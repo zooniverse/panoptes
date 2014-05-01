@@ -1,7 +1,11 @@
 default: &default
   adapter: postgresql
   encoding: unicode
+  user: panoptes
+  password: panoptes
+  host: localhost
   pool: 5
+  port: 5432
 
 development:
   <<: *default
@@ -10,3 +14,10 @@ development:
 test:
   <<: *default
   database: Panoptes_test
+
+docker_dev:
+  <<: *default
+  host: <%= ENV['DB_PORT_5432_TCP_ADDR'] %>
+  port: <%= ENV['DB_PORT_5432_TCP_PORT'] %>
+  database: Panoptes_development
+
