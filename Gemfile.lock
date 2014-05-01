@@ -64,6 +64,7 @@ GEM
     mime-types (1.25.1)
     minitest (5.3.3)
     multi_json (1.9.2)
+    mysql2 (0.3.15)
     orm_adapter (0.5.0)
     pg (0.17.1)
     polyglot (0.3.4)
@@ -148,6 +149,7 @@ DEPENDENCIES
   doorkeeper
   jbuilder (~> 2.0)
   jquery-rails
+  mysql2
   pg
   rails (= 4.1.0)
   rspec-rails

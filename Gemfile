@@ -15,6 +15,7 @@ gem 'devise'
 
 group :development do
   gem 'spring'
+  gem 'mysql2'
 end
 
 group :development, :test do
