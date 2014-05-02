@@ -9,7 +9,7 @@ Panoptes is developed on Ruby 2.1.1. It has not been tested with lower versions.
 You will need the following services available:
 * Postgresql 9.3
 * Kafka 0.8.1
-* [Cellect](https://github.com/mparrish/Cellect)
+* [Cellect](https://github.com/parrish/Cellect)
 * Zookeeper 3.4.6
 
 ### Vagrant
