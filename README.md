@@ -1,8 +1,8 @@
-== Panoptes
+## Panoptes
 
 The new Zooniverse API for supporting user-created projects. 
 
-=== Requirements
+### Requirements
 
 Panoptes is developed on Ruby 2.1.1. It has not been tested with lower versions. 
 
@@ -12,7 +12,7 @@ You will need the following services available:
 * [Cellect](https://github.com/mparrish/Cellect)
 * Zookeeper 3.4.6
 
-=== Vagrant
+### Vagrant
 
 Panoptes is convenient to use with [Vagrant](http://vagrantup.com) (version > 1.5.0). Simply run  to use run:
 
@@ -22,7 +22,7 @@ Panoptes is convenient to use with [Vagrant](http://vagrantup.com) (version > 1.
       bundle install
       rails s
 
-=== License
+### License
 
 Copyright 2014 by the Zooniverse
 
