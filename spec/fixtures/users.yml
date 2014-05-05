@@ -1,0 +1,14 @@
+imported_user:
+  hash_func: sha1
+  email: example@example.com
+  encrypted_password: gFlanK5bXjD2YS7LSYndVJNGGdY=
+  password_salt: nK5bXjD2YS7LSYndVJNGGdY=
+  name: Old User
+  login: test_user
+
+native_user:
+  hash_func: 'bcrypt'
+  email: example2@example.com
+  encrypted_password: <%= User.new.send(:password_digest, 'password') %>
+  name: New User
+  login: new_user
