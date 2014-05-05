@@ -7,7 +7,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     api_version(:module => "V1", :header => {name: "Accept", :value => "application/vnd.zooniverse.v1+json"}) do
-      get "me", 'users#show'
+      get "me", to: 'users#show'
       resource :users, :except => [:new, :edit]
     end
   end

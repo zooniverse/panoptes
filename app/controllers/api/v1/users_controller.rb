@@ -4,7 +4,7 @@ module Api
       doorkeeper_for :all
 
       def show
-        render json: current_user.to_json, content_type: api_content
+        render json: current_resource_owner.to_json, content_type: api_content
       end
     end
   end
