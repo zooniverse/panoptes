@@ -1,10 +1,13 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  use_doorkeeper
+  use_doorkeeper do
+    controllers applications: 'oauth/applications'
+  end
 
   namespace :api do
     api_version(:module => "V1", :header => {name: "Accept", :value => "application/vnd.zooniverse.v1+json"}) do
+      get "me", 'users#show'
       resource :users, :except => [:new, :edit]
     end
   end
