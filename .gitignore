@@ -19,3 +19,4 @@
 /config/*.yml
 .vagrant/
 *.swp
+.ruby-version

@@ -11,10 +11,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140505190104) do
+ActiveRecord::Schema.define(version: 20140523160809) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "classifications", force: true do |t|
+    t.integer  "grouped_subject_id"
+    t.integer  "project_id"
+    t.integer  "user_id"
+    t.integer  "workflow_id"
+    t.json     "annotations"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "classifications", ["grouped_subject_id"], name: "index_classifications_on_grouped_subject_id", using: :btree
+  add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
+  add_index "classifications", ["user_id"], name: "index_classifications_on_user_id", using: :btree
+  add_index "classifications", ["workflow_id"], name: "index_classifications_on_workflow_id", using: :btree
+
+  create_table "grouped_subjects", force: true do |t|
+    t.integer  "state"
+    t.integer  "subject_group_id"
+    t.integer  "classification_count"
+    t.integer  "subject_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "grouped_subjects", ["subject_group_id"], name: "index_grouped_subjects_on_subject_group_id", using: :btree
+  add_index "grouped_subjects", ["subject_id"], name: "index_grouped_subjects_on_subject_id", using: :btree
 
   create_table "oauth_access_grants", force: true do |t|
     t.integer  "resource_owner_id", null: false
@@ -58,6 +85,80 @@ ActiveRecord::Schema.define(version: 20140505190104) do
   add_index "oauth_applications", ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type", using: :btree
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
+  create_table "projects", force: true do |t|
+    t.string   "name"
+    t.string   "display_name"
+    t.integer  "classification_count"
+    t.integer  "user_count"
+    t.integer  "user_id_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree
+  add_index "projects", ["user_id_id"], name: "index_projects_on_user_id_id", using: :btree
+
+  create_table "subject_groups", force: true do |t|
+    t.string   "name"
+    t.integer  "project_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "subject_groups", ["project_id"], name: "index_subject_groups_on_project_id", using: :btree
+
+  create_table "subject_groups_workflows", id: false, force: true do |t|
+    t.integer "subject_group_id", null: false
+    t.integer "workflow_id",      null: false
+  end
+
+  create_table "subjects", force: true do |t|
+    t.string   "zooniverse_id"
+    t.json     "metadata"
+    t.json     "locations"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
+
+  create_table "subjects_user_subject_groups", id: false, force: true do |t|
+    t.integer "subject_id",            null: false
+    t.integer "user_subject_group_id", null: false
+  end
+
+  create_table "user_group_memberships", force: true do |t|
+    t.integer  "state"
+    t.integer  "user_group_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_group_memberships", ["user_group_id"], name: "index_user_group_memberships_on_user_group_id", using: :btree
+  add_index "user_group_memberships", ["user_id"], name: "index_user_group_memberships_on_user_id", using: :btree
+
+  create_table "user_groups", force: true do |t|
+    t.string   "name"
+    t.string   "display_name"
+    t.integer  "classification_count"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_groups", ["name"], name: "index_user_groups_on_name", unique: true, using: :btree
+
+  create_table "user_subject_collections", force: true do |t|
+    t.string   "name"
+    t.integer  "project_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_subject_collections", ["project_id"], name: "index_user_subject_collections_on_project_id", using: :btree
+  add_index "user_subject_collections", ["user_id"], name: "index_user_subject_collections_on_user_id", using: :btree
+
   create_table "users", force: true do |t|
     t.string   "email",                  default: "",       null: false
     t.string   "encrypted_password",     default: "",       null: false
@@ -82,5 +183,16 @@ ActiveRecord::Schema.define(version: 20140505190104) do
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+
+  create_table "workflows", force: true do |t|
+    t.string   "name"
+    t.json     "tasks"
+    t.integer  "classification_count"
+    t.integer  "project_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree
 
 end
