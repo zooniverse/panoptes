@@ -37,6 +37,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.7.0)
+    database_cleaner (1.2.0)
     devise (3.2.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -48,6 +49,11 @@ GEM
       railties (>= 3.1)
     erubis (2.7.0)
     execjs (2.0.2)
+    factory_girl (4.4.0)
+      activesupport (>= 3.0.0)
+    factory_girl_rails (4.4.1)
+      factory_girl (~> 4.4.0)
+      railties (>= 3.0.0)
     hike (1.2.3)
     i18n (0.6.9)
     jbuilder (2.0.6)
@@ -154,8 +160,10 @@ PLATFORMS
 
 DEPENDENCIES
   coffee-rails (~> 4.0.0)
+  database_cleaner (~> 1.2.0)
   devise
   doorkeeper
+  factory_girl_rails
   jbuilder (~> 2.0)
   jquery-rails
   mysql2
