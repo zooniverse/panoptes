@@ -1,12 +1,18 @@
 language: ruby
 
+cache: bundler
+
 rvm:
   - "2.1.1"
 
 services:
   - postgresql
 
+addons:
+  postgresql: "9.3"
+
 before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
   - rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson  
 
 script: RACK_EVN=test bundle exec rake spec
