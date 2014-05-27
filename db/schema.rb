@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140527205815) do
+ActiveRecord::Schema.define(version: 20140527211759) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -146,13 +146,13 @@ ActiveRecord::Schema.define(version: 20140527205815) do
   create_table "user_subject_collections", force: true do |t|
     t.string   "name"
     t.integer  "project_id"
-    t.integer  "user_id"
+    t.integer  "owner_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
+  add_index "user_subject_collections", ["owner_id"], name: "index_user_subject_collections_on_owner_id", using: :btree
   add_index "user_subject_collections", ["project_id"], name: "index_user_subject_collections_on_project_id", using: :btree
-  add_index "user_subject_collections", ["user_id"], name: "index_user_subject_collections_on_user_id", using: :btree
 
   create_table "user_subject_collections_subjects", id: false, force: true do |t|
     t.integer "subject_id",                 null: false
