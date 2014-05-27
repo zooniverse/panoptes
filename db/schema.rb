@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140527174814) do
+ActiveRecord::Schema.define(version: 20140527205815) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -122,11 +122,6 @@ ActiveRecord::Schema.define(version: 20140527174814) do
 
   add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
 
-  create_table "subjects_user_subject_groups", id: false, force: true do |t|
-    t.integer "subject_id",            null: false
-    t.integer "user_subject_group_id", null: false
-  end
-
   create_table "user_group_memberships", force: true do |t|
     t.integer  "state"
     t.integer  "user_group_id"
@@ -158,6 +153,11 @@ ActiveRecord::Schema.define(version: 20140527174814) do
 
   add_index "user_subject_collections", ["project_id"], name: "index_user_subject_collections_on_project_id", using: :btree
   add_index "user_subject_collections", ["user_id"], name: "index_user_subject_collections_on_user_id", using: :btree
+
+  create_table "user_subject_collections_subjects", id: false, force: true do |t|
+    t.integer "subject_id",                 null: false
+    t.integer "user_subject_collection_id", null: false
+  end
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "",       null: false
