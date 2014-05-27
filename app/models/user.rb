@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
 
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
   has_many :projects, foreign_key: "owner_id"
-  has_many :user_groups, through: :memberships
+  has_many :user_groups, through: :user_group_memberships
   has_many :user_subject_collections
 
   validates :login, uniqueness: true
