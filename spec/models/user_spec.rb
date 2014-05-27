@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe User, :type => :model do
-  it "should own projects" do
-    expect(create(:project_owner).projects).to exist
-  end
-
   describe "#password_required?" do
     it 'should require a password when creating with a new user' do
       expect{ User.create!(login: "t", password: "password1", email: "test@example.com") }
