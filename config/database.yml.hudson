@@ -12,8 +12,9 @@ development:
   database: Panoptes_development
 
 test:
-  <<: *default
-  database: Panoptes_test
+  adapter: postgresql
+  database: travis_ci_test
+  username: postgres
 
 docker_dev:
   <<: *default
