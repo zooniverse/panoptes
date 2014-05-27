@@ -1,0 +1,12 @@
+language: ruby
+
+rvm:
+  - "2.1.1"
+
+services:
+  - postgresql
+
+before_script:
+  - rename .yml.hudon .yml config/*.yml.hudson
+
+script: RACK_EVN=test bundle exec rake spec
