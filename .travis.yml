@@ -2,9 +2,14 @@ language: ruby
 
 cache: bundler
 
+jdk: 
+  - openjdk7
+
 rvm:
   - 2.1.1
   - 2.1.2
+  - jruby-19mode
+  - jruby-head
 
 services:
   - postgresql
