@@ -5,11 +5,11 @@ describe Subject, :type => :model do
     expect(build(:subject)).to be_valid
   end
 
-  describe "#user_subject_collections" do
+  describe "#collections" do
     let(:subject) { create(:subject_with_user_subject_collections) }
 
-    it "should belong to many subject_collections" do
-      expect(subject.user_subject_collections).to all( be_a(UserSubjectCollection) )
+    it "should belong to many collections" do
+      expect(subject.collections).to all( be_a(UserSubjectCollection) )
     end
   end
 

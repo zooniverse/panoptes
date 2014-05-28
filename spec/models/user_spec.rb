@@ -57,4 +57,12 @@ describe User, :type => :model do
       expect(user.user_groups).to all( be_a(UserGroup) )
     end
   end
+
+  describe "#collections" do
+    let(:user) { create(:user_with_collections) }
+
+    it "should have many collections" do
+      expect(user.collections).to all( be_a(UserSubjectCollection) )
+    end
+  end
 end
