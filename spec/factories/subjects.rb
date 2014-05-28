@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :subject do
-    sequence(:zooniverse_id) { |n| "TES" + "%08d" % n.to_s(26) }
+    sequence(:zooniverse_id) { |n| "TES#{n.to_s(26).rjust(8, '0')}" }
     metadata Hash.new(distance_from_earth: "42 light years",
               brightness: -20,
               loudness: 11).to_json

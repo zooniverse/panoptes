@@ -24,4 +24,20 @@ describe SubjectGroup, :type => :model do
       expect(subject_group.workflows).to all( be_a(Workflow) )
     end
   end
+
+  describe "#subjects" do
+    let(:subject_group) { create(:subject_group_with_subjects) } 
+
+    it "should have many subjects" do
+      expect(subject_group.subjects).to all( be_a(Subject) )
+    end
+  end
+
+  describe "#grouped_subjects" do 
+    let(:subject_group) { create(:subject_group_with_subjects) }
+
+    it "should have many grouped subjects" do
+      expect(subject_group.grouped_subjects).to all( be_a(GroupedSubject) )
+    end
+  end
 end
