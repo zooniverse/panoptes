@@ -6,7 +6,8 @@ FactoryGirl.define do
 
     factory :user_group_with_users do
       after(:create) do |ug|
-        create_list(:user_group_membership, 10, user_group: ug)
+        n = Array(20..100).sample
+        create_list(:user_group_membership, n, user_group: ug)
       end
     end
   end

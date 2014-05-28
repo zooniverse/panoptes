@@ -21,7 +21,7 @@ FactoryGirl.define do
       end
     end
 
-    factory :group_member do
+    factory :user_group_member do
       after(:create) do |user|
         create_list(:user_group_membership, 1, user: user)
       end
