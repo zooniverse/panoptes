@@ -4,4 +4,8 @@ class Project < ActiveRecord::Base
   has_many :subject_sets
 
   validates_presence_of :owner
+
+  def to_param
+    "#{owner.name}/#{self.name}"
+  end
 end
