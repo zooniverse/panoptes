@@ -4,7 +4,11 @@ The new Zooniverse API for supporting user-created projects.
 
 ### Requirements
 
-Panoptes is developed on Ruby 2.1.2. It has not been tested with lower versions. 
+Panoptes is primarily developed against stable MRI Ruby, currently 2.1.2. It is tested against the following versions:
+* 2.1.2
+* 2.1.1
+* JRuby 1.7.12
+* JRuby HEAD
 
 You will need the following services available:
 * Postgresql 9.3
