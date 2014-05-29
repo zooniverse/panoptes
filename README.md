@@ -4,7 +4,7 @@ The new Zooniverse API for supporting user-created projects.
 
 ### Requirements
 
-Panoptes is developed on Ruby 2.1.1. It has not been tested with lower versions. 
+Panoptes is developed on Ruby 2.1.2. It has not been tested with lower versions. 
 
 You will need the following services available:
 * Postgresql 9.3
@@ -14,13 +14,15 @@ You will need the following services available:
 
 ### Vagrant
 
-Panoptes is convenient to use with [Vagrant](http://vagrantup.com) (version > 1.5.0). Simply run  to use run:
+Panoptes comes with [Vagrant](http://vagrantup.com) (version > 1.5.0) and [VirtualBox](https://www.virtualbox.org/) (version > 4.3) configuration to make a test environment easy to get up and running. Use the following commands to get started
 
       vagrant up
       vagrant ssh
       cd /vagrant
       bundle install
       rails s
+
+The Rails application running in the VM will be available at `http://localhost:3000`.
 
 ### License
 
