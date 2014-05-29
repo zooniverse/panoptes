@@ -6,10 +6,10 @@ describe Subject, :type => :model do
   end
 
   describe "#collections" do
-    let(:subject) { create(:subject_with_user_subject_collections) }
+    let(:subject) { create(:subject_with_collections) }
 
     it "should belong to many collections" do
-      expect(subject.collections).to all( be_a(UserSubjectCollection) )
+      expect(subject.collections).to all( be_a(Collection) )
     end
   end
 

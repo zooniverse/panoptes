@@ -6,10 +6,10 @@ FactoryGirl.define do
               loudness: 11).to_json
     locations Hash.new(main_image: "http://example.com/main_image.png").to_json
 
-    factory :subject_with_user_subject_collections do
+    factory :subject_with_collections do
       after(:create) do |s|
         n = Array(20..150).sample
-        create_list(:user_subject_collection, n, subjects: [s])
+        create_list(:collection, n, subjects: [s])
       end
     end
 

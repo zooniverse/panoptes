@@ -30,7 +30,7 @@ FactoryGirl.define do
     factory :user_with_collections do
       after(:create) do |user|
         n = Array(2..10).sample
-        create_list(:user_subject_collection, n, owner: user)
+        create_list(:collection, n, owner: user)
       end
     end
   end

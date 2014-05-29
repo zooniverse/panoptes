@@ -62,7 +62,7 @@ describe User, :type => :model do
     let(:user) { create(:user_with_collections) }
 
     it "should have many collections" do
-      expect(user.collections).to all( be_a(UserSubjectCollection) )
+      expect(user.collections).to all( be_a(Collection) )
     end
   end
 end

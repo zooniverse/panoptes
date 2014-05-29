@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140528200132) do
+ActiveRecord::Schema.define(version: 20140529012325) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,22 @@ ActiveRecord::Schema.define(version: 20140528200132) do
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
   add_index "classifications", ["user_id"], name: "index_classifications_on_user_id", using: :btree
   add_index "classifications", ["workflow_id"], name: "index_classifications_on_workflow_id", using: :btree
+
+  create_table "collections", force: true do |t|
+    t.string   "name"
+    t.integer  "project_id"
+    t.integer  "owner_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "collections", ["owner_id"], name: "index_collections_on_owner_id", using: :btree
+  add_index "collections", ["project_id"], name: "index_collections_on_project_id", using: :btree
+
+  create_table "collections_subjects", id: false, force: true do |t|
+    t.integer "subject_id",    null: false
+    t.integer "collection_id", null: false
+  end
 
   create_table "grouped_subjects", force: true do |t|
     t.integer  "state"
@@ -122,11 +138,6 @@ ActiveRecord::Schema.define(version: 20140528200132) do
 
   add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
 
-  create_table "subjects_user_subject_collections", id: false, force: true do |t|
-    t.integer "subject_id",                 null: false
-    t.integer "user_subject_collection_id", null: false
-  end
-
   create_table "user_group_memberships", force: true do |t|
     t.integer  "state"
     t.integer  "user_group_id"
@@ -147,17 +158,6 @@ ActiveRecord::Schema.define(version: 20140528200132) do
   end
 
   add_index "user_groups", ["name"], name: "index_user_groups_on_name", unique: true, using: :btree
-
-  create_table "user_subject_collections", force: true do |t|
-    t.string   "name"
-    t.integer  "project_id"
-    t.integer  "owner_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "user_subject_collections", ["owner_id"], name: "index_user_subject_collections_on_owner_id", using: :btree
-  add_index "user_subject_collections", ["project_id"], name: "index_user_subject_collections_on_project_id", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "",       null: false
