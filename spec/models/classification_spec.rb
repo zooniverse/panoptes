@@ -10,7 +10,7 @@ describe Classification, :type => :model do
   end
 
   it "must have a subject" do
-    expect(build(:classification, grouped_subject: nil)).to_not be_valid
+    expect(build(:classification, set_member_subject: nil)).to_not be_valid
   end
 
   it "must have a workflow" do

@@ -13,19 +13,19 @@ describe Subject, :type => :model do
     end
   end
 
-  describe "#subject_groups" do
-    let(:subject) { create(:subject_with_subject_groups) }
+  describe "#subject_sets" do
+    let(:subject) { create(:subject_with_subject_sets) }
 
-    it "should belong to many subject groups" do 
-      expect(subject.subject_groups).to all( be_a(SubjectGroup) )
+    it "should belong to many subject sets" do 
+      expect(subject.subject_sets).to all( be_a(SubjectSet) )
     end
   end
 
-  describe "#grouped_subjects" do
-    let(:grouped_subjects) { create(:subject_with_subject_groups) }
+  describe "#set_member_subjects" do
+    let(:set_member_subjects) { create(:subject_with_subject_sets) }
 
-    it "should have many grouped subjects" do
-      expect(subject.grouped_subjects).to all( be_a(GroupedSubject) )
+    it "should have many set_member subjects" do
+      expect(subject.set_member_subjects).to all( be_a(SetMemberSubject) )
     end
   end
 end

@@ -13,10 +13,10 @@ FactoryGirl.define do
       end
     end
 
-    factory :subject_with_subject_groups do
+    factory :subject_with_subject_sets do
       after(:create) do |s|
         n = Array(10..20).sample
-        create_list(:grouped_subject, n, subject: s)
+        create_list(:set_member_subject, n, subject: s)
       end
     end
   end

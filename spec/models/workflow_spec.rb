@@ -17,11 +17,11 @@ describe Workflow, :type => :model do
     end
   end
 
-  describe "#subject_groups" do
-    let(:workflow) { create(:workflow_with_subject_groups) }
+  describe "#subject_sets" do
+    let(:workflow) { create(:workflow_with_subject_sets) }
 
-    it "should have many subject groups" do
-      expect(workflow.subject_groups).to all( be_a(SubjectGroup) )
+    it "should have many subject sets" do
+      expect(workflow.subject_sets).to all( be_a(SubjectSet) )
     end
   end
 end

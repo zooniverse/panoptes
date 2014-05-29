@@ -6,16 +6,16 @@ FactoryGirl.define do
     classification_count { 10 + rand(1000) }
     project
 
-    factory :workflow_with_subject_group do
+    factory :workflow_with_subject_set do
       after(:create) do |w|
-        create_list(:subject_group, 1, workflows: [w])
+        create_list(:subject_set, 1, workflows: [w])
       end
     end
 
-    factory :workflow_with_subject_groups do
+    factory :workflow_with_subject_sets do
       after(:create) do |w|
         n = Array(2..10).sample
-        create_list(:subject_group, n, workflows: [w])
+        create_list(:subject_set, n, workflows: [w])
       end
     end
   end

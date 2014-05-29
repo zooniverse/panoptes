@@ -13,11 +13,11 @@ describe Project, :type => :model do
     end
   end
 
-  describe "#subject_groups" do
-    let(:project) { create(:project_with_subject_groups) }
+  describe "#subject_sets" do
+    let(:project) { create(:project_with_subject_sets) }
 
-    it "should have many subject_groups" do
-      expect(project.subject_groups).to all( be_a(SubjectGroup) )
+    it "should have many subject_sets" do
+      expect(project.subject_sets).to all( be_a(SubjectSet) )
     end
   end
 

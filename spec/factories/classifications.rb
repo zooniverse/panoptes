@@ -5,6 +5,6 @@ FactoryGirl.define do
     user
     project
     workflow
-    grouped_subject
+    set_member_subject
   end
 end

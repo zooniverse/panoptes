@@ -11,13 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140529012325) do
+ActiveRecord::Schema.define(version: 20140529051108) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "classifications", force: true do |t|
-    t.integer  "grouped_subject_id"
+    t.integer  "set_member_subject_id"
     t.integer  "project_id"
     t.integer  "user_id"
     t.integer  "workflow_id"
@@ -26,8 +26,8 @@ ActiveRecord::Schema.define(version: 20140529012325) do
     t.datetime "updated_at"
   end
 
-  add_index "classifications", ["grouped_subject_id"], name: "index_classifications_on_grouped_subject_id", using: :btree
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
+  add_index "classifications", ["set_member_subject_id"], name: "index_classifications_on_set_member_subject_id", using: :btree
   add_index "classifications", ["user_id"], name: "index_classifications_on_user_id", using: :btree
   add_index "classifications", ["workflow_id"], name: "index_classifications_on_workflow_id", using: :btree
 
@@ -46,18 +46,6 @@ ActiveRecord::Schema.define(version: 20140529012325) do
     t.integer "subject_id",    null: false
     t.integer "collection_id", null: false
   end
-
-  create_table "grouped_subjects", force: true do |t|
-    t.integer  "state"
-    t.integer  "subject_group_id"
-    t.integer  "classification_count"
-    t.integer  "subject_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "grouped_subjects", ["subject_group_id"], name: "index_grouped_subjects_on_subject_group_id", using: :btree
-  add_index "grouped_subjects", ["subject_id"], name: "index_grouped_subjects_on_subject_id", using: :btree
 
   create_table "oauth_access_grants", force: true do |t|
     t.integer  "resource_owner_id", null: false
@@ -114,18 +102,30 @@ ActiveRecord::Schema.define(version: 20140529012325) do
   add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree
   add_index "projects", ["owner_id"], name: "index_projects_on_owner_id", using: :btree
 
-  create_table "subject_groups", force: true do |t|
+  create_table "set_member_subjects", force: true do |t|
+    t.integer  "state"
+    t.integer  "subject_set_id"
+    t.integer  "classification_count"
+    t.integer  "subject_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "set_member_subjects", ["subject_id"], name: "index_set_member_subjects_on_subject_id", using: :btree
+  add_index "set_member_subjects", ["subject_set_id"], name: "index_set_member_subjects_on_subject_set_id", using: :btree
+
+  create_table "subject_sets", force: true do |t|
     t.string   "name"
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "subject_groups", ["project_id"], name: "index_subject_groups_on_project_id", using: :btree
+  add_index "subject_sets", ["project_id"], name: "index_subject_sets_on_project_id", using: :btree
 
-  create_table "subject_groups_workflows", id: false, force: true do |t|
-    t.integer "subject_group_id", null: false
-    t.integer "workflow_id",      null: false
+  create_table "subject_sets_workflows", id: false, force: true do |t|
+    t.integer "subject_set_id", null: false
+    t.integer "workflow_id",    null: false
   end
 
   create_table "subjects", force: true do |t|

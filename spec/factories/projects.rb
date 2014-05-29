@@ -14,10 +14,10 @@ FactoryGirl.define do
       end
     end
 
-    factory :project_with_subject_groups do
+    factory :project_with_subject_sets do
       after(:create) do |p|
         n = Array(2..10).sample
-        create_list(:subject_group, n, project: p)
+        create_list(:subject_set, n, project: p)
       end
     end
   end
