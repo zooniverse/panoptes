@@ -16,7 +16,7 @@ describe UserGroup, :type => :model do
 
     it "should have on user for each membership" do
       ug = user_group
-      expect(ug.users.length).to eq(ug.user_group_memberships.length)
+      expect(ug.users.length).to eq(ug.memberships.length)
     end
   end
 
@@ -24,7 +24,7 @@ describe UserGroup, :type => :model do
     let(:user_group) { create(:user_group_with_users) }
 
     it "should have many user group memberships" do
-      expect(user_group.user_group_memberships).to all( be_a(UserGroupMembership) ) 
+      expect(user_group.memberships).to all( be_a(Membership) ) 
     end
   end
 

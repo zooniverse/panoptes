@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140529051108) do
+ActiveRecord::Schema.define(version: 20140529134634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,6 +46,17 @@ ActiveRecord::Schema.define(version: 20140529051108) do
     t.integer "subject_id",    null: false
     t.integer "collection_id", null: false
   end
+
+  create_table "memberships", force: true do |t|
+    t.integer  "state"
+    t.integer  "user_group_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "memberships", ["user_group_id"], name: "index_memberships_on_user_group_id", using: :btree
+  add_index "memberships", ["user_id"], name: "index_memberships_on_user_id", using: :btree
 
   create_table "oauth_access_grants", force: true do |t|
     t.integer  "resource_owner_id", null: false
@@ -137,17 +148,6 @@ ActiveRecord::Schema.define(version: 20140529051108) do
   end
 
   add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
-
-  create_table "user_group_memberships", force: true do |t|
-    t.integer  "state"
-    t.integer  "user_group_id"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "user_group_memberships", ["user_group_id"], name: "index_user_group_memberships_on_user_group_id", using: :btree
-  add_index "user_group_memberships", ["user_id"], name: "index_user_group_memberships_on_user_id", using: :btree
 
   create_table "user_groups", force: true do |t|
     t.string   "name"

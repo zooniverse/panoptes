@@ -23,7 +23,7 @@ FactoryGirl.define do
 
     factory :user_group_member do
       after(:create) do |user|
-        create_list(:user_group_membership, 1, user: user)
+        create_list(:membership, 1, user: user)
       end
     end
 

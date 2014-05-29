@@ -42,11 +42,11 @@ describe User, :type => :model do
     end
   end
 
-  describe "#user_group_memberships" do
+  describe "#memberships" do
     let(:user) { create(:user_group_member) }
 
     it "should have many user group members" do
-      expect(user.user_group_memberships).to all( be_a(UserGroupMembership) )
+      expect(user.memberships).to all( be_a(Membership) )
     end
   end
 
