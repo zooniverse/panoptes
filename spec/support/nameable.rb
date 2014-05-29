@@ -18,15 +18,6 @@ shared_examples "is uri nameable" do
       named.name = "name"
       expect(named.uri_name.name).to eq("name")
     end
-
-    it "should create a new uri name if it doesn't exist" do
-      name = named
-      old_name_id = name.uri_name.id
-      name.uri_name = nil
-      name.name = "name1"
-      expect(name.uri_name.id).to_not eq(old_name_id)
-    end
-
   end
 
   describe "::find_by_name" do

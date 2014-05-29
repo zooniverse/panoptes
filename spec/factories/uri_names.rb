@@ -9,7 +9,7 @@ FactoryGirl.define do
     end
 
     factory :uri_name_for_group do
-      association :resource, factory: :group
+      association :resource, factory: :user_group
     end
   end
 end
