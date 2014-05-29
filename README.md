@@ -28,6 +28,8 @@ Panoptes comes with [Vagrant](http://vagrantup.com) (version > 1.5.0) and [Virtu
 
 The Rails application running in the VM will be available at `http://localhost:3000`.
 
+You can specify either MRI-Ruby or JRuby for the vagrant box by setting $VAGRANT_RUBY to 'mri' or 'jruby' in your shell then running `vagrant provision` (or `vagrant up` if you haven't created the VM yet). By default it will install MRI-Ruby.
+
 ### License
 
 Copyright 2014 by the Zooniverse
