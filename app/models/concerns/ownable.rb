@@ -5,6 +5,7 @@ module Ownable
 
   included do 
     belongs_to :owner, polymorphic: true
+    validates_presence_of :owner
   end
 
 end

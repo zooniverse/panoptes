@@ -4,5 +4,4 @@ class Project < ActiveRecord::Base
   has_many :workflows
   has_many :subject_sets
 
-  validates_presence_of :owner
 end

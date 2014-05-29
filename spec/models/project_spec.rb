@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe Project, :type => :model do
+  let(:project) { build(:project) }
+  let(:owned) { project }
+  let(:not_owned) { build(:project, owner: nil) }
+  it_behaves_like "is ownable"
+
   it "should have a valid factory" do
     expect(build(:project)).to be_valid
   end
@@ -18,18 +23,6 @@ describe Project, :type => :model do
 
     it "should have many subject_sets" do
       expect(project.subject_sets).to all( be_a(SubjectSet) )
-    end
-  end
-
-  describe "#owner" do
-    let(:project) { create(:project) }
-
-    it "should have a user owner" do
-      expect(project.owner).to be_a(User)
-    end
-
-    it "shoutl not be valid without a user owner" do
-      expect(build(:project, owner: nil)).to_not be_valid
     end
   end
 end

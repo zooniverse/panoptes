@@ -2,19 +2,13 @@ require 'spec_helper'
 
 describe Collection, :type => :model do
   let(:collection) { create(:collection) }
+  let(:owned) { collection }
+  let(:not_owned) { build(:collection, owner: nil) }
+
+  it_behaves_like "is ownable"
 
   it "should have a valid factory" do
     expect(build(:collection)).to be_valid
-  end
-
-  describe "#owner" do
-    it "must have an owner" do
-      expect(build(:collection, owner: nil)).to_not be_valid
-    end
-
-    it "should belong to a user owner" do
-      expect(collection.owner).to be_a(User)
-    end
   end
 
   describe "#subject" do
