@@ -2,18 +2,22 @@ require 'spec_helper'
 
 describe User, :type => :model do
   let(:user) { create(:user) }
+  let(:named) { user }
+  let(:unnamed) { build(:user, uri_name: nil) }
+
+  it_behaves_like "is uri nameable"
 
   describe "#password_required?" do
     it 'should require a password when creating with a new user' do
-      expect{ User.create!(login: "t", password: "password1", email: "test@example.com") }
+      expect{ User.create!(uri_name: build(:uri_name), login: "t", password: "password1", email: "test@example.com") }
         .to_not raise_error
 
-      expect{ User.create!(login: "t", email: "test@example.com") }
+      expect{ User.create!(uri_name: build(:uri_name), login: "t", email: "test@example.com") }
         .to raise_error
     end
 
     it 'should not require a password when creating a user from an import' do
-      expect{ User.create!(login: "t", hash_func: 'sha1', email: "test@example.com") }
+      expect{ User.create!(uri_name: build(:uri_name), login: "t", hash_func: 'sha1', email: "test@example.com") }
         .to_not raise_error
     end
   end
