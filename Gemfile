@@ -26,5 +26,6 @@ end
 group :development, :test do
   gem 'database_cleaner', '~> 1.2.0'
   gem 'rspec-rails', '~> 3.0.0.rc1'
-  gem 'factory_girl_rails'
+  gem 'factory_girl_rails', '~> 4.4.1'
+  gem 'spring-commands-rspec', '~> 1.0.2'
 end
