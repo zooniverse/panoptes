@@ -4,8 +4,9 @@ FactoryGirl.define do
     sequence(:email) {|n| "example#{n}@example.com"}
     password 'password'
     encrypted_password { User.new.send(:password_digest, 'password') }
-    name 'New User'
+    display_name 'New User'
     sequence(:login) { |n| "new_user_#{n}" }
+    sequence(:name) { |n| "new_user_#{n}" }
 
     factory :insecure_user do
       hash_func 'sha1'

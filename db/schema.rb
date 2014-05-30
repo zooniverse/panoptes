@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140529164851) do
+ActiveRecord::Schema.define(version: 20140529202059) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -102,7 +102,6 @@ ActiveRecord::Schema.define(version: 20140529164851) do
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
   create_table "projects", force: true do |t|
-    t.string   "name"
     t.string   "display_name"
     t.integer  "classification_count"
     t.integer  "user_count"
@@ -112,7 +111,6 @@ ActiveRecord::Schema.define(version: 20140529164851) do
     t.string   "owner_type"
   end
 
-  add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree
   add_index "projects", ["owner_id"], name: "index_projects_on_owner_id", using: :btree
 
   create_table "set_member_subjects", force: true do |t|
@@ -151,15 +149,22 @@ ActiveRecord::Schema.define(version: 20140529164851) do
 
   add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
 
-  create_table "user_groups", force: true do |t|
+  create_table "uri_names", force: true do |t|
     t.string   "name"
+    t.string   "resource_type"
+    t.integer  "resource_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "uri_names", ["name"], name: "index_uri_names_on_name", unique: true, using: :btree
+
+  create_table "user_groups", force: true do |t|
     t.string   "display_name"
     t.integer  "classification_count"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "user_groups", ["name"], name: "index_user_groups_on_name", unique: true, using: :btree
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "",       null: false
@@ -179,7 +184,7 @@ ActiveRecord::Schema.define(version: 20140529164851) do
     t.string   "password_salt"
     t.string   "display_name"
     t.string   "zooniverse_id"
-    t.string   "name"
+    t.string   "credited_name"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree

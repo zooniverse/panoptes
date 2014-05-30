@@ -18,4 +18,10 @@ describe Collection, :type => :model do
       expect(collection.subjects).to all( be_a(Subject) )
     end
   end
+
+  describe "#to_param" do
+    it "should return a string of its owner name and its own name" do
+      expect(collection.to_param).to eq("#{collection.owner.name}/#{collection.name}")
+    end
+  end
 end
