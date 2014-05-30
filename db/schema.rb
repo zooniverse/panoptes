@@ -102,6 +102,7 @@ ActiveRecord::Schema.define(version: 20140529202059) do
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
   create_table "projects", force: true do |t|
+    t.string   "name"
     t.string   "display_name"
     t.integer  "classification_count"
     t.integer  "user_count"
@@ -111,6 +112,7 @@ ActiveRecord::Schema.define(version: 20140529202059) do
     t.string   "owner_type"
   end
 
+  add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree
   add_index "projects", ["owner_id"], name: "index_projects_on_owner_id", using: :btree
 
   create_table "set_member_subjects", force: true do |t|
