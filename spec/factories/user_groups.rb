@@ -10,5 +10,19 @@ FactoryGirl.define do
         create_list(:membership, n, user_group: ug)
       end
     end
+
+    factory :user_group_with_projects do
+      after(:create) do |ug|
+        n = Array(2..10).sample
+        create_list(:projects, n, owner: ug)
+      end
+    end
+
+    factory :user_group_with_collections do
+      after(:Create) do |ug|
+        n = Array(2..10).sample
+        create_list(:collections, n, owner: ug)
+      end
+    end
   end
 end
