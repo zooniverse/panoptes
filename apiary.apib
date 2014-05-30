@@ -29,7 +29,7 @@ The Collection resource has the following attributes:
 
 + Parameters
     + owner_name (string) ... Name of the owner (user or user group) that created the collection
-    + collection_name (string) .. Name of the collection
+    + collection_name (string) ... Name of the collection
 
 + Model (application/vnd.zooniverse.v1+json)
 
@@ -73,7 +73,7 @@ To edit a Collection send a JSON object with updated values for one or more of t
 ### Delete a Collection [DELETE]
 + Response 204
 
-## Collections Collection [/collections{?project}{?page}
+## Collections Collection [/collections{?project,page}]
 Collection of all Collections. 
 
 It contains a list of *Collections*. 
@@ -109,7 +109,7 @@ It contains a list of *Collections*.
 ### List all Collections [GET]
 + Parameters
     + project (optional, string) ... String name of a project in the form *:owner_name/:project_name*
-    + page (optiional, integer) ... Integer of the next page. 1 by default
+    + page (optional, integer) ... Integer of the next page. 1 by default
 
 + Response 200
 
@@ -120,13 +120,13 @@ To create a new Collection send a JSON representation containing at least a name
 
 + Request
 
-    {
-        "name": "cool_flowers",
-        "display_name": "Stuart's Cool Flowers",
-        "owner": "stuart",
-        "subjects": [1, 40, 20],
-        "description": "Just some cool looking flowers"
-    }
+        {
+            "name": "cool_flowers",
+            "display_name": "Stuart's Cool Flowers",
+            "owner": "stuart",
+            "subjects": [1, 40, 20],
+            "description": "Just some cool looking flowers"
+        }
 
 + Response 201
 
