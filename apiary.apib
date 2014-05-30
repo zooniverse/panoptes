@@ -1,47 +1,133 @@
 FORMAT: 1A
-HOST: http://www.google.com
+HOST: http://beta.api.zooniverse.org/
 
 # Panoptes API
-Notes API is a *short texts saving* service similar to its physical paper presence on your table.
+Panoptes is an api to support *Citizen Science Crowdsourcing Projects*, including managing subjects, describing project interfaces, persisting classifications, and supporting users collecting subjects.  
 
-# Group Notes
-Notes related resources of the **Notes API**
+## Authentication
+Panoptes supports OAuth2 using the [doorkeeper](http://github.com/doorkeeper-gem/doorkeeper) gem.
 
-## Notes Collection [/notes]
-### List all Notes [GET]
-+ Response 200 (application/json)
+## Media Types
+Panoptes uses standard JSON to represent resources. However, the API is versioned to allow for future flexibility. All requests and responses should use the `application/vnd.zooniverse.v1+json` media type.
 
-        [{
-          "id": 1, "title": "Jogging in park"
-        }, {
-          "id": 2, "title": "Pick-up posters from post-office"
-        }]
+# Group Collections 
+Collections related resources of the **Panoptes API**
 
-### Create a Note [POST]
-+ Request (application/json)
+## Collection [/collections/{owner_name}/{collection_name}]
+A single Collection object respenting a group of subjects from a project a user has collected together. 
 
-        { "title": "Buy cheese and bread for breakfast." }
+The Collection resource has the following attributes:
 
-+ Response 201 (application/json)
+- id
+- created_at
+- updated_at
+- name
+- display_name
+- description
 
-        { "id": 3, "title": "Buy cheese and bread for breakfast." }
-
-## Note [/notes/{id}]
-A single Note object with all its details
+*id* and *created_at* are assigned when the resource is created.
 
 + Parameters
-    + id (required, number, `1`) ... Numeric `id` of the Note to perform action with. Has example value.
+    + owner_name (string) ... Name of the owner (user or user group) that created the collection
+    + collection_name (string) .. Name of the collection
 
-### Retrieve a Note [GET]
-+ Response 200 (application/json)
++ Model (application/vnd.zooniverse.v1+json)
 
-    + Header
+    JSON respresentation of the Collection resource. It also includes links to subjects within the collection
 
-            X-My-Header: The Value
+    + Headers
+
+            Link: <http:/beta.api.zooniverse.org/collections/stuart/cool_flowers>;rel="self", http:/beta.api.zooniverse.org/collections/stuart/cool_flowers/subjects>;rel="subjects", <http:/beta.api.zooniverse.org/users/stuart>;rel="owner"
 
     + Body
 
-            { "id": 2, "title": "Pick-up posters from post-office" }
+            {
+                "id": 51,
+                "created_at": "2014-04-15T10:41:14Z",
+                "updated_at": "2014-04-20T10:41:14Z",
+                "name": "cool_flowers",
+                "display_name": "Stuart's Cool Flowers",
+                "description": "Just some cool looking flowers",
+                "self": "/collections/stuart/cool_flowers"
+                "owner": "/users/stuart",
+                "subjects": "/collections/stuart/cool_flowers/subjects"
+            }
 
-### Remove a Note [DELETE]
+### Retrieve a Single Collection [GET]
++ Response 200
+
+    [Collection][]
+
+### Edit a Collection [PATCH]
+To edit a Collection send a JSON object with updated values for one or more of the Collection resource attributes. `updated_at` will be updated to reflect the time the request was received. Other fields will not be changed if they are not included in the request. 
++ Request
+
+        {
+            "description": "Make this a little better..."
+        } 
+
++ Response 200
+
+    [Collection][]
+
+### Delete a Collection [DELETE]
 + Response 204
+
+## Collections Collection [/collections{?project}{?page}
+Collection of all Collections. 
+
+It contains a list of *Collections*. 
+
++ Model (application/vnd.zooniverse.v1+json)
+
+    JSON representation of the Collection Collection resource. Included collections should be full representations of the resource. 
+
+    + Headers
+            
+            Link: <http:/beta.api.zooniverse.org/collections?page=2>;rel="next", <http:/beta.api.zooniverse.org/collections?page=5>;rel="prev"
+
+    + Body
+
+            {
+                "collections" [{
+                     {
+                        "id": 51,
+                        "created_at": "2014-04-15T10:41:14Z",
+                        "updated_at": "2014-04-20T10:41:14Z",
+                        "name": "cool_flowers",
+                        "display_name": "Stuart's Cool Flowers",
+                        "description": "Just some cool looking flowers",
+                        "self": "/collections/stuart/cool_flowers"
+                        "owner": "/users/stuart",
+                        "subjects": "/collections/stuart/cool_flowers/subjects"
+                     }
+                }]
+                "next": "/collections?page=2",
+                "prev": "/collections?page=5"
+            }
+
+### List all Collections [GET]
++ Parameters
+    + project (optional, string) ... String name of a project in the form *:owner_name/:project_name*
+    + page (optiional, integer) ... Integer of the next page. 1 by default
+
++ Response 200
+
+    [Collections Collection][]
+
+### Create a Collection [POST]
+To create a new Collection send a JSON representation containing at least a name, display_name, and owner. A description and array of subject ids may also be included.
+
++ Request
+
+    {
+        "name": "new_collection",
+        "display_name": "New Collection",
+        "owner": "stuart",
+        "subjects": [1, 40, 20],
+        "description": "A New Collection. Who knows what I've got!"
+    }
+
++ Response 201
+
+    [Collection][]
