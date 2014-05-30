@@ -2,6 +2,14 @@
 
 The new Zooniverse API for supporting user-created projects. 
 
+### Documentation
+
+Panoptes Public API is documented [here](http://docs.panoptesapi.apiary.io), using [apiary.io](http://apiary.io).
+
+If you're interested in how Panoptes is implemented check out the [wiki](https://github.com/zooniverse/Panoptes/wiki).
+
+* [Data Model Description](https://github.com/zooniverse/Panoptes/wiki/DataModel)
+
 ### Requirements
 
 Panoptes is primarily developed against stable MRI Ruby, currently 2.1.2. It is tested against the following versions:
