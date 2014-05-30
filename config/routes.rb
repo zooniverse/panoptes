@@ -31,7 +31,7 @@ Rails.application.routes.draw do
         end
       end
 
-      scope "/projects/:ownername/" do
+      scope "/collections/:ownername/" do
         resources :collections, path: '', except: [:new, :edit] do
           resources :subjects, except: [:new, :edit]
         end
