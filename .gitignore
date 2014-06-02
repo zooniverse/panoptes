@@ -17,7 +17,9 @@
 
 # Ignore all config files
 /config/*.yml
+
 .vagrant/
 *.swp
 .ruby-*
 bin/**
+.rspec
