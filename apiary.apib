@@ -8,7 +8,7 @@ Panoptes is an api to support *Citizen Science Crowdsourcing Projects*, includin
 Panoptes supports OAuth2 using the [doorkeeper](http://github.com/doorkeeper-gem/doorkeeper) gem.
 
 ## Media Types
-Panoptes uses standard JSON to represent resources. However, the API is versioned to allow for future flexibility. All requests and responses should use the `application/vnd.zooniverse.v1+json` media type.
+Panoptes uses standard JSON to represent resources. However, the API is versioned to allow for future flexibility. All requests and responses should use the `application/vnd.api+json; version=1` media type.
 
 # Group Collections 
 Collections related resources of the **Panoptes API**
@@ -31,7 +31,7 @@ The Collection resource has the following attributes:
     + owner_name (string) ... Name of the owner (user or user group) that created the collection
     + collection_name (string) ... Name of the collection
 
-+ Model (application/vnd.zooniverse.v1+json)
++ Model (application/vnd.api+json; version=1)
 
     JSON respresentation of the Collection resource. It also includes links to subjects within the collection
 
@@ -78,7 +78,7 @@ Collection of all Collections.
 
 It contains a list of *Collections*. 
 
-+ Model (application/vnd.zooniverse.v1+json)
++ Model (application/vnd.api+json; version=1)
 
     JSON representation of the Collection Collection resource. Included collections should be full representations of the resource. 
 
@@ -131,3 +131,149 @@ To create a new Collection send a JSON representation containing at least a name
 + Response 201
 
     [Collection][]
+
+# Group Subjects
+
+## Subject [/subjects/{zooniverse_id}]
+A single Subject object representing a media object or group of media objects to be classified and attached metadata. 
+
+A Subject resource has the following attributes:
+
+- id
+- created_at
+- updated_at
+- zooniverse_id
+- locations
+- metadata
+
+*id*, *created_at*, and *zooniverse_id* are assigned when the resource is created
+
++ Parameters
+    + zooniverse_id (string) ... a three leter designation followed by a base26 number that is unique to the subject across all Zooniverse projects
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of the Subject resource
+
+    + Headers
+            
+            Link: <http://beta.api.zooniverse.org/subjects/ZOO0000001>;rel="self"
+
+    + Body
+
+            { 
+                subjects: [{
+                    "id": 81,
+                    "created_at": "2014-05-10T10:47:10Z",
+                    "updated_at": "2014-05-10T10:47:10Z",
+                    "zooniverse_id": "ZOO00000001",
+                    "locations": {
+                        "standard": "http://subjects.zooniverse.org/standard/ZOO00000001.png"
+                    },
+                    "metadata": {
+                        "magnitude": "8.1"
+                    },
+                    href: "/subjects/ZOO00000001"
+                }]
+            }
+
+### Retrieve a Single Subject [GET]
++ Response 200
+
+    [Subject][]
+
+### Edit a Subject [PATCH]
+To edit a Subject send a JSON object with updated values for either the *location* or *metadata* fields. Other fields are not editable. *location* or *metadata* must contain a complete representation of the new version of the field. 
++ Request
+  
+        {
+            "location": {
+                "standard": "http://my.new.io/standard_image.png"
+            }
+        }
+
++ Response 201
+
+    [Subject][]
+
+### Delete a Subject [DELETE]
++ Response 204
+
+## Subject Collection [/subjects{?page,page_size}]
+Collection of all Subjects. 
+
+It returns a list of *Subjects*
++ Model (application/vnd.api+json)
+
+    JSON API representation of Subject Collection resource. Included subjects should be full representations of the resource.
+
+    + Headers
+          
+            Link: <http:/beta.api.zooniverse.org/subjects?page=2&page_size=3>;rel="next", <http:/beta.api.zooniverse.org/subjects?page=3&page_size=3>;rel="prev"
+
+    + Body
+
+            {
+                "subjects": [{
+                    "id": 81,
+                    "created_at": "2014-05-10T10:47:10Z",
+                    "updated_at": "2014-05-10T10:47:10Z",
+                    "zooniverse_id": "ZOO00000001",
+                    "locations": {
+                        "standard": "http://subjects.zooniverse.org/standard/ZOO00000001.png"
+                    },
+                    "metadata": {
+                        "magnitude": "8.1"
+                    },
+                    href: "/subjects/ZOO00000001"
+                },{
+                    "id": 82,
+                    "created_at": "2014-05-11T10:47:10Z",
+                    "updated_at": "2014-05-11T10:47:10Z",
+                    "zooniverse_id": "ZOO00000002",
+                    "locations": {
+                        "standard": "http://subjects.zooniverse.org/standard/ZOO00000002.png"
+                    },
+                    "metadata": {
+                        "magnitude": "1.1"
+                    },
+                    href: "/subjects/ZOO00000001"
+                }],
+                "meta": {
+                    "subjects": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 3,
+                        "next_page": 2,
+                        "previous_href": "/subjects?page=3page_size=2",
+                        "next_href": "/subjects?page=2&page_size=2"
+                    }
+                }
+            }
+              
+### List all Subjects [GET]
++ Parameters
+    + page_size (optional, integer) ... Number of items per page. Default: 20, Min: 1, Max: 100
+    + page (optional, integer) ... Integer Index of the next page. Default: 1
+
++ Response 200
+
+    [Subject Collection][]
+
+### Create a Subject [POST]
+To create a new subject send a JSON representation containing at least a single *location* field. 
+
++ Request
+        
+        {
+            "location": {
+                "standard": "http://myhostedimage.com/image_name.png"
+            }
+        }
+
++ Response 201
+
+    [Subject][]
