@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140529202059) do
+ActiveRecord::Schema.define(version: 20140603155321) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -153,8 +153,8 @@ ActiveRecord::Schema.define(version: 20140529202059) do
 
   create_table "uri_names", force: true do |t|
     t.string   "name"
-    t.string   "resource_type"
-    t.integer  "resource_id"
+    t.string   "linked_resource_type"
+    t.integer  "linked_resource_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

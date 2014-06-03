@@ -9,15 +9,15 @@ describe User, :type => :model do
 
   describe "#password_required?" do
     it 'should require a password when creating with a new user' do
-      expect{ User.create!(uri_name: build(:uri_name), login: "t", password: "password1", email: "test@example.com") }
+      expect{ User.create!({uri_name: build(:uri_name), login: "t", password: "password1", email: "test@example.com"}, without_protection: true) }
         .to_not raise_error
 
-      expect{ User.create!(uri_name: build(:uri_name), login: "t", email: "test@example.com") }
+      expect{ User.create!({uri_name: build(:uri_name), login: "t", email: "test@example.com"}, without_protection: true) }
         .to raise_error
     end
 
     it 'should not require a password when creating a user from an import' do
-      expect{ User.create!(uri_name: build(:uri_name), login: "t", hash_func: 'sha1', email: "test@example.com") }
+      expect{ User.create!({uri_name: build(:uri_name), login: "t", hash_func: 'sha1', email: "test@example.com"}, without_protection: true) }
         .to_not raise_error
     end
   end

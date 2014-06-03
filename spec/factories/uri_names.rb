@@ -5,11 +5,11 @@ FactoryGirl.define do
     sequence(:name) {|n| "MyString_#{n}"}
     
     factory :uri_name_for_user do
-      association :resource, factory: :user, password: "password"
+      association :linked_resource, factory: :user, password: "password"
     end
 
     factory :uri_name_for_group do
-      association :resource, factory: :user_group
+      association :linked_resource, factory: :user_group
     end
   end
 end

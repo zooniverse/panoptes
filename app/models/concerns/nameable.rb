@@ -2,13 +2,14 @@ module Nameable
   extend ActiveSupport::Concern
 
   included do
-    has_one :uri_name, as: :resource
+    attr_accessible :name
+    has_one :uri_name, as: :linked_resource
     validates_presence_of :uri_name
   end
 
   module ClassMethods
     def find_by_name(n)
-      UriName.where(name: n).first.resource
+      UriName.where(name: n).first.linked_resource
     end
   end
 
@@ -16,7 +17,7 @@ module Nameable
     if uri_name
       self.uri_name.name = n
     else
-      self.uri_name = UriName.create(name: n, resource: self)
+      self.uri_name = UriName.create(name: n, linked_resource: self)
     end
   end
 
@@ -27,4 +28,5 @@ module Nameable
   def to_param
     name
   end
+
 end
