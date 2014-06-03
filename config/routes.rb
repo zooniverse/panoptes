@@ -7,44 +7,32 @@ Rails.application.routes.draw do
 
   namespace :api do
     api_version(:module => "V1", :header => {name: "Accept", :value => "application/vnd.api+json; version=1"}) do
-      get "/me", to: 'users#show'
+      get "/me", to: 'users#show', format: false
 
-      resources :users, except: [:new, :edit] do 
-        resources :collections, except: [:new, :edit]
-        resources :projects, except: [:new, :edit] do
-          resources :classifications, except: [:new, :edit]
-          resources :workflows, except: [:new, :edit]
-          resources :subject_sets, except: [:new, :edit] do 
-            resources :subjects, except: [:new, :edit]
-          end
-        end
+      resources :users, except: [:new, :edit], format: false do 
+        resources :collections, only: :index, format: false
+        resources :projects, only: :index, format: false
       end
 
-      resources :groups, except: [:new, :edit] do
-        resources :collections, except: [:new, :edit]
-        resources :projects, except: [:new, :edit] do
-          resources :classifications, except: [:new, :edit]
-          resources :workflows, except: [:new, :edit]
-          resources :subject_sets, except: [:new, :edit] do 
-            resources :subjects, except: [:new, :edit]
-          end
-        end
+      resources :groups, except: [:new, :edit], format: false do
+        resources :collections, only: :index, format: false
+        resources :projects, only: :index, format: false
       end
 
       scope "/collections/:ownername/" do
-        resources :collections, path: '', except: [:new, :edit] do
-          resources :subjects, except: [:new, :edit]
+        resources :collections, path: '', except: [:new, :edit], format: false do
+          resources :subjects, only: :index, format: false
         end
       end
 
-      resources :subjects, except: [:new, :edit]
+      resources :subjects, except: [:new, :edit], format: false
 
       scope "/projects/:ownername/" do
-        resources :projects, path: '', except: [:new, :edit] do
-          resources :classifications, except: [:new, :edit]
-          resources :workflows, except: [:new, :edit]
-          resources :subject_sets, except: [:new, :edit] do 
-            resources :subjects, except: [:new, :edit]
+        resources :projects, path: '', except: [:new, :edit], format: false do
+          resources :classifications, except: [:new, :edit], format: false
+          resources :workflows, except: [:new, :edit], format: false
+          resources :subject_sets, except: [:new, :edit], format: false do 
+            resources :subjects, only: :index, format: false
           end
         end
       end
