@@ -35,10 +35,6 @@ The Collection resource has the following attributes:
 
     JSON respresentation of the Collection resource. It also includes links to subjects within the collection
 
-    + Headers
-
-            Link: <http:/beta.api.zooniverse.org/collections/stuart/cool_flowers>;rel="self", http:/beta.api.zooniverse.org/collections/stuart/cool_flowers/subjects>;rel="subjects", <http:/beta.api.zooniverse.org/users/stuart>;rel="owner"
-
     + Body
 
             {
@@ -82,10 +78,6 @@ It contains a list of *Collections*.
 
     JSON representation of the Collection Collection resource. Included collections should be full representations of the resource. 
 
-    + Headers
-            
-            Link: <http:/beta.api.zooniverse.org/collections?page=2>;rel="next", <http:/beta.api.zooniverse.org/collections?page=5>;rel="prev"
-
     + Body
 
             {
@@ -116,14 +108,13 @@ It contains a list of *Collections*.
     [Collections Collection][]
 
 ### Create a Collection [POST]
-To create a new Collection send a JSON representation containing at least a name, display_name, and owner. A description and array of subject ids may also be included.
+To create a new Collection send a JSON representation containing at least a name and display_name. A description and array of subject ids may also be included. The *owner* will be added based on the authenicated user. *id* and *created_at* will also be added.
 
 + Request
 
         {
             "name": "cool_flowers",
             "display_name": "Stuart's Cool Flowers",
-            "owner": "stuart",
             "subjects": [1, 40, 20],
             "description": "Just some cool looking flowers"
         }
@@ -131,6 +122,70 @@ To create a new Collection send a JSON representation containing at least a name
 + Response 201
 
     [Collection][]
+
+## Collection Subjects Collection [/collections/{owner_name}/{collection_name}/subjects{?page,page_size}]
+Collection Subjects is a list of subjects belonging to a collection. 
+
++ Parameters
+
+    + owner_name (string) ... name of the collection owner
+    + collection_name (string) ... name of the collection
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of a list of subjects belonging to a collection
+
+    + Body
+
+            {
+               "subjects": [{
+                    "id": 81,
+                    "created_at": "2014-05-10T10:47:10Z",
+                    "updated_at": "2014-05-10T10:47:10Z",
+                    "zooniverse_id": "ZOO00000001",
+                    "locations": {
+                        "standard": "http://subjects.zooniverse.org/standard/ZOO00000001.png"
+                    },
+                    "metadata": {
+                        "magnitude": "8.1"
+                    },
+                    href: "/subjects/ZOO00000001"
+                },{
+                    "id": 82,
+                    "created_at": "2014-05-11T10:47:10Z",
+                    "updated_at": "2014-05-11T10:47:10Z",
+                    "zooniverse_id": "ZOO00000002",
+                    "locations": {
+                        "standard": "http://subjects.zooniverse.org/standard/ZOO00000002.png"
+                    },
+                    "metadata": {
+                        "magnitude": "1.1"
+                    },
+                    href: "/subjects/ZOO00000001"
+                }],
+                "meta": {
+                    "subjects": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 3,
+                        "next_page": 2,
+                        "previous_href": "/subjects?page=3page_size=2",
+                        "next_href": "/subjects?page=2&page_size=2"
+                    }
+                } 
+            }
+
+### List All Subjects in a Collection [GET]
++ Parameters
+    + page (optional, integer) ... integer index of a page in collection default is 1.
+    + page_size (optional, integer) ... number of items to be returned in a page. Default is 20. Max is 100. Min is 10.
+
++ Response 200
+
+    [Collection Subjects Collection][]
 
 # Group Subjects
 
@@ -154,10 +209,6 @@ A Subject resource has the following attributes:
 + Model (application/vnd.api+json; version=1)
 
     JSON API representation of the Subject resource
-
-    + Headers
-            
-            Link: <http://beta.api.zooniverse.org/subjects/ZOO0000001>;rel="self"
 
     + Body
 
@@ -206,10 +257,6 @@ It returns a list of *Subjects*
 + Model (application/vnd.api+json)
 
     JSON API representation of Subject Collection resource. Included subjects should be full representations of the resource.
-
-    + Headers
-          
-            Link: <http:/beta.api.zooniverse.org/subjects?page=2&page_size=3>;rel="next", <http:/beta.api.zooniverse.org/subjects?page=3&page_size=3>;rel="prev"
 
     + Body
 
