@@ -1,8 +1,11 @@
 require 'spec_helper'
 
 describe Subject, :type => :model do
+
+  let(:subject) { build(:subject) }
+
   it "should have a valid factory" do
-    expect(build(:subject)).to be_valid
+    expect(subject).to be_valid
   end
 
   describe "#collections" do
@@ -16,7 +19,7 @@ describe Subject, :type => :model do
   describe "#subject_sets" do
     let(:subject) { create(:subject_with_subject_sets) }
 
-    it "should belong to many subject sets" do 
+    it "should belong to many subject sets" do
       expect(subject.subject_sets).to all( be_a(SubjectSet) )
     end
   end

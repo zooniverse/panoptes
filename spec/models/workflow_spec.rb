@@ -1,13 +1,16 @@
 require 'spec_helper'
 
 describe Workflow, :type => :model do
-  let(:workflow) { create(:workflow) } 
-  
+
+  let(:workflow) { build(:workflow) }
+
   it "should have a valid factory" do
-    expect(build(:workflow)).to be_valid
+    expect(workflow).to be_valid
   end
 
   describe "#project" do
+    let(:workflow) { create(:workflow) }
+
     it "should have a project" do
       expect(workflow.project).to be_a(Project)
     end
@@ -23,5 +26,11 @@ describe Workflow, :type => :model do
     it "should have many subject sets" do
       expect(workflow.subject_sets).to all( be_a(SubjectSet) )
     end
+  end
+
+  describe "#classifications" do
+    let(:relation_instance) { workflow }
+
+    it_behaves_like "it has a classifications assocation"
   end
 end

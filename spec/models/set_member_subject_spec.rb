@@ -31,4 +31,10 @@ describe SetMemberSubject, :type => :model do
       expect(set_member_subject.subject).to be_a(Subject)
     end
   end
+
+  describe "#classifications" do
+    let(:relation_instance) { set_member_subject }
+
+    it_behaves_like "it has a classifications assocation"
+  end
 end

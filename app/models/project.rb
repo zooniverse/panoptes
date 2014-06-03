@@ -3,6 +3,7 @@ class Project < ActiveRecord::Base
 
   has_many :workflows
   has_many :subject_sets
+  has_many :classifications
 
   def to_param
     "#{owner.name}/#{self.name}"
