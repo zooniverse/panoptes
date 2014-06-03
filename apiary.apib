@@ -82,17 +82,15 @@ It contains a list of *Collections*.
 
             {
                 "collections" [{
-                     {
-                        "id": 51,
-                        "created_at": "2014-04-15T10:41:14Z",
-                        "updated_at": "2014-04-20T10:41:14Z",
-                        "name": "cool_flowers",
-                        "display_name": "Stuart's Cool Flowers",
-                        "description": "Just some cool looking flowers",
-                        "self": "/collections/stuart/cool_flowers"
-                        "owner": "/users/stuart",
-                        "subjects": "/collections/stuart/cool_flowers/subjects"
-                     }
+                    "id": 51,
+                    "created_at": "2014-04-15T10:41:14Z",
+                    "updated_at": "2014-04-20T10:41:14Z",
+                    "name": "cool_flowers",
+                    "display_name": "Stuart's Cool Flowers",
+                    "description": "Just some cool looking flowers",
+                    "self": "/collections/stuart/cool_flowers"
+                    "owner": "/users/stuart",
+                    "subjects": "/collections/stuart/cool_flowers/subjects"
                 }]
                 "next": "/collections?page=2",
                 "prev": "/collections?page=5"
@@ -188,6 +186,7 @@ Collection Subjects is a list of subjects belonging to a collection.
     [Collection Subjects Collection][]
 
 # Group Subjects
+Subject resources for **Panoptes API**.
 
 ## Subject [/subjects/{zooniverse_id}]
 A single Subject object representing a media object or group of media objects to be classified and attached metadata. 
@@ -324,3 +323,170 @@ To create a new subject send a JSON representation containing at least a single 
 + Response 201
 
     [Subject][]
+
+# Group User
+User resources for **Panoptes API**
+
+## User [/user/{user_name}]
+A single User object representing a logged in user of the site. 
+
+A User resource has the following attributes:
+
+- id
+- display_name
+- credited_name
+- email
+- name
+- zooniverse_id
+- login
+- roles
+- created_at
+- updated_at
+- last_sign_in_at
+- current_sign_in_at
+
+Only attributes will be visible depending on the authorization level of the User and of the OAuth Application making the request. 
+
++ Parameters
+    + user_name (string) ... URI name of the user. Same as the name attribute
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of a User resource. Includes links to owned projects and collections and active group memberships
+
+    + Body
+            {
+                "links": {
+                    "users.collections": {
+                        "href": "/users/{users.name}/collections"
+                    },
+                    "users.projects": {
+                        "href": "/users/{users.name}/projects"
+                    },
+                    "users.groups": {
+                        "href": "/users/{users.name}/groups"
+                    }
+                },
+                "users": [{
+                    "id": 1,
+                    "display_name": "Edwardo the Great",
+                    "credited_name": "Edward Paget",
+                    "email": "ed@example.com",
+                    "name": "edward",
+                    "zooniverse_id": 101012,
+                    "login": "edwardothegreat",
+                    "created_at": "2014-01-23T04:34:15Z",
+                    "udpated_at": "2014-01-30T14:34:15Z",
+                    "last_sign_in_at": 2014-05-13T15:34:15Z",
+                    "current_sign_in_at": 2014-06-01T07:33:15Z",
+                    "roles": {
+                        "edward.penguin_madness": ["owner", "scientist"]
+                        "stuart.flower_power": ["beta_tester", "traslator"]
+                    }
+                }]
+            }
+
+### Retrieve a Single User [GET]
++ Response 200
+
+    [User][]
+
+### Edit a User [PATCH]
+To edit a User resource you must send a [JSON Patch](http://tools.ietf.org/html/rfc6902) document. You may update the *display_name*, *email*, *credited_name*, or *roles* fields.
+
+Request (application/json-patch+json)
+
+    + Headers
+    
+            Accept: application/vnd.api+json; version=1
+
+    + Body
+            [
+                {"op": "replace", "path": "/users/edward/display_name", "value": "Edwardo the less Great"}
+            ]
+
+Response 200
+
+    [User][]
+
+### Delete a User [DELETE]                
++ Response 204
+      
+## Users Collection [/users{?page,page_size}]
+A Collection all Users
+
++ Model (application/vnd.api+json; version=1)
+
+    A JSON APi representation of the Users collection including link templates for owned projects and collections and active group memberships.                   
+                    
+    + Body
+            {
+                "links": {
+                    "users.collections": {
+                        "href": "/users/{users.name}/collections"
+                    },
+                    "users.projects": {
+                        "href": "/users/{users.name}/projects"
+                    },
+                    "users.groups": {
+                        "href": "/users/{users.name}/groups"
+                    }
+                },
+                "meta": {
+                    "subjects": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 3,
+                        "next_page": 2,
+                        "previous_href": "/users?page=3page_size=2",
+                        "next_href": "/users?page=2&page_size=2"
+                    }
+                },
+                "users": [{
+                    "id": 1,
+                    "display_name": "Edwardo the Great",
+                    "credited_name": "Edward Paget",
+                    "email": "ed@example.com",
+                    "name": "edward",
+                    "zooniverse_id": 101012,
+                    "login": "edwardothegreat",
+                    "created_at": "2014-01-23T04:34:15Z",
+                    "udpated_at": "2014-01-30T14:34:15Z",
+                    "last_sign_in_at": 2014-05-13T15:34:15Z",
+                    "current_sign_in_at": 2014-06-01T07:33:15Z",
+                    "roles": {
+                        "edward.penguin_madness": ["owner", "scientist"]
+                        "stuart.flower_power": ["beta_tester", "traslator"]
+                    }
+                },{
+                    "id": 2,
+                    "display_name": "Stuart",
+                    "credited_name": "Stuart Lynn",
+                    "email": "slynn@example.com",
+                    "name": "stuart",
+                    "zooniverse_id": 101,
+                    "login": "slynn",
+                    "created_at": "2014-01-23T04:34:15Z",
+                    "udpated_at": "2014-01-30T14:34:15Z",
+                    "last_sign_in_at": 2014-05-13T15:34:15Z",
+                    "current_sign_in_at": 2014-06-01T07:33:15Z",
+                    "roles": {
+                        "edward.penguin_madness": ["scientist"]
+                        "stuart.flower_power": ["owner", "traslator"]
+                    }
+                
+                }]
+            }
+
+### List All Users [GET]
++ Parameters
+
+    + page (optional, integer) ... Index of Page. Default is 1
+    + page_size (optional, integer) ... Number of records to return perpage. Default is 20. Min is 10. Max is 100. 
+
++ Response 200
+
+    [Users Collection][]
