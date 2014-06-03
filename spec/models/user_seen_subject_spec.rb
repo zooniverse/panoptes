@@ -28,11 +28,11 @@ RSpec.describe UserSeenSubject, :type => :model do
   end
 
   describe "#add_subject" do
-    it "should add a subject's zooniverse_id to the subject_ids array" do
+    it "should add a subject's id to the subject_ids array" do
       uss = user_seen_subject
       s = build(:subject)
       uss.add_subject(s)
-      expect(uss.subject_zooniverse_ids).to include(s.zooniverse_id)
+      expect(uss.subject_ids).to include(s.id)
     end
   end
 end

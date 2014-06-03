@@ -4,8 +4,8 @@ class UserSeenSubject < ActiveRecord::Base
   validates_presence_of :user, :workflow
 
   def add_subject(subject) 
-    subject_zooniverse_ids << subject.zooniverse_id
-    subject_zooniverse_ids_will_change!
+    subject_ids << subject.id
+    subject_ids_will_change!
     save!
   end
 end
