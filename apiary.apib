@@ -355,6 +355,7 @@ Only attributes will be visible depending on the authorization level of the User
     JSON API representation of a User resource. Includes links to owned projects and collections and active group memberships
 
     + Body
+    
             {
                 "links": {
                     "users.collections": {
@@ -394,18 +395,23 @@ Only attributes will be visible depending on the authorization level of the User
 ### Edit a User [PATCH]
 To edit a User resource you must send a [JSON Patch](http://tools.ietf.org/html/rfc6902) document. You may update the *display_name*, *email*, *credited_name*, or *roles* fields.
 
-Request (application/json-patch+json)
++ Request (application/json-patch+json)
 
     + Headers
     
             Accept: application/vnd.api+json; version=1
 
     + Body
+    
             [
-                {"op": "replace", "path": "/users/edward/display_name", "value": "Edwardo the less Great"}
+                {
+                    "op": "replace", 
+                    "path": "/users/edward/display_name", 
+                    "value": "Edwardo the less Great"
+                }
             ]
 
-Response 200
++ Response 200
 
     [User][]
 
@@ -417,9 +423,10 @@ A Collection all Users
 
 + Model (application/vnd.api+json; version=1)
 
-    A JSON APi representation of the Users collection including link templates for owned projects and collections and active group memberships.                   
+    A JSON API representation of the Users collection including link templates for owned projects and collections and active group memberships.                   
                     
     + Body
+    
             {
                 "links": {
                     "users.collections": {
