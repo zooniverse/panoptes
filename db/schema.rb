@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140529202059) do
+ActiveRecord::Schema.define(version: 20140603023303) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -167,6 +167,17 @@ ActiveRecord::Schema.define(version: 20140529202059) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "user_seen_subjects", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "workflow_id"
+    t.string   "subject_zooniverse_ids", array: true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_seen_subjects", ["user_id"], name: "index_user_seen_subjects_on_user_id", using: :btree
+  add_index "user_seen_subjects", ["workflow_id"], name: "index_user_seen_subjects_on_workflow_id", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "",       null: false
