@@ -91,7 +91,7 @@ GEM
     json (1.8.1)
     json (1.8.1-java)
     libv8 (3.16.14.3)
-    listen (2.7.5)
+    listen (2.7.6)
       celluloid (>= 0.15.2)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
@@ -116,6 +116,8 @@ GEM
       method_source (~> 0.8)
       slop (~> 3.4)
       spoon (~> 0.0)
+    pry-rails (0.3.2)
+      pry (>= 0.9.10)
     rack (1.5.2)
     rack-cors (0.2.9)
     rack-test (0.6.2)
@@ -231,6 +233,7 @@ DEPENDENCIES
   jquery-rails
   mysql2
   pg
+  pry-rails (~> 0.3.2)
   rack-cors
   rails (= 4.1.1)
   rspec (~> 3.0.0)

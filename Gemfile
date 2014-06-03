@@ -30,4 +30,5 @@ group :development, :test do
   gem 'guard-rspec', '~> 4.2.9', require: false
   gem 'factory_girl_rails', '~> 4.4.1'
   gem 'spring-commands-rspec', '~> 1.0.2'
+  gem 'pry-rails', '~> 0.3.2'
 end
