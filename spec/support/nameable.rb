@@ -21,6 +21,8 @@ shared_examples "is uri nameable" do
   end
 
   describe "::find_by_name" do
+    let!(:persist_the_named_instance) { named.save }
+
     it "should return the model named by the uri" do
       n = named
       name = n.name

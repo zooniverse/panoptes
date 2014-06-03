@@ -9,7 +9,7 @@ describe Classification, :type => :model do
     expect(build(:classification, project: nil)).to_not be_valid
   end
 
-  it "must have a subject" do
+  it "must have a set_member_subject" do
     expect(build(:classification, set_member_subject: nil)).to_not be_valid
   end
 

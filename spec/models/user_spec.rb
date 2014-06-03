@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe User, :type => :model do
-  let(:user) { create(:user) }
+  let(:user) { build(:user) }
   let(:named) { user }
   let(:unnamed) { build(:user, uri_name: nil) }
 
@@ -68,5 +68,11 @@ describe User, :type => :model do
     it "should have many collections" do
       expect(user.collections).to all( be_a(Collection) )
     end
+  end
+
+  describe "#classifications" do
+    let(:relation_instance) { user }
+
+    it_behaves_like "it has a classifications assocation"
   end
 end

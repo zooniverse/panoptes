@@ -10,6 +10,7 @@ class User < ActiveRecord::Base
   has_many :projects, as: :owner
   has_many :user_groups, through: :memberships
   has_many :memberships
+  has_many :classifications
 
   validates :login, uniqueness: true
 
