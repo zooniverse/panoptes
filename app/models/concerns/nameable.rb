@@ -16,7 +16,7 @@ module Nameable
     if uri_name
       self.uri_name.name = n
     else
-      self.uri_name = UriName.create(name: n, resource: self)
+      self.uri_name = UriName.new(name: n, resource: self)
     end
   end
 
