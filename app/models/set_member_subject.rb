@@ -1,5 +1,5 @@
 class SetMemberSubject < ActiveRecord::Base
-  belongs_to :subject_set
+  belongs_to :subject_set, counter_cache: true
   belongs_to :subject
   has_many :classifications
 

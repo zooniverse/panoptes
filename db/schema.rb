@@ -133,6 +133,7 @@ ActiveRecord::Schema.define(version: 20140604155118) do
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "set_member_subjects_count", default: 0, null: false
   end
 
   add_index "subject_sets", ["project_id"], name: "index_subject_sets_on_project_id", using: :btree
