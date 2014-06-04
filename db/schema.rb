@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140603144054) do
+ActiveRecord::Schema.define(version: 20140604123846) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -104,12 +104,12 @@ ActiveRecord::Schema.define(version: 20140603144054) do
   create_table "projects", force: true do |t|
     t.string   "name"
     t.string   "display_name"
-    t.integer  "classification_count"
     t.integer  "user_count"
     t.integer  "owner_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "owner_type"
+    t.integer  "classifications_count", default: 0, null: false
   end
 
   add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree
@@ -118,10 +118,10 @@ ActiveRecord::Schema.define(version: 20140603144054) do
   create_table "set_member_subjects", force: true do |t|
     t.integer  "state"
     t.integer  "subject_set_id"
-    t.integer  "classification_count"
     t.integer  "subject_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "classifications_count", default: 0, null: false
   end
 
   add_index "set_member_subjects", ["subject_id"], name: "index_set_member_subjects_on_subject_id", using: :btree
@@ -198,6 +198,7 @@ ActiveRecord::Schema.define(version: 20140603144054) do
     t.string   "display_name"
     t.string   "zooniverse_id"
     t.string   "credited_name"
+    t.integer  "classifications_count",  default: 0,        null: false
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
@@ -207,10 +208,10 @@ ActiveRecord::Schema.define(version: 20140603144054) do
   create_table "workflows", force: true do |t|
     t.string   "name"
     t.json     "tasks"
-    t.integer  "classification_count"
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "classifications_count", default: 0, null: false
   end
 
   add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree

@@ -32,5 +32,21 @@ describe UserGroup, :type => :model do
     end
   end
 
+  describe "#classifcations_count" do
+    let(:user_group) { create(:user_group_with_users) }
 
+    it "should have a zero classifcations count" do
+      expect(user_group.classifications_count).to eq(0)
+    end
+
+    context "when a user in the group submits a classfication" do
+
+      it "should have incremented the count" do
+        user = user_group.users.sample
+        create(:classification, user: user)
+        user.reload
+        expect(user_group.classifications_count).to eq(1)
+      end
+    end
+  end
 end

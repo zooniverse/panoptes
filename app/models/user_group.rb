@@ -5,4 +5,8 @@ class UserGroup < ActiveRecord::Base
 
   has_many :users, through: :memberships
   has_many :memberships
+
+  def classifications_count
+    users.map(&:classifications_count).inject(:+)
+  end
 end

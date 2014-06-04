@@ -37,4 +37,10 @@ describe Project, :type => :model do
       expect(project.to_param).to eq("#{project.owner.name}/#{project.name}")
     end
   end
+
+  describe "#classifcations_count" do
+    let(:relation_instance) { project }
+
+    it_behaves_like "it has a cached counter for classifications"
+  end
 end
