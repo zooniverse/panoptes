@@ -24,4 +24,14 @@ describe Classification, :type => :model do
   it "must have annotations" do
     expect(build(:classification, annotations: nil)).to_not be_valid
   end
+
+  describe "#user_groups" do
+
+    let(:expected_user_group) { create(:user_group) }
+    let(:classification_with_user_group) { create(:classifaction_with_user_group, user_group: expected_user_group) }
+
+    it "should have many user_groups" do
+      expect(classification_with_user_group.user_group).to eq(expected_user_group)
+    end
+  end
 end

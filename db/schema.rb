@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140604123846) do
+ActiveRecord::Schema.define(version: 20140604155118) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 20140604123846) do
     t.json     "annotations"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "user_group_id"
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
@@ -166,6 +167,7 @@ ActiveRecord::Schema.define(version: 20140604123846) do
     t.integer  "classification_count"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "classifications_count", default: 0, null: false
   end
 
   create_table "user_seen_subjects", force: true do |t|
