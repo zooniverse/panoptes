@@ -44,7 +44,6 @@ describe UserGroup, :type => :model do
       it "should have incremented the count" do
         user = user_group.users.sample
         create(:classification, user: user)
-        user.reload
         expect(user_group.classifications_count).to eq(1)
       end
     end
