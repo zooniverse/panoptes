@@ -7,6 +7,18 @@ describe User, :type => :model do
 
   it_behaves_like "is uri nameable"
 
+  describe '#login' do
+    it 'should validate presence' do
+      expect{ User.create!(uri_name: build(:uri_name), password: 'password1', email: 'test@example.com') }.to raise_error
+    end
+
+    it 'should validate uniqueness' do
+      expect{ User.create!(uri_name: build(:uri_name), login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
+      expect{ User.create!(uri_name: build(:uri_name), login: 't', password: 'password1', email: 'test2@example.com') }.to raise_error
+    end
+  end
+
+
   describe "#password_required?" do
     it 'should require a password when creating with a new user' do
       expect{ User.create!(uri_name: build(:uri_name), login: "t", password: "password1", email: "test@example.com") }

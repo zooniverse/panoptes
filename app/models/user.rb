@@ -12,7 +12,7 @@ class User < ActiveRecord::Base
   has_many :memberships
   has_many :classifications
 
-  validates :login, uniqueness: true
+  validates :login, presence: true, uniqueness: true
 
   def password_required?
     super && hash_func != 'sha1'
