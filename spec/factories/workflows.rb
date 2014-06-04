@@ -17,5 +17,12 @@ FactoryGirl.define do
         create_list(:subject_set, n, workflows: [w])
       end
     end
+
+    factory :workflow_with_subjects do
+      after(:create) do |w|
+        n = Array(2..10).sample
+        create_list(:subject_set_with_subjects, n, workflows: [w])
+      end
+    end
   end
 end

@@ -3,6 +3,9 @@ require 'spec_helper'
 describe Workflow, :type => :model do
 
   let(:workflow) { build(:workflow) }
+  let(:subject_relation) { build(:workflow_with_subjects) }
+
+  it_behaves_like "has subject_count"
 
   it "should have a valid factory" do
     expect(workflow).to be_valid
