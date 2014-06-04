@@ -12,7 +12,10 @@ class User < ActiveRecord::Base
   has_many :memberships
   has_many :classifications
 
-  validates :login, uniqueness: true
+  validates :login, presence: true, uniqueness: true
+  validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
+
+  attr_accessor :migrated_user
 
   def password_required?
     super && hash_func != 'sha1'
@@ -37,6 +40,10 @@ class User < ActiveRecord::Base
   end
 
   protected
+
+  def migrated_user?
+    !!migrated_user
+  end
 
   def sha1_encrypt(plain_password)
     bytes = plain_password.each_char.inject(''){ |bytes, c| bytes + c + "\x00" }
