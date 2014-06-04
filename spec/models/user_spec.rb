@@ -55,6 +55,14 @@ describe User, :type => :model do
       user.valid_password?('tajikistan')
       expect(user.hash_func).to eq("bcrypt")
     end
+
+    it 'should validate length of user passwords' do
+      user_errors = ->(attrs){ User.new(attrs).tap{ |u| u.valid? }.errors }
+      expect(user_errors.call(password: 'ab12')).to have_key :password
+      expect(user_errors.call(password: 'abcd1234')).to_not have_key :password
+      expect(user_errors.call(migrated_user: true, password: 'ab')).to have_key :password
+      expect(user_errors.call(migrated_user: true, password: 'ab12')).to_not have_key :password
+    end
   end
 
   describe "#projects" do
