@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Workflow, :type => :model do
 
   let(:workflow) { build(:workflow) }
-  let(:subject_relation) { build(:workflow_with_subjects) }
+  let(:subject_relation) { create(:workflow_with_subjects) }
 
   it_behaves_like "has subject_count"
 
