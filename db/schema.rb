@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140604155118) do
+ActiveRecord::Schema.define(version: 20140605091427) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -148,8 +148,13 @@ ActiveRecord::Schema.define(version: 20140604155118) do
     t.json     "locations"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "owner_id"
+    t.integer  "project_id"
+    t.string   "owner_type"
   end
 
+  add_index "subjects", ["owner_id"], name: "index_subjects_on_owner_id", using: :btree
+  add_index "subjects", ["project_id"], name: "index_subjects_on_project_id", using: :btree
   add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
 
   create_table "uri_names", force: true do |t|

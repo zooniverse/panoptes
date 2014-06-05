@@ -43,4 +43,10 @@ describe Project, :type => :model do
 
     it_behaves_like "it has a cached counter for classifications"
   end
+
+  describe "#subjects" do
+    let(:relation_instance) { project }
+
+    it_behaves_like "it has a subjects association"
+  end
 end

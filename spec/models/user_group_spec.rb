@@ -32,6 +32,12 @@ describe UserGroup, :type => :model do
     end
   end
 
+  describe "#subjects" do
+    let(:relation_instance) { user_group }
+
+    it_behaves_like "it has a subjects association"
+  end
+
   describe "#classifcations_count" do
     let(:relation_instance) { user_group }
 
