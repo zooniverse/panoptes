@@ -97,6 +97,12 @@ describe User, :type => :model do
     end
   end
 
+  describe "#subjects" do
+    let(:relation_instance) { user }
+
+    it_behaves_like "it has a subjects association"
+  end
+
   describe "#classifications" do
     let(:relation_instance) { user }
 

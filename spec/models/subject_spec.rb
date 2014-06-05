@@ -8,6 +8,16 @@ describe Subject, :type => :model do
     expect(subject).to be_valid
   end
 
+  it "should be invalid without a project_id" do
+    subject.project = nil
+    expect(subject).to_not be_valid
+  end
+
+  it "should be invalid without an owner_id" do
+    subject.owner = nil
+    expect(subject).to_not be_valid
+  end
+
   describe "#collections" do
     let(:subject) { create(:subject_with_collections) }
 

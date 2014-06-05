@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
   has_many :collections, as: :owner
   has_many :projects, as: :owner
+  has_many :subjects, as: :owner
   has_many :user_groups, through: :memberships
   has_many :memberships
   has_many :classifications
