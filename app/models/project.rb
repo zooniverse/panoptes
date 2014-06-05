@@ -7,6 +7,6 @@ class Project < ActiveRecord::Base
   has_many :subjects
 
   def to_param
-    "#{owner.name}/#{self.name}"
+    "#{owner.name}+#{self.name}"
   end
 end

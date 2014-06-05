@@ -5,6 +5,6 @@ class Collection < ActiveRecord::Base
   has_and_belongs_to_many :subjects
 
   def to_param
-    "#{owner.name}/#{self.name}"
+    "#{owner.name}+#{self.name}"
   end
 end
