@@ -16,6 +16,7 @@ gem 'doorkeeper'
 gem 'devise'
 gem 'versionist'
 gem 'rack-cors', require: 'rack/cors'
+gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "feature-use_to_param"
 
 group :development do
   gem 'spring'
