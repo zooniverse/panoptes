@@ -32,12 +32,6 @@ describe Project, :type => :model do
     it_behaves_like "it has a classifications assocation"
   end
 
-  describe "#to_param" do
-    it "should return a string of its owner name and its project name" do
-      expect(project.to_param).to eq("#{project.owner.name}/#{project.name}")
-    end
-  end
-
   describe "#classifcations_count" do
     let(:relation_instance) { project }
 

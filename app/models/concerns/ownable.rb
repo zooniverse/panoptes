@@ -8,4 +8,7 @@ module Ownable
     validates_presence_of :owner
   end
 
+  def to_param
+    "#{owner.name}+#{self.name}"
+  end
 end

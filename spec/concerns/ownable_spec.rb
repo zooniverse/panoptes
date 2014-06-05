@@ -7,7 +7,7 @@ end
 
 describe Owned, type: :model do
   let(:owned) do
-    owned = Owned.new; 
+    owned = Owned.new(name: "test")
     owned.owner = build(:user)
     owned
   end
