@@ -169,7 +169,6 @@ ActiveRecord::Schema.define(version: 20140605091427) do
 
   create_table "user_groups", force: true do |t|
     t.string   "display_name"
-    t.integer  "classification_count"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "classifications_count", default: 0, null: false
