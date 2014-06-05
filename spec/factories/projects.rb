@@ -19,5 +19,12 @@ FactoryGirl.define do
         create_list(:subject_set, n, project: p)
       end
     end
+
+    factory :project_with_subjects do
+      after(:create) do |p|
+        n = Array(2..10).sample
+        create_list(:subject_set_with_subjects, n, project: p)
+      end
+    end
   end
 end
