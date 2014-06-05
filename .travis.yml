@@ -2,7 +2,7 @@ language: ruby
 
 cache: bundler
 
-jdk: 
+jdk:
   - openjdk7
 
 rvm:
@@ -19,7 +19,7 @@ addons:
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
-  - rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson  
+  - rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson
   - RACK_ENV=test bundle exec rake db:create db:migrate
 
-script: RACK_EVN=test bundle exec rake spec
+script: RACK_ENV=test bundle exec rake spec
