@@ -29,10 +29,4 @@ shared_examples "is uri nameable" do
       expect(described_class.find_by_name(name)).to eq(n)
     end
   end
-
-  describe "#to_param" do
-    it "should return the resource's name" do
-      expect(named.name).to eq(named.to_param)
-    end
-  end
 end

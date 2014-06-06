@@ -7,8 +7,4 @@ module Ownable
     belongs_to :owner, polymorphic: true
     validates_presence_of :owner
   end
-
-  def to_param
-    "#{owner.name}+#{self.name}"
-  end
 end

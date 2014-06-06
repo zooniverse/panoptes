@@ -23,8 +23,4 @@ module Nameable
   def name
     uri_name.name
   end
-
-  def to_param
-    name
-  end
 end
