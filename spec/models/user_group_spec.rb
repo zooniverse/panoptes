@@ -4,8 +4,10 @@ describe UserGroup, :type => :model do
   let(:user_group) { create(:user_group) }
   let(:named) { user_group }
   let(:unnamed) { build(:user_group, uri_name: nil) }
+  let(:activateable) { user_group }
 
   it_behaves_like "is uri nameable"
+  it_behaves_like "activateable"
 
   it "should have a valid factory" do
     expect(build(:user_group)).to be_valid

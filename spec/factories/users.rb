@@ -5,6 +5,7 @@ FactoryGirl.define do
     password 'password'
     encrypted_password { User.new.send(:password_digest, 'password') }
     display_name 'New User'
+    activated_state :active
     sequence(:login) { |n| "new_user_#{n}" }
     sequence(:name) { |n| "new_user_#{n}" }
 

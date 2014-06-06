@@ -3,6 +3,7 @@ FactoryGirl.define do
     sequence(:name) {|n| "test_project_#{n}"}
     display_name "Test Project"
     user_count { 10 + rand(1000) }
+    activated_state :active
 
     association :owner, factory: :user, password: "password"
 

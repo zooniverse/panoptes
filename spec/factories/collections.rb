@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :collection do
     name "collection_name"
+    activated_state :active
 
     project
     association :owner, factory: :user
