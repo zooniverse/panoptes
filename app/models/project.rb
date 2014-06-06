@@ -6,9 +6,4 @@ class Project < ActiveRecord::Base
   has_many :subject_sets
   has_many :classifications
   has_many :subjects
-
-  def to_param
-    "#{owner.name}/#{self.name}"
-  end
-
 end
