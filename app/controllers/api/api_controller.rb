@@ -2,7 +2,7 @@ module Api
   class ApiController < ApplicationController
 
     def api_content
-      "application/vnd.zooniverse.v1+json"
+      "application/vnd.api+json; version=1"
     end
 
     def current_resource_owner
