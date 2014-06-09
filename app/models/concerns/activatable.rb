@@ -2,6 +2,7 @@ module Activatable
   extend ActiveSupport::Concern
 
   included do
+    attr_accessible :activated_state
     enum activated_state: [:active, :inactive]
     scope :active, -> { where(actived_state: :active) }
     scope :disabled, -> { where(actived_state: :inactive) }

@@ -2,6 +2,7 @@ module Nameable
   extend ActiveSupport::Concern
 
   included do
+    attr_accessible :name
     has_one :uri_name, as: :resource
     validates_presence_of :uri_name
   end
