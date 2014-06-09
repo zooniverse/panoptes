@@ -1,5 +1,7 @@
 class UserGroup < ActiveRecord::Base
   include Nameable
+  include Activateable
+
   has_many :projects, as: :owner
   has_many :collections, as: :owner
   has_many :subjects, as: :owner
@@ -7,4 +9,5 @@ class UserGroup < ActiveRecord::Base
   has_many :users, through: :memberships
   has_many :memberships
   has_many :classifications
+
 end

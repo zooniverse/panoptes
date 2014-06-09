@@ -1,17 +1,19 @@
 class User < ActiveRecord::Base
   include Nameable
+  include Activateable
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
-  has_many :collections, as: :owner
-  has_many :projects, as: :owner
   has_many :subjects, as: :owner
   has_many :user_groups, through: :memberships
-  has_many :memberships
   has_many :classifications
+
+  has_many :collections, as: :owner
+  has_many :projects, as: :owner
+  has_many :memberships
 
   validates :login, presence: true, uniqueness: true
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
@@ -52,5 +54,4 @@ class User < ActiveRecord::Base
     sha1 = Digest::SHA1.digest concat
     Base64.encode64(sha1).strip
   end
-
 end

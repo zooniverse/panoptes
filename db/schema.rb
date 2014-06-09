@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140605091427) do
+ActiveRecord::Schema.define(version: 20140606204140) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 20140605091427) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "owner_type"
+    t.integer  "activated_state", default: 0, null: false
   end
 
   add_index "collections", ["owner_id"], name: "index_collections_on_owner_id", using: :btree
@@ -111,6 +112,7 @@ ActiveRecord::Schema.define(version: 20140605091427) do
     t.datetime "updated_at"
     t.string   "owner_type"
     t.integer  "classifications_count", default: 0, null: false
+    t.integer  "activated_state",       default: 0, null: false
   end
 
   add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree
@@ -173,6 +175,7 @@ ActiveRecord::Schema.define(version: 20140605091427) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "classifications_count", default: 0, null: false
+    t.integer  "activated_state",       default: 0, null: false
   end
 
   create_table "user_seen_subjects", force: true do |t|
@@ -206,6 +209,7 @@ ActiveRecord::Schema.define(version: 20140605091427) do
     t.string   "zooniverse_id"
     t.string   "credited_name"
     t.integer  "classifications_count",  default: 0,        null: false
+    t.integer  "activated_state",        default: 0,        null: false
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
