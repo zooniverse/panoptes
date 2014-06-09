@@ -15,8 +15,7 @@ describe Api::V1::UsersController, type: :controller do
       expect(response.content_type).to eq("application/vnd.api+json; version=1")
     end
 
-    it "should include allowed attributes" do
-      expect(json_response["users"]).to all( include("name",
+    it "should include allowed attributes" do expect(json_response["users"]).to all( include("name",
                                                      "login",
                                                      "display_name",
                                                      "created_at",
@@ -84,5 +83,19 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     it_behaves_like "a response"
+  end
+
+  describe "#destory" do
+    before(:each) do
+      delete :destroy, id: users.first.id
+    end
+
+    it "should return 204" do
+      expect(response.status).to eq(204)
+    end
+
+    it "should disable the user" do
+      expect(users.first.reload.inactive?).to be_truthy
+    end
   end
 end
