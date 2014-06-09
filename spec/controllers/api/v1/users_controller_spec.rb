@@ -55,7 +55,24 @@ describe Api::V1::UsersController, type: :controller do
 
   describe "#show" do
     before(:each) do
-      get :show, id: "new_user_2"
+      get :show, id: users.first.id
+    end
+
+    it "should return 200" do
+      expect(response.status).to eq(200)
+    end
+
+    it "should have a single user" do
+      expect(json_response["users"].length).to eq(1)
+    end
+
+    it_behaves_like "a response"
+  end
+
+  describe "#me" do
+    before(:each) do 
+      stub_token_with_user(users.first)
+      get :me
     end
 
     it "should return 200" do

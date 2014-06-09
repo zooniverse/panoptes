@@ -1,4 +1,6 @@
 class Api::V1::UsersController < Api::ApiController
+  doorkeeper_for :all
+
   def index
     render json: UserSerializer.page(params), content_type: api_content
   end
@@ -8,7 +10,7 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def me
-    render json: UserSerializer.single(current_resource_owner), content_type: api_content
+    render json: UserSerializer.resource(id: current_resource_owner.id), content_type: api_content
   end
 
   def update
