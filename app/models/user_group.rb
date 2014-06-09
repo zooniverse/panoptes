@@ -1,6 +1,6 @@
 class UserGroup < ActiveRecord::Base
   include Nameable
-  include Activateable
+  include Activatable
 
   has_many :projects, as: :owner
   has_many :collections, as: :owner

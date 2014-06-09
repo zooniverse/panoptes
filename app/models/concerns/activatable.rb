@@ -1,4 +1,4 @@
-module Activateable
+module Activatable
   extend ActiveSupport::Concern
 
   included do

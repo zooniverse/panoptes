@@ -4,10 +4,10 @@ describe User, :type => :model do
   let(:user) { build(:user) }
   let(:named) { user }
   let(:unnamed) { build(:user, uri_name: nil) }
-  let(:activateable) { user }
+  let(:activatable) { user }
 
   it_behaves_like "is uri nameable"
-  it_behaves_like "activateable"
+  it_behaves_like "activatable"
 
   describe '#login' do
     it 'should validate presence' do

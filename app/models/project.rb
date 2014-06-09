@@ -1,7 +1,7 @@
 class Project < ActiveRecord::Base
   include Ownable
   include SubjectCounts
-  include Activateable
+  include Activatable
 
   has_many :workflows
   has_many :subject_sets

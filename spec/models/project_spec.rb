@@ -5,11 +5,11 @@ describe Project, :type => :model do
   let(:owned) { project }
   let(:not_owned) { build(:project, owner: nil) }
   let(:subject_relation) { create(:project_with_subjects) }
-  let(:activateable) { project }
+  let(:activatable) { project }
 
   it_behaves_like "is ownable"
   it_behaves_like "has subject_count"
-  it_behaves_like "activateable"
+  it_behaves_like "activatable"
 
   it "should have a valid factory" do
     expect(project).to be_valid

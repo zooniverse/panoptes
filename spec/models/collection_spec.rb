@@ -4,10 +4,10 @@ describe Collection, :type => :model do
   let(:collection) { create(:collection) }
   let(:owned) { collection }
   let(:not_owned) { build(:collection, owner: nil) }
-  let(:activateable) { collection }
+  let(:activatable) { collection }
 
   it_behaves_like "is ownable"
-  it_behaves_like "activateable"
+  it_behaves_like "activatable"
 
   it "should have a valid factory" do
     expect(build(:collection)).to be_valid
