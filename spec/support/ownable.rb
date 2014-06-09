@@ -6,4 +6,14 @@ shared_examples "is ownable" do
   it "should not be valid without an owner" do
     expect(not_owned).to_not be_valid
   end
+
+  describe "#owner?" do
+    it "should return true when passed its owner object" do
+      expect(owned.owner?(owned.owner)).to be_truthy
+    end
+
+    it "should be false when passed another object" do
+      expect(owned.owner?(OpenStruct.new)).to be_falsy
+    end
+  end
 end

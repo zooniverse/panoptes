@@ -5,9 +5,12 @@ describe User, :type => :model do
   let(:named) { user }
   let(:unnamed) { build(:user, uri_name: nil) }
   let(:activatable) { user }
+  let(:owner) { user }
+  let(:owned) { build(:project, owner: user) }
 
   it_behaves_like "is uri nameable"
   it_behaves_like "activatable"
+  it_behaves_like "is an owner"
 
   describe '#login' do
     it 'should validate presence' do

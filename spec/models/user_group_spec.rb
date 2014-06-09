@@ -5,9 +5,12 @@ describe UserGroup, :type => :model do
   let(:named) { user_group }
   let(:unnamed) { build(:user_group, uri_name: nil) }
   let(:activatable) { user_group }
+  let(:owner) { user_group }
+  let(:owned) { build(:project, owner: owner) }
 
   it_behaves_like "is uri nameable"
   it_behaves_like "activatable"
+  it_behaves_like "is an owner"
 
   it "should have a valid factory" do
     expect(build(:user_group)).to be_valid

@@ -5,13 +5,17 @@ module Owner
     def owns(*owned)
       owned.each do |properties_type|
         if properties_type.length == 2
-          properties_type, attributes = properties_type
-          attributes[:as] = :owner
-          has_many properties_type, **attributes
+          properties_type, *attributes = properties_type
+          attributes << {as: :owner}
+          has_many properties_type, *attributes
         else
           has_many properties_type, as: :owner
         end
       end
     end
+  end
+
+  def owns?(instance)
+    instance.class < Ownable && instance.owner?(self)
   end
 end
