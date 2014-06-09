@@ -1,34 +1,34 @@
 shared_examples "activateable" do
-  describe "#disable" do
+  describe "#disable!" do
     it "should change state to inactive when disabled" do
       example = activateable
       expect(example.inactive?).to be_falsy
-      example.disable
+      example.disable!
       expect(example.inactive?).to be_truthy
     end
 
     it "should call #enable on all proxied relations" do
       instance = activateable
       instance.class.instance_variable_get(:@activate_proxies).each do |v|
-        expect(instance.send(v)).to receive(:disable)
+        expect(instance.send(v)).to receive(:disable!)
       end
-      instance.disable
+      instance.disable!
     end
   end
 
-  describe "#enable" do
+  describe "#enable!" do
     it "should change state to active when enabled" do
       example = activateable
-      example.enable
+      example.enable!
       expect(example.active?).to be_truthy
     end
 
-    it "should call #enable on all proxied relations" do
+    it "should call #enable! on all proxied relations" do
       instance = activateable
       instance.class.instance_variable_get(:@activate_proxies).each do |v|
-        expect(instance.send(v)).to receive(:enable)
+        expect(instance.send(v)).to receive(:enable!)
       end
-      instance.enable
+      instance.enable!
     end
   end
 end

@@ -9,15 +9,15 @@ module Activateable
   end
 
   module ActivateProxyHasMany
-    def disable
+    def disable!
       self.each do |rel|
-        rel.disable
+        rel.disable!
       end
     end
 
-    def enable
+    def enable!
       self.each do |rel|
-        rel.enable
+        rel.enable!
       end
     end
   end
@@ -27,27 +27,27 @@ module Activateable
       @activate_proxies = args
     end
 
-    def disable_relations(instance)
+    def disable_relations!(instance)
       @activate_proxies.each do |r|
-        instance.send(r).disable
+        instance.send(r).disable!
       end
     end
 
-    def enable_relations(instance)
+    def enable_relations!(instance)
       @activate_proxies.each do |r|
-        instance.send(r).enable
+        instance.send(r).enable!
       end
     end
   end
 
 
-  def disable
+  def disable!
     inactive!
-    self.class.disable_relations(self)
+    self.class.disable_relations!(self)
   end
 
-  def enable
+  def enable!
     active!
-    self.class.enable_relations(self)
+    self.class.enable_relations!(self)
   end
 end

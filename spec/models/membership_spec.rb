@@ -31,4 +31,20 @@ describe Membership, :type => :model do
       expect(build(:membership, state: nil)).to_not be_valid
     end
   end
+
+  describe "#enable" do
+    it "should set state to active" do
+      m = membership
+      m.enable!
+      expect(m.active?).to be_truthy
+    end
+  end
+
+  describe "#disable" do
+    it "should set state to inactive" do
+      m = membership
+      m.disable!
+      expect(m.inactive?).to be_truthy
+    end
+  end
 end

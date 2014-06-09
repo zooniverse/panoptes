@@ -4,4 +4,12 @@ class Membership < ActiveRecord::Base
   enum state: [:active, :invited, :inactive]
 
   validates_presence_of :user, :user_group, :state
+
+  def disable!
+    inactive!
+  end
+
+  def enable!
+    active!
+  end
 end
