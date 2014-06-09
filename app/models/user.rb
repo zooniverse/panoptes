@@ -11,15 +11,12 @@ class User < ActiveRecord::Base
   has_many :user_groups, through: :memberships
   has_many :classifications
 
-  has_many :collections, as: :owner, extend: Activateable::ActivateProxyHasMany
-  has_many :projects, as: :owner, extend: Activateable::ActivateProxyHasMany
-  has_many :memberships, extend: Activateable::ActivateProxyHasMany
+  has_many :collections, as: :owner
+  has_many :projects, as: :owner
+  has_many :memberships
 
   validates :login, presence: true, uniqueness: true
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
-
-  proxy_status :projects, :collections, :memberships
-
 
   attr_accessor :migrated_user
 
