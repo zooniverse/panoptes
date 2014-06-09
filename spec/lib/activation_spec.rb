@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Activation' do
+describe Activation do
   class ActivatedObject
     def initialize(active=true)
       @active = active
@@ -38,9 +38,8 @@ describe 'Activation' do
 
   describe '::enable_instances!' do
     it 'should call enable! on a list of objects' do
-      is = instances
-      expect(is).to all( receive(:enable!) )
-      Activation.enable_instances!(is)
+      expect(instances).to all( receive(:enable!) )
+      Activation.enable_instances!(instances)
     end
 
     it 'should set all instances to active' do
@@ -49,11 +48,10 @@ describe 'Activation' do
     end
   end
 
-  describe '::disable_instances!' do
+  describe '::dinstancesable_instances!' do
     it 'should call disable on a list of objects' do
-      is = instances
-      expect(is).to all( receive(:disable!) )
-      Activation.disable_instances!(is)
+      expect(instances).to all( receive(:disable!) )
+      Activation.disable_instances!(instances)
     end
 
     it 'should set all instances to inactive' do
