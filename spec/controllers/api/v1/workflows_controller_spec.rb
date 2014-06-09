@@ -1,5 +1,5 @@
 require 'spec_helper'
 
-describe Api::V1::ProjectsController, type: :controller do
+describe Api::V1::WorkflowsController, type: :controller do
 
 end

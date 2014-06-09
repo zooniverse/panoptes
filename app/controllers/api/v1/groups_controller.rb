@@ -2,11 +2,11 @@ class Api::V1::GroupsController < Api::ApiController
   doorkeeper_for :all
 
   def show
-    render json: GroupsSerailizer.resource(params), content_type: api_content
+    render json: UserGroupsSerailizer.resource(params), content_type: api_content
   end
 
   def index
-    render json: GroupsSerailizer.page(params), content_type: api_content
+    render json: UserGroupsSerailizer.page(params), content_type: api_content
   end
 
   def update
