@@ -8,6 +8,10 @@ module Activatable
     scope :disabled, -> { where(actived_state: :inactive) }
   end
 
+  def disabled?
+    activated_state == "inactive"
+  end
+
   def disable!
     inactive!
   end
