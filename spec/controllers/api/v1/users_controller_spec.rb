@@ -25,8 +25,8 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     it "should have links to a users owned resources" do
-      expect(json_response["links"]).to include("users.projects", 
-                                                "users.collections", 
+      expect(json_response["links"]).to include("users.projects",
+                                                "users.collections",
                                                 "users.classifications",
                                                 "users.subjects")
     end
@@ -69,7 +69,7 @@ describe Api::V1::UsersController, type: :controller do
   end
 
   describe "#me" do
-    before(:each) do 
+    before(:each) do
       stub_token_with_user(users.first)
       get :me
     end
@@ -85,16 +85,22 @@ describe Api::V1::UsersController, type: :controller do
     it_behaves_like "a response"
   end
 
-  describe "#destory" do
-    before(:each) do
-      delete :destroy, id: users.first.id
+  describe "#destroy" do
+    let(:user) { users.first}
+    let(:user_id) { user.id }
+
+    it "should call the UserInfoScrubber with the user" do
+      expect(UserInfoScrubber).to receive(:scrub_personal_info!).with(user)
+      delete :destroy, id: user_id
     end
 
     it "should return 204" do
+      delete :destroy, id: user_id
       expect(response.status).to eq(204)
     end
 
     it "should disable the user" do
+      delete :destroy, id: user_id
       expect(users.first.reload.inactive?).to be_truthy
     end
   end

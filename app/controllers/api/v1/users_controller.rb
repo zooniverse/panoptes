@@ -14,11 +14,12 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def update
-    # TODO: implement JSON-Patch or find a gem that does 
+    # TODO: implement JSON-Patch or find a gem that does
   end
 
   def destroy
     user = User.find(params[:id])
+    UserInfoScrubber.scrub_personal_info!(user)
     user.disable!
     Activation.disable_instances!(user.projects | user.collections | user.memberships)
     render status: 204, json: {}
