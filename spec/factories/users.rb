@@ -35,5 +35,12 @@ FactoryGirl.define do
         create_list(:collection, n, owner: user)
       end
     end
+
+    factory :inactive_user do
+      activated_state :inactive
+      display_name 'deleted_user'
+      email 'deleted_user@zooniverse.org'
+      login '1234567890'
+    end
   end
 end
