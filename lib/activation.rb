@@ -1,13 +1,13 @@
 class Activation
-  def self.enable_instances!(instances=[])
-    instances.each do |i|
-      i.enable!
-    end
-  end
 
-  def self.disable_instances!(instances=[])
-    instances.each do |i|
-      i.disable!
+  class << self
+
+    def enable_instances!(instances=[])
+      instances.map(&:enable!)
+    end
+
+    def disable_instances!(instances=[])
+      instances.map(&:disable!)
     end
   end
 end

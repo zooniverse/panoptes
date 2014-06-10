@@ -23,7 +23,7 @@ describe Activation do
     end
   end
 
-  let(:instances) { 
+  let(:instances) {
     n = Array(10..20).sample
     is = []
     n.times do |i|
@@ -37,26 +37,30 @@ describe Activation do
   }
 
   describe '::enable_instances!' do
+    let(:enable_instances) { Activation.enable_instances!(instances) }
+
     it 'should call enable! on a list of objects' do
       expect(instances).to all( receive(:enable!) )
-      Activation.enable_instances!(instances)
+      enable_instances
     end
 
     it 'should set all instances to active' do
-      expect(Activation.enable_instances!(instances).map{|i| i.active? })
-        .to all( be_truthy )
+      enable_instances
+      expect(instances.map { |i| i.active? }).to all( be_truthy )
     end
   end
 
-  describe '::dinstancesable_instances!' do
+  describe '::disable_instances!' do
+    let(:disable_instances) { Activation.disable_instances!(instances) }
+
     it 'should call disable on a list of objects' do
       expect(instances).to all( receive(:disable!) )
-      Activation.disable_instances!(instances)
+      disable_instances
     end
 
     it 'should set all instances to inactive' do
-      expect(Activation.disable_instances!(instances).map{|i| i.inactive?})
-        .to all( be_truthy ) 
+      disable_instances
+      expect(instances.map { |i| i.inactive? }).to all( be_truthy )
     end
   end
 end
