@@ -9,6 +9,6 @@ module Ownable
   end
 
   def owner?(instance)
-    owner == instance
+    instance.class < Owner && owner == instance
   end
 end
