@@ -3,7 +3,7 @@ require "zlib"
 
 describe UserInfoScrubber do
 
-  describe '::scrub_personal_info!!' do
+  describe '::scrub_personal_info!' do
     let(:scrub_user_details) { UserInfoScrubber.scrub_personal_info!(user) }
 
     context "when using an active user" do
@@ -26,16 +26,17 @@ describe UserInfoScrubber do
       end
     end
 
-    context "when using an active user" do
+    context "when using an inactive user" do
       let(:user) { create(:inactive_user) }
 
-      it 'should not change the persisted instance' do
-        scrub_user_details
-        expect(user.changed?).to eq(false)
+      it 'should raise an error as the user is already disabled' do
+        error_message = "Can't scrub personal details of a disabled user with id: #{user.id}"
+        expect { scrub_user_details }.to raise_error(UserInfoScrubber::ScrubDisabledUserError, error_message)
       end
 
-      it 'should return false as the user is already disabled' do
-        expect(scrub_user_details).to eq(false)
+      it 'should not change the persisted instance' do
+        scrub_user_details rescue nil
+        expect(user.changed?).to eq(false)
       end
     end
   end
