@@ -20,8 +20,7 @@ class Api::V1::UsersController < Api::ApiController
   def destroy
     user = User.find(params[:id])
     UserInfoScrubber.scrub_personal_info!(user)
-    user.disable!
-    Activation.disable_instances!(user.projects | user.collections | user.memberships)
+    Activation.disable_instances!([ user ] | user.projects | user.collections | user.memberships)
     render status: 204, json: {}
   end
 end
