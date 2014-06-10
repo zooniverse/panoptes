@@ -11,34 +11,34 @@ describe User, :type => :model do
 
   describe '#login' do
     it 'should validate presence' do
-      expect{ User.create!(uri_name: build(:uri_name), password: 'password1', email: 'test@example.com') }.to raise_error
+      expect{ User.create!(name: 't', password: 'password1', email: 'test@example.com') }.to raise_error
     end
 
     it 'should validate uniqueness' do
-      expect{ User.create!(uri_name: build(:uri_name), login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
-      expect{ User.create!(uri_name: build(:uri_name), login: 't', password: 'password1', email: 'test2@example.com') }.to raise_error
-      expect{ User.create!(uri_name: build(:uri_name), login: 'T', password: 'password1', email: 'test3@example.com') }.to raise_error
+      expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
+      expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test2@example.com') }.to raise_error
+      expect{ User.create!(name: 'T', login: 'T', password: 'password1', email: 'test3@example.com') }.to raise_error
     end
   end
 
   describe '#email' do
     it 'should validate case insensitive uniqueness' do
-      expect{ User.create!(uri_name: build(:uri_name), login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
-      expect{ User.create!(uri_name: build(:uri_name), login: 't2', password: 'password1', email: 'TEST@example.com') }.to raise_error
+      expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
+      expect{ User.create!(name: 't2', login: 't2', password: 'password1', email: 'TEST@example.com') }.to raise_error
     end
   end
 
   describe "#password_required?" do
     it 'should require a password when creating with a new user' do
-      expect{ User.create!(uri_name: build(:uri_name), login: "t", password: "password1", email: "test@example.com") }
+      expect{ User.create!(name: 't', login: "t", password: "password1", email: "test@example.com") }
         .to_not raise_error
 
-      expect{ User.create!(uri_name: build(:uri_name), login: "t", email: "test@example.com") }
+      expect{ User.create!(name: 'T', login: "T", email: "test@example.com") }
         .to raise_error
     end
 
     it 'should not require a password when creating a user from an import' do
-      expect{ User.create!(uri_name: build(:uri_name), login: "t", hash_func: 'sha1', email: "test@example.com") }
+      expect{ User.create!({name: 't', login: "t", hash_func: 'sha1', email: "test@example.com"}, without_protection: true) }
         .to_not raise_error
     end
   end
