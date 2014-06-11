@@ -21,6 +21,6 @@ class Api::V1::UsersController < Api::ApiController
     user = User.find(params[:id])
     UserInfoScrubber.scrub_personal_info!(user)
     Activation.disable_instances!([ user ] | user.projects | user.collections | user.memberships)
-    render status: 204, json: {}
+    deleted_resource_response
   end
 end

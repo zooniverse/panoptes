@@ -14,7 +14,7 @@ FactoryGirl.define do
     factory :user_group_with_projects do
       after(:create) do |ug|
         n = Array(2..10).sample
-        create_list(:projects, n, owner: ug)
+        create_list(:project, n, owner: ug)
       end
     end
 

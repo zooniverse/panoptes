@@ -2,11 +2,11 @@ class Api::V1::GroupsController < Api::ApiController
   doorkeeper_for :all
 
   def show
-    render json: UserGroupsSerailizer.resource(params), content_type: api_content
+    render json: UserGroupSerializer.resource(params), content_type: api_content
   end
 
   def index
-    render json: UserGroupsSerailizer.page(params), content_type: api_content
+    render json: UserGroupSerializer.page(params), content_type: api_content
   end
 
   def update
@@ -17,7 +17,9 @@ class Api::V1::GroupsController < Api::ApiController
 
   end
 
-  def delete
-
+  def destroy
+    user_group = UserGroup.find(params[:id])
+    Activation.disable_instances!([ user_group ] | user_group.projects | user_group.memberships)
+    deleted_resource_response
   end
-end 
+end
