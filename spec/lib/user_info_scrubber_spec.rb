@@ -1,5 +1,4 @@
 require 'spec_helper'
-require "zlib"
 
 describe UserInfoScrubber do
 
