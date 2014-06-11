@@ -19,10 +19,10 @@ describe UserInfoScrubber do
         expect(user.display_name).to eq("deleted_user")
       end
 
-      it "should hash their login" do
-        hashed_login_string = Zlib.crc32(user.login).to_s
+      it "should not change their login" do
+        prev_user_login = user.login
         scrub_user_details
-        expect(user.login).to eq(hashed_login_string)
+        expect(user.login).to eq(prev_user_login)
       end
     end
 
