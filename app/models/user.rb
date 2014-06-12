@@ -9,6 +9,8 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
+  rolify
+
   has_many :user_groups, through: :memberships
   has_many :classifications
   has_many :memberships

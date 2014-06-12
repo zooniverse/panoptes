@@ -1,5 +1,6 @@
 module Api
   class ApiController < ApplicationController
+    include Pundit
 
     class PatchResourceError < StandardError; end
 
