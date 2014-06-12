@@ -1,17 +1,22 @@
 class OwnedObjectPolicy < ApplicationPolicy
   def read?
-    super || user.owns?(record) || record.has_access? user
+    super || is_owner? || record.has_access?(user)
   end
 
   def create?
-    user.exists?
+    !user.nil?
   end
 
   def update?
-    super || user.owns?(record)
+    super || is_owner?
   end
 
   def delete?
-    super || user.owns?(record)
+    super || is_owner?
+  end
+
+  private 
+  def is_owner?
+    !user.nil? && user.owns?(record)
   end
 end

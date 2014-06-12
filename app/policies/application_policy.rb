@@ -1,17 +1,23 @@
 class ApplicationPolicy < Struct.new(:user, :record)
   def read?
-    user.admin?
+    is_admin?
   end
 
   def create?
-    user.admin?
+    is_admin?
   end
 
   def update?
-    user.admin?
+    is_admin?
   end
 
   def delete?
-    user.admin?
+    is_admin?
+  end
+
+  private
+
+  def is_admin?
+    !user.nil? && user.has_role?(:admin)
   end
 end

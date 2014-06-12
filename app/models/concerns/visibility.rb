@@ -30,7 +30,7 @@ module Visibility
   end
 
   def has_access?(actor)
-    is_public? || actor.has_any_role?(*roles_visible_to)
+    is_public? || (!actor.nil? && actor.has_any_role?(*roles_visible_to))
   end
 end
 
