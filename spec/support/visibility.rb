@@ -27,14 +27,14 @@ shared_examples "has visibility controls" do
   end
 
   describe "#has_access?" do
-    let(:actor) { build(:user) }
+    let(:actor) { create(:user) }
     it "should return true if it is public" do
       visible.visibility = "public"
       expect(visible.has_access?(actor)).to be_truthy
     end
 
-    it "should return true if the actor has a require role" do
-      level = visible.class.visibility_levels.keys.sample
+    it "should return true if the actor has a required role" do
+      level = visible.class.visibility_levels.keys.select{|k| k != :public}.sample
       role = visible.class.visibility_levels[level].sample
       actor.add_role(role, visible)
       visible.visibility = level.to_s
@@ -42,7 +42,7 @@ shared_examples "has visibility controls" do
     end
 
     it "should return false otherwise" do
-      level = visible.class.visibility_levels.keys.sample
+      level = visible.class.visibility_levels.keys.select{|k| k != :public}.sample
       visible.visibility = level.to_s
       expect(visible.has_access?(actor)).to be_falsy
     end

@@ -4,6 +4,7 @@ FactoryGirl.define do
     display_name "Test Project"
     user_count { 10 + rand(1000) }
     activated_state :active
+    visibility "public"
 
     association :owner, factory: :user, password: "password"
 
