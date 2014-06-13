@@ -29,7 +29,7 @@ describe OwnedObjectPolicy do
 
       it "should permit a user with the proper role" do
         collab = create(:user)
-        collab.add_role :collaborator, project
+        collab.add_role(:collaborator, project)
         expect(subject).to permit(collab, project)
       end
     end
