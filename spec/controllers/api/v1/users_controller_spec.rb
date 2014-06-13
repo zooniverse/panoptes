@@ -7,7 +7,7 @@ describe Api::V1::UsersController, type: :controller do
   }
 
   before(:each) do
-    default_request
+    default_request(scopes: ["public", "user"], user_id: users.first.id)
   end
 
   let(:api_resource_name) { "users" }
@@ -52,7 +52,6 @@ describe Api::V1::UsersController, type: :controller do
 
   describe "#me" do
     before(:each) do
-      stub_token_with_user(users.first)
       get :me
     end
 

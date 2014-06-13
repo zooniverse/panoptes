@@ -13,20 +13,22 @@ module RequestHelpers
     request.headers["Content-Type"] = "application/json-patch"
   end
 
-  def stub_token
-    allow(controller).to receive(:doorkeeper_token) { double accessible?: true }
+  def stub_token(scopes: [], user_id: nil)
+    allow(controller).to receive(:doorkeeper_token) { double( accessible?: true,
+                                                              scopes: scopes,
+                                                              resource_owner_id: user_id ) }
   end
 
   def stub_token_with_scopes(*scopes)
-    allow(controller).to receive(:dookeeper_token) { double accessible?: true, scopes: scopes }
+    stub_token(scopes: scopes)
   end
 
   def stub_token_with_user(user)
-    allow(controller).to receive(:doorkeeper_token) { double accessible?: true, resource_owner_id: user.id }
+    stub_token(user_id: user.id)
   end
 
-  def default_request
+  def default_request(scopes: ["public"], user_id: nil)
     set_accept
-    stub_token
+    stub_token(scopes: scopes, user_id: user_id)
   end
 end
