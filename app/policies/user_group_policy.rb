@@ -4,14 +4,19 @@ class UserGroupPolicy < ApplicationPolicy
   end
 
   def create?
-    user.exists?
+    !user.nil?
   end
 
   def update?
-    super || user.has_role? :group_admin, record
+    super || group_admin?
   end
 
   def delete?
-    super || user.has_role? :group_admin, record
+    super || group_admin?
+  end
+
+  private 
+  def group_admin?
+    !user.nil? && user.has_role?(:group_admin, record)
   end
 end

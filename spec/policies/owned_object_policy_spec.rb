@@ -7,18 +7,13 @@ describe OwnedObjectPolicy do
     let(:user) { build(:user) }
 
     context "project is public" do
-      let(:project) { build(:project, visibility: "public") }
-      it "should permit access if the project is public" do
-        expect(subject).to permit(user, project)
-      end
+      let(:resource) { build(:project, visibility: "public") }
 
-      it "should permit access if the project is public and there is no user" do
-        expect(subject).to permit(nil, project)
-      end
+      it_behaves_like "is public"
     end
 
     context "project is private" do
-      let(:project) { build(:project, visibility: "private", owner: user) }
+      let(:project) { create(:project, visibility: "private", owner: user) }
       
       it "should permit the owner access" do
         expect(subject).to permit(user, project)
