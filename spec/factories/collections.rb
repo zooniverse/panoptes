@@ -2,6 +2,7 @@ FactoryGirl.define do
   factory :collection do
     name "collection_name"
     activated_state :active
+    visibility "public"
 
     project
     association :owner, factory: :user

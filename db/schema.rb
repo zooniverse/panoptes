@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140612182549) do
+ActiveRecord::Schema.define(version: 20140613180001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 20140612182549) do
     t.datetime "updated_at"
     t.string   "owner_type"
     t.integer  "activated_state", default: 0, null: false
+    t.string   "visibility"
   end
 
   add_index "collections", ["owner_id"], name: "index_collections_on_owner_id", using: :btree
