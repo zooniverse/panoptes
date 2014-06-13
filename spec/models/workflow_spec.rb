@@ -11,6 +11,12 @@ describe Workflow, :type => :model do
     expect(workflow).to be_valid
   end
 
+  describe "selection" do
+    it "should not be valid with a selection" do
+      expect(build(:workflow, selection: nil)).to_not be_valid
+    end
+  end
+
   describe "#project" do
     let(:workflow) { create(:workflow) }
 

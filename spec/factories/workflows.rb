@@ -3,6 +3,9 @@ FactoryGirl.define do
     name "A Workflow"
     tasks [{we_need: "an_example"},
            {of_some_tasks: "blerg!"}].to_json
+    pairwise false
+    grouped_selection false
+    selection :random
     project
 
     factory :workflow_with_subject_set do

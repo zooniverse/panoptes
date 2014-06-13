@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140613180001) do
+ActiveRecord::Schema.define(version: 20140613211001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -242,7 +242,10 @@ ActiveRecord::Schema.define(version: 20140613180001) do
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "classifications_count", default: 0, null: false
+    t.integer  "classifications_count", default: 0,     null: false
+    t.boolean  "pairwise",              default: false, null: false
+    t.boolean  "grouped_selection",     default: false, null: false
+    t.integer  "selection",             default: 0,     null: false
   end
 
   add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree
