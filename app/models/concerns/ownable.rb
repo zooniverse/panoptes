@@ -8,6 +8,12 @@ module Ownable
     validates_presence_of :owner
   end
 
+  module ClassMethods 
+    def policy_class
+      OwnedObjectPolicy
+    end
+  end
+
   def owner?(instance)
     instance.class < Owner && owner == instance
   end
