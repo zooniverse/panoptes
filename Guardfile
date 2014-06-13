@@ -1,7 +1,7 @@
 # A sample Guardfile
 # More info at https://github.com/guard/guard#readme
 
-guard 'rspec', cmd: "bin/rspec --fail-fast", all_on_start: true, all_after_pass: false, notification: false do
+default_watch_proc = Proc.new do
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
   watch('spec/spec_helper.rb')  { "spec" }
@@ -14,3 +14,15 @@ guard 'rspec', cmd: "bin/rspec --fail-fast", all_on_start: true, all_after_pass:
   watch('config/routes.rb')                           { "spec/routing" }
   watch('app/controllers/application_controller.rb')  { "spec/controllers" }
 end
+
+group :focus do
+  guard 'rspec', cmd: "bin/rspec --tag focus --fail-fast", all_on_start: true, all_after_pass: false, notification: false do
+    default_watch_proc.call
+  end
+end
+
+guard 'rspec', cmd: "bin/rspec --fail-fast", all_on_start: true, all_after_pass: false, notification: false do
+  default_watch_proc.call
+end
+
+scope groups: 'default'
