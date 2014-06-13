@@ -168,5 +168,21 @@ describe Api::V1::UsersController, type: :controller do
       delete :destroy, id: user_id
       expect(users.first.reload.inactive?).to be_truthy
     end
+
+    context "an unmauthorized user" do
+      before(:each) do
+        stub_token(scopes: [:user], user_id: users.second.id)
+      end
+
+      it "should return 401" do
+        delete :destroy, id: user_id
+        expect(response.status).to eq(401)
+      end
+
+      it "should not disable the user" do 
+        delete :destroy, id: user_id
+        expect(users.first.reload.inactive?).to be_falsy
+      end
+    end
   end
 end

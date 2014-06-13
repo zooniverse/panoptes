@@ -33,7 +33,6 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def destroy
-    p "HERE"
     user = User.find(params[:id])
     authorize user, :delete?
     UserInfoScrubber.scrub_personal_info!(user)
