@@ -14,7 +14,15 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def update
-    # TODO: implement JSON-Patch or find a gem that does
+    response_status, response_body = begin
+      user = User.find(params[:id])
+      patched_attributes_hash = patch_resource_attributes(params[:patch], user)
+      user.update!(patched_attributes_hash)
+      [ 200, UserSerializer.resource(user) ]
+    rescue PatchResourceError, ActiveRecord::RecordInvalid => e
+      [ 400, e.message.to_json ]
+    end
+    render status: response_status, json: response_body, content_type: api_content
   end
 
   def destroy

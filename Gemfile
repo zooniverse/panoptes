@@ -17,6 +17,7 @@ gem 'devise'
 gem 'versionist'
 gem 'rack-cors', require: 'rack/cors'
 gem 'restpack_serializer'
+gem 'json-patch', '~> 1.0.0'
 
 group :development do
   gem 'spring'

@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   include Activatable
   include Owner
 
-  attr_accessible :name, :email, :password, :login, :migrated_user
+  attr_accessible :name, :email, :password, :login, :migrated_user, :display_name
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -13,7 +13,7 @@ class User < ActiveRecord::Base
   has_many :classifications
   has_many :memberships
 
-  owns :projects, :collections, :subjects, 
+  owns :projects, :collections, :subjects,
     [:oauth_applications, {class_name: "Doorkeeper::Application"}]
 
   validates :login, presence: true, uniqueness: true

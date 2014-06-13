@@ -67,6 +67,67 @@ describe Api::V1::UsersController, type: :controller do
     it_behaves_like "an api response"
   end
 
+  describe "#update" do
+    let(:user) { users.first }
+
+    before(:each) do
+      patch :update, id: user.id, patch: patch_options
+    end
+
+    context "with a valid replace patch operation" do
+      let(:new_display_name) { "Mr Creosote" }
+      let(:patch_options) { %Q"[{ \"op\": \"replace\", \"path\": \"/display_name\", \"value\": \"#{new_display_name}\" }]" }
+
+      it "should return 200 status" do
+        expect(response.status).to eq(200)
+      end
+
+      it "should have updated the attribute" do
+        expect(user.reload.display_name).to eq(new_display_name)
+      end
+
+      it "should have a single group" do
+        expect(json_response[api_resource_name].length).to eq(1)
+      end
+
+      it_behaves_like "an api response"
+    end
+
+    context "with a an invalid patch operation" do
+      let(:patch_options) { %q'[{}]' }
+
+      it "should return an error status" do
+        expect(response.status).to eq(400)
+      end
+
+      it "should return a specific error message in the response body" do
+        expect(response.body).to eq("\"Error: Patch failed to apply, check patch options.\"")
+      end
+
+      it "should not updated the resource attribute" do
+        prev_display_name = user.display_name
+        expect(user.reload.display_name).to eq(prev_display_name)
+      end
+    end
+
+    context "with and patch operation that sets a required attribute to nil" do
+      let(:patch_options) { %q'[{ "op": "replace", "path": "/login", "value": "" }]' }
+
+      it "should return a bad request status" do
+        expect(response.status).to eq(400)
+      end
+
+      it "should return a specific error message in the response body" do
+        expect(response.body).to eq("\"Validation failed: Login can't be blank\"")
+      end
+
+      it "should not updated the resource attribute" do
+        prev_login = user.login
+        expect(user.reload.login).to eq(prev_login)
+      end
+    end
+  end
+
   describe "#destroy" do
     let(:user) { users.first}
     let(:user_id) { user.id }

@@ -90,6 +90,7 @@ GEM
       thor (>= 0.14, < 2.0)
     json (1.8.1)
     json (1.8.1-java)
+    json-patch (1.0.0)
     kaminari (0.15.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -241,6 +242,7 @@ DEPENDENCIES
   guard-rspec (~> 4.2.9)
   jbuilder (~> 2.0)
   jquery-rails
+  json-patch (~> 1.0.0)
   mysql2
   pg
   pry-rails (~> 0.3.2)
