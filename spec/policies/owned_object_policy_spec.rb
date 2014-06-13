@@ -29,9 +29,7 @@ describe OwnedObjectPolicy do
       end
 
       it "should permit an admin user" do
-        admin = build(:user)
-        admin.add_role :admin
-        expect(subject).to permit(admin, project)
+        expect(subject).to permit(build(:admin_user), project)
       end
 
       it "should permit a user with the proper role" do
@@ -65,9 +63,7 @@ describe OwnedObjectPolicy do
     end
 
     it "should permit an admit user to update" do
-      admin = build(:user)
-      admin.add_role :admin
-      expect(subject).to permit(admin, project)
+      expect(subject).to permit(build(:admin_user), project)
     end
 
     it "should not permit a non-owner user to update" do
@@ -88,9 +84,7 @@ describe OwnedObjectPolicy do
     end
 
     it "should permit an admit user to delete" do
-      admin = build(:user)
-      admin.add_role :admin
-      expect(subject).to permit(admin, project)
+      expect(subject).to permit(build(:admin_user), project)
     end
 
     it "should not permit a non-owner user to delete" do

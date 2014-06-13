@@ -42,5 +42,11 @@ FactoryGirl.define do
       email 'deleted_user@zooniverse.org'
       login '1234567890'
     end
+
+    factory :admin_user do
+      after(:build) do |u|
+        u.add_role :admin
+      end
+    end
   end
 end
