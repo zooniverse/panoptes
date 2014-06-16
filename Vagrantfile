@@ -21,6 +21,7 @@ ruby_build_version = if ruby_type == 'mri'
 install_ruby = <<BASH
 RUBY_VERSION=`ruby -e "p RUBY_VERSION"`
 if [[ "$RUBY_VERSION" != "\"#{ruby_version_test}\"" ]]; then
+  echo JRUBY_OPTS=--2.0 >> /etc/environment
   apt-get update
   apt-get install -y build-essential libssl-dev libreadline-dev wget libc6-dev libssl-dev libreadline6-dev zlib1g-dev libyaml-dev libpq-dev git-core openjdk-7-jre libmysqlclient-dev
   apt-get clean

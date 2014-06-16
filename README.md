@@ -18,6 +18,8 @@ Panoptes is primarily developed against stable MRI Ruby, currently 2.1.2. It is 
 * JRuby 1.7.12
 * JRuby HEAD
 
+It uses a couple Ruby 2.0 features, so you'll need to put JRuby in 2.0 mode by setting JRUBY_OPTS=--2.0 in your environment. 
+
 You will need the following services available:
 * Postgresql 9.3
 * Kafka 0.8.1
