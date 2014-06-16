@@ -2,7 +2,7 @@ shared_examples "has visibility controls" do
   describe "::visibility_level" do
     it "should add a level to a the class's visibility levels" do
       described_class.visibility_level(:private1, :role1, :role2)
-      expect(described_class.visibility_levels).to include(:private)
+      expect(described_class.visibility_levels).to include(:private1)
       expect(described_class.visibility_levels[:private1]).to include(:role1, :role2)
     end
   end
