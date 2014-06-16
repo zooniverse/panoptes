@@ -5,18 +5,18 @@ class Api::V1::UsersController < Api::ApiController
   after_action :verify_authorized, except: :index
 
   def index
-    render json: UserSerializer.page(params), content_type: api_content
+    render json_api: UserSerializer.page(params)
   end
 
   def show
     user = User.find(params[:id])
     authorize user, :read?
-    render json: UserSerializer.resource(user), content_type: api_content
+    render json_api: UserSerializer.resource(user)
   end
 
   def me
     authorize current_resource_owner, :read?
-    render json: UserSerializer.resource(current_resource_owner), content_type: api_content
+    render json_api: UserSerializer.resource(current_resource_owner)
   end
 
   def update
@@ -24,11 +24,11 @@ class Api::V1::UsersController < Api::ApiController
       user = User.find(params[:id])
       authorize user
       user.update!(request_update_attributes(user))
-      [ 200, UserSerializer.resource(user) ]
+      [ :ok, UserSerializer.resource(user) ]
     rescue PatchResourceError, ActiveRecord::RecordInvalid => e
-      [ 400, e.message.to_json ]
+      [ :bad_request, e.message]
     end
-    render status: response_status, json: response_body, content_type: api_content
+    render status: response_status, json_api: response_body
   end
 
   def destroy

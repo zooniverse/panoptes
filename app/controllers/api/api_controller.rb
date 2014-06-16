@@ -1,17 +1,10 @@
 module Api
   class ApiController < ApplicationController
     include Pundit
+    include JSONApiRender
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
     class PatchResourceError < StandardError; end
-
-    def api_content
-      "application/vnd.api+json; version=1"
-    end
-
-    def deleted_resource_response
-      render status: 204, json: {}, content_type: api_content
-    end
 
     def request_update_attributes(resource)
       if request.patch?
@@ -39,8 +32,12 @@ module Api
       current_resource_owner
     end
 
+    def deleted_resource_response
+      render status: :no_content, json_api: {}
+    end
+
     def not_found
-      render status: 404, json: {errors: {error: "record not found"}}.to_json, content_type: api_content
+      render status: :not_found, json_api: {}
     end
   end
 end
