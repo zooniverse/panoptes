@@ -69,14 +69,31 @@ describe Api::V1::UsersController, type: :controller do
 
   describe "#update" do
     let(:user) { users.first }
+    let!(:setup_request_headers) do
+       request.env["HTTP_ACCEPT"] = "application/vnd.api+json; version=1",
+       request.env["CONTENT_TYPE"] = "application/json-patch+json"
+    end
+    let(:user_id) { user.id }
 
     before(:each) do
-      patch :update, id: user.id, patch: patch_options
+      request.env["RAW_POST_DATA"] = patch_operations
+      patch :update, id: user_id
+    end
+
+    context "when updating a non-existant user" do
+      let!(:user_id) { 100 }
+      let(:patch_operations) { nil }
+
+      it "should return a 404 status" do
+        expect(response.status).to eq(404)
+      end
     end
 
     context "with a valid replace patch operation" do
       let(:new_display_name) { "Mr Creosote" }
-      let(:patch_options) { %Q"[{ \"op\": \"replace\", \"path\": \"/display_name\", \"value\": \"#{new_display_name}\" }]" }
+      let(:patch_operations) do
+        [{ "op" => "replace", "path" => "/display_name", "value" => "#{new_display_name}" }].to_json
+      end
 
       it "should return 200 status" do
         expect(response.status).to eq(200)
@@ -94,7 +111,7 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     context "with a an invalid patch operation" do
-      let(:patch_options) { %q'[{}]' }
+      let(:patch_operations) { [{}].to_json }
 
       it "should return an error status" do
         expect(response.status).to eq(400)
@@ -111,7 +128,7 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     context "with and patch operation that sets a required attribute to nil" do
-      let(:patch_options) { %q'[{ "op": "replace", "path": "/login", "value": "" }]' }
+      let(:patch_operations) { [{ "op" => "replace", "path" => "/login", "value" => "" }].to_json }
 
       it "should return a bad request status" do
         expect(response.status).to eq(400)
