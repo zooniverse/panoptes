@@ -1,6 +1,7 @@
 module Api
   class ApiController < ApplicationController
     include Pundit
+    rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
     class PatchResourceError < StandardError; end
 
@@ -36,6 +37,10 @@ module Api
 
     def pundit_user
       current_resource_owner
+    end
+
+    def not_found
+      render status: 404, json: {errors: {error: "record not found"}}.to_json, content_type: api_content
     end
   end
 end

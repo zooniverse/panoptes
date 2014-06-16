@@ -25,9 +25,8 @@ class Api::V1::UsersController < Api::ApiController
       authorize user
       user.update!(request_update_attributes(user))
       [ 200, UserSerializer.resource(user) ]
-    rescue PatchResourceError, ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
-      status = e.is_a?(ActiveRecord::RecordNotFound) ? 404 : 400
-      [ status, e.message.to_json ]
+    rescue PatchResourceError, ActiveRecord::RecordInvalid => e
+      [ 400, e.message.to_json ]
     end
     render status: response_status, json: response_body, content_type: api_content
   end
