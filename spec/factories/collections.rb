@@ -9,8 +9,7 @@ FactoryGirl.define do
 
     factory :collection_with_subjects do
       after(:create) do |col|
-        n = Array(2..100).sample
-        create_list(:subject, n, collections: [col])
+        create_list(:subject, 2, collections: [col])
       end
     end
   end

@@ -10,22 +10,19 @@ FactoryGirl.define do
 
     factory :project_with_workflows do
       after(:create) do |p|
-        n = Array(2..10).sample
-        create_list(:workflow, n, project: p)
+        create_list(:workflow, 2, project: p)
       end
     end
 
     factory :project_with_subject_sets do
       after(:create) do |p|
-        n = Array(2..10).sample
-        create_list(:subject_set, n, project: p)
+        create_list(:subject_set, 2, project: p)
       end
     end
 
     factory :project_with_subjects do
       after(:create) do |p|
-        n = Array(2..10).sample
-        create_list(:subject_set_with_subjects, n, project: p)
+        create_list(:subject_set_with_subjects, 2, project: p)
       end
     end
   end

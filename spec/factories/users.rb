@@ -18,8 +18,7 @@ FactoryGirl.define do
 
     factory :project_owner do
       after(:create) do |user|
-        n = Array(2..10).sample
-        create_list(:project, n, owner: user)
+        create_list(:project, 2, owner: user)
       end
     end
 
@@ -31,8 +30,7 @@ FactoryGirl.define do
 
     factory :user_with_collections do
       after(:create) do |user|
-        n = Array(2..10).sample
-        create_list(:collection, n, owner: user)
+        create_list(:collection, 2, owner: user)
       end
     end
 
