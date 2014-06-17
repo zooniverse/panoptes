@@ -20,15 +20,15 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def update
-    response_status, response_body = begin
+    response_status, response = begin
       user = User.find(params[:id])
       authorize user
       user.update!(request_update_attributes(user))
       [ :ok, UserSerializer.resource(user) ]
     rescue PatchResourceError, ActiveRecord::RecordInvalid => e
-      [ :bad_request, e.message]
+      [ :bad_request, e ]
     end
-    render status: response_status, json_api: response_body
+    render status: response_status, json_api: response
   end
 
   def destroy

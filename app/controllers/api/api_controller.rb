@@ -36,8 +36,8 @@ module Api
       render status: :no_content, json_api: {}
     end
 
-    def not_found
-      render status: :not_found, json_api: {}
+    def not_found(exception)
+      render status: :not_found, json_api: exception
     end
   end
 end

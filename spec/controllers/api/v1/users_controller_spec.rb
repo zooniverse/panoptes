@@ -86,6 +86,11 @@ describe Api::V1::UsersController, type: :controller do
       it "should return a 404 status" do
         expect(response.status).to eq(404)
       end
+
+      it "should return a specific error message in the response body" do
+        error_message = json_error_message("Couldn't find User with 'id'=100")
+        expect(response.body).to eq(error_message)
+      end
     end
 
     context "with a valid replace patch operation" do
