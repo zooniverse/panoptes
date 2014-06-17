@@ -2,9 +2,13 @@ module Api
   class ApiController < ApplicationController
     include Pundit
     include JSONApiRender
-    rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
-    class PatchResourceError < StandardError; end
+    class PatchResourceError < PanoptesControllerError; end
+    class UnauthorizedTokenError < PanoptesControllerError; end
+
+    rescue_from ActiveRecord::RecordNotFound, with: :not_found
+    rescue_from Pundit::NotAuthorizedError, with: :not_authorized
+    rescue_from UnauthorizedTokenError, with: :not_authorized
 
     def request_update_attributes(resource)
       if request.patch?
@@ -32,12 +36,22 @@ module Api
       current_resource_owner
     end
 
+    protected
+
     def deleted_resource_response
       render status: :no_content, json_api: {}
     end
 
+    def not_authorized(exception)
+      render status: :unauthorized, json_api: exception
+    end
+
     def not_found(exception)
       render status: :not_found, json_api: exception
+    end
+
+    def doorkeeper_unauthorized_render_options
+      raise UnauthorizedTokenError.new("You don't have sufficient permissions to access this resource")
     end
   end
 end
