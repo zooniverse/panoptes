@@ -244,8 +244,8 @@ ActiveRecord::Schema.define(version: 20140613211001) do
     t.datetime "updated_at"
     t.integer  "classifications_count", default: 0,     null: false
     t.boolean  "pairwise",              default: false, null: false
-    t.boolean  "grouped_selection",     default: false, null: false
-    t.integer  "selection",             default: 0,     null: false
+    t.boolean  "grouped",               default: false, null: false
+    t.boolean  "prioritized",           default: false, null: false
   end
 
   add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree

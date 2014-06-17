@@ -4,7 +4,6 @@ class Workflow < ActiveRecord::Base
   belongs_to :project
   has_and_belongs_to_many :subject_sets
   has_many :classifications
-  enum selection: [:random, :priorized]
 
-  validates_presence_of :project, :selection
+  validates_presence_of :project
 end
