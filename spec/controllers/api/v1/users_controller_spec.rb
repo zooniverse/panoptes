@@ -117,7 +117,8 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should return a specific error message in the response body" do
-        expect(response.body).to eq("\"Error: Patch failed to apply, check patch options.\"")
+        error_message = json_error_message("Patch failed to apply, check patch options.")
+        expect(response.body).to eq(error_message)
       end
 
       it "should not updated the resource attribute" do
@@ -134,7 +135,8 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should return a specific error message in the response body" do
-        expect(response.body).to eq("\"Validation failed: Login can't be blank\"")
+        error_message = json_error_message("Validation failed: Login can't be blank")
+        expect(response.body).to eq(error_message)
       end
 
       it "should not updated the resource attribute" do
@@ -179,7 +181,7 @@ describe Api::V1::UsersController, type: :controller do
         expect(response.status).to eq(401)
       end
 
-      it "should not disable the user" do 
+      it "should not disable the user" do
         delete :destroy, id: user_id
         expect(users.first.reload.inactive?).to be_falsy
       end
