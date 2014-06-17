@@ -1,10 +1,14 @@
-module ResponseHelpers
+module APIResponseHelpers
   def json_response
     @json ||= JSON.parse(response.body)
   end
+
+  def json_error_message(error_message)
+    { errors: [ message: error_message ] }.to_json
+  end
 end
 
-module RequestHelpers
+module APIRequestHelpers
   def set_accept
     request.headers["Accept"] = "application/vnd.api+json; version=1"
   end

@@ -21,7 +21,7 @@ module Api
       patched_resource_string = JSON.patch(resource_json_doc, json_patch_body)
       JSON.parse(patched_resource_string)
     rescue JSON::PatchError
-      raise PatchResourceError.new("Error: Patch failed to apply, check patch options.")
+      raise PatchResourceError.new("Patch failed to apply, check patch options.")
     end
 
     def current_resource_owner
@@ -36,8 +36,8 @@ module Api
       render status: :no_content, json_api: {}
     end
 
-    def not_found
-      render status: :not_found, json_api: {}
+    def not_found(exception)
+      render status: :not_found, json_api: exception
     end
   end
 end
