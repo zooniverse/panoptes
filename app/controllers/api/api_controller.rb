@@ -57,9 +57,5 @@ module Api
     def not_found(exception)
       json_api_render(:not_found, exception)
     end
-
-    def doorkeeper_unauthorized_render_options
-      raise UnauthorizedTokenError.new("You don't have sufficient permissions to access this resource")
-    end
   end
 end

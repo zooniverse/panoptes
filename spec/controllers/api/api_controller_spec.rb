@@ -41,11 +41,12 @@ describe Api::ApiController, type: :controller do
 
     describe "when a user has an incorrect scope" do
 
-      #I agree this should be a 403 when the scope differs as it's correctly authenticated.
-      it "should return 401 with a logged in user" do
-        default_request(scopes: ["owner"], user_id: user.id)
+      it "should return 403 with a logged in user" do
+        allow(controller).to receive(:doorkeeper_token) { double( accessible?: true,
+                                                                  acceptable?: false,
+                                                                  includes_scope?: false ) }
         get :index
-        expect(response.status).to eq(401)
+        expect(response.status).to eq(403)
       end
     end
   end
