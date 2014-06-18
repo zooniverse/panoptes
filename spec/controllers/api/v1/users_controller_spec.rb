@@ -183,7 +183,7 @@ describe Api::V1::UsersController, type: :controller do
 
       it "should return 401" do
         delete :destroy, id: user_id
-        expect(response.status).to eq(401)
+        expect(response.status).to eq(403)
       end
 
       it "should not disable the user" do
