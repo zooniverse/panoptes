@@ -8,7 +8,7 @@ module Api
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
     rescue_from Pundit::NotAuthorizedError, with: :not_authorized
-    rescue_from UnauthorizedTokenError, with: :not_authorized
+    rescue_from UnauthorizedTokenError, with: :not_authenticated
 
     def request_update_attributes(resource)
       if request.patch?
