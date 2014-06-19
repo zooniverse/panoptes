@@ -20,6 +20,7 @@ module APIRequestHelpers
   def stub_token(scopes: [], user_id: nil)
     allow(controller).to receive(:doorkeeper_token) { double( accessible?: true,
                                                               scopes: scopes,
+                                                              acceptable?: true,
                                                               resource_owner_id: user_id ) }
   end
 

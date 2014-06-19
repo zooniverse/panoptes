@@ -1,5 +1,4 @@
 class Api::V1::ProjectsController < Api::ApiController
-  doorkeeper_for :index, :show, scopes: [:public]
   doorkeeper_for :update, :create, :delete, scopes: [:project]
 
   after_action :verify_authorized, except: :index
