@@ -14,6 +14,8 @@ class Project < ActiveRecord::Base
   visibility_level :beta, :collaborator, :beta_tester, :scientist, :translator
   visibility_level :private, :collaborator, :scientist, :invited
 
+  validates :primary_language, format: {with: /\A[a-z]{2}(\z|-[A-z]{2})/}
+
   def content_for(language)
     project_contents.where(language: language).first
   end

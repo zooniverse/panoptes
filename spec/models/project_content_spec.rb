@@ -6,7 +6,7 @@ RSpec.describe ProjectContent, :type => :model do
     expect(project_content).to be_valid
   end
 
-  it  "should require languages to be exactly 2 or 5 characters" do
+  it "should require languages to be exactly 2 or 5 characters" do
     expect(build(:project_content, language: 'a')).to_not be_valid
     expect(build(:project_content, language: 'abasdf')).to_not be_valid
   end

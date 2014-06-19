@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140619172218) do
+ActiveRecord::Schema.define(version: 20140619191700) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -129,6 +129,7 @@ ActiveRecord::Schema.define(version: 20140619172218) do
     t.integer  "classifications_count", default: 0,     null: false
     t.integer  "activated_state",       default: 0,     null: false
     t.string   "visibility",            default: "dev", null: false
+    t.string   "primary_language"
   end
 
   add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree

@@ -17,6 +17,17 @@ describe Project, :type => :model do
     expect(project).to be_valid
   end
 
+  it "should require the primary language to be exactly 2 or 5 characters" do
+    expect(build(:project, primary_language: 'a')).to_not be_valid
+    expect(build(:project, primary_language: 'abasdf')).to_not be_valid
+  end
+
+  it "should require the primary languages to conform to a format" do
+    expect(build(:project, primary_language: 'abasd')).to_not be_valid
+    expect(build(:project, primary_language: 'ab')).to be_valid
+    expect(build(:project, primary_language: 'ab-sd')).to be_valid
+  end
+
   describe "#workflows" do
     let(:project) { create(:project_with_workflows) }
 
