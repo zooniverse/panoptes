@@ -1,10 +1,18 @@
 class Api::V1::RegistrationsController < Devise::RegistrationsController
 
-  #TODO: Extract out the API controller funcationlity to a helper
   include JSONApiRender
-  respond_to :json
 
   def create
-    render status: :not_found, json_api: {}
+    build_resource(sign_up_params)
+    resource_saved = resource.save
+    yield resource if block_given?
+    status, content = if resource_saved
+      sign_up(resource_name, resource)
+      [ :created, UserSerializer.resource(resource) ]
+    else
+      clean_up_passwords resource
+      [ :unprocessable_entity, {} ]
+    end
+    render status: status, json_api: content
   end
 end

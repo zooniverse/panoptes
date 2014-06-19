@@ -11,9 +11,9 @@ describe Api::V1::RegistrationsController, type: :controller, focus: true do
     describe "with valid user attributes" do
       let(:user_attributes) { attributes_for(:user) }
 
-      it "should return 200" do
+      it "should return 201" do
         post :create, user: user_attributes
-        expect(response.status).to eq(404)
+        expect(response.status).to eq(201)
       end
 
       it "should increase the count of users" do
@@ -22,25 +22,25 @@ describe Api::V1::RegistrationsController, type: :controller, focus: true do
 
       it "should persist the user account" do
         post :create, user: user_attributes
-        expect(User.where(login: user_attributes[:login]).first).to exist
+        expect(User.where(login: user_attributes[:login])).to exist
       end
     end
 
     describe "with invalid user attributes" do
-      let(:user_attributes) { attributes_for(:user).merge(email: nil, login: nil) }
+      let(:user_attributes) { attributes_for(:user).merge(login: nil) }
 
-      it "should return 400" do
+      it "should return 422" do
         post :create, user: user_attributes
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
 
-      it "should increase the count of users" do
-        expect{ post :create, user: user_attributes }.to change{User.count}.from(0).to(1)
+      it "should not increase the count of users" do
+        expect{ post :create, user: user_attributes }.not_to change{ User.count }
       end
 
-      it "should persist the user account" do
+      it "should not persist the user account" do
         post :create, user: user_attributes
-        expect(User.where(login: user_attributes[:login]).first).to exist
+        expect(User.where(login: user_attributes[:login])).to_not exist
       end
     end
   end
