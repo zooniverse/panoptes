@@ -119,6 +119,9 @@ GEM
     multi_json (1.10.1)
     mysql2 (0.3.16)
     orm_adapter (0.5.0)
+    paper_trail (3.0.2)
+      activerecord (>= 3.0, < 5.0)
+      activesupport (>= 3.0, < 5.0)
     pg (0.17.1)
     polyglot (0.3.4)
     protected_attributes (1.0.7)
@@ -257,6 +260,7 @@ DEPENDENCIES
   jquery-rails
   json-patch (~> 1.0.0)
   mysql2
+  paper_trail
   pg
   pry-rails (~> 0.3.2)
   pundit

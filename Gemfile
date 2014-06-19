@@ -20,6 +20,7 @@ gem 'restpack_serializer'
 gem 'json-patch', '~> 1.0.0'
 gem 'rolify'
 gem 'pundit'
+gem 'paper_trail'
 
 group :development do
   gem 'spring'
