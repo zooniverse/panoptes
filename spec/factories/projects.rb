@@ -25,5 +25,11 @@ FactoryGirl.define do
         create_list(:subject_set_with_subjects, 2, project: p)
       end
     end
+
+    factory :project_with_contents do
+      after(:create) do |p|
+        create_list(:project_content, 1, project: p)
+      end
+    end
   end
 end

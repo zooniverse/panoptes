@@ -50,4 +50,20 @@ describe Project, :type => :model do
 
     it_behaves_like "it has a subjects association"
   end
+
+  describe "#content_for" do
+    let(:project) { create(:project_with_contents) }
+
+    it "should return the contents for the given language" do
+      expect(project.content_for('en')).to be_a(ProjectContent)
+    end
+  end
+
+  describe "#available_languages" do
+    let(:project) { create(:project_with_contents) }
+
+    it "should return a list of available languages" do
+      expect(project.available_languages).to include('en')
+    end
+  end
 end
