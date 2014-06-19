@@ -4,10 +4,18 @@ Rails.application.routes.draw do
     controllers applications: 'oauth/applications'
   end
 
+  devise_for :users, skip: [ :registrations, :sessions, :passwords ]
+
   namespace :api do
     api_version(:module => "V1", :header => {name: "Accept", :value => "application/vnd.api+json; version=1"}) do
 
-      devise_for :users
+      devise_scope :user do
+        post   'registrations',   to: 'registrations#create',   as: 'sign_up'
+        post   'sessions',        to: 'sessions#create',        as: 'login'
+        delete 'sessions',        to: 'sessions#destroy',       as: 'logout'
+        post   'passwords_reset', to: 'passwords_reset#create', as: 'reset_password'
+        match  'passwords_reset', to: 'passwords_reset#update', as: 'reset_password_confirm', via: [:put, :patch]
+      end
 
       get "/me", to: 'users#me', format: false
 

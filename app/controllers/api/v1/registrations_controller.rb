@@ -1,34 +1,10 @@
-class Api::V1::RegistrationsController < Api::ApiController
+class Api::V1::RegistrationsController < Devise::RegistrationsController
 
-  class RegistrationError < StandardError; end
-
-  # doorkeeper_for :index, :me, :show, scopes: [:public]
-  # doorkeeper_for :update, :destroy, scopes: [:user]
-  #
-  # after_action :verify_authorized, except: :index
-
-  def new
-    not_supported
-  end
-
-  def edit
-    not_supported
-  end
-
-  def destroy
-    not_supported
-  end
-
-  def update
-    not_supported
-  end
+  #TODO: Extract out the API controller funcationlity to a helper
+  include JSONApiRender
+  respond_to :json
 
   def create
+    render status: :not_found, json_api: {}
   end
-
-  private
-
-    def not_supported
-      not_found(RegistrationError.new("Nothing to see here...move along now."))
-    end
 end
