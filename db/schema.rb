@@ -111,7 +111,6 @@ ActiveRecord::Schema.define(version: 20140620173823) do
     t.text     "description"
     t.json     "pages"
     t.json     "example_strings"
-    t.json     "task_strings"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

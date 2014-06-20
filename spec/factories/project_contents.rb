@@ -8,6 +8,5 @@ FactoryGirl.define do
     description "Some Lorem Ipsum"
     pages '{ "about": {"title": "A Page Title", "content_html": "<p>Some HTML Cotent</p>", "content_md": "Some Markdown Content"} }'
     example_strings '{ "example_1": "A descripton of it"}' 
-    task_strings '{"question_key": {"question": "Question Text", "answers": {"answer_key": "answer text"}}}'
   end
 end

@@ -7,7 +7,6 @@ class CreateProjectContents < ActiveRecord::Migration
       t.text :description
       t.json :pages
       t.json :example_strings
-      t.json :task_strings
 
       t.timestamps
     end

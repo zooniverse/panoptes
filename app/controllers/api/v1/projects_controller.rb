@@ -10,7 +10,6 @@ class Api::V1::ProjectsController < Api::ApiController
                                                 {languages: current_languages,
                                                 fields: ['title',
                                                          'description',
-                                                         'task_strings',
                                                          'example_strings',
                                                          'pages']})
   end

@@ -13,10 +13,6 @@ RSpec.describe ProjectContent, :type => :model do
     it_behaves_like "a locale field"
   end
 
-  it "should require task_strings to be present" do
-    expect(build(:project_content, task_strings: nil)).to_not be_valid
-  end
-
   it "should require title to be present" do
     expect(build(:project_content, title: nil)).to_not be_valid
   end
@@ -24,5 +20,4 @@ RSpec.describe ProjectContent, :type => :model do
   it "should require description to be present" do
     expect(build(:project_content, description: nil)).to_not be_valid
   end
-
 end
