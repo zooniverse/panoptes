@@ -7,7 +7,7 @@ class Api::V1::ProjectsController < Api::ApiController
     project = Project.find(params[:id])
     authorize project, :read?
     render json_api: ProjectSerializer.resource(project, 
-                                                language: current_language,
+                                                language: current_languages,
                                                 fields: ['title',
                                                          'description',
                                                          'task_strings',
@@ -17,7 +17,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def index
     render json_api: ProjectSerializer.page(params,
-                                            language: language,
+                                            language: current_languages,
                                             fields: ['title', 'decription'])
   end
 
