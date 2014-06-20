@@ -5,16 +5,12 @@ RSpec.describe ProjectContent, :type => :model do
   it "should have a valid factory" do
     expect(project_content).to be_valid
   end
-
-  it "should require languages to be exactly 2 or 5 characters" do
-    expect(build(:project_content, language: 'a')).to_not be_valid
-    expect(build(:project_content, language: 'abasdf')).to_not be_valid
-  end
-
-  it "should require languages to conform to a format" do
-    expect(build(:project_content, language: 'abasd')).to_not be_valid
-    expect(build(:project_content, language: 'ab')).to be_valid
-    expect(build(:project_content, language: 'ab-sd')).to be_valid
+  
+  describe "#language" do
+    let(:factory) { :project_content }
+    let(:locale_field) { :language }
+    
+    it_behaves_like "a locale field"
   end
 
   it "should require task_strings to be present" do

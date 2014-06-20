@@ -16,11 +16,25 @@ class Project < ActiveRecord::Base
 
   validates :primary_language, format: {with: /\A[a-z]{2}(\z|-[A-z]{2})/}
 
-  def content_for(language, fields)
+  def content_for(languages, fields)
+    language = best_match_for(languages)
     project_contents.select(*fields).where(language: language).first
   end
 
   def available_languages
-    project_contents.select('language').map(&:language)
+    project_contents.select('language').map(&:language).map(&:downcase)
+  end
+
+  private
+
+  def best_match_for(languages)
+    languages = languages.flat_map do |lang|
+      if lang.length == 2
+        lang
+      else
+        [lang, lang.split('-').first]
+      end
+    end
+    (languages & available_languages).first || primary_language
   end
 end

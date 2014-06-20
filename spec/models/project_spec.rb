@@ -16,16 +16,12 @@ describe Project, :type => :model do
   it "should have a valid factory" do
     expect(project).to be_valid
   end
-
-  it "should require the primary language to be exactly 2 or 5 characters" do
-    expect(build(:project, primary_language: 'a')).to_not be_valid
-    expect(build(:project, primary_language: 'abasdf')).to_not be_valid
-  end
-
-  it "should require the primary languages to conform to a format" do
-    expect(build(:project, primary_language: 'abasd')).to_not be_valid
-    expect(build(:project, primary_language: 'ab')).to be_valid
-    expect(build(:project, primary_language: 'ab-sd')).to be_valid
+  
+  describe "#primary_language" do
+    let(:factory) { :project}
+    let(:locale_field) { :primary_language }
+    
+    it_behaves_like "a locale field"
   end
 
   describe "#workflows" do
@@ -66,12 +62,16 @@ describe Project, :type => :model do
     let(:project) { create(:project_with_contents) }
 
     it "should return the contents for the given language" do
-      expect(project.content_for('en', ["id"])).to be_a(ProjectContent)
+      expect(project.content_for(['en'], ["id"])).to be_a(ProjectContent)
     end
 
     it "should return the given fields for the given langauge" do
-      expect(project.content_for('en', ["id"]).try(:id)).to_not be_nil
-      expect(project.content_for('en', ["id"]).try(:title)).to be_nil
+      expect(project.content_for(['en'], ["id"]).try(:id)).to_not be_nil
+      expect(project.content_for(['en'], ["id"]).try(:title)).to be_nil
+    end
+
+    it "should match less specific locales" do
+      expect(project.content_for(['en-US'], ["id"])).to be_a(ProjectContent)
     end
   end
 
