@@ -16,8 +16,8 @@ class Project < ActiveRecord::Base
 
   validates :primary_language, format: {with: /\A[a-z]{2}(\z|-[A-z]{2})/}
 
-  def content_for(language)
-    project_contents.where(language: language).first
+  def content_for(language, fields)
+    project_contents.select(*fields).where(language: language).first
   end
 
   def available_languages

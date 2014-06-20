@@ -66,7 +66,12 @@ describe Project, :type => :model do
     let(:project) { create(:project_with_contents) }
 
     it "should return the contents for the given language" do
-      expect(project.content_for('en')).to be_a(ProjectContent)
+      expect(project.content_for('en', ["id"])).to be_a(ProjectContent)
+    end
+
+    it "should return the given fields for the given langauge" do
+      expect(project.content_for('en', ["id"]).try(:id)).to_not be_nil
+      expect(project.content_for('en', ["id"]).try(:title)).to be_nil
     end
   end
 
