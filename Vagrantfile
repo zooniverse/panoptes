@@ -4,16 +4,16 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
-ruby_type = ENV['VAGRANT_RUBY'] || 'mri'
+ruby_type = ENV['VAGRANT_RUBY'] || 'jruby'
 
 ruby_version_test = if ruby_type == 'mri'
-                      "2.1.1"
+                      "2.1.2"
                     elsif ruby_type == 'jruby'
                       "1.9.3"
                     end
 
 ruby_build_version = if ruby_type == 'mri'
-                       "2.1.1"
+                       "2.1.2"
                      elsif ruby_type == 'jruby'
                        "jruby-1.7.12"
                      end
@@ -23,6 +23,7 @@ RUBY_VERSION=`ruby -e "p RUBY_VERSION"`
 if [[ "$RUBY_VERSION" != "\"#{ruby_version_test}\"" ]]; then
   echo JRUBY_OPTS=--2.0 >> /etc/environment
   apt-get update
+  apt-get remove -y openjdk-6-jre
   apt-get install -y build-essential libssl-dev libreadline-dev wget libc6-dev libssl-dev libreadline6-dev zlib1g-dev libyaml-dev libpq-dev git-core openjdk-7-jre libmysqlclient-dev
   apt-get clean
   git clone https://github.com/sstephenson/ruby-build.git && cd ruby-build && ./install.sh

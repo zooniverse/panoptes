@@ -12,9 +12,8 @@ If you're interested in how Panoptes is implemented check out the [wiki](https:/
 
 ### Requirements
 
-Panoptes is primarily developed against stable MRI Ruby, currently 2.1.2. It is tested against the following versions:
+Panoptes is primarily developed against stable JRuby, currently 1.7.12. It is tested against the following versions:
 * 2.1.2
-* 2.1.1
 * JRuby 1.7.12
 * JRuby HEAD
 
@@ -38,7 +37,7 @@ Panoptes comes with [Vagrant](http://vagrantup.com) (version > 1.5.0) and [Virtu
 
 The Rails application running in the VM will be available at `http://localhost:3000`.
 
-You can specify either MRI-Ruby or JRuby for the vagrant box by setting $VAGRANT_RUBY to 'mri' or 'jruby' in your shell then running `vagrant provision` (or `vagrant up` if you haven't created the VM yet). By default it will install MRI-Ruby.
+You can specify either MRI-Ruby or JRuby for the vagrant box by setting $VAGRANT_RUBY to 'mri' or 'jruby' in your shell then running `vagrant provision` (or `vagrant up` if you haven't created the VM yet). By default it will install JRuby.
 
 ### License
 
