@@ -39,7 +39,7 @@ module Api
     def current_languages
       ( [params[:language]] | 
         (current_resource_owner.try(:languages) || []) |
-        parse_http_accept_language ).uniq
+        parse_http_accept_language ).uniq.compact
     end
 
     protected
@@ -56,7 +56,7 @@ module Api
         [lang, priority]
       end.sort do |(_, left), (_, right)|
         right <=> left
-      end.map(&:first).compact
+      end.map(&:first)
     end
 
     def deleted_resource_response

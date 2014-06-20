@@ -11,7 +11,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
   let(:api_resource_name) { "projects" }
   let(:api_resource_attributes) do 
-    [ "id", "name", "display_name", "classifications_count", "subjects_count", "updated_at", "created_at", "available_languages"]
+    [ "id", "name", "display_name", "classifications_count", "subjects_count", "updated_at", "created_at", "available_languages", "content"]
   end
   let(:api_resource_links) do
     [ "projects.owner", "projects.workflows", "projects.subject_sets", "projects.project_contents" ]

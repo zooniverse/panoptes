@@ -8,8 +8,8 @@ class ProjectSerializer
 
   def content
     if @context[:languages]
-      content = @model.content_for(@content[:langauges], @context[:fields])
-      @context[:fields].map{ |k| Hash.new(k, content.send(k)) }.reduce(&:merge)
+      content = @model.content_for(@context[:languages], @context[:fields])
+      @context[:fields].map{ |k| Hash[k, content.send(k)] }.reduce(&:merge)
     end
   end
 end
