@@ -53,4 +53,30 @@ describe Api::V1::ProjectsController, type: :controller do
     it_behaves_like "an api response"
   end
 
+  describe "#create" do
+    before(:each) do
+      params = { display_name: "New Zoo",
+                 description: "A new Zoo for you!",
+                 name: "new_zoo",
+                 primary_language: 'en' }
+
+      post :create, params, { 'CONTENT_TYPE' => 'application/json' }
+    end
+
+    it "should create a new project" do
+      expect(Project.order(created_at: :desc).first.name).to eq("new_zoo")
+    end
+
+    it "should create an associated project_content model" do
+      expect(Project.order(created_at: :desc)
+              .first.project_contents.first.title).to eq('New Zoo')
+      expect(Project.order(created_at: :desc)
+              .first.project_contents.first.description).to eq('A new Zoo for you!')
+      expect(Project.order(created_at: :desc)
+              .first.project_contents.first.language).to eq('en')
+    end
+
+    it_behaves_like "an api response"
+  end
+
 end
