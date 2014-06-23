@@ -42,6 +42,7 @@ describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
       end
 
       it "should use devise to send the password reset email" do
+        Api::V1::PasswordsController.any_instance.stub(:reset_status).and_return(:ok)
         expect(User).to receive(:send_reset_password_instructions).once
         post :create, user_email_attrs
       end
@@ -61,6 +62,19 @@ describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
         post :create, user_email_attrs
         email = ActionMailer::Base.deliveries.first
         expect(email.to).to include(user.email)
+      end
+    end
+  end
+
+  describe "#update", :focus do
+    let(:user) { create(:user) }
+    let(:passwords) { { password: "654321", password_confirmation: "654321" } }
+
+    context "when not supplying a valid reset token" do
+
+      it "should return 422" do
+        put :update, user: { reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" }
+        expect(response.status).to eq(422)
       end
     end
   end
