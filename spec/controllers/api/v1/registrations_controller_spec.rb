@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::RegistrationsController, type: :controller, focus: true do
+describe Api::V1::RegistrationsController, type: :controller do
 
   before(:each) do
     request.env["devise.mapping"] = Devise.mappings[:user]

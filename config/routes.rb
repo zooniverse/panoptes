@@ -11,8 +11,6 @@ Rails.application.routes.draw do
 
       devise_scope :user do
         post   'registrations',   to: 'registrations#create',   as: 'sign_up'
-        post   'sessions',        to: 'sessions#create',        as: 'login'
-        delete 'sessions',        to: 'sessions#destroy',       as: 'logout'
         post   'passwords_reset', to: 'passwords_reset#create', as: 'reset_password'
         match  'passwords_reset', to: 'passwords_reset#update', as: 'reset_password_confirm', via: [:put, :patch]
       end
