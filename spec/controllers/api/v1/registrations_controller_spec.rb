@@ -24,6 +24,16 @@ describe Api::V1::RegistrationsController, type: :controller do
         post :create, user: user_attributes
         expect(User.where(login: user_attributes[:login])).to exist
       end
+
+      it "should not sign the user in" do
+        expect(subject).to_not receive(:sign_in)
+        post :create, user: user_attributes
+      end
+
+      it "should clear the password attributes" do
+        expect(subject).to receive(:clean_up_passwords)
+        post :create, user: user_attributes
+      end
     end
 
     describe "with invalid user attributes" do
