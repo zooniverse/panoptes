@@ -70,6 +70,19 @@ describe User, :type => :model do
     end
   end
 
+  describe "#active_for_authentication?" do
+    let(:user) { create(:user) }
+
+    it "should return true for an active user" do
+      expect(user.active_for_authentication?).to eq(true)
+    end
+
+    it "should be false for a disabled user" do
+      user.disable!
+      expect(user.active_for_authentication?).to eq(false)
+    end
+  end
+
   describe "#projects" do
     let(:user) { create(:project_owner) }
 

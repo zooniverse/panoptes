@@ -45,6 +45,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def active_for_authentication?
+    !disabled? && super
+  end
+
   protected
 
   def migrated_user?
