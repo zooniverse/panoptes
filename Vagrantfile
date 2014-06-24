@@ -44,8 +44,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "docker" do |d|
     d.pull_images "paintedfox/postgresql"
+    d.pull_images 'edpaget/zookeeper'
 
     d.run 'paintedfox/postgresql',
       args: '--name pg -p 5432:5432 -e USER="panoptes" -e PASS="panoptes" -v /opt/postgresql:/data'
+    d.run 'edpaget/zookeeper:3.4.6',
+      args: '--name zk -p 2181:2181',
+      cmd: '-c localhost:2888:3888 -i 1'
   end
 end
