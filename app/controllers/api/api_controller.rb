@@ -32,14 +32,30 @@ module Api
       @current_resource_owner ||= User.find(doorkeeper_token.resource_owner_id) if doorkeeper_token
     end
 
-    def pundit_user
-      current_resource_owner
+    def current_languages
+      ( [params[:language]] | 
+        (current_resource_owner.try(:languages) || []) |
+        parse_http_accept_language ).uniq.compact
     end
+
+    alias_method :pundit_user, :current_resource_owner
+    alias_method :user_for_paper_trail, :current_resource_owner
 
     protected
 
     def json_api_render(status, content)
       render status: status, json_api: content
+    end
+
+    def parse_http_accept_language
+      request.env['HTTP_ACCEPT_LANGUAGE'].gsub(/\s+/, '').split(',').map do |lang|
+        lang, priority = lang.split(";q=")
+        lang = lang.downcase
+        priority = priority ? priority.to_f : 1.0
+        [lang, priority]
+      end.sort do |(_, left), (_, right)|
+        right <=> left
+      end.map(&:first)
     end
 
     def deleted_resource_response

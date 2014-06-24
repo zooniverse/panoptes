@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140613211001) do
+ActiveRecord::Schema.define(version: 20140620173823) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -104,6 +104,19 @@ ActiveRecord::Schema.define(version: 20140613211001) do
   add_index "oauth_applications", ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type", using: :btree
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
+  create_table "project_contents", force: true do |t|
+    t.integer  "project_id"
+    t.string   "language"
+    t.string   "title"
+    t.text     "description"
+    t.json     "pages"
+    t.json     "example_strings"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "project_contents", ["project_id"], name: "index_project_contents_on_project_id", using: :btree
+
   create_table "projects", force: true do |t|
     t.string   "name"
     t.string   "display_name"
@@ -115,6 +128,7 @@ ActiveRecord::Schema.define(version: 20140613211001) do
     t.integer  "classifications_count", default: 0,     null: false
     t.integer  "activated_state",       default: 0,     null: false
     t.string   "visibility",            default: "dev", null: false
+    t.string   "primary_language"
   end
 
   add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree
@@ -223,6 +237,7 @@ ActiveRecord::Schema.define(version: 20140613211001) do
     t.string   "credited_name"
     t.integer  "classifications_count",  default: 0,        null: false
     t.integer  "activated_state",        default: 0,        null: false
+    t.string   "languages",                                              array: true
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
@@ -235,6 +250,17 @@ ActiveRecord::Schema.define(version: 20140613211001) do
   end
 
   add_index "users_roles", ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id", using: :btree
+
+  create_table "versions", force: true do |t|
+    t.string   "item_type",  null: false
+    t.integer  "item_id",    null: false
+    t.string   "event",      null: false
+    t.string   "whodunnit"
+    t.text     "object"
+    t.datetime "created_at"
+  end
+
+  add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
   create_table "workflows", force: true do |t|
     t.string   "name"

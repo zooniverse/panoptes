@@ -5,6 +5,7 @@ FactoryGirl.define do
     user_count { 10 + rand(1000) }
     activated_state :active
     visibility "public"
+    primary_language "en"
 
     association :owner, factory: :user, password: "password"
 
@@ -23,6 +24,12 @@ FactoryGirl.define do
     factory :project_with_subjects do
       after(:create) do |p|
         create_list(:subject_set_with_subjects, 2, project: p)
+      end
+    end
+
+    factory :project_with_contents do
+      after(:create) do |p|
+        create_list(:project_content, 1, project: p)
       end
     end
   end

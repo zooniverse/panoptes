@@ -1,13 +1,9 @@
 source 'https://rubygems.org'
 
 gem 'rails', '4.1.1'
-gem 'pg', platforms: :ruby
-gem 'activerecord-jdbcpostgresql-adapter', platforms: :jruby, github: 'jruby/activerecord-jdbc-adapter'
 gem 'sass-rails', '~> 4.0.3'
 gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.0.0'
-gem 'therubyracer',  platforms: :ruby
-gem 'therubyrhino', platforms: :jruby
 gem 'jquery-rails'
 gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
@@ -20,6 +16,17 @@ gem 'restpack_serializer'
 gem 'json-patch', '~> 1.0.0'
 gem 'rolify'
 gem 'pundit'
+gem 'paper_trail'
+
+platforms :jruby do
+  gem 'activerecord-jdbcpostgresql-adapter', github: 'jruby/activerecord-jdbc-adapter'
+  gem 'therubyrhino'
+end
+
+platforms :ruby do
+  gem 'therubyracer'
+  gem 'pg'
+end
 
 group :development do
   gem 'spring'
