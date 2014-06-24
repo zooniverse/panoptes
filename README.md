@@ -25,6 +25,14 @@ You will need the following services available:
 * [Cellect](https://github.com/parrish/Cellect)
 * Zookeeper 3.4.6
 
+#### Zookeeper
+
+A really easy way to get Zookeeper running on your local machine, if you don't want to use the Vagrant configuration, is to run it in a docker container. First install docker ([OS X Docs](https://docs.docker.com/installation/mac/), [Ubuntu docs](https://docs.docker.com/installation/ubuntulinux/)), then run the following command to pull and run a Zookeeper container:
+
+      sudo docker run -d --name zk --publish 2181:2181 edpaget/zookeeper:3.4.6 -i 1 -c localhost:2888:3888
+
+Make sure you don't have anything else running on port 2181 that will conflict with the container. Or change the second number to map to a different port and adjust the port in your `cellect.yml` file. 
+
 ### Vagrant
 
 Panoptes comes with [Vagrant](http://vagrantup.com) (version > 1.5.0) and [VirtualBox](https://www.virtualbox.org/) (version > 4.3) configuration to make a test environment easy to get up and running. Use the following commands to get started
