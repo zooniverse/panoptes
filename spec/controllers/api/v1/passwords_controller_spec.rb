@@ -8,6 +8,8 @@ describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
 
   describe "#create" do
     let(:user) { create(:user) }
+    let(:email_attributes) { user.attributes.slice("email") }
+    let(:user_email_attrs) { { user: email_attributes } }
 
     context "when not supplying an email" do
 
@@ -32,9 +34,20 @@ describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
       end
     end
 
+    context "when the user is disabled" do
+      let!(:disable_user) { user.disable! }
+
+      it "should respond with 422" do
+        post :create, user_email_attrs
+        expect(response.status).to eq(422)
+      end
+
+      it "should not send an email to the account email address" do
+        expect(ActionMailer::Base.deliveries).to be_empty
+      end
+    end
+
     context "using an email address that belongs to a user" do
-      let(:email_attributes) { user.attributes.slice("email") }
-      let(:user_email_attrs) { { user: email_attributes } }
 
       it "should return 200" do
         post :create, user_email_attrs
@@ -42,7 +55,7 @@ describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
       end
 
       it "should use devise to send the password reset email" do
-        Api::V1::PasswordsController.any_instance.stub(:reset_status).and_return(:ok)
+        Api::V1::PasswordsController.any_instance.stub(:successfully_sent?).and_return(:true)
         expect(User).to receive(:send_reset_password_instructions).once
         post :create, user_email_attrs
       end
@@ -66,15 +79,38 @@ describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
     end
   end
 
-  describe "#update", :focus do
+  describe "#update" do
     let(:user) { create(:user) }
-    let(:passwords) { { password: "654321", password_confirmation: "654321" } }
+    let(:new_password) { "87654321" }
+    let(:passwords) do
+      { password: new_password, password_confirmation: new_password }
+    end
 
     context "when not supplying a valid reset token" do
 
       it "should return 422" do
         put :update, user: { reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" }
         expect(response.status).to eq(422)
+      end
+    end
+
+    context "when supplying a valid reset token" do
+      let(:valid_token) { user.send_reset_password_instructions }
+
+      context "with a database user" do
+
+        before(:each) do
+          put :update, user: passwords.merge(reset_password_token: valid_token)
+        end
+
+        it "should return 200" do
+          expect(response.status).to eq(200)
+        end
+
+        it "should update the password" do
+          user.reload
+          expect(user.valid_password?(new_password)).to eq(true)
+        end
       end
     end
   end
