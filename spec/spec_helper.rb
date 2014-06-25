@@ -19,6 +19,8 @@ RSpec.configure do |config|
   config.include APIRequestHelpers, type: :controller
   config.include APIResponseHelpers, type: :controller
 
+  config.filter_run focus: true
+  config.run_all_when_everything_filtered = true
   config.use_transactional_fixtures = true
 
   config.before(:suite) do
