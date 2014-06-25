@@ -48,4 +48,14 @@ FactoryGirl.define do
       end
     end
   end
+
+  # fails validations - change when adding omniauth
+  factory :omni_auth_user, class: :user do
+    sequence(:login) { |n| "new_user_#{n}" }
+    sequence(:email) {|n| "example#{n}@example.com"}
+    display_name 'New User'
+    credited_name 'Dr New User'
+    activated_state :active
+    languages ['en', 'es', 'fr-ca']
+  end
 end

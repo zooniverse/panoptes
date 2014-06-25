@@ -4,7 +4,7 @@ class Api::V1::PasswordsController < Devise::PasswordsController
 
   def create
     status = false
-    if active_user?
+    if able_to_reset_password?
       resource = resource_class.send_reset_password_instructions(resource_params)
       yield resource if block_given?
       status = successfully_sent?(resource)
@@ -25,9 +25,10 @@ class Api::V1::PasswordsController < Devise::PasswordsController
       render status: response_status, json_api: {}
     end
 
-    def active_user?
+    def able_to_reset_password?
       if user = resource_class.find_for_authentication(resource_params)
-        !user.disabled?
+        disabled_or_omni_auth = user.disabled? || user.encrypted_password.blank?
+        !disabled_or_omni_auth
       else
         false
       end

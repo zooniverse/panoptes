@@ -47,6 +47,24 @@ describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
       end
     end
 
+    context "when the user was created using third party authentication" do
+      #rework when third party authentication is added in (currently req a password)
+      let!(:user) do
+        user = build(:omni_auth_user)
+        user.save(validate: false)
+        user
+      end
+
+      it "should respond with 422" do
+        post :create, user_email_attrs
+        expect(response.status).to eq(422)
+      end
+
+      it "should not send an email to the account email address" do
+        expect(ActionMailer::Base.deliveries).to be_empty
+      end
+    end
+
     context "using an email address that belongs to a user" do
 
       it "should return 200" do
