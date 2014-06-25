@@ -47,9 +47,9 @@ class Api::V1::ProjectsController < Api::ApiController
                                                          'description'])
   end
 
-  def delete
+  def destroy
     project = Project.find(params[:id])
-    authorize project, :delete?
+    authorize project, :destroy?
     project.destroy
     deleted_resource_response
   end

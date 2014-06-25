@@ -11,7 +11,7 @@ class ApplicationPolicy < Struct.new(:user, :record)
     is_admin?
   end
 
-  def delete?
+  def destroy?
     is_admin?
   end
 

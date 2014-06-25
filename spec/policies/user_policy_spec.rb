@@ -35,7 +35,7 @@ describe UserPolicy do
     it_behaves_like "only self"
   end
 
-  permissions :delete? do
+  permissions :destroy? do
     it_behaves_like "only self"
   end
 end

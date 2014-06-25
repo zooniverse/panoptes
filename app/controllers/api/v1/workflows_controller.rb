@@ -23,7 +23,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def destroy
     workflow = Workflow.find params[:id]
-    authorize workflow.project, :delete?
+    authorize workflow.project, :destroy?
     workflow.destroy!
     deleted_resource_response
   end

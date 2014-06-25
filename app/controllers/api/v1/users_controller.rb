@@ -33,7 +33,7 @@ class Api::V1::UsersController < Api::ApiController
 
   def destroy
     user = User.find(params[:id])
-    authorize user, :delete?
+    authorize user, :destroy?
     UserInfoScrubber.scrub_personal_info!(user)
     Activation.disable_instances!([ user ] | user.projects | user.collections | user.memberships)
     deleted_resource_response
