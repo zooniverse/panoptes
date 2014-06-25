@@ -17,7 +17,7 @@ class Api::V1::SubjectsController < Api::ApiController
 
   end
 
-  def delete
+  def destroy
 
   end
 end 

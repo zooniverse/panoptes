@@ -11,7 +11,7 @@ class OwnedObjectPolicy < ApplicationPolicy
     super || is_owner?
   end
 
-  def delete?
+  def destroy?
     super || is_owner?
   end
 

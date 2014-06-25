@@ -17,7 +17,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   end
 
-  def delete
+  def destroy
 
   end
 end 

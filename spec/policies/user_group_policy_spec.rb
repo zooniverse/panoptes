@@ -38,7 +38,7 @@ describe UserGroupPolicy do
     it_behaves_like "allows access for admins or group admins"
   end
 
-  permissions :delete? do
+  permissions :destroy? do
     it_behaves_like "allows access for admins or group admins"
   end
 end

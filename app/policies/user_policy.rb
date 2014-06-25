@@ -11,7 +11,7 @@ class UserPolicy < ApplicationPolicy
     super || user == record
   end
 
-  def delete?
+  def destroy?
     super || user == record
   end
 end

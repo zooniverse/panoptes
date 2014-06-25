@@ -11,7 +11,7 @@ class UserGroupPolicy < ApplicationPolicy
     super || group_admin?
   end
 
-  def delete?
+  def destroy?
     super || group_admin?
   end
 

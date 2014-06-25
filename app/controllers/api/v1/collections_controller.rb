@@ -18,7 +18,7 @@ class Api::V1::CollectionsController < Api::ApiController
 
   end
 
-  def delete
+  def destroy
 
   end
 end 

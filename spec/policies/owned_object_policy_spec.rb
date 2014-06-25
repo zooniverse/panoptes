@@ -70,7 +70,7 @@ describe OwnedObjectPolicy do
     end
   end
 
-  permissions :delete? do
+  permissions :destroy? do
     let(:user) { build(:user) }
     let(:project) { build(:project, owner: user) }
 

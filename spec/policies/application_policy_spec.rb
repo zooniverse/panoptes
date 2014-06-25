@@ -30,7 +30,7 @@ describe ApplicationPolicy do
     it_behaves_like "admins only"
   end
 
-  permissions :delete? do
+  permissions :destroy? do
     it_behaves_like "admins only"
   end
 end
