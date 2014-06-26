@@ -14,10 +14,22 @@ class Api::V1::SubjectSetsController < Api::ApiController
   end
 
   def create
-
+    subject_set = SubjectSet.new creation_params
+    authorize subject_set.project, :update?
+    subject_set.save!
+    json_api_render 201, SubjectSetSerializer.resource(subject_set)
   end
 
   def destroy
-
+    subject_set = SubjectSet.find params[:id]
+    authorize subject_set.project, :delete?
+    subject_set.destroy!
+    deleted_resource_response
   end
-end 
+  
+  private
+  
+  def creation_params
+    params.require(:subject_set).permit :name, :project_id
+  end
+end
