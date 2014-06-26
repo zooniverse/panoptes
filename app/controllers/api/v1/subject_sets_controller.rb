@@ -22,7 +22,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def destroy
     subject_set = SubjectSet.find params[:id]
-    authorize subject_set.project, :delete?
+    authorize subject_set.project, :destroy?
     subject_set.destroy!
     deleted_resource_response
   end
