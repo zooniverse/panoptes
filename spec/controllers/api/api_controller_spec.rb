@@ -39,6 +39,30 @@ describe Api::ApiController, type: :controller do
       end
     end
 
+    describe "when a user has an expired token" do
+      let(:token) do
+        create(:expired_token, scopes: ["public"].join(","), resource_owner_id: user.id)
+      end
+
+      it "should return 401" do
+        get :index, access_token: token.token
+        expect(response.status).to eq(401)
+      end
+    end
+
+    describe "when a user has a revoked token" do
+      let(:token) do
+        create(:revoked_token, scopes: ["public"].join(","),
+                               resource_owner_id: user.id,
+                               use_refresh_token: true)
+      end
+
+      it "should return 401" do
+        get :index, access_token: token.token
+        expect(response.status).to eq(401)
+      end
+    end
+
     describe "when a user has an incorrect scope" do
 
       it "should return 403 with a logged in user" do
@@ -77,7 +101,7 @@ describe Api::ApiController, type: :controller do
 
     before(:each) do
       default_request(user_id: create(:user))
-      get :index, language: 'es' 
+      get :index, language: 'es'
     end
 
     it 'should include langauge param as the first language' do
@@ -87,7 +111,7 @@ describe Api::ApiController, type: :controller do
     it 'should include the user\'s default languages after the lang param' do
       expect(json_response[1..-1]).to include('en', 'fr-ca')
     end
-    
+
     it 'should include Accept-Language(s) after the user languages' do
       expect(json_response[-3..-1]).to include('zh', 'zh-tw', 'fr-fr')
     end

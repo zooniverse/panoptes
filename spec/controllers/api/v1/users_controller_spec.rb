@@ -154,6 +154,10 @@ describe Api::V1::UsersController, type: :controller do
   describe "#destroy" do
     let(:user) { users.first}
     let(:user_id) { user.id }
+    let(:token) { create(:access_token) }
+    let!(:stub_token_auth) do
+      Doorkeeper.stub(:authenticate).and_return(token)
+    end
 
     it "should call the UserInfoScrubber with the user" do
       expect(UserInfoScrubber).to receive(:scrub_personal_info!).with(user)
@@ -174,6 +178,11 @@ describe Api::V1::UsersController, type: :controller do
     it "should disable the user" do
       delete :destroy, id: user_id
       expect(users.first.reload.inactive?).to be_truthy
+    end
+
+    it "should revoke the request doorkeeper token" do
+      delete :destroy, id: user_id
+      expect(token.reload.revoked?).to eq(true)
     end
 
     context "an unauthorized user" do

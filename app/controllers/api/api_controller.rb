@@ -33,7 +33,7 @@ module Api
     end
 
     def current_languages
-      ( [params[:language]] | 
+      ( [params[:language]] |
         (current_resource_owner.try(:languages) || []) |
         parse_http_accept_language ).uniq.compact
     end
@@ -73,5 +73,12 @@ module Api
     def not_found(exception)
       json_api_render(:not_found, exception)
     end
+
+    private
+
+      def revoke_doorkeeper_request_token!
+        token = Doorkeeper.authenticate(request)
+        token.revoke
+      end
   end
 end
