@@ -33,9 +33,10 @@ module Api
     end
 
     def current_languages
-      ( [params[:language]] |
-        (current_resource_owner.try(:languages) || []) |
-        parse_http_accept_language ).uniq.compact
+      param_langs  = [ params[:language] ]
+      user_langs   = current_resource_owner.languages
+      header_langs = parse_http_accept_language
+      ( param_langs | user_langs | header_langs ).compact
     end
 
     alias_method :pundit_user, :current_resource_owner
