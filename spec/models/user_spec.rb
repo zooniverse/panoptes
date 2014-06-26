@@ -83,6 +83,18 @@ describe User, :type => :model do
     end
   end
 
+  describe "#languages" do
+    let(:user) { build(:project_owner) }
+
+    context "when no languages are set" do
+
+      it "should return an emtpy array for no set languages" do
+        user.languages = nil
+        expect(user.languages).to match_array([])
+      end
+    end
+  end
+
   describe "#projects" do
     let(:user) { create(:project_owner) }
 

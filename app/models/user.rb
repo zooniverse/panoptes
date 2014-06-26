@@ -49,6 +49,10 @@ class User < ActiveRecord::Base
     !disabled? && super
   end
 
+  def languages
+    super || []
+  end
+
   protected
 
   def migrated_user?
