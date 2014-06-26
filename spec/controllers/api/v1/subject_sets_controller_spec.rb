@@ -64,7 +64,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
       expect(response.status).to eq 201
       created = json_response['subject_sets'].first
       expect(created['name']).to eq 'Test subject set'
-      binding.pry
     end
 
     it_behaves_like 'an api response'
