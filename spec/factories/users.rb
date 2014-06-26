@@ -6,7 +6,6 @@ FactoryGirl.define do
     encrypted_password { User.new.send(:password_digest, 'password') }
     display_name 'New User'
     activated_state :active
-    languages ['en', 'es', 'fr-ca']
     sequence(:login) { |n| "new_user_#{n}" }
     sequence(:name) { |n| "new_user_#{n}" }
 
@@ -40,6 +39,10 @@ FactoryGirl.define do
       display_name 'deleted_user'
       email 'deleted_user@zooniverse.org'
       login '1234567890'
+    end
+
+    factory :user_with_languages do
+      languages ['en', 'es', 'fr-ca']
     end
 
     factory :admin_user do
