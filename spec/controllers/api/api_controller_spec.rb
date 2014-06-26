@@ -100,7 +100,7 @@ describe Api::ApiController, type: :controller do
     end
 
     before(:each) do
-      default_request(user_id: create(:user))
+      default_request(user_id: create(:user_with_languages))
       get :index, language: 'es'
     end
 
