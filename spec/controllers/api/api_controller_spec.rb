@@ -39,6 +39,30 @@ describe Api::ApiController, type: :controller do
       end
     end
 
+    describe "when a user has an expired token" do
+      let(:token) do
+        create(:expired_token, scopes: ["public"].join(","), resource_owner_id: user.id)
+      end
+
+      it "should return 401" do
+        get :index, access_token: token.token
+        expect(response.status).to eq(401)
+      end
+    end
+
+    describe "when a user has a revoked token" do
+      let(:token) do
+        create(:revoked_token, scopes: ["public"].join(","),
+                               resource_owner_id: user.id,
+                               use_refresh_token: true)
+      end
+
+      it "should return 401" do
+        get :index, access_token: token.token
+        expect(response.status).to eq(401)
+      end
+    end
+
     describe "when a user has an incorrect scope" do
 
       it "should return 403 with a logged in user" do

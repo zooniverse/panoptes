@@ -36,6 +36,7 @@ class Api::V1::UsersController < Api::ApiController
     authorize user, :destroy?
     UserInfoScrubber.scrub_personal_info!(user)
     Activation.disable_instances!([ user ] | user.projects | user.collections | user.memberships)
+    revoke_doorkeeper_request_token!
     deleted_resource_response
   end
 end
