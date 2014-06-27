@@ -5,7 +5,7 @@ ENV LANG en_US.UTF-8
 
 # Install tools & libs to compile everything
 RUN apt-get update 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential libssl-dev libreadline-dev wget libc6-dev libssl-dev libreadline6-dev zlib1g-dev libyaml-dev libpq-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential libssl-dev libreadline-dev wget libc6-dev libssl-dev libreadline6-dev zlib1g-dev libyaml-dev libpq-dev libmysqlclient-dev
 RUN apt-get clean
 
 # Install ruby-build
