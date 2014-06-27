@@ -77,7 +77,7 @@ describe Api::ApiController, type: :controller do
 
     before(:each) do
       default_request(user_id: create(:user))
-      get :index, language: 'es' 
+      get :index, language: 'es'
     end
 
     it 'should include langauge param as the first language' do
@@ -87,7 +87,7 @@ describe Api::ApiController, type: :controller do
     it 'should include the user\'s default languages after the lang param' do
       expect(json_response[1..-1]).to include('en', 'fr-ca')
     end
-    
+
     it 'should include Accept-Language(s) after the user languages' do
       expect(json_response[-3..-1]).to include('zh', 'zh-tw', 'fr-fr')
     end
