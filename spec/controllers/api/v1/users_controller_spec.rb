@@ -69,7 +69,6 @@ describe Api::V1::UsersController, type: :controller do
   describe "#update" do
     let(:user) { users.first }
     let!(:setup_request_headers) do
-       request.env["HTTP_ACCEPT"] = "application/vnd.api+json; version=1",
        request.env["CONTENT_TYPE"] = "application/json-patch+json"
     end
     let(:user_id) { user.id }
