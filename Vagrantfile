@@ -45,11 +45,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "docker" do |d|
     d.pull_images "paintedfox/postgresql"
     d.pull_images 'edpaget/zookeeper'
+    d.pull_images 'edpaget/cellect'
 
     d.run 'paintedfox/postgresql',
-      args: '--name pg -p 5432:5432 -e USER="panoptes" -e PASS="panoptes" -v /opt/postgresql:/data'
+      args: '--name pg -p 5432:5432 -e DB="Panoptes_development" -e USER="panoptes" -e PASS="panoptes" -v /opt/postgresql:/data'
     d.run 'edpaget/zookeeper:3.4.6',
       args: '--name zk -p 2181:2181',
       cmd: '-c localhost:2888:3888 -i 1'
+    d.run 'cellect-1', image: 'edpaget/cellect:062714',
+      args: '--link pg:pg --link zk:zk'
+    d.run 'cellect-2', image: 'edpaget/cellect:062714',
+      args: '--link pg:pg --link zk:zk'
   end
 end
