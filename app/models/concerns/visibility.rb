@@ -1,22 +1,26 @@
 module Visibility
   extend ActiveSupport::Concern
 
-  included do
-    @visibility_levels = {public: []}
+  included do |klass|
+    class << self
+      attr_accessor :visibility_levels
+    end
+    
+    klass.class_eval do
+      scope :publicly_visible, ->{ where(visibility: 'public') }
+    end
+    
+    self.visibility_levels = { public: [] }
   end
 
-  module ClassMethods 
+  module ClassMethods
     def visibility_level(level, *roles)
-      @visibility_levels[level] = roles
-    end
-
-    def visibility_levels
-      @visibility_levels
+      visibility_levels[level] = roles
     end
   end
 
   def current_visibility
-    visibility.to_sym
+    (visibility || :private).to_sym
   end
 
   def is_public?
