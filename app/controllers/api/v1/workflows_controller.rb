@@ -1,8 +1,11 @@
 class Api::V1::WorkflowsController < Api::ApiController
-  doorkeeper_for :all
-  after_action :verify_authorized, except: [:index, :show]
+  doorkeeper_for :update, :create, :delete, scopes: [:project] 
+  after_action :verify_authorized, except: :index
 
   def show
+    workflow = Workflow.find(params[:id])
+    authorize workflow.project, :read?
+    load_cellect
     render json_api: WorkflowSerializer.resource(params)
   end
 
@@ -11,7 +14,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def update
-    # TO-DO
+    # TODO
   end
 
   def create
@@ -35,4 +38,24 @@ class Api::V1::WorkflowsController < Api::ApiController
       .permit(:name, :project_id, :pairwise, :grouped, :prioritized)
       .merge tasks: params[:workflow][:tasks]
   end
-end
+
+  def load_cellect
+    return unless current_resource_owner
+    Cellect::Client.connection.load_user(current_resource_owner.id, **cellect_params)
+  end
+
+  def cellect_host
+    host = Cellect::Client.choose_host
+    current_resource_owner.cellect_hosts_will_change!
+    current_resource_owner.cellect_hosts[params[:id]] = host
+    current_resource_owner.save!
+    host
+  end
+
+  def cellect_params
+    {
+      host: cellect_host,
+      workflow_id: params[:id]
+    }
+  end
+end 

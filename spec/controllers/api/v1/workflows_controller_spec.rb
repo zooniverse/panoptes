@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Api::V1::WorkflowsController, type: :controller do
+  let(:user) { create(:user) }
   let!(:workflows){ create_list :workflow_with_subjects, 2 }
   let(:workflow){ workflows.first }
   let(:project){ workflow.project }
@@ -11,7 +12,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets) }
 
   before(:each) do
-    default_request scopes: %w(public workflow)
+    default_request scopes: %w(public project)
   end
 
   describe '#index' do
@@ -28,29 +29,13 @@ describe Api::V1::WorkflowsController, type: :controller do
     it_behaves_like 'an api response'
   end
 
-  describe '#show' do
-    before(:each) do
-      get :show, id: workflow.id
-    end
-
-    it 'should return 200' do
-      expect(response.status).to eq 200
-    end
-
-    it 'should return the requested workflow' do
-      expect(json_response[api_resource_name].length).to eq 1
-    end
-
-    it_behaves_like 'an api response'
-  end
-
   describe '#update' do
     it 'should be implemented'
   end
 
   describe '#create' do
     before(:each) do
-      default_request scopes: %w(public workflow), user_id: owner.id
+      default_request scopes: %w(public project), user_id: owner.id
       params = {
         workflow: {
           name: 'Test workflow',
@@ -75,7 +60,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
   describe '#destroy' do
     before(:each) do
-      default_request scopes: %w(public workflow), user_id: owner.id
+      default_request scopes: %w(public project), user_id: owner.id
       params = {
         id: workflow.id
       }
@@ -85,6 +70,50 @@ describe Api::V1::WorkflowsController, type: :controller do
     it 'should delete a workflow' do
       expect(response.status).to eq 204
       expect{ workflow.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+  end
+
+  describe "#show" do
+    context "with a logged in user" do
+      before(:each) do
+        allow(Cellect::Client).to receive(:choose_host).and_return("http://example.com")
+        allow(Cellect::Client.connection).to receive(:load_user)
+        default_request user_id: user, scopes: %(project, public)
+        get :show, id: workflows.first.id
+      end
+
+      it "should return 200" do
+        expect(response.status).to eq(200)
+      end
+
+      it "should return the requested worklow" do
+        expect(json_response[api_resource_name].length).to eq(1)
+        expect(json_response[api_resource_name][0]['id']).to eq(workflows.first.id.to_s)
+      end
+
+      it "should set the cellect host for the user and workflow" do
+        user.reload
+        expect(user.cellect_hosts).to include( workflows.first.id.to_s )
+        expect(user.cellect_hosts[ workflows.first.id.to_s ]).to eq("http://example.com")
+      end
+
+      it "should set a load user command to cellect" do
+        expect(Cellect::Client.connection).to receive(:load_user)
+          .with(user.id, 
+                host: 'http://example.com',
+                workflow_id: workflows.first.id.to_s)
+        get :show, id: workflows.first.id
+      end
+
+      it_behaves_like "an api response"
+    end
+
+    context "without a logged in user" do
+      it "should not send a load user command to cellect" do
+        expect(Cellect::Client.connection).to_not receive(:load_user)
+        default_request scopes: %w(public project)
+        get :show, id: workflows.first.id
+      end
     end
   end
 end

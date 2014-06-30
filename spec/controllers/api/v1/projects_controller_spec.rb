@@ -46,8 +46,9 @@ describe Api::V1::ProjectsController, type: :controller do
       expect(response.status).to eq(200)
     end
 
-    it "should return the resquested project" do
+    it "should return the only requested project" do
       expect(json_response[api_resource_name].length).to eq(1)
+      expect(json_response[api_resource_name][0]['id']).to eq(projects.first.id.to_s)
     end
 
     it_behaves_like "an api response"
