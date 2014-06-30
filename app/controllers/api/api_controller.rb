@@ -75,6 +75,14 @@ module Api
       json_api_render(:not_found, exception)
     end
 
+    def cellect_host(workflow_id)
+      host = Cellect::Client.choose_host
+      current_resource_owner.cellect_hosts_will_change!
+      current_resource_owner.cellect_hosts[workflow_id] = host
+      current_resource_owner.save!
+      host
+    end
+  
     private
 
       def revoke_doorkeeper_request_token!

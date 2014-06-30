@@ -44,17 +44,9 @@ class Api::V1::WorkflowsController < Api::ApiController
     Cellect::Client.connection.load_user(current_resource_owner.id, **cellect_params)
   end
 
-  def cellect_host
-    host = Cellect::Client.choose_host
-    current_resource_owner.cellect_hosts_will_change!
-    current_resource_owner.cellect_hosts[params[:id]] = host
-    current_resource_owner.save!
-    host
-  end
-
   def cellect_params
     {
-      host: cellect_host,
+      host: cellect_host(params[:id]),
       workflow_id: params[:id]
     }
   end
