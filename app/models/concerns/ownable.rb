@@ -3,14 +3,14 @@
 module Ownable
   extend ActiveSupport::Concern
 
-  included do 
+  included do
     belongs_to :owner, polymorphic: true
     validates_presence_of :owner
   end
 
-  module ClassMethods 
+  module ClassMethods
     def policy_class
-      OwnedObjectPolicy
+      include?(Visiblity) ? OwnedVisibilityPolicy : OwnedObjectPolicy
     end
   end
 

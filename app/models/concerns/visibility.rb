@@ -14,6 +14,10 @@ module Visibility
   end
 
   module ClassMethods
+    def policy_class
+      include?(Ownable) ? OwnedVisibilityPolicy : super
+    end
+    
     def visibility_level(level, *roles)
       visibility_levels[level] = roles
     end

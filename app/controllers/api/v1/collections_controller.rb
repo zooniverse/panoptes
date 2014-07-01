@@ -10,8 +10,7 @@ class Api::V1::CollectionsController < Api::ApiController
   end
 
   def index
-    policy_scope Collection
-    render json_api: CollectionSerializer.page(params)
+    render json_api: CollectionSerializer.page(params, policy_scope(Collection))
   end
 
   def update

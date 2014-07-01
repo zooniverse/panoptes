@@ -1,4 +1,17 @@
 class ApplicationPolicy < Struct.new(:user, :record)
+  class Scope
+    attr_reader :user, :scope
+
+    def initialize(user, scope)
+      @user = user
+      @scope = scope
+    end
+
+    def resolve
+      scope
+    end
+  end
+  
   def read?
     is_admin?
   end
@@ -13,6 +26,10 @@ class ApplicationPolicy < Struct.new(:user, :record)
 
   def destroy?
     is_admin?
+  end
+  
+  def scope
+    Pundit.policy_scope! user, record.class
   end
 
   private
