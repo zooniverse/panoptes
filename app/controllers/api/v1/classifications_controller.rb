@@ -25,7 +25,6 @@ class Api::V1::ClassificationsController < Api::ApiController
   private
 
   def update_cellect
-    p 'here'
     Cellect::Client.connection.add_seen(params[:subject_id], **cellect_params)
   end
 

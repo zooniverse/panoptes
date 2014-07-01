@@ -15,7 +15,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         params = {workflow_id: workflow.id,
                   subject_id: set_member_subject.id,
                   annotations: []}
-        post :create, params, {'CONTENT_TYPE' => 'applicaiton/json' }
+        post :create, params
       end
 
       before(:each) do

@@ -1,8 +1,6 @@
 class Subject < ActiveRecord::Base
   include Ownable
 
-#  attr_accessible :location, :metadata, :zooniverse_id
-
   belongs_to :project
   has_and_belongs_to_many :collections
   has_many :subject_sets, through: :set_member_subjects
