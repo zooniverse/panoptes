@@ -12,6 +12,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
     describe "#create" do
       def send_request
+        request.session = { cellect_hosts: {workflow.id.to_s => "example.com"} }
         params = {workflow_id: workflow.id,
                   subject_id: set_member_subject.id,
                   annotations: []}
@@ -32,7 +33,7 @@ describe Api::V1::ClassificationsController, type: :controller do
           set_member_subject.id.to_s,
           workflow_id: workflow.id.to_s,
           user_id: user.id,
-          host: user.cellect_hosts[workflow.id.to_s]
+          host: 'example.com'
         )
         send_request
       end

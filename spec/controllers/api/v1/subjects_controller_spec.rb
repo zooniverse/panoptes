@@ -45,6 +45,7 @@ describe Api::V1::SubjectsController, type: :controller do
           allow(Cellect::Client).to receive(:choose_host).and_return("example.com")
           allow(Cellect::Client.connection).to receive(:get_subjects)
             .and_return(subjects.take(10).map(&:id))
+          request.session = { cellect_hosts: {workflow.id.to_s => 'example.com'} }
           get :index, {sort: 'random', workflow_id: workflow.id.to_s}
         end
 
@@ -54,6 +55,18 @@ describe Api::V1::SubjectsController, type: :controller do
 
         it 'should return a page of 10 objects' do
           expect(json_response[api_resource_name].length).to eq(10)
+        end
+
+        it 'should make a request against Cellect' do
+          expect(Cellect::Client.connection).to receive(:get_subjects)
+            .with(workflow_id: workflow.id.to_s,
+                  user_id: user.id,
+                  group_id: nil,
+                  host: 'example.com',
+                  limit: 10)
+            .and_return(subjects.take(10).map(&:id))
+
+          get :index, {sort: 'random', workflow_id: workflow.id.to_s}
         end
 
         it_behaves_like "an api response"
