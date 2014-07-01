@@ -3,7 +3,7 @@ module JSONApiRender
 
   included do
     ActionController.add_renderer :json_api do |obj, options|
-      self.content_type ||= Mime::Type.lookup("application/vnd.api+json; version=1")
+      self.content_type ||= Mime::Type.lookup("application/json")
       self.response_body = JSONApiResponse.format_response_body(obj)
     end
   end
