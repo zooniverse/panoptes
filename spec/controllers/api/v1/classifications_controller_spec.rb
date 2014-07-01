@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::V1::ClassificationsController, type: :controller do
   let!(:workflow) { create(:workflow_with_subjects) }
   let!(:set_member_subject) { workflow.subject_sets.first.set_member_subjects.first }
-  let!(:user) { create(:user, cellect_hosts: { workflow.id.to_s => 'http://example.com' }) }
+  let!(:user) { create(:user) }
 
   context "logged in user" do
     before(:each) do

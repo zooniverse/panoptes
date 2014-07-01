@@ -11,11 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140630185644) do
+ActiveRecord::Schema.define(version: 20140627175457) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  enable_extension "hstore"
 
   create_table "classifications", force: true do |t|
     t.integer  "set_member_subject_id"
@@ -112,6 +111,7 @@ ActiveRecord::Schema.define(version: 20140630185644) do
     t.text     "description"
     t.json     "pages"
     t.json     "example_strings"
+    t.json     "task_strings"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -240,7 +240,6 @@ ActiveRecord::Schema.define(version: 20140630185644) do
     t.integer  "classifications_count",  default: 0,        null: false
     t.integer  "activated_state",        default: 0,        null: false
     t.string   "languages",              default: [],       null: false, array: true
-    t.hstore   "cellect_hosts",          default: {}
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree

@@ -93,8 +93,8 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it "should set the cellect host for the user and workflow" do
         user.reload
-        expect(user.cellect_hosts).to include( workflows.first.id.to_s )
-        expect(user.cellect_hosts[ workflows.first.id.to_s ]).to eq("http://example.com")
+        expect(session[:cellect_hosts]).to include( workflows.first.id.to_s )
+        expect(session[:cellect_hosts][workflows.first.id.to_s]).to eq("http://example.com")
       end
 
       it "should set a load user command to cellect" do

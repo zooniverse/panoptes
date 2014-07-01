@@ -76,11 +76,12 @@ module Api
     end
 
     def cellect_host(workflow_id)
-      host = Cellect::Client.choose_host
-      current_resource_owner.cellect_hosts_will_change!
-      current_resource_owner.cellect_hosts[workflow_id] = host
-      current_resource_owner.save!
-      host
+      host = cellect_session[workflow_id] || Cellect::Client.choose_host
+      cellect_session[workflow_id] = host
+    end
+
+    def cellect_session
+      session[:cellect_hosts] ||= {}
     end
   
     private

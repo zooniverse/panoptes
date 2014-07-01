@@ -46,15 +46,9 @@ class Api::V1::SubjectsController < Api::ApiController
     {
       workflow_id: params[:workflow_id],
       user_id: current_resource_owner.try(:id),
-      host: cellect_host,
+      host: cellect_host(params[:workflow_id]),
       limit: params[:limit] || 10,
       group_id: params[:subject_set_id] || nil
     }
-  end
-
-  def cellect_host
-    host = current_resource_owner.try(:cellect_host).try(:[], params[:workflow_id])
-    host ||= Cellect::Client.choose_host
-    host
   end
 end 

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::V1::SubjectsController, type: :controller do
   let!(:workflow) { create(:workflow_with_subject_sets) }
   let!(:subjects) { create_list(:set_member_subject, 20, subject_set: workflow.subject_sets.first) }
-  let!(:user) { create(:user, cellect_hosts: {'1' => 'example.com'}) }
+  let!(:user) { create(:user) }
 
   let(:api_resource_name) { "subjects" }
   let(:api_resource_attributes) do 

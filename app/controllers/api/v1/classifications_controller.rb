@@ -28,10 +28,6 @@ class Api::V1::ClassificationsController < Api::ApiController
     Cellect::Client.connection.add_seen(params[:subject_id], **cellect_params)
   end
 
-  def cellect_host(workflow_id)
-    current_resource_owner.cellect_hosts[workflow_id] || super
-  end
-
   def cellect_params
     {
       user_id: current_resource_owner.id,
