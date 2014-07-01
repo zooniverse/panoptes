@@ -17,7 +17,7 @@ gem 'json-patch', '~> 1.0.0'
 gem 'rolify'
 gem 'pundit'
 gem 'paper_trail'
-gem 'cellect-client', github: 'edpaget/Cellect'
+gem 'cellect-client', '~> 0.0.3'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter', github: 'jruby/activerecord-jdbc-adapter'

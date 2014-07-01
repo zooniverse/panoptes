@@ -1,14 +1,4 @@
 GIT
-  remote: git://github.com/edpaget/Cellect.git
-  revision: a8c51a9f51cedfb5f6323a197fbd3156011516bb
-  specs:
-    cellect-client (0.0.2)
-      celluloid (= 0.16.0.pre)
-      celluloid-io (= 0.16.0.pre)
-      http (~> 0.6)
-      zk (~> 1.9)
-
-GIT
   remote: git://github.com/edpaget/doorkeeper.git
   revision: a387cf0c67120053af9e820786074ce6611cff53
   specs:
@@ -61,6 +51,11 @@ GEM
     bcrypt (3.1.7)
     bcrypt (3.1.7-java)
     builder (3.2.2)
+    cellect-client (0.0.3)
+      celluloid (= 0.16.0.pre)
+      celluloid-io (= 0.16.0.pre)
+      http (~> 0.6)
+      zk (~> 1.9)
     celluloid (0.16.0.pre)
       timers (~> 2.0.0)
     celluloid-io (0.16.0.pre)
@@ -285,7 +280,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter!
-  cellect-client!
+  cellect-client (~> 0.0.3)
   coffee-rails (~> 4.0.0)
   database_cleaner (~> 1.2.0)
   devise
