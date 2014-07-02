@@ -18,6 +18,8 @@ gem 'rolify'
 gem 'pundit'
 gem 'paper_trail'
 gem 'cellect-client', '~> 0.0.3'
+gem 'omniauth'
+gem 'omniauth-facebook'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter', github: 'jruby/activerecord-jdbc-adapter'
