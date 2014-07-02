@@ -52,10 +52,13 @@ FactoryGirl.define do
     end
   end
 
-  # fails validations - change when adding omniauth
-  factory :omni_auth_user, class: :user do
+  factory :omniauth_user, class: :user do
     sequence(:login) { |n| "new_user_#{n}" }
+    sequence(:name) { |n| "new_user_#{n}" }
     sequence(:email) {|n| "example#{n}@example.com"}
+    provider 'facebook'
+    uid '12345'
+    password 'password'
     display_name 'New User'
     credited_name 'Dr New User'
     activated_state :active

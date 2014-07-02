@@ -27,7 +27,7 @@ class Api::V1::PasswordsController < Devise::PasswordsController
 
     def able_to_reset_password?
       if user = resource_class.find_for_authentication(resource_params)
-        disabled_or_omni_auth = user.disabled? || user.encrypted_password.blank?
+        disabled_or_omni_auth = user.disabled? || user.email.blank?
         !disabled_or_omni_auth
       else
         false

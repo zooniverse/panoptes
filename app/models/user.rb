@@ -60,6 +60,14 @@ class User < ActiveRecord::Base
     !disabled? && super
   end
 
+  def email_required?
+    provider.nil?
+  end
+
+  def email_changed?
+    provider.nil?
+  end
+
   protected
 
   def migrated_user?
