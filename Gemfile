@@ -17,9 +17,9 @@ gem 'json-patch', '~> 1.0.0'
 gem 'rolify'
 gem 'pundit'
 gem 'paper_trail'
-gem 'cellect-client', '~> 0.0.3'
 gem 'omniauth'
 gem 'omniauth-facebook'
+gem 'cellect-client', '~> 0.0.6'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter', github: 'jruby/activerecord-jdbc-adapter'

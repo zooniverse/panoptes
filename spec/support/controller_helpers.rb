@@ -42,3 +42,16 @@ module APIRequestHelpers
     stub_token(scopes: scopes, user_id: user_id)
   end
 end
+
+module CellectHelpers
+  def stub_cellect_connection
+    @cellect_connection = instance_double(Cellect::Client::Connection)
+    allow(@cellect_connection).to receive(:add_seen)
+    allow(@cellect_connection).to receive(:load_user)
+    allow(Cellect::Client).to receive(:connection).and_return(@cellect_connection)
+  end
+
+  def stubbed_cellect_connection
+    @cellect_connection
+  end
+end

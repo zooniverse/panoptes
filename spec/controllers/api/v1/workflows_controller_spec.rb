@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::WorkflowsController, type: :controller do
+describe Api::V1::WorkflowsController, type: :controller, focus: true do
   let(:user) { create(:user) }
   let!(:workflows){ create_list :workflow_with_subjects, 2 }
   let(:workflow){ workflows.first }
@@ -45,7 +45,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           prioritized: true
         }
       }
-      post :create, params, { 'CONTENT_TYPE' => 'application/json' }
+      post :create, params
     end
 
     it 'should create a new workflow' do
@@ -64,7 +64,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       params = {
         id: workflow.id
       }
-      delete :destroy, params, { 'CONTENT_TYPE' => 'application/json' }
+      delete :destroy, params
     end
 
     it 'should delete a workflow' do
@@ -74,10 +74,11 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe "#show" do
+    let!(:stubbed_cellect) { stub_cellect_connection }
+
     context "with a logged in user" do
       before(:each) do
         allow(Cellect::Client).to receive(:choose_host).and_return("http://example.com")
-        allow(Cellect::Client.connection).to receive(:load_user)
         default_request user_id: user, scopes: %(project, public)
         get :show, id: workflows.first.id
       end
@@ -98,8 +99,8 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
 
       it "should set a load user command to cellect" do
-        expect(Cellect::Client.connection).to receive(:load_user)
-          .with(user.id, 
+        expect(stubbed_cellect_connection).to receive(:load_user)
+          .with(user.id,
                 host: 'http://example.com',
                 workflow_id: workflows.first.id.to_s)
         get :show, id: workflows.first.id
@@ -110,7 +111,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     context "without a logged in user" do
       it "should not send a load user command to cellect" do
-        expect(Cellect::Client.connection).to_not receive(:load_user)
+        expect(stubbed_cellect_connection).to_not receive(:load_user)
         default_request scopes: %w(public project)
         get :show, id: workflows.first.id
       end
