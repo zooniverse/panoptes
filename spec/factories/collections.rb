@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :collection do
     name "collection_name"
+    display_name 'another name'
     activated_state :active
     visibility "public"
 
