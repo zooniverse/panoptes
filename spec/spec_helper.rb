@@ -19,6 +19,7 @@ RSpec.configure do |config|
   config.include Devise::TestHelpers, type: :controller
   config.include APIRequestHelpers, type: :controller
   config.include APIResponseHelpers, type: :controller
+  config.include CellectHelpers, type: :controller
 
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
