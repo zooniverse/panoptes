@@ -73,7 +73,8 @@ describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
       end
 
       it "should use devise to send the password reset email" do
-        Api::V1::PasswordsController.any_instance.stub(:successfully_sent?).and_return(:true)
+        allow_any_instance_of(Api::V1::PasswordsController)
+          .to receive(:successfully_sent?).and_return(true)
         expect(User).to receive(:send_reset_password_instructions).once
         post :create, user_email_attrs
       end

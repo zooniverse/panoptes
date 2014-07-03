@@ -6,10 +6,11 @@ shared_examples "has visibility controls" do
       expect(described_class.visibility_levels[:private1]).to include(:role1, :role2)
     end
   end
-  
+
   describe '::publicly_visible' do
     it 'should inject a scope for publicly visible records' do
-      described_class.publicly_visible.to_sql.should match /WHERE "#{ described_class.table_name }"."visibility" = 'public'/
+      expected_sql = /WHERE "#{ described_class.table_name }"."visibility" = 'public'/
+      expect(described_class.publicly_visible.to_sql).to match(expected_sql)
     end
   end
 
@@ -20,7 +21,7 @@ shared_examples "has visibility controls" do
   end
 
   describe "#is_public?" do
-    it "should return true when the visibility is public" do 
+    it "should return true when the visibility is public" do
       visible.visibility = "public"
       expect(visible.is_public?).to be_truthy
     end
