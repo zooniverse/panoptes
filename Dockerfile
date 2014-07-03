@@ -9,7 +9,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-7-jre
 RUN apt-get clean
 
 # Install ruby-build
-RUN apt-get install -y git-core && apt-get clean
+RUN apt-get install -y git-core curl && apt-get clean
 RUN git clone https://github.com/sstephenson/ruby-build.git && cd ruby-build && ./install.sh
 
 # Install jruby-1.7.12
