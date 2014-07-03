@@ -4,65 +4,32 @@ class UniqueRoutableName
 
   class << self
 
-    def unique?(name, resource_id)
+    def unique?(name, resource_id, resource_class)
       return false if name.blank?
-      @name, @resource_id = name, resource_id
-      uniq_user_and_group_sql = "SELECT users.id as u_id, users.login, user_groups.id as ug_id, user_groups.display_name " +
-                                "FROM users FULL OUTER JOIN user_groups " +
-                                "ON users.login = user_groups.display_name " +
-                                "WHERE user_groups.display_name iLIKE '#{name}' OR users.login iLIKE '#{name}'"
-      result = ActiveRecord::Base.connection.select_all(uniq_user_and_group_sql)
-      return true if result.rows.empty?
-      result_hash = result.map { |r| r }.first
-      check_name_is_unique(result_hash)
+      @name, @resource_id, @resource_class = name, resource_id, resource_class
+      uniq_user_and_group_sql = "SELECT 'user', id, login FROM users " +
+                                "WHERE login iLIKE '#{name}' " +
+                                "UNION ALL " +
+                                "SELECT 'user_group', id, display_name FROM user_groups " +
+                                "WHERE display_name iLIKE '#{name}'"
+#TODO: get the iLike to use an index
+      rows = ActiveRecord::Base.connection.select_rows(uniq_user_and_group_sql).map(&:compact)
+      check_name_is_unique(rows)
     end
 
-    def check_name_is_unique(result)
-      checker = DuplicateRouteableNameChecker.new(result)
-      case
-      when checker.both_exist?
-        raise DuplicateRoutableNameError.new("More than one user / user_group with the same unique name: '#{@name}'")
-      when checker.one_exists?
-        false
-      when checker.none_exist?
+    def check_name_is_unique(rows)
+      case rows.length
+      when 0
         true
-      end
-    end
-
-    class DuplicateRouteableNameChecker
-
-      def initialize(result)
-        @result = result
-      end
-
-      def both_exist?
-        login_exists? && display_name_exists?
-      end
-
-      def one_exists?
-        only_login_exists? ^ only_display_name_exists?
-      end
-
-      def none_exist?
-        !both_exist?
-      end
-
-      private
-
-      def only_login_exists?
-        login_exists? && !display_name_exists?
-      end
-
-      def only_display_name_exists?
-        display_name_exists? && !login_exists?
-      end
-
-      def login_exists?
-        !!@result["login"]
-      end
-
-      def display_name_exists?
-        !!@result["display_name"]
+      when 1
+        row_data = rows.first
+        if @resource_class.match(/#{row_data[0]}/i) && @resource_id == row_data[1]
+          true
+        else
+          false
+        end
+      else
+        raise DuplicateRoutableNameError.new("More than one user / user_group with the same unique name: '#{@name}'")
       end
     end
   end
