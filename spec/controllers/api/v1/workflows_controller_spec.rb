@@ -77,7 +77,6 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     context "with a logged in user" do
       before(:each) do
-        allow(Cellect::Client).to receive(:choose_host).and_return("http://example.com")
         default_request user_id: user, scopes: %(project, public)
         get :show, id: workflows.first.id
       end
@@ -94,13 +93,13 @@ describe Api::V1::WorkflowsController, type: :controller do
       it "should set the cellect host for the user and workflow" do
         user.reload
         expect(session[:cellect_hosts]).to include( workflows.first.id.to_s )
-        expect(session[:cellect_hosts][workflows.first.id.to_s]).to eq("http://example.com")
+        expect(session[:cellect_hosts][workflows.first.id.to_s]).to eq("example.com")
       end
 
       it "should set a load user command to cellect" do
         expect(stubbed_cellect_connection).to receive(:load_user)
           .with(user_id: user.id,
-                host: 'http://example.com',
+                host: 'example.com',
                 workflow_id: workflows.first.id.to_s)
         get :show, id: workflows.first.id
       end
