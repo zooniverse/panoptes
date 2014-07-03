@@ -99,7 +99,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it "should set a load user command to cellect" do
         expect(stubbed_cellect_connection).to receive(:load_user)
-          .with(user.id,
+          .with(user_id: user.id,
                 host: 'http://example.com',
                 workflow_id: workflows.first.id.to_s)
         get :show, id: workflows.first.id
