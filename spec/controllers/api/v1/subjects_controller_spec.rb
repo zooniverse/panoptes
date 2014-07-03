@@ -6,14 +6,14 @@ describe Api::V1::SubjectsController, type: :controller do
   let!(:user) { create(:user) }
 
   let(:api_resource_name) { "subjects" }
-  let(:api_resource_attributes) do 
+  let(:api_resource_attributes) do
     [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at"]
   end
 
   let(:api_resource_links) do
     [ "subjects.owner" ]
   end
- 
+
   context "logged in user" do
     before(:each) do
       default_request user_id: user.id, scopes: ["subject"]
@@ -43,7 +43,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
         before(:each) do
           allow(Cellect::Client).to receive(:choose_host).and_return("example.com")
-          allow(Cellect::Client.connection).to receive(:get_subjects)
+          allow(stubbed_cellect_connection).to receive(:get_subjects)
             .and_return(subjects.take(10).map(&:id))
           request.session = { cellect_hosts: {workflow.id.to_s => 'example.com'} }
           get :index, {sort: 'random', workflow_id: workflow.id.to_s}
@@ -58,7 +58,7 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         it 'should make a request against Cellect' do
-          expect(Cellect::Client.connection).to receive(:get_subjects)
+          expect(stubbed_cellect_connection).to receive(:get_subjects)
             .with(workflow_id: workflow.id.to_s,
                   user_id: user.id,
                   group_id: nil,

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::WorkflowsController, type: :controller, focus: true do
+describe Api::V1::WorkflowsController, type: :controller do
   let(:user) { create(:user) }
   let!(:workflows){ create_list :workflow_with_subjects, 2 }
   let(:workflow){ workflows.first }
@@ -74,7 +74,6 @@ describe Api::V1::WorkflowsController, type: :controller, focus: true do
   end
 
   describe "#show" do
-    let!(:stubbed_cellect) { stub_cellect_connection }
 
     context "with a logged in user" do
       before(:each) do
