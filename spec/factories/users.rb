@@ -7,7 +7,6 @@ FactoryGirl.define do
     display_name 'New User'
     activated_state :active
     sequence(:login) { |n| "new_user_#{n}" }
-    sequence(:name) { |n| "new_user_#{n}" }
 
     factory :insecure_user do
       hash_func 'sha1'
