@@ -42,7 +42,6 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         before(:each) do
-          allow(Cellect::Client).to receive(:choose_host).and_return("example.com")
           allow(stubbed_cellect_connection).to receive(:get_subjects)
             .and_return(subjects.take(10).map(&:id))
           request.session = { cellect_hosts: {workflow.id.to_s => 'example.com'} }

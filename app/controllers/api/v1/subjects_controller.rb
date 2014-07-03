@@ -43,12 +43,11 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def cellect_params
-    {
-      workflow_id: params[:workflow_id],
-      user_id: current_resource_owner.try(:id),
-      host: cellect_host(params[:workflow_id]),
-      limit: params[:limit] || 10,
-      group_id: params[:subject_set_id] || nil
-    }
+    c_params = params.permit(:workflow_id, :subject_set_id, :limit)
+      .merge(user_id: current_resource_owner.try(:id),
+             limit: 10,
+             host: cellect_host(params[:workflow_id])) {|k, ov, nv| ov ? ov : nv}
+    c_params[:group_id] = c_params.delete(:subject_set_id)
+    c_params.symbolize_keys
   end
 end 
