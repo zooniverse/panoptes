@@ -86,7 +86,7 @@ describe Api::ApiController, type: :controller do
 
     it "should return 403 with a logged in user" do
       default_request(scopes: ["public"], user_id: user.id)
-      UserPolicy.any_instance.stub(:read?).and_return(false)
+      allow_any_instance_of(UserPolicy).to receive(:read?).and_return(false)
       get :index, id: user.id
       expect(response.status).to eq(403)
     end

@@ -155,7 +155,7 @@ describe Api::V1::UsersController, type: :controller do
     let(:user_id) { user.id }
     let(:token) { create(:access_token) }
     let!(:stub_token_auth) do
-      Doorkeeper.stub(:authenticate).and_return(token)
+      allow(Doorkeeper).to receive(:authenticate).and_return(token)
     end
 
     it "should call the UserInfoScrubber with the user" do
