@@ -12,6 +12,59 @@ describe User, :type => :model do
   it_behaves_like "activatable"
   it_behaves_like "is an owner"
 
+  describe '::from_omniauth' do
+    let(:auth_hash) { OmniAuth.config.mock_auth[:facebook] }
+
+    shared_examples 'new user from omniauth' do
+      let(:user_from_auth_hash) { 
+        user = User.from_omniauth(auth_hash)
+      }
+
+      it 'should create a new valid user' do
+        expect(user_from_auth_hash).to be_valid
+      end
+
+      it 'should create a user with the same details' do
+        expect(user_from_auth_hash.email).to eq(auth_hash.info.email)
+        expect(user_from_auth_hash.display_name).to eq(auth_hash.info.name)
+      end
+
+      it 'should create a user with a login' do
+        expect(user_from_auth_hash.login).to eq(auth_hash.info.name.downcase.gsub(/\s/, '_'))
+      end
+
+      it 'should create a user with a provider' do
+        expect(user_from_auth_hash.provider).to eq(auth_hash.provider)
+      end
+
+      it 'should not persist the user' do
+        expect(user.persisted?).to be false
+      end
+    end
+
+    context 'a new user with email' do
+      it_behaves_like 'new user from omniauth'
+    end
+
+    context 'a user without an email' do
+      let(:auth_hash) { OmniAuth.config.mock_auth[:facebook_no_email] }
+
+      it 'should not have an email' do
+        expect(User.from_omniauth(auth_hash).email).to be_nil
+      end
+
+      it_behaves_like 'new user from omniauth'
+    end
+
+    context 'an existing user' do
+      let!(:omniauth_user) { create(:omniauth_user) }
+
+      it 'should return the existing user' do
+        expect(User.from_omniauth(auth_hash)).to eq(omniauth_user)
+      end
+    end
+  end
+
   describe '#login' do
     it 'should validate presence' do
       expect{ User.create!(name: 't', password: 'password1', email: 'test@example.com') }.to raise_error

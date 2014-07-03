@@ -1,0 +1,15 @@
+development:
+  facebook:
+    app_id: <%= ENV['FACEBOOK_APP_ID'] %>
+    app_secret: <%= ENV['FACEBOOK_APP_SECRET'] %>
+    scopes:
+      - email
+      - public_profile
+
+test:
+  facebook:
+    app_id: Not a real id
+    app_secret: Not a real secret
+    scopes:
+      - email
+      - public_profile

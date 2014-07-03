@@ -4,7 +4,8 @@ Rails.application.routes.draw do
     controllers applications: 'oauth/applications'
   end
 
-  devise_for :users, skip: [ :registrations, :sessions, :passwords ]
+  devise_for :users, controllers: { omniauth_callbacks: 'omniauth_callbacks' },
+    skip: [ :registrations, :sessions, :passwords ]
 
   namespace :api do
     api_version(:module => "V1", :header => {name: "Accept", :value => "application/vnd.api+json; version=1"}) do

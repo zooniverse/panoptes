@@ -7,7 +7,8 @@ class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable
+         :recoverable, :rememberable, :trackable, :validatable,
+         :omniauthable, omniauth_providers: [:facebook]
 
   rolify
 
@@ -22,6 +23,16 @@ class User < ActiveRecord::Base
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
 
   attr_accessor :migrated_user
+
+  def self.from_omniauth(auth_hash)
+    where(auth_hash.slice(:provider, :uid)).first_or_create do |u|
+      u.email = auth_hash.info.email
+      u.password = Devise.friendly_token[0,20]
+      u.display_name = auth_hash.info.name
+      u.login = auth_hash.info.name.downcase.gsub(/\s/, '_')
+      u.name = auth_hash.info.name.downcase.gsub(/\s/, '_')
+    end
+  end
 
   def password_required?
     super && hash_func != 'sha1'
@@ -47,6 +58,14 @@ class User < ActiveRecord::Base
 
   def active_for_authentication?
     !disabled? && super
+  end
+
+  def email_required?
+    provider.nil?
+  end
+
+  def email_changed?
+    provider.nil?
   end
 
   protected

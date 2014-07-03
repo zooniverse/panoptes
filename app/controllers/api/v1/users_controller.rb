@@ -34,6 +34,7 @@ class Api::V1::UsersController < Api::ApiController
   def destroy
     user = User.find(params[:id])
     authorize user, :destroy?
+    sign_out if current_user && (current_user == user)
     UserInfoScrubber.scrub_personal_info!(user)
     Activation.disable_instances!([ user ] | user.projects | user.collections | user.memberships)
     revoke_doorkeeper_request_token!

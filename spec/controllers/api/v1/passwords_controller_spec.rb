@@ -50,8 +50,7 @@ describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
     context "when the user was created using third party authentication" do
       #rework when third party authentication is added in (currently req a password)
       let!(:user) do
-        user = build(:omni_auth_user)
-        user.save(validate: false)
+        user = build(:omniauth_user, email: nil)
         user
       end
 
