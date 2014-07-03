@@ -51,7 +51,7 @@ GEM
     bcrypt (3.1.7)
     bcrypt (3.1.7-java)
     builder (3.2.2)
-    cellect-client (0.0.3)
+    cellect-client (0.0.6)
       celluloid (= 0.16.0.pre)
       celluloid-io (= 0.16.0.pre)
       http (~> 0.6)
@@ -280,7 +280,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter!
-  cellect-client (~> 0.0.3)
+  cellect-client (~> 0.0.6)
   coffee-rails (~> 4.0.0)
   database_cleaner (~> 1.2.0)
   devise
