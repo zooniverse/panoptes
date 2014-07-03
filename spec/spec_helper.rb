@@ -37,6 +37,10 @@ RSpec.configure do |config|
     DatabaseCleaner.start
   end
 
+  config.before(:each, type: :controller) do
+    stub_cellect_connection
+  end
+
   config.after(:each) do
     DatabaseCleaner.clean
   end

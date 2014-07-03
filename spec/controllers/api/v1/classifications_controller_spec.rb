@@ -15,7 +15,6 @@ describe Api::V1::ClassificationsController, type: :controller do
 
   context "logged in user" do
     before(:each) do
-      stub_cellect_connection
       default_request user_id: user.id, scopes: ["classifications"]
     end
 
