@@ -48,6 +48,8 @@ module CellectHelpers
     @cellect_connection = instance_double(Cellect::Client::Connection)
     allow(@cellect_connection).to receive(:add_seen)
     allow(@cellect_connection).to receive(:load_user)
+    allow(@cellect_connection).to receive(:get_subjects)
+    allow(Cellect::Client).to receive(:choose_host).and_return("example.com")
     allow(Cellect::Client).to receive(:connection).and_return(@cellect_connection)
   end
 

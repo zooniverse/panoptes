@@ -25,14 +25,13 @@ class Api::V1::ClassificationsController < Api::ApiController
   private
 
   def update_cellect
-    Cellect::Client.connection.add_seen(params[:subject_id], **cellect_params)
+    Cellect::Client.connection.add_seen(**cellect_params)
   end
 
   def cellect_params
-    {
-      user_id: current_resource_owner.id,
-      workflow_id: params[:workflow_id],
-      host: cellect_host(params[:workflow_id])
-    }
+    params.require(:classification).permit(:workflow_id, :subject_id)
+      .merge(user_id: current_resource_owner.id,
+             host: cellect_host(params[:workflow_id]))
+      .symbolize_keys
   end
 end 
