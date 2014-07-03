@@ -41,12 +41,13 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def load_cellect
     return unless current_resource_owner
-    Cellect::Client.connection.load_user(current_resource_owner.id, **cellect_params)
+    Cellect::Client.connection.load_user(**cellect_params)
   end
 
   def cellect_params
     {
       host: cellect_host(params[:id]),
+      user_id: current_resource_owner.id,
       workflow_id: params[:id]
     }
   end
