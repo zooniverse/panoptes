@@ -1,9 +1,8 @@
 class User < ActiveRecord::Base
-  include Nameable
   include Activatable
   include Owner
 
-  attr_accessible :name, :email, :password, :login, :migrated_user, :display_name
+  attr_accessible :login, :email, :password, :migrated_user, :display_name, :credited_name
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -19,7 +18,8 @@ class User < ActiveRecord::Base
   owns :projects, :collections, :subjects,
     [:oauth_applications, {class_name: "Doorkeeper::Application"}]
 
-  validates :login, presence: true, uniqueness: true
+  validate :login, presence: true
+  validate :unique_login
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
 
   attr_accessor :migrated_user
@@ -79,5 +79,13 @@ class User < ActiveRecord::Base
     concat = Base64.decode64(password_salt).force_encoding('utf-8') + bytes
     sha1 = Digest::SHA1.digest concat
     Base64.encode64(sha1).strip
+  end
+
+  private
+
+  def unique_login
+    # unless UniqueRoutableName.unique?(self)
+    #   errors.add(:login, "is already taken")
+    # end
   end
 end

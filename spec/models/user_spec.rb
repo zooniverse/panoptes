@@ -2,13 +2,10 @@ require 'spec_helper'
 
 describe User, :type => :model do
   let(:user) { build(:user) }
-  let(:named) { user }
-  let(:unnamed) { build(:user, uri_name: nil) }
   let(:activatable) { user }
   let(:owner) { user }
   let(:owned) { build(:project, owner: user) }
 
-  it_behaves_like "is uri nameable"
   it_behaves_like "activatable"
   it_behaves_like "is an owner"
 
@@ -67,34 +64,47 @@ describe User, :type => :model do
 
   describe '#login' do
     it 'should validate presence' do
-      expect{ User.create!(name: 't', password: 'password1', email: 'test@example.com') }.to raise_error
+      expect{ User.create!(password: 'password1', email: 'test@example.com') }.to raise_error
     end
 
     it 'should validate uniqueness' do
-      expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
-      expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test2@example.com') }.to raise_error
-      expect{ User.create!(name: 'T', login: 'T', password: 'password1', email: 'test3@example.com') }.to raise_error
+      expect{ User.create!(login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
+      expect{ User.create!(login: 't', password: 'password1', email: 'test2@example.com') }.to raise_error
+      expect{ User.create!(login: 'T', password: 'password1', email: 'test3@example.com') }.to raise_error
+    end
+
+    context "when a user_group with the same name exists" do
+      let!(:user_group) { create(:user_group, display_name: user.login) }
+
+      it "should not be valid" do
+        expect(user.valid?).to be false
+      end
+
+      it "should have the non-uniq login name error" do
+        user.valid?
+        expect(user.errors[:login]).to include('is already taken')
+      end
     end
   end
 
   describe '#email' do
     it 'should validate case insensitive uniqueness' do
-      expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
-      expect{ User.create!(name: 't2', login: 't2', password: 'password1', email: 'TEST@example.com') }.to raise_error
+      expect{ User.create!(login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
+      expect{ User.create!(login: 't2', password: 'password1', email: 'TEST@example.com') }.to raise_error
     end
   end
 
   describe "#password_required?" do
     it 'should require a password when creating with a new user' do
-      expect{ User.create!(name: 't', login: "t", password: "password1", email: "test@example.com") }
+      expect{ User.create!(login: "t", password: "password1", email: "test@example.com") }
         .to_not raise_error
 
-      expect{ User.create!(name: 'T', login: "T", email: "test@example.com") }
+      expect{ User.create!(login: "T", email: "test@example.com") }
         .to raise_error
     end
 
     it 'should not require a password when creating a user from an import' do
-      expect{ User.create!({name: 't', login: "t", hash_func: 'sha1', email: "test@example.com"}, without_protection: true) }
+      expect{ User.create!({login: "t", hash_func: 'sha1', email: "test@example.com"}, without_protection: true) }
         .to_not raise_error
     end
   end
@@ -131,6 +141,7 @@ describe User, :type => :model do
     end
 
     it "should be false for a disabled user" do
+      binding.pry
       user.disable!
       expect(user.active_for_authentication?).to eq(false)
     end

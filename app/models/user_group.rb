@@ -1,7 +1,8 @@
 class UserGroup < ActiveRecord::Base
-  include Nameable
   include Activatable
   include Owner
+
+  attr_accessible :display_name
 
   owns :projects, :collections, :subjects
 
@@ -9,4 +10,12 @@ class UserGroup < ActiveRecord::Base
   has_many :memberships
   has_many :classifications
 
+  validate :display_name, presence: true
+  validate :unique_display_name
+
+  private
+
+  def unique_display_name
+    false
+  end
 end

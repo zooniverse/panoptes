@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-def check_uniqueness(name)
-  UniqueRoutableName.unique?(name)
+def check_uniqueness(name, resource_id=nil)
+  UniqueRoutableName.unique?(name, resource_id)
 end
 
 describe UniqueRoutableName do
