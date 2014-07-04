@@ -16,6 +16,8 @@ class UserGroup < ActiveRecord::Base
   private
 
   def unique_display_name
-    false
+    unless UniqueRoutableName.new(self).unique?
+      errors.add(:display_name, "is already taken")
+    end
   end
 end

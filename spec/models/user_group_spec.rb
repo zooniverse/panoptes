@@ -30,12 +30,12 @@ describe UserGroup, :type => :model do
       let!(:user) { create(:user, login: user_group.display_name) }
 
       it "should not be valid" do
-        expect(user_group.valid?).to be_false
+        expect(user_group.valid?).to be false
       end
 
       it "should have the non-uniq display_name error" do
         user_group.valid?
-        expect(user_group.errors[:display_name]).to eq('some description of the non-uniq error')
+        expect(user_group.errors[:display_name]).to include('is already taken')
       end
     end
   end
