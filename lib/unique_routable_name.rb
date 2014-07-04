@@ -20,10 +20,10 @@ class UniqueRoutableName
 
     def uniq_user_and_group_sql
       "SELECT 'user', id, login FROM users " +
-      "WHERE login iLIKE '#{@name}' " +
+      "WHERE lower(login) = lower('#{@name}') " +
       "UNION ALL " +
       "SELECT 'user_group', id, display_name FROM user_groups " +
-      "WHERE display_name iLIKE '#{@name}'"
+      "WHERE lower(display_name) = lower('#{@name}')"
     end
 
     def check_name_is_unique
