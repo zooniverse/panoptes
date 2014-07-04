@@ -40,7 +40,8 @@ class UniqueRoutableName
     end
 
     def different_resource?(result_class, result_id)
+      return true if @resource.id.nil?
       class_name = @resource.class.to_s.underscore
-      class_name.match(/#{result_class}/i) && @resource.id != result_id
+      class_name.match(/#{result_class}/i) && @resource.id.to_s != result_id
     end
 end

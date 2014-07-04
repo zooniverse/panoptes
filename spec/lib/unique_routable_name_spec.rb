@@ -41,13 +41,18 @@ describe UniqueRoutableName do
         expect(check_uniqueness(user)).to be true
       end
 
-      it "should be false for a duplicate name" do
-        expect(check_uniqueness(user)).to be false
+      it "should be true for it's own unique name" do
+        expect(check_uniqueness(user)).to be true
       end
 
-      it "should be false for a duplicate name with different case" do
-        set_resource_name(user, user.login.upcase)
-        expect(check_uniqueness(user)).to be false
+      it "should be false for a new resource with a duplicate name" do
+        set_resource_name(resource, user.login)
+        expect(check_uniqueness(resource)).to be false
+      end
+
+      it "should be false for a new resource with a duplicate name in a different case" do
+        set_resource_name(resource, user.login.upcase)
+        expect(check_uniqueness(resource)).to be false
       end
     end
 
@@ -59,8 +64,18 @@ describe UniqueRoutableName do
         expect(check_uniqueness(user_group)).to be true
       end
 
-      it "should be false for a duplicate name" do
-        expect(check_uniqueness(user_group)).to be false
+      it "should be true for it's own unique name" do
+        expect(check_uniqueness(user_group)).to be true
+      end
+
+      it "should be false for a new resource with a duplicate name" do
+        set_resource_name(resource, user_group.display_name)
+        expect(check_uniqueness(resource)).to be false
+      end
+
+      it "should be false for a new resource with a duplicate name in a different case" do
+        set_resource_name(resource, user_group.display_name.camelize)
+        expect(check_uniqueness(resource)).to be false
       end
     end
 
@@ -73,12 +88,14 @@ describe UniqueRoutableName do
         expect(check_uniqueness(resource)).to be true
       end
 
-      it "should be false for the duplicate user name" do
-        expect(check_uniqueness(user)).to be false
+      it "should be false for a resource the duplicate user name" do
+        set_resource_name(resource, user.login)
+        expect(check_uniqueness(resource)).to be false
       end
 
       it "should be false for the duplicate group name" do
-        expect(check_uniqueness(user_group)).to be false
+        set_resource_name(resource, user_group.display_name)
+        expect(check_uniqueness(resource)).to be false
       end
     end
 
