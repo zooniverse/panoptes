@@ -18,7 +18,7 @@ class User < ActiveRecord::Base
   owns :projects, :collections, :subjects,
     [:oauth_applications, {class_name: "Doorkeeper::Application"}]
 
-  validate :login, presence: true
+  validates :login, presence: true
   validate :unique_login
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
 
@@ -84,7 +84,7 @@ class User < ActiveRecord::Base
   private
 
   def unique_login
-    unless UniqueRoutableName.new(self).unique?
+    if errors.empty? && !UniqueRoutableName.new(self).unique?
       errors.add(:login, "is already taken")
     end
   end

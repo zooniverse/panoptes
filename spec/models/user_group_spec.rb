@@ -16,7 +16,13 @@ describe UserGroup, :type => :model do
   describe "#display_name" do
 
     it 'should validate presence' do
-      expect{ UserGroup.create!(display_name: nil) }.to raise_error
+      expect(build(:user_group, display_name: "").valid?).to be false
+    end
+
+    it 'should have non-blank error' do
+      ug = build(:user_group, display_name: "")
+      ug.valid?
+      expect(ug.errors[:display_name]).to include("can't be blank")
     end
 
     it 'should validate uniqueness' do

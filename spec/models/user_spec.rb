@@ -64,7 +64,13 @@ describe User, :type => :model do
 
   describe '#login' do
     it 'should validate presence' do
-      expect{ User.create!(password: 'password1', email: 'test@example.com') }.to raise_error
+      expect(build(:user, login: "").valid?).to be false
+    end
+
+    it 'should have non-blank error' do
+      user = build(:user, login: "")
+      user.valid?
+      expect(user.errors[:login]).to include("can't be blank")
     end
 
     it 'should validate uniqueness' do

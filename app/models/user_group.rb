@@ -10,13 +10,13 @@ class UserGroup < ActiveRecord::Base
   has_many :memberships
   has_many :classifications
 
-  validate :display_name, presence: true
+  validates :display_name, presence: true
   validate :unique_display_name
 
   private
 
   def unique_display_name
-    unless UniqueRoutableName.new(self).unique?
+    if errors.empty? && !UniqueRoutableName.new(self).unique?
       errors.add(:display_name, "is already taken")
     end
   end
