@@ -141,7 +141,6 @@ describe User, :type => :model do
     end
 
     it "should be false for a disabled user" do
-      binding.pry
       user.disable!
       expect(user.active_for_authentication?).to eq(false)
     end
