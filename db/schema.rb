@@ -188,16 +188,6 @@ ActiveRecord::Schema.define(version: 20140703144254) do
   add_index "subjects", ["project_id"], name: "index_subjects_on_project_id", using: :btree
   add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
 
-  create_table "uri_names", force: true do |t|
-    t.string   "name"
-    t.string   "resource_type"
-    t.integer  "resource_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "uri_names", ["name"], name: "index_uri_names_on_name", unique: true, using: :btree
-
   create_table "user_groups", force: true do |t|
     t.string   "display_name"
     t.datetime "created_at"
