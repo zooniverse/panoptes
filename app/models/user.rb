@@ -30,7 +30,6 @@ class User < ActiveRecord::Base
       u.password = Devise.friendly_token[0,20]
       u.display_name = auth_hash.info.name
       u.login = auth_hash.info.name.downcase.gsub(/\s/, '_')
-      u.name = auth_hash.info.name.downcase.gsub(/\s/, '_')
     end
   end
 

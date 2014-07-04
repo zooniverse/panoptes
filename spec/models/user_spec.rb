@@ -13,7 +13,7 @@ describe User, :type => :model do
     let(:auth_hash) { OmniAuth.config.mock_auth[:facebook] }
 
     shared_examples 'new user from omniauth' do
-      let(:user_from_auth_hash) { 
+      let(:user_from_auth_hash) {
         user = User.from_omniauth(auth_hash)
       }
 
