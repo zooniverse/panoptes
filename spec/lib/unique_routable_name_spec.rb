@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 def check_uniqueness(name, resource)
-  UniqueRoutableName.unique?(name, resource.id, resource.class.to_s.underscore)
+  UniqueRoutableName.new(name, resource.id, resource.class.to_s.underscore).unique?
 end
 
 describe UniqueRoutableName do
