@@ -5,11 +5,11 @@ ENV LANG en_US.UTF-8
 
 # Install tools & libs to compile everything
 RUN apt-get update 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-7-jre
-RUN apt-get clean
+# --no-install-recommends to avoid installing fuse (unsupported in docker < 1.0)
+RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y openjdk-7-jre
 
 # Install ruby-build
-RUN apt-get install -y git-core curl && apt-get clean
+RUN apt-get install -y git-core curl build-essential
 RUN git clone https://github.com/sstephenson/ruby-build.git && cd ruby-build && ./install.sh
 
 # Install jruby-1.7.12
