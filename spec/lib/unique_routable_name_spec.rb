@@ -102,7 +102,7 @@ describe UniqueRoutableName do
     context "when a user and a user_group with the same uniq names exist" do
       let!(:setup_dups) do
           build(:user, login: unique_name).save(validate: false)
-          create(:user_group, display_name: unique_name).save(validate: false)
+          build(:user_group, display_name: unique_name).save(validate: false)
       end
 
       it "should raise an error" do
