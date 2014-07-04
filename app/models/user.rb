@@ -84,8 +84,8 @@ class User < ActiveRecord::Base
   private
 
   def unique_login
-    # unless UniqueRoutableName.unique?(self)
-    #   errors.add(:login, "is already taken")
-    # end
+    unless UniqueRoutableName.new(self).unique?
+      errors.add(:login, "is already taken")
+    end
   end
 end

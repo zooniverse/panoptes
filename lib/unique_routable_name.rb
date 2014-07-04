@@ -2,8 +2,9 @@ class UniqueRoutableName
 
   class DuplicateRoutableNameError < StandardError; end
 
-  def initialize(name, resource_id, resource_class)
-    @name, @resource_id, @resource_class = name, resource_id, resource_class
+  def initialize(resource)
+    @resource = resource
+    @name = @resource.is_a?(User) ? @resource.login : @resource.display_name
   end
 
   def unique?
@@ -39,6 +40,7 @@ class UniqueRoutableName
     end
 
     def different_resource?(result_class, result_id)
-      @resource_class.match(/#{result_class}/i) && @resource_id != result_id
+      class_name = @resource.class.to_s.underscore
+      class_name.match(/#{result_class}/i) && @resource.id != result_id
     end
 end

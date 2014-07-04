@@ -1,7 +1,12 @@
 require 'spec_helper'
 
-def check_uniqueness(name, resource)
-  UniqueRoutableName.new(name, resource.id, resource.class.to_s.underscore).unique?
+def check_uniqueness(resource)
+  UniqueRoutableName.new(resource).unique?
+end
+
+def set_resource_name(resource, name)
+  attribute = resource.is_a?(User) ? :login : :display_name
+  resource.send("#{attribute}=", name)
 end
 
 describe UniqueRoutableName do
@@ -11,17 +16,20 @@ describe UniqueRoutableName do
     let(:resource) { [ User.new, UserGroup.new ].sample }
 
     it "should return false with an empty string" do
-      expect(check_uniqueness("", resource)).to be false
+      set_resource_name(resource, "")
+      expect(check_uniqueness(resource)).to be false
     end
 
     it "should return false with a nil string" do
-      expect(check_uniqueness(nil, resource)).to be false
+      set_resource_name(resource, nil)
+      expect(check_uniqueness(resource)).to be false
     end
 
     context "when no users or user groups exist" do
 
       it "should be true for a unique name" do
-        expect(check_uniqueness(unique_name, resource)).to be true
+        set_resource_name(resource, unique_name)
+        expect(check_uniqueness(resource)).to be true
       end
     end
 
@@ -29,15 +37,17 @@ describe UniqueRoutableName do
       let!(:user) { create(:user) }
 
       it "should be true for a unique name" do
-        expect(check_uniqueness(unique_name, resource)).to be true
+        set_resource_name(user, unique_name)
+        expect(check_uniqueness(user)).to be true
       end
 
       it "should be false for a duplicate name" do
-        expect(check_uniqueness(user.login, user)).to be false
+        expect(check_uniqueness(user)).to be false
       end
 
       it "should be false for a duplicate name with different case" do
-        expect(check_uniqueness(user.login.upcase, user)).to be false
+        set_resource_name(user, user.login.upcase)
+        expect(check_uniqueness(user)).to be false
       end
     end
 
@@ -45,11 +55,12 @@ describe UniqueRoutableName do
       let!(:user_group) { create(:user_group) }
 
       it "should be true for a unique name" do
-        expect(check_uniqueness(unique_name, resource)).to be true
+        set_resource_name(user_group, unique_name)
+        expect(check_uniqueness(user_group)).to be true
       end
 
       it "should be false for a duplicate name" do
-        expect(check_uniqueness(user_group.display_name, user_group)).to be false
+        expect(check_uniqueness(user_group)).to be false
       end
     end
 
@@ -58,15 +69,16 @@ describe UniqueRoutableName do
       let!(:user_group) { create(:user_group) }
 
       it "should be true for a unique name" do
-        expect(check_uniqueness(unique_name, resource)).to be true
+        set_resource_name(resource, unique_name)
+        expect(check_uniqueness(resource)).to be true
       end
 
       it "should be false for the duplicate user name" do
-        expect(check_uniqueness(user.login, user)).to be false
+        expect(check_uniqueness(user)).to be false
       end
 
       it "should be false for the duplicate group name" do
-        expect(check_uniqueness(user_group.display_name, user_group)).to be false
+        expect(check_uniqueness(user_group)).to be false
       end
     end
 
@@ -77,7 +89,8 @@ describe UniqueRoutableName do
       end
 
       it "should raise an error" do
-        expect { check_uniqueness(unique_name, resource) }.to raise_error(UniqueRoutableName::DuplicateRoutableNameError)
+        set_resource_name(resource, unique_name)
+        expect { expect(check_uniqueness(resource)) }.to raise_error(UniqueRoutableName::DuplicateRoutableNameError)
       end
     end
   end
