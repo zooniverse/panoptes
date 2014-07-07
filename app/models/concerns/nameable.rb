@@ -3,8 +3,8 @@ module Nameable
 
   included do
     attr_accessible :name
-    has_one :uri_name, as: :resource
-    validates_presence_of :uri_name
+    has_one :uri_name, as: :resource, dependent: :destroy
+    validates :uri_name, presence: true
   end
 
   module ClassMethods

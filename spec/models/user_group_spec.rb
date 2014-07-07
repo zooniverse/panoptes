@@ -48,4 +48,28 @@ describe UserGroup, :type => :model do
 
     it_behaves_like "it has a cached counter for classifications"
   end
+
+  describe "#uri_name" do
+
+    it "should destroy the uri_name on user destruction" do
+      user_group
+      expect{ user_group.destroy }.to change{ UriName.count }.from(1).to(0)
+    end
+
+    context "when the uri_name association is blank" do
+
+      before(:each) do
+        user_group.uri_name = nil
+      end
+
+      it "should be invalid without a uri_name" do
+        expect(user_group.valid?).to be false
+      end
+
+      it "should have the correct error message" do
+        user_group.valid?
+        expect(user_group.errors[:uri_name]).to include("can't be blank")
+      end
+    end
+  end
 end

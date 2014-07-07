@@ -16,7 +16,7 @@ describe User, :type => :model do
     let(:auth_hash) { OmniAuth.config.mock_auth[:facebook] }
 
     shared_examples 'new user from omniauth' do
-      let(:user_from_auth_hash) { 
+      let(:user_from_auth_hash) {
         user = User.from_omniauth(auth_hash)
       }
 
@@ -66,14 +66,28 @@ describe User, :type => :model do
   end
 
   describe '#login' do
-    it 'should validate presence' do
-      expect{ User.create!(name: 't', password: 'password1', email: 'test@example.com') }.to raise_error
+     it 'should validate presence' do
+      expect(build(:user, login: "").valid?).to be false
+    end
+
+    it 'should have non-blank error' do
+      user = build(:user, login: "")
+      user.valid?
+      expect(user.errors[:login]).to include("can't be blank")
     end
 
     it 'should validate uniqueness' do
       expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
       expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test2@example.com') }.to raise_error
       expect{ User.create!(name: 'T', login: 'T', password: 'password1', email: 'test3@example.com') }.to raise_error
+    end
+
+    context "when a user_group with the same name exists" do
+      let!(:user_group) { create(:user_group, name: user.name, display_name: user.name) }
+
+      it "should not save" do
+        expect{ user.save }.to raise_error(ActiveRecord::RecordNotUnique)
+      end
     end
   end
 
@@ -195,5 +209,29 @@ describe User, :type => :model do
     let(:relation_instance) { user }
 
     it_behaves_like "it has a cached counter for classifications"
+  end
+
+  describe "#uri_name" do
+    let!(:user) { create(:user) }
+
+    it "should destroy the uri_name on user destruction" do
+      expect{ user.destroy }.to change{ UriName.count }.from(1).to(0)
+    end
+
+    context "when the uri_name association is blank" do
+
+      before(:each) do
+        user.uri_name = nil
+      end
+
+      it "should be invalid without a uri_name" do
+        expect(user.valid?).to be false
+      end
+
+      it "should have the correct error message" do
+        user.valid?
+        expect(user.errors[:uri_name]).to include("can't be blank")
+      end
+    end
   end
 end
