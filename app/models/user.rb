@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   include Activatable
   include Owner
 
-  attr_accessible :name, :email, :password, :login, :migrated_user, :display_name
+  attr_accessible :name, :email, :password, :login, :migrated_user, :display_name, :credited_name
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -29,8 +29,7 @@ class User < ActiveRecord::Base
       u.email = auth_hash.info.email
       u.password = Devise.friendly_token[0,20]
       u.display_name = auth_hash.info.name
-      u.login = auth_hash.info.name.downcase.gsub(/\s/, '_')
-      u.name = auth_hash.info.name.downcase.gsub(/\s/, '_')
+      u.login = u.name = auth_hash.info.name.downcase.gsub(/\s/, '_')
     end
   end
 
