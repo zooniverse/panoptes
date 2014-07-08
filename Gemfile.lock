@@ -299,7 +299,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter!
-  cellect-client (~> 0.0.6)
+  cellect-client (~> 0.0.7)
   coffee-rails (~> 4.0.0)
   database_cleaner (~> 1.2.0)
   devise
