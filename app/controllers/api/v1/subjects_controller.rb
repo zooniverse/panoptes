@@ -50,4 +50,4 @@ class Api::V1::SubjectsController < Api::ApiController
     c_params[:group_id] = c_params.delete(:subject_set_id)
     c_params.symbolize_keys
   end
-end 
+end
