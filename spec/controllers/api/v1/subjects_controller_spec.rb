@@ -37,38 +37,40 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "with random sort" do
-        let(:api_resource_links) do
-          [ "subjects.subject_set" ]
+        let(:api_resource_links) { [ "subjects.subject_set" ] }
+        let(:request_params) { { sort: 'random', workflow_id: workflow.id.to_s } }
+        let(:cellect_results) { cellect_results = subjects.take(10).map(&:id) }
+        let!(:session) do
+          request.session = { cellect_hosts: { workflow.id.to_s => 'example.com' } }
         end
 
-        before(:each) do
-          allow(stubbed_cellect_connection).to receive(:get_subjects)
-            .and_return(subjects.take(10).map(&:id))
-          request.session = { cellect_hosts: {workflow.id.to_s => 'example.com'} }
-          get :index, {sort: 'random', workflow_id: workflow.id.to_s}
+        describe "testing the response" do
+
+          before(:each) do
+            allow(stubbed_cellect_connection).to receive(:get_subjects).and_return(cellect_results)
+            get :index, request_params
+          end
+
+          it "should return 200" do
+            get :index, request_params
+            expect(response.status).to eq(200)
+          end
+
+          it 'should return a page of 10 objects' do
+            get :index, request_params
+            expect(json_response[api_resource_name].length).to eq(10)
+          end
+
+          it_behaves_like "an api response"
         end
 
-        it "should return 200" do
-          expect(response.status).to eq(200)
+        describe "testing the cellect client setup" do
+
+          it 'should make a request against Cellect' do
+            expect(stubbed_cellect_connection).to receive(:get_subjects).and_return(cellect_results)
+            get :index, request_params
+          end
         end
-
-        it 'should return a page of 10 objects' do
-          expect(json_response[api_resource_name].length).to eq(10)
-        end
-
-        it 'should make a request against Cellect' do
-          expect(stubbed_cellect_connection).to receive(:get_subjects)
-            .with(workflow_id: workflow.id.to_s,
-                  user_id: user.id,
-                  group_id: nil,
-                  host: 'example.com',
-                  limit: 10)
-            .and_return(subjects.take(10).map(&:id))
-
-          get :index, {sort: 'random', workflow_id: workflow.id.to_s}
-        end
-
-        it_behaves_like "an api response"
       end
     end
   end
