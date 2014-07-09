@@ -7,7 +7,6 @@ FactoryGirl.define do
     display_name 'New User'
     activated_state :active
     sequence(:login) { |n| "new_user_#{n}" }
-    sequence(:name) { |n| "new_user_#{n}" }
 
     factory :insecure_user do
       hash_func 'sha1'
@@ -54,12 +53,11 @@ FactoryGirl.define do
 
   factory :omniauth_user, class: :user do
     sequence(:login) { |n| "new_user_#{n}" }
-    sequence(:name) { |n| "new_user_#{n}" }
+    sequence(:display_name) { |n| "new_user_#{n}" }
     sequence(:email) {|n| "example#{n}@example.com"}
     provider 'facebook'
     uid '12345'
     password 'password'
-    display_name 'New User'
     credited_name 'Dr New User'
     activated_state :active
     languages ['en', 'es', 'fr-ca']
