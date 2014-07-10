@@ -19,4 +19,9 @@ describe UriName, :type => :model do
       expect(create(:uri_name_for_group).resource).to be_a(UserGroup)
     end
   end
+
+  describe "#name" do
+
+    it "should spec out the uniq case insensitive index constraints"
+  end
 end
