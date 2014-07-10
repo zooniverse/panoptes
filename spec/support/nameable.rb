@@ -29,4 +29,31 @@ shared_examples "is uri nameable" do
       expect(described_class.find_by_name(name)).to eq(n)
     end
   end
+
+  describe "#uri_name" do
+
+    before(:each) do
+      named.save unless named.persisted?
+    end
+
+    it "should destroy the uri_name on named resource destruction" do
+      expect{ named.destroy }.to change{ UriName.count }.from(1).to(0)
+    end
+
+    context "when the uri_name association is blank" do
+
+      before(:each) do
+        named.uri_name = nil
+      end
+
+      it "should be invalid without a uri_name" do
+        expect(named.valid?).to be false
+      end
+
+      it "should have the correct error message" do
+        named.valid?
+        expect(named.errors[:uri_name]).to include("can't be blank")
+      end
+    end
+  end
 end

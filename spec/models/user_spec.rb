@@ -82,8 +82,11 @@ describe User, :type => :model do
       expect{ User.create!(name: 'T', login: 'T', password: 'password1', email: 'test3@example.com') }.to raise_error
     end
 
-    context "when a user_group with the same name exists" do
-      let!(:user_group) { create(:user_group, name: user.name, display_name: user.name) }
+    context "when a user_group with the same name in different case exists" do
+      let!(:user_group) do
+        upcase_name = user.name.upcase
+        create(:user_group, name: upcase_name, display_name: upcase_name)
+      end
 
       it "should not save" do
         expect{ user.save }.to raise_error(ActiveRecord::RecordNotUnique)
@@ -209,29 +212,5 @@ describe User, :type => :model do
     let(:relation_instance) { user }
 
     it_behaves_like "it has a cached counter for classifications"
-  end
-
-  describe "#uri_name" do
-    let!(:user) { create(:user) }
-
-    it "should destroy the uri_name on user destruction" do
-      expect{ user.destroy }.to change{ UriName.count }.from(1).to(0)
-    end
-
-    context "when the uri_name association is blank" do
-
-      before(:each) do
-        user.uri_name = nil
-      end
-
-      it "should be invalid without a uri_name" do
-        expect(user.valid?).to be false
-      end
-
-      it "should have the correct error message" do
-        user.valid?
-        expect(user.errors[:uri_name]).to include("can't be blank")
-      end
-    end
   end
 end

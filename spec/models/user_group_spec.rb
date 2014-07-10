@@ -16,6 +16,36 @@ describe UserGroup, :type => :model do
     expect(build(:user_group)).to be_valid
   end
 
+  describe "#display_name" do
+
+    it 'should validate presence' do
+      ug = build(:user_group, display_name: "")
+      expect(ug.valid?).to be false
+    end
+
+    it 'should have non-blank error' do
+      ug = build(:user_group, display_name: "")
+      ug.valid?
+      expect(ug.errors[:display_name]).to include("can't be blank")
+    end
+
+    it 'should validate uniqueness' do
+      name = "FancyUserGroup"
+      expect{ UserGroup.create!(name: name, display_name: name) }.to_not raise_error
+      expect{ UserGroup.create!(name: name.upcase, display_name: name.upcase) }.to raise_error
+      expect{ UserGroup.create!(name: name.downcase, display_name: name.downcase) }.to raise_error
+    end
+
+    context "when a user with the same login exists" do
+      let!(:user_group) { build(:user_group) }
+      let!(:user) { create(:user, login: user_group.display_name) }
+
+      it "should not save" do
+        expect{ user_group.save }.to raise_error(ActiveRecord::RecordNotUnique)
+      end
+    end
+  end
+
   describe "#users" do
     let(:user_group) { create(:user_group_with_users) }
 
@@ -47,29 +77,5 @@ describe UserGroup, :type => :model do
     let(:relation_instance) { user_group }
 
     it_behaves_like "it has a cached counter for classifications"
-  end
-
-  describe "#uri_name" do
-
-    it "should destroy the uri_name on user destruction" do
-      user_group
-      expect{ user_group.destroy }.to change{ UriName.count }.from(1).to(0)
-    end
-
-    context "when the uri_name association is blank" do
-
-      before(:each) do
-        user_group.uri_name = nil
-      end
-
-      it "should be invalid without a uri_name" do
-        expect(user_group.valid?).to be false
-      end
-
-      it "should have the correct error message" do
-        user_group.valid?
-        expect(user_group.errors[:uri_name]).to include("can't be blank")
-      end
-    end
   end
 end

@@ -64,7 +64,5 @@ FactoryGirl.define do
     credited_name 'Dr New User'
     activated_state :active
     languages ['en', 'es', 'fr-ca']
-
-    after(:build) { |user| user.name = user.login }
   end
 end
