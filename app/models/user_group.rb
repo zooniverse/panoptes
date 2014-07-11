@@ -11,5 +11,5 @@ class UserGroup < ActiveRecord::Base
   has_many :memberships
   has_many :classifications
 
-  validates :display_name, presence: true
+  validates :display_name, presence: true, uniqueness: true
 end

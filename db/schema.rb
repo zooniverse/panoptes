@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140702205819) do
+ActiveRecord::Schema.define(version: 20140711101624) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -205,6 +205,8 @@ ActiveRecord::Schema.define(version: 20140702205819) do
     t.integer  "classifications_count", default: 0, null: false
     t.integer  "activated_state",       default: 0, null: false
   end
+
+  add_index "user_groups", ["display_name"], name: "index_user_groups_on_display_name", unique: true, using: :btree
 
   create_table "user_seen_subjects", force: true do |t|
     t.integer  "user_id"
