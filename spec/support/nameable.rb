@@ -41,6 +41,13 @@ shared_examples "is uri nameable" do
       expect{ named.destroy }.to change{ UriName.count }.from(1).to(0)
     end
 
+    it "should not allow an inconsistent resource#uniq_name to uri_name#name" do
+      named.uri_name.name = "different"
+      named.valid?
+      error_attribute = named.send(:model_uniq_name_attribute)
+      expect(named.errors[error_attribute]).to include("inconsistent, match the uri_name#name value")
+    end
+
     context "when the uri_name association is blank" do
 
       before(:each) do
