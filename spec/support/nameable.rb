@@ -13,20 +13,27 @@ shared_examples "is uri nameable" do
     end
   end
 
-  describe "#name=" do
-    it "should set uri name if it exists" do
-      named.name = "name"
-      expect(named.uri_name.name).to eq("name")
-    end
-  end
-
   describe "::find_by_name" do
     let!(:persist_the_named_instance) { named.save }
 
+    it "should return nil when searching for nil" do
+      find_result = described_class.find_by_name(nil)
+      expect(find_result).to be_nil
+    end
+
+    it "should return nil when searching for an empty string" do
+      find_result = described_class.find_by_name("")
+      expect(find_result).to be_nil
+    end
+
     it "should return the model named by the uri" do
-      n = named
-      name = n.name
-      expect(described_class.find_by_name(name)).to eq(n)
+      find_result = described_class.find_by_name(named.name)
+      expect(find_result).to eq(named)
+    end
+
+    it "should return the model named by the uri independent of case" do
+      find_result = described_class.find_by_name(named.name.upcase)
+      expect(find_result).to eq(named)
     end
   end
 

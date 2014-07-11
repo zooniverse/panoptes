@@ -8,7 +8,11 @@ FactoryGirl.define do
     credited_name 'Dr User'
     activated_state :active
     sequence(:login) { |n| "new_user_#{n}" }
-    name { login }
+    after(:build) do |user|
+      unless user.uri_name
+        user.uri_name = build(:uri_name, name: user.login, resource: user)
+      end
+    end
 
     factory :insecure_user do
       hash_func 'sha1'
@@ -55,7 +59,6 @@ FactoryGirl.define do
 
   factory :omniauth_user, class: :user do
     sequence(:login) { |n| "new_user_#{n}" }
-    name { login }
     sequence(:email) {|n| "example#{n}@example.com"}
     provider 'facebook'
     uid '12345'
@@ -64,5 +67,12 @@ FactoryGirl.define do
     credited_name 'Dr New User'
     activated_state :active
     languages ['en', 'es', 'fr-ca']
+    after(:build) do |omni_auth_user|
+      unless omni_auth_user.uri_name
+        omni_auth_user.uri_name = build(:uri_name,
+                                         name: omni_auth_user.login,
+                                         resource: omni_auth_user)
+      end
+    end
   end
 end

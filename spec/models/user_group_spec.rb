@@ -3,7 +3,11 @@ require 'spec_helper'
 describe UserGroup, :type => :model do
   let(:user_group) { create(:user_group) }
   let(:named) { user_group }
-  let(:unnamed) { build(:user_group, uri_name: nil) }
+  let(:unnamed) do
+    unnamed = build(:user_group)
+    unnamed.uri_name = nil
+    unnamed
+  end
   let(:activatable) { user_group }
   let(:owner) { user_group }
   let(:owned) { build(:project, owner: owner) }
@@ -31,9 +35,9 @@ describe UserGroup, :type => :model do
 
     it 'should validate uniqueness' do
       name = "FancyUserGroup"
-      expect{ UserGroup.create!(name: name, display_name: name) }.to_not raise_error
-      expect{ UserGroup.create!(name: name.upcase, display_name: name.upcase) }.to raise_error
-      expect{ UserGroup.create!(name: name.downcase, display_name: name.downcase) }.to raise_error
+      expect{ create(:user_group, display_name: name) }.to_not raise_error
+      expect{ create(:user_group, display_name: name.upcase) }.to raise_error
+      expect{ create(:user_group, display_name: name.downcase) }.to raise_error
     end
 
     it "should have the correct case-insensitive uniqueness error" do

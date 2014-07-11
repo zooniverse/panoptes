@@ -4,23 +4,17 @@ module Nameable
   class UnknownNameableModel < StandardError; end
 
   included do
-    attr_accessible :name
     has_one :uri_name, as: :resource, autosave: true, dependent: :destroy
     validates :uri_name, presence: true
     validate  :consistent_uri_name
   end
 
   module ClassMethods
-    def find_by_name(n)
-      UriName.where(name: n).first.resource
-    end
-  end
-
-  def name=(n)
-    if uri_name
-      self.uri_name.name = n
-    else
-      self.uri_name = UriName.new(name: n, resource: self)
+    def find_by_name(name)
+      return nil if name.blank?
+      if uri_name = UriName.where(name: name.downcase).first
+        uri_name.resource
+      end
     end
   end
 
@@ -31,7 +25,8 @@ module Nameable
   private
 
   def consistent_uri_name
-    if uri_name && !uri_name.name.match(/#{model_uniq_name_value}/i)
+    return if uri_name.nil? || uri_name.name.blank?
+    unless uri_name.name.match(/#{model_uniq_name_value}/i)
       self.errors.add(model_uniq_name_attribute, "inconsistent, match the uri_name#name value")
     end
   end

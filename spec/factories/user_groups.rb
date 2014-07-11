@@ -1,8 +1,12 @@
 FactoryGirl.define do
   factory :user_group do
     sequence(:display_name) {|n| "User Group #{n}"}
-    name { display_name }
     activated_state :active
+    after(:build) do |user_group|
+      unless user_group.uri_name
+        user_group.uri_name = build(:uri_name, name: user_group.display_name, resource: user_group)
+      end
+    end
 
     factory :user_group_with_users do
       after(:create) do |ug|

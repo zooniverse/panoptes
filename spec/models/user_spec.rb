@@ -3,7 +3,11 @@ require 'spec_helper'
 describe User, :type => :model do
   let(:user) { build(:user) }
   let(:named) { user }
-  let(:unnamed) { build(:user, uri_name: nil) }
+  let(:unnamed) do
+    unnamed = build(:user)
+    unnamed.uri_name = nil
+    unnamed
+  end
   let(:activatable) { user }
   let(:owner) { user }
   let(:owned) { build(:project, owner: user) }
@@ -77,9 +81,10 @@ describe User, :type => :model do
     end
 
     it 'should validate uniqueness' do
-      expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
-      expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test2@example.com') }.to raise_error
-      expect{ User.create!(name: 'T', login: 'T', password: 'password1', email: 'test3@example.com') }.to raise_error
+      login = 't'
+      expect{ create(:user, login: login) }.to_not raise_error
+      expect{ create(:user, login: login.upcase, email: 'test2@example.com') }.to raise_error
+      expect{ create(:user, login: login.downcase, email: 'test3@example.com') }.to raise_error
     end
 
     it "should have the correct case-insensitive uniqueness error" do
@@ -90,10 +95,7 @@ describe User, :type => :model do
     end
 
     context "when a user_group with the same name in different case exists" do
-      let!(:user_group) do
-        upcase_name = user.name.upcase
-        create(:user_group, name: upcase_name, display_name: upcase_name)
-      end
+      let!(:user_group) { create(:user_group, display_name: user.name.upcase) }
 
       it "should not be valid" do
         expect(user).to_not be_valid
@@ -107,24 +109,35 @@ describe User, :type => :model do
   end
 
   describe '#email' do
-    it 'should validate case insensitive uniqueness' do
-      expect{ User.create!(name: 't', login: 't', password: 'password1', email: 'test@example.com') }.to_not raise_error
-      expect{ User.create!(name: 't2', login: 't2', password: 'password1', email: 'TEST@example.com') }.to raise_error
+
+    context "when a user is setup" do
+      let(:user) { create(:user, email: 'test@example.com') }
+
+      it 'should raise an error trying to save a duplcate' do
+        expect{ create(:user, email: user.email.upcase) }.to raise_error
+      end
+
+      it 'should validate case insensitive uniqueness' do
+        dup = build(:user, email: user.email.upcase)
+        dup.valid?
+        expect(dup.errors[:email]).to include("has already been taken")
+      end
     end
   end
 
   describe "#password_required?" do
     it 'should require a password when creating with a new user' do
-      expect{ User.create!(name: 't', login: "t", password: "password1", email: "test@example.com") }
-        .to_not raise_error
-
-      expect{ User.create!(name: 'T', login: "T", email: "test@example.com") }
-        .to raise_error
+      expect{ create(:user, password: "password1") }.to_not raise_error
+      expect{ create(:user, password: nil) }.to raise_error
     end
 
     it 'should not require a password when creating a user from an import' do
-      expect{ User.create!({name: 't', login: "t", hash_func: 'sha1', email: "test@example.com"}, without_protection: true) }
-        .to_not raise_error
+      attrs = {login: "t", hash_func: 'sha1', email: "test@example.com"}
+      expect do
+        User.create!(attrs, without_protection: true) do |user|
+          user.uri_name = UriName.new(name: "t", resource: user)
+        end
+      end.to_not raise_error
     end
   end
 

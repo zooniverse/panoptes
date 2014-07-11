@@ -8,7 +8,7 @@ describe UriName, :type => :model do
 
   describe "#resource" do
     it "should not be valid without a resource" do
-      expect(build(:uri_name)).to_not be_valid
+      expect(build(:uri_name, name: "test")).to_not be_valid
     end
 
     it "should be able to be user" do
