@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140710111625) do
+ActiveRecord::Schema.define(version: 20140702205819) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,11 +25,12 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_group_id"
-    t.index ["project_id"], :name => "index_classifications_on_project_id"
-    t.index ["set_member_subject_id"], :name => "index_classifications_on_set_member_subject_id"
-    t.index ["user_id"], :name => "index_classifications_on_user_id"
-    t.index ["workflow_id"], :name => "index_classifications_on_workflow_id"
   end
+
+  add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
+  add_index "classifications", ["set_member_subject_id"], name: "index_classifications_on_set_member_subject_id", using: :btree
+  add_index "classifications", ["user_id"], name: "index_classifications_on_user_id", using: :btree
+  add_index "classifications", ["workflow_id"], name: "index_classifications_on_workflow_id", using: :btree
 
   create_table "collections", force: true do |t|
     t.string   "name"
@@ -41,9 +42,10 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.integer  "activated_state", default: 0, null: false
     t.string   "visibility"
     t.string   "display_name"
-    t.index ["owner_id"], :name => "index_collections_on_owner_id"
-    t.index ["project_id"], :name => "index_collections_on_project_id"
   end
+
+  add_index "collections", ["owner_id"], name: "index_collections_on_owner_id", using: :btree
+  add_index "collections", ["project_id"], name: "index_collections_on_project_id", using: :btree
 
   create_table "collections_subjects", id: false, force: true do |t|
     t.integer "subject_id",    null: false
@@ -56,9 +58,10 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["user_group_id"], :name => "index_memberships_on_user_group_id"
-    t.index ["user_id"], :name => "index_memberships_on_user_id"
   end
+
+  add_index "memberships", ["user_group_id"], name: "index_memberships_on_user_group_id", using: :btree
+  add_index "memberships", ["user_id"], name: "index_memberships_on_user_id", using: :btree
 
   create_table "oauth_access_grants", force: true do |t|
     t.integer  "resource_owner_id", null: false
@@ -69,8 +72,9 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.datetime "created_at",        null: false
     t.datetime "revoked_at"
     t.string   "scopes"
-    t.index ["token"], :name => "index_oauth_access_grants_on_token", :unique => true
   end
+
+  add_index "oauth_access_grants", ["token"], name: "index_oauth_access_grants_on_token", unique: true, using: :btree
 
   create_table "oauth_access_tokens", force: true do |t|
     t.integer  "resource_owner_id"
@@ -81,10 +85,11 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.datetime "revoked_at"
     t.datetime "created_at",        null: false
     t.string   "scopes"
-    t.index ["refresh_token"], :name => "index_oauth_access_tokens_on_refresh_token", :unique => true
-    t.index ["resource_owner_id"], :name => "index_oauth_access_tokens_on_resource_owner_id"
-    t.index ["token"], :name => "index_oauth_access_tokens_on_token", :unique => true
   end
+
+  add_index "oauth_access_tokens", ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true, using: :btree
+  add_index "oauth_access_tokens", ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id", using: :btree
+  add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true, using: :btree
 
   create_table "oauth_applications", force: true do |t|
     t.string   "name",         null: false
@@ -95,9 +100,10 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.datetime "updated_at"
     t.integer  "owner_id"
     t.string   "owner_type"
-    t.index ["owner_id", "owner_type"], :name => "index_oauth_applications_on_owner_id_and_owner_type"
-    t.index ["uid"], :name => "index_oauth_applications_on_uid", :unique => true
   end
+
+  add_index "oauth_applications", ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type", using: :btree
+  add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
   create_table "project_contents", force: true do |t|
     t.integer  "project_id"
@@ -108,8 +114,9 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.json     "example_strings"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["project_id"], :name => "index_project_contents_on_project_id"
   end
+
+  add_index "project_contents", ["project_id"], name: "index_project_contents_on_project_id", using: :btree
 
   create_table "projects", force: true do |t|
     t.string   "name"
@@ -123,9 +130,10 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.integer  "activated_state",       default: 0,     null: false
     t.string   "visibility",            default: "dev", null: false
     t.string   "primary_language"
-    t.index ["name"], :name => "index_projects_on_name", :unique => true
-    t.index ["owner_id"], :name => "index_projects_on_owner_id"
   end
+
+  add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree
+  add_index "projects", ["owner_id"], name: "index_projects_on_owner_id", using: :btree
 
   create_table "roles", force: true do |t|
     t.string   "name"
@@ -133,9 +141,10 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.string   "resource_type"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["name", "resource_type", "resource_id"], :name => "index_roles_on_name_and_resource_type_and_resource_id"
-    t.index ["name"], :name => "index_roles_on_name"
   end
+
+  add_index "roles", ["name", "resource_type", "resource_id"], name: "index_roles_on_name_and_resource_type_and_resource_id", using: :btree
+  add_index "roles", ["name"], name: "index_roles_on_name", using: :btree
 
   create_table "set_member_subjects", force: true do |t|
     t.integer  "state"
@@ -144,9 +153,10 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "classifications_count", default: 0, null: false
-    t.index ["subject_id"], :name => "index_set_member_subjects_on_subject_id"
-    t.index ["subject_set_id"], :name => "index_set_member_subjects_on_subject_set_id"
   end
+
+  add_index "set_member_subjects", ["subject_id"], name: "index_set_member_subjects_on_subject_id", using: :btree
+  add_index "set_member_subjects", ["subject_set_id"], name: "index_set_member_subjects_on_subject_set_id", using: :btree
 
   create_table "subject_sets", force: true do |t|
     t.string   "name"
@@ -154,8 +164,9 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "set_member_subjects_count", default: 0, null: false
-    t.index ["project_id"], :name => "index_subject_sets_on_project_id"
   end
+
+  add_index "subject_sets", ["project_id"], name: "index_subject_sets_on_project_id", using: :btree
 
   create_table "subject_sets_workflows", id: false, force: true do |t|
     t.integer "subject_set_id", null: false
@@ -171,10 +182,11 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.integer  "owner_id"
     t.integer  "project_id"
     t.string   "owner_type"
-    t.index ["owner_id"], :name => "index_subjects_on_owner_id"
-    t.index ["project_id"], :name => "index_subjects_on_project_id"
-    t.index ["zooniverse_id"], :name => "index_subjects_on_zooniverse_id", :unique => true
   end
+
+  add_index "subjects", ["owner_id"], name: "index_subjects_on_owner_id", using: :btree
+  add_index "subjects", ["project_id"], name: "index_subjects_on_project_id", using: :btree
+  add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
 
   create_table "uri_names", force: true do |t|
     t.string   "name"
@@ -182,8 +194,9 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.integer  "resource_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["name"], :name => "index_uri_names_on_name", :unique => true, :case_sensitive => false
   end
+
+  add_index "uri_names", ["name"], name: "index_uri_names_on_name", unique: true, using: :btree
 
   create_table "user_groups", force: true do |t|
     t.string   "display_name"
@@ -199,10 +212,11 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "subject_ids", array: true
-    t.index ["user_id", "workflow_id"], :name => "index_user_seen_subjects_on_user_id_and_workflow_id"
-    t.index ["user_id"], :name => "index_user_seen_subjects_on_user_id"
-    t.index ["workflow_id"], :name => "index_user_seen_subjects_on_workflow_id"
   end
+
+  add_index "user_seen_subjects", ["user_id", "workflow_id"], name: "index_user_seen_subjects_on_user_id_and_workflow_id", using: :btree
+  add_index "user_seen_subjects", ["user_id"], name: "index_user_seen_subjects_on_user_id", using: :btree
+  add_index "user_seen_subjects", ["workflow_id"], name: "index_user_seen_subjects_on_workflow_id", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: ""
@@ -228,16 +242,18 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.string   "languages",              default: [],       null: false, array: true
     t.string   "provider"
     t.string   "uid"
-    t.index ["email"], :name => "index_users_on_email", :unique => true
-    t.index ["login"], :name => "index_users_on_login", :unique => true
-    t.index ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
   end
+
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "users_roles", id: false, force: true do |t|
     t.integer "user_id"
     t.integer "role_id"
-    t.index ["user_id", "role_id"], :name => "index_users_roles_on_user_id_and_role_id"
   end
+
+  add_index "users_roles", ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id", using: :btree
 
   create_table "versions", force: true do |t|
     t.string   "item_type",  null: false
@@ -246,8 +262,9 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.string   "whodunnit"
     t.text     "object"
     t.datetime "created_at"
-    t.index ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
   end
+
+  add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
   create_table "workflows", force: true do |t|
     t.string   "name"
@@ -259,7 +276,8 @@ ActiveRecord::Schema.define(version: 20140710111625) do
     t.boolean  "pairwise",              default: false, null: false
     t.boolean  "grouped",               default: false, null: false
     t.boolean  "prioritized",           default: false, null: false
-    t.index ["project_id"], :name => "index_workflows_on_project_id"
   end
+
+  add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree
 
 end
