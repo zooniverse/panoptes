@@ -12,4 +12,14 @@ class UserGroup < ActiveRecord::Base
   has_many :classifications
 
   validates :display_name, presence: true, uniqueness: true
+
+  before_validation :downcase_case_insensitive_fields
+
+  private
+
+  def downcase_case_insensitive_fields
+    if display_name
+      self.display_name = display_name.downcase
+    end
+  end
 end

@@ -3,7 +3,7 @@ module Nameable
 
   included do
     attr_accessible :name
-    has_one :uri_name, as: :resource, dependent: :destroy
+    has_one :uri_name, as: :resource, autosave: true, dependent: :destroy
     validates :uri_name, presence: true
   end
 

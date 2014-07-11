@@ -82,14 +82,26 @@ describe User, :type => :model do
       expect{ User.create!(name: 'T', login: 'T', password: 'password1', email: 'test3@example.com') }.to raise_error
     end
 
+    it "should have the correct case-insensitive uniqueness error" do
+      user = create(:user)
+      dup_user = build(:user, login: user.login.upcase)
+      dup_user.valid?
+      expect(dup_user.errors[:login]).to include("has already been taken")
+    end
+
     context "when a user_group with the same name in different case exists" do
       let!(:user_group) do
         upcase_name = user.name.upcase
         create(:user_group, name: upcase_name, display_name: upcase_name)
       end
 
-      it "should not save" do
-        expect{ user.save }.to raise_error(ActiveRecord::RecordNotUnique)
+      it "should not be valid" do
+        expect(user).to_not be_valid
+      end
+
+      it "should have the correct error message on the uri_name association" do
+        user.valid?
+        expect(user.errors[:"uri_name.name"]).to include("has already been taken")
       end
     end
   end
