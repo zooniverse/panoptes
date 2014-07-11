@@ -22,6 +22,29 @@ describe UriName, :type => :model do
 
   describe "#name" do
 
-    it "should spec out the uniq case insensitive index constraints"
+    let(:uri_name_factory) { [ :uri_name_for_user, :uri_name_for_group ].sample }
+
+    it "should only create one uri_name" do
+      expect{ create(uri_name_factory) }.to change{ UriName.count }.from(0).to(1)
+    end
+
+    it "should allow a non-duplicate name to be stored" do
+      expect(create(uri_name_factory)).to be_a(UriName)
+    end
+
+    context "when a uri_name already exists" do
+      let!(:original) { create(uri_name_factory) }
+
+      it "not allow a duplicate case insensitive name to valid" do
+        dup = build(uri_name_factory, name: original.name.upcase)
+        expect(dup).to_not be_valid
+      end
+
+      it "not have the correct error message on a duplicate case insensitive name" do
+        dup = build(uri_name_factory, name: original.name.upcase)
+        dup.valid?
+        expect(dup.errors[:name]).to include("has already been taken")
+      end
+    end
   end
 end

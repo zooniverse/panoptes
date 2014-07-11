@@ -3,13 +3,19 @@
 FactoryGirl.define do
   factory :uri_name do
     sequence(:name) {|n| "MyString_#{n}"}
-    
+
     factory :uri_name_for_user do
-      association :resource, factory: :user, password: "password"
+      after(:build) do |user_uri_name|
+        user = build(:user, password: "password", uri_name: user_uri_name)
+        user_uri_name.resource = user
+      end
     end
 
     factory :uri_name_for_group do
-      association :resource, factory: :user_group
+      after(:build) do |user_group_uri_name|
+        group = build(:user_group, uri_name: user_group_uri_name)
+        user_group_uri_name.resource = group
+      end
     end
   end
 end
