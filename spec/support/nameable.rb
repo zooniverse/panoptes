@@ -32,11 +32,12 @@ shared_examples "is uri nameable" do
 
   describe "#uri_name" do
 
-    before(:each) do
-      named.save unless named.persisted?
+    it "should save the uri_name on named resource save" do
+      expect{ named.save }.to change{ UriName.count }.from(0).to(1)
     end
 
     it "should destroy the uri_name on named resource destruction" do
+      named.save unless named.persisted?
       expect{ named.destroy }.to change{ UriName.count }.from(1).to(0)
     end
 
