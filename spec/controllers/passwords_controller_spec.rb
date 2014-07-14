@@ -9,9 +9,8 @@ describe PasswordsController, type: [ :controller, :mailer ] do
   context "as json" do
     describe "#create" do
       before(:each) do 
-        request.env["HTTP_ACCEPT"] = "application/json"
+        request.env["HTTP_ACCEPT"] = "application/vnd.api+json; version=1"
         request.env["CONTENT_TYPE"] = "application/json"
-        request.format = :json
       end
 
       let(:user) { create(:user) }
@@ -106,7 +105,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
     describe "#update" do
       before(:each) do
-        request.env["HTTP_ACCEPT"] = "application/json"
+        request.env["HTTP_ACCEPT"] = "application/vnd.api+json; version=1"
         request.env["CONTENT_TYPE"] = "application/json"
       end
 

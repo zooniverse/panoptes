@@ -1,14 +1,14 @@
 class PasswordsController < Devise::PasswordsController
   def create
     respond_to do |format|
-      format.json { create_from_json }
+      format.json_api { create_from_json }
       format.html { super }
     end
   end
 
   def update
     respond_to do |format|
-      format.json { update_from_json }
+      format.json_api { update_from_json }
       format.html { super }
     end
   end

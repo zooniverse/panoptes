@@ -1,7 +1,10 @@
 class RegistrationsController < Devise::RegistrationsController
+  include JSONApiRender
+
   def create
     respond_to do |format|
-      format.json { create_from_json }
+      p format
+      format.json_api { create_from_json }
       format.html { super }
     end
   end
@@ -14,11 +17,11 @@ class RegistrationsController < Devise::RegistrationsController
     yield resource if block_given?
     status, content = if resource_saved
       sign_in resource, event: :authentication
-      [ :created, resource ]
+      [ :created, UserSerializer.resource(resource) ]
     else
       [ :unprocessable_entity, {} ]
     end
     clean_up_passwords resource
-    render status: status, json: content
+    render status: status, json_api: content
   end 
 end

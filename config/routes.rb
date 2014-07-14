@@ -6,7 +6,8 @@ Rails.application.routes.draw do
 
   devise_for :users, controllers: { omniauth_callbacks: 'omniauth_callbacks',
                                     registrations: 'registrations',
-                                    passwords: 'passwords' }
+                                    passwords: 'passwords',
+                                    sessions: 'sessions' }
 
   namespace :api do
     api_version(:module => "V1", :header => {name: "Accept", :value => "application/vnd.api+json; version=1"}) do
