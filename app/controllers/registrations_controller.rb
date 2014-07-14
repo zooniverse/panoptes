@@ -13,8 +13,8 @@ class RegistrationsController < Devise::RegistrationsController
     resource_saved = resource.save
     yield resource if block_given?
     status, content = if resource_saved
-      [ :created, UserSerializer.resource(resource) ]
       sign_in resource, event: :authentication
+      [ :created, resource ]
     else
       [ :unprocessable_entity, {} ]
     end
