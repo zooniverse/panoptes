@@ -6,8 +6,6 @@ class ApplicationController < ActionController::Base
 
   class PanoptesControllerError < StandardError; end
 
-  rescue_from ActiveRecord::RecordNotFound,   with: :not_found
-
   before_filter :configure_permitted_parameters, if: :devise_controller?
 
   def unknown_route
