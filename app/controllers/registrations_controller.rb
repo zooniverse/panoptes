@@ -1,4 +1,4 @@
-class Api::V1::RegistrationsController < Devise::RegistrationsController
+class RegistrationsController < Devise::RegistrationsController
 
   include JSONApiRender
 

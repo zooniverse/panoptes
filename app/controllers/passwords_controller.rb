@@ -1,7 +1,4 @@
-class Api::V1::PasswordsController < Devise::PasswordsController
-
-  include JSONApiRender
-
+class PasswordsController < Devise::PasswordsController
   def create
     status = false
     if able_to_reset_password?
@@ -22,7 +19,7 @@ class Api::V1::PasswordsController < Devise::PasswordsController
 
     def respond_to_request(action_status)
       response_status = action_status ? :ok : :unprocessable_entity
-      render status: response_status, json_api: {}
+      render status: response_status, json: {}
     end
 
     def able_to_reset_password?

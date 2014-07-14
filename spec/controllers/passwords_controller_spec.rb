@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
+describe PasswordsController, type: [ :controller, :mailer ] do
 
   before(:each) do
     request.env["devise.mapping"] = Devise.mappings[:user]
@@ -72,7 +72,7 @@ describe Api::V1::PasswordsController, type: [ :controller, :mailer ] do
       end
 
       it "should use devise to send the password reset email" do
-        allow_any_instance_of(Api::V1::PasswordsController)
+        allow_any_instance_of(PasswordsController)
           .to receive(:successfully_sent?).and_return(true)
         expect(User).to receive(:send_reset_password_instructions).once
         post :create, user_email_attrs
