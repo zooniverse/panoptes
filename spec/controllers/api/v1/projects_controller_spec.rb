@@ -10,7 +10,7 @@ describe Api::V1::ProjectsController, type: :controller do
   }
 
   let(:api_resource_name) { "projects" }
-  let(:api_resource_attributes) do 
+  let(:api_resource_attributes) do
     [ "id", "name", "display_name", "classifications_count", "subjects_count", "updated_at", "created_at", "available_languages", "content"]
   end
   let(:api_resource_links) do
@@ -22,19 +22,41 @@ describe Api::V1::ProjectsController, type: :controller do
   end
 
   describe "#index" do
-    before(:each) do
-      get :index
+
+    context "with the reponse already fetched" do
+
+      before(:each) do
+        get :index
+      end
+
+      it "should return 200" do
+        expect(response.status).to eq(200)
+      end
+
+      it "should have 2 items by default" do
+        expect(json_response[api_resource_name].length).to eq(2)
+      end
+
+      it_behaves_like "an api response"
     end
 
-    it "should return 200" do
-      expect(response.status).to eq(200)
-    end
+    context "when a project doesn't have any project_contents" do
+      let!(:remove_project_contents) do
+        Project.first.update_attribute(:project_contents, [])
+      end
 
-    it "should have 2 items by default" do
-      expect(json_response[api_resource_name].length).to eq(2)
-    end
+      before(:each) do
+        get :index
+      end
 
-    it_behaves_like "an api response"
+      it "should have 2 items by default" do
+        expect(json_response[api_resource_name].length).to eq(2)
+      end
+
+      it "should have the first item without any contents" do
+        expect(json_response[api_resource_name][0]['content']).to eq({})
+      end
+    end
   end
 
   describe "#show" do
