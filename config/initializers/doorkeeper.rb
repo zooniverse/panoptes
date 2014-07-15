@@ -9,13 +9,18 @@ Doorkeeper.configure do
   realm "Panoptes"
 
   resource_owner_authenticator do
-    current_user || warden.authenticate!(scope: :user)
+    u = current_user || warden.authenticate!(scope: :user)
+    u if !u.disabled?
   end
 
   resource_owner_from_credentials do |routes|
     if u = User.find_for_database_authentication(login: params[:login])
       valid_non_disabled_user = u.valid_password?(params[:password]) && !u.disabled?
-      u if valid_non_disabled_user
+    else
+      u = current_user || warden.authenticate!(scope: :user)
+      valid_non_disabled_user = !u.disabled?
     end
+
+    u if valid_non_disabled_user
   end
 end
