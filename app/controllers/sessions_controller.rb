@@ -2,6 +2,13 @@ class SessionsController < Devise::SessionsController
   include JSONApiRender
   after_filter :set_csrf_headers, only: [:create, :destroy]
 
+  def new
+    respond_to do |format|
+      format.html { super }
+      format.json_api { login_options }
+    end
+  end
+
   def create
     respond_to do |format|
       format.html { super }
@@ -31,8 +38,16 @@ class SessionsController < Devise::SessionsController
     head :no_content
   end
 
+  def login_options
+    opts = { login: '/users/sign_in' }
+    Devise.omniauth_providers.each do |provider|
+      opts[provider] = "/users/auth/#{provider}"
+    end
+    render status: 200, json_api: opts
+  end
+
   def set_csrf_headers
-    response.headers['X-CSRF-Param'] = request_forgery_protection_token
-    response.headers['X-CSRF-Token'] = form_authenticity_token
+    response.headers['X-CSRF-Param'] = request_forgery_protection_token.to_s
+    response.headers['X-CSRF-Token'] = form_authenticity_token.to_s
   end
 end
