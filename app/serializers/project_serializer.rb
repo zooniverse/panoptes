@@ -5,6 +5,7 @@ class ProjectSerializer
     :content
 
   can_include :workflows, :subject_sets, :owner, :project_contents
+  can_filter_by :display_name
 
   def content
     return unless @context[:languages]

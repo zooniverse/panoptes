@@ -23,7 +23,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
   describe "#index" do
 
-    context "with the reponse already fetched" do
+    describe "with no filtering" do
 
       before(:each) do
         get :index
@@ -45,16 +45,70 @@ describe Api::V1::ProjectsController, type: :controller do
         Project.first.update_attribute(:project_contents, [])
       end
 
-      before(:each) do
-        get :index
-      end
-
       it "should have 2 items by default" do
+        get :index
         expect(json_response[api_resource_name].length).to eq(2)
       end
 
       it "should have the first item without any contents" do
+        get :index
         expect(json_response[api_resource_name][0]['content']).to eq({})
+      end
+    end
+
+    describe "filter params" do
+      let!(:project_owner) { create(:user) }
+      let!(:new_project) do
+        create(:project, display_name: "Non-test project", owner: project_owner)
+      end
+
+      before(:each) do
+        get :index, index_options
+      end
+
+      describe "filter by owner" do
+        let(:index_options) { { owner: project_owner.name } }
+
+        it "should respond with 1 item" do
+          expect(json_response[api_resource_name].length).to eq(1)
+        end
+
+        it "should respond with the correct item" do
+          owner_id = json_response[api_resource_name][0]['links']['owner']
+          expect(owner_id).to eq(new_project.owner.id.to_s)
+        end
+      end
+
+      describe "filter by display_name" do
+        let(:index_options) { { display_name: new_project.display_name } }
+
+        it "should respond with 1 item" do
+          expect(json_response[api_resource_name].length).to eq(1)
+        end
+
+        it "should respond with the correct item" do
+          project_name = json_response[api_resource_name][0]['display_name']
+          expect(project_name).to eq(new_project.display_name)
+        end
+      end
+
+      describe "filter by display_name & owner" do
+        let!(:filtered_project) do
+          projects.first.update_attribute(:owner_id, project_owner.id)
+          projects.first
+        end
+        let(:index_options) do
+          { owner: project_owner.name, display_name: filtered_project.display_name }
+        end
+
+        it "should respond with 1 item" do
+          expect(json_response[api_resource_name].length).to eq(1)
+        end
+
+        it "should respond with the correct item" do
+          project_name = json_response[api_resource_name][0]['display_name']
+          expect(project_name).to eq(filtered_project.display_name)
+        end
       end
     end
   end
