@@ -13,14 +13,13 @@ Doorkeeper.configure do
     u if !u.disabled?
   end
 
-  resource_owner_from_credentials do |routes|
+  resource_owner_from_credentials do
     if u = User.find_for_database_authentication(login: params[:login])
       valid_non_disabled_user = u.valid_password?(params[:password]) && !u.disabled?
     else
-      u = current_user || warden.authenticate!(scope: :user)
-      valid_non_disabled_user = !u.disabled?
+      u = current_user
+      valid_non_disabled_user = !u.blank? && !u.disabled?
     end
-
     u if valid_non_disabled_user
   end
 end

@@ -3,7 +3,6 @@ class RegistrationsController < Devise::RegistrationsController
 
   def create
     respond_to do |format|
-      p format
       format.json_api { create_from_json }
       format.html { super }
     end
