@@ -92,6 +92,19 @@ describe Api::V1::ProjectsController, type: :controller do
         end
       end
 
+      describe "filter by name" do
+        let(:index_options) { { name: new_project.name } }
+
+        it "should respond with 1 item" do
+          expect(json_response[api_resource_name].length).to eq(1)
+        end
+
+        it "should respond with the correct item" do
+          project_name = json_response[api_resource_name][0]['name']
+          expect(project_name).to eq(new_project.name)
+        end
+      end
+
       describe "filter by display_name & owner" do
         let!(:filtered_project) do
           projects.first.update_attribute(:owner_id, project_owner.id)
