@@ -6,7 +6,7 @@ class Api::V1::ProjectsController < Api::ApiController
   def show
     project = Project.find(params[:id])
     authorize project, :read?
-    render json_api: ProjectSerializer.resource(project, 
+    render json_api: ProjectSerializer.resource(project,
                                                 nil,
                                                 languages: current_languages,
                                                 fields: ['title',
@@ -16,7 +16,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def index
-    render json_api: ProjectSerializer.page(params, 
+    add_owner_ids_filter_param!
+    render json_api: ProjectSerializer.page(params,
                                             nil,
                                             languages: current_languages,
                                             fields: ['title', 'description'])
@@ -41,7 +42,7 @@ class Api::V1::ProjectsController < Api::ApiController
     project.save!
 
     render json_api: ProjectSerializer.resource(project,
-                                                nil, 
+                                                nil,
                                                 languages: [params[:primary_language]],
                                                 fields: ['title',
                                                          'description'])
@@ -53,4 +54,12 @@ class Api::V1::ProjectsController < Api::ApiController
     project.destroy
     deleted_resource_response
   end
-end 
+
+  private
+
+    def add_owner_ids_filter_param!
+      owner_filter = params.delete(:owner)
+      owner_ids = UriName.where(name: owner_filter).map(&:resource_id).join(",")
+      params.merge!({ owner_ids: owner_ids }) unless owner_ids.blank?
+    end
+end
