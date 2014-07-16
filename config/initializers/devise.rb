@@ -25,11 +25,13 @@ Devise.setup do |config|
     @social_config ||= load_social_config
   end
 
-  def omniauth_config_for(config, provider: provider)
-    conf = social_config[provider]
-    config.omniauth provider, conf['app_id'], conf['app_secret'], scope: (conf['scopes'] || '')
+  def omniauth_config_for(config, providers: provider)
+    providers.each do |provider|
+      conf = social_config[provider]
+      config.omniauth provider, conf.delete('app_id'), conf.delete('app_secret'), **conf
+    end
   end
 
-  omniauth_config_for(config, provider: :facebook)
+  omniauth_config_for(config, providers: [:facebook, :gplus])
 end
 

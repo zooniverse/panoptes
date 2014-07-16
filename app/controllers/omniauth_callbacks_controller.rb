@@ -1,6 +1,6 @@
 class OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
-  def facebook
+  def callback
     @user = User.from_omniauth(request.env['omniauth.auth'])
 
     unless @user.valid?
@@ -11,6 +11,9 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
       redirect_to sign_in_redirect
     end
   end
+
+  alias_method :facebook, :callback 
+  alias_method :gplus, :callback
   
   private
   def sign_in_redirect
