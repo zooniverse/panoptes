@@ -16,6 +16,18 @@ ActiveRecord::Schema.define(version: 20140711101624) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "authorizations", force: true do |t|
+    t.integer  "user_id"
+    t.string   "provider"
+    t.string   "uid"
+    t.string   "token"
+    t.datetime "expires_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "authorizations", ["user_id"], name: "index_authorizations_on_user_id", using: :btree
+
   create_table "classifications", force: true do |t|
     t.integer  "set_member_subject_id"
     t.integer  "project_id"
@@ -242,8 +254,6 @@ ActiveRecord::Schema.define(version: 20140711101624) do
     t.integer  "classifications_count",  default: 0,        null: false
     t.integer  "activated_state",        default: 0,        null: false
     t.string   "languages",              default: [],       null: false, array: true
-    t.string   "provider"
-    t.string   "uid"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree

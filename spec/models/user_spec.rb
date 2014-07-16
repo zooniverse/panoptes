@@ -37,8 +37,8 @@ describe User, :type => :model do
         expect(user_from_auth_hash.login).to eq(auth_hash.info.name.downcase.gsub(/\s/, '_'))
       end
 
-      it 'should create a user with a provider' do
-        expect(user_from_auth_hash.provider).to eq(auth_hash.provider)
+      it 'should create a user with a authorization' do
+        expect(user_from_auth_hash.authorizations).to all( be_an(Authorization) )
       end
 
       it 'should not persist the user' do

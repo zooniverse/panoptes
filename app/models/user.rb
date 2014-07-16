@@ -15,6 +15,7 @@ class User < ActiveRecord::Base
   has_many :user_groups, through: :memberships
   has_many :classifications
   has_many :memberships
+  has_many :authorizations
 
   owns :projects, :collections, :subjects,
     [:oauth_applications, {class_name: "Doorkeeper::Application"}]
@@ -25,12 +26,15 @@ class User < ActiveRecord::Base
   attr_accessor :migrated_user
 
   def self.from_omniauth(auth_hash)
-    where(auth_hash.slice(:provider, :uid)).first_or_create do |u|
+    auth = Authorization.from_omniauth(auth_hash)
+
+    auth.user ||= create do |u|
       u.email = auth_hash.info.email
       u.password = Devise.friendly_token[0,20]
       u.display_name = auth_hash.info.name
       u.login = auth_hash.info.name.downcase.gsub(/\s/, '_')
       u.uri_name = UriName.new(name: u.login, resource: u)
+      u.authorizations << auth
     end
   end
 
@@ -61,11 +65,11 @@ class User < ActiveRecord::Base
   end
 
   def email_required?
-    provider.nil?
+    authorizations.blank?
   end
 
   def email_changed?
-    provider.nil?
+    authorizations.blank?
   end
 
   protected
