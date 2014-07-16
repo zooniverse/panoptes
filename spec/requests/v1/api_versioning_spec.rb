@@ -3,7 +3,8 @@ require 'spec_helper'
 describe "api versioning with accept headers", type: :request do
 
   it "does not allow incorrect api version headers" do
-    expect { get "/api/users" }.to raise_error(ActionController::RoutingError)
+    get "/api/users"
+    expect(response.status).to eq(404)
   end
 
   it "allows correct api version headers" do

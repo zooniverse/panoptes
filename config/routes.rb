@@ -28,4 +28,5 @@ Rails.application.routes.draw do
   end
 
   root to: "home#index"
+  match "*path", to: "application#unknown_route", via: :all
 end
