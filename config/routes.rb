@@ -4,18 +4,19 @@ Rails.application.routes.draw do
     controllers applications: 'oauth/applications'
   end
 
-  devise_for :users, controllers: { omniauth_callbacks: 'omniauth_callbacks' },
-    skip: [ :registrations, :sessions, :passwords ]
+  devise_for :users, controllers: { omniauth_callbacks: 'omniauth_callbacks', passwords: 'passwords' }, skip: [ :sessions, :registrations ]
+
+  as :user do
+    get "/users/sign_in" => "sessions#new", as: :new_user_session
+    post "/users/sign_in" => "sessions#create", as: :user_session
+    delete "/users/sign_out" => "sessions#destroy", as: :destroy_user_session
+
+    get "/users/sign_up" => "registrations#new", as: :new_user_registration
+    post "/users" => "registrations#create", as: :user_registration
+  end
 
   namespace :api do
     api_version(:module => "V1", :header => {name: "Accept", :value => "application/vnd.api+json; version=1"}) do
-
-      devise_scope :user do
-        post   'registrations',   to: 'registrations#create',   as: 'sign_up'
-        post   'passwords', to: 'passwords#create', as: 'reset_password'
-        match  'passwords', to: 'passwords#update', as: 'reset_password_confirm', via: [:put, :patch]
-      end
-
       get "/me", to: 'users#me', format: false
 
       resources :users, except: [:new, :edit, :create], format: false
