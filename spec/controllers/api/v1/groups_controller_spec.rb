@@ -16,7 +16,8 @@ describe Api::V1::GroupsController, type: :controller do
   end
 
   before(:each) do
-    default_request
+    user = user_groups[0].users.first
+    default_request(scopes: ["public", "group"], user_id: user.id)
   end
 
   describe "#index" do
@@ -51,6 +52,44 @@ describe Api::V1::GroupsController, type: :controller do
     it_behaves_like "an api response"
   end
 
+  describe "#create", :focus do
+
+    context "with valid params" do
+      let!(:create_params) { { user_group: { display_name: "Zooniverse" } } }
+
+      it "should create a new UserGroup" do
+        expect{post :create, create_params}.to change{UserGroup.count}.by(1)
+      end
+
+      context "with the response ready" do
+        before(:each) do
+          post :create, create_params
+        end
+
+        it "should create a the project with the correct name" do
+          created_id = json_response["user_groups"][0]["id"]
+          expect(UserGroup.find(created_id).display_name).to eq("zooniverse")
+        end
+
+        it_behaves_like "an api response"
+      end
+    end
+
+    context "with invalid params" do
+      let!(:create_params) { { user_group: { name: "Zooniverse" } } }
+
+      before(:each) do
+        post :create, create_params
+      end
+
+      it "should respond with bad_request" do
+        expect(response.status).to eq(400)
+      end
+
+      it "should have the validation errors in the response body"
+    end
+  end
+
   describe "#destroy" do
     let(:group) { user_groups.first }
 
@@ -68,6 +107,22 @@ describe Api::V1::GroupsController, type: :controller do
     it "should disable the group" do
       delete :destroy, id: group.id
       expect(user_groups.first.reload.inactive?).to be_truthy
+    end
+
+    context "an unauthorized user" do
+      before(:each) do
+        unauthorized_user = create(:user)
+        stub_token(scopes: ["user"], user_id: unauthorized_user.id)
+        delete :destroy, id: group.id
+      end
+
+      it "should return 403" do
+        expect(response.status).to eq(403)
+      end
+
+      it "should not disable the user_group" do
+        expect(group.reload.inactive?).to be_falsy
+      end
     end
   end
 end

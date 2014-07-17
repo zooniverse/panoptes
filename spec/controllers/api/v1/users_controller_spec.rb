@@ -189,7 +189,7 @@ describe Api::V1::UsersController, type: :controller do
         stub_token(scopes: ["user"], user_id: users.second.id)
       end
 
-      it "should return 401" do
+      it "should return 403" do
         delete :destroy, id: user_id
         expect(response.status).to eq(403)
       end

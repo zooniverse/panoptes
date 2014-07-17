@@ -7,6 +7,7 @@ module Api
     class UnauthorizedTokenError < PanoptesControllerError; end
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
+    rescue_from ActiveRecord::RecordInvalid, with: :invalid_record
     rescue_from Pundit::NotAuthorizedError, with: :not_authorized
     rescue_from UnauthorizedTokenError, with: :not_authenticated
 
@@ -75,6 +76,10 @@ module Api
       json_api_render(:not_found, exception)
     end
 
+    def invalid_record(exception)
+      json_api_render(:bad_request, exception)
+    end
+
     def cellect_host(workflow_id)
       host = cellect_session[workflow_id] || Cellect::Client.choose_host
       cellect_session[workflow_id] = host
@@ -83,7 +88,7 @@ module Api
     def cellect_session
       session[:cellect_hosts] ||= {}
     end
-  
+
     private
 
       def revoke_doorkeeper_request_token!
