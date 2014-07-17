@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html { raise exception }
       format.json { render status: :not_found, json: response_body }
-      format.json_api { render status: :not_found, json: response_body }
+      format.json_api { render status: :not_found, json_api: response_body }
     end
   end
 
