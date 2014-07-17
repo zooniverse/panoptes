@@ -27,8 +27,8 @@ Devise.setup do |config|
 
   def omniauth_config_for(config, providers: provider)
     providers.each do |provider|
-      conf = social_config[provider]
-      config.omniauth provider, conf.delete('app_id'), conf.delete('app_secret'), **conf
+      conf = social_config[provider].symbolize_keys
+      config.omniauth provider, conf.delete(:app_id), conf.delete(:app_secret), **conf
     end
   end
 

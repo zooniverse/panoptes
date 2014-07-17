@@ -68,8 +68,8 @@ FactoryGirl.define do
     after(:build) do |u|
       unless u.uri_name
         u.uri_name = build(:uri_name,
-                           name: omni_auth_user.login,
-                           resource: omni_auth_user)
+                           name: u.login,
+                           resource: u)
       end
       create_list(:authorization, 1, user: u, provider: 'facebook', uid: '12345')
     end
