@@ -14,6 +14,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def create
+    p current_resource_owner
     update_cellect if current_resource_owner
     render json_api: {}, status: 204
   end
