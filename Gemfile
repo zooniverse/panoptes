@@ -19,6 +19,7 @@ gem 'pundit'
 gem 'paper_trail'
 gem 'omniauth'
 gem 'omniauth-facebook'
+gem 'omniauth-gplus'
 gem 'cellect-client', '~> 0.0.7'
 
 platforms :jruby do

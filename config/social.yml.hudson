@@ -2,14 +2,20 @@ development:
   facebook:
     app_id: <%= ENV['FACEBOOK_APP_ID'] %>
     app_secret: <%= ENV['FACEBOOK_APP_SECRET'] %>
-    scopes:
-      - email
-      - public_profile
+    scope: email, public_profile
+  gplus:
+    app_id: <%= ENV['GPLUS_APP_ID'] %>
+    app_secret: <%= ENV['GPLUS_APP_SECRET'] %>
+    scope: userinfo.email, userinfo.profile, plus.login
+    request_visible_actions: AddActivity,BuyActivity
 
 test:
   facebook:
     app_id: Not a real id
     app_secret: Not a real secret
-    scopes:
-      - email
-      - public_profile
+    scope: email, public_profile
+  gplus:
+    app_id: Not real
+    app_secret: all_fake
+    scope: userinfo.email, userinfo.profile, plus.login
+    request_visible_actions: AddActivity,BuyActivity
