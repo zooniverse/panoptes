@@ -5,7 +5,7 @@ describe HomeController, type: :controller do
   describe "GET 'index'" do
 
     before(:each) do
-      get 'index'
+      get 'index', format: :json
     end
 
     it "returns success" do

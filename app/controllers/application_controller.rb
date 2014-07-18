@@ -8,7 +8,11 @@ class ApplicationController < ActionController::Base
   def unknown_route
     exception = ActionController::RoutingError.new("Not Found")
     response_body = JSONApiRender::JSONApiResponse.format_response_body(exception)
-    render status: :not_found, json: response_body
+    respond_to do |format|
+      format.html { raise exception }
+      format.json { render status: :not_found, json: response_body }
+      format.json_api { render status: :not_found, json_api: response_body }
+    end
   end
 
   protected
