@@ -1,5 +1,9 @@
 require 'spec_helper'
 
+def created_user_groups_id
+  json_response["user_groups"][0]["id"]
+end
+
 describe Api::V1::GroupsController, type: :controller do
   let!(:user_groups) do
     [ create(:user_group_with_users),
@@ -52,7 +56,7 @@ describe Api::V1::GroupsController, type: :controller do
     it_behaves_like "an api response"
   end
 
-  describe "#create", :focus do
+  describe "#create" do
 
     context "with valid params" do
       let!(:create_params) { { user_group: { display_name: "Zooniverse" } } }
@@ -66,8 +70,17 @@ describe Api::V1::GroupsController, type: :controller do
           post :create, create_params
         end
 
+        it "should return 201" do
+          expect(response.status).to eq(201)
+        end
+
+        it "should set the Location header as per JSON-API specs" do
+          id = created_user_groups_id
+          expect(response.headers["Location"]).to eq("http://test.host/api/groups/#{id}")
+        end
+
         it "should create a the project with the correct name" do
-          created_id = json_response["user_groups"][0]["id"]
+          created_id = created_user_groups_id
           expect(UserGroup.find(created_id).display_name).to eq("zooniverse")
         end
 
@@ -86,7 +99,11 @@ describe Api::V1::GroupsController, type: :controller do
         expect(response.status).to eq(400)
       end
 
-      it "should have the validation errors in the response body"
+      it "should have the validation errors in the response body" do
+        message = "Validation failed: Uri name name can't be blank, Display name can't be blank"
+        error_response = { errors: [ { message: message } ] }.to_json
+        expect(response.body).to eq(error_response)
+      end
     end
   end
 

@@ -17,7 +17,9 @@ class Api::V1::GroupsController < Api::ApiController
     group = UserGroup.new(user_group_params)
     group.uri_name = UriName.new(name: group.display_name, resource: group)
     group.save!
-    render json_api: UserGroupSerializer.resource(group)
+    json_api_render( 201,
+                     UserGroupSerializer.resource(group),
+                     api_group_url(group) )
   end
 
   def destroy
