@@ -7,12 +7,12 @@ def annotation_values
     { user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" } ]
 end
 
-def setup_create_request(project_id, workflow_id, subject_set_member)
+def setup_create_request(project_id, workflow_id, set_member_subject)
   request.session = { cellect_hosts: { workflow_id.to_s => "example.com" } }
   params = { classification: { project_id: project_id,
                                workflow_id: workflow_id,
-                               set_member_subject_id: subject_set_member.id,
-                               subject_id: subject_set_member.subject_id,
+                               set_member_subject_id: set_member_subject.id,
+                               subject_id: set_member_subject.subject_id,
                                annotations: annotation_values } }
   post :create, params
 end
@@ -105,7 +105,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       it "should setup the add seen command to cellect" do
         expect(stubbed_cellect_connection).to receive(:add_seen).with(
-          subject_id: set_member_subject.id.to_s,
+          subject_id: set_member_subject.subject_id.to_s,
           workflow_id: workflow.id.to_s,
           user_id: user.id,
           host: 'example.com'
