@@ -22,10 +22,14 @@ module APIRequestHelpers
   end
 
   def stub_token(scopes: [], user_id: nil)
-    allow(controller).to receive(:doorkeeper_token) { double( accessible?: true,
-                                                              scopes: scopes,
-                                                              acceptable?: true,
-                                                              resource_owner_id: user_id ) }
+    allow(controller).to receive(:doorkeeper_token).and_return(token(scopes, user_id))
+  end
+
+  def token(scopes, user_id)
+    token = create(:access_token, resource_owner_id: user_id)
+    allow(token).to receive(:accessible?).and_return(true)
+    allow(token).to receive(:scopes).and_return(Doorkeeper::OAuth::Scopes.from_array(scopes))
+    token
   end
 
   def stub_token_with_scopes(*scopes)

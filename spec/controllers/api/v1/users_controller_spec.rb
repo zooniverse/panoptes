@@ -79,7 +79,7 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     context "when updating a non-existant user" do
-      let!(:user_id) { 100 }
+      let!(:user_id) { -1 }
       let(:patch_operations) { nil }
 
       it "should return a 404 status" do
@@ -87,7 +87,7 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should return a specific error message in the response body" do
-        error_message = json_error_message("Couldn't find User with 'id'=100")
+        error_message = json_error_message("Couldn't find User with 'id'=#{user_id}")
         expect(response.body).to eq(error_message)
       end
     end
@@ -153,9 +153,9 @@ describe Api::V1::UsersController, type: :controller do
   describe "#destroy" do
     let(:user) { users.first}
     let(:user_id) { user.id }
-    let(:token) { create(:access_token) }
+    let(:access_token) { create(:access_token) }
     let!(:stub_token_auth) do
-      allow(Doorkeeper).to receive(:authenticate).and_return(token)
+      allow(Doorkeeper).to receive(:authenticate).and_return(access_token)
     end
 
     it "should call the UserInfoScrubber with the user" do
@@ -181,7 +181,7 @@ describe Api::V1::UsersController, type: :controller do
 
     it "should revoke the request doorkeeper token" do
       delete :destroy, id: user_id
-      expect(token.reload.revoked?).to eq(true)
+      expect(access_token.reload.revoked?).to eq(true)
     end
 
     context "an unauthorized user" do

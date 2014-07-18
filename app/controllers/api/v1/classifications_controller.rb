@@ -34,4 +34,4 @@ class Api::V1::ClassificationsController < Api::ApiController
              host: cellect_host(params[:workflow_id]))
       .symbolize_keys
   end
-end 
+end

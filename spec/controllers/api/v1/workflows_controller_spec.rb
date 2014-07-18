@@ -77,7 +77,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     context "with a logged in user" do
       before(:each) do
-        default_request user_id: user, scopes: %(project, public)
+        default_request user_id: user.id, scopes: %(project public)
         get :show, id: workflows.first.id
       end
 
