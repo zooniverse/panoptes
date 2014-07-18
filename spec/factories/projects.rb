@@ -9,6 +9,13 @@ FactoryGirl.define do
 
     association :owner, factory: :user, password: "password"
 
+    factory :full_project do
+      after(:create) do |p|
+        workflow = create(:workflow, project: p)
+        subject_set = create_list(:subject_set_with_subjects, 2, project: p, workflows: [workflow])
+      end
+    end
+
     factory :project_with_workflows do
       after(:create) do |p|
         create_list(:workflow, 2, project: p)

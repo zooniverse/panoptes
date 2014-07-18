@@ -45,8 +45,8 @@ module Api
 
     protected
 
-    def json_api_render(status, content)
-      render status: status, json_api: content
+    def json_api_render(status, content, location=nil)
+      render status: status, json_api: content, location: location
     end
 
     def parse_http_accept_language
@@ -87,6 +87,10 @@ module Api
 
     def cellect_session
       session[:cellect_hosts] ||= {}
+    end
+
+    def request_ip
+      request.remote_ip
     end
 
     private
