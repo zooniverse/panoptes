@@ -37,6 +37,10 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "with random sort" do
+        let(:api_resource_attributes) do
+          [ "id", "metadata", "locations", "zooniverse_id", "classifications_count",
+            "state", "set_member_subject_id", "created_at", "updated_at" ]
+        end
         let(:api_resource_links) { [ "subjects.subject_set" ] }
         let(:request_params) { { sort: 'random', workflow_id: workflow.id.to_s } }
         let(:cellect_results) { cellect_results = subjects.take(10).map(&:id) }
