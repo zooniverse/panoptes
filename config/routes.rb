@@ -21,9 +21,15 @@ Rails.application.routes.draw do
 
       resources :users, except: [:new, :edit, :create], format: false
 
-      [:memberships, :groups, :collections, :subjects, :projects,
-       :classifications, :workflows, :subject_sets].each do |resource|
-          resources resource, except: [:new, :edit], format: false
+      resource_classes = [ :memberships, :groups, :collections, :subjects,
+                           :projects, :classifications, :workflows,
+                           :subject_sets ]
+      default_excepts = [:new, :edit]
+      resource_classes.each do |resource|
+        if resource == :classifications
+          except_list = default_excepts | [ :destroy, :update ]
+        end
+        resources resource, except: except_list, format: false
       end
     end
   end
