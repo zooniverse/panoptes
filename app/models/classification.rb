@@ -5,5 +5,5 @@ class Classification < ActiveRecord::Base
   belongs_to :workflow, counter_cache: true
   belongs_to :user_group, counter_cache: true
 
-  validates_presence_of :set_member_subject, :user, :project, :workflow, :annotations
+  validates_presence_of :set_member_subject, :project, :workflow, :annotations, :user_ip
 end

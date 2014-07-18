@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140711101624) do
+ActiveRecord::Schema.define(version: 20140718122413) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 20140711101624) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_group_id"
+    t.inet     "user_ip"
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree

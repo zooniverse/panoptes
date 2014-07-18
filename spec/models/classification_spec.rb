@@ -17,12 +17,16 @@ describe Classification, :type => :model do
     expect(build(:classification, workflow: nil)).to_not be_valid
   end
 
-  it "must have a user" do
-    expect(build(:classification, user: nil)).to_not be_valid
+  it "must have a user_ip" do
+    expect(build(:classification, user_ip: nil)).to_not be_valid
   end
 
   it "must have annotations" do
     expect(build(:classification, annotations: nil)).to_not be_valid
+  end
+
+  it "should be valid without a user" do
+    expect(build(:classification, user: nil)).to be_valid
   end
 
   describe "#user_groups" do
