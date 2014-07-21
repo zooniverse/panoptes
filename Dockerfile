@@ -27,3 +27,4 @@ RUN bundle install
 ADD ./ /rails_app
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ENTRYPOINT rails s
