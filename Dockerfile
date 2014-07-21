@@ -20,6 +20,8 @@ RUN gem install bundler
 WORKDIR /rails_app
 
 ENV RAILS_ENV docker_dev
+ENV JRUBY_OPTS --2.0
+
 ADD Gemfile /rails_app/Gemfile
 ADD Gemfile.lock /rails_app/Gemfile.lock
 RUN bundle install
