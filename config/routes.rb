@@ -1,8 +1,7 @@
 Rails.application.routes.draw do
 
   use_doorkeeper do
-    controllers applications: 'applications',
-      authorizations: 'authorizations',
+    controllers authorizations: 'authorizations',
       tokens: 'tokens'
   end
 
