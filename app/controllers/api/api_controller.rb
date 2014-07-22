@@ -5,9 +5,11 @@ module Api
 
     class PatchResourceError < PanoptesControllerError; end
     class UnauthorizedTokenError < PanoptesControllerError; end
+    class InvalidJsonAnnotationsError < PanoptesControllerError; end
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
     rescue_from ActiveRecord::RecordInvalid, with: :invalid_record
+    rescue_from InvalidJsonAnnotationsError, with: :invalid_record
     rescue_from Pundit::NotAuthorizedError, with: :not_authorized
     rescue_from UnauthorizedTokenError, with: :not_authenticated
 
