@@ -20,6 +20,8 @@ RUN gem install bundler
 WORKDIR /rails_app
 
 ENV RAILS_ENV docker_dev
+ENV JRUBY_OPTS --2.0
+
 ADD Gemfile /rails_app/Gemfile
 ADD Gemfile.lock /rails_app/Gemfile.lock
 RUN bundle install
@@ -27,3 +29,4 @@ RUN bundle install
 ADD ./ /rails_app
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ENTRYPOINT rails s
