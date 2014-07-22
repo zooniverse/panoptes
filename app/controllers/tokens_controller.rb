@@ -1,25 +1,17 @@
 class TokensController < Doorkeeper::TokensController
+  include OauthTrust
   before_action :allowed_grants, only: :create
-  before_action :default_scopes, only: :create
-  before_action :allowed_scopes, only: :create
+  before_action :default_scopes, only: :create, if: :non_code_request
+  before_action :allowed_scopes, only: :create, if: :non_code_request
 
   private
 
-  def client
-    @client ||= Doorkeeper::Application.where(uid: params[:client_id]).first
-  end
-
   def allowed_grants
     allowed = client.allowed_grants.include?(params[:grant_type]) 
-    head :bad_reqest unless allowed
+    head :bad_request unless allowed
   end
 
-  def allowed_scopes
-    allowed = Doorkeeper::OAuth::Helpers::ScopeChecker.valid?(params[:scope], client.scopes)
-    head :bad_reqest unless allowed
-  end
-
-  def default_scopes
-    params[:scope] ||= client.max_scope.join(',')
+  def non_code_request
+    params[:grant_type] == 'password' || params[:grant_type] == 'client_credentials'
   end
 end

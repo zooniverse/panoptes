@@ -1,0 +1,62 @@
+require 'spec_helper'
+
+shared_examples "restricted scopes" do
+  context 'requesting appropriate scopes' do
+    it 'should return the approval page' do
+      req
+      expect(response.status).to eq(200)
+    end
+  end  
+
+  context 'requesting greater scopes' do
+    it 'should return bad request' do
+      params['scope'] = 'public twentytwo'
+      req
+      expect(response.status).to eq(400)
+    end
+  end
+
+  context 'requesting no scopes' do
+    it 'should create a page with the apps default scopes' do
+      params.delete('scope')
+      req
+      expect(assigns(:pre_auth).scopes).to eq(['public', 'projects', 'classifications'])
+    end
+  end
+end
+
+describe AuthorizationsController, type: :controller do
+  let(:owner) { create(:user) }
+  let(:params) { { "client_id" => app.uid,
+                   "redirect_url" => 'urn:ietf:wg:oauth:2.0:oob',
+                   "scope" => "public projects classifications" } }
+  let(:token_params) { params[:request_type] = 'token'; params }
+  let(:code_params) { params[:request_type] = 'code'; params }
+
+  before(:each) do
+    sign_in owner
+  end
+
+  context "an implicit grant by an insecure application" do
+    let!(:app) { create(:application, owner: owner) }
+    let(:req) { get :new, token_params }
+
+    it_behaves_like 'restricted scopes'
+  end
+
+  context "an authorization grant by a secure application" do
+    let!(:app) { create(:secure_app, owner: owner) }
+    let(:req) { get :new, code_params }
+
+    it_behaves_like 'restricted scopes'
+  end
+
+  context "an authorization grant by an insecure application" do
+    let!(:app) { create(:application, owner: owner) }
+
+    it 'should return 400 bad request' do
+      get :new, code_params
+      expect(response.status).to eq(400)
+    end
+  end
+end
