@@ -5,11 +5,15 @@ module Api
 
     class PatchResourceError < PanoptesControllerError; end
     class UnauthorizedTokenError < PanoptesControllerError; end
+    class UnsupportedMediaType < PanoptesControllerError; end
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
     rescue_from ActiveRecord::RecordInvalid, with: :invalid_record
     rescue_from Pundit::NotAuthorizedError, with: :not_authorized
     rescue_from UnauthorizedTokenError, with: :not_authenticated
+    rescue_from UnsupportedMediaType, with: :unsupported_media_type
+
+    before_action :require_json
 
     def request_update_attributes(resource)
       if request.patch?
@@ -80,6 +84,10 @@ module Api
       json_api_render(:bad_request, exception)
     end
 
+    def unsupported_media_type(exception)
+      json_api_render(:unsupported_media_type, exception)
+    end
+
     def cellect_host(workflow_id)
       host = cellect_session[workflow_id] || Cellect::Client.choose_host
       cellect_session[workflow_id] = host
@@ -89,15 +97,28 @@ module Api
       session[:cellect_hosts] ||= {}
     end
 
+
     def request_ip
       request.remote_ip
     end
 
     private
 
-      def revoke_doorkeeper_request_token!
-        token = Doorkeeper.authenticate(request)
-        token.revoke
+    def require_json
+      unless valid_content_type?
+        raise UnsupportedMediaType.new("Only requests with Content-Type: application/json are allowed")
       end
+    end
+
+    def valid_content_type?
+      request.get? || 
+        request.headers['CONTENT_TYPE'] =~ /application\/json/ ||
+        (request.patch? && request.headers['CONTENT_TYPE'] =~ /application\/patch\+json/)
+    end
+
+    def revoke_doorkeeper_request_token!
+      token = Doorkeeper.authenticate(request)
+      token.revoke
+    end
   end
 end
