@@ -8,7 +8,7 @@ class TokensController < Doorkeeper::TokensController
 
   def allowed_grants
     allowed = client.allowed_grants.include?(params[:grant_type]) 
-    head :bad_request unless allowed
+    head :unprocessable_entity unless allowed
   end
 
   def non_code_request

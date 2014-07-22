@@ -8,6 +8,6 @@ class AuthorizationsController < Doorkeeper::AuthorizationsController
 
   def allowed_request_type
     allowed = client.allowed_auth_requests.include?(params[:request_type])
-    head :bad_request unless allowed
+    head :unprocessable_entity unless allowed
   end
 end

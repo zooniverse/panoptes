@@ -9,10 +9,10 @@ shared_examples "restricted scopes" do
   end  
 
   context 'requesting greater scopes' do
-    it 'should return bad request' do
+    it 'should return unprocessable entity' do
       params['scope'] = 'public twentytwo'
       req
-      expect(response.status).to eq(400)
+      expect(response.status).to eq(422)
     end
   end
 
@@ -54,9 +54,9 @@ describe AuthorizationsController, type: :controller do
   context "an authorization grant by an insecure application" do
     let!(:app) { create(:application, owner: owner) }
 
-    it 'should return 400 bad request' do
+    it 'should return 422 unprocessable entity' do
       get :new, code_params
-      expect(response.status).to eq(400)
+      expect(response.status).to eq(422)
     end
   end
 end

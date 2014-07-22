@@ -46,10 +46,10 @@ describe TokensController, type: :controller do
         end
 
         context "when requesting more than the allowed scope" do
-          it 'should return a bad request error' do
+          it 'should return a unprocessable entity error' do
             params['scope'] = 'public murder_one'
             req
-            expect(response.status).to eq(400)
+            expect(response.status).to eq(422)
           end
         end
 
@@ -85,18 +85,18 @@ describe TokensController, type: :controller do
     context "an insecure application" do
       let!(:app) { create(:application, owner: owner) }
 
-      it 'should reject the token request with bad request' do
+      it 'should reject the token request with unprocessable entity' do
         post :create, params
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 
     context "a secure application" do
       let!(:app) { create(:secure_app, owner: owner) }
 
-      it 'should reject the token request with bad request' do
+      it 'should reject the token request with unprocessable entity' do
         post :create, params
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
   end

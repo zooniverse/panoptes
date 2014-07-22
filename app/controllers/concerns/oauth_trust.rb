@@ -7,7 +7,7 @@ module OauthTrust
 
   def allowed_scopes
     allowed = Doorkeeper::OAuth::Helpers::ScopeChecker.valid?(params[:scope], client.scopes)
-    head :bad_request unless allowed
+    head :unprocessable_entity unless allowed
   end
 
   def default_scopes
