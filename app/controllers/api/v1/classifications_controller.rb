@@ -41,11 +41,23 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def creation_params
+    ensure_json_annotations
     permitted_attrs = [ :project_id,
                         :workflow_id,
                         :set_member_subject_id ]
     classification_params.permit(*permitted_attrs).tap do |while_listed|
       while_listed[:annotations] = params[:classification][:annotations]
+    end
+  end
+
+  def ensure_json_annotations
+    if annotations = classification_params["annotations"]
+      begin
+        JSON.parse(annotations)
+      rescue TypeError
+        error_message = "Validation failed: Annotations must be valid serialized JSON"
+        raise InvalidJsonAnnotationsError.new(error_message)
+      end
     end
   end
 end
