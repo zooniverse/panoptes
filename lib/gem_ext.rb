@@ -1,2 +1,2 @@
-require 'lib/gem_ext/doorkeeper/application.rb'
-require 'lib/gem_ext/doorkeeper/server'
+require_relative './gem_ext/doorkeeper/application.rb'
+require_relative './gem_ext/doorkeeper/server'
