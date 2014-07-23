@@ -20,36 +20,36 @@ describe UserGroup, :type => :model do
     expect(build(:user_group)).to be_valid
   end
 
-  describe "#display_name" do
+  describe "#name" do
 
     it 'should validate presence' do
-      ug = build(:user_group, display_name: "")
+      ug = build(:user_group, name: "")
       expect(ug.valid?).to be false
     end
 
     it 'should have non-blank error' do
-      ug = build(:user_group, display_name: "")
+      ug = build(:user_group, name: "")
       ug.valid?
-      expect(ug.errors[:display_name]).to include("can't be blank")
+      expect(ug.errors[:name]).to include("can't be blank")
     end
 
     it 'should validate uniqueness' do
       name = "FancyUserGroup"
-      expect{ create(:user_group, display_name: name) }.to_not raise_error
-      expect{ create(:user_group, display_name: name.upcase) }.to raise_error
-      expect{ create(:user_group, display_name: name.downcase) }.to raise_error
+      expect{ create(:user_group, name: name) }.to_not raise_error
+      expect{ create(:user_group, name: name.upcase) }.to raise_error
+      expect{ create(:user_group, name: name.downcase) }.to raise_error
     end
 
     it "should have the correct case-insensitive uniqueness error" do
       user_group = create(:user_group)
-      dup_user_group = build(:user_group, display_name: user_group.display_name.upcase)
+      dup_user_group = build(:user_group, name: user_group.name.upcase)
       dup_user_group.valid?
-      expect(dup_user_group.errors[:display_name]).to include("has already been taken")
+      expect(dup_user_group.errors[:name]).to include("has already been taken")
     end
 
     context "when a user with the same login exists" do
       let!(:user_group) { build(:user_group) }
-      let!(:user) { create(:user, login: user_group.display_name) }
+      let!(:user) { create(:user, login: user_group.name) }
 
       it "should not be valid" do
         expect(user_group).to_not be_valid

@@ -18,7 +18,7 @@ FactoryGirl.define do
         group = build(:user_group, owner_name: user_group_owner_name)
         user_group_owner_name.resource = group
         unless user_group_owner_name.name
-          user_group_owner_name.name = group.display_name
+          user_group_owner_name.name = group.name
         end
       end
     end

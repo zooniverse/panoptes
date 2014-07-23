@@ -15,7 +15,7 @@ class Api::V1::GroupsController < Api::ApiController
 
   def create
     group = UserGroup.new(user_group_params)
-    group.owner_name = OwnerName.new(name: group.display_name, resource: group)
+    group.owner_name = OwnerName.new(name: group.name, resource: group)
     group.save!
     json_api_render( 201,
                      UserGroupSerializer.resource(group),
@@ -32,6 +32,6 @@ class Api::V1::GroupsController < Api::ApiController
   private
 
   def user_group_params
-    params.require(:user_group).permit(:display_name)
+    params.require(:user_group).permit(:name, :display_name)
   end
 end

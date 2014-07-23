@@ -95,7 +95,7 @@ describe User, :type => :model do
     end
 
     context "when a user_group with the same name in different case exists" do
-      let!(:user_group) { create(:user_group, display_name: user.name.upcase) }
+      let!(:user_group) { create(:user_group, name: user.owner_uniq_name.upcase) }
 
       it "should not be valid" do
         expect(user).to_not be_valid

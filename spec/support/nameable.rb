@@ -9,7 +9,7 @@ shared_examples "is owner nameable" do
 
   describe "#name" do
     it "should return the owner_name's name" do
-      expect(named.owner_name.name).to be(named.name)
+      expect(named.owner_name.name).to eq(named.owner_uniq_name)
     end
   end
 
@@ -27,12 +27,12 @@ shared_examples "is owner nameable" do
     end
 
     it "should return the model named by the owner" do
-      find_result = described_class.find_by_name(named.name)
+      find_result = described_class.find_by_name(named.owner_uniq_name)
       expect(find_result).to eq(named)
     end
 
     it "should return the model named by the owner independent of case" do
-      find_result = described_class.find_by_name(named.name.upcase)
+      find_result = described_class.find_by_name(named.owner_uniq_name.upcase)
       expect(find_result).to eq(named)
     end
   end

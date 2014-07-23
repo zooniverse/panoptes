@@ -18,7 +18,7 @@ module Nameable
     end
   end
 
-  def name
+  def owner_uniq_name
     owner_name.name
   end
 
@@ -40,7 +40,7 @@ module Nameable
     when self.is_a?(User)
       :login
     when self.is_a?(UserGroup)
-      :display_name
+      :name
     else
       raise UnknownNameableModel.new("Unknown instance type when comparing resource to owner_name consistency")
     end
