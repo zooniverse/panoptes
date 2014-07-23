@@ -26,6 +26,8 @@ class ContentTypeFilter
     end
   end
 
+  private
+
   def empty_request?(request)
     request.get? || request.delete? || request.head? || request.options?
   end
