@@ -44,8 +44,8 @@ class Api::V1::ClassificationsController < Api::ApiController
     permitted_attrs = [ :project_id,
                         :workflow_id,
                         :set_member_subject_id ]
-    classification_params.permit(*permitted_attrs).tap do |while_listed|
-      while_listed[:annotations] = params[:classification][:annotations]
+    classification_params.permit(*permitted_attrs).tap do |white_listed|
+      white_listed[:annotations] = params[:classification][:annotations]
     end
   end
 end
