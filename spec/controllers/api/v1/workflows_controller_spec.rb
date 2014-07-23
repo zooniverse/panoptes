@@ -44,7 +44,8 @@ describe Api::V1::WorkflowsController, type: :controller do
           tasks: [{ foo: 'bar' }, { bar: 'baz' }],
           project_id: project.id,
           grouped: true,
-          prioritized: true
+          prioritized: true,
+          primary_language: 'en'
         }
       }
       post :create, params
