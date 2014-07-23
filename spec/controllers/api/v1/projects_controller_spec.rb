@@ -156,4 +156,33 @@ describe Api::V1::ProjectsController, type: :controller do
     it_behaves_like "an api response"
   end
 
+  describe "#destroy" do
+    let(:project) { projects.first }
+
+    it "should return 204" do
+      delete :destroy, id: project.id
+      expect(response.status).to eq(204)
+    end
+
+    it "should delete the project" do
+      delete :destroy, id: project.id
+      expect{Project.find(project.id)}.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    context "an unauthorized user" do
+      before(:each) do
+        unauthorized_user = create(:user)
+        stub_token(scopes: ["project"], user_id: unauthorized_user.id)
+        delete :destroy, id: project.id
+      end
+
+      it "should return 403" do
+        expect(response.status).to eq(403)
+      end
+
+      it "should not have deleted the project" do
+        expect(Project.find(project.id)).to eq(project)
+      end
+    end
+  end
 end
