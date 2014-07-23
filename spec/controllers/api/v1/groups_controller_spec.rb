@@ -1,9 +1,5 @@
 require 'spec_helper'
 
-def created_user_groups_id
-  json_response["user_groups"][0]["id"]
-end
-
 describe Api::V1::GroupsController, type: :controller do
   let!(:user_groups) do
     [ create(:user_group_with_users),
@@ -57,6 +53,7 @@ describe Api::V1::GroupsController, type: :controller do
   end
 
   describe "#create" do
+    let(:created_user_group_id) { created_instance_id("user_groups") }
 
     context "with valid params" do
       let!(:create_params) { { user_group: { display_name: "Zooniverse" } } }
@@ -75,12 +72,12 @@ describe Api::V1::GroupsController, type: :controller do
         end
 
         it "should set the Location header as per JSON-API specs" do
-          id = created_user_groups_id
+          id = created_user_group_id
           expect(response.headers["Location"]).to eq("http://test.host/api/groups/#{id}")
         end
 
         it "should create a the project with the correct name" do
-          created_id = created_user_groups_id
+          created_id = created_user_group_id
           expect(UserGroup.find(created_id).display_name).to eq("zooniverse")
         end
 

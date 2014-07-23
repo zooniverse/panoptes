@@ -6,6 +6,11 @@ module APIResponseHelpers
   def json_error_message(error_message)
     { errors: [ message: error_message ] }.to_json
   end
+
+  def created_instance_id(instance_type)
+    json_response[instance_type][0]["id"]
+  end
+
 end
 
 module APIRequestHelpers

@@ -34,6 +34,8 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe '#create' do
+    let(:created_workflow_id) { created_instance_id("workflows") }
+
     before(:each) do
       default_request scopes: %w(public project), user_id: owner.id
       params = {
@@ -48,11 +50,19 @@ describe Api::V1::WorkflowsController, type: :controller do
       post :create, params
     end
 
-    it 'should create a new workflow' do
-      expect(response.status).to eq 201
-      created = json_response['workflows'].first
-      expect(created['name']).to eq 'Test workflow'
-      expect(created['tasks']).to eq [{ 'foo' => 'bar' }, { 'bar' => 'baz' }]
+    it "should return 201" do
+      expect(response.status).to eq(201)
+    end
+
+    it 'should create the new workflow' do
+      created = Workflow.find(created_workflow_id)
+      expect(created.name).to eq 'Test workflow'
+      expect(created.tasks).to eq [{ 'foo' => 'bar' }, { 'bar' => 'baz' }]
+    end
+
+    it "should set the Location header as per JSON-API specs" do
+      id = created_workflow_id
+      expect(response.headers["Location"]).to eq("http://test.host/api/workflows/#{id}")
     end
 
     it_behaves_like 'an api response'
