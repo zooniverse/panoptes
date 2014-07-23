@@ -28,18 +28,26 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create
-    content = ProjectContent.new(
-      description: params.delete(:description),
-      title: params[:display_name],
-      language: params[:primary_language]
+    project_attributes = project_params
+
+    content = Project.content_model.new(
+      description: project_attributes.delete(:description),
+      title: project_attributes[:display_name],
+      language: project_attributes[:primary_language],
+      pages: {},
+      example_strings: {}
     )
 
-    params[:project_contents] = [content]
-    params[:owner] = current_resource_owner
+    project = Project.new(project_attributes)
+    project.owner = current_resource_owner
 
-    project = Project.new(params)
     authorize project, :create?
-    project.save!
+
+    ActiveRecord::Base.transaction do
+      project.save!
+      content.project = project
+      content.save!
+    end
 
     json_api_render( 201,
                      create_project_response(project),
@@ -55,16 +63,20 @@ class Api::V1::ProjectsController < Api::ApiController
 
   private
 
-    def add_owner_ids_filter_param!
-      owner_filter = params.delete(:owner)
-      owner_ids = OwnerName.where(name: owner_filter).map(&:resource_id).join(",")
-      params.merge!({ owner_ids: owner_ids }) unless owner_ids.blank?
-    end
+  def add_owner_ids_filter_param!
+    owner_filter = params.delete(:owner)
+    owner_ids = OwnerName.where(name: owner_filter).map(&:resource_id).join(",")
+    params.merge!({ owner_ids: owner_ids }) unless owner_ids.blank?
+  end
 
-    def create_project_response(project)
-      ProjectSerializer.resource( project,
-                                  nil,
-                                  languages: [ params[:primary_language] ],
-                                  fields: ['title', 'description'] )
-    end
-end
+  def create_project_response(project)
+    ProjectSerializer.resource( project,
+                                nil,
+                                languages: [ params[:project][:primary_language] ],
+                                fields: ['title', 'description'] )
+  end
+
+  def project_params
+    params.require(:project).permit(:display_name, :name, :description, :primary_language)
+  end
+end 

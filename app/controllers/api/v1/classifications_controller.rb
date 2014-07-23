@@ -20,7 +20,6 @@ class Api::V1::ClassificationsController < Api::ApiController
     json_api_render( 201,
                      ClassificationSerializer.resource(classification),
                      api_classification_url(classification) )
-
   end
 
   private

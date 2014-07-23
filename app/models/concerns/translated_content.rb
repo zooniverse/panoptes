@@ -10,7 +10,9 @@ module TranslatedContent
   module ClassMethods
     def translated_fields(*fields)
       @translated_fields = fields
-      validates_presence_of(@translated_fields)
+      @translated_fields.each do |field|
+        validate field, presence: true, allow_blank: true
+      end
     end
 
     def translated_for

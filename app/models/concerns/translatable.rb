@@ -25,11 +25,11 @@ module Translatable
     content_association.select('language').map(&:language).map(&:downcase)
   end
 
-  private
-
   def content_association
     @content_associattion ||= send(self.class.content_association)
   end
+
+  private
 
   def best_match_for(languages)
     languages = languages.flat_map do |lang|
