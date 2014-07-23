@@ -33,9 +33,7 @@ class Api::V1::ProjectsController < Api::ApiController
     content = Project.content_model.new(
       description: project_attributes.delete(:description),
       title: project_attributes[:display_name],
-      language: project_attributes[:primary_language],
-      pages: {},
-      example_strings: {}
+      language: project_attributes[:primary_language]
     )
 
     project = Project.new(project_attributes)

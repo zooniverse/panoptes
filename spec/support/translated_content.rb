@@ -11,10 +11,4 @@ shared_examples "is translated content" do
     
     it_behaves_like "a locale field"
   end
-
-  it "should require translated content to be present" do
-    content.class.instance_variable_get(:@translated_fields).each do |field|
-      expect(build(content_factory, { field => nil })).to_not be_valid
-    end
-  end
 end
