@@ -23,7 +23,7 @@ gem 'omniauth-gplus'
 gem 'cellect-client', '~> 0.0.7'
 
 platforms :jruby do
-  gem 'activerecord-jdbcpostgresql-adapter', github: 'jruby/activerecord-jdbc-adapter'
+  gem 'activerecord-jdbcpostgresql-adapter'
   gem 'therubyrhino'
 end
 
