@@ -100,7 +100,7 @@ describe Api::V1::GroupsController, type: :controller do
       end
 
       it "should have the validation errors in the response body" do
-        message = "Validation failed: Uri name name can't be blank, Display name can't be blank"
+        message = "Validation failed: Owner name name can't be blank, Display name can't be blank"
         error_response = { errors: [ { message: message } ] }.to_json
         expect(response.body).to eq(error_response)
       end

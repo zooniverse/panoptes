@@ -59,7 +59,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
     def add_owner_ids_filter_param!
       owner_filter = params.delete(:owner)
-      owner_ids = UriName.where(name: owner_filter).map(&:resource_id).join(",")
+      owner_ids = OwnerName.where(name: owner_filter).map(&:resource_id).join(",")
       params.merge!({ owner_ids: owner_ids }) unless owner_ids.blank?
     end
 end

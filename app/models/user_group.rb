@@ -3,7 +3,7 @@ class UserGroup < ActiveRecord::Base
   include Activatable
   include Owner
 
-  attr_accessible :display_name, :uri_name
+  attr_accessible :display_name
 
   owns :projects, :collections, :subjects
 

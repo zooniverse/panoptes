@@ -5,14 +5,14 @@ describe UserGroup, :type => :model do
   let(:named) { user_group }
   let(:unnamed) do
     unnamed = build(:user_group)
-    unnamed.uri_name = nil
+    unnamed.owner_name = nil
     unnamed
   end
   let(:activatable) { user_group }
   let(:owner) { user_group }
   let(:owned) { build(:project, owner: owner) }
 
-  it_behaves_like "is uri nameable"
+  it_behaves_like "is owner nameable"
   it_behaves_like "activatable"
   it_behaves_like "is an owner"
 
@@ -55,9 +55,9 @@ describe UserGroup, :type => :model do
         expect(user_group).to_not be_valid
       end
 
-      it "should have the correct error message on the uri_name association" do
+      it "should have the correct error message on the owner_name association" do
         user_group.valid?
-        expect(user_group.errors[:"uri_name.name"]).to include("has already been taken")
+        expect(user_group.errors[:"owner_name.name"]).to include("has already been taken")
       end
     end
   end
