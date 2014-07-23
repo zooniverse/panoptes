@@ -121,6 +121,9 @@ describe Api::V1::ClassificationsController, type: :controller do
   end
 
   context "a non-logged in user" do
+    before(:each) do
+      stub_content_filter
+    end
 
     describe "#create" do
 
