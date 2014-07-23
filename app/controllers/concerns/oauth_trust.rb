@@ -11,6 +11,6 @@ module OauthTrust
   end
 
   def default_scopes
-    params[:scope] ||= client.max_scope.join(' ')
+    params[:scope] ||= client.default_scope.join(' ')
   end
 end

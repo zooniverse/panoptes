@@ -4,7 +4,7 @@ Doorkeeper::Application.class_eval do
   enum trust_level: [:insecure, :secure, :first_party]
 
   def scopes
-    Doorkeeper::OAuth::Scopes.from_array(max_scope)
+    Doorkeeper::OAuth::Scopes.from_array(default_scope)
   end
 
   def allowed_grants
@@ -17,7 +17,7 @@ Doorkeeper::Application.class_eval do
     end
   end
 
-  def allowed_auth_requests
+  def allowed_authorizations
     if secure? || first_party?
       %w(token code)
     else

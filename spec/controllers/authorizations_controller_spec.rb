@@ -6,6 +6,10 @@ shared_examples "restricted scopes" do
       req
       expect(response.status).to eq(200)
     end
+
+    it 'should render the approval page' do
+      expect(req).to render_template(:new)
+    end
   end  
 
   context 'requesting greater scopes' do
@@ -28,10 +32,10 @@ end
 describe AuthorizationsController, type: :controller do
   let(:owner) { create(:user) }
   let(:params) { { "client_id" => app.uid,
-                   "redirect_url" => 'urn:ietf:wg:oauth:2.0:oob',
+                   "redirect_uri" => 'urn:ietf:wg:oauth:2.0:oob',
                    "scope" => "public projects classifications" } }
-  let(:token_params) { params[:request_type] = 'token'; params }
-  let(:code_params) { params[:request_type] = 'code'; params }
+  let(:token_params) { params['response_type'] = 'token'; params }
+  let(:code_params) { params['response_type'] = 'code'; params }
 
   before(:each) do
     sign_in owner
