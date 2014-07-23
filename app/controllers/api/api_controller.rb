@@ -1,19 +1,21 @@
 module Api
+  class PanoptesApiError < StandardError; end
+  class PatchResourceError < PanoptesApiError; end
+  class UnauthorizedTokenError < PanoptesApiError; end
+  class UnsupportedMediaType < PanoptesApiError; end
+
   class ApiController < ApplicationController
     include Pundit
     include JSONApiRender
 
-    class PatchResourceError < PanoptesControllerError; end
-    class UnauthorizedTokenError < PanoptesControllerError; end
-    class UnsupportedMediaType < PanoptesControllerError; end
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
     rescue_from ActiveRecord::RecordInvalid, with: :invalid_record
     rescue_from Pundit::NotAuthorizedError, with: :not_authorized
-    rescue_from UnauthorizedTokenError, with: :not_authenticated
-    rescue_from UnsupportedMediaType, with: :unsupported_media_type
+    rescue_from Api::UnauthorizedTokenError, with: :not_authenticated
+    rescue_from Api::UnsupportedMediaType, with: :unsupported_media_type
 
-    before_action :require_json
+    before_action ContentTypeFilter.new('application/json', 'PATCH' => 'application/patch+json')
 
     def request_update_attributes(resource)
       if request.patch?
@@ -30,7 +32,7 @@ module Api
       patched_resource_string = JSON.patch(resource_json_doc, json_patch_body)
       JSON.parse(patched_resource_string)
     rescue JSON::PatchError
-      raise PatchResourceError.new("Patch failed to apply, check patch options.")
+      raise Api::PatchResourceError.new("Patch failed to apply, check patch options.")
     end
 
     def current_resource_owner
@@ -103,18 +105,6 @@ module Api
     end
 
     private
-
-    def require_json
-      unless valid_content_type?
-        raise UnsupportedMediaType.new("Only requests with Content-Type: application/json are allowed")
-      end
-    end
-
-    def valid_content_type?
-      request.get? || 
-        request.headers['CONTENT_TYPE'] =~ /application\/json/ ||
-        (request.patch? && request.headers['CONTENT_TYPE'] =~ /application\/patch\+json/)
-    end
 
     def revoke_doorkeeper_request_token!
       token = Doorkeeper.authenticate(request)
