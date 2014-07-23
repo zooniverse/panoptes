@@ -28,7 +28,7 @@ describe Api::V1::CollectionsController, type: :controller do
     it 'should have 2 items by default' do
       expect(json_response[api_resource_name].length).to eq 2
     end
-    
+
     it 'should not include nonvisible collections' do
       collection_ids = json_response['collections'].collect{ |h| h['id'].to_i }
       expect(collection_ids).to_not include private_collection.id
@@ -42,23 +42,25 @@ describe Api::V1::CollectionsController, type: :controller do
       default_request scopes: %w(public collection), user_id: owner.id
       get :show, id: collection.id
     end
-    
+
     it 'should return 200' do
       expect(response.status).to eq 200
     end
-    
+
     it 'should return the requested collection' do
       expect(json_response[api_resource_name].length).to eq 1
     end
 
     it_behaves_like 'an api response'
   end
-  
+
   describe '#update' do
     it 'should be implemented'
   end
 
   describe '#create' do
+    let(:created_collection_id) { created_instance_id("collections") }
+
     before(:each) do
       default_request scopes: %w(public collection), user_id: owner.id
       params = {
@@ -71,14 +73,21 @@ describe Api::V1::CollectionsController, type: :controller do
       post :create, params, { 'CONTENT_TYPE' => 'application/json' }
     end
 
-    it 'should create a new collection' do
-      expect(response.status).to eq 201
-      created = json_response['collections'].first
-      created_collection = Collection.find created['id']
-      expect(created['name']).to eq 'Test collection'
-      expect(created['display_name']).to eq 'Fancy name'
-      expect(created_collection.owner).to eq owner
-      expect(created_collection.project).to eq project
+    it "should return 201" do
+      expect(response.status).to eq(201)
+    end
+
+    it 'should create the new collection' do
+      created = Collection.find(created_collection_id)
+      expect(created.name).to eq 'Test collection'
+      expect(created.display_name).to eq 'Fancy name'
+      expect(created.owner).to eq owner
+      expect(created.project).to eq project
+    end
+
+    it "should set the Location header as per JSON-API specs" do
+      id = created_collection_id
+      expect(response.headers["Location"]).to eq("http://test.host/api/collections/#{id}")
     end
 
     it_behaves_like 'an api response'

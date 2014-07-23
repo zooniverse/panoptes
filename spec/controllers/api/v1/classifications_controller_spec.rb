@@ -21,10 +21,6 @@ def create_classification
   setup_create_request(project.id, workflow.id, set_member_subject)
 end
 
-def created_classification_id
-  json_response["classifications"][0]["id"]
-end
-
 shared_context "a classification create" do
   it "should return 201" do
     create_classification
@@ -50,6 +46,7 @@ describe Api::V1::ClassificationsController, type: :controller do
   let!(:workflow) { project.workflows.first }
   let!(:set_member_subject) { workflow.subject_sets.first.set_member_subjects.first }
   let!(:user) { create(:user) }
+  let(:created_classification_id) { created_instance_id("classifications") }
 
   let(:api_resource_name) { "classifications" }
   let(:api_resource_attributes) do
@@ -115,6 +112,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       it "should set the user" do
         create_classification
+        id = created_instance_id("classifications")
         expect(Classification.find(created_classification_id).user.id).to eq(user.id)
       end
 

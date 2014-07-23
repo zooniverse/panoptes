@@ -43,12 +43,14 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
     it_behaves_like 'an api response'
   end
-  
+
   describe '#update' do
     it 'should be implemented'
   end
 
   describe '#create' do
+    let(:created_subject_set_id) { created_instance_id("subject_sets") }
+
     before(:each) do
       default_request scopes: %w(public subject_set), user_id: owner.id
       params = {
@@ -60,10 +62,18 @@ describe Api::V1::SubjectSetsController, type: :controller do
       post :create, params, { 'CONTENT_TYPE' => 'application/json' }
     end
 
-    it 'should create a new subject set' do
-      expect(response.status).to eq 201
-      created = json_response['subject_sets'].first
-      expect(created['name']).to eq 'Test subject set'
+    it "should return 201" do
+      expect(response.status).to eq(201)
+    end
+
+    it 'should create the new subject set' do
+      created = SubjectSet.find(created_subject_set_id)
+      expect(created.name).to eq 'Test subject set'
+    end
+
+    it "should set the Location header as per JSON-API specs" do
+      id = created_subject_set_id
+      expect(response.headers["Location"]).to eq("http://test.host/api/subject_sets/#{id}")
     end
 
     it_behaves_like 'an api response'

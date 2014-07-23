@@ -131,6 +131,8 @@ describe Api::V1::ProjectsController, type: :controller do
   end
 
   describe "#create" do
+    let(:created_project_id) { created_instance_id("projects") }
+
     before(:each) do
       params = { display_name: "New Zoo",
                  description: "A new Zoo for you!",
@@ -140,8 +142,17 @@ describe Api::V1::ProjectsController, type: :controller do
       post :create, params, { 'CONTENT_TYPE' => 'application/json' }
     end
 
-    it "should create a new project" do
-      expect(Project.order(created_at: :desc).first.name).to eq("new_zoo")
+    it "should return 201" do
+      expect(response.status).to eq(201)
+    end
+
+    it "should create the new project" do
+      expect(Project.find(created_project_id).name).to eq("new_zoo")
+    end
+
+    it "should set the Location header as per JSON-API specs" do
+      id = created_project_id
+      expect(response.headers["Location"]).to eq("http://test.host/api/projects/#{id}")
     end
 
     it "should create an associated project_content model" do

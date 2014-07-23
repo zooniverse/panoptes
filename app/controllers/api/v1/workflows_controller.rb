@@ -1,5 +1,5 @@
 class Api::V1::WorkflowsController < Api::ApiController
-  doorkeeper_for :update, :create, :delete, scopes: [:project] 
+  doorkeeper_for :update, :create, :delete, scopes: [:project]
   after_action :verify_authorized, except: :index
 
   def show
@@ -21,7 +21,9 @@ class Api::V1::WorkflowsController < Api::ApiController
     workflow = Workflow.new creation_params
     authorize workflow.project, :update?
     workflow.save!
-    json_api_render 201, WorkflowSerializer.resource(workflow)
+    json_api_render( 201,
+                     WorkflowSerializer.resource(workflow),
+                     api_workflow_url(workflow) )
   end
 
   def destroy
@@ -51,4 +53,4 @@ class Api::V1::WorkflowsController < Api::ApiController
       workflow_id: params[:id]
     }
   end
-end 
+end
