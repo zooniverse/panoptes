@@ -1,11 +1,13 @@
 require 'spec_helper'
 
 describe Workflow, :type => :model do
-
   let(:workflow) { build(:workflow) }
   let(:subject_relation) { create(:workflow_with_subjects) }
+  let(:translatable) { create(:workflow_with_contents) }
+  let(:primary_language_factory) { :workflow }
 
   it_behaves_like "has subject_count"
+  it_behaves_like "is translatable"
 
   it "should have a valid factory" do
     expect(workflow).to be_valid

@@ -1,5 +1,6 @@
 class Workflow < ActiveRecord::Base
   include SubjectCounts
+  include Translatable
 
   attr_accessible :name, :tasks, :project_id, :grouped, :pairwise, :prioritized
 
