@@ -1,4 +1,4 @@
-class UriName < ActiveRecord::Base
+class OwnerName < ActiveRecord::Base
   attr_accessible :name, :resource
   belongs_to :resource, polymorphic: true
 

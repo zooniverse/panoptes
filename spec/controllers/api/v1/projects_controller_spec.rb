@@ -67,7 +67,7 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       describe "filter by owner" do
-        let(:index_options) { { owner: project_owner.name } }
+        let(:index_options) { { owner: project_owner.owner_uniq_name } }
 
         it "should respond with 1 item" do
           expect(json_response[api_resource_name].length).to eq(1)
@@ -98,7 +98,7 @@ describe Api::V1::ProjectsController, type: :controller do
           projects.first
         end
         let(:index_options) do
-          { owner: project_owner.name, display_name: filtered_project.display_name }
+          { owner: project_owner.owner_uniq_name, display_name: filtered_project.display_name }
         end
 
         it "should respond with 1 item" do

@@ -56,7 +56,7 @@ describe Api::V1::GroupsController, type: :controller do
     let(:created_user_group_id) { created_instance_id("user_groups") }
 
     context "with valid params" do
-      let!(:create_params) { { user_group: { display_name: "Zooniverse" } } }
+      let!(:create_params) { { user_group: { name: "Zooniverse" } } }
 
       it "should create a new UserGroup" do
         expect{post :create, create_params}.to change{UserGroup.count}.by(1)
@@ -78,7 +78,7 @@ describe Api::V1::GroupsController, type: :controller do
 
         it "should create a the project with the correct name" do
           created_id = created_user_group_id
-          expect(UserGroup.find(created_id).display_name).to eq("zooniverse")
+          expect(UserGroup.find(created_id).name).to eq("zooniverse")
         end
 
         it_behaves_like "an api response"
@@ -86,7 +86,7 @@ describe Api::V1::GroupsController, type: :controller do
     end
 
     context "with invalid params" do
-      let!(:create_params) { { user_group: { name: "Zooniverse" } } }
+      let!(:create_params) { { user_group: { nmae: "Zooniverse" } } }
 
       before(:each) do
         post :create, create_params
@@ -97,7 +97,7 @@ describe Api::V1::GroupsController, type: :controller do
       end
 
       it "should have the validation errors in the response body" do
-        message = "Validation failed: Uri name name can't be blank, Display name can't be blank"
+        message = "Validation failed: Owner name name can't be blank, Name can't be blank"
         error_response = { errors: [ { message: message } ] }.to_json
         expect(response.body).to eq(error_response)
       end

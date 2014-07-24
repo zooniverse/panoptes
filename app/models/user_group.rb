@@ -3,7 +3,7 @@ class UserGroup < ActiveRecord::Base
   include Activatable
   include Owner
 
-  attr_accessible :display_name, :uri_name
+  attr_accessible :name, :display_name
 
   owns :projects, :collections, :subjects
 
@@ -11,15 +11,15 @@ class UserGroup < ActiveRecord::Base
   has_many :memberships
   has_many :classifications
 
-  validates :display_name, presence: true, uniqueness: true
+  validates :name, presence: true, uniqueness: true
 
   before_validation :downcase_case_insensitive_fields
 
   private
 
   def downcase_case_insensitive_fields
-    if display_name
-      self.display_name = display_name.downcase
+    if name
+      self.name = name.downcase
     end
   end
 end

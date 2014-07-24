@@ -9,8 +9,8 @@ FactoryGirl.define do
     activated_state :active
     sequence(:login) { |n| "new_user_#{n}" }
     after(:build) do |user|
-      unless user.uri_name
-        user.uri_name = build(:uri_name, name: user.login, resource: user)
+      unless user.owner_name
+        user.owner_name = build(:owner_name, name: user.login, resource: user)
       end
     end
 
@@ -66,10 +66,10 @@ FactoryGirl.define do
     activated_state :active
     languages ['en', 'es', 'fr-ca']
     after(:build) do |u|
-      unless u.uri_name
-        u.uri_name = build(:uri_name,
-                           name: u.login,
-                           resource: u)
+      unless u.owner_name
+        u.owner_name = build(:owner_name,
+                              name: u.login,
+                              resource: u)
       end
       create_list(:authorization, 1, user: u, provider: 'facebook', uid: '12345')
     end

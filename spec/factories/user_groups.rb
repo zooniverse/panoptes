@@ -1,10 +1,10 @@
 FactoryGirl.define do
   factory :user_group do
-    sequence(:display_name) {|n| "User Group #{n}"}
+    sequence(:name) {|n| "User Group #{n}"}
     activated_state :active
     after(:build) do |user_group|
-      unless user_group.uri_name
-        user_group.uri_name = build(:uri_name, name: user_group.display_name, resource: user_group)
+      unless user_group.owner_name
+        user_group.owner_name = build(:owner_name, name: user_group.name, resource: user_group)
       end
     end
 

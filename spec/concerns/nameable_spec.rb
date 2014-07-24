@@ -15,7 +15,7 @@ end
 def create_named_thing
   name = "named_thing"
   NamedThing.create(uniq_name: name) do |named|
-    named.uri_name = build(:uri_name, name: name, resource: named)
+    named.owner_name = build(:owner_name, name: name, resource: named)
   end
 end
 
@@ -23,5 +23,5 @@ describe NamedThing do
   let(:named) { create_named_thing }
   let(:unnamed) { NamedThing.new }
 
-  it_behaves_like "is uri nameable"
+  it_behaves_like "is owner nameable"
 end

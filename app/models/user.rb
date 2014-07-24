@@ -33,7 +33,7 @@ class User < ActiveRecord::Base
       u.password = Devise.friendly_token[0,20]
       u.display_name = auth_hash.info.name
       u.login = auth_hash.info.name.downcase.gsub(/\s/, '_')
-      u.uri_name = UriName.new(name: u.login, resource: u)
+      u.owner_name = OwnerName.new(name: u.login, resource: u)
       u.authorizations << auth
     end
   end

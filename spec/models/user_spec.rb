@@ -5,14 +5,14 @@ describe User, :type => :model do
   let(:named) { user }
   let(:unnamed) do
     unnamed = build(:user)
-    unnamed.uri_name = nil
+    unnamed.owner_name = nil
     unnamed
   end
   let(:activatable) { user }
   let(:owner) { user }
   let(:owned) { build(:project, owner: user) }
 
-  it_behaves_like "is uri nameable"
+  it_behaves_like "is owner nameable"
   it_behaves_like "activatable"
   it_behaves_like "is an owner"
 
@@ -95,15 +95,15 @@ describe User, :type => :model do
     end
 
     context "when a user_group with the same name in different case exists" do
-      let!(:user_group) { create(:user_group, display_name: user.name.upcase) }
+      let!(:user_group) { create(:user_group, name: user.owner_uniq_name.upcase) }
 
       it "should not be valid" do
         expect(user).to_not be_valid
       end
 
-      it "should have the correct error message on the uri_name association" do
+      it "should have the correct error message on the owner_name association" do
         user.valid?
-        expect(user.errors[:"uri_name.name"]).to include("has already been taken")
+        expect(user.errors[:"owner_name.name"]).to include("has already been taken")
       end
     end
   end
@@ -135,7 +135,7 @@ describe User, :type => :model do
       attrs = {login: "t", hash_func: 'sha1', email: "test@example.com"}
       expect do
         User.create!(attrs, without_protection: true) do |user|
-          user.uri_name = UriName.new(name: "t", resource: user)
+          user.owner_name = OwnerName.new(name: "t", resource: user)
         end
       end.to_not raise_error
     end
