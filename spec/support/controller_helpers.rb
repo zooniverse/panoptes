@@ -10,7 +10,6 @@ module APIResponseHelpers
   def created_instance_id(instance_type)
     json_response[instance_type][0]["id"]
   end
-
 end
 
 module APIRequestHelpers
