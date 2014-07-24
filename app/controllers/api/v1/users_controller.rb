@@ -25,7 +25,7 @@ class Api::V1::UsersController < Api::ApiController
       authorize user
       user.update!(request_update_attributes(user))
       [ :ok, UserSerializer.resource(user) ]
-    rescue PatchResourceError, ActiveRecord::RecordInvalid => e
+    rescue Api::PatchResourceError, ActiveRecord::RecordInvalid => e
       [ :bad_request, e ]
     end
     render status: response_status, json_api: response

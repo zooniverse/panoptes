@@ -241,6 +241,7 @@ GEM
       rdoc (~> 4.0, < 5.0)
     slop (3.6.0)
     slyphon-log4j (1.2.15)
+    slyphon-zookeeper_jar (3.3.5)
     slyphon-zookeeper_jar (3.3.5-java)
     spoon (0.0.4)
       ffi

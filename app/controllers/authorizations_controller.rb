@@ -1,5 +1,6 @@
 class AuthorizationsController < Doorkeeper::AuthorizationsController
   include OauthTrust
+  include Doorkeeper::Helpers::Controller
   before_action :allowed_response_type
   before_action :default_scopes
   before_action :allowed_scopes

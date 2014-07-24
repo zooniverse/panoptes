@@ -10,7 +10,6 @@ module APIResponseHelpers
   def created_instance_id(instance_type)
     json_response[instance_type][0]["id"]
   end
-
 end
 
 module APIRequestHelpers
@@ -45,9 +44,14 @@ module APIRequestHelpers
     stub_token(user_id: user.id)
   end
 
+  def stub_content_filter
+    allow_any_instance_of(ContentTypeFilter).to receive(:before).and_return(true)
+  end
+
   def default_request(scopes: ["public"], user_id: nil)
     set_accept
     set_accept_language
+    stub_content_filter
     stub_token(scopes: scopes, user_id: user_id)
   end
 end

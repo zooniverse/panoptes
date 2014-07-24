@@ -1,15 +1,23 @@
 module Api
+  class PanoptesApiError < StandardError; end
+  class PatchResourceError < PanoptesApiError; end
+  class UnauthorizedTokenError < PanoptesApiError; end
+  class UnsupportedMediaType < PanoptesApiError; end
+
   class ApiController < ApplicationController
     include Pundit
     include JSONApiRender
 
-    class PatchResourceError < PanoptesControllerError; end
-    class UnauthorizedTokenError < PanoptesControllerError; end
+    API_ACCEPTED_CONTENT_TYPE = 'application/json'
+    API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
     rescue_from ActiveRecord::RecordInvalid, with: :invalid_record
     rescue_from Pundit::NotAuthorizedError, with: :not_authorized
-    rescue_from UnauthorizedTokenError, with: :not_authenticated
+    rescue_from Api::UnauthorizedTokenError, with: :not_authenticated
+    rescue_from Api::UnsupportedMediaType, with: :unsupported_media_type
+
+    before_action ContentTypeFilter.new(API_ACCEPTED_CONTENT_TYPE, API_ALLOWED_METHOD_OVERRIDES)
 
     def request_update_attributes(resource)
       if request.patch?
@@ -26,7 +34,7 @@ module Api
       patched_resource_string = JSON.patch(resource_json_doc, json_patch_body)
       JSON.parse(patched_resource_string)
     rescue JSON::PatchError
-      raise PatchResourceError.new("Patch failed to apply, check patch options.")
+      raise Api::PatchResourceError.new("Patch failed to apply, check patch options.")
     end
 
     def current_resource_owner
@@ -80,6 +88,10 @@ module Api
       json_api_render(:bad_request, exception)
     end
 
+    def unsupported_media_type(exception)
+      json_api_render(:unsupported_media_type, exception)
+    end
+
     def cellect_host(workflow_id)
       host = cellect_session[workflow_id] || Cellect::Client.choose_host
       cellect_session[workflow_id] = host
@@ -95,9 +107,9 @@ module Api
 
     private
 
-      def revoke_doorkeeper_request_token!
-        token = Doorkeeper.authenticate(request)
-        token.revoke
-      end
+    def revoke_doorkeeper_request_token!
+      token = Doorkeeper.authenticate(request)
+      token.revoke
+    end
   end
 end
