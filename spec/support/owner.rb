@@ -1,4 +1,4 @@
-shared_examples "is an owner" do
+RSpec.shared_examples "is an owner" do
   let(:fake_owned) { build(:project) }
 
   describe "#owns?" do

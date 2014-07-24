@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::WorkflowsController, type: :controller do
+RSpec.describe Api::V1::WorkflowsController, type: :controller do
   let(:user) { create(:user) }
   let!(:workflows){ create_list :workflow_with_subjects, 2 }
   let(:workflow){ workflows.first }

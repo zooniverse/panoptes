@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SetMemberSubject, :type => :model do
+RSpec.describe SetMemberSubject, :type => :model do
 
   let(:set_member_subject) { build(:set_member_subject) }
 

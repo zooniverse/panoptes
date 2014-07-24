@@ -19,7 +19,7 @@ def create_named_thing
   end
 end
 
-describe NamedThing do
+RSpec.describe NamedThing do
   let(:named) { create_named_thing }
   let(:unnamed) { NamedThing.new }
 

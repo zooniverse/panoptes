@@ -1,4 +1,4 @@
-shared_examples "is owner nameable" do
+RSpec.shared_examples "is owner nameable" do
   it "should be valid with name" do
     expect(named).to be_valid
   end

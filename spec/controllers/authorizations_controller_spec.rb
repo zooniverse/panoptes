@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-shared_examples "restricted scopes" do
+RSpec.shared_examples "restricted scopes" do
   context 'requesting appropriate scopes' do
     it 'should return a successful status' do
       req
@@ -29,7 +29,7 @@ shared_examples "restricted scopes" do
   end
 end
 
-describe AuthorizationsController, type: :controller do
+RSpec.describe AuthorizationsController, type: :controller do
   let(:owner) { create(:user) }
   let(:params) { { "client_id" => app.uid,
                    "redirect_uri" => 'urn:ietf:wg:oauth:2.0:oob',

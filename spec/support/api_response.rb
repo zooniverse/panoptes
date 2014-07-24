@@ -1,4 +1,4 @@
-shared_examples "an api response" do
+RSpec.shared_examples "an api response" do
   it "should return the correct content type" do
     expect(response.content_type).to eq("application/vnd.api+json; version=1")
   end

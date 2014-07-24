@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe ApplicationPolicy do
+RSpec.describe ApplicationPolicy do
   subject { ApplicationPolicy }
 
-  shared_examples "admins only" do
+  RSpec.shared_examples "admins only" do
     let(:resource) { build(:subject) }
     it "should allow an admin user to read" do
       expect(subject).to permit(build(:admin_user), resource)

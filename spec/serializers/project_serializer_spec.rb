@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ProjectSerializer do
+RSpec.describe ProjectSerializer do
   describe "#content" do
     it "should return project content for the preferred language" do
       serializer = ProjectSerializer.new

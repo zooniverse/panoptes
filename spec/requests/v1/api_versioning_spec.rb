@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "api versioning with accept headers", type: :request do
+RSpec.describe "api versioning with accept headers", type: :request do
   describe "html format" do
     it "should raise a route not found error" do
       options = [ nil, { "HTTP_ACCEPT" => "text/html" } ]

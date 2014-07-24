@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::ProjectsController, type: :controller do
+RSpec.describe Api::V1::ProjectsController, type: :controller do
   let!(:user) {
     create(:user)
   }

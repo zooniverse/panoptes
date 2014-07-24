@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe OwnedObjectPolicy do
+RSpec.describe OwnedObjectPolicy do
   subject { OwnedObjectPolicy }
 
   permissions :read? do

@@ -20,7 +20,7 @@ def text_type_headers
   request_headers("text/plain; charset=utf-8")
 end
 
-describe "api should only accept certain content types", type: :request do
+RSpec.describe "api should only accept certain content types", type: :request do
 
   describe "json format" do
     it 'should allow access but return unauthorized' do

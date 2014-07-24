@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Project, :type => :model do
+RSpec.describe Project, :type => :model do
   let(:project) { build(:project) }
   let(:owned) { project }
   let(:not_owned) { build(:project, owner: nil) }

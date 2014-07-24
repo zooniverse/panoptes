@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe User, :type => :model do
+RSpec.describe User, :type => :model do
   let(:user) { build(:user) }
   let(:named) { user }
   let(:unnamed) do
@@ -19,7 +19,7 @@ describe User, :type => :model do
   describe '::from_omniauth' do
     let(:auth_hash) { OmniAuth.config.mock_auth[:facebook] }
 
-    shared_examples 'new user from omniauth' do
+    RSpec.shared_examples 'new user from omniauth' do
       let(:user_from_auth_hash) {
         user = User.from_omniauth(auth_hash)
       }

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe PasswordsController, type: [ :controller, :mailer ] do
+RSpec.describe PasswordsController, type: [ :controller, :mailer ] do
 
   before(:each) do
     request.env["devise.mapping"] = Devise.mappings[:user]

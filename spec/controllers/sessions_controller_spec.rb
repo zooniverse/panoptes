@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SessionsController, type: :controller do
+RSpec.describe SessionsController, type: :controller do
   let!(:users) { create_list(:user, 2) }
   let(:user) { users.first }
 

@@ -1,4 +1,4 @@
-shared_examples "is ownable" do
+RSpec.shared_examples "is ownable" do
   it "should be valid with an owner" do
     expect(owned).to be_valid
   end

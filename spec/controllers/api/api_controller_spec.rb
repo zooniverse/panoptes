@@ -10,7 +10,7 @@ def setup_controller(api_controller)
   end
 end
 
-describe Api::ApiController, type: :controller do
+RSpec.describe Api::ApiController, type: :controller do
   let(:user) { create(:user) }
 
   describe "without doorkeeper" do

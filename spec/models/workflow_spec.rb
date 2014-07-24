@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workflow, :type => :model do
+RSpec.describe Workflow, :type => :model do
 
   let(:workflow) { build(:workflow) }
   let(:subject_relation) { create(:workflow_with_subjects) }

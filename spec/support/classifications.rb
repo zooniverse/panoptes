@@ -1,4 +1,4 @@
-shared_examples "it has a classifications assocation" do
+RSpec.shared_examples "it has a classifications assocation" do
 
   context "when no classifications exist" do
 
@@ -18,7 +18,7 @@ shared_examples "it has a classifications assocation" do
   end
 end
 
-shared_examples "it has a cached counter for classifications" do
+RSpec.shared_examples "it has a cached counter for classifications" do
   let(:classification_with_relation) do
     association_name = relation_instance.class.name.underscore.to_sym
     create(:classification, Classification.reflections[association_name].name => relation_instance)

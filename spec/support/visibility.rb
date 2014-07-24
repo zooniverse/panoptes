@@ -1,4 +1,4 @@
-shared_examples "has visibility controls" do
+RSpec.shared_examples "has visibility controls" do
   describe "::visibility_level" do
     it "should add a level to a the class's visibility levels" do
       described_class.visibility_level(:private1, :role1, :role2)

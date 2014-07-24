@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::CollectionsController, type: :controller do
+RSpec.describe Api::V1::CollectionsController, type: :controller do
   let!(:collections){ create_list :collection_with_subjects, 2 }
   let!(:private_collection){ create :collection_with_subjects, visibility: 'private' }
   let(:collection){ collections.first }

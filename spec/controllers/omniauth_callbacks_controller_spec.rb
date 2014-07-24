@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-shared_examples "an omniauth callback" do 
+RSpec.shared_examples "an omniauth callback" do 
   it 'should create a user from an omniauth hash if one doesn\'t exist' do
     req
     expect(subject.current_user).to be_valid
@@ -34,7 +34,7 @@ shared_examples "an omniauth callback" do
   it 'should redirect to a user editor if the created user is not valid'
 end
 
-describe OmniauthCallbacksController, type: :controller do
+RSpec.describe OmniauthCallbacksController, type: :controller do
   before(:each) do 
     request.env['devise.mapping'] = Devise.mappings[:user]
   end
