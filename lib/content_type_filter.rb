@@ -1,43 +1,52 @@
 class ContentTypeFilter
-  attr_reader :acceptable_content
-  attr_reader :overrides
+  attr_reader :acceptable_content_types
+  attr_reader :http_method_overrides
 
-  def initialize(*content_types, overrides)
-    @acceptable_content, @overrides = content_types, overrides
+  def initialize(*content_types, http_method_overrides)
+    @acceptable_content_types, @http_method_overrides = content_types, http_method_overrides
   end
 
   def before(controller)
-    # If the request is a type that doesn't have a body don't check media type
-    return true if empty_request?(controller.request)
-
-    content_type = controller.request.media_type
-    method = controller.request.request_method
-
-    if overridden_method?(method)
-      accepted = matches?(content_type, method)
-    else
-      accepted = matches?(content_type)
-    end
-
-    unless accepted
-      raise Api::UnsupportedMediaType.new(
-        "Only requests with Content-Type: application/json are allowed"
-      )
+    setup_request_variables(controller)
+    return true if empty_request?
+    unless acceptable_content?
+      raise Api::UnsupportedMediaType.new(unsupported_media_type_message)
     end
   end
 
   private
 
-  def empty_request?(request)
-    request.get? || request.delete? || request.head? || request.options?
+  def setup_request_variables(controller)
+    @request = controller.request
+    @request_content_type = @request.media_type
+    @request_method = @request.request_method
   end
 
-  def overridden_method?(method)
-    overrides.include?(method)
+  def empty_request?
+    @request.get? || @request.delete? || @request.head? || @request.options?
   end
 
-  def matches?(content_type, method=nil)
-    acceptable = method.nil? ? acceptable_content : overrides[method]
-    acceptable.include?(content_type)
+  def allowed_override_method?
+    @http_method_overrides.include?(@request_method)
+  end
+
+  def overriden_content_types
+    [ @http_method_overrides[@request_method] ].compact
+  end
+
+  def allowed_content_types
+     if allowed_override_method?
+       overriden_content_types
+     else
+       acceptable_content_types
+     end
+  end
+
+  def acceptable_content?
+    allowed_content_types.include?(@request_content_type)
+  end
+
+  def unsupported_media_type_message
+    "Only requests with Content-Type: application/json are allowed"
   end
 end

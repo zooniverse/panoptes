@@ -8,6 +8,8 @@ module Api
     include Pundit
     include JSONApiRender
 
+    API_ACCEPTED_CONTENT_TYPE = 'application/json'
+    API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
     rescue_from ActiveRecord::RecordInvalid, with: :invalid_record
@@ -15,7 +17,7 @@ module Api
     rescue_from Api::UnauthorizedTokenError, with: :not_authenticated
     rescue_from Api::UnsupportedMediaType, with: :unsupported_media_type
 
-    before_action ContentTypeFilter.new('application/json', 'PATCH' => 'application/patch+json')
+    before_action ContentTypeFilter.new(API_ACCEPTED_CONTENT_TYPE, API_ALLOWED_METHOD_OVERRIDES)
 
     def request_update_attributes(resource)
       if request.patch?
@@ -98,7 +100,6 @@ module Api
     def cellect_session
       session[:cellect_hosts] ||= {}
     end
-
 
     def request_ip
       request.remote_ip
