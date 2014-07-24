@@ -1,5 +1,6 @@
-PATH
-  remote: ../doorkeeper
+GIT
+  remote: git://github.com/edpaget/doorkeeper.git
+  revision: f68a30463220af1f346fe8962b4a725f31894dc8
   specs:
     doorkeeper (1.3.1)
       railties (>= 3.1)
