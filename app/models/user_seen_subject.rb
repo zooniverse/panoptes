@@ -3,9 +3,13 @@ class UserSeenSubject < ActiveRecord::Base
   belongs_to :workflow
   validates_presence_of :user, :workflow
 
-  def add_subject(subject) 
+  class InvalidSubjectIdError < StandardError; end
+
+  def add_subject(subject)
+    unless subject.persisted?
+      raise InvalidSubjectIdError.new("Ensure the subject is persisted with an id.")
+    end
     subject_ids << subject.id
-    subject_ids_will_change!
     save!
   end
 end
