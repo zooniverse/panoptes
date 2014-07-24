@@ -8,7 +8,7 @@ module Translatable
 
   module ClassMethods
     def content_association
-      "#{name.downcase}_contents".to_sym
+      "#{model_name.singular}_contents".to_sym
     end
 
     def content_model
