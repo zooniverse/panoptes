@@ -28,9 +28,15 @@ RSpec.describe UserSeenSubject, :type => :model do
   end
 
   describe "#add_subject" do
-    it "should add a subject's id to the subject_ids array" do
-      uss = user_seen_subject
+    let(:uss) { user_seen_subject }
+
+    it "should not allow nil subject id's in the array" do
       s = build(:subject)
+      expect{ uss.add_subject(s) }.to raise_error(UserSeenSubject::InvalidSubjectIdError)
+    end
+
+    it "should add a subject's id to the subject_ids array" do
+      s = create(:subject)
       uss.add_subject(s)
       expect(uss.subject_ids).to include(s.id)
     end
