@@ -99,6 +99,21 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
 
     describe "#create" do
+      it "should create the user project preferences" do
+        create_classification
+        expect(UserProjectPreference.where(user: user, project: project).first).to_not be_nil
+      end
+
+      it "should set the communication preferences to the user's default" do
+        create_classification
+        expect(UserProjectPreference.where(user: user, project: project).first.email_communication).to eq(user.project_email_communication)
+      end
+
+      it 'should not create the user project preferences if they already exist' do
+        create(:user_project_preference, user: user, project: project)
+        create_classification
+        expect(UserProjectPreference.where(user: user, project: project).length).to eq(1)
+      end
 
       it "should setup the add seen command to cellect" do
         expect(stubbed_cellect_connection).to receive(:add_seen).with(
