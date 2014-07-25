@@ -8,7 +8,7 @@ class UserSeenSubject < ActiveRecord::Base
 
   class InvalidSubjectIdError < StandardError; end
 
-  def self.add_seen_subject_for_user(user_id:, workflow_id:, subject_id:)
+  def self.add_seen_subject_for_user(user_id: nil, workflow_id: nil, subject_id: nil)
     uss = self.find_or_create_by!(user_id: user_id, workflow_id: workflow_id)
     uss.add_subject_id(subject_id)
   end
