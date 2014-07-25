@@ -1,6 +1,6 @@
 GIT
-  remote: git://github.com/edpaget/doorkeeper.git
-  revision: f68a30463220af1f346fe8962b4a725f31894dc8
+  remote: git://github.com/doorkeeper-gem/doorkeeper.git
+  revision: cc857399eabc98d8e6d27c5b50fc4d9ce867aad5
   specs:
     doorkeeper (1.3.1)
       railties (>= 3.1)
@@ -241,7 +241,6 @@ GEM
       rdoc (~> 4.0, < 5.0)
     slop (3.6.0)
     slyphon-log4j (1.2.15)
-    slyphon-zookeeper_jar (3.3.5)
     slyphon-zookeeper_jar (3.3.5-java)
     spoon (0.0.4)
       ffi

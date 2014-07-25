@@ -1,3 +1,5 @@
+require 'doorkeeper/application_controller'
+
 class AuthorizationsController < Doorkeeper::AuthorizationsController
   include OauthTrust
   before_action :allowed_response_type
