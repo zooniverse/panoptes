@@ -6,6 +6,7 @@ FactoryGirl.define do
     pairwise false
     grouped false
     prioritized false
+    primary_language 'en-US'
     project
 
     factory :workflow_with_subject_set do
@@ -23,6 +24,12 @@ FactoryGirl.define do
     factory :workflow_with_subjects do
       after(:create) do |w|
         create_list(:subject_set_with_subjects, 2, workflows: [w])
+      end
+    end
+
+    factory :workflow_with_contents do
+      after(:create) do |w|
+        create_list(:workflow_content, 1, workflow: w)
       end
     end
   end

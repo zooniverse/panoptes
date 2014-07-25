@@ -134,12 +134,12 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:created_project_id) { created_instance_id("projects") }
 
     before(:each) do
-      params = { display_name: "New Zoo",
-                 description: "A new Zoo for you!",
-                 name: "new_zoo",
-                 primary_language: 'en' }
+      params = { 'project' => { 'display_name' => "New Zoo",
+                                'description' => "A new Zoo for you!",
+                                'name' => "new_zoo",
+                                'primary_language' => 'en' } }
 
-      post :create, params, { 'CONTENT_TYPE' => 'application/json' }
+      post :create, params
     end
 
     it "should return 201" do

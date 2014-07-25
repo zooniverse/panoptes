@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140723155028) do
+ActiveRecord::Schema.define(version: 20140723185518) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -282,6 +282,16 @@ ActiveRecord::Schema.define(version: 20140723155028) do
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
+  create_table "workflow_contents", force: true do |t|
+    t.integer  "workflow_id"
+    t.string   "language"
+    t.json     "strings"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "workflow_contents", ["workflow_id"], name: "index_workflow_contents_on_workflow_id", using: :btree
+
   create_table "workflows", force: true do |t|
     t.string   "name"
     t.json     "tasks"
@@ -292,6 +302,7 @@ ActiveRecord::Schema.define(version: 20140723155028) do
     t.boolean  "pairwise",              default: false, null: false
     t.boolean  "grouped",               default: false, null: false
     t.boolean  "prioritized",           default: false, null: false
+    t.string   "primary_language"
   end
 
   add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree

@@ -37,7 +37,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def creation_params
     params.require(:workflow)
-      .permit(:name, :project_id, :pairwise, :grouped, :prioritized)
+      .permit(:name, :project_id, :pairwise, :grouped, :prioritized, :primary_language)
       .merge tasks: params[:workflow][:tasks]
   end
 
