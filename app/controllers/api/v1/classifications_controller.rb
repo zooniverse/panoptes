@@ -18,7 +18,7 @@ class Api::V1::ClassificationsController < Api::ApiController
     end
     classification.save!
     uss_params = user_seen_subject_params(user)
-    UserSeenSubjectUpdater.update_user_seen_subjects(uss_params) if uss_params[:user_id]
+    UserSeenSubjectUpdater.update_user_seen_subjects(uss_params)
     json_api_render( 201,
                      ClassificationSerializer.resource(classification),
                      api_classification_url(classification) )
