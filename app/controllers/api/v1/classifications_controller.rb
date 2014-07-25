@@ -56,7 +56,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def preference_params
-    classification_params.permit(:project_id)
+    classification_params.permit(:project_id).symbolize_keys
   end
 
   def creation_params
