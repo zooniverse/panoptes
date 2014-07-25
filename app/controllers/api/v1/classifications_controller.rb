@@ -17,7 +17,8 @@ class Api::V1::ClassificationsController < Api::ApiController
       classification.user = user
     end
     classification.save!
-    UserSeenSubject.add_seen_subject_for_user(**user_seen_subject_params(user)) if user
+    uss_params = user_seen_subject_params(user)
+    UserSeenSubjectUpdater.update_user_seen_subjects(uss_params) if uss_params[:user_id]
     json_api_render( 201,
                      ClassificationSerializer.resource(classification),
                      api_classification_url(classification) )
@@ -55,7 +56,9 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def user_seen_subject_params(user)
     user_id = user ? user.id : nil
-    params = permitted_cellect_params.slice(:subject_id, :workflow_id).merge(user_id: user_id)
+    params = permitted_cellect_params
+               .slice(:subject_id, :workflow_id)
+               .merge(user_id: user_id)
     params.symbolize_keys
   end
 end

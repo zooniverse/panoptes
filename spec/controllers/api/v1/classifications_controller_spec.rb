@@ -140,6 +140,15 @@ describe Api::V1::ClassificationsController, type: :controller do
           create_classification
           set_member_subject.subject_id
         end
+
+        context "with and invalid subject_id" do
+
+          it "should gracefully return a json error" do
+            allow(set_member_subject).to receive(:subject_id).and_return("not a valid id")
+            create_classification
+            expect(response.body).to eq(json_error_message("Subject ID is invalid, possibly not persisted."))
+          end
+        end
       end
     end
   end

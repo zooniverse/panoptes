@@ -15,7 +15,7 @@ class UserSeenSubject < ActiveRecord::Base
 
   def add_subject_id(subject_id)
     unless Subject.exists?(subject_id)
-      raise InvalidSubjectIdError.new("Ensure the subject is persisted with an id.")
+      raise InvalidSubjectIdError.new("Subject ID is invalid, possibly not persisted.")
     end
     subject_ids_will_change!
     update_attribute(:subject_ids, subject_ids << subject_id)
