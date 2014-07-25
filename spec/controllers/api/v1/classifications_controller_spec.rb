@@ -117,6 +117,39 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it_behaves_like "a classification create"
+
+      describe "track user seen subjects" do
+        let(:expected_params) do
+          { subject_id: set_member_subject.subject_id.to_s,
+            workflow_id: workflow.id.to_s,
+            user_id: user.id }
+        end
+
+        it "should add the seen subject for the user" do
+          expect(UserSeenSubject).to receive(:add_seen_subject_for_user).with(**expected_params)
+          create_classification
+        end
+
+        it "should create a user seen subject" do
+          expect do
+            create_classification
+          end.to change{UserSeenSubject.count}.from(0).to(1)
+        end
+
+        it "should add the subject ids to the user's seen subjects list" do
+          create_classification
+          set_member_subject.subject_id
+        end
+
+        context "with and invalid subject_id" do
+
+          it "should gracefully return a json error" do
+            allow(set_member_subject).to receive(:subject_id).and_return("not a valid id")
+            create_classification
+            expect(response.body).to eq(json_error_message("Subject ID is invalid, possibly not persisted."))
+          end
+        end
+      end
     end
   end
 

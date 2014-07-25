@@ -17,6 +17,8 @@ class Api::V1::ClassificationsController < Api::ApiController
       classification.user = user
     end
     classification.save!
+    uss_params = user_seen_subject_params(user)
+    UserSeenSubjectUpdater.update_user_seen_subjects(uss_params)
     json_api_render( 201,
                      ClassificationSerializer.resource(classification),
                      api_classification_url(classification) )
@@ -32,8 +34,12 @@ class Api::V1::ClassificationsController < Api::ApiController
     params.require(:classification)
   end
 
-  def cellect_params
+  def permitted_cellect_params
     classification_params.permit(:workflow_id, :subject_id)
+  end
+
+  def cellect_params
+    permitted_cellect_params
       .merge(user_id: current_resource_owner.id,
              host: cellect_host(params[:workflow_id]))
       .symbolize_keys
@@ -46,5 +52,13 @@ class Api::V1::ClassificationsController < Api::ApiController
     classification_params.permit(*permitted_attrs).tap do |white_listed|
       white_listed[:annotations] = params[:classification][:annotations]
     end
+  end
+
+  def user_seen_subject_params(user)
+    user_id = user ? user.id : nil
+    params = permitted_cellect_params
+               .slice(:subject_id, :workflow_id)
+               .merge(user_id: user_id)
+    params.symbolize_keys
   end
 end

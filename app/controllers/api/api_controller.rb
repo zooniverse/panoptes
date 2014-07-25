@@ -3,6 +3,7 @@ module Api
   class PatchResourceError < PanoptesApiError; end
   class UnauthorizedTokenError < PanoptesApiError; end
   class UnsupportedMediaType < PanoptesApiError; end
+  class UserSeenSubjectIdError < PanoptesApiError; end
 
   class ApiController < ApplicationController
     include Pundit
@@ -16,6 +17,7 @@ module Api
     rescue_from Pundit::NotAuthorizedError, with: :not_authorized
     rescue_from Api::UnauthorizedTokenError, with: :not_authenticated
     rescue_from Api::UnsupportedMediaType, with: :unsupported_media_type
+    rescue_from Api::UserSeenSubjectIdError, with: :unprocessable_entity
 
     before_action ContentTypeFilter.new(API_ACCEPTED_CONTENT_TYPE, API_ALLOWED_METHOD_OVERRIDES)
 
@@ -90,6 +92,10 @@ module Api
 
     def unsupported_media_type(exception)
       json_api_render(:unsupported_media_type, exception)
+    end
+
+    def unprocessable_entity(exception)
+      json_api_render(:unprocessable_entity, exception)
     end
 
     def cellect_host(workflow_id)
