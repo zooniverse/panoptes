@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Collection, :type => :model do
+RSpec.describe Collection, :type => :model do
   let(:collection) { create(:collection) }
   let(:owned) { collection }
   let(:not_owned) { build(:collection, owner: nil) }

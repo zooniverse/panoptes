@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-shared_examples "has subject_count" do
+RSpec.shared_examples "has subject_count" do
   describe "#subjects_count" do
     it "return a count of the associated subjects" do
       expect(subject_relation.subjects_count).to eq(subject_relation

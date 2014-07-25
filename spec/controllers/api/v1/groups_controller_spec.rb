@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::GroupsController, type: :controller do
+RSpec.describe Api::V1::GroupsController, type: :controller do
   let!(:user_groups) do
     [ create(:user_group_with_users),
       create(:user_group_with_projects),

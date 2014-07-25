@@ -16,7 +16,7 @@ class VisibleClass < ActiveRecord::Base
   end
 end
 
-describe VisibleClass do
+RSpec.describe VisibleClass do
   let(:visible){ VisibleClass.new }
   it_behaves_like 'has visibility controls'
 end

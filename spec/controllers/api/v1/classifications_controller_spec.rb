@@ -21,7 +21,7 @@ def create_classification
   setup_create_request(project.id, workflow.id, set_member_subject)
 end
 
-shared_context "a classification create" do
+RSpec.shared_context "a classification create" do
   it "should return 201" do
     create_classification
     expect(response.status).to eq(201)
@@ -40,7 +40,7 @@ shared_context "a classification create" do
   end
 end
 
-describe Api::V1::ClassificationsController, type: :controller do
+RSpec.describe Api::V1::ClassificationsController, type: :controller do
   let(:classification) { create(:classification) }
   let(:project) { create(:full_project) }
   let!(:workflow) { project.workflows.first }

@@ -1,4 +1,4 @@
-shared_examples "is public" do
+RSpec.shared_examples "is public" do
   it "should permit admin users" do
     expect(subject).to permit(build(:admin_user), resource)
   end
@@ -12,7 +12,7 @@ shared_examples "is public" do
   end
 end
 
-shared_examples "is public to logged in users" do
+RSpec.shared_examples "is public to logged in users" do
   it "should permit admin users" do
     expect(subject).to permit(build(:admin_user), resource)
   end

@@ -12,11 +12,11 @@ namespace :user do
         u.created_at = user.created_at
         u.encrypted_password = user.crypted_password
         u.password_salt = user.password_salt
-        u.name = user.name
         u.display_name = user.display_name
         u.zooniverse_id = user.id
         u.hash_func = 'sha1'
       end
+      u.owner_name = OwnerName.new(resource: u, name: u.login)
       u.save!
     end
   end

@@ -1,3 +1,5 @@
+require 'doorkeeper/application_controller'
+
 class TokensController < Doorkeeper::TokensController
   include OauthTrust
   before_action :allowed_grants, only: :create

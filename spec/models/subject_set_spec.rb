@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SubjectSet, :type => :model do
+RSpec.describe SubjectSet, :type => :model do
   let(:subject_set) { create(:subject_set) }
 
   it "should have a valid factory" do

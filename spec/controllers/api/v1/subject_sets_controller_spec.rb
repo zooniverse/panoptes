@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::SubjectSetsController, type: :controller do
+RSpec.describe Api::V1::SubjectSetsController, type: :controller do
   let!(:subject_sets){ create_list :subject_set_with_subjects, 2 }
   let(:subject_set){ subject_sets.first }
   let(:project){ subject_set.project }

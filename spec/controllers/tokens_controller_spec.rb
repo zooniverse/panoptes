@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-shared_context "a valid login" do
+RSpec.shared_context "a valid login" do
   it "it should respond with 200" do
     req
     expect(response.status).to eq(200)
@@ -13,7 +13,7 @@ shared_context "a valid login" do
   end
 end
 
-describe TokensController, type: :controller do
+RSpec.describe TokensController, type: :controller do
   let(:owner) { create(:user)}
 
   describe "resource owner password credentials flow" do

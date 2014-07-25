@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::UsersController, type: :controller do
+RSpec.describe Api::V1::UsersController, type: :controller do
   let!(:users) {
     n = Array(22..30).sample
     create_list(:user, n)

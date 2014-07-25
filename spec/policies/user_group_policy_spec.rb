@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe UserGroupPolicy do
+RSpec.describe UserGroupPolicy do
   subject { UserGroupPolicy }
   let(:resource) { build(:user_group) }
 
-  shared_examples "allows access for admins or group admins" do
+  RSpec.shared_examples "allows access for admins or group admins" do
     let(:resource) { create(:user_group) }
 
     it "should allow admin users" do

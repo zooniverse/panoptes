@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe UserInfoScrubber do
+RSpec.describe UserInfoScrubber do
 
   describe '::scrub_personal_info!' do
     let(:scrub_user_details) { UserInfoScrubber.scrub_personal_info!(user) }

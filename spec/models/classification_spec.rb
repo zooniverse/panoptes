@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Classification, :type => :model do
+RSpec.describe Classification, :type => :model do
   it "should have a valid factory" do
     expect(build(:classification)).to be_valid
   end

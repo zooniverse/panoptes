@@ -1,4 +1,4 @@
-shared_examples "it has a subjects association" do
+RSpec.shared_examples "it has a subjects association" do
 
   context "when no subjects exist" do
 

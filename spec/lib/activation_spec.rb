@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Activation do
+RSpec.describe Activation do
   class ActivatedObject
     def initialize(active=true)
       @active = active

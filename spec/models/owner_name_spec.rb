@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe OwnerName, :type => :model do
+RSpec.describe OwnerName, :type => :model do
   it "should have a valid factory" do
     expect(build(:owner_name_for_user)).to be_valid
     expect(build(:owner_name_for_group)).to be_valid

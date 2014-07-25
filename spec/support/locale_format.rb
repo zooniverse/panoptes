@@ -1,4 +1,4 @@
-shared_examples "a locale field" do
+RSpec.shared_examples "a locale field" do
   it "should require languages to be exactly 2 or 5 characters" do
     expect(build(factory, locale_field => 'a')).to_not be_valid
     expect(build(factory, locale_field => 'abasdf')).to_not be_valid

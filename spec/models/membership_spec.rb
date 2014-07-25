@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Membership, :type => :model do
+RSpec.describe Membership, :type => :model do
   let(:membership) { create(:membership) }
   it "should have a valid factory" do
     expect(build(:membership)).to be_valid

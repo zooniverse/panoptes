@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe UserGroup, :type => :model do
+RSpec.describe UserGroup, :type => :model do
   let(:user_group) { create(:user_group) }
   let(:named) { user_group }
   let(:unnamed) do

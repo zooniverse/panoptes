@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe HomeController, type: :controller do
+RSpec.describe HomeController, type: :controller do
 
   describe "GET 'index'" do
 

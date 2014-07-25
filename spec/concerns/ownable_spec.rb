@@ -5,7 +5,7 @@ class Owned < ActiveRecord::Base
   self.table_name = "collections"
 end
 
-describe Owned, type: :model do
+RSpec.describe Owned, type: :model do
   let(:owned) do
     owned = Owned.new(name: "test")
     owned.owner = build(:user)

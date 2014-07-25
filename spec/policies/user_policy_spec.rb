@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe UserPolicy do
+RSpec.describe UserPolicy do
   subject { UserPolicy }
 
   let(:resource) { build(:user) }
 
-  shared_examples "only self" do
+  RSpec.shared_examples "only self" do
     it "should permit admin users" do
       expect(subject).to permit(build(:admin_user), resource)
     end

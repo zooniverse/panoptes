@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Subject, :type => :model do
+RSpec.describe Subject, :type => :model do
 
   let(:subject) { build(:subject) }
 

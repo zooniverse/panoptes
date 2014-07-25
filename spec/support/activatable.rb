@@ -1,4 +1,4 @@
-shared_examples "activatable" do
+RSpec.shared_examples "activatable" do
   describe "#disable!" do
     it "should change state to inactive" do
       expect(activatable.inactive?).to be_falsy

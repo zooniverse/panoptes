@@ -15,7 +15,7 @@ class FakeController
   end
 end
 
-describe ContentTypeFilter do
+RSpec.describe ContentTypeFilter do
   let(:filter) { ContentTypeFilter.new("application/json", 'text/plain', 'PATCH' => 'application/patch+json') }
 
   let(:request) do
