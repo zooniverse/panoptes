@@ -118,7 +118,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       it_behaves_like "a classification create"
 
-      describe "user seen subjects" do
+      describe "track user seen subjects" do
         let(:expected_params) do
           { subject_id: set_member_subject.subject_id.to_s,
             workflow_id: workflow.id.to_s,
