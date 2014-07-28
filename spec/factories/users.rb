@@ -8,6 +8,9 @@ FactoryGirl.define do
     credited_name 'Dr User'
     activated_state :active
     sequence(:login) { |n| "new_user_#{n}" }
+    global_email_communication true
+    project_email_communication true
+
     after(:build) do |user|
       unless user.owner_name
         user.owner_name = build(:owner_name, name: user.login, resource: user)

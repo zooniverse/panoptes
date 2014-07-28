@@ -3,7 +3,10 @@ class User < ActiveRecord::Base
   include Activatable
   include Owner
 
-  attr_accessible :name, :email, :password, :login, :migrated_user, :display_name, :credited_name
+  attr_accessible :name, :email, :password, :login, :migrated_user, 
+    :display_name, :credited_name, :global_email_communication, 
+    :project_email_communication
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
