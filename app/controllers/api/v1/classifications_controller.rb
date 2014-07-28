@@ -10,19 +10,20 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def create
-    create_project_preference
     classification = Classification.new(creation_params)
     classification.user_ip = request_ip
     if user = current_resource_owner
       update_cellect
       classification.user = user
     end
-    classification.save!
-    uss_params = user_seen_subject_params(user)
-    UserSeenSubjectUpdater.update_user_seen_subjects(uss_params)
-    json_api_render( 201,
-                     ClassificationSerializer.resource(classification),
-                     api_classification_url(classification) )
+    if classification.save!
+      uss_params = user_seen_subject_params(user)
+      UserSeenSubjectUpdater.update_user_seen_subjects(uss_params)
+      create_project_preference
+      json_api_render( 201,
+                       ClassificationSerializer.resource(classification),
+                       api_classification_url(classification) )
+    end
   end
 
   private
