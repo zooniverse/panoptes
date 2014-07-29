@@ -5,7 +5,7 @@ module ControlControl
     end
 
     module ClassMethods
-      def owner_of(resource, **attributes)
+      def owns(resource, **attributes)
         has_many resource, **attributes, as: :owner
       end
     end

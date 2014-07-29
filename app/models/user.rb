@@ -1,14 +1,13 @@
 class User < ActiveRecord::Base
   include Nameable
   include Activatable
-  include Owner
+  include ControlControl::Owner
+  include RoleControl::Enrolled
 
   attr_accessible :name, :email, :password, :login, :migrated_user,
     :display_name, :credited_name, :global_email_communication,
     :project_email_communication
 
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable, omniauth_providers: [:facebook, :gplus]
@@ -17,9 +16,15 @@ class User < ActiveRecord::Base
   has_many :classifications
   has_many :memberships
   has_many :authorizations
+  has_many :user_project_preferences
 
-  owns :projects, :collections, :subjects,
-    [:oauth_applications, {class_name: "Doorkeeper::Application"}]
+  owns :projects
+  owns :collections
+  owns :subjects
+  owns :oauth_applications, class_name: "Doorkeeper::Application"
+
+  roles_for :user_groups, :active_memberships
+  roles_for :projects, :user_project_preferences
 
   validates :login, presence: true, uniqueness: true
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?

@@ -12,10 +12,6 @@ shared_examples "is ownable" do
       expect(owned.owner?(owned.owner)).to be_truthy
     end
 
-    it "should be false when passed a object that is not an owner" do
-      expect(owned.owner?(OpenStruct.new)).to be_falsy
-    end
-
     it "should be false when passed an owner that does not own it" do
       not_the_owner = build(:user)
       expect(owned.owner?(not_the_owner)).to be_falsy

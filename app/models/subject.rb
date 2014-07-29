@@ -1,5 +1,5 @@
 class Subject < ActiveRecord::Base
-  include Ownable
+  include ControlControl::Ownable
 
   belongs_to :project
   has_and_belongs_to_many :collections

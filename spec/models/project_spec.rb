@@ -13,7 +13,7 @@ describe Project, :type => :model do
   it_behaves_like "is ownable"
   it_behaves_like "has subject_count"
   it_behaves_like "activatable"
-  it_behaves_like "has visibility controls"
+  #it_behaves_like "has visibility controls"
   it_behaves_like "is translatable"
 
   it "should have a valid factory" do

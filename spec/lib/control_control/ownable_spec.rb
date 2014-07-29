@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 class Owned < ActiveRecord::Base
-  include Ownable
+  include ControlControl::Ownable
   self.table_name = "collections"
 end
 
-describe Owned, type: :model do
+describe ControlControl::Ownable, type: :model do
   let(:owned) do
     owned = Owned.new(name: "test")
     owned.owner = build(:user)
