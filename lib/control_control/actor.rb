@@ -1,7 +1,8 @@
 module ControlControl
   module Actor
     def do_to_resource_on_behalf_of(resource, action, target, &block)
-      if resource.can_act_on_as?(target, self, action)
+      action_question = "can_#{ action }_as?".to_sym
+      if resource.send(action_question, target, self)
         resource.do_to_resource(target, action, &block)
       else
         raise AccessDenied.new("Insufficient permissions to access resource")

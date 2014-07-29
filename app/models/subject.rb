@@ -1,4 +1,5 @@
 class Subject < ActiveRecord::Base
+  include ControlControl::Resource
   include ControlControl::Ownable
 
   belongs_to :project

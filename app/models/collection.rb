@@ -1,4 +1,5 @@
 class Collection < ActiveRecord::Base
+  include ControlControl::Resource
   include ControlControl::Ownable
   include Activatable
   include Visibility

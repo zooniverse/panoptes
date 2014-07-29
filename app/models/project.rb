@@ -1,6 +1,6 @@
 class Project < ActiveRecord::Base
-  include ControlControl::Ownable
   include RoleControl::Controlled
+  include ControlControl::Ownable
   include SubjectCounts
   include Activatable
   include Translatable
@@ -15,6 +15,6 @@ class Project < ActiveRecord::Base
   validates_uniqueness_of :name, case_sensitive: false, scope: :owner
   validates_uniqueness_of :display_name, scope: :owner
 
-  action_controlled :edit, :collaborator
-  action_controlled :delete, :collaborator
+  can_by_role :edit, :collaborator
+  can_by_role :read, :collaborator
 end

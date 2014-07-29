@@ -1,11 +1,17 @@
 class UserGroup < ActiveRecord::Base
   include Nameable
   include Activatable
-  include Owner
+  include ControlControl::Resource
+  include ControlControl::Actor
+  include ControlControl::Owner
+  include ControlControl::ActAs
+  include RoleControl::Controlled
 
   attr_accessible :name, :display_name
 
-  owns :projects, :collections, :subjects
+  owns :projects
+  owns :collections
+  owns :subjects
 
   has_many :users, through: :memberships
   has_many :memberships

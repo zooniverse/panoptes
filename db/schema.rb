@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140801191844) do
+ActiveRecord::Schema.define(version: 20140731172009) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -52,9 +52,10 @@ ActiveRecord::Schema.define(version: 20140801191844) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "owner_type"
-    t.integer  "activated_state", default: 0, null: false
+    t.integer  "activated_state",  default: 0,  null: false
     t.string   "visibility"
     t.string   "display_name"
+    t.string   "visible_to_roles", default: [], null: false, array: true
   end
 
   add_index "collections", ["display_name", "owner_id", "owner_type"], name: "index_collections_on_display_name_and_owner_id_and_owner_type", unique: true, using: :btree
@@ -73,6 +74,7 @@ ActiveRecord::Schema.define(version: 20140801191844) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "access",        default: 0, null: false
   end
 
   add_index "memberships", ["user_group_id"], name: "index_memberships_on_user_group_id", using: :btree
@@ -157,6 +159,7 @@ ActiveRecord::Schema.define(version: 20140801191844) do
     t.integer  "activated_state",       default: 0,     null: false
     t.string   "visibility",            default: "dev", null: false
     t.string   "primary_language"
+    t.string   "visible_to_roles",      default: [],    null: false, array: true
   end
 
   add_index "projects", ["display_name", "owner_id", "owner_type"], name: "index_projects_on_display_name_and_owner_id_and_owner_type", using: :btree
@@ -235,6 +238,7 @@ ActiveRecord::Schema.define(version: 20140801191844) do
     t.json     "preferences"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "roles",               default: [], null: false, array: true
   end
 
   add_index "user_project_preferences", ["project_id"], name: "index_user_project_preferences_on_project_id", using: :btree

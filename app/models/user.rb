@@ -23,7 +23,6 @@ class User < ActiveRecord::Base
   owns :subjects
   owns :oauth_applications, class_name: "Doorkeeper::Application"
 
-  roles_for :user_groups, :active_memberships
   roles_for :projects, :user_project_preferences
 
   validates :login, presence: true, uniqueness: true
