@@ -3,7 +3,6 @@ ENV["RAILS_ENV"] ||= 'test'
 require 'cellect/testing'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
-require "pundit/rspec"
 require 'paper_trail/frameworks/rspec'
 
 # Requires supporting ruby files with custom matchers and macros, etc,

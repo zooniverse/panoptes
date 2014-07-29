@@ -13,8 +13,6 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable, omniauth_providers: [:facebook, :gplus]
 
-  rolify
-
   has_many :user_groups, through: :memberships
   has_many :classifications
   has_many :memberships

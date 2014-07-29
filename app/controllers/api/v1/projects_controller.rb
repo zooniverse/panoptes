@@ -1,11 +1,8 @@
 class Api::V1::ProjectsController < Api::ApiController
   doorkeeper_for :update, :create, :delete, scopes: [:project]
 
-  after_action :verify_authorized, except: :index
-
   def show
     project = Project.find(params[:id])
-    authorize project, :read?
     render json_api: ProjectSerializer.resource(project,
                                                 nil,
                                                 languages: current_languages,
@@ -39,8 +36,6 @@ class Api::V1::ProjectsController < Api::ApiController
     project = Project.new(project_attributes)
     project.owner = current_resource_owner
 
-    authorize project, :create?
-
     ActiveRecord::Base.transaction do
       project.save!
       content.project = project
@@ -54,7 +49,6 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def destroy
     project = Project.find(params[:id])
-    authorize project, :destroy?
     project.destroy
     deleted_resource_response
   end

@@ -6,7 +6,6 @@ module Api
   class UserSeenSubjectIdError < PanoptesApiError; end
 
   class ApiController < ApplicationController
-    include Pundit
     include JSONApiRender
 
     API_ACCEPTED_CONTENT_TYPE = 'application/json'
@@ -14,7 +13,6 @@ module Api
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
     rescue_from ActiveRecord::RecordInvalid, with: :invalid_record
-    rescue_from Pundit::NotAuthorizedError, with: :not_authorized
     rescue_from Api::UnauthorizedTokenError, with: :not_authenticated
     rescue_from Api::UnsupportedMediaType, with: :unsupported_media_type
     rescue_from Api::UserSeenSubjectIdError, with: :unprocessable_entity
