@@ -11,9 +11,7 @@ class RegistrationsController < Devise::RegistrationsController
   private
 
   def create_from_json
-    build_resource(sign_up_params)
-    resource.display_name = sign_up_params[:login]
-    resource.owner_name = OwnerName.new(name: resource.login, resource: resource)
+    build_user
     resource_saved = resource.save
     yield resource if block_given?
     status, content = if resource_saved
@@ -24,5 +22,13 @@ class RegistrationsController < Devise::RegistrationsController
     end
     clean_up_passwords resource
     render status: status, json_api: content
+  end
+
+  def build_user
+    build_resource(sign_up_params)
+    login = sign_up_params[:login]
+    resource.display_name = login
+    resource.login = User.login_name_converter(login)
+    resource.owner_name = OwnerName.new(name: resource.login, resource: resource)
   end
 end

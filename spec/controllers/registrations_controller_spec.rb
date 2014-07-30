@@ -42,9 +42,18 @@ describe RegistrationsController, type: :controller do
           post :create, user: user_attributes
         end
 
-        it "should set the display name to be the exact replica of the login field before downcasing" do
+        it "should set the display name to be the exact replica of the login field" do
           post :create, user: user_attributes
           expect(User.find(created_instance_id("users")).display_name).to eq(login)
+        end
+      end
+
+      context "with caps and spaces in the login name" do
+        let(:user_attributes) { attributes_for(:user, login: "Test User Login") }
+
+        it "should convert the login name correctly" do
+          post :create, user: user_attributes
+          expect(User.find(created_user_id).login).to eq("test_user_login")
         end
       end
 
