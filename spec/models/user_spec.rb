@@ -69,6 +69,19 @@ describe User, :type => :model do
     end
   end
 
+  describe ".login_name_converter" do
+
+    let(:name) { user.display_name }
+
+    it "should a name string correctly" do
+      expect(User.login_name_converter(name)).to eq("new_user")
+    end
+
+    it "should return nil on invalid param" do
+      expect(User.login_name_converter(nil)).to be_nil
+    end
+  end
+
   describe '#login' do
      it 'should validate presence' do
       expect(build(:user, login: "").valid?).to be false
