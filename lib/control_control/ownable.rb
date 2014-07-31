@@ -4,7 +4,7 @@ module ControlControl
       mod.module_eval do
         can :read, :owner?
         can :edit, :owner?
-        can :delete, :owner?
+        can :destroy, :owner?
         
         belongs_to :owner, polymorphic: true
         validates_presence_of :owner

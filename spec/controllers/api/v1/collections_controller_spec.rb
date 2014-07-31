@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::CollectionsController, type: :controller do
   let!(:collections){ create_list :collection_with_subjects, 2 }
-  let!(:private_collection){ create :collection_with_subjects, visibility: 'private' }
+  let!(:private_collection){ create :collection_with_subjects, visible_to: ['collaborator'] }
   let(:collection){ collections.first }
   let(:project){ collection.project }
   let(:owner){ collection.owner }

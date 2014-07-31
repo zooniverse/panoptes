@@ -6,7 +6,7 @@ describe Api::V1::ProjectsController, type: :controller do
   }
 
   let!(:projects) {
-    create_list(:project_with_contents, 2, owner: user)
+    projects = create_list(:project_with_contents, 2, owner: user)
   }
 
   let(:api_resource_name) { "projects" }

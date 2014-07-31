@@ -14,16 +14,21 @@ class User < ActiveRecord::Base
 
   has_many :user_groups, through: :memberships
   has_many :classifications
-  has_many :memberships
   has_many :authorizations
   has_many :user_project_preferences
+  has_many :user_collection_preferences
 
+  has_many :memberships
+  has_many :active_memberships, -> {  where state: :active }, class_name: 'Membership'
+  
   owns :projects
   owns :collections
   owns :subjects
   owns :oauth_applications, class_name: "Doorkeeper::Application"
 
-  roles_for :projects, :user_project_preferences
+  roles_for Project, :user_project_preferences
+  roles_for Collection, :user_collection_preferences
+  roles_for UserGroup, :active_memberships
 
   validates :login, presence: true, uniqueness: true
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?

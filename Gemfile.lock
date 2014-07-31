@@ -173,7 +173,13 @@ GEM
       activerecord (>= 3.0, < 5.0)
       activesupport (>= 3.0, < 5.0)
     pg (0.17.1)
+    pg_array_parser (0.0.9)
+    pg_array_parser (0.0.9-java)
     polyglot (0.3.5)
+    postgres_ext (2.3.0)
+      activerecord (>= 4.0.0)
+      arel (>= 4.0.1)
+      pg_array_parser (~> 0.0.9)
     protected_attributes (1.0.8)
       activemodel (>= 4.0.1, < 5.0)
     pry (0.10.0)
@@ -244,6 +250,7 @@ GEM
       rdoc (~> 4.0, < 5.0)
     slop (3.6.0)
     slyphon-log4j (1.2.15)
+    slyphon-zookeeper_jar (3.3.5)
     slyphon-zookeeper_jar (3.3.5-java)
     spoon (0.0.4)
       ffi
@@ -318,6 +325,7 @@ DEPENDENCIES
   omniauth-gplus
   paper_trail
   pg
+  postgres_ext
   pry-rails (~> 0.3.2)
   rack-cors
   rails (= 4.1.4)

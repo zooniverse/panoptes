@@ -3,7 +3,6 @@ FactoryGirl.define do
     sequence(:name) { |n| "collection_name_#{ n }" }
     sequence(:display_name) { |n| "another name #{ n }" }
     activated_state :active
-    visibility "public"
 
     project
     association :owner, factory: :user

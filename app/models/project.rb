@@ -1,5 +1,6 @@
 class Project < ActiveRecord::Base
-  include RoleControl::Controlled
+  extend RoleControl::Controlled
+  include RoleControl::VisibilityControlled
   include ControlControl::Ownable
   include SubjectCounts
   include Activatable
@@ -16,5 +17,5 @@ class Project < ActiveRecord::Base
   validates_uniqueness_of :display_name, scope: :owner
 
   can_by_role :edit, :collaborator
-  can_by_role :read, :collaborator
+  can_by_role :destroy, :collaborator
 end
