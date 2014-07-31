@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140731172009) do
+ActiveRecord::Schema.define(version: 20140731195029) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,7 +53,6 @@ ActiveRecord::Schema.define(version: 20140731172009) do
     t.datetime "updated_at"
     t.string   "owner_type"
     t.integer  "activated_state",  default: 0,  null: false
-    t.string   "visibility"
     t.string   "display_name"
     t.string   "visible_to_roles", default: [], null: false, array: true
   end
@@ -74,7 +73,8 @@ ActiveRecord::Schema.define(version: 20140731172009) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "access",        default: 0, null: false
+    t.integer  "access",        default: 0,  null: false
+    t.string   "roles",         default: [], null: false, array: true
   end
 
   add_index "memberships", ["user_group_id"], name: "index_memberships_on_user_group_id", using: :btree
@@ -155,11 +155,10 @@ ActiveRecord::Schema.define(version: 20140731172009) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "owner_type"
-    t.integer  "classifications_count", default: 0,     null: false
-    t.integer  "activated_state",       default: 0,     null: false
-    t.string   "visibility",            default: "dev", null: false
+    t.integer  "classifications_count", default: 0,  null: false
+    t.integer  "activated_state",       default: 0,  null: false
     t.string   "primary_language"
-    t.string   "visible_to_roles",      default: [],    null: false, array: true
+    t.string   "visible_to_roles",      default: [], null: false, array: true
   end
 
   add_index "projects", ["display_name", "owner_id", "owner_type"], name: "index_projects_on_display_name_and_owner_id_and_owner_type", using: :btree
@@ -219,6 +218,18 @@ ActiveRecord::Schema.define(version: 20140731172009) do
   add_index "subjects", ["owner_id"], name: "index_subjects_on_owner_id", using: :btree
   add_index "subjects", ["project_id"], name: "index_subjects_on_project_id", using: :btree
   add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
+
+  create_table "user_collection_preferences", force: true do |t|
+    t.json     "preferences"
+    t.string   "roles",         default: [], null: false, array: true
+    t.integer  "user_id"
+    t.integer  "collection_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_collection_preferences", ["collection_id"], name: "index_user_collection_preferences_on_collection_id", using: :btree
+  add_index "user_collection_preferences", ["user_id"], name: "index_user_collection_preferences_on_user_id", using: :btree
 
   create_table "user_groups", force: true do |t|
     t.string   "name"
