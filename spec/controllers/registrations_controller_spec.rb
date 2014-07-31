@@ -1,9 +1,5 @@
 require 'spec_helper'
 
-def created_user_id
-  json_response["users"][0]["id"]
-end
-
 describe RegistrationsController, type: :controller do
 
   before(:each) do
@@ -33,7 +29,7 @@ describe RegistrationsController, type: :controller do
 
         it "should persist the user account" do
           post :create, user: user_attributes
-          expect(User.find(created_user_id)).to_not be_nil
+          expect(User.find(created_instance_id("users"))).to_not be_nil
         end
 
         it "should sign the user in" do
@@ -48,7 +44,7 @@ describe RegistrationsController, type: :controller do
 
         it "should set the display name to be the exact replica of the login field before downcasing" do
           post :create, user: user_attributes
-          expect(User.find(created_user_id).display_name).to eq(login)
+          expect(User.find(created_instance_id("users")).display_name).to eq(login)
         end
       end
 
