@@ -19,7 +19,29 @@ describe Project, :type => :model do
   it "should have a valid factory" do
     expect(project).to be_valid
   end
-  
+
+  it 'should require unique names for an ower' do
+    owner = create(:user)
+    expect(create(:project, name: "hi_fives", owner: owner)).to be_valid
+    expect(build(:project, name: "hi_fives", owner: owner)).to_not be_valid
+  end
+
+  it 'should not require name uniquenames between owners' do
+    expect(create(:project, name: "test_project", owner: create(:user))).to be_valid
+    expect(create(:project, name: "test_project", owner: create(:user))).to be_valid
+  end
+
+  it 'should require unique dispalys name for an owner' do
+    owner = create(:user)
+    expect(create(:project, display_name: "hi fives", owner: owner)).to be_valid
+    expect(build(:project, display_name: "hi fives", owner: owner)).to_not be_valid
+  end
+ 
+  it 'should not require display name uniquenames between owners' do
+    expect(create(:project, display_name: "test project", owner: create(:user))).to be_valid
+    expect(create(:project, display_name: "test project", owner: create(:user))).to be_valid
+  end
+ 
   describe "#workflows" do
     let(:project) { create(:project_with_workflows) }
 

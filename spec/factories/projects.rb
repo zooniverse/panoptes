@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :project do
-    sequence(:name) {|n| "test_project_#{n}"}
-    display_name "Test Project"
+    sequence(:name) { |n| "test_project_#{ n }" }
+    sequence(:display_name) { |n| "Test Project #{ n }" }
     user_count { 10 + rand(1000) }
     activated_state :active
     visibility "public"

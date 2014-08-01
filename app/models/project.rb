@@ -15,4 +15,7 @@ class Project < ActiveRecord::Base
   visibility_level :dev, :collaborator
   visibility_level :beta, :collaborator, :beta_tester, :scientist, :translator
   visibility_level :private, :collaborator, :scientist, :invited
+
+  validates_uniqueness_of :name, case_sensitive: false, scope: :owner
+  validates_uniqueness_of :display_name, scope: :owner
 end
