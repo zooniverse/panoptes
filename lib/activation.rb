@@ -1,13 +1,10 @@
 class Activation
 
-  class << self
+  def self.enable_instances!(instances=[])
+    instances.map(&:enable!)
+  end
 
-    def enable_instances!(instances=[])
-      instances.map(&:enable!)
-    end
-
-    def disable_instances!(instances=[])
-      instances.map(&:disable!)
-    end
+  def self.disable_instances!(instances=[])
+    instances.map(&:disable!)
   end
 end
