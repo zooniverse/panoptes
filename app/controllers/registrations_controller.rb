@@ -12,6 +12,7 @@ class RegistrationsController < Devise::RegistrationsController
 
   def create_from_json
     build_resource(sign_up_params)
+    resource.display_name = sign_up_params[:login]
     resource.owner_name = OwnerName.new(name: resource.login, resource: resource)
     resource_saved = resource.save
     yield resource if block_given?

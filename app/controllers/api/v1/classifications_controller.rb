@@ -16,15 +16,26 @@ class Api::V1::ClassificationsController < Api::ApiController
       update_cellect
       classification.user = user
     end
-    classification.save!
-    uss_params = user_seen_subject_params(user)
-    UserSeenSubjectUpdater.update_user_seen_subjects(uss_params)
-    json_api_render( 201,
-                     ClassificationSerializer.resource(classification),
-                     api_classification_url(classification) )
+    if classification.save!
+      uss_params = user_seen_subject_params(user)
+      UserSeenSubjectUpdater.update_user_seen_subjects(uss_params)
+      create_project_preference
+      json_api_render( 201,
+                       ClassificationSerializer.resource(classification),
+                       api_classification_url(classification) )
+    end
   end
 
   private
+
+  def create_project_preference
+    return unless current_resource_owner
+    UserProjectPreference.where(user: current_resource_owner, **preference_params)
+      .first_or_create do |up|
+        up.email_communication = current_resource_owner.project_email_communication
+        up.preferences = {}
+      end
+  end
 
   def update_cellect
     Cellect::Client.connection.add_seen(**cellect_params)
@@ -43,6 +54,10 @@ class Api::V1::ClassificationsController < Api::ApiController
       .merge(user_id: current_resource_owner.id,
              host: cellect_host(params[:workflow_id]))
       .symbolize_keys
+  end
+
+  def preference_params
+    classification_params.permit(:project_id).symbolize_keys
   end
 
   def creation_params
