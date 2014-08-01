@@ -32,7 +32,8 @@ module Nameable
   end
 
   def model_uniq_name_value
-    self.send(model_uniq_name_attribute)
+    uniq_name_value = self.send(model_uniq_name_attribute)
+    StringConverter.downcase_and_replace_spaces(uniq_name_value)
   end
 
   def model_uniq_name_attribute

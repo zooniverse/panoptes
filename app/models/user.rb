@@ -28,24 +28,16 @@ class User < ActiveRecord::Base
 
   attr_accessor :migrated_user
 
-  class << self
-
-    def from_omniauth(auth_hash)
-      auth = Authorization.from_omniauth(auth_hash)
-      auth.user ||= create do |u|
-        u.email = auth_hash.info.email
-        u.password = Devise.friendly_token[0,20]
-        name = auth_hash.info.name
-        u.display_name = name
-        u.login = User.login_name_converter(name)
-        u.owner_name = OwnerName.new(name: u.login, resource: u)
-        u.authorizations << auth
-      end
-    end
-
-    def login_name_converter(name)
-      return nil unless name.is_a?(String)
-      name.downcase.gsub(/\s/, '_')
+  def self.from_omniauth(auth_hash)
+    auth = Authorization.from_omniauth(auth_hash)
+    auth.user ||= create do |u|
+      u.email = auth_hash.info.email
+      u.password = Devise.friendly_token[0,20]
+      name = auth_hash.info.name
+      u.display_name = name
+      u.login = StringConverter.downcase_and_replace_spaces(name)
+      u.owner_name = OwnerName.new(name: u.login, resource: u)
+      u.authorizations << auth
     end
   end
 

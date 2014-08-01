@@ -5,13 +5,13 @@ class OwnerName < ActiveRecord::Base
   validates :name, presence: true, uniqueness: true
   validates :resource, presence: true
 
-  before_validation :downcase_case_insensitive_fields
+  before_validation :clean_name_field
 
   private
 
-  def downcase_case_insensitive_fields
+  def clean_name_field
     if name
-      self.name = name.downcase
+      self.name = StringConverter.downcase_and_replace_spaces(name)
     end
   end
 end

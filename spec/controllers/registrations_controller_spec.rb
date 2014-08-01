@@ -51,9 +51,10 @@ describe RegistrationsController, type: :controller do
       context "with caps and spaces in the login name" do
         let(:user_attributes) { attributes_for(:user, login: "Test User Login") }
 
-        it "should convert the login name correctly" do
+        it "should convert the owner_name#name field correctly" do
           post :create, user: user_attributes
-          expect(User.find(created_user_id).login).to eq("test_user_login")
+          owner_uniq_name = User.find(created_instance_id("users")).owner_uniq_name
+          expect(owner_uniq_name).to eq("test_user_login")
         end
       end
 

@@ -62,6 +62,16 @@ describe Api::V1::GroupsController, type: :controller do
         expect{post :create, create_params}.to change{UserGroup.count}.by(1)
       end
 
+      context "with caps and spaces in the group name" do
+        let!(:create_params) { { user_group: { name: "Amazing Group Name" } } }
+
+        it "should convert the owner_name#name field correctly" do
+          post :create, create_params
+          owner_uniq_name = UserGroup.find(created_user_group_id).owner_uniq_name
+          expect(owner_uniq_name).to eq("amazing_group_name")
+        end
+      end
+
       context "with the response ready" do
         before(:each) do
           post :create, create_params
