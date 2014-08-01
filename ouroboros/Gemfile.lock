@@ -1,0 +1,18 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    bson (2.3.0)
+    connection_pool (2.0.0)
+    moped (2.0.0)
+      bson (~> 2.2)
+      connection_pool (~> 2.0)
+      optionable (~> 0.2.0)
+    optionable (0.2.0)
+    pg (0.17.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  moped
+  pg
