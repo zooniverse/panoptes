@@ -86,9 +86,14 @@ describe Api::V1::GroupsController, type: :controller do
           expect(response.headers["Location"]).to eq("http://test.host/api/groups/#{id}")
         end
 
-        it "should create a the project with the correct name" do
+        it "should create a project with the correct name" do
           created_id = created_user_group_id
           expect(UserGroup.find(created_id).name).to eq("zooniverse")
+        end
+
+        it "should create a the project with the correct display name" do
+          created_id = created_user_group_id
+          expect(UserGroup.find(created_id).display_name).to eq("Zooniverse")
         end
 
         it_behaves_like "an api response"

@@ -15,6 +15,7 @@ class Api::V1::GroupsController < Api::ApiController
 
   def create
     group = UserGroup.new(user_group_params)
+    group.display_name ||= group.name
     group.owner_name = OwnerName.new(name: group.name, resource: group)
     group.save!
     json_api_render( 201,
