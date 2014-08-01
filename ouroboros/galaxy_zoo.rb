@@ -17,7 +17,7 @@ unless zooniverse_user
     email: 'panoptes@zooniverse.org',
     password: 'asdf123456789'
   })
-  zooniverse_user.uri_name = UriName.new name: 'the_zooniverse', resource: zooniverse_user
+  zooniverse_user.owner_name = OwnerName.new name: 'the_zooniverse', resource: zooniverse_user
   zooniverse_user.save!
 end
 
@@ -72,7 +72,7 @@ user_query.each do |user|
         email: user['email'],
         password: 'asdf123456789'
       })
-      migrated_user.uri_name = UriName.new name: migrated_user.login, resource: migrated_user
+      migrated_user.owner_name = OwnerName.new name: migrated_user.login, resource: migrated_user
       
       migrated_user.save!
     rescue => e
