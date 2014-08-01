@@ -9,7 +9,7 @@ describe Api::V1::GroupsController, type: :controller do
 
   let(:api_resource_name) { "user_groups" }
   let(:api_resource_attributes) do
-    [ "id", "name", "display_name", "classifications_count", "created_at", "updated_at" ]
+    [ "id", "name", "display_name", "owner_name", "classifications_count", "created_at", "updated_at" ]
   end
   let(:api_resource_links) do
     [ "user_groups.memberships", "user_groups.users", "user_groups.projects", "user_groups.collections" ]
