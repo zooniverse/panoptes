@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140801192213) do
+ActiveRecord::Schema.define(version: 20140801191844) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -59,7 +59,6 @@ ActiveRecord::Schema.define(version: 20140801192213) do
 
   add_index "collections", ["display_name", "owner_id", "owner_type"], name: "index_collections_on_display_name_and_owner_id_and_owner_type", unique: true, using: :btree
   add_index "collections", ["name", "owner_id", "owner_type"], name: "index_collections_on_name_and_owner_id_and_owner_type", unique: true, using: :btree
-  add_index "collections", ["name"], name: "index_collections_on_name", using: :btree
   add_index "collections", ["owner_id"], name: "index_collections_on_owner_id", using: :btree
   add_index "collections", ["project_id"], name: "index_collections_on_project_id", using: :btree
 
