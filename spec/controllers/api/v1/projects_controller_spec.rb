@@ -63,7 +63,9 @@ describe Api::V1::ProjectsController, type: :controller do
 
       context "when a project doesn't have any project_contents" do
         let!(:remove_project_contents) do
-          Project.first.update_attribute(:project_contents, [])
+          project = Project.first
+          project.project_contents.each(&:destroy)
+          project.save!
         end
 
         it "should have 2 items by default" do

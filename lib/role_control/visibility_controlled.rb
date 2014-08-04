@@ -9,12 +9,21 @@ module RoleControl
 
     module ClassMethods
       def visible_to(actor)
-        roles = _roles(actor)
+        where(_where_clause(actor)).joins(_join_clause(actor))
+      end
 
-        where(_public_test.or(_owner_test(actor)).or(_roles_test(roles)))
-          .joins(arel_table.create_join(roles,
-                                        _role_join_on(roles),
-                                        Arel::Nodes::OuterJoin))
+      def _join_clause(actor)
+        roles = _roles(actor)
+        return unless roles
+        arel_table.create_join(roles, _role_join_on(roles), Arel::Nodes::OuterJoin)
+      end
+
+      def _where_clause(actor)
+        clause = _public_test
+        clause = clause.or(_owner_test(actor)) if actor.is_a?(ControlControl::Owner)
+        roles = _roles(actor)
+        clause = clause.or(_roles_test(roles)) if roles
+        clause
       end
 
       def _public_test
@@ -23,11 +32,11 @@ module RoleControl
 
       def _owner_test(actor)
         arel_table[:owner_id].eq(actor.id)
-          .and(arel_table[:owner_type].eq(actor.class.name))
+        .and(arel_table[:owner_type].eq(actor.class.name))
       end
 
       def _roles(actor)
-        actor.class.roles_query_for(actor, self).arel_table
+        actor.class.roles_query_for(actor, self).try(:arel_table)
       end
 
       def _roles_test(table)

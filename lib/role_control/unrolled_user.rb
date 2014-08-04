@@ -6,8 +6,12 @@ module RoleControl
       end
     end
 
-    def role_query_for(target)
+    def self.roles_query_for(*args)
       [EmptyRoles.new]
+    end
+
+    def roles_query_for(*args)
+      self.class.roles_query_for
     end
   end
 end

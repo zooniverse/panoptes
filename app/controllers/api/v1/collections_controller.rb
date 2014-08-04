@@ -3,9 +3,8 @@ class Api::V1::CollectionsController < Api::ApiController
 
   def show
     collection = Collection.find params[:id]
-    api_user.do_to_resource(collection, :read) do
-      render json_api: CollectionSerializer.resource(collection)
-    end
+    api_user.do(:read).to(collection).as(owner_from_params)
+      .call { render json_api: CollectionSerializer.resource(collection) }
   end
 
   def index
@@ -18,18 +17,16 @@ class Api::V1::CollectionsController < Api::ApiController
   end
 
   def create
-    collection = api_user.do_to_resource(Collection, :create, as: owner_from_params) do |owner|
-      create_for_owner(owner)
-    end
+    collection = api_user.do(:create).to(Collection).as(owner_from_params)
+      .call { |owner| create_for_owner(owner) }
     json_api_render(201,
                     CollectionSerializer.resource(collection),
                     api_collection_url(collection) )
   end
-def destroy
+  def destroy
     collection = Collection.find params[:id]
-    api_user.do_to_resource(collection, :destroy, as: owner_from_params) do
-      collection.destroy!
-    end
+    api_user.do(:destroy).to(collection).as(owner_from_params)
+      .call { collection.destroy! }
     deleted_resource_response
   end
 

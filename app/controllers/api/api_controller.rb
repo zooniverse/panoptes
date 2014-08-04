@@ -43,7 +43,7 @@ module Api
     end
 
     def api_user
-      @api_user ||= @current_resource_owner || RoleControl::UnrolledUser.new
+      @api_user ||= current_resource_owner || RoleControl::UnrolledUser.new
     end
 
     def current_languages

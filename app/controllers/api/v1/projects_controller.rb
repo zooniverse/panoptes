@@ -2,8 +2,7 @@ class Api::V1::ProjectsController < Api::ApiController
   doorkeeper_for :update, :create, :delete, scopes: [:project]
 
   def show
-    project = Project.find(params[:id])
-    api_user.do_to_resource(project, :read) do 
+    api_user.do(:read).to(project).as(owner_from_params).call do 
       render json_api: ProjectSerializer.resource(project,
                                                   nil,
                                                   languages: current_languages,
@@ -27,9 +26,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create
-    project = api_user.do_to_resource(Project, :create, as: owner_from_params) do |owner|
-      create_project(owner)
-    end
+    project = api_user.do(:create).to(Project).as(owner_from_params)
+      .call { |owner| create_project(owner) }
 
     json_api_render(201,
                     create_project_response(project),
@@ -37,16 +35,15 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def destroy
-    api_user.do_to_resource(project, :destroy, as: owner_from_params) do |owner, project|
-      project.destroy
-    end
+    api_user.do(:destroy).to(project).as(owner_from_params)
+      .call { project.destroy }
     deleted_resource_response
   end
 
   private
 
   def project
-    Project.find(params[:id])
+    @project ||= Project.find(params[:id])
   end
 
   def add_owner_ids_filter_param!
