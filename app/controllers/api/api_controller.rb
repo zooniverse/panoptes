@@ -45,7 +45,7 @@ module Api
 
     def current_languages
       param_langs  = [ params[:language] ]
-      user_langs   = current_resource_owner.languages
+      user_langs   = user_accept_languages
       header_langs = parse_http_accept_language
       ( param_langs | user_langs | header_langs ).compact
     end
@@ -59,8 +59,18 @@ module Api
       render status: status, json_api: content, location: location
     end
 
+    def user_accept_languages
+      if owner = current_resource_owner
+        owner.languages
+      else
+        []
+      end
+    end
+
     def parse_http_accept_language
-      request.env['HTTP_ACCEPT_LANGUAGE'].gsub(/\s+/, '').split(',').map do |lang|
+      accept_lang = request.env['HTTP_ACCEPT_LANGUAGE']
+      return [] if accept_lang.nil?
+      accept_lang.gsub(/\s+/, '').split(',').map do |lang|
         lang, priority = lang.split(";q=")
         lang = lang.downcase
         priority = priority ? priority.to_f : 1.0
