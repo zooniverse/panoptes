@@ -46,7 +46,7 @@ module Api
     def current_languages
       param_langs  = [ params[:language] ]
       user_langs   = user_accept_languages
-      header_langs = parse_http_accept_language
+      header_langs = parse_http_accept_languages
       ( param_langs | user_langs | header_langs ).compact
     end
 
@@ -67,17 +67,9 @@ module Api
       end
     end
 
-    def parse_http_accept_language
-      accept_lang = request.env['HTTP_ACCEPT_LANGUAGE']
-      return [] if accept_lang.nil?
-      accept_lang.gsub(/\s+/, '').split(',').map do |lang|
-        lang, priority = lang.split(";q=")
-        lang = lang.downcase
-        priority = priority ? priority.to_f : 1.0
-        [lang, priority]
-      end.sort do |(_, left), (_, right)|
-        right <=> left
-      end.map(&:first)
+    def parse_http_accept_languages
+      language_extractor = AcceptLanguageExtractor.new(request.env['HTTP_ACCEPT_LANGUAGE'])
+      language_extractor.parse_languages
     end
 
     def deleted_resource_response
