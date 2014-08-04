@@ -42,6 +42,10 @@ module Api
       @current_resource_owner ||= User.find(doorkeeper_token.resource_owner_id) if doorkeeper_token
     end
 
+    def api_user
+      @api_user ||= @current_resource_owner || RoleControl::UnrolledUser.new
+    end
+
     def current_languages
       param_langs  = [ params[:language] ]
       user_langs   = user_accept_languages
@@ -49,7 +53,6 @@ module Api
       ( param_langs | user_langs | header_langs ).compact
     end
 
-    alias_method :pundit_user, :current_resource_owner
     alias_method :user_for_paper_trail, :current_resource_owner
 
     protected
@@ -59,11 +62,7 @@ module Api
     end
 
     def user_accept_languages
-      if owner = current_resource_owner
-        owner.languages
-      else
-        []
-      end
+      api_user.try(:languages) || []
     end
 
     def parse_http_accept_languages

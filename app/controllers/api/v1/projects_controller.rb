@@ -3,7 +3,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def show
     project = Project.find(params[:id])
-    current_resource_owner.do_to_resource(project, :read) do 
+    api_user.do_to_resource(project, :read) do 
       render json_api: ProjectSerializer.resource(project,
                                                   nil,
                                                   languages: current_languages,
@@ -17,7 +17,7 @@ class Api::V1::ProjectsController < Api::ApiController
   def index
     add_owner_ids_filter_param!
     render json_api: ProjectSerializer.page(params,
-                                            Project.visible_to(current_resource_owner),
+                                            Project.visible_to(api_user),
                                             languages: current_languages,
                                             fields: ['title', 'description'])
   end
@@ -27,7 +27,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create
-    project = current_resource_owner.do_to_resource(Project, :create, as: owner_from_params) do |owner|
+    project = api_user.do_to_resource(Project, :create, as: owner_from_params) do |owner|
       create_project(owner)
     end
 
@@ -37,7 +37,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def destroy
-    current_resource_owner.do_to_resource(project, :destroy, as: owner_from_params) do |owner, project|
+    api_user.do_to_resource(project, :destroy, as: owner_from_params) do |owner, project|
       project.destroy
     end
     deleted_resource_response

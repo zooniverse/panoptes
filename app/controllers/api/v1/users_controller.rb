@@ -12,7 +12,7 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def me
-    render json_api: UserSerializer.resource(current_resource_owner)
+    render json_api: UserSerializer.resource(api_user)
   end
 
   def update

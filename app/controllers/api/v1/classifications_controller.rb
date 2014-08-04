@@ -12,7 +12,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   def create
     classification = Classification.new(creation_params)
     classification.user_ip = request_ip
-    if user = current_resource_owner
+    if user = api_user
       update_cellect
       classification.user = user
     end
@@ -29,10 +29,10 @@ class Api::V1::ClassificationsController < Api::ApiController
   private
 
   def create_project_preference
-    return unless current_resource_owner
-    UserProjectPreference.where(user: current_resource_owner, **preference_params)
+    return unless api_user
+    UserProjectPreference.where(user: api_user, **preference_params)
       .first_or_create do |up|
-        up.email_communication = current_resource_owner.project_email_communication
+        up.email_communication = api_user.project_email_communication
         up.preferences = {}
       end
   end
@@ -51,7 +51,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def cellect_params
     permitted_cellect_params
-      .merge(user_id: current_resource_owner.id,
+      .merge(user_id: api_user.id,
              host: cellect_host(params[:workflow_id]))
       .symbolize_keys
   end
