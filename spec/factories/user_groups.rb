@@ -10,9 +10,7 @@ FactoryGirl.define do
 
     factory :user_group_with_users do
       after(:create) do |ug|
-        create_list(:membership, 2, user_group: ug)
-        ug.reload
-        ug.users.map { |user| user.add_role(:group_admin, ug) }
+        create_list(:membership, 2, roles: [:group_admin], user_group: ug)
       end
     end
 

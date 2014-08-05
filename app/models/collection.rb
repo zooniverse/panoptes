@@ -12,5 +12,5 @@ class Collection < ActiveRecord::Base
   validates_uniqueness_of :name, case_sensitive: false, scope: :owner
   validates_uniqueness_of :display_name, scope: :owner
 
-  can :edit, :collaborator
+  can_by_role :update, :collaborator
 end

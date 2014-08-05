@@ -29,6 +29,7 @@ class Api::V1::GroupsController < Api::ApiController
     deleted_resource_response
   end
 
+  default_access_control resource_class: UserGroup
   private
 
   def user_group_params

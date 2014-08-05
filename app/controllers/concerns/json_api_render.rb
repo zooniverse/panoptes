@@ -8,6 +8,10 @@ module JSONApiRender
     end
   end
 
+  def json_api_render(status, content, location=nil)
+    render status: status, json_api: content, location: location
+  end
+
   private
 
     class JSONApiResponse

@@ -7,6 +7,8 @@ module Api
 
   class ApiController < ApplicationController
     include JSONApiRender
+    include JSONApiResponses
+    include RoleControl::RoledController
 
     API_ACCEPTED_CONTENT_TYPE = 'application/json'
     API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
@@ -57,9 +59,6 @@ module Api
 
     protected
 
-    def json_api_render(status, content, location=nil)
-      render status: status, json_api: content, location: location
-    end
 
     def user_accept_languages
       api_user.try(:languages) || []
@@ -68,34 +67,6 @@ module Api
     def parse_http_accept_languages
       language_extractor = AcceptLanguageExtractor.new(request.env['HTTP_ACCEPT_LANGUAGE'])
       language_extractor.parse_languages
-    end
-
-    def deleted_resource_response
-      json_api_render(:no_content, {})
-    end
-
-    def not_authenticated(exception)
-      json_api_render(:unauthorized, exception)
-    end
-
-    def not_authorized(exception)
-      json_api_render(:forbidden, exception)
-    end
-
-    def not_found(exception)
-      json_api_render(:not_found, exception)
-    end
-
-    def invalid_record(exception)
-      json_api_render(:bad_request, exception)
-    end
-
-    def unsupported_media_type(exception)
-      json_api_render(:unsupported_media_type, exception)
-    end
-
-    def unprocessable_entity(exception)
-      json_api_render(:unprocessable_entity, exception)
     end
 
     def cellect_host(workflow_id)
@@ -110,11 +81,6 @@ module Api
     def request_ip
       request.remote_ip
     end
-
-    def owner_from_params
-      OwnerName.where(name: params[:owner]).first.try(:resource)
-    end
-
     private
 
     def revoke_doorkeeper_request_token!

@@ -7,17 +7,16 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def show
-    user = User.find(params[:id])
-    render json_api: UserSerializer.resource(user)
+    render json_api: UserSerializer.resource(resource)
   end
 
   def me
-    render json_api: UserSerializer.resource(api_user)
+    render json_api: UserSerializer.resource(current_resource_owner)
   end
 
   def update
     response_status, response = begin
-      user = User.find(params[:id])
+      user = resource
       user.update!(request_update_attributes(user))
       [ :ok, UserSerializer.resource(user) ]
     rescue Api::PatchResourceError, ActiveRecord::RecordInvalid => e
@@ -27,11 +26,13 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def destroy
-    user = User.find(params[:id])
+    user = resource
     sign_out if current_user && (current_user == user)
     UserInfoScrubber.scrub_personal_info!(user)
     Activation.disable_instances!([ user ] | user.projects | user.collections | user.memberships)
     revoke_doorkeeper_request_token!
     deleted_resource_response
   end
+
+  default_access_control resource_class: User, except: [:create]
 end

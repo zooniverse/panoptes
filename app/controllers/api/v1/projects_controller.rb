@@ -2,21 +2,19 @@ class Api::V1::ProjectsController < Api::ApiController
   doorkeeper_for :update, :create, :delete, scopes: [:project]
 
   def show
-    api_user.do(:read).to(project).as(owner_from_params).call do 
-      render json_api: ProjectSerializer.resource(project,
-                                                  nil,
-                                                  languages: current_languages,
-                                                  fields: ['title',
-                                                           'description',
-                                                           'example_strings',
-                                                           'pages'])
-    end
+    render json_api: ProjectSerializer.resource(resource,
+                                                nil,
+                                                languages: current_languages,
+                                                fields: ['title',
+                                                         'description',
+                                                         'example_strings',
+                                                         'pages'])
   end
 
   def index
     add_owner_ids_filter_param!
     render json_api: ProjectSerializer.page(params,
-                                            Project.visible_to(api_user),
+                                            visible_scope(api_user),
                                             languages: current_languages,
                                             fields: ['title', 'description'])
   end
@@ -26,8 +24,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create
-    project = api_user.do(:create).to(Project).as(owner_from_params)
-      .call { |owner| create_project(owner) }
+    owner = owner_from_params || current_resource_owner
+    project = create_project(owner)
 
     json_api_render(201,
                     create_project_response(project),
@@ -35,16 +33,13 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def destroy
-    api_user.do(:destroy).to(project).as(owner_from_params)
-      .call { project.destroy }
+    resource.destroy
     deleted_resource_response
   end
 
-  private
+  default_access_control resource_class: Project
 
-  def project
-    @project ||= Project.find(params[:id])
-  end
+  private
 
   def add_owner_ids_filter_param!
     owner_filter = params.delete(:owner)

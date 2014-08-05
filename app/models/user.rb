@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  extend ControlControl::Resource
   include Nameable
   include Activatable
   include ControlControl::Owner
@@ -32,6 +33,10 @@ class User < ActiveRecord::Base
 
   validates :login, presence: true, uniqueness: true
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
+
+  can :show, proc { |requester| requester == self }
+  can :update, proc { |requester| requester == self }
+  can :destroy, proc { |requester| requester == self }
 
   attr_accessor :migrated_user
 

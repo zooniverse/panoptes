@@ -16,6 +16,6 @@ class Project < ActiveRecord::Base
   validates_uniqueness_of :name, case_sensitive: false, scope: :owner
   validates_uniqueness_of :display_name, scope: :owner
 
-  can_by_role :edit, :collaborator
+  can_by_role :update, :collaborator
   can_by_role :destroy, :collaborator
 end
