@@ -1,16 +1,17 @@
 module RoleControl
   module VisibilityControlled
-    def self.included(mod)
-      mod.extend(ClassMethods)
-      mod.module_eval do
-        can :read, :check_read_roles
-      end
+    extend ActiveSupport::Concern
+
+    included do
+      can :show, :check_read_roles
     end
 
     module ClassMethods
       def visible_to(actor)
         where(_where_clause(actor)).joins(_join_clause(actor))
       end
+
+      protected
 
       def _join_clause(actor)
         roles = _roles(actor)
@@ -55,6 +56,8 @@ module RoleControl
     def check_read_roles(enrolled)
       roles = enrolled.roles_query_for(self).first.try(:roles)
       return false if roles.blank?
+      return true if visible_to.empty?
+      p !(Set.new(roles) & Set.new(visible_to.map(&:to_s))).empty?
       !(Set.new(roles) & Set.new(visible_to.map(&:to_s))).empty?
     end
   end

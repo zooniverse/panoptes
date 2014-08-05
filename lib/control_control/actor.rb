@@ -14,15 +14,19 @@ module ControlControl
         self
       end
 
-      def as(resource)
-        return self if resource.nil?
+      def as(resource, allow_nil: true)
+        return self if !allow_nil && resource.nil?
         error unless resource.send(as_question, target, actor)
         @actor = resource
         self
       end
 
-      def call(&block)
-        block.call(actor, resource)
+      def call(no_args: false, &block)
+        unless no_args
+          block.call(actor, resource)
+        else
+          block.call
+        end
       end
 
       def allowed?

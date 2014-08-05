@@ -1,8 +1,6 @@
 module ControlControl
   module Owner
-    def self.included(mod)
-      mod.extend(ClassMethods)
-    end
+    extend ActiveSupport::Concern
 
     module ClassMethods
       def owns(resource, **attributes)
