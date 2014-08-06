@@ -16,7 +16,7 @@ module ControlControl
 
       def as(resource, allow_nil: true)
         return self if !allow_nil && resource.nil?
-        error unless resource.send(as_question, target, actor)
+        error unless resource.send(as_question, resource, actor)
         @actor = resource
         self
       end

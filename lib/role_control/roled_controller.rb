@@ -9,7 +9,7 @@ module RoleControl
         end
 
         old_action = alias_action(action) 
-        define_method action do 
+        define_method action do
           actor(block || actor_method).do(action)
             .to(resource)
             .as(owner_from_params, allow_nil: false)

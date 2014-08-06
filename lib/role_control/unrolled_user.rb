@@ -1,13 +1,17 @@
 module RoleControl
-  class UnrolledUser
+  module UnrolledUser
+    extend ActiveSupport::Concern
+    
     class EmptyRoles 
       def roles
         []
       end
     end
 
-    def self.roles_query_for(*args)
-      [EmptyRoles.new]
+    module ClassMethods
+      def roles_query_for(*args)
+        [EmptyRoles.new]
+      end
     end
 
     def roles_query_for(*args)

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ControlControl::Resource do
-  let(:fake_class) { Class.new { include(ControlControl::Resource) } }
+  let(:fake_class) { Class.new { extend(ControlControl::Resource) } }
 
   describe "::can" do
     it 'should define a instance method is one has not been defined' do

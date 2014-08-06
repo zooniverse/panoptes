@@ -55,8 +55,8 @@ module RoleControl
 
     def check_read_roles(enrolled)
       roles = enrolled.roles_query_for(self).first.try(:roles)
-      return false if roles.blank?
       return true if visible_to.empty?
+      return false if roles.blank?
       p !(Set.new(roles) & Set.new(visible_to.map(&:to_s))).empty?
       !(Set.new(roles) & Set.new(visible_to.map(&:to_s))).empty?
     end
