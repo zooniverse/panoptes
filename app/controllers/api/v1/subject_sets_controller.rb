@@ -22,10 +22,12 @@ class Api::V1::SubjectSetsController < Api::ApiController
   end
 
   def destroy
-    subject_set = SubjectSet.find params[:id]
+    subject_set = resource
     subject_set.destroy!
     deleted_resource_response
   end
+
+  default_access_control resource_class: SubjectSet
 
   private
 

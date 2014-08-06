@@ -12,12 +12,12 @@ class Api::V1::ClassificationsController < Api::ApiController
   def create
     classification = Classification.new(creation_params)
     classification.user_ip = request_ip
-    if user = api_user
+    if api_user.logged_in?
       update_cellect
-      classification.user = user
+      classification.user = api_user
     end
     if classification.save!
-      uss_params = user_seen_subject_params(user)
+      uss_params = user_seen_subject_params(api_user)
       UserSeenSubjectUpdater.update_user_seen_subjects(uss_params)
       create_project_preference
       json_api_render( 201,
@@ -29,7 +29,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   private
 
   def create_project_preference
-    return unless api_user
+    return unless api_user.logged_in?
     UserProjectPreference.where(user: api_user, **preference_params)
       .first_or_create do |up|
         up.email_communication = api_user.project_email_communication
@@ -70,10 +70,9 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def user_seen_subject_params(user)
-    user_id = user ? user.id : nil
     params = permitted_cellect_params
                .slice(:subject_id, :workflow_id)
-               .merge(user_id: user_id)
+               .merge(user_id: user.id)
     params.symbolize_keys
   end
 end

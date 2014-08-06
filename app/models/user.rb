@@ -5,8 +5,7 @@ class User < ActiveRecord::Base
   include ControlControl::Owner
   include RoleControl::Enrolled
 
-  attr_accessible :name, :email, :password, :login, :migrated_user,
-    :display_name, :credited_name, :global_email_communication,
+  attr_accessible :name, :email, :password, :login, :migrated_user, :display_name, :credited_name, :global_email_communication,
     :project_email_communication
 
   devise :database_authenticatable, :registerable,
@@ -20,7 +19,7 @@ class User < ActiveRecord::Base
   has_many :user_collection_preferences
 
   has_many :memberships
-  has_many :active_memberships, -> {  where state: :active }, class_name: 'Membership'
+  has_many :active_memberships, -> { active }, class_name: 'Membership'
   
   owns :projects
   owns :collections
@@ -85,6 +84,10 @@ class User < ActiveRecord::Base
 
   def email_changed?
     authorizations.blank?
+  end
+
+  def logged_in?
+    true
   end
 
   protected

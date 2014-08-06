@@ -2,7 +2,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   doorkeeper_for :update, :create, :delete, scopes: [:project]
 
   def show
-    workflow = Workflow.find(params[:id])
     load_cellect
     render json_api: WorkflowSerializer.resource(params)
   end
@@ -24,11 +23,13 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def destroy
-    workflow = Workflow.find params[:id]
+    workflow = resource
     workflow.destroy!
     deleted_resource_response
   end
 
+  default_access_control resource_class: Workflow
+  
   private
 
   def creation_params

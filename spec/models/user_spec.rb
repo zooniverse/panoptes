@@ -241,7 +241,7 @@ describe User, :type => :model do
     it_behaves_like "it has a cached counter for classifications"
   end
 
-  describe "#do_to_resource" do
+  describe "#do" do
     let(:user) { create(:user) }
     let(:project) { create(:project) }
     let!(:user_project_preference) do
@@ -253,18 +253,20 @@ describe User, :type => :model do
 
     let(:test_proc) { proc { true } }
 
-    it 'should be allowed to edit the resource' do
-      result = user.do_to_resource(project, :edit, &test_proc)
+    it 'should be allowed to update the resource' do
+      result = user.do(:update).to(project).call &test_proc
       expect(result).to be_truthy
     end
 
-    it 'should be allowed to read the resource' do
-      result = user.do_to_resource(project, :read, &test_proc)
+    it 'should be allowed to show the resource' do
+      result = user.do(:show).to(project).call &test_proc
       expect(result).to be_truthy
     end
     
     it 'should not be allowed to destroy the resource' do
-      expect{user.do_to_resource(project, :delete, &test_proc)}.to raise_error
+      user_project_preference.roles = []
+      user_project_preference.save!
+      expect{user.do(:destroy).to(project).call &test_proc}.to raise_error
     end
   end
 end

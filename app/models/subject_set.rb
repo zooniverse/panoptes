@@ -1,4 +1,6 @@
 class SubjectSet < ActiveRecord::Base
+  extend RoleControl::ParentalControlled
+  
   attr_accessible :name, :project_id
   
   belongs_to :project
@@ -7,4 +9,8 @@ class SubjectSet < ActiveRecord::Base
   has_and_belongs_to_many :workflows
 
   validates_presence_of :project
+
+  can_by_role_through_parent :update, :project
+  can_by_role_through_parent :show, :project
+  can_by_role_through_parent :destroy, :project
 end
