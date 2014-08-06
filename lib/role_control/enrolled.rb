@@ -2,11 +2,8 @@ require 'control_control/actor'
 
 module RoleControl
   module Enrolled
+    extend ActiveSupport::Concern
     include ControlControl::Actor
-
-    def self.included(mod)
-      mod.extend(ClassMethods)
-    end
 
     module ClassMethods
       def roles_for(klass, role_association, roles_field=:roles)

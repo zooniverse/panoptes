@@ -3,7 +3,10 @@ require 'spec_helper'
 class Owned < ActiveRecord::Base
   extend ControlControl::Resource
   include ControlControl::Ownable
-  self.table_name = "collections"
+
+  def self.table_name
+    "collections"
+  end
 end
 
 describe ControlControl::Ownable, type: :model do

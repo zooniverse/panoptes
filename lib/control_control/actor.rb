@@ -1,7 +1,7 @@
 module ControlControl
   module Actor
     class Action
-      attr_reader :resource, :actor
+      attr_reader :target, :actor
 
       def initialize(action_name, actor) 
         @action = action_name
@@ -10,20 +10,20 @@ module ControlControl
 
       def to(resource)
         error unless resource.send(question, actor)
-        @resource = resource
+        @target = resource
         self
       end
 
       def as(resource, allow_nil: true)
         return self if !allow_nil && resource.nil?
-        error unless resource.send(as_question, resource, actor)
+        error unless resource.send(as_question, actor, target)
         @actor = resource
         self
       end
 
       def call(no_args: false, &block)
         unless no_args
-          block.call(actor, resource)
+          block.call(actor, target)
         else
           block.call
         end
