@@ -5,11 +5,9 @@ describe Collection, :type => :model do
   let(:owned) { collection }
   let(:not_owned) { build(:collection, owner: nil) }
   let(:activatable) { collection }
-  let(:visible) { collection }
 
   it_behaves_like "is ownable"
   it_behaves_like "activatable"
-  it_behaves_like "has visibility controls"
 
   it "should have a valid factory" do
     expect(build(:collection)).to be_valid

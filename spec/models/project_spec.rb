@@ -6,14 +6,12 @@ describe Project, :type => :model do
   let(:not_owned) { build(:project, owner: nil) }
   let(:subject_relation) { create(:project_with_subjects) }
   let(:activatable) { project }
-  let(:visible) { project }
   let(:translatable) { create(:project_with_contents) }
   let(:primary_language_factory) { :project }
 
   it_behaves_like "is ownable"
   it_behaves_like "has subject_count"
   it_behaves_like "activatable"
-  #it_behaves_like "has visibility controls"
   it_behaves_like "is translatable"
 
   it "should have a valid factory" do
