@@ -19,6 +19,7 @@ RSpec.configure do |config|
   config.include APIRequestHelpers, type: :controller
   config.include APIResponseHelpers, [ type: :controller, type: :request ]
   config.include CellectHelpers, type: :controller
+  config.extend RSpec::Helpers::ActiveRecordMocks
 
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
