@@ -90,6 +90,10 @@ class User < ActiveRecord::Base
     true
   end
 
+  def is_admin?
+    admin
+  end
+
   protected
 
   def migrated_user?

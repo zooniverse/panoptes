@@ -1,6 +1,7 @@
 class Collection < ActiveRecord::Base
   extend RoleControl::Controlled
   include ControlControl::Ownable
+  include ControlControl::Adminable
   include RoleControl::VisibilityControlled
   include Activatable
   

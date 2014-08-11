@@ -2,6 +2,7 @@ class Project < ActiveRecord::Base
   extend RoleControl::Controlled
   include RoleControl::VisibilityControlled
   include ControlControl::Ownable
+  include ControlControl::Adminable
   include SubjectCounts
   include Activatable
   include Translatable

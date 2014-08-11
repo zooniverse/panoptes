@@ -3,6 +3,7 @@ class UserGroup < ActiveRecord::Base
   include Nameable
   include Activatable
   include ControlControl::Owner
+  include ControlControl::Adminable
 
   attr_accessible :name, :display_name
 
