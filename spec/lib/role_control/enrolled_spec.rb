@@ -39,14 +39,14 @@ describe RoleControl::Enrolled do
 
     it 'should produce matching sql for a general class query' do
       sql = subject.roles_query_for(instance, target.class).to_sql
-      matched_sql = "SELECT roles as roles, group_table_id FROM \"__membership_table\"  WHERE \"__membership_table\".\"role_model_table_id\" = #{ instance.id }"
-      expect(sql).to eq(matched_sql)
+      matched_sql = /SELECT roles as roles, group_table_id FROM \"__membership_table\"  WHERE \"__membership_table\".\"role_model_table_id\" = (#{ instance.id }|\$1)/
+      expect(sql).to match(matched_sql)
     end
 
     it 'should produce matching sql for a specific instance' do
       sql = subject.roles_query_for(instance, target.class, target.id).to_sql
-      matched_sql = "SELECT roles as roles, group_table_id FROM \"__membership_table\"  WHERE \"__membership_table\".\"role_model_table_id\" = #{ instance.id } AND \"__membership_table\".\"group_table_id\" = #{ target.id }"
-      expect(sql).to eq(matched_sql)
+      matched_sql = /SELECT roles as roles, group_table_id FROM \"__membership_table\"  WHERE \"__membership_table\".\"role_model_table_id\" = (#{ instance.id }|\$1) AND \"__membership_table\".\"group_table_id\" = #{ target.id }/
+      expect(sql).to match(matched_sql)
     end
 
   end
