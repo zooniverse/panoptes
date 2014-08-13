@@ -32,7 +32,7 @@ module RoleControl
       end
       
       def roles_query
-        query = actor.class.roles_query_for(actor, @parent)
+        query = actor.roles_query_for(@parent)
         arel_query = query.try(:arel).try(:as, "roles_query")
         binds = query.try(:bind_values)
         return unless arel_query

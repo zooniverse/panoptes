@@ -12,7 +12,7 @@ module ControlControl
     end
 
     def owner?(actor)
-      owner == actor
+      owner == actor || owner == actor.try(:owner)
     end
   end
 end

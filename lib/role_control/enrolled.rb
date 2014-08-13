@@ -22,7 +22,8 @@ module RoleControl
     end
 
     def roles_query_for(target)
-      self.class.roles_query_for(self, target.class, target.id)
+      target_class = (target.is_a?(Class)) ? target : target.class
+      self.class.roles_query_for(self, target_class, target.try(:id))
     end
   end
 end

@@ -24,7 +24,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create
-    owner = owner_from_params || current_resource_owner
+    owner = owner_from_params || api_user.user
     project = create_project(owner)
 
     json_api_render(201,

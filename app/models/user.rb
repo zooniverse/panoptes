@@ -33,9 +33,9 @@ class User < ActiveRecord::Base
   validates :login, presence: true, uniqueness: true
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
 
-  can :show, proc { |requester| requester == self }
-  can :update, proc { |requester| requester == self }
-  can :destroy, proc { |requester| requester == self }
+  can :show, proc { |requester| requester.user == self }
+  can :update, proc { |requester| requester.user == self }
+  can :destroy, proc { |requester| requester.user == self }
 
   attr_accessor :migrated_user
 
@@ -84,14 +84,6 @@ class User < ActiveRecord::Base
 
   def email_changed?
     authorizations.blank?
-  end
-
-  def logged_in?
-    true
-  end
-
-  def is_admin?
-    admin
   end
 
   protected

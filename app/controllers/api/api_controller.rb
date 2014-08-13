@@ -45,7 +45,11 @@ module Api
     end
 
     def api_user
-      @api_user ||= current_resource_owner || LoggedOutUser.new
+      @api_user ||= if current_resource_owner
+                      LoggedInUser.new(current_resource_owner)
+                    else
+                      LoggedOutUser.new
+                    end
     end
 
     def current_languages
@@ -80,7 +84,7 @@ module Api
     def request_ip
       request.remote_ip
     end
-    
+
     private
 
     def revoke_doorkeeper_request_token!

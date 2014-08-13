@@ -14,7 +14,7 @@ class Api::V1::CollectionsController < Api::ApiController
   end
 
   def create
-    owner = owner_from_params || api_user
+    owner = owner_from_params || api_user.user
     collection = create_for_owner(owner)
     json_api_render(201,
                     CollectionSerializer.resource(collection),

@@ -14,7 +14,7 @@ class Api::V1::ClassificationsController < Api::ApiController
     classification.user_ip = request_ip
     if api_user.logged_in?
       update_cellect
-      classification.user = api_user
+      classification.user = api_user.user
     end
     if classification.save!
       uss_params = user_seen_subject_params(api_user)
@@ -30,9 +30,9 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def create_project_preference
     return unless api_user.logged_in?
-    UserProjectPreference.where(user: api_user, **preference_params)
+    UserProjectPreference.where(user: api_user.user, **preference_params)
       .first_or_create do |up|
-        up.email_communication = api_user.project_email_communication
+        up.email_communication = api_user.user.project_email_communication
         up.preferences = {}
       end
   end

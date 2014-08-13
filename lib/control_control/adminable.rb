@@ -9,7 +9,7 @@ module ControlControl
     end
 
     def admin?(actor)
-      actor.is_admin?
+      actor.try(:is_admin?)
     end
   end
 end
