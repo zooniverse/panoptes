@@ -1,5 +1,5 @@
 class Workflow < ActiveRecord::Base
-  extend RoleControl::ParentalControlled
+  include RoleControl::ParentalControlled
   include SubjectCounts
   include Translatable
 

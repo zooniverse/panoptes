@@ -24,7 +24,7 @@ def setup_role_control_tables
   end
   
   GroupTable.class_eval do
-    extend RoleControl::Controlled
+    include RoleControl::Controlled
     can_by_role :read, :test_role
   end
 end

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 class TestParentControl
-  extend RoleControl::ParentalControlled
+  include RoleControl::ParentalControlled
 
   can_by_role_through_parent :read, :parent
   can_by_role_through_parent :edit, :parent, :test_parent_role

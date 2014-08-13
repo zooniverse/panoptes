@@ -1,5 +1,5 @@
 class UserGroup < ActiveRecord::Base
-  extend RoleControl::ActAsControlled
+  include RoleControl::ActAsControlled
   include Nameable
   include Activatable
   include ControlControl::Owner

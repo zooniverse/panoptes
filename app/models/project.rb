@@ -1,5 +1,5 @@
 class Project < ActiveRecord::Base
-  extend RoleControl::Controlled
+  include RoleControl::Controlled
   include RoleControl::VisibilityControlled
   include ControlControl::Ownable
   include ControlControl::Adminable

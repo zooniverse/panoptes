@@ -1,5 +1,5 @@
 class SubjectSet < ActiveRecord::Base
-  extend RoleControl::ParentalControlled
+  include RoleControl::ParentalControlled
   
   attr_accessible :name, :project_id
   

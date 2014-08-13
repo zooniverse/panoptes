@@ -1,5 +1,5 @@
 class SetMemberSubject < ActiveRecord::Base
-  extend RoleControl::ParentalControlled
+  include RoleControl::ParentalControlled
   
   belongs_to :subject_set, counter_cache: true
   belongs_to :subject
