@@ -59,7 +59,6 @@ module Api
 
     protected
 
-
     def user_accept_languages
       api_user.try(:languages) || []
     end
@@ -81,6 +80,7 @@ module Api
     def request_ip
       request.remote_ip
     end
+    
     private
 
     def revoke_doorkeeper_request_token!
