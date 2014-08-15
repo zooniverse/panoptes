@@ -13,5 +13,6 @@ class Collection < ActiveRecord::Base
   validates_uniqueness_of :name, case_sensitive: false, scope: :owner
   validates_uniqueness_of :display_name, scope: :owner
 
-  can_by_role :update, :collaborator
+  can_by_role :update, roles: [ :collaborator ]
+  can_by_role :read, roles: :visible_to
 end

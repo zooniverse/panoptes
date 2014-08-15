@@ -20,6 +20,7 @@ module RSpec
 
       def create_temp_table(table, &block)
         before :all do
+          "HERE!"
           ActiveRecord::Migration.suppress_messages do
             ActiveRecord::Migration.create_table "__#{table}_table",
               :temporary => true do |t|

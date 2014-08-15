@@ -1,6 +1,5 @@
 class Project < ActiveRecord::Base
   include RoleControl::Controlled
-  include RoleControl::VisibilityControlled
   include ControlControl::Ownable
   include ControlControl::Adminable
   include SubjectCounts
@@ -17,6 +16,7 @@ class Project < ActiveRecord::Base
   validates_uniqueness_of :name, case_sensitive: false, scope: :owner
   validates_uniqueness_of :display_name, scope: :owner
 
-  can_by_role :update, :collaborator
-  can_by_role :destroy, :collaborator
+  can_by_role :update, roles: [ :collaborator ] 
+  can_by_role :destroy, roles: [ :collaborator ]
+  can_by_role :show, roles: :visible_to
 end

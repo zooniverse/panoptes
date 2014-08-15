@@ -4,33 +4,36 @@ module RoleControl
   module Controlled
     extend ActiveSupport::Concern
 
+    included do
+      @roles_for = Hash.new 
+    end
+
     module ClassMethods
       include ControlControl::Resource
+      include ControlControl::ActAs
 
-      def can_by_role(action, *permitted_roles)
-        can action, &role_test_proc(permitted_roles)
+      def can_by_role(action, act_as: nil, roles: nil)
+        @roles_for[action] = RoleQuery.new(roles, self)
+        can action, &role_test_proc(action)
+        can_as action, &role_test_proc(action) if act_as
       end
 
       def can_create?(actor, *args)
         !actor.blank?
       end
+      
+      def scope_for(action, actor)
+        query = @roles_for[action].build(actor)
+        actor.global_scopes(query)
+      end
 
       protected
 
-      def role_test_proc(permitted_roles)
+      def role_test_proc(action)
         proc do |enrolled|
-          roles = enrolled.roles_query_for(self)
-            .first.try(:roles)
-          test_roles(roles, permitted_roles)
+          self.class.exists_in_scope_for(action, enrolled).exists?(self)
         end
       end
-    end
-
-    protected
-
-    def test_roles(roles, permitted_roles)
-      return false if roles.blank?
-      !(Set.new(roles) & Set.new(permitted_roles.map(&:to_s))).empty?
     end
   end
 end

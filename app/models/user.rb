@@ -26,9 +26,9 @@ class User < ActiveRecord::Base
   owns :subjects
   owns :oauth_applications, class_name: "Doorkeeper::Application"
 
-  roles_for Project, :user_project_preferences
-  roles_for Collection, :user_collection_preferences
-  roles_for UserGroup, :active_memberships
+  enrolled_for :projects, through: :user_project_preferences
+  enrolled_for :collections, through: :user_collection_preferences
+  enrolled_for :user_groups, through: :active_memberships
 
   validates :login, presence: true, uniqueness: true
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?

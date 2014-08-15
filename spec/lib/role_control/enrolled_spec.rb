@@ -3,61 +3,48 @@ require 'spec_helper'
 describe RoleControl::Enrolled do
   setup_role_control_tables
   
-  let(:subject) { RoleModelTable }
+  let(:subject) { EnrolledTable }
+  let(:instance) { subject.new }
+  let(:target) { ControlledTable.new }
+
+  before(:each) do
+    instance.save!
+    target.save!
+    mt = RoleModelTable.new(roles: ["test_role"])
+    mt.enrolled_table = instance
+    mt.controlled_table = target
+    mt.save!
+  end
   
-  describe "::roles_for" do
-    it 'should can entry to the roles_for Hash' do
-      subject.instance_eval { roles_for Object, :association, :roles_field }
-      expect(subject.instance_variable_get(:@roles_for)[Object]).to eq([:association,
-                                                                        :roles_field])
-      
-    end
-
-    it 'should use :roles as the default name for the roles field' do
-      subject.instance_eval { roles_for Object, :association }
-      expect(subject.instance_variable_get(:@roles_for)[Object]).to eq([:association,
-                                                                        :roles])
-    end
-  end
-
-  describe "::roles_query_for" do
-    let(:instance) { subject.new }
-    let(:target) { GroupTable.new }
-
+  describe "::enrolled_for" do
     before(:each) do
-      instance.save!
-      target.save!
-      mt = MembershipTable.new(roles: ["test_role"])
-      mt.role_model_table_id = instance.id
-      mt.group_table_id = target.id
-      mt.save!
+      subject.instance_eval { enrolled_for :objects, through: :association }
+    end
+    
+    it 'should can entry to the enrolled_for hash' do
+      expect(subject.instance_variable_get(:@enrolled_for)[Object])
+        .to eq(:association)
     end
 
-    it 'should return an AR relation' do
-      expect(subject.roles_query_for(instance, target.class)).to be_a(ActiveRecord::Relation)
+    it 'should define a method based on the supplied controlled relation' do
+      expect(subject.new).to respond_to(:objects)
     end
-
-    it 'should produce matching sql for a general class query' do
-      sql = subject.roles_query_for(instance, target.class).to_sql
-      matched_sql = /SELECT roles as roles, group_table_id FROM \"__membership_table\"  WHERE \"__membership_table\".\"role_model_table_id\" = (#{ instance.id }|\$1)/
-      expect(sql).to match(matched_sql)
-    end
-
-    it 'should produce matching sql for a specific instance' do
-      sql = subject.roles_query_for(instance, target.class, target.id).to_sql
-      matched_sql = /SELECT roles as roles, group_table_id FROM \"__membership_table\"  WHERE \"__membership_table\".\"role_model_table_id\" = (#{ instance.id }|\$1) AND \"__membership_table\".\"group_table_id\" = #{ target.id }/
-      expect(sql).to match(matched_sql)
-    end
-
   end
 
-  describe "#roles_query_for" do
-    it 'should deletegate to the class method' do
-      instance = subject.new
-      target = double({ id: 1 })
-      expect(subject).to receive(:roles_query_for)
-        .with(instance, target.class, target.id)
-      instance.roles_query_for(target)
+  describe "::roles_for" do
+    it 'should return an AR relation' do
+      expect(subject.roles_for(instance, target)).to be_a(ActiveRecord::Relation)
+    end
+  end
+
+  describe "#roles_for" do
+    it 'should deletegate to the instance method' do
+      expect(instance).to receive(:roles_query).with(target)
+      instance.roles_for(target)
+    end
+
+    it 'should return an array of roles' do
+      expect(instance.roles_for(target)).to eq(["test_role"])
     end
   end
 end

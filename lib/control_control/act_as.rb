@@ -1,3 +1,4 @@
+
 module ControlControl
   module ActAs
     def can_as(action, filter=nil, &block)

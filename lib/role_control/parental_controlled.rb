@@ -23,7 +23,7 @@ module RoleControl
         proc do |enrolled|
           begin
             send(parent).send(question, enrolled)
-          rescue StandardError => e
+          rescue MethodMissing => e
             nil
           end
         end
