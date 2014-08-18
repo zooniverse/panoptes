@@ -1,7 +1,7 @@
 class Subject < ActiveRecord::Base
   extend ControlControl::Resource
-  include ControlControl::Ownable
-  include ControlControl::Adminable
+  include RoleControl::Ownable
+  include RoleControl::Adminable
 
   belongs_to :project
   has_and_belongs_to_many :collections

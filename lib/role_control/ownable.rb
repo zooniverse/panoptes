@@ -1,4 +1,4 @@
-module ControlControl
+module RoleControl
   module Ownable
     extend ActiveSupport::Concern
     

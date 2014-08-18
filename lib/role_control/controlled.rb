@@ -12,8 +12,8 @@ module RoleControl
       include ControlControl::Resource
       include ControlControl::ActAs
 
-      def can_by_role(action, act_as: nil, roles: nil)
-        @roles_for[action] = RoleQuery.new(roles, self)
+      def can_by_role(action, act_as: nil, public: false, roles: nil)
+        @roles_for[action] = RoleQuery.new(roles, public, self)
         can action, &role_test_proc(action)
         can_as action, &role_test_proc(action) if act_as
       end
@@ -22,8 +22,8 @@ module RoleControl
         !actor.blank?
       end
       
-      def scope_for(action, actor)
-        query = @roles_for[action].build(actor)
+      def scope_for(action, actor, target: nil)
+        query = @roles_for[action].build(actor, target)
         actor.global_scopes(query)
       end
 
@@ -31,7 +31,7 @@ module RoleControl
 
       def role_test_proc(action)
         proc do |enrolled|
-          self.class.exists_in_scope_for(action, enrolled).exists?(self)
+          self.class.scope_for(action, enrolled, target: self).exists?(self)
         end
       end
     end

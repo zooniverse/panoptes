@@ -9,13 +9,21 @@ module RoleControl
     end
 
     module ClassMethods
-      def roles_query_for(*args)
+      def roles_query(*args)
         [EmptyRoles.new]
       end
     end
 
-    def roles_query_for(*args)
-      self.class.roles_query_for
+    def global_scopes(query)
+      query
+    end
+
+    def roles_query(*args)
+      self.class.roles_query
+    end
+
+    def roles_for
+      nil
     end
   end
 end

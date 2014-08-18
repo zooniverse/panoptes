@@ -10,7 +10,8 @@ describe RoleControl::Enrolled do
   before(:each) do
     instance.save!
     target.save!
-    mt = RoleModelTable.new(roles: ["test_role"])
+    mt = RoleModelTable.new
+    mt.roles = ["test_role"]
     mt.enrolled_table = instance
     mt.controlled_table = target
     mt.save!
@@ -39,7 +40,7 @@ describe RoleControl::Enrolled do
 
   describe "#roles_for" do
     it 'should deletegate to the instance method' do
-      expect(instance).to receive(:roles_query).with(target)
+      expect(instance).to receive(:roles_query).with(target).and_return([])
       instance.roles_for(target)
     end
 

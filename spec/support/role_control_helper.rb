@@ -17,14 +17,14 @@ def setup_role_control_tables
   EnrolledTable.class_eval do
     include RoleControl::Enrolled
     
-    has_many :membership_tables
-    enrolled_for :controlled_tables, through: :membership_tables
+    has_many :role_model_tables
+    enrolled_for :controlled_tables, through: :role_model_tables
   end
   
   ControlledTable.class_eval do
     include RoleControl::Controlled
     
-    can_by_role :read, roles: :visible_to
+    can_by_role :read, public: true, roles: :visible_to
     can_by_role :update, roles: [:test_role]
   end
 

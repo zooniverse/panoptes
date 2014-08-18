@@ -1,4 +1,4 @@
-module ControlControl
+module RoleControl
   module Adminable
     extend ActiveSupport::Concern
 

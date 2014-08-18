@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class Owner < ActiveRecord::Base
   include ControlControl::Actor
-  include ControlControl::Owner
+  include RoleControl::Owner
 
   def self.table_name
     "collections"
@@ -13,7 +13,7 @@ class Owner < ActiveRecord::Base
   end
 end
 
-describe ControlControl::Owner, type: :model do
+describe RoleControl::Owner, type: :model do
   let(:owner) { owner = Owner.new }
     
   let(:owned) { build(:project, owner: owner) }

@@ -1,7 +1,7 @@
 class Project < ActiveRecord::Base
   include RoleControl::Controlled
-  include ControlControl::Ownable
-  include ControlControl::Adminable
+  include RoleControl::Ownable
+  include RoleControl::Adminable
   include SubjectCounts
   include Activatable
   include Translatable

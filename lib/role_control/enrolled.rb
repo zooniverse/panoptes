@@ -12,7 +12,7 @@ module RoleControl
     module ClassMethods
       def enrolled_for(controlled, class_name: nil, through: nil)
         controlled_class = class_name ? class_name : controlled.to_s.classify.constantize
-        p controlled_class
+        #p controlled_class
         @enrolled_for[controlled_class] = through
 
         define_method controlled do |action|
@@ -21,11 +21,18 @@ module RoleControl
       end
       
       def roles_for(enrolled, target)
-        target_class = target.is_a?(Class) ? target : target.class
-        send(@enrolled_for[target_class]).roles_query(enrolled)
+        if target.is_a?(Class)
+          enrolled.send(@enrolled_for[target]).roles_query
+        else
+          enrolled.send(@enrolled_for[target.class]).roles_query(resource: target)
+        end
       end
     end
 
+    def global_scopes(query)
+      query
+    end
+    
     def roles_query(target)
       query = self.class.roles_for(self, target)
       return query if target.is_a?(Class)

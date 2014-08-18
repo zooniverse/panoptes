@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class Admined
   extend ControlControl::Resource
-  include ControlControl::Adminable
+  include RoleControl::Adminable
 end
 
 class Admin
@@ -15,7 +15,7 @@ class Admin
   end
 end
 
-describe ControlControl::Adminable do
+describe RoleControl::Adminable do
   let(:obj) { Admined.new }
   
   it 'should have defined can_*? methods' do

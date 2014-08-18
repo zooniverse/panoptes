@@ -1,8 +1,7 @@
 class Collection < ActiveRecord::Base
   include RoleControl::Controlled
-  include ControlControl::Ownable
-  include ControlControl::Adminable
-  include RoleControl::VisibilityControlled
+  include RoleControl::Ownable
+  include RoleControl::Adminable
   include Activatable
   
   attr_accessible :name, :display_name, :project_id

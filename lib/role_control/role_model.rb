@@ -9,9 +9,10 @@ module RoleControl
           @role_field, @parent = field, parent
         end
 
-        def build(actor=nil)
-          query = @parent.select(select_statement)
+        def build(actor=nil, resources=nil)
+          query = @parent.select(*select_statement)
           query = query.where(where_actor(actor)) if actor
+          query = query.where(where_resources(resources)) if !resources.blank?
           query
         end
 
@@ -21,7 +22,7 @@ module RoleControl
           arel_table[actor_field].eq(actor.id)
         end
 
-        def were_resources(resources)
+        def where_resources(resources)
           if resources.length == 1
             arel_table[resource_field].eq(resources.first.id)
           else
@@ -30,15 +31,17 @@ module RoleControl
         end
 
         def actor_field
-          "#{ @actor.klass.model_name.singular }_id".to_sym
+          "#{ @actor_rel.klass.model_name.singular }_id".to_sym
         end
 
         def resource_field
-          "#{ @resource.klass.model_name.singular }_id".to_sym
+          "#{ @resource_rel.klass.model_name.singular }_id".to_sym
         end
 
-        def select_statment
-          arel_table[field].as('roles')
+        def select_statement
+          [arel_table[@role_field].as('roles'),
+           arel_table[resource_field],
+           arel_table[actor_field]]
         end
 
         def arel_table
@@ -48,7 +51,7 @@ module RoleControl
 
       def roles_for(actor, resource, field: :roles, valid_roles: [])
         @role_query = Query.new(reflect_on_association(actor),
-                                relfect_on_association(resource),
+                                reflect_on_association(resource),
                                 field,
                                 self)
         @roles_field = field
@@ -56,8 +59,9 @@ module RoleControl
         validate :allowed_roles
       end
 
-      def roles_query(actor)
-        @role_query.build(actor)
+      def roles_query(actor: nil, resources: nil, resource: nil)
+        resources = [resource] if resource
+        @role_query.build(actor, resources)
       end
 
       def valid_roles
@@ -71,14 +75,12 @@ module RoleControl
 
     def allowed_roles
       roles_field = self.class.roles_field
-      valid_roles = self.class.valid_roles.include?(role)
-      return if valid_roles.blank?
+      valid_roles = self.class.valid_roles
       
-      valid_roles = send(roles_field).all? { |role| valid_roles.include?(role) }
+      return true if valid_roles.blank?
       
-      unless valid_roles
-        errors.add(role_field, "Roles must be in #{ valid_roles.join(', ') }")
-      end
+      valid = send(roles_field).all? { |role| valid_roles.include?(role) }
+      errors.add(role_field, "Roles must be in #{ valid_roles.join(', ') }") unless valid
     end
   end
 end

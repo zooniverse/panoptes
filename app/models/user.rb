@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
   extend ControlControl::Resource
   include Nameable
   include Activatable
-  include ControlControl::Owner
+  include RoleControl::Owner
   include RoleControl::Enrolled
 
   attr_accessible :name, :email, :password, :login, :migrated_user, :display_name, :credited_name, :global_email_communication,

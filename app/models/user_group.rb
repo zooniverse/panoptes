@@ -1,10 +1,9 @@
 class UserGroup < ActiveRecord::Base
-  include RoleControl::
-    Controlled
+  include RoleControl::Controlled
   include Nameable
   include Activatable
-  include ControlControl::Owner
-  include ControlControl::Adminable
+  include RoleControl::Owner
+  include RoleControl::Adminable
 
   attr_accessible :name, :display_name
 
@@ -20,11 +19,11 @@ class UserGroup < ActiveRecord::Base
 
   before_validation :downcase_case_insensitive_fields
 
-  can_by_role :show, roles: [ :group_admin, :project_edit, :collection_editor, :group_member ]
+  can_by_role :show, roles: [ :group_admin, :project_editor, :collection_editor, :group_member ]
   can_by_role :update, roles: [ :group_admin ]
   can_by_role :destroy, roles: [ :group_admin ]
 
-  can_by_role :show, roles: [ :group_admin, :project_edit, :collection_editor, :group_member ]
+  can_by_role :show, roles: [ :group_admin, :project_editor, :collection_editor, :group_member ]
 
   can_by_role :update, act_as: Collection, roles: [ :group_admin, :collection_editor ]
   can_by_role :destroy, act_as: Collection, roles: [ :group_admin, :collection_editor ]

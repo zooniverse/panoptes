@@ -1,16 +1,24 @@
 module RoleControl
   class RoleQuery
-    attr_reader :association
-    
-    def initialize(roles, resource_class)
-      @roles, @klass = roles, resource_class
+    def initialize(roles, public, resource_class)
+      @roles, @public, @klass = roles, public, resource_class
     end
 
-    def build(actor)
-      @klass.joins(join_clause(actor)).where(roles_test)
+    def build(actor, target=nil)
+      binding, join_query = join_clause(actor, target)
+      
+      query = @klass.where(where_clause(!!join_query))
+      query = query.joins(join_query) if join_query
+      
+      rebind(query, binding)
     end
 
     private
+
+    def rebind(query, bindings)
+      return query unless bindings
+      bindings.try(:reduce, query) { |q, b| q.bind(b) } 
+    end
 
     def table
       @klass.arel_table
@@ -20,12 +28,17 @@ module RoleControl
       @roles_table ||= Arel::Table.new(:roles_query)
     end
 
-    def role_query(actor)
-      actor.roles_for(@klass).arel.as(roles_table)
+    def role_query(actor, target)
+      target = target.nil? ? @klass : target
+      q = actor.roles_query(target)
+      binding, arel = q.try(:bind_values), q.try(:arel).try(:as, 'roles_query')
+      [binding, arel]
     end
 
-    def join_clause(actor)
-      table.create_join(role_query(actor), join_on, Arel::Nodes::OuterJoin)
+    def join_clause(actor, target)
+      binding, query = role_query(actor, target)
+      query = table.create_join(query, join_on, Arel::Nodes::OuterJoin) if query
+      [binding, query]
     end
     
     def join_on
@@ -36,6 +49,20 @@ module RoleControl
       "#{ @klass.model_name.singular }_id".to_sym
     end
 
+    def where_clause(include_roles)
+      if include_roles && @public
+        roles_test.or(public_test)
+      elsif @public
+        public_test
+      elsif include_roes
+        roles_test
+      end
+    end
+
+    def public_test
+      table[@roles].eq('{}')
+    end
+
     def roles_test
       test = roles_table[:roles].not_eq(nil)
         .and(roles)
@@ -44,7 +71,7 @@ module RoleControl
     end
 
     def roles
-      if @roles.is_a?[Array]
+      if @roles.is_a?(Array)
         roles_table[:roles].overlap(@roles)
       else
         roles_table[:roles].overlap(table[@roles])

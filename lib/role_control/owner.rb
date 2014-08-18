@@ -1,4 +1,4 @@
-module ControlControl
+module RoleControl
   module Owner
     extend ActiveSupport::Concern
 
