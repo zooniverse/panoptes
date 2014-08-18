@@ -12,10 +12,9 @@ module RoleControl
     module ClassMethods
       def enrolled_for(controlled, class_name: nil, through: nil)
         controlled_class = class_name ? class_name : controlled.to_s.classify.constantize
-        #p controlled_class
         @enrolled_for[controlled_class] = through
 
-        define_method controlled do |action|
+        define_method :"#{ controlled }_for" do |action=:show|
           controlled_class.scope_for(action, self)
         end
       end

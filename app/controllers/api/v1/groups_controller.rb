@@ -25,7 +25,7 @@ class Api::V1::GroupsController < Api::ApiController
 
   def destroy
     user_group = UserGroup.find(params[:id])
-    Activation.disable_instances!([ user_group ] | user_group.projects | user_group.memberships)
+    Activation.disable_instances!([ user_group ] | user_group.projects | user_group.collections | user_group.memberships)
     deleted_resource_response
   end
 

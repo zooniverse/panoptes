@@ -28,7 +28,7 @@ describe RoleControl::Enrolled do
     end
 
     it 'should define a method based on the supplied controlled relation' do
-      expect(subject.new).to respond_to(:objects)
+      expect(subject.new).to respond_to(:objects_for)
     end
   end
 

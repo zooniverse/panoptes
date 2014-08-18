@@ -15,7 +15,7 @@ module RoleControl
       def can_by_role(action, act_as: nil, public: false, roles: nil)
         @roles_for[action] = RoleQuery.new(roles, public, self)
         can action, &role_test_proc(action)
-        can_as action, &role_test_proc(action) if act_as
+        can_as action, &as_role_test_proc(action, act_as) if act_as
       end
 
       def can_create?(actor, *args)
@@ -31,6 +31,14 @@ module RoleControl
       def role_test_proc(action)
         proc do |enrolled|
           self.class.scope_for(action, enrolled, target: self).exists?(self)
+        end
+      end
+
+      def as_role_test_proc(action, act_as)
+        test_proc = role_test_proc(action)
+        proc do |enrolled|
+          return false unless enrolled == act_as || enrolled.class == act_as
+          test_proc.call(enrolled)
         end
       end
     end

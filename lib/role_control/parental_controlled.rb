@@ -23,7 +23,7 @@ module RoleControl
         proc do |enrolled|
           begin
             send(parent).send(question, enrolled)
-          rescue MethodMissing => e
+          rescue NoMethodError => e
             nil
           end
         end
@@ -31,8 +31,9 @@ module RoleControl
       
 
       def role_test_proc(parent, add_roles)
-        test_proc = super(add_roles)
-        proc { |enrolled| send(parent).instance_exec(enrolled, &test_proc) }
+        proc do |enrolled|
+          !(enrolled.roles_for(send(parent)) & add_roles.map(&:to_s)).blank?
+        end
       end
     end
   end

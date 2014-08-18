@@ -25,7 +25,7 @@ class User < ActiveRecord::Base
   owns :collections
   owns :subjects
   owns :oauth_applications, class_name: "Doorkeeper::Application"
-
+  
   enrolled_for :projects, through: :user_project_preferences
   enrolled_for :collections, through: :user_collection_preferences
   enrolled_for :user_groups, through: :active_memberships

@@ -75,12 +75,12 @@ module RoleControl
 
     def allowed_roles
       roles_field = self.class.roles_field
-      valid_roles = self.class.valid_roles
+      valid_roles = self.class.valid_roles.map(&:to_s)
       
       return true if valid_roles.blank?
       
       valid = send(roles_field).all? { |role| valid_roles.include?(role) }
-      errors.add(role_field, "Roles must be in #{ valid_roles.join(', ') }") unless valid
+      errors.add(roles_field, "Roles must be in #{ valid_roles.join(', ') }") unless valid
     end
   end
 end
