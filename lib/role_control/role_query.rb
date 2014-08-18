@@ -4,10 +4,11 @@ module RoleControl
       @roles, @public, @klass = roles, public, resource_class
     end
 
-    def build(actor, target=nil)
+    def build(actor, target=nil, extra_tests=[])
       binding, join_query = join_clause(actor, target)
+      extra_tests << public_test if @public
       
-      query = @klass.where(where_clause(!!join_query))
+      query = @klass.where(where_clause(!!join_query, extra_tests))
       query = query.joins(join_query) if join_query
       
       rebind(query, binding)
@@ -49,20 +50,15 @@ module RoleControl
       "#{ @klass.model_name.singular }_id".to_sym
     end
 
-    def where_clause(include_roles)
-      if include_roles && @public
-        roles_test.or(public_test)
-      elsif @public
-        public_test
-      elsif include_roes
-        roles_test
-      end
+    def where_clause(include_roles, extra_tests)
+      q = include_roles ? roles_test : extra_tests.pop 
+      extra_tests.reduce(q) { |query, test| query.or(test) }
     end
-
+    
     def public_test
       table[@roles].eq('{}')
     end
-
+    
     def roles_test
       test = roles_table[:roles].not_eq(nil)
         .and(roles)
@@ -72,7 +68,7 @@ module RoleControl
 
     def roles
       if @roles.is_a?(Array)
-        roles_table[:roles].overlap(@roles)
+        roles_table[:roles].overlap("{#{@roles.join(',')}}")
       else
         roles_table[:roles].overlap(table[@roles])
       end

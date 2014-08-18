@@ -22,7 +22,11 @@ class LoggedInUser
     user
   end
 
-  def roles_query_for(target)
-    user.roles_query_for(target)
+  def roles_query(target)
+    user.roles_query(target)
+  end
+
+  def roles_for(target)
+    user.roles_for(target)
   end
 end

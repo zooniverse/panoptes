@@ -12,9 +12,13 @@ module RoleControl
     end
 
     module ClassMethods
-      def scope_for(action, actor)
-        super(action, actor) & where(owner_id: actor.try(:id),
-                                     owner_class: actor.try(:class))
+      def scope_for(action, actor, target: nil, extra_test: [])
+        extra_test << ownership_test(actor.try(:owner) || actor)
+        super(action, actor, target: target, extra_test: extra_test)
+      end
+
+      def ownership_test(owner)
+        arel_table[:owner_id].eq(owner.id).and(arel_table[:owner_type].eq(owner.class))
       end
     end
 

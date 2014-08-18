@@ -2,8 +2,8 @@ class Api::V1::ProjectsController < Api::ApiController
   doorkeeper_for :update, :create, :delete, scopes: [:project]
 
   def show
-    render json_api: ProjectSerializer.resource(resource,
-                                                nil,
+    render json_api: ProjectSerializer.resource(params,
+                                                visible_scope(api_user),
                                                 languages: current_languages,
                                                 fields: ['title',
                                                          'description',

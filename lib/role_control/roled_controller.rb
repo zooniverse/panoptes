@@ -11,7 +11,7 @@ module RoleControl
         old_action = alias_action(action) 
         define_method action do
           actor(block || actor_method).do(action)
-            .to(resources)
+            .to(resource)
             .as(owner_from_params, allow_nil: false)
             .call(no_args: true, &method(old_action))
           end
@@ -49,10 +49,9 @@ module RoleControl
                  end
     end
 
-    def resources
-      @resources ||= if params.has_key?(:id)
-                      ids = params[:id].split(',')
-                      resource_class.find(ids)
+    def resource
+      @resource ||= if params.has_key?(:id)
+                      resource_class.find(params[:id])
                     else
                       resource_class
                     end
@@ -63,7 +62,7 @@ module RoleControl
     end
 
     def visible_scope(actor)
-      @scope ||= resource_class.visible_to(actor)
+      @scope ||= resource_class.scope_for(:show, actor)
     end
   end
 end

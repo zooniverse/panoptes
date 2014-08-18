@@ -14,10 +14,6 @@ module RoleControl
       end
     end
 
-    def global_scopes(query)
-      query
-    end
-
     def roles_query(*args)
       self.class.roles_query
     end

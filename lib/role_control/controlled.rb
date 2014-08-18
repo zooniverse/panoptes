@@ -22,9 +22,8 @@ module RoleControl
         !actor.blank?
       end
       
-      def scope_for(action, actor, target: nil)
-        query = @roles_for[action].build(actor, target)
-        actor.global_scopes(query)
+      def scope_for(action, actor, target: nil, extra_test: [])
+        @roles_for[action].build(actor, target, extra_test)
       end
 
       protected
