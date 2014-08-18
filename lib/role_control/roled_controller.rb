@@ -11,14 +11,14 @@ module RoleControl
         old_action = alias_action(action) 
         define_method action do
           actor(block || actor_method).do(action)
-            .to(resource)
+            .to(controlled_resource)
             .as(owner_from_params, allow_nil: false)
             .call(no_args: true, &method(old_action))
-          end
+        end
       end
 
-      def default_access_control(resource_class: nil, except: [])
-        ([:show, :create, :update, :destroy] - except).each do |action|
+      def access_control_for(*actions, resource_class: nil)
+        actions.each do |action|
           access_control_action(action, resource_class: resource_class)
         end
       end
@@ -49,12 +49,12 @@ module RoleControl
                  end
     end
 
-    def resource
-      @resource ||= if params.has_key?(:id)
-                      resource_class.find(params[:id])
-                    else
-                      resource_class
-                    end
+    def controlled_resource
+      @controlled_resource ||= if params.has_key?(:id)
+                                 resource_class.find(params[:id])
+                               else
+                                 resource_class
+                               end
     end
 
     def owner_from_params

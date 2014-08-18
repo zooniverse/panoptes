@@ -23,12 +23,13 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def destroy
-    workflow = resource
     workflow.destroy!
     deleted_resource_response
   end
 
-  default_access_control resource_class: Workflow
+  alias_method :workflow, :controlled_resource
+
+  access_control_for :create, :update, :destroy, resource_class: Workflow
   
   private
 

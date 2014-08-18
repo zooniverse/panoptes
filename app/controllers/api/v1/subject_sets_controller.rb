@@ -22,12 +22,13 @@ class Api::V1::SubjectSetsController < Api::ApiController
   end
 
   def destroy
-    subject_set = resource
     subject_set.destroy!
     deleted_resource_response
   end
 
-  default_access_control resource_class: SubjectSet
+  alias_method :subject_set, :controlled_resource
+
+  access_control_for :create, :update, :destroy, resource_class: SubjectSet
 
   private
 

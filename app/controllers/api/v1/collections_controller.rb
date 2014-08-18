@@ -2,7 +2,7 @@ class Api::V1::CollectionsController < Api::ApiController
   doorkeeper_for :all
 
   def show
-    render json_api: CollectionSerializer.resource(resource)
+    render json_api: CollectionSerializer.resource(params, visible_scope(api_user))
   end
 
   def index
@@ -22,11 +22,13 @@ class Api::V1::CollectionsController < Api::ApiController
   end
 
   def destroy
-    resource.destroy!
+    collection.destroy!
     deleted_resource_response
   end
+
+  alias_method :collection, :controlled_resource
   
-  default_access_control resource_class: Collection
+  access_control_for :create, :update, :destroy, resource_class: Collection
 
   protected
 

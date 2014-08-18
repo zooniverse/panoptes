@@ -33,11 +33,13 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def destroy
-    resource.destroy
+    project.destroy
     deleted_resource_response
   end
 
-  default_access_control resource_class: Project
+  alias_method :project, :controlled_resource
+
+  access_control_for :create, :update, :destroy, resource_class: Project
 
   private
 

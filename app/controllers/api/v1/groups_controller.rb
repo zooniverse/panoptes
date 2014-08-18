@@ -24,12 +24,17 @@ class Api::V1::GroupsController < Api::ApiController
   end
 
   def destroy
-    user_group = UserGroup.find(params[:id])
-    Activation.disable_instances!([ user_group ] | user_group.projects | user_group.collections | user_group.memberships)
+    Activation.disable_instances!([ user_group ] |
+                                  user_group.projects |
+                                  user_group.collections |
+                                  user_group.memberships)
     deleted_resource_response
   end
 
-  default_access_control resource_class: UserGroup
+  alias_method :user_group, :controlled_resource
+
+  access_control_for :update, :create, :destroy, resource_class: UserGroup
+  
   private
 
   def user_group_params
