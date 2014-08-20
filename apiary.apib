@@ -2,19 +2,27 @@ FORMAT: 1A
 HOST: http://beta.api.zooniverse.org/
 
 # Panoptes API
-Panoptes is an api to support *Citizen Science Crowdsourcing Projects*, including managing subjects, describing project interfaces, persisting classifications, and supporting users collecting subjects.  
+Panoptes is an api to support *Citizen Science Crowdsourcing
+Projects*, including managing subjects, describing project interfaces,
+persisting classifications, and supporting users collecting subjects.
 
 ## Authentication
-Panoptes supports OAuth2 using the [doorkeeper](http://github.com/doorkeeper-gem/doorkeeper) gem.
+Panoptes supports OAuth2 using the
+[doorkeeper](http://github.com/doorkeeper-gem/doorkeeper) gem. 
 
 ## Media Types
-Panoptes uses standard JSON to represent resources. However, the API is versioned to allow for future flexibility. All requests and responses should use the `application/vnd.api+json; version=1` media type.
+Panoptes uses a slightly modified verison of the
+[JSON API](https://jsonapi.org) to represent resources. However, the
+API is versioned to allow for future flexibility. All requests and
+responses should use the `application/vnd.api+json; version=1` media
+type. 
 
-# Group Collections 
-Collections related resources of the **Panoptes API**
+# Group Subject Collections 
+Subject Collections related resources of the **Panoptes API** 
 
-## Collection [/collections/{owner_name}/{collection_name}]
-A single Collection object respenting a group of subjects from a project a user has collected together. 
+## Subject Collection [/collections/{id}{?include}]
+A single Collection object respenting a group of subjects from a
+project a user has collected together.
 
 The Collection resource has the following attributes:
 
@@ -24,29 +32,48 @@ The Collection resource has the following attributes:
 - name
 - display_name
 - description
+- visible_to
+- owner
 
 *id* and *created_at* are assigned when the resource is created.
 
 + Parameters
-    + owner_name (string) ... Name of the owner (user or user group) that created the collection
-    + collection_name (string) ... Name of the collection
+    + id (integer) ... Integer Id of the Collection can be a comma
+      seperated list of ids to return multiple resources.
+    + include (string, optional) ... Use "subjects" to return subjects
+      that are part of a collection with the resource.
 
 + Model (application/vnd.api+json; version=1)
 
-    JSON respresentation of the Collection resource. It also includes links to subjects within the collection
+    JSON API respresentation of the Collection resource. It also includes
+    links to subjects within the collection 
 
     + Body
 
             {
-                "id": 51,
-                "created_at": "2014-04-15T10:41:14Z",
-                "updated_at": "2014-04-20T10:41:14Z",
-                "name": "cool_flowers",
-                "display_name": "Stuart's Cool Flowers",
-                "description": "Just some cool looking flowers",
-                "self": "/collections/stuart/cool_flowers"
-                "owner": "/users/stuart",
-                "subjects": "/collections/stuart/cool_flowers/subjects"
+                "links": {
+                    "collection.subjects" : {
+                        "href" : "http://api.zooniverse.org/subjects?collection_id={collection.id}",
+                        "type" : "subjects"
+                    }
+                },
+                "collections": {
+                    "id": "51",
+                    "created_at": "2014-04-15T10:41:14Z",
+                    "updated_at": "2014-04-20T10:41:14Z",
+                    "name": "cool_flowers",
+                    "display_name": "Stuart's Cool Flowers",
+                    "description": "Just some cool looking flowers",
+                    "visible_to": [],
+                    "links": {
+                        "subjects": [ "10", "20", "50", "51" ] ,
+                        "owner": {
+                            "href" : "http://api.zooniverse.org/users/21",
+                            "id": "21",
+                            "type": "user"
+                        }
+                    }
+                }
             }
 
 ### Retrieve a Single Collection [GET]
@@ -55,12 +82,43 @@ The Collection resource has the following attributes:
     [Collection][]
 
 ### Edit a Collection [PATCH]
-To edit a Collection send a JSON object with updated values for one or more of the Collection resource attributes. `updated_at` will be updated to reflect the time the request was received. Other fields will not be changed if they are not included in the request. 
-+ Request
+Edit a collection by sending a patch request using the
+[JSON+patch](http://tools.ietf.org/html/rfc6902) format.
+
++ Request (application/json+patch)
+
+        [
+            {
+                "op": "replace",
+                "path": "/display_name",
+                "value": "A Better Name"
+            },
+            {
+                "op": "add",
+                "path": "/links/subjects",
+                "value": "20"
+            }
+        ]
+
++ Response 200
+
+    [Collection][]
+
+### Edit a Collection [PUT]
+You can edit a resource by sending a JSON API formatted request with
+the resource's id and any fields you wish to update
+
++ Request (application/vnd.api+json)
 
         {
-            "description": "Make this a little better..."
-        } 
+            "collections": {
+                "id": "51",
+                "name": "flowers_rule",
+                "links": {
+                    "subjects": [ "10", "20", "50", "60" ]
+                }
+            }
+        }
 
 + Response 200
 
@@ -76,7 +134,9 @@ It contains a list of *Collections*.
 
 + Model (application/vnd.api+json; version=1)
 
-    JSON representation of the Collection Collection resource. Included collections should be full representations of the resource. 
+    JSON representation of the Collection Collection
+    resource. Included collections should be full representations of
+    the resource.
 
     + Body
 
@@ -98,15 +158,20 @@ It contains a list of *Collections*.
 
 ### List all Collections [GET]
 + Parameters
-    + project (optional, string) ... String name of a project in the form *:owner_name/:project_name*
-    + page (optional, integer) ... Integer of the next page. 1 by default
+    + project (optional, string) ... String name of a project in the
+      form *:owner_name/:project_name* 
+    + page (optional, integer) ... Integer of the next page. 1 by
+      default 
 
 + Response 200
 
     [Collections Collection][]
 
 ### Create a Collection [POST]
-To create a new Collection send a JSON representation containing at least a name and display_name. A description and array of subject ids may also be included. The *owner* will be added based on the authenicated user. *id* and *created_at* will also be added.
+To create a new Collection send a JSON representation containing at
+least a name and display_name. A description and array of subject ids
+may also be included. The *owner* will be added based on the
+authenicated user. *id* and *created_at* will also be added. 
 
 + Request
 
