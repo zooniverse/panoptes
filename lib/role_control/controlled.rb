@@ -1,11 +1,9 @@
-require 'control_control/resource'
-
 module RoleControl
   module Controlled
     extend ActiveSupport::Concern
 
     included do
-      @roles_for = Hash.new 
+      @roles_for = Hash.new
     end
 
     module ClassMethods
@@ -21,7 +19,7 @@ module RoleControl
       def can_create?(actor, *args)
         !actor.blank?
       end
-      
+
       def scope_for(action, actor, target: nil, extra_test: [])
         @roles_for[action].build(actor, target, extra_test)
       end
