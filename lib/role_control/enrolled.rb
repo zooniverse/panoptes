@@ -1,5 +1,3 @@
-require 'control_control/actor'
-
 module RoleControl
   module Enrolled
     extend ActiveSupport::Concern
@@ -18,7 +16,7 @@ module RoleControl
           controlled_class.scope_for(action, self)
         end
       end
-      
+
       def roles_for(enrolled, target)
         if target.is_a?(Class)
           enrolled.send(@enrolled_for[target]).roles_query
@@ -31,7 +29,7 @@ module RoleControl
     def global_scopes(query)
       query
     end
-    
+
     def roles_query(target)
       query = self.class.roles_for(self, target)
       return query if target.is_a?(Class)
@@ -44,4 +42,3 @@ module RoleControl
     end
   end
 end
-
