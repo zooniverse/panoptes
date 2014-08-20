@@ -5,20 +5,20 @@ module RoleControl
     end
 
     def build(actor, target=nil, extra_tests=[])
-      binding, join_query = join_clause(actor, target)
+      query_value, join_query = join_clause(actor, target)
       extra_tests << public_test if @public
       
       query = @klass.where(where_clause(!!join_query, extra_tests))
       query = query.joins(join_query) if join_query
       
-      rebind(query, binding)
+      rebind(query, query_value)
     end
 
     private
 
-    def rebind(query, bindings)
-      return query unless bindings
-      bindings.try(:reduce, query) { |q, b| q.bind(b) } 
+    def rebind(query, query_values)
+      return query unless query_values
+      query_values.try(:reduce, query) { |q, b| q.bind(b) } 
     end
 
     def table
@@ -32,14 +32,14 @@ module RoleControl
     def role_query(actor, target)
       target = target.nil? ? @klass : target
       q = actor.roles_query(target)
-      binding, arel = q.try(:bind_values), q.try(:arel).try(:as, 'roles_query')
-      [binding, arel]
+      query_value, arel = q.try(:bind_values), q.try(:arel).try(:as, 'roles_query')
+      [query_value, arel]
     end
 
     def join_clause(actor, target)
-      binding, query = role_query(actor, target)
+      query_value, query = role_query(actor, target)
       query = table.create_join(query, join_on, Arel::Nodes::OuterJoin) if query
-      [binding, query]
+      [query_value, query]
     end
     
     def join_on
