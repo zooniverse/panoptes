@@ -9,14 +9,14 @@ module ControlControl
       end
 
       def to(resource)
-        error unless resource.send(question, actor)
+        deny_access unless resource.send(question, actor)
         @target = resource
         self
       end
 
       def as(resource, allow_nil: true)
         return self if !allow_nil && resource.nil?
-        error unless resource.send(as_question, actor, target)
+        deny_access unless resource.send(as_question, actor, target)
         @actor = resource
         self
       end
@@ -43,7 +43,7 @@ module ControlControl
         "can_#{ @action }_as?".to_sym
       end
 
-      def error
+      def deny_access
         raise AccessDenied.new("Insufficient permissions to access resource")
       end
     end

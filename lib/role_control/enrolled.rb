@@ -31,10 +31,7 @@ module RoleControl
     end
 
     def roles_query(target)
-      query = self.class.roles_for(self, target)
-      return query if target.is_a?(Class)
-      target_id = "#{ target.class.model_name.singular }_id".to_sym
-      query.where( target_id => target.id )
+      self.class.roles_for(self, target)
     end
 
     def roles_for(target)
