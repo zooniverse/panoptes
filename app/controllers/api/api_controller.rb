@@ -1,4 +1,3 @@
-
 module Api
   class PanoptesApiError < StandardError; end
   class PatchResourceError < PanoptesApiError; end

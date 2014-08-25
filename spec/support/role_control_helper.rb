@@ -26,6 +26,7 @@ def setup_role_control_tables
     
     can_by_role :read, public: true, roles: :visible_to
     can_by_role :update, roles: [:test_role]
+    can_by_role :index, roles: [:admin]
   end
 
   RoleModelTable.class_eval do
@@ -33,7 +34,8 @@ def setup_role_control_tables
     belongs_to :enrolled_table
     belongs_to :controlled_table
 
-    roles_for :enrolled_table, :controlled_table
+    roles_for :enrolled_table, :controlled_table,
+      valid_roles: [ :admin, :test_role, :test_parent_role]
   end
 end
 

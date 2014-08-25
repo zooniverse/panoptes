@@ -5,7 +5,9 @@ def setup_controller(api_controller)
     yield(self) if block_given?
 
     def index
-      render json_api: { tests: [ { all: "good" }, { at: "least" }, { thats: "what I pretend" } ] }
+      render json_api: { tests: [ { all: "good" },
+                                  { at: "least" },
+                                  { thats: "what I pretend" } ] }
     end
   end
 end
