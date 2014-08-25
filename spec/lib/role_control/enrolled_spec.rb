@@ -4,12 +4,10 @@ describe RoleControl::Enrolled do
   setup_role_control_tables
   
   let(:subject) { EnrolledTable }
-  let(:instance) { subject.new }
-  let(:target) { ControlledTable.new }
+  let(:instance) { subject.create! }
+  let(:target) { ControlledTable.create! }
 
   before(:each) do
-    instance.save!
-    target.save!
     create_role_model_instance(%w(test_role), target, instance)
   end
   

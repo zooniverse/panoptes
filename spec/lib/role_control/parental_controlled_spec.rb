@@ -17,15 +17,9 @@ end
 describe RoleControl::ParentalControlled do
   setup_role_control_tables
 
-  let(:enrolled) { rt = EnrolledTable.new; rt.save!; rt }
-  let(:controlled) { gt = ControlledTable.new; gt.save!; gt }
-  let!(:relation) do
-    m = RoleModelTable.new
-    m.roles = ['test_parent_role', 'test_role']
-    m.enrolled_table = enrolled
-    m.controlled_table = controlled
-    m.save!
-  end
+  let(:enrolled) { EnrolledTable.create! }
+  let(:controlled) { ControlledTable.create! }
+  let!(:relation) { create_role_model_instance(%w(test_parent_role test_role), controlled, enrolled)  }
 
   let(:tpc) { TestParentControl.new(controlled) }
 

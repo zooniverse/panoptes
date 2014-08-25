@@ -6,15 +6,14 @@ describe RoleControl::Controlled do
   let(:subject) { ControlledTable }
   
   let(:controlled) do
-    s = subject.new
-    s.visible_to = [ "test_role" ]
-    s.save!
-    s
+    subject.create! do |s|
+      s.visible_to = [ "test_role" ]
+    end
   end
   
-  let(:enrolled_actor) { e = EnrolledTable.new; e.save!; e }
+  let(:enrolled_actor) { EnrolledTable.create! }
   
-  let(:unenrolled_actor) { u = EnrolledTable.new; u.save!; u }
+  let(:unenrolled_actor) { EnrolledTable.create! }
 
   describe "::can_create?" do
     it 'should return true when passed a non-nil value' do
