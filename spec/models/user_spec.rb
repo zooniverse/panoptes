@@ -4,11 +4,7 @@ describe User, :type => :model do
   let(:user) { build(:user) }
   let(:named) { user }
   
-  let(:unnamed) do
-    unnamed = build(:user)
-    unnamed.owner_name = nil
-    unnamed
-  end
+  let(:unnamed) { build(:user) { |u| u.owner_name = nil } }
   
   let(:activatable) { user }
   let(:owner) { user }
@@ -266,7 +262,7 @@ describe User, :type => :model do
     it 'should not be allowed to destroy the resource' do
       user_project_preference.roles = []
       user_project_preference.save!
-      expect{user.do(:destroy).to(project).call &test_proc}.to raise_error
+      expect{user.do(:destroy).to(project).call &test_proc}.to raise_error(ControlControl::AccessDenied)
     end
   end
 end
