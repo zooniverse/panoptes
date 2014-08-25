@@ -36,3 +36,11 @@ def setup_role_control_tables
     roles_for :enrolled_table, :controlled_table
   end
 end
+
+def create_role_model_instance(roles, controlled_resource, actor)
+  RoleModelTable.create! do |rmt|
+    rmt.roles = roles
+    rmt.controlled_table = controlled_resource
+    rmt.enrolled_table = actor
+  end
+end
