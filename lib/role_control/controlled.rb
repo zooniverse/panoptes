@@ -11,7 +11,7 @@ module RoleControl
       include ControlControl::ActAs
 
       def can_by_role(action, act_as: nil, public: false, roles: nil)
-        @roles_for[action] = RoleQuery.new(roles, public, self)
+        @roles_for[action] = RoleScope.new(roles, public, self)
         can action, &role_test_proc(action)
         can_as action, &as_role_test_proc(action, act_as) if act_as
       end
