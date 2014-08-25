@@ -10,11 +10,7 @@ describe RoleControl::Enrolled do
   before(:each) do
     instance.save!
     target.save!
-    mt = RoleModelTable.new
-    mt.roles = ["test_role"]
-    mt.enrolled_table = instance
-    mt.controlled_table = target
-    mt.save!
+    create_role_model_instance(%w(test_role), target, instance)
   end
   
   describe "::enrolled_for" do
@@ -22,7 +18,7 @@ describe RoleControl::Enrolled do
       subject.instance_eval { enrolled_for :objects, through: :association }
     end
     
-    it 'should can entry to the enrolled_for hash' do
+    it 'should add an entry to the enrolled_for hash' do
       expect(subject.instance_variable_get(:@enrolled_for)[Object])
         .to eq(:association)
     end
@@ -39,13 +35,27 @@ describe RoleControl::Enrolled do
   end
 
   describe "#roles_for" do
-    it 'should deletegate to the instance method' do
+    let(:roles_for) { instance.roles_for(target) }
+    it 'should call the roles_query instance method' do
       expect(instance).to receive(:roles_query).with(target).and_return([])
-      instance.roles_for(target)
+      roles_for
     end
 
     it 'should return an array of roles' do
-      expect(instance.roles_for(target)).to eq(["test_role"])
+      expect(roles_for).to eq(["test_role"])
+    end
+  end
+
+  describe "#roles_query" do
+    let(:roles_query) { instance.roles_query(target) }
+    
+    it 'should call the class roles_for method' do
+      expect(EnrolledTable).to receive(:roles_for).with(instance, target)
+      roles_query
+    end
+
+    it 'should return an active_record relation' do
+      expect(roles_query).to be_an(ActiveRecord::Relation)
     end
   end
 end
