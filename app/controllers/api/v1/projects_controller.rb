@@ -1,6 +1,9 @@
 class Api::V1::ProjectsController < Api::ApiController
   doorkeeper_for :update, :create, :delete, scopes: [:project]
+  access_control_for :create, :update, :destroy, resource_class: Project
 
+  alias_method :project, :controlled_resource
+  
   def show
     render json_api: ProjectSerializer.resource(params,
                                                 visible_scope(api_user),
@@ -36,10 +39,6 @@ class Api::V1::ProjectsController < Api::ApiController
     project.destroy
     deleted_resource_response
   end
-
-  alias_method :project, :controlled_resource
-
-  access_control_for :create, :update, :destroy, resource_class: Project
 
   private
 

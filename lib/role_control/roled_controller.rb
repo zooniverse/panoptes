@@ -8,12 +8,14 @@ module RoleControl
           define_resource_class(resource_class)
         end
 
-        old_action = alias_action(action) 
-        define_method action do
+        before_action only: [action] do |controller|
+          resource = controller.send(:controlled_resource)
+          act_as = controller.send(:owner_from_params)
+          
           actor(block || actor_method).do(action)
-            .to(controlled_resource)
-            .as(owner_from_params, allow_nil: false)
-            .call(no_args: true, &method(old_action))
+            .to(resource)
+            .as(act_as, allow_nil: false)
+            .allowed?
         end
       end
 
@@ -30,13 +32,6 @@ module RoleControl
           klass
         end
       end
-
-      def alias_action(action)
-        old_action_name = "_#{ action }_old".to_sym
-        alias_method(old_action_name, action)
-        old_action_name 
-      end
-
     end
 
     protected

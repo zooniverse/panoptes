@@ -1,5 +1,8 @@
 class Api::V1::CollectionsController < Api::ApiController
   doorkeeper_for :all
+  access_control_for :create, :update, :destroy, resource_class: Collection
+  
+  alias_method :collection, :controlled_resource
 
   def show
     render json_api: CollectionSerializer.resource(params, visible_scope(api_user))
@@ -25,10 +28,6 @@ class Api::V1::CollectionsController < Api::ApiController
     collection.destroy!
     deleted_resource_response
   end
-
-  alias_method :collection, :controlled_resource
-  
-  access_control_for :create, :update, :destroy, resource_class: Collection
 
   protected
 

@@ -1,5 +1,8 @@
 class Api::V1::WorkflowsController < Api::ApiController
   doorkeeper_for :update, :create, :delete, scopes: [:project]
+  access_control_for :create, :update, :destroy, resource_class: Workflow
+  
+  alias_method :workflow, :controlled_resource
 
   def show
     load_cellect
@@ -27,10 +30,6 @@ class Api::V1::WorkflowsController < Api::ApiController
     deleted_resource_response
   end
 
-  alias_method :workflow, :controlled_resource
-
-  access_control_for :create, :update, :destroy, resource_class: Workflow
-  
   private
 
   def creation_params

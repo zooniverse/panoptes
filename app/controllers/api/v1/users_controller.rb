@@ -1,6 +1,9 @@
 class Api::V1::UsersController < Api::ApiController
   doorkeeper_for :index, :me, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
+  access_control_for :update, :destroy, resource_class: User
+
+  alias_method :user, :controlled_resource
 
   def index
     render json_api: UserSerializer.page(params)
@@ -34,8 +37,4 @@ class Api::V1::UsersController < Api::ApiController
     revoke_doorkeeper_request_token!
     deleted_resource_response
   end
-
-  alias_method :user, :controlled_resource
-
-  access_control_for :update, :destroy, resource_class: User
 end

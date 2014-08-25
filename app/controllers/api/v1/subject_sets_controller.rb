@@ -1,5 +1,8 @@
 class Api::V1::SubjectSetsController < Api::ApiController
   doorkeeper_for :all
+  access_control_for :create, :update, :destroy, resource_class: SubjectSet
+
+  alias_method :subject_set, :controlled_resource
 
   def show
     render json_api: SubjectSetSerializer.resource(params)
@@ -25,10 +28,6 @@ class Api::V1::SubjectSetsController < Api::ApiController
     subject_set.destroy!
     deleted_resource_response
   end
-
-  alias_method :subject_set, :controlled_resource
-
-  access_control_for :create, :update, :destroy, resource_class: SubjectSet
 
   private
 

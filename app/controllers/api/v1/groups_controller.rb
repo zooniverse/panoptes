@@ -1,6 +1,9 @@
 class Api::V1::GroupsController < Api::ApiController
   doorkeeper_for :index, :create, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:group]
+  access_control_for :update, :create, :destroy, resource_class: UserGroup
+  
+  alias_method :user_group, :controlled_resource
 
   def show
     render json_api: UserGroupSerializer.resource(params)
@@ -31,10 +34,6 @@ class Api::V1::GroupsController < Api::ApiController
     deleted_resource_response
   end
 
-  alias_method :user_group, :controlled_resource
-
-  access_control_for :update, :create, :destroy, resource_class: UserGroup
-  
   private
 
   def user_group_params
