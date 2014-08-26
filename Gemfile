@@ -4,7 +4,7 @@ gem 'rails', '4.2.0.beta1'
 gem 'postgres_ext'
 gem 'sdoc', '~> 0.4.0',          group: :doc
 gem 'doorkeeper', '~> 1.4.0'
-gem 'devise'
+gem 'devise', :git => 'https://github.com/plataformatec/devise.git', :branch => 'lm-rails-4-2'
 gem 'versionist'
 gem 'rack-cors', require: 'rack/cors'
 gem 'protected_attributes', '~> 1.0.8'
