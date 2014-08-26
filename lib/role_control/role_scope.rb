@@ -9,12 +9,12 @@ module RoleControl
       @target = target.nil? ? @klass : target
       @extra_tests = setup_extra_tests(extra_tests)
       @actor_roles_query = nil
-      build_role_query
+      build_role_scope
     end
 
     private
 
-    def build_role_query
+    def build_role_scope
       query_bind_values = actor_roles_query_bind_values
       query = query_without_bind_values
       return query unless query_bind_values
