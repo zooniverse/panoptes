@@ -19,8 +19,7 @@ module Api
     rescue_from Api::UnsupportedMediaType, with: :unsupported_media_type
     rescue_from Api::UserSeenSubjectIdError, with: :unprocessable_entity
     rescue_from ControlControl::AccessDenied, with: :not_authorized
-
-    before_action ContentTypeFilter.new(API_ACCEPTED_CONTENT_TYPE, API_ALLOWED_METHOD_OVERRIDES)
+before_action ContentTypeFilter.new(API_ACCEPTED_CONTENT_TYPE, API_ALLOWED_METHOD_OVERRIDES)
 
     def request_update_attributes(resource)
       if request.patch?

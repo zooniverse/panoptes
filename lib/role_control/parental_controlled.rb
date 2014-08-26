@@ -27,7 +27,6 @@ module RoleControl
         end
       end
 
-
       def role_test_proc(parent, add_roles)
         proc do |enrolled|
           !(enrolled.roles_for(send(parent)) & add_roles.map(&:to_s)).blank?
