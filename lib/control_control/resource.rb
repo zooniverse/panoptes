@@ -15,12 +15,12 @@ module ControlControl
       method_name = "can_#{ name }?".to_sym
       return if self.method_defined?(method_name)
       
-      define_method method_name do |*args|
+      define_method method_name do |actor, *args|
         self.class.can_filters[name].any? do |filter|
           if filter.is_a?(Proc)
-            instance_exec(*args, &filter)
+            instance_exec(actor, *args, &filter)
           else
-            send(filter, *args)
+            send(filter, actor, *args)
           end
         end
       end
