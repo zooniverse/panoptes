@@ -17,6 +17,5 @@ class Project < ActiveRecord::Base
   validates_uniqueness_of :display_name, scope: :owner
 
   can_by_role :update, roles: [ :collaborator ] 
-  can_by_role :destroy, roles: [ :collaborator ]
   can_by_role :show, public: true, roles: :visible_to
 end

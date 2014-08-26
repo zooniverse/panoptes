@@ -17,6 +17,9 @@ describe Project, :type => :model do
   it "should have a valid factory" do
     expect(project).to be_valid
   end
+  
+  it { is_expected.to permit_field(:visible_to).for_action(:show) }
+  it { is_expected.to permit_roles(:collaborator).for_action(:update) }
 
   it 'should require unique names for an ower' do
     owner = create(:user)
