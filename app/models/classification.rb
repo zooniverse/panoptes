@@ -11,7 +11,8 @@ class Classification < ActiveRecord::Base
   validates_presence_of :set_member_subject, :project, :workflow,
     :annotations, :user_ip
 
-  attr_accessible :annotations, :user_ip
+  attr_accessible :user_id, :project_id, :workflow_id, :user_group_id,
+    :set_member_subject_id, :annotations, :user_ip
   
   can :show, :in_show_scope?
   can :update, :created_and_incomplete?

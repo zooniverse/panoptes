@@ -41,11 +41,11 @@ shared_context "a classification create" do
 end
 
 describe Api::V1::ClassificationsController, type: :controller do
-  let(:classification) { create(:classification) }
+  let!(:user) { create(:user) }
+  let(:classification) { create(:classification, user: user) }
   let(:project) { create(:full_project) }
   let!(:workflow) { project.workflows.first }
   let!(:set_member_subject) { workflow.subject_sets.first.set_member_subjects.first }
-  let!(:user) { create(:user) }
   let(:created_classification_id) { created_instance_id("classifications") }
 
   let(:api_resource_name) { "classifications" }
