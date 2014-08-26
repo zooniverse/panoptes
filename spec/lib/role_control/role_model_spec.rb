@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe RoleControl::RoleModel do
   setup_role_control_tables
-  let(:subject) { RoleModelTable }
-  let(:enrolled) { EnrolledTable.create! }
+  let(:subject) { RolesJoinTable }
+  let(:enrolled_actor) { EnrolledActorTable.create! }
   let(:controlled) { ControlledTable.create! }
 
-  # Tests RoleModelTable as defined in
+  # Tests RolesJoinTable as defined in
   # spec/support/role_control_helpers.rb
   
   describe "::roles_for" do

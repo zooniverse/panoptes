@@ -1,11 +1,11 @@
 def setup_role_control_tables
-  mock_active_record_model(:enrolled) do |t|
+  mock_active_record_model(:enrolled_actor) do |t|
     t.string(:a_field)
   end
 
-  mock_active_record_model(:role_model) do |t|
+  mock_active_record_model(:roles_join) do |t|
     t.string(:roles, array: true, default: [], null: false)
-    t.integer(:enrolled_table_id)
+    t.integer(:enrolled_actor_table_id)
     t.integer(:controlled_table_id)
   end
 
@@ -14,11 +14,11 @@ def setup_role_control_tables
     t.string(:visible_to, array: true, default: [], null: false)
   end
 
-  EnrolledTable.class_eval do
+  EnrolledActorTable.class_eval do
     include RoleControl::Enrolled
     
-    has_many :role_model_tables
-    enrolled_for :controlled_tables, through: :role_model_tables
+    has_many :roles_join_tables
+    enrolled_for :controlled_tables, through: :roles_join_tables
   end
   
   ControlledTable.class_eval do
@@ -29,20 +29,20 @@ def setup_role_control_tables
     can_by_role :index, roles: [:admin]
   end
 
-  RoleModelTable.class_eval do
+  RolesJoinTable.class_eval do
     include RoleControl::RoleModel
-    belongs_to :enrolled_table
+    belongs_to :enrolled_actor_table
     belongs_to :controlled_table
 
-    roles_for :enrolled_table, :controlled_table,
+    roles_for :enrolled_actor_table, :controlled_table,
       valid_roles: [ :admin, :test_role, :test_parent_role]
   end
 end
 
-def create_role_model_instance(roles, controlled_resource, actor)
-  RoleModelTable.create! do |rmt|
+def create_roles_join_instance(roles, controlled_resource, actor)
+  RolesJoinTable.create! do |rmt|
     rmt.roles = roles
     rmt.controlled_table = controlled_resource
-    rmt.enrolled_table = actor
+    rmt.enrolled_actor_table = actor
   end
 end

@@ -17,22 +17,22 @@ end
 describe RoleControl::ParentalControlled do
   setup_role_control_tables
 
-  let(:enrolled) { EnrolledTable.create! }
+  let(:enrolled_actor) { EnrolledActorTable.create! }
   let(:controlled) { ControlledTable.create! }
-  let!(:relation) { create_role_model_instance(%w(test_parent_role test_role), controlled, enrolled)  }
+  let!(:relation) { create_roles_join_instance(%w(test_parent_role test_role), controlled, enrolled_actor)  }
 
   let(:tpc) { TestParentControl.new(controlled) }
 
   it "returns truthy when the parent's test would be true" do
-    expect(tpc.can_read?(enrolled)).to be_truthy
+    expect(tpc.can_read?(enrolled_actor)).to be_truthy
   end
 
   it "returns truthy when its own role test is met" do
-    expect(tpc.can_edit?(enrolled)).to be_truthy
+    expect(tpc.can_edit?(enrolled_actor)).to be_truthy
   end
 
   it "should call the parent's can method if it exists" do
     expect(controlled).to receive(:can_read?)
-    tpc.can_read?(enrolled)
+    tpc.can_read?(enrolled_actor)
   end
 end

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe RoleControl::RoledController, type: :controller do
   setup_role_control_tables
 
-  let!(:enrolled) { EnrolledTable.create! }
+  let!(:enrolled_actor) { EnrolledActorTable.create! }
   
   let!(:controlled) do
     ControlledTable.create! do |c|
@@ -16,7 +16,7 @@ describe RoleControl::RoledController, type: :controller do
     access_control_for :index, resource_class: ControlledTable
 
     def api_user
-      EnrolledTable.first
+      EnrolledActorTable.first
     end
 
     def index
@@ -26,7 +26,7 @@ describe RoleControl::RoledController, type: :controller do
 
   describe "user is enrolled on controlled object" do
     before(:each) do
-      create_role_model_instance(["admin"], controlled, enrolled)
+      create_roles_join_instance(["admin"], controlled, enrolled_actor)
     end
 
     it 'should return 200' do

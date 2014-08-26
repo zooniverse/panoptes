@@ -11,9 +11,9 @@ describe RoleControl::Controlled do
     end
   end
   
-  let(:enrolled_actor) { EnrolledTable.create! }
+  let(:enrolled_actor) { EnrolledActorTable.create! }
   
-  let(:unenrolled_actor) { EnrolledTable.create! }
+  let(:unenrolled_actor) { EnrolledActorTable.create! }
 
   describe "::can_create?" do
     it 'should return truthy when passed a non-nil value' do
@@ -36,10 +36,10 @@ describe RoleControl::Controlled do
       gt3.visible_to = %w(admin)
       [gt1,gt2,gt3].each(&:save!)
       
-      create_role_model_instance(%w(admin), gt1, enrolled_actor)
-      create_role_model_instance(%w(test_role), gt2, enrolled_actor)
-      create_role_model_instance(%w(test_role), gt3, enrolled_actor)
-      create_role_model_instance([], gt3, unenrolled_actor)
+      create_roles_join_instance(%w(admin), gt1, enrolled_actor)
+      create_roles_join_instance(%w(test_role), gt2, enrolled_actor)
+      create_roles_join_instance(%w(test_role), gt3, enrolled_actor)
+      create_roles_join_instance([], gt3, unenrolled_actor)
       
       [gt1, gt2, gt3]
     end
@@ -71,8 +71,8 @@ describe RoleControl::Controlled do
 
   describe "::can_by_role" do
     before(:each) do
-      create_role_model_instance(%w(test_role), controlled, enrolled_actor)
-      create_role_model_instance([], controlled, unenrolled_actor)
+      create_roles_join_instance(%w(test_role), controlled, enrolled_actor)
+      create_roles_join_instance([], controlled, unenrolled_actor)
     end
     
     it 'should create an instance method to test the action' do 

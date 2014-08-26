@@ -11,10 +11,10 @@ describe RoleControl::RoleQuery do
   let(:fake_resource_rel) { fake_rel('resource') }
   
   let(:instance) do
-    RoleControl::RoleQuery.new(fake_actor_rel, fake_resource_rel, :roles, RoleModelTable)
+    RoleControl::RoleQuery.new(fake_actor_rel, fake_resource_rel, :roles, RolesJoinTable)
   end
 
-  let(:actor) { EnrolledTable.create! }
+  let(:actor) { EnrolledActorTable.create! }
   let(:resources) { [ControlledTable.create!] }
 
   describe "#build" do
@@ -25,12 +25,12 @@ describe RoleControl::RoleQuery do
     end
 
     it 'should generate a sql query with a where eq when resources has length 1' do
-      sql_string = "SELECT \"__role_model_table\".\"roles\" AS roles, \"__role_model_table\".\"resource_id\", \"__role_model_table\".\"actor_id\" FROM \"__role_model_table\"  WHERE \"__role_model_table\".\"actor_id\" = #{ actor.id } AND \"__role_model_table\".\"resource_id\" = #{ resources.first.id }"
+      sql_string = "SELECT \"__roles_join_table\".\"roles\" AS roles, \"__roles_join_table\".\"resource_id\", \"__roles_join_table\".\"actor_id\" FROM \"__roles_join_table\"  WHERE \"__roles_join_table\".\"actor_id\" = #{ actor.id } AND \"__roles_join_table\".\"resource_id\" = #{ resources.first.id }"
       expect(built_query.to_sql).to eq(sql_string)
     end
 
     it 'should not include the actor where test when no actor is supplied' do
-      sql_string = "SELECT \"__role_model_table\".\"roles\" AS roles, \"__role_model_table\".\"resource_id\", \"__role_model_table\".\"actor_id\" FROM \"__role_model_table\"  WHERE \"__role_model_table\".\"resource_id\" = #{ resources.first.id }"
+      sql_string = "SELECT \"__roles_join_table\".\"roles\" AS roles, \"__roles_join_table\".\"resource_id\", \"__roles_join_table\".\"actor_id\" FROM \"__roles_join_table\"  WHERE \"__roles_join_table\".\"resource_id\" = #{ resources.first.id }"
       expect(instance.build(nil, resources).to_sql).to eq(sql_string)
     end
 
@@ -38,12 +38,12 @@ describe RoleControl::RoleQuery do
       resources = []
       4.times { resources << ControlledTable.create! }
       
-      sql_string = "SELECT \"__role_model_table\".\"roles\" AS roles, \"__role_model_table\".\"resource_id\", \"__role_model_table\".\"actor_id\" FROM \"__role_model_table\"  WHERE \"__role_model_table\".\"actor_id\" = #{ actor.id } AND \"__role_model_table\".\"resource_id\" IN (#{ resources.map(&:id).join(', ') })"
+      sql_string = "SELECT \"__roles_join_table\".\"roles\" AS roles, \"__roles_join_table\".\"resource_id\", \"__roles_join_table\".\"actor_id\" FROM \"__roles_join_table\"  WHERE \"__roles_join_table\".\"actor_id\" = #{ actor.id } AND \"__roles_join_table\".\"resource_id\" IN (#{ resources.map(&:id).join(', ') })"
       expect(instance.build(actor, resources).to_sql).to eq(sql_string)
     end
 
     it 'should not include the resource where test when no resources are supplied' do
-      sql_string = "SELECT \"__role_model_table\".\"roles\" AS roles, \"__role_model_table\".\"resource_id\", \"__role_model_table\".\"actor_id\" FROM \"__role_model_table\"  WHERE \"__role_model_table\".\"actor_id\" = #{ actor.id }"
+      sql_string = "SELECT \"__roles_join_table\".\"roles\" AS roles, \"__roles_join_table\".\"resource_id\", \"__roles_join_table\".\"actor_id\" FROM \"__roles_join_table\"  WHERE \"__roles_join_table\".\"actor_id\" = #{ actor.id }"
       expect(instance.build(actor, nil).to_sql).to eq(sql_string)
     end
   end

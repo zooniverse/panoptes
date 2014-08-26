@@ -3,12 +3,12 @@ require 'spec_helper'
 describe RoleControl::Enrolled do
   setup_role_control_tables
   
-  let(:subject) { EnrolledTable }
+  let(:subject) { EnrolledActorTable }
   let(:instance) { subject.create! }
   let(:target) { ControlledTable.create! }
 
   before(:each) do
-    create_role_model_instance(%w(test_role), target, instance)
+    create_roles_join_instance(%w(test_role), target, instance)
   end
   
   describe "::enrolled_for" do
@@ -48,7 +48,7 @@ describe RoleControl::Enrolled do
     let(:roles_query) { instance.roles_query(target) }
     
     it 'should call the class roles_for method' do
-      expect(EnrolledTable).to receive(:roles_for).with(instance, target)
+      expect(EnrolledActorTable).to receive(:roles_for).with(instance, target)
       roles_query
     end
 
