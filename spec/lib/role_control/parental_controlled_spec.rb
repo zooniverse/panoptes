@@ -23,11 +23,11 @@ describe RoleControl::ParentalControlled do
 
   let(:tpc) { TestParentControl.new(controlled) }
 
-  it "returns true when the parent's test would be true" do
+  it "returns truthy when the parent's test would be true" do
     expect(tpc.can_read?(enrolled)).to be_truthy
   end
 
-  it "returns true when its own role test is met" do
+  it "returns truthy when its own role test is met" do
     expect(tpc.can_edit?(enrolled)).to be_truthy
   end
 

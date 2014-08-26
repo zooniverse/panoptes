@@ -8,11 +8,11 @@ shared_examples "is ownable" do
   end
 
   describe "#owner?" do
-    it "should return true when passed its owner object" do
+    it "should return truthy when passed its owner object" do
       expect(owned.owner?(owned.owner)).to be_truthy
     end
 
-    it "should be false when passed an owner that does not own it" do
+    it "should be falsy when passed an owner that does not own it" do
       not_the_owner = build(:user)
       expect(owned.owner?(not_the_owner)).to be_falsy
     end

@@ -31,12 +31,12 @@ describe RoleControl::Adminable do
       obj.admin?(admin)
     end
 
-    it 'should return true when admin.is_admin? is true' do
+    it 'should return truthy when admin.is_admin? is true' do
       admin = Admin.new
       expect(obj.admin?(admin)).to be_truthy
     end
 
-    it 'should return false when admin.is_admin? is false' do
+    it 'should return falsy when admin.is_admin? is false' do
       admin = Admin.new(false)
       expect(obj.admin?(admin)).to be_falsy
     end

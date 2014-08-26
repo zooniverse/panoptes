@@ -16,11 +16,11 @@ describe RoleControl::Controlled do
   let(:unenrolled_actor) { EnrolledTable.create! }
 
   describe "::can_create?" do
-    it 'should return true when passed a non-nil value' do
+    it 'should return truthy when passed a non-nil value' do
       expect(subject.can_create?(Object.new)).to be_truthy
     end
 
-    it 'should return false when passed a nil value' do
+    it 'should return falsy when passed a nil value' do
       expect(subject.can_create?(nil)).to be_falsy
     end
   end
@@ -84,11 +84,11 @@ describe RoleControl::Controlled do
       expect(subject.instance_variable_get(:@can_filters)[:edit].first).to be_a(Proc)
     end
 
-    it 'should return true when passed an enrolled object with roles' do
+    it 'should return truthy when passed an enrolled object with roles' do
       expect(controlled.can_read?(enrolled_actor)).to be_truthy
     end
 
-    it 'should return false when passed an unenrolled object with no roles' do
+    it 'should return falsy when passed an unenrolled object with no roles' do
       expect(controlled.can_read?(unenrolled_actor)).to be_falsy
     end
   end

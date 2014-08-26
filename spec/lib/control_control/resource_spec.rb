@@ -19,7 +19,7 @@ describe ControlControl::Resource do
       expect(fake_class.instance_variable_get(:@can_filters)[:edit][0]).to be_a(Proc)
     end
 
-    it 'should create function that returns true when its filter is passed' do
+    it 'should create function that returns truthy when its filter is passed' do
       fake_class.__send__(:define_method, :fake_method, proc { |actor| actor.real? })
       fake_class.can(:edit, :fake_method)
       actor = double({ real?: true })
