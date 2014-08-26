@@ -10,6 +10,7 @@ FactoryGirl.define do
     sequence(:login) { |n| "new_user_#{n}" }
     global_email_communication true
     project_email_communication true
+    admin false
 
     after(:build) do |user|
       unless user.owner_name

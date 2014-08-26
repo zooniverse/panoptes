@@ -3,7 +3,6 @@ ENV["RAILS_ENV"] ||= 'test'
 require 'cellect/testing'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
-require "pundit/rspec"
 require 'paper_trail/frameworks/rspec'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
@@ -20,6 +19,7 @@ RSpec.configure do |config|
   config.include APIRequestHelpers, type: :controller
   config.include APIResponseHelpers, [ type: :controller, type: :request ]
   config.include CellectHelpers, type: :controller
+  config.extend RSpec::Helpers::ActiveRecordMocks
 
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true

@@ -173,7 +173,13 @@ GEM
       activerecord (>= 3.0, < 5.0)
       activesupport (>= 3.0, < 5.0)
     pg (0.17.1)
+    pg_array_parser (0.0.9)
+    pg_array_parser (0.0.9-java)
     polyglot (0.3.5)
+    postgres_ext (2.3.0)
+      activerecord (>= 4.0.0)
+      arel (>= 4.0.1)
+      pg_array_parser (~> 0.0.9)
     protected_attributes (1.0.8)
       activemodel (>= 4.0.1, < 5.0)
     pry (0.10.0)
@@ -187,8 +193,6 @@ GEM
       spoon (~> 0.0)
     pry-rails (0.3.2)
       pry (>= 0.9.10)
-    pundit (0.2.3)
-      activesupport (>= 3.0.0)
     rack (1.5.2)
     rack-cors (0.2.9)
     rack-test (0.6.2)
@@ -215,7 +219,6 @@ GEM
     rdoc (4.1.1)
       json (~> 1.4)
     ref (1.0.5)
-    rolify (3.4.0)
     rspec (3.0.0)
       rspec-core (~> 3.0.0)
       rspec-expectations (~> 3.0.0)
@@ -322,12 +325,11 @@ DEPENDENCIES
   omniauth-gplus
   paper_trail
   pg
+  postgres_ext
   pry-rails (~> 0.3.2)
-  pundit
   rack-cors
   rails (= 4.1.4)
   restpack_serializer!
-  rolify
   rspec (~> 3.0.0)
   rspec-rails (~> 3.0.0)
   sass-rails (~> 4.0.3)

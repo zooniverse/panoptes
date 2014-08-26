@@ -6,19 +6,20 @@ describe Project, :type => :model do
   let(:not_owned) { build(:project, owner: nil) }
   let(:subject_relation) { create(:project_with_subjects) }
   let(:activatable) { project }
-  let(:visible) { project }
   let(:translatable) { create(:project_with_contents) }
   let(:primary_language_factory) { :project }
 
   it_behaves_like "is ownable"
   it_behaves_like "has subject_count"
   it_behaves_like "activatable"
-  it_behaves_like "has visibility controls"
   it_behaves_like "is translatable"
 
   it "should have a valid factory" do
     expect(project).to be_valid
   end
+  
+  it { is_expected.to permit_field(:visible_to).for_action(:show) }
+  it { is_expected.to permit_roles(:collaborator).for_action(:update) }
 
   it 'should require unique names for an ower' do
     owner = create(:user)

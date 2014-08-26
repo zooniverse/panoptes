@@ -1,30 +1,41 @@
 class User < ActiveRecord::Base
+  extend ControlControl::Resource
   include Nameable
   include Activatable
-  include Owner
+  include RoleControl::Owner
+  include RoleControl::Enrolled
 
-  attr_accessible :name, :email, :password, :login, :migrated_user,
-    :display_name, :credited_name, :global_email_communication,
+  attr_accessible :name, :email, :password, :login, :migrated_user, :display_name, :credited_name, :global_email_communication,
     :project_email_communication
 
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable, omniauth_providers: [:facebook, :gplus]
 
-  rolify
-
   has_many :user_groups, through: :memberships
   has_many :classifications
-  has_many :memberships
   has_many :authorizations
+  has_many :user_project_preferences
+  has_many :user_collection_preferences
 
-  owns :projects, :collections, :subjects,
-    [:oauth_applications, {class_name: "Doorkeeper::Application"}]
+  has_many :memberships
+  has_many :active_memberships, -> { active }, class_name: 'Membership'
+  
+  owns :projects
+  owns :collections
+  owns :subjects
+  owns :oauth_applications, class_name: "Doorkeeper::Application"
+  
+  enrolled_for :projects, through: :user_project_preferences
+  enrolled_for :collections, through: :user_collection_preferences
+  enrolled_for :user_groups, through: :active_memberships
 
   validates :login, presence: true, uniqueness: true
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
+
+  can :show, proc { |requester| requester.user == self }
+  can :update, proc { |requester| requester.user == self }
+  can :destroy, proc { |requester| requester.user == self }
 
   attr_accessor :migrated_user
 

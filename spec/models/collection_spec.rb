@@ -5,16 +5,17 @@ describe Collection, :type => :model do
   let(:owned) { collection }
   let(:not_owned) { build(:collection, owner: nil) }
   let(:activatable) { collection }
-  let(:visible) { collection }
 
   it_behaves_like "is ownable"
   it_behaves_like "activatable"
-  it_behaves_like "has visibility controls"
 
   it "should have a valid factory" do
     expect(build(:collection)).to be_valid
   end
 
+  it { is_expected.to permit_field(:visible_to).for_action(:show) }
+  it { is_expected.to permit_roles(:collaborator).for_action(:update) }
+  
   it 'should require unique names for an ower' do
     owner = create(:user)
     expect(create(:collection, name: "hi_fives", owner: owner)).to be_valid

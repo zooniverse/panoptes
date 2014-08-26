@@ -1,10 +1,10 @@
 class Api::V1::WorkflowsController < Api::ApiController
   doorkeeper_for :update, :create, :delete, scopes: [:project]
-  after_action :verify_authorized, except: :index
+  access_control_for :create, :update, :destroy, resource_class: Workflow
+  
+  alias_method :workflow, :controlled_resource
 
   def show
-    workflow = Workflow.find(params[:id])
-    authorize workflow.project, :read?
     load_cellect
     render json_api: WorkflowSerializer.resource(params)
   end
@@ -19,7 +19,6 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def create
     workflow = Workflow.new creation_params
-    authorize workflow.project, :update?
     workflow.save!
     json_api_render( 201,
                      WorkflowSerializer.resource(workflow),
@@ -27,8 +26,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def destroy
-    workflow = Workflow.find params[:id]
-    authorize workflow.project, :destroy?
     workflow.destroy!
     deleted_resource_response
   end
@@ -42,14 +39,14 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def load_cellect
-    return unless current_resource_owner
+    return unless api_user
     Cellect::Client.connection.load_user(**cellect_params)
   end
 
   def cellect_params
     {
       host: cellect_host(params[:id]),
-      user_id: current_resource_owner.id,
+      user_id: api_user.id,
       workflow_id: params[:id]
     }
   end

@@ -11,7 +11,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
   let(:api_resource_links){ %w(subject_sets.project subject_sets.workflows) }
 
   before(:each) do
-    default_request scopes: %w(public subject_set)
+    default_request scopes: %w(public subject_set), user_id: owner.id
   end
 
   describe '#index' do

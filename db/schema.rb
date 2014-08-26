@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140801191844) do
+ActiveRecord::Schema.define(version: 20140811214222) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -52,9 +52,9 @@ ActiveRecord::Schema.define(version: 20140801191844) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "owner_type"
-    t.integer  "activated_state", default: 0, null: false
-    t.string   "visibility"
+    t.integer  "activated_state", default: 0,  null: false
     t.string   "display_name"
+    t.string   "visible_to",      default: [], null: false, array: true
   end
 
   add_index "collections", ["display_name", "owner_id", "owner_type"], name: "index_collections_on_display_name_and_owner_id_and_owner_type", unique: true, using: :btree
@@ -73,6 +73,7 @@ ActiveRecord::Schema.define(version: 20140801191844) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "roles",         default: [], null: false, array: true
   end
 
   add_index "memberships", ["user_group_id"], name: "index_memberships_on_user_group_id", using: :btree
@@ -153,27 +154,15 @@ ActiveRecord::Schema.define(version: 20140801191844) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "owner_type"
-    t.integer  "classifications_count", default: 0,     null: false
-    t.integer  "activated_state",       default: 0,     null: false
-    t.string   "visibility",            default: "dev", null: false
+    t.integer  "classifications_count", default: 0,  null: false
+    t.integer  "activated_state",       default: 0,  null: false
     t.string   "primary_language"
+    t.string   "visible_to",            default: [], null: false, array: true
   end
 
   add_index "projects", ["display_name", "owner_id", "owner_type"], name: "index_projects_on_display_name_and_owner_id_and_owner_type", using: :btree
   add_index "projects", ["name", "owner_id", "owner_type"], name: "index_projects_on_name_and_owner_id_and_owner_type", unique: true, using: :btree
-  add_index "projects", ["name"], name: "index_projects_on_name", using: :btree
   add_index "projects", ["owner_id"], name: "index_projects_on_owner_id", using: :btree
-
-  create_table "roles", force: true do |t|
-    t.string   "name"
-    t.integer  "resource_id"
-    t.string   "resource_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "roles", ["name", "resource_type", "resource_id"], name: "index_roles_on_name_and_resource_type_and_resource_id", using: :btree
-  add_index "roles", ["name"], name: "index_roles_on_name", using: :btree
 
   create_table "set_member_subjects", force: true do |t|
     t.integer  "state"
@@ -217,6 +206,18 @@ ActiveRecord::Schema.define(version: 20140801191844) do
   add_index "subjects", ["project_id"], name: "index_subjects_on_project_id", using: :btree
   add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
 
+  create_table "user_collection_preferences", force: true do |t|
+    t.json     "preferences"
+    t.string   "roles",         default: [], null: false, array: true
+    t.integer  "user_id"
+    t.integer  "collection_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_collection_preferences", ["collection_id"], name: "index_user_collection_preferences_on_collection_id", using: :btree
+  add_index "user_collection_preferences", ["user_id"], name: "index_user_collection_preferences_on_user_id", using: :btree
+
   create_table "user_groups", force: true do |t|
     t.string   "name"
     t.datetime "created_at"
@@ -235,6 +236,7 @@ ActiveRecord::Schema.define(version: 20140801191844) do
     t.json     "preferences"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "roles",               default: [], null: false, array: true
   end
 
   add_index "user_project_preferences", ["project_id"], name: "index_user_project_preferences_on_project_id", using: :btree
@@ -276,18 +278,12 @@ ActiveRecord::Schema.define(version: 20140801191844) do
     t.string   "languages",                   default: [],       null: false, array: true
     t.boolean  "global_email_communication"
     t.boolean  "project_email_communication"
+    t.boolean  "admin",                       default: false,    null: false
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
-
-  create_table "users_roles", id: false, force: true do |t|
-    t.integer "user_id"
-    t.integer "role_id"
-  end
-
-  add_index "users_roles", ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id", using: :btree
 
   create_table "versions", force: true do |t|
     t.string   "item_type",  null: false

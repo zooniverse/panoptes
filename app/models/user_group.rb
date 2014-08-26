@@ -1,11 +1,15 @@
 class UserGroup < ActiveRecord::Base
+  include RoleControl::Controlled
   include Nameable
   include Activatable
-  include Owner
+  include RoleControl::Owner
+  include RoleControl::Adminable
 
   attr_accessible :name, :display_name
 
-  owns :projects, :collections, :subjects
+  owns :projects
+  owns :collections
+  owns :subjects
 
   has_many :users, through: :memberships
   has_many :memberships
@@ -14,6 +18,20 @@ class UserGroup < ActiveRecord::Base
   validates :name, presence: true, uniqueness: true
 
   before_validation :downcase_case_insensitive_fields
+
+  can_by_role :show, roles: [ :group_admin, :project_editor, :collection_editor, :group_member ]
+  can_by_role :update, roles: [ :group_admin ]
+  can_by_role :destroy, roles: [ :group_admin ]
+
+  can_by_role :show, roles: [ :group_admin, :project_editor, :collection_editor, :group_member ]
+
+  can_by_role :update, act_as: Collection, roles: [ :group_admin, :collection_editor ]
+  can_by_role :destroy, act_as: Collection, roles: [ :group_admin, :collection_editor ]
+  can_by_role :create, act_as: Collection, roles: [ :group_admin, :collection_editor ]
+
+  can_by_role :update, act_as: Project, roles: [ :group_admin, :project_editor ]
+  can_by_role :destroy, act_as: Project, roles: [ :group_admin, :project_editor ]
+  can_by_role :create, act_as: Project, roles: [ :group_admin, :project_editor ]
 
   private
 

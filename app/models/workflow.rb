@@ -1,4 +1,5 @@
 class Workflow < ActiveRecord::Base
+  include RoleControl::ParentalControlled
   include SubjectCounts
   include Translatable
 
@@ -9,4 +10,8 @@ class Workflow < ActiveRecord::Base
   has_many :classifications
 
   validates_presence_of :project
+
+  can_by_role_through_parent :update, :project
+  can_by_role_through_parent :show, :project
+  can_by_role_through_parent :destroy, :project
 end

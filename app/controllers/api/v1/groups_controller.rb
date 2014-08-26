@@ -1,6 +1,9 @@
 class Api::V1::GroupsController < Api::ApiController
   doorkeeper_for :index, :create, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:group]
+  access_control_for :update, :create, :destroy, resource_class: UserGroup
+  
+  alias_method :user_group, :controlled_resource
 
   def show
     render json_api: UserGroupSerializer.resource(params)
@@ -24,9 +27,10 @@ class Api::V1::GroupsController < Api::ApiController
   end
 
   def destroy
-    user_group = UserGroup.find(params[:id])
-    authorize user_group, :destroy?
-    Activation.disable_instances!([ user_group ] | user_group.projects | user_group.memberships)
+    Activation.disable_instances!([ user_group ] |
+                                  user_group.projects |
+                                  user_group.collections |
+                                  user_group.memberships)
     deleted_resource_response
   end
 

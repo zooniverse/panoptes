@@ -6,7 +6,7 @@ describe Api::V1::ProjectsController, type: :controller do
   }
 
   let!(:projects) {
-    create_list(:project_with_contents, 2, owner: user)
+    projects = create_list(:project_with_contents, 2, owner: user)
   }
 
   let(:api_resource_name) { "projects" }
@@ -63,7 +63,10 @@ describe Api::V1::ProjectsController, type: :controller do
 
       context "when a project doesn't have any project_contents" do
         let!(:remove_project_contents) do
-          Project.first.update_attribute(:project_contents, [])
+          Project.all.each do |project|
+            project.project_contents = []
+            project.save!
+          end
         end
 
         it "should have 2 items by default" do

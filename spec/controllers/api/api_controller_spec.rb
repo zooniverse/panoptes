@@ -5,7 +5,9 @@ def setup_controller(api_controller)
     yield(self) if block_given?
 
     def index
-      render json_api: { tests: [ { all: "good" }, { at: "least" }, { thats: "what I pretend" } ] }
+      render json_api: { tests: [ { all: "good" },
+                                  { at: "least" },
+                                  { thats: "what I pretend" } ] }
     end
   end
 end
@@ -79,14 +81,16 @@ describe Api::ApiController, type: :controller do
     controller do
       doorkeeper_for :index, scopes: [:public]
       def index
-        authorize User.find(params[:id]), :read?
-        render json_api: { tests: [ { all: "good" }, { at: "least" }, { thats: "what I pretend" } ] }
+        resource = User.find(params[:id])
+        api_user.do(:show).to(resource).call do 
+          render json_api: { tests: [ { all: "good" }, { at: "least" }, { thats: "what I pretend" } ] }
+        end
       end
     end
 
     it "should return 403 with a logged in user" do
       default_request(scopes: ["public"], user_id: user.id)
-      allow_any_instance_of(UserPolicy).to receive(:read?).and_return(false)
+      allow_any_instance_of(User).to receive(:can_show?).and_return(false)
       get :index, id: user.id
       expect(response.status).to eq(403)
     end

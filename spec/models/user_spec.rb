@@ -3,11 +3,9 @@ require 'spec_helper'
 describe User, :type => :model do
   let(:user) { build(:user) }
   let(:named) { user }
-  let(:unnamed) do
-    unnamed = build(:user)
-    unnamed.owner_name = nil
-    unnamed
-  end
+  
+  let(:unnamed) { build(:user) { |u| u.owner_name = nil } }
+  
   let(:activatable) { user }
   let(:owner) { user }
   let(:owned) { build(:project, owner: user) }
@@ -70,7 +68,7 @@ describe User, :type => :model do
   end
 
   describe '#login' do
-     it 'should validate presence' do
+    it 'should validate presence' do
       expect(build(:user, login: "").valid?).to be false
     end
 
@@ -237,5 +235,34 @@ describe User, :type => :model do
     let(:relation_instance) { user }
 
     it_behaves_like "it has a cached counter for classifications"
+  end
+
+  describe "#do" do
+    let(:user) { create(:user) }
+    let(:project) { create(:project) }
+    let!(:user_project_preference) do
+      create(:user_project_preference,
+             roles: ['collaborator'],
+             project: project,
+             user: user)
+    end
+
+    let(:test_proc) { proc { true } }
+
+    it 'should be allowed to update the resource' do
+      result = user.do(:update).to(project).call &test_proc
+      expect(result).to be_truthy
+    end
+
+    it 'should be allowed to show the resource' do
+      result = user.do(:show).to(project).call &test_proc
+      expect(result).to be_truthy
+    end
+    
+    it 'should not be allowed to destroy the resource' do
+      user_project_preference.roles = []
+      user_project_preference.save!
+      expect{user.do(:destroy).to(project).call &test_proc}.to raise_error(ControlControl::AccessDenied)
+    end
   end
 end

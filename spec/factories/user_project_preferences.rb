@@ -3,6 +3,7 @@ FactoryGirl.define do
     user
     project
     email_communication true
+    roles []
     preferences '{"tutorial": "done"}'
   end
 end

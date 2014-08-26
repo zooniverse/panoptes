@@ -12,12 +12,12 @@ class Api::V1::ClassificationsController < Api::ApiController
   def create
     classification = Classification.new(creation_params)
     classification.user_ip = request_ip
-    if user = current_resource_owner
+    if api_user.logged_in?
       update_cellect
-      classification.user = user
+      classification.user = api_user.user
     end
     if classification.save!
-      uss_params = user_seen_subject_params(user)
+      uss_params = user_seen_subject_params(api_user)
       UserSeenSubjectUpdater.update_user_seen_subjects(uss_params)
       create_project_preference
       json_api_render( 201,
@@ -29,10 +29,10 @@ class Api::V1::ClassificationsController < Api::ApiController
   private
 
   def create_project_preference
-    return unless current_resource_owner
-    UserProjectPreference.where(user: current_resource_owner, **preference_params)
+    return unless api_user.logged_in?
+    UserProjectPreference.where(user: api_user.user, **preference_params)
       .first_or_create do |up|
-        up.email_communication = current_resource_owner.project_email_communication
+        up.email_communication = api_user.user.project_email_communication
         up.preferences = {}
       end
   end
@@ -51,7 +51,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def cellect_params
     permitted_cellect_params
-      .merge(user_id: current_resource_owner.id,
+      .merge(user_id: api_user.id,
              host: cellect_host(params[:workflow_id]))
       .symbolize_keys
   end
@@ -70,10 +70,9 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def user_seen_subject_params(user)
-    user_id = user ? user.id : nil
     params = permitted_cellect_params
                .slice(:subject_id, :workflow_id)
-               .merge(user_id: user_id)
+               .merge(user_id: user.id)
     params.symbolize_keys
   end
 end

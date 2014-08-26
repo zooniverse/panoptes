@@ -122,7 +122,7 @@ describe Api::V1::GroupsController, type: :controller do
     let(:group) { user_groups.first }
 
     it "should call Activation#disable_instances! with instances to disable" do
-      instances_to_disable = [group] | group.projects | group.memberships
+      instances_to_disable = [group] | group.projects | group.memberships | group.collections
       expect(Activation).to receive(:disable_instances!).with(instances_to_disable)
       delete :destroy, id: group.id
     end
