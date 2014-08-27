@@ -1,12 +1,13 @@
 class Api::V1::ClassificationsController < Api::ApiController
   doorkeeper_for :show, :index, scopes: [:classifications]
+  access_control_for :update, :destroy, resource_class: Classification
 
   def show
-    render json_api: ClassificationSerializer.resource(params)
+    render json_api: ClassificationSerializer.resource(params, visible_scope(api_user))
   end
 
   def index
-    render json_api: ClassificationSerializer.page(params)
+    render json_api: ClassificationSerializer.page(params, visible_scope(api_user))
   end
 
   def create
@@ -26,7 +27,19 @@ class Api::V1::ClassificationsController < Api::ApiController
     end
   end
 
+  def update
+    # TODO
+  end
+
+  def destroy
+    # TODO
+  end
+
   private
+
+  def visible_scope(actor)
+    Classification.visible_to(actor)
+  end
 
   def create_project_preference
     return unless api_user.logged_in?

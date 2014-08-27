@@ -12,7 +12,7 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable, omniauth_providers: [:facebook, :gplus]
 
-  has_many :user_groups, through: :memberships
+  has_many :user_groups, through: :active_memberships
   has_many :classifications
   has_many :authorizations
   has_many :user_project_preferences
