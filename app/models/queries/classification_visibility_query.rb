@@ -10,21 +10,21 @@ class ClassificationVisibilityQuery
     query = @parent.where(where_user
                           .or(where_project)
                           .or(where_group))
-    rebind(query, all_binding_values)
+    rebind(query)
   end
 
   private
 
-  def rebind(query, binding_values)
-    binding_values.reduce(query) { |query, value| query.bind(value) }
+  def rebind(query)
+    all_bind_values.reduce(query) { |query, value| query.bind(value) }
   end
-
+  
   def arel_table
     @parent.arel_table
   end
 
-  def all_binding_values
-    project_scope.bind_values.concat(group_scope.bind_values)
+  def all_bind_values
+    project_scope.bind_values | group_scope.bind_values
   end
   
   def where_user

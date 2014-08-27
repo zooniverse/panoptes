@@ -6,6 +6,7 @@ default: &default
   host: localhost
   pool: 5
   port: 5432
+  prepared_statements: false
 
 development:
   <<: *default
@@ -15,6 +16,7 @@ test:
   adapter: postgresql
   database: travis_ci_test
   username: postgres
+  prepared_statements: false
 
 docker_dev:
   <<: *default
