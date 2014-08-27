@@ -8,17 +8,15 @@ class ClassificationVisibilityQuery
   def build(as_admin)
     return @parent.all if actor.is_admin? && as_admin
     query = @parent.where(where_user
-                  .or(where_project)
-                  .or(where_group))
+                          .or(where_project)
+                          .or(where_group))
     rebind(query, all_binding_values)
   end
 
   private
 
   def rebind(query, binding_values)
-    binding_values.reduce(query) do |query, value|
-      query.bind(value)
-    end
+    binding_values.reduce(query) { |query, value| query.bind(value) }
   end
 
   def arel_table
@@ -30,7 +28,7 @@ class ClassificationVisibilityQuery
   end
   
   def where_user
-    @where_user ||= arel_table[:user_id].eq(actor.id)
+    arel_table[:user_id].eq(actor.id)
   end
 
   def project_scope
@@ -38,7 +36,7 @@ class ClassificationVisibilityQuery
   end
 
   def group_scope
-    @group_query = actor.owner.user_groups.select(:id)
+    @group_query ||= actor.owner.user_groups.select(:id)
   end
 
   def where_project
