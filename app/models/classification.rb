@@ -19,10 +19,7 @@ class Classification < ActiveRecord::Base
   can :destroy, :created_and_incomplete?
 
   def self.visible_to(actor, as_admin: false)
-    return all if actor.is_admin? && as_admin
-    where(where_user(actor)
-          .or(where_project(actor))
-          .or(where_group(actor)))
+    ClassificationVisibilityQuery.new(actor, self).build(as_admin)
   end
 
   def creator?(actor)
@@ -38,21 +35,7 @@ class Classification < ActiveRecord::Base
   end
 
   private
-
-  def self.where_user(actor)
-    arel_table[:user_id].eq(actor.id)
-  end
-
-  def self.where_project(actor)
-    projects = Project.scope_for(:update, actor).select(:id).to_sql
-    arel_table[:project_id].in(Arel.sql(projects))
-  end
-
-  def self.where_group(actor)
-    groups = actor.owner.user_groups.select(:id).to_sql
-    arel_table[:user_group_id].in(Arel.sql(groups))
-  end
-  
+ 
   def created_and_incomplete?(actor)
     creator?(actor) && incomplete?
   end
