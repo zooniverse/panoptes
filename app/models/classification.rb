@@ -1,7 +1,7 @@
 class Classification < ActiveRecord::Base
   extend ControlControl::Resource
   include RoleControl::Adminable
-  
+
   belongs_to :set_member_subject, counter_cache: true
   belongs_to :project, counter_cache: true
   belongs_to :user, counter_cache: true
@@ -10,10 +10,11 @@ class Classification < ActiveRecord::Base
 
   validates_presence_of :set_member_subject, :project, :workflow,
     :annotations, :user_ip
+  validates :completed, inclusion: { in: [ true, false ] }
 
   attr_accessible :user_id, :project_id, :workflow_id, :user_group_id,
     :set_member_subject_id, :annotations, :user_ip
-  
+
   can :show, :in_show_scope?
   can :update, :created_and_incomplete?
   can :destroy, :created_and_incomplete?
@@ -35,7 +36,7 @@ class Classification < ActiveRecord::Base
   end
 
   private
- 
+
   def created_and_incomplete?(actor)
     creator?(actor) && incomplete?
   end
