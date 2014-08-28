@@ -6,25 +6,15 @@ class Api::V1::UsersController < Api::ApiController
   alias_method :user, :controlled_resource
 
   def index
-    render json_api: UserSerializer.page(params)
+    render json_api: page_serializer(params)
   end
 
   def show
-    render json_api: UserSerializer.resource(params)
+    render json_api: resource_serializer(params)
   end
 
   def me
-    render json_api: UserSerializer.resource(current_resource_owner)
-  end
-
-  def update
-    response_status, response = begin
-      user.update!(request_update_attributes(user))
-      [ :ok, UserSerializer.resource(user) ]
-    rescue Api::PatchResourceError, ActiveRecord::RecordInvalid => e
-      [ :bad_request, e ]
-    end
-    render status: response_status, json_api: response
+    render json_api: resource_serializer(current_resource_owner)
   end
 
   def destroy
@@ -36,5 +26,19 @@ class Api::V1::UsersController < Api::ApiController
                                   user.memberships)
     revoke_doorkeeper_request_token!
     deleted_resource_response
+  end
+
+  private
+
+  def resource_serializer(*args)
+    UserSerializer.resource(*args)
+  end
+
+  def page_serializer(*args)
+    UserSerializer.page(*args)
+  end
+
+  def permitted_update_attributes
+    params.require(:users).permit(:display_name, :email, :credited_name)
   end
 end

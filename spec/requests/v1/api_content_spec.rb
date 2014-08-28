@@ -39,9 +39,9 @@ describe "api should only accept certain content types", type: :request do
   end
 
   describe "json patch format" do
-    it 'should allow access on PATCH requests but return unauthorized' do
+    it 'should return not implemented on patch requests' do
       patch '/api/users/1', nil, json_patch_type_headers
-      expect(response.status).to eq(401)
+      expect(response.status).to eq(501)
     end
 
     it 'should return unsupported media type on non-patch requests' do

@@ -68,19 +68,17 @@ describe Api::V1::UsersController, type: :controller do
 
   describe "#update" do
     let(:user) { users.first }
-    let!(:setup_request_headers) do
-       request.env["CONTENT_TYPE"] = "application/json-patch+json"
-    end
     let(:user_id) { user.id }
 
     before(:each) do
-      request.env["RAW_POST_DATA"] = patch_operations
-      patch :update, id: user_id
+      params = put_operations || Hash.new
+      params[:id] = user_id
+      put :update, params
     end
 
     context "when updating a non-existant user" do
       let!(:user_id) { -1 }
-      let(:patch_operations) { nil }
+      let(:put_operations) { nil }
 
       it "should return a 404 status" do
         expect(response.status).to eq(404)
@@ -92,10 +90,10 @@ describe Api::V1::UsersController, type: :controller do
       end
     end
 
-    context "with a valid replace patch operation" do
+    context "with a valid replace put operation" do
       let(:new_display_name) { "Mr Creosote" }
-      let(:patch_operations) do
-        [{ "op" => "replace", "path" => "/display_name", "value" => "#{new_display_name}" }].to_json
+      let(:put_operations) do
+        { users: { display_name: new_display_name } }
       end
 
       it "should return 200 status" do
@@ -113,15 +111,15 @@ describe Api::V1::UsersController, type: :controller do
       it_behaves_like "an api response"
     end
 
-    context "with a an invalid patch operation" do
-      let(:patch_operations) { [{}].to_json }
+    context "with a an invalid put operation" do
+      let(:put_operations) { {} }
 
       it "should return an error status" do
         expect(response.status).to eq(400)
       end
 
       it "should return a specific error message in the response body" do
-        error_message = json_error_message("Patch failed to apply, check patch options.")
+        error_message = json_error_message("param is missing or the value is empty: users")
         expect(response.body).to eq(error_message)
       end
 
@@ -131,15 +129,15 @@ describe Api::V1::UsersController, type: :controller do
       end
     end
 
-    context "with and patch operation that sets a required attribute to nil" do
-      let(:patch_operations) { [{ "op" => "replace", "path" => "/login", "value" => "" }].to_json }
+    context "with and put operation that sets a required attribute to nil" do
+      let(:put_operations) { {users: { login: "" }} }
 
       it "should return a bad request status" do
         expect(response.status).to eq(400)
       end
 
       it "should return a specific error message in the response body" do
-        error_message = json_error_message("Validation failed: Login can't be blank")
+        error_message = json_error_message("found unpermitted parameters: login")
         expect(response.body).to eq(error_message)
       end
 
