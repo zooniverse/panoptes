@@ -55,9 +55,7 @@ FactoryGirl.define do
     end
 
     factory :admin_user do
-      after(:build) do |u|
-        u.add_role :admin
-      end
+      admin true
     end
   end
 
