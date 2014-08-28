@@ -20,18 +20,19 @@ class User < ActiveRecord::Base
 
   has_many :memberships
   has_many :active_memberships, -> { active }, class_name: 'Membership'
-  
+
   owns :projects
   owns :collections
   owns :subjects
   owns :oauth_applications, class_name: "Doorkeeper::Application"
-  
+
   enrolled_for :projects, through: :user_project_preferences
   enrolled_for :collections, through: :user_collection_preferences
   enrolled_for :user_groups, through: :active_memberships
 
   validates :login, presence: true, uniqueness: true
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
+  validates :admin, inclusion: { in: [ true, false ], message: "must be a boolean value" }
 
   can :show, proc { |requester| requester.user == self }
   can :update, proc { |requester| requester.user == self }

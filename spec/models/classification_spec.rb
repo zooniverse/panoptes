@@ -25,6 +25,10 @@ describe Classification, :type => :model do
     expect(build(:classification, annotations: nil)).to_not be_valid
   end
 
+  it "must have a completed value" do
+    expect(build(:classification, completed: nil)).to_not be_valid
+  end
+
   it "should be valid without a user" do
     expect(build(:classification, user: nil)).to be_valid
   end
@@ -41,7 +45,7 @@ describe Classification, :type => :model do
        create(:classification, user_group: user_group),
        create(:classification)]
     end
-    
+
     it 'should return an ActiveRecord::Relation' do
       expect(Classification.visible_to(user)).to be_a(ActiveRecord::Relation)
     end
@@ -50,12 +54,12 @@ describe Classification, :type => :model do
       expected = classifications[1]
       expect(Classification.visible_to(user)).to include(expected)
     end
-    
+
     it 'should return all classifications for a user group if the user can update it' do
       expected = classifications[2]
       expect(Classification.visible_to(user)).to include(expected)
     end
-    
+
     it 'should return all classifications a user has made' do
       expected = classifications[0]
       expect(Classification.visible_to(user)).to include(expected)
@@ -70,7 +74,7 @@ describe Classification, :type => :model do
 
   describe "#creator?" do
     let(:user) { LoggedInUser.new(build(:user)) }
-    
+
     it "should be truthy if a user is the classification's creator" do
       classification = build(:classification, user: user.owner)
       expect(classification.creator?(user)).to be_truthy
@@ -94,18 +98,18 @@ describe Classification, :type => :model do
 
   describe "#in_show_scope?" do
     let(:user) { LoggedInUser.new(create(:user)) }
-    
+
     it "should be truthy if the classification is in the actor's visible_scope" do
       classification = create(:classification, user: user.owner)
       expect(classification.in_show_scope?(user)).to be_truthy
-      
+
     end
-    
+
     it "should be falsy if the classification is not in the actor's visible_scope" do
       classification = create(:classification)
       expect(classification.in_show_scope?(user)).to be_falsy
     end
-    
+
   end
 
   describe "#user_groups" do

@@ -3,9 +3,9 @@ require 'spec_helper'
 describe User, :type => :model do
   let(:user) { build(:user) }
   let(:named) { user }
-  
+
   let(:unnamed) { build(:user) { |u| u.owner_name = nil } }
-  
+
   let(:activatable) { user }
   let(:owner) { user }
   let(:owned) { build(:project, owner: user) }
@@ -163,6 +163,29 @@ describe User, :type => :model do
     end
   end
 
+  describe "#admin" do
+    let(:user) { build(:user) }
+
+    it "should be false" do
+      expect(user.admin).to be false
+    end
+
+    context "without an admin value" do
+      before(:each) do
+        user.admin = nil
+      end
+
+      it "should not be valid without an admin value" do
+        expect(user).to_not be_valid
+      end
+
+      it "should have the correct error message" do
+        user.valid?
+        expect(user.errors[:admin]).to include("must be a boolean value")
+      end
+    end
+  end
+
   describe "#active_for_authentication?" do
     let(:user) { create(:user) }
 
@@ -258,7 +281,7 @@ describe User, :type => :model do
       result = user.do(:show).to(project).call &test_proc
       expect(result).to be_truthy
     end
-    
+
     it 'should not be allowed to destroy the resource' do
       user_project_preference.roles = []
       user_project_preference.save!
