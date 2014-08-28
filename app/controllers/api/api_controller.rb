@@ -16,11 +16,17 @@ module Api
     rescue_from Api::UnsupportedMediaType, with: :unsupported_media_type
     rescue_from Api::UserSeenSubjectIdError, with: :unprocessable_entity
     rescue_from ControlControl::AccessDenied, with: :not_authorized
+    rescue_from Api::PatchResourceError, with: :unprocessable_entity
+    rescue_from ActionController::UnpermittedParameters, with: :unprocessable_entity
+    rescue_from ActionController::ParameterMissing, with: :unprocessable_entity
 
-    before_action ContentTypeFilter.new(API_ACCEPTED_CONTENT_TYPE, API_ALLOWED_METHOD_OVERRIDES)
+    before_action ContentTypeFilter.new(API_ACCEPTED_CONTENT_TYPE,
+                                        API_ALLOWED_METHOD_OVERRIDES)
 
     def current_resource_owner
-      @current_resource_owner ||= User.find(doorkeeper_token.resource_owner_id) if doorkeeper_token
+      if doorkeeper_token
+        @current_resource_owner ||= User.find(doorkeeper_token.resource_owner_id)
+      end
     end
 
     def api_user

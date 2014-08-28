@@ -2,18 +2,10 @@ module UpdateResource
   extend ActiveSupport::Concern
   
   def update
-    response_status, response =
-      begin
-        attributes = request_update_attributes(controlled_resource)
-        controlled_resource.update!(attributes)
-        [ :ok, resource_serializer(controlled_resource) ]
-      rescue Api::PatchResourceError,
-          ActiveRecord::RecordInvalid,
-          ActionController::ParameterMissing,
-          ActionController::UnpermittedParameters => e
-        [ :bad_request, e ]
-      end
-    render status: response_status, json_api: response
+    attributes = request_update_attributes(controlled_resource)
+    controlled_resource.update!(attributes)
+    response = resource_serializer(controlled_resource)
+    render json_api: response
   end
 
   def request_update_attributes(resource)

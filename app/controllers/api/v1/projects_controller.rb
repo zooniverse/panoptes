@@ -42,6 +42,10 @@ class Api::V1::ProjectsController < Api::ApiController
 
   private
 
+  def resource_serializer(*args)
+    ProjectSerializer.resource(*args)
+  end
+
   def add_owner_ids_filter_param!
     owner_filter = params.delete(:owner)
     owner_ids = OwnerName.where(name: owner_filter).map(&:resource_id).join(",")
@@ -49,22 +53,29 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_project_response(project)
-    ProjectSerializer.resource( project,
-                               nil,
-                               languages: [ params[:project][:primary_language] ],
-                               fields: ['title', 'description'] )
+    resource_serializer(project,
+                        nil,
+                        languages: [ params[:project][:primary_language] ],
+                        fields: ['title', 'description'] )
+  end
+
+  def creation_params
+    params.require(:project)
+      .permit(:description, :display_name, :name, :primary_language)
   end
 
   def project_params
-    params.require(:project).permit(:display_name, :name, :primary_language)
+    project_params = creation_params.dup
+    project_params.delete(:description)
+    project_params
   end
 
   def content_params
-    params.require(:project).permit(:description, :display_name, :primary_language)
-    .tap do |obj| 
-      obj[:title] = obj.delete(:display_name)
-      obj[:language] = obj.delete(:primary_language)
-    end
+    content_params = creation_params.dup
+    content_params.delete(:name)
+    content_params[:title] = content_params.delete(:display_name)
+    content_params[:language] = content_params.delete(:primary_language)
+    content_params
   end
 
   def create_project(owner)
@@ -80,5 +91,4 @@ class Api::V1::ProjectsController < Api::ApiController
 
     project
   end
-
 end 

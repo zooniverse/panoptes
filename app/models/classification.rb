@@ -13,7 +13,7 @@ class Classification < ActiveRecord::Base
   validates :completed, inclusion: { in: [ true, false ] }
 
   attr_accessible :user_id, :project_id, :workflow_id, :user_group_id,
-    :set_member_subject_id, :annotations, :user_ip
+    :set_member_subject_id, :annotations, :user_ip, :completed
 
   can :show, :in_show_scope?
   can :update, :created_and_incomplete?

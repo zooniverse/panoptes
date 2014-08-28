@@ -16,7 +16,11 @@ describe RegistrationsController, type: :controller do
 
       context "with valid user attributes" do
         let(:login) { "mcMMO-Dev" }
-        let(:user_attributes) { attributes_for(:user, login: login, display_name: nil) }
+        let(:user_attributes) do
+          attributes_for(:user, login: login, display_name: nil)
+            .slice(:email, :password, :password_confirmation, :login, :name,
+                   :global_email_communication, :project_email_communication)
+        end
 
         it "should return 201" do
           post :create, user: user_attributes
@@ -49,7 +53,12 @@ describe RegistrationsController, type: :controller do
       end
 
       context "with caps and spaces in the login name" do
-        let(:user_attributes) { attributes_for(:user, login: "Test User Login") }
+        let(:user_attributes) do
+          attributes_for(:user, login: "Test User Login")
+            .slice(:email, :password, :password_confirmation, :login, :name,
+                   :global_email_communication, :project_email_communication)
+        end
+        
 
         it "should convert the owner_name#name field correctly" do
           post :create, user: user_attributes
@@ -59,7 +68,12 @@ describe RegistrationsController, type: :controller do
       end
 
       context "with invalid user attributes" do
-        let(:user_attributes) { attributes_for(:user).merge(login: nil) }
+        let(:user_attributes) do
+          attributes_for(:user).merge(login: nil)
+            .slice(:email, :password, :password_confirmation, :login, :name, 
+                   :global_email_communication, :project_email_communication)
+        end
+        
 
         it "should return 422" do
           post :create, user: user_attributes

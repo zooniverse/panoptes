@@ -5,7 +5,7 @@ describe RejectPatchRequests do
   let(:middle) { RejectPatchRequests.new(app) }
   
   context "when a request is not a PATCh" do
-    let(:env) { double({ patch?: false }) }
+    let(:env) { { 'REQUEST_METHOD' => 'PUT' } }
     
     it 'should allow execution to continue normally' do
       expect(app).to receive(:call)
@@ -18,7 +18,7 @@ describe RejectPatchRequests do
   end
 
   context "when a request is a PATCH" do
-    let(:env) { double({ patch?: true }) }
+    let(:env) { { 'REQUEST_METHOD' => 'PATCH' } }
     let(:request) { middle.call(env) }
     let(:status) { 501 }
     let(:msg) { "PATCH Requests are not currently supported" }

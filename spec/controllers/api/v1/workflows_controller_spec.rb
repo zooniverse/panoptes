@@ -39,7 +39,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     before(:each) do
       default_request scopes: %w(public project), user_id: owner.id
       params = {
-        workflow: {
+        workflows: {
           name: 'Test workflow',
           tasks: [{ foo: 'bar' }, { bar: 'baz' }],
           project_id: project.id,

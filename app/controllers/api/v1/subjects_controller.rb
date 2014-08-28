@@ -43,7 +43,8 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def cellect_params
-    c_params = params.permit(:workflow_id, :subject_set_id, :limit)
+    c_params = params.permit(:workflow_id, :subject_set_id, :limit, :sort)
+      .slice(:workflow_id, :subject_set_id, :limit)
       .merge(user_id: api_user.try(:id),
              limit: 10,
              host: cellect_host(params[:workflow_id])) {|k, ov, nv| ov ? ov : nv}

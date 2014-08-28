@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 def annotation_values
-  [ { value: "adult" },
+  [ { key: "age", value: "adult" },
     { started_at: DateTime.now },
     { finished_at: DateTime.now },
     { user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" } ]
@@ -9,11 +9,12 @@ end
 
 def setup_create_request(project_id, workflow_id, set_member_subject)
   request.session = { cellect_hosts: { workflow_id.to_s => "example.com" } }
-  params = { classification: { project_id: project_id,
-                               workflow_id: workflow_id,
-                               set_member_subject_id: set_member_subject.id,
-                               subject_id: set_member_subject.subject_id,
-                               annotations: annotation_values } }
+  params = { classifications: { project_id: project_id,
+                                workflow_id: workflow_id,
+                                completed: true,
+                                set_member_subject_id: set_member_subject.id,
+                                subject_id: set_member_subject.subject_id,
+                                annotations: annotation_values } }
   post :create, params
 end
 

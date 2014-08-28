@@ -33,9 +33,15 @@ class Api::V1::WorkflowsController < Api::ApiController
   private
 
   def creation_params
-    params.require(:workflow)
-      .permit(:name, :project_id, :pairwise, :grouped, :prioritized, :primary_language)
-      .merge tasks: params[:workflow][:tasks]
+    tasks = params[:workflows].delete(:tasks)
+    params.require(:workflows)
+      .permit(:name,
+              :project_id,
+              :pairwise,
+              :grouped,
+              :prioritized,
+              :primary_language)
+      .merge(tasks: tasks)
   end
 
   def load_cellect

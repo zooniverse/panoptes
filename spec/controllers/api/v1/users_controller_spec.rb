@@ -115,7 +115,7 @@ describe Api::V1::UsersController, type: :controller do
       let(:put_operations) { {} }
 
       it "should return an error status" do
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
 
       it "should return a specific error message in the response body" do
@@ -133,7 +133,7 @@ describe Api::V1::UsersController, type: :controller do
       let(:put_operations) { {users: { login: "" }} }
 
       it "should return a bad request status" do
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
 
       it "should return a specific error message in the response body" do

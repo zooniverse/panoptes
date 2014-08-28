@@ -108,11 +108,11 @@ describe Api::V1::GroupsController, type: :controller do
       end
 
       it "should respond with bad_request" do
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
 
       it "should have the validation errors in the response body" do
-        message = "Validation failed: Owner name name can't be blank, Name can't be blank"
+        message = "found unpermitted parameters: nmae"
         expect(response.body).to eq(json_error_message(message))
       end
     end
