@@ -35,5 +35,8 @@ module Panoptes
                            methods: [:delete, :get, :post, :options, :put, :patch]
       end
     end
+
+    config.middleware.insert_before ActionDispatch::ParamsParser, "RejectPatchRequests"
+    config.action_controller.action_on_unpermitted_parameters = :raise
   end
 end
