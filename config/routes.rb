@@ -25,12 +25,13 @@ Rails.application.routes.draw do
       resource_classes = [ :memberships, :groups, :collections, :subjects,
                            :projects, :classifications, :workflows,
                            :subject_sets ]
-      default_excepts = [:new, :edit]
+      except = [:new, :edit]
+
       resource_classes.each do |resource|
-        if resource == :classifications
-          except_list = default_excepts | [ :destroy, :update ]
+        resources resource, except: except, format: false do
+          post "/links/:link_relation", to: "#{ resource }#update_links", format: false
+          delete "/links/:link_relation(/:link_ids)", to: "#{ resource }#destroy_links", format: false
         end
-        resources resource, except: except_list, format: false
       end
     end
   end
