@@ -2,7 +2,7 @@ FROM ubuntu:12.04
 
 ENV LANG en_US.UTF-8
 ENV CONFIGURE_OPTS --disable-install-rdoc
-ENV RAILS_ENV docker_dev
+ENV RAILS_ENV production
 ENV JRUBY_OPTS --2.0
 
 WORKDIR /rails_app
@@ -18,4 +18,4 @@ RUN apt-get update && \
     bundle install && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENTRYPOINT rails s
+ENTRYPOINT /rails_app/start.sh
