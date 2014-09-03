@@ -14,12 +14,20 @@ Doorkeeper.configure do
   end
 
   resource_owner_from_credentials do
-    if u = User.find_for_database_authentication(login: params[:login])
+    if params[:login] && u = User.find_for_database_authentication(login: params[:login])
       valid_non_disabled_user = u.valid_password?(params[:password]) && !u.disabled?
     else
       u = current_user
       valid_non_disabled_user = !u.blank? && !u.disabled?
     end
     u if valid_non_disabled_user
+  end
+
+  admin_authenticator do |routes|
+    if u = current_user
+      u.admin ? u : (head :forbidden)
+    else
+      head :unauthorized
+    end
   end
 end

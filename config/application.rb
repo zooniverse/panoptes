@@ -34,5 +34,11 @@ module Panoptes
         resource '/api/*', headers: :any, methods: [:get, :post, :options, :put, :patch]
       end
     end
+
+    #hack to fix issue with doorkeeper not loading ControllerHelpers in test env
+    # https://github.com/doorkeeper-gem/doorkeeper/issues/375
+    config.to_prepare do
+      Doorkeeper::ApplicationsController.helper Doorkeeper::Helpers::Controller
+    end
   end
 end
