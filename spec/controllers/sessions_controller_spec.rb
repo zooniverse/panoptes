@@ -6,7 +6,7 @@ describe SessionsController, type: :controller do
 
   context "using json" do
     before(:each) do
-      request.env["HTTP_ACCEPT"] = "application/vnd.api+json"
+      request.env["HTTP_ACCEPT"] = "application/json"
       request.env["CONTENT_TYPE"] = "application/json"
       request.env["devise.mapping"] = Devise.mappings[:user]
     end
@@ -35,7 +35,7 @@ describe SessionsController, type: :controller do
         end
 
         it 'should return no-content' do
-          delete :destroy 
+          delete :destroy
           expect(response.status).to eq(204)
         end
 

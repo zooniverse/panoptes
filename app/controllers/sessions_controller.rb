@@ -1,25 +1,24 @@
 class SessionsController < Devise::SessionsController
-  include JSONApiRender
   after_filter :set_csrf_headers, only: [:create, :destroy]
 
   def new
     respond_to do |format|
       format.html { super }
-      format.json_api { login_options }
+      format.json { login_options }
     end
   end
 
   def create
     respond_to do |format|
       format.html { super }
-      format.json_api { create_from_json }
+      format.json { create_from_json }
     end
   end
 
   def destroy
     respond_to do |format|
       format.html { super }
-      format.json_api { destroy_from_json }
+      format.json { destroy_from_json }
     end
   end
 
@@ -29,10 +28,10 @@ class SessionsController < Devise::SessionsController
     self.resource = warden.authenticate!(auth_options)
     sign_in(resource_name, resource)
     yield resource if block_given?
-    render status: 200, json_api: UserSerializer.resource(resource)
+    render status: 200, json: UserSerializer.resource(resource)
   end
 
-  def destroy_from_json 
+  def destroy_from_json
     Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
     yield if block_given?
     head :no_content
@@ -43,7 +42,7 @@ class SessionsController < Devise::SessionsController
     Devise.omniauth_providers.each do |provider|
       opts[provider] = "/users/auth/#{provider}"
     end
-    render status: 200, json_api: opts
+    render status: 200, json: opts
   end
 
   def set_csrf_headers
