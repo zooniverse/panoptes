@@ -2,7 +2,7 @@ FactoryGirl.define do
   factory :application, class: Doorkeeper::Application do
     sequence(:name) { |n| "Application #{n}" }
     redirect_uri 'urn:ietf:wg:oauth:2.0:oob'
-    default_scope ['public', 'projects', 'classifications']
+    default_scope ['public', 'project', 'classification']
     trust_level 0
 
     factory :first_party_app do
