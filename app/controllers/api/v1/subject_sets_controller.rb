@@ -1,4 +1,6 @@
 class Api::V1::SubjectSetsController < Api::ApiController
+  include Destructable
+  
   doorkeeper_for :all
   access_control_for :create, :update, :destroy, resource_class: SubjectSet
 
@@ -22,11 +24,6 @@ class Api::V1::SubjectSetsController < Api::ApiController
     json_api_render( 201,
                      SubjectSetSerializer.resource(subject_set),
                      api_subject_set_url(subject_set) )
-  end
-
-  def destroy
-    subject_set.destroy!
-    deleted_resource_response
   end
 
   private

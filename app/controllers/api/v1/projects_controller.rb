@@ -1,4 +1,6 @@
 class Api::V1::ProjectsController < Api::ApiController
+  include Destructable
+  
   doorkeeper_for :update, :create, :delete, scopes: [:project]
   access_control_for :create, :update, :destroy, resource_class: Project
 
@@ -33,11 +35,6 @@ class Api::V1::ProjectsController < Api::ApiController
     json_api_render(201,
                     create_project_response(project),
                     api_project_url(project) )
-  end
-
-  def destroy
-    project.destroy
-    deleted_resource_response
   end
 
   private

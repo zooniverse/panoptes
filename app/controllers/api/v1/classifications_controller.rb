@@ -1,5 +1,7 @@
 class Api::V1::ClassificationsController < Api::ApiController
-  doorkeeper_for :show, :index, scopes: [:classifications]
+  include Destructable
+  
+  doorkeeper_for :show, :index, :destory, :update, scopes: [:classification]
   access_control_for :update, :destroy, resource_class: Classification
 
   def show
@@ -30,10 +32,6 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def update
-    # TODO
-  end
-
-  def destroy
     # TODO
   end
 

@@ -11,13 +11,15 @@ describe Api::V1::CollectionsController, type: :controller do
   let(:api_resource_attributes){ %w(id name display_name created_at updated_at) }
   let(:api_resource_links){ %w(collections.project collections.owner) }
 
+  let(:scopes) { %w(public collection) }
+
   before(:each) do
-    default_request scopes: %w(public collection)
+    default_request scopes: scopes
   end
 
   describe '#index' do
     before(:each) do
-      default_request scopes: %w(public collection), user_id: owner.id
+      default_request scopes: scopes, user_id: owner.id
       get :index
     end
 
@@ -39,7 +41,7 @@ describe Api::V1::CollectionsController, type: :controller do
 
   describe '#show' do
     before(:each) do
-      default_request scopes: %w(public collection), user_id: owner.id
+      default_request scopes: scopes, user_id: owner.id
       get :show, id: collection.id
     end
 
@@ -62,14 +64,14 @@ describe Api::V1::CollectionsController, type: :controller do
     let(:created_collection_id) { created_instance_id("collections") }
 
     before(:each) do
-      default_request scopes: %w(public collection), user_id: owner.id
+      default_request scopes: scopes, user_id: owner.id
       params = {
-        collection: {
-          name: 'Test collection',
-          display_name: 'Fancy name',
-          project_id: project.id
-        }
-      }
+                collection: {
+                             name: 'Test collection',
+                             display_name: 'Fancy name',
+                             project_id: project.id
+                            }
+               }
       post :create, params, { 'CONTENT_TYPE' => 'application/json' }
     end
 
@@ -94,17 +96,10 @@ describe Api::V1::CollectionsController, type: :controller do
   end
 
   describe '#destroy' do
-    before(:each) do
-      default_request scopes: %w(public collection), user_id: owner.id
-      params = {
-        id: collection.id
-      }
-      delete :destroy, params, { 'CONTENT_TYPE' => 'application/json' }
-    end
+    let(:authorized_user) { owner }
+    let(:resource) { collection }
+    let(:resource_class) { Collection }
 
-    it 'should delete a collection' do
-      expect(response.status).to eq 204
-      expect{ collection.reload }.to raise_error ActiveRecord::RecordNotFound
-    end
+    it_behaves_like "is destructable"
   end
 end

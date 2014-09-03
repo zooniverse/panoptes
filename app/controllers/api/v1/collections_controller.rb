@@ -1,4 +1,6 @@
 class Api::V1::CollectionsController < Api::ApiController
+  include Destructable
+  
   doorkeeper_for :all
   access_control_for :create, :update, :destroy, resource_class: Collection
   
@@ -22,11 +24,6 @@ class Api::V1::CollectionsController < Api::ApiController
     json_api_render(201,
                     CollectionSerializer.resource(collection),
                     api_collection_url(collection) )
-  end
-
-  def destroy
-    collection.destroy!
-    deleted_resource_response
   end
 
   protected

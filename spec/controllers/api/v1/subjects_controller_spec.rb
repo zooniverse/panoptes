@@ -5,6 +5,8 @@ describe Api::V1::SubjectsController, type: :controller do
   let!(:subjects) { create_list(:set_member_subject, 20, subject_set: workflow.subject_sets.first) }
   let!(:user) { create(:user) }
 
+  let(:scopes) { %w(subject) }
+
   let(:api_resource_name) { "subjects" }
   let(:api_resource_attributes) do
     [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at"]
@@ -16,9 +18,8 @@ describe Api::V1::SubjectsController, type: :controller do
 
   context "logged in user" do
     before(:each) do
-      default_request user_id: user.id, scopes: ["subject"]
+      default_request user_id: user.id, scopes: scopes
     end
-
     describe "#index" do
       context "without random sort" do
         before(:each) do
@@ -39,7 +40,7 @@ describe Api::V1::SubjectsController, type: :controller do
       context "with random sort" do
         let(:api_resource_attributes) do
           [ "id", "metadata", "locations", "zooniverse_id", "classifications_count",
-            "state", "set_member_subject_id", "created_at", "updated_at" ]
+           "state", "set_member_subject_id", "created_at", "updated_at" ]
         end
         let(:api_resource_links) { [ "subjects.subject_set" ] }
         let(:request_params) { { sort: 'random', workflow_id: workflow.id.to_s } }
@@ -77,5 +78,13 @@ describe Api::V1::SubjectsController, type: :controller do
         end
       end
     end
+  end
+  
+  describe "#destroy" do
+    let(:authorized_user) { user }
+    let(:resource) { create(:subject, owner: user) }
+    let(:resource_class) { Subject }
+
+    it_behaves_like "is destructable"
   end
 end

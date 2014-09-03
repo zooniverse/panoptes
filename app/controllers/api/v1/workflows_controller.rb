@@ -1,4 +1,6 @@
 class Api::V1::WorkflowsController < Api::ApiController
+  include Destructable
+  
   doorkeeper_for :update, :create, :delete, scopes: [:project]
   access_control_for :create, :update, :destroy, resource_class: Workflow
   
@@ -23,11 +25,6 @@ class Api::V1::WorkflowsController < Api::ApiController
     json_api_render( 201,
                      WorkflowSerializer.resource(workflow),
                      api_workflow_url(workflow) )
-  end
-
-  def destroy
-    workflow.destroy!
-    deleted_resource_response
   end
 
   private

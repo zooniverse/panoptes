@@ -1,17 +1,19 @@
 require 'spec_helper'
 
 describe Api::V1::SubjectSetsController, type: :controller do
-  let!(:subject_sets){ create_list :subject_set_with_subjects, 2 }
-  let(:subject_set){ subject_sets.first }
-  let(:project){ subject_set.project }
-  let(:owner){ project.owner }
-  let(:api_resource_name){ 'subject_sets' }
+  let!(:subject_sets) { create_list :subject_set_with_subjects, 2 }
+  let(:subject_set) { subject_sets.first }
+  let(:project) { subject_set.project }
+  let(:owner) { project.owner }
+  let(:api_resource_name) { 'subject_sets' }
 
-  let(:api_resource_attributes){ %w(id name set_member_subjects_count created_at updated_at) }
-  let(:api_resource_links){ %w(subject_sets.project subject_sets.workflows) }
+  let(:api_resource_attributes) { %w(id name set_member_subjects_count created_at updated_at) }
+  let(:api_resource_links) { %w(subject_sets.project subject_sets.workflows) }
+  
+  let(:scopes) { %w(public subject_set) }
 
   before(:each) do
-    default_request scopes: %w(public subject_set), user_id: owner.id
+    default_request scopes: scopes, user_id: owner.id
   end
 
   describe '#index' do
@@ -54,11 +56,11 @@ describe Api::V1::SubjectSetsController, type: :controller do
     before(:each) do
       default_request scopes: %w(public subject_set), user_id: owner.id
       params = {
-        subject_set: {
-          name: 'Test subject set',
-          project_id: project.id
-        }
-      }
+                subject_set: {
+                              name: 'Test subject set',
+                              project_id: project.id
+                             }
+               }
       post :create, params, { 'CONTENT_TYPE' => 'application/json' }
     end
 
@@ -80,17 +82,10 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#destroy' do
-    before(:each) do
-      default_request scopes: %w(public subject_set), user_id: owner.id
-      params = {
-        id: subject_set.id
-      }
-      delete :destroy, params, { 'CONTENT_TYPE' => 'application/json' }
-    end
+    let(:authorized_user) { owner }
+    let(:resource) { subject_set }
+    let(:resource_class) { SubjectSet }
 
-    it 'should delete a subject set' do
-      expect(response.status).to eq 204
-      expect{ subject_set.reload }.to raise_error ActiveRecord::RecordNotFound
-    end
+    it_behaves_like "is destructable"
   end
 end

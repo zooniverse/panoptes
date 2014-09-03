@@ -10,9 +10,10 @@ describe Api::V1::WorkflowsController, type: :controller do
 
   let(:api_resource_attributes){ %w(id name tasks classifications_count subjects_count created_at updated_at) }
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets) }
+  let(:scopes) { %w(public project) }
 
   before(:each) do
-    default_request scopes: %w(public project)
+    default_request scopes: scopes
   end
 
   describe '#index' do
@@ -37,7 +38,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:created_workflow_id) { created_instance_id("workflows") }
 
     before(:each) do
-      default_request scopes: %w(public project), user_id: owner.id
+      default_request scopes: scopes, user_id: owner.id
       params = {
         workflows: {
           name: 'Test workflow',
@@ -70,25 +71,18 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe '#destroy' do
-    before(:each) do
-      default_request scopes: %w(public project), user_id: owner.id
-      params = {
-        id: workflow.id
-      }
-      delete :destroy, params
-    end
+    let(:authorized_user) { owner }
+    let(:resource) { workflow }
+    let(:resource_class) { Workflow }
 
-    it 'should delete a workflow' do
-      expect(response.status).to eq 204
-      expect{ workflow.reload }.to raise_error ActiveRecord::RecordNotFound
-    end
+    it_behaves_like "is destructable"
   end
 
   describe "#show" do
 
     context "with a logged in user" do
       before(:each) do
-        default_request user_id: user.id, scopes: %(project public)
+        default_request user_id: user.id, scopes: scopes
         get :show, id: workflows.first.id
       end
 

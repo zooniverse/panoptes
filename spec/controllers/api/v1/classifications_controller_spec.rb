@@ -2,19 +2,19 @@ require 'spec_helper'
 
 def annotation_values
   [ { key: "age", value: "adult" },
-    { started_at: DateTime.now },
-    { finished_at: DateTime.now },
-    { user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" } ]
+   { started_at: DateTime.now },
+   { finished_at: DateTime.now },
+   { user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" } ]
 end
 
 def setup_create_request(project_id, workflow_id, set_member_subject)
   request.session = { cellect_hosts: { workflow_id.to_s => "example.com" } }
   params = { classifications: { project_id: project_id,
-                                workflow_id: workflow_id,
-                                completed: true,
-                                set_member_subject_id: set_member_subject.id,
-                                subject_id: set_member_subject.subject_id,
-                                annotations: annotation_values } }
+                               workflow_id: workflow_id,
+                               completed: true,
+                               set_member_subject_id: set_member_subject.id,
+                               subject_id: set_member_subject.subject_id,
+                               annotations: annotation_values } }
   post :create, params
 end
 
@@ -55,14 +55,16 @@ describe Api::V1::ClassificationsController, type: :controller do
   end
   let(:api_resource_links) do
     [ "classifications.project",
-      "classifications.set_member_subject",
-      "classifications.user",
-      "classifications.user_group" ]
+     "classifications.set_member_subject",
+     "classifications.user",
+     "classifications.user_group" ]
   end
+
+  let(:scopes) { %w(classification) }
 
   context "logged in user" do
     before(:each) do
-      default_request user_id: user.id, scopes: ["classifications"]
+      default_request user_id: user.id, scopes: scopes
     end
 
     describe "#index" do
@@ -118,11 +120,11 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       it "should setup the add seen command to cellect" do
         expect(stubbed_cellect_connection).to receive(:add_seen).with(
-          subject_id: set_member_subject.subject_id.to_s,
-          workflow_id: workflow.id.to_s,
-          user_id: user.id,
-          host: 'example.com'
-        )
+                                                                      subject_id: set_member_subject.subject_id.to_s,
+                                                                      workflow_id: workflow.id.to_s,
+                                                                      user_id: user.id,
+                                                                      host: 'example.com'
+                                                                     )
         create_classification
       end
 
@@ -137,8 +139,8 @@ describe Api::V1::ClassificationsController, type: :controller do
       describe "track user seen subjects" do
         let(:expected_params) do
           { subject_id: set_member_subject.subject_id.to_s,
-            workflow_id: workflow.id.to_s,
-            user_id: user.id }
+           workflow_id: workflow.id.to_s,
+           user_id: user.id }
         end
 
         it "should add the seen subject for the user" do
@@ -166,6 +168,17 @@ describe Api::V1::ClassificationsController, type: :controller do
           end
         end
       end
+    end
+  end
+
+  
+  describe "#destroy" do
+    context "an incomplete classification" do
+      let(:authorized_user) { user }
+      let(:resource) { create(:classification, user: user, completed: false) }
+      let(:resource_class) { Classification }
+
+      it_behaves_like "is destructable"
     end
   end
 
