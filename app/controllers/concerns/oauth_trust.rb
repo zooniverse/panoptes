@@ -19,10 +19,8 @@ module OauthTrust
   private
 
   def client_from_params
-    if client_id = params[:client_id]
-      Doorkeeper::Application.where(uid: client_id).first
-    else
-      raise ClientIdError.new
-    end
+    client_id = params[:client_id]
+    raise ClientIdError.new if client_id.blank?
+    Doorkeeper::Application.where(uid: client_id).first
   end
 end

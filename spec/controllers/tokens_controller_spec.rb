@@ -32,6 +32,19 @@ describe TokensController, type: :controller do
         end
       end
 
+      context "when supplying missing and blank applicaiton client_id" do
+
+        it "it should respond with 422" do
+          post :create, params.merge!("client_id" => '')
+          expect(response.status).to eq(422)
+        end
+
+        it "it should respond with 422" do
+          post :create, params.except("client_id")
+          expect(response.status).to eq(422)
+        end
+      end
+
       context "when supplying valid user credentials" do
         let(:valid_creds) { params.merge!(login: owner.login, password: owner.password) }
         let(:req) { post :create, valid_creds }
