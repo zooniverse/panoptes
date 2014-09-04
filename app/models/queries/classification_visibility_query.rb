@@ -7,9 +7,15 @@ class ClassificationVisibilityQuery
   
   def build(as_admin)
     return @parent.all if actor.is_admin? && as_admin
-    query = @parent.where(where_user
-                          .or(where_project)
-                          .or(where_group))
+
+    query = Arel::Nodes::UnionAll.new(where_project.arel.ast,
+                                      where_group.arel.ast)
+    query = Arel::Nodes::UnionAll.new(where_user.arel.ast,
+                                      query)
+    query = Arel::Nodes::As.new(query, union_table) 
+
+    query = @parent.from(query)
+
     rebind(query)
   end
 
@@ -36,7 +42,7 @@ class ClassificationVisibilityQuery
   end
   
   def where_user
-    arel_table[:user_id].eq(actor.id)
+    @parent.where(arel_table[:user_id].eq(actor.id))
   end
 
   def project_scope
@@ -48,10 +54,14 @@ class ClassificationVisibilityQuery
   end
 
   def where_project
-    arel_table[:project_id].in(project_scope.arel)
+    @parent.where(arel_table[:project_id].in(project_scope.arel))
   end
 
   def where_group
-    arel_table[:user_group_id].in(group_scope.arel)
+    @parent.where(arel_table[:user_group_id].in(group_scope.arel))
+  end
+
+  def union_table
+    Arel::Table.new(:classifications)
   end
 end
