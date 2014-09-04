@@ -1,5 +1,10 @@
 class TokensController < Doorkeeper::TokensController
+  include AbstractController::Callbacks
+  include ActionController::Head
+  include ActionController::Helpers
+  include Devise::Controllers::Helpers
   include OauthTrust
+
   before_action :allowed_grants, only: :create
   before_action :default_scopes, only: :create, if: :non_code_request
   before_action :allowed_scopes, only: :create, if: :non_code_request
