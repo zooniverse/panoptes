@@ -2,12 +2,13 @@ require 'spec_helper'
 
 describe Api::V1::UsersController, type: :controller do
   let!(:users) {
-    n = Array(22..30).sample
-    create_list(:user, n)
+    create_list(:user, 22)
   }
 
+  let(:scopes) { %w(public user) }
+
   before(:each) do
-    default_request(scopes: ["public", "user"], user_id: users.first.id)
+    default_request(scopes: scopes, user_id: users.first.id)
   end
 
   let(:api_resource_name) { "users" }
@@ -152,7 +153,8 @@ describe Api::V1::UsersController, type: :controller do
     let(:user) { users.first}
     let(:user_id) { user.id }
     let(:access_token) { create(:access_token) }
-    let!(:stub_token_auth) do
+    
+    before(:each) do
       allow(Doorkeeper).to receive(:authenticate).and_return(access_token)
     end
 
@@ -160,42 +162,21 @@ describe Api::V1::UsersController, type: :controller do
       expect(UserInfoScrubber).to receive(:scrub_personal_info!).with(user)
       delete :destroy, id: user_id
     end
-
-    it "should call Activation#disable_instances! with instances to disable" do
-      instances_to_disable = [user] | user.projects | user.collections | user.memberships
-      expect(Activation).to receive(:disable_instances!).with(instances_to_disable)
-      delete :destroy, id: user_id
-    end
-
-    it "should return 204" do
-      delete :destroy, id: user_id
-      expect(response.status).to eq(204)
-    end
-
-    it "should disable the user" do
-      delete :destroy, id: user_id
-      expect(users.first.reload.inactive?).to be_truthy
-    end
-
+    
     it "should revoke the request doorkeeper token" do
       delete :destroy, id: user_id
       expect(access_token.reload.revoked?).to eq(true)
     end
-
-    context "an unauthorized user" do
-      before(:each) do
-        stub_token(scopes: ["user"], user_id: users.second.id)
-      end
-
-      it "should return 403" do
-        delete :destroy, id: user_id
-        expect(response.status).to eq(403)
-      end
-
-      it "should not disable the user" do
-        delete :destroy, id: user_id
-        expect(users.first.reload.inactive?).to be_falsy
-      end
+    
+    let(:authorized_user) { user }
+    let(:resource) { user }
+    let(:instances_to_disable) do
+      [resource] |
+        resource.projects |
+        resource.memberships |
+        resource.collections
     end
+
+    it_behaves_like "is deactivatable"
   end
 end

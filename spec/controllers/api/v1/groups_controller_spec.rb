@@ -3,9 +3,11 @@ require 'spec_helper'
 describe Api::V1::GroupsController, type: :controller do
   let!(:user_groups) do
     [ create(:user_group_with_users),
-      create(:user_group_with_projects),
-      create(:user_group_with_collections) ]
+     create(:user_group_with_projects),
+     create(:user_group_with_collections) ]
   end
+
+  let(:user) { user_groups[0].users.first }
 
   let(:api_resource_name) { "user_groups" }
   let(:api_resource_attributes) do
@@ -15,9 +17,10 @@ describe Api::V1::GroupsController, type: :controller do
     [ "user_groups.memberships", "user_groups.users", "user_groups.projects", "user_groups.collections" ]
   end
 
+  let(:scopes) { %w(public group) }
+
   before(:each) do
-    user = user_groups[0].users.first
-    default_request(scopes: ["public", "group"], user_id: user.id)
+    default_request(scopes: scopes, user_id: user.id)
   end
 
   describe "#index" do
@@ -119,38 +122,16 @@ describe Api::V1::GroupsController, type: :controller do
   end
 
   describe "#destroy" do
-    let(:group) { user_groups.first }
-
-    it "should call Activation#disable_instances! with instances to disable" do
-      instances_to_disable = [group] | group.projects | group.memberships | group.collections
-      expect(Activation).to receive(:disable_instances!).with(instances_to_disable)
-      delete :destroy, id: group.id
+    let(:resource) { user_groups.first }
+    let(:authorized_user) { resource.users.first }
+    let(:instances_to_disable) do
+      [resource] |
+        resource.projects |
+        resource.memberships |
+        resource.collections
     end
 
-    it "should return 204" do
-      delete :destroy, id: group.id
-      expect(response.status).to eq(204)
-    end
+    it_behaves_like "is deactivatable"
 
-    it "should disable the group" do
-      delete :destroy, id: group.id
-      expect(user_groups.first.reload.inactive?).to be_truthy
-    end
-
-    context "an unauthorized user" do
-      before(:each) do
-        unauthorized_user = create(:user)
-        stub_token(scopes: ["user"], user_id: unauthorized_user.id)
-        delete :destroy, id: group.id
-      end
-
-      it "should return 403" do
-        expect(response.status).to eq(403)
-      end
-
-      it "should not disable the user_group" do
-        expect(group.reload.inactive?).to be_falsy
-      end
-    end
   end
 end

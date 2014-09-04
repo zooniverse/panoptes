@@ -1,4 +1,6 @@
 class Api::V1::UsersController < Api::ApiController
+  include Deactivatable
+  
   doorkeeper_for :index, :me, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
   access_control_for :update, :destroy, resource_class: User
@@ -19,16 +21,19 @@ class Api::V1::UsersController < Api::ApiController
 
   def destroy
     sign_out if current_user && (current_user == user)
-    UserInfoScrubber.scrub_personal_info!(user)
-    Activation.disable_instances!([ user ] |
-                                  user.projects |
-                                  user.collections |
-                                  user.memberships)
     revoke_doorkeeper_request_token!
-    deleted_resource_response
+    UserInfoScrubber.scrub_personal_info!(user)
+    super
   end
 
   private
+
+  def to_disable
+    [ user ] |
+      user.projects |
+      user.collections |
+      user.memberships
+  end
 
   def resource_serializer(*args)
     UserSerializer.resource(*args)
