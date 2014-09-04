@@ -1,16 +1,17 @@
 require 'spec_helper'
 
-def get_oauth_apps
-  get oauth_applications_path
-end
-
 describe "doorkeeper applications list", type: :request do
+  let(:get_oauth_apps) { get oauth_applications_path }
 
   context "when unauthenticated" do
+    before(:each) { get_oauth_apps }
 
-    it 'should not allow access but return unauthorized' do
-      get_oauth_apps
-      expect(response.status).to eq(401)
+    it 'should redirect to the new session page' do
+      expect(response.status).to eq(302)
+    end
+
+    it 'should redirect to the new session page' do
+      expect(subject).to redirect_to(new_user_session_url)
     end
   end
 

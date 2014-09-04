@@ -25,9 +25,10 @@ Doorkeeper.configure do
 
   admin_authenticator do |routes|
     if u = current_user
-      u.admin ? u : (head :forbidden)
+      u.admin ? u :
+                (render file: "#{Rails.root}/public/403.html", status: 403, layout: false)
     else
-      head :unauthorized
+      redirect_to(new_user_session_path)
     end
   end
 end
