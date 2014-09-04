@@ -1,47 +1,967 @@
 FORMAT: 1A
-HOST: http://www.google.com
+HOST: http://beta.api.zooniverse.org/
 
 # Panoptes API
-Notes API is a *short texts saving* service similar to its physical paper presence on your table.
+Panoptes is an api to support *Citizen Science Crowdsourcing
+Projects*, including managing subjects, describing project interfaces,
+persisting classifications, and supporting users collecting subjects.
 
-# Group Notes
-Notes related resources of the **Notes API**
+## Authentication
+Panoptes supports OAuth2 using the
+[doorkeeper](http://github.com/doorkeeper-gem/doorkeeper) gem. 
 
-## Notes Collection [/notes]
-### List all Notes [GET]
-+ Response 200 (application/json)
+## Media Types
+Panoptes uses a slightly modified verison of the
+[JSON API](https://jsonapi.org) to represent resources. However, the
+API is versioned to allow for future flexibility. All requests and
+responses should use the `application/vnd.api+json; version=1` media
+type. 
 
-        [{
-          "id": 1, "title": "Jogging in park"
-        }, {
-          "id": 2, "title": "Pick-up posters from post-office"
-        }]
+# Group Subject Collections 
+Subject Collections related resources of the **Panoptes API** 
 
-### Create a Note [POST]
-+ Request (application/json)
+## Subject Collection [/collections/{id}{?include}]
+A single Collection object respenting a group of subjects from a
+project a user has collected together.
 
-        { "title": "Buy cheese and bread for breakfast." }
+The Collection resource has the following attributes:
 
-+ Response 201 (application/json)
+- id
+- created_at
+- updated_at
+- name
+- display_name
+- description
+- visible_to
+- owner
 
-        { "id": 3, "title": "Buy cheese and bread for breakfast." }
-
-## Note [/notes/{id}]
-A single Note object with all its details
+*id* and *created_at* are assigned when the resource is created.
 
 + Parameters
-    + id (required, number, `1`) ... Numeric `id` of the Note to perform action with. Has example value.
+    + id (integer) ... Integer Id of the Collection can be a comma
+      seperated list of ids to return multiple resources.
+    + include (string, optional) ... Use "subjects" to return subjects
+      that are part of a collection with the resource.
 
-### Retrieve a Note [GET]
-+ Response 200 (application/json)
++ Model (application/vnd.api+json; version=1)
 
-    + Header
-
-            X-My-Header: The Value
+    JSON API respresentation of the Collection resource. It also includes
+    links to subjects within the collection 
 
     + Body
 
-            { "id": 2, "title": "Pick-up posters from post-office" }
+            {
+                "links": {
+                    "collection.subjects" : {
+                        "href" : "http://api.zooniverse.org/subjects?collection_id={collection.id}",
+                        "type" : "subjects"
+                    }
+                },
+                "collections": {
+                    "id": "51",
+                    "created_at": "2014-04-15T10:41:14Z",
+                    "updated_at": "2014-04-20T10:41:14Z",
+                    "name": "cool_flowers",
+                    "display_name": "Stuart's Cool Flowers",
+                    "description": "Just some cool looking flowers",
+                    "visible_to": [],
+                    "links": {
+                        "subjects": [ "10", "20", "50", "51" ] ,
+                        "owner": {
+                            "href" : "http://api.zooniverse.org/users/21",
+                            "id": "21",
+                            "type": "user"
+                        }
+                    }
+                }
+            }
 
-### Remove a Note [DELETE]
+### Retrieve a Single Collection [GET]
++ Response 200
+
+    [Collection][]
+
+### Edit a Collection [PATCH]
+Edit a collection by sending a patch request using the
+[JSON+patch](http://tools.ietf.org/html/rfc6902) format.
+
++ Request (application/json+patch)
+
+        [
+            {
+                "op": "replace",
+                "path": "/display_name",
+                "value": "A Better Name"
+            },
+            {
+                "op": "add",
+                "path": "/links/subjects",
+                "value": "20"
+            }
+        ]
+
++ Response 200
+
+    [Collection][]
+
+### Edit a Collection [PUT]
+You can edit a resource by sending a JSON API formatted request with
+the resource's id and any fields you wish to update
+
++ Request (application/vnd.api+json)
+
+        {
+            "collections": {
+                "id": "51",
+                "name": "flowers_rule",
+                "links": {
+                    "subjects": [ "10", "20", "50", "60" ]
+                }
+            }
+        }
+
++ Response 200
+
+    [Collection][]
+
+### Delete a Collection [DELETE]
 + Response 204
+
+## Collections Collection [/collections{?project,page}]
+Collection of all Collections. 
+
+It contains a list of *Collections*. 
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON representation of the Collection Collection
+    resource. Included collections should be full representations of
+    the resource.
+
+    + Body
+
+            {
+                "collections" [{
+                    "id": 51,
+                    "created_at": "2014-04-15T10:41:14Z",
+                    "updated_at": "2014-04-20T10:41:14Z",
+                    "name": "cool_flowers",
+                    "display_name": "Stuart's Cool Flowers",
+                    "description": "Just some cool looking flowers",
+                    "self": "/collections/stuart/cool_flowers"
+                    "owner": "/users/stuart",
+                    "subjects": "/collections/stuart/cool_flowers/subjects"
+                }]
+                "next": "/collections?page=2",
+                "prev": "/collections?page=5"
+            }
+
+### List all Collections [GET]
++ Parameters
+    + project (optional, string) ... String name of a project in the
+      form *:owner_name/:project_name* 
+    + page (optional, integer) ... Integer of the next page. 1 by
+      default 
+
++ Response 200
+
+    [Collections Collection][]
+
+### Create a Collection [POST]
+To create a new Collection send a JSON representation containing at
+least a name and display_name. A description and array of subject ids
+may also be included. The *owner* will be added based on the
+authenicated user. *id* and *created_at* will also be added. 
+
++ Request
+
+        {
+            "name": "cool_flowers",
+            "display_name": "Stuart's Cool Flowers",
+            "subjects": [1, 40, 20],
+            "description": "Just some cool looking flowers"
+        }
+
++ Response 201
+
+    [Collection][]
+
+## Collection Subjects Collection [/collections/{owner_name}/{collection_name}/subjects{?page,page_size}]
+Collection Subjects is a list of subjects belonging to a collection. 
+
++ Parameters
+
+    + owner_name (string) ... name of the collection owner
+    + collection_name (string) ... name of the collection
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of a list of subjects belonging to a collection
+
+    + Body
+
+            {
+               "subjects": [{
+                    "id": 81,
+                    "created_at": "2014-05-10T10:47:10Z",
+                    "updated_at": "2014-05-10T10:47:10Z",
+                    "zooniverse_id": "ZOO00000001",
+                    "locations": {
+                        "standard": "http://subjects.zooniverse.org/standard/ZOO00000001.png"
+                    },
+                    "metadata": {
+                        "magnitude": "8.1"
+                    },
+                    href: "/subjects/ZOO00000001"
+                },{
+                    "id": 82,
+                    "created_at": "2014-05-11T10:47:10Z",
+                    "updated_at": "2014-05-11T10:47:10Z",
+                    "zooniverse_id": "ZOO00000002",
+                    "locations": {
+                        "standard": "http://subjects.zooniverse.org/standard/ZOO00000002.png"
+                    },
+                    "metadata": {
+                        "magnitude": "1.1"
+                    },
+                    href: "/subjects/ZOO00000001"
+                }],
+                "meta": {
+                    "subjects": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 3,
+                        "next_page": 2,
+                        "previous_href": "/subjects?page=3page_size=2",
+                        "next_href": "/subjects?page=2&page_size=2"
+                    }
+                } 
+            }
+
+### List All Subjects in a Collection [GET]
++ Parameters
+    + page (optional, integer) ... integer index of a page in collection default is 1.
+    + page_size (optional, integer) ... number of items to be returned in a page. Default is 20. Max is 100. Min is 10.
+
++ Response 200
+
+    [Collection Subjects Collection][]
+
+# Group Subjects
+Subject resources for **Panoptes API**.
+
+## Subject [/subjects/{zooniverse_id}]
+A single Subject object representing a media object or group of media objects to be classified and attached metadata. 
+
+A Subject resource has the following attributes:
+
+- id
+- created_at
+- updated_at
+- zooniverse_id
+- locations
+- metadata
+
+*id*, *created_at*, and *zooniverse_id* are assigned when the resource is created
+
++ Parameters
+    + zooniverse_id (string) ... a three leter designation followed by a base26 number that is unique to the subject across all Zooniverse projects
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of the Subject resource
+
+    + Body
+
+            { 
+                subjects: [{
+                    "id": 81,
+                    "created_at": "2014-05-10T10:47:10Z",
+                    "updated_at": "2014-05-10T10:47:10Z",
+                    "zooniverse_id": "ZOO00000001",
+                    "locations": {
+                        "standard": "http://subjects.zooniverse.org/standard/ZOO00000001.png"
+                    },
+                    "metadata": {
+                        "magnitude": "8.1"
+                    },
+                    href: "/subjects/ZOO00000001"
+                }]
+            }
+
+### Retrieve a Single Subject [GET]
++ Response 200
+
+    [Subject][]
+
+### Edit a Subject [PATCH]
+To edit a Subject send a JSON object with updated values for either the *location* or *metadata* fields. Other fields are not editable. *location* or *metadata* must contain a complete representation of the new version of the field. 
++ Request
+  
+        {
+            "location": {
+                "standard": "http://my.new.io/standard_image.png"
+            }
+        }
+
++ Response 201
+
+    [Subject][]
+
+### Delete a Subject [DELETE]
++ Response 204
+
+## Subject Collection [/subjects{?page,page_size}]
+Collection of all Subjects. 
+
+It returns a list of *Subjects*
++ Model (application/vnd.api+json)
+
+    JSON API representation of Subject Collection resource. Included subjects should be full representations of the resource.
+
+    + Body
+
+            {
+                "subjects": [{
+                    "id": 81,
+                    "created_at": "2014-05-10T10:47:10Z",
+                    "updated_at": "2014-05-10T10:47:10Z",
+                    "zooniverse_id": "ZOO00000001",
+                    "locations": {
+                        "standard": "http://subjects.zooniverse.org/standard/ZOO00000001.png"
+                    },
+                    "metadata": {
+                        "magnitude": "8.1"
+                    },
+                    href: "/subjects/ZOO00000001"
+                },{
+                    "id": 82,
+                    "created_at": "2014-05-11T10:47:10Z",
+                    "updated_at": "2014-05-11T10:47:10Z",
+                    "zooniverse_id": "ZOO00000002",
+                    "locations": {
+                        "standard": "http://subjects.zooniverse.org/standard/ZOO00000002.png"
+                    },
+                    "metadata": {
+                        "magnitude": "1.1"
+                    },
+                    href: "/subjects/ZOO00000001"
+                }],
+                "meta": {
+                    "subjects": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 3,
+                        "next_page": 2,
+                        "previous_href": "/subjects?page=3page_size=2",
+                        "next_href": "/subjects?page=2&page_size=2"
+                    }
+                }
+            }
+              
+### List all Subjects [GET]
++ Parameters
+    + page_size (optional, integer) ... Number of items per page. Default: 20, Min: 1, Max: 100
+    + page (optional, integer) ... Integer Index of the next page. Default: 1
+
++ Response 200
+
+    [Subject Collection][]
+
+### Create a Subject [POST]
+To create a new subject send a JSON representation containing at least a single *location* field. 
+
++ Request
+        
+        {
+            "location": {
+                "standard": "http://myhostedimage.com/image_name.png"
+            }
+        }
+
++ Response 201
+
+    [Subject][]
+
+# Group Users
+User resources for **Panoptes API**
+
+## User [/user/{user_name}]
+A single User object representing a logged in user of the site. 
+
+A User resource has the following attributes:
+
+- id
+- display_name
+- credited_name
+- email
+- name
+- zooniverse_id
+- login
+- roles
+- created_at
+- updated_at
+- last_sign_in_at
+- current_sign_in_at
+
+Only attributes will be visible depending on the authorization level of the User and of the OAuth Application making the request. 
+
++ Parameters
+    + user_name (string) ... URI name of the user. Same as the name attribute
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of a User resource. Includes links to owned projects and collections and active group memberships
+
+    + Body
+    
+            {
+                "links": {
+                    "users.collections": {
+                        "href": "/users/{users.name}/collections"
+                    },
+                    "users.projects": {
+                        "href": "/users/{users.name}/projects"
+                    },
+                    "users.groups": {
+                        "href": "/users/{users.name}/groups"
+                    }
+                },
+                "users": [{
+                    "id": 1,
+                    "display_name": "Edwardo the Great",
+                    "credited_name": "Edward Paget",
+                    "email": "ed@example.com",
+                    "name": "edward",
+                    "zooniverse_id": 101012,
+                    "login": "edwardothegreat",
+                    "created_at": "2014-01-23T04:34:15Z",
+                    "udpated_at": "2014-01-30T14:34:15Z",
+                    "last_sign_in_at": 2014-05-13T15:34:15Z",
+                    "current_sign_in_at": 2014-06-01T07:33:15Z",
+                    "roles": {
+                        "edward.penguin_madness": ["owner", "scientist"]
+                        "stuart.flower_power": ["beta_tester", "traslator"]
+                    }
+                }]
+            }
+
+### Retrieve a Single User [GET]
++ Response 200
+
+    [User][]
+
+### Edit a User [PATCH]
+To edit a User resource you must send a [JSON Patch](http://tools.ietf.org/html/rfc6902) document. You may update the *display_name*, *email*, *credited_name*, or *roles* fields.
+
++ Request (application/json-patch+json)
+
+    + Headers
+    
+            Accept: application/vnd.api+json; version=1
+
+    + Body
+    
+            [
+                {
+                    "op": "replace", 
+                    "path": "/users/edward/display_name", 
+                    "value": "Edwardo the less Great"
+                }
+            ]
+
++ Response 200
+
+    [User][]
+
+### Delete a User [DELETE]                
++ Response 204
+      
+## Users Collection [/users{?page,page_size}]
+A Collection all Users
+
++ Model (application/vnd.api+json; version=1)
+
+    A JSON API representation of the Users collection including link templates for owned projects and collections and active group memberships.                   
+                    
+    + Body
+    
+            {
+                "links": {
+                    "users.collections": {
+                        "href": "/users/{users.name}/collections"
+                    },
+                    "users.projects": {
+                        "href": "/users/{users.name}/projects"
+                    },
+                    "users.groups": {
+                        "href": "/users/{users.name}/groups"
+                    }
+                },
+                "meta": {
+                    "subjects": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 3,
+                        "next_page": 2,
+                        "previous_href": "/users?page=3page_size=2",
+                        "next_href": "/users?page=2&page_size=2"
+                    }
+                },
+                "users": [{
+                    "id": 1,
+                    "display_name": "Edwardo the Great",
+                    "credited_name": "Edward Paget",
+                    "email": "ed@example.com",
+                    "name": "edward",
+                    "zooniverse_id": 101012,
+                    "login": "edwardothegreat",
+                    "created_at": "2014-01-23T04:34:15Z",
+                    "udpated_at": "2014-01-30T14:34:15Z",
+                    "last_sign_in_at": 2014-05-13T15:34:15Z",
+                    "current_sign_in_at": 2014-06-01T07:33:15Z",
+                    "roles": {
+                        "edward.penguin_madness": ["owner", "scientist"]
+                        "stuart.flower_power": ["beta_tester", "traslator"]
+                    }
+                },{
+                    "id": 2,
+                    "display_name": "Stuart",
+                    "credited_name": "Stuart Lynn",
+                    "email": "slynn@example.com",
+                    "name": "stuart",
+                    "zooniverse_id": 101,
+                    "login": "slynn",
+                    "created_at": "2014-01-23T04:34:15Z",
+                    "udpated_at": "2014-01-30T14:34:15Z",
+                    "last_sign_in_at": 2014-05-13T15:34:15Z",
+                    "current_sign_in_at": 2014-06-01T07:33:15Z",
+                    "roles": {
+                        "edward.penguin_madness": ["scientist"]
+                        "stuart.flower_power": ["owner", "traslator"]
+                    }
+                
+                }]
+            }
+
+### List All Users [GET]
++ Parameters
+
+    + page (optional, integer) ... Index of Page. Default is 1
+    + page_size (optional, integer) ... Number of records to return perpage. Default is 20. Min is 10. Max is 100. 
+
++ Response 200
+
+    [Users Collection][]
+
+## User Projects Collection [/users/{user_name}/projects{?page,page_size}]
+Collection of **Project** resources belong to a **User** resource. 
+
++ Parmaters
+
+    + user_name (string) ... name of the projects' owner
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of a list of projects belonging to a user.
+
+    + Body
+            {
+                "links": {
+                    "projects.workflows": {
+                        "href": "/projects/{projects.owner_name}/{projects.name}/workflows"
+                    },
+                    "projects.subject_sets": {
+                        "href": "/projects/{projects.owner_name}/{projects.name}/subject_sets"
+                    },
+                    "projects.subjects": {
+                        "href": "/projects/{projects.owner_name}/{projects.name}/subjects"
+                    },
+                    "projects.classifications": {
+                        "href": "/projects/{projects.owner_name}/{projects.name}/classifications"
+                    }
+                },
+                 "meta": {
+                    "projects": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 3,
+                        "next_page": 2,
+                        "previous_href": "/users/edward/projects?page=3page_size=2",
+                        "next_href": "/users/edward/projects?page=2&page_size=2"
+                    }
+                },
+                "projects": [{
+                    "name": "penguin_madness",
+                    "owner_name": "edward",
+                    "display_name": "Penguin Madness!",
+                    "created_at": "2014-03-21T07:34:13Z",
+                    "updated_at": "2014-04-21T08:23:12Z",
+                    "subject_count": 1002,
+                    "classifications_count": 10000
+                },{
+                    "name": "sun_spotting",
+                    "owner_name": "edward",
+                    "display_name": "Sun Spotting",
+                    "created_at": "2014-05-21T07:34:13Z",
+                    "updated_at": "2014-06-24T18:31:11Z",
+                    "subject_count": 1002,
+                    "classifications_count": 10000
+                }]
+            }
+
+### List all Projects belonging to a User [GET]
++ Parameters
+    + page (optional, integer) ... integer index of a page in the collection. The default is 1
+    + page_size (optional, integer) ... number of pages to be returned at time. Default is 20. Min is 10. Max is 100
+
++ Response 200
+
+    [User Projects Collection][]
+
+## User Collections Collection [/users/{user_name}/collections{?page,page_size}]
+Collection of **Collection** resources belong to a **User** resource. 
+
++ Parmaters
+
+    + user_name (string) ... name of the projects' owner
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of a list of collections belonging to a user.
+
+    + Body
+            {
+                "links": {
+                    "collections.subjects": {
+                        "href": "/collections/{collections.owner_name}/{collections.name}/subjects"
+                    }
+                },
+                 "meta": {
+                    "collections": {
+                        "page": 1,
+                        "page_size": 1,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 6,
+                        "next_page": 2,
+                        "previous_href": "/users/stuart/collections?page=3page_size=1",
+                        "next_href": "/users/stuart/collections?page=2&page_size=1"
+                    }
+                },
+                "projects": [{
+                    "id": 51,
+                    "created_at": "2014-04-15T10:41:14Z",
+                    "updated_at": "2014-04-20T10:41:14Z",
+                    "name": "cool_flowers",
+                    "display_name": "Stuart's Cool Flowers",
+                    "description": "Just some cool looking flowers",
+                    "owner_name": "stuart"
+                }]
+            }
+
+### List all Collections belonging to a User [GET]
++ Parameters
+    + page (optional, integer) ... integer index of a page in the collection. The default is 1
+    + page_size (optional, integer) ... number of pages to be returned at time. Default is 20. Min is 10. Max is 100
+
++ Response 200
+
+    [User Collections Collection][]
+
+## Group [/group/{group_name}]
+A single Group object representing a logged in group of the site. 
+
+A Group resource has the following attributes:
+
+- id
+- display_name
+- name
+- users_count
+- created_at
+- updated_at
+
+Only attributes will be visible depending on the authorization level of the Group and of the OAuth Application making the request. 
+
++ Parameters
+    + group_name (string) ... URI name of the group. Same as the name attribute
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of a Group resource. Includes links to owned projects and collections and active group memberships
+
+    + Body
+    
+            {
+                "links": {
+                    "groups.collections": {
+                        "href": "/groups/{groups.name}/collections"
+                    },
+                    "groups.projects": {
+                        "href": "/groups/{groups.name}/projects"
+                    },
+                    "groups.groups": {
+                        "href": "/groups/{groups.name}/groups"
+                    }
+                },
+                "groups": [{
+                    "id": 1,
+                    "display_name": "Edwardo the Great",
+                    "credited_name": "Edward Paget",
+                    "email": "ed@example.com",
+                    "name": "edward",
+                    "zooniverse_id": 101012,
+                    "login": "edwardothegreat",
+                    "created_at": "2014-01-23T04:34:15Z",
+                    "udpated_at": "2014-01-30T14:34:15Z",
+                    "last_sign_in_at": 2014-05-13T15:34:15Z",
+                    "current_sign_in_at": 2014-06-01T07:33:15Z",
+                    "roles": {
+                        "edward.penguin_madness": ["owner", "scientist"]
+                        "stuart.flower_power": ["beta_tester", "traslator"]
+                    }
+                }]
+            }
+
+### Retrieve a Single Group [GET]
++ Response 200
+
+    [Group][]
+
+### Edit a Group [PATCH]
+To edit a Group resource you must send a [JSON Patch](http://tools.ietf.org/html/rfc6902) document. You may update the *display_name*, *email*, *credited_name*, or *roles* fields.
+
++ Request (application/json-patch+json)
+
+    + Headers
+    
+            Accept: application/vnd.api+json; version=1
+
+    + Body
+    
+            [
+                {
+                    "op": "replace", 
+                    "path": "/groups/edward/display_name", 
+                    "value": "Edwardo the less Great"
+                }
+            ]
+
++ Response 200
+
+    [Group][]
+
+### Delete a Group [DELETE]                
++ Response 204
+      
+## Groups Collection [/groups{?page,page_size}]
+A Collection all Groups
+
++ Model (application/vnd.api+json; version=1)
+
+    A JSON API representation of the Groups collection including link templates for owned projects and collections and active group memberships.                   
+                    
+    + Body
+    
+            {
+                "links": {
+                    "groups.collections": {
+                        "href": "/groups/{groups.name}/collections"
+                    },
+                    "groups.projects": {
+                        "href": "/groups/{groups.name}/projects"
+                    },
+                    "groups.groups": {
+                        "href": "/groups/{groups.name}/groups"
+                    }
+                },
+                "meta": {
+                    "subjects": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 3,
+                        "next_page": 2,
+                        "previous_href": "/groups?page=3page_size=2",
+                        "next_href": "/groups?page=2&page_size=2"
+                    }
+                },
+                "groups": [{
+                    "id": 1,
+                    "display_name": "Edwardo the Great",
+                    "credited_name": "Edward Paget",
+                    "email": "ed@example.com",
+                    "name": "edward",
+                    "zooniverse_id": 101012,
+                    "login": "edwardothegreat",
+                    "created_at": "2014-01-23T04:34:15Z",
+                    "udpated_at": "2014-01-30T14:34:15Z",
+                    "last_sign_in_at": 2014-05-13T15:34:15Z",
+                    "current_sign_in_at": 2014-06-01T07:33:15Z",
+                    "roles": {
+                        "edward.penguin_madness": ["owner", "scientist"]
+                        "stuart.flower_power": ["beta_tester", "traslator"]
+                    }
+                },{
+                    "id": 2,
+                    "display_name": "Stuart",
+                    "credited_name": "Stuart Lynn",
+                    "email": "slynn@example.com",
+                    "name": "stuart",
+                    "zooniverse_id": 101,
+                    "login": "slynn",
+                    "created_at": "2014-01-23T04:34:15Z",
+                    "udpated_at": "2014-01-30T14:34:15Z",
+                    "last_sign_in_at": 2014-05-13T15:34:15Z",
+                    "current_sign_in_at": 2014-06-01T07:33:15Z",
+                    "roles": {
+                        "edward.penguin_madness": ["scientist"]
+                        "stuart.flower_power": ["owner", "traslator"]
+                    }
+                
+                }]
+            }
+
+### List All Groups [GET]
++ Parameters
+
+    + page (optional, integer) ... Index of Page. Default is 1
+    + page_size (optional, integer) ... Number of records to return perpage. Default is 20. Min is 10. Max is 100. 
+
++ Response 200
+
+    [Groups Collection][]
+
+## Group Projects Collection [/groups/{group_name}/projects{?page,page_size}]
+Collection of **Project** resources belong to a **Group** resource. 
+
++ Parmaters
+
+    + group_name (string) ... name of the projects' owner
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of a list of projects belonging to a group.
+
+    + Body
+            {
+                "links": {
+                    "projects.workflows": {
+                        "href": "/projects/{projects.owner_name}/{projects.name}/workflows"
+                    },
+                    "projects.subject_sets": {
+                        "href": "/projects/{projects.owner_name}/{projects.name}/subject_sets"
+                    },
+                    "projects.subjects": {
+                        "href": "/projects/{projects.owner_name}/{projects.name}/subjects"
+                    },
+                    "projects.classifications": {
+                        "href": "/projects/{projects.owner_name}/{projects.name}/classifications"
+                    }
+                },
+                 "meta": {
+                    "projects": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 3,
+                        "next_page": 2,
+                        "previous_href": "/groups/edward/projects?page=3page_size=2",
+                        "next_href": "/groups/edward/projects?page=2&page_size=2"
+                    }
+                },
+                "projects": [{
+                    "name": "penguin_madness",
+                    "owner_name": "edward",
+                    "display_name": "Penguin Madness!",
+                    "created_at": "2014-03-21T07:34:13Z",
+                    "updated_at": "2014-04-21T08:23:12Z",
+                    "subject_count": 1002,
+                    "classifications_count": 10000
+                },{
+                    "name": "sun_spotting",
+                    "owner_name": "edward",
+                    "display_name": "Sun Spotting",
+                    "created_at": "2014-05-21T07:34:13Z",
+                    "updated_at": "2014-06-24T18:31:11Z",
+                    "subject_count": 1002,
+                    "classifications_count": 10000
+                }]
+            }
+
+### List all Projects belonging to a Group [GET]
++ Parameters
+    + page (optional, integer) ... integer index of a page in the collection. The default is 1
+    + page_size (optional, integer) ... number of pages to be returned at time. Default is 20. Min is 10. Max is 100
+
++ Response 200
+
+    [Group Projects Collection][]
+
+## Group Collections Collection [/groups/{group_name}/collections{?page,page_size}]
+Collection of **Collection** resources belong to a **Group** resource. 
+
++ Parmaters
+
+    + group_name (string) ... name of the projects' owner
+
++ Model (application/vnd.api+json; version=1)
+
+    JSON API representation of a list of collections belonging to a group.
+
+    + Body
+            {
+                "links": {
+                    "collections.subjects": {
+                        "href": "/collections/{collections.owner_name}/{collections.name}/subjects"
+                    }
+                },
+                 "meta": {
+                    "collections": {
+                        "page": 1,
+                        "page_size": 1,
+                        "count": 6,
+                        "include": [],
+                        "page_count": 3,
+                        "previous_page": 6,
+                        "next_page": 2,
+                        "previous_href": "/groups/stuart/collections?page=3page_size=1",
+                        "next_href": "/groups/stuart/collections?page=2&page_size=1"
+                    }
+                },
+                "projects": [{
+                    "id": 51,
+                    "created_at": "2014-04-15T10:41:14Z",
+                    "updated_at": "2014-04-20T10:41:14Z",
+                    "name": "cool_flowers",
+                    "display_name": "Stuart's Cool Flowers",
+                    "description": "Just some cool looking flowers",
+                    "owner_name": "stuart"
+                }]
+            }
+
+### List all Collections belonging to a Group [GET]
++ Parameters
+    + page (optional, integer) ... integer index of a page in the collection. The default is 1
+    + page_size (optional, integer) ... number of pages to be returned at time. Default is 20. Min is 10. Max is 100
+
++ Response 200
+
+    [Group Collections Collection][]
