@@ -69,12 +69,5 @@ module Api
     def request_ip
       request.remote_ip
     end
-
-    private
-
-    def revoke_doorkeeper_request_token!
-      token = Doorkeeper.authenticate(request)
-      token.revoke
-    end
   end
 end

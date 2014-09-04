@@ -46,4 +46,10 @@ class Api::V1::UsersController < Api::ApiController
   def permitted_update_attributes
     params.require(:users).permit(:display_name, :email, :credited_name)
   end
+
+
+  def revoke_doorkeeper_request_token!
+    token = Doorkeeper.authenticate(request)
+    token.revoke
+  end
 end
