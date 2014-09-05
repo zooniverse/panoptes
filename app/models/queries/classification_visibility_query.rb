@@ -7,23 +7,37 @@ class ClassificationVisibilityQuery
   
   def build(as_admin)
     return @parent.all if actor.is_admin? && as_admin
-    query = @parent.where(where_user
-                          .or(where_project)
-                          .or(where_group))
+
+    query = query_asts.reduce do |query, ast|
+      Arel::Nodes::UnionAll.new(query, ast)
+    end
+    
+    query = Arel::Nodes::As.new(query, union_table) 
+
+    query = @parent.from(query)
+
     rebind(query)
   end
 
   private
 
   def rebind(query)
-    reindex_binds(query)
-    all_bind_values.reduce(query) { |query, value| query.bind(value) }
+    reindex_binds
+    all_bind_values.reduce(query) { |query, bind_value| query.bind(bind_value) }
   end
 
-  def reindex_binds(query)
-    query.arel.ast.grep(Arel::Nodes::BindParam).each_with_index do |bp, i|
-      bv = all_bind_values[i]
-      bp.replace(@parent.connection.substitute_at(bv, i))
+  def query_asts
+    [where_user.arel.ast, where_project.arel.ast, where_group.arel.ast]
+  end
+
+  def reindex_binds
+    bind_index = 0
+    query_asts.each do |ast|
+      ast.grep(Arel::Nodes::BindParam).each do |bp|
+        bv = all_bind_values[bind_index]
+        bp.replace(@parent.connection.substitute_at(bv, bind_index))
+        bind_index += 1
+      end
     end
   end
   
@@ -36,7 +50,7 @@ class ClassificationVisibilityQuery
   end
   
   def where_user
-    arel_table[:user_id].eq(actor.id)
+    @where_user ||= @parent.where(arel_table[:user_id].eq(actor.id))
   end
 
   def project_scope
@@ -48,10 +62,14 @@ class ClassificationVisibilityQuery
   end
 
   def where_project
-    arel_table[:project_id].in(project_scope.arel)
+    @where_project ||= @parent.where(arel_table[:project_id].in(project_scope.arel))
   end
 
   def where_group
-    arel_table[:user_group_id].in(group_scope.arel)
+    @where_group ||= @parent.where(arel_table[:user_group_id].in(group_scope.arel))
+  end
+
+  def union_table
+    Arel::Table.new(:classifications)
   end
 end
