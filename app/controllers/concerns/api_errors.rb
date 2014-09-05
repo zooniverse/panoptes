@@ -4,4 +4,5 @@ module ApiErrors
   class UnauthorizedTokenError < PanoptesApiError; end
   class UnsupportedMediaType < PanoptesApiError; end
   class UserSeenSubjectIdError < PanoptesApiError; end
+  class NotLoggedIn< PanoptesApiError; end
 end

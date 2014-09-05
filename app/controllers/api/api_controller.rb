@@ -13,6 +13,7 @@ module Api
     API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
+    rescue_from Api::NotLoggedIn, with: :not_authenticated
     rescue_from ActiveRecord::RecordInvalid, with: :invalid_record
     rescue_from Api::UnauthorizedTokenError, with: :not_authenticated
     rescue_from Api::UnsupportedMediaType, with: :unsupported_media_type
@@ -27,7 +28,7 @@ module Api
 
     def current_resource_owner
       if doorkeeper_token
-        @current_resource_owner ||= User.find(doorkeeper_token.resource_owner_id)
+        @current_resource_owner ||= User.find_by_id(doorkeeper_token.resource_owner_id)
       end
     end
 
@@ -43,8 +44,6 @@ module Api
     end
 
     alias_method :user_for_paper_trail, :current_resource_owner
-
-    protected
 
     def user_accept_languages
       api_user.try(:languages) || []
@@ -66,6 +65,23 @@ module Api
 
     def request_ip
       request.remote_ip
+    end
+
+    def serializer
+      @serializer ||= "#{ resource_name.camelize }Serializer".constantize
+    end
+
+    def resource_name
+      @resource_name ||= self.class.name
+        .match(/::([a-zA-Z]*)Controller/)[1].underscore.singularize
+    end
+
+    def visible_scope
+      super(api_user)
+    end
+
+    def require_login
+      raise Api::NotLoggedIn unless api_user.logged_in?
     end
   end
 end

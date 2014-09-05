@@ -1,5 +1,6 @@
 class Api::V1::SubjectSetsController < Api::ApiController
-  doorkeeper_for :all
+  before_filter :require_login, only: [:update, :destroy, :create]
+  doorkeeper_for :create, :update, :destroy, scopes: [:project]
   access_control_for :create, :update, :destroy, resource_class: SubjectSet
 
   alias_method :subject_set, :controlled_resource
@@ -16,17 +17,9 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   end
 
-  def create
-    subject_set = SubjectSet.new creation_params
-    subject_set.save!
-    json_api_render( 201,
-                     SubjectSetSerializer.resource(subject_set),
-                     api_subject_set_url(subject_set) )
-  end
-
   private
 
-  def creation_params
-    params.require(:subject_set).permit :name, :project_id
+  def create_params
+    params.require(:subject_sets).permit(:name, :project_id)
   end
 end

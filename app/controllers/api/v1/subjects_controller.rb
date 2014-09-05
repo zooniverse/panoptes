@@ -1,5 +1,6 @@
 class Api::V1::SubjectsController < Api::ApiController
-  doorkeeper_for :update, :create, :update, scopes: [:subject]
+  before_filter :require_login, only: [:update, :create, :destroy]
+  doorkeeper_for :update, :create, :destroy, scopes: [:subject]
   access_control_for :update, :create, :destroy, resource_class: Subject
 
   def show
@@ -17,10 +18,6 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def update
-
-  end
-
-  def create
 
   end
 
@@ -47,5 +44,13 @@ class Api::V1::SubjectsController < Api::ApiController
              host: cellect_host(params[:workflow_id])) {|k, ov, nv| ov ? ov : nv}
     c_params[:group_id] = c_params.delete(:subject_set_id)
     c_params.symbolize_keys
+  end
+
+  def create_params
+    params.require(:subjects)
+      .permit(:project_id,
+              metadata: params[:subjects][:metadata].try(:keys),
+              locations: params[:subjects][:locations].try(:keys))
+      .merge(owner: owner)
   end
 end

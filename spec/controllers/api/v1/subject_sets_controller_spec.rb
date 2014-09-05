@@ -10,7 +10,8 @@ describe Api::V1::SubjectSetsController, type: :controller do
   let(:api_resource_attributes) { %w(id name set_member_subjects_count created_at updated_at) }
   let(:api_resource_links) { %w(subject_sets.project subject_sets.workflows) }
   
-  let(:scopes) { %w(public subject_set) }
+  let(:scopes) { %w(public project) }
+  let(:resource_class) { SubjectSet }
 
   before(:each) do
     default_request scopes: scopes, user_id: owner.id
@@ -51,40 +52,23 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#create' do
-    let(:created_subject_set_id) { created_instance_id("subject_sets") }
-
-    before(:each) do
-      default_request scopes: %w(public subject_set), user_id: owner.id
-      params = {
-                subject_set: {
-                              name: 'Test subject set',
-                              project_id: project.id
-                             }
-               }
-      post :create, params, { 'CONTENT_TYPE' => 'application/json' }
+    let(:authorized_user) { owner }
+    let(:test_attr) { :name}
+    let(:test_attr_value) { 'Test subject set' }
+    let(:create_params) do
+      {
+       subject_sets: {
+                      name: 'Test subject set',
+                      project_id: project.id
+                     }
+      }
     end
-
-    it "should return 201" do
-      expect(response.status).to eq(201)
-    end
-
-    it 'should create the new subject set' do
-      created = SubjectSet.find(created_subject_set_id)
-      expect(created.name).to eq 'Test subject set'
-    end
-
-    it "should set the Location header as per JSON-API specs" do
-      id = created_subject_set_id
-      expect(response.headers["Location"]).to eq("http://test.host/api/subject_sets/#{id}")
-    end
-
-    it_behaves_like 'an api response'
+    it_behaves_like "is creatable"
   end
 
   describe '#destroy' do
     let(:authorized_user) { owner }
     let(:resource) { subject_set }
-    let(:resource_class) { SubjectSet }
 
     it_behaves_like "is destructable"
   end

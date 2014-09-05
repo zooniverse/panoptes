@@ -30,10 +30,6 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   private
 
-  def serializer
-    ClassificationSerializer
-  end
-
   def visible_scope
     Classification.visible_to(api_user)
   end
