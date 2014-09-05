@@ -1,6 +1,4 @@
 class Api::V1::WorkflowsController < Api::ApiController
-  include Destructable
-  
   doorkeeper_for :update, :create, :delete, scopes: [:project]
   access_control_for :create, :update, :destroy, resource_class: Workflow
   

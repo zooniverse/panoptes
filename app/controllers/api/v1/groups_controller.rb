@@ -1,5 +1,5 @@
 class Api::V1::GroupsController < Api::ApiController
-  include Deactivatable
+  include DeactivatableResource
   
   doorkeeper_for :index, :create, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:group]

@@ -1,6 +1,4 @@
 class Api::V1::SubjectsController < Api::ApiController
-  include Destructable
-  
   doorkeeper_for :update, :create, :update, scopes: [:subject]
   access_control_for :update, :create, :destroy, resource_class: Subject
 

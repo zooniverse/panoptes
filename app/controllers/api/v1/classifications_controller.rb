@@ -1,34 +1,27 @@
 class Api::V1::ClassificationsController < Api::ApiController
-  include Destructable
-  
   doorkeeper_for :show, :index, :destory, :update, scopes: [:classification]
   access_control_for :update, :destroy, resource_class: Classification
 
   def show
-    render json_api: ClassificationSerializer.resource(params, visible_scope(api_user))
+    render json_api: serializer.resource(params, visible_scope)
   end
 
   def index
-    render json_api: ClassificationSerializer.page(params, visible_scope(api_user))
+    render json_api: serializer.page(params, visible_scope)
   end
 
   def create
-    classification = Classification.new(creation_params)
-    classification.user_ip = request_ip
-    
-    if api_user.logged_in?
+    classification = Classification.new(create_params)
+
+    if classification.save! && api_user.logged_in? 
+      update_seen_subjects
       update_cellect
-      classification.user = api_user.user
+      create_project_preference
     end
     
-    if classification.save!
-      uss_params = user_seen_subject_params(api_user)
-      UserSeenSubjectUpdater.update_user_seen_subjects(uss_params)
-      create_project_preference
-      json_api_render(201,
-                      ClassificationSerializer.resource(classification),
-                      api_classification_url(classification))
-    end
+    json_api_render(201,
+                    serializer.resource(classification),
+                    api_classification_url(classification))
   end
 
   def update
@@ -37,17 +30,25 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   private
 
-  def visible_scope(actor)
-    Classification.visible_to(actor)
+  def serializer
+    ClassificationSerializer
+  end
+
+  def visible_scope
+    Classification.visible_to(api_user)
   end
 
   def create_project_preference
-    return unless api_user.logged_in?
     UserProjectPreference.where(user: api_user.user, **preference_params)
       .first_or_create do |up|
       up.email_communication = api_user.user.project_email_communication
       up.preferences = {}
     end
+  end
+
+  def update_seen_subjects
+    UserSeenSubjectUpdater
+      .update_user_seen_subjects(user_seen_subject_params)
   end
 
   def update_cellect
@@ -73,21 +74,28 @@ class Api::V1::ClassificationsController < Api::ApiController
               :set_member_subject_id,
               :subject_id,
               :completed,
-              annotations: [:value, :key, :started_at, :finished_at, :user_agent])
+              annotations: [:value,
+                            :key,
+                            :started_at,
+                            :finished_at,
+                            :user_agent])
   end
 
-  def creation_params
-    classification_params.slice(:project_id,
-                                :workflow_id,
-                                :set_member_subject_id,
-                                :completed,
-                                :annotations)
+  def create_params
+    classification_params
+      .slice(:project_id,
+             :workflow_id,
+             :set_member_subject_id,
+             :completed,
+             :annotations)
+      .merge(user_ip: request_ip,
+             user_id: api_user.user.try(:id))
   end
 
-  def user_seen_subject_params(user)
+  def user_seen_subject_params
     classification_params
       .slice(:subject_id, :workflow_id)
-      .merge(user_id: user.id)
+      .merge(user_id: api_user.user.try(:id))
       .symbolize_keys
   end
 end

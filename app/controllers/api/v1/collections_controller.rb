@@ -1,6 +1,4 @@
 class Api::V1::CollectionsController < Api::ApiController
-  include Destructable
-  
   doorkeeper_for :all
   access_control_for :create, :update, :destroy, resource_class: Collection
   

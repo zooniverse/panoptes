@@ -1,5 +1,5 @@
 class Api::V1::UsersController < Api::ApiController
-  include Deactivatable
+  include DeactivatableResource
   
   doorkeeper_for :index, :me, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
@@ -8,15 +8,15 @@ class Api::V1::UsersController < Api::ApiController
   alias_method :user, :controlled_resource
 
   def index
-    render json_api: page_serializer(params)
+    render json_api: serializer.resource(params)
   end
 
   def show
-    render json_api: resource_serializer(params)
+    render json_api: serializer.resource(params)
   end
 
   def me
-    render json_api: resource_serializer(current_resource_owner)
+    render json_api: serializer.resource(current_resource_owner)
   end
 
   def destroy
@@ -24,6 +24,11 @@ class Api::V1::UsersController < Api::ApiController
     revoke_doorkeeper_request_token!
     UserInfoScrubber.scrub_personal_info!(user)
     super
+  end
+
+  # Override included behaviour from CreatableResource
+  def create
+    nil
   end
 
   private
@@ -35,18 +40,13 @@ class Api::V1::UsersController < Api::ApiController
       user.memberships
   end
 
-  def resource_serializer(*args)
-    UserSerializer.resource(*args)
+  def serializer
+    UserSerializer
   end
 
-  def page_serializer(*args)
-    UserSerializer.page(*args)
-  end
-
-  def permitted_update_attributes
+  def update_params
     params.require(:users).permit(:display_name, :email, :credited_name)
   end
-
 
   def revoke_doorkeeper_request_token!
     token = Doorkeeper.authenticate(request)
