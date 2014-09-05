@@ -34,7 +34,7 @@ describe Classification, :type => :model do
   end
 
   describe "::visible_to" do
-    let(:user) { LoggedInUser.new(create(:user)) }
+    let(:user) { ApiUser.new(create(:user)) }
     let(:project) { create(:project, owner: user.owner) }
     let(:user_group) { create(:user_group) }
     let!(:classifications) do
@@ -73,7 +73,7 @@ describe Classification, :type => :model do
   end
 
   describe "#creator?" do
-    let(:user) { LoggedInUser.new(build(:user)) }
+    let(:user) { ApiUser.new(build(:user)) }
 
     it "should be truthy if a user is the classification's creator" do
       classification = build(:classification, user: user.owner)
@@ -97,7 +97,7 @@ describe Classification, :type => :model do
   end
 
   describe "#in_show_scope?" do
-    let(:user) { LoggedInUser.new(create(:user)) }
+    let(:user) { ApiUser.new(create(:user)) }
 
     it "should be truthy if the classification is in the actor's visible_scope" do
       classification = create(:classification, user: user.owner)

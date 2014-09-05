@@ -2,10 +2,12 @@ module Api
   include ApiErrors
   
   class ApiController < ApplicationController
+    include RoleControl::RoledController
     include JSONApiRender
     include JSONApiResponses
-    include RoleControl::RoledController
-    include UpdateResource
+    include UpdatableResource
+    include DestructableResource
+    include CreatableResource
 
     API_ACCEPTED_CONTENT_TYPE = 'application/json'
     API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
@@ -30,11 +32,7 @@ module Api
     end
 
     def api_user
-      @api_user ||= if current_resource_owner
-                      LoggedInUser.new(current_resource_owner)
-                    else
-                      LoggedOutUser.new
-                    end
+      @api_user ||= ApiUser.new(current_resource_owner)
     end
 
     def current_languages
