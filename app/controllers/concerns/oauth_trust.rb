@@ -1,8 +1,6 @@
 module OauthTrust
   extend ActiveSupport::Concern
 
-  class ClientIdError < StandardError; end
-
   def client
     @client ||= client_from_params
   end
@@ -19,8 +17,8 @@ module OauthTrust
   private
 
   def client_from_params
-    client_id = params[:client_id]
-    raise ClientIdError.new if client_id.blank?
-    Doorkeeper::Application.where(uid: client_id).first
+    if client_id = params[:client_id]
+      Doorkeeper::Application.where(uid: client_id).first
+    end
   end
 end

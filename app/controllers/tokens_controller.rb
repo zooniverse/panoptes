@@ -12,10 +12,7 @@ class TokensController < Doorkeeper::TokensController
   private
 
   def allowed_grants
-    allowed = client.allowed_grants.include?(params[:grant_type])
-  rescue ClientIdError
-    allowed = false
-  ensure
+    allowed = client.try(:allowed_grants).try(:include?, params[:grant_type])
     head :unprocessable_entity unless allowed
   end
 
