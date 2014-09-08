@@ -36,4 +36,10 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  #hack to fix issue with doorkeeper not loading ControllerHelpers in test env
+  # https://github.com/doorkeeper-gem/doorkeeper/issues/375
+  config.to_prepare do
+    Doorkeeper::ApplicationsController.helper Doorkeeper::Helpers::Controller
+  end
 end

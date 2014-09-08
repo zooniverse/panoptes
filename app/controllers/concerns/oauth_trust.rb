@@ -2,7 +2,7 @@ module OauthTrust
   extend ActiveSupport::Concern
 
   def client
-    @client ||= Doorkeeper::Application.where(uid: params[:client_id]).first
+    @client ||= client_from_params
   end
 
   def allowed_scopes
@@ -12,5 +12,13 @@ module OauthTrust
 
   def default_scopes
     params[:scope] ||= client.default_scope.join(' ')
+  end
+
+  private
+
+  def client_from_params
+    if client_id = params[:client_id]
+      Doorkeeper::Application.where(uid: client_id).first
+    end
   end
 end

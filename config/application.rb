@@ -34,6 +34,5 @@ module Panoptes
         resource '/api/*', headers: :any, methods: [:get, :post, :options, :put, :patch]
       end
     end
-    config.middleware.insert_before ActionDispatch::ParamsParser, "CatchApiJsonParseErrors"
   end
 end

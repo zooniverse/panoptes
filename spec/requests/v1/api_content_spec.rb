@@ -31,19 +31,9 @@ describe "api should only accept certain content types", type: :request do
     describe "classifications#create with invalid POST params" do
       let(:params) { { classification: [ { value: [ { x: 734.16 } ] } ] } }
 
-      before(:each) do
-        post "/api/classifications/", params, json_content_type_headers
-      end
-
       it 'should respond with a bad_request stauts' do
-        expect(response.status).to eq(400)
-      end
-
-      it 'should provide an error message in the response body' do
-        error_message_prefix = "There was a problem in the JSON you submitted:"
-        error_message_suffix = "unexpected token at 'classification[][value][][x]=734.16'"
-        expect(response.body).to include(error_message_prefix)
-        expect(response.body).to include(error_message_suffix)
+        expect{ post "/api/classifications/", params, json_content_type_headers }.to \
+                       raise_error(ActionDispatch::ParamsParser::ParseError)
       end
     end
   end
