@@ -61,7 +61,7 @@ describe RoleControl::Controlled do
     end
 
     it 'should fetch all publicly visible records for unenrolled actor' do
-      test_user = Class.new{ include RoleControl::UnrolledUser }.new
+      test_user = double({ roles_query: [] })
       
       visible_records = subject.scope_for(:read, test_user)
       expected_records = group_tables.values_at(0)

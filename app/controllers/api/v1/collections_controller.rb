@@ -1,15 +1,16 @@
 class Api::V1::CollectionsController < Api::ApiController
-  doorkeeper_for :all
+  before_filter :require_login, only: [:create, :update, :destroy]
+  doorkeeper_for :create, :update, :destroy, scopes: [:collection]
   access_control_for :create, :update, :destroy, resource_class: Collection
   
   alias_method :collection, :controlled_resource
 
   def show
-    render json_api: serializer.resource(params, visible_scope(api_user))
+    render json_api: serializer.resource(params, visible_scope)
   end
 
   def index
-    render json_api: serializer.page(params, visible_scope(api_user))
+    render json_api: serializer.page(params, visible_scope)
   end
 
   def update
@@ -25,6 +26,7 @@ class Api::V1::CollectionsController < Api::ApiController
   end
 
   def create_params
-    params.require(:collection).permit(:name, :display_name, :project_id)
+    params.require(:collections)
+      .permit(:name, :display_name, :project_id)
   end
 end

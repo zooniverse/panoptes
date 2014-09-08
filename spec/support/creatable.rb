@@ -17,9 +17,10 @@ shared_examples "is creatable" do
     end
 
     it "should set the Location header as per JSON-API specs" do
+      name = defined?(resource_name) ? resource_name : api_resource_name
       id = created_id
       location_header = response.headers["Location"]
-      resource_url = "http://test.host/api/#{ api_resource_name }/#{ id }"
+      resource_url = "http://test.host/api/#{ name }/#{ id }"
       expect(location_header).to eq(resource_url)
     end
     

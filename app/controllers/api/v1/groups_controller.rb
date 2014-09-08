@@ -1,6 +1,7 @@
 class Api::V1::GroupsController < Api::ApiController
   include DeactivatableResource
-  
+
+  before_filter :require_login, only: [:create, :update, :destroy]
   doorkeeper_for :index, :create, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:group]
   access_control_for :update, :create, :destroy, resource_class: UserGroup
@@ -22,9 +23,19 @@ class Api::V1::GroupsController < Api::ApiController
 
   def create_resource
     group = UserGroup.new(user_group_params)
-    group.display_name ||= group.name
-    group.owner_name = OwnerName.new(name: group.name, resource: group)
-    return group if group.save!
+    
+    ActiveRecord::Base.transaction do
+      group.display_name ||= group.name
+      group.owner_name = OwnerName.new(name: group.name,
+                                       resource: group)
+      group.save!
+      Membership.create(user: api_user.user,
+                        user_group: group,
+                        state: :active,
+                        roles: ["group_admin"])
+    end
+    
+    return group if group.persisted?
   end
 
   def to_disable
@@ -35,7 +46,7 @@ class Api::V1::GroupsController < Api::ApiController
   end
 
   def user_group_params
-    params.require(:user_group).permit(:name, :display_name)
+    params.require(:user_groups).permit(:name, :display_name)
   end
 
   def serializer

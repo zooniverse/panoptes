@@ -1,4 +1,5 @@
 class Api::V1::ProjectsController < Api::ApiController
+  before_filter :require_login, only: [:create, :update, :destroy]
   doorkeeper_for :update, :create, :delete, scopes: [:project]
   access_control_for :create, :update, :destroy, resource_class: Project
 
@@ -37,12 +38,12 @@ class Api::V1::ProjectsController < Api::ApiController
   def create_response(project)
     serializer.resource(project,
                         nil,
-                        languages: [ params[:project][:primary_language] ],
+                        languages: [ params[:projects][:primary_language] ],
                         fields: ['title', 'description'] )
   end
 
   def create_params
-    params.require(:project)
+    params.require(:projects)
       .permit(:description, :display_name, :name, :primary_language)
   end
 

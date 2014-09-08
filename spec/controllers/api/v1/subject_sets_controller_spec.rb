@@ -12,6 +12,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
   
   let(:scopes) { %w(public project) }
   let(:resource_class) { SubjectSet }
+  let(:authorized_user) { owner }
 
   before(:each) do
     default_request scopes: scopes, user_id: owner.id
@@ -52,7 +53,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#create' do
-    let(:authorized_user) { owner }
     let(:test_attr) { :name}
     let(:test_attr_value) { 'Test subject set' }
     let(:create_params) do
@@ -67,7 +67,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#destroy' do
-    let(:authorized_user) { owner }
     let(:resource) { subject_set }
 
     it_behaves_like "is destructable"

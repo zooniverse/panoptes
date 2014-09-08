@@ -18,6 +18,8 @@ describe Api::V1::ProjectsController, type: :controller do
   end
 
   let(:scopes) { %w(public project) }
+  let(:authorized_user) { user }
+  let(:resource_class) { Project }
 
   describe "when not logged in" do
 
@@ -158,46 +160,37 @@ describe Api::V1::ProjectsController, type: :controller do
 
     describe "#create" do
       let(:created_project_id) { created_instance_id("projects") }
+      let(:test_attr) { :display_name }
+      let(:test_attr_value) { "New Zoo" }
 
-      before(:each) do
-        params = { 'project' => { 'display_name' => "New Zoo",
-                                 'description' => "A new Zoo for you!",
-                                 'name' => "new_zoo",
-                                 'primary_language' => 'en' } }
-
-        post :create, params
+      let(:create_params) do
+        { projects: {display_name: "New Zoo",
+                     description: "A new Zoo for you!",
+                     name: "new_zoo",
+                     primary_language: 'en' } }
       end
 
-      it "should return 201" do
-        expect(response.status).to eq(201)
-      end
+      describe "project contents" do
+        it "should create an associated project_content model" do
+          default_request scopes: scopes, user_id: authorized_user.id
+          post :create, create_params
 
-      it "should create the new project" do
-        expect(Project.find(created_project_id).name).to eq("new_zoo")
+          expect(Project.find(created_project_id)
+                 .project_contents.first.title).to eq('New Zoo')
+          
+          expect(Project.find(created_project_id)
+                 .project_contents.first.description).to eq('A new Zoo for you!')
+          expect(Project.find(created_project_id)
+                 .project_contents.first.language).to eq('en')
+        end
       end
-
-      it "should set the Location header as per JSON-API specs" do
-        id = created_project_id
-        expect(response.headers["Location"]).to eq("http://test.host/api/projects/#{id}")
-      end
-
-      it "should create an associated project_content model" do
-        expect(Project.order(created_at: :desc)
-               .first.project_contents.first.title).to eq('New Zoo')
-        expect(Project.order(created_at: :desc)
-               .first.project_contents.first.description).to eq('A new Zoo for you!')
-        expect(Project.order(created_at: :desc)
-               .first.project_contents.first.language).to eq('en')
-      end
-
-      it_behaves_like "an api response"
+      
+      it_behaves_like "is creatable"
     end
 
   end
   
   describe "#destroy" do
-    let(:authorized_user) { user }
-    let(:resource_class) { Project }
     let(:resource) { projects.first }
 
     it_behaves_like "is destructable"

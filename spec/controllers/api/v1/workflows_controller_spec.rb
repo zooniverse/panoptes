@@ -7,6 +7,8 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:project){ workflow.project }
   let(:owner){ project.owner }
   let(:api_resource_name){ 'workflows' }
+  let(:resource_class) { Workflow }
+  let(:authorized_user) { owner }
 
   let(:api_resource_attributes){ %w(id name tasks classifications_count subjects_count created_at updated_at) }
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets) }
@@ -35,45 +37,26 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe '#create' do
-    let(:created_workflow_id) { created_instance_id("workflows") }
-
-    before(:each) do
-      default_request scopes: scopes, user_id: owner.id
-      params = {
-        workflows: {
-          name: 'Test workflow',
-          tasks: [{ foo: 'bar' }, { bar: 'baz' }],
-          project_id: project.id,
-          grouped: true,
-          prioritized: true,
-          primary_language: 'en'
-        }
+    let(:test_attr) { :name }
+    let(:test_attr_value) { 'Test workflow' }
+    let(:create_params) do
+      {
+       workflows: {
+                   name: 'Test workflow',
+                   tasks: [{ foo: 'bar' }, { bar: 'baz' }],
+                   project_id: project.id,
+                   grouped: true,
+                   prioritized: true,
+                   primary_language: 'en'
+                  }
       }
-      post :create, params
     end
-
-    it "should return 201" do
-      expect(response.status).to eq(201)
-    end
-
-    it 'should create the new workflow' do
-      created = Workflow.find(created_workflow_id)
-      expect(created.name).to eq 'Test workflow'
-      expect(created.tasks).to eq [{ 'foo' => 'bar' }, { 'bar' => 'baz' }]
-    end
-
-    it "should set the Location header as per JSON-API specs" do
-      id = created_workflow_id
-      expect(response.headers["Location"]).to eq("http://test.host/api/workflows/#{id}")
-    end
-
-    it_behaves_like 'an api response'
+    
+    it_behaves_like "is creatable"
   end
 
   describe '#destroy' do
-    let(:authorized_user) { owner }
     let(:resource) { workflow }
-    let(:resource_class) { Workflow }
 
     it_behaves_like "is destructable"
   end

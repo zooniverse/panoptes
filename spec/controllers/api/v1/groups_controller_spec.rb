@@ -56,67 +56,30 @@ describe Api::V1::GroupsController, type: :controller do
   end
 
   describe "#create" do
-    let(:created_user_group_id) { created_instance_id("user_groups") }
+    let(:authorized_user) { create(:user) }
+    let(:resource_class) { UserGroup }
+    let(:test_attr) { :name }
+    let(:test_attr_value) { "zooniverse" }
+    let(:resource_name) { 'groups' }
+    let(:create_params) { { user_groups: { name: "Zooniverse" } } }
 
-    context "with valid params" do
-      let!(:create_params) { { user_group: { name: "Zooniverse" } } }
+    it_behaves_like "is creatable"
 
-      it "should create a new UserGroup" do
-        expect{post :create, create_params}.to change{UserGroup.count}.by(1)
-      end
-
-      context "with caps and spaces in the group name" do
-        let!(:create_params) { { user_group: { name: "Amazing Group Name" } } }
-
-        it "should convert the owner_name#name field correctly" do
-          post :create, create_params
-          owner_uniq_name = UserGroup.find(created_user_group_id).owner_uniq_name
-          expect(owner_uniq_name).to eq("amazing_group_name")
-        end
-      end
-
-      context "with the response ready" do
-        before(:each) do
-          post :create, create_params
-        end
-
-        it "should return 201" do
-          expect(response.status).to eq(201)
-        end
-
-        it "should set the Location header as per JSON-API specs" do
-          id = created_user_group_id
-          expect(response.headers["Location"]).to eq("http://test.host/api/groups/#{id}")
-        end
-
-        it "should create a project with the correct name" do
-          created_id = created_user_group_id
-          expect(UserGroup.find(created_id).name).to eq("zooniverse")
-        end
-
-        it "should create a the project with the correct display name" do
-          created_id = created_user_group_id
-          expect(UserGroup.find(created_id).display_name).to eq("Zooniverse")
-        end
-
-        it_behaves_like "an api response"
-      end
-    end
-
-    context "with invalid params" do
-      let!(:create_params) { { user_group: { nmae: "Zooniverse" } } }
-
+    describe "default member" do
+      let(:group_id) { created_instance_id('user_groups') }
       before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
         post :create, create_params
       end
-
-      it "should respond with bad_request" do
-        expect(response.status).to eq(422)
+      
+      it "should make a the creating user a member" do
+        membership = Membership.where(user_group_id: group_id).first
+        expect(authorized_user.memberships).to include(membership)
       end
 
-      it "should have the validation errors in the response body" do
-        message = "found unpermitted parameters: nmae"
-        expect(response.body).to eq(json_error_message(message))
+      it "should amke the creating user a group admin" do
+        group = UserGroup.find(group_id)
+        expect(authorized_user.roles_for(group)).to include("group_admin")
       end
     end
   end

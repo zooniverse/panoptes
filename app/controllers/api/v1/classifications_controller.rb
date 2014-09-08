@@ -18,10 +18,8 @@ class Api::V1::ClassificationsController < Api::ApiController
       update_cellect
       create_project_preference
     end
-    
-    json_api_render(201,
-                    serializer.resource(classification),
-                    api_classification_url(classification))
+
+    created_resource_response(classification)
   end
 
   def update
