@@ -18,8 +18,12 @@ shared_examples "is destructable" do
 
   context "an unauthorized user" do
     before(:each) do
-      unauthorized_user ||= create(:user)
-      stub_token(scopes: scopes, user_id: unauthorized_user.id)
+      user = if defined?(unauthorized_user)
+               unauthorized_user
+             else
+               create(:user)
+             end
+      stub_token(scopes: scopes, user_id: user.id)
       delete :destroy, id: resource.id
     end
 

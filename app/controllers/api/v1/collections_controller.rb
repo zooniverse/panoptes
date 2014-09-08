@@ -13,10 +13,6 @@ class Api::V1::CollectionsController < Api::ApiController
     render json_api: serializer.page(params, visible_scope)
   end
 
-  def update
-    # TODO 
-  end
-
   protected
 
   def create_resource
@@ -28,5 +24,11 @@ class Api::V1::CollectionsController < Api::ApiController
   def create_params
     params.require(:collections)
       .permit(:name, :display_name, :project_id)
+  end
+
+  def update_params
+    p params
+    params.require(:collections)
+      .permit(:name, :display_name, links: :subjects)
   end
 end

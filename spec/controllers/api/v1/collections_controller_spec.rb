@@ -59,7 +59,19 @@ describe Api::V1::CollectionsController, type: :controller do
   end
 
   describe '#update' do
-    it 'should be implemented'
+    let(:subjects) { create_list(:subject, 4) }
+    let(:resource) { collection }
+    let(:update_params) do
+      { collections: {
+                      name: "Tested Collection",
+                      links: {
+                              subjects: subjects.map(&:id).map(&:to_s)
+                             }
+                     }
+      }
+    end
+
+    it_behaves_like "is updatable"
   end
 
   describe '#create' do
