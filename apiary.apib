@@ -981,7 +981,257 @@ returned.
 + Response 201
 
     [Project][]
-                
-                
-            
 
+# Group Workflows
+Resources related to _Panoptes Workflows_.
+
+## Workflow [/workflows/{id}]
+A single workflow object. Workflows represent the series of
+questions/tasks a user will be asked to complete for a subject.
+
+A workflow has the following attributes
+
+- id
+- created_at
+- updated_at
+- name
+- tasks
+- classifications_count
+- pairwise
+- grouped
+- prioritized
+- primary_language
+- content
+
+*id*, *created_at*, *updated_at*, and *classifications_count* are
+ assigned by the API
+
++ Model (application/vnd.api+json)
+
+    + Body
+
+            {
+                links: {
+                    "workflows.subjects": {
+                        "href": "/subjects{?workflow_id=workflows.id}",
+                        "type": "subject"
+                    },
+                    "workflows.project": {
+                        "href": "/projects/{workflows.project}",
+                        "type": "project"
+                    },
+                    "workflows.subject_sets": {
+                        "href": "/subject_sets/{workflows.subject_set}",
+                        "type": "subject_set"
+                    }
+                },
+                "workflows": {
+                    "id": "22",
+                    "name": "Find moons",
+                    "created_at": "2014-02-13T10:11:34Z",
+                    "updated_at": "2014-02-13T10:11:34Z",
+                    "classifications_count": 1000,
+                    "pairwise": false,
+                    "grouped" : false,
+                    "prioritized": false,
+                    "primary_language": "es-mx",
+                    "content": {
+                        "strings": { "task_key": "string for key"},
+                        "language": "es-mx"
+                    }
+                    "tasks: { "format": "tbd"},
+                    "links": {
+                        "project": "1",
+                        "subject_sets": ["7", "9"]
+                    }
+                }
+            }
+
+### Retrieve a single Workflow [GET]
+
++ Response 200
+
+    [Workflow][]
+
+### Edit a single workflow [PUT]
+A user may edit a workflow if they have edit permissions for the parent
+project. Editing tasks for content requires a full replacement for the
+field. Only the subject set link may be edited. Removing a subject_set
+link doesn't destroy the subject_set.
+
++ Request (application/vnd.api+json)
+
+        {
+            "workflows": {
+                "tasks": { "format": "all new!"}
+                "links": {
+                    "subject_sets": ["8"]
+                }
+            }
+        }
+
++ Response 200
+
+    [Workflow][]
+
+### Destroy a single workflow [DELETE]
+A user may edit a workflow if they have destroy permissions for the
+parent project.
+
++ Response 204
+
+## Update subject set links [/workflow/{id}/links/subject_set]
+An alternative way to update links.
+
+### Update subject sets [POST]
+Adds the posted subject sets to a workflow's links. Creates a copy of
+the subject set if it belongs do a difference project.
+
++ Parameters
+  + id (required, integer) ... id of workflow to update
+
++ Request (application/vnd.api+json)
+
+        { "subject_sets": ["9"] }
+
++ Response 200
+
+    [Workflow][]
+
+## Destroy subject set links [/workflow/{id}/links/subject_set/{subject_set_ids}]
+An alternative way to remove links.
+
+### Destroy stubject set [DELETE]
+Removes workflow's links to the given subject_sets. It does not
+destroy the subject set models.
+
++ Parameters
+  + id (required, integer) ... id of workflow to update
+  + subject_set_ids (required, string) ... comma seperated list of ids
+    to destroy
+
++ Response 204
+
+## Workflow Collection [/workflow{?page,per_page,sort,project}]
+A collection of _Panotpes Workflow_ resources.
+
+All collections add a *meta* attribute that is a hash containing
+paging information.
+
+- meta
+
+Workflows are returned as an array under the _workflows_ key.
+
++ Model (application/vnd.api+json)
+
+    A JSON API formatted representation of a collection of workflows.
+
+    + Body
+
+             {
+                links: {
+                    "workflows.subjects": {
+                        "href": "/subjects{?workflow_id=workflows.id}",
+                        "type": "subject"
+                    },
+                    "workflows.project": {
+                        "href": "/projects/{workflows.project}",
+                        "type": "project"
+                    },
+                    "workflows.subject_sets": {
+                        "href": "/subject_sets/{workflows.subject_set}",
+                        "type": "subject_set"
+                    }
+                },
+                "meta": {
+                   "workflows": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 28,
+                        "include": [],
+                        "page_count": 14,
+                        "previous_page": 14,
+                        "next_page": 2,
+                        "first_href": "/workflows?page_size=2",
+                        "previous_href": "/workflows?page=14page_size=2",
+                        "next_href": "/workflows?page=2&page_size=2",
+                        "last_href": "/workflows?page=14&page_size=2"
+                    }
+                },
+                "workflows": [{
+                    "id": "22",
+                    "name": "Find moons",
+                    "created_at": "2014-02-13T10:11:34Z",
+                    "updated_at": "2014-02-13T10:11:34Z",
+                    "classifications_count": 1000,
+                    "pairwise": false,
+                    "grouped" : false,
+                    "prioritized": false,
+                    "primary_language": "es-mx",
+                    "content": {
+                        "strings": { "task_key": "string for key"},
+                        "language": "es-mx"
+                    }
+                    "tasks: { "format": "tbd"},
+                    "links": {
+                        "project": "1",
+                        "subject_sets": ["7", "9"]
+                    }
+                },{
+                    "id": "23",
+                    "name": "Find planets",
+                    "created_at": "2014-08-13T10:11:34Z",
+                    "updated_at": "2014-08-13T10:11:34Z",
+                    "classifications_count": 18910,
+                    "pairwise": false,
+                    "grouped" : true,
+                    "prioritized": false,
+                    "primary_language": "en-gb",
+                    "content": {
+                        "strings": { "task_key": "string for key"},
+                        "language": "en-gb"
+                    }
+                    "tasks: { "format": "tbd"},
+                    "links": {
+                        "project": "8",
+                        "subject_sets": ["1", "91"]
+                    }
+                }]
+            }
+
+### List All Workflows [GET]
++ Parameters
+  + page (optional, integer) ... the index of the page to retrieve
+    default is 1
+  + per_page (optional, integer) ... number of items to include on a
+    page default is 20
+  + sort (optional, string) ... field to sort by id by default
+  + project_id (optional, integer) ... filter workflows by project id
+
++ Response 200
+
+    [Workflow Collection][]
+
+### Create a Workflow [POST]
+Requires a set of tasks, a primary language, and a name, as well as a
+link to a project. Can optionally set random select parameters (false
+by default) and links to subject sets.
+
+Stings in tasks are moved to the content hash in the response
+
++ Request (application/vnd.api+json)
+
+        {
+            "workflows": {
+                "name": "Spot Monsters!",
+                "tasks": { "Format": "still waiting..."},
+                "primary_language": "en-ca",
+                "links": {
+                    "subject_sets": ["1", "2"]
+                }
+            }
+        }
+
++ Response 201
+
+    [Workflow][]
