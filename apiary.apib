@@ -2,46 +2,216 @@ FORMAT: 1A
 HOST: http://www.google.com
 
 # Panoptes API
-Notes API is a *short texts saving* service similar to its physical paper presence on your table.
+Panoptes API is a *crowdsourcing system* based on serving _subjects_,
+images or other media, to _volunteers_ and asking them to _classify_
+the _subject_ based on a defined _workflow_ for the _subject_ type.
 
-# Group Notes
-Notes related resources of the **Notes API**
 
-## Notes Collection [/notes]
-### List all Notes [GET]
-+ Response 200 (application/json)
+# Authentication
+Panoptes API provides an OAuth 2.0 authentication mechanism. (TODO:
+Describe Authentication Workflow).
 
-        [{
-          "id": 1, "title": "Jogging in park"
-        }, {
-          "id": 2, "title": "Pick-up posters from post-office"
-        }]
+# Panoptes API Root [/]
+Panoptes API entry point.
 
-### Create a Note [POST]
-+ Request (application/json)
+This resource does not have attributes intstead it lists links to the
+available resources.
 
-        { "title": "Buy cheese and bread for breakfast." }
+## Retrieve Entry Point [GET]
 
-+ Response 201 (application/json)
++ Response 200 (application/vnd.api+json)
 
-        { "id": 3, "title": "Buy cheese and bread for breakfast." }
+    + Body
+    
+            {
+                "links": {
+                    "subjects": "/subjects",
+                    "users": "/users",
+                    "projects": "/projects",
+                    "workflows": "/workflows",
+                    "subject_sets": "/subject_sets",
+                    "groups": "/groups",
+                    "classifications": "/classifications",
+                    "memberships": "/memberships",
+                    "collections": "/collections"
+                }
+            }
 
-## Note [/notes/{id}]
-A single Note object with all its details
+# Group User
+Resources related to *Panotpes API Users*
+
+## User [/users/{id}]
+A single User object. A User is representation of the identity and
+contributions of a voluneteer.
+
+The User resource has the following attribtues:
+
+- id
+- created_at
+- updated_at
+- credited_name
+- display_name
+- login
+- email
+- zooniverse_id
+- classifications_count
+- languages
+
+*id*, *zooniverse_id*, *created_at*, *updated_at*, and
+ *classification_count* are created and updated by the Panoptes API.
 
 + Parameters
-    + id (required, number, `1`) ... Numeric `id` of the Note to perform action with. Has example value.
+    + id (integer) ... ID of the User as an integer key
 
-### Retrieve a Note [GET]
-+ Response 200 (application/json)
++ Model (application/vnd.api+json)
 
-    + Header
-
-            X-My-Header: The Value
+    JSON-API representation of the User Resource.
 
     + Body
 
-            { "id": 2, "title": "Pick-up posters from post-office" }
+            {
+                "links": {
+                    "user.projects": {},
+                    "user.user_groups": {},
+                    "user.subjects": {},
+                    "user.collections": {}
+                },
+                "users": {
+                    "id": 1,
+                    "created_at": "2014-03-20T00:15:47Z",
+                    "updated_at": "2013-09-30T10:20:32Z",
+                    "created_name": "Dr. Stuart Lynn",
+                    "display_name": "stuart",
+                    "login": "stuart",
+                    "email": "stuart@zoooniverse.org",
+                    "zooniverse_id": "123432",
+                    "classifications_count": "104",
+                    "langauges": ["en-gb", "es-mx"],
+                    "links": {
+                        "projects": ["4", "43", "220"],
+                        "user_groups": ["8"],
+                        "subjects": ["1", "20", "40", "567"],
+                        "collections": ["3"]
+                    }
+                }
+            }
 
-### Remove a Note [DELETE]
+### Retrieve a single User [GET]
++ Response 200
+
+    [User][]
+
+### Edit a single User [PUT]
+The currently logged in User may edit their record by sending a
+partial representation of the resource including their changes. A User
+cannot edit their links.
+
++ Request (application/vnd.api+json)
+
+        {
+            "credited_name": "Dr. Stuart Lynn, DDS"
+        }
+
++ Response 200 (application/vnd.api+json)
+
+    [User][]
+
+### Destory a single User [DELETE]
+The current logged in User may delete themselves. This does not fully
+remove their record. It deactivates their projects and removes
+personally identifying information.
+
 + Response 204
+
+## Users Collection [/users{?page,per_page,sort}]
+Collection of all Users
+
+All collections add a *meta* attribute that is a hash containing
+paging information.
+
+- meta
+
+User resources are included a an array under the _users_ key
+
++ Model (application/vnd.api+json)
+
+    JSON-API formatted respresentation of the Users collection
+
+    + Body
+    
+            {
+                "links": {
+                    "user.projects": {},
+                    "user.user_groups": {},
+                    "user.subjects": {},
+                    "user.collections": {}
+                },
+                "meta": {
+                    "users": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 28,
+                        "include": [],
+                        "page_count": 14,
+                        "previous_page": 14,
+                        "next_page": 2,
+                        "first_href": "/users?page_size=2",
+                        "previous_href": "/users?page=14page_size=2",
+                        "next_href": "/users?page=2&page_size=2",
+                        "last_href": "/users?page=14&page_size=2"
+                    }
+                }
+                "users": [{
+                    "id": 1,
+                    "created_at": "2014-03-20T00:15:47Z",
+                    "updated_at": "2013-09-30T10:20:32Z",
+                    "created_name": "Dr. Stuart Lynn",
+                    "display_name": "stuart",
+                    "login": "stuart",
+                    "email": "stuart@zoooniverse.org",
+                    "zooniverse_id": "123432",
+                    "classifications_count": "104",
+                    "langauges": ["en-gb", "es-mx"],
+                    "links": {
+                        "projects": ["4", "43", "220"],
+                        "user_groups": ["8"],
+                        "subjects": ["1", "20", "40", "567"],
+                        "collections": ["3"]
+                    }
+                },
+                {
+                    "id": 2,
+                    "created_at": "2014-03-20T00:15:47Z",
+                    "updated_at": "2013-09-30T10:20:32Z",
+                    "created_name": "Dr. Stuart Lynn",
+                    "display_name": "stuart",
+                    "login": "stuart",
+                    "email": "stuart@zoooniverse.org",
+                    "zooniverse_id": "123432",
+                    "classifications_count": "104",
+                    "langauges": ["en-gb", "es-mx"],
+                    "links": {
+                        "projects": ["4", "43", "220"],
+                        "user_groups": ["8"],
+                        "subjects": ["1", "20", "40", "567"],
+                        "collections": ["3"]
+                    }
+                }]
+            }
+
+### List all Users [GET]
++ Parameters
+    + page (optional, integer) ... index of the collection page, 1 is
+      default
+    + per_page (optional, integer) ... number of items on a page. 20
+      is default
+    + sort (optional, string) ... fields to sort collection by. id is
+      default
+
++ Response 200
+
+    [Users Collection][]
+    
+
+
+                
