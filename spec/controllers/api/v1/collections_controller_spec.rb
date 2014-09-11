@@ -61,6 +61,10 @@ describe Api::V1::CollectionsController, type: :controller do
   describe '#update' do
     let(:subjects) { create_list(:subject, 4) }
     let(:resource) { collection }
+    let(:test_attr) { :name }
+    let(:test_attr_value) { "Tested Collection" }
+    let(:test_relation) { :subjects }
+    let(:test_relation_ids) { subjects.map(&:id) }
     let(:update_params) do
       { collections: {
                       name: "Tested Collection",

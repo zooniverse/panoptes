@@ -5,6 +5,5 @@ module ApiErrors
   class UnsupportedMediaType < PanoptesApiError; end
   class UserSeenSubjectIdError < PanoptesApiError; end
   class NotLoggedIn < PanoptesApiError; end
-  class NoSuchRelation < PanoptesApiError; end
   class BadLinkParams < PanoptesApiError; end
 end

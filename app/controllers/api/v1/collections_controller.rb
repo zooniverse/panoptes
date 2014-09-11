@@ -27,8 +27,12 @@ class Api::V1::CollectionsController < Api::ApiController
   end
 
   def update_params
-    p params
     params.require(:collections)
-      .permit(:name, :display_name, links: :subjects)
+      .permit(:name, :display_name, links: link_params) 
+  end
+
+  def link_params
+    { subjects: [] }
   end
 end
+

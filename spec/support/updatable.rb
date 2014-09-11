@@ -1,5 +1,7 @@
 shared_examples "is updatable" do
   context "an authorized user" do
+    let(:updated_resource) { resource.reload }
+    
     before(:each) do
       default_request scopes: scopes, user_id: authorized_user.id
       params = update_params.merge(id: resource.id)
@@ -7,10 +9,13 @@ shared_examples "is updatable" do
     end
     
     it 'should update supplied attributes' do
+      expect(updated_resource.send(test_attr)).to eq(test_attr_value)
       
     end
 
     it 'should update any included links' do
+      expect(updated_resource.send(test_relation)
+             .map(&:id)).to eq(test_relation_ids)
     end
 
     it 'should return 200' do
