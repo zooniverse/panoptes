@@ -645,9 +645,9 @@ required parameter.
   + per_page (optional, integer) ... number of items to include on a
     page default is 20
   + sort (optional, string) ... field to sort by 'random' has special behaviour
-  + workflow_id (options, intger) ... filter to subjects belonging to
+  + workflow_id (optional, intger) ... filter to subjects belonging to
     a specific workflow. Required when sort is 'random'
-  + subject_set_id (options, intger) ... return subjects belonging to
+  + subject_set_id (optional, intger) ... return subjects belonging to
     the identified subject_set
 
 + Response 200
@@ -818,7 +818,7 @@ of the complete Project representation response.
 
     [Project][]
 
-## Project Destroy Links [/project/{id}/links/{link_type}/{link_ids]
+## Project Destroy Links [/project/{id}/links/{link_type}/{link_ids}]
 An alternative way to destroy project links.
 
 ### Destroy a Link [DELETE]
@@ -1110,7 +1110,7 @@ destroy the subject set models.
 
 + Response 204
 
-## Workflow Collection [/workflow{?page,per_page,sort,project}]
+## Workflow Collection [/workflow{?page,per_page,sort,project_id}]
 A collection of _Panotpes Workflow_ resources.
 
 All collections add a *meta* attribute that is a hash containing
@@ -1946,7 +1946,7 @@ for a collection, may delete it.
 ## Add subject links [/collections/{id}/links/subjects]
 Add subjects to a collection.
 
-### Add links
+### Add links [POST]
 A user is permitted to add subject if they are the collection owner or
 have edit permissions.
 
@@ -1963,7 +1963,7 @@ have edit permissions.
 ## Remove subject links [/collection/{id}/links/subjects/{link_ids}]
 Remove subjects from a collection.
 
-### Remove links
+### Remove links [DELETE]
 A user is permitted to remove subjects if they are the colleciton
 owner or have edit permissions.
 
@@ -2072,6 +2072,6 @@ owner, and links to subjects.
             }
         }
 
-+ Response
++ Response 201
 
     [Collection][]
