@@ -1692,3 +1692,171 @@ memberships with the 'invited' state.
 + Response 201
 
     [UserGroup][]
+
+#Group Membership
+Resources related to _Panoptes Group Memberships_
+
+## Membership [/memberships/{id}]
+A membership represents and user's status in a group and their role
+within the group.
+
+It has the following attributes:
+
+- id
+- created_at
+- updated_at
+- state
+- roles
+
+*id*, *created_at*, and *update_at* are assigned by the API.
+
++ Model (application/vnd.api+json)
+
+    + Body
+
+            {
+                "links": {
+                    "memberships.user_group": {
+                        "href": "/groups/{memberships.user_group}",
+                        "type": "user_group"
+                    },
+                    "memberships.user": {
+                        "href": "/users/{memberships.user}",
+                        "type": "user"
+                    }
+                },
+                "memberships": {
+                    "id": "101",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "state": "active",
+                    "roles": ["group_admin"],
+                    "links": {
+                        "user": "12",
+                        "user_groups": "31"
+                    }
+                }
+            }
+                    
+### Retreive a Membership [GET]
+
++ Response 200
+
+    [Membership][]
+
+### Edit a Membership [PUT]
+A user can ordinary only change their membership state. A user with
+user group edit permissions can change the membership's roles.
+
++ Request (application/vnd.api+json)
+
+        {
+            "memberships": {
+                "state": "inactive"
+            }
+        }
+
++ Response 200
+
+    [Membership][]
+
+### Destroy a Membership [DELETE]
+Destroying a membership only sets the state to inactive. A user may
+destroy their own memberships and a user with edit permission in a
+user group may destroy membership for that group.
+
++ Response 204
+
+## Membership Collection [/memberships{?page,per_page,sort,user_id,user_group_id}]
+A collection of Membership resources.
+
+All collections add a meta attribute hash containing paging
+information.
+
+Memberships are returned as an array under *memberships*.
+
++ Model (application/vnd.api+json)
+
+    + Body
+
+            {
+                "links": {
+                    "memberships.user_group": {
+                        "href": "/groups/{memberships.user_group}",
+                        "type": "user_group"
+                    },
+                    "memberships.user": {
+                        "href": "/users/{memberships.user}",
+                        "type": "user"
+                    }
+                },
+                "meta": {
+                    "memberships": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 28,
+                        "include": [],
+                        "page_count": 14,
+                        "previous_page": 14,
+                        "next_page": 2,
+                        "first_href": "/memberships?page_size=2",
+                        "previous_href": "/memberships?page=14page_size=2",
+                        "next_href": "/memberships?page=2&page_size=2",
+                        "last_href": "/memberships?page=14&page_size=2"
+                    }
+                },
+                "memberships": [{
+                    "id": "101",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "state": "active",
+                    "roles": ["group_admin"],
+                    "links": {
+                        "user": "12",
+                        "user_groups": "31"
+                    }
+                },{
+                    "id": "111",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "state": "inactive",
+                    "roles": [],
+                    "links": {
+                        "user": "12",
+                        "user_groups": "20"
+                    }
+                }]
+            }
+
+### List all memberships [GET]
++ Parameters
+  + page (optional, integer) ... index of the page to retrieve 1 by default
+  + per_page (optional, integer) ... number of items per page 20 by default
+  + sort (optional, string) ... field to sort by, id by default
+  + user_id (optional, integer) ... filter list to memberships for a user
+  + user_group_id (optional, integer) ... filter list to memberships for a user group
+
++ Response 200
+
+    [Membership Collection][]
+
+### Create a Membership [POST]
+A membership creation request must include a link to a user and to a
+user_group. Optionally it may include an array of roles. It's state
+will be set to 'invited' until the linked user takes action.
+
++ Request (application/vnd.api+json)
+
+        {
+            "memberships": {
+                "roles": ["group_admin"],
+                "links": {
+                    "user": "10",
+                    "user_group": "11
+                }
+            }
+        }
+
++ Response 201
+
+    [Membership][]
