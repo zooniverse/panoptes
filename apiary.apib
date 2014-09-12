@@ -669,11 +669,11 @@ owner besides the active user are optional.
 Resources related to _Panoptes Projects_.
 
 ## Project [/projects/{id}]
-A single project object. A Project is a collection of subjects,
-workflows, and supplementary text that describe the task a volunteer
-is being asked to perform.
+A Project is a collection of subjects and task workflows that a
+volunteer performs on subjects. The project also holds supplementary
+text describing the tasks volunteers perform.
 
-It has the following attributes
+It has the following attributes:
 
 - id
 - created_at
@@ -846,7 +846,7 @@ Projects are returned as an array under the _projects_ key.
                     "projects.subject_sets": {
                         "href": "/subject_sets/{projects.subject_sets}",
                         "type": "subject_Sets"
-                    },
+                    }
                 },
                 "meta": {
                    "projects": {
@@ -1184,7 +1184,7 @@ Workflows are returned as an array under the _workflows_ key.
     [Workflow Collection][]
 
 ### Create a Workflow [POST]
-Requires a set of tasks, a primary language, and a name, as well as a
+Requires a set of tasks, a primary language, a name, and a
 link to a project. Can optionally set random select parameters (false
 by default) and links to subject sets.
 
