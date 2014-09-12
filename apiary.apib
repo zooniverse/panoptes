@@ -215,12 +215,9 @@ User resources are included a an array under the _users_ key
 
 ### List all Users [GET]
 + Parameters
-    + page (optional, integer) ... index of the collection page, 1 is
-      default
-    + per_page (optional, integer) ... number of items on a page. 20
-      is default
-    + sort (optional, string) ... fields to sort collection by. id is
-      default
+    + page (optional, integer) ... index of the collection page, 1 is default
+    + per_page (optional, integer) ... number of items on a page. 20 is default
+    + sort (optional, string) ... fields to sort collection by. id is default
 
 + Response 200
 
@@ -427,16 +424,11 @@ classifications from other members of a user_group or projects the
 user has permission to view.
 
 + Parameters
-    + page (optional, integer) ... index of the collection page, 1 is
-      default
-    + per_page (optional, integer) ... number of items on a page. 20
-      is default
-    + sort (optional, string) ... fields to sort collection by. updated_at is
-      default
-    + project_id (optional, integer) ... only retrieve classifications
-      for a specific project
-    + group_id (optional, integer) ... only retrieve classifications
-      for a specific user group
+    + page (optional, integer) ... index of the collection page, 1 is default
+    + per_page (optional, integer) ... number of items on a page. 20 is default
+    + sort (optional, string) ... fields to sort collection by. updated_at is default
+    + project_id (optional, integer) ... only retrieve classifications for a specific project
+    + group_id (optional, integer) ... only retrieve classifications for a specific user group
 
 + Response 200
 
@@ -635,15 +627,11 @@ active user. When the random sort is used, *workflow_id* is a
 required parameter.
 
 + Parameters
-  + page (optional, integer) ... the index of the page to retrieve
-    default is 1
-  + per_page (optional, integer) ... number of items to include on a
-    page default is 20
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + per_page (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by 'random' has special behaviour
-  + workflow_id (optional, intger) ... filter to subjects belonging to
-    a specific workflow. Required when sort is 'random'
-  + subject_set_id (optional, intger) ... return subjects belonging to
-    the identified subject_set
+  + workflow_id (optional, intger) ... filter to subjects belonging to a specific workflow. Required when sort is 'random'
+  + subject_set_id (optional, intger) ... return subjects belonging to the identified subject_set
 
 + Response 200
 
@@ -822,10 +810,8 @@ this action.
 
 + Parameters
   + id (required, integer) ... the id of the project to modify
-  + link_type (required, string) ... the name of the link to
-    edit. May only be subject_set or workflow
-  + link_ids (required, string) ... comma seperated list of ids to
-    modify
+  + link_type (required, string) ... the name of the link to edit. May only be subject_set or workflow
+  + link_ids (required, string) ... comma seperated list of ids to modify
 
 + Response 204
 
@@ -934,13 +920,10 @@ Projects are returned as an array under the _projects_ key.
             
 ### List All Projects [GET]
 + Parameters
-  + page (optional, integer) ... the index of the page to retrieve
-    default is 1
-  + per_page (optional, integer) ... number of items to include on a
-    page default is 20
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + per_page (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
-  + owner (optional, string) ... string owner name of either a user or
-    a user group to filter by.
+  + owner (optional, string) ... string owner name of either a user or a user group to filter by.
 
 + Response 200
 
@@ -1098,8 +1081,7 @@ destroy the subject set models.
 
 + Parameters
   + id (required, integer) ... id of workflow to update
-  + subject_set_ids (required, string) ... comma seperated list of ids
-    to destroy
+  + subject_set_ids (required, string) ... comma seperated list of ids to destroy
 
 + Response 204
 
@@ -1192,10 +1174,8 @@ Workflows are returned as an array under the _workflows_ key.
 
 ### List All Workflows [GET]
 + Parameters
-  + page (optional, integer) ... the index of the page to retrieve
-    default is 1
-  + per_page (optional, integer) ... number of items to include on a
-    page default is 20
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + per_page (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by id by default
   + project_id (optional, integer) ... filter workflows by project id
 
