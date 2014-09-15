@@ -1,11 +1,14 @@
 class Authorization < ActiveRecord::Base
   belongs_to :user
 
+  attr_accessible :provider, :uid
+
   validates_presence_of :provider, :uid, :token
   validates_uniqueness_of :provider, scope: :user_id
 
   def self.from_omniauth(auth_hash)
-    auth = where(auth_hash.slice(:provider, :uid)).first_or_create do |a|
+    hash = auth_hash.slice(:provider, :uid).to_hash.symbolize_keys
+    auth = where(hash).first_or_create do |a|
       a.token = auth_hash.credentials.token
       a.expires_at = Time.at(auth_hash.credentials.expires_at).utc
     end
