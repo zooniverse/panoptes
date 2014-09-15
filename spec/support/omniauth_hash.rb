@@ -8,7 +8,7 @@ facebook = {
   credentials: {
     token: "asd;lkfjas;dflkjasdfasdfha;vznxfhjasd;lfkhaweiuha;sdlkfjasdf",
     expires: true,
-    expires_at: 1410721607
+    expires_at: 1.month.from_now.to_i
   }
 }
 
@@ -22,7 +22,7 @@ gplus = {
   credentials: {
     token: "asd;lkfjas;dflkjasdfasdfha;vznxfhjasd;lfkhaweiuha;sdlkfjasdf",
     expires: true,
-    expires_at: 1410721607
+    expires_at: 1.month.from_now.to_i
   }
 }
 
