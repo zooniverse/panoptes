@@ -19,20 +19,54 @@ Rails.application.routes.draw do
 
   namespace :api do
     api_version(:module => "V1", :header => {name: "Accept", :value => "application/vnd.api+json; version=1"}) do
-      get "/me", to: 'users#me', format: false
-
-      resources :users, except: [:new, :edit, :create], format: false
-
-      resource_classes = [ :memberships, :groups, :collections, :subjects,
-                           :projects, :classifications, :workflows,
-                           :subject_sets ]
       except = [:new, :edit]
+      
+      get "/me", to: 'users#me', format: false
+      
+      resources :classifications, except: except, format: false
+      resources :memberships, except: except, format: false
+      resources :subjects, except: except, format: false
 
-      resource_classes.each do |resource|
-        resources resource, except: except, format: false do
-          post "/links/:link_relation", to: "#{ resource }#update_links", format: false
-          delete "/links/:link_relation(/:link_ids)", to: "#{ resource }#destroy_links", format: false
-        end
+      resources :users, except: [:new, :edit, :create], format: false do
+        post "/links/:link_relation", to: "users#update_links",
+          constraints: { link_relation: /user_groups/ }, format: false
+        delete "/links/:link_relation/:link_ids", to: "users#destroy_links",
+          constraints: { link_relation: /user_groups/ }, format: false
+      end
+      
+      resources :groups, except: except, format: false do
+        post "/links/:link_relation", to: "groups#update_links",
+          constraints: { link_relation: /users/ }, format: false
+        delete "/links/:link_relation/:link_ids", to: "group#update_links",
+          constraints: { link_relation: /users/ }, format: false
+      end
+
+      resources :projects, except: except, format: false do
+        post "/links/:link_relation", to: "projects#update_links",
+          constraints: { link_relation: /(subjects|workflows)/ }, format: false
+        delete "/links/:link_relation/:link_ids", to: "projects#destroy_links",
+          constraints: { link_relation: /(subjects|workflows)/ }, format: false
+      end
+      
+      resources :workflows, except: except, format: false do
+        post "/links/:link_relation", to: "workflows#update_links",
+          constraints: { link_relation: /subject_sets/ }, format: false
+        delete "/links/:link_relation(/:link_ids)", to: "workflows#destroy_links",
+          constraints: { link_relation: /subject_sets/ }, format: false
+      end
+      
+      resources :subject_sets, except: except, format: false do
+        post "/links/:link_relation", to: "subject_sets#update_links",
+          constraints: { link_relation: /(workflows|subjects)/ }, format: false
+        delete "/links/:link_relation/:link_ids", to: "subject_sets#destroy_links",
+          constraints: { link_relation: /(workflows|subjects)/ }, format: false
+      end
+      
+      resources :collections, except: except, format: false do
+        post "/links/:link_relation", to: "collections#update_links",
+          constraints: { link_relation: /subjects/ }, format: false
+        delete "/links/:link_relation/:link_ids", to: "collections#destroy_links",
+          constraints: { link_relation: /subjects/ }, format: false
       end
     end
   end
