@@ -4,10 +4,6 @@ module RoleControl
 
     module ClassMethods
       def access_control_action(action, resource_class: nil, actor_method: :api_user, &block)
-        if !!resource_class && !method_defined?(:resource_class)
-          define_resource_class(resource_class)
-        end
-
         before_action only: [action] do |controller|
           resource = controller.send(:controlled_resource)
           act_as = controller.send(:owner_from_params)
@@ -25,13 +21,6 @@ module RoleControl
         end
       end
 
-      protected 
-
-      def define_resource_class(klass)
-        define_method :resource_class do
-          klass
-        end
-      end
     end
 
     protected
@@ -53,11 +42,31 @@ module RoleControl
     end
 
     def owner_from_params
-      @owner ||= OwnerName.where(name: params[:owner]).first.try(:resource)
+      @owner ||= if params[:owner]
+                   OwnerName.where(name: params[:owner]).first.try(:resource)
+                 elsif params[resource_sym].try(:has_key, :owner)
+                   owner_from_link_params
+                 else
+                   nil
+                 end
     end
 
     def visible_scope(actor)
       @scope ||= resource_class.scope_for(:show, actor)
+    end
+
+    protected
+
+    def owner_from_links_params
+      id, type = params[resource_name.pluralize.to_sym][:owner]
+        .values_at(:id, :type)
+      type = type.camelize.constantize
+      
+      unless type < RoleControl::Owner
+        raise StandardError.new('type is not owner')
+      end
+      
+      type.find(id)
     end
   end
 end

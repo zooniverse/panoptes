@@ -5,9 +5,6 @@ module Api
     include RoleControl::RoledController
     include JSONApiRender
     include JSONApiResponses
-    include UpdatableResource
-    include DestructableResource
-    include CreatableResource
 
     API_ACCEPTED_CONTENT_TYPE = 'application/json'
     API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
@@ -50,7 +47,9 @@ module Api
     end
 
     def parse_http_accept_languages
-      language_extractor = AcceptLanguageExtractor.new(request.env['HTTP_ACCEPT_LANGUAGE'])
+      language_extractor = AcceptLanguageExtractor
+        .new(request.env['HTTP_ACCEPT_LANGUAGE'])
+      
       language_extractor.parse_languages
     end
 
@@ -65,19 +64,6 @@ module Api
 
     def request_ip
       request.remote_ip
-    end
-
-    def serializer
-      @serializer ||= "#{ resource_name.camelize }Serializer".constantize
-    end
-
-    def resource_name
-      @resource_name ||= self.class.name
-        .match(/::([a-zA-Z]*)Controller/)[1].underscore.singularize
-    end
-
-    def visible_scope
-      super(api_user)
     end
 
     def require_login

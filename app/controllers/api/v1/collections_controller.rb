@@ -1,38 +1,22 @@
 class Api::V1::CollectionsController < Api::ApiController
+  include JsonApiController
+  
   before_filter :require_login, only: [:create, :update, :destroy]
   doorkeeper_for :create, :update, :destroy, scopes: [:collection]
-  access_control_for :create, :update, :destroy, resource_class: Collection
+  access_control_for :create, :update, :destroy
+
+  resource_actions :default
+
+  request_template :create, :name, :display_name,
+    links: [ :project, subjects:  [], owner: polymorphic ]
+
+  request_template :update, :name, :display_name, links: [ subjects: [] ]
   
-  alias_method :collection, :controlled_resource
-
-  def show
-    render json_api: serializer.resource(params, visible_scope)
-  end
-
-  def index
-    render json_api: serializer.page(params, visible_scope)
-  end
-
   protected
 
-  def create_resource
-    collection = Collection.new(create_params)
-    collection.owner = owner
-    return collection if collection.save!
-  end
-
-  def create_params
-    params.require(:collections)
-      .permit(:name, :display_name, :project_id)
-  end
-
-  def update_params
-    params.require(:collections)
-      .permit(:name, :display_name, links: link_params) 
-  end
-
-  def link_params
-    { subjects: [] }
+  def create_resource(create_params)
+    create_params[:links][:owner] = owner || api_user.user
+    super(create_params)
   end
 end
 

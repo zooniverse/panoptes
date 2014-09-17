@@ -15,7 +15,7 @@ shared_examples "is updatable" do
 
     it 'should update any included links' do
       expect(updated_resource.send(test_relation)
-             .map(&:id)).to eq(test_relation_ids)
+             .map(&:id)).to include(*test_relation_ids)
     end
 
     it 'should return 200' do
