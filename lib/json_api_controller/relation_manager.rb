@@ -1,9 +1,6 @@
 module JsonApiController
   module RelationManager
     def update_relation(relation, value, replace=false)
-      unless value
-        raise Api::BadLinkParams.new("Link relation must match body keys")
-      end
 
       case value
       when Hash

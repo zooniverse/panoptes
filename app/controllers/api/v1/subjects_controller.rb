@@ -1,11 +1,11 @@
 class Api::V1::SubjectsController < Api::ApiController
+  include JsonApiController
+  
   before_filter :require_login, only: [:update, :create, :destroy]
   doorkeeper_for :update, :create, :destroy, scopes: [:subject]
-  access_control_for :update, :create, :destroy, resource_class: Subject
+  access_control_for :update, :create, :destroy
 
-  def show
-    render json_api: SubjectSerializer.page(params)
-  end
+  resource_actions :default
 
   def index
     if params[:sort] == 'random' && params.has_key?(:workflow_id)
@@ -13,18 +13,19 @@ class Api::V1::SubjectsController < Api::ApiController
     elsif params.has_key?(:subject_set_id)
       query_subject_sets
     else
-      query_subjects
+      super
     end
-  end
-
-  def update
-
   end
 
   private
 
+  def create_resource(create_params)
+    create_params[:links][:owner] = owner || api_user.user
+    super(create_params)
+  end
+
   def query_subjects
-    render json_api: SubjectSerializer.resource(params)
+    render json_api: serializer.resource(params)
   end
 
   def query_subject_sets
@@ -48,9 +49,14 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def create_params
     params.require(:subjects)
-      .permit(:project_id,
-              metadata: params[:subjects][:metadata].try(:keys),
+      .permit(metadata: params[:subjects][:metadata].try(:keys),
+              locations: params[:subjects][:locations].try(:keys),
+              links: [:project, owner: [:id, :type]])
+  end
+
+  def update_params
+    params.require(:subjects)
+      .permit(metadata: params[:subjects][:metadata].try(:keys),
               locations: params[:subjects][:locations].try(:keys))
-      .merge(owner: owner)
   end
 end

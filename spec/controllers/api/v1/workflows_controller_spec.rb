@@ -19,17 +19,11 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe '#index' do
-    before(:each){ get :index }
-
-    it 'should return 200' do
-      expect(response.status).to eq 200
-    end
-
-    it 'should have 2 items by default' do
-      expect(json_response[api_resource_name].length).to eq 2
-    end
-
-    it_behaves_like 'an api response'
+    let(:private_project) { create(:private_project) }
+    let!(:private_resource) { create(:workflow, project: private_project) }
+    let(:n_visible) { 2 }
+    
+    it_behaves_like 'is indexable'
   end
 
   describe '#update' do
@@ -43,11 +37,15 @@ describe Api::V1::WorkflowsController, type: :controller do
       {
        workflows: {
                    name: 'Test workflow',
-                   tasks: [{ foo: 'bar' }, { bar: 'baz' }],
-                   project_id: project.id,
+                   tasks: [{type: "draw",
+                            question: "Draw a Circle",
+                            key:'q-1'}],
                    grouped: true,
                    prioritized: true,
-                   primary_language: 'en'
+                   primary_language: 'en',
+                   links: { 
+                           project: project.id,
+                          }
                   }
       }
     end
@@ -62,22 +60,16 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe "#show" do
+    let(:resource) { workflows.first }
+
+    it_behaves_like "is showable"
 
     context "with a logged in user" do
       before(:each) do
         default_request user_id: user.id, scopes: scopes
         get :show, id: workflows.first.id
       end
-
-      it "should return 200" do
-        expect(response.status).to eq(200)
-      end
-
-      it "should return the requested worklow" do
-        expect(json_response[api_resource_name].length).to eq(1)
-        expect(json_response[api_resource_name][0]['id']).to eq(workflows.first.id.to_s)
-      end
-
+      
       it "should set the cellect host for the user and workflow" do
         user.reload
         expect(session[:cellect_hosts]).to include( workflows.first.id.to_s )
@@ -91,8 +83,6 @@ describe Api::V1::WorkflowsController, type: :controller do
                 workflow_id: workflows.first.id.to_s)
         get :show, id: workflows.first.id
       end
-
-      it_behaves_like "an api response"
     end
 
     context "without a logged in user" do

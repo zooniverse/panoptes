@@ -23,6 +23,8 @@ describe Api::V1::CollectionsController, type: :controller do
       create :collection_with_subjects, visible_to: ['collaborator']
     end
 
+    let(:n_visible) { 2 }
+
     it_behaves_like "is indexable"
   end
 

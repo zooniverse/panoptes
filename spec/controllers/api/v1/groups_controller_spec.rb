@@ -18,46 +18,27 @@ describe Api::V1::GroupsController, type: :controller do
   end
 
   let(:scopes) { %w(public group) }
+  let(:authorized_user) { user }
+  let(:resource_class) { UserGroup }
 
   before(:each) do
     default_request(scopes: scopes, user_id: user.id)
   end
 
   describe "#index" do
-    before(:each) do
-      get :index
-    end
-
-    it "should return 200" do
-      expect(response.status).to eq(200)
-    end
-
-    it "should have three items by default" do
-      expect(json_response[api_resource_name].length).to eq(3)
-    end
-
-    it_behaves_like "an api response"
+    let(:private_resource) { user_groups[1] }
+    let(:n_visible) { 1 }
+    
+    it_behaves_like "is indexable"
   end
 
   describe "#show" do
-    before(:each) do
-      get :show, id: user_groups.first.id
-    end
-
-    it "should return 200" do
-      expect(response.status).to eq(200)
-    end
-
-    it "should have a single group" do
-      expect(json_response[api_resource_name].length).to eq(1)
-    end
-
-    it_behaves_like "an api response"
+    let(:resource) { user_groups.first }
+    
+    it_behaves_like "is showable"
   end
 
   describe "#create" do
-    let(:authorized_user) { create(:user) }
-    let(:resource_class) { UserGroup }
     let(:test_attr) { :name }
     let(:test_attr_value) { "zooniverse" }
     let(:resource_name) { 'groups' }
@@ -95,6 +76,5 @@ describe Api::V1::GroupsController, type: :controller do
     end
 
     it_behaves_like "is deactivatable"
-
   end
 end

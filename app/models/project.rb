@@ -6,7 +6,8 @@ class Project < ActiveRecord::Base
   include Activatable
   include Translatable
 
-  attr_accessible :name, :display_name, :owner, :primary_language
+  attr_accessible :name, :display_name, :owner, :primary_language,
+    :project_contents
 
   has_many :workflows
   has_many :subject_sets

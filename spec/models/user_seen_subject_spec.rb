@@ -13,11 +13,11 @@ RSpec.describe UserSeenSubject, :type => :model do
 
   describe ".add_seen_subject_for_user" do
     let(:subject) { create(:subject) }
-    let(:params) { { user_id: user_id, workflow_id: workflow_id, subject_id: subject.id } }
+    let(:params) { { user: user, workflow: workflow, subject_id: subject.id } }
 
     context "when no user or workflow exists" do
-      let(:workflow_id) { nil }
-      let(:user_id) { nil }
+      let(:workflow) { nil }
+      let(:user) { nil }
 
       it "should fail" do
         expect do
@@ -27,8 +27,8 @@ RSpec.describe UserSeenSubject, :type => :model do
     end
 
     context "user and workflow exist" do
-      let(:workflow_id) { user_seen_subject.workflow.id }
-      let(:user_id) { user_seen_subject.user.id }
+      let(:workflow) { user_seen_subject.workflow }
+      let(:user) { user_seen_subject.user }
 
       context "no user_seen_subject exists" do
 
@@ -84,16 +84,7 @@ RSpec.describe UserSeenSubject, :type => :model do
 
   describe "#add_subject_id" do
     let(:uss) { user_seen_subject }
-
-    it "should not allow nil subject id's in the array" do
-      s = build(:subject)
-      expect{ uss.add_subject_id(s.id) }.to raise_error(UserSeenSubject::InvalidSubjectIdError)
-    end
-
-    it "should fail on a non-integer" do
-      expect{ uss.add_subject_id("subject_id") }.to raise_error(UserSeenSubject::InvalidSubjectIdError)
-    end
-
+    
     it "should add a subject's id to the subject_ids array" do
       s = create(:subject)
       uss.add_subject_id(s.id)

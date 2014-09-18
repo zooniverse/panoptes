@@ -9,12 +9,18 @@ end
 
 def setup_create_request(project_id, workflow_id, set_member_subject)
   request.session = { cellect_hosts: { workflow_id.to_s => "example.com" } }
-  params = { classifications: { project_id: project_id,
-                               workflow_id: workflow_id,
-                               completed: true,
-                               set_member_subject_id: set_member_subject.id,
-                               subject_id: set_member_subject.subject_id,
-                               annotations: annotation_values } }
+  params =
+    {
+     classifications: {
+                       completed: true,
+                       annotations: annotation_values,
+                       links: {
+                               project: project_id,
+                               workflow: workflow_id,
+                               set_member_subject: set_member_subject.id,
+                              }
+                      }
+    }
   post :create, params
 end
 
@@ -61,6 +67,7 @@ describe Api::V1::ClassificationsController, type: :controller do
   end
 
   let(:scopes) { %w(classification) }
+  let(:authorized_user) { user }
 
   context "logged in user" do
     before(:each) do
@@ -68,37 +75,16 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
 
     describe "#index" do
-
-      before(:each) do
-        classification
-        get :index
-      end
-
-      it "should return 200" do
-        expect(response.status).to eq(200)
-      end
-
-      it "should have one item by default" do
-        expect(json_response[api_resource_name].length).to eq(1)
-      end
-
-      it_behaves_like "an api response"
+      let!(:classifications) { create_list(:classification, 2, user: user) }
+      let!(:private_resource) { create(:classification) }
+      let(:n_visible) { 2 }
+      
+      it_behaves_like "is indexable"
     end
 
     describe "#show" do
-      before(:each) do
-        get :show, id: classification.id
-      end
-
-      it "should return 200" do
-        expect(response.status).to eq(200)
-      end
-
-      it "should have a single user" do
-        expect(json_response[api_resource_name].length).to eq(1)
-      end
-
-      it_behaves_like "an api response"
+      let(:resource) { classification }
+      it_behaves_like "is showable"
     end
 
     describe "#create" do
@@ -119,32 +105,35 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it "should setup the add seen command to cellect" do
-        expect(stubbed_cellect_connection).to receive(:add_seen).with(
-                                                                      subject_id: set_member_subject.subject_id.to_s,
-                                                                      workflow_id: workflow.id.to_s,
-                                                                      user_id: user.id,
-                                                                      host: 'example.com'
-                                                                     )
+        expect(stubbed_cellect_connection).to receive(:add_seen)
+          .with(
+                subject_id: set_member_subject.subject_id,
+                workflow_id: workflow.id,
+                user_id: user.id,
+                host: 'example.com'
+               )
         create_classification
       end
 
       it "should set the user" do
         create_classification
         id = created_instance_id("classifications")
-        expect(Classification.find(created_classification_id).user.id).to eq(user.id)
+        expect(Classification.find(created_classification_id)
+               .user.id).to eq(user.id)
       end
 
       it_behaves_like "a classification create"
 
       describe "track user seen subjects" do
         let(:expected_params) do
-          { subject_id: set_member_subject.subject_id.to_s,
-           workflow_id: workflow.id.to_s,
-           user_id: user.id }
+          {subject_id: set_member_subject.subject_id,
+           workflow: workflow,
+           user: user }
         end
 
         it "should add the seen subject for the user" do
-          expect(UserSeenSubject).to receive(:add_seen_subject_for_user).with(**expected_params)
+          expect(UserSeenSubject).to receive(:add_seen_subject_for_user)
+            .with(**expected_params)
           create_classification
         end
 
@@ -158,23 +147,12 @@ describe Api::V1::ClassificationsController, type: :controller do
           create_classification
           set_member_subject.subject_id
         end
-
-        context "with and invalid subject_id" do
-
-          it "should gracefully return a json error" do
-            allow(set_member_subject).to receive(:subject_id).and_return("not a valid id")
-            create_classification
-            expect(response.body).to eq(json_error_message("Subject ID is invalid, possibly not persisted."))
-          end
-        end
       end
     end
   end
-
   
   describe "#destroy" do
     context "an incomplete classification" do
-      let(:authorized_user) { user }
       let(:resource) { create(:classification, user: user, completed: false) }
       let(:resource_class) { Classification }
 

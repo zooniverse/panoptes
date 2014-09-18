@@ -1,6 +1,6 @@
 shared_examples "is showable" do
   before(:each) do
-    default_request scopes: scopes, user_id: owner.id
+    default_request scopes: scopes, user_id: authorized_user.id
     get :show, id: resource.id
   end
 

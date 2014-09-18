@@ -4,20 +4,16 @@ class UserSeenSubject < ActiveRecord::Base
 
   validates_presence_of :user, :workflow
 
-  attr_accessible :user_id, :workflow_id
+  attr_accessible :user, :workflow
 
-  class InvalidSubjectIdError < StandardError; end
-
-  def self.add_seen_subject_for_user(user_id: nil, workflow_id: nil, subject_id: nil)
-    uss = self.find_or_create_by!(user_id: user_id, workflow_id: workflow_id)
+  def self.add_seen_subject_for_user(user: nil, workflow: nil, subject_id: nil)
+    uss = self.find_or_create_by!(user: user, workflow: workflow)
     uss.add_subject_id(subject_id)
   end
 
   def add_subject_id(subject_id)
-    unless Subject.exists?(subject_id)
-      raise InvalidSubjectIdError.new("Subject ID is invalid, possibly not persisted.")
-    end
     subject_ids_will_change!
-    update_attribute(:subject_ids, subject_ids << subject_id)
+    subject_ids << subject_id
+    save!
   end
 end

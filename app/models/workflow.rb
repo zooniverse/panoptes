@@ -11,7 +11,5 @@ class Workflow < ActiveRecord::Base
 
   validates_presence_of :project
 
-  can_by_role_through_parent :update, :project
-  can_by_role_through_parent :show, :project
-  can_by_role_through_parent :destroy, :project
+  can_through_parent :project, :update, :show, :destroy
 end

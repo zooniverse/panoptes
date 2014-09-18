@@ -83,6 +83,12 @@ describe Api::V1::SubjectsController, type: :controller do
     end
   end
 
+  describe "#show" do
+    let(:resource) { subjects.first.subject }
+
+    it_behaves_like "is showable"
+  end
+
   describe "#create" do
     let(:test_attr) { :locations }
     let(:test_attr_value) do
@@ -94,7 +100,9 @@ describe Api::V1::SubjectsController, type: :controller do
        subjects: {
                   metadata: { cool_factor: 11 },
                   locations: { standard: "http://test.host/imgs/marioface.jpg" },
-                  project_id: project.id
+                  links: {  
+                          project: project.id
+                         }
                  }
       }
     end

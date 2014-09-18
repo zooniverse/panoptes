@@ -3,7 +3,7 @@ module Translatable
 
   included do
     validates :primary_language, format: {with: /\A[a-z]{2}(\z|-[A-z]{2})/}
-    has_many content_association
+    has_many content_association, autosave: true
   end
 
   module ClassMethods

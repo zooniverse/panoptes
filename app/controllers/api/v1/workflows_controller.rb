@@ -1,35 +1,27 @@
 class Api::V1::WorkflowsController < Api::ApiController
+  include JsonApiController
+  
   before_filter :require_login, only: [:create, :update, :destroy]
   doorkeeper_for :update, :create, :delete, scopes: [:project]
   access_control_for :create, :update, :destroy, resource_class: Workflow
+
+  resource_actions :default
+
+  request_template :create, :pairwise, :grouped, :prioritized, :name,
+    :primary_language, tasks: [:key, :question, :type, :answers],
+    links: [:project, subject_sets: []]
+
+  request_template :update, :pairwise, :grouped, :prioritized, :name,
+    tasks: [:key, :question, :type, :answers], links: [subject_sets: []]
 
   alias_method :workflow, :controlled_resource
 
   def show
     load_cellect
-    render json_api: WorkflowSerializer.resource(params)
-  end
-
-  def index
-    render json_api: WorkflowSerializer.resource(params)
-  end
-
-  def update
-    # TODO
+    super
   end
 
   private
-
-  def create_params
-    params.require(:workflows)
-      .permit(:name,
-              :project_id,
-              :pairwise,
-              :grouped,
-              :prioritized,
-              :primary_language,
-              tasks: params[:workflows][:tasks].map(&:keys))
-  end
 
   def load_cellect
     return unless api_user.logged_in?

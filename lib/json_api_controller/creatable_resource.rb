@@ -3,8 +3,10 @@ module JsonApiController
     include RelationManager
     
     def create
-      resource = create_resource(create_params)
-      created_resource_response(resource)
+      resource = ActiveRecord::Base.transaction do 
+        create_resource(create_params)
+      end
+      created_resource_response(resource) if resource.save!
     end
 
     protected
@@ -15,13 +17,10 @@ module JsonApiController
     
     def create_resource(create_params)
       link_params = create_params.delete(:links)
+      @controlled_resource = resource_class.new(create_params)
       
-      ActiveRecord::Base.transaction do 
-        @controlled_resource = resource_class.new(create_params)
-        link_params.try(:each) do |k,v|
-          update_relation(k,v)
-        end
-        controlled_resource.save!
+      link_params.try(:each) do |k,v|
+        update_relation(k,v)
       end
 
       controlled_resource

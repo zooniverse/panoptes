@@ -1,13 +1,11 @@
 require 'spec_helper'
 
-describe RelationManager do
-  class Api::BadLinkParams < StandardError; end
-  
+describe JsonApiController::RelationManager do
   let!(:resource) { create(:collection_with_subjects) }
 
   let(:test_class) do
     Class.new do
-      include RelationManager
+      include JsonApiController::RelationManager
 
       def initialize(resource)
         @resource, @klass = resource, resource.class
@@ -29,12 +27,6 @@ describe RelationManager do
   let(:subjects) { create_list(:subject, 4, owner: user) }
 
   describe "#update_relations" do
-    it 'should error when passed a nil value' do
-      expect do
-        test_instance.update_relation(:subjects, nil)
-      end.to raise_error(Api::BadLinkParams)
-    end
-    
     context "many-to-many" do
       context "add" do
         it 'should add the new relation to the resource' do

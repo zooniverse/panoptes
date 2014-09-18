@@ -1,9 +1,18 @@
 class Api::V1::ProjectsController < Api::ApiController
+  include JsonApiController
+  
   before_filter :require_login, only: [:create, :update, :destroy]
   doorkeeper_for :update, :create, :delete, scopes: [:project]
   access_control_for :create, :update, :destroy, resource_class: Project
 
   alias_method :project, :controlled_resource
+
+  resource_actions :update, :create, :destroy
+
+  request_template :create, :description, :display_name, :name,
+    :primary_language, links: [owner: polymorphic,
+                               workflows: [],
+                               subject_sets: []]
   
   def show
     render json_api: serializer.resource(params,
@@ -23,10 +32,6 @@ class Api::V1::ProjectsController < Api::ApiController
                                      fields: ['title', 'description'])
   end
 
-  def update
-    # TODO: implement JSON-Patch or find a gem that does
-  end
-
   private
 
   def add_owner_ids_filter_param!
@@ -42,36 +47,19 @@ class Api::V1::ProjectsController < Api::ApiController
                         fields: ['title', 'description'] )
   end
 
-  def create_params
-    params.require(:projects)
-      .permit(:description, :display_name, :name, :primary_language)
-  end
 
-  def create_project_params
-    project_params = create_params.dup
-    project_params.delete(:description)
-    project_params
-  end
+  def create_resource(create_params)
+    title, language = create_params.values_at(:display_name,
+                                              :primary_language)
+    description = create_params.delete(:description)
+    
+    create_params[:links] ||= Hash.new
+    create_params[:links][:owner] = owner || api_user.user
 
-  def create_content_params
-    content_params = create_params.dup
-    content_params.delete(:name)
-    content_params[:title] = content_params.delete(:display_name)
-    content_params[:language] = content_params.delete(:primary_language)
-    content_params
-  end
-
-  def create_resource
-    project = Project.new(create_project_params)
-    content = Project.content_model.new(create_content_params)
-    project.owner = owner
-
-    ActiveRecord::Base.transaction do
-      project.save!
-      content.project = project
-      content.save!
-    end
-
-    project if project.persisted? && content.persisted?
+    project = super(create_params)
+    project.project_contents.build(description: description,
+                                   title: title,
+                                   language: language)
+    project
   end
 end 

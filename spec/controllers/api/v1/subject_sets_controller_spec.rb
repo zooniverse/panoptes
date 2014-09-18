@@ -19,33 +19,17 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#index' do
-    before(:each){ get :index }
-
-    it 'should return 200' do
-      expect(response.status).to eq 200
-    end
-
-    it 'should have 2 items by default' do
-      expect(json_response[api_resource_name].length).to eq 2
-    end
-
-    it_behaves_like 'an api response'
+    let(:private_project) { create(:project, visible_to: ["collaborator"]) }
+    let!(:private_resource) { create(:subject_set, project: private_project)  }
+    let(:n_visible) { 2 }
+    
+    it_behaves_like 'is indexable'
   end
 
   describe '#show' do
-    before(:each) do
-      get :show, id: subject_set.id
-    end
-
-    it 'should return 200' do
-      expect(response.status).to eq 200
-    end
-
-    it 'should return the requested subject_set' do
-      expect(json_response[api_resource_name].length).to eq 1
-    end
-
-    it_behaves_like 'an api response'
+    let(:resource) { subject_set }
+    
+    it_behaves_like 'is showable'
   end
 
   describe '#update' do
@@ -59,7 +43,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
       {
        subject_sets: {
                       name: 'Test subject set',
-                      project_id: project.id
+                      links: {
+                              project: project.id
+                             }
                      }
       }
     end

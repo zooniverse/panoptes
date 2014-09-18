@@ -7,7 +7,7 @@ module JsonApiController
 
       ActiveRecord::Base.transaction do 
         controlled_resource.update!(update_params)
-        links.each { |k, v| update_relation(k.to_sym, v, true) }
+        links.try(:each) { |k, v| update_relation(k.to_sym, v, true) }
         controlled_resource.save!
       end
       
@@ -17,17 +17,25 @@ module JsonApiController
     end
 
     def update_links
+      check_relation
       update_relation(relation, params[relation])
       controlled_resource.save!
       update_response
     end
 
     def destroy_links
+      check_relation
       destroy_relation(relation, params[:link_ids])
       deleted_resource_response
     end
 
     protected
+
+    def check_relation
+      if params[relation].nil?
+        raise Api::BadLinkParams.new("Link relation must match body keys")
+      end
+    end
     
     def update_response
       render json_api: serializer.resource(controlled_resource)

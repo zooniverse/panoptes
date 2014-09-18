@@ -9,6 +9,10 @@ FactoryGirl.define do
 
     association :owner, factory: :user, password: "password"
 
+    factory :private_project do
+      visible_to ["collaborator"]
+    end
+
     factory :full_project do
       after(:create) do |p|
         workflow = create(:workflow, project: p)

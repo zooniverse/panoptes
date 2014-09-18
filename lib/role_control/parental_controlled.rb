@@ -6,30 +6,23 @@ module RoleControl
     module ClassMethods
       include RoleControl::Controlled::ClassMethods
 
-      def can_by_role_through_parent(action, parent, *additional_roles)
-        question = "can_#{ action }?".to_sym
-        can action, &test_parent(parent, question)
-
-        unless additional_roles.blank?
-          can action, &role_test_proc(parent, additional_roles)
-        end
-      end
-
-      protected
-
-      def test_parent(parent, question)
-        proc do |enrolled|
-          begin
-            send(parent).send(question, enrolled)
-          rescue NoMethodError => e
-            nil
+      def can_through_parent(parent, *actions)
+        @parent = parent
+        @actions = actions
+        
+        actions.each do |action|
+          method = "can_#{ action }?"
+          define_method method do |*args|
+            send(parent).send(method, *args)
           end
         end
       end
-
-      def role_test_proc(parent, add_roles)
-        proc do |enrolled|
-          !(enrolled.roles_for(send(parent)) & add_roles.map(&:to_s)).blank?
+      
+      def scope_for(action, *args)
+        if @actions.include?(action)
+          parent_scope = @parent.to_s.camelize.constantize
+            .scope_for(action, *args)
+          where(:"#{ @parent }_id" => parent_scope.select(:id))
         end
       end
     end
