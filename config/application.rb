@@ -33,6 +33,11 @@ module Panoptes
         origins '*'
         resource '/api/*', headers: :any, methods: [:get, :post, :options, :put, :patch]
       end
+
+      allow do
+        origins 'localhost:*', '127.0.0.1:*'
+        resource '*', headers: :any, methods: [:get, :post, :put, :delete, :options, :patch]
+      end
     end
   end
 end
