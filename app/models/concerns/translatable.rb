@@ -29,6 +29,10 @@ module Translatable
     @content_associattion ||= send(self.class.content_association)
   end
 
+  def primary_content
+    send(self.class.content_association).where(language: primary_language).first
+  end
+
   private
 
   def best_match_for(languages)
