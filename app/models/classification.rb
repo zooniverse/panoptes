@@ -39,12 +39,6 @@ class Classification < ActiveRecord::Base
   def subject_id
     set_member_subject.subject_id
   end
-
-  private
-
-  def created_and_incomplete?(actor)
-    creator?(actor) && incomplete?
-  end
   
   def create_project_preference
     return unless !!user
@@ -60,5 +54,11 @@ class Classification < ActiveRecord::Base
     UserSeenSubject.add_seen_subject_for_user(user: user,
                                               workflow: workflow,
                                               subject_id: subject_id)
+  end
+
+  private
+
+  def created_and_incomplete?(actor)
+    creator?(actor) && incomplete?
   end
 end
