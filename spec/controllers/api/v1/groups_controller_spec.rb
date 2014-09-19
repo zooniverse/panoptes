@@ -18,8 +18,8 @@ describe Api::V1::GroupsController, type: :controller do
   end
 
   let(:scopes) { %w(public group) }
-  let(:authorized_user) { user }
   let(:resource_class) { UserGroup }
+  let(:authorized_user) { user_groups.first.users.first }
 
   before(:each) do
     default_request(scopes: scopes, user_id: user.id)
@@ -30,6 +30,21 @@ describe Api::V1::GroupsController, type: :controller do
     let(:n_visible) { 1 }
     
     it_behaves_like "is indexable"
+  end
+  
+  describe "#update" do
+    let(:resource) { user_groups.first }
+    let(:test_attr) { :display_name}
+    let(:test_attr_value) { "A Different Name" }
+    let(:update_params) do
+      {
+       user_groups: {
+                     display_name: "A Different Name",
+                    }
+      }
+    end
+
+    it_behaves_like "is updatable"
   end
 
   describe "#show" do
@@ -67,7 +82,6 @@ describe Api::V1::GroupsController, type: :controller do
 
   describe "#destroy" do
     let(:resource) { user_groups.first }
-    let(:authorized_user) { resource.users.first }
     let(:instances_to_disable) do
       [resource] |
         resource.projects |

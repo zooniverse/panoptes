@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe Api::V1::SubjectsController, type: :controller do
   let!(:workflow) { create(:workflow_with_subject_sets) }
-  let!(:subjects) { create_list(:set_member_subject, 20, subject_set: workflow.subject_sets.first) }
   let!(:user) { create(:user) }
 
   let(:scopes) { %w(subject) }
@@ -24,6 +23,7 @@ describe Api::V1::SubjectsController, type: :controller do
       default_request user_id: user.id, scopes: scopes
     end
     describe "#index" do
+      let!(:subjects) { create_list(:set_member_subject, 20, subject_set: workflow.subject_sets.first) }
       context "without random sort" do
         before(:each) do
           get :index
@@ -84,9 +84,26 @@ describe Api::V1::SubjectsController, type: :controller do
   end
 
   describe "#show" do
-    let(:resource) { subjects.first.subject }
+    let(:resource) { create(:subject) }
 
     it_behaves_like "is showable"
+  end
+
+  describe "#update" do
+    let(:resource) { create(:subject, owner: user) }
+    let(:test_attr) { :metadata }
+    let(:test_attr_value) { { "interesting_data" => "Tested Collection" } }
+    let(:update_params) do
+      {
+       subjects: {
+                     metadata: {
+                                interesting_data: "Tested Collection"
+                               }
+                    }
+      }
+    end
+
+    it_behaves_like "is updatable"
   end
 
   describe "#create" do

@@ -13,18 +13,13 @@ shared_examples "is updatable" do
       
     end
 
-    it 'should update any included links' do
-      expect(updated_resource.send(test_relation)
-             .map(&:id)).to include(*test_relation_ids)
-    end
-
     it 'should return 200' do
       expect(response.status).to eq(200)
     end
 
     it_behaves_like 'an api response'
   end
-
+  
   context "an unauthorized user" do
     before(:each) do
       user = if defined?(unauthorized_user)
@@ -48,7 +43,23 @@ shared_examples "is updatable" do
   end
 end
 
+
 shared_examples "has updatable links" do
+  let(:updated_resource) { resource.reload }
+  
+  before(:each) do
+    default_request scopes: scopes, user_id: authorized_user.id
+    params = update_params.merge(id: resource.id)
+    put :update, params
+  end
+  
+  it 'should update any included links' do
+    expect(updated_resource.send(test_relation)
+           .map(&:id)).to include(*test_relation_ids)
+  end
+end
+
+shared_examples "has update_links" do
   describe "#update_links" do
     context "many-to-many" do
       it 'should add the new relations to the resource' do
@@ -89,16 +100,14 @@ shared_examples "has updatable links" do
       end
     end
   end
-end
 
-shared_examples "has destructable links" do
   describe "#destroy_links" do
     context 'habtm' do
       before(:each) do
         resource.subjects = subjects
         resource.save!
       end
-      
+
       it 'should remove included relations' do
         delete :destroy_links, {id: resource.id,
                                 link_relation: :subjects,

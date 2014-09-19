@@ -13,6 +13,9 @@ class Api::V1::ProjectsController < Api::ApiController
     :primary_language, links: [owner: polymorphic,
                                workflows: [],
                                subject_sets: []]
+
+  request_template :update, :description, :display_name,
+    links: [workflows: [], subject_sets: []]
   
   def show
     render json_api: serializer.resource(params,
@@ -47,19 +50,39 @@ class Api::V1::ProjectsController < Api::ApiController
                         fields: ['title', 'description'] )
   end
 
+  def content_from_params(params)
+    title, language = params.values_at(:display_name, :primary_language)
+    description = params.delete(:description)
+    {  description: description, title: title, language: language}.select { |k,v| !!v } 
+  end
 
   def create_resource(create_params)
-    title, language = create_params.values_at(:display_name,
-                                              :primary_language)
-    description = create_params.delete(:description)
+    content_params = content_from_params(create_params)
     
     create_params[:links] ||= Hash.new
     create_params[:links][:owner] = owner || api_user.user
 
     project = super(create_params)
-    project.project_contents.build(description: description,
-                                   title: title,
-                                   language: language)
+    project.project_contents.build(**content_params)
     project
+  end
+
+  def update_resource(update_params)
+    content_params = content_from_params(update_params)
+    super(update_params)
+    project.primary_content.update_attributes(content_params)
+  end
+
+  def update_relation(relation, value, replace=false)
+    if relation == :workflows || relation == :subject_sets
+      values = assoc_class(relation).where(id: value).map(&:dup)
+      if replace
+        project.send(:"#{ relation }=", values)
+      else
+        project.send(relation) << values
+      end
+    else
+      super
+    end
   end
 end 

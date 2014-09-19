@@ -27,7 +27,27 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe '#update' do
-    it 'should be implemented'
+    let(:subject_set) { create(:subject_set) }
+    let(:resource) { create(:workflow, project: project) }
+    let(:test_attr) { :name }
+    let(:test_attr_value) { "A Better Name" }
+    let(:test_relation) { :subject_sets }
+    let(:test_relation_ids) { subject_set.id }
+    let(:update_params) do
+      {
+       workflows: {
+                  name: "A Better Name",
+                  links: {
+                          subject_sets: [subject_set.id.to_s],
+                         }
+                  
+                 }
+      }
+    end
+
+    it_behaves_like "is updatable"
+
+    it_behaves_like "has updatable links"
   end
 
   describe '#create' do

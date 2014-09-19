@@ -33,7 +33,29 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#update' do
-    it 'should be implemented'
+    let(:subjects) { create_list(:subject, 4) }
+    let(:workflow) { create(:workflow) }
+    let(:resource) { create(:subject_set, project: project) }
+    let(:test_attr) { :name }
+    let(:test_attr_value) { "A Better Name" }
+    let(:test_relation) { :subjects }
+    let(:test_relation_ids) { subjects.map(&:id) }
+    let(:update_params) do
+      {
+       subject_sets: {
+                  name: "A Better Name",
+                  links: {
+                          workflows: [workflow.id.to_s],
+                          subjects: subjects.map(&:id).map(&:to_s)
+                         }
+                  
+                 }
+      }
+    end
+
+    it_behaves_like "is updatable"
+
+    it_behaves_like "has updatable links"
   end
 
   describe '#create' do

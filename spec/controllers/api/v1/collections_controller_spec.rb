@@ -53,6 +53,7 @@ describe Api::V1::CollectionsController, type: :controller do
     end
 
     it_behaves_like "is updatable"
+    it_behaves_like "has updatable links"
   end
 
   describe '#create' do

@@ -10,19 +10,18 @@ class Api::V1::ClassificationsController < Api::ApiController
     annotations: [:key, :value, :started_at, :finished_at, :user_agent],
     links: [:project, :workflow, :set_member_subject, :subject]
 
-  request_template :udpate, :completed,
+  request_template :update, :completed,
     annotations: [:key, :value, :started_at, :finished_at, :user_agent]
 
   def create
-      classification = ActiveRecord::Base.transaction do 
-        create_resource(create_params)
-        end
-         if classification.save!
-         
-    update_cellect(classification) 
+    classification = ActiveRecord::Base.transaction do 
+      create_resource(create_params)
+    end
+    if classification.save!
+      
+      update_cellect(classification) 
       created_resource_response(classification)
-      end
- 
+    end
   end
 
   private

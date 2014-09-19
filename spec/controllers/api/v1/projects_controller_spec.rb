@@ -187,7 +187,59 @@ describe Api::V1::ProjectsController, type: :controller do
       
       it_behaves_like "is creatable"
     end
+  end
 
+  describe "#update" do
+    let(:workflow) { create(:workflow) }
+    let(:subject_set) { create(:subject_set) }
+    let(:resource) { create(:project_with_contents, owner: authorized_user) }
+    let(:test_attr) { :display_name }
+    let(:test_attr_value) { "A Better Name" }
+    let(:update_params) do
+      {
+       projects: {
+                  display_name: "A Better Name",
+                  links: {
+                          workflows: [workflow.id.to_s],
+                          subject_sets: [subject_set.id.to_s]
+                         }
+                  
+                 }
+      }
+    end
+
+    it_behaves_like "is updatable"
+
+    context "project_contents" do
+      it 'should update the default contents when the display_name or description is updated' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        params = update_params.merge(id: resource.id)
+        put :update, params
+
+        contents_title = resource.project_contents
+          .where(language: resource.primary_language).first.title
+        
+        expect(contents_title).to eq(test_attr_value)
+      end
+    end
+
+    context "update_links" do
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        params = update_params.merge(id: resource.id)
+        put :update, params
+      end
+      
+      it 'should make a copy of a linked workflow' do
+        expect(resource.workflows.first.tasks).to eq(workflow.tasks)
+        expect(resource.workflows.first.id).to_not eq(workflow.id)
+      end
+
+      it 'should make a copy of a link subject_set' do
+        expect(resource.subject_sets.first.name).to eq(subject_set.name)
+        expect(resource.subject_sets.first.id).to_not eq(subject_set.id)
+      end
+    end
   end
   
   describe "#destroy" do

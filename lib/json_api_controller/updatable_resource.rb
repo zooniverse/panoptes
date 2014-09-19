@@ -3,14 +3,11 @@ module JsonApiController
     include RelationManager
     
     def update
-      links = update_params.delete(:links)
-
-      ActiveRecord::Base.transaction do 
-        controlled_resource.update!(update_params)
-        links.try(:each) { |k, v| update_relation(k.to_sym, v, true) }
-        controlled_resource.save!
+      ActiveRecord::Base.transaction do
+        update_resource(update_params)
       end
       
+      controlled_resource.save
       controlled_resource.reload
       
       update_response
@@ -30,6 +27,12 @@ module JsonApiController
     end
 
     protected
+
+    def update_resource(update_params)
+      links = update_params.delete(:links)
+      controlled_resource.assign_attributes(update_params)
+      links.try(:each) { |k, v| update_relation(k.to_sym, v, true) }
+    end
 
     def check_relation
       if params[relation].nil?

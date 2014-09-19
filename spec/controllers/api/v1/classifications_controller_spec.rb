@@ -68,6 +68,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
   let(:scopes) { %w(classification) }
   let(:authorized_user) { user }
+      let(:resource_class) { Classification }
 
   context "logged in user" do
     before(:each) do
@@ -150,13 +151,48 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
     end
   end
+
+  describe "#update" do
+    context "an incomplete classification" do
+      let(:resource) { create(:classification, user: authorized_user, completed: false) }
+      let(:test_attr) { :completed }
+      let(:test_attr_value) { true }
+      let(:update_params) do
+        {
+         classifications: {
+                           completed: true,
+                           annotations: [{ key: "q-1", value: "round" }]
+                          }
+        }
+      end
+
+      it_behaves_like "is updatable"
+      
+    end
+
+    context "a complete classification" do
+      it 'should return 403' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        classification = create(:classification, user: authorized_user, completed: true)
+        put :update, id: classification.id
+        expect(response.status).to eq(403)
+      end
+    end
+  end
   
   describe "#destroy" do
     context "an incomplete classification" do
-      let(:resource) { create(:classification, user: user, completed: false) }
-      let(:resource_class) { Classification }
-
+      let(:resource) { create(:classification, user: authorized_user, completed: false) }
       it_behaves_like "is destructable"
+    end
+
+    context "a complete classification" do
+      it 'should return 403' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        classification = create(:classification, user: authorized_user, completed: true)
+        delete :destroy, id: classification.id
+        expect(response.status).to eq(403)
+      end
     end
   end
 
