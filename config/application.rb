@@ -32,7 +32,7 @@ module Panoptes
       allow do
         origins '*'
         resource '/api/*', headers: :any,
-                           methods: [:get, :post, :options, :put, :patch]
+                           methods: [:delete, :get, :post, :options, :put, :patch]
       end
     end
   end
