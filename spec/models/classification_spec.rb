@@ -25,12 +25,22 @@ describe Classification, :type => :model do
     expect(build(:classification, annotations: nil)).to_not be_valid
   end
 
-  it "must have a completed value" do
-    expect(build(:classification, completed: nil)).to_not be_valid
+  it "must have a state value" do
+    expect(build(:classification, state: nil)).to_not be_valid
   end
 
   it "should be valid without a user" do
     expect(build(:classification, user: nil)).to be_valid
+  end
+
+  it 'should not be valid if incomplete with no user' do
+    classification = build(:classification, user: nil, state: :incomplete)
+    expect(classification).to_not be_valid
+  end
+  
+  it 'should not be valid if enqueued with no user' do
+    classification = build(:classification, user: nil, state: :enqueue)
+    expect(classification).to_not be_valid
   end
 
   describe "::visible_to" do
@@ -138,12 +148,12 @@ describe Classification, :type => :model do
   end
 
   describe "#incomplete?" do
-    it "should be truthy if completed attribute is false" do
-      expect(build(:classification, completed: false).incomplete?).to be_truthy
+    it "should be truthy if state attribute is completed" do
+      expect(build(:classification, state: :incomplete).incomplete?).to be_truthy
     end
 
     it "should be falsy if completed attribute is true" do
-      expect(build(:classification, completed: true).incomplete?).to be_falsy
+      expect(build(:classification, state: :complete).incomplete?).to be_falsy
     end
   end
 
@@ -169,6 +179,54 @@ describe Classification, :type => :model do
 
     it "should a single user_group" do
       expect(classification_with_user_group.user_group).to eq(expected_user_group)
+    end
+  end
+
+  describe "#enqueue_subject" do
+    it 'should call enqueue_subject_for_user' do
+      classification = build(:classification, state: :enqueue)
+      expect(UserEnqueuedSubject).to receive(:enqueue_subject_for_user)
+        .with(user: classification.user,
+              workflow: classification.workflow,
+              subject_id: classification.subject_id)
+      classification.enqueue_subject
+    end
+
+    it 'should not call enqueue when there is no user' do
+      classification = build(:classification, state: :enqueue, user: nil)
+      expect(UserEnqueuedSubject).to_not receive(:enqueue_subject_for_user)
+      classification.enqueue_subject
+    end
+
+    it 'should not call enqueue when the classification is in another state' do
+      classification = build(:classification, state: :complete)
+      expect(UserEnqueuedSubject).to_not receive(:enqueue_subject_for_user)
+      classification.enqueue_subject
+    end
+  end
+  
+  describe "#dequeue_subject" do
+    it 'should call dequeue_subject_for_user' do
+      classification = create(:classification, state: :enqueue)
+      expect(UserEnqueuedSubject).to receive(:dequeue_subject_for_user)
+        .with(user: classification.user,
+              workflow: classification.workflow,
+              subject_id: classification.subject_id)
+      classification.state = :complete
+      classification.save!
+    end
+
+    it 'should not call dequeue_subject_for_user when state is not complete' do
+      classification = create(:classification, state: :enqueue)
+      expect(UserEnqueuedSubject).to_not receive(:dequeue_subject_for_user)
+      classification.save!
+    end
+
+    it 'should not call dequeue_subject_for_use when state was :incomplete' do
+      classification = create(:classification, state: :incomplete)
+      expect(UserEnqueuedSubject).to_not receive(:dequeue_subject_for_user)
+      classification.state = :complete
+      classification.save!
     end
   end
 end

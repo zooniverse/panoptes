@@ -9,8 +9,10 @@ class Classification < ActiveRecord::Base
   belongs_to :user_group, counter_cache: true
 
   validates_presence_of :set_member_subject, :project, :workflow,
-    :annotations, :user_ip
-  validates :completed, inclusion: { in: [ true, false ] }
+    :annotations, :user_ip, :state
+
+  validates :user, presence: true, if: :incomplete?
+  validates :user, presence: true, if: :enqueue?
 
   attr_accessible :annotations, :completed, :user_ip
   
@@ -18,7 +20,7 @@ class Classification < ActiveRecord::Base
   can :update, :created_and_incomplete?
   can :destroy, :created_and_incomplete?
 
-  after_create :create_project_preference, :update_seen_subjects
+  after_create :create_project_preference, :update_seen_subjects, :enqueue_subject
 
   def self.visible_to(actor, as_admin: false)
     ClassificationVisibilityQuery.new(actor, self).build(as_admin)
@@ -30,10 +32,6 @@ class Classification < ActiveRecord::Base
 
   def creator?(actor)
     user == actor.user
-  end
-
-  def incomplete?
-    !completed
   end
 
   def in_show_scope?(actor)
@@ -56,9 +54,28 @@ class Classification < ActiveRecord::Base
                                               set_member_subject_id: set_member_subject.id)
   end
 
+  def enqueue_subject
+    return true unless !!user && enqueue?
+    UserEnqueuedSubject.enqueue_subject_for_user(user: user,
+                                                 workflow: workflow,
+                                                 subject_id: subject_id)
+  end
+
+  def dequeue_subject
+    return true unless !!user && complete? && was_enqueued?
+    UserEnqueuedSubject.dequeue_subject_for_user(user: user,
+                                                 workflow: workflow,
+                                                 subject_id: subject_id)
+  end
+  
   private
 
-  def created_and_incomplete?(actor)
-    creator?(actor) && incomplete?
+  def was_enqueued?
+    changes[:state].try(:first) == "enqueue"
   end
+  
+  def created_and_incomplete?(actor)
+    creator?(actor) && (incomplete? || enqueue?)
+  end
+
 end
