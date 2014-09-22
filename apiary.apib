@@ -626,10 +626,14 @@ random list of subjects that have not been seen by the
 active user. When the random sort is used, *workflow_id* is a
 required parameter.
 
+Subjects also allow an 'queued' sort, which will return a random
+subset of subjects have a been queued for a particular user to
+classify, usually for expert classifiers. 
+
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + per_page (optional, integer) ... number of items to include on a page default is 20
-  + sort (optional, string) ... field to sort by 'random' has special behaviour
+  + sort (optional, string) ... field to sort by 'random' and 'queued' have special behaviour
   + workflow_id (optional, intger) ... filter to subjects belonging to a specific workflow. Required when sort is 'random'
   + subject_set_id (optional, intger) ... return subjects belonging to the identified subject_set
 

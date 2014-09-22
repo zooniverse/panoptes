@@ -16,7 +16,7 @@ RSpec.describe UserEnqueuedSubject, :type => :model do
   describe "::enqueue_subject_for_user" do
     let(:user) { create(:user) }
     let(:workflow) { create(:workflow) }
-    let(:subject) { create(:subject) }
+    let(:subject) { create(:set_member_subject) }
     
     context "nothing for user" do
       it 'should create a new user_enqueue_subject' do
@@ -54,7 +54,7 @@ RSpec.describe UserEnqueuedSubject, :type => :model do
   describe "::dequeue_subject_for_user" do
     let(:user) { create(:user) }
     let(:workflow) { create(:workflow) }
-    let(:subject) { create(:subject) }
+    let(:subject) { create(:set_member_subject) }
     let!(:ues) { create(:user_enqueued_subject,
                         user: user,
                         workflow: workflow,
@@ -69,11 +69,11 @@ RSpec.describe UserEnqueuedSubject, :type => :model do
   end
 
   describe "#sample_subjects" do
-    let(:subjects) { create_list(:subject, 20) }
+    let(:subjects) { create_list(:set_member_subject, 20) }
     let(:ues) { build(:user_enqueued_subject, subject_ids: subjects.map(&:id)) }
     
-    it 'should return a collection of subjects' do
-      expect(ues.sample_subjects).to all( be_a(Subject) )
+    it 'should return a collection of ids' do
+      expect(ues.sample_subjects).to all( be_a(Fixnum) )
     end
 
     it 'should return 10 by default' do
@@ -89,14 +89,14 @@ RSpec.describe UserEnqueuedSubject, :type => :model do
     let(:ues) { build(:user_enqueued_subject) }
     
     it 'should add the id to the subject_ids array' do
-      subject_id = create(:subject).id
+      subject_id = create(:set_member_subject).id
       ues.add_subject_id(subject_id)
       expect(ues.subject_ids).to include(subject_id)
     end
   end
 
   describe "#remove_subject_id" do
-    let(:subject) { create(:subject) }
+    let(:subject) { create(:set_member_subject) }
     let(:ues) { build(:user_enqueued_subject, subject_ids: [subject.id]) }
     
     it 'should remove the id from the subject ids' do

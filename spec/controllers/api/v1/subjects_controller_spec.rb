@@ -40,6 +40,34 @@ describe Api::V1::SubjectsController, type: :controller do
         it_behaves_like "an api response"
       end
 
+      context "with queued subjects" do
+        let(:api_resource_attributes) do
+          [ "id", "metadata", "locations", "zooniverse_id", "classifications_count",
+           "state", "set_member_subject_id", "created_at", "updated_at" ]
+        end
+        let(:api_resource_links) { [ "subjects.subject_set" ] }
+        let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
+
+        let!(:ues) { create(:user_enqueued_subject, user: user, workflow: workflow, subject_ids: subjects.map(&:id)) }
+
+        before(:each) do
+          get :index, request_params
+        end
+        
+        it "should return 200" do
+          get :index, request_params
+          expect(response.status).to eq(200)
+        end
+
+        it 'should return a page of 10 objects' do
+          get :index, request_params
+          expect(json_response[api_resource_name].length).to eq(10)
+        end
+
+        it_behaves_like "an api response"
+      end
+      
+
       context "with random sort" do
         let(:api_resource_attributes) do
           [ "id", "metadata", "locations", "zooniverse_id", "classifications_count",

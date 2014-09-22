@@ -16,7 +16,7 @@ class UserEnqueuedSubject < ActiveRecord::Base
   end
   
   def sample_subjects(limit=10)
-    Subject.find(subject_ids.sample(limit))
+    subject_ids.sample(limit)
   end
 
   def add_subject_id(id)

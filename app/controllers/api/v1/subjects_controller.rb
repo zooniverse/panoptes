@@ -7,6 +7,8 @@ class Api::V1::SubjectsController < Api::ApiController
   def index
     if params[:sort] == 'random' && params.has_key?(:workflow_id)
       random_subjects
+    elsif params[:sort] == 'queued' && params.has_key?(:workflow_id)
+      queued_subjects
     elsif params.has_key?(:subject_set_id)
       query_subject_sets
     else
@@ -21,12 +23,21 @@ class Api::V1::SubjectsController < Api::ApiController
     super(create_params)
   end
 
+  private
+
+  def queued_subjects
+    user_enqueued = UserEnqueuedSubject.find_by(user: api_user.user,
+                                               workflow_id: params[:workflow_id])
+    subjects = user_enqueued.sample_subjects(10 || params[:limit]).join(',')
+    render json_api: SetMemberSubjectSerializer.resource({id: subjects})
+  end
+
   def query_subjects
     render json_api: serializer.resource(params)
   end
 
   def query_subject_sets
-    render json_api: SetMemberSubjectSerializer.resource(params)
+    render json_api: SetMemberSubjectSerializer.page(params)
   end
 
   def random_subjects

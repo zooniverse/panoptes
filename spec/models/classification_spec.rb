@@ -188,7 +188,7 @@ describe Classification, :type => :model do
       expect(UserEnqueuedSubject).to receive(:enqueue_subject_for_user)
         .with(user: classification.user,
               workflow: classification.workflow,
-              subject_id: classification.subject_id)
+              subject_id: classification.set_member_subject.id)
       classification.enqueue_subject
     end
 
@@ -211,7 +211,7 @@ describe Classification, :type => :model do
       expect(UserEnqueuedSubject).to receive(:dequeue_subject_for_user)
         .with(user: classification.user,
               workflow: classification.workflow,
-              subject_id: classification.subject_id)
+              subject_id: classification.set_member_subject.id)
       classification.state = :complete
       classification.save!
     end
