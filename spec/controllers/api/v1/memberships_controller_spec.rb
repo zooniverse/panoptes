@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::MembershipsController, type: :controller do
   let(:authorized_user) { create(:user) }
-  let!(:memberships) { create_list(:membership, 2, user: authorized_user, roles: ["group_admin"]) }
+  let!(:memberships) { create_list(:membership, 2, user: authorized_user, roles: ["group_admin"], state: :active) }
   let(:api_resource_name) { 'memberships' }
   let(:api_resource_attributes) { %w(id state) }
   let(:api_resource_links) { %w(memberships.user memberships.user_group) }
