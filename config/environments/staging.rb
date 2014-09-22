@@ -85,8 +85,9 @@ Rails.application.configure do
 
   config.middleware.use Rack::Cors do
     allow do
-      origins 'localhost:*', '127.0.0.1:*'
-      resource '*', headers: :any, methods: [:get, :post, :put, :delete, :options, :patch]
+      origins /^http:\/\/(127\.0\.0\.1|localhost|10\.0\.2\.2)(:\d+)?$/
+      resource '*', headers: :any,
+                    methods: [:get, :post, :put, :delete, :options, :patch]
     end
   end
 end
