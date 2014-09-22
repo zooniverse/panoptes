@@ -108,7 +108,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       it "should setup the add seen command to cellect" do
         expect(stubbed_cellect_connection).to receive(:add_seen)
           .with(
-                subject_id: set_member_subject.subject_id,
+                subject_id: set_member_subject.id,
                 workflow_id: workflow.id,
                 user_id: user.id,
                 host: 'example.com'

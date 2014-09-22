@@ -106,9 +106,10 @@ describe Classification, :type => :model do
     context "with a user" do
       it 'should add the subject_id to the seen subjects' do
         classification = build(:classification)
-        expect(UserSeenSubject).to receive(:add_seen_subject_for_user).with(user: classification.user,
-                                                                            workflow: classification.workflow,
-                                                                            subject_id: classification.subject_id)
+        expect(UserSeenSubject).to receive(:add_seen_subject_for_user)
+          .with(user: classification.user,
+                workflow: classification.workflow,
+                subject_id: classification.set_member_subject.id)
         classification.update_seen_subjects
       end
     end

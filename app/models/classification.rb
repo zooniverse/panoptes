@@ -36,10 +36,6 @@ class Classification < ActiveRecord::Base
     self.class.visible_to(actor).exists?(self)
   end
 
-  def subject_id
-    set_member_subject.subject_id
-  end
-  
   def create_project_preference
     return unless !!user
     UserProjectPreference.where(user: user, project: project)
@@ -53,7 +49,7 @@ class Classification < ActiveRecord::Base
     return unless !!user
     UserSeenSubject.add_seen_subject_for_user(user: user,
                                               workflow: workflow,
-                                              subject_id: subject_id)
+                                              subject_id: set_member_subject.id)
   end
 
   private

@@ -41,7 +41,7 @@ class Api::V1::ClassificationsController < Api::ApiController
     Cellect::Client.connection
       .add_seen(user_id: classification.user_id,
                 workflow_id: classification.workflow_id,
-                subject_id: classification.subject_id,
+                subject_id: classification.set_member_subject.id,
                 host: cellect_host(classification.workflow_id))
   end
 end
