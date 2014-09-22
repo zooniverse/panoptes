@@ -43,9 +43,9 @@ Rails.application.routes.draw do
 
       resources :projects, except: except, format: false do
         post "/links/:link_relation", to: "projects#update_links",
-          constraints: { link_relation: /(subjects|workflows)/ }, format: false
+          constraints: { link_relation: /(subject_sets|workflows)/ }, format: false
         delete "/links/:link_relation/:link_ids", to: "projects#destroy_links",
-          constraints: { link_relation: /(subjects|workflows)/ }, format: false
+          constraints: { link_relation: /(subject_sets|workflows)/ }, format: false
       end
       
       resources :workflows, except: except, format: false do
