@@ -97,7 +97,8 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(response.status).to eq(200)
           end
 
-          it 'should return a page of 10 objects' do
+          it 'should return a page of 20 objects' do
+            get :index, request_params
             expect(json_response[api_resource_name].length).to eq(20)
           end
 
