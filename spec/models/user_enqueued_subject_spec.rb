@@ -45,7 +45,6 @@ RSpec.describe UserEnqueuedSubject, :type => :model do
         UserEnqueuedSubject.enqueue_subject_for_user(user: user,
                                                      workflow: workflow,
                                                      subject_id: subject.id)
-
         expect(ues.reload.subject_ids).to include(subject.id)
       end
     end
@@ -54,17 +53,29 @@ RSpec.describe UserEnqueuedSubject, :type => :model do
   describe "::dequeue_subject_for_user" do
     let(:user) { create(:user) }
     let(:workflow) { create(:workflow) }
-    let(:subject) { create(:set_member_subject) }
-    let!(:ues) { create(:user_enqueued_subject,
-                        user: user,
-                        workflow: workflow,
-                        subject_ids: [subject.id]) }
+    let(:subjects) { create_list(:set_member_subject, 2) }
     
-    it 'should remove the subject give a user and workflow' do
+    it 'should remove the subject given a user and workflow' do
+      ues = create(:user_enqueued_subject,
+                   user: user,
+                   workflow: workflow,
+                   subject_ids: subjects.map(&:id))
       UserEnqueuedSubject.dequeue_subject_for_user(user: user,
                                                    workflow: workflow,
-                                                   subject_id: subject.id)
-      expect(ues.reload.subject_ids).to_not include(subject.id)
+                                                   subject_id: subjects.first.id)
+      expect(ues.reload.subject_ids).to_not include(subjects.first.id)
+    end
+
+    it 'should destroy the model if there are no more subject_ids' do
+      ues = create(:user_enqueued_subject,
+                   user: user,
+                   workflow: workflow,
+                   subject_ids: [subjects.first.id])
+      UserEnqueuedSubject.dequeue_subject_for_user(user: user,
+                                                   workflow: workflow,
+                                                   subject_id: subjects.first.id)
+      expect(UserEnqueuedSubject.exists?(ues)).to be_falsy
+
     end
   end
 

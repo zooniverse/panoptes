@@ -13,6 +13,7 @@ class UserEnqueuedSubject < ActiveRecord::Base
   def self.dequeue_subject_for_user(user: nil, workflow: nil, subject_id: nil)
     ues = find_by!(user: user, workflow: workflow)
     ues.remove_subject_id(subject_id)
+    ues.destroy if ues.subject_ids.empty?
   end
   
   def sample_subjects(limit=10)
