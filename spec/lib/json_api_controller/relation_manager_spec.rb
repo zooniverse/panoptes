@@ -7,12 +7,17 @@ describe JsonApiController::RelationManager do
     Class.new do
       include JsonApiController::RelationManager
 
-      def initialize(resource)
+      def initialize(resource, user)
         @resource, @klass = resource, resource.class
+        @user = ApiUser.new(user)
       end
 
       def controlled_resource
         @resource
+      end
+
+      def current_actor
+        @user
       end
 
       def resource_class
@@ -21,10 +26,11 @@ describe JsonApiController::RelationManager do
     end
   end
 
-  let(:test_instance) { test_class.new(resource) }
 
   let(:user) { create(:user) }
   let(:subjects) { create_list(:subject, 4, owner: user) }
+  
+  let(:test_instance) { test_class.new(resource, user) }
 
   describe "#update_relations" do
     context "many-to-many" do

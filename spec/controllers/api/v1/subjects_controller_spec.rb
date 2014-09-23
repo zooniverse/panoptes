@@ -6,8 +6,8 @@ describe Api::V1::SubjectsController, type: :controller do
 
   let(:scopes) { %w(subject) }
   let(:resource_class) { Subject }
-  let(:project) { create(:project) }
   let(:authorized_user) { user }
+  let(:project) { create(:project, owner: user) }
 
   let(:api_resource_name) { "subjects" }
   let(:api_resource_attributes) do

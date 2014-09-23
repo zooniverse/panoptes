@@ -34,7 +34,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
   describe '#update' do
     let(:subjects) { create_list(:subject, 4) }
-    let(:workflow) { create(:workflow) }
+    let(:workflow) { create(:workflow, project: project) }
     let(:resource) { create(:subject_set, project: project) }
     let(:test_attr) { :name }
     let(:test_attr_value) { "A Better Name" }

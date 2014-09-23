@@ -8,15 +8,13 @@ module JsonApiController
         item = type.camelize.constantize.find(id)
         controlled_resource.send(:"#{ relation }=", item)
       when Array
-        new_items = assoc_class(relation).where(id: value)
         if replace
-          controlled_resource.send(:"#{ relation }=", new_items)
+          controlled_resource.send(:"#{ relation }=", new_items(relation, value))
         else
-          controlled_resource.send(relation) << new_items
+          controlled_resource.send(relation) << new_items(relation, value)
         end
       when String, Integer
-        new_item = assoc_class(relation).find(value)
-        controlled_resource.send(:"#{ relation }=", new_item)
+        controlled_resource.send(:"#{ relation }=", new_items(relation, value))
       else
         controlled_resource.send(:"#{ relation }=", value)
       end
@@ -28,6 +26,12 @@ module JsonApiController
     end
 
     protected
+
+    def new_items(relation, value)
+      assoc_class(relation)
+        .link_to(controlled_resource, current_actor)
+        .find(value)
+    end
 
     def assoc_class(relation)
       resource_class.reflect_on_association(relation).klass

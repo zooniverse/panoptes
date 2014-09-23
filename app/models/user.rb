@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   include Activatable
   include RoleControl::Owner
   include RoleControl::Enrolled
+  include Linkable
 
   attr_accessible :name, :email, :password, :login, :migrated_user, :display_name, :credited_name, :global_email_communication,
     :project_email_communication
@@ -37,6 +38,9 @@ class User < ActiveRecord::Base
   can :show, proc { |requester| requester.user == self }
   can :update, proc { |requester| requester.user == self }
   can :destroy, proc { |requester| requester.user == self }
+
+  can_be_linked :membership, :all
+  can_be_linked :user_group, :all
 
   attr_accessor :migrated_user
 

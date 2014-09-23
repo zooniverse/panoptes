@@ -27,7 +27,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe '#update' do
-    let(:subject_set) { create(:subject_set) }
+    let(:subject_set) { create(:subject_set, project: project) }
     let(:resource) { create(:workflow, project: project) }
     let(:test_attr) { :name }
     let(:test_attr_value) { "A Better Name" }

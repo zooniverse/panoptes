@@ -4,6 +4,7 @@ class UserGroup < ActiveRecord::Base
   include Activatable
   include RoleControl::Owner
   include RoleControl::Adminable
+  include Linkable
 
   attr_accessible :name, :display_name
 

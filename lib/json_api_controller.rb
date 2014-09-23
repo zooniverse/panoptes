@@ -43,6 +43,10 @@ module JsonApiController
       { id: nil, type: nil }
     end
   end
+
+  def current_actor
+    owner_from_params || api_user
+  end
   
   def serializer
     @serializer ||= "#{ resource_name.camelize }Serializer".constantize
