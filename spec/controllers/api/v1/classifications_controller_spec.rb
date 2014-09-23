@@ -127,7 +127,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       describe "track user seen subjects" do
         let(:expected_params) do
-          {subject_id: set_member_subject.subject_id,
+          {subject_id: set_member_subject.id,
            workflow: workflow,
            user: user }
         end

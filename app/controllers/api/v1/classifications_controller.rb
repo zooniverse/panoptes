@@ -17,8 +17,8 @@ class Api::V1::ClassificationsController < Api::ApiController
     classification = ActiveRecord::Base.transaction do 
       create_resource(create_params)
     end
+    
     if classification.save!
-      
       update_cellect(classification) 
       created_resource_response(classification)
     end
