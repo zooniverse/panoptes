@@ -16,6 +16,9 @@ ActiveRecord::Schema.define(version: 20140929125651) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "authorizations", force: true do |t|
     t.integer  "user_id"
     t.string   "provider"
@@ -38,7 +41,8 @@ ActiveRecord::Schema.define(version: 20140929125651) do
     t.datetime "updated_at"
     t.integer  "user_group_id"
     t.inet     "user_ip"
-    t.integer  "state",                 default: 0, null: false
+    t.boolean  "completed",             default: true,  null: false
+    t.boolean  "enqueued",              default: false, null: false
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree

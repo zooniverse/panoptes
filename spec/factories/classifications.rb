@@ -3,7 +3,8 @@ FactoryGirl.define do
     annotations [{an_annotation: true,
                   another_one: [1, 2]}].to_json
     user_ip "192.168.0.1"
-    state :complete
+    completed true
+    enqueued false
     user
     project
     workflow

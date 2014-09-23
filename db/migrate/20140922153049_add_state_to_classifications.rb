@@ -1,6 +1,5 @@
 class AddStateToClassifications < ActiveRecord::Migration
   def change
-    remove_column :classifications, :completed, :boolean
-    add_column :classifications, :state, :integer, default: 0, null: false
+    add_column :classifications, :enqueued, :boolean, default: false, null: false
   end
 end
