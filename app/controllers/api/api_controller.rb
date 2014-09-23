@@ -19,6 +19,7 @@ module Api
     rescue_from Api::PatchResourceError, with: :unprocessable_entity
     rescue_from ActionController::UnpermittedParameters, with: :unprocessable_entity
     rescue_from ActionController::ParameterMissing, with: :unprocessable_entity
+    rescue_from SubjectSelector::MissingParameter, with: :unprocessable_entity
 
     before_action ContentTypeFilter.new(API_ACCEPTED_CONTENT_TYPE,
                                         API_ALLOWED_METHOD_OVERRIDES)

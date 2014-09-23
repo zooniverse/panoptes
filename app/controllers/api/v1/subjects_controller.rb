@@ -1,19 +1,12 @@
 class Api::V1::SubjectsController < Api::ApiController
   include JsonApiController
   
+  before_action :merge_cellect_host, only: :index
   doorkeeper_for :update, :create, :destroy, scopes: [:subject]
   resource_actions :default
 
   def index
-    if params[:sort] == 'random' && params.has_key?(:workflow_id)
-      random_subjects
-    elsif params[:sort] == 'queued' && params.has_key?(:workflow_id)
-      queued_subjects
-    elsif params.has_key?(:subject_set_id)
-      query_subject_sets
-    else
-      super
-    end
+    render json_api: selector.create_response
   end
 
   private
@@ -25,34 +18,12 @@ class Api::V1::SubjectsController < Api::ApiController
 
   private
 
-  def queued_subjects
-    user_enqueued = UserEnqueuedSubject.find_by(user: api_user.user,
-                                               workflow_id: params[:workflow_id])
-    subjects = user_enqueued.sample_subjects(10 || params[:limit]).join(',')
-    render json_api: SetMemberSubjectSerializer.resource({id: subjects})
+  def merge_cellect_host
+    params[:host] = cellect_host(params[:workflow_id])
   end
 
-  def query_subjects
-    render json_api: serializer.resource(params)
-  end
-
-  def query_subject_sets
-    render json_api: SetMemberSubjectSerializer.page(params)
-  end
-
-  def random_subjects
-    subject_ids = Cellect::Client.connection.get_subjects(**cellect_params).join(',')
-    render json_api: SetMemberSubjectSerializer.page({id: subject_ids})
-  end
-
-  def cellect_params
-    c_params = params.permit(:workflow_id, :subject_set_id, :limit, :sort)
-      .slice(:workflow_id, :subject_set_id, :limit)
-      .merge(user_id: api_user.try(:id),
-             limit: 10,
-             host: cellect_host(params[:workflow_id])) {|k, ov, nv| ov ? ov : nv}
-    c_params[:group_id] = c_params.delete(:subject_set_id)
-    c_params.symbolize_keys
+  def selector
+    @selector ||= SubjectSelector.new(api_user, params)
   end
 
   def create_params
