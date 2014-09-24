@@ -15,6 +15,11 @@ class UserEnqueuedSubject < ActiveRecord::Base
     ues.remove_subject_id(subject_id)
     ues.destroy if ues.subject_ids.empty?
   end
+
+  def self.is_subject_queued?(user: nil, workflow: nil, set_member_subject_id: nil)
+    where(user: user, workflow: workflow)
+      .any(set_member_subject_ids: set_member_subject_id)
+  end
   
   def sample_subjects(limit=10)
     subject_ids.sample(limit)

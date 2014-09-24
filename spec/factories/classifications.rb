@@ -4,7 +4,6 @@ FactoryGirl.define do
                   another_one: [1, 2]}].to_json
     user_ip "192.168.0.1"
     completed true
-    enqueued false
     user
     project
     workflow
