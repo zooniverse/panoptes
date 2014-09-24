@@ -51,10 +51,11 @@ class SubjectSelector
   end
   
   def cellect_params
-    c_params = params.permit(:workflow_id, :subject_set_id, :limit, :host)
+    c_params = params.permit(:sort, :workflow_id, :subject_set_id, :limit, :host)
     c_params[:user_id] = user.id
     c_params[:limit] ||= 10
     c_params[:group_id] = c_params.delete(:subject_set_id)
+    c_params.delete(:sort)
     c_params.symbolize_keys
   end
 end
