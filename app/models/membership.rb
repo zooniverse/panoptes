@@ -28,7 +28,7 @@ class Membership < ActiveRecord::Base
   end
 
   def self.can_create?(actor)
-    true
+    !!actor
   end
 
   def allowed_to_change?(actor)

@@ -19,8 +19,7 @@ class Api::V1::GroupsController < Api::ApiController
     create_params[:display_name] ||= create_params[:name]
 
     group = super(create_params)
-    group.owner_name = OwnerName.new(name: group.name,
-                                     resource: group)
+    group.build_owner_name(name: group.name, resource: group)
     group.memberships.build(**initial_member)
     group
   end
@@ -34,12 +33,10 @@ class Api::V1::GroupsController < Api::ApiController
 
   def update_relation(relation, value, replace=false)
     if relation == :users
-      ActiveRecord::Base.transaction do 
-        User.find(value).each do |user|
-          user_group.memberships.build(user: user,
-                                       state: :invited,
-                                       roles: ["group_member"])
-        end
+      new_items(relation, value).each do |user|
+        user_group.memberships.build(user: user,
+                                     state: :invited,
+                                     roles: ["group_member"])
       end
     else
       super

@@ -11,9 +11,16 @@ module Linkable
       @link_scopes[rel_class] = [scope] | args
     end
 
-    def link_to(model, actor, *args)
+    def link_to_resource(model, actor, *args)
       method, *default_args = @link_scopes[model.class]
-      arguments = (default_args | args).map do |item|
+      scope_args = *link_scope_arguments(default_args, model, actor, args)
+      send(method, *scope_args)
+    end
+
+    protected
+
+    def link_scope_arguments(default_args, model, actor, additional_args)
+      (default_args | additional_args).map do |item|
         case item
         when :actor
           actor
@@ -23,10 +30,7 @@ module Linkable
           item
         end
       end
-      send(method, *arguments)
     end
-
-    protected
 
     def default_link_to_scope(actor)
       scope_for(:show, actor)

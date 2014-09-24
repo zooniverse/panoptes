@@ -3,7 +3,7 @@ class Api::V1::UsersController < Api::ApiController
   
   doorkeeper_for :index, :me, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
-  access_control_for :update, :destroy, resource_class: User
+  access_control_for :update, :destroy
 
   resource_actions :deactivate, :update, :index, :show
 
@@ -16,13 +16,17 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def destroy
-    sign_out if current_user && (current_user == user)
+    sign_out_current_user!
     revoke_doorkeeper_request_token!
     UserInfoScrubber.scrub_personal_info!(user)
     super
   end
 
   private
+
+  def sign_out_current_user!
+    sign_out if current_user && (current_user == user)
+  end
 
   def visible_scope
     User.all
@@ -33,10 +37,6 @@ class Api::V1::UsersController < Api::ApiController
       user.projects |
       user.collections |
       user.memberships
-  end
-
-  def serializer
-    UserSerializer
   end
 
   def revoke_doorkeeper_request_token!

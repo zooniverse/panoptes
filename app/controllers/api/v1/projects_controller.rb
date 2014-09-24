@@ -53,14 +53,14 @@ class Api::V1::ProjectsController < Api::ApiController
   def content_from_params(params)
     title, language = params.values_at(:display_name, :primary_language)
     description = params.delete(:description)
-    {  description: description, title: title, language: language}.select { |k,v| !!v } 
+    { description: description, title: title, language: language}.select { |k,v| !!v } 
   end
 
   def create_resource(create_params)
     content_params = content_from_params(create_params)
     
     create_params[:links] ||= Hash.new
-    create_params[:links][:owner] = owner || api_user.user
+    create_params[:links][:owner] = current_actor
 
     project = super(create_params)
     project.project_contents.build(**content_params)
@@ -75,7 +75,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def update_relation(relation, value, replace=false)
     if relation == :workflows || relation == :subject_sets
-      values = assoc_class(relation).where(id: value).map(&:dup)
+      values = new_items(relation, value).map(&:dup)
       if replace
         project.send(:"#{ relation }=", values)
       else

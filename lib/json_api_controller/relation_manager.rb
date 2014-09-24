@@ -29,7 +29,7 @@ module JsonApiController
 
     def new_items(relation, value)
       assoc_class(relation)
-        .link_to(controlled_resource, current_actor)
+        .link_to_resource(controlled_resource, current_actor)
         .find(value)
     end
 
