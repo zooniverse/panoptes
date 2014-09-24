@@ -1,9 +1,8 @@
 class Api::V1::ClassificationsController < Api::ApiController
   include JsonApiController
-  
-  doorkeeper_for :show, :index, :destory, :update, scopes: [:classification]
-  access_control_for :update, :destroy, resource_class: Classification
 
+  skip_before_filter :require_login, only: :create
+  doorkeeper_for :show, :index, :destory, :update, scopes: [:classification]
   resource_actions :default
 
   allowed_params :create, :completed,

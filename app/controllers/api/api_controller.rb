@@ -1,4 +1,3 @@
-
 module Api
   include ApiErrors
   
@@ -23,6 +22,9 @@ module Api
 
     before_action ContentTypeFilter.new(API_ACCEPTED_CONTENT_TYPE,
                                         API_ALLOWED_METHOD_OVERRIDES)
+    
+    before_filter :require_login, only: [:create, :update, :destroy]
+    access_control_for :update, :destroy, :create
 
     def current_resource_owner
       if doorkeeper_token

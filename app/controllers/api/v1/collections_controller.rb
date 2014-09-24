@@ -1,10 +1,7 @@
 class Api::V1::CollectionsController < Api::ApiController
   include JsonApiController
   
-  before_filter :require_login, only: [:create, :update, :destroy]
   doorkeeper_for :create, :update, :destroy, scopes: [:collection]
-  access_control_for :create, :update, :destroy
-
   resource_actions :default
 
   allowed_params :create, :name, :display_name,

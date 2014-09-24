@@ -1,10 +1,7 @@
 class Api::V1::SubjectsController < Api::ApiController
   include JsonApiController
   
-  before_filter :require_login, only: [:update, :create, :destroy]
   doorkeeper_for :update, :create, :destroy, scopes: [:subject]
-  access_control_for :update, :create, :destroy
-
   resource_actions :default
 
   def index

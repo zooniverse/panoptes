@@ -1,10 +1,7 @@
 class Api::V1::WorkflowsController < Api::ApiController
   include JsonApiController
   
-  before_filter :require_login, only: [:create, :update, :destroy]
   doorkeeper_for :update, :create, :delete, scopes: [:project]
-  access_control_for :create, :update, :destroy, resource_class: Workflow
-
   resource_actions :default
 
   allowed_params :create, :pairwise, :grouped, :prioritized, :name,

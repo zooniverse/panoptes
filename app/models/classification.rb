@@ -24,6 +24,10 @@ class Classification < ActiveRecord::Base
     ClassificationVisibilityQuery.new(actor, self).build(as_admin)
   end
 
+  def self.can_create?(actor)
+    true
+  end
+
   def creator?(actor)
     user == actor.user
   end

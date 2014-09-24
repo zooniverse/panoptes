@@ -1,14 +1,11 @@
 class Api::V1::ProjectsController < Api::ApiController
   include JsonApiController
   
-  before_filter :require_login, only: [:create, :update, :destroy]
   doorkeeper_for :update, :create, :delete, scopes: [:project]
-  access_control_for :create, :update, :destroy
-
-  alias_method :project, :controlled_resource
-
   resource_actions :update, :create, :destroy
 
+  alias_method :project, :controlled_resource
+  
   allowed_params :create, :description, :display_name, :name,
     :primary_language, links: [owner: polymorphic,
                                workflows: [],

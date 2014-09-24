@@ -3,8 +3,6 @@ class Api::V1::UsersController < Api::ApiController
   
   doorkeeper_for :index, :me, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
-  access_control_for :update, :destroy
-
   resource_actions :deactivate, :update, :index, :show
 
   allowed_params :update, :display_name, :email, :credited_name
