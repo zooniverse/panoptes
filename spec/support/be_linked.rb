@@ -18,7 +18,7 @@ RSpec::Matchers.define :link_to do |rel|
   match do |actual|
     link_to_args = @args || [double]
     link_model = rel.is_a?(Class) ? rel.new : rel
-    @link_scope = actual.link_to(link_model, *link_to_args)
+    @link_scope = actual.link_to_resource(link_model, *link_to_args)
     @scope_scope = actual.send(@scope, *@scope_args)
 
     @link_scope.to_sql == @scope_scope.to_sql
