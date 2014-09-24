@@ -1,22 +1,24 @@
 module JsonApiController
   module RelationManager
-    def update_relation(relation, value, replace=false)
-
+    def update_relation(relation, value)
       case value
       when Hash
         id, type = value.values_at(:id, :type)
-        item = type.camelize.constantize.find(id)
-        controlled_resource.send(:"#{ relation }=", item)
-      when Array
-        if replace
-          controlled_resource.send(:"#{ relation }=", new_items(relation, value))
-        else
-          controlled_resource.send(relation) << new_items(relation, value)
-        end
-      when String, Integer
-        controlled_resource.send(:"#{ relation }=", new_items(relation, value))
+        item = find_for_string_type(type, id)
+        assign(relation, item)
+      when Array, String, Integer
+        find_and_assign_to_resource(relation, value)
       else
-        controlled_resource.send(:"#{ relation }=", value)
+        assign(relation, value)
+      end
+    end
+
+    def add_relation(relation, value)
+      case value
+      when Array
+        controlled_resource.send(relation) << new_items(relation, value)
+      else
+        update_relation(relation, value)
       end
     end
 
@@ -26,6 +28,21 @@ module JsonApiController
     end
 
     protected
+
+    def find_and_assign_to_resource(relation, value)
+      assign(relation, new_items(relation, value))
+    end
+
+    def assign(relation, items)
+      controlled_resource.send(:"#{ relation }=", items)
+    end
+
+    def find_for_string_type(type, id)
+      type.camelize
+        .constantize
+        .link_to_resource(controlled_resource, current_actor)
+        .find(id)
+    end
 
     def new_items(relation, value)
       assoc_class(relation)
