@@ -127,7 +127,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       describe "track user seen subjects" do
         let(:expected_params) do
-          {subject_id: set_member_subject.id,
+          {set_member_subject_id: set_member_subject.id,
            workflow: workflow,
            user: user }
         end
@@ -142,11 +142,6 @@ describe Api::V1::ClassificationsController, type: :controller do
           expect do
             create_classification
           end.to change{UserSeenSubject.count}.from(0).to(1)
-        end
-
-        it "should add the subject ids to the user's seen subjects list" do
-          create_classification
-          set_member_subject.subject_id
         end
       end
     end

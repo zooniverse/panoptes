@@ -49,7 +49,7 @@ class Classification < ActiveRecord::Base
     return unless !!user
     UserSeenSubject.add_seen_subject_for_user(user: user,
                                               workflow: workflow,
-                                              subject_id: set_member_subject.id)
+                                              set_member_subject_id: set_member_subject.id)
   end
 
   private
