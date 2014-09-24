@@ -4,7 +4,7 @@ describe RejectPatchRequests do
   let(:app) { double({ call: true }) }
   let(:middle) { RejectPatchRequests.new(app) }
   
-  context "when a request is not a PATCh" do
+  context "when a request is not a PATCH" do
     let(:env) { { 'REQUEST_METHOD' => 'PUT' } }
     
     it 'should allow execution to continue normally' do
@@ -25,6 +25,4 @@ describe RejectPatchRequests do
 
     it_behaves_like 'a json error response'
   end
-  
-  
 end

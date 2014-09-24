@@ -171,15 +171,27 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       describe "project contents" do
-        it "should create an associated project_content model" do
+        before(:each) do
           default_request scopes: scopes, user_id: authorized_user.id
           post :create, create_params
+        end
+        
+        it "should create an associated project_content model" do
+          expect(Project.find(created_project_id)
+                 .project_contents.first).to_not be_nil
+        end
 
+        it 'should set the contents title do' do
           expect(Project.find(created_project_id)
                  .project_contents.first.title).to eq('New Zoo')
-          
+        end
+
+        it 'should set the description' do
           expect(Project.find(created_project_id)
                  .project_contents.first.description).to eq('A new Zoo for you!')
+        end
+
+        it 'should set the language' do
           expect(Project.find(created_project_id)
                  .project_contents.first.language).to eq('en')
         end
@@ -229,16 +241,28 @@ describe Api::V1::ProjectsController, type: :controller do
         params = update_params.merge(id: resource.id)
         put :update, params
       end
-      
-      it 'should make a copy of a linked workflow' do
-        expect(resource.workflows.first.tasks).to eq(workflow.tasks)
-        expect(resource.workflows.first.id).to_not eq(workflow.id)
+
+      context "copy linked workflow" do
+        it 'should have the same tasks workflow' do
+          expect(resource.workflows.first.tasks).to eq(workflow.tasks)
+        end
+        
+
+        it 'should have a different id' do
+          expect(resource.workflows.first.id).to_not eq(workflow.id)
+        end
       end
 
-      it 'should make a copy of a link subject_set' do
-        expect(resource.subject_sets.first.name).to eq(subject_set.name)
-        expect(resource.subject_sets.first.id).to_not eq(subject_set.id)
+      context "copy linked subject_set" do
+        it 'should have the same name' do
+          expect(resource.subject_sets.first.name).to eq(subject_set.name)
+        end
+
+        it 'should have a differen id' do
+          expect(resource.subject_sets.first.id).to_not eq(subject_set.id)
+        end
       end
+      
     end
   end
   

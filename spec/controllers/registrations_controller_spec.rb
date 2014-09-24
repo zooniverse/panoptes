@@ -5,6 +5,12 @@ describe RegistrationsController, type: :controller do
   before(:each) do
     request.env["devise.mapping"] = Devise.mappings[:user]
   end
+  
+  let(:user_attributes) do
+    attributes_for(:user, **extra_attributes)
+      .slice(:email, :password, :password_confirmation, :login, :name, 
+             :global_email_communication, :project_email_communication)
+  end
 
   context "as json" do
 
@@ -16,11 +22,7 @@ describe RegistrationsController, type: :controller do
 
       context "with valid user attributes" do
         let(:login) { "mcMMO-Dev" }
-        let(:user_attributes) do
-          attributes_for(:user, login: login, display_name: nil)
-            .slice(:email, :password, :password_confirmation, :login, :name,
-                   :global_email_communication, :project_email_communication)
-        end
+        let(:extra_attributes) { {login: login, display_name: nil} }
 
         it "should return 201" do
           post :create, user: user_attributes
@@ -53,12 +55,7 @@ describe RegistrationsController, type: :controller do
       end
 
       context "with caps and spaces in the login name" do
-        let(:user_attributes) do
-          attributes_for(:user, login: "Test User Login")
-            .slice(:email, :password, :password_confirmation, :login, :name,
-                   :global_email_communication, :project_email_communication)
-        end
-        
+        let(:extra_attributes) { { login: "Test User Login" } }
 
         it "should convert the owner_name#name field correctly" do
           post :create, user: user_attributes
@@ -68,12 +65,7 @@ describe RegistrationsController, type: :controller do
       end
 
       context "with invalid user attributes" do
-        let(:user_attributes) do
-          attributes_for(:user).merge(login: nil)
-            .slice(:email, :password, :password_confirmation, :login, :name, 
-                   :global_email_communication, :project_email_communication)
-        end
-        
+        let(:extra_attributes) { { login: nil } }
 
         it "should return 422" do
           post :create, user: user_attributes

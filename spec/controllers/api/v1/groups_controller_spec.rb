@@ -71,9 +71,10 @@ describe Api::V1::GroupsController, type: :controller do
       it "should make a the creating user a member" do
         membership = Membership.where(user_group_id: group_id).first
         expect(authorized_user.memberships).to include(membership)
+
       end
 
-      it "should amke the creating user a group admin" do
+      it "should make the creating user a group admin" do
         group = UserGroup.find(group_id)
         expect(authorized_user.roles_for(group)).to include("group_admin")
       end
