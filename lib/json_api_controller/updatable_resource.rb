@@ -14,7 +14,7 @@ module JsonApiController
 
     def update_links
       check_relation
-      ActiveRecord::Base.transcation do
+      ActiveRecord::Base.transaction do
         update_relation(relation, params[relation])
         controlled_resource.save!
       end
@@ -23,9 +23,8 @@ module JsonApiController
     end
 
     def destroy_links
-      check_relation
-      ActiveRecord::Base.transcation do
-      destroy_relation(relation, params[:link_ids])
+      ActiveRecord::Base.transaction do
+        destroy_relation(relation, params[:link_ids])
       end
       deleted_resource_response
     end
