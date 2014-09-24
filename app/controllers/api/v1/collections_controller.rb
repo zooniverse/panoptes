@@ -7,10 +7,10 @@ class Api::V1::CollectionsController < Api::ApiController
 
   resource_actions :default
 
-  request_template :create, :name, :display_name,
+  allowed_params :create, :name, :display_name,
     links: [ :project, subjects:  [], owner: polymorphic ]
 
-  request_template :update, :name, :display_name, links: [ subjects: [] ]
+  allowed_params :update, :name, :display_name, links: [ subjects: [] ]
   
   protected
 

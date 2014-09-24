@@ -29,7 +29,7 @@ module JsonApiController
       end
     end
 
-    def request_template(action, *request_description)
+    def allowed_params(action, *request_description)
       @action_params[action] = request_description
     end
 

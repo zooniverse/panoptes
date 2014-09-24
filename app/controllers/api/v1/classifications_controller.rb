@@ -6,11 +6,11 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   resource_actions :default
 
-  request_template :create, :completed,
+  allowed_params :create, :completed,
     annotations: [:key, :value, :started_at, :finished_at, :user_agent],
     links: [:project, :workflow, :set_member_subject, :subject]
 
-  request_template :update, :completed,
+  allowed_params :update, :completed,
     annotations: [:key, :value, :started_at, :finished_at, :user_agent]
 
   def create

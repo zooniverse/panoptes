@@ -7,11 +7,11 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   resource_actions :default
 
-  request_template :create, :name, links: [:project,
+  allowed_params :create, :name, links: [:project,
                                            workflows: [],
                                            subjects: []]
 
-  request_template :update, :name, links: [workflows: [], subjects: []]
+  allowed_params :update, :name, links: [workflows: [], subjects: []]
 
 
 end

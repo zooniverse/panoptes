@@ -10,8 +10,8 @@ class Api::V1::GroupsController < Api::ApiController
 
   resource_actions :show, :index, :update, :deactivate, :create
 
-  request_template :create, :name, :display_name, links: [ :users ]
-  request_template :update, :display_name
+  allowed_params :create, :name, :display_name, links: [ :users ]
+  allowed_params :update, :display_name
   
   private
 

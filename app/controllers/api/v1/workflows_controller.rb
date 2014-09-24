@@ -7,11 +7,11 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   resource_actions :default
 
-  request_template :create, :pairwise, :grouped, :prioritized, :name,
+  allowed_params :create, :pairwise, :grouped, :prioritized, :name,
     :primary_language, tasks: [:key, :question, :type, :answers],
     links: [:project, subject_sets: []]
 
-  request_template :update, :pairwise, :grouped, :prioritized, :name,
+  allowed_params :update, :pairwise, :grouped, :prioritized, :name,
     tasks: [:key, :question, :type, :answers], links: [subject_sets: []]
 
   alias_method :workflow, :controlled_resource

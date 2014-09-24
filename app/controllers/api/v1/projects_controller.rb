@@ -9,12 +9,12 @@ class Api::V1::ProjectsController < Api::ApiController
 
   resource_actions :update, :create, :destroy
 
-  request_template :create, :description, :display_name, :name,
+  allowed_params :create, :description, :display_name, :name,
     :primary_language, links: [owner: polymorphic,
                                workflows: [],
                                subject_sets: []]
 
-  request_template :update, :description, :display_name,
+  allowed_params :update, :description, :display_name,
     links: [workflows: [], subject_sets: []]
   
   def show

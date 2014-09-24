@@ -7,7 +7,7 @@ class Api::V1::UsersController < Api::ApiController
 
   resource_actions :deactivate, :update, :index, :show
 
-  request_template :update, :display_name, :email, :credited_name
+  allowed_params :update, :display_name, :email, :credited_name
 
   alias_method :user, :controlled_resource
   

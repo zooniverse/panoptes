@@ -7,8 +7,8 @@ class Api::V1::MembershipsController < Api::ApiController
 
   resource_actions :index, :show, :create, :update, :deactivate
 
-  request_template :create, links: [:user, :user_group]
-  request_template :update, :state
+  allowed_params :create, links: [:user, :user_group]
+  allowed_params :update, :state
 
   alias_method :membership, :controlled_resource
 
