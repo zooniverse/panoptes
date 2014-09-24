@@ -31,15 +31,18 @@ class Api::V1::GroupsController < Api::ApiController
       user_group.memberships
   end
 
-  def update_relation(relation, value, replace=false)
+  def new_items(relation, value)
+    items = super(relation, value)
+    
     if relation == :users
-      new_items(relation, value).each do |user|
-        user_group.memberships.build(user: user,
-                                     state: :invited,
-                                     roles: ["group_member"])
+      items.map do |user|
+        Membership.new(user: user,
+                       group: user_group,
+                       state: :invited,
+                       roles: ["group_member"])
       end
     else
-      super
+      items
     end
   end
 
