@@ -3,7 +3,7 @@ class Api::V1::ProjectsController < Api::ApiController
   
   before_filter :require_login, only: [:create, :update, :destroy]
   doorkeeper_for :update, :create, :delete, scopes: [:project]
-  access_control_for :create, :update, :destroy, resource_class: Project
+  access_control_for :create, :update, :destroy
 
   alias_method :project, :controlled_resource
 
@@ -53,14 +53,16 @@ class Api::V1::ProjectsController < Api::ApiController
   def content_from_params(params)
     title, language = params.values_at(:display_name, :primary_language)
     description = params.delete(:description)
-    { description: description, title: title, language: language}.select { |k,v| !!v } 
+    { description: description,
+      title: title,
+      language: language }.select { |k,v| !!v } 
   end
 
   def build_resource_for_create(create_params)
     content_params = content_from_params(create_params)
     
     create_params[:links] ||= Hash.new
-    create_params[:links][:owner] = current_actor
+    create_params[:links][:owner] = owner || api_user.user
 
     project = super(create_params)
     project.project_contents.build(**content_params)
@@ -73,16 +75,7 @@ class Api::V1::ProjectsController < Api::ApiController
     project.primary_content.update_attributes(content_params)
   end
 
-  def update_relation(relation, value, replace=false)
-    if relation == :workflows || relation == :subject_sets
-      values = new_items(relation, value).map(&:dup)
-      if replace
-        project.send(:"#{ relation }=", values)
-      else
-        project.send(relation) << values
-      end
-    else
-      super
-    end
+  def new_items(relation, value)
+    super(relation, value).map(&:dup)
   end
 end 

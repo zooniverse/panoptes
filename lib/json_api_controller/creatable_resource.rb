@@ -4,9 +4,12 @@ module JsonApiController
     
     def create
       resource = ActiveRecord::Base.transaction do 
-        build_resource_for_create(create_params)
+        resource = build_resource_for_create(create_params)
+        resource.save!
+        resource
       end
-      created_resource_response(resource) if resource.save!
+      
+      created_resource_response(resource) if resource.persisted?
     end
 
     protected
@@ -18,11 +21,7 @@ module JsonApiController
     def build_resource_for_create(create_params)
       link_params = create_params.delete(:links)
       @controlled_resource = resource_class.new(create_params)
-      
-      link_params.try(:each) do |k,v|
-        update_relation(k,v)
-      end
-
+      link_params.try(:each) { |k,v| update_relation(k,v) }
       controlled_resource
     end
 

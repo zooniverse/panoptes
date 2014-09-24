@@ -35,7 +35,7 @@ module JsonApiController
     def build_resource_for_update(update_params)
       links = update_params.delete(:links)
       controlled_resource.assign_attributes(update_params)
-      links.try(:each) { |k, v| update_relation(k.to_sym, v, true) }
+      links.try(:each) { |k, v| update_relation(k.to_sym, v) }
     end
 
     def check_relation
