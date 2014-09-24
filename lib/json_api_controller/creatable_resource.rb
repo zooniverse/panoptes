@@ -4,7 +4,7 @@ module JsonApiController
     
     def create
       resource = ActiveRecord::Base.transaction do 
-        create_resource(create_params)
+        build_resource_for_create(create_params)
       end
       created_resource_response(resource) if resource.save!
     end
@@ -15,7 +15,7 @@ module JsonApiController
       owner_from_params || api_user.user
     end
     
-    def create_resource(create_params)
+    def build_resource_for_create(create_params)
       link_params = create_params.delete(:links)
       @controlled_resource = resource_class.new(create_params)
       

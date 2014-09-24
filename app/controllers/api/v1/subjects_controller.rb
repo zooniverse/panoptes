@@ -19,7 +19,7 @@ class Api::V1::SubjectsController < Api::ApiController
 
   private
 
-  def create_resource(create_params)
+  def build_resource_for_create(create_params)
     create_params[:links][:owner] = owner || api_user.user
     super(create_params)
   end

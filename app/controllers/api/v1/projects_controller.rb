@@ -56,7 +56,7 @@ class Api::V1::ProjectsController < Api::ApiController
     { description: description, title: title, language: language}.select { |k,v| !!v } 
   end
 
-  def create_resource(create_params)
+  def build_resource_for_create(create_params)
     content_params = content_from_params(create_params)
     
     create_params[:links] ||= Hash.new
@@ -67,7 +67,7 @@ class Api::V1::ProjectsController < Api::ApiController
     project
   end
 
-  def update_resource(update_params)
+  def build_resource_for_update(update_params)
     content_params = content_from_params(update_params)
     super(update_params)
     project.primary_content.update_attributes(content_params)

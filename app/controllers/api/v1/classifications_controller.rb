@@ -15,7 +15,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def create
     classification = ActiveRecord::Base.transaction do 
-      create_resource(create_params)
+      build_resource_for_create(create_params)
     end
     
     if classification.save!
@@ -30,7 +30,7 @@ class Api::V1::ClassificationsController < Api::ApiController
     Classification.visible_to(api_user)
   end
 
-  def create_resource(create_params)
+  def build_resource_for_create(create_params)
     create_params[:links][:user] = api_user.user
     create_params[:user_ip] = request_ip
     classification = super(create_params)

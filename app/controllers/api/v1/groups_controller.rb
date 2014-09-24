@@ -15,7 +15,7 @@ class Api::V1::GroupsController < Api::ApiController
   
   private
 
-  def create_resource(create_params)
+  def build_resource_for_create(create_params)
     create_params[:display_name] ||= create_params[:name]
 
     group = super(create_params)
