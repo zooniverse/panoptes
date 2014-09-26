@@ -10,6 +10,7 @@ ADD ./ /rails_app
 
 # --no-install-recommends to avoid installing fuse (unsupported in docker < 1.0)
 RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y upgrade && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y openjdk-7-jre git-core curl build-essential && \
     git clone https://github.com/sstephenson/ruby-build.git && cd ruby-build && ./install.sh && \
     ruby-build jruby-1.7.13 /usr/local && rm -rf ruby-build && \
