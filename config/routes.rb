@@ -68,6 +68,13 @@ Rails.application.routes.draw do
         delete "/links/:link_relation/:link_ids", to: "collections#destroy_links",
           constraints: { link_relation: /subjects/ }, format: false
       end
+
+      resources :subject_queues, except: except, format: false do
+        post "/links/:link_relation", to: "subject_queues#update_links",
+          constraints: { link_relation: /set_member_subjects/ }, format: false
+        delete "/links/:link_relation/:link_ids", to: "subject_queues#destroy_links",
+          constraints: { link_relation: /set_member_subjects/ }, format: false
+      end
     end
   end
 

@@ -15,6 +15,7 @@ class Workflow < ActiveRecord::Base
   can_through_parent :project, :update, :show, :destroy
   
   can_be_linked :subject_set, :same_project?, :model
+  can_be_linked :user_subject_queue, :scope_for, :update, :actor
 
   def self.same_project?(subject_set)
     where(project: subject_set.project)

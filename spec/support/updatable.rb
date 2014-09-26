@@ -9,8 +9,8 @@ shared_examples "is updatable" do
     end
     
     it 'should update supplied attributes' do
+      p updated_resource
       expect(updated_resource.send(test_attr)).to eq(test_attr_value)
-      
     end
 
     it 'should return 200' do
