@@ -57,7 +57,7 @@ class ClassificationLifecycle
   
   def update_cellect
     Cellect::Client.connection
-      .add_seen(user_id: user.id,
+      .add_seen(user_id: user.try(:id),
                 workflow_id: workflow.id,
                 subject_id: set_member_subject.id,
                 host: cellect_host)

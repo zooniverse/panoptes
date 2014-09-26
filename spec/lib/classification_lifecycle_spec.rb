@@ -40,13 +40,15 @@ shared_examples "dequeue subject" do
 end
 
 shared_examples "update cellect" do
+  let(:classification) { create(:classification) }
+  
   it "should setup the add seen command to cellect" do
     expect(stubbed_cellect_connection).to receive(:add_seen)
       .with(
-            subject_id: set_member_subject.id,
-            workflow_id: workflow.id,
-            user_id: user.id,
-            host: 'example.com'
+            subject_id: classification.set_member_subject.id,
+            workflow_id: classification.workflow.id,
+            user_id: classification.user.id,
+            host: 'http://test.host/'
            )
     subject.send(test_method)
   end

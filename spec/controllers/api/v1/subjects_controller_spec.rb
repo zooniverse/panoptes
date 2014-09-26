@@ -66,7 +66,7 @@ describe Api::V1::SubjectsController, type: :controller do
           let!(:ues) do
             create(:user_subject_queue, user: user,
                    workflow: workflow,
-                   subject_ids: subjects.map(&:id))
+                   set_member_subject_ids: subjects.map(&:id))
           end
 
           before(:each) do
