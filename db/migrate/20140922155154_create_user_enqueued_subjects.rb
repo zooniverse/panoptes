@@ -1,4 +1,4 @@
-class CreateUserSubjectQueues < ActiveRecord::Migration
+class CreateUserEnqueuedSubjects < ActiveRecord::Migration
   def change
     create_table :user_enqueued_subjects do |t|
       t.references :user, index: true

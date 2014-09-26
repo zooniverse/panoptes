@@ -64,7 +64,7 @@ describe Api::V1::SubjectsController, type: :controller do
         context "with queued subjects" do
           let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
           let!(:ues) do
-            create(:user_enqueued_subject, user: user,
+            create(:user_subject_queue, user: user,
                    workflow: workflow,
                    subject_ids: subjects.map(&:id))
           end

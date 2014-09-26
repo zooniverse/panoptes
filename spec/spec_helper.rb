@@ -15,6 +15,7 @@ ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
+  config.include CellectHelpers
   config.include Devise::TestHelpers, type: :controller
   config.include APIRequestHelpers, type: :controller
   config.include APIResponseHelpers, [ type: :controller, type: :request ]

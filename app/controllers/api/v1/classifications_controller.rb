@@ -12,11 +12,13 @@ class Api::V1::ClassificationsController < Api::ApiController
   allowed_params :update, :completed,
     annotations: [:key, :value, :started_at, :finished_at, :user_agent]
 
+  alias_method :classification, :controlled_resource
+
   private
 
   def build_resource_for_update(update_params)
-    classification = super
-    host = cellect_host(classification.workflow_id)
+    super
+    host = cellect_host(classification.workflow.id)
     ClassificationLifecycle.new(classification, host).on_update
     classification
   end
@@ -30,7 +32,7 @@ class Api::V1::ClassificationsController < Api::ApiController
     create_params[:user_ip] = request_ip
     classification = super(create_params)
     
-    host = cellect_host(classification.workflow_id)
+    host = cellect_host(classification.workflow.id)
     ClassificationLifecycle.new(classification, host).on_create
     classification
   end
