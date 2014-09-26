@@ -4,8 +4,7 @@ require 'spec_helper'
 class TestParentControl
   include RoleControl::ParentalControlled
 
-  can_by_role_through_parent :read, :parent
-  can_by_role_through_parent :edit, :parent, :test_parent_role
+  can_through_parent :parent, :read
 
   attr_reader :parent
 
@@ -25,10 +24,6 @@ describe RoleControl::ParentalControlled do
 
   it "returns truthy when the parent's test would be true" do
     expect(tpc.can_read?(enrolled_actor)).to be_truthy
-  end
-
-  it "returns truthy when its own role test is met" do
-    expect(tpc.can_edit?(enrolled_actor)).to be_truthy
   end
 
   it "should call the parent's can method if it exists" do

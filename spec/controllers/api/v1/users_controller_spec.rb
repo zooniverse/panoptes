@@ -2,12 +2,13 @@ require 'spec_helper'
 
 describe Api::V1::UsersController, type: :controller do
   let!(:users) {
-    n = Array(22..30).sample
-    create_list(:user, n)
+    create_list(:user, 22)
   }
 
+  let(:scopes) { %w(public user) }
+
   before(:each) do
-    default_request(scopes: ["public", "user"], user_id: users.first.id)
+    default_request(scopes: scopes, user_id: users.first.id)
   end
 
   let(:api_resource_name) { "users" }
@@ -68,19 +69,17 @@ describe Api::V1::UsersController, type: :controller do
 
   describe "#update" do
     let(:user) { users.first }
-    let!(:setup_request_headers) do
-       request.env["CONTENT_TYPE"] = "application/json-patch+json"
-    end
     let(:user_id) { user.id }
 
     before(:each) do
-      request.env["RAW_POST_DATA"] = patch_operations
-      patch :update, id: user_id
+      params = put_operations || Hash.new
+      params[:id] = user_id
+      put :update, params
     end
 
     context "when updating a non-existant user" do
       let!(:user_id) { -1 }
-      let(:patch_operations) { nil }
+      let(:put_operations) { nil }
 
       it "should return a 404 status" do
         expect(response.status).to eq(404)
@@ -92,10 +91,10 @@ describe Api::V1::UsersController, type: :controller do
       end
     end
 
-    context "with a valid replace patch operation" do
+    context "with a valid replace put operation" do
       let(:new_display_name) { "Mr Creosote" }
-      let(:patch_operations) do
-        [{ "op" => "replace", "path" => "/display_name", "value" => "#{new_display_name}" }].to_json
+      let(:put_operations) do
+        { users: { display_name: new_display_name } }
       end
 
       it "should return 200 status" do
@@ -113,15 +112,15 @@ describe Api::V1::UsersController, type: :controller do
       it_behaves_like "an api response"
     end
 
-    context "with a an invalid patch operation" do
-      let(:patch_operations) { [{}].to_json }
+    context "with a an invalid put operation" do
+      let(:put_operations) { {} }
 
       it "should return an error status" do
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
 
       it "should return a specific error message in the response body" do
-        error_message = json_error_message("Patch failed to apply, check patch options.")
+        error_message = json_error_message("param is missing or the value is empty: users")
         expect(response.body).to eq(error_message)
       end
 
@@ -131,15 +130,15 @@ describe Api::V1::UsersController, type: :controller do
       end
     end
 
-    context "with and patch operation that sets a required attribute to nil" do
-      let(:patch_operations) { [{ "op" => "replace", "path" => "/login", "value" => "" }].to_json }
+    context "with and put operation that sets a required attribute to nil" do
+      let(:put_operations) { {users: { login: "" }} }
 
       it "should return a bad request status" do
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
 
       it "should return a specific error message in the response body" do
-        error_message = json_error_message("Validation failed: Login can't be blank")
+        error_message = json_error_message("found unpermitted parameters: login")
         expect(response.body).to eq(error_message)
       end
 
@@ -154,7 +153,8 @@ describe Api::V1::UsersController, type: :controller do
     let(:user) { users.first}
     let(:user_id) { user.id }
     let(:access_token) { create(:access_token) }
-    let!(:stub_token_auth) do
+    
+    before(:each) do
       allow(Doorkeeper).to receive(:authenticate).and_return(access_token)
     end
 
@@ -162,42 +162,21 @@ describe Api::V1::UsersController, type: :controller do
       expect(UserInfoScrubber).to receive(:scrub_personal_info!).with(user)
       delete :destroy, id: user_id
     end
-
-    it "should call Activation#disable_instances! with instances to disable" do
-      instances_to_disable = [user] | user.projects | user.collections | user.memberships
-      expect(Activation).to receive(:disable_instances!).with(instances_to_disable)
-      delete :destroy, id: user_id
-    end
-
-    it "should return 204" do
-      delete :destroy, id: user_id
-      expect(response.status).to eq(204)
-    end
-
-    it "should disable the user" do
-      delete :destroy, id: user_id
-      expect(users.first.reload.inactive?).to be_truthy
-    end
-
+    
     it "should revoke the request doorkeeper token" do
       delete :destroy, id: user_id
       expect(access_token.reload.revoked?).to eq(true)
     end
-
-    context "an unauthorized user" do
-      before(:each) do
-        stub_token(scopes: ["user"], user_id: users.second.id)
-      end
-
-      it "should return 403" do
-        delete :destroy, id: user_id
-        expect(response.status).to eq(403)
-      end
-
-      it "should not disable the user" do
-        delete :destroy, id: user_id
-        expect(users.first.reload.inactive?).to be_falsy
-      end
+    
+    let(:authorized_user) { user }
+    let(:resource) { user }
+    let(:instances_to_disable) do
+      [resource] |
+        resource.projects |
+        resource.memberships |
+        resource.collections
     end
+
+    it_behaves_like "is deactivatable"
   end
 end

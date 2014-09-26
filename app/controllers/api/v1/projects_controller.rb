@@ -1,43 +1,35 @@
 class Api::V1::ProjectsController < Api::ApiController
+  include JsonApiController
+  
   doorkeeper_for :update, :create, :delete, scopes: [:project]
-  access_control_for :create, :update, :destroy, resource_class: Project
+  resource_actions :update, :create, :destroy
 
   alias_method :project, :controlled_resource
   
+  allowed_params :create, :description, :display_name, :name,
+    :primary_language, links: [owner: polymorphic,
+                               workflows: [],
+                               subject_sets: []]
+
+  allowed_params :update, :description, :display_name,
+    links: [workflows: [], subject_sets: []]
+  
   def show
-    render json_api: ProjectSerializer.resource(params,
-                                                visible_scope(api_user),
-                                                languages: current_languages,
-                                                fields: ['title',
-                                                         'description',
-                                                         'example_strings',
-                                                         'pages'])
+    render json_api: serializer.resource(params,
+                                         visible_scope,
+                                         languages: current_languages,
+                                         fields: ['title',
+                                                  'description',
+                                                  'example_strings',
+                                                  'pages'])
   end
 
   def index
     add_owner_ids_filter_param!
-    render json_api: ProjectSerializer.page(params,
-                                            visible_scope(api_user),
-                                            languages: current_languages,
-                                            fields: ['title', 'description'])
-  end
-
-  def update
-    # TODO: implement JSON-Patch or find a gem that does
-  end
-
-  def create
-    owner = owner_from_params || api_user.user
-    project = create_project(owner)
-
-    json_api_render(201,
-                    create_project_response(project),
-                    api_project_url(project) )
-  end
-
-  def destroy
-    project.destroy
-    deleted_resource_response
+    render json_api: serializer.page(params,
+                                     visible_scope,
+                                     languages: current_languages,
+                                     fields: ['title', 'description'])
   end
 
   private
@@ -48,37 +40,39 @@ class Api::V1::ProjectsController < Api::ApiController
     params.merge!({ owner_ids: owner_ids }) unless owner_ids.blank?
   end
 
-  def create_project_response(project)
-    ProjectSerializer.resource( project,
-                               nil,
-                               languages: [ params[:project][:primary_language] ],
-                               fields: ['title', 'description'] )
+  def create_response(project)
+    serializer.resource(project,
+                        nil,
+                        languages: [ params[:projects][:primary_language] ],
+                        fields: ['title', 'description'] )
   end
 
-  def project_params
-    params.require(:project).permit(:display_name, :name, :primary_language)
+  def content_from_params(params)
+    title, language = params.values_at(:display_name, :primary_language)
+    description = params.delete(:description)
+    { description: description,
+      title: title,
+      language: language }.select { |k,v| !!v } 
   end
 
-  def content_params
-    params.require(:project).permit(:description, :display_name, :primary_language)
-    .tap do |obj| 
-      obj[:title] = obj.delete(:display_name)
-      obj[:language] = obj.delete(:primary_language)
-    end
-  end
+  def build_resource_for_create(create_params)
+    content_params = content_from_params(create_params)
+    
+    create_params[:links] ||= Hash.new
+    create_params[:links][:owner] = owner || api_user.user
 
-  def create_project(owner)
-    project = Project.new(project_params)
-    content = Project.content_model.new(content_params)
-    project.owner = owner
-
-    ActiveRecord::Base.transaction do
-      project.save!
-      content.project = project
-      content.save!
-    end
-
+    project = super(create_params)
+    project.project_contents.build(**content_params)
     project
   end
 
+  def build_resource_for_update(update_params)
+    content_params = content_from_params(update_params)
+    super(update_params)
+    project.primary_content.update_attributes(content_params)
+  end
+
+  def new_items(relation, value)
+    super(relation, value).map(&:dup)
+  end
 end 

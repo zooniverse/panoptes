@@ -7,6 +7,16 @@ describe SubjectSet, :type => :model do
     expect(build(:subject_set)).to be_valid
   end
 
+  describe "links" do
+    let(:project) { create(:project) }
+    let(:workflow) { create(:workflow, project: project) }
+    
+    it 'should allow links to workflows in the same project' do
+      expect(SubjectSet).to link_to(workflow)
+        .with_scope(:where, { project: project })
+    end
+  end
+
   describe "#project" do
     it "should have a project" do
       expect(subject_set.project).to be_a(Project)

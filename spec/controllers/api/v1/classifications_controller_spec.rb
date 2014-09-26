@@ -1,19 +1,26 @@
 require 'spec_helper'
 
 def annotation_values
-  [ { value: "adult" },
-    { started_at: DateTime.now },
-    { finished_at: DateTime.now },
-    { user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" } ]
+  [ { key: "age", value: "adult" },
+   { started_at: DateTime.now },
+   { finished_at: DateTime.now },
+   { user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" } ]
 end
 
 def setup_create_request(project_id, workflow_id, set_member_subject)
   request.session = { cellect_hosts: { workflow_id.to_s => "example.com" } }
-  params = { classification: { project_id: project_id,
-                               workflow_id: workflow_id,
-                               set_member_subject_id: set_member_subject.id,
-                               subject_id: set_member_subject.subject_id,
-                               annotations: annotation_values } }
+  params =
+    {
+     classifications: {
+                       completed: true,
+                       annotations: annotation_values,
+                       links: {
+                               project: project_id,
+                               workflow: workflow_id,
+                               set_member_subject: set_member_subject.id,
+                              }
+                      }
+    }
   post :create, params
 end
 
@@ -54,48 +61,31 @@ describe Api::V1::ClassificationsController, type: :controller do
   end
   let(:api_resource_links) do
     [ "classifications.project",
-      "classifications.set_member_subject",
-      "classifications.user",
-      "classifications.user_group" ]
+     "classifications.set_member_subject",
+     "classifications.user",
+     "classifications.user_group" ]
   end
+
+  let(:scopes) { %w(classification) }
+  let(:authorized_user) { user }
+      let(:resource_class) { Classification }
 
   context "logged in user" do
     before(:each) do
-      default_request user_id: user.id, scopes: ["classifications"]
+      default_request user_id: user.id, scopes: scopes
     end
 
     describe "#index" do
-
-      before(:each) do
-        classification
-        get :index
-      end
-
-      it "should return 200" do
-        expect(response.status).to eq(200)
-      end
-
-      it "should have one item by default" do
-        expect(json_response[api_resource_name].length).to eq(1)
-      end
-
-      it_behaves_like "an api response"
+      let!(:classifications) { create_list(:classification, 2, user: user) }
+      let!(:private_resource) { create(:classification) }
+      let(:n_visible) { 2 }
+      
+      it_behaves_like "is indexable"
     end
 
     describe "#show" do
-      before(:each) do
-        get :show, id: classification.id
-      end
-
-      it "should return 200" do
-        expect(response.status).to eq(200)
-      end
-
-      it "should have a single user" do
-        expect(json_response[api_resource_name].length).to eq(1)
-      end
-
-      it_behaves_like "an api response"
+      let(:resource) { classification }
+      it_behaves_like "is showable"
     end
 
     describe "#create" do
@@ -116,32 +106,35 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it "should setup the add seen command to cellect" do
-        expect(stubbed_cellect_connection).to receive(:add_seen).with(
-          subject_id: set_member_subject.subject_id.to_s,
-          workflow_id: workflow.id.to_s,
-          user_id: user.id,
-          host: 'example.com'
-        )
+        expect(stubbed_cellect_connection).to receive(:add_seen)
+          .with(
+                subject_id: set_member_subject.id,
+                workflow_id: workflow.id,
+                user_id: user.id,
+                host: 'example.com'
+               )
         create_classification
       end
 
       it "should set the user" do
         create_classification
         id = created_instance_id("classifications")
-        expect(Classification.find(created_classification_id).user.id).to eq(user.id)
+        expect(Classification.find(created_classification_id)
+               .user.id).to eq(user.id)
       end
 
       it_behaves_like "a classification create"
 
       describe "track user seen subjects" do
         let(:expected_params) do
-          { subject_id: set_member_subject.subject_id.to_s,
-            workflow_id: workflow.id.to_s,
-            user_id: user.id }
+          {set_member_subject_id: set_member_subject.id,
+           workflow: workflow,
+           user: user }
         end
 
         it "should add the seen subject for the user" do
-          expect(UserSeenSubject).to receive(:add_seen_subject_for_user).with(**expected_params)
+          expect(UserSeenSubject).to receive(:add_seen_subject_for_user)
+            .with(**expected_params)
           create_classification
         end
 
@@ -150,20 +143,50 @@ describe Api::V1::ClassificationsController, type: :controller do
             create_classification
           end.to change{UserSeenSubject.count}.from(0).to(1)
         end
+      end
+    end
+  end
 
-        it "should add the subject ids to the user's seen subjects list" do
-          create_classification
-          set_member_subject.subject_id
-        end
+  describe "#update" do
+    context "an incomplete classification" do
+      let(:resource) { create(:classification, user: authorized_user, completed: false) }
+      let(:test_attr) { :completed }
+      let(:test_attr_value) { true }
+      let(:update_params) do
+        {
+         classifications: {
+                           completed: true,
+                           annotations: [{ key: "q-1", value: "round" }]
+                          }
+        }
+      end
 
-        context "with and invalid subject_id" do
+      it_behaves_like "is updatable"
+      
+    end
 
-          it "should gracefully return a json error" do
-            allow(set_member_subject).to receive(:subject_id).and_return("not a valid id")
-            create_classification
-            expect(response.body).to eq(json_error_message("Subject ID is invalid, possibly not persisted."))
-          end
-        end
+    context "a complete classification" do
+      it 'should return 403' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        classification = create(:classification, user: authorized_user, completed: true)
+        put :update, id: classification.id
+        expect(response.status).to eq(403)
+      end
+    end
+  end
+  
+  describe "#destroy" do
+    context "an incomplete classification" do
+      let(:resource) { create(:classification, user: authorized_user, completed: false) }
+      it_behaves_like "is destructable"
+    end
+
+    context "a complete classification" do
+      it 'should return 403' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        classification = create(:classification, user: authorized_user, completed: true)
+        delete :destroy, id: classification.id
+        expect(response.status).to eq(403)
       end
     end
   end

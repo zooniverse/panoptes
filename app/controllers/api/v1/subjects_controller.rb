@@ -1,9 +1,8 @@
 class Api::V1::SubjectsController < Api::ApiController
-  doorkeeper_for :update, :create, :update, scopes: [:subject]
-
-  def show
-    render json_api: SubjectSerializer.page(params)
-  end
+  include JsonApiController
+  
+  doorkeeper_for :update, :create, :destroy, scopes: [:subject]
+  resource_actions :default
 
   def index
     if params[:sort] == 'random' && params.has_key?(:workflow_id)
@@ -11,26 +10,19 @@ class Api::V1::SubjectsController < Api::ApiController
     elsif params.has_key?(:subject_set_id)
       query_subject_sets
     else
-      query_subjects
+      super
     end
-  end
-
-  def update
-
-  end
-
-  def create
-
-  end
-
-  def destroy
-
   end
 
   private
 
+  def build_resource_for_create(create_params)
+    create_params[:links][:owner] = owner || api_user.user
+    super(create_params)
+  end
+
   def query_subjects
-    render json_api: SubjectSerializer.resource(params)
+    render json_api: serializer.resource(params)
   end
 
   def query_subject_sets
@@ -43,11 +35,25 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def cellect_params
-    c_params = params.permit(:workflow_id, :subject_set_id, :limit)
+    c_params = params.permit(:workflow_id, :subject_set_id, :limit, :sort)
+      .slice(:workflow_id, :subject_set_id, :limit)
       .merge(user_id: api_user.try(:id),
              limit: 10,
              host: cellect_host(params[:workflow_id])) {|k, ov, nv| ov ? ov : nv}
     c_params[:group_id] = c_params.delete(:subject_set_id)
     c_params.symbolize_keys
+  end
+
+  def create_params
+    params.require(:subjects)
+      .permit(metadata: params[:subjects][:metadata].try(:keys),
+              locations: params[:subjects][:locations].try(:keys),
+              links: [:project, owner: [:id, :type]])
+  end
+
+  def update_params
+    params.require(:subjects)
+      .permit(metadata: params[:subjects][:metadata].try(:keys),
+              locations: params[:subjects][:locations].try(:keys))
   end
 end

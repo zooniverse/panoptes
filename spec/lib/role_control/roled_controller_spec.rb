@@ -13,10 +13,18 @@ describe RoleControl::RoledController, type: :controller do
 
   controller(ApplicationController) do
     include RoleControl::RoledController
-    access_control_for :index, resource_class: ControlledTable
+    access_control_for :index, 
 
     def api_user
       EnrolledActorTable.first
+    end
+
+    def resource_class
+      ControlledTable
+    end
+
+    def resource_sym
+      :controlled_tables
     end
 
     def index

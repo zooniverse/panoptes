@@ -19,7 +19,7 @@ describe TokensController, type: :controller do
   describe "resource owner password credentials flow" do
     let(:params) { { "grant_type" => "password",
                      "client_id" => app.uid,
-                     "scope" => "public projects classifications",
+                     "scope" => "public project classification",
                      "client_secret" => app.secret } }
 
     context "a first party application" do
@@ -70,7 +70,7 @@ describe TokensController, type: :controller do
           it "should return a token with the app's max scope" do
             params.delete('scope')
             req
-            expect(json_response['scope']).to eq('public projects classifications')
+            expect(json_response['scope']).to eq('public project classification')
           end
         end
 

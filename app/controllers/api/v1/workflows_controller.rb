@@ -1,45 +1,27 @@
 class Api::V1::WorkflowsController < Api::ApiController
-  doorkeeper_for :update, :create, :delete, scopes: [:project]
-  access_control_for :create, :update, :destroy, resource_class: Workflow
+  include JsonApiController
   
+  doorkeeper_for :update, :create, :delete, scopes: [:project]
+  resource_actions :default
+
+  allowed_params :create, :pairwise, :grouped, :prioritized, :name,
+    :primary_language, tasks: [:key, :question, :type, :answers],
+    links: [:project, subject_sets: []]
+
+  allowed_params :update, :pairwise, :grouped, :prioritized, :name,
+    tasks: [:key, :question, :type, :answers], links: [subject_sets: []]
+
   alias_method :workflow, :controlled_resource
 
   def show
     load_cellect
-    render json_api: WorkflowSerializer.resource(params)
-  end
-
-  def index
-    render json_api: WorkflowSerializer.resource(params)
-  end
-
-  def update
-    # TODO
-  end
-
-  def create
-    workflow = Workflow.new creation_params
-    workflow.save!
-    json_api_render( 201,
-                     WorkflowSerializer.resource(workflow),
-                     api_workflow_url(workflow) )
-  end
-
-  def destroy
-    workflow.destroy!
-    deleted_resource_response
+    super
   end
 
   private
 
-  def creation_params
-    params.require(:workflow)
-      .permit(:name, :project_id, :pairwise, :grouped, :prioritized, :primary_language)
-      .merge tasks: params[:workflow][:tasks]
-  end
-
   def load_cellect
-    return unless api_user
+    return unless api_user.logged_in?
     Cellect::Client.connection.load_user(**cellect_params)
   end
 

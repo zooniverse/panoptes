@@ -34,7 +34,7 @@ describe Classification, :type => :model do
   end
 
   describe "::visible_to" do
-    let(:user) { LoggedInUser.new(create(:user)) }
+    let(:user) { ApiUser.new(create(:user)) }
     let(:project) { create(:project, owner: user.owner) }
     let(:user_group) { create(:user_group) }
     let!(:classifications) do
@@ -72,8 +72,59 @@ describe Classification, :type => :model do
     end
   end
 
+  describe "#create_project_preference" do
+    context "with a user" do
+      context "when no preference exists"  do
+        it 'should create a project preference' do
+          classification = build(:classification)
+          expect do
+            expect{ create_project_preference }.to change{ UserProjectPreference.count }.from(0).to(1)
+          end
+        end
+      end
+
+      context "when a preference exists" do
+        it "should not create a project preference" do
+          user = create(:user)
+          project = create(:project)
+          create(:user_project_preference, user: user, project: project)
+          classification = build(:classification, project: project, user: user)
+          expect{ classification.create_project_preference }.to_not change{ UserProjectPreference.count }
+        end
+      end
+    end
+
+    context "without a user" do
+      it 'should not create a project preference' do
+        classification = build(:classification, user: nil)
+        expect{ classification.create_project_preference }.to_not change{ UserProjectPreference.count }
+      end
+    end
+  end
+
+  describe "#update_seen_subjects" do
+    context "with a user" do
+      it 'should add the set_member_subject_id to the seen subjects' do
+        classification = build(:classification)
+        expect(UserSeenSubject).to receive(:add_seen_subject_for_user)
+          .with(user: classification.user,
+                workflow: classification.workflow,
+                set_member_subject_id: classification.set_member_subject.id)
+        classification.update_seen_subjects
+      end
+    end
+
+    context "without a user" do
+      it 'should do nothing' do
+        classification = build(:classification, user: nil)
+        expect(UserSeenSubject).to_not receive(:add_seen_subject_for_user)
+        classification.update_seen_subjects
+      end
+    end
+  end
+
   describe "#creator?" do
-    let(:user) { LoggedInUser.new(build(:user)) }
+    let(:user) { ApiUser.new(build(:user)) }
 
     it "should be truthy if a user is the classification's creator" do
       classification = build(:classification, user: user.owner)
@@ -97,7 +148,7 @@ describe Classification, :type => :model do
   end
 
   describe "#in_show_scope?" do
-    let(:user) { LoggedInUser.new(create(:user)) }
+    let(:user) { ApiUser.new(create(:user)) }
 
     it "should be truthy if the classification is in the actor's visible_scope" do
       classification = create(:classification, user: user.owner)

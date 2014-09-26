@@ -42,6 +42,32 @@ describe Project, :type => :model do
     expect(create(:project, display_name: "test project", owner: create(:user))).to be_valid
     expect(create(:project, display_name: "test project", owner: create(:user))).to be_valid
   end
+
+  describe "links" do
+    let(:user) { ApiUser.new(create(:user)) }
+    
+    it "should allow workflows to link when user has update permissions" do
+      expect(Project).to link_to(Workflow).given_args(user)
+        .with_scope(:scope_for, :update, user)
+    end
+    
+    it "should allow subject_sets to link when user has update permissions" do
+      expect(Project).to link_to(SubjectSet).given_args(user)
+        .with_scope(:scope_for, :update, user)
+    end
+    
+    it "should allow subjects to link when user has update permissions" do
+      expect(Project).to link_to(Subject).given_args(user)
+        .with_scope(:scope_for, :update, user)
+    end
+
+    it "should allow collections to link user has show permissions" do
+      expect(Project).to link_to(Collection).given_args(user)
+        .with_scope(:scope_for, :show, user)
+    end
+    
+  end
+  
  
   describe "#workflows" do
     let(:project) { create(:project_with_workflows) }

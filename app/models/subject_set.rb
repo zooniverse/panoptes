@@ -1,5 +1,6 @@
 class SubjectSet < ActiveRecord::Base
   include RoleControl::ParentalControlled
+  include Linkable
   
   attr_accessible :name, :project_id
   
@@ -10,7 +11,10 @@ class SubjectSet < ActiveRecord::Base
 
   validates_presence_of :project
 
-  can_by_role_through_parent :update, :project
-  can_by_role_through_parent :show, :project
-  can_by_role_through_parent :destroy, :project
+  can_through_parent :project, :update, :show, :destroy
+  can_be_linked :workflow, :same_project?, :model
+
+  def self.same_project?(workflow)
+    where(project: workflow.project)
+  end
 end

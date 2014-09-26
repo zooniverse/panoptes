@@ -4,6 +4,7 @@ class UserGroup < ActiveRecord::Base
   include Activatable
   include RoleControl::Owner
   include RoleControl::Adminable
+  include Linkable
 
   attr_accessible :name, :display_name
 
@@ -22,8 +23,6 @@ class UserGroup < ActiveRecord::Base
   can_by_role :show, roles: [ :group_admin, :project_editor, :collection_editor, :group_member ]
   can_by_role :update, roles: [ :group_admin ]
   can_by_role :destroy, roles: [ :group_admin ]
-
-  can_by_role :show, roles: [ :group_admin, :project_editor, :collection_editor, :group_member ]
 
   can_by_role :update, act_as: Collection, roles: [ :group_admin, :collection_editor ]
   can_by_role :destroy, act_as: Collection, roles: [ :group_admin, :collection_editor ]

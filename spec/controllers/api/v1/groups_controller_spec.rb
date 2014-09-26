@@ -3,9 +3,11 @@ require 'spec_helper'
 describe Api::V1::GroupsController, type: :controller do
   let!(:user_groups) do
     [ create(:user_group_with_users),
-      create(:user_group_with_projects),
-      create(:user_group_with_collections) ]
+     create(:user_group_with_projects),
+     create(:user_group_with_collections) ]
   end
+
+  let(:user) { user_groups[0].users.first }
 
   let(:api_resource_name) { "user_groups" }
   let(:api_resource_attributes) do
@@ -15,142 +17,79 @@ describe Api::V1::GroupsController, type: :controller do
     [ "user_groups.memberships", "user_groups.users", "user_groups.projects", "user_groups.collections" ]
   end
 
+  let(:scopes) { %w(public group) }
+  let(:resource_class) { UserGroup }
+  let(:authorized_user) { user_groups.first.users.first }
+
   before(:each) do
-    user = user_groups[0].users.first
-    default_request(scopes: ["public", "group"], user_id: user.id)
+    default_request(scopes: scopes, user_id: user.id)
   end
 
   describe "#index" do
-    before(:each) do
-      get :index
+    let(:private_resource) { user_groups[1] }
+    let(:n_visible) { 1 }
+    
+    it_behaves_like "is indexable"
+  end
+  
+  describe "#update" do
+    let(:resource) { user_groups.first }
+    let(:test_attr) { :display_name}
+    let(:test_attr_value) { "A Different Name" }
+    let(:update_params) do
+      {
+       user_groups: {
+                     display_name: "A Different Name",
+                    }
+      }
     end
 
-    it "should return 200" do
-      expect(response.status).to eq(200)
-    end
-
-    it "should have three items by default" do
-      expect(json_response[api_resource_name].length).to eq(3)
-    end
-
-    it_behaves_like "an api response"
+    it_behaves_like "is updatable"
   end
 
   describe "#show" do
-    before(:each) do
-      get :show, id: user_groups.first.id
-    end
-
-    it "should return 200" do
-      expect(response.status).to eq(200)
-    end
-
-    it "should have a single group" do
-      expect(json_response[api_resource_name].length).to eq(1)
-    end
-
-    it_behaves_like "an api response"
+    let(:resource) { user_groups.first }
+    
+    it_behaves_like "is showable"
   end
 
   describe "#create" do
-    let(:created_user_group_id) { created_instance_id("user_groups") }
+    let(:test_attr) { :name }
+    let(:test_attr_value) { "zooniverse" }
+    let(:resource_name) { 'groups' }
+    let(:create_params) { { user_groups: { name: "Zooniverse" } } }
 
-    context "with valid params" do
-      let!(:create_params) { { user_group: { name: "Zooniverse" } } }
+    it_behaves_like "is creatable"
 
-      it "should create a new UserGroup" do
-        expect{post :create, create_params}.to change{UserGroup.count}.by(1)
-      end
-
-      context "with caps and spaces in the group name" do
-        let!(:create_params) { { user_group: { name: "Amazing Group Name" } } }
-
-        it "should convert the owner_name#name field correctly" do
-          post :create, create_params
-          owner_uniq_name = UserGroup.find(created_user_group_id).owner_uniq_name
-          expect(owner_uniq_name).to eq("amazing_group_name")
-        end
-      end
-
-      context "with the response ready" do
-        before(:each) do
-          post :create, create_params
-        end
-
-        it "should return 201" do
-          expect(response.status).to eq(201)
-        end
-
-        it "should set the Location header as per JSON-API specs" do
-          id = created_user_group_id
-          expect(response.headers["Location"]).to eq("http://test.host/api/groups/#{id}")
-        end
-
-        it "should create a project with the correct name" do
-          created_id = created_user_group_id
-          expect(UserGroup.find(created_id).name).to eq("zooniverse")
-        end
-
-        it "should create a the project with the correct display name" do
-          created_id = created_user_group_id
-          expect(UserGroup.find(created_id).display_name).to eq("Zooniverse")
-        end
-
-        it_behaves_like "an api response"
-      end
-    end
-
-    context "with invalid params" do
-      let!(:create_params) { { user_group: { nmae: "Zooniverse" } } }
-
+    describe "default member" do
+      let(:group_id) { created_instance_id('user_groups') }
       before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
         post :create, create_params
       end
+      
+      it "should make a the creating user a member" do
+        membership = Membership.where(user_group_id: group_id).first
+        expect(authorized_user.memberships).to include(membership)
 
-      it "should respond with bad_request" do
-        expect(response.status).to eq(400)
       end
 
-      it "should have the validation errors in the response body" do
-        message = "Validation failed: Owner name name can't be blank, Name can't be blank"
-        expect(response.body).to eq(json_error_message(message))
+      it "should make the creating user a group admin" do
+        group = UserGroup.find(group_id)
+        expect(authorized_user.roles_for(group)).to include("group_admin")
       end
     end
   end
 
   describe "#destroy" do
-    let(:group) { user_groups.first }
-
-    it "should call Activation#disable_instances! with instances to disable" do
-      instances_to_disable = [group] | group.projects | group.memberships | group.collections
-      expect(Activation).to receive(:disable_instances!).with(instances_to_disable)
-      delete :destroy, id: group.id
+    let(:resource) { user_groups.first }
+    let(:instances_to_disable) do
+      [resource] |
+        resource.projects |
+        resource.memberships |
+        resource.collections
     end
 
-    it "should return 204" do
-      delete :destroy, id: group.id
-      expect(response.status).to eq(204)
-    end
-
-    it "should disable the group" do
-      delete :destroy, id: group.id
-      expect(user_groups.first.reload.inactive?).to be_truthy
-    end
-
-    context "an unauthorized user" do
-      before(:each) do
-        unauthorized_user = create(:user)
-        stub_token(scopes: ["user"], user_id: unauthorized_user.id)
-        delete :destroy, id: group.id
-      end
-
-      it "should return 403" do
-        expect(response.status).to eq(403)
-      end
-
-      it "should not disable the user_group" do
-        expect(group.reload.inactive?).to be_falsy
-      end
-    end
+    it_behaves_like "is deactivatable"
   end
 end

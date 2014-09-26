@@ -24,7 +24,7 @@ shared_examples "restricted scopes" do
     it 'should create a page with the apps default scopes' do
       params.delete('scope')
       req
-      expect(assigns(:pre_auth).scopes).to eq(['public', 'projects', 'classifications'])
+      expect(assigns(:pre_auth).scopes).to eq(['public', 'project', 'classification'])
     end
   end
 end
@@ -33,7 +33,7 @@ describe AuthorizationsController, type: :controller do
   let(:owner) { create(:user) }
   let(:params) { { "client_id" => app.uid,
                    "redirect_uri" => 'urn:ietf:wg:oauth:2.0:oob',
-                   "scope" => "public projects classifications" } }
+                   "scope" => "public project classification" } }
   let(:token_params) { params['response_type'] = 'token'; params }
   let(:code_params) { params['response_type'] = 'code'; params }
 

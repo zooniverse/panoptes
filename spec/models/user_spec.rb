@@ -14,13 +14,23 @@ describe User, :type => :model do
   it_behaves_like "activatable"
   it_behaves_like "is an owner"
 
+  describe "links" do
+    it "should allow membership links to any user" do
+      expect(User).to link_to(Membership).with_scope(:all)
+    end
+    
+    it "should allow user_gruop links to any user" do
+      expect(User).to link_to(UserGroup).with_scope(:all)
+    end
+  end
+
   describe '::from_omniauth' do
     let(:auth_hash) { OmniAuth.config.mock_auth[:facebook] }
 
     shared_examples 'new user from omniauth' do
-      let(:user_from_auth_hash) {
+      let(:user_from_auth_hash) do
         user = User.from_omniauth(auth_hash)
-      }
+      end
 
       it 'should create a new valid user' do
         expect(user_from_auth_hash).to be_valid

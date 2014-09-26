@@ -2,8 +2,12 @@ require 'spec_helper'
 
 describe Api::V1::SubjectsController, type: :controller do
   let!(:workflow) { create(:workflow_with_subject_sets) }
-  let!(:subjects) { create_list(:set_member_subject, 20, subject_set: workflow.subject_sets.first) }
   let!(:user) { create(:user) }
+
+  let(:scopes) { %w(subject) }
+  let(:resource_class) { Subject }
+  let(:authorized_user) { user }
+  let(:project) { create(:project, owner: user) }
 
   let(:api_resource_name) { "subjects" }
   let(:api_resource_attributes) do
@@ -16,10 +20,10 @@ describe Api::V1::SubjectsController, type: :controller do
 
   context "logged in user" do
     before(:each) do
-      default_request user_id: user.id, scopes: ["subject"]
+      default_request user_id: user.id, scopes: scopes
     end
-
     describe "#index" do
+      let!(:subjects) { create_list(:set_member_subject, 20, subject_set: workflow.subject_sets.first) }
       context "without random sort" do
         before(:each) do
           get :index
@@ -39,7 +43,7 @@ describe Api::V1::SubjectsController, type: :controller do
       context "with random sort" do
         let(:api_resource_attributes) do
           [ "id", "metadata", "locations", "zooniverse_id", "classifications_count",
-            "state", "set_member_subject_id", "created_at", "updated_at" ]
+           "state", "set_member_subject_id", "created_at", "updated_at" ]
         end
         let(:api_resource_links) { [ "subjects.subject_set" ] }
         let(:request_params) { { sort: 'random', workflow_id: workflow.id.to_s } }
@@ -77,5 +81,55 @@ describe Api::V1::SubjectsController, type: :controller do
         end
       end
     end
+  end
+
+  describe "#show" do
+    let(:resource) { create(:subject) }
+
+    it_behaves_like "is showable"
+  end
+
+  describe "#update" do
+    let(:resource) { create(:subject, owner: user) }
+    let(:test_attr) { :metadata }
+    let(:test_attr_value) { { "interesting_data" => "Tested Collection" } }
+    let(:update_params) do
+      {
+       subjects: {
+                     metadata: {
+                                interesting_data: "Tested Collection"
+                               }
+                    }
+      }
+    end
+
+    it_behaves_like "is updatable"
+  end
+
+  describe "#create" do
+    let(:test_attr) { :locations }
+    let(:test_attr_value) do
+      { "standard" => "http://test.host/imgs/marioface.jpg" }
+    end
+    
+    let(:create_params) do
+      {
+       subjects: {
+                  metadata: { cool_factor: 11 },
+                  locations: { standard: "http://test.host/imgs/marioface.jpg" },
+                  links: {  
+                          project: project.id
+                         }
+                 }
+      }
+    end
+
+    it_behaves_like "is creatable"
+  end
+  
+  describe "#destroy" do
+    let(:resource) { create(:subject, owner: user) }
+
+    it_behaves_like "is destructable"
   end
 end

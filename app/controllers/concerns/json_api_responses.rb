@@ -1,6 +1,12 @@
 module JSONApiResponses
   extend ActiveSupport::Concern
 
+  def created_resource_response(resource)
+    json_api_render(:created,
+                    create_response(resource),
+                    link_header(resource))
+  end
+
   def deleted_resource_response
     json_api_render(:no_content, {})
   end
