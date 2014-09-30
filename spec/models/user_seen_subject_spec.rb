@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 def created_uss
-  UserSeenSubject.where(params.except(:set_member_subject_id)).first
+  UserSeenSubject.where(params.except(:set_member_subject)).first
 end
 
 RSpec.describe UserSeenSubject, :type => :model do
@@ -11,9 +11,9 @@ RSpec.describe UserSeenSubject, :type => :model do
     expect(user_seen_subject).to be_valid
   end
 
-  describe ".add_seen_subject_for_user" do
+  describe "::add_seen_subject_for_user" do
     let(:subject) { create(:subject) }
-    let(:params) { { user: user, workflow: workflow, set_member_subject_id: subject.id } }
+    let(:params) { { user: user, workflow: workflow, set_member_subject: subject } }
 
     context "when no user or workflow exists" do
       let(:workflow) { nil }
@@ -82,12 +82,12 @@ RSpec.describe UserSeenSubject, :type => :model do
     end
   end
 
-  describe "#add_set_member_subject_id" do
+  describe "#add_set_member_subject" do
     let(:uss) { user_seen_subject }
     
     it "should add a subject's id to the set_member_subject_ids array" do
       s = create(:subject)
-      uss.add_set_member_subject_id(s.id)
+      uss.add_set_member_subject(s)
       uss.reload
       expect(uss.set_member_subject_ids).to include(s.id)
     end
