@@ -1978,10 +1978,10 @@ Collection are returned as an array under *collections*.
                         "page_count": 14,
                         "previous_page": 14,
                         "next_page": 2,
-                        "first_href": "/memberships?page_size=2",
-                        "previous_href": "/memberships?page=14page_size=2",
-                        "next_href": "/memberships?page=2&page_size=2",
-                        "last_href": "/memberships?page=14&page_size=2"
+                        "first_href": "/collections?page_size=2",
+                        "previous_href": "/collections?page=14page_size=2",
+                        "next_href": "/collections?page=2&page_size=2",
+                        "last_href": "/collections?page=14&page_size=2"
                     }
                 },
                 "collections": [{
@@ -2024,7 +2024,7 @@ Collection are returned as an array under *collections*.
     
 + Response 200
 
-    [Collection][]
+    [Collection Collection][]
 
 ### Create Collection [POST]
 A Collection only need a *display name* to be created. By default
@@ -2052,3 +2052,191 @@ owner, and links to subjects.
 + Response 201
 
     [Collection][]
+
+# Group SubjectQueues
+Resources related to _Panotpes SubjectQueues_
+
+## SubjectQueue [/subject_queues/{id}]
+A subject queue is a list of subjects for a classifiation by a
+particular user created by a project owner or editor. Subjects in the
+queue will be randomly assigned to a user when they request subjects
+to classify.
+
++ id
++ created_at
++ updated_at
+
+All attributes are assigned by the API.
+
++ Model (application/vnd.api+json)
+
+    + Body
+
+            {
+                "links": {
+                    "subject_queues.user": {
+                        "href": "/users/{subject_queues.user}",
+                        "type": "users"
+                    },
+                    "subject_queues.workflow": {
+                        "href": "/workflows/{subject_queues.workflow}",
+                        "type": "workflows"
+                    },
+                    "subject_queues.set_member_subjects": {
+                        "href": "/subjects{?set_member_subject_ids=subject_queues.set_member_subjects}",
+                        "type": "set_member_subjects"
+                    }
+                },
+                "subject_queues": {
+                    "id": "101",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "links": {
+                        "user": "101",
+                        "workflow": 66,
+                        "set_member_subjects": ["10", "20", "44", "90", "91"]
+                    }
+                }
+            }
+
+### Retrieve a single SubjectQueue [GET]
++ Response 200
+
+    [SubjectQueue][]
+
+### Edit a single SubjectQueue [PUT]
+The only edit operation on a queue is a put replacing the queued
+subjects with a new queue of subjects.
+
++ Request (application/vnd.api+json)
+
+        {
+            "subject_queues: {
+                "links"; {
+                    "set_member_subjects": ["10", "22"]
+                }
+            }
+        }
+
++ Response 200
+
+    [SubjectQueue][]
+
+### Destroy a SubjectQueue [DELETE]
+Removes the queue entirely
+
++ Response 204
+
+## Add set_member_subject links [/subject_queues/{id}/links/set_member_subjects]
+Add subjects to a queue.
+
+### Add links [POST]
+A user is permitted to add subjects if they are the project owner or
+have edit permissions.
+
++ Request (application/vnd.api+json)
+
+        {
+            "set_member_subjects": ["1", "2"]
+        }
+
++ Response 200
+
+    [SubjectQueue][]
+
+## Remove subject links [/subject_queues/{id}/links/set_member_subjects/{link_ids}]
+Remove subjects from a queue.
+
+### Remove links [DELETE]
+A user is permitted to remove subjects if they are the project owner
+or have edit permissions.
+
++ Parameters
+  + id (required, integer) ... id of queue to edit
+  + link_ids (required, string) ... comma seperated list of ids to remove
+    
++ Response 204
+
+## SubjectQueue Collection [/subject_queues?{page,per_page,workflow_id,user_id}]
+A collection of SubjectQueue resources.
+
+All collections add a meta attribute hash containing paging
+information.
+
+SubjectQueues are returned as an array under *subject_queues*.
+
++ Model (application/vnd.api+json)
+
+    + Body
+
+            {
+                "links": {
+                },
+                "meta": {
+                    "memberships": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 28,
+                        "include": [],
+                        "page_count": 14,
+                        "previous_page": 14,
+                        "next_page": 2,
+                        "first_href": "/subject_queues?page_size=2",
+                        "previous_href": "/subject_queues?page=14page_size=2",
+                        "next_href": "/subject_queues?page=2&page_size=2",
+                        "last_href": "/subject_queues?page=14&page_size=2"
+                    }
+                },
+                "subject_queues": [{
+                    "id": "101",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "links": {
+                        "user": "101",
+                        "workflow": 66,
+                        "set_member_subjects": ["10", "20", "44", "90", "91"]
+                    }
+                },{
+                    "id": "102",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "created_at": "2014-04-20T06:23:12Z",
+                    "links": {
+                        "user": "102",
+                        "workflow": 66,
+                        "set_member_subjects": ["10", "20", "44", "90", "91"]
+                    }
+                }]
+            }
+
+### List all collections [GET]
++ Parameters
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + workflow_id (optional, integer) ... workflow queue belongs to
+  + user_id (optional, integer) ... user id queue belongs to
+    
++ Response 200
+
+    [SubjectQueueCollection][]
+
+### Create SubjectQueue [POST]
+A subject queue only requires a user and a workflow link to
+create. Optionally a list of set_member_subjects to queue for the user
+may be included
+
++ Request (application/vnd.api+json)
+
+        {
+            "subject_queues": {
+                "links": {
+                    "user": "10",
+                    "workflow": "42",
+                    "set_member_subjects": ["3", "12321", "8004"]
+                }
+            }
+        }
+
++ Response 201
+
+    [SubjectQueue][]
+
