@@ -4,7 +4,7 @@ describe Api::V1::SubjectQueuesController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:api_resource_name) { 'subject_queues' }
   let(:api_resource_attributes) { %w(id) }
-  let(:api_resource_links) { %w(user_subject_queues.user, user_subject_queues.workflow user_subject_queues.set_member_subject_ids) }
+  let(:api_resource_links) { %w(subject_queues.user subject_queues.workflow subject_queues.set_member_subjects) }
 
   let(:project) { create(:project, owner: authorized_user) }
   let(:workflow) { create(:workflow, project: project) }
