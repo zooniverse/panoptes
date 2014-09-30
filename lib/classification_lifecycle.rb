@@ -83,7 +83,7 @@ class ClassificationLifecycle
     {
      user: user,
      workflow: workflow,
-     set_member_subject_id: set_member_subject.id
+     set_member_subject: set_member_subject
     }
   end
 end

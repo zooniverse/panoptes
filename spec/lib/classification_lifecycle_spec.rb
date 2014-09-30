@@ -18,7 +18,7 @@ shared_examples "dequeue subject" do
         expect(UserSubjectQueue).to receive(:dequeue_subject_for_user)
           .with(user: classification.user,
                 workflow: classification.workflow,
-                set_member_subject_id: classification.set_member_subject.id)
+                set_member_subject: classification.set_member_subject)
       end
     end
 
@@ -110,7 +110,7 @@ shared_examples "update seen subjects" do
       expect(UserSeenSubject).to receive(:add_seen_subject_for_user)
         .with(user: classification.user,
               workflow: classification.workflow,
-              set_member_subject_id: classification.set_member_subject.id)
+              set_member_subject: classification.set_member_subject)
     end
   end
 
