@@ -7,21 +7,8 @@ class Api::V1::SubjectQueuesController < Api::ApiController
   allowed_params :create, links: [:user, :workflow, set_member_subjects: []]
   allowed_params :update, links: [set_member_subjects: []]
 
-  alias_method :subject_queue, :controlled_resource
-
   protected
 
-  def add_relation(relation, value)
-    if relation == :set_member_subjects
-      items = new_items(relation, value).map(&:id)
-      subject_queue.set_member_subject_ids_will_change!
-      subject_queue.set_member_subject_ids << items
-      subject_queue.save!
-    else
-      super
-    end
-  end
-  
   def resource_name
     "user_subject_queue"
   end

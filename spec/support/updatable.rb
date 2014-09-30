@@ -9,8 +9,12 @@ shared_examples "is updatable" do
     end
     
     it 'should update supplied attributes' do
-      p updated_resource
-      expect(updated_resource.send(test_attr)).to eq(test_attr_value)
+      field = updated_resource.send(test_attr)
+      if field.is_a?(Array)
+        expect(field).to match_array(test_attr_value)
+      else
+        expect(field).to eq(test_attr_value)
+      end
     end
 
     it 'should return 200' do

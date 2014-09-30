@@ -12,8 +12,13 @@ shared_examples "is creatable" do
     end
 
     it 'should create the new resource' do
-      created = resource_class.find(created_id)
-      expect(created.send(test_attr)).to eq(test_attr_value)
+      field = resource_class.find(created_id).send(test_attr)
+      
+      if field.is_a?(Array)
+        expect(field).to match_array(test_attr_value)
+      else
+        expect(field).to eq(test_attr_value)
+      end
     end
 
     it "should set the Location header as per JSON-API specs" do
