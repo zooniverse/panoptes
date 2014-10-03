@@ -47,7 +47,7 @@ class SubjectSelector
   private
 
   def workflow_id_error
-    MissingParamter.new("workflow_id parameter missing")
+    MissingParameter.new("workflow_id parameter missing")
   end
   
   def cellect_params
