@@ -30,7 +30,7 @@ class Classification < ActiveRecord::Base
   def created_and_incomplete?(actor)
     creator?(actor) && incomplete?
   end
-  
+
   def in_show_scope?(actor)
     self.class.visible_to(actor).exists?(self)
   end
