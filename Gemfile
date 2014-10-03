@@ -19,6 +19,7 @@ gem 'logstasher'
 gem 'airbrake', '~> 4.1.0'
 gem 'jquery-rails'
 gem 'uglifier'
+gem 'sidekiq'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
