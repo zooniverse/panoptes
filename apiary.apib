@@ -2057,10 +2057,10 @@ owner, and links to subjects.
 Resources related to _Panotpes SubjectQueues_
 
 ## SubjectQueue [/subject_queues/{id}]
-A subject queue is a list of subjects for a classifiation by a
-particular user created by a project owner or editor. Subjects in the
-queue will be randomly assigned to a user when they request subjects
-to classify.
+A subject queue is a list of subjects for classifiation by a
+user that is created by a project owner or editor. When a user
+requests subjects to classify using the `?sort=queued` param they we
+be given a randomly selection from their queue if it exists.
 
 + id
 + created_at
@@ -2217,12 +2217,11 @@ SubjectQueues are returned as an array under *subject_queues*.
     
 + Response 200
 
-    [SubjectQueueCollection][]
+    [SubjectQueue Collection][]
 
 ### Create SubjectQueue [POST]
-A subject queue only requires a user and a workflow link to
-create. Optionally a list of set_member_subjects to queue for the user
-may be included
+Creating a subject queue only requires a user and a workflow link. You
+may optionally include a list of set_member_subjects to populate the queue.
 
 + Request (application/vnd.api+json)
 
