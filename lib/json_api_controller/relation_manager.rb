@@ -48,9 +48,6 @@ module JsonApiController
       assoc_class(relation)
         .link_to_resource(controlled_resource, current_actor)
         .find(value)
-    rescue ActiveRecord::RecordNotFound => e
-      p relation, value
-      raise e
     end
 
     def assoc_class(relation)

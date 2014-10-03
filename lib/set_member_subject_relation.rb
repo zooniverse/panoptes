@@ -22,7 +22,6 @@ class SetMemberSubjectRelation
   def concat(models)
     owner.set_member_subject_ids_will_change!
     owner.set_member_subject_ids.concat(models.map(&:id))
-    p owner.valid?
     owner.save!
   end
 
