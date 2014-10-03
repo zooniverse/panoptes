@@ -1,3 +1,4 @@
+ActionDispatch::Routing::Mapper.send :include, JsonApiRoutes
 
 Rails.application.routes.draw do
 
@@ -18,63 +19,29 @@ Rails.application.routes.draw do
   end
 
   namespace :api do
-    api_version(:module => "V1", :header => {name: "Accept", :value => "application/vnd.api+json; version=1"}) do
-      except = [:new, :edit]
-      
+    api_version(module: "V1", header: {name: "Accept", value: "application/vnd.api+json; version=1"}) do
       get "/me", to: 'users#me', format: false
-      
-      resources :classifications, except: except, format: false
-      resources :memberships, except: except, format: false
-      resources :subjects, except: except, format: false
 
-      resources :users, except: [:new, :edit, :create], format: false do
-        post "/links/:link_relation", to: "users#update_links",
-          constraints: { link_relation: /user_groups/ }, format: false
-        delete "/links/:link_relation/:link_ids", to: "users#destroy_links",
-          constraints: { link_relation: /user_groups/ }, format: false
-      end
+      json_api_resources :classifications
       
-      resources :groups, except: except, format: false do
-        post "/links/:link_relation", to: "groups#update_links",
-          constraints: { link_relation: /users/ }, format: false
-        delete "/links/:link_relation/:link_ids", to: "group#update_links",
-          constraints: { link_relation: /users/ }, format: false
-      end
+      json_api_resources :memberships
+      
+      json_api_resources :subjects
+      
+      json_api_resources :users, except: [:new, :edit, :create],
+        links: [:user_groups]
+      
+      json_api_resources :groups, links: [:users]
+      
+      json_api_resources :projects, links: [:subject_sets, :workflows]
+      
+      json_api_resources :workflows, links: [:subject_sets]
+      
+      json_api_resources :subject_sets, links: [:workflows, :subjects]
+      
+      json_api_resources :collections, links: [:subjects]
 
-      resources :projects, except: except, format: false do
-        post "/links/:link_relation", to: "projects#update_links",
-          constraints: { link_relation: /(subject_sets|workflows)/ }, format: false
-        delete "/links/:link_relation/:link_ids", to: "projects#destroy_links",
-          constraints: { link_relation: /(subject_sets|workflows)/ }, format: false
-      end
-      
-      resources :workflows, except: except, format: false do
-        post "/links/:link_relation", to: "workflows#update_links",
-          constraints: { link_relation: /subject_sets/ }, format: false
-        delete "/links/:link_relation(/:link_ids)", to: "workflows#destroy_links",
-          constraints: { link_relation: /subject_sets/ }, format: false
-      end
-      
-      resources :subject_sets, except: except, format: false do
-        post "/links/:link_relation", to: "subject_sets#update_links",
-          constraints: { link_relation: /(workflows|subjects)/ }, format: false
-        delete "/links/:link_relation/:link_ids", to: "subject_sets#destroy_links",
-          constraints: { link_relation: /(workflows|subjects)/ }, format: false
-      end
-      
-      resources :collections, except: except, format: false do
-        post "/links/:link_relation", to: "collections#update_links",
-          constraints: { link_relation: /subjects/ }, format: false
-        delete "/links/:link_relation/:link_ids", to: "collections#destroy_links",
-          constraints: { link_relation: /subjects/ }, format: false
-      end
-
-      resources :subject_queues, except: except, format: false do
-        post "/links/:link_relation", to: "subject_queues#update_links",
-          constraints: { link_relation: /set_member_subjects/ }, format: false
-        delete "/links/:link_relation/:link_ids", to: "subject_queues#destroy_links",
-          constraints: { link_relation: /set_member_subjects/ }, format: false
-      end
+      json_api_resources :subject_queues, links: [:set_member_subjects]
     end
   end
 
