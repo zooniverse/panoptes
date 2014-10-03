@@ -3,12 +3,12 @@ module RoleControl
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def access_control_action(action, resource_class: nil, actor_method: :api_user, &block)
-        before_action only: [action] do |controller|
+      def access_control_action(controller_action, test_action, resource_class: nil, actor_method: :api_user, &block)
+        before_action only: [controller_action] do |controller|
           resource = controller.send(:controlled_resource)
           act_as = controller.send(:owner_from_params)
           
-          actor(block || actor_method).do(action)
+          actor(block || actor_method).do(test_action)
             .to(resource)
             .as(act_as, allow_nil: false)
             .allowed?
@@ -16,11 +16,11 @@ module RoleControl
       end
 
       def access_control_for(*actions, resource_class: nil)
-        actions.each do |action|
-          access_control_action(action, resource_class: resource_class)
+        actions.each do |(controller_action, test_action)|
+          test_action ||= controller_action
+          access_control_action(controller_action, test_action, resource_class: resource_class)
         end
       end
-
     end
 
     protected
