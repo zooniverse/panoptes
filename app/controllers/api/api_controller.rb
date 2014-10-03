@@ -24,6 +24,8 @@ module Api
                                         API_ALLOWED_METHOD_OVERRIDES)
     
     before_filter :require_login, only: [:create, :update, :destroy]
+    skip_before_action :verify_authenticity_token
+    
     access_control_for :update, :destroy, :create
 
     def current_resource_owner
