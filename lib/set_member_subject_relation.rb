@@ -19,13 +19,15 @@ class SetMemberSubjectRelation
     @relation = SetMemberSubject.where(id: owner.set_member_subject_ids)
   end
 
-  def concat(models)
+  def concat(*models)
+    models = models.flatten
     owner.set_member_subject_ids_will_change!
     owner.set_member_subject_ids.concat(models.map(&:id))
     owner.save!
   end
 
   def destroy(*models)
+    models = models.flatten
     owner.set_member_subject_ids_will_change!
     owner.set_member_subject_ids.delete(*models.map(&:id))
     owner.save!
