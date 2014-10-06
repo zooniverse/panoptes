@@ -139,6 +139,7 @@ GEM
       activesupport (>= 3.0, < 5.0)
     pg (0.17.1)
     pg_array_parser (0.0.9)
+    poseidon (0.0.4)
     postgres_ext (2.3.0)
       activerecord (>= 4.0.0)
       arel (>= 4.0.1)
@@ -269,6 +270,7 @@ DEPENDENCIES
   factory_girl_rails (~> 4.4.1)
   guard-rspec (~> 4.2.9)
   jquery-rails
+  jruby-kafka
   logstasher
   mysql2
   omniauth
@@ -276,6 +278,7 @@ DEPENDENCIES
   omniauth-gplus
   paper_trail
   pg
+  poseidon
   postgres_ext
   protected_attributes (~> 1.0.8)
   pry-rails (~> 0.3.2)

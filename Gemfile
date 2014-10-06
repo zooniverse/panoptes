@@ -24,11 +24,13 @@ gem 'sidekiq'
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
   gem 'therubyrhino'
+  gem 'jruby-kafka'
 end
 
 platforms :ruby do
   gem 'therubyracer'
   gem 'pg'
+  gem 'poseidon'
 end
 
 group :development do
