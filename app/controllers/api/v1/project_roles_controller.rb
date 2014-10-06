@@ -26,8 +26,12 @@ class Api::V1::ProjectRolesController < Api::ApiController
   def visible_scope
     UserProjectPreference.visible_to(api_user)
   end
-   
+  
   def new_items(relation, value)
-    super(relation, value, :roles)
+    if relation == :project
+      super(relation, value, :roles)
+    else
+      super
+    end
   end
 end
