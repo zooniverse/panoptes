@@ -40,7 +40,7 @@ module JsonApiController
     protected
 
     def polymorphic
-      { id: nil, type: nil }
+      [ :id, :type ]
     end
   end
 

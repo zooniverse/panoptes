@@ -1,0 +1,33 @@
+class Api::V1::ProjectRolesController < Api::ApiController
+  include JsonApiController
+  
+  before_filter :require_login
+  doorkeeper_for :all, scopes: [:project]
+  resource_actions :index, :show, :create, :update
+
+  allowed_params :create, roles: [], links: [:user, :project]
+
+  allowed_params :update, roles: []
+
+  private
+
+  def serializer
+    UserProjectRoleSerializer
+  end
+
+  def resource_name
+    "project_role"
+  end
+
+  def resource_class
+    UserProjectPreference
+  end
+
+  def visible_scope
+    UserProjectPreference.visible_to(api_user)
+  end
+   
+  def new_items(relation, value)
+    super(relation, value, :roles)
+  end
+end

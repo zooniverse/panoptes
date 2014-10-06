@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 ActionDispatch::Routing::Mapper.send :include, JsonApiRoutes
 
+=======
+>>>>>>> Add Controllers and Specs for Project Roles and Preferences
 Rails.application.routes.draw do
 
   use_doorkeeper do
@@ -21,6 +24,10 @@ Rails.application.routes.draw do
   namespace :api do
     api_version(module: "V1", header: {name: "Accept", value: "application/vnd.api+json; version=1"}) do
       get "/me", to: 'users#me', format: false
+      
+      json_api_resources :project_roles
+      
+      json_api_resources :project_preferences
 
       json_api_resources :classifications
       
