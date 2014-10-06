@@ -4,6 +4,11 @@ describe 'api should not require csrf protection', type: :request do
   before(:each) do
     ActionController::Base.allow_forgery_protection = true
   end
+
+  after(:each) do
+    ActionController::Base.allow_forgery_protection = false
+  end
+  
   
   it 'should return 200 when making a request without csrf' do
     user = create(:user)
