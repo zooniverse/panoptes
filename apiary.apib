@@ -1956,7 +1956,7 @@ A collection of Collection resources.
 All collections add a meta attribute hash containing paging
 information.
 
-Collection are returned as an array under *collections*.
+Collections are returned as an array under *collections*.
 
 + Model (application/vnd.api+json)
 
@@ -2053,7 +2053,7 @@ owner, and links to subjects.
 
     [Collection][]
 
-# Group SubjectQueues
+# Group SubjectQueue
 Resources related to _Panotpes SubjectQueues_
 
 ## SubjectQueue [/subject_queues/{id}]
@@ -2239,3 +2239,337 @@ may optionally include a list of set_member_subjects to populate the queue.
 
     [SubjectQueue][]
 
+# Group ProjectRole
+Resources related to Roles for _Panoptes Projects_
+
+## ProjectRole [/project_roles/{id}]
+A Project Role resources captures an array of roles assigned to a user
+for a particular project
+
+It has the following attributes:
+
+- id
+- created_at
+- updated_at
+- roles
+
+*id*, *created_at*, and *updated_at* are set the by the API. Project
+ roles are visible to the project owner and the user given roles.
+
++ Model (application/vnd.api+json)
+
+    + Body
+
+            {
+                "links": {
+                    "project_roles.user": {
+                        "href": "/user/{project_roles.user}",
+                        "type": "user"
+                    },
+                    "project_roles.project": {
+                        "href": "/projects/{project_roles.project}",
+                        "type": "project"
+                    }
+                },
+                "project_roles": {
+                    "id": "942",
+                    "roles": ["collaborator"],
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "created_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "user" : "30",
+                        "project": "11"
+                    }
+                }
+            }
+
+### Retrieve a single ProjectRole [GET]
+
++ Response 200
+
+    [ProjectRole][]
+
+### Edit a ProjectRole [PUT]
+A user with permissions to edit a project may modify roles for other
+users in the project. A user without edit permissions may not edit
+their own roles.
+
+Editing requires sending a full representation of the roles array.
+
++ Request (application/vnd.api+json)
+
+        {
+            "project_roles": {
+                "roles": ["tester", "translator"]
+            }
+        }
+
++ Response 200
+
+    [ProjectRole][]
+
+## ProjectRole Collection [/project_roles{?user_id,project_id,page,per_page,sort}]
+A Collection of ProjectRole resources.
+
+All collections add a meta attribute hash containing paging
+information.
+
+ProjectRoles are returned as an array under *project_roles*.
+
++ Model (application/vnd.api+json)
+                    
+            {
+                "links": {
+                    "project_roles.user": {
+                        "href": "/user/{project_roles.user}",
+                        "type": "user"
+                    },
+                    "project_roles.project": {
+                        "href": "/projects/{project_roles.project}",
+                        "type": "project"
+                    }
+                },
+                "meta": {
+                    "project_roles": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 28,
+                        "include": [],
+                        "page_count": 14,
+                        "previous_page": 14,
+                        "next_page": 2,
+                        "first_href": "/project_roles?page_size=2",
+                        "previous_href": "/project_roles?page=14page_size=2",
+                        "next_href": "/project_roles?page=2&page_size=2",
+                        "last_href": "/project_roles?page=14&page_size=2"
+                    }
+                },
+                "project_roles": [{
+                    "id": "942",
+                    "roles": ["collaborator"],
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "created_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "user" : "30",
+                        "project": "11"
+                    }
+                },{
+                "id": "949",
+                    "roles": ["tester", "translator"],
+                    "created_at": "2014-08-20T06:23:12Z",
+                    "created_at": "2014-09-21T08:22:22Z",
+                    "links": {
+                        "user" : "33",
+                        "project": "81"
+                    }
+                }]
+            }
+
+### List all ProjectRoles [GET]
++ Parameters
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + sort (optional, string) ... field to sort by
+  + user_id (optional, integer) ... user_id to see roles for
+  + project_id (option, integer) ... project_id to see roles for
+
++ Response 200
+
+    [ProjectRole Collection][]
+
+### Create a ProjectRole [POST]
+Creating a Project Role resource requires a link to a user and a
+project. You may also include an array of roles.
+
++ Request (application/vnd.api+json)
+
+        {
+            "project_roles": {
+                "roles": ["collaborator"],
+                "links": {
+                    "project": "1",
+                    "user": "842"
+                }
+            }
+        }
+
++ Response 201
+
+    [ProjectRole][]
+
+# Group ProjectPreference
+Resources related to setting preferences for _Panoptes Projects_
+
+## ProjectRole [/project_preferences/{id}]
+A Project Preference resource captures a user's settings for a
+particular project.
+
+It has the following attributes:
+
+- id
+- created_at
+- updated_at
+- preferences
+- email_communication
+
+*id*, *created_at*, and *updated_at* are set the by the API. Project
+ preferences are only visible to user they belong to.
+
++ Model (application/vnd.api+json)
+
+    + Body
+
+            {
+                "links": {
+                    "project_preferences.user": {
+                        "href": "/user/{project_preferences.user}",
+                        "type": "user"
+                    },
+                    "project_preferences.project": {
+                        "href": "/projects/{project_preferences.project}",
+                        "type": "project"
+                    }
+                },
+                "project_preferences": {
+                    "id": "942",
+                    "email_communication": true,
+                    "preferences": {
+                        "tutorial": true
+                    },
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "created_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "user" : "30",
+                        "project": "11"
+                    }
+                }
+            }
+
+### Retrieve a single ProjectPreference [GET]
+
++ Response 200
+
+    [ProjectPreference][]
+
+### Edit a ProjectPreference [PUT]
+Only the owning user may edit a Project Preference resource. The
+email_communication field and the preferences field may be edited.
+
+Editing the preferences field requires a full represenation of the
+preferences hash to be sent. 
+
++ Request (application/vnd.api+json)
+
+        {
+            "project_preferences": {
+                "preferences": {
+                    "mini_course": false,
+                }
+            }
+        }
+
++ Response 200
+
+    [ProjectPreference][]
+
+## ProjectPreference Collection [/project_preferences{?user_id,project_id,page,per_page,sort}]
+A Collection of ProjectPreference resources.
+
+All collections add a meta attribute hash containing paging
+information.
+
+ProjectPreferences are returned as an array under *project_preferences*.
+
++ Model (application/vnd.api+json)
+                    
+            {
+                "links": {
+                    "project_preferences.user": {
+                        "href": "/user/{project_preferences.user}",
+                        "type": "user"
+                    },
+                    "project_preferences.project": {
+                        "href": "/projects/{project_preferences.project}",
+                        "type": "project"
+                    }
+                },
+                "meta": {
+                    "project_preferences": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 28,
+                        "include": [],
+                        "page_count": 14,
+                        "previous_page": 14,
+                        "next_page": 2,
+                        "first_href": "/project_preferences?page_size=2",
+                        "previous_href": "/project_preferences?page=14page_size=2",
+                        "next_href": "/project_preferences?page=2&page_size=2",
+                        "last_href": "/project_preferences?page=14&page_size=2"
+                    }
+                },
+                "project_preferences": [{
+                    "id": "942",
+                    "email_communication": true,
+                    "preferences": {
+                        "tutorial": true
+                    },
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "created_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "user" : "30",
+                        "project": "11"
+                    }
+                },{
+                    "id": "949",
+                    "email_communication": true,
+                    "preferences": {
+                        "tutorial": true
+                    },
+                    "created_at": "2014-08-20T06:23:12Z",
+                    "created_at": "2014-09-21T08:22:22Z",
+                    "links": {
+                        "user" : "33",
+                        "project": "81"
+                    }
+                }]
+            }
+
+### List all ProjectPreferences [GET]
++ Parameters
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + sort (optional, string) ... field to sort by
+  + user_id (optional, integer) ... user_id to see preferences for
+  + project_id (option, integer) ... project_id to see preferences for
+
++ Response 200
+
+    [ProjectPreference Collection][]
+
+### Create a ProjectPreference [POST]
+Creating a Project Preference requires only a link to a
+project. Optionally a boolean flag for email_communication or a hash
+of settings for preferences may be included.
+
+Since a user can only create, read, or modify their own preferences
+the currently logged in user is always set as the linked user on
+creation. 
+
++ Request (application/vnd.api+json)
+
+        {
+            "project_preferences": {
+                "email_communication": true,
+                "preferences": {
+                    "tutorial": true
+                },
+                "links": {
+                    "project": "1"
+                }
+            }
+        }
+
++ Response 201
+
+    [ProjectPreference][]
