@@ -6,7 +6,8 @@ module Api
     include JSONApiRender
     include JSONApiResponses
 
-    API_ACCEPTED_CONTENT_TYPE = 'application/json'
+    API_ACCEPTED_CONTENT_TYPES = ['application/json',
+                                  'application/vnd.api+json']
     API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
@@ -20,7 +21,7 @@ module Api
     rescue_from ActionController::UnpermittedParameters, with: :unprocessable_entity
     rescue_from ActionController::ParameterMissing, with: :unprocessable_entity
 
-    before_action ContentTypeFilter.new(API_ACCEPTED_CONTENT_TYPE,
+    before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
                                         API_ALLOWED_METHOD_OVERRIDES)
     
     before_filter :require_login, only: [:create, :update, :destroy]

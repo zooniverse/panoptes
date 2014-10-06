@@ -47,6 +47,7 @@ class ContentTypeFilter
   end
 
   def unsupported_media_type_message
-    "Only requests with Content-Type: application/json are allowed"
+    types = acceptable_content_types.join(" or ")
+    "Only requests with Content-Type: #{ types } are allowed"
   end
 end
