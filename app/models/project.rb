@@ -24,4 +24,14 @@ class Project < ActiveRecord::Base
   can_be_linked :subject_set, :scope_for, :update, :actor
   can_be_linked :subject, :scope_for, :update, :actor
   can_be_linked :workflow, :scope_for, :update, :actor
+  can_be_linked :user_project_preference, :preference_scope, :actor, :preferences
+
+  def self.preference_scope(actor, type)
+    case type
+    when :roles
+      scope_for(:update, actor)
+    when :preferences
+      scope_for(:show, actor)
+    end
+  end
 end
