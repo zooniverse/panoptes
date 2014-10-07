@@ -5,10 +5,10 @@ describe RegistrationsController, type: :controller do
   before(:each) do
     request.env["devise.mapping"] = Devise.mappings[:user]
   end
-  
+
   let(:user_attributes) do
     attributes_for(:user, **extra_attributes)
-      .slice(:email, :password, :password_confirmation, :login, :name, 
+      .slice(:email, :password, :password_confirmation, :login, :name,
              :global_email_communication, :project_email_communication)
   end
 
@@ -79,6 +79,12 @@ describe RegistrationsController, type: :controller do
         it "should not persist the user account" do
           post :create, user: user_attributes
           expect(User.where(login: user_attributes[:login])).to_not exist
+        end
+
+        it "should provide an error message in the response body" do
+          post :create, user: user_attributes
+          error_body = { "owner_name.name" => ["can't be blank"],"login" => ["can't be blank"] }
+          expect(response.body).to eq(json_error_message(error_body))
         end
       end
     end
