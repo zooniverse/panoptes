@@ -16,8 +16,7 @@ describe RegistrationsController, type: :controller do
 
     describe "#create" do
       before(:each) do
-        request.env["HTTP_ACCEPT"] = "application/vnd.api+json"
-        request.env["CONTENT_TYPE"] = "application/json"
+        request.env["HTTP_ACCEPT"] = "application/json"
       end
 
       context "with valid user attributes" do
