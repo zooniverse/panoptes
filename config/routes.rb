@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 ActionDispatch::Routing::Mapper.send :include, JsonApiRoutes
 
-=======
->>>>>>> Add Controllers and Specs for Project Roles and Preferences
 Rails.application.routes.draw do
 
   use_doorkeeper do
