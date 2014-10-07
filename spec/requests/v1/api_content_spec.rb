@@ -20,6 +20,10 @@ def text_type_headers
   request_headers("text/plain; charset=utf-8")
 end
 
+def json_api_type_headers
+  request_headers("application/vnd.api+json; version=1; charset=utf-8")
+end
+
 describe "api should only accept certain content types", type: :request do
 
   describe "json format" do
@@ -32,9 +36,17 @@ describe "api should only accept certain content types", type: :request do
       let(:params) { { classification: [ { value: [ { x: 734.16 } ] } ] } }
 
       it 'should respond with a bad_request stauts' do
-        expect{ post "/api/classifications/", params, json_content_type_headers }.to \
-                       raise_error(ActionDispatch::ParamsParser::ParseError)
+        expect do
+          post "/api/classifications/", params, json_content_type_headers
+        end.to raise_error(ActionDispatch::ParamsParser::ParseError)
       end
+    end
+  end
+
+  describe 'json api format' do
+    it 'should allow access but return unauthorized' do
+      put "/api/users/1", nil, json_api_type_headers
+      expect(response.status).to eq(401)
     end
   end
 
@@ -59,8 +71,8 @@ describe "api should only accept certain content types", type: :request do
     it 'should return an error message' do
       put '/api/users/1', nil, text_type_headers
       error = {"errors" => [
-        {"message" => "Only requests with Content-Type: application/json are allowed"}
-      ]}
+                            {"message" => "Only requests with Content-Type: application/json or application/vnd.api+json are allowed"}
+                           ]}
       expect(JSON.parse(response.body)).to eq(error)
     end
 
