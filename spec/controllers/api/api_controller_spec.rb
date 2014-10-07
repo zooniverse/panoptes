@@ -5,9 +5,9 @@ def setup_controller(api_controller)
     yield(self) if block_given?
 
     def index
-      render json_api: { tests: [ { all: "good" },
-                                  { at: "least" },
-                                  { thats: "what I pretend" } ] }
+      render json_api: { tests: [{ all: "good" },
+                                 { at: "least" },
+                                 { thats: "what I pretend" } ] }
     end
   end
 end
@@ -55,8 +55,8 @@ describe Api::ApiController, type: :controller do
     describe "when a user has a revoked token" do
       let(:token) do
         create(:revoked_token, scopes: ["public"].join(","),
-                               resource_owner_id: user.id,
-                               use_refresh_token: true)
+               resource_owner_id: user.id,
+               use_refresh_token: true)
       end
 
       it "should return 401" do
@@ -69,8 +69,8 @@ describe Api::ApiController, type: :controller do
 
       it "should return 403 with a logged in user" do
         allow(controller).to receive(:doorkeeper_token) { double( accessible?: true,
-                                                                  acceptable?: false,
-                                                                  includes_scope?: false ) }
+                                                                 acceptable?: false,
+                                                                 includes_scope?: false ) }
         get :index
         expect(response.status).to eq(403)
       end
@@ -119,6 +119,86 @@ describe Api::ApiController, type: :controller do
 
     it 'should include Accept-Language(s) after the user languages' do
       expect(json_response[-3..-1]).to include('zh', 'zh-tw', 'fr-fr')
+    end
+  end
+
+  describe "default access control" do
+    controller(Api::ApiController) do
+      def update
+        render nothing: true
+      end
+
+      def destroy
+        render nothing: true
+      end
+
+      def create
+        render nothing: true
+      end
+
+      def update_links
+        render nothing: true
+      end
+
+      def destroy_links
+        render nothing: true
+      end
+
+      def resource_class
+        Collection
+      end
+    end
+
+    let(:api_user) { ApiUser.new(user) }
+    let(:collection) { create(:collection, owner: user) }
+    
+    before(:each) do
+      routes.draw do
+        put "update" => "api/api#update"
+        post "create" => "api/api#create"
+        delete "destroy" => "api/api#destroy"
+        post "update_links" => "api/api#update_links"
+        delete "destroy_links" => "api/api#destroy_links"
+      end
+
+      allow(controller).to receive(:controlled_resource).and_return(collection)
+      allow(controller).to receive(:api_user).and_return(api_user)
+      allow(controller).to receive(:current_actor).and_return(api_user)
+    end
+
+    context "put #update request" do
+      it 'should call can_update? on the requested collection' do
+        expect(collection).to receive(:can_update?).with(api_user)
+        put :update, id: collection.id
+      end
+    end
+
+    context "delete #destroy request" do
+      it 'should call can_destroy? on the requested collection' do
+        expect(collection).to receive(:can_destroy?).with(api_user)
+        delete :destroy, id: collection.id
+      end
+    end
+
+    context "post #create request" do
+      it 'should call can_create? on the Collection class' do
+        expect(Collection).to receive(:can_create?).with(api_user)
+        post :create
+      end
+    end
+
+    context "post #update_links request" do
+      it 'should call can_update? on the requested collection' do
+        expect(collection).to receive(:can_update?).with(api_user)
+        post :update_links, id: collection.id
+      end
+    end
+
+    context "delete #destroy_links request" do
+      it 'should call can_update? on the requested collection' do
+        expect(collection).to receive(:can_update?).with(api_user)
+        delete :destroy_links, id: collection.id
+      end
     end
   end
 end

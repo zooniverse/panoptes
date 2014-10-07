@@ -29,7 +29,7 @@ module Api
     skip_before_action :verify_authenticity_token
     
     access_control_for :update, :destroy, :create,
-    [:update_links, :update], [:destroy_links, :update]
+      [:update_links, :update], [:destroy_links, :update]
 
     def current_resource_owner
       if doorkeeper_token

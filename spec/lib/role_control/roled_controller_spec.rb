@@ -13,7 +13,7 @@ describe RoleControl::RoledController, type: :controller do
 
   controller(ApplicationController) do
     include RoleControl::RoledController
-    access_control_for :index, 
+    access_control_for :index, [:show, :index]
 
     def api_user
       EnrolledActorTable.first
@@ -30,6 +30,10 @@ describe RoleControl::RoledController, type: :controller do
     def index
       render json: { test: "YAY!" }
     end
+
+    def show
+      render json: { test: "YAY!" }
+    end
   end
 
   describe "user is enrolled on controlled object" do
@@ -37,9 +41,18 @@ describe RoleControl::RoledController, type: :controller do
       create_roles_join_instance(["admin"], controlled, enrolled_actor)
     end
 
-    it 'should return 200' do
-      get :index, id: controlled.id
-      expect(response.status).to eq(200)
+    context "route with access control using it's own name" do
+      it 'should return 200' do
+        get :index, id: controlled.id
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context "route with access control using a different method" do
+      it 'should return 200' do
+        get :show, id: controlled.id
+        expect(response.status).to eq(200)
+      end
     end
   end
 
