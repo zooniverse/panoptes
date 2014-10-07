@@ -14,12 +14,7 @@ class RegistrationsController < Devise::RegistrationsController
     build_user
     resource_saved = resource.save
     yield resource if block_given?
-    status, content = if resource_saved
-      sign_in resource, event: :authentication
-      [ :created, UserSerializer.resource(resource) ]
-    else
-      [ :unprocessable_entity, {} ]
-    end
+    status, content = registrations_response(resource_saved)
     clean_up_passwords resource
     render status: status, json_api: content
   end
@@ -30,5 +25,18 @@ class RegistrationsController < Devise::RegistrationsController
     resource.display_name = login
     resource.login = login
     resource.owner_name = OwnerName.new(name: login, resource: resource)
+  end
+
+  def registrations_response(resource_saved)
+    if resource_saved
+      sign_in resource, event: :authentication
+      [ :created, UserSerializer.resource(resource) ]
+    else
+      response_body = {}
+      if resource && !resource.valid?
+        response_body.merge!({ errors: [ message: resource.errors ] })
+      end
+      [ :unprocessable_entity, response_body ]
+    end
   end
 end
