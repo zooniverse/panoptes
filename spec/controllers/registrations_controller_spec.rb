@@ -5,10 +5,10 @@ describe RegistrationsController, type: :controller do
   before(:each) do
     request.env["devise.mapping"] = Devise.mappings[:user]
   end
-  
+
   let(:user_attributes) do
     attributes_for(:user, **extra_attributes)
-      .slice(:email, :password, :password_confirmation, :login, :name, 
+      .slice(:email, :password, :password_confirmation, :login, :name,
              :global_email_communication, :project_email_communication)
   end
 
@@ -16,8 +16,7 @@ describe RegistrationsController, type: :controller do
 
     describe "#create" do
       before(:each) do
-        request.env["HTTP_ACCEPT"] = "application/vnd.api+json"
-        request.env["CONTENT_TYPE"] = "application/json"
+        request.env["HTTP_ACCEPT"] = "application/json"
       end
 
       context "with valid user attributes" do
