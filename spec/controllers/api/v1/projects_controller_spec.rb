@@ -14,7 +14,11 @@ describe Api::V1::ProjectsController, type: :controller do
     [ "id", "name", "display_name", "classifications_count", "subjects_count", "updated_at", "created_at", "available_languages", "content"]
   end
   let(:api_resource_links) do
-    [ "projects.owner", "projects.workflows", "projects.subject_sets", "projects.project_contents" ]
+    [ "projects.owner",
+      "projects.workflows",
+      "projects.subject_sets",
+      "projects.project_contents",
+      "projects.project_roles" ]
   end
 
   let(:scopes) { %w(public project) }

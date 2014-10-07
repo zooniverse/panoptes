@@ -16,8 +16,8 @@ class User < ActiveRecord::Base
   has_many :user_groups, through: :active_memberships
   has_many :classifications
   has_many :authorizations
-  has_many :user_project_preferences
   has_many :user_collection_preferences
+  has_many :project_preferences, class_name: "UserProjectPreference"
 
   has_many :memberships
   has_many :active_memberships, -> { active }, class_name: 'Membership'
@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
   owns :subjects
   owns :oauth_applications, class_name: "Doorkeeper::Application"
 
-  enrolled_for :projects, through: :user_project_preferences
+  enrolled_for :projects, through: :project_preferences
   enrolled_for :collections, through: :user_collection_preferences
   enrolled_for :user_groups, through: :active_memberships
 
