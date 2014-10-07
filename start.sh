@@ -4,4 +4,4 @@ cd /rails_app
 
 ln -sf /rails_conf/* ./config/
 
-exec rails s $*
+exec rails s -p80 $*
