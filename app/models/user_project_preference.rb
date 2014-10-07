@@ -25,10 +25,10 @@ class UserProjectPreference < ActiveRecord::Base
   end
 
   def self.can_create?(actor)
-    !!actor
+    actor.try(:logged_in?)
   end
 
   def allowed_to_change?(actor)
-    actor.user == user || actor.owns?(project)
+    actor.user == user || project.can_update?(actor)
   end
 end

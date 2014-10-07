@@ -2,7 +2,7 @@ class Api::V1::ProjectRolesController < Api::ApiController
   include JsonApiController
   include CreateOrUpdate
   
-  before_filter :require_login
+  prepend_before_filter :require_login
   doorkeeper_for :all, scopes: [:project]
   resource_actions :index, :show, :create, :update
 
