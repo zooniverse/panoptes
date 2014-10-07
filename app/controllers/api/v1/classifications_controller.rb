@@ -12,18 +12,16 @@ class Api::V1::ClassificationsController < Api::ApiController
   allowed_params :update, :completed,
     annotations: [:key, :value, :started_at, :finished_at, :user_agent]
 
-  def create
-    classification = ActiveRecord::Base.transaction do 
-      build_resource_for_create(create_params)
-    end
-    
-    if classification.save!
-      update_cellect(classification) 
-      created_resource_response(classification)
-    end
-  end
+  alias_method :classification, :controlled_resource
 
   private
+
+  def build_resource_for_update(update_params)
+    super
+    host = cellect_host(classification.workflow.id)
+    ClassificationLifecycle.new(classification, host).on_update
+    classification
+  end
 
   def visible_scope
     Classification.visible_to(api_user)
@@ -33,14 +31,9 @@ class Api::V1::ClassificationsController < Api::ApiController
     create_params[:links][:user] = api_user.user
     create_params[:user_ip] = request_ip
     classification = super(create_params)
+    
+    host = cellect_host(classification.workflow.id)
+    ClassificationLifecycle.new(classification, host).on_create
     classification
-  end
-
-  def update_cellect(classification)
-    Cellect::Client.connection
-      .add_seen(user_id: classification.user_id,
-                workflow_id: classification.workflow_id,
-                subject_id: classification.set_member_subject.id,
-                host: cellect_host(classification.workflow_id))
   end
 end

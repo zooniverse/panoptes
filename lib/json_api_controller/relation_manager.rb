@@ -16,7 +16,7 @@ module JsonApiController
     def add_relation(relation, value)
       case value
       when Array
-        controlled_resource.send(relation) << new_items(relation, value)
+        controlled_resource.send(relation).concat(new_items(relation, value))
       else
         update_relation(relation, value)
       end

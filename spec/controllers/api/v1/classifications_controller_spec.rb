@@ -68,7 +68,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
   let(:scopes) { %w(classification) }
   let(:authorized_user) { user }
-      let(:resource_class) { Classification }
+  let(:resource_class) { Classification }
 
   context "logged in user" do
     before(:each) do
@@ -89,30 +89,10 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
 
     describe "#create" do
-      it "should create the user project preferences" do
-        create_classification
-        expect(UserProjectPreference.where(user: user, project: project).first).to_not be_nil
-      end
-
-      it "should set the communication preferences to the user's default" do
-        create_classification
-        expect(UserProjectPreference.where(user: user, project: project).first.email_communication).to eq(user.project_email_communication)
-      end
-
-      it 'should not create the user project preferences if they already exist' do
-        create(:user_project_preference, user: user, project: project)
-        create_classification
-        expect(UserProjectPreference.where(user: user, project: project).length).to eq(1)
-      end
-
-      it "should setup the add seen command to cellect" do
-        expect(stubbed_cellect_connection).to receive(:add_seen)
-          .with(
-                subject_id: set_member_subject.id,
-                workflow_id: workflow.id,
-                user_id: user.id,
-                host: 'example.com'
-               )
+      it "should class the classification lifecycle on create method" do
+        lifecycle = double
+        expect(lifecycle).to receive(:on_create)
+        allow(ClassificationLifecycle).to receive(:new).and_return(lifecycle)
         create_classification
       end
 
@@ -124,26 +104,6 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it_behaves_like "a classification create"
-
-      describe "track user seen subjects" do
-        let(:expected_params) do
-          {set_member_subject_id: set_member_subject.id,
-           workflow: workflow,
-           user: user }
-        end
-
-        it "should add the seen subject for the user" do
-          expect(UserSeenSubject).to receive(:add_seen_subject_for_user)
-            .with(**expected_params)
-          create_classification
-        end
-
-        it "should create a user seen subject" do
-          expect do
-            create_classification
-          end.to change{UserSeenSubject.count}.from(0).to(1)
-        end
-      end
     end
   end
 
@@ -177,14 +137,19 @@ describe Api::V1::ClassificationsController, type: :controller do
   
   describe "#destroy" do
     context "an incomplete classification" do
-      let(:resource) { create(:classification, user: authorized_user, completed: false) }
+      let(:resource) do
+        create(:classification, user: authorized_user, completed: false)
+      end
+      
       it_behaves_like "is destructable"
     end
 
     context "a complete classification" do
       it 'should return 403' do
         default_request scopes: scopes, user_id: authorized_user.id
-        classification = create(:classification, user: authorized_user, completed: true)
+        classification = create(:classification,
+                                user: authorized_user,
+                                completed: true)
         delete :destroy, id: classification.id
         expect(response.status).to eq(403)
       end
@@ -200,7 +165,8 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       it "should not set the user" do
         create_classification
-        expect(Classification.find(created_classification_id).user).to be_blank
+        user = Classification.find(created_classification_id).user
+        expect(user).to be_blank
       end
 
       it_behaves_like "a classification create"
