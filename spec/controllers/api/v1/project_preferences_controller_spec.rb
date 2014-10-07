@@ -2,10 +2,10 @@ require 'spec_helper'
 
 RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   let(:authorized_user) { create(:user) }
-  let(:project) { create(:project, owner: authorized_user) }
+  let(:project) { create(:project) }
   
   let!(:upps) do
-    create_list :user_project_preference, 2, project: project,
+    create_list :user_project_preference, 2, user: authorized_user,
       roles: ["tester"], email_communication: true
   end
   
@@ -42,17 +42,34 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   describe "#create" do
     let(:test_attr) { :preferences }
     let(:test_attr_value) { { "tutorial" => true } }
-    let(:create_params) do
-      {
-       project_preferences: {
-                             preferences: { tutorial: true },
-                             links: {
-                                     project: project.id.to_s
-                                    }
-                            }
-      }
+    context "when a user doesn't have preferences for a project" do
+      let(:create_params) do
+        {
+         project_preferences: {
+                               preferences: { tutorial: true },
+                               links: {
+                                       project: project.id.to_s
+                                      }
+                              }
+        }
+      end
+
+      it_behaves_like "is creatable"
     end
 
-    it_behaves_like "is creatable"
+    context "when a user doesn't have preferences for a project" do
+      let(:create_params) do
+        {
+         project_preferences: {
+                               preferences: { tutorial: true },
+                               links: {
+                                       project: resource.project.id.to_s
+                                      }
+                              }
+        }
+      end
+
+      it_behaves_like "is creatable"
+    end
   end
 end

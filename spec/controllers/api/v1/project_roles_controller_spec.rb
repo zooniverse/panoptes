@@ -42,18 +42,36 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
   describe "#create" do
     let(:test_attr) { :roles }
     let(:test_attr_value) { ["collaborator"] }
-    let(:create_params) do
-      {
-       project_roles: {
-                     roles: ["collaborator"],
-                     links: {
-                             user: create(:user).id.to_s,
-                             project: project.id.to_s
-                            }
-                    }
-      }
+    context "when a user has preferences for a project" do
+      let(:create_params) do
+        {
+         project_roles: {
+                         roles: ["collaborator"],
+                         links: {
+                                 user: create(:user).id.to_s,
+                                 project: project.id.to_s
+                                }
+                        }
+        }
+      end
+
+      it_behaves_like "is creatable"
     end
 
-    it_behaves_like "is creatable"
+    context "when a user doesn't have preferences for a project" do
+      let(:create_params) do
+        {
+         project_roles: {
+                         roles: ["collaborator"],
+                         links: {
+                                 user: resource.user.id.to_s,
+                                 project: resource.project.id.to_s
+                                }
+                        }
+        }
+      end
+
+      it_behaves_like "is creatable"
+    end
   end
 end

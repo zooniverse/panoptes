@@ -1,5 +1,6 @@
 class Api::V1::ProjectRolesController < Api::ApiController
   include JsonApiController
+  include CreateOrUpdate
   
   before_filter :require_login
   doorkeeper_for :all, scopes: [:project]
@@ -10,6 +11,10 @@ class Api::V1::ProjectRolesController < Api::ApiController
   allowed_params :update, roles: []
 
   private
+
+  def should_update?
+    super(create_params[:links])
+  end
 
   def serializer
     UserProjectRoleSerializer
@@ -28,7 +33,7 @@ class Api::V1::ProjectRolesController < Api::ApiController
   end
   
   def new_items(relation, value)
-    if relation == :project
+    if relation == "project"
       super(relation, value, :roles)
     else
       super
