@@ -174,7 +174,7 @@ describe Api::ApiController, type: :controller do
     context "put #update request" do
       it 'should call can_update? on the requested collection' do
         expect(collection).to receive(:can_update?).with(api_user)
-        put :update, id: collection.id, format: :json
+        put :update, id: collection.id
       end
     end
 
