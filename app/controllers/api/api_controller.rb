@@ -28,7 +28,8 @@ module Api
     before_filter :require_login, only: [:create, :update, :destroy]
     skip_before_action :verify_authenticity_token
     
-    access_control_for :update, :destroy, :create
+    access_control_for :update, :destroy, :create,
+      [:update_links, :update], [:destroy_links, :update]
 
     def current_resource_owner
       if doorkeeper_token
