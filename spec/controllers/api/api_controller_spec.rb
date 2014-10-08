@@ -123,7 +123,7 @@ describe Api::ApiController, type: :controller do
   end
 
   describe "default access control" do
-    controller(Api::ApiController) do
+    controller do
       def update
         render nothing: true
       end
@@ -142,6 +142,10 @@ describe Api::ApiController, type: :controller do
 
       def destroy_links
         render nothing: true
+      end
+
+      def resource_sym
+        :collections
       end
 
       def resource_class
@@ -164,12 +168,13 @@ describe Api::ApiController, type: :controller do
       allow(controller).to receive(:controlled_resource).and_return(collection)
       allow(controller).to receive(:api_user).and_return(api_user)
       allow(controller).to receive(:current_actor).and_return(api_user)
+      @request.env["CONTENT_TYPE"] = "application/json"
     end
 
     context "put #update request" do
       it 'should call can_update? on the requested collection' do
         expect(collection).to receive(:can_update?).with(api_user)
-        put :update, id: collection.id
+        put :update, id: collection.id, format: :json
       end
     end
 
@@ -182,6 +187,7 @@ describe Api::ApiController, type: :controller do
 
     context "post #create request" do
       it 'should call can_create? on the Collection class' do
+        allow(controller).to receive(:controlled_resource).and_return(Collection)
         expect(Collection).to receive(:can_create?).with(api_user)
         post :create
       end
