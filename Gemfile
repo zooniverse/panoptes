@@ -21,6 +21,7 @@ gem 'omniauth'
 gem 'omniauth-facebook'
 gem 'omniauth-gplus'
 gem 'cellect-client', '~> 0.0.7'
+gem 'puma'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
