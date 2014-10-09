@@ -90,4 +90,7 @@ Rails.application.configure do
                     methods: [:get, :post, :put, :delete, :options, :patch]
     end
   end
+
+  # Enable the logstasher logs for the current environment
+  config.logstasher.enabled = true
 end
