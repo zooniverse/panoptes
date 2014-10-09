@@ -1,15 +1,11 @@
 GIT
-  remote: https://github.com/plataformatec/devise.git
-  revision: 1d8890b77372b9c4fd3ec8e9b4963d76774ed33c
-  branch: lm-rails-4-2
+  remote: git://github.com/dockyard/postgres_ext.git
+  revision: 681224c2c3c57b9614d3346884ddb717bc51c1d4
   specs:
-    devise (3.3.0)
-      bcrypt (~> 3.0)
-      orm_adapter (~> 0.1)
-      railties (>= 3.2.6, < 5)
-      responders
-      thread_safe (~> 0.1)
-      warden (~> 1.2.3)
+    postgres_ext (2.4.0.beta.1)
+      activerecord (>= 4.0.0)
+      arel (>= 4.0.1)
+      pg_array_parser (~> 0.0.9)
 
 GEM
   remote: https://rubygems.org/
@@ -84,6 +80,13 @@ GEM
     database_cleaner (1.2.0)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
+    devise (3.4.1)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 3.2.6, < 5)
+      responders
+      thread_safe (~> 0.1)
+      warden (~> 1.2.3)
     diff-lcs (1.2.5)
     doorkeeper (1.4.0)
       railties (>= 3.1)
@@ -183,10 +186,6 @@ GEM
       activerecord (>= 3.0, < 5.0)
       activesupport (>= 3.0, < 5.0)
     pg_array_parser (0.0.9-java)
-    postgres_ext (2.3.0)
-      activerecord (>= 4.0.0)
-      arel (>= 4.0.1)
-      pg_array_parser (~> 0.0.9)
     protected_attributes (1.0.8)
       activemodel (>= 4.0.1, < 5.0)
     pry (0.10.1-java)
@@ -332,7 +331,7 @@ DEPENDENCIES
   airbrake (~> 4.1.0)
   cellect-client (~> 0.0.7)
   database_cleaner (~> 1.2.0)
-  devise!
+  devise (~> 3.4.0)
   doorkeeper (~> 1.4.0)
   factory_girl_rails (~> 4.4.1)
   guard-rspec (~> 4.2.9)
@@ -347,7 +346,7 @@ DEPENDENCIES
   paper_trail
   pg
   poseidon
-  postgres_ext
+  postgres_ext!
   protected_attributes (~> 1.0.8)
   pry-rails (~> 0.3.2)
   puma
