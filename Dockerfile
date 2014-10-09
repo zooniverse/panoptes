@@ -18,4 +18,6 @@ RUN apt-get update && \
     bundle install --without test development && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+EXPOSE 80
+
 ENTRYPOINT /rails_app/start.sh
