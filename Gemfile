@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.0.beta1'
+gem 'rails', '4.2.0.beta2'
 gem 'postgres_ext'
 gem 'sdoc', '~> 0.4.0',          group: :doc
 gem 'doorkeeper', '~> 1.4.0'
