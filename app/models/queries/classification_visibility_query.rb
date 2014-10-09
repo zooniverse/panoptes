@@ -6,28 +6,19 @@ class ClassificationVisibilityQuery < VisibilityQuery
   end
 
   def all_bind_values
-    project_scope.bind_values | group_scope.bind_values
+    where_user.bind_values | where_project.bind_values | where_group.bind_values
   end
-
-  def project_scope
-    @project_scope ||= Project.scope_for(:update, actor).select(:id)
-  end
-
-  def group_scope
-    @group_query ||= actor.owner.user_groups.select(:id)
-  end
-
-
+  
   def where_user
-    @where_user ||= parent.where(arel_table[:user_id].eq(actor.id))
+    @where_user ||= @parent.where(user_id: actor.id)
   end
-
+  
   def where_project
-    @where_project ||= parent.where(arel_table[:project_id].in(project_scope.arel))
+    @where_project ||= @parent.where(project_id: project_scope)
   end
 
   def where_group
-    @where_group ||= parent.where(arel_table[:user_group_id].in(group_scope.arel))
+    @where_group ||= @parent.where(user_group_id: group_scope)
   end
 
   def union_table
