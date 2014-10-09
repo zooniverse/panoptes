@@ -121,6 +121,10 @@ GEM
     logging (1.8.2)
       little-plugger (>= 1.1.3)
       multi_json (>= 1.8.4)
+    logstash-event (1.1.5)
+    logstasher (0.6.1)
+      logstash-event (~> 1.1.0)
+      request_store
     lumberjack (1.0.9)
     mail (2.6.1)
       mime-types (>= 1.16, < 3)
@@ -205,6 +209,7 @@ GEM
     rdoc (4.1.1)
       json (~> 1.4)
     ref (1.0.5)
+    request_store (1.1.0)
     restpack_serializer (0.5.4)
       activerecord (>= 4.0.3, < 5.0)
       activesupport (>= 4.0.3, < 5.0)
@@ -240,7 +245,6 @@ GEM
       rdoc (~> 4.0, < 5.0)
     slop (3.6.0)
     slyphon-log4j (1.2.15)
-    slyphon-zookeeper_jar (3.3.5)
     slyphon-zookeeper_jar (3.3.5-java)
     spoon (0.0.4)
       ffi
@@ -306,6 +310,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   json-patch (~> 1.0.0)
+  logstasher
   mysql2
   omniauth
   omniauth-facebook
