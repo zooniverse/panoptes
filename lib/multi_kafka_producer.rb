@@ -17,12 +17,10 @@ module MultiKafkaProducer
     adapter.connect(client_id, *brokers)
   end
 
-  def publish(topic, *msgs)
+  def publish(topic, *msgs_and_keys)
     raise KafkaNotConnected.new(adapter) unless adapater.connected?
-    adapter.publish(topic, msgs, opts)
+    adapter.publish(topic, msgs_and_keys)
   end
-
-  private
 
   KAFKAS = { kafka: 'jruby-kafka', poseidon: 'poseidon' }
 

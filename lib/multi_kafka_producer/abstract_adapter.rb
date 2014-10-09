@@ -8,5 +8,12 @@ module MultiKafkaProducer
     def name
       self.class.adapter_name
     end
+
+    private
+    
+    def split_msg_pair(msg)
+      key, msg = msg
+      (msg) ? [key, msg] : [nil, key]
+    end
   end
 end
