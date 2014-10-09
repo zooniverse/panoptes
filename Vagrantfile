@@ -4,57 +4,33 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
-ruby_type = ENV['VAGRANT_RUBY'] || 'jruby'
-
-ruby_version_test = if ruby_type == 'mri'
-                      "2.1.2"
-                    elsif ruby_type == 'jruby'
-                      "1.9.3"
-                    end
-
-ruby_build_version = if ruby_type == 'mri'
-                       "2.1.2"
-                     elsif ruby_type == 'jruby'
-                       "jruby-1.7.12"
-                     end
-
-install_ruby = <<BASH
-RUBY_VERSION=`ruby -e "p RUBY_VERSION"`
-if [[ "$RUBY_VERSION" != "\"#{ruby_version_test}\"" ]]; then
-  echo JRUBY_OPTS=--2.0 >> /etc/environment
-  apt-get update
-  apt-get remove -y openjdk-6-jre
-  apt-get install -y build-essential libssl-dev libreadline-dev wget libc6-dev libssl-dev libreadline6-dev zlib1g-dev libyaml-dev libpq-dev git-core openjdk-7-jre libmysqlclient-dev
-  apt-get clean
-  git clone https://github.com/sstephenson/ruby-build.git && cd ruby-build && ./install.sh
-  export CONFIGURE_OPTS="--disable-install-rdoc"
-  ruby-build #{ruby_build_version} /usr/local
-  ruby -v
-  gem install bundler
-fi
-BASH
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "phusion_ubuntu-12.04-docker"
-  config.vm.box_url = "https://oss-binaries.phusionpassenger.com/vagrant/boxes/ubuntu-12.04.3-amd64-vbox.box"
+  config.vm.box = "ubuntu-14.04-docker"
+  config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
   config.vm.network :forwarded_port, guest: 3000, host: 3000
 
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
+  end
+
+  config.vm.synced_folder "./", "/home/vagrant/panoptes/"
+
   config.vm.provision "shell", inline: "mkdir -p /opt/postgresql"
-  config.vm.provision "shell", inline: install_ruby
+  config.vm.provision "shell", inline: "docker stop $(docker ps -aq) || true; docker rm $(docker ps -aq) || true; rm /home/vagrant/panoptes/tmp/pids/server.pid || true"
+
+  config.vm.provision "docker",
+    version: '1.0.1',
+    images: [ 'zooniverse/postgresql', 'zooniverse/zookeeper', 'zooniverse/cellect', 'zooniverse/panoptes' ]
 
   config.vm.provision "docker" do |d|
-    d.pull_images "paintedfox/postgresql"
-    d.pull_images 'edpaget/zookeeper'
-    d.pull_images 'edpaget/cellect'
-
-    d.run 'paintedfox/postgresql',
-      args: '--name pg -p 5432:5432 -e DB="Panoptes_development" -e USER="panoptes" -e PASS="panoptes" -v /opt/postgresql:/data'
-    d.run 'edpaget/zookeeper:3.4.6',
-      args: '--name zk -p 2181:2181',
+    d.run 'zooniverse/postgresql',
+      args: '--name postgres -e DB="panoptes_development" -e PG_USER="panoptes" -e PASS="panoptes" -v /opt/postgresql:/data'
+    d.run 'zooniverse/zookeeper',
+      args: '--name zookeeper',
       cmd: '-c localhost:2888:3888 -i 1'
-    d.run 'cellect-1', image: 'edpaget/cellect:062714',
-      args: '--link pg:pg --link zk:zk'
-    d.run 'cellect-2', image: 'edpaget/cellect:062714',
-      args: '--link pg:pg --link zk:zk'
+    d.run 'cellect', image: 'zooniverse/cellect',
+      args: '--link postgres:pg --link zookeeper:zk'
+    d.run 'panoptes', image: 'zooniverse/panoptes',
+      args: '--link zookeeper:zookeeper --link postgres:postgres -v /home/vagrant/panoptes/:/rails_app/ -e "RAILS_ENV=development" -p 3000:80 zooniverse/panoptes'
   end
 end

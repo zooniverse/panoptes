@@ -1,5 +1,5 @@
 development:
-  zk_url: localhost:2181
+  zk_url: zookeeper:2181
 
 test:
   zk_url: localhost:2181

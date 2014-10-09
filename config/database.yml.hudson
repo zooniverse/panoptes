@@ -9,16 +9,10 @@ default: &default
 
 development:
   <<: *default
-  database: Panoptes_development
+  host: postgres
+  database: panoptes_development
 
 test:
   adapter: postgresql
   database: travis_ci_test
   username: postgres
-
-docker_dev:
-  <<: *default
-  host: <%= ENV['DB_PORT_5432_TCP_ADDR'] %>
-  port: <%= ENV['DB_PORT_5432_TCP_PORT'] %>
-  database: Panoptes_development
-
