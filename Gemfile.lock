@@ -35,6 +35,9 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
+    airbrake (4.1.0)
+      builder
+      multi_json
     arel (5.0.1.20140414130214)
     bcrypt (3.1.7)
     bcrypt (3.1.7-java)
@@ -300,6 +303,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter
+  airbrake (~> 4.1.0)
   cellect-client (~> 0.0.7)
   coffee-rails (~> 4.0.0)
   database_cleaner (~> 1.2.0)
