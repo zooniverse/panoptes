@@ -23,6 +23,7 @@ gem 'omniauth-gplus'
 gem 'cellect-client', '~> 0.0.7'
 gem 'puma'
 gem 'logstasher'
+gem 'airbrake', '~> 4.1.0'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
