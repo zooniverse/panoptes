@@ -2,9 +2,11 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   include JsonApiController
   include CreateOrUpdate
 
+  skip_before_filter :access_control_for_update_by_update
   prepend_before_filter :require_login
   doorkeeper_for :all, scopes: [:project]
   resource_actions :index, :show, :create, :update
+  access_control_for [:update, :update_preferences]
 
   allowed_params :create, :email_communication, preferences: [:tutorial],
     links: [:project]

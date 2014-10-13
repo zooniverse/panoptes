@@ -58,6 +58,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     end
 
     context "when a user doesn't have preferences for a project" do
+      let(:unauthorized_user) { resource.project.owner }
       let(:create_params) do
         {
          project_preferences: {

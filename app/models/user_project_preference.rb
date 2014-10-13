@@ -19,6 +19,8 @@ class UserProjectPreference < ActiveRecord::Base
   can :update, :allowed_to_change?
   can :destroy, :allowed_to_change?
   can :show, :allowed_to_change?
+  can :update_roles, proc { |actor| project.can_update?(actor) }
+  can :update_preferences, proc { |actor| user == actor.try(:user) }
 
   def self.visible_to(actor, as_admin: false)
     UserProjectPreferenceVisibilityQuery.new(actor, self).build(as_admin)
@@ -29,6 +31,6 @@ class UserProjectPreference < ActiveRecord::Base
   end
 
   def allowed_to_change?(actor)
-    actor.user == user || project.can_update?(actor)
+    can_update_preferences?(actor) || can_update_roles?(actor)
   end
 end

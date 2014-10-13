@@ -59,6 +59,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     end
 
     context "when a user doesn't have preferences for a project" do
+      let(:unauthorized_user) { resource.user }
       let(:create_params) do
         {
          project_roles: {
