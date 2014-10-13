@@ -4,6 +4,10 @@ class ClassificationVisibilityQuery < VisibilityQuery
   def queries
     [where_user, where_project, where_group]
   end
+  
+  def arel_table
+    @parent.arel_table
+  end
 
   def all_bind_values
     where_user.bind_values | where_project.bind_values | where_group.bind_values

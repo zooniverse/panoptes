@@ -20,6 +20,7 @@ gem 'airbrake', '~> 4.1.0'
 gem 'jquery-rails'
 gem 'uglifier'
 gem 'sidekiq'
+gem 'active_record_union'
 
 platforms :jruby do
   gem 'jbundler'
