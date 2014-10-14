@@ -17,7 +17,6 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
   let(:resource) { upps.first }
   let(:resource_class) { UserProjectPreference }
 
-
   describe "#index" do
     let!(:private_resource) { create(:user_project_preference) }
     let(:n_visible) { 2 }
@@ -43,7 +42,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
   describe "#create" do
     let(:test_attr) { :roles }
     let(:test_attr_value) { ["collaborator"] }
-    context "when a user has a preference object for a project" do
+    context "when a user doesn't a preference object for a project" do
       let(:create_params) do
         {
          project_roles: {
@@ -59,7 +58,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
       it_behaves_like "is creatable"
     end
 
-    context "when a user doesn't a preference object for a project" do
+    context "when a user has a preference object for a project" do
       let(:create_params) do
         {
          project_roles: {
@@ -72,7 +71,29 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
         }
       end
 
-      it_behaves_like "is creatable"
+      context "when the resource has no set roles" do
+        let!(:resource) do
+          create:user_project_preference, roles: [], project: project
+        end
+        
+        it_behaves_like "is creatable"
+      end
+
+      context "when the resource has previously set roles" do
+        before(:each) do
+          default_request scopes: scopes, user_id: authorized_user.id
+          post :create, create_params
+        end
+
+        it 'should return 422' do
+          expect(response.status).to eq(422)
+        end
+
+        it 'should give an error explaination' do
+          expect(json_response['errors'][0]['message'])
+            .to eq("Cannot create roles resource when one exists for the user and project")
+        end
+      end
     end
   end
 end

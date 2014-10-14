@@ -43,34 +43,17 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   describe "#create" do
     let(:test_attr) { :preferences }
     let(:test_attr_value) { { "tutorial" => true } }
-    context "when a user doesn't a preference object for a project" do
-      let(:create_params) do
-        {
-         project_preferences: {
-                               preferences: { tutorial: true },
-                               links: {
-                                       project: project.id.to_s
-                                      }
-                              }
-        }
-      end
-
-      it_behaves_like "is creatable"
+    let(:create_params) do
+      {
+       project_preferences: {
+                             preferences: { tutorial: true },
+                             links: {
+                                     project: project.id.to_s
+                                    }
+                            }
+      }
     end
 
-    context "when a user has a preference object for a project" do
-      let(:create_params) do
-        {
-         project_preferences: {
-                               preferences: { tutorial: true },
-                               links: {
-                                       project: resource.project.id.to_s
-                                      }
-                              }
-        }
-      end
-
-      it_behaves_like "is creatable"
-    end
+    it_behaves_like "is creatable"
   end
 end

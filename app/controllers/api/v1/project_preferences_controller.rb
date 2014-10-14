@@ -1,6 +1,5 @@
 class Api::V1::ProjectPreferencesController < Api::ApiController
   include JsonApiController
-  include CreateOrUpdate
 
   prepend_before_filter :require_login
   doorkeeper_for :all, scopes: [:project]
@@ -13,12 +12,6 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   allowed_params :update, :email_communication, preferences: [:tutorial]
 
   private
-
-  def should_update?
-    find_params = { user: api_user.user,
-                    project: create_params[:links][:project] }
-    super(find_params)
-  end
 
   def serializer
     UserProjectPreferenceSerializer

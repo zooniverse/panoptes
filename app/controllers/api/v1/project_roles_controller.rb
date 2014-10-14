@@ -1,6 +1,5 @@
 class Api::V1::ProjectRolesController < Api::ApiController
   include JsonApiController
-  include CreateOrUpdate
 
   prepend_before_filter :require_login
   doorkeeper_for :all, scopes: [:project]
@@ -11,11 +10,31 @@ class Api::V1::ProjectRolesController < Api::ApiController
   allowed_params :create, roles: [], links: [:user, :project]
 
   allowed_params :update, roles: []
+  def create
+    if should_update?
+      unless controlled_resource.roles.empty?
+        raise Api::RolesExist.new
+      end
+      
+      ActiveRecord::Base.transaction do
+        build_resource_for_update(create_params.except(:links))
+        controlled_resource.save!
+      end
+      
+      if controlled_resource.persisted?
+        created_resource_response(controlled_resource)
+      end
+    else
+      super
+    end
+  end
 
   private
-
+  
   def should_update?
-    super(create_params[:links])
+    @controlled_resource = resource_class.find_by(**create_params[:links])
+    return unless @controlled_resource
+    controlled_resource.can_update_roles?(api_user)
   end
 
   def serializer
