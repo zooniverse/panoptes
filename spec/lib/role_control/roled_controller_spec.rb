@@ -37,8 +37,8 @@ describe RoleControl::RoledController, type: :controller do
   end
 
   describe "#access_control_action" do
-    it 'should create a method named access_control_for_#{action}_by_#{test_method}' do
-      expect(controller).to respond_to(:access_control_for_update_by_update)
+    it 'should create a method named access_control_for_#{action}' do
+      expect(controller).to respond_to(:access_control_for_update)
     end
   end
 
