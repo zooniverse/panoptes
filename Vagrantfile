@@ -33,7 +33,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     d.run 'cellect', image: 'zooniverse/cellect',
       args: '--link postgres:pg --link zookeeper:zk'
     d.run 'panoptes', image: "zooniverse/ruby:#{ ruby_version }",
-      args: '--link zookeeper:zookeeper --link postgres:postgres -v /home/vagrant/panoptes/:/rails_app/ -e "RAILS_ENV=development" -p 3000:80 zooniverse/panoptes',
+      args: '--link zookeeper:zookeeper --link postgres:postgres -v /home/vagrant/panoptes/:/rails_app/ -e "RAILS_ENV=development" -p 3000:80',
       cmd: '/rails_app/start.sh'
   end
 end
