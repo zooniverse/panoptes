@@ -38,7 +38,7 @@ RSpec.describe UserProjectPreference, :type => :model do
       expect(UserProjectPreference.visible_to(actor)).to include(upps[0])
     end
 
-    it 'should not return preferences a user cannot access' do
+    it 'should not return preferences not belonging to a user or an editable project' do
       expect(UserProjectPreference.visible_to(actor)).not_to include(upps[2])
     end
 
