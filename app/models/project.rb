@@ -27,6 +27,8 @@ class Project < ActiveRecord::Base
   can_be_linked :workflow, :scope_for, :update, :actor
   can_be_linked :user_project_preference, :preference_scope, :actor
 
+  # Users can add preferences for any project they can see. Roles may
+  # only be added by a User that has edit permissions for a project
   def self.preference_scope(actor, type)
     case type
     when :roles
