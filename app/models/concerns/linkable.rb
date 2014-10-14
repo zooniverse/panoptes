@@ -13,7 +13,7 @@ module Linkable
 
     def link_to_resource(model, actor, *args)
       method, *default_args = @link_scopes[model.class]
-      scope_args = *link_scope_arguments(default_args, model, actor, args)
+      scope_args = link_scope_arguments(default_args, model, actor, args)
       send(method, *scope_args)
     end
 

@@ -4,15 +4,19 @@ module RoleControl
 
     module ClassMethods
       def access_control_action(controller_action, test_action, actor_method: :api_user, &block)
-        before_action only: [controller_action] do |controller|
-          resource = controller.send(:controlled_resource)
-          act_as = controller.send(:owner_from_params)
+        method_name = :"access_control_for_#{ controller_action}"
+
+        define_method method_name do
+          resource = send(:controlled_resource)
+          act_as = send(:owner_from_params)
 
           actor(block || actor_method).do(test_action)
             .to(resource)
             .as(act_as, allow_nil: false)
             .allowed?
         end
+        
+        before_action method_name, only: [controller_action]
       end
 
       def access_control_for(*actions)

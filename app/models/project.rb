@@ -14,6 +14,7 @@ class Project < ActiveRecord::Base
   has_many :subject_sets
   has_many :classifications
   has_many :subjects
+  has_many :project_roles, -> { where.not(roles: []) }, class_name: "UserProjectPreference"
 
   validates_uniqueness_of :name, case_sensitive: false, scope: :owner
   validates_uniqueness_of :display_name, scope: :owner
@@ -24,4 +25,16 @@ class Project < ActiveRecord::Base
   can_be_linked :subject_set, :scope_for, :update, :actor
   can_be_linked :subject, :scope_for, :update, :actor
   can_be_linked :workflow, :scope_for, :update, :actor
+  can_be_linked :user_project_preference, :preference_scope, :actor
+
+  # Users can add preferences for any project they can see. Roles may
+  # only be added by a User that has edit permissions for a project
+  def self.preference_scope(actor, type)
+    case type
+    when :roles
+      scope_for(:update, actor)
+    when :preferences
+      scope_for(:show, actor)
+    end
+  end
 end

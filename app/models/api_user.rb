@@ -19,6 +19,10 @@ class ApiUser
     user
   end
 
+  def owns?(model)
+    !!user.try(:owns?, model)
+  end
+
   def id
     user.try(:id)
   end

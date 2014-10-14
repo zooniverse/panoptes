@@ -4,7 +4,8 @@ class ProjectSerializer
     :subjects_count, :created_at, :updated_at, :available_languages,
     :content
 
-  can_include :workflows, :subject_sets, :owner, :project_contents
+  can_include :workflows, :subject_sets, :owner, :project_contents,
+    :project_roles
   can_filter_by :display_name
 
   def content

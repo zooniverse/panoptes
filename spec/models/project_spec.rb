@@ -65,9 +65,7 @@ describe Project, :type => :model do
       expect(Project).to link_to(Collection).given_args(user)
         .with_scope(:scope_for, :show, user)
     end
-    
   end
-  
  
   describe "#workflows" do
     let(:project) { create(:project_with_workflows) }
@@ -101,5 +99,21 @@ describe Project, :type => :model do
     let(:relation_instance) { project }
 
     it_behaves_like "it has a subjects association"
+  end
+
+  describe "#project_roles" do
+    let!(:preferences) do
+      [create(:user_project_preference, project: project, roles: []),
+       create(:user_project_preference, project: project, roles: ["tester"]),
+       create(:user_project_preference, project: project, roles: ["collaborator"])]
+    end
+
+    it 'should include models with assigned roles' do
+      expect(project.project_roles).to match_array(preferences[1..-1])
+    end
+
+    it 'should not include models without assigned roles' do
+      expect(project.project_roles).to_not include(preferences[0])
+    end
   end
 end

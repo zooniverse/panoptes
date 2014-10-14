@@ -16,7 +16,11 @@ describe Api::V1::UsersController, type: :controller do
     [ "id", "login", "display_name", "credited_name", "owner_name", "created_at", "updated_at" ]
   end
   let(:api_resource_links) do
-    [ "users.projects", "users.collections", "users.classifications", "users.subjects" ]
+    [ "users.projects",
+      "users.collections",
+      "users.classifications",
+      "users.subjects",
+      "users.project_preferences" ]
   end
 
   describe "#index" do

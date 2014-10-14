@@ -6,7 +6,8 @@ class User < ActiveRecord::Base
   include RoleControl::Enrolled
   include Linkable
 
-  attr_accessible :name, :email, :password, :login, :migrated_user, :display_name, :credited_name, :global_email_communication,
+  attr_accessible :name, :email, :password, :login, :migrated_user,
+    :display_name, :credited_name, :global_email_communication,
     :project_email_communication
 
   devise :database_authenticatable, :registerable,
@@ -16,8 +17,8 @@ class User < ActiveRecord::Base
   has_many :user_groups, through: :active_memberships
   has_many :classifications
   has_many :authorizations
-  has_many :user_project_preferences
   has_many :user_collection_preferences
+  has_many :project_preferences, class_name: "UserProjectPreference"
 
   has_many :memberships
   has_many :active_memberships, -> { active }, class_name: 'Membership'
@@ -27,7 +28,7 @@ class User < ActiveRecord::Base
   owns :subjects
   owns :oauth_applications, class_name: "Doorkeeper::Application"
 
-  enrolled_for :projects, through: :user_project_preferences
+  enrolled_for :projects, through: :project_preferences
   enrolled_for :collections, through: :user_collection_preferences
   enrolled_for :user_groups, through: :active_memberships
 
@@ -42,6 +43,7 @@ class User < ActiveRecord::Base
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
   can_be_linked :user_subject_queue, :all
+  can_be_linked :user_project_preference, :all
 
   attr_accessor :migrated_user
 
