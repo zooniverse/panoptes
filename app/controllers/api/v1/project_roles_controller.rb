@@ -37,7 +37,8 @@ class Api::V1::ProjectRolesController < Api::ApiController
   end
   
   def should_update?
-    @controlled_resource = resource_class.find_by(**create_params[:links])
+    find_params = create_params[:links].symbolize_keys
+    @controlled_resource = resource_class.find_by(**find_params)
     return unless @controlled_resource
     controlled_resource.can_update_roles?(api_user)
   end
