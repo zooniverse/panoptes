@@ -4,7 +4,8 @@ module RoleControl
 
     module ClassMethods
       def access_control_action(controller_action, test_action, actor_method: :api_user, &block)
-        method_name = :"access_control_for_#{ controller_action}_by_#{ test_action }"
+        method_name = :"access_control_for_#{ controller_action}"
+
 
         define_method method_name do
           resource = send(:controlled_resource)
@@ -15,8 +16,9 @@ module RoleControl
             .as(act_as, allow_nil: false)
             .allowed?
         end
-          
-       before_action method_name, only: [controller_action]
+        
+        skip_before_filter method_name
+        before_action method_name, only: [controller_action]
       end
 
       def access_control_for(*actions)

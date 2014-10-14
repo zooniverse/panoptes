@@ -2,7 +2,6 @@ class Api::V1::ProjectRolesController < Api::ApiController
   include JsonApiController
   include CreateOrUpdate
 
-  skip_before_filter :access_control_for_update_by_update
   prepend_before_filter :require_login
   doorkeeper_for :all, scopes: [:project]
   access_control_for [:update, :update_roles]
