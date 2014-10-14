@@ -20,7 +20,7 @@ class ApiUser
   end
 
   def owns?(model)
-    user.try(:owns?, model)
+    !!user.try(:owns?, model)
   end
 
   def id

@@ -42,7 +42,7 @@ RSpec.describe UserProjectPreference, :type => :model do
       expect(UserProjectPreference.visible_to(actor)).not_to include(upps[2])
     end
 
-    it 'should only return accessable preferences' do
+    it 'should only return preferences belonging to user or an editable project' do
       expect(UserProjectPreference.visible_to(actor)).to match_array(upps[0..1])
     end
   end

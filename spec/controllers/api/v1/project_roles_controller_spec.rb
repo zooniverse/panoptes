@@ -30,6 +30,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
   end
 
   describe "#update" do
+    let(:unauthorized_user) { resource.user }
     let(:test_attr) { :roles }
     let(:test_attr_value) { %w(collaborator) }
     let(:update_params) do
@@ -42,7 +43,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
   describe "#create" do
     let(:test_attr) { :roles }
     let(:test_attr_value) { ["collaborator"] }
-    context "when a user has preferences for a project" do
+    context "when a user has a preference object for a project" do
       let(:create_params) do
         {
          project_roles: {
@@ -58,8 +59,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
       it_behaves_like "is creatable"
     end
 
-    context "when a user doesn't have preferences for a project" do
-      let(:unauthorized_user) { resource.user }
+    context "when a user doesn't a preference object for a project" do
       let(:create_params) do
         {
          project_roles: {
