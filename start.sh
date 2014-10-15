@@ -6,7 +6,7 @@ cd /rails_app
 if [ "$RAILS_ENV" == "development" ]
 then
     bundle install
-    rake db:schema:load
+    rake db:migrate
 else
     ln -sf /rails_conf/* ./config/
 fi
