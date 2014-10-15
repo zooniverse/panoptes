@@ -269,6 +269,7 @@ DEPENDENCIES
   doorkeeper (~> 1.4.0)
   factory_girl_rails (~> 4.4.1)
   guard-rspec (~> 4.2.9)
+  jbundler
   jquery-rails
   jruby-kafka
   logstasher

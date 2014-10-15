@@ -25,6 +25,7 @@ platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
   gem 'therubyrhino'
   gem 'jruby-kafka'
+  gem 'jbundler'
 end
 
 platforms :ruby do
