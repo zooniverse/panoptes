@@ -5,26 +5,26 @@ module MultiKafkaProducer
     end
   end
   
-  def adapter=(adapter)
+  def self.adapter=(adapter)
     @adapter = load_adapater(adapter)
   end
   
-  def adapter
+  def self.adapter
     @adapter ||= default_adapter
   end
 
-  def connect(client_id, *brokers)
+  def self.connect(client_id, *brokers)
     adapter.connect(client_id, *brokers)
   end
 
-  def publish(topic, *msgs_and_keys)
+  def self.publish(topic, *msgs_and_keys)
     raise KafkaNotConnected.new(adapter) unless adapater.connected?
     adapter.publish(topic, msgs_and_keys)
   end
 
   KAFKAS = { kafka: 'jruby-kafka', poseidon: 'poseidon' }
 
-  def default_adapter
+  def self.default_adapter
     return :kafka if ::Kafka
     return :poseidon if ::Poseidon
 
@@ -38,18 +38,18 @@ module MultiKafkaProducer
     end
   end
 
-  def load_adapater(new_adapter)
+  def self.load_adapater(new_adapter)
     case new_adapter
     when String, Symbol
       load_adapter_by_name new_adapter.to_s
     when NilClass, FalseClass
       load_adapter default_adapter
-    when Class, MOdule
+    when Class, Module
       new_adapter
     end
   end
 
   def load_adapater_by_name(adapter_name)
-    "MultiKafkaProducer::Adapter::#{ adapter_name.camelize }".constantize
+    "MultiKafkaProducer::#{ adapter_name.camelize }".constantize
   end
 end

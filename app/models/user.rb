@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
   include RoleControl::Owner
   include RoleControl::Enrolled
   include Linkable
+  include KafkaEvent
 
   attr_accessible :name, :email, :password, :login, :migrated_user,
     :display_name, :credited_name, :global_email_communication,
@@ -46,6 +47,8 @@ class User < ActiveRecord::Base
   can_be_linked :user_project_preference, :all
 
   attr_accessor :migrated_user
+
+  kafka_event :sign_in, attributes: [:login, :current_sign_in_ip, :current_sign_in_at]
 
   def self.from_omniauth(auth_hash)
     auth = Authorization.from_omniauth(auth_hash)
