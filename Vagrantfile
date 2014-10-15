@@ -4,7 +4,7 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
-ruby_version = ENV['RUBY'] || 'jruby-1.7.16'
+ruby_version = ENV['PANOTPES_RUBY'] || 'jruby-1.7.16'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu-14.04-docker"
