@@ -1,27 +1,60 @@
 require 'spec_helper'
 
+def scrub_user_details(user)(user)
+  UserInfoScrubber.scrub_personal_info!(user)
+end
+
 describe UserInfoScrubber do
 
+  describe '::deleted_user_email' do
+    let(:user) { create(:user) }
+    let(:deleted_email) { UserInfoScrubber.deleted_user_email(user) }
+
+    it "should append the user_id to the email prefix" do
+      expect(deleted_email).to eq("deleted_user_#{user.id}@zooniverse.org")
+    end
+
+    context "when a user has been deleted" do
+
+      it "should append the user_id to the email prefix" do
+        scrub_user_details(user)
+        expect(deleted_email).to eq("deleted_user_#{user.id}@zooniverse.org")
+      end
+    end
+  end
+
   describe '::scrub_personal_info!' do
-    let(:scrub_user_details) { UserInfoScrubber.scrub_personal_info!(user) }
 
     context "when using an active user" do
       let(:user) { create(:user) }
 
+
       it 'should set set their email address to nil' do
-        scrub_user_details
-        expect(user.email).to eq(UserInfoScrubber::DELETED_USER_EMAIL)
+        scrub_user_details(user)
+        expect(user.email).to eq(UserInfoScrubber.deleted_user_email(user))
       end
 
       it "should replace their display name" do
-        scrub_user_details
+        scrub_user_details(user)
         expect(user.display_name).to eq("deleted_user")
       end
 
       it "should not change their login" do
         prev_user_login = user.login
-        scrub_user_details
+        scrub_user_details(user)
         expect(user.login).to eq(prev_user_login)
+      end
+    end
+
+    context "when a previous user has been deleted" do
+      let!(:setup_deleted_user) do
+        user = create(:user)
+        scrub_user_details(user)
+      end
+      let(:user) { create(:user) }
+
+      it "should not raise an error scrubbing the second user" do
+        expect{ scrub_user_details(user) }.to_not raise_error
       end
     end
 
@@ -30,11 +63,11 @@ describe UserInfoScrubber do
 
       it 'should raise an error as the user is already disabled' do
         error_message = "Can't scrub personal details of a disabled user with id: #{user.id}"
-        expect { scrub_user_details }.to raise_error(UserInfoScrubber::ScrubDisabledUserError, error_message)
+        expect { scrub_user_details(user) }.to raise_error(UserInfoScrubber::ScrubDisabledUserError, error_message)
       end
 
       it 'should not change the persisted instance' do
-        scrub_user_details rescue nil
+        scrub_user_details(user) rescue nil
         expect(user.changed?).to eq(false)
       end
     end
