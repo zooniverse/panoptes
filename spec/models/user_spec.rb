@@ -48,10 +48,6 @@ describe User, :type => :model do
       it 'should create a user with a authorization' do
         expect(user_from_auth_hash.authorizations).to all( be_an(Authorization) )
       end
-
-      it 'should not persist the user' do
-        expect(user.persisted?).to be false
-      end
     end
 
     context 'a new user with email' do
@@ -73,6 +69,14 @@ describe User, :type => :model do
 
       it 'should return the existing user' do
         expect(User.from_omniauth(auth_hash)).to eq(omniauth_user)
+      end
+    end
+
+    context 'an invalid user' do
+      it 'should raise an exception' do
+        create(:user, email: 'examplar@example.com')
+        auth_hash = OmniAuth.config.mock_auth[:gplus]
+        expect{ User.from_omniauth(auth_hash) }.to raise_error(ActiveRecord::RecordNotUnique)
       end
     end
   end
