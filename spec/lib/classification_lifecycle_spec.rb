@@ -119,12 +119,36 @@ shared_examples "update seen subjects" do
   end
 end
 
+shared_examples "publish to kafka" do
+  after(:each) { subject.send(test_method) }
+  
+  context "when classificaiton is completed" do
+    let(:classification) { build(:classification) }
+    
+    it 'should publish to kafka' do
+      serialized = ClassificationSerializer.serialize(classification).to_json
+      expect(MultiKafkaProducer).to receive(:publish)
+        .with('classifications', [classification.project.id, serialized])
+    end
+  end
+
+  context "when classificaiton is incomplete" do
+    let(:classification) { build(:classification, completed: false) }
+
+    it 'should do nothing' do
+      expect(MultiKafkaProducer).to_not receive(:publish)
+    end
+  end
+end
+
+
 describe ClassificationLifecycle do
   subject do
     ClassificationLifecycle.new(classification)
   end
 
   before(:each) do
+    allow(MultiKafkaProducer).to receive(:publish)
     stub_cellect_connection
   end
 
@@ -165,6 +189,7 @@ describe ClassificationLifecycle do
     it_behaves_like "dequeue subject"
     it_behaves_like "create project preference"
     it_behaves_like "update seen subjects"
+    it_behaves_like "publish to kafka"
   end
 
   describe "#on_update" do
@@ -172,5 +197,6 @@ describe ClassificationLifecycle do
 
     it_behaves_like "dequeue subject"
     it_behaves_like "update seen subjects"
+    it_behaves_like "publish to kafka"
   end
 end

@@ -17,6 +17,8 @@ class ClassificationLifecycle
       dequeue_subject if should_dequeue_subject?
       create_project_preference if should_create_project_preference?
     end
+
+    publish_to_kafka if classification.complete?
   end
 
   def on_update
@@ -24,6 +26,8 @@ class ClassificationLifecycle
       update_seen_subjects if should_update_seen?
       dequeue_subject if should_dequeue_subject?
     end
+    
+    publish_to_kafka if classification.complete?
   end
 
   private
@@ -79,6 +83,11 @@ class ClassificationLifecycle
 
   def update_seen_subjects
     UserSeenSubject.add_seen_subject_for_user(**user_workflow_subject)
+  end
+
+  def publish_to_kafka
+    classification_json = ClassificationSerializer.serialize(classification).to_json
+    MultiKafkaProducer.publish('classifications', [classification.project.id, classification_json])
   end
 
   def user_workflow_subject
