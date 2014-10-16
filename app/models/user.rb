@@ -87,7 +87,7 @@ class User < ActiveRecord::Base
   end
 
   def email_required?
-    authorizations.blank?
+    authorizations.blank? && !disabled?
   end
 
   def email_changed?

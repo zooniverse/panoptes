@@ -131,6 +131,13 @@ describe User, :type => :model do
         expect(dup.errors[:email]).to include("has already been taken")
       end
     end
+
+    context "when a user is disabled and has no email" do
+      subject { build(:user, email: nil, activated_state: :inactive) }
+
+      it { is_expected.to be_valid }
+    end
+    
   end
 
   describe "#password_required?" do

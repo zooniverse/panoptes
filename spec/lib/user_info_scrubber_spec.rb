@@ -6,23 +6,6 @@ end
 
 describe UserInfoScrubber do
 
-  describe '::deleted_user_email' do
-    let(:user) { create(:user) }
-    let(:deleted_email) { UserInfoScrubber.deleted_user_email(user) }
-
-    it "should append the user_id to the email prefix" do
-      expect(deleted_email).to eq("deleted_user_#{user.id}@zooniverse.org")
-    end
-
-    context "when a user has been deleted" do
-
-      it "should append the user_id to the email prefix" do
-        scrub_user_details(user)
-        expect(deleted_email).to eq("deleted_user_#{user.id}@zooniverse.org")
-      end
-    end
-  end
-
   describe '::scrub_personal_info!' do
 
     context "when using an active user" do
@@ -31,7 +14,7 @@ describe UserInfoScrubber do
 
       it 'should set set their email address to nil' do
         scrub_user_details(user)
-        expect(user.email).to eq(UserInfoScrubber.deleted_user_email(user))
+        expect(user.email).to be_nil
       end
 
       it "should replace their display name" do
