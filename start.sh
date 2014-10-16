@@ -7,7 +7,10 @@ if [ "$RAILS_ENV" == "development" ]
 then
     bundle install
     rake db:migrate
-else
+fi
+
+if [ -d "/rails_conf/" ]
+then
     ln -sf /rails_conf/* ./config/
 fi
 
