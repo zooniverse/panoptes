@@ -12,11 +12,10 @@ If you're interested in how Panoptes is implemented check out the [wiki](https:/
 
 ### Requirements
 
-Panoptes is primarily developed against stable JRuby, currently 1.7.12. It is
+Panoptes is primarily developed against stable JRuby, currently 1.7.16. It is
 tested against the following versions:
 * 2.1.2
-* JRuby 1.7.12
-* JRuby HEAD
+* JRuby 1.7.16
 
 It uses a couple Ruby 2.0 features, so you'll need to put JRuby in 2.0 mode by
 setting JRUBY_OPTS=--2.0 in your environment.
@@ -43,6 +42,9 @@ adjust the port in your `cellect.yml` file.
 
 ### Vagrant
 
+If you're just looking to run Panoptes to develop against it's API. I
+recommend looking at [Devoptes](https://github.com/zooniverse/Devoptes).
+
 Panoptes comes with [Vagrant](http://vagrantup.com) (version > 1.5.0) and
 [VirtualBox](https://www.virtualbox.org/) (version > 4.3) configuration to make
 a test environment easy to get up and running. Use the following commands to get
@@ -54,6 +56,12 @@ started
 The Rails application running in the VM will be available at
 `http://localhost:3000`. Note that it will take a few minutes for Panoptes to
 start. Monitor it with `docker logs panoptes`.
+
+After Panoptes starts you can access a rails console within the
+vagrant box by running
+
+      vagrant ssh #if not already logged in
+      ./panoptes/vagrant-scripts/console.sh
 
 ### License
 
