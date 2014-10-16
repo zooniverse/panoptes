@@ -18,8 +18,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def build_resource_for_update(update_params)
     super
-    host = cellect_host(classification.workflow.id)
-    ClassificationLifecycle.new(classification, host).on_update
+    ClassificationLifecycle.new(classification).queue(cellect_host)
     classification
   end
 
@@ -31,8 +30,11 @@ class Api::V1::ClassificationsController < Api::ApiController
     create_params[:links][:user] = api_user.user
     create_params[:user_ip] = request_ip
     classification = super(create_params)
-    host = cellect_host(classification.workflow.id)
-    ClassificationLifecycle.new(classification, host).on_create
+    ClassificationLifecycle.new(classification).queue(cellect_host)
     classification
+  end
+
+  def cellect_host
+    super(classification.workflow.id)
   end
 end

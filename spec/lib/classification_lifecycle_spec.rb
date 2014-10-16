@@ -40,8 +40,6 @@ shared_examples "dequeue subject" do
 end
 
 shared_examples "update cellect" do
-  let(:classification) { create(:classification) }
-  
   it "should setup the add seen command to cellect" do
     expect(stubbed_cellect_connection).to receive(:add_seen)
       .with(
@@ -50,7 +48,6 @@ shared_examples "update cellect" do
             user_id: classification.user.id,
             host: 'http://test.host/'
            )
-    subject.send(test_method)
   end
 end
 
@@ -124,11 +121,42 @@ end
 
 describe ClassificationLifecycle do
   subject do
-    ClassificationLifecycle.new(classification, "http://test.host/")
+    ClassificationLifecycle.new(classification)
   end
 
   before(:each) do
     stub_cellect_connection
+  end
+
+  describe "#queue" do
+    let(:classification) { create(:classification) }
+
+    after(:each) do
+      subject.queue('http://test.host/', test_method)
+    end
+    
+    context "with create action" do
+      let(:test_method) { :create }
+      
+      it_behaves_like "update cellect"
+
+      it 'should queue other actions' do
+        expect(ClassificationWorker).to receive(:perform_async)
+          .with(classification.id, :create)
+      end
+    end
+    
+    context "with update action" do
+      let(:test_method) { :update }
+      
+      it_behaves_like "update cellect"
+
+      it 'should queue other actions' do
+        expect(ClassificationWorker).to receive(:perform_async)
+          .with(classification.id, :update )
+      end
+    end
+    
   end
   
   describe "#on_create" do
@@ -137,7 +165,6 @@ describe ClassificationLifecycle do
     it_behaves_like "dequeue subject"
     it_behaves_like "create project preference"
     it_behaves_like "update seen subjects"
-    it_behaves_like "update cellect"
   end
 
   describe "#on_update" do
@@ -145,6 +172,5 @@ describe ClassificationLifecycle do
 
     it_behaves_like "dequeue subject"
     it_behaves_like "update seen subjects"
-    it_behaves_like "update cellect"
   end
 end

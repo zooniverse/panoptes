@@ -1,27 +1,29 @@
 class ClassificationLifecycle
   attr_reader :classification, :cellect_host
   
-  def initialize(classification, cellect_host)
-    @classification, @cellect_host = classification, cellect_host
+  def initialize(classification)
+    @classification = classification
+  end
+
+  def queue(cellect_host, action)
+    @cellect_host = cellect_host
+    update_cellect if should_update_seen?
+    ClassificationWorker.perform_async(classification.id, action)
   end
   
   def on_create
-    if should_update_seen?
-      update_cellect
-      update_seen_subjects
+    ActiveRecord::Base.transaction do 
+      update_seen_subjects if should_update_seen?
+      dequeue_subject if should_dequeue_subject?
+      create_project_preference if should_create_project_preference?
     end
-    
-    dequeue_subject if should_dequeue_subject?
-    create_project_preference if should_create_project_preference?
   end
 
   def on_update
-    if should_update_seen?
-      update_cellect
-      update_seen_subjects
+    ActiveRecord::Base.transaction do 
+      update_seen_subjects if should_update_seen?
+      dequeue_subject if should_dequeue_subject?
     end
-    
-    dequeue_subject if should_dequeue_subject?
   end
 
   private

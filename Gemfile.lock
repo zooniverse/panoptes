@@ -262,7 +262,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter
-  airbrake (~> 4.1.0)
+  airbrake
   cellect-client (~> 0.0.7)
   database_cleaner (~> 1.2.0)
   devise
