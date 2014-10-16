@@ -1,12 +1,12 @@
 module MultiKafkaProducer
   class KafkaNotConnected < StandardError
     def initialize(adapter)
-      super "Kafka adapter #{ adapter.name } is not connected"
+      super("Kafka adapter #{ adapter.name } is not connected")
     end
   end
   
   def self.adapter=(adapter)
-    @adapter = load_adapater(adapter)
+    @adapter = load_adapter(adapter)
   end
   
   def self.adapter
@@ -18,9 +18,11 @@ module MultiKafkaProducer
   end
 
   def self.publish(topic, *msgs_and_keys)
-    raise KafkaNotConnected.new(adapter) unless adapater.connected?
+    raise KafkaNotConnected, adapter unless adapter.connected?
     adapter.publish(topic, msgs_and_keys)
   end
+
+  private
 
   KAFKAS = { kafka: 'jruby-kafka', poseidon: 'poseidon' }
 
@@ -38,7 +40,7 @@ module MultiKafkaProducer
     end
   end
 
-  def self.load_adapater(new_adapter)
+  def self.load_adapter(new_adapter)
     case new_adapter
     when String, Symbol
       load_adapter_by_name new_adapter.to_s
@@ -49,7 +51,7 @@ module MultiKafkaProducer
     end
   end
 
-  def load_adapater_by_name(adapter_name)
+  def self.load_adapter_by_name(adapter_name)
     "MultiKafkaProducer::#{ adapter_name.camelize }".constantize
   end
 end

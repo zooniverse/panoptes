@@ -1,19 +1,19 @@
 module MultiKafkaProducer
   class Kafka < AbstractAdapter
-    adapter_name :jruby-kafka
+    adapter_name :jruby_kafka
 
-    def connected?
+    def self.connected?
       !!@connection
     end
 
-    def connect(client_id, *brokers)
-      @connection = Kafka::Producer.new({broker_list: brokers,
-                                         client_id: client_id})
+    def self.connect(client_id, *brokers)
+      @connection = ::Kafka::Producer.new({broker_list: brokers,
+                                           client_id: client_id})
       @connection.connect
       @connection
     end
 
-    def publish(topic, msgs_and_keys)
+    def self.publish(topic, msgs_and_keys)
       msgs.each do |msg|
         key, msg = split_msg_pair(msg)
         @connection.send_msg(topic, key, msg)
