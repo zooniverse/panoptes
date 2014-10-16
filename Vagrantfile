@@ -5,6 +5,7 @@
 VAGRANTFILE_API_VERSION = "2"
 
 ruby_version = ENV['PANOTPES_RUBY'] || 'jruby-1.7.16'
+bundle_command = ruby_version.match(/jruby/) ? 'jbundle' : 'bundle'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu-14.04-docker"
@@ -23,7 +24,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "docker",
     version: '1.0.1',
-    images: [ 'zooniverse/postgresql', 'zooniverse/zookeeper', 'zooniverse/cellect', 'zooniverse/ruby' ]
+    images: [ 'zooniverse/postgresql',
+              'zooniverse/zookeeper',
+              'zooniverse/cellect',
+              'zooniverse/ruby',
+              'edpaget/kafka',
+              'redis' ]
 
   config.vm.provision "docker" do |d|
     d.run 'postgres', image: 'zooniverse/postgresql',
@@ -32,8 +38,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cmd: '-c localhost:2888:3888 -i 1'
     d.run 'cellect', image: 'zooniverse/cellect',
       args: '--link postgres:pg --link zookeeper:zk'
+    d.run 'redis', image: 'redis',
+      cmd: 'redis-server --appendonly yes'
+    d.run 'kafka', image: 'edpaget/kafka:0.8.1',
+      args: '--link zookeeper:zookeeper',
+      cmd: '-H kafka -p 9092 -z zookeeper:2181 -i 1'
     d.run 'panoptes', image: "zooniverse/ruby:#{ ruby_version }",
-      args: '--link zookeeper:zookeeper --link postgres:postgres -v /home/vagrant/panoptes/:/rails_app/ -e "RAILS_ENV=development" -p 3000:80',
-      cmd: '/rails_app/start.sh'
+      args: '--link zookeeper:zookeeper --link postgres:postgres --link kafka:kafka --link redis:redis -v /home/vagrant/panoptes/:/rails_app/ -e "RAILS_ENV=development" -p 3000:80',
+      cmd: "bash -c \"#{ bundle_command } /rails_app/start.sh\""
+    d.run 'panoptes-sidekiq', image: "zooniverse/ruby:#{ ruby_version}",
+      args: '--link zookeeper:zookeeper --link postgres:postgres --link kafka:kafka --link redis:redis -v /home/vagrant/panoptes/:/rails_app/ -e "RAILS_ENV=development"',
+      cmd: "bash -c \"#{ bundle_command } install && bundle exec sidekiq\""
   end
 end
