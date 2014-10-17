@@ -27,8 +27,8 @@ module MultiKafkaProducer
   KAFKAS = { kafka: 'jruby-kafka', poseidon: 'poseidon' }
 
   def self.default_adapter
-    return :kafka if ::Kafka
-    return :poseidon if ::Poseidon
+    return :kafka if defined? ::Kafka
+    return :poseidon if defined? ::Poseidon
 
     KAFKAS.each do |name, package_name|
       begin
