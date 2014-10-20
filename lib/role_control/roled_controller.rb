@@ -39,7 +39,7 @@ module RoleControl
 
     def controlled_resource
       @controlled_resource ||= 
-        if params.has_key?("#{ resource_name }_id")
+        if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
           resource_class.find(params["#{ resource_name }_id"])
         elsif params.has_key?(:id)
           resource_class.find(params[:id])
