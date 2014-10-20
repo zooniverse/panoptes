@@ -32,6 +32,7 @@ shared_examples "an omniauth callback" do
   end
 
   it 'should redirect to a user editor if the created user is not valid'
+  it 'should redirect to a user editor if the created user is not unique'
 end
 
 describe OmniauthCallbacksController, type: :controller do
