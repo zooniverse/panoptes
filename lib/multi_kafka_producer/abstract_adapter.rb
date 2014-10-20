@@ -5,7 +5,7 @@ module MultiKafkaProducer
       @name
     end
 
-    def name
+    def self.name
       self.class.adapter_name
     end
 
