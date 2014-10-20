@@ -8,7 +8,9 @@ shared_examples "an api response" do
   end
 
   it "should have links to other resources" do
-    expect(json_response["links"]).to include(*api_resource_links)
+    unless api_resource_links.empty?
+      expect(json_response["links"]).to include(*api_resource_links)
+    end
   end
 
   it "should have list the response instances" do
