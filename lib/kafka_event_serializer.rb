@@ -1,4 +1,4 @@
-class KafkaSerializer
+class KafkaEventSerializer
   attr_reader :attributes, :links
   
   def initialize(attributes=[], links=[])
@@ -31,7 +31,7 @@ class KafkaSerializer
       when :has_one, :belongs_to
         if reflection.polymorphic?
           linked = model.send(link)
-          { link => {id: linked  .id.to_s,
+          { link => {id: linked.id.to_s,
                      type: linked.class.model_name.singular}}
         else
           { link => model.send(link).id.to_s }

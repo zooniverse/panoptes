@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-RSpec.describe KafkaSerializer do
+RSpec.describe KafkaEventSerializer do
   let(:model) { create(:collection_with_subjects) }
 
   describe "#serialize" do
     let(:serialized) do
-      KafkaSerializer.new([:name, :display_name], [:subjects, :owner])
+      KafkaEventSerializer.new([:name, :display_name], [:subjects, :owner])
         .serialize(model)
     end
     
