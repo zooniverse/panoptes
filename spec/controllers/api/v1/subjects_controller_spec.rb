@@ -216,4 +216,21 @@ describe Api::V1::SubjectsController, type: :controller do
 
     it_behaves_like "is destructable"
   end
+
+  describe "versioning" do
+    let(:resource) { create(:subject, owner: user) }
+
+    let(:update_block) do
+      10.times do |n|
+        resource.update!(metadata: { times: n })
+      end
+    end
+    
+    let(:api_resource_name) { "versions" }
+    let(:api_resource_attributes) { %w(id changeset whodunnit created_at) }
+    let(:api_resource_links) { [ "versions.item" ] }
+    let(:resource_param) { :subject_id }
+   
+    it_behaves_like "a versioned resource"
+  end
 end

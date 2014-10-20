@@ -32,7 +32,10 @@ Rails.application.routes.draw do
       
       json_api_resources :memberships
       
-      json_api_resources :subjects
+      json_api_resources :subjects do
+        get "/versions", to: "subjects#versions", format: false
+        get "/versions/:id", to: "subjects#version", format: false
+      end
       
       json_api_resources :users, except: [:new, :edit, :create],
         links: [:user_groups]

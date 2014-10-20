@@ -38,21 +38,25 @@ module RoleControl
     end
 
     def controlled_resource
-      @controlled_resource ||= if params.has_key?(:id)
-                                 resource_class.find(params[:id])
-                               else
-                                 resource_class
-                               end
+      @controlled_resource ||= 
+        if params.has_key?("#{ resource_name }_id")
+          resource_class.find(params["#{ resource_name }_id"])
+        elsif params.has_key?(:id)
+          resource_class.find(params[:id])
+        else
+          resource_class
+        end
     end
 
     def owner_from_params
-      @owner ||= if params[:owner]
-                   OwnerName.where(name: params[:owner]).first.try(:resource)
-                 elsif params[resource_sym].try(:has_key, :owner)
-                   owner_from_link_params
-                 else
-                   nil
-                 end
+      @owner ||=
+        if params[:owner]
+          OwnerName.where(name: params[:owner]).first.try(:resource)
+        elsif params[resource_sym].try(:has_key, :owner)
+          owner_from_link_params
+        else
+          nil
+        end
     end
 
     def visible_scope(actor)

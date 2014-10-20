@@ -1,8 +1,10 @@
 class Api::V1::SubjectsController < Api::ApiController
   include JsonApiController
+  include Versioned
   
   before_action :merge_cellect_host, only: :index
-  doorkeeper_for :update, :create, :destroy, scopes: [:subject]
+  doorkeeper_for :update, :create, :destroy, :version, :versions,
+    scopes: [:subject]
   resource_actions :default
 
   def index
