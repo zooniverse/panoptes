@@ -226,9 +226,6 @@ describe Api::V1::SubjectsController, type: :controller do
       end
     end
     
-    let(:api_resource_name) { "versions" }
-    let(:api_resource_attributes) { %w(id changeset whodunnit created_at) }
-    let(:api_resource_links) { [ "versions.item" ] }
     let(:resource_param) { :subject_id }
    
     it_behaves_like "a versioned resource"
