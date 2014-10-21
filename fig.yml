@@ -16,8 +16,10 @@ cellect:
     - zookeeper:zk
 
 panoptes:
-  build: .
+  image: zooniverse/ruby:jruby-1.7.16
   command: /rails_app/start.sh
+  volumes:
+    - ./:/rails_app
   ports:
     - "3000:80"
   environment:
