@@ -13,15 +13,21 @@ class Api::V1::ProjectsController < Api::ApiController
 
   allowed_params :update, :description, :display_name,
     links: [workflows: [], subject_sets: []]
-  
+
+  CONTENT_FIELDS = %W(title
+                      description
+                      guide
+                      team_members
+                      science_case
+                      introduction)
+
+  INDEX_FIELDS = %w(title description)
+
   def show
     render json_api: serializer.resource(params,
                                          visible_scope,
                                          languages: current_languages,
-                                         fields: ['title',
-                                                  'description',
-                                                  'example_strings',
-                                                  'pages'])
+                                         fields: CONTENT_FIELDS)
   end
 
   def index
@@ -29,7 +35,7 @@ class Api::V1::ProjectsController < Api::ApiController
     render json_api: serializer.page(params,
                                      visible_scope,
                                      languages: current_languages,
-                                     fields: ['title', 'description'])
+                                     fields: INDEX_FIELDS)
   end
 
   private
@@ -43,16 +49,20 @@ class Api::V1::ProjectsController < Api::ApiController
   def create_response(project)
     serializer.resource(project,
                         nil,
-                        languages: [ params[:projects][:primary_language] ],
+                        languages: [ project.primary_language ],
                         fields: ['title', 'description'] )
   end
 
-  def content_from_params(params)
-    title, language = params.values_at(:display_name, :primary_language)
-    description = params.delete(:description)
-    { description: description,
-      title: title,
-      language: language }.select { |k,v| !!v } 
+  def update_response
+    render json_api: create_response(project)
+  end
+  
+  def content_from_params(ps)
+    ps[:title] = ps[:display_name]
+    content = ps.slice(*CONTENT_FIELDS)
+    content[:language] = ps[:primary_language]
+    ps.except!(*CONTENT_FIELDS)
+    content.select { |k,v| !!v } 
   end
 
   def build_resource_for_create(create_params)

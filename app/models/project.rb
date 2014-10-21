@@ -8,7 +8,7 @@ class Project < ActiveRecord::Base
   include Linkable
 
   attr_accessible :name, :display_name, :owner, :primary_language,
-    :project_contents
+    :project_contents, :avatar, :background_image
 
   has_many :workflows
   has_many :subject_sets
