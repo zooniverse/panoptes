@@ -14,14 +14,14 @@ class Api::V1::ProjectsController < Api::ApiController
   allowed_params :update, :description, :display_name,
     links: [workflows: [], subject_sets: []]
 
-  CONTENT_FIELDS = %W(title
-                      description
-                      guide
-                      team_members
-                      science_case
-                      introduction)
+  CONTENT_FIELDS = [:title,
+                    :description,
+                    :guide,
+                    :team_members,
+                    :science_case,
+                    :introduction]
 
-  INDEX_FIELDS = %w(title description)
+  INDEX_FIELDS = [:title, :description]
 
   def show
     render json_api: serializer.resource(params,
@@ -72,7 +72,7 @@ class Api::V1::ProjectsController < Api::ApiController
     create_params[:links][:owner] = owner || api_user.user
 
     project = super(create_params)
-    project.project_contents.build(**content_params)
+    project.project_contents.build(**content_params.symbolize_keys)
     project
   end
 
