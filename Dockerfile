@@ -2,9 +2,12 @@ FROM zooniverse/ruby:jruby-1.7.16
 
 WORKDIR /rails_app
 
-ADD ./ /rails_app
+ADD ./Gemfile /rails_app/
+ADD ./Gemfile.lock /rails_app/
 
 RUN bundle install --without test development
+
+ADD ./ /rails_app
 
 EXPOSE 80
 
