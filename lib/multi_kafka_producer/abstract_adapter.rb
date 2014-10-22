@@ -11,7 +11,7 @@ module MultiKafkaProducer
 
     private
     
-    def split_msg_pair(msg)
+    def self.split_msg_pair(msg)
       key, msg = msg
       (msg) ? [key, msg] : [nil, key]
     end
