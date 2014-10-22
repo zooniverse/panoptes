@@ -1,0 +1,30 @@
+postgres:
+  image: zooniverse/postgresql
+  environment:
+    - "DB=panoptes_development"
+    - "PG_USER=panoptes"
+    - "PASS=panoptes"
+
+zookeeper:
+  image: zooniverse/zookeeper
+  command: /usr/share/zookeeper/bin/zkServer.sh start-foreground -c localhost:2888:3888 -i 1
+
+cellect:
+  image: zooniverse/cellect
+  links:
+    - postgres:pg
+    - zookeeper:zk
+
+panoptes:
+  image: zooniverse/ruby:jruby-1.7.16
+  command: /rails_app/start.sh
+  volumes:
+    - ./:/rails_app
+  ports:
+    - "3000:80"
+  environment:
+    - "RAILS_ENV=development"
+  links:
+    - postgres
+    - zookeeper
+    - cellect
