@@ -12,7 +12,10 @@ class ClassificationLifecycle
 
   def transact!(&block)
     Classification.transaction do
-      instance_eval &block
+      update_seen_subjects
+      dequeue_subject
+      instance_eval &block if block_given?
+      publish_to_kafka
     end
   end
 
@@ -83,9 +86,9 @@ class ClassificationLifecycle
   
   def user_workflow_subject
     {
-     user: user,
-     workflow: workflow,
-     set_member_subject: set_member_subject
+      user: user,
+      workflow: workflow,
+      set_member_subject: set_member_subject
     }
   end
 end

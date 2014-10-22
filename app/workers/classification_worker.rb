@@ -5,18 +5,9 @@ class ClassificationWorker
     classification = ClassificationLifecycle.new(Classification.find(id))
     case action
     when :update
-      classification.transact! do
-        update_seen_subjects
-        dequeue_subject
-        publish_to_kafka
-      end
+      classification.transact!
     when :create
-      classification.transact! do
-        update_seen_subjects
-        dequeue_subject
-        create_project_preference
-        publish_to_kafka
-      end
+      classification.transact! { create_project_preference }
     end
   end
 end
