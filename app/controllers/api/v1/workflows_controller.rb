@@ -4,15 +4,13 @@ class Api::V1::WorkflowsController < Api::ApiController
   doorkeeper_for :update, :create, :delete, scopes: [:project]
   resource_actions :default
 
-  allowed_params :create, :pairwise, :grouped, :prioritized, :name,
-    :primary_language, tasks: [:key, :question, :type, :answers],
-    links: [:project, subject_sets: []]
+  
+  
+  
 
-  allowed_params :update, :pairwise, :grouped, :prioritized, :name,
-    tasks: [:key, :question, :type, :answers], links: [subject_sets: []]
 
   alias_method :workflow, :controlled_resource
-
+  
   def show
     load_cellect
     super
@@ -31,5 +29,42 @@ class Api::V1::WorkflowsController < Api::ApiController
       user_id: api_user.id,
       workflow_id: params[:id]
     }
+  end
+
+  def create_params
+    permit_params(:pairwise,
+                  :grouped,
+                  :prioritized,
+                  :name,
+                  :primary_language,
+                  :first_task,
+                  tasks: permit_tasks,
+                  links: [:project,
+                          subject_sets: []]) 
+  end
+
+  def update_params
+    permit_params(:pairwise,
+                  :grouped,
+                  :prioritized,
+                  :name,
+                  :tasks, permit_tasks,
+                  :first_task,
+                  links: [subject_sets: []])
+  end
+
+  def permit_params(*permitted)
+    params.require(:workflows).permit(*permitted)
+  end
+
+  def permit_tasks
+    params[:workflows].fetch(:tasks, [])
+      .reduce([]) do |permitted, (task_name, _)|
+      permitted.concat([task_name => [:type,
+                                      :question,
+                                      :next,
+                                      tools: [:value, :label, :type, :color],
+                                      answers: [:value, :label]]])
+    end
   end
 end

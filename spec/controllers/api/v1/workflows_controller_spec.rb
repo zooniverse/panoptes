@@ -35,13 +35,13 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:test_relation_ids) { subject_set.id }
     let(:update_params) do
       {
-       workflows: {
-                  name: "A Better Name",
-                  links: {
-                          subject_sets: [subject_set.id.to_s],
-                         }
-                  
-                 }
+        workflows: {
+          name: "A Better Name",
+          links: {
+            subject_sets: [subject_set.id.to_s],
+          }
+          
+        }
       }
     end
 
@@ -55,18 +55,38 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:test_attr_value) { 'Test workflow' }
     let(:create_params) do
       {
-       workflows: {
-                   name: 'Test workflow',
-                   tasks: [{type: "draw",
-                            question: "Draw a Circle",
-                            key:'q-1'}],
-                   grouped: true,
-                   prioritized: true,
-                   primary_language: 'en',
-                   links: { 
-                           project: project.id,
-                          }
-                  }
+        workflows: {
+          name: 'Test workflow',
+          first_task: 'interest',
+          tasks: {
+            interest: {
+              type: "draw",
+              question: "Draw a Circle",
+              next: "shape",
+              tools: [
+                {value: "red", label: "Red", type: 'point', color: 'red'},
+                {value: "green", label: "Green", type: 'point', color: 'lime'},
+                {value: "blue", label: "Blue", type: 'point', color: 'blue'},
+              ]
+            },
+            shape: {
+              type: 'multiple',
+              question: "What shape is this galaxy?",
+              answers: [
+                {value: 'smooth', label: "Smooth"},
+                {value: 'features', label: "Features"},
+                {value: 'other', label: 'Star or artifact'}
+              ],
+              next: nil
+            }
+          },
+          grouped: true,
+          prioritized: true,
+          primary_language: 'en',
+          links: { 
+            project: project.id,
+          }
+        }
       }
     end
     
@@ -98,9 +118,9 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it "should set a load user command to cellect" do
         expect(stubbed_cellect_connection).to receive(:load_user)
-          .with(user_id: user.id,
-                host: 'example.com',
-                workflow_id: workflows.first.id.to_s)
+                                               .with(user_id: user.id,
+                                                     host: 'example.com',
+                                                     workflow_id: workflows.first.id.to_s)
         get :show, id: workflows.first.id
       end
     end
