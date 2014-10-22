@@ -48,8 +48,6 @@ class User < ActiveRecord::Base
 
   attr_accessor :migrated_user
 
-  kafka_event :sign_in, attributes: [:login, :current_sign_in_ip, :current_sign_in_at]
-
   def self.from_omniauth(auth_hash)
     auth = Authorization.from_omniauth(auth_hash)
     auth.user ||= create do |u|
