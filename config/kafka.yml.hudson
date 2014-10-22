@@ -7,4 +7,3 @@ test:
   producer_id: panoptes_test
   brokers:
     - localhost:9092
-        
