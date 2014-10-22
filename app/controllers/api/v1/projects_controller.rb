@@ -5,14 +5,12 @@ class Api::V1::ProjectsController < Api::ApiController
   resource_actions :update, :create, :destroy
 
   alias_method :project, :controlled_resource
-  
-  allowed_params :create, :description, :display_name, :name,
-    :primary_language, links: [owner: polymorphic,
-                               workflows: [],
-                               subject_sets: []]
 
-  allowed_params :update, :description, :display_name,
-    links: [workflows: [], subject_sets: []]
+  CONTENT_PARAMS = [:description,
+                    :science_case,
+                    :introduction,
+                    team_members: [:name, :bio, :twitter, :institution],
+                    guide: [:image, :explanation]] 
 
   CONTENT_FIELDS = [:title,
                     :description,
@@ -22,6 +20,14 @@ class Api::V1::ProjectsController < Api::ApiController
                     :introduction]
 
   INDEX_FIELDS = [:title, :description]
+  
+  allowed_params :create, :display_name, :name, :primary_language,
+    *CONTENT_PARAMS, links: [owner: polymorphic,
+                             workflows: [],
+                             subject_sets: []]
+
+  allowed_params :update, :display_name, *CONTENT_PARAMS,
+    links: [workflows: [], subject_sets: []]
 
   def show
     render json_api: serializer.resource(params,
