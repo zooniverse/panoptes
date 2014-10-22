@@ -25,18 +25,18 @@ RSpec.describe KafkaEvent do
 
   describe "::kafka_event" do
     it 'should create method with the event name' do
-      expect(test_class).to respond_to(:event_thing)
+      expect(test_class).to respond_to(:publish_event_thing)
     end
 
     it 'should call delay' do
       expect(test_class).to receive(:delay).and_return(test_class)
-      test_class.event_thing(1,2,3)
+      test_class.publish_event_thing(1,2,3)
     end
 
     it 'should call publish_to_kafka' do
       expect(test_class).to receive(:publish_to_kafka)
         .with('events1', :event_thing, [1, 2, 3])
-      test_class.event_thing(1,2,3)
+      test_class.publish_event_thing(1,2,3)
     end
   end
 

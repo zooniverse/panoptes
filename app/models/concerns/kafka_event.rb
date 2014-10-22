@@ -8,7 +8,7 @@ module KafkaEvent
   module ClassMethods
     def kafka_event(kafka_key, topic: 'events', attributes: [], links: [])
       @serializers[kafka_key] = KafkaEventSerializer.new(attributes, links)
-      define_singleton_method kafka_key do |*ids|
+      define_singleton_method :"publish_#{ kafka_key}" do |*ids|
         delay.publish_to_kafka(topic, kafka_key, ids)
       end
     end
