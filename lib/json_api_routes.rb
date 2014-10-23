@@ -12,6 +12,9 @@ module JsonApiRoutes
     links = options.delete(:links)
     options = options.merge(except: [:new, :edit],
                             format: false)
-    resources(path, options) { create_links(path, links) if links }
+    resources(path, options) do
+      create_links(path, links) if links
+      yield if block_given?
+    end
   end
 end
