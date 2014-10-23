@@ -5,7 +5,6 @@ class User < ActiveRecord::Base
   include RoleControl::Owner
   include RoleControl::Enrolled
   include Linkable
-  include KafkaEvent
 
   attr_accessible :name, :email, :password, :login, :migrated_user,
     :display_name, :credited_name, :global_email_communication,
