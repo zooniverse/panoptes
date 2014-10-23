@@ -1,19 +1,8 @@
 require 'spec_helper'
-shared_examples "update cellect" do
-  it "should setup the add seen command to cellect" do
-    expect(stubbed_cellect_connection).to receive(:add_seen)
-      .with(
-            subject_id: classification.set_member_subject.id,
-            workflow_id: classification.workflow.id,
-            user_id: classification.user.id,
-            host: 'http://test.host/'
-           )
-  end
-end
 
 describe ClassificationLifecycle do
   subject do
-    ClassificationLifecycle.new(classification, 'http://test.host/')
+    ClassificationLifecycle.new(classification)
   end
 
   before(:each) do
@@ -31,22 +20,18 @@ describe ClassificationLifecycle do
     context "with create action" do
       let(:test_method) { :create }
       
-      it_behaves_like "update cellect"
-
       it 'should queue other actions' do
         expect(ClassificationWorker).to receive(:perform_async)
-          .with(classification.id, :create)
+                                         .with(classification.id, :create)
       end
     end
     
     context "with update action" do
       let(:test_method) { :update }
       
-      it_behaves_like "update cellect"
-
       it 'should queue other actions' do
         expect(ClassificationWorker).to receive(:perform_async)
-          .with(classification.id, :update )
+                                         .with(classification.id, :update )
       end
     end
     
@@ -61,7 +46,7 @@ describe ClassificationLifecycle do
       it 'should publish to kafka' do
         serialized = ClassificationSerializer.serialize(classification).to_json
         expect(MultiKafkaProducer).to receive(:publish)
-          .with('classifications', [classification.project.id, serialized])
+                                       .with('classifications', [classification.project.id, serialized])
       end
     end
 
@@ -90,9 +75,9 @@ describe ClassificationLifecycle do
         
         it 'should call dequeue_subject_for_user' do
           expect(UserSubjectQueue).to receive(:dequeue_subject_for_user)
-            .with(user: classification.user,
-                  workflow: classification.workflow,
-                  set_member_subject: classification.set_member_subject)
+                                       .with(user: classification.user,
+                                             workflow: classification.workflow,
+                                             set_member_subject: classification.set_member_subject)
         end
       end
 
@@ -127,10 +112,10 @@ describe ClassificationLifecycle do
         it "should set the communication preferences to the user's default" do
           subject.create_project_preference
           email_pref = UserProjectPreference
-            .where(user: classification.user, project: classification.project)
-            .first.email_communication
+                       .where(user: classification.user, project: classification.project)
+                       .first.email_communication
           expect(email_pref).to eq(classification.user
-                                   .project_email_communication)
+                                    .project_email_communication)
         end
 
       end
@@ -168,9 +153,9 @@ describe ClassificationLifecycle do
       let(:classification) { build(:classification) }
       it 'should add the set_member_subject_id to the seen subjects' do
         expect(UserSeenSubject).to receive(:add_seen_subject_for_user)
-          .with(user: classification.user,
-                workflow: classification.workflow,
-                set_member_subject: classification.set_member_subject)
+                                    .with(user: classification.user,
+                                          workflow: classification.workflow,
+                                          set_member_subject: classification.set_member_subject)
       end
     end
 
@@ -179,6 +164,21 @@ describe ClassificationLifecycle do
       it 'should do nothing' do
         expect(UserSeenSubject).to_not receive(:add_seen_subject_for_user)
       end
+    end
+  end
+
+  describe "#update_cellect" do
+    let(:classification) { create(:classification) }
+    
+    it "should setup the add seen command to cellect" do
+      expect(stubbed_cellect_connection).to receive(:add_seen)
+                                             .with(
+                                               subject_id: classification.set_member_subject.id,
+                                               workflow_id: classification.workflow.id,
+                                               user_id: classification.user.id,
+                                               host: 'http://test.host/'
+                                             )
+      subject.update_cellect('http://test.host/')
     end
   end
 end

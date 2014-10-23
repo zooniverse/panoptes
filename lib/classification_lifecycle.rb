@@ -1,12 +1,11 @@
 class ClassificationLifecycle
-  attr_reader :classification, :cellect_host
+  attr_reader :classification
   
-  def initialize(classification, cellect_host=nil)
-    @classification, @cellect_host = classification, cellect_host
+  def initialize(classification)
+    @classification = classification
   end
 
   def queue(action)
-    update_cellect
     ClassificationWorker.perform_async(classification.id, action)
   end
 
@@ -19,7 +18,7 @@ class ClassificationLifecycle
     end
   end
 
-  def update_cellect
+  def update_cellect(cellect_host)
     return unless should_update_seen?
     Cellect::Client.connection
       .add_seen(user_id: user.try(:id),
