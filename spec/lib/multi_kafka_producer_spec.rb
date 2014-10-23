@@ -92,7 +92,7 @@ describe MultiKafkaProducer do
     end
 
     context "disconnected adapter" do
-      let(:adapter) { double({ connected?: false, name: "blerg" }) }
+      let(:adapter) { double({ connected?: false, adapter_name: "blerg" }) }
       
       it 'should raise an exception when the adapter is not connected' do
         expect do

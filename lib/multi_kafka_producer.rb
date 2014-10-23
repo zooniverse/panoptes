@@ -1,7 +1,7 @@
 module MultiKafkaProducer
   class KafkaNotConnected < StandardError
     def initialize(adapter)
-      super("Kafka adapter #{ adapter.name } is not connected")
+      super("Kafka adapter #{ adapter.adapter_name } is not connected")
     end
   end
   

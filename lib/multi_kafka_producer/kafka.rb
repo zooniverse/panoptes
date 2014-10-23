@@ -14,11 +14,11 @@ module MultiKafkaProducer
     end
 
     def self.publish(topic, msgs_and_keys)
-      msgs.each do |msg|
+      msgs_and_keys.each do |msg|
         key, msg = split_msg_pair(msg)
         @connection.send_msg(topic, key, msg)
       end
-    rescue FailedToSendMessageException
+    rescue StandardError
       raise KafkaNotConnected.new(self)
     end
   end

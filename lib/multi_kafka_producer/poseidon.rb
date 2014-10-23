@@ -11,10 +11,11 @@ module MultiKafkaProducer
     end
 
     def self.publish(topic, msgs_and_keys)
-      @connection.send_messages msgs.map do |msg|
+      msgs = msgs_and_keys.map do |msg|
         key, msg = split_msg_pair(msg)
         ::Poseidon::MessageToSend.new(topic, msg, key)
       end
+      @connection.send_messages msgs
     end
 
     def self.close
