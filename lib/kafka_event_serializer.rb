@@ -27,12 +27,16 @@ class KafkaEventSerializer
       reflection = model.class.reflect_on_association(link)
       case reflection.macro
       when :has_many, :has_and_belongs_to_many
-        { link => model.send(link).pluck(:id).map(&:to_s) }
+        if model.send(link).loaded?
+          { link => model.send(link).map(&:id).map(&:to_s) }
+        else
+          { link => model.send(link).pluck(:id).map(&:to_s) }
+        end
       when :has_one, :belongs_to
         if reflection.polymorphic?
           linked = model.send(link)
-          { link => {id: linked.id.to_s,
-                     type: linked.class.model_name.singular}}
+          {link => {id: linked.id.to_s,
+                    type: linked.class.model_name.singular}}
         else
           { link => model.send(link).id.to_s }
         end

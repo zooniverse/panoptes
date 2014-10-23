@@ -161,7 +161,7 @@ describe ClassificationLifecycle do
     end
   end
 
-  describe "#{}update_seen_subjects" do
+  describe "#update_seen_subjects" do
     after(:each) { subject.update_seen_subjects }
     
     context "with a user" do
