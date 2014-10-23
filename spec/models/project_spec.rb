@@ -37,7 +37,7 @@ describe Project, :type => :model do
     expect(create(:project, display_name: "hi fives", owner: owner)).to be_valid
     expect(build(:project, display_name: "hi fives", owner: owner)).to_not be_valid
   end
- 
+  
   it 'should not require display name uniquenames between owners' do
     expect(create(:project, display_name: "test project", owner: create(:user))).to be_valid
     expect(create(:project, display_name: "test project", owner: create(:user))).to be_valid
@@ -48,25 +48,25 @@ describe Project, :type => :model do
     
     it "should allow workflows to link when user has update permissions" do
       expect(Project).to link_to(Workflow).given_args(user)
-        .with_scope(:scope_for, :update, user)
+                          .with_scope(:scope_for, :update, user)
     end
     
     it "should allow subject_sets to link when user has update permissions" do
       expect(Project).to link_to(SubjectSet).given_args(user)
-        .with_scope(:scope_for, :update, user)
+                          .with_scope(:scope_for, :update, user)
     end
     
     it "should allow subjects to link when user has update permissions" do
       expect(Project).to link_to(Subject).given_args(user)
-        .with_scope(:scope_for, :update, user)
+                          .with_scope(:scope_for, :update, user)
     end
 
     it "should allow collections to link user has show permissions" do
       expect(Project).to link_to(Collection).given_args(user)
-        .with_scope(:scope_for, :show, user)
+                          .with_scope(:scope_for, :show, user)
     end
   end
- 
+  
   describe "#workflows" do
     let(:project) { create(:project_with_workflows) }
 
@@ -114,6 +114,45 @@ describe Project, :type => :model do
 
     it 'should not include models without assigned roles' do
       expect(project.project_roles).to_not include(preferences[0])
+    end
+  end
+
+  describe "::translatable_by" do
+    let(:users) { create_list(:user, 2) }
+    let(:private_project) { create(:project, visible_to: ["collaborator"]) }
+    let!(:upp) do
+      create(:user_project_preference, user: users.first, project: project, roles: ["translator"])
+    end
+
+    it 'should include projects a user is a translator for' do
+      expect(Project.translatable_by(users.first)).to match_array([project])
+    end
+
+    it 'should not include projects a user is not a translator for' do
+      expect(Project.translatable_by(users.first)).to_not include(private_project)
+    end
+
+    it 'should by empty when a user not a translator on any project' do
+      expect(Project.translatable_by(users[1])).to be_empty
+    end
+  end
+
+  describe "#is_translator" do
+    let(:user) { create(:user) }
+    context "when user has a translator role" do
+      let!(:upp) do
+        create(:user_project_preference, user: user, project: project, roles: ["translator"])
+      end
+      
+      it 'should return truthy' do
+        expect(project.is_translator?(user)).to be_truthy
+      end
+    end
+
+    context "when a user does not have a translator role" do
+      it 'should return false if a user is not a translator' do
+        expect(project.is_translator?(user)).to be_falsy
+      end
     end
   end
 end
