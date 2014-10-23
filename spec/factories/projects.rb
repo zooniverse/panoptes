@@ -5,6 +5,8 @@ FactoryGirl.define do
     user_count { 10 + rand(1000) }
     activated_state :active
     primary_language "en"
+    avatar "http://test.host/x02234.jpg.gif.png.webp"
+    background_image "http://test.host/12312asd.jp2"
     visible_to []
 
     association :owner, factory: :user, password: "password"

@@ -11,7 +11,10 @@ describe Api::V1::ProjectsController, type: :controller do
 
   let(:api_resource_name) { "projects" }
   let(:api_resource_attributes) do
-    [ "id", "name", "display_name", "classifications_count", "subjects_count", "updated_at", "created_at", "available_languages", "content"]
+    ["id", "name", "display_name", "classifications_count", "subjects_count",
+     "updated_at", "created_at", "available_languages", "title", "avatar",
+     "description", "team_members", "guide", "science_case", "introduction",
+     "background_image"]
   end
   let(:api_resource_links) do
     [ "projects.owner",
@@ -50,6 +53,7 @@ describe Api::V1::ProjectsController, type: :controller do
     before(:each) do
       default_request(scopes: scopes, user_id: user.id)
     end
+    
     describe "#index" do
 
       describe "with no filtering" do
@@ -67,25 +71,6 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         it_behaves_like "an api response"
-      end
-
-      context "when a project doesn't have any project_contents" do
-        let!(:remove_project_contents) do
-          Project.all.each do |project|
-            project.project_contents = []
-            project.save!
-          end
-        end
-
-        it "should have 2 items by default" do
-          get :index
-          expect(json_response[api_resource_name].length).to eq(2)
-        end
-
-        it "should have the first item without any contents" do
-          get :index
-          expect(json_response[api_resource_name][0]['content']).to eq({})
-        end
       end
 
       describe "filter params" do
@@ -130,7 +115,8 @@ describe Api::V1::ProjectsController, type: :controller do
             projects.first
           end
           let(:index_options) do
-            { owner: project_owner.owner_uniq_name, display_name: filtered_project.display_name }
+            {owner: project_owner.owner_uniq_name,
+             display_name: filtered_project.display_name}
           end
 
           it "should respond with 1 item" do
@@ -266,7 +252,6 @@ describe Api::V1::ProjectsController, type: :controller do
           expect(resource.subject_sets.first.id).to_not eq(subject_set.id)
         end
       end
-      
     end
   end
   

@@ -6,7 +6,9 @@ FactoryGirl.define do
     language "en"
     title "A Test Project"
     description "Some Lorem Ipsum"
-    pages '{ "about": {"title": "A Page Title", "content_html": "<p>Some HTML Cotent</p>", "content_md": "Some Markdown Content"} }'
-    example_strings '{ "example_1": "A descripton of it"}' 
+    introduction "MORE IPSUM"
+    science_case "asdfasdf asdfasdf"
+    team_members []
+    guide({ "example_1" => "A descripton of it" })
   end
 end
