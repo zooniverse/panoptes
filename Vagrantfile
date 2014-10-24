@@ -28,7 +28,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
               'zooniverse/zookeeper',
               'zooniverse/cellect',
               'zooniverse/ruby',
-              'edpaget/kafka',
+              'zooniverse/kafka',
               'redis' ]
 
   config.vm.provision "docker" do |d|
@@ -40,7 +40,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       args: '--link postgres:pg --link zookeeper:zk'
     d.run 'redis', image: 'redis',
       cmd: 'redis-server --appendonly yes'
-    d.run 'kafka', image: 'edpaget/kafka:0.8.1',
+    d.run 'kafka', image: 'zooniverse/kafka',
       args: '--link zookeeper:zookeeper',
       cmd: '-H kafka -p 9092 -z zookeeper:2181 -i 1'
     d.run 'panoptes', image: "zooniverse/ruby:#{ ruby_version }",
