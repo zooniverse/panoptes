@@ -32,6 +32,7 @@ describe SessionsController, type: :controller do
       context "a signed in user" do
         before(:each) do
           request.env['devise.user'] = user
+          sign_in user
         end
 
         it 'should return no-content' do
