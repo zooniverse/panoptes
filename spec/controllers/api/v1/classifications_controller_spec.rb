@@ -89,9 +89,10 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
 
     describe "#create" do
-      it "should class the classification lifecycle on create method" do
+      it "should call the classification lifecycle queue method" do
         lifecycle = double
-        expect(lifecycle).to receive(:on_create)
+        allow(lifecycle).to receive(:update_cellect)
+        expect(lifecycle).to receive(:queue).with(:create)
         allow(ClassificationLifecycle).to receive(:new).and_return(lifecycle)
         create_classification
       end

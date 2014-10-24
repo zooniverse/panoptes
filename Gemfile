@@ -19,15 +19,19 @@ gem 'logstasher'
 gem 'airbrake', '~> 4.1.0'
 gem 'jquery-rails'
 gem 'uglifier'
+gem 'sidekiq'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
   gem 'therubyrhino'
+  gem 'jruby-kafka'
+  gem 'jbundler'
 end
 
 platforms :ruby do
   gem 'therubyracer'
   gem 'pg'
+  gem 'poseidon'
 end
 
 group :development do

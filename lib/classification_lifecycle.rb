@@ -1,31 +1,59 @@
 class ClassificationLifecycle
-  attr_reader :classification, :cellect_host
+  attr_reader :classification
   
-  def initialize(classification, cellect_host)
-    @classification, @cellect_host = classification, cellect_host
-  end
-  
-  def on_create
-    if should_update_seen?
-      update_cellect
-      update_seen_subjects
-    end
-    
-    dequeue_subject if should_dequeue_subject?
-    create_project_preference if should_create_project_preference?
+  def initialize(classification)
+    @classification = classification
   end
 
-  def on_update
-    if should_update_seen?
-      update_cellect
-      update_seen_subjects
-    end
-    
-    dequeue_subject if should_dequeue_subject?
+  def queue(action)
+    ClassificationWorker.perform_async(classification.id, action)
   end
 
+  def transact!(&block)
+    Classification.transaction do
+      update_seen_subjects
+      dequeue_subject
+      instance_eval &block if block_given?
+      publish_to_kafka
+    end
+  end
+
+  def update_cellect(cellect_host)
+    return unless should_update_seen?
+    Cellect::Client.connection
+      .add_seen(user_id: user.try(:id),
+                workflow_id: workflow.id,
+                subject_id: set_member_subject.id,
+                host: cellect_host)
+  end
+
+  def dequeue_subject
+    return unless should_dequeue_subject?
+    UserSubjectQueue.dequeue_subject_for_user(**user_workflow_subject)
+  end
+
+  def create_project_preference
+    return unless should_create_project_preference?
+    UserProjectPreference.where(user: user, project: project)
+      .first_or_create do |up|
+      up.email_communication = user.project_email_communication
+      up.preferences = {}
+    end
+  end
+
+  def update_seen_subjects
+    return unless should_update_seen?
+    UserSeenSubject.add_seen_subject_for_user(**user_workflow_subject)
+  end
+
+  def publish_to_kafka
+    return unless classification.complete?
+    classification_json = ClassificationSerializer.serialize(classification).to_json
+    MultiKafkaProducer.publish('classifications', [classification.project.id, classification_json])
+  end
+  
   private
-  
+
   def should_update_seen?
     !classification.anonymous? && classification.complete?
   end
@@ -55,35 +83,11 @@ class ClassificationLifecycle
     classification.set_member_subject
   end
   
-  def update_cellect
-    Cellect::Client.connection
-      .add_seen(user_id: user.try(:id),
-                workflow_id: workflow.id,
-                subject_id: set_member_subject.id,
-                host: cellect_host)
-  end
-
-  def dequeue_subject
-    UserSubjectQueue.dequeue_subject_for_user(**user_workflow_subject)
-  end
-
-  def create_project_preference
-    UserProjectPreference.where(user: user, project: project)
-      .first_or_create do |up|
-      up.email_communication = user.project_email_communication
-      up.preferences = {}
-    end
-  end
-
-  def update_seen_subjects
-    UserSeenSubject.add_seen_subject_for_user(**user_workflow_subject)
-  end
-
   def user_workflow_subject
     {
-     user: user,
-     workflow: workflow,
-     set_member_subject: set_member_subject
+      user: user,
+      workflow: workflow,
+      set_member_subject: set_member_subject
     }
   end
 end
