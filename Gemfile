@@ -18,6 +18,7 @@ gem 'puma'
 gem 'logstasher'
 gem 'airbrake', '~> 4.1.0'
 gem 'jquery-rails'
+gem 'uglifier'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
