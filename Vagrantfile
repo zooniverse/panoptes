@@ -37,7 +37,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     d.run 'zookeeper', image: 'zooniverse/zookeeper',
       cmd: '-c localhost:2888:3888 -i 1'
     d.run 'cellect', image: 'zooniverse/cellect',
-      args: '--link postgres:pg --link zookeeper:zk'
+      args: '--link postgres:pg --link zookeeper:zk',
+      cmd: "bash -c \"sleep 600 && /usr/bin/supervisord\""
     d.run 'redis', image: 'redis',
       cmd: 'redis-server --appendonly yes'
     d.run 'kafka', image: 'zooniverse/kafka',
@@ -45,9 +46,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cmd: '-H kafka -p 9092 -z zookeeper:2181 -i 1'
     d.run 'panoptes', image: "zooniverse/ruby:#{ ruby_version }",
       args: '--link zookeeper:zookeeper --link postgres:postgres --link kafka:kafka --link redis:redis -v /home/vagrant/panoptes/:/rails_app/ -e "RAILS_ENV=development" -p 3000:80',
-      cmd: "bash -c \"#{ bundle_command } /rails_app/start.sh\""
+      cmd: "./rails_app/start.sh"
     d.run 'panoptes-sidekiq', image: "zooniverse/ruby:#{ ruby_version}",
       args: '--link zookeeper:zookeeper --link postgres:postgres --link kafka:kafka --link redis:redis -v /home/vagrant/panoptes/:/rails_app/ -e "RAILS_ENV=development"',
-      cmd: "bash -c \"#{ bundle_command } install && bundle exec sidekiq\""
+      cmd: "bash -c \"bundle install && bundle exec sidekiq\""
   end
 end
