@@ -7,8 +7,14 @@ then
     ln -sf /rails_conf/* ./config/
 fi
 
+if [ -d "/rails_app/.jbundler" ]
+then
+    rm -rf .jbundler
+fi
+
 if [ "$RAILS_ENV" == "development" ]
 then
+    bundle install
     rake db:migrate
 fi
 

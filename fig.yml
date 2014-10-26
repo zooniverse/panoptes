@@ -11,12 +11,23 @@ zookeeper:
 
 cellect:
   image: zooniverse/cellect
+  command: "bash -c \"sleep 300 && /usr/bin/supervisord\""
   links:
     - postgres:pg
     - zookeeper:zk
 
+redis:
+  image: redis
+  command: "redis-server --appendonly yes"
+
+kafka:
+  image: zooniverse/kafka
+  links:
+    - zookeeper:zk
+  command: "-z zk:2181 -H kafka -p 9092 -i 1"
+
 panoptes:
-  image: zooniverse/ruby:jruby-1.7.16
+  build: .
   command: /rails_app/start.sh
   volumes:
     - ./:/rails_app
@@ -28,3 +39,5 @@ panoptes:
     - postgres
     - zookeeper
     - cellect
+    - kafka
+    - redis
