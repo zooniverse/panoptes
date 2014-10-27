@@ -1,8 +1,30 @@
 FactoryGirl.define do
   factory :workflow do
     name "A Workflow"
-    tasks [{we_need: "an_example"},
-           {of_some_tasks: "blerg!"}].to_json
+    tasks(
+      {
+        interest: {
+          type: "draw",
+          question: 0,
+          next: "shape",
+          tools: [
+            {value: "red", label: 1, type: 'point', color: 'red'},
+            {value: "green", label: 2, type: 'point', color: 'lime'},
+            {value: "blue", label: 3, type: 'point', color: 'blue'},
+          ]
+        },
+        shape: {
+          type: 'multiple',
+          question: 4,
+          answers: [
+            {value: 'smooth', label: 5},
+            {value: 'features', label: 6},
+            {value: 'other', label: 7}
+          ],
+          next: nil
+        }
+      }
+    )
     pairwise false
     grouped false
     prioritized false

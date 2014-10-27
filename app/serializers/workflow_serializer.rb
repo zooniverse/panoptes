@@ -4,6 +4,8 @@ class WorkflowSerializer
   can_include :project, :subject_sets
 
   def tasks
-    @
+    strings = @model.content_for(@context[:languages], :strings).strings
+    TasksVisitors::InjectStrings.new(strings).visit(@model.tasks)
+    @model.tasks
   end
 end

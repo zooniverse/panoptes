@@ -2,16 +2,34 @@ class Api::V1::WorkflowsController < Api::ApiController
   include JsonApiController
   
   doorkeeper_for :update, :create, :delete, scopes: [:project]
-  resource_actions :default
+  resource_actions :create, :update, :destroy
 
   alias_method :workflow, :controlled_resource
   
   def show
     load_cellect
-    super
+    render json_api: serializer.resource(params,
+                                         visible_scope,
+                                         languages: current_languages)
+  end
+
+  def index
+    render json_api: serializer.page(params,
+                                     visible_scope,
+                                     languages: current_languages)
   end
 
   private
+
+  def create_response(workflow)
+    serializer.resource(workflow,
+                        nil,
+                        languages: [workflow.primary_language]) 
+  end
+
+  def update_response
+    render json_api: create_response(workflow)
+  end
 
   def load_cellect
     return unless api_user.logged_in?
@@ -22,7 +40,7 @@ class Api::V1::WorkflowsController < Api::ApiController
     if update_params.has_key? :tasks
       stripped_tasks, strings = extract_strings(update_params[:tasks])
       update_params[:tasks] = stripped_tasks
-      workflow.primary_content.update!(strings: strings)
+      workflow.primary_content.update_attributes(strings: strings)
     end
     super(update_params)
   end
@@ -31,9 +49,8 @@ class Api::V1::WorkflowsController < Api::ApiController
     stripped_tasks, strings = extract_strings(create_params[:tasks])
     create_params[:tasks] = stripped_tasks
     workflow = super(create_params)
-    WorkflowContent.create!(workflow: workflow,
-                            strings: strings,
-                            language: workflow.primary_language)
+    workflow.workflow_contents.build(strings: strings,
+                                     language: workflow.primary_language)
     workflow
   end
 

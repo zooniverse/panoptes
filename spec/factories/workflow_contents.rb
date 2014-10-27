@@ -4,6 +4,13 @@ FactoryGirl.define do
   factory :workflow_content do
     workflow 
     language "en"
-    strings ['a string', 'another string']
+    strings ['Draw a circle',
+             'Red',
+             'Green',
+             'Blue',
+             'What shape is this galaxy',
+             'Smooth',
+             'Features',
+             'Star or artifact']
   end
 end
