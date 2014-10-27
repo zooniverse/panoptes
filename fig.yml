@@ -9,11 +9,21 @@ zookeeper:
   image: zooniverse/zookeeper
   command: /usr/share/zookeeper/bin/zkServer.sh start-foreground -c localhost:2888:3888 -i 1
 
-cellect:
-  image: zooniverse/cellect
+#cellect:
+#  image: zooniverse/cellect
+#  links:
+#    - postgres:pg
+#    - zookeeper:zk
+
+redis:
+  image: redis
+  command: redis-server -appendonly yes
+
+kafka:
+  image: zooniverse/kafka
   links:
-    - postgres:pg
     - zookeeper:zk
+  command: -i 1 -H kafka -p 9092 -z zk:2181
 
 panoptes:
   image: zooniverse/ruby:jruby-1.7.16
@@ -27,4 +37,4 @@ panoptes:
   links:
     - postgres
     - zookeeper
-    - cellect
+#    - cellect
