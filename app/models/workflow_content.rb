@@ -1,4 +1,4 @@
 class WorkflowContent < ActiveRecord::Base
   include TranslatedContent
-  attr_accessible :langauge, :strings
+  attr_accessible :language, :strings
 end

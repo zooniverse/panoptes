@@ -28,7 +28,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
   describe '#update' do
     let(:subject_set) { create(:subject_set, project: project) }
-    let(:resource) { create(:workflow, project: project) }
+    let(:resource) { create(:workflow_with_contents, project: project) }
     let(:test_attr) { :name }
     let(:test_attr_value) { "A Better Name" }
     let(:test_relation) { :subject_sets }
@@ -37,6 +37,18 @@ describe Api::V1::WorkflowsController, type: :controller do
       {
         workflows: {
           name: "A Better Name",
+          tasks: {
+            interest: {
+              type: "draw",
+              question: "Draw a Circle",
+              next: "shape",
+              tools: [
+                {value: "red", label: "Red", type: 'point', color: 'red'},
+                {value: "green", label: "Green", type: 'point', color: 'lime'},
+                {value: "blue", label: "Blue", type: 'point', color: 'blue'},
+              ]
+            }
+          },
           links: {
             subject_sets: [subject_set.id.to_s],
           }
@@ -48,6 +60,15 @@ describe Api::V1::WorkflowsController, type: :controller do
     it_behaves_like "is updatable"
 
     it_behaves_like "has updatable links"
+
+    context "extracts strings from workflow" do
+      it 'should replace "Draw a circle" with 0' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        put :update, update_params.merge(id: resource.id)
+        instance = Workflow.find(created_instance_id(api_resource_name))
+        expect(instance.tasks["interest"]["question"]).to eq(0)
+      end
+    end
   end
 
   describe '#create' do
@@ -91,6 +112,15 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
     
     it_behaves_like "is creatable"
+
+    context "extracts strings from workflow" do
+      it 'should replace "Draw a circle" with 0' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, create_params
+        instance = Workflow.find(created_instance_id(api_resource_name))
+        expect(instance.tasks["interest"]["question"]).to eq(0)
+      end
+    end
   end
 
   describe '#destroy' do

@@ -29,7 +29,7 @@ FactoryGirl.define do
 
     factory :workflow_with_contents do
       after(:create) do |w|
-        create_list(:workflow_content, 1, workflow: w)
+        create_list(:workflow_content, 1, workflow: w, language: w.primary_language)
       end
     end
   end
