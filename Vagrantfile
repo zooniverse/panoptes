@@ -5,7 +5,6 @@
 VAGRANTFILE_API_VERSION = "2"
 
 ruby_version = ENV['PANOTPES_RUBY'] || 'jruby-1.7.16'
-bundle_command = ruby_version.match(/jruby/) ? 'jbundle' : 'bundle'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu-14.04-docker"
@@ -18,8 +17,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.synced_folder "./", "/home/vagrant/panoptes/"
 
-  config.vm.provision "docker",
-    version: '1.0.1'
+  config.vm.provision "docker", version: '1.0.1'
 
   config.vm.provision "shell", inline: "apt-get -y -q install python-pip"
   config.vm.provision "shell", inline: "pip install \"fig>=1.0,<1.1\""
