@@ -47,7 +47,7 @@ RSpec.describe TasksVisitors::ExtractStrings do
       it 'should substitute question strings with TaskIndex objects' do
         question_vals = task_hash.values_at(:interest, :shape, :roundness)
           .map { |hash| hash[:question] }
-        expect(question_vals).to all( be_a(TasksVisitors::TaskIndex))
+        expect(question_vals).to include(0, 4, 8)
       end
 
       it 'should substitute label strings with TaskIndex objects' do
@@ -60,11 +60,11 @@ RSpec.describe TasksVisitors::ExtractStrings do
           end
         end
         
-        expect(label_vals).to all( be_a(TasksVisitors::TaskIndex))
+        expect(label_vals).to include(1,2,3,5,6,7,9,10,11)
       end
 
-      it 'should set the index of the substituted string' do
-        expect(task_hash[:interest][:question].index).to eq(0)
+      it 'should set the key to the index of the substituted string' do
+        expect(task_hash[:interest][:question]).to eq(0)
       end
 
       it 'should populate the collector with strings' do

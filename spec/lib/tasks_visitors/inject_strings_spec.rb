@@ -5,32 +5,32 @@ RSpec.describe TasksVisitors::InjectStrings do
     {
      interest: {
                 type: 'drawing',
-                question: TasksVisitors::TaskIndex.new(0),
+                question: 0,
                 tools: [
-                        {value: 'red', label: TasksVisitors::TaskIndex.new(1), type: 'point', color: 'red'},
-                        {value: 'green', label: TasksVisitors::TaskIndex.new(2), type: 'point', color: 'lime'},
-                        {value: 'blue', label: TasksVisitors::TaskIndex.new(3), type: 'point', color: 'blue'}
+                        {value: 'red', label: 1, type: 'point', color: 'red'},
+                        {value: 'green', label: 2, type: 'point', color: 'lime'},
+                        {value: 'blue', label: 3, type: 'point', color: 'blue'}
                        ],
                 next: 'shape'
                },
      shape: {
              type: 'multiple',
-             question: TasksVisitors::TaskIndex.new(4),
+             question: 4,
              answers: [
-                       {value: 'smooth', label: TasksVisitors::TaskIndex.new(5)},
-                       {value: 'features', label: TasksVisitors::TaskIndex.new(6)},
-                       {value: 'other', label: TasksVisitors::TaskIndex.new(7)}
+                       {value: 'smooth', label: 5},
+                       {value: 'features', label: 6},
+                       {value: 'other', label: 7}
                       ],
              required: true,
              next: 'roundness'
             },
      roundness: {
                  type: 'single',
-                 question: TasksVisitors::TaskIndex.new(8),
+                 question: 8,
                  answers: [
-                           {value: 'very', label: TasksVisitors::TaskIndex.new(9), next: 'shape'},
-                           {value: 'sorta', label: TasksVisitors::TaskIndex.new(10)},
-                           {value: 'not', label: TasksVisitors::TaskIndex.new(11)}
+                           {value: 'very', label: 9, next: 'shape'},
+                           {value: 'sorta', label: 10},
+                           {value: 'not', label: 11}
                           ],
                  next: nil}
     }
@@ -43,13 +43,13 @@ RSpec.describe TasksVisitors::InjectStrings do
       TasksVisitors::InjectStrings.new(strings).visit(task_hash)
     end
     
-    it 'should substitute question TaskIndex objects with strings' do
+    it 'should substitute question indexes with strings' do
       question_vals = task_hash.values_at(:interest, :shape, :roundness)
         .map { |hash| hash[:question] }
       expect(question_vals).to eq(%w(q1 q2 q3))
     end
 
-    it 'should substitute label strings with TaskIndex objects' do
+    it 'should substitute label indexes with strings' do
       label_vals = task_hash.values_at(:interest, :shape, :roundness)
         .flat_map do |hash|
         if hash.has_key?(:answers)
@@ -62,7 +62,7 @@ RSpec.describe TasksVisitors::InjectStrings do
       expect(label_vals).to eq(%w(l1 l2 l3 l4 l5 l6 l7 l8 l9))
     end
 
-    it 'should substituted a string at the correct index' do
+    it 'should substitute a string at the correct index' do
       expect(task_hash[:interest][:question]).to eq("q1")
     end
   end

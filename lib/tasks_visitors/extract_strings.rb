@@ -1,17 +1,12 @@
 module TasksVisitors
   class ExtractStrings < TasksVisitor
     private
-    
-    def visit_Hash(n, c)
-      n.each do |k, v|
-        case k
-        when :label, :question
-          c << v
-          n[k] = TaskIndex.new(c.length - 1)
-        else
-          visit(v, c)
-        end
-      end
+    def substitute_string(n, c)
+      c << n
+      c.length - 1
     end
+
+    alias :visit_label :substitute_string
+    alias :visit_question :substitute_string
   end
 end

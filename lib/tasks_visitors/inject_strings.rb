@@ -5,15 +5,12 @@ module TasksVisitors
     end
     
     private
-    
-    def visit_Hash(n, c)
-      n.each do |k, v|
-        n[k] = visit(v, c)
-      end
+
+    def inject_string(n, c)
+      @strings[n]
     end
 
-    def visit_TasksVisitors_TaskIndex(n, c)
-      @strings[n.index]
-    end
+    alias :visit_question :inject_string
+    alias :visit_label :inject_string
   end
 end
