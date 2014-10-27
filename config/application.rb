@@ -1,8 +1,5 @@
 require File.expand_path('../boot', __FILE__)
 
-# Intiailizes Classpath
-require 'jbundler' if RUBY_PLATFORM == 'java'
-
 require "active_model/railtie"
 require "active_record/railtie"
 require "action_controller/railtie"
