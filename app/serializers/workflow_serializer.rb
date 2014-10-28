@@ -5,7 +5,8 @@ class WorkflowSerializer
 
   def tasks
     strings = @model.content_for(@context[:languages], :strings).strings
-    TasksVisitors::InjectStrings.new(strings).visit(@model.tasks)
-    @model.tasks
+    tasks = @model.tasks.dup
+    TasksVisitors::InjectStrings.new(strings).visit(tasks)
+    tasks
   end
 end

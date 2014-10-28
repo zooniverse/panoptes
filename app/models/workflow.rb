@@ -29,4 +29,8 @@ class Workflow < ActiveRecord::Base
   def self.translatable_by(actor)
     where(project: translation_scope.build(actor))
   end
+
+  def tasks
+    read_attribute(:tasks).with_indifferent_access
+  end
 end
