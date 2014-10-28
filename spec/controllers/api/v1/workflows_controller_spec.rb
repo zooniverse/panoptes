@@ -10,7 +10,9 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:resource_class) { Workflow }
   let(:authorized_user) { owner }
 
-  let(:api_resource_attributes){ %w(id name tasks classifications_count subjects_count created_at updated_at) }
+  let(:api_resource_attributes) do
+    %w(id name tasks classifications_count subjects_count created_at updated_at first_task primary_language)
+  end
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets) }
   let(:scopes) { %w(public project) }
 

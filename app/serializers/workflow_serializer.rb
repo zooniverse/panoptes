@@ -1,6 +1,7 @@
 class WorkflowSerializer
   include RestPack::Serializer
-  attributes :id, :name, :tasks, :classifications_count, :subjects_count, :created_at, :updated_at
+  attributes :id, :name, :tasks, :classifications_count, :subjects_count,
+             :created_at, :updated_at, :first_task, :primary_language
   can_include :project, :subject_sets
 
   def tasks
