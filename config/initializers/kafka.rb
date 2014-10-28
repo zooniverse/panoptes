@@ -4,7 +4,7 @@ adapter, kafka_config = begin
                           config = YAML.load(ERB.new(File.read(Rails.root.join('config/kafka.yml'))).result)
                           config[Rails.env].symbolize_keys
                           [ nil, config ]
-                        rescue Errno::ENOENT
+                        rescue Errno::ENOENT, NoMethodError
                           [ :null, {  } ]
                         end
 
