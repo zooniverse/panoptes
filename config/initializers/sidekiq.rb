@@ -14,10 +14,12 @@ module SidekiqConfig
   def self.redis_url
     config = begin
                YAML.load(File.read(Rails.root.join('config/redis.yml')))
-             rescue Errno::ENOENT
-               { Rails.env => { 'sidekiq' => {  }  } }
+               config[Rails.env]['sidekiq'].symbolize_keys
+             rescue Errno::ENOENT, NoMethodError
+               { }
              end
-    config = default_redis.merge(config[Rails.env]['sidekiq'].symbolize_keys)
+    
+    config = default_redis.merge(config)
 
     if config.has_key? :password
       "redis://:#{ config[:password] }@#{ config[:host] }:#{ config[:port] }/#{ config[:db] }"
