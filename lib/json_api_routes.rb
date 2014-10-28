@@ -15,14 +15,21 @@ module JsonApiRoutes
     delete "/links/:link_relation/:link_ids", to: "#{ path }#update_links",
       constraints: constraints, format: :false
   end
+
+  def create_versions(path)
+    get "/versions", to: "@{ path }#versions", format: false
+    get "/versions/:id", to: "#{ path }#version", format: false
+  end
   
   def json_api_resources(path, options={})
     links = options.delete(:links)
+    versioned = options.delete(:version)
     options = options.merge(except: [:new, :edit],
                             constraints: { id: VALID_IDS },
                             format: false)
     resources(path, options) do
       create_links(path, links) if links
+      create_versions(path) if versioned
       yield if block_given?
     end
   end

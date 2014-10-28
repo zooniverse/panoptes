@@ -9,7 +9,7 @@ describe WorkflowSerializer do
       
       serializer.instance_variable_set(:@context,
                                        {languages: ['en']})
-      expect(serializer.tasks[:interest][:question]).to eq('Draw a circle')
+      expect(serializer.tasks['interest']['question']).to eq('Draw a circle')
     end
   end
 end

@@ -1,9 +1,10 @@
 class Workflow < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include SubjectCounts
-  include Translatable
   include Linkable
+  include Translatable
 
+  has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
   attr_accessible :name, :tasks, :project_id, :grouped, :pairwise, :prioritized, :primary_language
 
   belongs_to :project
@@ -19,5 +20,13 @@ class Workflow < ActiveRecord::Base
 
   def self.same_project?(subject_set)
     where(project: subject_set.project)
+  end
+  
+  def self.translation_scope
+    @translation_scope ||= RoleControl::RoleScope.new(["translator"], false, Project)
+  end
+  
+  def self.translatable_by(actor)
+    where(project: translation_scope.build(actor))
   end
 end

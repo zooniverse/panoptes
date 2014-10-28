@@ -28,7 +28,7 @@ FactoryGirl.define do
     pairwise false
     grouped false
     prioritized false
-    primary_language 'en-US'
+    primary_language 'en'
     project
 
     factory :workflow_with_subject_set do

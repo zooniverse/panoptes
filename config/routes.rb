@@ -22,6 +22,8 @@ Rails.application.routes.draw do
     api_version(module: "V1", header: {name: "Accept", value: "application/vnd.api+json; version=1"}) do
       get "/me", to: 'users#me', format: false
 
+      json_api_resources :workflow_contents, versioned: true
+
       json_api_resources :project_contents
       
       json_api_resources :project_roles
@@ -32,10 +34,7 @@ Rails.application.routes.draw do
       
       json_api_resources :memberships
       
-      json_api_resources :subjects do
-        get "/versions", to: "subjects#versions", format: false
-        get "/versions/:id", to: "subjects#version", format: false
-      end
+      json_api_resources :subjects, versioned: true
       
       json_api_resources :users, except: [:new, :edit, :create],
         links: [:user_groups]
@@ -44,7 +43,7 @@ Rails.application.routes.draw do
       
       json_api_resources :projects, links: [:subject_sets, :workflows]
       
-      json_api_resources :workflows, links: [:subject_sets]
+      json_api_resources :workflows, links: [:subject_sets], versioned: true   
       
       json_api_resources :subject_sets, links: [:workflows, :subjects]
       
