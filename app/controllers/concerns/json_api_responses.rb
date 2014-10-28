@@ -28,7 +28,7 @@ module JSONApiResponses
   end
 
   def bad_query(exception)
-    message = StandardError.new(exception.message.match(/ERROR: (.*):/)[1])
+    message = StandardError.new(exception.message.match(/ERROR:(\s*)(.*):/)[-1])
     json_api_render(:bad_request, message)
   end
 
