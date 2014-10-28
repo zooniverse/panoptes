@@ -1,14 +1,8 @@
 class TasksVisitor
   def visit(node, collector=nil, key=nil)
-    if key
-      method = :"visit_#{key}"
-    else
-      method = :visit_hash
-    end
-
+    method = :"visit_#{key}"
+    method = respond_to?(method, true) ? method : :visit_hash
     send(method, node, collector)
-  rescue NoMethodError => e
-    send(:visit_hash, node, collector)
   end
 
   private
