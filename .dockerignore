@@ -1,0 +1,5 @@
+.git/
+.jbundler/
+.vagrant/
+.ruby-gemset
+.ruby-version

@@ -22,10 +22,10 @@ gem 'uglifier'
 gem 'sidekiq'
 
 platforms :jruby do
+  gem 'jbundler'
   gem 'activerecord-jdbcpostgresql-adapter'
   gem 'therubyrhino'
   gem 'jruby-kafka'
-  gem 'jbundler'
 end
 
 platforms :ruby do
