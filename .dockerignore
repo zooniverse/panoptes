@@ -1,5 +1,9 @@
-.git/
-.jbundler/
-.vagrant/
+.git
+.jbundler
+.vagrant
 .ruby-gemset
 .ruby-version
+spec
+ouroboros
+vagrant_scripts
+log/*
