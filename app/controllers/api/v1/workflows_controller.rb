@@ -6,7 +6,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   resource_actions :create, :update, :destroy
 
   alias_method :workflow, :controlled_resource
-  
+
   def show
     load_cellect
     render json_api: serializer.resource(params,
@@ -82,7 +82,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def update_params
-    
     permit_params(:pairwise,
                   :grouped,
                   :prioritized,
@@ -97,8 +96,9 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def permit_tasks
-    params[:workflows].fetch(:tasks, [])
-      .reduce([]) do |permitted, (task_name, _)|
+    tasks = params[:workflows].fetch(:tasks, [])
+    
+    tasks.reduce([]) do |permitted, (task_name, _)|
       permitted.concat([task_name => [:type,
                                       :question,
                                       :next,
