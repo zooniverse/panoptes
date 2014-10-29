@@ -14,6 +14,7 @@ fi
 
 if [ "$RAILS_ENV" == "development" ]
 then
+    bundle install
     rake db:migrate
 fi
 
