@@ -25,7 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: "cd /home/vagrant/panoptes && fig stop && fig rm; rm /home/vagrant/panoptes/tmp/pids/server.pid || true"
   config.vm.provision "shell", inline: "echo #{ ruby_version } > /home/vagrant/.ruby-version"
   unless ruby_version == 'jruby-1.7.16' 
-    config.vm.provision "shell", inline: "cd /home/vagrant/panoptes && sed -i 's/jruby-1.7.16/#{ruby_version}/' fig.yml"
+    config.vm.provision "shell", inline: "cd /home/vagrant/panoptes && sed -i 's/ruby:.*$/ruby:#{ruby_version}/' fig.yml"
   end
 
   config.vm.provision "shell", inline: "cd /home/vagrant/panoptes && fig up"
