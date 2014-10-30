@@ -10,11 +10,11 @@ module TranslatedContent
     can_through_parent translated_for, :show
 
     can :update do |actor|
-      (parent.can_update?(actor) || is_translator?(actor)) && !is_primary?
+      !is_primary? && (parent.can_update?(actor) || is_translator?(actor))
     end
     
     can :destroy do |actor|
-      parent.can_destroy?(actor) && !is_primary?
+      !is_primary? && parent.can_destroy?(actor)
     end
     
   end
