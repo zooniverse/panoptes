@@ -72,23 +72,21 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
       it_behaves_like "is updatable"
     end
 
-    context "primary-language content" do
-      context "primary-langauge content" do
-        
-        before(:each) do
-          default_request user_id: authorized_user.id, scopes: scopes
-          params = update_params.merge(id: primary_content.id)
-          put :update, params
-        end
-        
-        it 'should return forbidden' do
-          expect(response.status).to eq(403)
-        end
+    context "primary-langauge content" do
+      
+      before(:each) do
+        default_request user_id: authorized_user.id, scopes: scopes
+        params = update_params.merge(id: primary_content.id)
+        put :update, params
+      end
+      
+      it 'should return forbidden' do
+        expect(response.status).to eq(403)
+      end
 
-        it 'should not update the content' do
-          primary_content.reload
-          expect(primary_content.strings).to_not eq(test_attr_value)
-        end
+      it 'should not update the content' do
+        primary_content.reload
+        expect(primary_content.strings).to_not eq(test_attr_value)
       end
     end
   end
