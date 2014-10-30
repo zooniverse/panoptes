@@ -27,6 +27,11 @@ module JSONApiResponses
     json_api_render(:bad_request, exception)
   end
 
+  def bad_query(exception)
+    message = StandardError.new(exception.message.match(/ERROR:(\s*)(.*):/)[-1])
+    json_api_render(:bad_request, message)
+  end
+
   def unsupported_media_type(exception)
     json_api_render(:unsupported_media_type, exception)
   end
