@@ -13,7 +13,7 @@ module Panoptes
   class Application < Rails::Application
     config.autoload_paths += %W(#{config.root}/lib)
     config.autoload_paths += Dir[Rails.root.join('app', 'models', '**/')]
-    config.middleware.use Rack::Cors do
+    config.middleware.insert_before Warden::Manager, Rack::Cors do
       allow do
         origins '*'
         resource '/api/*', headers: :any,
