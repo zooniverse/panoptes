@@ -1,6 +1,8 @@
 module JsonApiRoutes
+  VALID_IDS = /[0-9]*/
+  
   def id_constraint(path)
-    { :"#{ path.to_s.singularize }_id" => /[0-9]*/ }
+    { :"#{ path.to_s.singularize }_id" => VALID_IDS }
   end
   
   def create_links(path, links)
@@ -17,7 +19,7 @@ module JsonApiRoutes
   def json_api_resources(path, options={})
     links = options.delete(:links)
     options = options.merge(except: [:new, :edit],
-                            constraints: { id: /[0-9]*/ },
+                            constraints: { id: VALID_IDS },
                             format: false)
     resources(path, options) do
       create_links(path, links) if links
