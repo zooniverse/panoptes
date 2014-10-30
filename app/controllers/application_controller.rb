@@ -1,4 +1,7 @@
 class ApplicationController < ActionController::Base
+  include JSONApiRender
+  include JSONApiResponses
+  
   protect_from_forgery with: :exception
 
   before_filter :configure_permitted_parameters, if: :devise_controller?
@@ -9,7 +12,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html { raise exception }
       format.json { render status: :not_found, json: response_body }
-      format.json_api { render status: :not_found, json_api: response_body }
+      format.json_api { not_found(exception) }
     end
   end
 

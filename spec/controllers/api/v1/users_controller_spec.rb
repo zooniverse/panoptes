@@ -82,7 +82,7 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     context "when updating a non-existant user" do
-      let!(:user_id) { -1 }
+      let!(:user_id) { User.last.id + 1 }
       let(:put_operations) { nil }
 
       it "should return a 404 status" do

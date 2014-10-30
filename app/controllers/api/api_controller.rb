@@ -3,8 +3,6 @@ module Api
   
   class ApiController < ApplicationController
     include RoleControl::RoledController
-    include JSONApiRender
-    include JSONApiResponses
 
     API_ACCEPTED_CONTENT_TYPES = ['application/json',
                                   'application/vnd.api+json']
@@ -22,6 +20,7 @@ module Api
     rescue_from ActionController::ParameterMissing, with: :unprocessable_entity
     rescue_from SubjectSelector::MissingParameter, with: :unprocessable_entity
     rescue_from Api::RolesExist, with: :unprocessable_entity
+    rescue_from ActiveRecord::StatementInvalid, with: :bad_query
 
     before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
                                         API_ALLOWED_METHOD_OVERRIDES)
