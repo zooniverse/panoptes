@@ -6,7 +6,8 @@ ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 ADD ./Jarfile.lock /rails_app/
 
-RUN bundle install --without test development
+RUN bundle install --without test development && \
+    jbundle install --without test development
 
 ADD ./ /rails_app
 
