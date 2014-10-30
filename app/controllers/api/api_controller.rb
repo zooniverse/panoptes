@@ -3,8 +3,6 @@ module Api
   
   class ApiController < ApplicationController
     include RoleControl::RoledController
-    include JSONApiRender
-    include JSONApiResponses
 
     API_ACCEPTED_CONTENT_TYPES = ['application/json',
                                   'application/vnd.api+json']
