@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::WorkflowsController, type: :controller do
   let(:user) { create(:user) }
-  let!(:workflows){ create_list :workflow_with_subjects, 2 }
+  let!(:workflows){ create_list :workflow_with_contents, 2 }
   let(:workflow){ workflows.first }
   let(:project){ workflow.project }
   let(:owner){ project.owner }
@@ -10,7 +10,9 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:resource_class) { Workflow }
   let(:authorized_user) { owner }
 
-  let(:api_resource_attributes){ %w(id name tasks classifications_count subjects_count created_at updated_at) }
+  let(:api_resource_attributes) do
+    %w(id name tasks classifications_count subjects_count created_at updated_at first_task primary_language)
+  end
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets) }
   let(:scopes) { %w(public project) }
 
@@ -28,26 +30,47 @@ describe Api::V1::WorkflowsController, type: :controller do
 
   describe '#update' do
     let(:subject_set) { create(:subject_set, project: project) }
-    let(:resource) { create(:workflow, project: project) }
+    let(:resource) { create(:workflow_with_contents, project: project) }
     let(:test_attr) { :name }
     let(:test_attr_value) { "A Better Name" }
     let(:test_relation) { :subject_sets }
     let(:test_relation_ids) { subject_set.id }
     let(:update_params) do
       {
-       workflows: {
-                  name: "A Better Name",
-                  links: {
-                          subject_sets: [subject_set.id.to_s],
-                         }
-                  
-                 }
+        workflows: {
+          name: "A Better Name",
+          tasks: {
+            interest: {
+              type: "draw",
+              question: "Draw a Circle",
+              next: "shape",
+              tools: [
+                {value: "red", label: "Red", type: 'point', color: 'red'},
+                {value: "green", label: "Green", type: 'point', color: 'lime'},
+                {value: "blue", label: "Blue", type: 'point', color: 'blue'},
+              ]
+            }
+          },
+          links: {
+            subject_sets: [subject_set.id.to_s],
+          }
+          
+        }
       }
     end
 
     it_behaves_like "is updatable"
 
     it_behaves_like "has updatable links"
+
+    context "extracts strings from workflow" do
+      it 'should replace "Draw a circle" with 0' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        put :update, update_params.merge(id: resource.id)
+        instance = Workflow.find(created_instance_id(api_resource_name))
+        expect(instance.tasks["interest"]["question"]).to eq(0)
+      end
+    end
   end
 
   describe '#create' do
@@ -55,22 +78,51 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:test_attr_value) { 'Test workflow' }
     let(:create_params) do
       {
-       workflows: {
-                   name: 'Test workflow',
-                   tasks: [{type: "draw",
-                            question: "Draw a Circle",
-                            key:'q-1'}],
-                   grouped: true,
-                   prioritized: true,
-                   primary_language: 'en',
-                   links: { 
-                           project: project.id,
-                          }
-                  }
+        workflows: {
+          name: 'Test workflow',
+          first_task: 'interest',
+          tasks: {
+            interest: {
+              type: "draw",
+              question: "Draw a Circle",
+              next: "shape",
+              tools: [
+                {value: "red", label: "Red", type: 'point', color: 'red'},
+                {value: "green", label: "Green", type: 'point', color: 'lime'},
+                {value: "blue", label: "Blue", type: 'point', color: 'blue'},
+              ]
+            },
+            shape: {
+              type: 'multiple',
+              question: "What shape is this galaxy?",
+              answers: [
+                {value: 'smooth', label: "Smooth"},
+                {value: 'features', label: "Features"},
+                {value: 'other', label: 'Star or artifact'}
+              ],
+              next: nil
+            }
+          },
+          grouped: true,
+          prioritized: true,
+          primary_language: 'en',
+          links: { 
+            project: project.id,
+          }
+        }
       }
     end
     
     it_behaves_like "is creatable"
+
+    context "extracts strings from workflow" do
+      it 'should replace "Draw a circle" with 0' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, create_params
+        instance = Workflow.find(created_instance_id(api_resource_name))
+        expect(instance.tasks["interest"]["question"]).to eq(0)
+      end
+    end
   end
 
   describe '#destroy' do
@@ -98,9 +150,9 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it "should set a load user command to cellect" do
         expect(stubbed_cellect_connection).to receive(:load_user)
-          .with(user_id: user.id,
-                host: 'example.com',
-                workflow_id: workflows.first.id.to_s)
+                                               .with(user_id: user.id,
+                                                     host: 'example.com',
+                                                     workflow_id: workflows.first.id.to_s)
         get :show, id: workflows.first.id
       end
     end

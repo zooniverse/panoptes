@@ -56,7 +56,7 @@ class Api::V1::ProjectsController < Api::ApiController
     serializer.resource(project,
                         nil,
                         languages: [ project.primary_language ],
-                        fields: ['title', 'description'] )
+                        fields: CONTENT_FIELDS)
   end
 
   def update_response

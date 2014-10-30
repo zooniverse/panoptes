@@ -54,4 +54,22 @@ describe Workflow, :type => :model do
 
     it_behaves_like "it has a cached counter for classifications"
   end
+
+  describe "versioning" do
+    let(:workflow) { create(:workflow) }
+    
+    it { is_expected.to be_versioned }
+
+    it 'should track changes to tasks', versioning: true do
+      new_tasks = { blha: 'asdfasd', quera: "asdfas" }
+      workflow.update!(tasks: new_tasks)
+      expect(workflow.previous_version.tasks).to_not eq(new_tasks)
+    end
+
+    it 'should not track changes to primary_language', versioning: true do
+      new_lang = 'en'
+      workflow.update!(primary_language: new_lang)
+      expect(workflow.previous_version).to be_nil
+    end
+  end
 end

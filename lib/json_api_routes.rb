@@ -10,19 +10,28 @@ module JsonApiRoutes
     constraints = { link_relation: links_regex }.merge(id_constraint(path))
     
     post "/links/:link_relation", to: "#{ path }#update_links",
-      constraints: constraints, format: :false
+         constraints: constraints, format: :false
     
     delete "/links/:link_relation/:link_ids", to: "#{ path }#update_links",
-      constraints: constraints, format: :false
+           constraints: constraints, format: :false
+  end
+
+  def create_versions(path)
+    get "/versions", to: "#{ path }#versions", format: false,
+        constraints: id_constraint(path)
+    get "/versions/:id", to: "#{ path }#version", format: false,
+        constraints: id_constraint(path)
   end
   
   def json_api_resources(path, options={})
     links = options.delete(:links)
+    versioned = options.delete(:versioned)
     options = options.merge(except: [:new, :edit],
                             constraints: { id: VALID_IDS },
                             format: false)
     resources(path, options) do
       create_links(path, links) if links
+      create_versions(path) if versioned
       yield if block_given?
     end
   end
