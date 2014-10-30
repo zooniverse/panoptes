@@ -10,15 +10,17 @@ module JsonApiRoutes
     constraints = { link_relation: links_regex }.merge(id_constraint(path))
     
     post "/links/:link_relation", to: "#{ path }#update_links",
-      constraints: constraints, format: :false
+         constraints: constraints, format: :false
     
     delete "/links/:link_relation/:link_ids", to: "#{ path }#update_links",
-      constraints: constraints, format: :false
+           constraints: constraints, format: :false
   end
 
   def create_versions(path)
-    get "/versions", to: "#{ path }#versions", format: false
-    get "/versions/:id", to: "#{ path }#version", format: false
+    get "/versions", to: "#{ path }#versions", format: false,
+        constraints: id_constraint(path)
+    get "/versions/:id", to: "#{ path }#version", format: false,
+        constraints: id_constraint(path)
   end
   
   def json_api_resources(path, options={})
