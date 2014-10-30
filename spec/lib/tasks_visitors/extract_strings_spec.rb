@@ -39,11 +39,14 @@ RSpec.describe TasksVisitors::ExtractStrings do
   describe "#visit" do
     context "given an array collector" do
       let(:collector) { [] }
-      
-      before(:each) do
-        subject.visit(task_hash, collector)
+      subject do
+        TasksVisitors::ExtractStrings.new(collector)
       end
-      
+
+      before(:each) do
+        subject.visit(task_hash)
+      end
+
       it 'should substitute question strings with TaskIndex objects' do
         question_vals = task_hash.values_at(:interest, :shape, :roundness)
           .map { |hash| hash[:question] }
@@ -53,13 +56,10 @@ RSpec.describe TasksVisitors::ExtractStrings do
       it 'should substitute label strings with TaskIndex objects' do
         label_vals = task_hash.values_at(:interest, :shape, :roundness)
           .flat_map do |hash|
-          if hash.has_key?(:answers)
-            hash[:answers].map { |h| h[:label] }
-          else
-            hash[:tools].map { |h| h[:label] }
+            key = hash.has_key?(:answers) ? :answers : :tools
+            hash[key].map { |h| h[:label] }
           end
-        end
-        
+
         expect(label_vals).to include(1,2,3,5,6,7,9,10,11)
       end
 
@@ -69,6 +69,17 @@ RSpec.describe TasksVisitors::ExtractStrings do
 
       it 'should populate the collector with strings' do
         expect(collector).to include("Color some points",
+                                     'Red',
+                                     'How round is it?',
+                                     "Cigar shaped")
+      end
+    end
+
+    context "without an array collector" do
+
+      it 'should return the strings via the collect method' do
+        subject.visit(task_hash)
+        expect(subject.collector).to include("Color some points",
                                      'Red',
                                      'How round is it?',
                                      "Cigar shaped")

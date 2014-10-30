@@ -1,7 +1,7 @@
 class Api::V1::WorkflowsController < Api::ApiController
   include JsonApiController
   include Versioned
-  
+
   doorkeeper_for :update, :create, :delete, scopes: [:project]
   resource_actions :create, :update, :destroy
 
@@ -25,7 +25,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   def create_response(workflow)
     serializer.resource(workflow,
                         nil,
-                        languages: [workflow.primary_language]) 
+                        languages: [workflow.primary_language])
   end
 
   def update_response
@@ -56,9 +56,9 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def extract_strings(tasks)
-    collector = []
-    TasksVisitors::ExtractStrings.new.visit(tasks, collector)
-    [tasks, collector]
+    task_string_extractor = TasksVisitors::ExtractStrings.new
+    task_string_extractor.visit(tasks)
+    [tasks, task_string_extractor.collector]
   end
 
   def cellect_params
@@ -78,10 +78,11 @@ class Api::V1::WorkflowsController < Api::ApiController
                   :first_task,
                   tasks: permit_tasks,
                   links: [:project,
-                          subject_sets: []]) 
+                          subject_sets: []])
   end
 
   def update_params
+
     permit_params(:pairwise,
                   :grouped,
                   :prioritized,
@@ -97,7 +98,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def permit_tasks
     tasks = params[:workflows].fetch(:tasks, [])
-    
+
     tasks.reduce([]) do |permitted, (task_name, _)|
       permitted.concat([task_name => [:type,
                                       :question,

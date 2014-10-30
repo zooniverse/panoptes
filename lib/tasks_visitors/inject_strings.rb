@@ -3,10 +3,10 @@ module TasksVisitors
     def initialize(strings)
       @strings = strings
     end
-    
+
     private
 
-    def inject_string(n, c)
+    def inject_string(n)
       @strings[n]
     end
 
