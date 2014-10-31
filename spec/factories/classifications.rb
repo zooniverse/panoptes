@@ -11,7 +11,6 @@ FactoryGirl.define do
                  {another_one: [1, 2]}]
     user_ip "192.168.0.1"
     completed true
-    gold_standard false
     user
     project
     workflow

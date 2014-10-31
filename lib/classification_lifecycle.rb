@@ -1,6 +1,6 @@
 class ClassificationLifecycle
   attr_reader :classification
-  
+
   def initialize(classification)
     @classification = classification
   end
@@ -51,7 +51,13 @@ class ClassificationLifecycle
     classification_json = ClassificationSerializer.serialize(classification).to_json
     MultiKafkaProducer.publish('classifications', [classification.project.id, classification_json])
   end
-  
+
+  def add_gold_standard_flag
+    if user && gold_standard = project.expert_classifier?(user)
+      classification.update(gold_standard: gold_standard)
+    end
+  end
+
   private
 
   def should_update_seen?
@@ -68,23 +74,23 @@ class ClassificationLifecycle
   end
 
   def user
-    classification.user
+    @user ||= classification.user
   end
 
   def workflow
-    classification.workflow
+    @workflow ||= classification.workflow
   end
 
   def project
-    classification.project
+    @project ||= classification.project
   end
 
   def set_member_subject
-    classification.set_member_subject
+    @set_member_subject ||= classification.set_member_subject
   end
-  
+
   def user_workflow_subject
-    {
+    @user_workflow_subject ||= {
       user: user,
       workflow: workflow,
       set_member_subject: set_member_subject

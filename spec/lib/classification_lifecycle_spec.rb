@@ -135,7 +135,7 @@ describe ClassificationLifecycle do
     context "with a user" do
       context "when no preference exists"  do
         let(:classification) { build(:classification) }
-
+        
         it 'should create a project preference' do
           expect do
             subject.create_project_preference
@@ -212,6 +212,44 @@ describe ClassificationLifecycle do
                                                host: 'http://test.host/'
                                              )
       subject.update_cellect('http://test.host/')
+    end
+  end
+
+  describe "#add_gold_standard_flag" do
+    let(:classification) { create(:classification) }
+    let!(:user_role) do
+      create(:user_project_preference, project: classification.project,
+                                       user: classification.user,
+                                       roles: roles)
+    end
+
+    before(:each) do
+      subject.add_gold_standard_flag
+      classification.reload
+    end
+
+    context "when the classifying user is a collaborator" do
+      let(:roles) { ['collaborator'] }
+
+      it 'should not mark the classification as gold standard' do
+        expect(classification.gold_standard?).to be_truthy
+      end
+    end
+
+    context "with a non-expert user" do
+      let(:roles) { ['moderator'] }
+
+      it 'should not mark the classification as gold standard' do
+        expect(classification.gold_standard?).to be_falsey
+      end
+    end
+
+    context "without a user" do
+      let(:roles) { [] }
+
+      it 'should not mark the classification as gold standard' do
+        expect(classification.gold_standard?).to be_falsey
+      end
     end
   end
 end

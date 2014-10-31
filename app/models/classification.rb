@@ -14,8 +14,8 @@ class Classification < ActiveRecord::Base
   validates :user, presence: true, if: :incomplete?
   validate :metadata, :required_metadata_present
 
-  attr_accessible :annotations, :completed, :user_ip, :metadata
-  
+  attr_accessible :annotations, :completed, :user_ip, :gold_standard, :metadata
+
   can :show, :in_show_scope?
   can :update, :created_and_incomplete?
   can :destroy, :created_and_incomplete?
@@ -35,7 +35,7 @@ class Classification < ActiveRecord::Base
   def in_show_scope?(actor)
     self.class.visible_to(actor).exists?(self)
   end
-  
+
   def creator?(actor)
     user == actor.user
   end
