@@ -11,6 +11,7 @@ class ClassificationLifecycle
 
   def transact!(&block)
     Classification.transaction do
+      add_gold_standard_flag
       update_seen_subjects
       dequeue_subject
       instance_eval &block if block_given?

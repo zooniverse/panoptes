@@ -47,6 +47,11 @@ describe ClassificationLifecycle do
         subject.transact!
       end
 
+      it "should call the #add_gold_standard_flag method" do
+        expect(subject).to receive(:add_gold_standard_flag).once
+        subject.transact!
+      end
+
       it "should call the #update_seen_subjects method" do
         expect(subject).to receive(:update_seen_subjects).once
         subject.transact!
@@ -135,7 +140,7 @@ describe ClassificationLifecycle do
     context "with a user" do
       context "when no preference exists"  do
         let(:classification) { build(:classification) }
-        
+
         it 'should create a project preference' do
           expect do
             subject.create_project_preference
