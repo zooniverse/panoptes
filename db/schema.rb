@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 20141106180016) do
     t.inet     "user_ip"
     t.boolean  "completed",             default: true, null: false
     t.json     "metadata",              default: {},   null: false
+    t.boolean  "gold_standard",         default: false, null: false
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
