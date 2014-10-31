@@ -32,7 +32,7 @@ module RoleControl
 
       def role_test_proc(action)
         proc do |enrolled|
-          self.class.scope_for(action, enrolled, target: self).exists?(self)
+          self.class.scope_for(action, enrolled, target: self).exists?(self.id)
         end
       end
 

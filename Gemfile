@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.1.6'
-gem 'postgres_ext'
+gem 'rails', '4.2.0.beta2'
+gem 'postgres_ext', github: "dockyard/postgres_ext"
 gem 'sdoc', '~> 0.4.0',          group: :doc
 gem 'doorkeeper', '~> 1.4.0'
-gem 'devise'
+gem 'devise', '~> 3.4.0'
 gem 'versionist'
 gem 'rack-cors', require: 'rack/cors'
 gem 'protected_attributes', '~> 1.0.8'
@@ -20,6 +20,7 @@ gem 'airbrake', '~> 4.1.0'
 gem 'jquery-rails'
 gem 'uglifier'
 gem 'sidekiq'
+gem 'active_record_union'
 
 platforms :jruby do
   gem 'jbundler'

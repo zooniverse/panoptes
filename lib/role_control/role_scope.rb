@@ -18,7 +18,7 @@ module RoleControl
       query_bind_values = actor_roles_query_bind_values
       query = query_without_bind_values
       return query unless query_bind_values
-      query_bind_values.reduce(query) { |query, value| query.bind(value) }
+      query_bind_values.reduce(query) { |q, value| q.bind(value) }
     end
 
     def query_without_bind_values

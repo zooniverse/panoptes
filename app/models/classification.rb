@@ -32,7 +32,7 @@ class Classification < ActiveRecord::Base
   end
 
   def in_show_scope?(actor)
-    self.class.visible_to(actor).exists?(self)
+    self.class.visible_to(actor).exists?(id)
   end
   
   def creator?(actor)
