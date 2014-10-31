@@ -16,33 +16,66 @@ describe ClassificationLifecycle do
     after(:each) do
       subject.queue(test_method)
     end
-    
+
     context "with create action" do
       let(:test_method) { :create }
-      
+
       it 'should queue other actions' do
         expect(ClassificationWorker).to receive(:perform_async)
                                          .with(classification.id, :create)
       end
     end
-    
+
     context "with update action" do
       let(:test_method) { :update }
-      
+
       it 'should queue other actions' do
         expect(ClassificationWorker).to receive(:perform_async)
                                          .with(classification.id, :update )
       end
     end
-    
   end
-  
+
+  describe "#transact!" do
+    let(:classification) { create(:classification) }
+
+    describe "the classification lifecycle methods" do
+
+      it "should wrap the calls in a transaction" do
+        subject
+        expect(Classification).to receive(:transaction)
+        subject.transact!
+      end
+
+      it "should call the #update_seen_subjects method" do
+        expect(subject).to receive(:update_seen_subjects).once
+        subject.transact!
+      end
+
+      it "should call the #dequeue_subject method" do
+        expect(subject).to receive(:dequeue_subject).once
+        subject.transact!
+      end
+
+      it "should call the instance_eval on the block if passed a block" do
+        expect(subject).to receive(:instance_eval).once
+        subject.transact! { true }
+      end
+
+      it "should call the #publish_to_kafka method" do
+        expect(subject).to receive(:publish_to_kafka).once
+        subject.transact!
+      end
+    end
+  end
+
+
   describe "publish_to_kafka" do
     after(:each) { subject.publish_to_kafka }
-    
+
     context "when classificaiton is completed" do
       let(:classification) { build(:classification) }
-      
+
       it 'should publish to kafka' do
         serialized = ClassificationSerializer.serialize(classification).to_json
         expect(MultiKafkaProducer).to receive(:publish)
@@ -61,8 +94,8 @@ describe ClassificationLifecycle do
 
   describe "#dequeue_subject" do
     after(:each) { subject.dequeue_subject }
-    
-    context "complete classification" do 
+
+    context "complete classification" do
       let(:classification) { create(:classification, completed: true) }
 
       context "is queued" do
@@ -72,7 +105,7 @@ describe ClassificationLifecycle do
                  workflow: classification.workflow,
                  set_member_subject_ids: [classification.set_member_subject_id])
         end
-        
+
         it 'should call dequeue_subject_for_user' do
           expect(UserSubjectQueue).to receive(:dequeue_subject_for_user)
                                        .with(user: classification.user,
@@ -88,10 +121,10 @@ describe ClassificationLifecycle do
         end
       end
     end
-    
+
     context "incomplete classification" do
       let(:classification) { create(:classification, completed: false) }
-      
+
       it 'should not call dequeue_subject_for_use when incomplete' do
         expect(UserSubjectQueue).to_not receive(:dequeue_subject_for_user)
       end
@@ -102,7 +135,7 @@ describe ClassificationLifecycle do
     context "with a user" do
       context "when no preference exists"  do
         let(:classification) { build(:classification) }
-        
+
         it 'should create a project preference' do
           expect do
             subject.create_project_preference
@@ -127,7 +160,7 @@ describe ClassificationLifecycle do
       let(:classification) do
         build(:classification, project: project, user: user)
       end
-      
+
       it "should not create a project preference" do
         create(:user_project_preference, user: user, project: project)
         expect do
@@ -148,7 +181,7 @@ describe ClassificationLifecycle do
 
   describe "#update_seen_subjects" do
     after(:each) { subject.update_seen_subjects }
-    
+
     context "with a user" do
       let(:classification) { build(:classification) }
       it 'should add the set_member_subject_id to the seen subjects' do
@@ -169,7 +202,7 @@ describe ClassificationLifecycle do
 
   describe "#update_cellect" do
     let(:classification) { create(:classification) }
-    
+
     it "should setup the add seen command to cellect" do
       expect(stubbed_cellect_connection).to receive(:add_seen)
                                              .with(
