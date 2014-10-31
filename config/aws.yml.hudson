@@ -1,0 +1,9 @@
+development:
+  access_key_id:
+  secret_access_key:
+  subjects_bucket:
+
+test:
+  access_key_id:
+  secret_access_key:
+  subjects_bucket:
