@@ -4,8 +4,7 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
-ruby_version = ENV['PANOTPES_RUBY'] || 'jruby-1.7.16'
-bundle_command = ruby_version.match(/jruby/) ? 'jbundle' : 'bundle'
+ruby_version = ENV['PANOPTES_RUBY'] || 'jruby-1.7.16'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu-14.04-docker"
@@ -18,14 +17,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.synced_folder "./", "/home/vagrant/panoptes/"
 
-  config.vm.provision "docker",
-    version: '1.0.1'
+  config.vm.provision "docker", version: '1.0.1'
 
   config.vm.provision "shell", inline: "apt-get -y -q install python-pip"
   config.vm.provision "shell", inline: "pip install \"fig>=1.0,<1.1\""
   config.vm.provision "shell", inline: "mkdir -p /opt/postgresql"
   config.vm.provision "shell", inline: "cd /home/vagrant/panoptes && fig stop && fig rm; rm /home/vagrant/panoptes/tmp/pids/server.pid || true"
   config.vm.provision "shell", inline: "echo #{ ruby_version } > /home/vagrant/.ruby-version"
+  unless ruby_version == 'jruby-1.7.16' 
+    config.vm.provision "shell", inline: "cd /home/vagrant/panoptes && sed -i 's/ruby:.*$/ruby:#{ruby_version}/' fig.yml"
+  end
 
   config.vm.provision "shell", inline: "cd /home/vagrant/panoptes && fig up"
 end
