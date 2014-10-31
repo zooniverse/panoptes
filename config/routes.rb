@@ -24,7 +24,7 @@ Rails.application.routes.draw do
 
       json_api_resources :workflow_contents, versioned: true
 
-      json_api_resources :project_contents
+      json_api_resources :project_contents, versioned: true
       
       json_api_resources :project_roles
       

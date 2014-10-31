@@ -1,5 +1,6 @@
 class Api::V1::ProjectsController < Api::ApiController
   include JsonApiController
+  include Versioned
   
   doorkeeper_for :update, :create, :delete, scopes: [:project]
   resource_actions :update, :create, :destroy
