@@ -6,12 +6,12 @@ module Panoptes
                       file = Rails.root.join('config/aws.yml')
                       YAML.load(File.read(file))[Rails.env].symbolize_keys
                     rescue Errno::ENOENT, NoMethodError
-                      { subjects_bucket: "development_subjects" }
+                      { subjects_bucket: "panoptes_development_subjects" }
                     end
   end
   
   def self.subjects_bucket
-    @subjects_bucket ||= AWS::S3.new.buckets[aws_config[:subject_bucket]]
+    @subjects_bucket ||= AWS::S3.new.buckets[aws_config[:subjects_bucket]]
   end
 end
 

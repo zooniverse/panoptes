@@ -25,4 +25,19 @@ class Subject < ActiveRecord::Base
   def self.can_create?(actor)
     true
   end
+
+  def locations=(locations)
+    locations = locations.reduce({}) do |locs, (location, mime)|
+      locs[location] = {mime_type: mime,
+                        s3_path: subject_path(location, mime)}
+      locs
+    end
+    
+    write_attribute(:locations, locations)
+  end
+
+  def subject_path(location, mime)
+    extension = MIME::Types[mime].first.extensions.first
+    "#{project.id}/#{location}/#{id}.#{extension}"
+  end
 end

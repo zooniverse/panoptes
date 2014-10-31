@@ -4,8 +4,10 @@ class Api::V1::SubjectsController < Api::ApiController
   
   before_action :merge_cellect_host, only: :index
   doorkeeper_for :update, :create, :destroy, :version, :versions,
-    scopes: [:subject]
+                 scopes: [:subject]
   resource_actions :default
+
+  alias_method :subject, :controlled_resource
 
   def index
     render json_api: selector.create_response
@@ -13,13 +15,23 @@ class Api::V1::SubjectsController < Api::ApiController
 
   private
 
-  def build_resource_for_create(create_params)
-    create_params[:links][:owner] = owner || api_user.user
-    super(create_params)
+  def create_response(subject)
+    serializer.resource(subject, nil, post_urls: true)
   end
 
-  private
+  def update_response
+    render json_api: serializer.resource(subject, nil, post_urls: true)
+  end
 
+  def build_resource_for_create(create_params)
+    locations = create_params.delete(:locations)
+    create_params[:links][:owner] = owner || api_user.user
+    subject = super(create_params)
+    subject.save!
+    subject.locations = locations
+    subject
+  end
+  
   def merge_cellect_host
     params[:host] = cellect_host(params[:workflow_id])
   end
@@ -32,12 +44,13 @@ class Api::V1::SubjectsController < Api::ApiController
     params.require(:subjects)
       .permit(metadata: params[:subjects][:metadata].try(:keys),
               locations: params[:subjects][:locations].try(:keys),
-              links: [:project, owner: [:id, :type]])
+              links: [:project, :subject_sets, owner: [:id, :type]])
   end
 
   def update_params
     params.require(:subjects)
       .permit(metadata: params[:subjects][:metadata].try(:keys),
-              locations: params[:subjects][:locations].try(:keys))
+              locations: params[:subjects][:locations].try(:keys),
+              links: [:subject_sets])
   end
 end

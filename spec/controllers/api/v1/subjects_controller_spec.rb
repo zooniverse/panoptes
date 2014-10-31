@@ -55,8 +55,9 @@ describe Api::V1::SubjectsController, type: :controller do
       context "subjects that use the SetMemberSubjectSerializer" do
         let(:api_resource_attributes) do
           [ "id", "metadata", "locations", "zooniverse_id", "classifications_count",
-           "state", "set_member_subject_id", "created_at", "updated_at" ]
+            "state", "set_member_subject_id", "created_at", "updated_at" ]
         end
+        
         let(:api_resource_links) { [ "subjects.subject_set" ] }
 
         context "with queued subjects" do
@@ -152,7 +153,6 @@ describe Api::V1::SubjectsController, type: :controller do
                 expect(response.status).to eq(422)
               end
             end
-            
           end
 
           describe "testing the cellect client setup" do
@@ -179,11 +179,14 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:test_attr_value) { { "interesting_data" => "Tested Collection" } }
     let(:update_params) do
       {
-       subjects: {
-                  metadata: {
-                             interesting_data: "Tested Collection"
-                            }
-                 }
+        subjects: {
+          metadata: {
+            interesting_data: "Tested Collection"
+          },
+          locations: {
+            standard: "image/jpeg"
+          }
+        }
       }
     end
 
@@ -191,21 +194,30 @@ describe Api::V1::SubjectsController, type: :controller do
   end
 
   describe "#create" do
-    let(:test_attr) { :locations }
+    let(:test_attr) { :metadata }
     let(:test_attr_value) do
-      { "standard" => "http://test.host/imgs/marioface.jpg" }
+      { "cool_factor" => 11 }
     end
     
     let(:create_params) do
       {
-       subjects: {
-                  metadata: { cool_factor: 11 },
-                  locations: { standard: "http://test.host/imgs/marioface.jpg" },
-                  links: {  
-                          project: project.id
-                         }
-                 }
+        subjects: {
+          metadata: { cool_factor: 11 },
+          locations: { 
+            standard: "image/jpeg",
+          },
+          links: {  
+            project: project.id
+          }
+        }
       }
+    end
+
+    it 'should return locations as a hash of signed s3 urls' do
+      default_request scopes: scopes, user_id: authorized_user.id
+      post :create, create_params
+      standard_url = json_response['subjects'][0]['locations']['standard']
+      expect(standard_url).to match(/Expires=[0-9]++&Signature=[A-z0-9]+/)
     end
 
     it_behaves_like "is creatable"
@@ -227,7 +239,7 @@ describe Api::V1::SubjectsController, type: :controller do
     end
     
     let(:resource_param) { :subject_id }
-   
+    
     it_behaves_like "a versioned resource"
   end
 end

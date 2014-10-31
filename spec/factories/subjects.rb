@@ -6,7 +6,7 @@ FactoryGirl.define do
     metadata({distance_from_earth: "42 light years",
               brightness: -20,
               loudness: 11})
-    locations({main_image: "http://example.com/main_image.png"})
+    locations({main_image: "image/jpeg"})
 
     factory :subject_with_collections do
       after(:create) do |s|
