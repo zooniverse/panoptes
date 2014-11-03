@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141106180016) do
+ActiveRecord::Schema.define(version: 20141103124520) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 20141106180016) do
     t.boolean  "completed",             default: true, null: false
     t.json     "metadata",              default: {},   null: false
     t.boolean  "gold_standard",         default: false, null: false
+    t.integer  "expert_classifier"
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
