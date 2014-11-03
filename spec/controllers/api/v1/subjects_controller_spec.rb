@@ -196,13 +196,13 @@ describe Api::V1::SubjectsController, type: :controller do
   describe "#create" do
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
-      { "cool_factor" => 11 }
+      { "cool_factor" => "11" }
     end
     
     let(:create_params) do
       {
         subjects: {
-          metadata: { cool_factor: 11 },
+          metadata: { cool_factor: "11" },
           locations: { 
             standard: "image/jpeg",
           },
