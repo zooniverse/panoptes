@@ -221,39 +221,52 @@ describe ClassificationLifecycle do
   end
 
   describe "#add_gold_standard_flag" do
-    let(:classification) { create(:classification) }
-    let!(:user_role) do
-      create(:user_project_preference, project: classification.project,
-                                       user: classification.user,
-                                       roles: roles)
-    end
 
-    before(:each) do
-      subject.add_gold_standard_flag
-      classification.reload
-    end
-
-    context "when the classifying user is a collaborator" do
-      let(:roles) { ['collaborator'] }
+    context "without a logged in user" do
+      let(:classification) { create(:classification, user: nil) }
 
       it 'should not mark the classification as gold standard' do
-        expect(classification.gold_standard?).to be_truthy
-      end
-    end
-
-    context "with a non-expert user" do
-      let(:roles) { ['moderator'] }
-
-      it 'should not mark the classification as gold standard' do
+        subject.add_gold_standard_flag
+        classification.reload
         expect(classification.gold_standard?).to be_falsey
       end
     end
 
-    context "without a user" do
-      let(:roles) { [] }
+    context "with a logged in user" do
+      let(:classification) { create(:classification) }
+      let!(:user_role) do
+        create(:user_project_preference, project: classification.project,
+                                         user: classification.user,
+                                         roles: roles)
+      end
 
-      it 'should not mark the classification as gold standard' do
-        expect(classification.gold_standard?).to be_falsey
+      before(:each) do
+        subject.add_gold_standard_flag
+        classification.reload
+      end
+
+      context "when the classifying user is a collaborator" do
+        let(:roles) { ['collaborator'] }
+
+        it 'should not mark the classification as gold standard' do
+          expect(classification.gold_standard?).to be_truthy
+        end
+      end
+
+      context "with a non-expert user" do
+        let(:roles) { ['moderator'] }
+
+        it 'should not mark the classification as gold standard' do
+          expect(classification.gold_standard?).to be_falsey
+        end
+      end
+
+      context "without an explicit role" do
+        let(:roles) { [] }
+
+        it 'should not mark the classification as gold standard' do
+          expect(classification.gold_standard?).to be_falsey
+        end
       end
     end
   end
