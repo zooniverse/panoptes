@@ -8,7 +8,7 @@ class Classification < ActiveRecord::Base
   belongs_to :workflow, counter_cache: true
   belongs_to :user_group, counter_cache: true
 
-  enum gold_standard: [:expert, :owner]
+  enum expert_classifier: [:expert, :owner]
 
   validates_presence_of :set_member_subject, :project, :workflow,
                         :annotations, :user_ip

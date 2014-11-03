@@ -11,7 +11,7 @@ class ClassificationLifecycle
 
   def transact!(&block)
     Classification.transaction do
-      add_gold_standard_flag
+      mark_expert_classifier
       update_seen_subjects
       dequeue_subject
       instance_eval &block if block_given?
@@ -53,9 +53,9 @@ class ClassificationLifecycle
     MultiKafkaProducer.publish('classifications', [classification.project.id, classification_json])
   end
 
-  def add_gold_standard_flag
-    if user && gold_standard = project.expert_classifier?(user)
-      classification.update(gold_standard: gold_standard)
+  def mark_expert_classifier
+    if user && expert_level = project.expert_classifier_level(user)
+      classification.update(expert_classifier: expert_level)
     end
   end
 

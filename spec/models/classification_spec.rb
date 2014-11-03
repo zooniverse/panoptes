@@ -149,4 +149,31 @@ describe Classification, :type => :model do
       expect(classification_with_user_group.user_group).to eq(expected_user_group)
     end
   end
+
+  describe "#gold_standard?" do
+
+    context "without it set" do
+
+      it "should be falsey" do
+        classification = create(:classification)
+        expect(classification.gold_standard?).to be_falsey
+      end
+    end
+
+    context "with it set" do
+
+      it "should be truthy" do
+        classification = create(:gold_standard_classification)
+        expect(classification.gold_standard?).to be_truthy
+      end
+    end
+
+    context "with an incorrect value for the gold standard key" do
+
+      it "should be falsey" do
+        classification = create(:fake_gold_standard_classification)
+        expect(classification.gold_standard?).to be_falsey
+      end
+    end
+  end
 end

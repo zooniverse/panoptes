@@ -47,8 +47,8 @@ describe ClassificationLifecycle do
         subject.transact!
       end
 
-      it "should call the #add_gold_standard_flag method" do
-        expect(subject).to receive(:add_gold_standard_flag).once
+      it "should call the #mark_expert_classifier method" do
+        expect(subject).to receive(:mark_expert_classifier).once
         subject.transact!
       end
 
@@ -220,15 +220,15 @@ describe ClassificationLifecycle do
     end
   end
 
-  describe "#add_gold_standard_flag" do
+  describe "#mark_expert_classifier" do
 
     context "without a logged in user" do
       let(:classification) { create(:classification, user: nil) }
 
-      it 'should not mark the classification as gold standard' do
-        subject.add_gold_standard_flag
+      it 'should not mark the classification as expert' do
+        subject.mark_expert_classifier
         classification.reload
-        expect(classification.gold_standard?).to be_falsey
+        expect(classification.expert_classifier?).to be_falsey
       end
     end
 
@@ -241,31 +241,31 @@ describe ClassificationLifecycle do
       end
 
       before(:each) do
-        subject.add_gold_standard_flag
+        subject.mark_expert_classifier
         classification.reload
       end
 
       context "when the classifying user is a collaborator" do
         let(:roles) { ['collaborator'] }
 
-        it 'should not mark the classification as gold standard' do
-          expect(classification.gold_standard?).to be_truthy
+        it 'should not mark the classification as expert' do
+          expect(classification.expert_classifier?).to be_falsey
         end
       end
 
       context "with a non-expert user" do
         let(:roles) { ['moderator'] }
 
-        it 'should not mark the classification as gold standard' do
-          expect(classification.gold_standard?).to be_falsey
+        it 'should not mark the classification as expert' do
+          expect(classification.expert_classifier?).to be_falsey
         end
       end
 
       context "without an explicit role" do
         let(:roles) { [] }
 
-        it 'should not mark the classification as gold standard' do
-          expect(classification.gold_standard?).to be_falsey
+        it 'should not mark the classification as expert' do
+          expect(classification.expert_classifier?).to be_falsey
         end
       end
     end

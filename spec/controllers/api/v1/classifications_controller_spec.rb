@@ -88,7 +88,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       let!(:classifications) { create_list(:classification, 2, user: user) }
       let!(:private_resource) { create(:classification) }
       let(:n_visible) { 2 }
-      
+
       it_behaves_like "is indexable"
     end
 
@@ -132,7 +132,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it_behaves_like "is updatable"
-      
+
     end
 
     context "a complete classification" do
@@ -144,13 +144,13 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
     end
   end
-  
+
   describe "#destroy" do
     context "an incomplete classification" do
       let(:resource) do
         create(:classification, user: authorized_user, completed: false)
       end
-      
+
       it_behaves_like "is destructable"
     end
 

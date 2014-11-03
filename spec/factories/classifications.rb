@@ -19,5 +19,14 @@ FactoryGirl.define do
     factory :classifaction_with_user_group do
       user_group
     end
+
+    factory :gold_standard_classification do
+      expert_classifier :expert
+      gold_standard true
+    end
+
+    factory :fake_gold_standard_classification do
+      gold_standard false
+    end
   end
 end

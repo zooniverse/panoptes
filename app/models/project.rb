@@ -7,7 +7,7 @@ class Project < ActiveRecord::Base
   include Linkable
   include Translatable
 
-  EXPERT_ROLES = [:collaborator]
+  EXPERT_ROLES = [:expert]
 
   attr_accessible :name, :display_name, :owner, :primary_language,
     :project_contents, :avatar, :background_image
@@ -44,10 +44,15 @@ class Project < ActiveRecord::Base
     @translation_scope ||= RoleControl::RoleScope.new(["translator"], false, self)
   end
 
-  def expert_classifier?(actor)
-    return true if actor == owner
-    project_roles.where(user_id: actor.id)
+  def expert_classifier_level(classifier)
+    return :owner if classifier == owner
+    expert_role = project_roles.where(user_id: classifier.id)
       .where("roles @> ARRAY[?]::varchar[]", EXPERT_ROLES)
       .exists?
+    expert_role ? :expert : nil
+  end
+
+  def expert_classifier?(classifier)
+    !!expert_classifier_level(classifier)
   end
 end
