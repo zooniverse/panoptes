@@ -24,14 +24,21 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    locations = create_params.delete(:locations)
     create_params[:links][:owner] = owner || api_user.user
+    create_params[:locations] = add_subject_path(create_params[:locations],
+                                                 create_params[:links][:project])
     subject = super(create_params)
-    subject.save!
-    subject.locations = locations
     subject
   end
-  
+
+  def build_resource_for_update(update_params)
+    if update_params.has_key? :locations
+      update_params[:locations] = add_subject_path(update_params[:locations],
+                                                   controlled_resource.project.id)
+    end
+    super(update_params)
+  end
+
   def merge_cellect_host
     params[:host] = cellect_host(params[:workflow_id])
   end
@@ -52,5 +59,18 @@ class Api::V1::SubjectsController < Api::ApiController
       .permit(metadata: params[:subjects][:metadata].try(:keys),
               locations: params[:subjects][:locations].try(:keys),
               links: [:subject_sets])
+  end
+  
+  def add_subject_path(locations, project_id)
+    locations.reduce({}) do |locs, (location, mime)|
+      locs[location] = {mime_type: mime,
+                        s3_path: subject_path(location, mime, project_id)}
+      locs
+    end
+  end
+
+  def subject_path(location, mime, project_id)
+    extension = MIME::Types[mime].first.extensions.first
+    "#{project_id}/#{location}/#{SecureRandom.uuid}.#{extension}"
   end
 end

@@ -213,11 +213,27 @@ describe Api::V1::SubjectsController, type: :controller do
       }
     end
 
-    it 'should return locations as a hash of signed s3 urls' do
-      default_request scopes: scopes, user_id: authorized_user.id
-      post :create, create_params
-      standard_url = json_response['subjects'][0]['locations']['standard']
-      expect(standard_url).to match(/Expires=[0-9]++&Signature=[A-z0-9]+/)
+    context "s3 urls" do
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, create_params
+      end
+
+      let(:standard_url) do
+        json_response['subjects'][0]['locations']['standard']
+      end
+      
+      it 'should return locations as a hash of signed s3 urls' do
+        expect(standard_url).to match(/Expires=[0-9]++&Signature=[A-z0-9]+/)
+      end
+
+      it "should set a uuidv4 id as the file name" do
+        expect(standard_url).to match(/[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/)
+      end
+
+      it "should set the file extension from the provided mime-type" do
+        expect(standard_url).to match(/\.jpeg/)
+      end
     end
 
     it_behaves_like "is creatable"
