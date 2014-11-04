@@ -109,6 +109,14 @@ describe Api::V1::ClassificationsController, type: :controller do
                 .user.id).to eq(user.id)
       end
 
+      it "should set the workflow version", versioning: true do
+        create_classification
+        id = created_instance_id("classifications")
+        classification = Classification.find(id)
+        version = PaperTrail::Version.where(item: workflow).first
+        expect(classification.workflow_version.id).to eq(version.id)
+      end
+
       it_behaves_like "a classification create"
     end
   end
