@@ -1,4 +1,4 @@
-FROM zooniverse/ruby:jruby-1.7.16
+FROM zooniverse/ruby:jruby-1.7.16.1
 
 WORKDIR /rails_app
 
