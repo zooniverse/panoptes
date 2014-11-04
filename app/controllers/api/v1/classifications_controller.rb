@@ -5,14 +5,12 @@ class Api::V1::ClassificationsController < Api::ApiController
   doorkeeper_for :show, :index, :destory, :update, scopes: [:classification]
   resource_actions :default
 
-  allowed_params :create, :completed,
-    annotations: [:key, :value, :started_at, :finished_at, :user_agent],
-    links: [:project, :workflow, :set_member_subject, :subject]
-
-  allowed_params :update, :completed,
-    annotations: [:key, :value, :started_at, :finished_at, :user_agent]
-
   alias_method :classification, :controlled_resource
+
+  METADATA_PARAMS = [:screen_resolution,
+                     :started_at,
+                     :finished_at,
+                     :user_agent]
 
   private
 
@@ -42,5 +40,24 @@ class Api::V1::ClassificationsController < Api::ApiController
     lifecycle = ClassificationLifecycle.new(classification)
     lifecycle.update_cellect(cellect_host)
     lifecycle.queue(action)
+  end
+
+  def annotation_params
+    params[:classifications][:annotations].map(&:keys)
+  end
+
+  def create_params
+    params.require(:classifications).permit(:completed,
+                                            metadata: METADATA_PARAMS,
+                                            annotations: annotation_params,
+                                            links: [:project,
+                                                    :workflow,
+                                                    :set_member_subject])
+  end
+
+  def update_params
+    params.require(:classifications).permit(:completed,
+                                            metadata: METADATA_PARAMS,
+                                            annotations: annotation_params)
   end
 end
