@@ -16,7 +16,7 @@ cellect:
     - zookeeper:zk
 
 redis:
-  image: redis
+  image: redis:latest
   command: redis-server -appendonly yes
 
 kafka:
