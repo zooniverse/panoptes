@@ -1,7 +1,10 @@
 FactoryGirl.define do
   factory :classification do
-    annotations [{an_annotation: true,
-                  another_one: [1, 2]}].to_json
+    metadata({user_agent: "CURL",
+              started_at: 2.minutes.ago,
+              finished_at: Time.now})
+    annotations [{an_annotation: true},
+                 {another_one: [1, 2]}]
     user_ip "192.168.0.1"
     completed true
     user

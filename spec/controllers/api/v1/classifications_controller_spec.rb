@@ -1,25 +1,30 @@
 require 'spec_helper'
 
+def metadata_values
+  [ { started_at: DateTime.now },
+    { finished_at: DateTime.now },
+    { user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" } ]
+end
+
 def annotation_values
-  [ { key: "age", value: "adult" },
-   { started_at: DateTime.now },
-   { finished_at: DateTime.now },
-   { user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" } ]
+  [ { "question_key" => "question_answer"},
+    { "age" => "adult"} ]
 end
 
 def setup_create_request(project_id, workflow_id, set_member_subject)
   request.session = { cellect_hosts: { workflow_id.to_s => "example.com" } }
   params =
     {
-     classifications: {
-                       completed: true,
-                       annotations: annotation_values,
-                       links: {
-                               project: project_id,
-                               workflow: workflow_id,
-                               set_member_subject: set_member_subject.id,
-                              }
-                      }
+      classifications: {
+        completed: true,
+        metadata: metadata_values,
+        annotations: annotation_values,
+        links: {
+          project: project_id,
+          workflow: workflow_id,
+          set_member_subject: set_member_subject.id,
+        }
+      }
     }
   post :create, params
 end
@@ -61,9 +66,9 @@ describe Api::V1::ClassificationsController, type: :controller do
   end
   let(:api_resource_links) do
     [ "classifications.project",
-     "classifications.set_member_subject",
-     "classifications.user",
-     "classifications.user_group" ]
+      "classifications.set_member_subject",
+      "classifications.user",
+      "classifications.user_group" ]
   end
 
   let(:scopes) { %w(classification) }
@@ -101,7 +106,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         create_classification
         id = created_instance_id("classifications")
         expect(Classification.find(created_classification_id)
-               .user.id).to eq(user.id)
+                .user.id).to eq(user.id)
       end
 
       it_behaves_like "a classification create"
@@ -115,10 +120,10 @@ describe Api::V1::ClassificationsController, type: :controller do
       let(:test_attr_value) { true }
       let(:update_params) do
         {
-         classifications: {
-                           completed: true,
-                           annotations: [{ key: "q-1", value: "round" }]
-                          }
+          classifications: {
+            completed: true,
+            annotations: [{ "q-1" => "round" }]
+          }
         }
       end
 
