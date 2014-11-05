@@ -72,4 +72,12 @@ describe Workflow, :type => :model do
       expect(workflow.previous_version).to be_nil
     end
   end
+
+  describe "#current_version" do
+    it 'should return the most recent version', :versioning do
+      workflow = create(:workflow)
+
+      expect(workflow.current_version).to eq(workflow.versions.last)
+    end
+  end
 end

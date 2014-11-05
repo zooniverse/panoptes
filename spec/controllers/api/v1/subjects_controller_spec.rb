@@ -247,6 +247,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe "versioning" do
     let(:resource) { create(:subject, owner: user) }
+    let(:parent_resource) { "subject" }
 
     let(:update_block) do
       10.times do |n|

@@ -10,6 +10,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   METADATA_PARAMS = [:screen_resolution,
                      :started_at,
                      :finished_at,
+                     :language,
                      :user_agent]
 
   private
@@ -27,8 +28,11 @@ class Api::V1::ClassificationsController < Api::ApiController
   def build_resource_for_create(create_params)
     create_params[:links][:user] = api_user.user
     create_params[:user_ip] = request_ip
+    workflow_version = create_params[:links].delete(:workflow_version)
+    
     classification = super(create_params)
-    classification.workflow_version = classification.workflow.versions.last
+    
+    classification.workflow_version_id = workflow_version
     lifecycle(:create, classification)
     classification
   end
@@ -53,6 +57,7 @@ class Api::V1::ClassificationsController < Api::ApiController
                                             annotations: annotation_params,
                                             links: [:project,
                                                     :workflow,
+                                                    :workflow_version,
                                                     :set_member_subject])
   end
 
