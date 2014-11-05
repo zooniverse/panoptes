@@ -28,7 +28,7 @@ class Api::V1::ClassificationsController < Api::ApiController
     create_params[:links][:user] = api_user.user
     create_params[:user_ip] = request_ip
     classification = super(create_params)
-    classification.workflow_version = classification.workflow.versions.first
+    classification.workflow_version = classification.workflow.versions.last
     lifecycle(:create, classification)
     classification
   end

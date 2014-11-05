@@ -84,7 +84,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       let!(:classifications) { create_list(:classification, 2, user: user) }
       let!(:private_resource) { create(:classification) }
       let(:n_visible) { 2 }
-      
+
       it_behaves_like "is indexable"
     end
 
@@ -109,12 +109,21 @@ describe Api::V1::ClassificationsController, type: :controller do
                 .user.id).to eq(user.id)
       end
 
-      it "should set the workflow version", versioning: true do
-        create_classification
-        id = created_instance_id("classifications")
-        classification = Classification.find(id)
-        version = PaperTrail::Version.where(item: workflow).first
-        expect(classification.workflow_version.id).to eq(version.id)
+      context "adding workflow versions to the classification", :versioning do
+        let(:id) { created_instance_id("classifications") }
+        let(:classification) { Classification.find(id) }
+        let(:version) { workflow.versions.last }
+
+        it "should set the workflow version" do
+          create_classification
+          expect(classification.workflow_version.id).to eq(version.id)
+        end
+
+        it "should add the lastest version id" do
+          workflow.update(grouped: true)
+          create_classification
+          expect(classification.workflow_version.id).to eq(version.id)
+        end
       end
 
       it_behaves_like "a classification create"
@@ -136,7 +145,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it_behaves_like "is updatable"
-      
+
     end
 
     context "a complete classification" do
@@ -148,13 +157,13 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
     end
   end
-  
+
   describe "#destroy" do
     context "an incomplete classification" do
       let(:resource) do
         create(:classification, user: authorized_user, completed: false)
       end
-      
+
       it_behaves_like "is destructable"
     end
 
