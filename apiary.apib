@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: http://www.google.com
+HOST: https://panoptes-staging.zooniverse.org
 
 # Panoptes API
 Panoptes API is a *crowdsourcing system* based on serving _subjects_,
@@ -11,7 +11,7 @@ the _subject_ based on a defined _workflow_ for the _subject_ type.
 Panoptes API provides an OAuth 2.0 authentication mechanism. (TODO:
 Describe Authentication Workflow).
 
-# Panoptes API Root [/]
+# Group Panoptes API Root [/]
 Panoptes API entry point.
 
 This resource does not have attributes intstead it lists links to the
@@ -33,7 +33,12 @@ available resources.
                     "groups": "/groups",
                     "classifications": "/classifications",
                     "memberships": "/memberships",
-                    "collections": "/collections"
+                    "collections": "/collections",
+                    "subject_queues": "/subject_queues",
+                    "project_roles": "/project_roles",
+                    "project_preferences": "/project_preferences",
+                    "workflow_contents": "/workflow_contents",
+                    "project_contents": "/project_contents"
                 }
             }
 
@@ -126,7 +131,7 @@ cannot edit their links.
             }
         }
 
-+ Response 200 (application/vnd.api+json)
++ Response 200
 
     [User][]
 
@@ -1703,7 +1708,7 @@ It has the following attributes:
                 "memberships": {
                     "id": "101",
                     "created_at": "2014-04-20T06:23:12Z",
-                    "created_at": "2014-04-20T06:23:12Z",
+                    "updated_at": "2014-04-20T06:23:12Z",
                     "state": "active",
                     "roles": ["group_admin"],
                     "links": {
@@ -1783,7 +1788,7 @@ Memberships are returned as an array under *memberships*.
                 "memberships": [{
                     "id": "101",
                     "created_at": "2014-04-20T06:23:12Z",
-                    "created_at": "2014-04-20T06:23:12Z",
+                    "updated_at": "2014-04-20T06:23:12Z",
                     "state": "active",
                     "roles": ["group_admin"],
                     "links": {
@@ -1793,7 +1798,7 @@ Memberships are returned as an array under *memberships*.
                 },{
                     "id": "111",
                     "created_at": "2014-04-20T06:23:12Z",
-                    "created_at": "2014-04-20T06:23:12Z",
+                    "updated_at": "2014-04-20T06:23:12Z",
                     "state": "inactive",
                     "roles": [],
                     "links": {
@@ -1870,7 +1875,7 @@ It has the following attributes:
                 "collections": {
                     "id": "101",
                     "created_at": "2014-04-20T06:23:12Z",
-                    "created_at": "2014-04-20T06:23:12Z",
+                    "updated_at": "2014-04-20T06:23:12Z",
                     "name" : "flowers",
                     "display_name": "Lots of Pretty flowers",
                     "visible_to": [],
@@ -1987,7 +1992,7 @@ Collections are returned as an array under *collections*.
                 "collections": [{
                     "id": "101",
                     "created_at": "2014-04-20T06:23:12Z",
-                    "created_at": "2014-04-20T06:23:12Z",
+                    "updated_at": "2014-04-20T06:23:12Z",
                     "name" : "flowers",
                     "display_name": "Lots of Pretty flowers",
                     "visible_to": [],
@@ -2001,7 +2006,7 @@ Collections are returned as an array under *collections*.
                 },{
                     "id": "102",
                     "created_at": "2014-04-21T09:23:12Z",
-                    "created_at": "2014-04-21T16:23:12Z",
+                    "updated_at": "2014-04-21T16:23:12Z",
                     "name" : "bad_flowers",
                     "display_name": "Lots of Ugly flowers",
                     "visible_to": ["collaborators"],
@@ -2090,7 +2095,7 @@ All attributes are assigned by the API.
                 "subject_queues": {
                     "id": "101",
                     "created_at": "2014-04-20T06:23:12Z",
-                    "created_at": "2014-04-20T06:23:12Z",
+                    "updated_at": "2014-04-20T06:23:12Z",
                     "links": {
                         "user": "101",
                         "workflow": 66,
@@ -2190,7 +2195,7 @@ SubjectQueues are returned as an array under *subject_queues*.
                 "subject_queues": [{
                     "id": "101",
                     "created_at": "2014-04-20T06:23:12Z",
-                    "created_at": "2014-04-20T06:23:12Z",
+                    "updated_at": "2014-04-20T06:23:12Z",
                     "links": {
                         "user": "101",
                         "workflow": 66,
@@ -2199,7 +2204,7 @@ SubjectQueues are returned as an array under *subject_queues*.
                 },{
                     "id": "102",
                     "created_at": "2014-04-20T06:23:12Z",
-                    "created_at": "2014-04-20T06:23:12Z",
+                    "updated_at": "2014-04-20T06:23:12Z",
                     "links": {
                         "user": "102",
                         "workflow": 66,
@@ -2275,7 +2280,7 @@ It has the following attributes:
                     "id": "942",
                     "roles": ["collaborator"],
                     "created_at": "2014-03-20T06:23:12Z",
-                    "created_at": "2014-04-21T08:22:22Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
                     "links": {
                         "user" : "30",
                         "project": "11"
@@ -2317,7 +2322,9 @@ information.
 ProjectRoles are returned as an array under *project_roles*.
 
 + Model (application/vnd.api+json)
-                    
+
+    + Body
+
             {
                 "links": {
                     "project_roles.user": {
@@ -2348,7 +2355,7 @@ ProjectRoles are returned as an array under *project_roles*.
                     "id": "942",
                     "roles": ["collaborator"],
                     "created_at": "2014-03-20T06:23:12Z",
-                    "created_at": "2014-04-21T08:22:22Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
                     "links": {
                         "user" : "30",
                         "project": "11"
@@ -2357,7 +2364,7 @@ ProjectRoles are returned as an array under *project_roles*.
                 "id": "949",
                     "roles": ["tester", "translator"],
                     "created_at": "2014-08-20T06:23:12Z",
-                    "created_at": "2014-09-21T08:22:22Z",
+                    "updated_at": "2014-09-21T08:22:22Z",
                     "links": {
                         "user" : "33",
                         "project": "81"
@@ -2371,7 +2378,7 @@ ProjectRoles are returned as an array under *project_roles*.
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + user_id (optional, integer) ... user_id to see roles for
-  + project_id (option, integer) ... project_id to see roles for
+  + project_id (optional, integer) ... project_id to see roles for
 
 + Response 200
 
@@ -2400,7 +2407,7 @@ project. You may also include an array of roles.
 # Group ProjectPreference
 Resources related to setting preferences for _Panoptes Projects_
 
-## ProjectRole [/project_preferences/{id}]
+## ProjectPreference [/project_preferences/{id}]
 A Project Preference resource captures a user's settings for a
 particular project.
 
@@ -2437,7 +2444,7 @@ It has the following attributes:
                         "tutorial": true
                     },
                     "created_at": "2014-03-20T06:23:12Z",
-                    "created_at": "2014-04-21T08:22:22Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
                     "links": {
                         "user" : "30",
                         "project": "11"
@@ -2515,7 +2522,7 @@ ProjectPreferences are returned as an array under *project_preferences*.
                         "tutorial": true
                     },
                     "created_at": "2014-03-20T06:23:12Z",
-                    "created_at": "2014-04-21T08:22:22Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
                     "links": {
                         "user" : "30",
                         "project": "11"
@@ -2527,7 +2534,7 @@ ProjectPreferences are returned as an array under *project_preferences*.
                         "tutorial": true
                     },
                     "created_at": "2014-08-20T06:23:12Z",
-                    "created_at": "2014-09-21T08:22:22Z",
+                    "updated_at": "2014-09-21T08:22:22Z",
                     "links": {
                         "user" : "33",
                         "project": "81"
@@ -2541,7 +2548,7 @@ ProjectPreferences are returned as an array under *project_preferences*.
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + user_id (optional, integer) ... user_id to see preferences for
-  + project_id (option, integer) ... project_id to see preferences for
+  + project_id (optional, integer) ... project_id to see preferences for
 
 + Response 200
 
@@ -2573,3 +2580,335 @@ creation.
 + Response 201
 
     [ProjectPreference][]
+
+# Group ProjectContents
+Resources related to the translatable strings for _Panotpes Projects_.
+
+## ProjectContent [/project_contents/{id}]
+A Project Content resourcs contains all strings for a project for a
+particular language. This resource will normally only be accessed by
+project translators. Users will receive translated versions of
+projects based on their *Accept-Language* header or preferences. 
+
+It has the following attributes
+
+- id
+- language
+- title
+- description
+- created_at
+- updated_at
+- introduction
+- science_case
+- team_members
+- guide
+
+*id*, *created_at*, and *updated_at* are created by the api
+server.
+
+*language* is a two or five character identifier where the first two
+characters are the [ISO 638](http://en.wikipedia.org/wiki/ISO_639)
+language codes. In the five character version, the middle character
+may be a "-" or "_" and the final two characters the [ISO 3166-1 alpha-2](http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+country code. This allows multiple translations for each language, for
+instance Simplified Chinese (zh_CN) vs Traditional Chinese (zh_TW or
+zh_HK).
+
++ Model (application/vnd.api+json)
+
+    + Body
+
+            {
+                "links": {
+                    "project_content.project": {
+                        "href": "/project/{project_content.project}",
+                        "type": "project"
+                    }
+                },
+                "project_contents": {
+                    "id": "42",
+                    "language": "en_UK",
+                    "title": "A Labourious and Colourful project",
+                    "description": "Lots of colours and labour go into this",
+                    "introduction": "Text..",
+                    "science_case": "More text..",
+                    "team_memebrs": [{
+                        "name": "Rocky",
+                        "bio": "a bio",
+                        "institution": "whatsmattau",
+                        "twitter": "@rocky",
+                    }],
+                    "guide": {
+                        "image": "http://asdfasdf.jpg.gif",
+                        "explanation": "It's a bear!"
+                    },
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "project": "11"
+                    }
+                }
+            }
+
+
+### Retrieve a single ProjectContent [GET]
++ Response 200
+
+    [ProjectContent][]
+
+### Update a ProjectContent [PUT]
+Only users with edit permissions for the parent project or users who
+have the "translator" roles may edit project contents".
+
+The *team_members* and *guide* fields must be updated as a full
+representation. The *language* field is not editable once created.
+
+Project Contents that have the same language as their parent project's
+primary_language field may not be edited. 
+
++ Request (application/vnd.api+json)
+
+        {
+            "project_contents": {
+                "title": "A Less Labourious Title"
+            }
+        }
+
++ Response 200
+
+    [ProjectContent][]
+
+### Destroy a ProjectConent [DELETE]
+Only users who edit premissions for the parent project may remove
+project content models.
+
+Project Contents that have the same language as their parent project's
+primary_language field may not be destroyed. 
+
++ Response 204
+
+## ProjectContent Version [/project_contents/{project_contents_id}/versions/{id}]
+A Project Content Version resource represents a set of changes made to
+a Project Content resource.
+
+It has the following attributes:
+
+- id
+- changset
+- whodunnit
+- created_at
+
+It is not editable.
+
++ Model (application/vnd.api+json)
+
+    + Body
+
+            {
+                "version": {
+                    "id": "42",
+                    "changeset": {
+                        "title": ["A Colourful Project", "A Colorful Project"]
+                    },
+                    "whodunnit": "stuartlynn",
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "links": {
+                        "item": {
+                            id: "101",
+                            "href": "/project_contents/101",
+                            "type": "project_content"
+                        }
+                    }
+                }
+            }
+
+### Retrieve a Single Version [GET]
+
++ Response 200
+
+    [ProjectContent Version][]
+
+
+## ProjectContent Version Collection [/project_contents/{project_contents_id}/versions{?per_page,page}]
+A collection of Project Content Version resources.
+
+All collections add a meta attribute hash containing paging
+information.
+
+Project Content Versions are returned as an array under *versions*.
+
++ Model (application/vnd.api+json)
+
+    + Body
+
+            {
+                "meta": {
+                    "versions": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 28,
+                        "include": [],
+                        "page_count": 14,
+                        "previous_page": 14,
+                        "next_page": 2,
+                        "first_href": "/project_contents/101/versions?page_size=2",
+                        "previous_href": "/project_contents/101/versions?page=14page_size=2",
+                        "next_href": "/project_contents/101/versions/?page=2&page_size=2",
+                        "last_href": "/project_contents/101/versions?page=14&page_size=2"
+                    }
+                },
+                "versions": [{
+                    "id": "42",
+                    "changeset": {
+                        "title": ["A Colourful Project", "A Colorful Project"]
+                    },
+                    "whodunnit": "stuartlynn",
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "links": {
+                        "item": {
+                            id: "101",
+                            "href": "/project_contents/101",
+                            "type": "project_content"
+                        }
+                    }
+                },{
+                    "id": "43",
+                    "changeset": {
+                        "description": ["No Words Here!", "Words"]
+                    },
+                    "whodunnit": "edwardothegreat",
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "links": {
+                        "item": {
+                            id: "101",
+                            "href": "/project_contents/101",
+                            "type": "project_content"
+                        }
+                    }
+                }]
+            }
+
+### List all Project Content Versions [GET]
++ Parameters
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + per_page (optional, integer) ... number of items to include on a page default is 20
+
++ Response 200
+
+    [ProjectContent Version Collection][]
+
+## ProjectContent Collection [/project_contents{?project_id,language,page,per_page}]
+A collection of Project Content resources.
+
+All collections add a meta attribute hash containing paging
+information.
+
+Project Contents are returned as an array under *project_contents*.
+
++ Model (application/vnd.api+json)
+
+    + Body
+                    
+            {
+                "links": {
+                    "project_content.project": {
+                        "href": "/project/{project_content.project}",
+                        "type": "project"
+                    }
+                },
+                "meta": {
+                    "project_contents": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 28,
+                        "include": [],
+                        "page_count": 14,
+                        "previous_page": 14,
+                        "next_page": 2,
+                        "first_href": "/project_contents?page_size=2",
+                        "previous_href": "/project_contents?page=14page_size=2",
+                        "next_href": "/project_contents?page=2&page_size=2",
+                        "last_href": "/project_contents?page=14&page_size=2"
+                    }
+                },
+                "project_contents": [{
+                    "id": "42",
+                    "language": "en_UK",
+                    "title": "A Labourious and Colourful project",
+                    "description": "Lots of colours and labour go into this",
+                    "introduction": "Text..",
+                    "science_case": "More text..",
+                    "team_memebrs": [{
+                        "name": "Rocky",
+                        "bio": "a bio",
+                        "institution": "whatsmattau",
+                        "twitter": "@rocky",
+                    }],
+                    "guide": {
+                        "image": "http://asdfasdf.jpg.gif",
+                        "explanation": "It's a bear!"
+                    },
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "project": "11"
+                    }
+                },
+                {
+                    "id": "43",
+                    "language": "en_CA",
+                    "title": "A Labourious and Colourful project",
+                    "description": "Lots of colours and labour go into this",
+                    "introduction": "Text..",
+                    "science_case": "More text..",
+                    "team_memebrs": [{
+                        "name": "Rocky",
+                        "bio": "a bio",
+                        "institution": "whatsmattau",
+                        "twitter": "@rocky",
+                    }],
+                    "guide": {
+                        "image": "http://asdfasdf.jpg.gif",
+                        "explanation": "It's a bear!"
+                    },
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "project": "11"
+                    }
+                }]
+            }
+
+### List all ProjectContents [GET]
++ Parameters
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + project_id (optional, integer) ... project_id to see contents for
+  + language (optional, string) ... language code to search for
+  
++ Response 200
+
+    [ProjectContent Collection][]
+
+### Create ProjectContent [POST]
+A ProjectContent resource can be created for a project by either a
+user with edit permissions for the project or a user with a
+"translator" role.
+
+The *language* field and a link to a project are the only required
+fields to created a ProjectContent resource.
+
++ Request (application/vnd.api+json)
+
+        {
+            "project_contents": {
+                "language": "es",
+                "links": {
+                    "project": "11"
+                }
+            }
+        }
+
++ Response 201
+
+    [ProjectContent][]
