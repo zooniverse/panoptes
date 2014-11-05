@@ -1,3 +1,9 @@
+shared_examples "a versioned response" do
+  it 'should have links to parent resource' do
+    expect(json_response[api_resource_name][0]['links']).to include("item")
+  end
+end
+
 shared_examples "a versioned resource" do
   let(:api_resource_name) { "versions" }
   let(:api_resource_attributes) { %w(id changeset whodunnit created_at) }
@@ -11,9 +17,10 @@ shared_examples "a versioned resource" do
   end
 
   after(:each) do
-    PaperTrail.enabled = true
-    PaperTrail.enabled_for_controller = true
+    PaperTrail.enabled = false
+    PaperTrail.enabled_for_controller = false
   end
+
   
   describe "#versions" do
     before(:each) do
@@ -29,6 +36,7 @@ shared_examples "a versioned resource" do
     end
 
     it_behaves_like "an api response"
+    it_behaves_like "a versioned response"
   end
 
   describe "#version" do
@@ -46,5 +54,6 @@ shared_examples "a versioned resource" do
     end
 
     it_behaves_like "an api response"
+    it_behaves_like "a versioned response"
   end
 end

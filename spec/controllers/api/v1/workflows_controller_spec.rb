@@ -13,7 +13,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:api_resource_attributes) do
     %w(id name tasks classifications_count subjects_count created_at updated_at first_task primary_language)
   end
-  let(:api_resource_links){ %w(workflows.project workflows.subject_sets) }
+  let(:api_resource_links){ %w(workflows.project workflows.subject_sets, workflows.current_version) }
   let(:scopes) { %w(public project) }
 
   before(:each) do
@@ -162,6 +162,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         expect(stubbed_cellect_connection).to_not receive(:load_user)
         default_request scopes: %w(public project)
         get :show, id: workflows.first.id
+        p json_response['workflows'][0]['links']
       end
     end
   end

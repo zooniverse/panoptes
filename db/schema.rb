@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141104151629) do
+ActiveRecord::Schema.define(version: 20141105145653) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 20141104151629) do
     t.inet     "user_ip"
     t.boolean  "completed",             default: true, null: false
     t.json     "metadata",              default: {},   null: false
+    t.integer  "workflow_version_id"
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree

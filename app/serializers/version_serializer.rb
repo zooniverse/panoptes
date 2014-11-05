@@ -1,17 +1,17 @@
 class VersionSerializer
   include RestPack::Serializer
-  attributes :id, :changeset, :whodunnit, :created_at
+  attributes :id, :changeset, :whodunnit, :created_at, :links
 
   def self.model_class
     PaperTrail::Version
   end
 
   def item_href
-    "/#{ @model.item.model_name.route_key }/#{ @model.item.id }"
+    "/#{ @model.item.class.model_name.route_key }/#{ @model.item.id }"
   end
 
   def item_type
-    @model.item.model_name.singular
+    @model.item.class.model_name.singular
   end
 
   def links

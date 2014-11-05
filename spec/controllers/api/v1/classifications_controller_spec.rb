@@ -11,8 +11,8 @@ def annotation_values
     { "age" => "adult"} ]
 end
 
-def setup_create_request(project_id, workflow_id, set_member_subject)
-  request.session = { cellect_hosts: { workflow_id.to_s => "example.com" } }
+def setup_create_request(project_id, workflow, set_member_subject)
+  request.session = { cellect_hosts: { workflow.id.to_s => "example.com" } }
   params =
     {
       classifications: {
@@ -21,7 +21,8 @@ def setup_create_request(project_id, workflow_id, set_member_subject)
         annotations: annotation_values,
         links: {
           project: project_id,
-          workflow: workflow_id,
+          workflow: workflow.id,
+          workflow_version: workflow.versions.last.id,
           set_member_subject: set_member_subject.id,
         }
       }
@@ -30,22 +31,22 @@ def setup_create_request(project_id, workflow_id, set_member_subject)
 end
 
 def create_classification
-  setup_create_request(project.id, workflow.id, set_member_subject)
+  setup_create_request(project.id, workflow, set_member_subject)
 end
 
 shared_context "a classification create" do
-  it "should return 201" do
+  it "should return 201", :versioning do
     create_classification
     expect(response.status).to eq(201)
   end
 
-  it "should set the Location header as per JSON-API specs" do
+  it "should set the Location header as per JSON-API specs", :versioning do
     create_classification
     id = created_classification_id
     expect(response.headers["Location"]).to eq("http://test.host/api/classifications/#{id}")
   end
 
-  it "should create the classification" do
+  it "should create the classification", :versioning do
     expect do
       create_classification
     end.to change{Classification.count}.from(0).to(1)
@@ -84,7 +85,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       let!(:classifications) { create_list(:classification, 2, user: user) }
       let!(:private_resource) { create(:classification) }
       let(:n_visible) { 2 }
-      
+
       it_behaves_like "is indexable"
     end
 
@@ -94,7 +95,7 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
 
     describe "#create" do
-      it "should call the classification lifecycle queue method" do
+      it "should call the classification lifecycle queue method", :versioning do
         lifecycle = double
         allow(lifecycle).to receive(:update_cellect)
         expect(lifecycle).to receive(:queue).with(:create)
@@ -102,11 +103,28 @@ describe Api::V1::ClassificationsController, type: :controller do
         create_classification
       end
 
-      it "should set the user" do
+      it "should set the user", :versioning do
         create_classification
         id = created_instance_id("classifications")
         expect(Classification.find(created_classification_id)
                 .user.id).to eq(user.id)
+      end
+
+      context "adding workflow versions to the classification", :versioning do
+        let(:id) { created_instance_id("classifications") }
+        let(:classification) { Classification.find(id) }
+        let(:version) { workflow.versions.last }
+
+        it "should set the workflow version" do
+          create_classification
+          expect(classification.workflow_version.id).to eq(version.id)
+        end
+
+        it "should add the lastest version id" do
+          workflow.update(grouped: true)
+          create_classification
+          expect(classification.workflow_version.id).to eq(version.id)
+        end
       end
 
       it_behaves_like "a classification create"
@@ -128,7 +146,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it_behaves_like "is updatable"
-      
+
     end
 
     context "a complete classification" do
@@ -140,13 +158,13 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
     end
   end
-  
+
   describe "#destroy" do
     context "an incomplete classification" do
       let(:resource) do
         create(:classification, user: authorized_user, completed: false)
       end
-      
+
       it_behaves_like "is destructable"
     end
 
@@ -169,7 +187,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
     describe "#create" do
 
-      it "should not set the user" do
+      it "should not set the user", :versioning do
         create_classification
         user = Classification.find(created_classification_id).user
         expect(user).to be_blank

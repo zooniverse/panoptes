@@ -9,6 +9,9 @@ class Workflow < ActiveRecord::Base
 
   belongs_to :project
   has_and_belongs_to_many :subject_sets
+  has_one :current_version, -> (obj) { where(id: obj.versions.last.id) },
+          class_name: "PaperTrail::Version", as: :item
+
   has_many :classifications
 
   validates_presence_of :project
