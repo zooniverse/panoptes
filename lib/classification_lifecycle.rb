@@ -54,6 +54,7 @@ class ClassificationLifecycle
   end
 
   def mark_expert_classifier
+    return unless classification.gold_standard
     if user && expert_level = project.expert_classifier_level(user)
       classification.update(expert_classifier: expert_level)
     end

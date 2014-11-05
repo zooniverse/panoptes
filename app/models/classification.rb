@@ -16,7 +16,8 @@ class Classification < ActiveRecord::Base
   validates :user, presence: true, if: :incomplete?
   validate :metadata, :required_metadata_present
 
-  attr_accessible :annotations, :completed, :user_ip, :gold_standard, :metadata
+  attr_accessible :annotations, :completed, :user_ip, :gold_standard,
+    :metadata, :expert_classifier
 
   can :show, :in_show_scope?
   can :update, :created_and_incomplete?

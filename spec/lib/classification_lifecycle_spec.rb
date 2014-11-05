@@ -228,12 +228,14 @@ describe ClassificationLifecycle do
       it 'should not mark the classification as expert' do
         subject.mark_expert_classifier
         classification.reload
-        expect(classification.expert_classifier?).to be_falsey
+        expect(classification.expert_classifier).to be_nil
       end
     end
 
     context "with a logged in user" do
-      let(:classification) { create(:classification) }
+      let(:setup_as_owner) { false }
+      let(:roles) { [] }
+      let(:classification) { create(:classification, gold_standard: gold_standard) }
       let!(:user_role) do
         create(:user_project_preference, project: classification.project,
                                          user: classification.user,
@@ -241,31 +243,71 @@ describe ClassificationLifecycle do
       end
 
       before(:each) do
+        classification.user = classification.project.owner if setup_as_owner
         subject.mark_expert_classifier
         classification.reload
       end
 
-      context "when the classifying user is a collaborator" do
-        let(:roles) { ['collaborator'] }
+      context "when the classification is not marked as gold_standard" do
+        let(:gold_standard) { false }
 
-        it 'should not mark the classification as expert' do
-          expect(classification.expert_classifier?).to be_falsey
+        context "when the classifying user is the project owner" do
+          let!(:setup_as_owner) { true }
+
+          it 'should not mark the classification as expert' do
+            expect(classification.expert_classifier).to be_nil
+          end
         end
+
+        context "when the classifying user is an expert" do
+          let(:roles) { ['expert'] }
+
+          it 'should not mark the classification as expert' do
+            expect(classification.expert_classifier).to be_nil
+          end
+        end
+
+        context "without an explicit role" do
+
+          it 'should not mark the classification as expert' do
+            expect(classification.expert_classifier).to be_nil
+          end
+        end
+
       end
 
-      context "with a non-expert user" do
-        let(:roles) { ['moderator'] }
+      context "when the classification is marked as gold_standard" do
+        let(:gold_standard) { true }
 
-        it 'should not mark the classification as expert' do
-          expect(classification.expert_classifier?).to be_falsey
+        context "when the classifying user is the project owner" do
+          let!(:setup_as_owner) { true }
+
+          it 'should mark the classification as expert' do
+            expect(classification.expert_classifier).to eq('owner')
+          end
         end
-      end
 
-      context "without an explicit role" do
-        let(:roles) { [] }
+        context "when the classifying user is an expert" do
+          let(:roles) { ['expert'] }
 
-        it 'should not mark the classification as expert' do
-          expect(classification.expert_classifier?).to be_falsey
+          it 'should mark the classification as expert' do
+            expect(classification.expert_classifier).to eq('expert')
+          end
+        end
+
+        context "with a non-expert user" do
+          let(:roles) { ['moderator'] }
+
+          it 'should not mark the classification as expert' do
+            expect(classification.expert_classifier).to be_nil
+          end
+        end
+
+        context "without an explicit role" do
+
+          it 'should not mark the classification as expert' do
+            expect(classification.expert_classifier).to be_nil
+          end
         end
       end
     end
