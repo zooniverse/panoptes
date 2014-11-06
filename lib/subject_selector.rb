@@ -14,11 +14,7 @@ class SubjectSelector
     when 'queued'
       queued_subjects
     else
-      if params.has_key?(:subject_set_id)
-        query_subject_sets
-      else
-        query_subjects
-      end
+      query_subjects
     end
   end
   
@@ -26,22 +22,18 @@ class SubjectSelector
     raise workflow_id_error unless params.has_key?(:workflow_id)
     user_enqueued = UserSubjectQueue
       .find_by(user: user.user, workflow_id: params[:workflow_id])
-    subjects = user_enqueued.sample_subjects(10 || params[:limit]).join(',')
-    SetMemberSubjectSerializer.resource({id: subjects})
+    subject_ids = user_enqueued.sample_subjects(10 || params[:limit])
+    SubjectSerializer.page({}, Subject.where(id: SetMemberSubject.where(id: subject_ids).select(:subject_id)))
   end
 
   def cellect_subjects
     raise workflow_id_error unless params.has_key?(:workflow_id)
-    subject_ids = Cellect::Client.connection.get_subjects(**cellect_params).join(',')
-    SetMemberSubjectSerializer.page({id: subject_ids})
+    subject_ids = Cellect::Client.connection.get_subjects(**cellect_params)
+    SubjectSerializer.page({}, Subject.where(id: SetMemberSubject.where(id: subject_ids).select(:subject_id)))
   end
   
   def query_subjects
     SubjectSerializer.page(params)
-  end
-
-  def query_subject_sets
-    SetMemberSubjectSerializer.page(params)
   end
 
   private
