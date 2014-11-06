@@ -9,8 +9,8 @@ class SubjectSelector
 
   def create_response
     case params[:sort]
-    when 'random'
-      random_subjects
+    when 'cellect'
+      cellect_subjects
     when 'queued'
       queued_subjects
     else
@@ -30,7 +30,7 @@ class SubjectSelector
     SetMemberSubjectSerializer.resource({id: subjects})
   end
 
-  def random_subjects
+  def cellect_subjects
     raise workflow_id_error unless params.has_key?(:workflow_id)
     subject_ids = Cellect::Client.connection.get_subjects(**cellect_params).join(',')
     SetMemberSubjectSerializer.page({id: subject_ids})

@@ -118,7 +118,7 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         context "with random sort" do
-          let(:request_params) { { sort: 'random', workflow_id: workflow.id.to_s } }
+          let(:request_params) { { sort: 'cellect', workflow_id: workflow.id.to_s } }
           let(:cellect_results) { subjects.take(2).map(&:id) }
           
           let!(:session) do
@@ -146,7 +146,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
             context "without a workflow id" do
               let(:request_params) do
-                { sort: 'random' }
+                { sort: 'cellect' }
               end
               
               it 'should return 422' do
