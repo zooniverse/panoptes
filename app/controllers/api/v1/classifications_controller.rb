@@ -27,10 +27,11 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    create_params[:links][:user] = api_user.user
-    create_params[:user_ip] = request_ip
-    classification = super(create_params)
-    lifecycle(:create, classification)
+    super(create_params) do |create_params, link_params|
+      link_params[:user] = api_user.user
+      create_params[:user_ip] = request_ip
+    end
+    lifecycle(:create)
     classification
   end
 
@@ -38,7 +39,7 @@ class Api::V1::ClassificationsController < Api::ApiController
     super(classification.workflow.id)
   end
 
-  def lifecycle(action, classification=classification)
+  def lifecycle(action)
     lifecycle = ClassificationLifecycle.new(classification)
     lifecycle.update_cellect(cellect_host)
     lifecycle.queue(action)
