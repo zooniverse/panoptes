@@ -10,6 +10,8 @@ class Api::V1::ClassificationsController < Api::ApiController
   METADATA_PARAMS = [:screen_resolution,
                      :started_at,
                      :finished_at,
+                     :user_language,
+                     :workflow_version,
                      :user_agent]
 
   private

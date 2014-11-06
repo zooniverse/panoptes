@@ -9,9 +9,10 @@ class Classification < ActiveRecord::Base
   belongs_to :user_group, counter_cache: true
 
   validates_presence_of :set_member_subject, :project, :workflow,
-    :annotations, :user_ip
+                        :annotations, :user_ip
 
   validates :user, presence: true, if: :incomplete?
+  validate :metadata, :required_metadata_present
 
   attr_accessible :annotations, :completed, :user_ip, :metadata
   
@@ -49,5 +50,19 @@ class Classification < ActiveRecord::Base
 
   def anonymous?
     !user
+  end
+
+  def metadata
+    read_attribute(:metadata).with_indifferent_access
+  end
+
+  private
+
+  def required_metadata_present
+    %i(started_at finished_at workflow_version user_language user_agent).each do |key|
+      unless metadata.has_key? key
+        errors.add(:metadata, "must have #{key} metadata")
+      end
+    end
   end
 end
