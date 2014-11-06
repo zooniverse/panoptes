@@ -220,6 +220,42 @@ describe ClassificationLifecycle do
     end
   end
 
+  describe "#validate_schema" do
+    let(:classification) { create(:classification, gold_standard: gold_standard) }
+
+    context "when the gold standard value is set to false" do
+      let(:gold_standard) { false }
+
+      it "should raise an error" do
+        expect do
+          subject.validate_schema
+        end.to raise_exception(ClassificationSchemaValidator::InvalidSchema)
+      end
+    end
+
+    context "when the gold standard value is set to true" do
+      let(:gold_standard) { true }
+
+      context "when the classification user is not authorised for expert mode" do
+
+        it "should raise an error" do
+          expect do
+            subject.validate_schema
+          end.to raise_exception(ClassificationSchemaValidator::NonExpertUser)
+        end
+      end
+
+      context "when the classification user is authorised for expert mode" do
+
+        it "should not raise an error" do
+          classification.user = classification.project.owner
+          classification.save
+          expect{ subject.validate_schema }.not_to raise_exception
+        end
+      end
+    end
+  end
+
   describe "#mark_expert_classifier" do
 
     context "without a logged in user" do
