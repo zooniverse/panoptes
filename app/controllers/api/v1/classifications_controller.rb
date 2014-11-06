@@ -41,6 +41,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def lifecycle(action)
     lifecycle = ClassificationLifecycle.new(classification)
+    lifecycle.validate_schema
     lifecycle.update_cellect(cellect_host)
     lifecycle.queue(action)
   end
@@ -49,18 +50,21 @@ class Api::V1::ClassificationsController < Api::ApiController
     params[:classifications][:annotations].map(&:keys)
   end
 
+  def create_update_params
+    [ :completed,
+      :gold_standard,
+      metadata: METADATA_PARAMS,
+      annotations: annotation_params ]
+  end
+
   def create_params
-    params.require(:classifications).permit(:completed,
-                                            metadata: METADATA_PARAMS,
-                                            annotations: annotation_params,
-                                            links: [:project,
-                                                    :workflow,
-                                                    :set_member_subject])
+    param_set = create_update_params | [ links: [:project,
+                                                 :workflow,
+                                                 :set_member_subject] ]
+    params.require(:classifications).permit(param_set)
   end
 
   def update_params
-    params.require(:classifications).permit(:completed,
-                                            metadata: METADATA_PARAMS,
-                                            annotations: annotation_params)
+    params.require(:classifications).permit(create_update_params)
   end
 end
