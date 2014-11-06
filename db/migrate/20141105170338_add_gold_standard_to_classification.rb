@@ -1,5 +1,5 @@
 class AddGoldStandardToClassification < ActiveRecord::Migration
   def change
-    add_column :classifications, :gold_standard, :boolean, default: false, null: false
+    add_column :classifications, :gold_standard, :boolean
   end
 end

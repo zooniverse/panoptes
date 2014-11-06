@@ -38,10 +38,10 @@ ActiveRecord::Schema.define(version: 20141105170338) do
     t.datetime "updated_at"
     t.integer  "user_group_id"
     t.inet     "user_ip"
-    t.boolean  "completed",             default: true,  null: false
+    t.boolean  "completed",             default: true, null: false
     t.integer  "expert_classifier"
-    t.json     "metadata",              default: {},    null: false
-    t.boolean  "gold_standard",         default: false, null: false
+    t.json     "metadata",              default: {},   null: false
+    t.boolean  "gold_standard"
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
