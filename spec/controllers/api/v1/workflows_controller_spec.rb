@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::WorkflowsController, type: :controller do
   let(:user) { create(:user) }
-  let!(:workflows){ create_list :workflow_with_contents, 2 }
+  let(:workflows){ create_list :workflow_with_contents, 2 }
   let(:workflow){ workflows.first }
   let(:project){ workflow.project }
   let(:owner){ project.owner }
@@ -11,13 +11,19 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:authorized_user) { owner }
 
   let(:api_resource_attributes) do
-    %w(id name tasks classifications_count subjects_count created_at updated_at first_task primary_language)
+    %w(id name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version)
   end
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets) }
   let(:scopes) { %w(public project) }
 
   before(:each) do
-    default_request scopes: scopes
+    PaperTrail.enabled = true
+    PaperTrail.enabled_for_controller = true
+  end
+
+  after(:each) do
+    PaperTrail.enabled = false
+    PaperTrail.enabled_for_controller = false
   end
 
   describe '#index' do
