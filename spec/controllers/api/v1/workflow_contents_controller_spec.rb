@@ -112,4 +112,16 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
       end
     end
   end
+  
+  describe "versionsing" do
+    let(:update_block) do
+      11.times do |n|
+        resource.update!(strings: [n.to_s])
+      end
+    end
+
+    let(:resource_param) { :workflow_content_id }
+
+    it_behaves_like "a versioned resource"
+  end
 end
