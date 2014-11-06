@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141106163726) do
+ActiveRecord::Schema.define(version: 20141106180016) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -172,7 +172,7 @@ ActiveRecord::Schema.define(version: 20141106163726) do
   add_index "projects", ["owner_id"], name: "index_projects_on_owner_id", using: :btree
 
   create_table "set_member_subjects", force: true do |t|
-    t.integer  "state"
+    t.integer  "state",                 default: 0, null: false
     t.integer  "subject_set_id"
     t.integer  "subject_id"
     t.datetime "created_at"
