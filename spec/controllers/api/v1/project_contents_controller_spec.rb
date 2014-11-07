@@ -117,4 +117,16 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
       end
     end
   end
+  
+  describe "versionsing" do
+    let(:update_block) do
+      11.times do |n|
+        resource.update!(title: n.to_s)
+      end
+    end
+
+    let(:resource_param) { :project_content_id }
+
+    it_behaves_like "a versioned resource"
+  end
 end

@@ -1,4 +1,17 @@
-shared_examples "a versioned resource" do
+RSpec.shared_examples "has item link" do
+  it 'should have an item link' do
+    expect(json_response[api_resource_name][0]["links"]).to include("item")
+  end
+
+  it 'should have full link data' do
+    expect(json_response[api_resource_name][0]['links']['item']).to include("id" => resource.id.to_s,
+                                                                            "href" => "/#{resource_class.model_name.route_key}/#{resource.id}",
+                                                                            "type" => resource_class.model_name.singular)
+  end
+end
+
+
+RSpec.shared_examples "a versioned resource" do
   let(:api_resource_name) { "versions" }
   let(:api_resource_attributes) { %w(id changeset whodunnit created_at) }
   let(:api_resource_links) { [ ] }
@@ -7,12 +20,12 @@ shared_examples "a versioned resource" do
     PaperTrail.enabled = true
     PaperTrail.enabled_for_controller = true
     update_block
-    default_request user_id: user.id, scopes: scopes
+    default_request user_id: authorized_user.id, scopes: scopes
   end
 
   after(:each) do
-    PaperTrail.enabled = true
-    PaperTrail.enabled_for_controller = true
+    PaperTrail.enabled = false
+    PaperTrail.enabled_for_controller = false
   end
   
   describe "#versions" do
@@ -28,6 +41,7 @@ shared_examples "a versioned resource" do
       expect(response.status).to eq(200)
     end
 
+    it_behaves_like "has item link"
     it_behaves_like "an api response"
   end
 
@@ -45,6 +59,7 @@ shared_examples "a versioned resource" do
       expect(response.status).to eq(200)
     end
 
+    it_behaves_like "has item link"
     it_behaves_like "an api response"
   end
 end

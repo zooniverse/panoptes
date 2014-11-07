@@ -1,7 +1,5 @@
 shared_examples "it has a subjects association" do
-
   context "when no subjects exist" do
-
     it "should return an empty array" do
       expect(relation_instance.subjects).to eq([])
     end
