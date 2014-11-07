@@ -1,13 +1,26 @@
 class WorkflowSerializer
   include RestPack::Serializer
   attributes :id, :name, :tasks, :classifications_count, :subjects_count,
-             :created_at, :updated_at, :first_task, :primary_language
+             :created_at, :updated_at, :first_task, :primary_language,
+             :version, :content_language
+  
   can_include :project, :subject_sets
 
+  def version
+    "#{@model.versions.last.id}.#{content.versions.last.id}"
+  end
+
+  def content_language
+    content.language
+  end
+
   def tasks
-    strings = @model.content_for(@context[:languages], :strings).strings
     tasks = @model.tasks.dup
-    TasksVisitors::InjectStrings.new(strings).visit(tasks)
+    TasksVisitors::InjectStrings.new(content.strings).visit(tasks)
     tasks
+  end
+
+  def content
+    @content = @model.content_for(@context[:languages], [:strings, :language, :id])
   end
 end

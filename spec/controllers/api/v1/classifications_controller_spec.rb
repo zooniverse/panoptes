@@ -1,9 +1,13 @@
 require 'spec_helper'
 
 def metadata_values
-  [ { started_at: DateTime.now },
-    { finished_at: DateTime.now },
-    { user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" } ]
+  {
+    started_at: DateTime.now,
+    finished_at: DateTime.now,
+    workflow_version: "1.1",
+    user_language: 'en',
+    user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0"
+  }
 end
 
 def annotation_values

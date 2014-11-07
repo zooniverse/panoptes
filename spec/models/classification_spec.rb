@@ -33,6 +33,35 @@ describe Classification, :type => :model do
     classification = build(:classification, user: nil, completed: false)
     expect(classification).to_not be_valid
   end
+
+  describe "#metadata" do
+    let(:metadata) { build(:classification).metadata }
+    
+    it 'must have started_at' do
+      metadata.delete(:started_at)
+      expect(build(:classification, metadata: metadata)).to_not be_valid
+    end
+
+    it 'must have finished_at' do
+      metadata.delete(:finished_at)
+      expect(build(:classification, metadata: metadata)).to_not be_valid
+    end
+
+    it 'must have workflow_version' do
+      metadata.delete(:workflow_version)
+      expect(build(:classification, metadata: metadata)).to_not be_valid
+    end
+
+    it 'must have user_language' do
+      metadata.delete(:user_language)
+      expect(build(:classification, metadata: metadata)).to_not be_valid
+    end
+
+    it 'must have user_agent' do
+      metadata.delete(:user_agent)
+      expect(build(:classification, metadata: metadata)).to_not be_valid
+    end
+  end
   
   describe "::visible_to" do
     let(:user) { ApiUser.new(create(:user)) }
