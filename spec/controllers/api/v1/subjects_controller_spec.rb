@@ -21,7 +21,7 @@ describe Api::V1::SubjectsController, type: :controller do
     before(:each) do
       default_request user_id: user.id, scopes: scopes
     end
-    
+
     describe "#index" do
       context "without any sort" do
         before(:each) do
@@ -144,7 +144,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe "#show" do
     let(:resource) { create(:subject) }
-    
+
     it_behaves_like "is showable"
   end
 
@@ -173,15 +173,15 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:test_attr_value) do
       { "cool_factor" => "11" }
     end
-    
+
     let(:create_params) do
       {
         subjects: {
           metadata: { cool_factor: "11" },
-          locations: { 
+          locations: {
             standard: "image/jpeg",
           },
-          links: {  
+          links: {
             project: project.id
           }
         }
@@ -197,7 +197,7 @@ describe Api::V1::SubjectsController, type: :controller do
       let(:standard_url) do
         json_response['subjects'][0]['locations']['standard']
       end
-      
+
       it 'should return locations as a hash of signed s3 urls' do
         expect(standard_url).to match(/Expires=[0-9]++&Signature=[A-z0-9]+/)
       end
@@ -222,15 +222,13 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe "versioning" do
     let(:resource) { create(:subject, owner: user) }
-
-    let(:update_block) do
-      10.times do |n|
-        resource.update!(metadata: { times: n })
-      end
+    let!(:existing_versions) { resource.versions.length }
+    let(:num_times) { 10 }
+    let(:update_proc) do
+      Proc.new { |resource, n| resource.update!(metadata: { times: n }) }
     end
-    
     let(:resource_param) { :subject_id }
-    
+
     it_behaves_like "a versioned resource"
   end
 end

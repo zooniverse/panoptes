@@ -30,7 +30,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:private_project) { create(:private_project) }
     let!(:private_resource) { create(:workflow, project: private_project) }
     let(:n_visible) { 2 }
-    
+
     it_behaves_like 'is indexable'
   end
 
@@ -60,7 +60,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           links: {
             subject_sets: [subject_set.id.to_s],
           }
-          
+
         }
       }
     end
@@ -112,13 +112,13 @@ describe Api::V1::WorkflowsController, type: :controller do
           grouped: true,
           prioritized: true,
           primary_language: 'en',
-          links: { 
+          links: {
             project: project.id,
           }
         }
       }
     end
-    
+
     it_behaves_like "is creatable"
 
     context "extracts strings from workflow" do
@@ -147,7 +147,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         default_request user_id: user.id, scopes: scopes
         get :show, id: workflows.first.id
       end
-      
+
       it "should set the cellect host for the user and workflow" do
         user.reload
         expect(session[:cellect_hosts]).to include( workflows.first.id.to_s )
@@ -172,15 +172,11 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
   end
 
-  describe "versionsing" do
+  describe "versioning" do
     let(:resource) { workflow }
-
-    let(:update_block) do
-      10.times do |n|
-        resource.update!(prioritized: (n % 2 == 0))
-      end
-    end
-
+    let!(:existing_versions) { resource.versions.length }
+    let(:num_times) { 11 }
+    let(:update_proc) { Proc.new { |resource, n| resource.update!(prioritized: (n % 2 == 0)) } }
     let(:resource_param) { :workflow_id }
 
     it_behaves_like "a versioned resource"

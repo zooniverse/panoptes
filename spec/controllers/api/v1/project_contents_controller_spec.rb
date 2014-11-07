@@ -6,7 +6,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   let!(:upp) do
     create(:user_project_preference,
            user: authorized_user,
-           project: project, 
+           project: project,
            roles: ["translator"])
   end
 
@@ -77,13 +77,13 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
 
     context "primary-language content" do
       context "primary-langauge content" do
-        
+
         before(:each) do
           default_request user_id: authorized_user.id, scopes: scopes
           params = update_params.merge(id: primary_content.id)
           put :update, params
         end
-        
+
         it 'should return forbidden' do
           expect(response.status).to eq(403)
         end
@@ -107,7 +107,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
         default_request user_id: authorized_user.id, scopes: scopes
         delete :destroy, id: primary_content.id
       end
-      
+
       it 'should return forbidden' do
         expect(response.status).to eq(403)
       end
@@ -117,14 +117,11 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
       end
     end
   end
-  
-  describe "versionsing" do
-    let(:update_block) do
-      11.times do |n|
-        resource.update!(title: n.to_s)
-      end
-    end
 
+  describe "versioning" do
+    let!(:existing_versions) { resource.versions.length }
+    let(:num_times) { 11 }
+    let(:update_proc) { Proc.new { |resource, n| resource.update!(title: n.to_s) } }
     let(:resource_param) { :project_content_id }
 
     it_behaves_like "a versioned resource"
