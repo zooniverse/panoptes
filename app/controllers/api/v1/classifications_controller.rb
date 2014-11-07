@@ -41,7 +41,6 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def lifecycle(action)
     lifecycle = ClassificationLifecycle.new(classification)
-    lifecycle.validate_schema
     lifecycle.update_cellect(cellect_host)
     lifecycle.queue(action)
   end

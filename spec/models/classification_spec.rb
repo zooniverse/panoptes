@@ -62,7 +62,50 @@ describe Classification, :type => :model do
       expect(build(:classification, metadata: metadata)).to_not be_valid
     end
   end
-  
+
+  describe "validate gold_standard" do
+    let(:classification) { build(:classification, gold_standard: gold_standard) }
+
+    context "when the gold standard value is set to false" do
+      let(:gold_standard) { false }
+
+      it "should not be valid" do
+        expect(classification).to_not be_valid
+      end
+
+      it "should have the correct error message" do
+        classification.valid?
+        expect(classification.errors[:gold_standard])
+          .to include('can not be set to false')
+      end
+    end
+
+    context "when the gold standard value is set to true" do
+      let(:gold_standard) { true }
+
+      context "when the classification user is not authorised for expert mode" do
+
+        it "should not be valid" do
+          expect(classification).to_not be_valid
+        end
+
+        it "should have the correct error message" do
+          classification.valid?
+          expect(classification.errors[:gold_standard])
+            .to include('classifier is not a project expert')
+        end
+      end
+
+      context "when the classification user is authorised for expert mode" do
+
+        it "should be valid" do
+          classification.user = classification.project.owner
+          expect(classification).to be_valid
+        end
+      end
+    end
+  end
+
   describe "::visible_to" do
     let(:user) { ApiUser.new(create(:user)) }
     let(:project) { create(:project, owner: user.owner) }
@@ -155,15 +198,14 @@ describe Classification, :type => :model do
     context "without it set" do
 
       it "should be falsey" do
-        classification = create(:classification)
-        expect(classification.gold_standard?).to be_falsey
+        expect(build(:classification).gold_standard?).to be_falsey
       end
     end
 
     context "with it set" do
 
       it "should be truthy" do
-        classification = create(:gold_standard_classification)
+        classification = build(:gold_standard_classification)
         expect(classification.gold_standard?).to be_truthy
       end
     end
@@ -171,7 +213,7 @@ describe Classification, :type => :model do
     context "with an incorrect value for the gold standard key" do
 
       it "should be falsey" do
-        classification = create(:fake_gold_standard_classification)
+        classification = build(:fake_gold_standard_classification)
         expect(classification.gold_standard?).to be_falsey
       end
     end

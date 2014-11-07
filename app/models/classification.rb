@@ -15,6 +15,7 @@ class Classification < ActiveRecord::Base
 
   validates :user, presence: true, if: :incomplete?
   validate :metadata, :required_metadata_present
+  validate :validate_gold_standard
 
   attr_accessible :annotations, :completed, :user_ip, :gold_standard,
     :metadata, :expert_classifier
@@ -67,5 +68,9 @@ class Classification < ActiveRecord::Base
         errors.add(:metadata, "must have #{key} metadata")
       end
     end
+  end
+
+  def validate_gold_standard
+    ClassificationSchemaValidator.new(self).validate_gold_standard
   end
 end

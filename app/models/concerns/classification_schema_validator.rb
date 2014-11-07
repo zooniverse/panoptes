@@ -1,14 +1,17 @@
 class ClassificationSchemaValidator
 
-  class InvalidSchema < StandardError; end
-  class NonExpertUser < StandardError; end
-
   def initialize(classification)
     @classification = classification
   end
 
-  def validate
-    validate_gold_standard
+  def validate_gold_standard
+    if classification.gold_standard
+      unless project.expert_classifier?(user)
+        add_error(:gold_standard, 'classifier is not a project expert')
+      end
+    elsif classification.gold_standard == false
+      add_error(:gold_standard, 'can not be set to false')
+    end
   end
 
   private
@@ -25,13 +28,7 @@ class ClassificationSchemaValidator
     @user ||= classification.user
   end
 
-  def validate_gold_standard
-    if classification.gold_standard
-      unless project.expert_classifier?(user)
-        raise NonExpertUser.new("Classifier is not a project expert")
-      end
-    elsif classification.gold_standard == false
-       raise InvalidSchema.new('Gold standard can not be set to false')
-    end
+  def add_error(field, message)
+    classification.errors.add(field, message)
   end
 end

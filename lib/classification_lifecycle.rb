@@ -60,10 +60,6 @@ class ClassificationLifecycle
     end
   end
 
-  def validate_schema
-    ClassificationSchemaValidator.new(classification).validate
-  end
-
   private
 
   def should_update_seen?
