@@ -56,7 +56,7 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
     it_behaves_like "is creatable"
   end
 
-  
+
   describe "#update" do
     let(:update_params) do
       { workflow_contents: {
@@ -73,13 +73,13 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
     end
 
     context "primary-langauge content" do
-      
+
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
         params = update_params.merge(id: primary_content.id)
         put :update, params
       end
-      
+
       it 'should return forbidden' do
         expect(response.status).to eq(403)
       end
@@ -102,7 +102,7 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
         default_request user_id: authorized_user.id, scopes: scopes
         delete :destroy, id: primary_content.id
       end
-      
+
       it 'should return forbidden' do
         expect(response.status).to eq(403)
       end
@@ -112,14 +112,11 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
       end
     end
   end
-  
-  describe "versionsing" do
-    let(:update_block) do
-      11.times do |n|
-        resource.update!(strings: [n.to_s])
-      end
-    end
 
+  describe "versioning" do
+    let(:num_times) { 11 }
+    let!(:existing_versions) { resource.versions.length }
+    let(:update_proc) { Proc.new { |resource, n| resource.update!(strings: [n.to_s]) } }
     let(:resource_param) { :workflow_content_id }
 
     it_behaves_like "a versioned resource"
