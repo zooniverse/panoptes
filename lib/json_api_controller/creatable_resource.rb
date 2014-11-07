@@ -26,7 +26,7 @@ module JsonApiController
     end
 
     def create_response(resource)
-      serializer.resource(resource)
+      serializer.resource(resource, nil, context)
     end
 
     def link_header(resource)

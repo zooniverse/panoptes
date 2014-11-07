@@ -80,4 +80,8 @@ module JsonApiController
   def update_params
     params_for(:update)
   end
+
+  def context
+    {}
+  end
 end
