@@ -16,8 +16,9 @@ class UserSerializer
   private
   
   def permitted_requester?
-    @context[:requester].logged_in? &&
+    @context[:include_private] || 
+    (@context[:requester].logged_in? &&
       (@model.id == @context[:requester].id) ||
-      @context[:requester].is_admin?
+      @context[:requester].is_admin?)
   end
 end

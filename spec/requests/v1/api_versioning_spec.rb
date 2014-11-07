@@ -24,9 +24,9 @@ describe "api versioning with accept headers", type: :request do
   end
 
   describe "JSON-API version 1 format" do
-    it "allows access but raises an unauthorized" do
+    it "allows access" do
       get "/api/users", nil, { "HTTP_ACCEPT" => "application/vnd.api+json; version=1" }
-      expect(response.status).to eq(401)
+      expect(response.status).to eq(200)
     end
   end
 end
