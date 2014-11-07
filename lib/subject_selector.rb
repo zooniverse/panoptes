@@ -22,18 +22,20 @@ class SubjectSelector
     raise workflow_id_error unless params.has_key?(:workflow_id)
     user_enqueued = UserSubjectQueue
       .find_by(user: user.user, workflow_id: params[:workflow_id])
-    subject_ids = user_enqueued.sample_subjects(10 || params[:limit])
-    SubjectSerializer.page({}, Subject.where(id: SetMemberSubject.where(id: subject_ids).select(:subject_id)))
+    selected_subjects(user_enqueued.sample_subjects(10 || params[:limit]))
   end
 
   def cellect_subjects
     raise workflow_id_error unless params.has_key?(:workflow_id)
-    subject_ids = Cellect::Client.connection.get_subjects(**cellect_params)
-    SubjectSerializer.page({}, Subject.where(id: SetMemberSubject.where(id: subject_ids).select(:subject_id)))
+    selected_subjects(Cellect::Client.connection.get_subjects(**cellect_params))
   end
   
   def query_subjects
     SubjectSerializer.page(params)
+  end
+
+  def selected_subjects(subject_ids)
+    SubjectSerializer.page({}, Subject.where(id: SetMemberSubject.where(id: subject_ids).select(:subject_id)))
   end
 
   private

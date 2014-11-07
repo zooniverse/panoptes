@@ -24,26 +24,19 @@ describe Api::V1::SubjectsController, type: :controller do
     
     describe "#index" do
       context "without any sort" do
-        let(:api_resource_attributes) do
-          [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at"]
+        before(:each) do
+          get :index
         end
-        let(:api_resource_links) { [ "subjects.owner" ] }
 
-        context "without random sort" do
-          before(:each) do
-            get :index
-          end
-
-          it "should return 200" do
-            expect(response.status).to eq(200)
-          end
-
-          it "should return a page of 2 objects" do
-            expect(json_response[api_resource_name].length).to eq(2)
-          end
-
-          it_behaves_like "an api response"
+        it "should return 200" do
+          expect(response.status).to eq(200)
         end
+
+        it "should return a page of 2 objects" do
+          expect(json_response[api_resource_name].length).to eq(2)
+        end
+
+        it_behaves_like "an api response"
       end
 
       context "with queued subjects" do
