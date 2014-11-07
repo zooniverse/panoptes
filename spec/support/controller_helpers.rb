@@ -54,4 +54,11 @@ module APIRequestHelpers
     stub_content_filter
     stub_token(scopes: scopes, user_id: user_id)
   end
+
+  def unauthenticated_request
+    set_accept
+    set_accept_language
+    stub_content_filter
+    allow(controller).to receive(:doorkeeper_token).and_return(nil)
+  end
 end
