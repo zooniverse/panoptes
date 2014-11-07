@@ -6,6 +6,8 @@ class SetMemberSubject < ActiveRecord::Base
   belongs_to :subject
   has_many :classifications
 
+  attr_accessible :state, :priority
+
   enum state: [:active, :inactive, :retired]
 
   validates_presence_of :subject_set, :subject

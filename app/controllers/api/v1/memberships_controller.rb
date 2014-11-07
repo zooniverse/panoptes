@@ -11,6 +11,11 @@ class Api::V1::MembershipsController < Api::ApiController
   alias_method :membership, :controlled_resource
 
   protected
+
+  def build_resource_for_update(update_params)
+    update_params[:state] = Membership.states[update_params[:state]]
+    super(update_params)
+  end
   
   def to_disable
     [membership]

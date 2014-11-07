@@ -23,55 +23,89 @@ describe Api::V1::SubjectsController, type: :controller do
     end
     
     describe "#index" do
-      context "without random sort" do
+      context "without any sort" do
         before(:each) do
           get :index
         end
 
-        context "subjects that use the SubjectSerializer" do
-          let(:api_resource_attributes) do
-            [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at"]
+        it "should return 200" do
+          expect(response.status).to eq(200)
+        end
+
+        it "should return a page of 2 objects" do
+          expect(json_response[api_resource_name].length).to eq(2)
+        end
+
+        it_behaves_like "an api response"
+      end
+
+      context "with queued subjects" do
+        let(:request_params) do
+          { sort: 'queued', workflow_id: workflow.id.to_s }
+        end
+        
+        let!(:ues) do
+          create(:user_subject_queue, user: user,
+                 workflow: workflow,
+                 set_member_subject_ids: subjects.map(&:id))
+        end
+
+        before(:each) do
+          get :index, request_params
+        end
+
+        it "should return 200" do
+          expect(response.status).to eq(200)
+        end
+
+        it 'should return a page of 2 objects' do
+          expect(json_response[api_resource_name].length).to eq(2)
+        end
+
+        it_behaves_like "an api response"
+
+        context "without a workflow id" do
+          let(:request_params) do
+            { sort: 'queued' }
           end
-          let(:api_resource_links) { [ "subjects.owner" ] }
-
-          context "without random sort" do
-            before(:each) do
-              get :index
-            end
-
-            it "should return 200" do
-              expect(response.status).to eq(200)
-            end
-
-            it "should return a page of 2 objects" do
-              expect(json_response[api_resource_name].length).to eq(2)
-            end
-
-            it_behaves_like "an api response"
+          
+          it 'should return 422' do
+            expect(response.status).to eq(422)
           end
         end
       end
 
-      context "subjects that use the SetMemberSubjectSerializer" do
-        let(:api_resource_attributes) do
-          [ "id", "metadata", "locations", "zooniverse_id", "classifications_count",
-            "state", "set_member_subject_id", "created_at", "updated_at" ]
-        end
-        
-        let(:api_resource_links) { [ "subjects.subject_set" ] }
+      context "with subject_set_ids" do
+        let(:request_params) { { subject_set_id: subject_set.id.to_s } }
 
-        context "with queued subjects" do
-          let(:request_params) do
-            { sort: 'queued', workflow_id: workflow.id.to_s }
-          end
-          
-          let!(:ues) do
-            create(:user_subject_queue, user: user,
-                   workflow: workflow,
-                   set_member_subject_ids: subjects.map(&:id))
-          end
+        before(:each) do
+          get :index, request_params
+        end
+
+        it "should return 200" do
+          expect(response.status).to eq(200)
+        end
+
+        it 'should return a page of 2 objects' do
+          get :index, request_params
+          expect(json_response[api_resource_name].length).to eq(2)
+        end
+
+        it_behaves_like "an api response"
+      end
+
+      context "with cellect sort" do
+        let(:request_params) { { sort: 'cellect', workflow_id: workflow.id.to_s } }
+        let(:cellect_results) { subjects.take(2).map(&:id) }
+        
+        let!(:session) do
+          request.session = { cellect_hosts: { workflow.id.to_s => 'example.com' } }
+        end
+
+        describe "testing the response" do
 
           before(:each) do
+            allow(stubbed_cellect_connection).to receive(:get_subjects).and_return(cellect_results)
             get :index, request_params
           end
 
@@ -89,7 +123,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
           context "without a workflow id" do
             let(:request_params) do
-              { sort: 'queued' }
+              { sort: 'cellect' }
             end
             
             it 'should return 422' do
@@ -98,69 +132,10 @@ describe Api::V1::SubjectsController, type: :controller do
           end
         end
 
-        context "with subject_set_ids" do
-          let(:request_params) { { subject_set_id: subject_set.id.to_s } }
-
-          before(:each) do
+        describe "testing the cellect client setup" do
+          it 'should make a request against Cellect' do
+            expect(stubbed_cellect_connection).to receive(:get_subjects).and_return(cellect_results)
             get :index, request_params
-          end
-
-          it "should return 200" do
-            expect(response.status).to eq(200)
-          end
-
-          it 'should return a page of 2 objects' do
-            get :index, request_params
-            expect(json_response[api_resource_name].length).to eq(2)
-          end
-
-          it_behaves_like "an api response"
-        end
-
-        context "with random sort" do
-          let(:request_params) { { sort: 'cellect', workflow_id: workflow.id.to_s } }
-          let(:cellect_results) { subjects.take(2).map(&:id) }
-          
-          let!(:session) do
-            request.session = { cellect_hosts: { workflow.id.to_s => 'example.com' } }
-          end
-
-          describe "testing the response" do
-
-            before(:each) do
-              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return(cellect_results)
-              get :index, request_params
-            end
-
-            it "should return 200" do
-              get :index, request_params
-              expect(response.status).to eq(200)
-            end
-
-            it 'should return a page of 2 objects' do
-              get :index, request_params
-              expect(json_response[api_resource_name].length).to eq(2)
-            end
-
-            it_behaves_like "an api response"
-
-            context "without a workflow id" do
-              let(:request_params) do
-                { sort: 'cellect' }
-              end
-              
-              it 'should return 422' do
-                expect(response.status).to eq(422)
-              end
-            end
-          end
-
-          describe "testing the cellect client setup" do
-
-            it 'should make a request against Cellect' do
-              expect(stubbed_cellect_connection).to receive(:get_subjects).and_return(cellect_results)
-              get :index, request_params
-            end
           end
         end
       end

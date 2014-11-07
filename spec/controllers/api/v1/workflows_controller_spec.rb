@@ -176,7 +176,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:resource) { workflow }
 
     let(:update_block) do
-      11.times do |n|
+      10.times do |n|
         resource.update!(prioritized: (n % 2 == 0))
       end
     end

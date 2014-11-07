@@ -11,7 +11,6 @@ describe Api::V1::MembershipsController, type: :controller do
   let(:resource) { memberships.first }
   let(:resource_class) { Membership }
 
-
   describe "#index" do
     let!(:private_resource) { create(:membership) }
     let(:n_visible) { 2 }
@@ -38,12 +37,12 @@ describe Api::V1::MembershipsController, type: :controller do
     let(:test_attr_value) { "inactive" }
     let(:create_params) do
       {
-       memberships: {
-                     links: {
-                             user: create(:user),
-                             user_group: resource.user_group
-                            }
-                    }
+        memberships: {
+          links: {
+            user: create(:user).id.to_s,
+            user_group: resource.user_group.id.to_s
+          }
+        }
       }
     end
 

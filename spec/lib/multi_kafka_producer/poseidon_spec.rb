@@ -11,12 +11,12 @@ if RUBY_PLATFORM != 'java'
         it 'should be truthy' do
           subject.connect "asdf", "localhost:9092"
           expect(subject).to be_connected
-          subject.instance_variable_set(:@connection, nil)
         end
       end
 
       context "a connection has not been estasblished" do
         it 'should be falsy' do
+          subject.instance_variable_set(:@connection, nil)
           expect(subject).to_not be_connected
         end
       end
@@ -26,7 +26,6 @@ if RUBY_PLATFORM != 'java'
       it 'should set @connection to a Kafka Producer' do
         subject.connect 'adsf', 'localhost:9092'
         expect(subject.instance_variable_get(:@connection)).to be_a(Poseidon::Producer)
-        subject.instance_variable_set(:@connection, nil)
       end
     end
 
@@ -35,7 +34,6 @@ if RUBY_PLATFORM != 'java'
         subject.connect 'adsf', 'localhost:9092'
         expect_any_instance_of(Poseidon::Producer).to receive(:send_messages)
         subject.publish("topic", [["key", "msg"]])
-        subject.instance_variable_set(:@connection, nil)
       end
     end
   end
