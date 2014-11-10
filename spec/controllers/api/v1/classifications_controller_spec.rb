@@ -30,6 +30,9 @@ def setup_create_request(project_id, workflow_id, set_member_subject)
         }
       }
     }
+  unless gold_standard.nil?
+    params[:classifications].merge!(gold_standard: gold_standard)
+  end
   post :create, params
 end
 
@@ -37,27 +40,9 @@ def create_classification
   setup_create_request(project.id, workflow.id, set_member_subject)
 end
 
-shared_context "a classification create" do
-  it "should return 201" do
-    create_classification
-    expect(response.status).to eq(201)
-  end
-
-  it "should set the Location header as per JSON-API specs" do
-    create_classification
-    id = created_classification_id
-    expect(response.headers["Location"]).to eq("http://test.host/api/classifications/#{id}")
-  end
-
-  it "should create the classification" do
-    expect do
-      create_classification
-    end.to change{Classification.count}.from(0).to(1)
-  end
-end
-
 describe Api::V1::ClassificationsController, type: :controller do
   let!(:user) { create(:user) }
+  let(:gold_standard) { nil }
   let(:classification) { create(:classification, user: user) }
   let(:project) { create(:full_project) }
   let!(:workflow) { project.workflows.first }
@@ -88,7 +73,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       let!(:classifications) { create_list(:classification, 2, user: user) }
       let!(:private_resource) { create(:classification) }
       let(:n_visible) { 2 }
-      
+
       it_behaves_like "is indexable"
     end
 
@@ -98,22 +83,10 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
 
     describe "#create" do
-      it "should call the classification lifecycle queue method" do
-        lifecycle = double
-        allow(lifecycle).to receive(:update_cellect)
-        expect(lifecycle).to receive(:queue).with(:create)
-        allow(ClassificationLifecycle).to receive(:new).and_return(lifecycle)
-        create_classification
-      end
-
-      it "should set the user" do
-        create_classification
-        id = created_instance_id("classifications")
-        expect(Classification.find(created_classification_id)
-                .user.id).to eq(user.id)
-      end
 
       it_behaves_like "a classification create"
+      it_behaves_like "a classification lifecycle event"
+      it_behaves_like "a gold standard classfication"
     end
   end
 
@@ -132,7 +105,6 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it_behaves_like "is updatable"
-      
     end
 
     context "a complete classification" do
@@ -144,13 +116,13 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
     end
   end
-  
+
   describe "#destroy" do
     context "an incomplete classification" do
       let(:resource) do
         create(:classification, user: authorized_user, completed: false)
       end
-      
+
       it_behaves_like "is destructable"
     end
 

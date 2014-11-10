@@ -39,6 +39,8 @@ ActiveRecord::Schema.define(version: 20141106180016) do
     t.integer  "user_group_id"
     t.inet     "user_ip"
     t.boolean  "completed",             default: true, null: false
+    t.boolean  "gold_standard"
+    t.integer  "expert_classifier"
     t.json     "metadata",              default: {},   null: false
   end
 

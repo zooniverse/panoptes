@@ -8,14 +8,18 @@ class Classification < ActiveRecord::Base
   belongs_to :workflow, counter_cache: true
   belongs_to :user_group, counter_cache: true
 
+  enum expert_classifier: [:expert, :owner]
+
   validates_presence_of :set_member_subject, :project, :workflow,
                         :annotations, :user_ip
 
   validates :user, presence: true, if: :incomplete?
   validate :metadata, :required_metadata_present
+  validate :validate_gold_standard
 
-  attr_accessible :annotations, :completed, :user_ip, :metadata
-  
+  attr_accessible :annotations, :completed, :user_ip, :gold_standard,
+    :metadata, :expert_classifier
+
   can :show, :in_show_scope?
   can :update, :created_and_incomplete?
   can :destroy, :created_and_incomplete?
@@ -35,7 +39,7 @@ class Classification < ActiveRecord::Base
   def in_show_scope?(actor)
     self.class.visible_to(actor).exists?(self)
   end
-  
+
   def creator?(actor)
     user == actor.user
   end
@@ -64,5 +68,9 @@ class Classification < ActiveRecord::Base
         errors.add(:metadata, "must have #{key} metadata")
       end
     end
+  end
+
+  def validate_gold_standard
+    ClassificationSchemaValidator.new(self).validate_gold_standard
   end
 end

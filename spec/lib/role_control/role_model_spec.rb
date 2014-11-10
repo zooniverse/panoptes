@@ -8,7 +8,7 @@ describe RoleControl::RoleModel do
 
   # Tests RolesJoinTable as defined in
   # spec/support/role_control_helpers.rb
-  
+
   describe "::roles_for" do
     it 'should set the role query variable' do
       expect(subject.instance_variable_get(:@role_query)).to be_a(RoleControl::RoleQuery)
@@ -17,11 +17,10 @@ describe RoleControl::RoleModel do
     it 'should set the roles field variable' do
       expect(subject.instance_variable_get(:@roles_field)).to eq(:roles)
     end
-    
+
     it 'should set the valid roles variable' do
-      expect(subject.instance_variable_get(:@valid_roles)).to eq([:admin,
-                                                                  :test_role,
-                                                                  :test_parent_role])
+      valid_roles = %w(admin test_role test_parent_role)
+      expect(subject.instance_variable_get(:@valid_roles)).to eq(valid_roles)
     end
 
   end
@@ -35,7 +34,7 @@ describe RoleControl::RoleModel do
   end
 
   let(:role_model) { subject.new }
-  
+
   it 'should validate allowed roles' do
     role_model.roles = ["test_rolo"]
     expect(role_model).to_not be_valid

@@ -47,6 +47,11 @@ describe ClassificationLifecycle do
         subject.transact!
       end
 
+      it "should call the #mark_expert_classifier method" do
+        expect(subject).to receive(:mark_expert_classifier).once
+        subject.transact!
+      end
+
       it "should call the #update_seen_subjects method" do
         expect(subject).to receive(:update_seen_subjects).once
         subject.transact!
@@ -212,6 +217,53 @@ describe ClassificationLifecycle do
                                                host: 'http://test.host/'
                                              )
       subject.update_cellect('http://test.host/')
+    end
+  end
+
+  describe "#mark_expert_classifier" do
+
+    context "without a logged in user" do
+      let(:classification) { create(:classification, user: nil) }
+
+      it 'should not mark the classification as expert' do
+        subject.mark_expert_classifier
+        classification.reload
+        expect(classification.expert_classifier).to be_nil
+      end
+    end
+
+    context "with a logged in user" do
+      let(:setup_as_owner) { false }
+      let(:roles) { [] }
+      let(:classification) { build(:classification, gold_standard: true) }
+      let!(:user_role) do
+        create(:user_project_preference, project: classification.project,
+                                         user: classification.user,
+                                         roles: roles)
+      end
+
+      before(:each) do
+        classification.user = classification.project.owner if setup_as_owner
+        classification.save
+        subject.mark_expert_classifier
+        classification.reload
+      end
+
+      context "when the classifying user is the project owner" do
+        let!(:setup_as_owner) { true }
+
+        it 'should mark the classification as expert' do
+          expect(classification.expert_classifier).to eq('owner')
+        end
+      end
+
+      context "when the classifying user is an expert" do
+        let(:roles) { ['expert'] }
+
+        it 'should mark the classification as expert' do
+          expect(classification.expert_classifier).to eq('expert')
+        end
+      end
     end
   end
 end

@@ -17,7 +17,7 @@ describe Project, :type => :model do
   it "should have a valid factory" do
     expect(project).to be_valid
   end
-  
+
   it { is_expected.to permit_field(:visible_to).for_action(:show) }
   it { is_expected.to permit_roles(:collaborator).for_action(:update) }
 
@@ -37,7 +37,7 @@ describe Project, :type => :model do
     expect(create(:project, display_name: "hi fives", owner: owner)).to be_valid
     expect(build(:project, display_name: "hi fives", owner: owner)).to_not be_valid
   end
-  
+
   it 'should not require display name uniquenames between owners' do
     expect(create(:project, display_name: "test project", owner: create(:user))).to be_valid
     expect(create(:project, display_name: "test project", owner: create(:user))).to be_valid
@@ -45,17 +45,17 @@ describe Project, :type => :model do
 
   describe "links" do
     let(:user) { ApiUser.new(create(:user)) }
-    
+
     it "should allow workflows to link when user has update permissions" do
       expect(Project).to link_to(Workflow).given_args(user)
                           .with_scope(:scope_for, :update, user)
     end
-    
+
     it "should allow subject_sets to link when user has update permissions" do
       expect(Project).to link_to(SubjectSet).given_args(user)
                           .with_scope(:scope_for, :update, user)
     end
-    
+
     it "should allow subjects to link when user has update permissions" do
       expect(Project).to link_to(Subject).given_args(user)
                           .with_scope(:scope_for, :update, user)
@@ -66,7 +66,7 @@ describe Project, :type => :model do
                           .with_scope(:scope_for, :show, user)
     end
   end
-  
+
   describe "#workflows" do
     let(:project) { create(:project_with_workflows) }
 
@@ -114,6 +114,79 @@ describe Project, :type => :model do
 
     it 'should not include models without assigned roles' do
       expect(project.project_roles).to_not include(preferences[0])
+    end
+  end
+
+  describe "#expert_classifier_level and #expert_classifier?" do
+    let(:project_user) { create(:user) }
+    let(:roles) { [] }
+    let(:prefs) do
+      create(:user_project_preference, user: project_user,
+                                       project: project,
+                                       roles: roles)
+    end
+
+    before(:each) do
+      prefs
+    end
+
+    context "when they are the project owner" do
+
+      it '#expert_classifier_level should be :owner' do
+        expect(project.expert_classifier_level(project.owner)).to eq(:owner)
+      end
+
+      it "#expert_classifier? should be truthy" do
+        expect(project.expert_classifier?(project.owner)).to be_truthy
+      end
+    end
+
+    context "when they are a project expert" do
+      let!(:roles) { ["expert"] }
+
+      it '#expert_classifier_level should be :expert' do
+        expect(project.expert_classifier_level(project_user)).to eq(:expert)
+      end
+
+      it "#expert_classifier? should be truthy" do
+        expect(project.expert_classifier?(project_user)).to be_truthy
+      end
+    end
+
+    context "when they are an owner and they have marked themselves as a project expert" do
+      let!(:project_user) { project.owner }
+      let!(:roles) { ["expert"] }
+
+      it '#expert_classifier_level should be :owner' do
+        expect(project.expert_classifier_level(project_user)).to eq(:owner)
+      end
+
+      it "#expert_classifier? should be truthy" do
+        expect(project.expert_classifier?(project_user)).to be_truthy
+      end
+    end
+
+    context "when they are a project collaborator" do
+      let!(:roles) { ["collaborator"] }
+
+      it '#expert_classifier_level should be nil' do
+        expect(project.expert_classifier_level(prefs.user)).to be_nil
+      end
+
+      it "#expert_classifier? should be falsey" do
+        expect(project.expert_classifier?(prefs.user)).to be_falsey
+      end
+    end
+
+    context "when they have no role on the project" do
+
+      it '#expert_classifier_level should be nil' do
+        expect(project.expert_classifier_level(project_user)).to be_nil
+      end
+
+      it "#expert_classifier? should be falsey" do
+        expect(project.expert_classifier?(project_user)).to be_falsey
+      end
     end
   end
 end

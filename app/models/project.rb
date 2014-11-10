@@ -7,6 +7,8 @@ class Project < ActiveRecord::Base
   include Linkable
   include Translatable
 
+  EXPERT_ROLES = [:expert]
+
   attr_accessible :name, :display_name, :owner, :primary_language,
     :project_contents, :avatar, :background_image
 
@@ -19,7 +21,7 @@ class Project < ActiveRecord::Base
   validates_uniqueness_of :name, case_sensitive: false, scope: :owner
   validates_uniqueness_of :display_name, scope: :owner
 
-  can_by_role :update, roles: [ :collaborator ] 
+  can_by_role :update, roles: [ :collaborator ]
   can_by_role :show, public: true, roles: :visible_to
 
   can_be_linked :subject_set, :scope_for, :update, :actor
@@ -40,5 +42,17 @@ class Project < ActiveRecord::Base
 
   def self.translation_scope
     @translation_scope ||= RoleControl::RoleScope.new(["translator"], false, self)
+  end
+
+  def expert_classifier_level(classifier)
+    return :owner if classifier == owner
+    expert_role = project_roles.where(user_id: classifier.id)
+      .where("roles @> ARRAY[?]::varchar[]", EXPERT_ROLES)
+      .exists?
+    expert_role ? :expert : nil
+  end
+
+  def expert_classifier?(classifier)
+    !!expert_classifier_level(classifier)
   end
 end

@@ -3,7 +3,9 @@ require 'spec_helper'
 RSpec.describe UserProjectPreference, :type => :model do
   let(:user_project) { build(:user_project_preference) }
   let(:factory) { :user_project_preference }
-  let(:valid_roles)  { ["tester", "collaborator"] }
+  let(:valid_roles)  do
+    %w(expert collaborator translator tester scientist moderator)
+  end
   let(:roles_field) { :roles }
 
   it 'should have a valid factory' do
@@ -29,7 +31,7 @@ RSpec.describe UserProjectPreference, :type => :model do
        create(:user_project_preference, user: user),
        create(:user_project_preference)]
     end
-    
+
     it 'should return any preferences that belong to the user' do
       expect(UserProjectPreference.visible_to(actor)).to include(upps[1])
     end

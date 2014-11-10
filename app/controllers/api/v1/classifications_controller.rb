@@ -27,10 +27,11 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    create_params[:links][:user] = api_user.user
-    create_params[:user_ip] = request_ip
-    classification = super(create_params)
-    lifecycle(:create, classification)
+    super(create_params) do |create_params, link_params|
+      link_params[:user] = api_user.user
+      create_params[:user_ip] = request_ip
+    end
+    lifecycle(:create)
     classification
   end
 
@@ -38,7 +39,7 @@ class Api::V1::ClassificationsController < Api::ApiController
     super(classification.workflow.id)
   end
 
-  def lifecycle(action, classification=classification)
+  def lifecycle(action)
     lifecycle = ClassificationLifecycle.new(classification)
     lifecycle.update_cellect(cellect_host)
     lifecycle.queue(action)
@@ -48,18 +49,21 @@ class Api::V1::ClassificationsController < Api::ApiController
     params[:classifications][:annotations].map(&:keys)
   end
 
+  def create_update_params
+    [ :completed,
+      :gold_standard,
+      metadata: METADATA_PARAMS,
+      annotations: annotation_params ]
+  end
+
   def create_params
-    params.require(:classifications).permit(:completed,
-                                            metadata: METADATA_PARAMS,
-                                            annotations: annotation_params,
-                                            links: [:project,
-                                                    :workflow,
-                                                    :set_member_subject])
+    param_set = create_update_params | [ links: [:project,
+                                                 :workflow,
+                                                 :set_member_subject] ]
+    params.require(:classifications).permit(param_set)
   end
 
   def update_params
-    params.require(:classifications).permit(:completed,
-                                            metadata: METADATA_PARAMS,
-                                            annotations: annotation_params)
+    params.require(:classifications).permit(create_update_params)
   end
 end
