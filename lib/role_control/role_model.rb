@@ -34,7 +34,7 @@ module RoleControl
       return true if valid_roles.blank?
 
       unless (send(roles_field) - valid_roles).empty?
-        errors.add(roles_field, "Roles must be in #{ valid_roles }")
+        errors.add(roles_field, "Roles must be in #{ valid_roles.join(', ') }")
       end
     end
   end
