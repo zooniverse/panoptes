@@ -1,11 +1,11 @@
 class Api::V1::SubjectsController < Api::ApiController
   include JsonApiController
   include Versioned
-  
+
   before_action :merge_cellect_host, only: :index
   doorkeeper_for :update, :create, :destroy, :version, :versions,
                  scopes: [:subject]
-  resource_actions :default
+  resource_actions :show, :create, :update, :destroy
 
   alias_method :subject, :controlled_resource
 
@@ -60,7 +60,7 @@ class Api::V1::SubjectsController < Api::ApiController
               locations: params[:subjects][:locations].try(:keys),
               links: [:subject_sets])
   end
-  
+
   def add_subject_path(locations, project_id)
     locations.reduce({}) do |locs, (location, mime)|
       locs[location] = {mime_type: mime,
