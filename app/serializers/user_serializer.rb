@@ -1,6 +1,7 @@
 class UserSerializer
   include RestPack::Serializer
-  attributes :id, :login, :display_name, :credited_name, :email, :created_at, :updated_at
+  attributes :id, :login, :display_name, :credited_name, :email, :created_at, :updated_at,
+             :owner_name
   can_include :projects, :collections, :classifications, :subjects, :project_preferences
 
   can_filter_by :login
@@ -11,6 +12,10 @@ class UserSerializer
 
   def email
     @model.email if permitted_requester?
+  end
+
+  def owner_name
+    @model.owner_uniq_name
   end
 
   private
