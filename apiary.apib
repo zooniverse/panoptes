@@ -335,7 +335,7 @@ A User may delete an incomplete classification.
 
 + Response 204
 
-## Classification Collection [/classifications{?page,per_page,sort,project_id,group_id}]
+## Classification Collection [/classifications{?page,per_page,sort,project_id,group_id,include}]
 A representation of all the Classifications in a collection
 
 All collections add a *meta* attribute hash containing
@@ -574,7 +574,7 @@ subjects belongs to a project a user has destroy permissions for.
 
 + Response 204
 
-## Subject Version [/workflow_contents/{workflow_contents_id}/versions/{id}]
+## Subject Version [/subjects/{subject_id}/versions/{id}]
 A Subject Version resource represents a set of changes made to
 a Subject resource.
 
@@ -625,7 +625,7 @@ It is not editable.
 
     [Subject Version][]
 
-## Subject Version Collection [/project_contents/{project_contents_id}/versions{?per_page,page}]
+## Subject Version Collection [/subjects/{subject_id}/versions{?per_page,page}]
 A collection of Subject Version resources.
 
 All collections add a meta attribute hash containing paging
@@ -1375,13 +1375,13 @@ It is not editable.
     [Workflow Version][]
 
 
-## WorkflowContent Version Collection [/project_contents/{project_contents_id}/versions{?per_page,page}]
-A collection of Workflow Content Version resources.
+## Workflow Version Collection [/workflows/{workflow_id}/versions{?per_page,page}]
+A collection of Workflow Version resources.
 
 All collections add a meta attribute hash containing paging
 information.
 
-Workflow Content Versions are returned as an array under *versions*.
+Workflow Versions are returned as an array under *versions*.
 
 + Parameters
   + workflow_id (required, integer) ... id of the workflow to retreive versions for
@@ -2530,10 +2530,10 @@ be given a randomly selection from their queue if it exists.
 + created_at
 + updated_at
 
+All attributes are assigned by the API.
+
 + Parameters
   + id (required, integer) ... the integer id of the subject queue resource
-
-All attributes are assigned by the API.
 
 + Model (application/vnd.api+json)
 
@@ -3410,7 +3410,7 @@ fields to created a ProjectContent resource.
 # Group WorkflowContents
 Resources related to the translatable strings for _Panotpes Workflows_.
 
-## WorkflowContent [/project_contents/{id}{?include}]
+## WorkflowContent [/workflow_contents/{id}{?include}]
 A Workflow Content resource contains strings for a workflow in a
 particular language.
 
@@ -3563,7 +3563,7 @@ It is not editable.
     [WorkflowContent Version][]
 
 
-## WorkflowContent Version Collection [/project_contents/{project_contents_id}/versions{?per_page,page}]
+## WorkflowContent Version Collection [/workflow_contents/{workflow_contents_id}/versions{?per_page,page}]
 A collection of Workflow Content Version resources.
 
 All collections add a meta attribute hash containing paging
@@ -3816,7 +3816,7 @@ SubjectSet belongs to may edit the *state* and *priority* attributes.
             }
         }
 
-+ Response 204
++ Response 200
 
     [SetMemberSubject][]
 
@@ -3894,14 +3894,13 @@ SetMemberSubjects are returned as an array under *set_member_subjects*.
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + subject_id (optional, integer) ... id of subject to see set_member_subjects for
   + subject_set_id (optional, integer) ... id of subject_set to see set_member_subjects for
-  + language (optional, string) ... language code to search for
   + include (optional, string) ... comma seperated list of linked resources to load
   
 + Response 200
 
     [SetMemberSubject Collection][]
 
-### Create a SetMemberSubject
+### Create a SetMemberSubject [POST]
 A SetMemberSubject may be created by a user that can see the Subject
 they wish to link to and can edit the project the SubjectSet belongs
 to.
