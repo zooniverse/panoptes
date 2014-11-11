@@ -213,7 +213,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       it 'should return locations as a hash of signed s3 urls' do
-        expect(standard_url).to match(/Expires=[0-9]++&Signature=[A-z0-9]+/)
+        expect(standard_url).to match(/Expires=[0-9]+&Signature=[%A-z0-9]+/)
       end
 
       it "should set a uuidv4 id as the file name" do
