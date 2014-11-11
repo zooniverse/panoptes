@@ -44,7 +44,7 @@ module JsonApiController
     end
     
     def update_response
-      render json_api: serializer.resource(controlled_resource)
+      render json_api: serializer.resource(controlled_resource, nil, context)
     end
 
     def relation

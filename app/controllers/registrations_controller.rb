@@ -30,7 +30,7 @@ class RegistrationsController < Devise::RegistrationsController
   def registrations_response(resource_saved)
     if resource_saved
       sign_in resource, event: :authentication
-      [ :created, UserSerializer.resource(resource) ]
+      [ :created, UserSerializer.resource(resource, nil, { include_private: true }) ]
     else
       response_body = {}
       if resource && !resource.valid?

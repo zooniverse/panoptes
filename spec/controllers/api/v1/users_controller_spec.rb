@@ -7,13 +7,9 @@ describe Api::V1::UsersController, type: :controller do
 
   let(:scopes) { %w(public user) }
 
-  before(:each) do
-    default_request(scopes: scopes, user_id: users.first.id)
-  end
-
   let(:api_resource_name) { "users" }
   let(:api_resource_attributes) do
-    [ "id", "login", "display_name", "credited_name", "owner_name", "created_at", "updated_at" ]
+    [ "id", "login", "display_name", "credited_name", "email", "created_at", "updated_at" ]
   end
   let(:api_resource_links) do
     [ "users.projects",
@@ -24,23 +20,42 @@ describe Api::V1::UsersController, type: :controller do
   end
 
   describe "#index" do
-    before(:each) do
-      get :index
+    context "with an authenticated user" do
+      before(:each) do
+        default_request(scopes: scopes, user_id: users.first.id)
+        get :index
+      end
+
+      it "should return 200" do
+        expect(response.status).to eq(200)
+      end
+
+      it "should have twenty items by default" do
+        expect(json_response[api_resource_name].length).to eq(20)
+      end
+      
+      it_behaves_like "an api response"
     end
 
-    it "should return 200" do
-      expect(response.status).to eq(200)
-    end
+    context "an unauthenticated request" do
+      before(:each) do
+        unauthenticated_request
+        get :index
+      end
 
-    it "should have twenty items by default" do
-      expect(json_response[api_resource_name].length).to eq(20)
-    end
+      it 'should have a nil email address' do
+        expect(json_response[api_resource_name]).to all( include("email" => nil) )
+      end
 
-    it_behaves_like "an api response"
+      it 'should have a nil credited name' do
+        expect(json_response[api_resource_name]).to all( include("credited_name" => nil) )
+      end
+    end
   end
 
   describe "#show" do
     before(:each) do
+      default_request(scopes: scopes, user_id: users.first.id)
       get :show, id: users.first.id
     end
 
@@ -52,11 +67,16 @@ describe Api::V1::UsersController, type: :controller do
       expect(json_response["users"].length).to eq(1)
     end
 
+    it "should have the user's email" do
+      expect(json_response['users'][0]['email']).to_not be_nil
+    end
+
     it_behaves_like "an api response"
   end
 
   describe "#me" do
     before(:each) do
+      default_request(scopes: scopes, user_id: users.first.id)
       get :me
     end
 
@@ -76,6 +96,7 @@ describe Api::V1::UsersController, type: :controller do
     let(:user_id) { user.id }
 
     before(:each) do
+      default_request(scopes: scopes, user_id: users.first.id)
       params = put_operations || Hash.new
       params[:id] = user_id
       put :update, params
@@ -159,6 +180,7 @@ describe Api::V1::UsersController, type: :controller do
     let(:access_token) { create(:access_token) }
     
     before(:each) do
+      default_request(scopes: scopes, user_id: users.first.id)
       allow(Doorkeeper).to receive(:authenticate).and_return(access_token)
     end
 
