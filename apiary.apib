@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: https://panoptes-staging.zooniverse.org
+HOST: https://panoptes-staging.zooniverse.org/api
 
 # Panoptes API
 Panoptes API is a *crowdsourcing system* based on serving _subjects_,
@@ -355,19 +355,19 @@ key.
                 "links": {
                     "classifications.user": {
                         "href": "/users/{classifications.user}",
-                        "type": "classification"
+                        "type": "classifications"
                     },
                     "classifications.project": {
                         "href": "/projects/{classifications.project}",
-                        "type": "project"
+                        "type": "projects"
                     },
                     "classifications.workflow": {
                         "href": "/workflows/{classification.workflow}",
-                        "type": "workflow"
+                        "type": "workflows"
                     },
                     "classifications.subject": {
                         "href": "/set_member_subjects/{classifications.set_member_subject}",
-                        "type": "subject"
+                        "type": "subjects"
                     }
                 },
                 "meta": {
@@ -511,7 +511,7 @@ the API.
                 "links": {
                     "subjects.project": {
                         "href": "/projects/subjects.project",
-                        "type": "project"
+                        "type": "projects"
                     }
                 },
                 "subjects": [{
@@ -530,7 +530,7 @@ the API.
                         "owner": {
                             "id": "2",
                             "href": "/users/2",
-                            "type": "user"
+                            "type": "users"
                         }
                     }
                 }]
@@ -613,7 +613,7 @@ It is not editable.
                         "item": {
                             "id": "101",
                             "href": "/subject/101",
-                            "type": "subject"
+                            "type": "subjects"
                         }
                     }
                 }]
@@ -673,7 +673,7 @@ Subject Versions are returned as an array under *versions*.
                         "item": {
                             "id": "101",
                             "href": "/subject/101",
-                            "type": "subject"
+                            "type": "subjects"
                         }
                     }
                 },{
@@ -693,7 +693,7 @@ Subject Versions are returned as an array under *versions*.
                         "item": {
                             "id": "101",
                             "href": "/subject/101",
-                            "type": "subject"
+                            "type": "subjects"
                         }
                     }
                 }]
@@ -723,7 +723,7 @@ Subjects are returned as an array under the _subject_ key.
                 "links": {
                     "subjects.project": {
                         "href": "/projects/subjects.project",
-                        "type": "project"
+                        "type": "projects"
                     }
                 },
                 "meta": {
@@ -757,7 +757,7 @@ Subjects are returned as an array under the _subject_ key.
                         "owner": {
                             "id": "2",
                             "href": "/users/2",
-                            "type": "user"
+                            "type": "users"
                         }
                     }
                 },{
@@ -776,7 +776,7 @@ Subjects are returned as an array under the _subject_ key.
                         "owner": {
                             "id": "4",
                             "href": "/groups/4",
-                            "type": "user_group"
+                            "type": "user_groups"
                         }
                     }
                 }]
@@ -826,7 +826,7 @@ the active user are optional.
                     "project": "1",
                     "owner": {
                         "id": "4",
-                        "type": "user_group"
+                        "type": "user_groups"
                     }
                 }
             }
@@ -1023,19 +1023,19 @@ Projects are returned as an array under the _projects_ key.
                 "links": {
                     "projects.subjects": {
                         "href": "/subjects{?project_id=projects.id},
-                        "type": "subject"
+                        "type": "subjects"
                     },
                     "projects.classifications": {
                         "href": "/classifications{?project_id=projects.id}",
-                        "type": "classification"
+                        "type": "classifications"
                     },
                     "projects.workflows": {
                         "href": "/workflows/{projects.workflows}",
-                        "type": "workflow"
+                        "type": "workflows"
                     },
                     "projects.subject_sets": {
                         "href": "/subject_sets/{projects.subject_sets}",
-                        "type": "subject_Sets"
+                        "type": "subject_sets"
                     }
                 },
                 "meta": {
@@ -1082,7 +1082,7 @@ Projects are returned as an array under the _projects_ key.
                         "owner": {
                             "id": "2",
                             "href": "/users/2",
-                            "type": "user"
+                            "type": "users"
                         }
                     }
                 },{
@@ -1114,7 +1114,7 @@ Projects are returned as an array under the _projects_ key.
                         "owner": {
                             "id": "2",
                             "href": "/users/2",
-                            "type": "user"
+                            "type": "users"
                         }
                     }
                 }]
@@ -1149,7 +1149,7 @@ returned.
                     "workflows": ["1", "2"]
                     "owner": {
                         "id": 10,
-                        "type": "user_group"
+                        "type": "user_groups"
                     }
                 }
             }
@@ -2157,11 +2157,11 @@ It has the following attributes:
                 "links": {
                     "memberships.user_group": {
                         "href": "/groups/{memberships.user_group}",
-                        "type": "user_group"
+                        "type": "user_groups"
                     },
                     "memberships.user": {
                         "href": "/users/{memberships.user}",
-                        "type": "user"
+                        "type": "users"
                     }
                 },
                 "memberships": {
@@ -2222,11 +2222,11 @@ Memberships are returned as an array under *memberships*.
                 "links": {
                     "memberships.user_group": {
                         "href": "/groups/{memberships.user_group}",
-                        "type": "user_group"
+                        "type": "user_groups"
                     },
                     "memberships.user": {
                         "href": "/users/{memberships.user}",
-                        "type": "user"
+                        "type": "users"
                     }
                 },
                 "meta": {
@@ -2328,7 +2328,7 @@ It has the following attributes:
                 "links": {
                     "collections.subjects": {
                         "href": "/subjects{?collection_id=collections.id}",
-                        "type": "subject"
+                        "type": "subjects"
                     }
                 },
                 "collections": [{
@@ -2342,7 +2342,7 @@ It has the following attributes:
                         "owner": {
                             "id": "10",
                             "href": "/users/10",
-                            "type": "user"
+                            "type": "users"
                         }
                     }
                 }]
@@ -2430,7 +2430,7 @@ Collections are returned as an array under *collections*.
                 "links": {
                     "collections.subjects": {
                         "href": "/subjects{?collection_id=collections.id}",
-                        "type": "subject"
+                        "type": "subjects"
                     }
                 },
                 "meta": {
@@ -2459,7 +2459,7 @@ Collections are returned as an array under *collections*.
                         "owner": {
                             "id": "10",
                             "href": "/users/10",
-                            "type": "user"
+                            "type": "users"
                         }
                     }
                 },{
@@ -2473,7 +2473,7 @@ Collections are returned as an array under *collections*.
                         "owner": {
                             "id": "11",
                             "href": "/groups/11",
-                            "type": "user_group"
+                            "type": "user_groups"
                         }
                     }
                 }]
@@ -2507,7 +2507,7 @@ owner, and links to subjects.
                 "links": {
                     "owner": {
                         "id" : "10",
-                        "type": "user_group"
+                        "type": "user_groups"
                     }
                 }
             }
@@ -2747,11 +2747,11 @@ roles are visible to the project owner and the user given roles.
                 "links": {
                     "project_roles.user": {
                         "href": "/user/{project_roles.user}",
-                        "type": "user"
+                        "type": "users"
                     },
                     "project_roles.project": {
                         "href": "/projects/{project_roles.project}",
-                        "type": "project"
+                        "type": "projects"
                     }
                 },
                 "project_roles": [{
@@ -2809,11 +2809,11 @@ ProjectRoles are returned as an array under *project_roles*.
                 "links": {
                     "project_roles.user": {
                         "href": "/user/{project_roles.user}",
-                        "type": "user"
+                        "type": "users"
                     },
                     "project_roles.project": {
                         "href": "/projects/{project_roles.project}",
-                        "type": "project"
+                        "type": "projects"
                     }
                 },
                 "meta": {
@@ -2914,11 +2914,11 @@ It has the following attributes:
                 "links": {
                     "project_preferences.user": {
                         "href": "/user/{project_preferences.user}",
-                        "type": "user"
+                        "type": "users"
                     },
                     "project_preferences.project": {
                         "href": "/projects/{project_preferences.project}",
-                        "type": "project"
+                        "type": "projects"
                     }
                 },
                 "project_preferences": [{
@@ -2979,11 +2979,11 @@ ProjectPreferences are returned as an array under *project_preferences*.
                 "links": {
                     "project_preferences.user": {
                         "href": "/user/{project_preferences.user}",
-                        "type": "user"
+                        "type": "users"
                     },
                     "project_preferences.project": {
                         "href": "/projects/{project_preferences.project}",
-                        "type": "project"
+                        "type": "projects"
                     }
                 },
                 "meta": {
@@ -3112,7 +3112,7 @@ zh_HK).
                 "links": {
                     "project_content.project": {
                         "href": "/project/{project_content.project}",
-                        "type": "project"
+                        "type": "projects"
                     }
                 },
                 "project_contents": [{
@@ -3198,7 +3198,7 @@ It is not editable.
     + Body
 
             {
-                "version": {
+                "versions": [{
                     "id": "42",
                     "changeset": {
                         "title": ["A Colourful Project", "A Colorful Project"]
@@ -3209,10 +3209,10 @@ It is not editable.
                         "item": {
                             id: "101",
                             "href": "/project_contents/101",
-                            "type": "project_content"
+                            "type": "project_contents"
                         }
                     }
-                }
+                }]
             }
 
 ### Retrieve a Single Version [GET]
@@ -3261,7 +3261,7 @@ Project Content Versions are returned as an array under *versions*.
                         "item": {
                             id: "101",
                             "href": "/project_contents/101",
-                            "type": "project_content"
+                            "type": "project_contents"
                         }
                     }
                 },{
@@ -3275,7 +3275,7 @@ Project Content Versions are returned as an array under *versions*.
                         "item": {
                             id: "101",
                             "href": "/project_contents/101",
-                            "type": "project_content"
+                            "type": "project_contents"
                         }
                     }
                 }]
@@ -3304,9 +3304,9 @@ Project Contents are returned as an array under *project_contents*.
                     
             {
                 "links": {
-                    "project_content.project": {
+                    "project_contents.project": {
                         "href": "/project/{project_content.project}",
-                        "type": "project"
+                        "type": "projects"
                     }
                 },
                 "meta": {
@@ -3446,7 +3446,7 @@ zh_HK).
 
             {
                 "links": {
-                    "workflow_content.workflow": {
+                    "workflow_contents.workflow": {
                         "href": "/workflows/{workflow_content.workflow}",
                         "type": "workflows"
                     }
@@ -3550,7 +3550,7 @@ It is not editable.
                         "item": {
                             "id": "101",
                             "href": "/workflow_contents/101",
-                            "type": "workflow_content"
+                            "type": "workflow_contents"
                         }
                     }
                 }]
@@ -3613,7 +3613,7 @@ Workflow Content Versions are returned as an array under *versions*.
                         "item": {
                             "id": "101",
                             "href": "/workflow_contents/101",
-                            "type": "workflow_content"
+                            "type": "workflow_contents"
                         }
                     }
                 },{
@@ -3635,7 +3635,7 @@ Workflow Content Versions are returned as an array under *versions*.
                         "item": {
                             "id": "101",
                             "href": "/workflow_contents/101",
-                            "type": "workflow_content"
+                            "type": "workflow_contents"
                         }
                     }
                 }]
@@ -3666,7 +3666,7 @@ Workflow Contents are returned as an array under *workflow_contents*.
                 "links": {
                     "workflow_contents.workflow": {
                         "href": "/project/{workflow_content.workflow}",
-                        "type": "workflow"
+                        "type": "workflows"
                     }
                 },
                 "meta": {
@@ -3776,11 +3776,11 @@ It has the following attribtues
                 links: {
                     "set_member_subjects.subject": {
                         "href": "/subjects/{set_member_subjects.subject}",
-                        "type": "subject"
+                        "type": "subjects"
                     },
                     "set_member_subjects.subject_set": {
                         "href": "/subject_sets/{set_member_subjects.subject_set}",
-                        "type": "subject_set"
+                        "type": "subject_sets"
                     }
                 },
                 "set_member_subjects": [{
@@ -3843,11 +3843,11 @@ SetMemberSubjects are returned as an array under *set_member_subjects*.
                 links: {
                     "set_member_subjects.subject": {
                         "href": "/subjects/{set_member_subjects.subject}",
-                        "type": "subject"
+                        "type": "subjects"
                     },
                     "set_member_subjects.subject_set": {
                         "href": "/subject_sets/{set_member_subjects.subject_set}",
-                        "type": "subject_set"
+                        "type": "subject_sets"
                     }
                 },
                 "meta": {
