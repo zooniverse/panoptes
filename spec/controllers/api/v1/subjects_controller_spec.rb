@@ -39,38 +39,52 @@ describe Api::V1::SubjectsController, type: :controller do
         it_behaves_like "an api response"
       end
 
-      context "with queued subjects" do
+      context "a queued request" do
         let(:request_params) do
           { sort: 'queued', workflow_id: workflow.id.to_s }
         end
         
-        let!(:ues) do
-          create(:user_subject_queue, user: user,
-                 workflow: workflow,
-                 set_member_subject_ids: subjects.map(&:id))
-        end
+        context "with queued subjects" do
+          before(:each) do
+            create(:user_subject_queue,
+                   user: user,
+                   workflow: workflow,
+                   set_member_subject_ids: subjects.map(&:id))
+            get :index, request_params
+          end
 
-        before(:each) do
-          get :index, request_params
-        end
+          it "should return 200" do
+            expect(response.status).to eq(200)
+          end
 
-        it "should return 200" do
-          expect(response.status).to eq(200)
-        end
+          it 'should return a page of 2 objects' do
+            expect(json_response[api_resource_name].length).to eq(2)
+          end
 
-        it 'should return a page of 2 objects' do
-          expect(json_response[api_resource_name].length).to eq(2)
+          it_behaves_like "an api response"
         end
-
-        it_behaves_like "an api response"
 
         context "without a workflow id" do
+          before(:each) do
+            get :index, request_params
+          end
+          
           let(:request_params) do
             { sort: 'queued' }
           end
           
           it 'should return 422' do
             expect(response.status).to eq(422)
+          end
+        end
+
+        context "without queued subejcts" do
+          before(:each) do
+            get :index, request_params
+          end
+          
+          it 'should return 404' do
+            expect(response.status).to eq(404)
           end
         end
       end
