@@ -34,7 +34,7 @@ install docker ([OS X Docs](https://docs.docker.com/installation/mac/), [Ubuntu
 docs](https://docs.docker.com/installation/ubuntulinux/)), then run the
 following command to pull and run a Zookeeper container:
 
-      sudo docker run -d --name zk --publish 2181:2181 edpaget/zookeeper:3.4.6 -i 1 -c localhost
+      sudo docker run -d --name zk --publish 2181:2181 zooniverse/zookeeper
 
 Make sure you don't have anything else running on port 2181 that will conflict
 with the container. Or change the second number to map to a different port and
