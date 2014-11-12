@@ -2111,10 +2111,15 @@ User Groups are returned as an array under *user_groups*.
     [UserGroup Collection][]
 
 ### Create a User Group [POST]
-A user can create new group by just giving it a display name. The name
-will be set to the underscored downcased version of the display name,
-and they will added as the sole active users. Optionally a user may
-specify a different name and links to other users who will be given
+A user can create new group by just giving it a name (how it appears
+in a @mention and url) or display name (how it shown to other users).
+
+In the case where only a display name is provided, the name will be
+set to the underscored, downcased, and url escaped version of the
+display name. When only a name is provided, display_name will be set
+to the same string as name.
+
+Optionally links to other users who will be given
 memberships with the 'invited' state.
 
 + Request (application/vnd.api+json)
