@@ -14,6 +14,7 @@ class Api::V1::GroupsController < Api::ApiController
 
   def build_resource_for_create(create_params)
     create_params[:display_name] ||= create_params[:name]
+    create_params[:name] ||= CGI.escape(create_params[:display_name].downcase.gsub(/\s+/, "_"))
 
     group = super(create_params)
     group.build_owner_name(name: group.name, resource: group)

@@ -79,6 +79,16 @@ describe Api::V1::GroupsController, type: :controller do
         expect(authorized_user.roles_for(group)).to include("group_admin")
       end
     end
+
+    describe "when only a display_name is provided" do
+      it "should set the name to an underscored downcased equvilent" do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, { user_groups: { display_name: "Galaxy Zoo" }}
+
+        group = UserGroup.find(created_instance_id("user_groups"))
+        expect(group.name).to eq("galaxy_zoo")
+      end
+    end
   end
 
   describe "#destroy" do
