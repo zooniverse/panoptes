@@ -51,10 +51,11 @@ GEM
     bcrypt (3.1.9)
     bcrypt (3.1.9-java)
     builder (3.2.2)
-    cellect-client (0.0.7)
+    cellect-client (0.0.8)
       celluloid (= 0.16.0.pre)
       celluloid-io (= 0.16.0.pre)
       http (~> 0.6)
+      multi_json (~> 1.10.1)
       zk (~> 1.9)
     celluloid (0.16.0.pre)
       timers (~> 2.0.0)
@@ -335,7 +336,7 @@ DEPENDENCIES
   activerecord-jdbcpostgresql-adapter
   airbrake (~> 4.1.0)
   aws-sdk
-  cellect-client (~> 0.0.7)
+  cellect-client (~> 0.0.8)
   database_cleaner (~> 1.2.0)
   devise
   doorkeeper (~> 1.4.0)
