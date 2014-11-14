@@ -20,6 +20,7 @@ gem 'airbrake', '~> 4.1.0'
 gem 'jquery-rails'
 gem 'uglifier'
 gem 'sidekiq'
+gem 'sinatra', '>= 1.3.0', :require => nil
 gem 'aws-sdk'
 
 platforms :jruby do
