@@ -6,7 +6,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
   
   let!(:upps) do
     create_list :user_project_preference, 2, project: project,
-      roles: ["tester"]
+                roles: ["tester"]
   end
   
   let(:api_resource_name) { 'project_roles' }
@@ -42,58 +42,39 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
   describe "#create" do
     let(:test_attr) { :roles }
     let(:test_attr_value) { ["collaborator"] }
-    context "when a user doesn't a preference object for a project" do
-      let(:create_params) do
-        {
-         project_roles: {
-                         roles: ["collaborator"],
-                         links: {
-                                 user: create(:user).id.to_s,
-                                 project: project.id.to_s
-                                }
-                        }
-        }
-      end
 
-      it_behaves_like "is creatable"
+    let(:resource_to_update) do
+      create :user_project_preference, roles: [], project: project
     end
 
-    context "when a user has a preference object for a project" do
-      let(:create_params) do
-        {
-         project_roles: {
-                         roles: ["collaborator"],
-                         links: {
-                                 user: resource.user.id.to_s,
-                                 project: resource.project.id.to_s
-                                }
-                        }
-        }
-      end
-
-      context "when the resource has no set roles" do
-        let!(:resource) do
-          create:user_project_preference, roles: [], project: project
-        end
-        
-        it_behaves_like "is creatable"
-      end
-
-      context "when the resource has previously set roles" do
-        before(:each) do
-          default_request scopes: scopes, user_id: authorized_user.id
-          post :create, create_params
-        end
-
-        it 'should return 422' do
-          expect(response.status).to eq(422)
-        end
-
-        it 'should give an error explaination' do
-          expect(json_response['errors'][0]['message'])
-            .to eq("Cannot create roles resource when one exists for the user and project")
-        end
-      end
+    let(:resource_to_not_update) do
+      create :user_project_preference, roles: ["collaborator"], project: project
     end
+    
+    let(:created_params) do
+      {
+        project_roles: {
+          roles: ["collaborator"],
+          links: {
+            user: resource.user.id.to_s,
+            project: resource.project.id.to_s
+          }
+        }
+      }
+    end
+    
+    let(:create_params) do
+      {
+        project_roles: {
+          roles: ["collaborator"],
+          links: {
+            user: create(:user).id.to_s,
+            project: project.id.to_s
+          }
+        }
+      }
+    end
+
+    it_behaves_like "creatable or updatable"
   end
 end
