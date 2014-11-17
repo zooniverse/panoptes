@@ -1,9 +1,17 @@
 class UserCollectionPreference < ActiveRecord::Base
+  extend ControlControl::Resource
+  include RoleControl::Adminable
   include RoleControl::RoleModel
-  belongs_to :user
-  belongs_to :collection
+  include Preferences
+  
+  belongs_to :user, dependent: :destroy
+  belongs_to :collection, dependent: :destroy
+
+  attr_accessible :roles, :preferences
   
   roles_for :user, :collection, valid_roles: [ :collaborator ]
   
   validates_presence_of :user, :collection
+  
+  visibility_query UserCollectionPreferenceVisibilityQuery
 end

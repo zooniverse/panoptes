@@ -17,10 +17,6 @@ class UserProjectPreferenceVisibilityQuery < VisibilityQuery
     @project_scope ||= Project.scope_for(:update, actor).select(:id)
   end
 
-  def where_user
-    @where_user ||= parent.where(arel_table[:user_id].eq(actor.id))
-  end
-
   def where_project
     @where_project ||= parent.where(arel_table[:project_id].in(project_scope.arel))
   end
