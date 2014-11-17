@@ -17,7 +17,7 @@ cellect:
 
 redis:
   image: redis:latest
-  command: redis-server -appendonly yes
+  command: redis-server --appendonly yes
 
 kafka:
   image: zooniverse/kafka
