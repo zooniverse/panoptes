@@ -10,6 +10,7 @@ module RoleControl
                                     self)
         @roles_field = field
         @valid_roles = valid_roles.map(&:to_s)
+        @roles_resource = resource
         validate :allowed_roles
       end
 
@@ -24,6 +25,10 @@ module RoleControl
 
       def roles_field
         @roles_field
+      end
+
+      def roles_resource
+        @roles_resource
       end
     end
 

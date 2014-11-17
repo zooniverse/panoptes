@@ -31,7 +31,7 @@ class Api::V1::CollectionRolesController < Api::ApiController
   end
 
   def new_items(relation, value)
-    if relation == "project"
+    if relation == "collection"
       super(relation, value, :roles)
     else
       super

@@ -6,6 +6,7 @@ class Project < ActiveRecord::Base
   include Activatable
   include Linkable
   include Translatable
+  include PreferencesLink
 
   EXPERT_ROLES = [:expert]
 
@@ -27,19 +28,9 @@ class Project < ActiveRecord::Base
   can_be_linked :subject_set, :scope_for, :update, :actor
   can_be_linked :subject, :scope_for, :update, :actor
   can_be_linked :workflow, :scope_for, :update, :actor
-  can_be_linked :user_project_preference, :preference_scope, :actor
 
-  # Users can add preferences for any project they can see. Roles may
-  # only be added by a User that has edit permissions for a project
-  def self.preference_scope(actor, type)
-    case type
-    when :roles
-      scope_for(:update, actor)
-    when :preferences
-      scope_for(:show, actor)
-    end
-  end
-
+  preferences_model :user_project_preference
+  
   def self.translation_scope
     @translation_scope ||= RoleControl::RoleScope.new(["translator"], false, self)
   end

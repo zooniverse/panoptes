@@ -3,6 +3,8 @@ class Collection < ActiveRecord::Base
   include RoleControl::Ownable
   include RoleControl::Adminable
   include Activatable
+  include Linkable
+  include PreferencesLink
   
   attr_accessible :name, :display_name, :project_id
 
@@ -14,4 +16,6 @@ class Collection < ActiveRecord::Base
 
   can_by_role :update, roles: [ :collaborator ]
   can_by_role :show, public: true, roles: :visible_to
+  
+  preferences_model :user_collection_preference
 end
