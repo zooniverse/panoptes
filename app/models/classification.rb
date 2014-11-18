@@ -17,9 +17,6 @@ class Classification < ActiveRecord::Base
   validate :metadata, :required_metadata_present
   validate :validate_gold_standard
 
-  attr_accessible :annotations, :completed, :user_ip, :gold_standard,
-    :metadata, :expert_classifier
-
   can :show, :in_show_scope?
   can :update, :created_and_incomplete?
   can :destroy, :created_and_incomplete?

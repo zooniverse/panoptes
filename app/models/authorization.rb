@@ -1,8 +1,6 @@
 class Authorization < ActiveRecord::Base
   belongs_to :user
 
-  attr_accessible :provider, :uid
-
   validates_presence_of :provider, :uid, :token
   validates_uniqueness_of :provider, scope: :user_id
 

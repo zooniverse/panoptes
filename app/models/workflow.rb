@@ -5,7 +5,6 @@ class Workflow < ActiveRecord::Base
   include Translatable
 
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
-  attr_accessible :name, :tasks, :project_id, :grouped, :pairwise, :prioritized, :primary_language
 
   belongs_to :project
   has_and_belongs_to_many :subject_sets

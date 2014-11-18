@@ -6,10 +6,6 @@ class User < ActiveRecord::Base
   include RoleControl::Enrolled
   include Linkable
 
-  attr_accessible :name, :email, :password, :login, :migrated_user,
-    :display_name, :credited_name, :global_email_communication,
-    :project_email_communication
-
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable, omniauth_providers: [:facebook, :gplus]

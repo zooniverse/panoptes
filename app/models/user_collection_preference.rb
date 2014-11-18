@@ -7,8 +7,6 @@ class UserCollectionPreference < ActiveRecord::Base
   belongs_to :user, dependent: :destroy
   belongs_to :collection, dependent: :destroy
 
-  attr_accessible :roles, :preferences
-  
   roles_for :user, :collection, valid_roles: [ :collaborator ]
   
   validates_presence_of :user, :collection

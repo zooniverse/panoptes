@@ -10,9 +10,6 @@ class Project < ActiveRecord::Base
 
   EXPERT_ROLES = [:expert]
 
-  attr_accessible :name, :display_name, :owner, :primary_language,
-    :project_contents, :avatar, :background_image
-
   has_many :workflows
   has_many :subject_sets
   has_many :classifications

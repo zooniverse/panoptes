@@ -153,7 +153,7 @@ describe User, :type => :model do
     it 'should not require a password when creating a user from an import' do
       attrs = {login: "t", hash_func: 'sha1', email: "test@example.com"}
       expect do
-        User.create!(attrs, without_protection: true) do |user|
+        User.create!(attrs) do |user|
           user.owner_name = OwnerName.new(name: "t", resource: user)
         end
       end.to_not raise_error
