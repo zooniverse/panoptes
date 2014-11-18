@@ -3,6 +3,7 @@ class Api::V1::CollectionsController < Api::ApiController
   
   doorkeeper_for :create, :update, :destroy, scopes: [:collection]
   resource_actions :default
+  schema_type :strong_params
 
   allowed_params :create, :name, :display_name,
     links: [ :project, subjects:  [], owner: polymorphic ]

@@ -71,6 +71,6 @@ class Classification < ActiveRecord::Base
   end
 
   def validate_gold_standard
-    ClassificationSchemaValidator.new(self).validate_gold_standard
+    ClassificationValidator.new(self).validate_gold_standard
   end
 end

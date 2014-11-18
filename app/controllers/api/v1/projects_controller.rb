@@ -3,6 +3,7 @@ class Api::V1::ProjectsController < Api::ApiController
   
   doorkeeper_for :update, :create, :delete, scopes: [:project]
   resource_actions :update, :create, :destroy
+  schema_type :strong_params
 
   alias_method :project, :controlled_resource
 

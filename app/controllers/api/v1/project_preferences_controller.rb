@@ -5,6 +5,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   doorkeeper_for :all, scopes: [:project]
   resource_actions :index, :show, :create, :update
   access_control_for [:update, :update_preferences]
+  schema_type :strong_params
 
   allowed_params :create, :email_communication, preferences: [:tutorial],
     links: [:project]

@@ -4,6 +4,7 @@ class Api::V1::GroupsController < Api::ApiController
   doorkeeper_for :index, :create, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:group]
   resource_actions :show, :index, :update, :deactivate, :create
+  schema_type :strong_params
 
   alias_method :user_group, :controlled_resource
   

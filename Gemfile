@@ -22,6 +22,7 @@ gem 'uglifier'
 gem 'sidekiq'
 gem 'sinatra', '>= 1.3.0', :require => nil
 gem 'aws-sdk'
+gem 'json-schema'
 
 platforms :jruby do
   gem 'jbundler'

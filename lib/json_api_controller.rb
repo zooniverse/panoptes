@@ -31,18 +31,18 @@ module JsonApiController
       end
     end
 
-    def allowed_params(action, *request_description)
-      @action_params[action] = request_description
+    def schema_type(type)
+      case type
+      when :json_schema
+        include JsonApiController::JsonSchemaValidator
+      when :strong_params
+        include JsonApiController::StrongParamsValidator
+      end
     end
 
-    def action_params
-      @action_params
-    end
-
-    protected
-
-    def polymorphic
-      [ :id, :type ]
+    def resource_name
+      @resource_name ||= name.match(/::([a-zA-Z]*)Controller/)[1]
+                       .underscore.singularize
     end
   end
 
@@ -55,8 +55,7 @@ module JsonApiController
   end
 
   def resource_name
-    @resource_name ||= self.class.name
-                     .match(/::([a-zA-Z]*)Controller/)[1].underscore.singularize
+    self.class.resource_name
   end
 
   def resource_sym
@@ -69,18 +68,6 @@ module JsonApiController
 
   def visible_scope
     super(api_user)
-  end
-
-  def params_for(action)
-    params.require(resource_sym).permit(*self.class.action_params[action])
-  end
-
-  def create_params
-    params_for(:create)
-  end
-
-  def update_params
-    params_for(:update)
   end
 
   def context

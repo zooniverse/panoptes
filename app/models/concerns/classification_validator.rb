@@ -1,4 +1,4 @@
-class ClassificationSchemaValidator
+class ClassificationValidator
 
   def initialize(classification)
     @classification = classification
