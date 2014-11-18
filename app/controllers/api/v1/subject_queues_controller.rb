@@ -3,6 +3,7 @@ class Api::V1::SubjectQueuesController < Api::ApiController
 
   doorkeeper_for :update, :destroy, :create, scopes: [:project]
   resource_actions :default
+  schema_type :strong_params
 
   allowed_params :create, links: [:user, :workflow, set_member_subjects: []]
   allowed_params :update, links: [set_member_subjects: []]

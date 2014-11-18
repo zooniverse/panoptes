@@ -4,6 +4,8 @@ class Api::V1::CollectionPreferencesController < Api::ApiController
   prepend_before_filter :require_login
   doorkeeper_for :all, scopes: [:collection]
   resource_actions :index, :show, :create, :update
+  schema_type :strong_params
+  
   access_control_for [:update, :update_preferences]
 
   allowed_params :create, preferences: [:display], links: [:collection]

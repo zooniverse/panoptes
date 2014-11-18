@@ -6,6 +6,7 @@ class Api::V1::SubjectsController < Api::ApiController
   doorkeeper_for :update, :create, :destroy, :version, :versions,
                  scopes: [:subject]
   resource_actions :show, :create, :update, :destroy
+  schema_type :strong_params
 
   alias_method :subject, :controlled_resource
 

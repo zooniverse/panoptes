@@ -4,6 +4,7 @@ class Api::V1::UsersController < Api::ApiController
   doorkeeper_for :me, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show
+  schema_type :strong_params
 
   allowed_params :update, :display_name, :email, :credited_name
 
