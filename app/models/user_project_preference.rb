@@ -7,8 +7,6 @@ class UserProjectPreference < ActiveRecord::Base
   belongs_to :user, dependent: :destroy
   belongs_to :project, dependent: :destroy
 
-  attr_accessible :roles, :preferences, :email_communication
-
   roles_for :user, :project, valid_roles: [:expert,
                                            :collaborator,
                                            :translator,

@@ -189,8 +189,6 @@ GEM
       activerecord (>= 4.0.0)
       arel (>= 4.0.1)
       pg_array_parser (~> 0.0.9)
-    protected_attributes (1.0.8)
-      activemodel (>= 4.0.1, < 5.0)
     pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -362,12 +360,11 @@ DEPENDENCIES
   pg
   poseidon
   postgres_ext
-  protected_attributes (~> 1.0.8)
   pry-rails (~> 0.3.2)
   puma
   rack-cors
   rails (= 4.1.7)
-  restpack_serializer (~> 0.5.4)
+  restpack_serializer (~> 0.5.6)
   rspec (~> 3.0.0)
   rspec-rails (~> 3.0.0)
   sdoc (~> 0.4.0)

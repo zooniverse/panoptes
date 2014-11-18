@@ -5,7 +5,6 @@ class UserSubjectQueue < ActiveRecord::Base
   belongs_to :workflow
 
   validates_presence_of :user, :workflow
-  attr_accessible :user, :workflow
 
   can_through_parent :workflow, :update, :destroy
 

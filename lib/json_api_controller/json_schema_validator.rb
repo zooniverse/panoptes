@@ -26,7 +26,7 @@ module JsonApiController
     protected
 
     def params_for(action=action_name.to_sym)
-      ps = params[resource_sym]
+      ps = params.require(resource_sym).permit!
       self.class.action_params[action].validate!(ps)
       ps
     end

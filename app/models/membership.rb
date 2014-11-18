@@ -2,7 +2,6 @@ class Membership < ActiveRecord::Base
   extend ControlControl::Resource
   include RoleControl::RoleModel
   
-  attr_accessible :state, :roles, :user_group, :user
   belongs_to :user_group
   belongs_to :user
   enum state: [:active, :invited, :inactive]

@@ -6,8 +6,6 @@ class UserGroup < ActiveRecord::Base
   include RoleControl::Adminable
   include Linkable
 
-  attr_accessible :name, :display_name
-
   owns :projects
   owns :collections
   owns :subjects

@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :subject_set do
     name "A Subject set"
+    metadata({ just_some: "stuff" })
     project
 
     factory :subject_set_with_workflow do

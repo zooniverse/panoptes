@@ -5,7 +5,6 @@ class NamedThing < ActiveRecord::Base
   self.table_name = "set_member_subjects"
 
   attr_accessor :uniq_name
-  attr_accessible :uniq_name
 
   def model_uniq_name_attribute
     :uniq_name

@@ -65,6 +65,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
       {
        subject_sets: {
                       name: 'Test subject set',
+                      metadata: {
+                        location: "Africa"
+                      },
                       links: {
                               project: project.id
                              }

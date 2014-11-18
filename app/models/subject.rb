@@ -11,7 +11,6 @@ class Subject < ActiveRecord::Base
   has_many :subject_sets, through: :set_member_subjects
   has_many :set_member_subjects
   
-  attr_accessible :project_id, :metadata, :locations, :owner
   validates_presence_of :project
 
   def self.scope_for(action, actor)
