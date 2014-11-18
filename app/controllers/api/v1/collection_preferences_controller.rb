@@ -23,8 +23,9 @@ class Api::V1::CollectionPreferencesController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    create_params[:links][:user] = api_user.user
-    super(create_params)
+    super(create_params) do | _, link_params |
+      link_params[:user] = api_user.user
+    end
   end
 
   def visible_scope

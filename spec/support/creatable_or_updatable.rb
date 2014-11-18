@@ -24,7 +24,7 @@ RSpec.shared_examples "creatable or updatable" do
         expect(response.status).to eq(422)
       end
 
-      it 'should give an error explaination' do
+      it 'should give an error explanation' do
         expect(json_response['errors'][0]['message'])
           .to eq("Cannot create roles resource when one exists for the user and project")
       end
