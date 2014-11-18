@@ -5,8 +5,7 @@ def request_headers(header)
 end
 
 def default_accept
-  { "HTTP_ACCEPT" => "application/vnd.api+json; version=1" }
-end
+  { "HTTP_ACCEPT" => "application/vnd.api+json; version=1" } end
 
 def json_content_type_headers
   request_headers("application/json; charset=utf-8")

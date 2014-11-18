@@ -4,6 +4,7 @@ class Api::V1::CollectionRolesController < Api::ApiController
   prepend_before_filter :require_login
   doorkeeper_for :all, scopes: [:collection]
   access_control_for [:update, :update_roles]
+  schema_type :strong_params
 
   resource_actions :index, :show, :create_or_update, :update
 
