@@ -123,6 +123,7 @@ GEM
       jbundler (= 0.5.5)
     json (1.8.1)
     json (1.8.1-java)
+    json-schema (2.4.1)
     jwt (1.0.0)
     kaminari (0.16.1)
       actionpack (>= 3.0.0)
@@ -351,6 +352,7 @@ DEPENDENCIES
   jbundler
   jquery-rails
   jruby-kafka
+  json-schema
   logstasher
   mysql2
   omniauth
