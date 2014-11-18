@@ -25,6 +25,8 @@ module JsonApiController
           include JsonApiController::DestructableResource
         when :deactivate
           include JsonApiController::DeactivatableResource
+        when :create_or_update
+          include JsonApiController::CreatableOrUpdatableResource
         end
       end
     end
@@ -54,7 +56,7 @@ module JsonApiController
 
   def resource_name
     @resource_name ||= self.class.name
-      .match(/::([a-zA-Z]*)Controller/)[1].underscore.singularize
+                     .match(/::([a-zA-Z]*)Controller/)[1].underscore.singularize
   end
 
   def resource_sym

@@ -15,4 +15,8 @@ class VisibilityQuery
   def arel_table
     parent.arel_table
   end
+  
+  def where_user
+    @where_user ||= parent.where(arel_table[:user_id].eq(actor.id))
+  end
 end
