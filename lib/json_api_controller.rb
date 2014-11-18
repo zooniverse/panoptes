@@ -39,6 +39,11 @@ module JsonApiController
         include JsonApiController::StrongParamsValidator
       end
     end
+
+    def resource_name
+      @resource_name ||= name.match(/::([a-zA-Z]*)Controller/)[1]
+                       .underscore.singularize
+    end
   end
 
   def current_actor
@@ -50,8 +55,7 @@ module JsonApiController
   end
 
   def resource_name
-    @resource_name ||= self.class.name
-                     .match(/::([a-zA-Z]*)Controller/)[1].underscore.singularize
+    self.class.resource_name
   end
 
   def resource_sym

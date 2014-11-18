@@ -3,11 +3,8 @@ class Api::V1::SubjectSetsController < Api::ApiController
   
   doorkeeper_for :create, :update, :destroy, scopes: [:project]
   resource_actions :default
-  schema_type :strong_params
+  schema_type :json_schema
 
-  allowed_params :create, :name, links: [:project,
-                                           workflows: [],
-                                           subjects: []]
-
-  allowed_params :update, :name, links: [workflows: [], subjects: []]
+  allowed_params :create
+  allowed_params :update
 end
