@@ -73,6 +73,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
+    Namer.set_name_fields(create_params)
+    
     content_params = content_from_params(create_params)
     
     create_params[:links] ||= Hash.new
