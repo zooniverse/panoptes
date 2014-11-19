@@ -7,8 +7,7 @@ module JsonApiController
         @action_params[action] = if block_given?
                                    JsonSchema.build(&block)
                                  else
-                                   path = schema_path(action)
-                                   JsonSchema.build_eval(File.read(path))
+                                   schema_class(action).new
                                  end
       end
 
@@ -18,8 +17,8 @@ module JsonApiController
 
       private
       
-      def schema_path(action)
-        Rails.root.join("app/schemas/#{ resource_name }_#{ action }_schema.rb")
+      def schema_class(action)
+        "#{ resource_name }_#{ action }_schema".camelize.constantize
       end
     end
 

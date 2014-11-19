@@ -37,31 +37,33 @@ RSpec.describe JsonSchema do
     end
   end
   
-  describe "::build_eval" do
+  describe "::schema" do
     subject do
-      JsonSchema.build_eval <<-RUBY
-        type "object"
-        required "id", "name"
-        property "id" do
-          type "integer"
-        end
-
-        property "name" do
-          type "string"
-        end
-
-        property "metadata" do
+      Class.new(JsonSchema) do
+        schema do
           type "object"
-          required "start", "end"
-          property "start" do
+          required "id", "name"
+          property "id" do
             type "integer"
           end
 
-          property "end" do
-            type "float"
+          property "name" do
+            type "string"
+          end
+
+          property "metadata" do
+            type "object"
+            required "start", "end"
+            property "start" do
+              type "integer"
+            end
+
+            property "end" do
+              type "float"
+            end
           end
         end
-      RUBY
+      end.new
     end
 
     it_behaves_like "validates json"
