@@ -6,7 +6,7 @@ module TasksVisitors
 
     private
 
-    def inject_string(n)
+    def inject_string(n, path=nil)
       @strings[n]
     end
 

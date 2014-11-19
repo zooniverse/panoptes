@@ -1,31 +1,34 @@
 FactoryGirl.define do
   factory :workflow do
     name "A Workflow"
+
     first_task "interest"
     tasks(
       {
         interest: {
-          type: "draw",
-          question: 0,
-          next: "shape",
+          type: 'drawing',
+          question: "interest.question",
           tools: [
-            {value: "red", label: 1, type: 'point', color: 'red'},
-            {value: "green", label: 2, type: 'point', color: 'lime'},
-            {value: "blue", label: 3, type: 'point', color: 'blue'},
-          ]
+            {value: 'red', label: "interest.tools.0.label", type: 'point', color: 'red'},
+            {value: 'green', label: "interest.tools.1.label", type: 'point', color: 'lime'},
+            {value: 'blue', label: "interest.tools.2.label", type: 'point', color: 'blue'}
+          ],
+          next: 'shape'
         },
         shape: {
           type: 'multiple',
-          question: 4,
+          question: "shape.question",
           answers: [
-            {value: 'smooth', label: 5},
-            {value: 'features', label: 6},
-            {value: 'other', label: 7}
+            {value: 'smooth', label: "shape.answers.0.label"},
+            {value: 'features', label: "shape.answers.1.label"},
+            {value: 'other', label: "shape.answers.2.label"}
           ],
-          next: nil
+          required: true,
+          next: 'roundness'
         }
       }
     )
+    
     pairwise false
     grouped false
     prioritized false

@@ -1,6 +1,6 @@
 module TasksVisitors
   class ExtractStrings < TasksVisitor
-    def initialize(collector=[])
+    def initialize(collector={})
       @collector = collector
     end
 
@@ -9,9 +9,11 @@ module TasksVisitors
     end
 
     private
-    def substitute_string(n)
-      @collector << n
-      @collector.length - 1
+    
+    def substitute_string(n, path)
+      path = path.join(".")
+      @collector[path] = n
+      path
     end
 
     alias :visit_label :substitute_string

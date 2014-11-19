@@ -74,7 +74,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         default_request scopes: scopes, user_id: authorized_user.id
         put :update, update_params.merge(id: resource.id)
         instance = Workflow.find(created_instance_id(api_resource_name))
-        expect(instance.tasks["interest"]["question"]).to eq(0)
+        expect(instance.tasks["interest"]["question"]).to eq("interest.question")
       end
     end
   end
@@ -126,7 +126,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         default_request scopes: scopes, user_id: authorized_user.id
         post :create, create_params
         instance = Workflow.find(created_instance_id(api_resource_name))
-        expect(instance.tasks["interest"]["question"]).to eq(0)
+        expect(instance.tasks["interest"]["question"]).to eq("interest.question")
       end
     end
   end
