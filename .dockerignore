@@ -3,6 +3,7 @@
 .vagrant
 .ruby-gemset
 .ruby-version
+.bundle
 spec
 ouroboros
 vagrant_scripts

@@ -71,13 +71,12 @@ class JsonSchema
     new(Builder.new.build(&block))
   end
 
-  def self.build_eval(str)
-    builder = Builder.new
-    builder.instance_eval(str)
-    new(builder.schema)
+  def self.schema(&block)
+    return @schema unless block_given?
+    @schema = Builder.new.build(&block)
   end
   
-  def initialize(schema)
+  def initialize(schema=self.class.schema)
     @schema = schema
   end
 
