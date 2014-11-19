@@ -43,6 +43,7 @@ group :development do
 end
 
 group :development, :test do
+  gem 'foreman'
   gem 'database_cleaner', '~> 1.2.0'
   gem 'rspec', '~> 3.0.0'
   gem 'rspec-rails', '~> 3.0.0'

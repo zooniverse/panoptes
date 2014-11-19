@@ -26,15 +26,16 @@ kafka:
   command: -i 1 -H kafka -p 9092 -z zk:2181
 
 panoptes:
-  image: zooniverse/ruby:jruby-1.7.16.1
-  command: /rails_app/start.sh
+  build: .
   volumes:
     - ./:/rails_app
   ports:
     - "3000:80"
   environment:
-    - "RAILS_ENV=development"
+    RAILS_ENV: development
   links:
     - postgres
     - zookeeper
     - cellect
+    - kafka
+    - redis

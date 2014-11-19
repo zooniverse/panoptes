@@ -12,6 +12,8 @@ RUN apt-get update && apt-get -y upgrade && apt-get clean && \
     bundle install --without test development && \
     jbundle install --without test development
 
+RUN touch /firstrun
+
 ADD ./ /rails_app
 
 EXPOSE 80
