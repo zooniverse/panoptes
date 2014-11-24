@@ -23,7 +23,7 @@ setting JRUBY_OPTS=--2.0 in your environment.
 You will need the following services available:
 * Postgresql 9.3
 * Kafka 0.8.1
-* [Cellect Server](https://github.com/parrish/Cellect)
+* [Cellect Server](https://github.com/zooniverse/Cellect)
 * Zookeeper 3.4.6
 * Redis
 
