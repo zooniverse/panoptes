@@ -9,11 +9,11 @@ Doorkeeper::Application.class_eval do
 
   def allowed_grants
     if secure?
-      %w(client_credentials authorization_code)
+      %w(client_credentials authorization_code refresh_token)
     elsif insecure?
-      []
+      %w(refresh_token)
     else
-      %w(client_credentails authorization_code password)
+      %w(client_credentails authorization_code password refresh_token)
     end
   end
 

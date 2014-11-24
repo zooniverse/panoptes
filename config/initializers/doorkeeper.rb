@@ -1,6 +1,8 @@
 Doorkeeper.configure do
   orm :active_record
 
+  use_refresh_token
+
   enable_application_owner :confirmation => true
 
   default_scopes  :public
