@@ -7,7 +7,7 @@ shared_context "a valid login" do
   end
 
   it "it should return the expected response format" do
-    token_response_keys = [ "access_token", "token_type", "expires_in", "scope" ]
+    token_response_keys = [ "access_token", "token_type", "expires_in", "refresh_token", "scope" ]
     req
     expect(json_response).to include(*token_response_keys)
   end
@@ -32,7 +32,7 @@ describe TokensController, type: :controller do
         end
       end
 
-      context "when supplying missing and blank applicaiton client_id" do
+      context "when supplying missing and blank application client_id" do
 
         it "it should respond with 422" do
           post :create, params.merge!("client_id" => '')
