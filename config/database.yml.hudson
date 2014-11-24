@@ -16,3 +16,7 @@ test:
   adapter: postgresql
   database: travis_ci_test
   username: postgres
+
+zooniverse_home_development:
+  <<: *default
+  database: zooniverse_home_development
