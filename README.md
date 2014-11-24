@@ -46,8 +46,8 @@ Prepare the docker containers, from rails root run:
   + Note: this script will does not recreate containers to avoid installing gems and migrating the database.
   + If you need to recreate the build image because you've added new gems, etc then just run `fig up`.
 3. Seed the fig development database in the docker container.
-  + `scripts/fig_run_cmd_panoptes.sh "bundle install" "rails runner" db/fig_dev_seed_data/fig_dev_seed_data.rb"`
-4. Finally if you want to apply schema migrations you can do this via `scripts/fig_run_cmd_panoptes.sh "bundle install ; rake db:migrate"`
+  + `scripts/fig_run_cmd_panoptes.sh "bundle install && rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
+4. Finally if you want to apply schema migrations you can do this via `scripts/fig_run_cmd_panoptes.sh "bundle install && rake db:migrate"`
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
