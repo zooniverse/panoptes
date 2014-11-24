@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141118144942) do
+ActiveRecord::Schema.define(version: 20141119150447) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,9 +39,9 @@ ActiveRecord::Schema.define(version: 20141118144942) do
     t.integer  "user_group_id"
     t.inet     "user_ip"
     t.boolean  "completed",             default: true, null: false
-    t.json     "metadata",              default: {},   null: false
     t.boolean  "gold_standard"
     t.integer  "expert_classifier"
+    t.json     "metadata",              default: {},   null: false
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
@@ -325,7 +325,7 @@ ActiveRecord::Schema.define(version: 20141118144942) do
     t.string   "language"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "strings",     default: [], null: false, array: true
+    t.json     "strings",     default: {}, null: false
   end
 
   add_index "workflow_contents", ["workflow_id"], name: "index_workflow_contents_on_workflow_id", using: :btree

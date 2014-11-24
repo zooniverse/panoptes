@@ -1,23 +1,23 @@
 class TasksVisitor
-  def visit(node, key=nil)
+  def visit(node, path=[], key=nil)
     method = :"visit_#{key}"
     method = respond_to?(method, true) ? method : :visit_hash
-    send(method, node)
+    send(method, node, path)
   end
 
   private
 
-  def array_node(n)
-    n.map { |sub_node| visit(sub_node) }
+  def array_node(n, path)
+    n.each_with_index.map { |sub_node, i| visit(sub_node, path + [i]) }
   end
 
-  def noop(n)
+  def noop(n, p)
     n
   end
 
-  def visit_hash(n)
+  def visit_hash(n, path)
     n.each do |k, v|
-      n[k] = visit(v, k)
+      n[k] = visit(v, path + [k], k)
     end
   end
 
