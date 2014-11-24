@@ -43,7 +43,7 @@ Prepare the docker containers, from rails root run:
 1. `./scripts/fig_up_panoptes.sh`
   + On the first run it will build the docker containers, setup the database and install the dev and test gems.
 2. `./scripts/fig_up_panoptes.sh` again to start Panoptes and the dependant services.
-  + Note: this script will does not recreate containers to avoid installing gems and migrating the database.
+  + Note: this script does not recreate containers to avoid installing gems and migrating the database.
   + If you need to recreate the build image because you've added new gems, etc then just run `fig up`.
 3. Seed the fig development database in the docker container.
   + `scripts/fig_run_cmd_panoptes.sh "bundle install && rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
