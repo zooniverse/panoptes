@@ -35,9 +35,6 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
-    airbrake (4.1.0)
-      builder
-      multi_json
     arel (5.0.1.20140414130214)
     aws-sdk (1.58.0)
       aws-sdk-v1 (= 1.58.0)
@@ -105,6 +102,8 @@ GEM
     hike (1.2.3)
     hitimes (1.2.2)
     hitimes (1.2.2-java)
+    honeybadger (1.16.5)
+      json
     http (0.6.2)
       http_parser.rb (~> 0.6.0)
     http_parser.rb (0.6.0)
@@ -339,7 +338,6 @@ PLATFORMS
 DEPENDENCIES
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter
-  airbrake (~> 4.1.0)
   aws-sdk
   cellect-client (~> 0.0.8)
   database_cleaner (~> 1.2.0)
@@ -347,6 +345,7 @@ DEPENDENCIES
   doorkeeper (~> 1.4.0)
   factory_girl_rails (~> 4.4.1)
   guard-rspec (~> 4.2.9)
+  honeybadger
   jbundler
   jquery-rails
   jruby-kafka
