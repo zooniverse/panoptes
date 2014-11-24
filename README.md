@@ -29,7 +29,7 @@ You will need the following services available:
 
 #### Development Environment with Fig and Docker
 
-An easy way to get a full stack Panoptes running (see fig.yml to dig into the setup),
+An easy way to get the full Panoptes stack running (see fig.yml to dig into the setup),
 ##### Required - you'll need docker installed!
  + [OS X Docs](https://docs.docker.com/installation/mac/) - Boot2Docker
  + [Ubuntu docs](https://docs.docker.com/installation/ubuntulinux/) - Docker
@@ -41,21 +41,22 @@ Prepare your fig development environment config files. You should only have to d
 
 Prepare the docker containers, from rails root run:
 1. `./scripts/fig/up_panoptes.sh`
-  + On the first run it will build the docker containers, setup the database and install the dev and test gems but won't start the rails server(s).
+  + On the first run it will build the docker containers, setup the database and install the development and test environment gems.
+  + **Note: it will not start the rails server(s) and will exit after db migration.**
 2. `./scripts/fig/up_panoptes.sh`
-  + On the second the script will start Panoptes and all the dependant services.
+  + On second run the script will start Panoptes and all the dependent services.
     + **Note:** this script does not recreate containers to avoid installing gems and migrating the database.
     + Run `fig up` if you need to recreate the build image perhaps because you've added new gems.
 3. Seed the fig development database in the docker container.
   + `scripts/fig/run_cmd_panoptes.sh "bundle install && rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
   + **Note:** Run this only after step 1 has completed successfully.
-4. Finally if you want to apply schema migrations you can do this via `scripts/fig/migrate_db_panoptes.sh
+4. Finally if you want to apply schema migrations you can do this via `scripts/fig/migrate_db_panoptes.sh`
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
 Finally there are some helper scripts to get access to a console, bash shell etc. **Note:** these commands build a new run container
 * To get a rails console `scripts/fig/rails_console_panoptes.sh`
-  + **Note:** you can override the RAILS_ENV by passing a param, just make sure you've setup the DB for it!
+  + **Note:** you can override the RAILS_ENV by passing a valid argument, just make sure you've setup the DB for it!
 * To get a bash console `scripts/fig/run_cmd_panoptes.sh bash`
 * You can also attach a bash process to the running container, e.g. `docker exec -it panoptes_panoptes_1 bash`
   + Assuming the 'panoptes_panoptes_1' container is running, use `fig ps` or `docker ps` to check.
