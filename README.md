@@ -35,29 +35,32 @@ An easy way to get a full stack Panoptes running (see fig.yml to dig into the se
  + [Ubuntu docs](https://docs.docker.com/installation/ubuntulinux/) - Docker
  + [Windows Docks](http://docs.docker.com/installation/windows/) - Boot2Docker
 
-Prepare your fig development environment config files. You should only have to do this before the first boot. Note: the fig docker environment uses linked docker containers so your Postgres and Zookeeper hosts url's need to refer to these containers.
+Prepare your fig development environment config files. You should only have to do this before the first boot. **Note:** the fig docker environment uses linked docker containers so your Postgres and Zookeeper hosts url's need to refer to these containers.
 
 * Copy all the *file_name*.yml.hudson files to *file_name*.yml, the default values should work out of the box.
 
 Prepare the docker containers, from rails root run:
-1. `./scripts/fig_up_panoptes.sh`
-  + On the first run it will build the docker containers, setup the database and install the dev and test gems.
-2. `./scripts/fig_up_panoptes.sh` again to start Panoptes and the dependant services.
-  + Note: this script does not recreate containers to avoid installing gems and migrating the database.
-  + If you need to recreate the build image because you've added new gems, etc then just run `fig up`.
+1. `./scripts/fig/up_panoptes.sh`
+  + On the first run it will build the docker containers, setup the database and install the dev and test gems but won't start the rails server(s).
+2. `./scripts/fig/up_panoptes.sh`
+  + On the second the script will start Panoptes and all the dependant services.
+    + **Note:** this script does not recreate containers to avoid installing gems and migrating the database.
+    + Run `fig up` if you need to recreate the build image perhaps because you've added new gems.
 3. Seed the fig development database in the docker container.
-  + `scripts/fig_run_cmd_panoptes.sh "bundle install && rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
-4. Finally if you want to apply schema migrations you can do this via `scripts/fig_run_cmd_panoptes.sh "bundle install && rake db:migrate"`
+  + `scripts/fig/run_cmd_panoptes.sh "bundle install && rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
+  + **Note:** Run this only after step 1 has completed successfully.
+4. Finally if you want to apply schema migrations you can do this via `scripts/fig/migrate_db_panoptes.sh
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
-Finally there are some helper scripts to get access to a console, bash shell etc. Note: these commands build a new run container
-* To get a rails console `scripts/fig_run_cmd_panoptes.sh`
-  + Note: this command
-* To get a bash console `scripts/fig_run_cmd_panoptes.sh`
+Finally there are some helper scripts to get access to a console, bash shell etc. **Note:** these commands build a new run container
+* To get a rails console `scripts/fig/rails_console_panoptes.sh`
+  + **Note:** you can override the RAILS_ENV by passing a param, just make sure you've setup the DB for it!
+* To get a bash console `scripts/fig/run_cmd_panoptes.sh bash`
 * You can also attach a bash process to the running container, e.g. `docker exec -it panoptes_panoptes_1 bash`
+  + Assuming the 'panoptes_panoptes_1' container is running, use `fig ps` or `docker ps` to check.
 
-Note: if you've ever built a Panoptes docker container before you should just run fig up instead of the `./scripts/fig_up_panoptes.sh` to ensure the previously built container is not re-used. After rebuilding you should be good to use `./scripts/fig_up_panoptes.sh` script to use the created containers
+**Note:** if you've ever built a Panoptes docker container before you should just run `fig up` instead of the `./scripts/fig/up_panoptes.sh` to ensure the previously built container is not re-used. After rebuilding you should be good to use `./scripts/fig/up_panoptes.sh` script to use the re-created containers.
 
 ### Run manually with self installed and run dependencies
 
