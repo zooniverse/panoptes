@@ -1,6 +1,6 @@
 ## Panoptes ![Build Status](https://travis-ci.org/zooniverse/Panoptes.svg?branch=master)
 
-The new Zooniverse API for supporting user-created projects. 
+The new Zooniverse API for supporting user-created projects.
 
 ### Documentation
 
@@ -23,11 +23,63 @@ setting JRUBY_OPTS=--2.0 in your environment.
 You will need the following services available:
 * Postgresql 9.3
 * Kafka 0.8.1
-* [Cellect](https://github.com/parrish/Cellect)
+* [Cellect Server](https://github.com/zooniverse/Cellect)
 * Zookeeper 3.4.6
+* Redis
+
+#### Development Environment with Fig and Docker
+
+An easy way to get the full Panoptes stack running (see fig.yml to dig into the setup),
+##### Required - you'll need docker installed!
+ + [OS X Docs](https://docs.docker.com/installation/mac/) - Boot2Docker
+ + [Ubuntu docs](https://docs.docker.com/installation/ubuntulinux/) - Docker
+ + [Windows Docks](http://docs.docker.com/installation/windows/) - Boot2Docker
+
+Prepare your fig development environment config files. You should only have to do this before the first boot. **Note:** the fig docker environment uses linked docker containers so your Postgres and Zookeeper hosts url's need to refer to these containers.
+
+* Copy all the *file_name*.yml.hudson files to *file_name*.yml, the default values should work out of the box.
+
+Prepare the docker containers, from rails root run:
+1. `./scripts/fig/up_panoptes.sh`
+  + On the first run it will build the docker containers, setup the database and install the development and test environment gems.
+  + **Note: it will not start the rails server(s) and will exit after db migration.**
+2. `./scripts/fig/up_panoptes.sh`
+  + On second run the script will start Panoptes and all the dependent services.
+    + **Note:** this script does not recreate containers to avoid installing gems and migrating the database.
+    + Run `fig up` if you need to recreate the build image perhaps because you've added new gems.
+3. Seed the fig development database in the docker container.
+  + `scripts/fig/run_cmd_panoptes.sh "bundle install && rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
+  + **Note:** Run this only after step 1 has completed successfully.
+4. Finally if you want to apply schema migrations you can do this via `scripts/fig/migrate_db_panoptes.sh`
+
+This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
+
+Finally there are some helper scripts to get access to a console, bash shell etc. **Note:** these commands build a new run container
+* To get a rails console `scripts/fig/rails_console_panoptes.sh`
+  + **Note:** you can override the RAILS_ENV by passing a valid argument, just make sure you've setup the DB for it!
+* To get a bash console `scripts/fig/run_cmd_panoptes.sh bash`
+* You can also attach a bash process to the running container, e.g. `docker exec -it panoptes_panoptes_1 bash`
+  + Assuming the 'panoptes_panoptes_1' container is running, use `fig ps` or `docker ps` to check.
+
+**Note:** if you've ever built a Panoptes docker container before you should just run `fig up` instead of the `./scripts/fig/up_panoptes.sh` to ensure the previously built container is not re-used. After rebuilding you should be good to use `./scripts/fig/up_panoptes.sh` script to use the re-created containers.
+
+### Run manually with self installed and run dependencies
+
+Setup the following services to get Panoptes up and running
+
+#### Postgresql
+If you don't want to use docker then just install Postgresql 9.3+ and setup as per a normal Rails app.
+
+#### Cellect Server
+See the Cellect server gem and docker file - http://rubygems.org/gems/cellect-server
+
+#### Redis
+Normal redis config and configure sidekiq (config/sidekiq.yml) to access redis.
+
+#### Kafka
+Setup kafka and then configure the config/kafka.yml file
 
 #### Zookeeper
-
 A really easy way to get Zookeeper running on your local machine, if you don't
 want to use the Vagrant configuration, is to run it in a docker container. First
 install docker ([OS X Docs](https://docs.docker.com/installation/mac/), [Ubuntu
