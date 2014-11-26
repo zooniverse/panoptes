@@ -20,5 +20,9 @@ FactoryGirl.define do
         create_list(:set_member_subject, 2, subject: s)
       end
     end
+
+    factory :migrated_project_subject do
+      locations({standard: "http://www.galaxyzoo.org.s3.amazonaws.com/subjects/standard/1237679543502373086.jpg"})
+    end
   end
 end
