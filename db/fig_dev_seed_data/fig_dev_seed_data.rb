@@ -50,7 +50,8 @@ app = Doorkeeper::Application.create do |da|
   # zooniverse first-party app
   da.trust_level = 2
   #scoped resources this app has access to
-  da.default_scope = Doorkeeper::PanoptesScopes.optional.map(&:to_s)
+  scopes = [:public] | Doorkeeper::PanoptesScopes.optional
+  da.default_scope = scopes.map(&:to_s)
 end
 puts "\nOauth Zooniverse first party app details:"
 puts "client_id: #{green(app.uid)}\n"
