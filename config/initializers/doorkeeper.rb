@@ -6,7 +6,7 @@ Doorkeeper.configure do
   enable_application_owner :confirmation => true
 
   default_scopes  :public
-  optional_scopes :user, :project, :group, :collection, :classification
+  optional_scopes :user, :project, :group, :collection, :classification, :subject
 
   realm "Panoptes"
 
