@@ -1,3 +1,11 @@
+module Doorkeeper
+  module PanoptesScopes
+    def self.optional
+      %i(user project group collection classification subject)
+    end
+  end
+end
+
 Doorkeeper.configure do
   orm :active_record
 
@@ -6,7 +14,7 @@ Doorkeeper.configure do
   enable_application_owner :confirmation => true
 
   default_scopes  :public
-  optional_scopes :user, :project, :group, :collection, :classification
+  optional_scopes *Doorkeeper::PanoptesScopes.optional
 
   realm "Panoptes"
 
