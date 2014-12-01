@@ -38,20 +38,29 @@ module JsonApiController
     end
 
     def find_for_string_type(type, id)
-      type.camelize
-        .constantize
-        .link_to_resource(controlled_resource, current_actor)
-        .find(id)
+      relation_find(id) do
+        type.camelize
+            .constantize
+            .link_to_resource(controlled_resource, current_actor)
+      end
     end
 
     def new_items(relation, value, *args)
-      assoc_class(relation)
-        .link_to_resource(controlled_resource, current_actor, *args)
-        .find(value)
+      relation_find(value) do
+        assoc_class(relation)
+          .link_to_resource(controlled_resource, current_actor, *args)
+      end
     end
 
     def assoc_class(relation)
       resource_class.reflect_on_association(relation).klass
+    end
+
+    def relation_find(find_arg)
+      relation = yield
+      relation.find(find_arg)
+    rescue ActiveRecord::RecordNotFound
+      raise ActiveRecord::RecordNotFound.new("Couldn't find resource")
     end
   end
 end

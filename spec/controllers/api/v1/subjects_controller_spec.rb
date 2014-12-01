@@ -247,6 +247,23 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     it_behaves_like "is creatable"
+
+    context "when the user is not-the owner of the project" do
+      let(:unauthorised_user) { create(:user) }
+
+      before(:each) do
+        default_request scopes: scopes, user_id: unauthorised_user.id
+        post :create, create_params
+      end
+
+      it 'should return a 404' do
+        expect(response.status).to eq(404)
+      end
+
+      it 'should scrub any schema sql from the error message' do
+        expect(response.body).to eq(json_error_message("Couldn't find resource"))
+      end
+    end
   end
 
   describe "#destroy" do
