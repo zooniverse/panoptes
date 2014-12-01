@@ -60,7 +60,7 @@ module JsonApiController
       relation = yield
       relation.find(find_arg)
     rescue ActiveRecord::RecordNotFound
-      raise ActiveRecord::RecordNotFound.new("Couldn't find record")
+      raise ActiveRecord::RecordNotFound.new("Couldn't find resource")
     end
   end
 end

@@ -240,7 +240,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       it 'should scrub any schema sql from the error message' do
-        expect(response.body).to eq(json_error_message("Couldn't find record"))
+        expect(response.body).to eq(json_error_message("Couldn't find resource"))
       end
     end
   end
