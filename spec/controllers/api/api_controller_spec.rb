@@ -68,9 +68,11 @@ describe Api::ApiController, type: :controller do
     describe "when a user has an incorrect scope" do
 
       it "should return 403 with a logged in user" do
-        allow(controller).to receive(:doorkeeper_token) { double( accessible?: true,
-                                                                 acceptable?: false,
-                                                                 includes_scope?: false ) }
+        allow(controller).to receive(:doorkeeper_token) {
+          double( accessible?: true,
+                  acceptable?: false,
+                  includes_scope?: false,
+                  resource_owner_id: user.id ) }
         get :index
         expect(response.status).to eq(403)
       end
@@ -204,6 +206,58 @@ describe Api::ApiController, type: :controller do
       it 'should call can_update? on the requested collection' do
         expect(collection).to receive(:can_update?).with(api_user)
         delete :destroy_links, id: collection.id
+      end
+    end
+  end
+
+  describe "when a banned user attempts to take an action" do
+    let(:user) { create(:user, banned: true) }
+    
+    controller do
+      def update
+        render nothing: true
+      end
+
+      def create
+        render nothing: true
+      end
+
+      def destroy
+        render nothing: true
+      end
+    end
+
+    let(:api_user) { ApiUser.new(user) }
+    
+    before(:each) do
+      routes.draw do 
+        put "update" => "api/api#update"
+        post "create" => "api/api#create"
+        delete "destroy" => "api/api#destroy"
+      end
+      
+      allow(controller).to receive(:api_user).and_return(api_user)
+      @request.env["CONTENT_TYPE"] = "application/json"
+    end
+
+    context "create action" do
+      it 'should return an empty created response' do
+        post :create
+        expect(response.status).to eq(201)
+      end
+    end
+    
+    context "update action" do
+      it 'should return an empty okay response' do
+        put :update
+        expect(response.status).to eq(200)
+      end
+    end
+    
+    context "destroy action" do
+      it 'should return an empty no content response' do
+        delete :destroy
+        expect(response.status).to eq(204)
       end
     end
   end

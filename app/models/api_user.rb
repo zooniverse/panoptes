@@ -27,6 +27,14 @@ class ApiUser
     user.try(:id)
   end
 
+  def banned
+    if user
+      user.banned
+    else
+      false
+    end
+  end
+
   def languages
     user.try(:languages)
   end
