@@ -27,7 +27,7 @@ class Api::V1::ProjectsController < Api::ApiController
                              workflows: [],
                              subject_sets: []]
 
-  allowed_params :update, :display_name, *CONTENT_PARAMS,
+  allowed_params :update, :display_name, :name, *CONTENT_PARAMS,
     links: [workflows: [], subject_sets: []]
 
   def show

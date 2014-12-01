@@ -6,6 +6,14 @@ Panoptes API is a *crowdsourcing system* based on serving _subjects_,
 images or other media, to _volunteers_ and asking them to _classify_
 the _subject_ based on a defined _workflow_ for the _subject_ type.
 
+# Naming Conventions
+
+Resources attributes related to human readable names for resources
+follow a common convention.
+
++ name - the url_escaped, downcased, and underscored unique identifier that can be used to construct client URLs
++ display_name - a non-unique identifier that can contain any character. Used to quickly describe a resource.
++ title - a non-unique identifier that can contain any character. Maybe translated if a client requests a representation of a resource in another langauge
 
 # Authentication
 Panoptes API provides an OAuth 2.0 authentication mechanism. (TODO:
@@ -1171,7 +1179,7 @@ A workflow has the following attributes
 - id
 - created_at
 - updated_at
-- name
+- display_name
 - tasks
 - classifications_count
 - pairwise
@@ -1205,7 +1213,7 @@ and *classifications_count* are assigned by the API
                 },
                 "workflows": [{
                     "id": "22",
-                    "name": "Find moons",
+                    "display_name": "Find moons",
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
                     "classifications_count": 1000,
@@ -1499,7 +1507,7 @@ Workflows are returned as an array under the _workflows_ key.
                 },
                 "workflows": [{
                     "id": "22",
-                    "name": "Find moons",
+                    "display_name": "Find moons",
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
                     "classifications_count": 1000,
@@ -1547,7 +1555,7 @@ Workflows are returned as an array under the _workflows_ key.
                     }
                 },{
                     "id": "23",
-                    "name": "Find moons",
+                    "display_name": "Find moons",
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
                     "classifications_count": 1000,
@@ -1609,7 +1617,7 @@ Workflows are returned as an array under the _workflows_ key.
     [Workflow Collection][]
 
 ### Create a Workflow [POST]
-Requires a set of tasks, a primary language, a name, and a
+Requires a set of tasks, a primary language, a display_name, and a
 link to a project. Can optionally set cellect parameters *grouped*,
 *prioritized*, and *pairwise*. (false by default) and links to
 *subject_sets*.
@@ -1618,7 +1626,7 @@ link to a project. Can optionally set cellect parameters *grouped*,
 
         {
             "workflows": {
-                "name": "Spot Monsters!",
+                "display_name": "Spot Monsters!",
                 "tasks":  {
                     "interest": {
                         "type": "drawing",
@@ -1673,12 +1681,12 @@ workflow of questions to be answered.
 A SubjectSet has the following attributes
 
 - id
-- name
+- display_name
 - set_member_subjects_count
 - created_at
 - updated_at
 
-All attributes except name are set by the API
+All attributes except display_name are set by the API
 
 + Parameters
   + id (required, integer) ... integer id of the subject_set to retrieve
@@ -1708,7 +1716,7 @@ All attributes except name are set by the API
                 },
                 "subject_sets": [{
                     "id": "20",
-                    "name": "Weird Looking Galaxies",
+                    "display_name": "Weird Looking Galaxies",
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
                     "set_member_subject_cound": 100,
@@ -1728,7 +1736,7 @@ All attributes except name are set by the API
 
 ### Edit a single Subject Set [PUT]
 A user may only edit a subject if they edit permissions for the parent
-project. The name attributes and links to workflows and subjects are
+project. The display_name attributes and links to workflows and subjects are
 editable. Editing links requires a full representation of the new set
 of links, but does not destroy unlinked resources.
 
@@ -1738,7 +1746,7 @@ This is not the recommended way to manage linked subjects.
 
         {
             "subject_sets": {
-                "name": "Normal Galaxies",
+                "display_name": "Normal Galaxies",
                 "links": {
                     "subjects": ["1", "2", "4", "5", "10"]
                 }
@@ -1841,7 +1849,7 @@ Subject Sets are returned as an array under *subject_sets*.
                 },
                 "subject_sets": [{
                     "id": "20",
-                    "name": "Weird Looking Galaxies",
+                    "display_name": "Weird Looking Galaxies",
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
                     "set_member_subject_cound": 100,
@@ -1850,7 +1858,7 @@ Subject Sets are returned as an array under *subject_sets*.
                     }
                 },{
                     "id": "20",
-                    "name": "Boring Looking Galaxies",
+                    "display_name": "Boring Looking Galaxies",
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
                     "set_member_subject_cound": 100,
@@ -1874,14 +1882,14 @@ Subject Sets are returned as an array under *subject_sets*.
     [SubjectSet Collection][]
 
 ### Create a Subject Set [POST]
-A subject set must supply a name and a link to a project. Optionally,
+A subject set must supply a display_name and a link to a project. Optionally,
 it may include links to subjects and workflows.
 
 + Request (application/vnd.api+json)
 
         {
             "subject_sets": {
-                "name": "A Group of Interesting Subjects"
+                "display_name": "A Group of Interesting Subjects"
                 "links": {
                     "project": "43",
                     "subjects": ["234", "1243", "8023"]
@@ -2496,7 +2504,7 @@ Collections are returned as an array under *collections*.
     [Collection Collection][]
 
 ### Create Collection [POST]
-A Collection only need a *display name* to be created. By default
+A Collection only needs a *display name* to be created. By default
 *visible_to* will be set to an empty array, name will be the
 underscored and downcased version of *display_name*, and the current
 user will be set as the owner.

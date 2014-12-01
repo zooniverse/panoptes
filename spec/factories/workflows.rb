@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :workflow do
-    name "A Workflow"
+    display_name "A Workflow"
 
     first_task "interest"
     tasks(

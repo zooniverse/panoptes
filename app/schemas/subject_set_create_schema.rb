@@ -2,10 +2,10 @@ class SubjectSetCreateSchema < JsonSchema
   schema do
     type "object"
     description "A Set of Subjects"
-    required "links", "name"
+    required "links", "display_name"
     additional_properties false
 
-    property "name" do
+    property "display_name" do
       type "string"
     end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141201164157) do
+ActiveRecord::Schema.define(version: 20141201175902) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -187,7 +187,7 @@ ActiveRecord::Schema.define(version: 20141201164157) do
   add_index "set_member_subjects", ["subject_set_id"], name: "index_set_member_subjects_on_subject_set_id", using: :btree
 
   create_table "subject_sets", force: true do |t|
-    t.string   "name"
+    t.string   "display_name"
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -333,7 +333,7 @@ ActiveRecord::Schema.define(version: 20141201164157) do
   add_index "workflow_contents", ["workflow_id"], name: "index_workflow_contents_on_workflow_id", using: :btree
 
   create_table "workflows", force: true do |t|
-    t.string   "name"
+    t.string   "display_name"
     t.json     "tasks"
     t.integer  "project_id"
     t.datetime "created_at"
