@@ -201,6 +201,7 @@ describe Api::V1::ProjectsController, type: :controller do
       {
        projects: {
                   display_name: "A Better Name",
+                  name: "something_new",
                   links: {
                           workflows: [workflow.id.to_s],
                           subject_sets: [subject_set.id.to_s]
