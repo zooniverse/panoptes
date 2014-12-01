@@ -43,7 +43,7 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:request_params) do
           { sort: 'queued', workflow_id: workflow.id.to_s }
         end
-        
+
         context "with queued subjects" do
           before(:each) do
             create(:user_subject_queue,
@@ -68,11 +68,11 @@ describe Api::V1::SubjectsController, type: :controller do
           before(:each) do
             get :index, request_params
           end
-          
+
           let(:request_params) do
             { sort: 'queued' }
           end
-          
+
           it 'should return 422' do
             expect(response.status).to eq(422)
           end
@@ -82,7 +82,7 @@ describe Api::V1::SubjectsController, type: :controller do
           before(:each) do
             get :index, request_params
           end
-          
+
           it 'should return 404' do
             expect(response.status).to eq(404)
           end
@@ -111,7 +111,7 @@ describe Api::V1::SubjectsController, type: :controller do
       context "with cellect sort" do
         let(:request_params) { { sort: 'cellect', workflow_id: workflow.id.to_s } }
         let(:cellect_results) { subjects.take(2).map(&:id) }
-        
+
         let!(:session) do
           request.session = { cellect_hosts: { workflow.id.to_s => 'example.com' } }
         end
@@ -139,7 +139,7 @@ describe Api::V1::SubjectsController, type: :controller do
             let(:request_params) do
               { sort: 'cellect' }
             end
-            
+
             it 'should return 422' do
               expect(response.status).to eq(422)
             end
@@ -226,6 +226,23 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     it_behaves_like "is creatable"
+
+    context "when the user is not-the owner of the project" do
+      let(:unauthorised_user) { create(:user) }
+
+      before(:each) do
+        default_request scopes: scopes, user_id: unauthorised_user.id
+        post :create, create_params
+      end
+
+      it 'should return a 404' do
+        expect(response.status).to eq(404)
+      end
+
+      it 'should scrub any schema sql from the error message' do
+        expect(response.body).to eq(json_error_message("Couldn't find record"))
+      end
+    end
   end
 
   describe "#destroy" do
