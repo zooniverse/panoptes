@@ -10,11 +10,11 @@ describe Subject, :type => :model do
 
   describe "versioning" do
     let(:subject) { create(:subject) }
-    
+
     it { is_expected.to be_versioned }
 
     it "should create versions when updated", versioning: true do
-      expect do 
+      expect do
         subject.update!(metadata: { more: "Meta" })
         subject.reload
       end.to change{subject.versions.length}.from(1).to(2)
@@ -70,6 +70,23 @@ describe Subject, :type => :model do
 
     it "should have many set_member subjects" do
       expect(subject.set_member_subjects).to all( be_a(SetMemberSubject) )
+    end
+  end
+
+  describe "#migrated_subject?" do
+
+    it "should be falsy when the flag is not set" do
+      expect(subject.migrated_subject?).to be_falsey
+    end
+
+    it "should be falsy when the flag is set to false" do
+      subject.migrated = false
+      expect(subject.migrated_subject?).to be_falsey
+    end
+
+    it "should be truthy when the flag is set true" do
+      subject.migrated = true
+      expect(subject.migrated_subject?).to be_truthy
     end
   end
 end
