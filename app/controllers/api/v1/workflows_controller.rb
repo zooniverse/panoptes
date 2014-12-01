@@ -73,7 +73,7 @@ class Api::V1::WorkflowsController < Api::ApiController
     permit_params(:pairwise,
                   :grouped,
                   :prioritized,
-                  :name,
+                  :display_name,
                   :primary_language,
                   :first_task,
                   tasks: permit_tasks,
@@ -82,11 +82,10 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def update_params
-
     permit_params(:pairwise,
                   :grouped,
                   :prioritized,
-                  :name,
+                  :display_name,
                   :first_task,
                   tasks: permit_tasks,
                   links: [subject_sets: []])

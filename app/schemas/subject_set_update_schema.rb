@@ -4,7 +4,7 @@ class SubjectSetUpdateSchema < JsonSchema
     description "A Set of Subjects"
     additional_properties false
 
-    property "name" do
+    property "display_name" do
       type "string"
     end
 

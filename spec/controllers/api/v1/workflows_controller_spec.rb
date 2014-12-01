@@ -11,7 +11,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:authorized_user) { owner }
 
   let(:api_resource_attributes) do
-    %w(id name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version)
+    %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version)
   end
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets) }
   let(:scopes) { %w(public project) }
@@ -37,14 +37,14 @@ describe Api::V1::WorkflowsController, type: :controller do
   describe '#update' do
     let(:subject_set) { create(:subject_set, project: project) }
     let(:resource) { create(:workflow_with_contents, project: project) }
-    let(:test_attr) { :name }
+    let(:test_attr) { :display_name }
     let(:test_attr_value) { "A Better Name" }
     let(:test_relation) { :subject_sets }
     let(:test_relation_ids) { subject_set.id }
     let(:update_params) do
       {
         workflows: {
-          name: "A Better Name",
+          display_name: "A Better Name",
           tasks: {
             interest: {
               type: "draw",
@@ -80,12 +80,12 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe '#create' do
-    let(:test_attr) { :name }
+    let(:test_attr) { :display_name }
     let(:test_attr_value) { 'Test workflow' }
     let(:create_params) do
       {
         workflows: {
-          name: 'Test workflow',
+          display_name: 'Test workflow',
           first_task: 'interest',
           tasks: {
             interest: {

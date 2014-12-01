@@ -7,7 +7,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
   let(:owner) { project.owner }
   let(:api_resource_name) { 'subject_sets' }
 
-  let(:api_resource_attributes) { %w(id name set_member_subjects_count created_at updated_at) }
+  let(:api_resource_attributes) { %w(id display_name set_member_subjects_count created_at updated_at) }
   let(:api_resource_links) { %w(subject_sets.project subject_sets.workflows) }
   
   let(:scopes) { %w(public project) }
@@ -36,14 +36,14 @@ describe Api::V1::SubjectSetsController, type: :controller do
     let(:subjects) { create_list(:subject, 4) }
     let(:workflow) { create(:workflow, project: project) }
     let(:resource) { create(:subject_set, project: project) }
-    let(:test_attr) { :name }
+    let(:test_attr) { :display_name }
     let(:test_attr_value) { "A Better Name" }
     let(:test_relation) { :subjects }
     let(:test_relation_ids) { subjects.map(&:id) }
     let(:update_params) do
       {
        subject_sets: {
-                  name: "A Better Name",
+                  display_name: "A Better Name",
                   links: {
                           workflows: [workflow.id.to_s],
                           subjects: subjects.map(&:id).map(&:to_s)
@@ -59,12 +59,12 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#create' do
-    let(:test_attr) { :name}
+    let(:test_attr) { :display_name}
     let(:test_attr_value) { 'Test subject set' }
     let(:create_params) do
       {
        subject_sets: {
-                      name: 'Test subject set',
+                      display_name: 'Test subject set',
                       metadata: {
                         location: "Africa"
                       },
