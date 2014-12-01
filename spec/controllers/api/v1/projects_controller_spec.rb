@@ -246,7 +246,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
       context "copy linked subject_set" do
         it 'should have the same name' do
-          expect(resource.subject_sets.first.name).to eq(subject_set.name)
+          expect(resource.subject_sets.first.display_name).to eq(subject_set.display_name)
         end
 
         it 'should have a differen id' do

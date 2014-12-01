@@ -17,7 +17,7 @@ RSpec.describe "api should only accept certain content types", type: :request do
   context "valid create params" do
     before(:each) do
       post "/api/subject_sets",
-           { subject_sets: { name: "a name", links: { project: project.id.to_s } } }.to_json, 
+           { subject_sets: { display_name: "a name", links: { project: project.id.to_s } } }.to_json, 
            headers
     end
 
@@ -29,7 +29,7 @@ RSpec.describe "api should only accept certain content types", type: :request do
   context "invalid create params" do
     before(:each) do
       post "/api/subject_sets",
-           { subject_sets: { extra: "bad param", name: "a name", links: { project: project.id.to_s } } }.to_json,
+           { subject_sets: { extra: "bad param", display_name: "a name", links: { project: project.id.to_s } } }.to_json,
            headers
     end
 
