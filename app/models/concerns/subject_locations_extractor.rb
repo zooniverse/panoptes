@@ -2,14 +2,16 @@ class SubjectLocationsExtractor
 
   class FormatError < StandardError; end
 
-  def initialize(locations, context)
-    @locations = locations
+  def initialize(model, context)
+    @model = model
     @context = context
   end
 
   def locations
-    if migrated_project_format?
-      migrated_project_locations
+    duplicate_locations
+    return {} unless @locations
+    if migrated_subject?
+      migrated_locations
     else
       panoptes_locations
     end
@@ -17,11 +19,15 @@ class SubjectLocationsExtractor
 
   private
 
-  def migrated_project_format?
-    !!@locations.values.first.is_a?(String)
+  def duplicate_locations
+    @locations = @model.try(:locations).try(:dup)
   end
 
-  def migrated_project_locations
+  def migrated_subject?
+    @model.migrated_subject?
+  end
+
+  def migrated_locations
     @locations
   end
 

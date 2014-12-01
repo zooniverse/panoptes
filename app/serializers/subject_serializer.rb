@@ -5,8 +5,6 @@ class SubjectSerializer
   can_include :owner, :versions
 
   def locations
-    locations = @model.try(:locations).try(:dup)
-    return {} unless locations
-    SubjectLocationsExtractor.new(locations, @context).locations
+    SubjectLocationsExtractor.new(@model, @context).locations
   end
 end
