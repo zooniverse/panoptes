@@ -11,6 +11,7 @@ FactoryGirl.define do
     global_email_communication true
     project_email_communication true
     admin false
+    banned false
 
     after(:build) do |user|
       unless user.owner_name

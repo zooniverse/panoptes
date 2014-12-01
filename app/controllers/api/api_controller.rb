@@ -26,11 +26,12 @@ module Api
     before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
                                         API_ALLOWED_METHOD_OVERRIDES)
 
-    before_filter :require_login, only: [:create, :update, :destroy]
+    before_action :require_login, only: [:create, :update, :destroy]
+    before_action :ban_user, only: [:create, :update, :destroy]
     skip_before_action :verify_authenticity_token
 
     access_control_for :update, :destroy, :create,
-      [:update_links, :update], [:destroy_links, :update]
+                       [:update_links, :update], [:destroy_links, :update]
 
     def current_resource_owner
       if doorkeeper_token
@@ -57,7 +58,7 @@ module Api
 
     def parse_http_accept_languages
       language_extractor = AcceptLanguageExtractor
-        .new(request.env['HTTP_ACCEPT_LANGUAGE'])
+                           .new(request.env['HTTP_ACCEPT_LANGUAGE'])
 
       language_extractor.parse_languages
     end
@@ -77,6 +78,19 @@ module Api
 
     def require_login
       raise Api::NotLoggedIn unless api_user.logged_in?
+    end
+
+    def ban_user
+      if api_user.banned
+        case action_name
+        when "update"
+          head :ok
+        when "create"
+          head :created
+        when "destroy"
+          head :no_content
+        end
+      end
     end
   end
 end
