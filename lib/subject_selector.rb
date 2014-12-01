@@ -1,6 +1,6 @@
 class SubjectSelector
   class MissingParameter < StandardError; end
-  
+
   attr_reader :user, :params
 
   def initialize(user, params)
@@ -17,7 +17,7 @@ class SubjectSelector
       query_subjects
     end
   end
-  
+
   def queued_subjects
     raise workflow_id_error unless params.has_key?(:workflow_id)
     user_enqueued = UserSubjectQueue
@@ -29,13 +29,15 @@ class SubjectSelector
     raise workflow_id_error unless params.has_key?(:workflow_id)
     selected_subjects(Cellect::Client.connection.get_subjects(**cellect_params))
   end
-  
+
   def query_subjects
     SubjectSerializer.page(params)
   end
 
   def selected_subjects(subject_ids)
-    SubjectSerializer.page({}, Subject.where(id: SetMemberSubject.where(id: subject_ids).select(:subject_id)))
+    set_member_subjects = SetMemberSubject.where(id: subject_ids).select(:subject_id)
+    subjects = Subject.includes(:versions).where(id: set_member_subjects)
+    SubjectSerializer.page({}, subjects)
   end
 
   private
@@ -43,7 +45,7 @@ class SubjectSelector
   def workflow_id_error
     MissingParameter.new("workflow_id parameter missing")
   end
-  
+
   def cellect_params
     c_params = params.permit(:sort, :workflow_id, :subject_set_id, :limit, :host)
     c_params[:user_id] = user.id

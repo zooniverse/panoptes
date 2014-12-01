@@ -214,6 +214,7 @@ ActiveRecord::Schema.define(version: 20141201164157) do
     t.integer  "owner_id"
     t.integer  "project_id"
     t.string   "owner_type"
+    t.boolean  "migrated"
   end
 
   add_index "subjects", ["owner_id"], name: "index_subjects_on_owner_id", using: :btree

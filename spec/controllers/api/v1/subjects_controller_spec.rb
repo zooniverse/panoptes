@@ -23,6 +23,25 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     describe "#index" do
+
+      context "with a migrated project subject" do
+        let!(:migrated_subject) { create(:migrated_project_subject) }
+
+        before(:each) do
+          get :index
+        end
+
+        it "should return 200" do
+          expect(response.status).to eq(200)
+        end
+
+        it "should return a page of 2 objects" do
+          expect(json_response[api_resource_name].length).to eq(3)
+        end
+
+        it_behaves_like "an api response"
+      end
+
       context "without any sort" do
         before(:each) do
           get :index
@@ -43,7 +62,7 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:request_params) do
           { sort: 'queued', workflow_id: workflow.id.to_s }
         end
-        
+
         context "with queued subjects" do
           before(:each) do
             create(:user_subject_queue,
@@ -68,11 +87,11 @@ describe Api::V1::SubjectsController, type: :controller do
           before(:each) do
             get :index, request_params
           end
-          
+
           let(:request_params) do
             { sort: 'queued' }
           end
-          
+
           it 'should return 422' do
             expect(response.status).to eq(422)
           end
@@ -82,7 +101,7 @@ describe Api::V1::SubjectsController, type: :controller do
           before(:each) do
             get :index, request_params
           end
-          
+
           it 'should return 404' do
             expect(response.status).to eq(404)
           end
@@ -111,7 +130,7 @@ describe Api::V1::SubjectsController, type: :controller do
       context "with cellect sort" do
         let(:request_params) { { sort: 'cellect', workflow_id: workflow.id.to_s } }
         let(:cellect_results) { subjects.take(2).map(&:id) }
-        
+
         let!(:session) do
           request.session = { cellect_hosts: { workflow.id.to_s => 'example.com' } }
         end
@@ -139,7 +158,7 @@ describe Api::V1::SubjectsController, type: :controller do
             let(:request_params) do
               { sort: 'cellect' }
             end
-            
+
             it 'should return 422' do
               expect(response.status).to eq(422)
             end
@@ -193,7 +212,9 @@ describe Api::V1::SubjectsController, type: :controller do
         subjects: {
           metadata: { cool_factor: "11" },
           locations: {
-            standard: "image/jpeg",
+            standard:  "image/jpeg",
+            thumbnail: "image/jpeg",
+            inverted:  "image/jpeg",
           },
           links: {
             project: project.id

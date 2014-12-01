@@ -10,7 +10,7 @@ class Subject < ActiveRecord::Base
   has_and_belongs_to_many :collections
   has_many :subject_sets, through: :set_member_subjects
   has_many :set_member_subjects
-  
+
   validates_presence_of :project
 
   def self.scope_for(action, actor)
@@ -23,5 +23,9 @@ class Subject < ActiveRecord::Base
 
   def self.can_create?(actor)
     true
+  end
+
+  def migrated_subject?
+    !!migrated
   end
 end
