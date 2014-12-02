@@ -50,7 +50,7 @@ class Api::V1::ProjectsController < Api::ApiController
     content_params = content_from_params(create_params)
     
     create_params[:links] ||= Hash.new
-    create_params[:links][:owner] = owner || api_user.user
+    create_params[:links][:owner] = owner
 
     project = super(create_params)
     project.project_contents.build(**content_params.symbolize_keys)

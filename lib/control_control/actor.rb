@@ -36,11 +36,11 @@ module ControlControl
       private
 
       def question
-        "can_#{ @action }?".to_sym
+        "can_#{ @action }?"
       end
 
       def as_question
-        "can_#{ @action }_as?".to_sym
+        "can_#{ @action }_as?"
       end
 
       def deny_access

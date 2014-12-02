@@ -52,10 +52,8 @@ module RoleControl
       @owner ||=
         if params[:owner]
           OwnerName.where(name: params[:owner]).first.try(:resource)
-        elsif params[resource_sym].try(:has_key, :owner)
-          owner_from_link_params
         else
-          nil
+          owner_from_links_params
         end
     end
 
@@ -66,15 +64,19 @@ module RoleControl
     protected
 
     def owner_from_links_params
-      id, type = params[resource_name.pluralize.to_sym][:owner]
-        .values_at(:id, :type)
-      type = type.camelize.constantize
-      
-      unless type < RoleControl::Owner
-        raise StandardError.new('type is not owner')
+      id, type = params.fetch(resource_sym, {})
+                 .fetch(:links, {})
+                 .fetch(:owner, {})
+                 .values_at(:id, :type)
+      if id && type
+        type = type.singularize.camelize.constantize
+        
+        unless type < RoleControl::Owner
+          raise StandardError.new('type is not owner')
+        end
+        
+        type.find(id)
       end
-      
-      type.find(id)
     end
   end
 end
