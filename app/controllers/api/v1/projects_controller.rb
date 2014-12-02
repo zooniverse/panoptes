@@ -30,8 +30,7 @@ class Api::V1::ProjectsController < Api::ApiController
   private
 
   def add_owner_ids_to_filter_param!
-    if params.has_key? :owner
-      owner_filter = params.delete(:owner)
+    if owner_filter = params.delete(:owner)
       owner_ids = OwnerName.where(name: owner_filter).map(&:resource_id).join(",")
       params.merge!({ owner_ids: owner_ids }) unless owner_ids.blank?
     end
