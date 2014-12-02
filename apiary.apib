@@ -13,7 +13,7 @@ follow a common convention.
 
 + name - the url_escaped, downcased, and underscored unique identifier that can be used to construct client URLs
 + display_name - a non-unique identifier that can contain any character. Used to quickly describe a resource.
-+ title - a non-unique identifier that can contain any character. Maybe translated if a client requests a representation of a resource in another langauge
++ title - a non-unique identifier that can contain any character. Maybe translated if a client requests a representation of a resource in another language
 
 # Authentication
 Panoptes API provides an OAuth 2.0 authentication mechanism. (TODO:
@@ -83,7 +83,7 @@ The User resource has the following attributes:
             {
                 "links": {
                     "users.projects": {
-                        "href": "/projects?user_id={users.id}",
+                        "href": "/projects?owner={users.login}",
                         "type": "projects"
                     },
                     "users.user_groups": {
@@ -95,7 +95,7 @@ The User resource has the following attributes:
                         "type": "subjects"
                     },
                     "users.collections": {
-                        "href": "/collections?user_id={users.id}",
+                        "href": "/collections?owner={users.login}",
                         "type": "collections"
                     }
                 },
@@ -109,7 +109,7 @@ The User resource has the following attributes:
                     "email": "stuart@zoooniverse.org",
                     "zooniverse_id": "123432",
                     "classifications_count": "104",
-                    "langauges": ["en-gb", "es-mx"]
+                    "languages": ["en-gb", "es-mx"]
                 }]
             }
 
@@ -164,7 +164,7 @@ User resources are included a an array under the _users_ key
             {
                 "links": {
                     "users.projects": {
-                        "href": "/projects?user_id={users.id}",
+                        "href": "/projects?owner={users.login}",
                         "type": "projects"
                     },
                     "users.user_groups": {
@@ -176,7 +176,7 @@ User resources are included a an array under the _users_ key
                         "type": "subjects"
                     },
                     "users.collections": {
-                        "href": "/collections?user_id={users.id}",
+                        "href": "/collections?owner={users.login}",
                         "type": "collections"
                     }
                 },
@@ -205,7 +205,7 @@ User resources are included a an array under the _users_ key
                     "email": "stuart@zoooniverse.org",
                     "zooniverse_id": "123432",
                     "classifications_count": "104",
-                    "langauges": ["en-gb", "es-mx"],
+                    "languages": ["en-gb", "es-mx"],
                 },
                 {
                     "id": 2,
@@ -217,7 +217,7 @@ User resources are included a an array under the _users_ key
                     "email": "stuart@zoooniverse.org",
                     "zooniverse_id": "123432",
                     "classifications_count": "104",
-                    "langauges": ["en-gb", "es-mx"],
+                    "languages": ["en-gb", "es-mx"],
                 }]
             }
 
@@ -1142,7 +1142,7 @@ Projects are returned as an array under the _projects_ key.
 
 
 ### Create a Project [POST]
-Requires at least a name, description, and primary language. Workflows
+Requires at least a *name*, *description*, and *primary_language*. Workflows
 and Subject sets added as links will be copied and their new ids
 returned.
 
@@ -1152,7 +1152,7 @@ returned.
             "projects": {
                 "name": "galaxy_zoo",
                 "description": "A doubleplus good project",
-                "language": "en-us",
+                "primary_language": "en-us",
                 "links": {
                     "workflows": ["1", "2"]
                     "owner": {
@@ -1189,7 +1189,7 @@ A workflow has the following attributes
 - workflow_version
 - content_language
 
-*id*, *created_at*, *updated_at*, *workflow_version*, *content_langauge*,
+*id*, *created_at*, *updated_at*, *workflow_version*, *content_language*,
 and *classifications_count* are assigned by the API
 
 + Model (application/vnd.api+json)
@@ -1930,7 +1930,7 @@ A User Group has the following attributes:
             {
                 "links": {
                     "user_groups.projects": {
-                        "href": "/projects?owner_name={user_groups.name}",
+                        "href": "/projects?owner={user_groups.name}",
                         "type": "projects"
                     },
                     "user_groups.classifications": {
@@ -1938,7 +1938,7 @@ A User Group has the following attributes:
                         "type": "classifications"
                     },
                     "user_groups.collections": {
-                        "href": "/collections?owner_name={user_groups.name}"
+                        "href": "/collections?owner={user_groups.name}"
                         "type": "collections"
                     },
                     "user_groups.users": {
@@ -2052,7 +2052,7 @@ User Groups are returned as an array under *user_groups*.
             {
                  "links": {
                     "user_groups.projects": {
-                        "href": "/projects?owner_name={user_groups.name}",
+                        "href": "/projects?owner={user_groups.name}",
                         "type": "projects"
                     },
                     "user_groups.classifications": {
@@ -2060,7 +2060,7 @@ User Groups are returned as an array under *user_groups*.
                         "type": "classifications"
                     },
                     "user_groups.collections": {
-                        "href": "/collections?owner_name={user_groups.name}"
+                        "href": "/collections?owner={user_groups.name}"
                         "type": "collections"
                     },
                     "user_groups.users": {
