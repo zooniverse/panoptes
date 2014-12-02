@@ -29,19 +29,13 @@ class Api::V1::GroupsController < Api::ApiController
       user_group.memberships
   end
 
-  def new_items(relation, value)
-    items = super(relation, value)
-    
-    if relation == :users
-      items.map do |user|
-        Membership.new(user: user,
-                       group: user_group,
-                       state: :invited,
-                       roles: ["group_member"])
+  def controlled_resource
+    @controlled_resource ||=
+      if params.has_key? :group_id
+        resource_class.find(params[:group_id])
+      else
+        super
       end
-    else
-      items
-    end
   end
 
   def resource_name

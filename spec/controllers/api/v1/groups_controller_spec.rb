@@ -3,8 +3,8 @@ require 'spec_helper'
 describe Api::V1::GroupsController, type: :controller do
   let!(:user_groups) do
     [ create(:user_group_with_users),
-     create(:user_group_with_projects),
-     create(:user_group_with_collections) ]
+      create(:user_group_with_projects),
+      create(:user_group_with_collections) ]
   end
 
   let(:user) { user_groups[0].users.first }
@@ -38,9 +38,9 @@ describe Api::V1::GroupsController, type: :controller do
     let(:test_attr_value) { "A Different Name" }
     let(:update_params) do
       {
-       user_groups: {
-                     display_name: "A Different Name",
-                    }
+        user_groups: {
+          display_name: "A Different Name",
+        }
       }
     end
 
@@ -101,5 +101,25 @@ describe Api::V1::GroupsController, type: :controller do
     end
 
     it_behaves_like "is deactivatable"
+  end
+
+  describe "#update_links" do
+    let(:new_user) { create(:user) }
+    let(:resource) { user_groups.first }
+    let(:new_membership) { Membership.where(user: new_user).first }
+    
+    before(:each) do
+      
+      default_request scopes: scopes, user_id: authorized_user.id
+      post :update_links, group_id: resource.id, users: [ new_user.id.to_s ], link_relation: "users"
+    end
+    
+    it 'should add a user to the group' do
+      expect(new_membership.user_group).to eq(resource)
+    end
+
+    it 'should give the user a group_member role' do
+      expect(new_membership.roles).to eq(%w(group_member))
+    end
   end
 end
