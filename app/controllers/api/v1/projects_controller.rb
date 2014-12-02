@@ -2,8 +2,8 @@ class Api::V1::ProjectsController < Api::ApiController
   include JsonApiController
   
   doorkeeper_for :update, :create, :delete, scopes: [:project]
-  resource_actions :update, :create, :destroy
-  schema_type :strong_params
+  resource_actions :default
+  schema_type :json_schema
 
   alias_method :project, :controlled_resource
 
@@ -22,48 +22,20 @@ class Api::V1::ProjectsController < Api::ApiController
 
   INDEX_FIELDS = [:title, :description]
   
-  allowed_params :create, :display_name, :name, :primary_language,
-    *CONTENT_PARAMS, links: [owner: polymorphic,
-                             workflows: [],
-                             subject_sets: []]
+  allowed_params :create
+  allowed_params :update
 
-  allowed_params :update, :display_name, :name, *CONTENT_PARAMS,
-    links: [workflows: [], subject_sets: []]
-
-  def show
-    render json_api: serializer.resource(params,
-                                         visible_scope,
-                                         languages: current_languages,
-                                         fields: CONTENT_FIELDS)
-  end
-
-  def index
-    add_owner_ids_filter_param!
-    render json_api: serializer.page(params,
-                                     visible_scope,
-                                     languages: current_languages,
-                                     fields: INDEX_FIELDS)
-  end
-
+  before_action :add_owner_ids_to_filter_param!, only: :index
+  
   private
 
-  def add_owner_ids_filter_param!
-    owner_filter = params.delete(:owner)
-    owner_ids = OwnerName.where(name: owner_filter).map(&:resource_id).join(",")
-    params.merge!({ owner_ids: owner_ids }) unless owner_ids.blank?
+  def add_owner_ids_to_filter_param!
+    if owner_filter = params.delete(:owner)
+      owner_ids = OwnerName.where(name: owner_filter).map(&:resource_id).join(",")
+      params.merge!({ owner_ids: owner_ids }) unless owner_ids.blank?
+    end
   end
 
-  def create_response(project)
-    serializer.resource(project,
-                        nil,
-                        languages: [ project.primary_language ],
-                        fields: CONTENT_FIELDS)
-  end
-
-  def update_response
-    render json_api: create_response(project)
-  end
-  
   def content_from_params(ps)
     ps[:title] = ps[:display_name]
     content = ps.slice(*CONTENT_FIELDS)
@@ -93,5 +65,27 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def new_items(relation, value)
     super(relation, value).map(&:dup)
+  end
+
+  def context
+    { languages: language_context, fields: field_content }
+  end
+
+  def language_context
+    case action_name
+    when "show", "index"
+      current_languages
+    when "update", "create"
+      [ project.primary_language ]
+    end
+  end
+
+  def field_content
+    case action_name
+    when "index"
+      INDEX_FIELDS
+    when "show", "update", "create"
+      CONTENT_FIELDS
+    end
   end
 end 
