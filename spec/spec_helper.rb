@@ -14,8 +14,8 @@ RSpec.configure do |config|
   config.include Devise::TestHelpers, type: :controller
   config.include APIRequestHelpers, type: :controller
   config.include APIResponseHelpers, [ type: :controller, type: :request ]
-  config.include CellectHelpers, type: :controller
   config.include ValidUserRequestHelper, type: :request
+  config.include CellectHelpers
   config.extend RSpec::Helpers::ActiveRecordMocks
 
   config.filter_run focus: true
