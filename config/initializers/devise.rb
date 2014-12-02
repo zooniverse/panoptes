@@ -14,8 +14,12 @@ Devise.setup do |config|
 
   config.sign_out_via = :delete
 
+  # MAILER
+  require 'devise_mailer/background_mailer'
+  config.mailer = "Devise::BackgroundMailer"
+
   # OMNIAUTH
-  
+
   def load_social_config
     config = YAML.load(ERB.new(File.read(Rails.root.join('config/social.yml'))).result)
     config[Rails.env].symbolize_keys
@@ -34,4 +38,3 @@ Devise.setup do |config|
 
   omniauth_config_for(config, providers: [:facebook, :gplus])
 end
-

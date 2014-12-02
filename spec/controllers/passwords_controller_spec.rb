@@ -8,7 +8,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
   context "as json" do
     describe "#create" do
-      before(:each) do 
+      before(:each) do
         request.env["HTTP_ACCEPT"] = "application/vnd.api+json"
         request.env["CONTENT_TYPE"] = "application/json"
       end
@@ -72,6 +72,16 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
       context "using an email address that belongs to a user" do
 
+        context "when the background mailer is used" do
+
+          it "should queue the email for delayed sending" do
+            Devise.mailer = Devise::BackgroundMailer
+            expect { post :create, user_email_attrs }
+              .to change { Sidekiq::Extensions::DelayedMailer.jobs.size }
+              .from(0).to(1)
+          end
+        end
+
         it "should return 200" do
           post :create, user_email_attrs
           expect(response.status).to eq(200)
@@ -99,6 +109,13 @@ describe PasswordsController, type: [ :controller, :mailer ] do
           post :create, user_email_attrs
           email = ActionMailer::Base.deliveries.first
           expect(email.to).to include(user.email)
+        end
+
+        it "should contain the correct route url for the server" do
+          post :create, user_email_attrs
+          email = ActionMailer::Base.deliveries.first
+          url = "https://panoptes_test.zooniverse.org/users/password/edit?reset_password_token="
+          expect(email.body.raw_source).to include(url)
         end
       end
     end
