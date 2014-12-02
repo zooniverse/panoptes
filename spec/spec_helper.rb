@@ -23,6 +23,8 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.use_transactional_fixtures = true
 
+  Devise.mailer = Devise::Mailer
+
   config.before(:suite) do
     begin
       DatabaseCleaner.strategy = :transaction

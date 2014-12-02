@@ -72,6 +72,16 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
       context "using an email address that belongs to a user" do
 
+        context "when the background mailer is used" do
+
+          it "should queue the email for delayed sending" do
+            Devise.mailer = Devise::BackgroundMailer
+            expect { post :create, user_email_attrs }
+              .to change { Sidekiq::Extensions::DelayedMailer.jobs.size }
+              .from(0).to(1)
+          end
+        end
+
         it "should return 200" do
           post :create, user_email_attrs
           expect(response.status).to eq(200)
