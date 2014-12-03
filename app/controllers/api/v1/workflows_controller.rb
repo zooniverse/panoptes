@@ -23,13 +23,13 @@ class Api::V1::WorkflowsController < Api::ApiController
   private
 
   def create_response(workflow)
-    serializer.resource(workflow,
-                        nil,
+    serializer.resource({},
+                        resource_scope(workflow),
                         languages: [workflow.primary_language])
   end
 
-  def update_response
-    render json_api: create_response(workflow)
+  def update_response(workflow)
+    create_response(workflow)
   end
 
   def load_cellect

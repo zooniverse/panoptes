@@ -10,7 +10,7 @@ module JsonApiController
       if actions.first == :default
         actions = [:show, :index, :create, :update, :destroy]
       end
-      
+
       actions.each do |action|
         case action
         when :show
@@ -49,7 +49,7 @@ module JsonApiController
   def current_actor
     owner_from_params || api_user
   end
-  
+
   def serializer
     @serializer ||= "#{ resource_name.camelize }Serializer".constantize
   end
@@ -72,5 +72,11 @@ module JsonApiController
 
   def context
     {}
+  end
+
+  private
+
+  def resource_scope(resource)
+    resource_class.where(id: resource.id)
   end
 end

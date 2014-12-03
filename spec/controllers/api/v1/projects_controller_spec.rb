@@ -53,7 +53,7 @@ describe Api::V1::ProjectsController, type: :controller do
     before(:each) do
       default_request(scopes: scopes, user_id: user.id)
     end
-    
+
     describe "#index" do
 
       describe "with no filtering" do
@@ -152,39 +152,57 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:created_project_id) { created_instance_id("projects") }
       let(:test_attr) { :display_name }
       let(:test_attr_value) { "New Zoo" }
+      let(:display_name) { test_attr_value }
 
       let(:create_params) do
-        { projects: {
-            display_name: "New Zoo",
-            description: "A new Zoo for you!",
-            name: "new_zoo",
-            primary_language: 'en' } }
+        { projects: { display_name: display_name,
+                      name: "new_zoo",
+                      description: "A new Zoo for you!",
+                      primary_language: 'en' } }
       end
 
-      describe "project contents" do
+      describe "correct serializer configuration" do
         before(:each) do
           default_request scopes: scopes, user_id: authorized_user.id
           post :create, create_params
         end
-        
-        it "should create an associated project_content model" do
-          expect(Project.find(created_project_id)
-                  .project_contents.first).to_not be_nil
+
+        context "without commas in the display name" do
+
+          it "should return the correct resource in the response" do
+            expect(json_response["projects"]).to_not be_empty
+          end
         end
 
-        it 'should set the contents title do' do
-          expect(Project.find(created_project_id)
-                  .project_contents.first.title).to eq('New Zoo')
+        context "when the display name has commas in it" do
+          let!(:display_name) { "My parents, Steve McQueen, and God" }
+
+          it "should return a created response" do
+            expect(json_response["projects"]).to_not be_empty
+          end
         end
 
-        it 'should set the description' do
-          expect(Project.find(created_project_id)
-                  .project_contents.first.description).to eq('A new Zoo for you!')
-        end
+        describe "project contents" do
 
-        it 'should set the language' do
-          expect(Project.find(created_project_id)
-                  .project_contents.first.language).to eq('en')
+          it "should create an associated project_content model" do
+            expect(Project.find(created_project_id)
+                   .project_contents.first).to_not be_nil
+          end
+
+          it 'should set the contents title do' do
+            expect(Project.find(created_project_id)
+                   .project_contents.first.title).to eq('New Zoo')
+          end
+
+          it 'should set the description' do
+            expect(Project.find(created_project_id)
+                   .project_contents.first.description).to eq('A new Zoo for you!')
+          end
+
+          it 'should set the language' do
+            expect(Project.find(created_project_id)
+                   .project_contents.first.language).to eq('en')
+          end
         end
       end
 
@@ -236,15 +254,15 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:test_attr_value) { "A Better Name" }
     let(:update_params) do
       {
-        projects: {
-          display_name: "A Better Name",
-          name: "something_new",
-          links: {
-            workflows: [workflow.id.to_s],
-            subject_sets: [subject_set.id.to_s]
-          }
-          
-        }
+       projects: {
+                  display_name: "A Better Name",
+                  name: "something_new",
+                  links: {
+                          workflows: [workflow.id.to_s],
+                          subject_sets: [subject_set.id.to_s]
+                         }
+
+                 }
       }
     end
 
@@ -274,7 +292,6 @@ describe Api::V1::ProjectsController, type: :controller do
         it 'should have the same tasks workflow' do
           expect(resource.workflows.first.tasks).to eq(workflow.tasks)
         end
-        
 
         it 'should have a different id' do
           expect(resource.workflows.first.id).to_not eq(workflow.id)

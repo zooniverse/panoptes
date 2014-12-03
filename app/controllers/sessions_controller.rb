@@ -28,7 +28,8 @@ class SessionsController < Devise::SessionsController
     self.resource = warden.authenticate!(auth_options)
     sign_in(resource_name, resource)
     yield resource if block_given?
-    render status: 200, json: UserSerializer.resource(resource, nil, { include_private: true })
+    resource_scope = resource.class.where(id: resource.id)
+    render status: 200, json: UserSerializer.resource({}, resource_scope, { include_private: true })
   end
 
   def destroy_from_json
