@@ -5,22 +5,22 @@ describe JsonApiController::UpdatableResource, type: :controller do
   controller(ApplicationController) do
     include JsonApiController::UpdatableResource
 
-    def update_response
+    def updated_resource_response(controlled_resource)
       render nothing: true
     end
-    
+
     def deleted_resource_response
       render nothing: true
     end
-    
+
     def resource_class
       Collection
     end
-    
+
     def controlled_resource
       @controlled_resource ||= Collection.find(params[:id])
     end
-    
+
     def serializer
       CollectionSerializer
     end
@@ -33,7 +33,7 @@ describe JsonApiController::UpdatableResource, type: :controller do
     end
 
     api_user = ApiUser.new(user)
-    
+
     allow(controller).to receive(:api_user).and_return(api_user)
     allow(controller).to receive(:current_actor).and_return(api_user)
   end
@@ -41,7 +41,7 @@ describe JsonApiController::UpdatableResource, type: :controller do
   let(:user) { create(:user) }
   let(:resource) { create(:collection, owner: user) }
   let(:subjects) { create_list(:subject, 4) }
-  
+
   describe "#update_links" do
     context "many-to-many" do
       it 'should add the new relations to the resource' do

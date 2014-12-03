@@ -8,9 +8,7 @@ module JSONApiResponses
   end
 
   def updated_resource_response(resource)
-    json_api_render(:ok,
-                    update_response(resource),
-                    link_header(resource))
+    json_api_render(:ok, update_response(resource))
   end
 
   def deleted_resource_response

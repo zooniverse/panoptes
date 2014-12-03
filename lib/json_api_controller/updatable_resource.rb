@@ -43,6 +43,10 @@ module JsonApiController
       end
     end
 
+    def update_response(resource)
+      serializer.resource({}, resource_scope(resource), context)
+    end
+
     def relation
       params[:link_relation].to_sym
     end

@@ -175,7 +175,7 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         context "when the display name has commas in it" do
-          let!(:display_name) { "My parents, Steve McQueen and, God" }
+          let!(:display_name) { "My parents, Steve McQueen, and God" }
 
           it "should return a created response" do
             expect(json_response["projects"]).to_not be_empty
