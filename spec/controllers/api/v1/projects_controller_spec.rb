@@ -154,10 +154,11 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:test_attr_value) { "New Zoo" }
 
       let(:create_params) do
-        { projects: {display_name: "New Zoo",
-                     description: "A new Zoo for you!",
-                     name: "new_zoo",
-                     primary_language: 'en' } }
+        { projects: {
+            display_name: "New Zoo",
+            description: "A new Zoo for you!",
+            name: "new_zoo",
+            primary_language: 'en' } }
       end
 
       describe "project contents" do
@@ -168,26 +169,62 @@ describe Api::V1::ProjectsController, type: :controller do
         
         it "should create an associated project_content model" do
           expect(Project.find(created_project_id)
-                 .project_contents.first).to_not be_nil
+                  .project_contents.first).to_not be_nil
         end
 
         it 'should set the contents title do' do
           expect(Project.find(created_project_id)
-                 .project_contents.first.title).to eq('New Zoo')
+                  .project_contents.first.title).to eq('New Zoo')
         end
 
         it 'should set the description' do
           expect(Project.find(created_project_id)
-                 .project_contents.first.description).to eq('A new Zoo for you!')
+                  .project_contents.first.description).to eq('A new Zoo for you!')
         end
 
         it 'should set the language' do
           expect(Project.find(created_project_id)
-                 .project_contents.first.language).to eq('en')
+                  .project_contents.first.language).to eq('en')
         end
       end
-      
-      it_behaves_like "is creatable"
+
+      context "created with user as owner" do
+        it_behaves_like "is creatable"
+      end
+
+      context "create with user_group as owner" do
+        let(:owner) { create(:user_group) }
+        let!(:membership) { create(:membership,
+                                   state: :active,
+                                   user: user,
+                                   user_group: owner,
+                                   roles: ["group_admin"]) }
+        
+        let(:create_params) do
+          {
+            projects: {
+              display_name: "New Zoo",
+              primary_language: "en-us",
+              description: "stuff to do",
+              links: {
+                owner: {
+                  id: owner.id.to_s,
+                  type: "user_groups"
+                }
+              }
+            }
+          }
+        end
+
+        it 'should have the user group as its owner' do
+          default_request scopes: scopes, user_id: authorized_user.id
+          post :create, create_params
+          project = Project.find(json_response['projects'][0]['id'])
+          expect(project.owner).to eq(owner)
+        end
+        
+        it_behaves_like "is creatable"
+      end
     end
   end
 
@@ -199,15 +236,15 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:test_attr_value) { "A Better Name" }
     let(:update_params) do
       {
-       projects: {
-                  display_name: "A Better Name",
-                  name: "something_new",
-                  links: {
-                          workflows: [workflow.id.to_s],
-                          subject_sets: [subject_set.id.to_s]
-                         }
-                  
-                 }
+        projects: {
+          display_name: "A Better Name",
+          name: "something_new",
+          links: {
+            workflows: [workflow.id.to_s],
+            subject_sets: [subject_set.id.to_s]
+          }
+          
+        }
       }
     end
 
@@ -220,7 +257,7 @@ describe Api::V1::ProjectsController, type: :controller do
         put :update, params
 
         contents_title = resource.project_contents
-          .where(language: resource.primary_language).first.title
+                         .where(language: resource.primary_language).first.title
         
         expect(contents_title).to eq(test_attr_value)
       end
@@ -255,7 +292,7 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
   end
-  
+
   describe "#destroy" do
     let(:resource) { projects.first }
 

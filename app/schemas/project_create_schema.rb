@@ -3,7 +3,6 @@ class ProjectCreateSchema < JsonSchema
     type "object"
     description "A Project"
     additional_properties false
-    required "name"
 
     property "display_name" do
       type "string"

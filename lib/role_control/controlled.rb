@@ -12,11 +12,12 @@ module RoleControl
 
       def can_by_role(action, act_as: nil, public: false, roles: nil)
         if act_as
-          action = :"#{ action }_#{ act_as }"
-          can_as action, &as_role_test_proc(action, act_as) if act_as
+          can_as action, &dispatch_can_as(action)
+          can_as "#{ action }_#{ act_as }", &role_test_proc(action)
         else
           can action, &role_test_proc(action)
         end
+        
         @roles_for[action] = RoleScope.new(roles, public, self)
       end
 
@@ -30,17 +31,20 @@ module RoleControl
 
       protected
 
-      def role_test_proc(action)
-        proc do |enrolled|
-          self.class.scope_for(action, enrolled, target: self).exists?(self)
+      def dispatch_can_as(action)
+        proc do |enrolled, target|
+          begin
+            klass = target.is_a?(Class) ? target : target.class
+            send("can_#{ action }_#{ klass }_as?", enrolled)
+          rescue NoMethodError
+            false
+          end
         end
       end
 
-      def as_role_test_proc(action, act_as)
-        test_proc = role_test_proc(action)
+      def role_test_proc(action)
         proc do |enrolled|
-          return false unless enrolled == act_as || enrolled.class == act_as
-          test_proc.call(enrolled)
+          self.class.scope_for(action, enrolled, target: self).exists?(self)
         end
       end
     end
