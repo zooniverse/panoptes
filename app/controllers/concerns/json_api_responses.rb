@@ -7,6 +7,12 @@ module JSONApiResponses
                     link_header(resource))
   end
 
+  def updated_resource_response(resource)
+    json_api_render(:ok,
+                    update_response(resource),
+                    link_header(resource))
+  end
+
   def deleted_resource_response
     json_api_render(:no_content, {})
   end

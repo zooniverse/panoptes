@@ -1,15 +1,15 @@
 module JsonApiController
   module UpdatableResource
     include RelationManager
-    
+
     def update
       ActiveRecord::Base.transaction do
         build_resource_for_update(update_params)
         controlled_resource.save!
       end
-      
+
       controlled_resource.reload
-      update_response
+      updated_resource_response(controlled_resource)
     end
 
     def update_links
@@ -18,8 +18,8 @@ module JsonApiController
         update_relation(relation, params[relation])
         controlled_resource.save!
       end
-      
-      update_response
+
+      updated_resource_response(controlled_resource)
     end
 
     def destroy_links
@@ -41,10 +41,6 @@ module JsonApiController
       if params[relation].nil?
         raise Api::BadLinkParams.new("Link relation must match body keys")
       end
-    end
-    
-    def update_response
-      render json_api: serializer.resource(controlled_resource, nil, context)
     end
 
     def relation

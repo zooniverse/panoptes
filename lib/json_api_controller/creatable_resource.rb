@@ -28,10 +28,6 @@ module JsonApiController
       controlled_resource
     end
 
-    def create_response(resource)
-      serializer.resource(resource, nil, context)
-    end
-
     def link_header(resource)
       send(:"api_#{ resource_name }_url", resource)
     end

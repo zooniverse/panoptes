@@ -1,6 +1,6 @@
 class Api::V1::UsersController < Api::ApiController
-  include JsonApiController 
-  
+  include JsonApiController
+
   doorkeeper_for :me, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show
@@ -9,9 +9,9 @@ class Api::V1::UsersController < Api::ApiController
   allowed_params :update, :display_name, :email, :credited_name
 
   alias_method :user, :controlled_resource
-  
+
   def me
-    render json_api: serializer.resource(current_resource_owner, nil, context)
+    render json_api: serializer.resource({}, resource_scope(current_resource_owner), context)
   end
 
   def destroy

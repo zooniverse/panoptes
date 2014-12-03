@@ -17,11 +17,11 @@ class Api::V1::SubjectsController < Api::ApiController
   private
 
   def create_response(subject)
-    serializer.resource(subject, nil, post_urls: true)
+    serializer.resource({}, resource_scope(subject), post_urls: true)
   end
 
-  def update_response
-    render json_api: serializer.resource(subject, nil, post_urls: true)
+  def update_response(subject)
+    serializer.resource({}, resource_scope(subject), post_urls: true)
   end
 
   def build_resource_for_create(create_params)
