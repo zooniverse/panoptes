@@ -6,13 +6,17 @@ shared_examples "is destructable" do
     end
 
     it "should return 204" do
-      delete :destroy, id: resource.id
       expect(response.status).to eq(204)
     end
 
     it "should delete the resource" do
-      delete :destroy, id: resource.id
       expect{resource_class.find(resource.id)}.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "should 403 with a non-scoped token" do
+      stub_token(scopes: ["public"], user_id: authorized_user.id)
+      delete :destroy, id: resource.id
+      expect(response.status).to eq(403)
     end
   end
 

@@ -1,7 +1,7 @@
 class Api::V1::ProjectsController < Api::ApiController
   include JsonApiController
-  
-  doorkeeper_for :update, :create, :delete, scopes: [:project]
+
+  doorkeeper_for :update, :create, :destroy, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
 
@@ -11,7 +11,7 @@ class Api::V1::ProjectsController < Api::ApiController
                     :science_case,
                     :introduction,
                     team_members: [:name, :bio, :twitter, :institution],
-                    guide: [:image, :explanation]] 
+                    guide: [:image, :explanation]]
 
   CONTENT_FIELDS = [:title,
                     :description,
@@ -21,12 +21,12 @@ class Api::V1::ProjectsController < Api::ApiController
                     :introduction]
 
   INDEX_FIELDS = [:title, :description]
-  
+
   allowed_params :create
   allowed_params :update
 
   before_action :add_owner_ids_to_filter_param!, only: :index
-  
+
   private
 
   def add_owner_ids_to_filter_param!
@@ -41,14 +41,14 @@ class Api::V1::ProjectsController < Api::ApiController
     content = ps.slice(*CONTENT_FIELDS)
     content[:language] = ps[:primary_language]
     ps.except!(*CONTENT_FIELDS)
-    content.select { |k,v| !!v } 
+    content.select { |k,v| !!v }
   end
 
   def build_resource_for_create(create_params)
     Namer.set_name_fields(create_params)
-    
+
     content_params = content_from_params(create_params)
-    
+
     create_params[:links] ||= Hash.new
     create_params[:links][:owner] = owner
 
@@ -88,4 +88,4 @@ class Api::V1::ProjectsController < Api::ApiController
       CONTENT_FIELDS
     end
   end
-end 
+end
