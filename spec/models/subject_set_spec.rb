@@ -27,11 +27,9 @@ describe SubjectSet, :type => :model do
     end
   end
 
-  describe "#workflows" do
-    let(:subject_set) { create(:subject_set_with_workflows) }
-
-    it "should have many workflows" do
-      expect(subject_set.workflows).to all( be_a(Workflow) )
+  describe "#workflow" do
+    it "should belong to a workflow" do
+      expect(subject_set.workflow).to be_a(Workflow)
     end
   end
 

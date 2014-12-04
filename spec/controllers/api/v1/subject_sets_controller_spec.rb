@@ -8,7 +8,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
   let(:api_resource_name) { 'subject_sets' }
 
   let(:api_resource_attributes) { %w(id display_name set_member_subjects_count created_at updated_at) }
-  let(:api_resource_links) { %w(subject_sets.project subject_sets.workflows) }
+  let(:api_resource_links) { %w(subject_sets.project subject_sets.workflow) }
   
   let(:scopes) { %w(public project) }
   let(:resource_class) { SubjectSet }
@@ -45,7 +45,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
        subject_sets: {
                   display_name: "A Better Name",
                   links: {
-                          workflows: [workflow.id.to_s],
+                          workflow: workflow.id.to_s,
                           subjects: subjects.map(&:id).map(&:to_s)
                          }
                   

@@ -1944,7 +1944,8 @@ All attributes except display_name are set by the API
                     "updated_at": "2014-02-13T10:11:34Z",
                     "set_member_subject_cound": 100,
                     "links": {
-                        "project": "1"
+                        "project": "1",
+                        "workflow": "10"
                     }
                 }]
             }
@@ -2008,8 +2009,8 @@ for the subject set's project.
 + Response 204
 
 ## Subject Set Links [/subject_sets/{id}/links/{link_type}]
-Allows the addition of links to workflows and subjects to a subject
-set object without needing to set a full representation of the linked
+Allows the addition of links to subjects to a subject
+set object without needing to send a full representation of the linked
 relationship.
 
 This is the recommended way to managed linked subjects.
@@ -2019,7 +2020,7 @@ This is the recommended way to managed linked subjects.
   + link_type (required, string) ... the relationship to modify must be the same as the supplied body key
 
 ### Add to link [POST]
-Only then Subjects and Workflows links may be edited.
+Only Subjects links may be edited.
 
 + Request
 
@@ -2110,18 +2111,20 @@ Subject Sets are returned as an array under *subject_sets*.
                     "display_name": "Weird Looking Galaxies",
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
-                    "set_member_subject_cound": 100,
+                    "set_member_subject_count": 100,
                     "links": {
-                        "project": "1"
+                        "project": "1",
+                        "workflow": "10"
                     }
                 },{
                     "id": "20",
                     "display_name": "Boring Looking Galaxies",
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
-                    "set_member_subject_cound": 100,
+                    "set_member_subject_count": 100,
                     "links": {
-                        "project": "1"
+                        "project": "1",
+                        "workflow": "11"
                     }
                 }]
             }
@@ -2148,7 +2151,7 @@ Subject Sets are returned as an array under *subject_sets*.
 
 ### Create a Subject Set [POST]
 A subject set must supply a display_name and a link to a project. Optionally,
-it may include links to subjects and workflows.
+it may include links to subjects and a workflow.
 
 + Request
 
