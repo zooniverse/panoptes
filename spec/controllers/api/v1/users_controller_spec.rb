@@ -71,6 +71,16 @@ describe Api::V1::UsersController, type: :controller do
       expect(json_response['users'][0]['email']).to_not be_nil
     end
 
+    it 'should include a customized url for projects' do
+      projects_link = json_response['links']['users.projects']['href']
+      expect(projects_link).to eq("/projects?owner={users.login}")
+    end
+
+    it 'should include a customized url for collections' do
+      collections_link = json_response['links']['users.collections']['href']
+      expect(collections_link).to eq("/collections?owner={users.login}")
+    end
+    
     it_behaves_like "an api response"
   end
 
