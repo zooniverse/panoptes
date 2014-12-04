@@ -27,10 +27,17 @@ available resources.
 
 ## Retrieve Entry Point [GET]
 
-+ Response 200 (application/vnd.api+json)
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
++ Response 200
 
     + Body
-    
+
             {
                 "links": {
                     "subjects": "/subjects",
@@ -76,7 +83,7 @@ The User resource has the following attributes:
 + Parameters
     + id (integer) ... ID of the User as an integer key
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -118,6 +125,13 @@ The *email* attribute is only available if the requesting user is an
 administrator or the user resource being requested is that of the
 requesting user.
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [User][]
@@ -127,13 +141,20 @@ The currently logged in User may edit their record by sending a
 partial representation of the resource including their changes. A User
 cannot edit linked resources.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "users": {
-                "credited_name": "Dr. Stuart Lynn, DDS"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "users": {
+                    "credited_name": "Dr. Stuart Lynn, DDS"
+                }
             }
-        }
 
 + Response 200
 
@@ -155,12 +176,17 @@ paging information.
 
 User resources are included a an array under the _users_ key
 
-+ Model (application/vnd.api+json)
++ Model
 
     JSON-API formatted respresentation of the Users collection
 
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
     + Body
-    
+
             {
                 "links": {
                     "users.projects": {
@@ -228,17 +254,24 @@ User resources are included a an array under the _users_ key
     + sort (optional, string) ... fields to sort collection by. id is default
     + include (optional, string) ... comma seperated list of linked resources to include
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Users Collection][]
-    
+
 # Group Classification
 Resources related to _Pantopes Classifications_.
 
 ## Classification [/classification/{id}]
 A single Classification resource object. This represents a _user's_
 responses to a _worflow's_ questions about a _subject_.
-                
+
 A classifications has the following attributes:
 
 - id
@@ -251,7 +284,7 @@ A classifications has the following attributes:
 
 Annotations is an array of maps of the form `{ "question_key":
 "question answer" }`. Metadata contains additional information about a
-classification including: 
+classification including:
 
 - started_at
 - finished_at
@@ -259,7 +292,7 @@ classification including:
 - workflow_version
 - user_language
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -311,6 +344,13 @@ A User may only retrieve a single classification if it not completed
 in order to finish it. Otherwise they may retrieve a list of
 classifications from the Classification Collection resource.
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Classification][]
@@ -322,17 +362,24 @@ completed when done.
 The *annotations* attributes must be returned as a full representation
 of the annotations array.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "classifications": {
-                "annotations": [
-                    {"key": "workflow-1", "value": [10.4, 12.4, 13.2]},
-                    {"key": "workflow-2", "value": "fishy"},
-                ],
-                "complete": true
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "classifications": {
+                    "annotations": [
+                        {"key": "workflow-1", "value": [10.4, 12.4, 13.2]},
+                        {"key": "workflow-2", "value": "fishy"},
+                    ],
+                    "complete": true
+                }
             }
-        }
 
 + Response 200
 
@@ -340,6 +387,13 @@ of the annotations array.
 
 ### Destroy a single Classification [DELETE]
 A User may delete an incomplete classification.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 204
 
@@ -350,15 +404,15 @@ All collections add a *meta* attribute hash containing
 paging information.
 
 Classifications are returned as an array under the _classifications_
-key. 
+key.
 
-+ Model (application/vnd.api+json)
++ Model
 
     A JSON API formatted respresentation of a collection of
     classification resources
 
     + Body
-    
+
             {
                 "links": {
                     "classifications.user": {
@@ -438,11 +492,11 @@ key.
                         "project": "2"
                     }
                 }]
-                
+
             }
 
 ### List all classifications [GET]
-Only lists a classifications the active user has made, 
+Only lists a classifications the active user has made,
 classifications from other members of a user_group, or projects the
 user has edit permissions for.
 
@@ -454,6 +508,13 @@ user has edit permissions for.
     + group_id (optional, integer) ... only retrieve classifications for a specific user group
     + include (optional, string) ... comma seperated list of linked resources to return with the collection
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Classification Collection][]
@@ -464,28 +525,35 @@ must include annotations and a links hash with a set_member_subject,
 a project, and a workflow. Optionally may include the complete field,
 which will be set to true by default.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "classifications": {
-                "complete": false,
-                "metadata": {
-                    "started_at": "2014-08-24T22:20:21Z",
-                    "finished_at": "2014-08-24T22:24:31Z",
-                    "user_agent": "cURL",
-                    "user_language": "es_MX",
-                    "workflow_version": "11.12"
-                },
-                "annotations": [
-                    {"workflow-1": [10.4, 12.4, 13.2]},
-                ],
-                "links": {
-                    "subject": "11",
-                    "workflow": "81",
-                    "project": "2"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "classifications": {
+                    "complete": false,
+                    "metadata": {
+                        "started_at": "2014-08-24T22:20:21Z",
+                        "finished_at": "2014-08-24T22:24:31Z",
+                        "user_agent": "cURL",
+                        "user_language": "es_MX",
+                        "workflow_version": "11.12"
+                    },
+                    "annotations": [
+                        {"workflow-1": [10.4, 12.4, 13.2]},
+                    ],
+                    "links": {
+                        "subject": "11",
+                        "workflow": "81",
+                        "project": "2"
+                    }
                 }
             }
-        }
 
 + Response 201
 
@@ -511,10 +579,10 @@ the API.
 + Parameters
   + id (required, integer) ... integer id of the subject resource
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
-    
+
             {
                 "links": {
                     "subjects.project": {
@@ -545,6 +613,13 @@ the API.
             }
 
 ### Retrieve a single Subject [GET]
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Subject][]
@@ -560,17 +635,24 @@ will contain signed s3 urls the client may make a PUT request
 containing the media to. The signed urls will be valid for 20 minutes.
 
 A request chagning the *metadata* hash must contain a full
-representation of the attribute. 
+representation of the attribute.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "subjects": {
-                "locations": {
-                    "standard": "image/png"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "subjects": {
+                    "locations": {
+                        "standard": "image/png"
+                    }
                 }
             }
-        }
 
 + Response 200
 
@@ -579,6 +661,13 @@ representation of the attribute.
 ### Destroy a single subject [DELETE]
 Users are permitted to destroy a subjects they own or
 subjects belongs to a project a user has destroy permissions for.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 204
 
@@ -599,7 +688,7 @@ It is not editable.
   + subject_id (required, integer) ... id of the subject to retreive versions for
   + id (required, integer) ... integer id of the version to load
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -629,6 +718,13 @@ It is not editable.
 
 ### Retrieve a Single Version [GET]
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Subject Version][]
@@ -643,8 +739,8 @@ Subject Versions are returned as an array under *versions*.
 
 + Parameters
   + subject_id (required, integer) ... id of the subject to retreive versions for
-  
-+ Model (application/vnd.api+json)
+
++ Model
 
     + Body
 
@@ -712,18 +808,25 @@ Subject Versions are returned as an array under *versions*.
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + per_page (optional, integer) ... number of items to include on a page default is 20
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Subject Version Collection][]
 
 ## Subject Collection [/subjects{?page,per_page,sort,workflow_id,subject_set_id}]
-Represenents a collection of subjects. 
+Represenents a collection of subjects.
 
 All collections add a *meta* attribute hash containing paging information.
 
 Subjects are returned as an array under the _subject_ key.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -797,7 +900,7 @@ When the cellect sort is used, *workflow_id* is a required parameter.
 
 Subjects also allow an 'queued' sort, which will return a random
 subset of subjects have a been queued for a particular user to
-classify, usually for expert classifiers. 
+classify, usually for expert classifiers.
 
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
@@ -805,6 +908,13 @@ classify, usually for expert classifiers.
   + sort (optional, string) ... field to sort by 'cellect' and 'queued' have special behaviour
   + workflow_id (optional, intger) ... filter to subjects belonging to a specific workflow. Required when sort is 'random'
   + subject_set_id (optional, intger) ... return subjects belonging to the identified subject_set
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 200
 
@@ -820,25 +930,32 @@ will be valid for 20 minutes.
 The *metadata* attribute and a link to an owner besides
 the active user are optional.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "subjects": {
-                "locations": {
-                    "standard": "image/png",
-                },
-                "metadata": {
-                    "lens_type": "50mm"
-                },
-                "links": {
-                    "project": "1",
-                    "owner": {
-                        "id": "4",
-                        "type": "user_groups"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "subjects": {
+                    "locations": {
+                        "standard": "image/png",
+                    },
+                    "metadata": {
+                        "lens_type": "50mm"
+                    },
+                    "links": {
+                        "project": "1",
+                        "owner": {
+                            "id": "4",
+                            "type": "user_groups"
+                        }
                     }
                 }
             }
-        }
 
 + Response 201
 
@@ -877,10 +994,10 @@ It has the following attributes:
 + Parameters
   + id (required, integer) ... integer id of the resource to retrieve
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
-            
+
             {
                 "links": {
                     "projects.subjects": {
@@ -939,6 +1056,13 @@ It has the following attributes:
 + Parameters
   + include (optional, string) ... comma seperated list of linked resources to include in the response
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Project][]
@@ -953,17 +1077,24 @@ the original to be copied and a new id to be returned.
 Setting has may links through a PUT, while supported, is not
 recommened. Instead, use the link endpoints explained below.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "projects": {
-                "display_name": "Galaxy Zooooooooo!",
-                "links": {
-                    "workflows": ["1"],
-                    "subject_sets": ["10"]
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "projects": {
+                    "display_name": "Galaxy Zooooooooo!",
+                    "links": {
+                        "workflows": ["1"],
+                        "subject_sets": ["10"]
+                    }
                 }
             }
-        }
 
 + Response 200
 
@@ -971,6 +1102,13 @@ recommened. Instead, use the link endpoints explained below.
 
 ### Destroy a single Project [DELETE]
 A user may destroy a project they own or have destroy permissions for.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 204
 
@@ -984,14 +1122,21 @@ added in this way will be copied and their id will be returned as part
 of the complete Project representation response.
 
 + Parameters
-  + id (required, integer) ... the id of the project to add 
+  + id (required, integer) ... the id of the project to add
   + link_type (required, string) ... the name of the link to edit. May only be workflow or subject_set
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "subject_sets": ["1", "2"]
-        }
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "subject_sets": ["1", "2"]
+            }
 
 + Response 200
 
@@ -1011,6 +1156,13 @@ this action.
   + link_type (required, string) ... the name of the link to edit. May only be subject_set or workflow
   + link_ids (required, string) ... comma seperated list of ids to destroy
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 204
 
 ## Project Collection [/projects{?page,per_page,sort,owner,include}]
@@ -1021,12 +1173,12 @@ paging information.
 
 Projects are returned as an array under the _projects_ key.
 
-+ Model (application/vnd.api+json)
++ Model
 
     A JSON API formatted representation of a collection of Projects.
 
     + Body
-    
+
             {
                 "links": {
                     "projects.subjects": {
@@ -1127,7 +1279,7 @@ Projects are returned as an array under the _projects_ key.
                     }
                 }]
             }
-            
+
 ### List All Projects [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
@@ -1135,7 +1287,14 @@ Projects are returned as an array under the _projects_ key.
   + sort (optional, string) ... field to sort by
   + owner (optional, string) ... string owner name of either a user or a user group to filter by.
   + include (optional, string) ... comma seperated list of linked resources to include in the response
-  
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Project Collection][]
@@ -1146,22 +1305,29 @@ Requires at least a *name*, *description*, and *primary_language*. Workflows
 and Subject sets added as links will be copied and their new ids
 returned.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "projects": {
-                "name": "galaxy_zoo",
-                "description": "A doubleplus good project",
-                "primary_language": "en-us",
-                "links": {
-                    "workflows": ["1", "2"]
-                    "owner": {
-                        "id": 10,
-                        "type": "user_groups"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "projects": {
+                    "name": "galaxy_zoo",
+                    "description": "A doubleplus good project",
+                    "primary_language": "en-us",
+                    "links": {
+                        "workflows": ["1", "2"]
+                        "owner": {
+                            "id": 10,
+                            "type": "user_groups"
+                        }
                     }
                 }
             }
-        }
 
 + Response 201
 
@@ -1192,7 +1358,7 @@ A workflow has the following attributes
 *id*, *created_at*, *updated_at*, *workflow_version*, *content_language*,
 and *classifications_count* are assigned by the API
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -1253,7 +1419,7 @@ and *classifications_count* are assigned by the API
                                  {"value": "sorta", "label": "In between"},
                                  {"value": "not", "label": "Cigar shaped"}
                              ],
-                             "next": null 
+                             "next": null
                          }
                      },
                     "links": {
@@ -1264,7 +1430,14 @@ and *classifications_count* are assigned by the API
 
 ### Retrieve a single Workflow [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to include in the response 
+  + include (optional, string) ... comma seperated list of linked resources to include in the response
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 200
 
@@ -1277,18 +1450,25 @@ field. Only the subject set link may be edited. Removing a subject_set
 link doesn't destroy the subject_set.
 
 This is not the recommended way to edit links. Use the subject_set
-link mode documented below. 
+link mode documented below.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "workflows": {
-                "tasks": { "format": "all new!"},
-                "links": {
-                    "subject_sets": ["8"]
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "workflows": {
+                    "tasks": { "format": "all new!"},
+                    "links": {
+                        "subject_sets": ["8"]
+                    }
                 }
             }
-        }
 
 + Response 200
 
@@ -1310,9 +1490,16 @@ the subject set if it belongs do a different project.
 + Parameters
   + id (required, integer) ... id of workflow to update
 
-+ Request (application/vnd.api+json)
++ Request
 
-        { "subject_sets": ["9"] }
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            { "subject_sets": ["9"] }
 
 + Response 200
 
@@ -1328,6 +1515,13 @@ destroy the subject set models.
 + Parameters
   + id (required, integer) ... id of workflow to update
   + subject_set_ids (required, string) ... comma seperated list of ids to destroy
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 204
 
@@ -1348,7 +1542,7 @@ It is not editable.
   + workflow_id (required, integer) ... id of the workflow to retreive versions for
   + id (required, integer) ... id of the version resource to retreive
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -1378,6 +1572,13 @@ It is not editable.
   + workflow_id (required, integer) ... integer id of the workflow resource
   + id (required, integer) ... integer id of the version to retrieve
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Workflow Version][]
@@ -1393,8 +1594,8 @@ Workflow Versions are returned as an array under *versions*.
 
 + Parameters
   + workflow_id (required, integer) ... id of the workflow to retreive versions for
-    
-+ Model (application/vnd.api+json)
+
++ Model
 
     + Body
 
@@ -1457,6 +1658,13 @@ Workflow Versions are returned as an array under *versions*.
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + per_page (optional, integer) ... number of items to include on a page default is 20
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Workflow Version Collection][]
@@ -1469,7 +1677,7 @@ paging information.
 
 Workflows are returned as an array under the _workflows_ key.
 
-+ Model (application/vnd.api+json)
++ Model
 
     A JSON API formatted representation of a collection of workflows.
 
@@ -1547,7 +1755,7 @@ Workflows are returned as an array under the _workflows_ key.
                                  {"value": "sorta", "label": "In between"},
                                  {"value": "not", "label": "Cigar shaped"}
                              ],
-                             "next": null 
+                             "next": null
                          }
                      },
                     "links": {
@@ -1595,7 +1803,7 @@ Workflows are returned as an array under the _workflows_ key.
                                  {"value": "sorta", "label": "In between"},
                                  {"value": "not", "label": "Cigar shaped"}
                              ],
-                             "next": null 
+                             "next": null
                          }
                      },
                     "links": {
@@ -1612,6 +1820,13 @@ Workflows are returned as an array under the _workflows_ key.
   + project_id (optional, integer) ... filter workflows by project id
   + include (optional, string) ... comma seperated list of linked resources to load
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Workflow Collection][]
@@ -1622,50 +1837,57 @@ link to a project. Can optionally set cellect parameters *grouped*,
 *prioritized*, and *pairwise*. (false by default) and links to
 *subject_sets*.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "workflows": {
-                "display_name": "Spot Monsters!",
-                "tasks":  {
-                    "interest": {
-                        "type": "drawing",
-                        "question": "Color some points",
-                        "tools": [
-                            {"value": "red", "label": "Red", "type": "point", "color": "red"},
-                            {"value": "green", "label": "Green", "type": "point", "color": "lime"},
-                            {"value": "blue", "label": "Blue", "type": "point", "color": "blue"}
-                        ],
-                        "next": "shape"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "workflows": {
+                    "display_name": "Spot Monsters!",
+                    "tasks":  {
+                        "interest": {
+                            "type": "drawing",
+                            "question": "Color some points",
+                            "tools": [
+                                {"value": "red", "label": "Red", "type": "point", "color": "red"},
+                                {"value": "green", "label": "Green", "type": "point", "color": "lime"},
+                                {"value": "blue", "label": "Blue", "type": "point", "color": "blue"}
+                            ],
+                            "next": "shape"
+                        },
+                        "shape": {
+                            "type": "multiple",
+                            "question": "What shape is this galaxy?",
+                            "answers": [
+                                {"value": "smooth", "label": "Smooth"},
+                                {"value": "features", "label": 'Features"},
+                                {"value": "other", "label": "Star or artifact"}
+                            ],
+                            "required": true,
+                            "next": "roundness"
+                        },
+                        roundness: {
+                            "type": "single",
+                            "question": "How round is it?",
+                            "answers": [
+                                {"value": "very", "label": "Very...", "next": "shape"},
+                                {"value": "sorta", "label": "In between"},
+                                {"value": "not", "label": "Cigar shaped"}
+                            ],
+                            "next": null
+                        }
                     },
-                    "shape": {
-                        "type": "multiple",
-                        "question": "What shape is this galaxy?",
-                        "answers": [
-                            {"value": "smooth", "label": "Smooth"},
-                            {"value": "features", "label": 'Features"},
-                            {"value": "other", "label": "Star or artifact"}
-                        ],
-                        "required": true,
-                        "next": "roundness"
-                    },
-                    roundness: {
-                        "type": "single",
-                        "question": "How round is it?",
-                        "answers": [
-                            {"value": "very", "label": "Very...", "next": "shape"},
-                            {"value": "sorta", "label": "In between"},
-                            {"value": "not", "label": "Cigar shaped"}
-                        ],
-                        "next": null 
+                    "primary_language": "en-ca",
+                    "links": {
+                        "subject_sets": ["1", "2"]
                     }
-                },
-                "primary_language": "en-ca",
-                "links": {
-                    "subject_sets": ["1", "2"]
                 }
             }
-        }
 
 + Response 201
 
@@ -1691,7 +1913,7 @@ All attributes except display_name are set by the API
 + Parameters
   + id (required, integer) ... integer id of the subject_set to retrieve
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -1725,10 +1947,17 @@ All attributes except display_name are set by the API
                     }
                 }]
             }
-                        
+
 ### Retrieve a single Subject Set [GET]
 + Parameters
   + include (optional, string) ... comma seperated list of linked resources to include in the response
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 200
 
@@ -1740,18 +1969,25 @@ project. The display_name attributes and links to workflows and subjects are
 editable. Editing links requires a full representation of the new set
 of links, but does not destroy unlinked resources.
 
-This is not the recommended way to manage linked subjects. 
+This is not the recommended way to manage linked subjects.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "subject_sets": {
-                "display_name": "Normal Galaxies",
-                "links": {
-                    "subjects": ["1", "2", "4", "5", "10"]
-                }
-            }
-        }
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+              {
+                  "subject_sets": {
+                      "display_name": "Normal Galaxies",
+                      "links": {
+                          "subjects": ["1", "2", "4", "5", "10"]
+                      }
+                  }
+              }
 
 + Response 200
 
@@ -1760,6 +1996,13 @@ This is not the recommended way to manage linked subjects.
 ### Destroy a single Subject Set [DELETE]
 A user may only destroy a subject set if they have destroy permissions
 for the subject set's project.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 204
 
@@ -1777,11 +2020,18 @@ This is the recommended way to managed linked subjects.
 ### Add to link [POST]
 Only then Subjects and Workflows links may be edited.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "subjects": ["1", "5", "9", "11"]
-        }
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "subjects": ["1", "5", "9", "11"]
+            }
 
 + Response 200
 
@@ -1791,13 +2041,20 @@ Only then Subjects and Workflows links may be edited.
 Allows links to be removed without sending a full represenation of the
 linked relationship.
 
-+ Paraemters
++ Parameters
   + id (required, integer) ... the id of the Subject Set to modify
   + link_type (required, string) ... the relationship to modify
   + link_ids (required, integer) ... comma seperated list of ids to remove
 
 ### Destroy some links [DELETE]
 Will only remove the link. This operation does not destroy the linked object.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 204
 
@@ -1809,7 +2066,7 @@ information.
 
 Subject Sets are returned as an array under *subject_sets*.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -1877,6 +2134,13 @@ Subject Sets are returned as an array under *subject_sets*.
   + workflow_id (optional, integer) ... filter by linked workflow
   + include (optional, string) ... comma seperated list of linked resources to include in the response
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [SubjectSet Collection][]
@@ -1885,17 +2149,24 @@ Subject Sets are returned as an array under *subject_sets*.
 A subject set must supply a display_name and a link to a project. Optionally,
 it may include links to subjects and workflows.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "subject_sets": {
-                "display_name": "A Group of Interesting Subjects"
-                "links": {
-                    "project": "43",
-                    "subjects": ["234", "1243", "8023"]
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "subject_sets": {
+                    "display_name": "A Group of Interesting Subjects"
+                    "links": {
+                        "project": "43",
+                        "subjects": ["234", "1243", "8023"]
+                    }
                 }
             }
-        }
 
 + Response 201
 
@@ -1923,7 +2194,7 @@ A User Group has the following attributes:
 *id*, *created_at*, *updated_at*, and *classifications_count* are all
  set by the API.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -1965,6 +2236,13 @@ A User Group has the following attributes:
 + Parameters
   + include (optional, string) ... comma seperated list of linked resources to include in the response
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [UserGroup][]
@@ -1974,25 +2252,32 @@ A user with edit permissions on a user group may edit the group's
 name, display_name, or links to projects, collections and
 users. Projects and Collections may only be removed. Removing a
 link to a project or collection will destroy the project or
-collection, removing a link to a user will set their 
+collection, removing a link to a user will set their
 membership state to inactive.
 
 Adding a user creates a membership link with an 'invited'
 state. Membership and Classification links cannot be modified.
 
-This is not the recommended way to modify links. 
+This is not the recommended way to modify links.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "user_groups": {
-                "display_name": "A Uncool Group",
-                "links": {
-                    "projects": [],
-                    "collections": []
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "user_groups": {
+                    "display_name": "A Uncool Group",
+                    "links": {
+                        "projects": [],
+                        "collections": []
+                    }
                 }
             }
-        }
 
 + Response 200
 
@@ -2004,6 +2289,13 @@ A user may destroy a group if they have the requisite permissions. A
 destroyed group and linked projects, collections, and memberships will
 be placed in an 'inactive' state.
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 204
 
 ## Add a link [/groups/{id}/links/users]
@@ -2012,13 +2304,20 @@ Only links to users may be added.
 ### Add user links [POST]
 Creates a membership for a user. The membership will be immediately
 added, but a user won't show up in the group's links until they set
-their membership to 'active'. 
+their membership to 'active'.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "users": ["123", "23"]
-        }
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "users": ["123", "23"]
+            }
 
 + Response 200
 
@@ -2035,6 +2334,14 @@ membership set to 'inactive'.
   + link_ids (required, string) ... comma seperated list of ids to remove
 
 ### Remove links [DELETE]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 204
 
 ## UserGroup Collection [/groups{?page,per_page,sort,user_id,include}]
@@ -2045,10 +2352,10 @@ information.
 
 User Groups are returned as an array under *user_groups*.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
- 
+
             {
                  "links": {
                     "user_groups.projects": {
@@ -2114,6 +2421,13 @@ User Groups are returned as an array under *user_groups*.
   + user_id (optional, integer) ... filter list to groups a user is part of
   + include (optional, string) ... comma seperated list of linked resources to include in the response
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [UserGroup Collection][]
@@ -2130,17 +2444,24 @@ to the same string as name.
 Optionally links to other users who will be given
 memberships with the 'invited' state.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "user_groups": {
-                "display_name": "A Super Grouper!",
-                "links": {
-                    "users": ["10", "22"]
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "user_groups": {
+                    "display_name": "A Super Grouper!",
+                    "links": {
+                        "users": ["10", "22"]
+                    }
                 }
             }
-        }
-                
+
 + Response 201
 
     [UserGroup][]
@@ -2162,7 +2483,7 @@ It has the following attributes:
 
 *id*, *created_at*, and *update_at* are assigned by the API.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -2189,8 +2510,15 @@ It has the following attributes:
                     }
                 }
             }
-                    
+
 ### Retreive a Membership [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 200
 
@@ -2200,13 +2528,20 @@ It has the following attributes:
 A user can ordinary only change their membership state. A user with
 user group edit permissions can change the membership's roles.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "memberships": {
-                "state": "inactive"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "memberships": {
+                    "state": "inactive"
+                }
             }
-        }
 
 + Response 200
 
@@ -2227,7 +2562,7 @@ information.
 
 Memberships are returned as an array under *memberships*.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -2288,6 +2623,13 @@ Memberships are returned as an array under *memberships*.
   + user_id (optional, integer) ... filter list to memberships for a user
   + user_group_id (optional, integer) ... filter list to memberships for a user group
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Membership Collection][]
@@ -2297,17 +2639,24 @@ A membership creation request must include a link to a user and to a
 user_group. Optionally it may include an array of roles. It's state
 will be set to 'invited' until the linked user takes action.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "memberships": {
-                "roles": ["group_admin"],
-                "links": {
-                    "user": "10",
-                    "user_group": "11
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "memberships": {
+                    "roles": ["group_admin"],
+                    "links": {
+                        "user": "10",
+                        "user_group": "11
+                    }
                 }
             }
-        }
 
 + Response 201
 
@@ -2333,7 +2682,7 @@ It has the following attributes:
  is set to anything except an empty array it will only be visible to
  users assigned one of the visible roles for the collection.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -2363,6 +2712,13 @@ It has the following attributes:
 
 ### Retrieve a single collection [GET]
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Collection][]
@@ -2378,14 +2734,21 @@ collection has many subjects.
 
 Removing subjects from a collection does not destroy the subject record.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "collections": {
-                "name": "flower_power",
-                "visible_to": ["collaborators"]
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "collections": {
+                    "name": "flower_power",
+                    "visible_to": ["collaborators"]
+                }
             }
-        }
 
 + Response 200
 
@@ -2394,6 +2757,13 @@ Removing subjects from a collection does not destroy the subject record.
 ### Destroy a Collection [DELETE]
 A user who is the owner of a collection or who has destroy permissions
 for a collection, may delete it.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 204
 
@@ -2404,11 +2774,18 @@ Add subjects to a collection.
 A user is permitted to add subject if they are the collection owner or
 have edit permissions.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "subjects": ["1", "2"]
-        }
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "subjects": ["1", "2"]
+            }
 
 + Response 200
 
@@ -2424,7 +2801,14 @@ owner or have edit permissions.
 + Parameters
   + id (required, integer) ... id of collection to edit
   + link_ids (required, string) ... comma seperated list of ids to remove
-    
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 204
 
 ## Collection Collection [/collections{?page,per_page,sort,owner}]
@@ -2435,7 +2819,7 @@ information.
 
 Collections are returned as an array under *collections*.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -2498,7 +2882,14 @@ Collections are returned as an array under *collections*.
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + owner (optional, string) ... string name of either a user or user group to filter by
-    
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [Collection Collection][]
@@ -2512,19 +2903,26 @@ user will be set as the owner.
 Optionally a create request may include name, visible_to, a link to an
 owner, and links to subjects.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "collections": {
-                "display_name": "flowers",
-                "links": {
-                    "owner": {
-                        "id" : "10",
-                        "type": "user_groups"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "collections": {
+                    "display_name": "flowers",
+                    "links": {
+                        "owner": {
+                            "id" : "10",
+                            "type": "user_groups"
+                        }
                     }
                 }
             }
-        }
 
 + Response 201
 
@@ -2548,7 +2946,7 @@ All attributes are assigned by the API.
 + Parameters
   + id (required, integer) ... the integer id of the subject queue resource
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -2582,6 +2980,13 @@ All attributes are assigned by the API.
 + Parameters
   + include (optional, string) ... comma seperated list of linked resources to include
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [SubjectQueue][]
@@ -2590,15 +2995,22 @@ All attributes are assigned by the API.
 The only edit operation on a queue is a put replacing the queued
 subjects with a new queue of subjects.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "subject_queues: {
-                "links"; {
-                    "set_member_subjects": ["10", "22"]
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "subject_queues: {
+                    "links"; {
+                        "set_member_subjects": ["10", "22"]
+                    }
                 }
             }
-        }
 
 + Response 200
 
@@ -2606,6 +3018,13 @@ subjects with a new queue of subjects.
 
 ### Destroy a SubjectQueue [DELETE]
 Removes the queue entirely
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 204
 
@@ -2616,11 +3035,18 @@ Add subjects to a queue.
 A user is permitted to add subjects if they are the project owner or
 have edit permissions.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "set_member_subjects": ["1", "2"]
-        }
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "set_member_subjects": ["1", "2"]
+            }
 
 + Response 200
 
@@ -2636,7 +3062,14 @@ or have edit permissions.
 + Parameters
   + id (required, integer) ... id of queue to edit
   + link_ids (required, string) ... comma seperated list of ids to remove
-    
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 204
 
 ## SubjectQueue Collection [/subject_queues?{page,per_page,workflow_id,user_id,include}]
@@ -2647,7 +3080,7 @@ information.
 
 SubjectQueues are returned as an array under *subject_queues*.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -2707,7 +3140,14 @@ SubjectQueues are returned as an array under *subject_queues*.
   + workflow_id (optional, integer) ... workflow queue belongs to
   + user_id (optional, integer) ... user id queue belongs to
   + include (optional, string) ... comma seperated list of linked resources to include
-    
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [SubjectQueue Collection][]
@@ -2716,17 +3156,24 @@ SubjectQueues are returned as an array under *subject_queues*.
 Creating a subject queue only requires a user and a workflow link. You
 may optionally include a list of set_member_subjects to populate the queue.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "subject_queues": {
-                "links": {
-                    "user": "10",
-                    "workflow": "42",
-                    "set_member_subjects": ["3", "12321", "8004"]
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "subject_queues": {
+                    "links": {
+                        "user": "10",
+                        "workflow": "42",
+                        "set_member_subjects": ["3", "12321", "8004"]
+                    }
                 }
             }
-        }
 
 + Response 201
 
@@ -2752,7 +3199,7 @@ roles are visible to the project owner and the user given roles.
 + Parameters
   + id (required, integer) ... integer identifier of the project role resource
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -2783,6 +3230,13 @@ roles are visible to the project owner and the user given roles.
 + Parameters
   + include (optional, string) ... comma seperate list of linked resources to load
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [ProjectRole][]
@@ -2794,13 +3248,20 @@ their own roles.
 
 Editing requires sending a full representation of the roles array.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "project_roles": {
-                "roles": ["tester", "translator"]
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "project_roles": {
+                    "roles": ["tester", "translator"]
+                }
             }
-        }
 
 + Response 200
 
@@ -2814,7 +3275,7 @@ information.
 
 ProjectRoles are returned as an array under *project_roles*.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -2874,6 +3335,13 @@ ProjectRoles are returned as an array under *project_roles*.
   + project_id (optional, integer) ... project_id to see roles for
   + include (optional, string) ... comma seperate list of linked resources to load
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [ProjectRole Collection][]
@@ -2882,17 +3350,24 @@ ProjectRoles are returned as an array under *project_roles*.
 Creating a Project Role resource requires a link to a user and a
 project. You may also include an array of roles.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "project_roles": {
-                "roles": ["collaborator"],
-                "links": {
-                    "project": "1",
-                    "user": "842"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "project_roles": {
+                    "roles": ["collaborator"],
+                    "links": {
+                        "project": "1",
+                        "user": "842"
+                    }
                 }
             }
-        }
 
 + Response 201
 
@@ -2919,7 +3394,7 @@ It has the following attributes:
 + Parameters
   + id (required, integer) ... integer identifier of resource
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -2953,6 +3428,13 @@ It has the following attributes:
 + Parameters
   + include (optional, string) ... comma seperated list of linked resources to load
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [ProjectPreference][]
@@ -2962,17 +3444,24 @@ Only the owning user may edit a Project Preference resource. The
 email_communication field and the preferences field may be edited.
 
 Editing the preferences field requires a full represenation of the
-preferences hash to be sent. 
+preferences hash to be sent.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "project_preferences": {
-                "preferences": {
-                    "mini_course": false,
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "project_preferences": {
+                    "preferences": {
+                        "mini_course": false,
+                    }
                 }
             }
-        }
 
 + Response 200
 
@@ -2986,8 +3475,8 @@ information.
 
 ProjectPreferences are returned as an array under *project_preferences*.
 
-+ Model (application/vnd.api+json)
-                    
++ Model
+
             {
                 "links": {
                     "project_preferences.user": {
@@ -3050,6 +3539,13 @@ ProjectPreferences are returned as an array under *project_preferences*.
   + project_id (optional, integer) ... project_id to see preferences for
   + include (optional, string) ... comma seperated list of linked resources to load
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [ProjectPreference Collection][]
@@ -3061,21 +3557,28 @@ of settings for preferences may be included.
 
 Since a user can only create, read, or modify their own preferences
 the currently logged in user is always set as the linked user on
-creation. 
+creation.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "project_preferences": {
-                "email_communication": true,
-                "preferences": {
-                    "tutorial": true
-                },
-                "links": {
-                    "project": "1"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "project_preferences": {
+                    "email_communication": true,
+                    "preferences": {
+                        "tutorial": true
+                    },
+                    "links": {
+                        "project": "1"
+                    }
                 }
             }
-        }
 
 + Response 201
 
@@ -3088,7 +3591,7 @@ Resources related to the translatable strings for _Panotpes Projects_.
 A Project Content resources contains all strings for a project for a
 particular language. This resource will normally only be accessed by
 project translators. Users will receive translated versions of
-projects based on their *Accept-Language* header or preferences. 
+projects based on their *Accept-Language* header or preferences.
 
 It has the following attributes
 
@@ -3117,7 +3620,7 @@ zh_HK).
 + Parameters
   + id (required, integer) ... integer id of the resource
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -3158,6 +3661,13 @@ zh_HK).
 + Parameters
   + include (optional, string) ... comma seperated list of linked resources to load
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [ProjectContent][]
@@ -3170,15 +3680,22 @@ The *team_members* and *guide* fields must be updated as a full
 representation. The *language* field is not editable once created.
 
 Project Contents that have the same language as their parent project's
-primary_language field may not be edited. 
+primary_language field may not be edited.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "project_contents": {
-                "title": "A Less Labourious Title"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "project_contents": {
+                    "title": "A Less Labourious Title"
+                }
             }
-        }
 
 + Response 200
 
@@ -3189,7 +3706,14 @@ Only users who edit premissions for the parent project may remove
 project content models.
 
 Project Contents that have the same language as their parent project's
-primary_language field may not be destroyed. 
+primary_language field may not be destroyed.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 204
 
@@ -3206,7 +3730,7 @@ It has the following attributes:
 
 It is not editable.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -3230,6 +3754,13 @@ It is not editable.
 
 ### Retrieve a Single Version [GET]
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [ProjectContent Version][]
@@ -3243,7 +3774,7 @@ information.
 
 Project Content Versions are returned as an array under *versions*.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -3299,6 +3830,13 @@ Project Content Versions are returned as an array under *versions*.
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + per_page (optional, integer) ... number of items to include on a page default is 20
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [ProjectContent Version Collection][]
@@ -3311,10 +3849,10 @@ information.
 
 Project Contents are returned as an array under *project_contents*.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
-                    
+
             {
                 "links": {
                     "project_contents.project": {
@@ -3392,7 +3930,14 @@ Project Contents are returned as an array under *project_contents*.
   + project_id (optional, integer) ... project_id to see contents for
   + language (optional, string) ... language code to search for
   + include (optional, string) ... comma seperated list of linked resources to load
-  
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [ProjectContent Collection][]
@@ -3405,16 +3950,23 @@ user with edit permissions for the project or a user with a
 The *language* field and a link to a project are the only required
 fields to created a ProjectContent resource.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "project_contents": {
-                "language": "es",
-                "links": {
-                    "project": "11"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "project_contents": {
+                    "language": "es",
+                    "links": {
+                        "project": "11"
+                    }
                 }
             }
-        }
 
 + Response 201
 
@@ -3429,7 +3981,7 @@ particular language.
 
 This resource will normally only be accessed by
 project translators. Users will receive translated versions of
-workflows based on their *Accept-Language* header or preferences. 
+workflows based on their *Accept-Language* header or preferences.
 
 It has the following attributes
 
@@ -3453,7 +4005,7 @@ zh_HK).
 + Parameters
   + id (required, integer) ... integer id of the resource
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -3485,6 +4037,13 @@ zh_HK).
 + Parameters
   + include (optional, string) ... comma seperated list of linked resources to load
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [WorkflowContent][]
@@ -3496,18 +4055,25 @@ have the "translator" roles may edit workflow contents.
 The *strings* field must be edited as a full respresentation. The
 *language* field may not be changed.
 
-Workflow Contents that have the same language as their parent workflow's 
-primary_language field may not be edited. 
+Workflow Contents that have the same language as their parent workflow's
+primary_language field may not be edited.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "workflow_contents": {
-                "strings": [
-                    "a replacement string"
-                ]
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "workflow_contents": {
+                    "strings": [
+                        "a replacement string"
+                    ]
+                }
             }
-        }
 
 + Response 200
 
@@ -3517,8 +4083,15 @@ primary_language field may not be edited.
 Only users who edit premissions for the parent project may remove
 workflow content models.
 
-Workflow Contents that have the same language as their parent workflow's 
-primary_language field may not be destroyed. 
+Workflow Contents that have the same language as their parent workflow's
+primary_language field may not be destroyed.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
 
 + Response 204
 
@@ -3539,7 +4112,7 @@ It is not editable.
   + workflow_contents_id (required, integer) ... id of the workflow to retreive versions for
   + id (required, integer) ... integer id of the version to load
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -3571,6 +4144,13 @@ It is not editable.
 
 ### Retrieve a Single Version [GET]
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [WorkflowContent Version][]
@@ -3586,8 +4166,8 @@ Workflow Content Versions are returned as an array under *versions*.
 
 + Parameters
   + workflow_contents_id (required, integer) ... id of the workflow to retreive versions for
-  
-+ Model (application/vnd.api+json)
+
++ Model
 
     + Body
 
@@ -3659,6 +4239,13 @@ Workflow Content Versions are returned as an array under *versions*.
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + per_page (optional, integer) ... number of items to include on a page default is 20
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [WorkflowContent Version Collection][]
@@ -3671,10 +4258,10 @@ information.
 
 Workflow Contents are returned as an array under *workflow_contents*.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
-                    
+
             {
                 "links": {
                     "workflow_contents.workflow": {
@@ -3733,7 +4320,14 @@ Workflow Contents are returned as an array under *workflow_contents*.
   + workflow_id (optional, integer) ... id of workflow to see contents for
   + language (optional, string) ... language code to search for
   + include (optional, string) ... comma seperated list of linked resources to load
-  
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [WorkflowContent Collection][]
@@ -3746,16 +4340,23 @@ user with edit permissions for the parent project or a user with a
 The *language* field and a link to a workflow are the only required
 fields to create a WorkflowContent resource.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "workflow_contents": {
-                "language": "es",
-                "links": {
-                    "workflow": "11"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "workflow_contents": {
+                    "language": "es",
+                    "links": {
+                        "workflow": "11"
+                    }
                 }
             }
-        }
 
 + Response 201
 
@@ -3781,7 +4382,7 @@ It has the following attribtues
 + Parameters
   + id (required, integer) ... integer identifier for the resource
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
 
@@ -3813,6 +4414,13 @@ It has the following attribtues
 + Parameters
   + include (optional, string) ... comma seperated list of linked resources to load
 
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [SetMemberSubject][]
@@ -3821,13 +4429,20 @@ It has the following attribtues
 A user with edit permissions for the project a SetMemberSubject's
 SubjectSet belongs to may edit the *state* and *priority* attributes.
 
-+ Request (application/vnd.api+json)
++ Request
 
-        {
-            "set_member_subjects": {
-                "state": "inactive"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "set_member_subjects": {
+                    "state": "inactive"
+                }
             }
-        }
 
 + Response 200
 
@@ -3848,10 +4463,10 @@ information.
 
 SetMemberSubjects are returned as an array under *set_member_subjects*.
 
-+ Model (application/vnd.api+json)
++ Model
 
     + Body
-                    
+
             {
                 links: {
                     "set_member_subjects.subject": {
@@ -3908,7 +4523,14 @@ SetMemberSubjects are returned as an array under *set_member_subjects*.
   + subject_id (optional, integer) ... id of subject to see set_member_subjects for
   + subject_set_id (optional, integer) ... id of subject_set to see set_member_subjects for
   + include (optional, string) ... comma seperated list of linked resources to load
-  
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
 + Response 200
 
     [SetMemberSubject Collection][]
@@ -3923,16 +4545,23 @@ SubjectSet. Optionally, the create request may include a state and a
 priority. The state will be 'active' by default and the priority will
 be null by default.
 
-+ Request (applicaiton/vnd.api+json)
++ Request
 
-        {
-            "set_member_subjects: {
-                "links": {
-                    "subject": "12031",
-                    "subject_set": "10"
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "set_member_subjects: {
+                    "links": {
+                        "subject": "12031",
+                        "subject_set": "10"
+                    }
                 }
             }
-        }
 
 + Response 201
 
