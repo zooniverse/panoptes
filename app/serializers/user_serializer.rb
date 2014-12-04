@@ -3,8 +3,8 @@ class UserSerializer
   attributes :id, :login, :display_name, :credited_name, :email, :created_at, :updated_at,
              :owner_name
   can_include :classifications, :subjects, :project_preferences,
-              projects: { param: "owner", value: "login" },
-              collections: { param: "owner", value: "login" }
+              projects: { param: "owner", value: "owner_name" },
+              collections: { param: "owner", value: "owner_name" }
 
   can_filter_by :login
 
@@ -15,7 +15,7 @@ class UserSerializer
   def email
     @model.email if permitted_requester?
   end
-
+  
   def owner_name
     @model.owner_uniq_name
   end

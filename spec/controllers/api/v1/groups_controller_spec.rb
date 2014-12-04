@@ -11,7 +11,7 @@ describe Api::V1::GroupsController, type: :controller do
 
   let(:api_resource_name) { "user_groups" }
   let(:api_resource_attributes) do
-    [ "id", "name", "display_name", "owner_name", "classifications_count", "created_at", "updated_at" ]
+    [ "id", "name", "display_name", "classifications_count", "created_at", "updated_at" ]
   end
   let(:api_resource_links) do
     [ "user_groups.memberships", "user_groups.users", "user_groups.projects", "user_groups.collections" ]
@@ -28,8 +28,23 @@ describe Api::V1::GroupsController, type: :controller do
   describe "#index" do
     let(:private_resource) { user_groups[1] }
     let(:n_visible) { 1 }
-    
-    it_behaves_like "is indexable"
+
+    context "filtering by name" do
+      it 'should return only the requested group' do
+        create(:membership,
+               state: :active,
+               user: user,
+               user_group: user_groups[1])
+        
+        get :index, name: user_groups[1].name
+        
+        expect(json_response["user_groups"]).to all( include(name: user_groups[1].name) )
+      end
+    end
+
+    context "no filters" do
+      it_behaves_like "is indexable"
+    end
   end
   
   describe "#update" do
@@ -57,12 +72,12 @@ describe Api::V1::GroupsController, type: :controller do
       
       it 'should include a url for projects' do
         projects_link = json_response['links']['user_groups.projects']['href']
-        expect(projects_link).to eq("/projects?owner={user_groups.name}")
+        expect(projects_link).to eq("/projects?owner={user_groups.owner_name}")
       end
 
       it 'should include a url for collections' do
         collections_link = json_response['links']['user_groups.collections']['href']
-        expect(collections_link).to eq("/collections?owner={user_groups.name}")
+        expect(collections_link).to eq("/collections?owner={user_groups.owner_name}")
       end
     end
     
