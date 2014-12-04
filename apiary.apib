@@ -1832,8 +1832,8 @@ Workflows are returned as an array under the _workflows_ key.
     [Workflow Collection][]
 
 ### Create a Workflow [POST]
-Requires a set of tasks, a primary language, a display_name, and a
-link to a project. Can optionally set cellect parameters *grouped*,
+Requires a set of *tasks*, a *primary_language*, a *display_name*, and a
+link to a *project*. Can optionally set cellect parameters *grouped*,
 *prioritized*, and *pairwise*. (false by default) and links to
 *subject_sets*.
 
@@ -1884,6 +1884,7 @@ link to a project. Can optionally set cellect parameters *grouped*,
                     },
                     "primary_language": "en-ca",
                     "links": {
+                        "project": "42",
                         "subject_sets": ["1", "2"]
                     }
                 }
