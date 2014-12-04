@@ -2,7 +2,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   include JsonApiController
 
   skip_before_filter :require_login, only: :create
-  doorkeeper_for :show, :index, :destory, :update, scopes: [:classification]
+  doorkeeper_for :show, :index, :destroy, :update, scopes: [:classification]
   resource_actions :default
 
   alias_method :classification, :controlled_resource

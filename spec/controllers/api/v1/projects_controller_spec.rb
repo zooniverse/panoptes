@@ -308,12 +308,6 @@ describe Api::V1::ProjectsController, type: :controller do
   describe "#destroy" do
     let(:resource) { create(:full_project, owner: user) }
 
-    it "should 403 with a non-scoped token" do
-      stub_token(scopes: ["public"], user_id: user.id)
-      delete :destroy, id: resource.id
-      expect(response.status).to eq(403)
-    end
-
     it_behaves_like "is destructable"
   end
 end

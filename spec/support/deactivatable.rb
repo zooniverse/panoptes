@@ -3,7 +3,7 @@ shared_examples 'is deactivatable' do
     before(:each) do
       stub_token(scopes: scopes, user_id: authorized_user.id)
     end
-    
+
     it "should call Activation#disable_instances! with instances to disable" do
       expect(Activation).to receive(:disable_instances!).with(instances_to_disable)
       delete :destroy, id: resource.id
@@ -17,6 +17,12 @@ shared_examples 'is deactivatable' do
     it "should disable the resource" do
       delete :destroy, id: resource.id
       expect(resource.reload.inactive?).to be_truthy
+    end
+
+    it "should 403 with a non-scoped token" do
+      stub_token(scopes: ["public"], user_id: authorized_user.id)
+      delete :destroy, id: resource.id
+      expect(response.status).to eq(403)
     end
   end
 

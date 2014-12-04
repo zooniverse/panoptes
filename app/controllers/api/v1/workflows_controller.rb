@@ -2,7 +2,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   include JsonApiController
   include Versioned
 
-  doorkeeper_for :update, :create, :delete, scopes: [:project]
+  doorkeeper_for :update, :create, :destroy, scopes: [:project]
   resource_actions :create, :update, :destroy
 
   alias_method :workflow, :controlled_resource
