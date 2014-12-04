@@ -6,12 +6,10 @@ shared_examples "is destructable" do
     end
 
     it "should return 204" do
-      delete :destroy, id: resource.id
       expect(response.status).to eq(204)
     end
 
     it "should delete the resource" do
-      delete :destroy, id: resource.id
       expect{resource_class.find(resource.id)}.to raise_error(ActiveRecord::RecordNotFound)
     end
   end

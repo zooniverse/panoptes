@@ -1,13 +1,8 @@
 require 'spec_helper'
 
 describe Api::V1::ProjectsController, type: :controller do
-  let!(:user) {
-    create(:user)
-  }
-
-  let!(:projects) {
-    projects = create_list(:project_with_contents, 2, owner: user)
-  }
+  let!(:user) { create(:user) }
+  let!(:projects) {create_list(:project_with_contents, 2, owner: user) }
 
   let(:api_resource_name) { "projects" }
   let(:api_resource_attributes) do
@@ -217,7 +212,7 @@ describe Api::V1::ProjectsController, type: :controller do
                                    user: user,
                                    user_group: owner,
                                    roles: ["group_admin"]) }
-        
+
         let(:create_params) do
           {
             projects: {
@@ -240,7 +235,7 @@ describe Api::V1::ProjectsController, type: :controller do
           project = Project.find(json_response['projects'][0]['id'])
           expect(project.owner).to eq(owner)
         end
-        
+
         it_behaves_like "is creatable"
       end
     end
@@ -276,7 +271,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
         contents_title = resource.project_contents
                          .where(language: resource.primary_language).first.title
-        
+
         expect(contents_title).to eq(test_attr_value)
       end
     end
@@ -303,7 +298,7 @@ describe Api::V1::ProjectsController, type: :controller do
           expect(resource.subject_sets.first.display_name).to eq(subject_set.display_name)
         end
 
-        it 'should have a differen id' do
+        it 'should have a different id' do
           expect(resource.subject_sets.first.id).to_not eq(subject_set.id)
         end
       end
@@ -311,7 +306,13 @@ describe Api::V1::ProjectsController, type: :controller do
   end
 
   describe "#destroy" do
-    let(:resource) { projects.first }
+    let(:resource) { create(:full_project, owner: user) }
+
+    it "should 403 with a non-scoped token" do
+      stub_token(scopes: ["public"], user_id: user.id)
+      delete :destroy, id: resource.id
+      expect(response.status).to eq(403)
+    end
 
     it_behaves_like "is destructable"
   end
