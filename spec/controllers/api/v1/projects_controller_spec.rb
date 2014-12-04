@@ -17,8 +17,7 @@ describe Api::V1::ProjectsController, type: :controller do
      "background_image"]
   end
   let(:api_resource_links) do
-    [ "projects.owner",
-      "projects.workflows",
+    [ "projects.workflows",
       "projects.subject_sets",
       "projects.project_contents",
       "projects.project_roles" ]
@@ -91,7 +90,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
 
           it "should respond with the correct item" do
-            owner_id = json_response[api_resource_name][0]['links']['owner']
+            owner_id = json_response[api_resource_name][0]['links']['owner']['id']
             expect(owner_id).to eq(new_project.owner.id.to_s)
           end
         end

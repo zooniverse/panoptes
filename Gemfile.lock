@@ -1,3 +1,13 @@
+GIT
+  remote: git://github.com/edpaget/restpack_serializer.git
+  revision: e55fd3dee8e1f0e4c16ccdfd79cbbd59d564fa9d
+  branch: dev
+  specs:
+    restpack_serializer (0.5.6)
+      activerecord (>= 4.0.3, < 5.0)
+      activesupport (>= 4.0.3, < 5.0)
+      kaminari (~> 0.16.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -243,10 +253,6 @@ GEM
     request_store (1.1.0)
     responders (1.1.2)
       railties (>= 3.2, < 4.2)
-    restpack_serializer (0.5.6)
-      activerecord (>= 4.0.3, < 5.0)
-      activesupport (>= 4.0.3, < 5.0)
-      kaminari (~> 0.16.1)
     rspec (3.0.0)
       rspec-core (~> 3.0.0)
       rspec-expectations (~> 3.0.0)
@@ -370,7 +376,7 @@ DEPENDENCIES
   puma
   rack-cors
   rails (= 4.1.7)
-  restpack_serializer (~> 0.5.6)
+  restpack_serializer!
   rspec (~> 3.0.0)
   rspec-rails (~> 3.0.0)
   sdoc (~> 0.4.0)
