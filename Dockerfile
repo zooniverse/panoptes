@@ -8,7 +8,8 @@ ADD ./Jarfile.lock /rails_app/
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && apt-get -y upgrade && apt-get clean && \
+RUN apt-get update && apt-get -y upgrade && \
+    apt-get install -y git && apt-get clean && \
     bundle install --without test development && \
     jbundle install --without test development
 
