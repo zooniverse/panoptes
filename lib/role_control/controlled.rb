@@ -25,8 +25,8 @@ module RoleControl
         !actor.blank?
       end
 
-      def scope_for(action, actor, target: nil, extra_test: [])
-        @roles_for[action].build(actor, target, extra_test)
+      def scope_for(action, actor, target: nil, extra_tests: [])
+        @roles_for[action].build(actor, target, extra_tests)
       end
 
       protected

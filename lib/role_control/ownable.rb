@@ -12,9 +12,9 @@ module RoleControl
     end
 
     module ClassMethods
-      def scope_for(action, actor, target: nil, extra_test: [])
-        extra_test << ownership_test(actor.try(:owner) || actor)
-        super(action, actor, target: target, extra_test: extra_test)
+      def scope_for(action, actor, target: nil, extra_tests: [])
+        extra_tests << ownership_test(actor.try(:owner) || actor)
+        super(action, actor, target: target, extra_tests: extra_tests)
       end
 
       def ownership_test(owner)

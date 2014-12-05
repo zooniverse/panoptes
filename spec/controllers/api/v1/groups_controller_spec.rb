@@ -4,7 +4,8 @@ describe Api::V1::GroupsController, type: :controller do
   let!(:user_groups) do
     [ create(:user_group_with_users),
       create(:user_group_with_projects),
-      create(:user_group_with_collections) ]
+      create(:user_group_with_collections),
+      create(:user_group, private: false) ]
   end
 
   let(:user) { user_groups[0].users.first }
@@ -27,7 +28,7 @@ describe Api::V1::GroupsController, type: :controller do
 
   describe "#index" do
     let(:private_resource) { user_groups[1] }
-    let(:n_visible) { 1 }
+    let(:n_visible) { 2 }
 
     context "filtering by name" do
       it 'should return only the requested group' do
