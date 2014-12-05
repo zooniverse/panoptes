@@ -18,7 +18,7 @@ FactoryGirl.define do
     factory :full_project do
       after(:create) do |p|
         workflow = create(:workflow, project: p)
-        subject_set = create_list(:subject_set_with_subjects, 2, project: p, workflows: [workflow])
+        subject_set = create_list(:subject_set_with_subjects, 2, project: p, workflow: workflow)
       end
     end
 

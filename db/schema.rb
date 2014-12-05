@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141201175902) do
+ActiveRecord::Schema.define(version: 20141204192317) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -193,17 +193,11 @@ ActiveRecord::Schema.define(version: 20141201175902) do
     t.datetime "updated_at"
     t.integer  "set_member_subjects_count", default: 0, null: false
     t.json     "metadata"
+    t.integer  "workflow_id"
   end
 
   add_index "subject_sets", ["project_id"], name: "index_subject_sets_on_project_id", using: :btree
-
-  create_table "subject_sets_workflows", id: false, force: true do |t|
-    t.integer "subject_set_id", null: false
-    t.integer "workflow_id",    null: false
-  end
-
-  add_index "subject_sets_workflows", ["subject_set_id"], name: "index_subject_sets_workflows_on_subject_set_id", using: :btree
-  add_index "subject_sets_workflows", ["workflow_id"], name: "index_subject_sets_workflows_on_workflow_id", using: :btree
+  add_index "subject_sets", ["workflow_id"], name: "index_subject_sets_on_workflow_id", using: :btree
 
   create_table "subjects", force: true do |t|
     t.string   "zooniverse_id"
