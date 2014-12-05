@@ -48,6 +48,7 @@ shared_examples "is updatable" do
 end
 
 shared_examples "has updatable links" do
+  let(:old_ids) { resource.send(test_relation).map(&:id) }
   let(:updated_resource) { resource.reload }
   
   before(:each) do
@@ -58,6 +59,31 @@ shared_examples "has updatable links" do
   
   it 'should update any included links' do
     expect(updated_resource.send(test_relation)
-           .map(&:id)).to include(*test_relation_ids)
+            .map(&:id)).to include(*test_relation_ids)
+  end
+end
+
+RSpec.shared_examples "supports update_links" do
+  let!(:old_ids) { resource.send(test_relation).map(&:id) }
+  let(:updated_resource) { resource.reload }
+
+  before(:each) do
+    default_request scopes: scopes, user_id: authorized_user.id
+    params = {
+      link_relation: test_relation.to_s,
+      test_relation => test_relation_ids,
+      resource_id => resource.id
+    }
+    
+    post :update_links, params
+  end
+  
+  it 'should update any included links' do
+    expect(updated_resource.send(test_relation)
+            .map(&:id).map(&:to_s)).to include(*test_relation_ids)
+  end
+
+  it 'should retain pre-existing links' do
+    expect(updated_resource.send(test_relation).map(&:id)).to include(*old_ids)
   end
 end
