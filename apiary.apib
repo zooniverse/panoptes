@@ -90,7 +90,7 @@ The User resource has the following attributes:
             {
                 "links": {
                     "users.projects": {
-                        "href": "/projects?owner={users.login}",
+                        "href": "/projects?owner={users.owner_name}",
                         "type": "projects"
                     },
                     "users.user_groups": {
@@ -98,11 +98,11 @@ The User resource has the following attributes:
                         "type": "user_groups"
                     },
                     "users.subjects": {
-                        "href": "/subjects?user_id={users.users.id}",
+                        "href": "/subjects?user_id={users.id}",
                         "type": "subjects"
                     },
                     "users.collections": {
-                        "href": "/collections?owner={users.login}",
+                        "href": "/collections?owner={users.owner_name}",
                         "type": "collections"
                     }
                 },
@@ -113,6 +113,7 @@ The User resource has the following attributes:
                     "credited_name": "Dr. Stuart Lynn",
                     "display_name": "stuart",
                     "login": "stuart",
+                    "owner_name": "stuart",
                     "email": "stuart@zoooniverse.org",
                     "zooniverse_id": "123432",
                     "classifications_count": "104",
@@ -190,7 +191,7 @@ User resources are included a an array under the _users_ key
             {
                 "links": {
                     "users.projects": {
-                        "href": "/projects?owner={users.login}",
+                        "href": "/projects?owner={users.owner_name}",
                         "type": "projects"
                     },
                     "users.user_groups": {
@@ -198,11 +199,11 @@ User resources are included a an array under the _users_ key
                         "type": "user_groups"
                     },
                     "users.subjects": {
-                        "href": "/subjects?user_id={users.users.id}",
+                        "href": "/subjects?user_id={users.id}",
                         "type": "subjects"
                     },
                     "users.collections": {
-                        "href": "/collections?owner={users.login}",
+                        "href": "/collections?owner={users.owner_name}",
                         "type": "collections"
                     }
                 },
@@ -228,6 +229,7 @@ User resources are included a an array under the _users_ key
                     "created_name": "Dr. Stuart Lynn",
                     "display_name": "stuart",
                     "login": "stuart",
+                    "owner_name": "stuart",
                     "email": "stuart@zoooniverse.org",
                     "zooniverse_id": "123432",
                     "classifications_count": "104",
@@ -240,6 +242,7 @@ User resources are included a an array under the _users_ key
                     "created_name": "Dr. Stuart Lynn",
                     "display_name": "stuart",
                     "login": "stuart",
+                    "owner_name": "stuart",
                     "email": "stuart@zoooniverse.org",
                     "zooniverse_id": "123432",
                     "classifications_count": "104",
@@ -2205,7 +2208,7 @@ A User Group has the following attributes:
             {
                 "links": {
                     "user_groups.projects": {
-                        "href": "/projects?owner={user_groups.name}",
+                        "href": "/projects?owner={user_groups.owner_name}",
                         "type": "projects"
                     },
                     "user_groups.classifications": {
@@ -2213,7 +2216,7 @@ A User Group has the following attributes:
                         "type": "classifications"
                     },
                     "user_groups.collections": {
-                        "href": "/collections?owner={user_groups.name}"
+                        "href": "/collections?owner={user_groups.owner_name}"
                         "type": "collections"
                     },
                     "user_groups.users": {
@@ -2229,10 +2232,17 @@ A User Group has the following attributes:
                     "id": "42",
                     "name": "a_cool_group",
                     "display_name": "A Cool Group",
+                    "owner_name": "a_cool_group",
                     "created_at": "2014-08-11T10:11:34Z",
                     "updated_at": "2014-12-11T00:11:34Z",
                     "classifications_count": "1002340",
-                    "activated_state": "active"
+                    "activated_state": "active",
+                    "links": {
+                        "memberships": ["101", "102"],
+                        "users": ["10001", "9102"],
+                        "projects": ["10"],
+                        "collections": ["11"]
+                    }
                 }]
             }
 
@@ -2363,7 +2373,7 @@ User Groups are returned as an array under *user_groups*.
             {
                  "links": {
                     "user_groups.projects": {
-                        "href": "/projects?owner={user_groups.name}",
+                        "href": "/projects?owner={user_groups.owner_name}",
                         "type": "projects"
                     },
                     "user_groups.classifications": {
@@ -2371,7 +2381,7 @@ User Groups are returned as an array under *user_groups*.
                         "type": "classifications"
                     },
                     "user_groups.collections": {
-                        "href": "/collections?owner={user_groups.name}"
+                        "href": "/collections?owner={user_groups.owner_name}"
                         "type": "collections"
                     },
                     "user_groups.users": {
@@ -2402,18 +2412,32 @@ User Groups are returned as an array under *user_groups*.
                     "id": "42",
                     "name": "a_cool_group",
                     "display_name": "A Cool Group",
+                    "owner_name": "a_cool_group",
                     "created_at": "2014-08-11T10:11:34Z",
                     "updated_at": "2014-12-11T00:11:34Z",
                     "classifications_count": "1002340",
                     "activated_state": "active"
+                    "links": {
+                        "memberships": ["101", "102"],
+                        "users": ["10001", "9102"],
+                        "projects": ["10"],
+                        "collections": ["11"]
+                    }
                 },{
                     "id": "44",
                     "name": "a_cool_gang",
                     "display_name": "A Cool Gang",
+                    "owner_name": "a_cool_gang",
                     "created_at": "2014-09-10T10:41:54Z",
                     "updated_at": "2014-11-11T01:21:33Z",
                     "classifications_count": "2341",
                     "activated_state": "active"
+                    "links": {
+                        "memberships": ["101", "102"],
+                        "users": ["10001", "9102"],
+                        "projects": ["10"],
+                        "collections": ["11"]
+                    }
                 }]
             }
 
