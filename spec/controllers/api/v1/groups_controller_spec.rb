@@ -49,6 +49,22 @@ describe Api::V1::GroupsController, type: :controller do
 
   describe "#show" do
     let(:resource) { user_groups.first }
+
+    context "includes customized urls" do
+      before(:each) do
+        get :show, id: resource.id
+      end
+      
+      it 'should include a url for projects' do
+        projects_link = json_response['links']['user_groups.projects']['href']
+        expect(projects_link).to eq("/projects?owner={user_groups.name}")
+      end
+
+      it 'should include a url for collections' do
+        collections_link = json_response['links']['user_groups.collections']['href']
+        expect(collections_link).to eq("/collections?owner={user_groups.name}")
+      end
+    end
     
     it_behaves_like "is showable"
   end

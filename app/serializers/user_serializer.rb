@@ -2,7 +2,9 @@ class UserSerializer
   include RestPack::Serializer
   attributes :id, :login, :display_name, :credited_name, :email, :created_at, :updated_at,
              :owner_name
-  can_include :projects, :collections, :classifications, :subjects, :project_preferences
+  can_include :classifications, :subjects, :project_preferences,
+              projects: { param: "owner", value: "login" },
+              collections: { param: "owner", value: "login" }
 
   can_filter_by :login
 
