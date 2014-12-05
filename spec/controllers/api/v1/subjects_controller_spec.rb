@@ -244,6 +244,10 @@ describe Api::V1::SubjectsController, type: :controller do
       it "should set the file extension from the provided mime-type" do
         expect(standard_url).to match(/\.jpeg/)
       end
+
+      it "should set the bucket with a path prefix" do
+        expect(standard_url).to match(/s3_subject_bucket\/test_bucket_path/)
+      end
     end
 
     it_behaves_like "is creatable"

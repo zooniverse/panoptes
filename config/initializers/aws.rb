@@ -9,9 +9,13 @@ module Panoptes
                       { subjects_bucket: "panoptes_development_subjects" }
                     end
   end
-  
+
   def self.subjects_bucket
     @subjects_bucket ||= AWS::S3.new.buckets[aws_config[:subjects_bucket]]
+  end
+
+  def self.bucket_path
+    @bucket_path ||= aws_config[:bucket_path]
   end
 end
 

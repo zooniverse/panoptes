@@ -72,6 +72,6 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def subject_path(location, mime, project_id)
     extension = MIME::Types[mime].first.extensions.first
-    "#{project_id}/#{location}/#{SecureRandom.uuid}.#{extension}"
+    "#{::Panoptes.bucket_path}/#{project_id}/#{location}/#{SecureRandom.uuid}.#{extension}"
   end
 end
