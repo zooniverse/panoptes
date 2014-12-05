@@ -138,19 +138,22 @@ describe Api::V1::GroupsController, type: :controller do
     let(:new_user) { create(:user) }
     let(:resource) { user_groups.first }
     let(:new_membership) { Membership.where(user: new_user).first }
-    
-    before(:each) do
+    let(:test_relation) { :users }
+    let(:test_relation_ids) { [ new_user.id.to_s ] }
+    let(:resource_id) { :group_id }
+
+    context "created membership" do
+      before(:each) do
+        
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :update_links, group_id: resource.id, users: [ new_user.id.to_s ], link_relation: "users"
+      end
       
-      default_request scopes: scopes, user_id: authorized_user.id
-      post :update_links, group_id: resource.id, users: [ new_user.id.to_s ], link_relation: "users"
-    end
-    
-    it 'should add a user to the group' do
-      expect(new_membership.user_group).to eq(resource)
+      it 'should give the user a group_member role' do
+        expect(new_membership.roles).to eq(%w(group_member))
+      end
     end
 
-    it 'should give the user a group_member role' do
-      expect(new_membership.roles).to eq(%w(group_member))
-    end
+    it_behaves_like "supports update_links"
   end
 end

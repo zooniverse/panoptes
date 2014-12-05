@@ -15,7 +15,7 @@ module JsonApiController
     def update_links
       check_relation
       ActiveRecord::Base.transaction do
-        update_relation(relation, params[relation])
+        add_relation(relation, params[relation])
         controlled_resource.save!
       end
 
