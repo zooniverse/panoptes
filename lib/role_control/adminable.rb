@@ -9,9 +9,9 @@ module RoleControl
     end
 
     module ClassMethods
-      def scope_for(action, actor, target: nil)
+      def scope_for(action, actor, target: nil, extra_tests: [])
         return all if actor.try(:is_admin?)
-        super(action, actor, target: target)
+        super(action, actor, target: target, extra_tests: extra_tests)
       end
     end
     

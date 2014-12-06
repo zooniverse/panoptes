@@ -30,6 +30,15 @@ class UserGroup < ActiveRecord::Base
   can_by_role :destroy, act_as: Project, roles: [ :group_admin, :project_editor ]
   can_by_role :create, act_as: Project, roles: [ :group_admin, :project_editor ]
 
+  def self.scope_for(action, actor, target: nil)
+    case action
+    when :show
+      super(action, actor, target: target, extra_tests: [arel_table[:private].eq(false)])
+    else
+      super(action, actor, target: target)
+    end
+  end
+
   private
 
   def downcase_case_insensitive_fields
