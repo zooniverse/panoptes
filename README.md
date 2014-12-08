@@ -75,7 +75,7 @@ Finally there are some helper scripts to get access to a console, bash shell etc
 
 **Note:** if you've ever built a Panoptes docker container before you should just run `fig up` instead of the `./scripts/fig/up_panoptes.sh` to ensure the previously built container is not re-used. After rebuilding you should be good to use `./scripts/fig/up_panoptes.sh` script to use the re-created containers.
 
-### Run manually with self installed and run dependencies
+### 2. Run manually with self installed and run dependencies
 
 Setup the following services to get Panoptes up and running:
 
@@ -104,7 +104,7 @@ A really easy way to get Zookeeper running on your local machine, if you don't w
 
 Make sure you don't have anything else running on port 2181 that will conflict with the container. Or change the second number to map to a different port and adjust the port in your `cellect.yml` file.
 
-### Vagrant
+### 3. Vagrant
 
 If you're just looking to run Panoptes to develop against its API. I recommend looking at [Devoptes](https://github.com/zooniverse/Devoptes). **Note:** Devoptes is no longer under active development!
 
