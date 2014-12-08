@@ -15,17 +15,14 @@ class SubjectSetUpdateSchema < JsonSchema
     property "links" do
       type "object"
       
-      property "workflows" do
-        type "array"
-        items do
-          type "string"
-        end
+      property "workflow" do
+        type "string", "integer"
       end
 
       property "subjects" do
         type "array"
         items do
-          type "string"
+          type "string", "integer"
         end
       end
     end
