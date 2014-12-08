@@ -131,10 +131,6 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:request_params) { { sort: 'cellect', workflow_id: workflow.id.to_s } }
         let(:cellect_results) { subjects.take(2).map(&:id) }
 
-        let!(:session) do
-          request.session = { cellect_hosts: { workflow.id.to_s => 'example.com' } }
-        end
-
         describe "testing the response" do
 
           before(:each) do
@@ -191,9 +187,7 @@ describe Api::V1::SubjectsController, type: :controller do
           metadata: {
             interesting_data: "Tested Collection"
           },
-          locations: {
-            standard: "image/jpeg"
-          }
+          locations: [ "image/jpeg" ]
         }
       }
     end
@@ -211,11 +205,7 @@ describe Api::V1::SubjectsController, type: :controller do
       {
         subjects: {
           metadata: { cool_factor: "11" },
-          locations: {
-            standard:  "image/jpeg",
-            thumbnail: "image/jpeg",
-            inverted:  "image/jpeg",
-          },
+          locations: ["image/jpeg", "image/jpeg", "image/jpeg"],
           links: {
             project: project.id
           }
@@ -230,7 +220,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       let(:standard_url) do
-        json_response['subjects'][0]['locations']['standard']
+        json_response['subjects'][0]['locations'][0]['image/jpeg']
       end
 
       it 'should return locations as a hash of signed s3 urls' do

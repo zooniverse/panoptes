@@ -45,28 +45,30 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def selector
-    @selector ||= SubjectSelector.new(api_user, params)
+    @selector ||= SubjectSelector.new(api_user,
+                                      params)
   end
 
   def create_params
     params.require(:subjects)
       .permit(metadata: params[:subjects][:metadata].try(:keys),
-              locations: params[:subjects][:locations].try(:keys),
+              locations: [],
               links: [:project, :subject_sets, owner: [:id, :type]])
   end
 
   def update_params
     params.require(:subjects)
       .permit(metadata: params[:subjects][:metadata].try(:keys),
-              locations: params[:subjects][:locations].try(:keys),
+              locations: [],
               links: [:subject_sets])
   end
 
   def add_subject_path(locations, project_id)
-    locations.reduce({}) do |locs, (location, mime)|
-      locs[location] = {mime_type: mime,
-                        s3_path: subject_path(location, mime, project_id)}
-      locs
+    locations.map.with_index do |mime, idx|
+      mime.split(',').reduce({}) do |location, mime|
+        location[mime] = subject_path(idx, mime, project_id)
+        location
+      end
     end
   end
 

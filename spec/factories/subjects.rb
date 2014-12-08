@@ -6,8 +6,7 @@ FactoryGirl.define do
     metadata({distance_from_earth: "42 light years",
               brightness: -20,
               loudness: 11})
-    locations({main_image: {mime_type: "image/jpeg",
-                            s3_path: "1/main_image/#{SecureRandom.uuid}.jpeg"}})
+    locations([ {"image/jpeg" => "1/1/#{SecureRandom.uuid}.jpeg"} ])
 
     factory :subject_with_collections do
       after(:create) do |s|
