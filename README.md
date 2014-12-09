@@ -59,7 +59,7 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
 
 6. Run `scripts/fig/run_cmd_panoptes.sh "bundle install && rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
     * This will seed the fig development database in the docker container.
-    * **Note:** Run this only after step 1 has completed successfully.
+    * **Note:** Run this only after step 4 has completed successfully.
 
 7. Finally, if you want to apply schema migrations, run `scripts/fig/migrate_db_panoptes.sh`
 
