@@ -44,6 +44,7 @@ class SubjectLocationsExtractor
   def s3_url(obj, mime_type)
     if @context[:post_urls]
       obj.url_for(:write, {secure: true,
+                           content_type: mime_type,
                            expires_in: 20.minutes.from_now,
                            response_content_type: mime_type,
                            acl: 'public-read'}).to_s
