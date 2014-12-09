@@ -78,6 +78,7 @@ class Api::V1::WorkflowsController < Api::ApiController
                   :first_task,
                   tasks: permit_tasks,
                   links: [:project,
+                          :tutorial_subject,
                           subject_sets: []])
   end
 
@@ -88,7 +89,7 @@ class Api::V1::WorkflowsController < Api::ApiController
                   :display_name,
                   :first_task,
                   tasks: permit_tasks,
-                  links: [subject_sets: []])
+                  links: [:tutorial_subject, subject_sets: []])
   end
 
   def permit_params(*permitted)

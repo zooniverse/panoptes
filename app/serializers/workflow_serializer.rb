@@ -4,7 +4,7 @@ class WorkflowSerializer
              :created_at, :updated_at, :first_task, :primary_language,
              :version, :content_language
   
-  can_include :project, :subject_sets
+  can_include :project, :subject_sets, :tutorial_subject
 
   def version
     "#{@model.versions.last.id}.#{content.versions.last.id}"

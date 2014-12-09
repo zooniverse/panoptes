@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141205165618) do
+ActiveRecord::Schema.define(version: 20141209165421) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -339,8 +339,10 @@ ActiveRecord::Schema.define(version: 20141205165618) do
     t.boolean  "prioritized",           default: false, null: false
     t.string   "primary_language"
     t.string   "first_task"
+    t.integer  "tutorial_subject_id"
   end
 
   add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree
+  add_index "workflows", ["tutorial_subject_id"], name: "index_workflows_on_tutorial_subject_id", using: :btree
 
 end
