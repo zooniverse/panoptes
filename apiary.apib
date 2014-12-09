@@ -598,9 +598,9 @@ the API.
                     "zooniverse_id": "AGFS0001231",
                     "created_at": "2014-03-24T10:42:21Z",
                     "updated_at": "2014-03-24T10:42:21Z",
-                    "locations": {
-                        "standard": "http://s3.amazonaws.com/subjects/1.png"
-                    },
+                    "locations": [
+                        {"image/jpeg": "http://s3.amazonaws.com/subjects/1.png"}
+                    ],
                     "metadata": {
                         "lens_type": "50mm"
                     },
@@ -632,10 +632,10 @@ Users are permitted to edit subjects they own or subjects
 belonging to projects a user has edit permissions for. A user may
 not change the project or owner of a subject.
 
-A request changing the *locations* hash should be full list of keys and
-mime-types for the assoicated media (see sample below). The response
-will contain signed s3 urls the client may make a PUT request
-containing the media to. The signed urls will be valid for 20 minutes.
+The *locations* array should have the mime-types of the subject's
+associated media. The response will contain signed s3 urls the client
+may make a PUT request containing the media to. The signed urls will
+be valid for 20 minutes.
 
 A request chagning the *metadata* hash must contain a full
 representation of the attribute.
@@ -651,9 +651,9 @@ representation of the attribute.
 
             {
                 "subjects": {
-                    "locations": {
-                        "standard": "image/png"
-                    }
+                    "locations": [
+                        "image/png"
+                    ]
                 }
             }
 
@@ -860,9 +860,9 @@ Subjects are returned as an array under the _subject_ key.
                     "zooniverse_id": "AGFS0001231",
                     "created_at": "2014-03-24T10:42:21Z",
                     "updated_at": "2014-03-24T10:42:21Z",
-                    "locations": {
-                        "standard": "http://s3.amazonaws.com/subjects/1.png"
-                    },
+                    "locations": [
+                        {"image/jpeg": "http://s3.amazonaws.com/subjects/1.png"}
+                    ],
                     "metadata": {
                         "lens_type": "50mm"
                     },
@@ -879,9 +879,9 @@ Subjects are returned as an array under the _subject_ key.
                     "zooniverse_id": "AGFS0001232",
                     "created_at": "2014-03-24T10:44:21Z",
                     "updated_at": "2014-03-24T10:44:21Z",
-                    "locations": {
-                        "standard": "http://s3.amazonaws.com/subjects/2.png"
-                    },
+                    "locations": [
+                        {"image/jpeg": "http://s3.amazonaws.com/subjects/2.png"}
+                    ],
                     "metadata": {
                         "lens_type": "50mm"
                     },
@@ -924,11 +924,12 @@ classify, usually for expert classifiers.
     [Subject Collection][]
 
 ### Create a Subject [POST]
-A *locations* attributes and a project link are required. The
-*locations* hash should include keys and the mime-type of their
+A *locations* attributes and a project link are required.
+
+The *locations* array should have the mime-types of the subject's
 associated media. The response will contain signed s3 urls the client
-may make a PUT request containing the media to. The signed urls
-will be valid for 20 minutes.
+may make a PUT request containing the media to. The signed urls will
+be valid for 20 minutes.
 
 The *metadata* attribute and a link to an owner besides
 the active user are optional.
@@ -944,9 +945,9 @@ the active user are optional.
 
             {
                 "subjects": {
-                    "locations": {
-                        "standard": "image/png",
-                    },
+                    "locations": [
+                        "image/png"
+                    ],
                     "metadata": {
                         "lens_type": "50mm"
                     },

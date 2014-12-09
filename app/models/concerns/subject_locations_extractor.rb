@@ -9,7 +9,7 @@ class SubjectLocationsExtractor
 
   def locations
     duplicate_locations
-    return {} unless @locations
+    return [] unless @locations
     if migrated_subject?
       migrated_locations
     else
@@ -32,11 +32,12 @@ class SubjectLocationsExtractor
   end
 
   def panoptes_locations
-    @locations.reduce({}) do |locs, (key, data)|
-      path, mime_type = data.values_at("s3_path", "mime_type")
-      obj = ::Panoptes.subjects_bucket.objects[path]
-      locs[key] = s3_url(obj, mime_type)
-      locs
+    @locations.map do |media|
+      media.reduce({}) do |m, (mime_type, path)|
+        obj = ::Panoptes.subjects_bucket.objects[path]
+        m[mime_type] = s3_url(obj, mime_type)
+        m
+      end
     end
   end
 

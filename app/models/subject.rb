@@ -22,7 +22,7 @@ class Subject < ActiveRecord::Base
   end
 
   def self.can_create?(actor)
-    true
+    !!actor
   end
 
   def migrated_subject?
