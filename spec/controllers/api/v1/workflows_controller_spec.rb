@@ -13,7 +13,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:api_resource_attributes) do
     %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version)
   end
-  let(:api_resource_links){ %w(workflows.project workflows.subject_sets) }
+  let(:api_resource_links){ %w(workflows.project workflows.subject_sets workflows.tutorial_subject) }
   let(:scopes) { %w(public project) }
 
   before(:each) do
@@ -113,7 +113,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           prioritized: true,
           primary_language: 'en',
           links: {
-            project: project.id,
+            project: project.id.to_s
           }
         }
       }
@@ -127,6 +127,24 @@ describe Api::V1::WorkflowsController, type: :controller do
         post :create, create_params
         instance = Workflow.find(created_instance_id(api_resource_name))
         expect(instance.tasks["interest"]["question"]).to eq("interest.question")
+      end
+    end
+
+    context "includes a tutorial subject" do
+      let(:tut_sub) { create(:subject, project: project).id.to_s }
+      
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        create_params[:workflows][:links][:tutorial_subject] = tut_sub
+        post :create, create_params
+      end
+      
+      it 'responds with tutorial subject link' do
+        expect(json_response['workflows'][0]['links']['tutorial_subject']).to eq(tut_sub)
+      end
+
+      it 'responds with a tutorial subject link template' do
+        expect(json_response['links']['workflows.tutorial_subject']['href']).to eq("/subjects/{workflows.tutorial_subject}")
       end
     end
   end

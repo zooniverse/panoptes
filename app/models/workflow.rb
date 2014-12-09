@@ -9,6 +9,7 @@ class Workflow < ActiveRecord::Base
   belongs_to :project
   has_many :subject_sets
   has_many :classifications
+  belongs_to :tutorial_subject, class_name: "Subject"
 
   validates_presence_of :project
 
