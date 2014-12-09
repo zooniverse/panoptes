@@ -2511,6 +2511,11 @@ It has the following attributes:
 
 *id*, *created_at*, and *update_at* are assigned by the API.
 
+Membership *state* can be "invited", "active", "inactive". When a user
+is added to a group, their state is set to "invited". After they take
+action to join the group their state becomes "active". A User who leaves
+a group has their state set to "inactive". 
+
 + Model
 
     + Body
