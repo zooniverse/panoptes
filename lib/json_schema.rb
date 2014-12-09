@@ -23,8 +23,8 @@ class JsonSchema
       schema[:title] = title
     end
 
-    def type(type)
-      schema[:type] = type
+    def type(*type)
+      schema[:type] = type.length == 1 ? type.first : type
     end
 
     def description(desc)

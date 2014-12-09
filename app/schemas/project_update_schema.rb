@@ -82,14 +82,14 @@ class ProjectUpdateSchema < JsonSchema
       property "workflows" do
         type "array"
         items do
-          type "string"
+          type "string", "integer"
         end
       end
 
       property "subject_sets" do
         type "array"
         items do
-          type "string"
+          type "string", "integer"
         end
       end
     end
