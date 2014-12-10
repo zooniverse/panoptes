@@ -2,7 +2,6 @@ class Api::V1::SubjectsController < Api::ApiController
   include JsonApiController
   include Versioned
 
-  before_action :merge_cellect_host, only: :index
   doorkeeper_for :update, :create, :destroy, :version, :versions,
                  scopes: [:subject]
   resource_actions :show, :create, :update, :destroy
@@ -40,13 +39,11 @@ class Api::V1::SubjectsController < Api::ApiController
     super(update_params)
   end
 
-  def merge_cellect_host
-    params[:host] = cellect_host(params[:workflow_id])
-  end
-
   def selector
     @selector ||= SubjectSelector.new(api_user,
-                                      params)
+                                      params,
+                                      visible_scope,
+                                      cellect_host(params[:workflow_id]))
   end
 
   def create_params

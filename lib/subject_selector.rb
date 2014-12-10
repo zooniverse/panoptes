@@ -3,8 +3,8 @@ class SubjectSelector
 
   attr_reader :user, :params
 
-  def initialize(user, params)
-    @user, @params = user, params
+  def initialize(user, params, scope, host)
+    @user, @params, @scope, @host = user, params, scope, host
   end
 
   def create_response
@@ -31,12 +31,12 @@ class SubjectSelector
   end
 
   def query_subjects
-    SubjectSerializer.page(params)
+    SubjectSerializer.page(params, @scope)
   end
 
   def selected_subjects(subject_ids)
     set_member_subjects = SetMemberSubject.where(id: subject_ids).select(:subject_id)
-    subjects = Subject.includes(:versions).where(id: set_member_subjects)
+    subjects = @scope.where(id: set_member_subjects)
     SubjectSerializer.page({}, subjects)
   end
 
@@ -47,11 +47,12 @@ class SubjectSelector
   end
 
   def cellect_params
-    c_params = params.permit(:sort, :workflow_id, :subject_set_id, :limit, :host)
-    c_params[:user_id] = user.id
-    c_params[:limit] ||= 10
-    c_params[:group_id] = c_params.delete(:subject_set_id)
-    c_params.delete(:sort)
-    c_params.symbolize_keys
+    {
+      workflow_id: params[:workflow_id],
+      group_id: params[:subject_set_id],
+      limit: params[:per_page] || 10,
+      host: @host,
+      user_id: user.id
+    }
   end
 end
