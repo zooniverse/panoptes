@@ -27,7 +27,7 @@ platforms :jruby do
   gem 'jbundler'
   gem 'activerecord-jdbcpostgresql-adapter'
   gem 'therubyrhino'
-  gem 'jruby-kafka'
+  gem 'jruby-kafka', github: 'joekiller/jruby-kafka'
 end
 
 platforms :ruby do
