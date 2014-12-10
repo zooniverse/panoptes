@@ -19,7 +19,7 @@ if [ "$RAILS_ENV" == "development" ]; then
     rake db:migrate
     rm /firstrun
   else
-    foreman start
+    exec foreman start
   fi
 else
   exec bundle exec rails s puma -p 80 $*
