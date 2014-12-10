@@ -5,7 +5,7 @@ class ProjectSerializer
     :title, :description, :guide, :team_members, :science_case,
     :introduction, :avatar, :background_image
 
-  can_include :workflows, :subject_sets, :owner, :project_contents,
+  can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles
   can_filter_by :display_name
 
@@ -24,7 +24,7 @@ class ProjectSerializer
   def team_members
     content[:team_members]
   end
-  
+
   def science_case
     content[:science_case]
   end
