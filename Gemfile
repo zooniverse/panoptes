@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'jbundler', platform: :jruby
 gem 'rails', '4.1.7'
 gem 'postgres_ext'
 gem 'sdoc', '~> 0.4.0',          group: :doc
@@ -24,7 +25,6 @@ gem 'aws-sdk'
 gem 'json-schema'
 
 platforms :jruby do
-  gem 'jbundler'
   gem 'activerecord-jdbcpostgresql-adapter'
   gem 'therubyrhino'
   gem 'jruby-kafka', github: 'joekiller/jruby-kafka'
