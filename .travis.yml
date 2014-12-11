@@ -2,24 +2,27 @@ language: ruby
 
 cache: bundler
 
-jdk:
-  - openjdk7
-
-rvm:
-  - 2.1.2
-  - jruby-19mode
-
-services:
-  - postgresql
-
-env: JRUBY_OPTS=--2.0
-
-addons:
-  postgresql: "9.3"
-
-before_script:
+before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
   - rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson
   - RACK_ENV=test bundle exec rake db:create db:migrate
+
+matrix:
+  include:
+    - rvm: 2.1.2
+    - rvm: jruby-19mode
+      jdk: openjdk7
+      env: JRUBY_OPTS=--2.0
+      before_script:
+        - bundle exec jbundle install
+        - psql -c 'create database travis_ci_test;' -U postgres
+        - rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson
+        - RACK_ENV=test bundle exec rake db:create db:migrate
+      
+services:
+  - postgresql
+
+addons:
+  postgresql: "9.3"
 
 script: RACK_ENV=test bundle exec rake spec
