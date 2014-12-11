@@ -34,22 +34,22 @@ class SubjectLocationsExtractor
   def panoptes_locations
     @locations.map do |media|
       media.reduce({}) do |m, (mime_type, path)|
-        obj = ::Panoptes.subjects_bucket.objects[path]
-        m[mime_type] = s3_url(obj, mime_type)
+        m[mime_type] = s3_url(path, mime_type)
         m
       end
     end
   end
 
-  def s3_url(obj, mime_type)
+  def s3_url(path, mime_type)
     if @context[:post_urls]
+      obj = ::Panoptes.subjects_bucket.objects[path]
       obj.url_for(:write, {secure: true,
                            content_type: mime_type,
                            expires_in: 20.minutes.from_now,
                            response_content_type: mime_type,
                            acl: 'public-read'}).to_s
     else
-      obj.public_url(secure: true)
+      "https://#{path[1..-1]}"
     end
   end
 end

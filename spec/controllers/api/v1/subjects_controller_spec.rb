@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+UUIDv4Regex = /[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/
+
 describe Api::V1::SubjectsController, type: :controller do
   let!(:workflow) { create(:workflow_with_subject_sets) }
   let!(:subject_set) { workflow.subject_sets.first }
@@ -175,6 +177,23 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:resource) { create(:subject) }
 
     it_behaves_like "is showable"
+
+    context "location urls" do
+      let(:url) { json_response['subjects'][0]['locations'][0]['image/jpeg'] }
+      
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        get :show, id: resource.id
+      end
+
+      it 'should return the location path as an id' do
+        expect(url).to match(/https:\/\/panoptes-uploads.zooniverse.org/)
+      end
+
+      it 'should return the uuid file name' do
+        expect(url).to match(UUIDv4Regex)
+      end
+    end
   end
 
   describe "#update" do
@@ -228,7 +247,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       it "should set a uuidv4 id as the file name" do
-        expect(standard_url).to match(/[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/)
+        expect(standard_url).to match(UUIDv4Regex)
       end
 
       it "should set the file extension from the provided mime-type" do
