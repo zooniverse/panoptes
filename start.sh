@@ -22,5 +22,8 @@ if [ "$RAILS_ENV" == "development" ]; then
     exec foreman start
   fi
 else
+  mkdir -p tmp/pids/
+  rm -f tmp/pids/*.pid
+  bundle exec sidekiq &
   exec bundle exec rails s puma -p 80 $*
 fi
