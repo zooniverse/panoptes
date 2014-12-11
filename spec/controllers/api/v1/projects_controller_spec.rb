@@ -123,6 +123,37 @@ describe Api::V1::ProjectsController, type: :controller do
           end
         end
       end
+
+      describe "include params" do
+        before(:each) do
+          get :index, { include: includes }
+        end
+
+        context "when the serializer models are known" do
+          let(:includes) { "workflows,subject_sets" }
+
+          it "should include the relations in the response as linked" do
+            expect(json_response['linked'].keys).to match_array(%w(workflows subject_sets))
+          end
+        end
+
+        context "when the serializer model is polymorphic" do
+          let(:includes) { "owners" }
+
+          it "should include the owners in the response as linked" do
+            expect(json_response['linked'].keys).to match_array([includes])
+          end
+        end
+
+        context "when the included model is invalid" do
+          let(:includes) { "unknown_model_plural" }
+
+          it "should return an error body in the response" do
+            error_message = ":unknown_model_plural is not a valid include for Project"
+            expect(response.body).to eq(json_error_message(error_message))
+          end
+        end
+      end
     end
 
     describe "#show" do
@@ -173,6 +204,13 @@ describe Api::V1::ProjectsController, type: :controller do
 
           it "should return a created response" do
             expect(json_response["projects"]).to_not be_empty
+          end
+        end
+
+        describe "owner links" do
+
+          it "should include the link" do
+            expect(json_response['linked']['owners']).to_not be_nil
           end
         end
 

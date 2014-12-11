@@ -36,6 +36,13 @@ class Api::V1::ProjectsController < Api::ApiController
     end
   end
 
+  def create_response(project)
+    serializer.resource({ id: project.id, include: 'owners'},
+                          nil,
+                          languages: [ project.primary_language ],
+                          fields: CONTENT_FIELDS)
+  end
+
   def content_from_params(ps)
     ps[:title] = ps[:display_name]
     content = ps.slice(*CONTENT_FIELDS)

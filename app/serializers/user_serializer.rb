@@ -15,17 +15,20 @@ class UserSerializer
   def email
     @model.email if permitted_requester?
   end
-  
+
   def owner_name
     @model.owner_uniq_name
   end
 
   private
-  
+
   def permitted_requester?
-    @perrmitted ||= @context[:include_private] || 
-                    (@context[:requester].logged_in? &&
-                     (@model.id == @context[:requester].id) ||
-                     @context[:requester].is_admin?)
+    @perrmitted ||= @context[:include_private] || requester
+
+  end
+
+  def requester
+    @context[:requester] && @context[:requester].logged_in? &&
+    (@context[:requester].is_admin? || @model.id == @context[:requester].id)
   end
 end

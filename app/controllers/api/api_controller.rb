@@ -22,6 +22,7 @@ module Api
     rescue_from SubjectSelector::MissingParameter,       with: :unprocessable_entity
     rescue_from Api::RolesExist,                         with: :unprocessable_entity
     rescue_from JsonSchema::ValidationError,             with: :unprocessable_entity
+    rescue_from RestPack::Serializer::InvalidInclude,    with: :unprocessable_entity
 
     before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
                                         API_ALLOWED_METHOD_OVERRIDES)

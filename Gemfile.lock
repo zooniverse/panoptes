@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/edpaget/restpack_serializer.git
-  revision: 404bd61cb9d0bb414f4393796e836647851a4ee1
+  revision: 834ef0b0597a1f5b57b2ba7f78824b31fd5f1aa1
   branch: dev
   specs:
     restpack_serializer (0.5.6)
