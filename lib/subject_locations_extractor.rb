@@ -49,7 +49,7 @@ class SubjectLocationsExtractor
                            response_content_type: mime_type,
                            acl: 'public-read'}).to_s
     else
-      "https://#{path[1..-1]}"
+      "https://#{path}"
     end
   end
 end
