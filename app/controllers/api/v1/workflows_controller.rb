@@ -4,6 +4,10 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   doorkeeper_for :update, :create, :destroy, scopes: [:project]
   resource_actions :create, :update, :destroy
+  schema_type :json_schema
+
+  allowed_params :create
+  allowed_params :update
 
   alias_method :workflow, :controlled_resource
 
@@ -67,44 +71,5 @@ class Api::V1::WorkflowsController < Api::ApiController
       user_id: api_user.id,
       workflow_id: params[:id]
     }
-  end
-
-  def create_params
-    permit_params(:pairwise,
-                  :grouped,
-                  :prioritized,
-                  :display_name,
-                  :primary_language,
-                  :first_task,
-                  tasks: permit_tasks,
-                  links: [:project,
-                          :tutorial_subject,
-                          subject_sets: []])
-  end
-
-  def update_params
-    permit_params(:pairwise,
-                  :grouped,
-                  :prioritized,
-                  :display_name,
-                  :first_task,
-                  tasks: permit_tasks,
-                  links: [:tutorial_subject, subject_sets: []])
-  end
-
-  def permit_params(*permitted)
-    params.require(:workflows).permit(*permitted)
-  end
-
-  def permit_tasks
-    tasks = params[:workflows].fetch(:tasks, [])
-
-    tasks.reduce([]) do |permitted, (task_name, _)|
-      permitted.concat([task_name => [:type,
-                                      :question,
-                                      :next,
-                                      tools: [:value, :label, :type, :color],
-                                      answers: [:value, :label]]])
-    end
   end
 end
