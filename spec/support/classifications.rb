@@ -21,7 +21,8 @@ end
 shared_examples "it has a cached counter for classifications" do
   let(:classification_with_relation) do
     association_name = relation_instance.class.name.underscore.to_sym
-    create(:classification, Classification.reflections[association_name].name => relation_instance)
+    name = Classification.reflect_on_association(association_name).name
+    create(:classification, name => relation_instance)
   end
 
   it "should cache the count of classficiatons" do

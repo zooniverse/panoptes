@@ -11,31 +11,42 @@ def setup_role_control_tables
 
   mock_active_record_model(:controlled) do |t|
     t.string(:another_field)
-    t.string(:visible_to, array: true, default: [], null: false)
+    t.boolean(:private, default: true)
   end
 
-  EnrolledActorTable.class_eval do
-    include RoleControl::Enrolled
-    
-    has_many :roles_join_tables
-    enrolled_for :controlled_tables, through: :roles_join_tables
-  end
-  
-  ControlledTable.class_eval do
-    include RoleControl::Controlled
-    
-    can_by_role :read, public: true, roles: :visible_to
-    can_by_role :update, roles: [:test_role]
-    can_by_role :index, roles: [:admin]
+  unless const_defined?("EnrolledActorTable")
+    Object.const_set("EnrolledActorTable",
+                     Class.new(ActiveRecord::Base) do
+                       has_many :roles_join_tables
+                     end)
   end
 
-  RolesJoinTable.class_eval do
-    include RoleControl::RoleModel
-    belongs_to :enrolled_actor_table
-    belongs_to :controlled_table
+  unless const_defined?("ControlledTable")
+    Object.const_set("ControlledTable",
+                     Class.new(ActiveRecord::Base) do
+                       include RoleControl::Controlled
 
-    roles_for :enrolled_actor_table, :controlled_table,
-      valid_roles: [ :admin, :test_role, :test_parent_role]
+                       has_many :roles_join_tables
+
+                       scope :public_controlled, ->{ where(private: false) }
+                       
+                       can_by_role :read,
+                                   public: :public_controlled,
+                                   role_association: :roles_join_tables,
+                                   roles: [:admin, :test_role]
+                       
+                       can_by_role :update, roles: [:test_role]
+                       
+                       can_by_role :index, roles: [:admin]
+                     end)
+  end
+
+  unless const_defined?("RolesJoinTable")
+    Object.const_set("RolesJoinTable",
+                     Class.new(ActiveRecord::Base) do
+                       belongs_to :enrolled_actor_table
+                       belongs_to :controlled_table
+                     end)
   end
 end
 

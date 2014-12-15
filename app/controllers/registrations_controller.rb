@@ -24,7 +24,7 @@ class RegistrationsController < Devise::RegistrationsController
     login = sign_up_params[:login]
     resource.display_name = login
     resource.login = login
-    resource.owner_name = OwnerName.new(name: login, resource: resource)
+    resource.create_identity_group(login)
   end
 
   def registrations_response(resource_saved)

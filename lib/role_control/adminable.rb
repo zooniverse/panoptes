@@ -3,9 +3,6 @@ module RoleControl
     extend ActiveSupport::Concern
 
     included do
-      can :show, :admin?
-      can :update, :admin?
-      can :destroy, :admin?
     end
 
     module ClassMethods

@@ -11,7 +11,12 @@ class Membership < ActiveRecord::Base
                                               :collection_editor,
                                               :group_member]
 
-  validates_presence_of :user, :user_group, :state
+  scope :identity, -> { where(identity: true,
+                              state: states[:active],
+                              roles: ["group_admin"]) }
+
+  validates_presence_of :user, unless: :identity
+  validates_associated :user_group
 
   can :update, :allowed_to_change?
   can :destroy, :allowed_to_change?

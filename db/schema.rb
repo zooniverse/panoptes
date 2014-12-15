@@ -16,6 +16,18 @@ ActiveRecord::Schema.define(version: 20150112192525) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "access_control_lists", force: true do |t|
+    t.integer  "user_group_id"
+    t.string   "role"
+    t.integer  "resource_id"
+    t.string   "resource_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "access_control_lists", ["resource_id", "resource_type"], name: "index_access_control_lists_on_resource_id_and_resource_type", using: :btree
+  add_index "access_control_lists", ["user_group_id"], name: "index_access_control_lists_on_user_group_id", using: :btree
+
   create_table "authorizations", force: true do |t|
     t.integer  "user_id"
     t.string   "provider"
@@ -53,19 +65,14 @@ ActiveRecord::Schema.define(version: 20150112192525) do
   create_table "collections", force: true do |t|
     t.string   "name"
     t.integer  "project_id"
-    t.integer  "owner_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "owner_type"
-    t.integer  "activated_state", default: 0,  null: false
+    t.integer  "activated_state", default: 0, null: false
     t.string   "display_name"
-    t.string   "visible_to",      default: [], null: false, array: true
+    t.boolean  "private"
     t.integer  "lock_version",    default: 0
   end
 
-  add_index "collections", ["display_name", "owner_id", "owner_type"], name: "index_collections_on_display_name_and_owner_id_and_owner_type", unique: true, using: :btree
-  add_index "collections", ["name", "owner_id", "owner_type"], name: "index_collections_on_name_and_owner_id_and_owner_type", unique: true, using: :btree
-  add_index "collections", ["owner_id"], name: "index_collections_on_owner_id", using: :btree
   add_index "collections", ["project_id"], name: "index_collections_on_project_id", using: :btree
 
   create_table "collections_subjects", id: false, force: true do |t|
@@ -80,6 +87,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "roles",         default: ["group_member"], null: false, array: true
+    t.boolean  "identity"
   end
 
   add_index "memberships", ["user_group_id"], name: "index_memberships_on_user_group_id", using: :btree
@@ -158,22 +166,16 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.string   "name"
     t.string   "display_name"
     t.integer  "user_count"
-    t.integer  "owner_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "owner_type"
-    t.integer  "classifications_count", default: 0,  null: false
-    t.integer  "activated_state",       default: 0,  null: false
+    t.integer  "classifications_count", default: 0, null: false
+    t.integer  "activated_state",       default: 0, null: false
     t.string   "primary_language"
-    t.string   "visible_to",            default: [], null: false, array: true
     t.text     "avatar"
     t.text     "background_image"
+    t.boolean  "private"
     t.integer  "lock_version",          default: 0
   end
-
-  add_index "projects", ["display_name", "owner_id", "owner_type"], name: "index_projects_on_display_name_and_owner_id_and_owner_type", using: :btree
-  add_index "projects", ["name", "owner_id", "owner_type"], name: "index_projects_on_name_and_owner_id_and_owner_type", unique: true, using: :btree
-  add_index "projects", ["owner_id"], name: "index_projects_on_owner_id", using: :btree
 
   create_table "set_member_subjects", force: true do |t|
     t.integer  "state",                 default: 0, null: false
@@ -210,14 +212,11 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.json     "locations"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "owner_id"
     t.integer  "project_id"
-    t.string   "owner_type"
     t.boolean  "migrated"
     t.integer  "lock_version",  default: 0
   end
 
-  add_index "subjects", ["owner_id"], name: "index_subjects_on_owner_id", using: :btree
   add_index "subjects", ["project_id"], name: "index_subjects_on_project_id", using: :btree
   add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
 

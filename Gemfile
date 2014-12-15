@@ -2,7 +2,8 @@ source 'https://rubygems.org'
 
 gem 'jbundler', platform: :jruby
 gem 'rails', '4.1.7'
-gem 'postgres_ext'
+gem 'postgres_ext', '2.4.0'
+gem 'active_record_union'
 gem 'sdoc', '~> 0.4.0',          group: :doc
 gem 'doorkeeper', '~> 1.4.1'
 gem 'devise'
@@ -49,7 +50,7 @@ group :development, :test do
   gem 'rspec', '~> 3.0.0'
   gem 'rspec-rails', '~> 3.0.0'
   gem 'guard-rspec', '~> 4.2.9', require: false
-  gem 'factory_girl_rails', '~> 4.4.1'
+  gem 'factory_girl_rails', '~> 4.5.0'
   gem 'spring-commands-rspec', '~> 1.0.2'
   gem 'pry-rails', '~> 0.3.2'
 end

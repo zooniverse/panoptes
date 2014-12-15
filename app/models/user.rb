@@ -1,8 +1,6 @@
 class User < ActiveRecord::Base
   extend ControlControl::Resource
-  include Nameable
   include Activatable
-  include RoleControl::Owner
   include RoleControl::Enrolled
   include Linkable
 
@@ -10,27 +8,32 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable, omniauth_providers: [:facebook, :gplus]
 
-  has_many :user_groups, through: :active_memberships
   has_many :classifications
   has_many :authorizations
   has_many :user_collection_preferences
   has_many :project_preferences, class_name: "UserProjectPreference"
+  has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
 
   has_many :memberships
   has_many :active_memberships, -> { active }, class_name: 'Membership'
+  has_one :identity_membership, -> { identity }, class_name: 'Membership'
+  
+  has_many :user_groups, through: :active_memberships
+  has_one :identity_group, through: :identity_membership, source: :user_group, class_name: "UserGroup"
 
-  owns :projects
-  owns :collections
-  owns :subjects
-  owns :oauth_applications, class_name: "Doorkeeper::Application"
-
-  enrolled_for :projects, through: :project_preferences
-  enrolled_for :collections, through: :user_collection_preferences
-  enrolled_for :user_groups, through: :active_memberships
+  has_many :project_roles, through: :identity_group
+  has_many :collection_roles, through: :identity_group
 
   validates :login, presence: true, uniqueness: true
-  validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
-  validates :admin, inclusion: { in: [ true, false ], message: "must be a boolean value" }
+  validates_length_of :password, within: 8..128, allow_blank: true,
+                      unless: :migrated_user?
+
+  validates_with IdentityGroupNameValidator
+
+  delegate :projects, to: :identity_group
+  delegate :collections, to: :identity_group
+  delegate :subjects, to: :identity_group
+  delegate :owns?, to: :identity_group
 
   can :show, proc { |requester| requester.user == self }
   can :update, proc { |requester| requester.user == self }
@@ -52,7 +55,7 @@ class User < ActiveRecord::Base
       name = auth_hash.info.name
       u.display_name = name
       u.login = StringConverter.downcase_and_replace_spaces(name)
-      u.owner_name = OwnerName.new(name: u.login, resource: u)
+      u.build_identity_group
       u.authorizations << auth
     end
   end
@@ -91,6 +94,12 @@ class User < ActiveRecord::Base
     authorizations.blank?
   end
 
+  def build_identity_group
+    raise StandardError, "Identity Group Exists" if identity_group
+    build_identity_membership
+    self.identity_group = identity_membership.build_user_group(name: login)
+  end
+  
   protected
 
   def migrated_user?

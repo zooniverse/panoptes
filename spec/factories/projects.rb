@@ -7,12 +7,10 @@ FactoryGirl.define do
     primary_language "en"
     avatar "http://test.host/x02234.jpg.gif.png.webp"
     background_image "http://test.host/12312asd.jp2"
-    visible_to []
-
-    association :owner, factory: :user, password: "password"
+    private false
 
     factory :private_project do
-      visible_to ["collaborator"]
+      private(true)
     end
 
     factory :full_project do

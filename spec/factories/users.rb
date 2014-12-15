@@ -1,5 +1,9 @@
 FactoryGirl.define do
   factory :user do
+    transient do
+      build_group true
+    end
+    
     hash_func 'bcrypt'
     sequence(:email) {|n| "example#{n}@example.com"}
     password 'password'
@@ -13,9 +17,11 @@ FactoryGirl.define do
     admin false
     banned false
 
-    after(:build) do |user|
-      unless user.owner_name
-        user.owner_name = build(:owner_name, name: user.login, resource: user)
+
+    after(:build) do |u, env|
+      if env.build_group
+        u.identity_group = build(:user_group, name: u.login)
+        u.identity_membership = build(:membership, user: u, user_group: u.identity_group, state: 0, identity: true, roles: ["group_admin"])
       end
     end
 
@@ -28,7 +34,8 @@ FactoryGirl.define do
 
     factory :project_owner do
       after(:create) do |user|
-        create_list(:project, 2, owner: user)
+        user.projects.concat(create_list(:project, 2))
+        user.save!
       end
     end
 
@@ -40,7 +47,8 @@ FactoryGirl.define do
 
     factory :user_with_collections do
       after(:create) do |user|
-        create_list(:collection, 2, owner: user)
+        user.collections.concat(create_list(:collection, 2))
+        user.save!
       end
     end
 
@@ -68,12 +76,10 @@ FactoryGirl.define do
     credited_name 'Dr New User'
     activated_state :active
     languages ['en', 'es', 'fr-ca']
+
     after(:build) do |u|
-      unless u.owner_name
-        u.owner_name = build(:owner_name,
-                              name: u.login,
-                              resource: u)
-      end
+      u.identity_group = build(:user_group, name: u.login)
+      u.identity_membership = build(:membership, user: u, user_group: u.identity_group, state: 0, identity: true, roles: ["group_admin"])
       create_list(:authorization, 1, user: u, provider: 'facebook', uid: '12345')
     end
   end

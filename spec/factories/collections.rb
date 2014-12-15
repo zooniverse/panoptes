@@ -3,9 +3,12 @@ FactoryGirl.define do
     sequence(:name) { |n| "collection_name_#{ n }" }
     sequence(:display_name) { |n| "another name #{ n }" }
     activated_state :active
-
     project
-    association :owner, factory: :user
+    private false
+
+    factory :private_collection do
+      private true
+    end
 
     factory :collection_with_subjects do
       after(:create) do |col|
