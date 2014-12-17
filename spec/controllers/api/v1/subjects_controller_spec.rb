@@ -199,12 +199,18 @@ describe Api::V1::SubjectsController, type: :controller do
   describe "#update" do
     let(:resource) { create(:subject, owner: user) }
     let(:test_attr) { :metadata }
-    let(:test_attr_value) { { "interesting_data" => "Tested Collection" } }
+    let(:test_attr_value) do
+      {
+        "interesting_data" => "Tested Collection",
+        "an_interesting_array" => ["1", "2", "asdf", "99.99"]
+      }
+    end 
     let(:update_params) do
       {
         subjects: {
           metadata: {
-            interesting_data: "Tested Collection"
+            interesting_data: "Tested Collection",
+            an_interesting_array: ["1", "2", "asdf", "99.99"]
           },
           locations: [ "image/jpeg" ]
         }

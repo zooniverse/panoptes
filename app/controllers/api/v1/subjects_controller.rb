@@ -5,7 +5,10 @@ class Api::V1::SubjectsController < Api::ApiController
   doorkeeper_for :update, :create, :destroy, :version, :versions,
                  scopes: [:subject]
   resource_actions :show, :create, :update, :destroy
-  schema_type :strong_params
+  schema_type :json_schema
+  
+  allowed_params :create
+  allowed_params :update
 
   alias_method :subject, :controlled_resource
 
@@ -45,21 +48,7 @@ class Api::V1::SubjectsController < Api::ApiController
                                       visible_scope,
                                       cellect_host(params[:workflow_id]))
   end
-
-  def create_params
-    params.require(:subjects)
-      .permit(metadata: params[:subjects][:metadata].try(:keys),
-              locations: [],
-              links: [:project, :subject_sets, owner: [:id, :type]])
-  end
-
-  def update_params
-    params.require(:subjects)
-      .permit(metadata: params[:subjects][:metadata].try(:keys),
-              locations: [],
-              links: [:subject_sets])
-  end
-
+  
   def add_subject_path(locations, project_id)
     locations.map.with_index do |mime, idx|
       mime.split(',').reduce({}) do |location, mime|
