@@ -4,7 +4,7 @@ gem 'jbundler', platform: :jruby
 gem 'rails', '4.1.7'
 gem 'postgres_ext'
 gem 'sdoc', '~> 0.4.0',          group: :doc
-gem 'doorkeeper', '~> 1.4.0'
+gem 'doorkeeper', '~> 1.4.1'
 gem 'devise'
 gem 'versionist'
 gem 'rack-cors', require: 'rack/cors'
