@@ -3,10 +3,10 @@ require 'spec_helper'
 RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:workflow) { create(:workflow_with_contents) }
-  let!(:upp) do
-    create(:user_project_preference,
-           user: authorized_user,
-           project: workflow.project,
+  let!(:acl) do
+    create(:access_control_list,
+           user_group: authorized_user.identity_group,
+           resource: workflow.project,
            roles: ["translator"])
   end
 
@@ -23,7 +23,7 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
 
   describe "#index" do
     let!(:private_resource) do
-      project = create(:project, visible_to: ["collaborator"])
+      project = create(:project, private: true)
       create(:workflow_with_contents, project: project)
         .workflow_contents.first
     end
@@ -81,7 +81,7 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
       end
 
       it 'should return forbidden' do
-        expect(response.status).to eq(403)
+        expect(response).to have_http_status(:not_found)
       end
 
       it 'should not update the content' do
@@ -104,7 +104,7 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
       end
 
       it 'should return forbidden' do
-        expect(response.status).to eq(403)
+        expect(response).to have_http_status(:not_found)
       end
 
       it 'should not delete the content' do

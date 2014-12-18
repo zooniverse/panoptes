@@ -4,10 +4,6 @@ module JsonApiController
   class PreconditionNotPresent < StandardError; end
   class PreconditionFailed < StandardError; end
 
-  included do
-    @action_params = Hash.new
-  end
-
   module ClassMethods
     def resource_actions(*actions)
       if actions.first == :default
@@ -49,10 +45,6 @@ module JsonApiController
     end
   end
 
-  def current_actor
-    owner_from_params || api_user
-  end
-
   def serializer
     @serializer ||= "#{ resource_name.camelize }Serializer".constantize
   end
@@ -70,16 +62,29 @@ module JsonApiController
   end
 
   def visible_scope
-    super(api_user)
+    controlled_resources
   end
 
   def context
     {}
   end
+<<<<<<< HEAD
   
+=======
+
+  def controlled_resource
+    @controlled_resource ||= controlled_resources.first
+  end
+
+  def scope_context
+    {}
+  end
+
+>>>>>>> Convert all Controllers to use new RoleControl
   private
 
-  def resource_scope(resource)
-    resource_class.where(id: resource.id)
+  def resource_scope(resources)
+    return resources if resources.is_a?(ActiveRecord::Relation)
+    resource_class.where(id: resources.try(:id))
   end
 end

@@ -19,7 +19,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#index' do
-    let(:private_project) { create(:project, visible_to: ["collaborator"]) }
+    let(:private_project) { create(:project, private: true) }
     let!(:private_resource) { create(:subject_set, project: private_project)  }
     let(:n_visible) { 2 }
     

@@ -1,9 +1,8 @@
 class Api::V1::MembershipsController < Api::ApiController
-  include JsonApiController
-
   before_filter :require_login
   doorkeeper_for :all, scopes: [:group]
   resource_actions :index, :show, :create, :update, :deactivate
+  setup_access_control! { |user| user }
   schema_type :strong_params
 
   allowed_params :create, links: [:user, :user_group]

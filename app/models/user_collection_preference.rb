@@ -1,6 +1,5 @@
 class UserCollectionPreference < ActiveRecord::Base
-  belongs_to :user, dependent: :destroy
-  belongs_to :collection, dependent: :destroy
+  include Preferences
 
-  validates_presence_of :user, :collection
+  preferences_for :collection
 end

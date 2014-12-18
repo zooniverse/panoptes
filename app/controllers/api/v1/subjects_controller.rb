@@ -1,5 +1,4 @@
 class Api::V1::SubjectsController < Api::ApiController
-  include JsonApiController
   include Versioned
 
   doorkeeper_for :update, :create, :destroy, :version, :versions,
@@ -27,25 +26,24 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    create_params[:links][:owner] = owner || api_user.user
     create_params[:locations] = add_subject_path(create_params[:locations],
                                                  create_params[:links][:project])
     subject = super(create_params)
     subject
   end
 
-  def build_resource_for_update(update_params)
+  def build_update_hash(update_params, id)
     if update_params.has_key? :locations
       update_params[:locations] = add_subject_path(update_params[:locations],
                                                    controlled_resource.project.id)
     end
-    super(update_params)
+    super(update_params, id)
   end
 
   def selector
     @selector ||= SubjectSelector.new(api_user,
                                       params,
-                                      visible_scope,
+                                      controlled_resources,
                                       cellect_host(params[:workflow_id]))
   end
   

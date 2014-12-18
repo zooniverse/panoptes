@@ -2,6 +2,7 @@ module Api
   include ApiErrors
 
   class ApiController < ApplicationController
+    include JsonApiController
     include RoleControl::RoledController
 
     API_ACCEPTED_CONTENT_TYPES = ['application/json',
@@ -13,20 +14,20 @@ module Api
     rescue_from Api::NotLoggedIn,                        with: :not_authenticated
     rescue_from Api::UnauthorizedTokenError,             with: :not_authenticated
     rescue_from Api::UnsupportedMediaType,               with: :unsupported_media_type
-    rescue_from RoleControl::AccessDenied,               with: :not_authorized
+    rescue_from RoleControl::AccessDenied,               with: :not_found
     rescue_from ActiveRecord::StatementInvalid,          with: :bad_query
-    rescue_from Api::PatchResourceError,                 with: :unprocessable_entity
-    rescue_from Api::UserSeenSubjectIdError,             with: :unprocessable_entity
-    rescue_from ActionController::UnpermittedParameters, with: :unprocessable_entity
-    rescue_from ActionController::ParameterMissing,      with: :unprocessable_entity
-    rescue_from SubjectSelector::MissingParameter,       with: :unprocessable_entity
-    rescue_from Api::RolesExist,                         with: :unprocessable_entity
-    rescue_from JsonSchema::ValidationError,             with: :unprocessable_entity
-    rescue_from RestPack::Serializer::InvalidInclude,    with: :unprocessable_entity
     rescue_from JsonApiController::PreconditionNotPresent, with: :precondition_required
     rescue_from JsonApiController::PreconditionFailed,   with: :precondition_failed
     rescue_from ActiveRecord::StaleObjectError,          with: :conflict
-    
+    rescue_from Api::PatchResourceError,
+                Api::UserSeenSubjectIdError,
+                ActionController::UnpermittedParameters,
+                ActionController::ParameterMissing,
+                SubjectSelector::MissingParameter,
+                Api::RolesExist,
+                JsonSchema::ValidationError,
+                RestPack::Serializer::InvalidInclude,    with: :unprocessable_entity
+
     before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
                                         API_ALLOWED_METHOD_OVERRIDES)
 
@@ -34,8 +35,7 @@ module Api
     before_action :ban_user, only: [:create, :update, :destroy]
     skip_before_action :verify_authenticity_token
 
-    access_control_for :update, :destroy, :create,
-                       [:update_links, :update], [:destroy_links, :update]
+    setup_access_control!
 
     def current_resource_owner
       if doorkeeper_token
@@ -85,7 +85,7 @@ module Api
     end
 
     def ban_user
-      if api_user.banned
+      if api_user.banned?
         case action_name
         when "update"
           head :ok

@@ -197,7 +197,7 @@ describe Api::V1::SubjectsController, type: :controller do
   end
 
   describe "#update" do
-    let(:resource) { create(:subject, owner: user) }
+    let(:resource) { create(:subject, project: create(:project, owner: user)) }
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
       {
@@ -286,13 +286,13 @@ describe Api::V1::SubjectsController, type: :controller do
   end
 
   describe "#destroy" do
-    let(:resource) { create(:subject, owner: user) }
+    let(:resource) { create(:subject, project: create(:project, owner: user)) }
 
     it_behaves_like "is destructable"
   end
 
   describe "versioning" do
-    let(:resource) { create(:subject, owner: user) }
+    let(:resource) { create(:subject, project: create(:project, owner: user)) }
     let!(:existing_versions) { resource.versions.length }
     let(:num_times) { 10 }
     let(:update_proc) do

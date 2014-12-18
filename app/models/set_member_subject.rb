@@ -10,5 +10,6 @@ class SetMemberSubject < ActiveRecord::Base
 
   validates_presence_of :subject_set, :subject
 
-  can_through_parent :subject_set, :update, :show, :destroy
+  can_through_parent :subject_set, :update, :show, :destroy, :index, :update_links,
+                     :destroy_links
 end

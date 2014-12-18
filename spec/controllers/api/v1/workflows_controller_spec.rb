@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::WorkflowsController, type: :controller do
   let(:user) { create(:user) }
-  let(:workflows){ create_list :workflow_with_contents, 2 }
+  let(:workflows) { create_list :workflow_with_contents, 2 }
   let(:workflow){ workflows.first }
   let(:project){ workflow.project }
   let(:owner){ project.owner }

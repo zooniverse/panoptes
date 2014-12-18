@@ -14,12 +14,18 @@ class Classification < ActiveRecord::Base
   validate :metadata, :required_metadata_present
   validate :validate_gold_standard
 
-  def self.visible_to(actor, as_admin: false)
-    ClassificationVisibilityQuery.new(actor, self).build(as_admin)
-  end
+  scope :incomplete, -> { where(completed: false) }
+  scope :created_by, -> (user) { where(user: user) }
 
-  def self.can_create?(actor)
-    true
+  def self.scope_for(action, actor, opts={})
+    case action
+    when :show, :index
+      actor.user.classifications
+    when :update, :destroy
+      incomplete.merge(created_by(actor.user))
+    else
+      none
+    end
   end
 
   def created_and_incomplete?(actor)

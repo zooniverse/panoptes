@@ -14,8 +14,11 @@ module JsonApiController
 
     protected
 
-    def owner
-      owner_from_params || api_user.user
+    def add_user_as_linked_owner(create_params)
+      unless create_params.fetch(:links, {}).has_key? :owner
+        create_params[:links] ||= {}
+        create_params[:links][:owner] = api_user.user
+      end
     end
 
     def build_resource_for_create(create_params)
@@ -24,7 +27,11 @@ module JsonApiController
         yield create_params, link_params
       end
       @controlled_resource = resource_class.new(create_params)
-      link_params.try(:each) { |k,v| update_relation(k,v) }
+      
+      link_params.try(:each) do |k,v|
+        controlled_resource.send("#{k}=", update_relation(k,v))
+      end
+      
       controlled_resource
     end
 

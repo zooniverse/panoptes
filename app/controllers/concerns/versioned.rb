@@ -2,14 +2,19 @@ module Versioned
   extend ActiveSupport::Concern
 
   included do
-    access_control_for [:versions, :show], [:version, :show]
+    setup_access_control!([:versions, :show], [:version, :show])
   end
 
   def versions
-    render json_api: VersionSerializer.page(params, controlled_resource.versions)
+    render json_api: VersionSerializer.page(params, version_scope)
   end
 
   def version
-    render json_api: VersionSerializer.resource(params, controlled_resource.versions)
+    render json_api: VersionSerializer.resource(params, version_scope)
+  end
+
+  def version_scope
+    PaperTrail::Version.where(item_id: controlled_resources.select(:id),
+                              item_type: resource_class.to_s)
   end
 end

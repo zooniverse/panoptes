@@ -1,4 +1,5 @@
 class Subject < ActiveRecord::Base
+  include RoleControl::ParentalControlled
   include Linkable
 
   has_paper_trail only: [:metadata, :locations]
@@ -8,18 +9,10 @@ class Subject < ActiveRecord::Base
   has_many :subject_sets, through: :set_member_subjects
   has_many :set_member_subjects
   
-  has_one :owner_control_list, -> { where(role: "owner") }, as: :resource, class_name: "AccessControlList"
-  has_one :owner, through: :owner_control_list, source: :user_group, as: :resource, class_name: "UserGroup"
-
   validates_presence_of :project
 
-  def self.scope_for(action, actor)
-    if action == :show
-      all
-    else
-      actor.owner.subjects
-    end
-  end
+  can_through_parent :project, :update, :index, :show, :destroy, :update_links,
+                     :destroy_links
 
   def migrated_subject?
     !!migrated

@@ -1,9 +1,8 @@
 class Api::V1::UsersController < Api::ApiController
-  include JsonApiController
-
   doorkeeper_for :me, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show
+  setup_access_control! { |user| user }
   schema_type :strong_params
 
   allowed_params :update, :display_name, :email, :credited_name

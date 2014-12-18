@@ -9,7 +9,7 @@ gem 'doorkeeper', '~> 1.4.1'
 gem 'devise'
 gem 'versionist'
 gem 'rack-cors', require: 'rack/cors'
-gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev"
+gem 'restpack_serializer', path: "../restpack_serializer/"
 gem 'paper_trail'
 gem 'omniauth'
 gem 'omniauth-facebook'

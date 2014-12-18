@@ -1,6 +1,4 @@
 class Api::V1::SubjectQueuesController < Api::ApiController
-  include JsonApiController
-
   doorkeeper_for :update, :destroy, :create, scopes: [:project]
   resource_actions :default
   schema_type :strong_params

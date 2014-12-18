@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
 
   has_many :classifications
   has_many :authorizations
-  has_many :user_collection_preferences
+  has_many :collection_preferences, class_name: "UserCollectionPreference"
   has_many :project_preferences, class_name: "UserProjectPreference"
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
 
@@ -41,6 +41,15 @@ class User < ActiveRecord::Base
 
   attr_accessor :migrated_user
 
+  def self.scope_for(action, user, opts={})
+    case action
+    when :show, :index
+      all
+    else
+      where(id: user.id)
+    end
+  end
+
   def self.from_omniauth(auth_hash)
     auth = Authorization.from_omniauth(auth_hash)
     auth.user ||= create do |u|
@@ -54,8 +63,28 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.reflect_on_association(association_name)
+    case association_name.to_sym
+    when :projects, :collections
+      UserGroup.reflect_on_association(association_name)
+    else
+      super
+    end
+  end
+
   def password_required?
     super && hash_func != 'sha1'
+  end
+
+  def groups_for(action, klass=nil)
+    roles = case action
+                when :show, :index
+                  [:group_admin, :group_memebr]
+                else
+                  [:group_admin]
+                end
+    roles.push :"#{klass.name.underscore}_editor" if klass
+    user_groups.where.overlap(memberships: { roles: roles })
   end
 
   def valid_password?(password)
@@ -91,7 +120,12 @@ class User < ActiveRecord::Base
   def build_identity_group
     raise StandardError, "Identity Group Exists" if identity_group
     build_identity_membership
-    self.identity_group = identity_membership.build_user_group(name: login)
+    name = StringConverter.downcase_and_replace_spaces(login)
+    self.identity_group = identity_membership.build_user_group(name: name)
+  end
+
+  def is_admin?
+    !!admin
   end
   
   protected

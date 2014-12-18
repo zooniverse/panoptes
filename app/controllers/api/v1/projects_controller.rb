@@ -1,5 +1,5 @@
 class Api::V1::ProjectsController < Api::ApiController
-  include JsonApiController
+  include FilterByOwner
 
   doorkeeper_for :update, :create, :destroy, scopes: [:project]
   resource_actions :default
@@ -25,19 +25,12 @@ class Api::V1::ProjectsController < Api::ApiController
   before_action :add_owner_ids_to_filter_param!, only: :index
 
   private
-
-  def add_owner_ids_to_filter_param!
-    if owner_filter = params.delete(:owner)
-      owner_ids = OwnerName.where(name: owner_filter).map(&:resource_id).join(",")
-      params.merge!({ owner_ids: owner_ids }) unless owner_ids.blank?
-    end
-  end
-
+  
   def create_response(project)
     serializer.resource({ id: project.id, include: 'owners'},
-                          nil,
-                          languages: [ project.primary_language ],
-                          fields: CONTENT_FIELDS)
+                        nil,
+                        languages: [ project.primary_language ],
+                        fields: CONTENT_FIELDS)
   end
 
   def content_from_params(ps)
@@ -50,21 +43,17 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def build_resource_for_create(create_params)
     Namer.set_name_fields(create_params)
-
-    content_params = content_from_params(create_params)
-
-    create_params[:links] ||= Hash.new
-    create_params[:links][:owner] = owner
-
-    project = super(create_params)
-    project.project_contents.build(**content_params.symbolize_keys)
-    project
+    create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
+    add_user_as_linked_owner(create_params)
+    super(create_params)
   end
 
-  def build_resource_for_update(update_params)
-    content_params = content_from_params(update_params)
-    super(update_params)
-    project.primary_content.update_attributes(content_params)
+  def build_update_hash(update_params, id)
+    content_update = content_from_params(update_params)
+    unless content_update.blank?
+      Project.find(id).primary_content.update!(content_update)
+    end
+    super(update_params, id)
   end
 
   def new_items(relation, value)

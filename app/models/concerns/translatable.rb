@@ -5,16 +5,22 @@ module Translatable
     validates :primary_language, format: {with: /\A[a-z]{2}(\z|-[A-z]{2})/}
     has_many content_association, autosave: true
 
-    can_be_linked content_model.name.underscore.to_sym, :translatable_by, :actor
+    can_be_linked content_model.name.underscore.to_sym, :scope_for, :translate, :groups
   end
 
   module ClassMethods
     def translation_scope
-      @translation_scope ||= RoleControl::RoleScope.new(["translator"], false, self)
+      @translation_scope ||= joins(:access_control_lists)
+                           .where.overlap(access_control_lists: { roles: ["translator"] })
     end
     
-    def translatable_by(actor)
-      translation_scope.build(actor)
+    def scope_for(action, groups, opts={})
+      case action
+      when :translate
+        translation_scope.where(access_control_lists: { user_group: groups })
+      else
+        super
+      end
     end
 
     def content_association

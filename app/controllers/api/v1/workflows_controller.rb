@@ -1,5 +1,4 @@
 class Api::V1::WorkflowsController < Api::ApiController
-  include JsonApiController
   include Versioned
 
   doorkeeper_for :update, :create, :destroy, scopes: [:project]
@@ -15,10 +14,18 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   private
 
+  def context
+    case action_name
+    when "show", "index"
+      { languages: current_languages }
+    else
+      {}
+    end
+  end
+
   def create_response(workflow)
     serializer.resource({},
-                        resource_scope(workflow),
-                        languages: [workflow.primary_language])
+                        resource_scope(workflow))
   end
 
   def update_response(workflow)
@@ -38,15 +45,14 @@ class Api::V1::WorkflowsController < Api::ApiController
       {}
     end
   end
-    
 
-  def build_resource_for_update(update_params)
+  def build_update_hash(update_params, id)
     if update_params.has_key? :tasks
       stripped_tasks, strings = extract_strings(update_params[:tasks])
       update_params[:tasks] = stripped_tasks
-      workflow.primary_content.update_attributes(strings: strings)
+      Workflow.find(id).primary_content.update_attributes(strings: strings)
     end
-    super(update_params)
+    super(update_params, id)
   end
 
   def build_resource_for_create(create_params)

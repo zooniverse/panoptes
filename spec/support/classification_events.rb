@@ -1,8 +1,9 @@
 shared_context "a classification create" do
   it "should return 201" do
     create_classification
-    expect(response.status).to eq(201)
+    expect(response).to have_http_status(:created)
   end
+
 
   it "should set the Location header as per JSON-API specs" do
     create_classification
@@ -55,8 +56,8 @@ shared_context "a gold standard classfication" do
       create_classification
     end
 
-    it "should response with a 400" do
-      expect(response.status).to eq(400)
+    it "should respond with bad request" do
+      expect(response).to have_http_status(:bad_request)
     end
 
     it "should responsd with an error message in the body" do
@@ -74,8 +75,8 @@ shared_context "a gold standard classfication" do
 
     context "when the classifier is not an expert on the project" do
 
-      it "should response with a 400" do
-        expect(response.status).to eq(400)
+      it "should respond with bad request" do
+        expect(response).to have_http_status(:bad_request)
       end
 
       it "should response with an error message in the body" do
@@ -87,8 +88,8 @@ shared_context "a gold standard classfication" do
     context "when the classifier is an expert on the project" do
       let!(:user) { project.owner }
 
-      it "should response with a 201" do
-        expect(response.status).to eq(201)
+      it "should respond with created" do
+        expect(response).to have_http_status(:created)
       end
     end
   end

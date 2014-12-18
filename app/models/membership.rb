@@ -10,13 +10,15 @@ class Membership < ActiveRecord::Base
   validates_presence_of :user, unless: :identity
   validates_associated :user_group
 
-  def self.scope_for(action, actor)
-    case actor
-    when ApiUser
-      actor.user.memberships
-    when UserGroup
-      actor.memberships.active
-    end
+  def self.scope_for(action, user, opts={})
+    case action
+    when :show, :index
+      where(user_group: UserGroup.public_groups)
+        .union(where(user: user.user))
+        .union(where(user: user.groups_for(:show)))
+    when :update, :destroy
+      where(user_group: user.groups_for(:update)).union(where(user: user.user))
+    end.where(identity: false)
   end
 
   def self.can_create?(actor)

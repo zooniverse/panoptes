@@ -1,8 +1,8 @@
 class Workflow < ActiveRecord::Base
-  include RoleControl::ParentalControlled
-  include SubjectCounts
   include Linkable
   include Translatable
+  include RoleControl::ParentalControlled
+  include SubjectCounts
 
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
@@ -14,21 +14,23 @@ class Workflow < ActiveRecord::Base
 
   validates_presence_of :project
 
-  can_through_parent :project, :update, :show, :destroy
+  can_through_parent :project, :update, :index, :show, :destroy, :update_links,
+                     :destroy_links, :translate
   
   can_be_linked :subject_set, :same_project?, :model
-  can_be_linked :user_subject_queue, :scope_for, :update, :actor
+  can_be_linked :user_subject_queue, :scope_for, :update, :groups
 
   def self.same_project?(subject_set)
     where(project: subject_set.project)
   end
   
-  def self.translation_scope
-    @translation_scope ||= RoleControl::RoleScope.new(["translator"], false, Project)
-  end
-  
-  def self.translatable_by(actor)
-    where(project: translation_scope.build(actor))
+  def self.scope_for(action, groups, opt={})
+    case action
+    when :translate
+      where(project: super)
+    else
+      super
+    end
   end
 
   def tasks

@@ -2,6 +2,10 @@ module JsonApiController
   module StrongParamsValidator
     extend ActiveSupport::Concern
 
+    included do
+      @action_params = Hash.new
+    end
+
     module ClassMethods
       def polymorphic
         [ :id, :type ]

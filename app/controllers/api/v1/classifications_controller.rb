@@ -1,11 +1,13 @@
 class Api::V1::ClassificationsController < Api::ApiController
-  include JsonApiController
-
   skip_before_filter :require_login, only: :create
   doorkeeper_for :show, :index, :destroy, :update, scopes: [:classification]
+  setup_access_control! { |user| user }
+  
   resource_actions :default
 
   alias_method :classification, :controlled_resource
+
+  rescue_from RoleControl::AccessDenied, with: :access_denied
 
   METADATA_PARAMS = [:screen_resolution,
                      :started_at,
@@ -16,14 +18,25 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   private
 
+  def access_denied(exception)
+    case action_name
+    when "update", "destroy"
+      if Classification.created_by(api_user.user)
+          .where(id: resource_ids, completed: true).exists?
+        error = StandardError.new(completed_error)
+        not_authorized(error)
+      else
+        not_found(exception)
+      end
+    else
+      not_found(exception)
+    end
+  end
+  
   def build_resource_for_update(update_params)
     super
     lifecycle(:update)
     classification
-  end
-
-  def visible_scope
-    Classification.visible_to(api_user)
   end
 
   def build_resource_for_create(create_params)
@@ -65,5 +78,13 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def update_params
     params.require(:classifications).permit(create_update_params)
+  end
+
+  def completed_error
+    if resource_ids.length == 1
+      "Classification with id='#{resource_ids.first}' is complete"
+    else
+      "Classifications with ids='#{resource_ids.join(',')}' are complete"
+    end
   end
 end

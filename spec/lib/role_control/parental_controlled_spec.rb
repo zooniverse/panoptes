@@ -22,12 +22,6 @@ describe RoleControl::ParentalControlled do
 
   let(:tpc) { TestParentControl.new(controlled) }
 
-  it "returns truthy when the parent's test would be true" do
-    expect(tpc.can_read?(enrolled_actor)).to be_truthy
-  end
-
-  it "should call the parent's can method if it exists" do
-    expect(controlled).to receive(:can_read?)
-    tpc.can_read?(enrolled_actor)
+  describe "::scope_for" do
   end
 end

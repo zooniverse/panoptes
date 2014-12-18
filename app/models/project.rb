@@ -1,45 +1,46 @@
 class Project < ActiveRecord::Base
   include RoleControl::Controlled
-  include RoleControl::Adminable
+  include RoleControl::Owned
   include SubjectCounts
   include Activatable
   include Linkable
   include Translatable
   include PreferencesLink
 
-  EXPERT_ROLES = [:expert]
+  EXPERT_ROLES = [:expert, :owner]
 
   has_many :workflows
   has_many :subject_sets
   has_many :classifications
   has_many :subjects
-  has_many :project_roles, -> { where.not(roles: []) }, class_name: "UserProjectPreference"
+  has_many :project_roles, class_name: "AccessControlList", as: :resource
 
-  has_one :owner_control_list, -> { where(role: "owner") }, as: :resource, class_name: "AccessControlList"
-  has_one :owner, through: :owner_control_list, source: :user_group, as: :resource, class_name: "UserGroup"
+  accepts_nested_attributes_for :project_contents
 
   ## TODO: Figure out how to do these validations
   #validates_uniqueness_of :name, case_sensitive: false, scope: :owner
   #validates_uniqueness_of :display_name, scope: :owner
 
-  can_by_role :update, roles: [ :collaborator ]
-  can_by_role :show, public: true, roles: :visible_to
+  can_by_role :destroy, :update, :update_links, :destroy_links, roles: [ :owner,
+                                                                         :collaborator ]
+  can_by_role :show, :index, public: :public_scope, roles: [ :owner,
+                                                             :collaborator,
+                                                             :tester,
+                                                             :translator,
+                                                             :scientist,
+                                                             :moderator ]
 
-  can_be_linked :subject_set, :scope_for, :update, :actor
-  can_be_linked :subject, :scope_for, :update, :actor
-  can_be_linked :workflow, :scope_for, :update, :actor
+  can_be_linked :subject_set, :scope_for, :update, :groups
+  can_be_linked :subject, :scope_for, :update, :groups
+  can_be_linked :workflow, :scope_for, :update, :groups
+  can_be_linked :user_group, :scope_for, :edit_project, :user
 
   preferences_model :user_project_preference
   
-  def self.translation_scope
-    @translation_scope ||= RoleControl::RoleScope.new(["translator"], false, self)
-  end
-
   def expert_classifier_level(classifier)
-    return :owner if classifier == owner
-    expert_role = project_roles.where(user_id: classifier.id)
-      .where("roles @> ARRAY[?]::varchar[]", EXPERT_ROLES)
-      .exists?
+    expert_role = project_roles.where(user_group: classifier.identity_group)
+                  .where.overlap(roles: EXPERT_ROLES)
+                  .exists?
     expert_role ? :expert : nil
   end
 

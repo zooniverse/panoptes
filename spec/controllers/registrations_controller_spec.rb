@@ -58,9 +58,9 @@ describe RegistrationsController, type: :controller do
       context "with caps and spaces in the login name" do
         let(:extra_attributes) { { login: "Test User Login" } }
 
-        it "should convert the owner_name#name field correctly" do
+        it "should convert the identity_group#name field correctly" do
           post :create, user: user_attributes
-          owner_uniq_name = User.find(created_instance_id("users")).owner_uniq_name
+          owner_uniq_name = User.find(created_instance_id("users")).identity_group.name
           expect(owner_uniq_name).to eq("test_user_login")
         end
       end
@@ -84,7 +84,7 @@ describe RegistrationsController, type: :controller do
 
         it "should provide an error message in the response body" do
           post :create, user: user_attributes
-          error_body = { "owner_name.name" => ["can't be blank"],"login" => ["can't be blank"] }
+          error_body = { "login" => ["can't be blank"], "identity_group.name" => ["can't be blank"] }
           expect(response.body).to eq(json_error_message(error_body))
         end
       end
@@ -133,9 +133,9 @@ describe RegistrationsController, type: :controller do
         let(:login) { "Test User Login" }
         let(:extra_attributes) { { login: login } }
 
-        it "should convert the owner_name#name field correctly" do
+        it "should convert the identity_group#name field correctly" do
           post :create, user: user_attributes
-          owner_uniq_name = User.find_by_login(login.downcase).owner_uniq_name
+          owner_uniq_name = User.find_by_login(login.downcase).identity_group.name
           expect(owner_uniq_name).to eq("test_user_login")
         end
       end

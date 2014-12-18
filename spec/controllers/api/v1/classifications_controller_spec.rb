@@ -33,6 +33,7 @@ def setup_create_request(project_id, workflow_id, set_member_subject)
   unless gold_standard.nil?
     params[:classifications].merge!(gold_standard: gold_standard)
   end
+  
   post :create, params
 end
 
@@ -112,7 +113,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         default_request scopes: scopes, user_id: authorized_user.id
         classification = create(:classification, user: authorized_user, completed: true)
         put :update, id: classification.id
-        expect(response.status).to eq(403)
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
@@ -133,7 +134,7 @@ describe Api::V1::ClassificationsController, type: :controller do
                                 user: authorized_user,
                                 completed: true)
         delete :destroy, id: classification.id
-        expect(response.status).to eq(403)
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end

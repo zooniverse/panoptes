@@ -13,7 +13,7 @@ describe RoleControl::RoledController, type: :controller do
 
   controller(ApplicationController) do
     include RoleControl::RoledController
-    access_control_for :update, [:show, :read]
+    setup_access_control!
 
     def api_user
       EnrolledActorTable.first

@@ -30,7 +30,7 @@ RSpec.describe Api::V1::CollectionPreferencesController, type: :controller do
   end
 
   describe "#update" do
-    let(:unauthorized_user) { resource.collection.owner }
+    let(:unauthorized_user) { create(:user) }
     let(:test_attr) { :preferences }
     let(:test_attr_value) { { "display" => "list" } }
     

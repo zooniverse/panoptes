@@ -3,10 +3,10 @@ require 'spec_helper'
 RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:project) { create(:project_with_contents) }
-  let!(:upp) do
-    create(:user_project_preference,
-           user: authorized_user,
-           project: project,
+  let!(:acl) do
+    create(:access_control_list,
+           user_group: authorized_user.identity_group,
+           resource: project,
            roles: ["translator"])
   end
 
@@ -25,7 +25,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
 
   describe "#index" do
     let!(:private_resource) do
-      create(:project_with_contents, visible_to: ["collaborator"])
+      create(:project_with_contents, private: true)
         .project_contents.first
     end
     let(:n_visible) { 2 }
@@ -85,7 +85,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
         end
 
         it 'should return forbidden' do
-          expect(response.status).to eq(403)
+          expect(response).to have_http_status(:not_found)
         end
 
         it 'should not update the content' do
@@ -109,7 +109,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
       end
 
       it 'should return forbidden' do
-        expect(response.status).to eq(403)
+        expect(response).to have_http_status(:not_found)
       end
 
       it 'should not delete the content' do

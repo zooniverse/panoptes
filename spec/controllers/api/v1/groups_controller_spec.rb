@@ -73,12 +73,12 @@ describe Api::V1::GroupsController, type: :controller do
       
       it 'should include a url for projects' do
         projects_link = json_response['links']['user_groups.projects']['href']
-        expect(projects_link).to eq("/projects?owner={user_groups.owner_name}")
+        expect(projects_link).to eq("/projects?owner={user_groups.name}")
       end
 
       it 'should include a url for collections' do
         collections_link = json_response['links']['user_groups.collections']['href']
-        expect(collections_link).to eq("/collections?owner={user_groups.owner_name}")
+        expect(collections_link).to eq("/collections?owner={user_groups.name}")
       end
     end
     
@@ -108,7 +108,8 @@ describe Api::V1::GroupsController, type: :controller do
 
       it "should make the creating user a group admin" do
         group = UserGroup.find(group_id)
-        expect(authorized_user.roles_for(group)).to include("group_admin")
+        membership = authorized_user.memberships.where(user_group: group).first
+        expect(membership.roles).to include("group_admin")
       end
     end
 
@@ -138,7 +139,7 @@ describe Api::V1::GroupsController, type: :controller do
   describe "#update_links" do
     let(:new_user) { create(:user) }
     let(:resource) { user_groups.first }
-    let(:new_membership) { Membership.where(user: new_user).first }
+    let(:new_membership) { Membership.where(user: new_user, user_group: resource).first }
     let(:test_relation) { :users }
     let(:test_relation_ids) { [ new_user.id.to_s ] }
     let(:resource_id) { :group_id }

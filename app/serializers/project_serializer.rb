@@ -33,6 +33,21 @@ class ProjectSerializer
     content[:introduction]
   end
 
+  def add_links(model, data)
+    data = super
+
+    data[:links][:owner] = {id: @model.owner.id.to_s,
+                            type: @model.owner.class.model_name.plural,
+                            href: "#{@model.owner.class.model_name.route_key}/#{@model.owner.id}"}
+    data
+  end
+
+  def self.links
+    links = super
+    links.delete("#{key}.owner")
+    links
+  end
+
   def content
     @content ||=
       if content = @model.content_for(@context[:languages],

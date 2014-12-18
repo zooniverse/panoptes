@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
 
   create_table "access_control_lists", force: true do |t|
     t.integer  "user_group_id"
-    t.string   "role"
+    t.string   "roles",         default: [], null: false, array: true
     t.integer  "resource_id"
     t.string   "resource_type"
     t.datetime "created_at"
@@ -87,7 +87,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "roles",         default: ["group_member"], null: false, array: true
-    t.boolean  "identity"
+    t.boolean  "identity",      default: false,            null: false
   end
 
   add_index "memberships", ["user_group_id"], name: "index_memberships_on_user_group_id", using: :btree

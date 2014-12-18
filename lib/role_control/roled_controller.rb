@@ -4,81 +4,58 @@ module RoleControl
   module RoledController
     extend ActiveSupport::Concern
 
+    included do
+      attr_accessor :controlled_resources
+    end
+
+    DEFAULT_ACCESS_CONTROL_ACTIONS = %i(update show index destroy update_links destory_links)
+
     module ClassMethods
-      def access_control_action(controller_action, test_action, actor_method: :api_user, &block)
-        method_name = :"access_control_for_#{ controller_action }"
+      def setup_access_control!(*actions, &block)
+        actions = DEFAULT_ACCESS_CONTROL_ACTIONS if actions.blank?
+        actions.each do |action|
+          action, scope_action = action
+          method_name = :"access_control_for_#{ action }"
 
-        define_method method_name do
-          resource = send(:controlled_resource)
-          act_as = send(:owner_from_params)
+          define_method method_name do
+            resource_ids = send(:resource_ids)
+            
+            resource_scope = send(:api_user)
+                             .do(scope_action || action, &block)
+                             .to(send(:resource_class), scope_context)
+                             .with_ids(resource_ids)
 
-          actor(block || actor_method).do(test_action)
-            .to(resource)
-            .as(act_as, allow_nil: false)
-            .allowed?
-        end
-        
-        before_action method_name, only: [controller_action]
-      end
-
-      def access_control_for(*actions)
-        actions.each do |(controller_action, test_action)|
-          test_action ||= controller_action
-          access_control_action(controller_action, test_action)
+            send(:controlled_resources=, resource_scope.scope)
+            
+            unless send(:controlled_resources).exists?
+              raise RoleControl::AccessDenied, send(:rejected_message)
+            end
+          end
+          
+          before_action method_name, only: [action]
         end
       end
     end
 
     protected
 
-    def actor(actor_method)
-      @actor ||= if actor_method.is_a?(Symbol)
-                   send(actor_method)
-                 else
-                   actor_method.call(request)
-                 end
+    def rejected_message
+      if resource_ids.length == 1
+        "Could not find #{resource_name} with id='#{resource_ids.first}'"
+      else
+        "Could not find #{resource_sym} with ids='#{resource_ids.join(',')}'"
+      end
     end
 
-    def controlled_resource
-      @controlled_resource ||= 
+    def resource_ids
+      @resource_ids =
         if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
-          resource_class.find(params["#{ resource_name }_id"])
+          params["#{ resource_name }_id"]
         elsif params.has_key?(:id)
-          resource_class.find(params[:id])
+          params[:id]
         else
-          resource_class
-        end
-    end
-
-    def owner_from_params
-      @owner ||=
-        if params[:owner]
-          OwnerName.where(name: params[:owner]).first.try(:resource)
-        else
-          owner_from_links_params
-        end
-    end
-
-    def visible_scope(actor)
-      @scope ||= resource_class.scope_for(:show, actor)
-    end
-
-    protected
-
-    def owner_from_links_params
-      id, type = params.fetch(resource_sym, {})
-                 .fetch(:links, {})
-                 .fetch(:owner, {})
-                 .values_at(:id, :type)
-      if id && type
-        type = type.singularize.camelize.constantize
-        
-        unless type < RoleControl::Owner
-          raise StandardError.new('type is not owner')
-        end
-        
-        type.find(id)
-      end
+          ''
+        end.split(',')
     end
   end
 end
