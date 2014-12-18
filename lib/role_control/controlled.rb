@@ -18,10 +18,6 @@ module RoleControl
                               public]
       end
 
-      def can_create?(actor, *args)
-        !actor.blank?
-      end
-
       def scope_for(action, target)
         roles, assoc, public_scope = roles(action)
         target_name = target.class.name.underscore

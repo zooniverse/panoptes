@@ -1,7 +1,4 @@
 class Classification < ActiveRecord::Base
-  extend ControlControl::Resource
-  include RoleControl::Adminable
-
   belongs_to :set_member_subject, counter_cache: true
   belongs_to :project, counter_cache: true
   belongs_to :user, counter_cache: true
@@ -16,10 +13,6 @@ class Classification < ActiveRecord::Base
   validates :user, presence: true, if: :incomplete?
   validate :metadata, :required_metadata_present
   validate :validate_gold_standard
-
-  can :show, :in_show_scope?
-  can :update, :created_and_incomplete?
-  can :destroy, :created_and_incomplete?
 
   def self.visible_to(actor, as_admin: false)
     ClassificationVisibilityQuery.new(actor, self).build(as_admin)

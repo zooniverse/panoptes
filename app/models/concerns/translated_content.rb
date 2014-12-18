@@ -8,15 +8,6 @@ module TranslatedContent
     belongs_to translated_for
 
     can_through_parent translated_for, :show
-
-    can :update do |actor|
-      !is_primary? && (parent.can_update?(actor) || is_translator?(actor))
-    end
-    
-    can :destroy do |actor|
-      !is_primary? && parent.can_destroy?(actor)
-    end
-    
   end
 
   module ClassMethods

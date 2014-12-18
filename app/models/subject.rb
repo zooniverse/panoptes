@@ -1,6 +1,4 @@
 class Subject < ActiveRecord::Base
-  extend ControlControl::Resource
-  include RoleControl::Adminable
   include Linkable
 
   has_paper_trail only: [:metadata, :locations]
@@ -21,10 +19,6 @@ class Subject < ActiveRecord::Base
     else
       actor.owner.subjects
     end
-  end
-
-  def self.can_create?(actor)
-    !!actor
   end
 
   def migrated_subject?

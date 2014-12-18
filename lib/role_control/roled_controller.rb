@@ -1,4 +1,6 @@
 module RoleControl
+  class AccessDenied < StandardError; end
+  
   module RoledController
     extend ActiveSupport::Concern
 

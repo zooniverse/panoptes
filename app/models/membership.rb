@@ -1,15 +1,7 @@
 class Membership < ActiveRecord::Base
-  extend ControlControl::Resource
-  include RoleControl::RoleModel
-  
   belongs_to :user_group
   belongs_to :user
   enum state: [:active, :invited, :inactive]
-
-  roles_for :user, :user_group, valid_roles: [:group_admin,
-                                              :project_editor,
-                                              :collection_editor,
-                                              :group_member]
 
   scope :identity, -> { where(identity: true,
                               state: states[:active],
@@ -17,10 +9,6 @@ class Membership < ActiveRecord::Base
 
   validates_presence_of :user, unless: :identity
   validates_associated :user_group
-
-  can :update, :allowed_to_change?
-  can :destroy, :allowed_to_change?
-  can :show, :allowed_to_change?
 
   def self.scope_for(action, actor)
     case actor

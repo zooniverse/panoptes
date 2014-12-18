@@ -1,7 +1,5 @@
 class User < ActiveRecord::Base
-  extend ControlControl::Resource
   include Activatable
-  include RoleControl::Enrolled
   include Linkable
 
   devise :database_authenticatable, :registerable,
@@ -34,10 +32,6 @@ class User < ActiveRecord::Base
   delegate :collections, to: :identity_group
   delegate :subjects, to: :identity_group
   delegate :owns?, to: :identity_group
-
-  can :show, proc { |requester| requester.user == self }
-  can :update, proc { |requester| requester.user == self }
-  can :destroy, proc { |requester| requester.user == self }
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
