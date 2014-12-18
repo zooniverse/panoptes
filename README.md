@@ -125,7 +125,22 @@ After Panoptes starts you can access a rails console within the vagrant box by r
   ./panoptes/vagrant-scripts/console.sh
 ```
 
-### License
+## Contributing
+
+Thanks a bunch for wanting to help Zooniverse. Here are few quick guidelines to start working on our project:
+
+1. Fork the Project on Github.
+2. Clone the code and follow one of the above guides to setup a dev environment.
+3. Create a new git branch and make your changes.
+4. Make sure the tests still pass by running `bundle exec rspec`.
+5. Add tests if you introduced new functionality. 
+6. Commit your changes. Try to make your commit message [informative](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html), but we're not sticklers about it. Do try to to add `Closes #issue` or `Fixes #issue` somewhere in your message if it's addressing a specific open issue.
+7. Submit a Pull Request
+8. Wait for feedback or a merge!
+
+Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.1.2 and JRuby 1.7.16 before we take a look at it. 
+
+## License
 
 Copyright 2014 by the Zooniverse
 
