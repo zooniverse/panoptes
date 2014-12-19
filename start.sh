@@ -8,16 +8,7 @@ then
 fi
 
 if [ "$RAILS_ENV" == "development" ]; then
-  if [ -e /firstrun ]
-  then
-    if [ -d "/rails_app/.jbundler" ]
-    then
-        rm -rf /rails_app/.jbundler
-    fi
-    # ensure the dev and test gems are installed
-    # https://github.com/bundler/bundler/issues/2862
-    bundle install --without nothing
-    jbundle install --without nothing
+  if [ -e /firstrun ]; then
     rake db:migrate
     rm /firstrun
   fi
