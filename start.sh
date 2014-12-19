@@ -14,13 +14,14 @@ if [ "$RAILS_ENV" == "development" ]; then
     then
         rm -rf /rails_app/.jbundler
     fi
-    bundle install
-    jbundle install
+    # ensure the dev and test gems are installed
+    # https://github.com/bundler/bundler/issues/2862
+    bundle install --without nothing
+    jbundle install --without nothing
     rake db:migrate
     rm /firstrun
-  else
-    exec foreman start
   fi
+  exec foreman start
 else
   mkdir -p tmp/pids/
   rm -f tmp/pids/*.pid
