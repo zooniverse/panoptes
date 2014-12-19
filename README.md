@@ -48,20 +48,17 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
 
 3. Copy all the `config/*.yml.hudson` files to `config/*.yml`. The default values should work out of the box.
 
-4. Run `./scripts/fig/up_panoptes.sh`.
-    * On the first run it will build the docker containers, setup the database and install the development and test environment gems.
-    * **Note:** It will not start the rails server(s), and will exit after db migration.
+4. Run `fig up`
+    * On the first run it will build the docker containers, setup the database.
+    * **NOTE: Use the `./scripts/fig/up_panoptes.sh` after the first `fig up` to avoid reinstalling the gems.**
 
-5. Run `./scripts/fig/up_panoptes.sh` again.
-  * On second run the script will start Panoptes and all the dependent services.
-  * **Note:** this script does not recreate containers to avoid installing gems and migrating the database.
-   * If you've added new gems, or you otherwise need to recreate the build image, run `fig up`.
-
-6. Run `scripts/fig/run_cmd_panoptes.sh "bundle install && rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
+6. Run `scripts/fig/run_cmd_panoptes.sh "rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
     * This will seed the fig development database in the docker container.
     * **Note:** Run this only after step 4 has completed successfully.
 
-7. Finally, if you want to apply schema migrations, run `scripts/fig/migrate_db_panoptes.sh`
+8. If you've added new gems run `scripts/fig/gem_install_panoptes.sh`.
+
+9. Finally, if you want to apply schema migrations, run `scripts/fig/migrate_db_panoptes.sh`
 
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
@@ -133,12 +130,12 @@ Thanks a bunch for wanting to help Zooniverse. Here are few quick guidelines to 
 2. Clone the code and follow one of the above guides to setup a dev environment.
 3. Create a new git branch and make your changes.
 4. Make sure the tests still pass by running `bundle exec rspec`.
-5. Add tests if you introduced new functionality. 
+5. Add tests if you introduced new functionality.
 6. Commit your changes. Try to make your commit message [informative](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html), but we're not sticklers about it. Do try to to add `Closes #issue` or `Fixes #issue` somewhere in your message if it's addressing a specific open issue.
 7. Submit a Pull Request
 8. Wait for feedback or a merge!
 
-Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.1.2 and JRuby 1.7.16 before we take a look at it. 
+Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.1.2 and JRuby 1.7.16 before we take a look at it.
 
 ## License
 

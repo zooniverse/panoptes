@@ -25,10 +25,13 @@ kafka:
     - zookeeper:zk
   command: -i 1 -H kafka -p 9092 -z zk:2181
 
+panoptesdata:
+  build: scripts/fig/
+
 panoptes:
   build: .
-  volumes:
-    - ./:/rails_app
+  volumes_from:
+    - panoptesdata
   ports:
     - "3000:80"
   environment:
