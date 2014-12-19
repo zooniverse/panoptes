@@ -48,17 +48,18 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
 
 3. Copy all the `config/*.yml.hudson` files to `config/*.yml`. The default values should work out of the box.
 
-4. Run `fig up`
-    * On the first run it will build the docker containers, setup the database.
-    * **NOTE: Use the `./scripts/fig/up_panoptes.sh` after the first `fig up` to avoid reinstalling the gems.**
+4. Run `scripts/fig/build_panoptes.sh` to build the docker containers
+
+5. Run `fig up ` OR `scripts/fig/up_panoptes.sh` to start all Panoptes services.
 
 6. Run `scripts/fig/run_cmd_panoptes.sh "rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
     * This will seed the fig development database in the docker container.
     * **Note:** Run this only after step 4 has completed successfully.
 
-8. If you've added new gems run `scripts/fig/gem_install_panoptes.sh`.
+7. If you've added new gems you'll need to rebuild the docker image via the command in step 4.
+  ** NOTE --> ADD A NOTE ABOUT --NO-CACHE here and look into voiding the cache on the gem install commmand**
 
-9. Finally, if you want to apply schema migrations, run `scripts/fig/migrate_db_panoptes.sh`
+8. Finally, if you want to apply schema migrations, run `scripts/fig/migrate_db_panoptes.sh`
 
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
