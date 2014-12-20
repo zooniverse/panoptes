@@ -28,6 +28,11 @@ password = STDIN.noecho(&:gets).chomp
 if password.length < 8
   abort(red("Failed: Password must be at least 8 characters long\n"))
 end
+puts yellow("Please re-enter your password")
+second_password = STDIN.noecho(&:gets).chomp
+unless password == second_password
+  abort(red("Failed: passwords do not match!\n"))
+end
 
 #setup an admin user
 attrs = { display_name: 'Zooniverse Admin',
