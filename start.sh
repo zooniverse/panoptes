@@ -8,10 +8,6 @@ then
 fi
 
 if [ "$RAILS_ENV" == "development" ]; then
-  if [ -e /firstrun ]; then
-    rake db:migrate
-    rm /firstrun
-  fi
   exec foreman start
 else
   mkdir -p tmp/pids/
