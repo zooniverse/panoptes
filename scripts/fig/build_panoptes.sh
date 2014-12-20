@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 SCRIPT_DIR="`dirname \"$0\"`"
 cp -f Dockerfile Dockerfile.orig
 cp -f $SCRIPT_DIR/Dockerfile .
