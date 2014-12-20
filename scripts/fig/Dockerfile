@@ -16,8 +16,6 @@ ADD ./Jarfile.lock /rails_app/
 
 RUN bundle install && jbundle install
 
-RUN touch /firstrun
-
 ADD ./ /rails_app
 
 EXPOSE 80
