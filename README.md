@@ -44,34 +44,29 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
 
 1. Ensure your repo directory starts with a lowercase letter - you may need to move `/Panoptes` to `/panoptes`.
 
-2. Prepare your fig development environment config files. You should only have to do this before the first boot. **Note:** The fig docker environment uses linked docker containers, so your Postgres and Zookeeper hosts urls need to refer to these containers.
+2. Prepare your development environment config files, you should only have to do this before the first boot. **Note:** The fig docker environment uses linked docker containers, so your Postgres and Zookeeper hosts urls need to refer to these containers.
+  * Copy all the `config/*.yml.hudson` files to `config/*.yml`. The default values should work out of the box.
 
-3. Copy all the `config/*.yml.hudson` files to `config/*.yml`. The default values should work out of the box.
+3. Run `scripts/fig/build_panoptes.sh` to build the docker containers
 
-4. Run `scripts/fig/build_panoptes.sh` to build the docker containers
+4. Run `fig up ` OR `scripts/fig/up_panoptes.sh` to start all Panoptes services.
 
-5. Run `fig up ` OR `scripts/fig/up_panoptes.sh` to start all Panoptes services.
+5. Once step 4 is finished, run `scripts/fig/run_cmd_panoptes.sh "rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
+  * This will seed the development database with an Admin user and a Doorkeeper client applications.
 
-6. Run `scripts/fig/run_cmd_panoptes.sh "rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
-    * This will seed the fig development database in the docker container.
-    * **Note:** Run this only after step 4 has completed successfully.
+6. If you've added new gems you'll need to rebuild the docker image via the command in step 4.
+  * ** Note:** This will only be rebuild the changes made to the filesystem that are used in the Dockerfile, see [Docker RUN instructions cache](https://docs.docker.com/reference/builder/).
 
-7. If you've added new gems you'll need to rebuild the docker image via the command in step 4.
-  ** NOTE --> ADD A NOTE ABOUT --NO-CACHE here and look into voiding the cache on the gem install commmand**
-
-8. Finally, if you want to apply schema migrations, run `scripts/fig/migrate_db_panoptes.sh`
-
+7. Finally, if you want to apply schema migrations, run `scripts/fig/migrate_db_panoptes.sh`
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
-Finally there are some helper scripts to get access to a console, bash shell etc. **Note:** these commands build a new run container
-* To get a rails console `scripts/fig/rails_console_panoptes.sh`
-  + **Note:** you can override the RAILS_ENV by passing a valid argument, just make sure you've setup the DB for it!
-* To get a bash console `scripts/fig/run_cmd_panoptes.sh bash`
-* You can also attach a bash process to the running container, e.g. `docker exec -it panoptes_panoptes_1 bash`
-  + Assuming the 'panoptes_panoptes_1' container is running, use `fig ps` or `docker ps` to check.
-
-**Note:** if you've ever built a Panoptes docker container before you should just run `fig up` instead of the `./scripts/fig/up_panoptes.sh` to ensure the previously built container is not re-used. After rebuilding you should be good to use `./scripts/fig/up_panoptes.sh` script to use the re-created containers.
+Finally there are some helper scripts to get access to a console, bash shell etc. **Note:** these commands build a new container on each run, see [Fig CLI](http://www.fig.sh/cli.html).
+  * To get a rails console `scripts/fig/rails_console_panoptes.sh`
+    + **Note:** you can override the RAILS_ENV by passing a valid argument, just make sure you've set the DB for the env!
+  * To get a bash console `scripts/fig/run_cmd_panoptes.sh bash`
+  * You can also attach a bash process to the running container, e.g. `docker exec -it panoptes_panoptes_1 bash`
+    + Assuming the 'panoptes_panoptes_1' container is running, use `fig ps` or `docker ps` to check.
 
 ### 2. Run manually with self installed and run dependencies
 
