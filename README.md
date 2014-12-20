@@ -49,17 +49,17 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
 
 3. Run `scripts/fig/build_panoptes.sh` to build the docker containers
 
-4. Run `fig up ` OR `scripts/fig/up_panoptes.sh` to start all Panoptes services.
+4. Run, `scripts/fig/migrate_db_panoptes.sh` to setup the database.
+  * Use this command to apply any schema migrations during development. **Note:** This script runs in a separately built container and can be applied when the server is running.
 
 5. Once step 4 is finished, run `scripts/fig/run_cmd_panoptes.sh "rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
-  * This will seed the development database with an Admin user and a Doorkeeper client applications.
+  * This will seed the development database with an Admin user and a Doorkeeper client application for API access.
 
-6. If you've added new gems you'll need to rebuild the docker image via the command in step 4.
-  * ** Note:** This will only be rebuild the changes made to the filesystem that are used in the Dockerfile, see [Docker RUN instructions cache](https://docs.docker.com/reference/builder/).
-
-7. Finally, if you want to apply schema migrations, run `scripts/fig/migrate_db_panoptes.sh`
+6. Run `fig up ` OR `scripts/fig/up_panoptes.sh` to start all Panoptes services.
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
+
+If you've added new gems you'll need to rebuild the docker image via the command in step 4.
 
 Finally there are some helper scripts to get access to a console, bash shell etc. **Note:** these commands build a new container on each run, see [Fig CLI](http://www.fig.sh/cli.html).
   * To get a rails console `scripts/fig/rails_console_panoptes.sh`
