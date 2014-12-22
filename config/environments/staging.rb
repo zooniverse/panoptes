@@ -87,7 +87,7 @@ Rails.application.configure do
 
   config.middleware.insert_before Warden::Manager, Rack::Cors do
     allow do
-      origins /^http:\/\/(127\.0\.0\.1|localhost|10\.0\.2\.2)(:\d+)?$/
+      origins /^https?:\/\/(127\.0\.0\.1|localhost|10\.0\.2\.2|[a-z0-9-]+\.zooniverse\.org)(:\d+)?$/
       resource '*', headers: :any,
                     methods: [:get, :post, :put, :delete, :options, :patch]
     end
