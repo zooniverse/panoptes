@@ -1,13 +1,13 @@
 module JsonApiController
   module RelationManager
-    def update_relation(relation, value)
+    def update_relation(resource, relation, value)
       case value
       when Hash
         id, type = value.values_at(:id, :type)
-        item = find_for_string_type(type, id)
+        item = find_for_string_type(resource, type, id)
         item
       when Array, String, Integer
-        new_items(relation, value)
+        new_items(resource, relation, value)
       else
         value
       end
@@ -16,32 +16,32 @@ module JsonApiController
     def add_relation(resource, relation, value)
       case value
       when Array
-        resource.send(relation).concat(new_items(relation, value))
+        resource.send(relation).concat(new_items(resource, relation, value))
       else
-        resource.send("#{relation}=", update_relation(relation, value))
+        resource.send("#{relation}=", update_relation(resource, relation, value))
       end
     end
 
-    def destroy_relation(relation, value)
+    def destroy_relation(resource, relation, value)
       ids = value.split(',').map(&:to_i)
-      controlled_resources.send(relation).destroy(*ids)
+      resource.send(relation).destroy(*ids)
     end
 
     protected
 
-    def find_for_string_type(type, id)
+    def find_for_string_type(resource, type, id)
       relation_find(id) do
         type.camelize
           .singularize
           .constantize
-          .link_to_resource(controlled_resource, api_user)
+          .link_to_resource(resource, api_user)
       end
     end
 
-    def new_items(relation, value, *args)
+    def new_items(resource, relation, value, *args)
       relation_find(value) do
         assoc_class(relation)
-          .link_to_resource(controlled_resource, api_user, *args)
+          .link_to_resource(resource, api_user, *args)
       end
     end
 

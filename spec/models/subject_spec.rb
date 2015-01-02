@@ -37,19 +37,14 @@ describe Subject, :type => :model do
     end
 
     it 'should not track other attribute changes', versioning: true do
-      new_owner = create(:user)
-      subject.update!(owner: new_owner)
+      project = create(:project)
+      subject.update!(project: project)
       expect(subject.previous_version).to be_nil
     end
   end
 
   it "should be invalid without a project_id" do
     subject.project = nil
-    expect(subject).to_not be_valid
-  end
-
-  it "should be invalid without an owner_id" do
-    subject.owner = nil
     expect(subject).to_not be_valid
   end
 

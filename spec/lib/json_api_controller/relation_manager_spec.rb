@@ -12,11 +12,7 @@ describe JsonApiController::RelationManager do
         @user = ApiUser.new(user)
       end
 
-      def controlled_resource
-        @resource
-      end
-
-      def current_actor
+      def api_user
         @user
       end
 
@@ -28,24 +24,26 @@ describe JsonApiController::RelationManager do
 
 
   let(:user) { create(:user) }
-  let(:subjects) { create_list(:subject, 4, owner: user) }
-  let(:project) { create(:project) }
+  let(:project) { create(:project, owner: user) }
+  let(:subjects) { create_list(:subject, 4, project: project) }
   
   let(:test_instance) { test_class.new(resource, user) }
 
   describe "#update_relations" do
     context "many-to-many" do
       it 'should replace the relation with new items' do
-        test_instance.update_relation(:subjects,
-                                      subjects.map(&:id).map(&:to_s))
-        expect(resource.subjects).to eq(subjects)
+        updated = test_instance.update_relation(resource,
+                                                :subjects,
+                                                subjects.map(&:id).map(&:to_s))
+        expect(updated).to match_array(subjects)
       end
     end
 
     context "one-to-many" do
       it 'should add the new relation to the resource' do
-        test_instance.update_relation(:project, project.id)
-        expect(resource.project).to eq(project)
+        updated = test_instance.update_relation(resource,
+                                                :project, project.id)
+        expect(updated).to eq(project)
       end
     end
 
@@ -53,9 +51,11 @@ describe JsonApiController::RelationManager do
       it 'should add the new relation to the resource' do
         group = create(:user_group)
         create(:membership, user: user, user_group: group, state: :active, roles: ["group_admin"])
-        test_instance.update_relation(:owner, {id: group.id.to_s,
-                                               type: "user_group"})
-        expect(resource.owner).to eq(group)
+        updated = test_instance.update_relation(resource,
+                                                :owner,
+                                                {id: group.id.to_s,
+                                                 type: "user_group"})
+        expect(updated).to eq(group)
       end
     end
   end
@@ -63,7 +63,8 @@ describe JsonApiController::RelationManager do
   describe "#add_relation" do
     context "to-many" do
       it 'should add the new relation to the resource' do
-        test_instance.add_relation(:subjects,
+        test_instance.add_relation(resource,
+                                   :subjects,
                                    subjects.map(&:id).map(&:to_s))
         expect(resource.subjects).to include(*subjects)
       end
@@ -71,7 +72,8 @@ describe JsonApiController::RelationManager do
     
     context "to-one" do
       it 'should replace the old relation' do
-        test_instance.add_relation(:project, project.id)
+        test_instance.add_relation(resource,
+                                   :project, project.id)
         expect(resource.project).to eq(project)
       end
     end
@@ -81,7 +83,7 @@ describe JsonApiController::RelationManager do
   describe "#destroy_relation" do
     it 'should remove the linked relations' do
       del_string = resource.subjects[0..2].map(&:id).join(",")
-      test_instance.destroy_relation(:subjects, del_string)
+      test_instance.destroy_relation(resource, :subjects, del_string)
       expect(resource.subjects).to_not include(*subjects[0..2])
     end
     
@@ -89,7 +91,7 @@ describe JsonApiController::RelationManager do
       it 'should not destroy the unlinked items' do
         expect do
           del_string = resource.subjects[0..2].map(&:id).join(",")
-          test_instance.destroy_relation(:subjects, del_string)
+          test_instance.destroy_relation(resource, :subjects, del_string)
         end.to_not change{ Subject.count }
       end
     end
@@ -100,7 +102,7 @@ describe JsonApiController::RelationManager do
       it 'should destroy the unlinked items' do
         expect do
           del_string = resource.workflows.map(&:id).join(",")
-          test_instance.destroy_relation(:workflows, del_string)
+          test_instance.destroy_relation(resource, :workflows, del_string)
         end.to change{ Workflow.count }.from(2).to(0)
       end
     end

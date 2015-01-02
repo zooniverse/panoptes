@@ -1,11 +1,9 @@
 class Api::V1::ClassificationsController < Api::ApiController
   skip_before_filter :require_login, only: :create
   doorkeeper_for :show, :index, :destroy, :update, scopes: [:classification]
-  setup_access_control! { |user| user }
+  setup_access_control_for_user!
   
   resource_actions :default
-
-  alias_method :classification, :controlled_resource
 
   rescue_from RoleControl::AccessDenied, with: :access_denied
 
@@ -34,27 +32,27 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
   
   def build_resource_for_update(update_params)
-    super
-    lifecycle(:update)
+    classification = super
+    lifecycle(:update, classification)
     classification
   end
 
   def build_resource_for_create(create_params)
-    super(create_params) do |create_params, link_params|
+   classification = super(create_params) do |create_params, link_params|
       link_params[:user] = api_user.user
       create_params[:user_ip] = request_ip
     end
-    lifecycle(:create)
+    lifecycle(:create, classification)
     classification
   end
 
-  def cellect_host
+  def cellect_host(classification)
     super(classification.workflow.id)
   end
 
-  def lifecycle(action)
+  def lifecycle(action, classification)
     lifecycle = ClassificationLifecycle.new(classification)
-    lifecycle.update_cellect(cellect_host)
+    lifecycle.update_cellect(cellect_host(classification))
     lifecycle.queue(action)
   end
 

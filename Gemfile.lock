@@ -1,15 +1,17 @@
 GIT
-  remote: git://github.com/joekiller/jruby-kafka.git
-  revision: 2ca14364bd872926d9b44e438711f9fe67772578
-  specs:
-
-PATH
-  remote: ../restpack_serializer/
+  remote: git://github.com/edpaget/restpack_serializer.git
+  revision: 31a51c84a1634a3047e7c07b109772a6dc731762
+  branch: dev
   specs:
     restpack_serializer (0.5.6)
       activerecord (>= 4.0.3, < 5.0)
       activesupport (>= 4.0.3, < 5.0)
       kaminari (~> 0.16.1)
+
+GIT
+  remote: git://github.com/joekiller/jruby-kafka.git
+  revision: 2ca14364bd872926d9b44e438711f9fe67772578
+  specs:
 
 GEM
   remote: https://rubygems.org/

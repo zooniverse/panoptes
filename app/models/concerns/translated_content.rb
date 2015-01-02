@@ -7,7 +7,7 @@ module TranslatedContent
     validates :language, format: {with: /\A[a-z]{2}(\z|-[A-z]{2})/}
     belongs_to translated_for
 
-    can_through_parent translated_for, :show, :index
+    can_through_parent translated_for, :show, :index, :versions, :version
   end
 
   module ClassMethods

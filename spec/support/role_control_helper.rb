@@ -17,6 +17,8 @@ def setup_role_control_tables
   unless const_defined?("EnrolledActorTable")
     Object.const_set("EnrolledActorTable",
                      Class.new(ActiveRecord::Base) do
+                       include RoleControl::Actor
+                       
                        has_many :roles_join_tables
                      end)
   end
@@ -30,12 +32,13 @@ def setup_role_control_tables
 
                        scope :public_controlled, ->{ where(private: false) }
                        
-                       can_by_role :read,
+                       can_by_role :read, :show,
                                    public: :public_controlled,
                                    role_association: :roles_join_tables,
                                    roles: [:admin, :test_role]
                        
-                       can_by_role :update, roles: [:test_role]
+                       can_by_role :update, roles: [:test_role],
+                                   role_association: :roles_join_tables
                        
                        can_by_role :index, roles: [:admin]
                      end)

@@ -35,8 +35,6 @@ module Api
     before_action :ban_user, only: [:create, :update, :destroy]
     skip_before_action :verify_authenticity_token
 
-    setup_access_control!
-
     def current_resource_owner
       if doorkeeper_token
         @current_resource_owner ||= User.find_by_id(doorkeeper_token.resource_owner_id)

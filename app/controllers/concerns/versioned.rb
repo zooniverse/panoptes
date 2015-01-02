@@ -2,7 +2,7 @@ module Versioned
   extend ActiveSupport::Concern
 
   included do
-    setup_access_control!([:versions, :show], [:version, :show])
+    setup_access_control_for_groups!(:versions, :version)
   end
 
   def versions

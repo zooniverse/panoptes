@@ -12,7 +12,7 @@ class Subject < ActiveRecord::Base
   validates_presence_of :project
 
   can_through_parent :project, :update, :index, :show, :destroy, :update_links,
-                     :destroy_links
+                     :destroy_links, :versions, :version
 
   def migrated_subject?
     !!migrated

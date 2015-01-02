@@ -119,7 +119,17 @@ describe Api::V1::WorkflowsController, type: :controller do
       }
     end
 
-    it_behaves_like "is creatable"
+    context "when the linked project is owned by a user" do
+      it_behaves_like "is creatable"
+    end
+
+    context "when a project is owned by a user group" do
+      let(:membership) { create(:membership, state: 0, roles: ["project_editor"]) }
+      let(:project) { create(:project, owner: membership.user_group) }
+      let(:authorized_user) { membership.user }
+      
+      it_behaves_like "is creatable"
+    end
 
     context "extracts strings from workflow" do
       it 'should replace "Draw a circle" with 0' do

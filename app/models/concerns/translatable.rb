@@ -32,10 +32,6 @@ module Translatable
     end
   end
 
-  def is_translator?(actor)
-    self.class.translatable_by(actor).exists?(id)
-  end
-
   def content_for(languages, fields)
     language = best_match_for(languages)
     content_association.select(*fields).where(language: language).first

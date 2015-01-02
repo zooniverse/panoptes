@@ -23,7 +23,7 @@ module JsonApiController
     def update_links
       check_relation
       resource = controlled_resources.first
-      ActiveRecord::Base.transaction do
+      resource_class.transaction do
         add_relation(resource, relation, params[relation])
         resource.save!
       end
@@ -32,8 +32,9 @@ module JsonApiController
     end
 
     def destroy_links
-      ActiveRecord::Base.transaction do
-        destroy_relation(relation, params[:link_ids])
+      resource = controlled_resources.first
+      resource_class.transaction do
+        destroy_relation(resource, relation, params[:link_ids])
       end
       deleted_resource_response
     end
@@ -43,7 +44,7 @@ module JsonApiController
     def build_update_hash(update_params, id)
       return update_params unless links = update_params.delete(:links)
       links.try(:reduce, update_params) do |params, (k, v)|
-        params[k] = update_relation(k.to_sym, v)
+        params[k] = update_relation(resource_class.find(id), k.to_sym, v)
         params
       end
     end

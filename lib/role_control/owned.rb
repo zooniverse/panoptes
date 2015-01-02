@@ -9,6 +9,8 @@ module RoleControl
 
       scope :public_scope, -> { where(private: false) }
 
+      validates_presence_of :owner
+
       include OwnerOverrides
     end
 
@@ -35,7 +37,10 @@ module RoleControl
           group
         end
       end
-      
+
+      def owner?(test_owner)
+        owner == test_owner
+      end
     end
   end
 end

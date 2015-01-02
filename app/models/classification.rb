@@ -17,10 +17,19 @@ class Classification < ActiveRecord::Base
   scope :incomplete, -> { where(completed: false) }
   scope :created_by, -> (user) { where(user: user) }
 
-  def self.scope_for(action, actor, opts={})
+  def self.scope_for(action, actor, project: nil, user_group: nil, as_admin: nil)
     case action
     when :show, :index
-      actor.user.classifications
+      case
+      when actor.is_admin? && as_admin
+        all
+      when project
+        where(project: Project.scope_for(action, actor.groups_for(:update, Project)))
+      when user_group
+        where(user_group: actor.user_groups)
+      else
+        actor.classifications
+      end
     when :update, :destroy
       incomplete.merge(created_by(actor.user))
     else
@@ -30,10 +39,6 @@ class Classification < ActiveRecord::Base
 
   def created_and_incomplete?(actor)
     creator?(actor) && incomplete?
-  end
-
-  def in_show_scope?(actor)
-    self.class.visible_to(actor).exists?(self)
   end
 
   def creator?(actor)

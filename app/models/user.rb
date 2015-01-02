@@ -79,7 +79,7 @@ class User < ActiveRecord::Base
   def groups_for(action, klass=nil)
     roles = case action
                 when :show, :index
-                  [:group_admin, :group_memebr]
+                  [:group_admin, :group_member]
                 else
                   [:group_admin]
                 end

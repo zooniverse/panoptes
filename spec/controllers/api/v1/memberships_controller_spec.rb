@@ -13,7 +13,12 @@ describe Api::V1::MembershipsController, type: :controller do
 
   describe "#index" do
     let!(:private_resource) { create(:membership) }
-    let(:n_visible) { 2 }
+    let(:n_visible) { 4 }
+
+    before(:each) do
+      group = memberships.first.user_group
+      create_list(:membership, 2, roles: ["group_member"], state: :invited, user_group: group)
+    end
 
     it_behaves_like "is indexable"
   end

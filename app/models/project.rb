@@ -13,22 +13,22 @@ class Project < ActiveRecord::Base
   has_many :subject_sets
   has_many :classifications
   has_many :subjects
-  has_many :project_roles, class_name: "AccessControlList", as: :resource
+  has_many :project_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
 
   accepts_nested_attributes_for :project_contents
 
-  ## TODO: Figure out how to do these validations
-  #validates_uniqueness_of :name, case_sensitive: false, scope: :owner
-  #validates_uniqueness_of :display_name, scope: :owner
+  ## TODO: This potential has locking issues
+  validates_with UniqueForOwnerValidator
 
   can_by_role :destroy, :update, :update_links, :destroy_links, roles: [ :owner,
                                                                          :collaborator ]
-  can_by_role :show, :index, public: :public_scope, roles: [ :owner,
-                                                             :collaborator,
-                                                             :tester,
-                                                             :translator,
-                                                             :scientist,
-                                                             :moderator ]
+  can_by_role :show, :index, :versions, :version,
+              public: :public_scope, roles: [ :owner,
+                                              :collaborator,
+                                              :tester,
+                                              :translator,
+                                              :scientist,
+                                              :moderator ]
 
   can_be_linked :subject_set, :scope_for, :update, :groups
   can_be_linked :subject, :scope_for, :update, :groups
@@ -40,8 +40,7 @@ class Project < ActiveRecord::Base
   def expert_classifier_level(classifier)
     expert_role = project_roles.where(user_group: classifier.identity_group)
                   .where.overlap(roles: EXPERT_ROLES)
-                  .exists?
-    expert_role ? :expert : nil
+    expert_role.first.try(:roles).try(:first).try(:to_sym)
   end
 
   def expert_classifier?(classifier)

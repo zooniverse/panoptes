@@ -159,7 +159,6 @@ describe User, :type => :model do
       it "should have the correct error message on the owner_name association" do
         user.build_identity_group
         user.valid?
-        p user.errors.messages
         expect(user.errors[:"identity_group.name"]).to include("has already been taken")
       end
     end
@@ -269,12 +268,6 @@ describe User, :type => :model do
     end
   end
 
-  describe "#subjects" do
-    let(:relation_instance) { user }
-
-    it_behaves_like "it has a subjects association"
-  end
-
   describe "#classifications" do
     let(:relation_instance) { user }
 
@@ -285,34 +278,5 @@ describe User, :type => :model do
     let(:relation_instance) { user }
 
     it_behaves_like "it has a cached counter for classifications"
-  end
-
-  describe "#do" do
-    let(:user) { create(:user) }
-    let(:project) { create(:project) }
-    let!(:user_project_preference) do
-      create(:user_project_preference,
-             roles: ['collaborator'],
-             project: project,
-             user: user)
-    end
-
-    let(:test_proc) { proc { true } }
-
-    it 'should be allowed to update the resource' do
-      #result = user.do(:update).to(project).call &test_proc
-      #expect(result).to be_truthy
-    end
-
-    it 'should be allowed to show the resource' do
-      #result = user.do(:show).to(project).call &test_proc
-      #expect(result).to be_truthy
-    end
-
-    it 'should not be allowed to destroy the resource' do
-      #user_project_preference.roles = []
-      #user_project_preference.save!
-      #expect{user.do(:destroy).to(project).call &test_proc}.to raise_error(ControlControl::AccessDenied)
-    end
   end
 end

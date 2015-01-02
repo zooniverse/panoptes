@@ -98,12 +98,6 @@ describe UserGroup, :type => :model do
     end
   end
 
-  describe "#subjects" do
-    let(:relation_instance) { user_group }
-
-    it_behaves_like "it has a subjects association"
-  end
-
   describe "#projects" do
     let(:user_group) { create(:user_group_with_projects) }
 

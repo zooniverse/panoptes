@@ -4,9 +4,7 @@ module PreferencesController
   included do
     prepend_before_filter :require_login
   
-    setup_access_control! do |user|
-      user
-    end
+    setup_access_control_for_user!
     
     resource_actions :index, :show, :create, :update
 

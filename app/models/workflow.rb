@@ -15,7 +15,7 @@ class Workflow < ActiveRecord::Base
   validates_presence_of :project
 
   can_through_parent :project, :update, :index, :show, :destroy, :update_links,
-                     :destroy_links, :translate
+                     :destroy_links, :translate, :versions, :version
   
   can_be_linked :subject_set, :same_project?, :model
   can_be_linked :user_subject_queue, :scope_for, :update, :groups
@@ -25,12 +25,7 @@ class Workflow < ActiveRecord::Base
   end
   
   def self.scope_for(action, groups, opt={})
-    case action
-    when :translate
-      where(project: super)
-    else
-      super
-    end
+    super
   end
 
   def tasks

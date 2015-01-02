@@ -91,6 +91,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
   end
 
   add_index "memberships", ["user_group_id"], name: "index_memberships_on_user_group_id", using: :btree
+  add_index "memberships", ["user_id", "identity"], name: "index_memberships_on_user_id_and_identity", unique: true, where: "(identity = true)", using: :btree
   add_index "memberships", ["user_id"], name: "index_memberships_on_user_id", using: :btree
 
   create_table "oauth_access_grants", force: true do |t|

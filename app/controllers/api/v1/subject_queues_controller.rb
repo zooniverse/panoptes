@@ -3,6 +3,8 @@ class Api::V1::SubjectQueuesController < Api::ApiController
   resource_actions :default
   schema_type :strong_params
 
+  setup_access_control_for_groups!
+  
   allowed_params :create, links: [:user, :workflow, set_member_subjects: []]
   allowed_params :update, links: [set_member_subjects: []]
 

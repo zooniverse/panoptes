@@ -15,7 +15,6 @@ matrix:
   fast_finish: true
   allow_failures:
     - rvm: 2.1.5
-    - rvm: ruby-head
     - rvm: jruby-head
     - rvm: 2.2.0
   include:
@@ -26,7 +25,7 @@ matrix:
       before_script: *jruby_before_script
     - rvm: 2.1.5
     - rvm: 2.2.0
-    - rvm: ruby-head
+    - rvm: jruby-head
       
 services:
   - postgresql

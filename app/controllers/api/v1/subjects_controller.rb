@@ -17,12 +17,13 @@ class Api::V1::SubjectsController < Api::ApiController
 
   private
 
-  def create_response(subject)
-    serializer.resource({}, resource_scope(subject), post_urls: true)
-  end
-
-  def update_response(subject)
-    serializer.resource({}, resource_scope(subject), post_urls: true)
+  def context
+    case action_name
+    when "update", "create"
+      { post_urls: true }
+    else
+      { }
+    end
   end
 
   def build_resource_for_create(create_params)

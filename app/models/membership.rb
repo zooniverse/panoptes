@@ -9,26 +9,20 @@ class Membership < ActiveRecord::Base
 
   validates_presence_of :user, unless: :identity
   validates_associated :user_group
+  validates_presence_of :state, :user_group
 
   def self.scope_for(action, user, opts={})
     case action
     when :show, :index
-      where(user_group: UserGroup.public_groups)
+      where(user_group: UserGroup.public_groups, state: states[:active])
         .union(where(user: user.user))
-        .union(where(user: user.groups_for(:show)))
+        .union(where(user_group: user.groups_for(:show)))
     when :update, :destroy
-      where(user_group: user.groups_for(:update)).union(where(user: user.user))
+      where(user_group: user.groups_for(:update)).where.not(state: states[:invited])
+        .union(where(user: user.user))
     end.where(identity: false)
   end
 
-  def self.can_create?(actor)
-    !!actor
-  end
-
-  def allowed_to_change?(actor)
-    actor.try(:owner) == user || (actor == user_group && active?)
-  end
-  
   def disable!
     inactive!
   end

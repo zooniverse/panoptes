@@ -68,23 +68,15 @@ module JsonApiController
   def context
     {}
   end
-<<<<<<< HEAD
-  
-=======
 
   def controlled_resource
     @controlled_resource ||= controlled_resources.first
   end
 
-  def scope_context
-    {}
-  end
-
->>>>>>> Convert all Controllers to use new RoleControl
   private
 
   def resource_scope(resources)
     return resources if resources.is_a?(ActiveRecord::Relation)
-    resource_class.where(id: resources.try(:id))
+    resource_class.where(id: resources.try(:id) || resources.map(&:id))
   end
 end

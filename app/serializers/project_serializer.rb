@@ -50,7 +50,7 @@ class ProjectSerializer
 
   def content
     @content ||=
-      if content = @model.content_for(@context[:languages],
+      if content = @model.content_for(@context[:languages] || [@model.primary_language],
                                       @context[:fields])
         content = @context[:fields].map do
           |k| Hash[k, content.send(k)]

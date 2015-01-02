@@ -1,9 +1,11 @@
 class Api::V1::ProjectsController < Api::ApiController
   include FilterByOwner
-
+  
   doorkeeper_for :update, :create, :destroy, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
+
+  setup_access_control_for_groups!
 
   alias_method :project, :controlled_resource
 
@@ -26,10 +28,9 @@ class Api::V1::ProjectsController < Api::ApiController
 
   private
   
-  def create_response(project)
-    serializer.resource({ id: project.id, include: 'owners'},
-                        nil,
-                        languages: [ project.primary_language ],
+  def create_response(projects)
+    serializer.resource({ include: 'owners' },
+                        resource_scope(projects),
                         fields: CONTENT_FIELDS)
   end
 
@@ -56,29 +57,11 @@ class Api::V1::ProjectsController < Api::ApiController
     super(update_params, id)
   end
 
-  def new_items(relation, value)
-    super(relation, value).map(&:dup)
+  def new_items(resource, relation, value)
+    super(resource, relation, value).map(&:dup)
   end
 
   def context
-    { languages: language_context, fields: field_content }
-  end
-
-  def language_context
-    case action_name
-    when "show", "index"
-      current_languages
-    when "update", "create"
-      [ project.primary_language ]
-    end
-  end
-
-  def field_content
-    case action_name
-    when "index"
-      INDEX_FIELDS
-    when "show", "update", "create"
-      CONTENT_FIELDS
-    end
+    { languages: current_languages, fields: INDEX_FIELDS }
   end
 end

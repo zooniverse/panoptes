@@ -237,9 +237,9 @@ describe ClassificationLifecycle do
       let(:roles) { [] }
       let(:classification) { build(:classification, gold_standard: true) }
       let!(:user_role) do
-        create(:user_project_preference, project: classification.project,
-                                         user: classification.user,
-                                         roles: roles)
+        create(:access_control_list, resource: classification.project,
+               user_group: classification.user.identity_group,
+               roles: roles)
       end
 
       before(:each) do

@@ -3,6 +3,8 @@ class Api::V1::SetMemberSubjectsController < Api::ApiController
   resource_actions :default
   schema_type :strong_params
 
+  setup_access_control_for_groups!
+  
   allowed_params :create, :priority, :state, links: [:subject, :subject_set]
   allowed_params :update, :priority, :state
 

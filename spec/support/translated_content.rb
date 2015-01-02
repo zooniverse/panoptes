@@ -29,23 +29,4 @@ shared_examples "is translated content" do
       end
     end
   end
-
-  describe "#is_translator?" do
-    let(:content) { create(content_factory) }
-    let(:user) { create(:user) }
-    
-    context "when user is enrolled as a translator" do
-      it 'should be truthy' do
-        project = content.try(:project) || content.send(parent_factory).project
-        create(:user_project_preference, project: project,  user: user, roles: ["translator"])
-        expect(content.is_translator?(user)).to be_truthy
-      end
-    end
-
-    context "when user is not enrolled" do
-      it 'should be falsy' do
-        expect(content.is_translator?(user)).to be_falsy
-      end
-    end
-  end
 end

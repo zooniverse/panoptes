@@ -4,40 +4,40 @@ module RoleControl
   module RoledController
     extend ActiveSupport::Concern
 
-    included do
-      attr_accessor :controlled_resources
-    end
-
     DEFAULT_ACCESS_CONTROL_ACTIONS = %i(update show index destroy update_links destory_links)
 
     module ClassMethods
-      def setup_access_control!(*actions, &block)
+      def setup_access_control_for_user!(*actions)
         actions = DEFAULT_ACCESS_CONTROL_ACTIONS if actions.blank?
-        actions.each do |action|
-          action, scope_action = action
-          method_name = :"access_control_for_#{ action }"
+        setup_access_control!(*actions) { |user| user }
+      end
 
-          define_method method_name do
-            resource_ids = send(:resource_ids)
-            
-            resource_scope = send(:api_user)
-                             .do(scope_action || action, &block)
-                             .to(send(:resource_class), scope_context)
-                             .with_ids(resource_ids)
-
-            send(:controlled_resources=, resource_scope.scope)
-            
-            unless send(:controlled_resources).exists?
-              raise RoleControl::AccessDenied, send(:rejected_message)
-            end
+      def setup_access_control_for_groups!(*actions)
+        actions = DEFAULT_ACCESS_CONTROL_ACTIONS if actions.blank?
+        setup_access_control!(*actions) do |user, action, klass|
+          user.groups_for(action, klass).try(:select, :id)
+        end
+      end
+      
+      def setup_access_control!(*actions, &block)
+        define_method(:controlled_block) { block }
+        before_action only: actions do |controller|
+          unless controller.controlled_resources.exists?
+            raise RoleControl::AccessDenied, send(:rejected_message)
           end
-          
-          before_action method_name, only: [action]
         end
       end
     end
 
     protected
+
+    def controlled_resources
+      @controlled_resources ||= api_user
+                              .do(action_name.to_sym, &controlled_block)
+                              .to(resource_class, scope_context)
+                              .with_ids(resource_ids)
+                              .scope
+    end
 
     def rejected_message
       if resource_ids.length == 1
@@ -56,6 +56,10 @@ module RoleControl
         else
           ''
         end.split(',')
+    end
+
+    def scope_context
+      {}
     end
   end
 end
