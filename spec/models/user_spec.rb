@@ -279,4 +279,58 @@ describe User, :type => :model do
 
     it_behaves_like "it has a cached counter for classifications"
   end
+
+  describe "::groups_for" do
+    let(:user) { create(:user_group_member) }
+    let(:query_sql) { user.groups_for(action, test_class).to_sql }
+    let(:test_class) { Project }
+    let(:action) { :update }
+    
+    context "supplied class" do
+      it 'should query for editor roles for the supplied class' do
+        expect(query_sql).to match(/project_editor/)
+      end
+    end
+
+    context "no class" do
+      let(:test_class) { nil }
+      it 'should not add additional roles' do
+        expect(query_sql).to_not match(/editor/)
+      end
+    end
+
+    context "action is show" do
+      let(:action) { :show }
+      
+      it 'should query for group_admin' do
+        expect(query_sql).to match(/group_admin/)
+      end
+      
+      it 'should query for group_member' do
+        expect(query_sql).to match(/group_member/)
+      end
+    end
+
+    context "action is index" do
+      let(:action) { :index }
+      
+      it 'should query for group_admin' do
+        expect(query_sql).to match(/group_admin/)
+      end
+      
+      it 'should query for group_member' do
+        expect(query_sql).to match(/group_member/)
+      end
+    end
+
+    context "action is not show or index" do
+      it 'should query for group_admin' do
+        expect(query_sql).to match(/group_admin/)
+      end
+
+      it 'should not query for group member' do
+        expect(query_sql).to_not match(/group_member/)
+      end
+    end
+  end
 end
