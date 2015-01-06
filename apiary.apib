@@ -1342,7 +1342,9 @@ Resources related to _Panoptes Workflows_.
 
 ## Workflow [/workflows/{id}{?include}]
 Workflows represent the series of questions/tasks a user will be asked
-to complete for a subject.
+to complete for a subject. Subjects are selected from SubjectSets. A
+Workflow may have many SubjectSets linked to, but a SubjectSet may
+only be linked to a single Workflow.
 
 A workflow has the following attributes
 
@@ -1361,6 +1363,40 @@ A workflow has the following attributes
 
 *id*, *created_at*, *updated_at*, *workflow_version*, *content_language*,
 and *classifications_count* are assigned by the API
+
+A workflow's `tasks` is a hash of keys to task definitions.
+
+A workflow's `first_task` is a string matching the key of its first task. (The order of keys in JSON hashes is not guaranteed).
+
+Each task has a `type` string of "single" or "multiple" choice, or "drawing". (More task types to come, e.g. Serengeti-style filter and Sunspotter's comparison.)
+
+Each task has a `next` string, linking to the next task in the workflow. If this is `null` or not defined, the workflow ends.
+
+Each task may have an optional number `required`, which when set will force the user to provide a certain number of values before moving on to the next task. (This had been a boolean; `true` will be cast to `1`, `false` to `0`).
+
+Each task has a `question` string telling the user how to complete the task.
+
+"single"- and "multiple"-type tasks have an `answers` array.
+
+Each answer has a `value` (of any type) recorded in the classification and a `label` string displayed to the user.
+
+Each answer in a "single"-type task may have an optional `next` string overriding the task's when the answer is chosen. Explicitly setting this to `null` ends the workflow.
+
+"drawing"-type tasks have a `tools` array.
+
+Each tool has a `value` and a `label`, just like an answer.
+
+Each tool has a string `type`. Options include:
+
++ point
++ ellipse
++ circle
++ linke
++ axes
++ rectangle
++ polygon
+
+Each tool has a string `color`, which is applied to the marks made by the tool. Any format valid as CSS can be used.
 
 + Model
 
@@ -1393,6 +1429,7 @@ and *classifications_count* are assigned by the API
                     "primary_language": "es_MX",
                     "workflow_version": "22.1",
                     "content_language": "en_US",
+                    "first_task": "interest",
                     "tasks": {
                          "interest": {
                              "type": "drawing",
@@ -1428,6 +1465,7 @@ and *classifications_count* are assigned by the API
                      },
                     "links": {
                         "project": "1",
+                        "subject_sets": ["10", "11", "12"]
                     }
                 }]
             }
@@ -1729,6 +1767,7 @@ Workflows are returned as an array under the _workflows_ key.
                     "primary_language": "es_MX",
                     "workflow_version": "22.1",
                     "content_language": "en_US",
+                    "first_task": "interest",
                     "tasks": {
                          "interest": {
                              "type": "drawing",
@@ -1764,6 +1803,7 @@ Workflows are returned as an array under the _workflows_ key.
                      },
                     "links": {
                         "project": "1",
+                        "subject_sets": ["10", "11", "12"]
                     }
                 },{
                     "id": "23",
@@ -1777,6 +1817,7 @@ Workflows are returned as an array under the _workflows_ key.
                     "primary_language": "es_MX",
                     "workflow_version": "22.1",
                     "content_language": "en_US",
+                    "first_task": "interest",
                     "tasks": {
                          "interest": {
                              "type": "drawing",
@@ -1812,6 +1853,7 @@ Workflows are returned as an array under the _workflows_ key.
                      },
                     "links": {
                         "project": "1",
+                        "subject_sets": ["10", "11", "12"]
                     }
                 }]
             }
@@ -1840,6 +1882,9 @@ Requires a set of *tasks*, a *primary_language*, a *display_name*, and a
 link to a *project*. Can optionally set cellect parameters *grouped*,
 *prioritized*, and *pairwise*. (false by default) and links to
 *subject_sets*.
+
+A SubjectSet that already belongs to another workflow will be
+duplicated when it is linked.
 
 + Request
 
@@ -1903,7 +1948,8 @@ Resources related to _Panoptes SubjectSets_
 
 ## SubjectSet [/subject_sets/{id}{?include}]
 Subject Sets represent collections of Subjects that are paired with a
-workflow of questions to be answered.
+workflow of questions to be answered. A SubjectSet belongs to one
+Workflow, while a single Workflow may have many SubjectSets.
 
 A SubjectSet has the following attributes
 
@@ -1944,6 +1990,9 @@ All attributes except display_name are set by the API
                 "subject_sets": [{
                     "id": "20",
                     "display_name": "Weird Looking Galaxies",
+                    "metadata": {
+                        "category": "things"
+                    },
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
                     "set_member_subject_cound": 100,
@@ -2113,6 +2162,9 @@ Subject Sets are returned as an array under *subject_sets*.
                 "subject_sets": [{
                     "id": "20",
                     "display_name": "Weird Looking Galaxies",
+                    "metadata": {
+                        "category": "things"
+                    },
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
                     "set_member_subject_count": 100,
@@ -2123,6 +2175,9 @@ Subject Sets are returned as an array under *subject_sets*.
                 },{
                     "id": "20",
                     "display_name": "Boring Looking Galaxies",
+                    "metadata": {
+                        "category": "things"
+                    },
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
                     "set_member_subject_count": 100,
@@ -2155,7 +2210,7 @@ Subject Sets are returned as an array under *subject_sets*.
 
 ### Create a Subject Set [POST]
 A subject set must supply a display_name and a link to a project. Optionally,
-it may include links to subjects and a workflow.
+it may include links to subjects and a single workflow.
 
 + Request
 
@@ -2169,6 +2224,9 @@ it may include links to subjects and a workflow.
             {
                 "subject_sets": {
                     "display_name": "A Group of Interesting Subjects",
+                    "metadata": {
+                        "category": "things"
+                    },
                     "links": {
                         "project": "43",
                         "subjects": ["234", "1243", "8023"]
@@ -4284,7 +4342,7 @@ Workflow Content Versions are returned as an array under *versions*.
 
     [WorkflowContent Version Collection][]
 
-## WorkflowContent Collection [/project_contents{?workflow_id,language,page,per_page,include}]
+## WorkflowContent Collection [/workflow_contents{?workflow_id,language,page,per_page,include}]
 A collection of Workflow Content resources.
 
 All collections add a meta attribute hash containing paging
@@ -4600,3 +4658,402 @@ be null by default.
 + Response 201
 
     [SetMemberSubject][]
+
+# Group CollectionRole
+Resources related to Roles for _Panoptes Collections_
+
+## CollectionRole [/collection_roles/{id}{?include}]
+A Collection Role resources contains an array of roles assigned to a user
+for a particular collection.
+
+It has the following attributes:
+
+- id
+- created_at
+- updated_at
+- roles
+
+*id*, *created_at*, and *updated_at* are set the by the API. Collection
+roles are visible to the collection owner and the user given roles.
+
++ Parameters
+  + id (required, integer) ... integer identifier of the collection role resource
+
++ Model
+
+    + Body
+
+            {
+                "links": {
+                    "collection_roles.user": {
+                        "href": "/user/{collection_roles.user}",
+                        "type": "users"
+                    },
+                    "collection_roles.collection": {
+                        "href": "/collections/{collection_roles.collection}",
+                        "type": "collections"
+                    }
+                },
+                "collection_roles": [{
+                    "id": "942",
+                    "roles": ["collaborator"],
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "user" : "30",
+                        "collection": "11"
+                    }
+                }]
+            }
+
+### Retrieve a single CollectionRole [GET]
++ Parameters
+  + include (optional, string) ... comma seperate list of linked resources to load
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
++ Response 200
+
+    [CollectionRole][]
+
+### Edit a CollectionRole [PUT]
+A user with permissions to edit a collection may modify roles for other
+users in the collection. A user without edit permissions may not edit
+their own roles.
+
+Editing requires sending a full representation of the roles array.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "collection_roles": {
+                    "roles": ["viewer"]
+                }
+            }
+
++ Response 200
+
+    [CollectionRole][]
+
+## CollectionRole Collection [/collection_roles{?user_id,collection_id,page,per_page,sort,include}]
+A Collection of CollectionRole resources.
+
+All collections add a meta attribute hash containing paging
+information.
+
+CollectionRoles are returned as an array under *collection_roles*.
+
++ Model
+
+    + Body
+
+            {
+                "links": {
+                    "collection_roles.user": {
+                        "href": "/user/{collection_roles.user}",
+                        "type": "users"
+                    },
+                    "collection_roles.collection": {
+                        "href": "/collections/{collection_roles.collection}",
+                        "type": "collections"
+                    }
+                },
+                "meta": {
+                    "collection_roles": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 28,
+                        "include": [],
+                        "page_count": 14,
+                        "previous_page": 14,
+                        "next_page": 2,
+                        "first_href": "/collection_roles?page_size=2",
+                        "previous_href": "/collection_roles?page=14page_size=2",
+                        "next_href": "/collection_roles?page=2&page_size=2",
+                        "last_href": "/collection_roles?page=14&page_size=2"
+                    }
+                },
+                "collection_roles": [{
+                    "id": "942",
+                    "roles": ["collaborator"],
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "user" : "30",
+                        "collection": "11"
+                    }
+                },{
+                "id": "949",
+                    "roles": ["viewer"],
+                    "created_at": "2014-08-20T06:23:12Z",
+                    "updated_at": "2014-09-21T08:22:22Z",
+                    "links": {
+                        "user" : "33",
+                        "collection": "81"
+                    }
+                }]
+            }
+
+### List all CollectionRoles [GET]
++ Parameters
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + sort (optional, string) ... field to sort by
+  + user_id (optional, integer) ... user_id to see roles for
+  + collection_id (optional, integer) ... collection_id to see roles for
+  + include (optional, string) ... comma seperate list of linked resources to load
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
++ Response 200
+
+    [CollectionRole Collection][]
+
+### Create a CollectionRole [POST]
+Creating a Collection Role resource requires a link to a user and a
+collection. You may also include an array of roles.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "collection_roles": {
+                    "roles": ["collaborator"],
+                    "links": {
+                        "collection": "1",
+                        "user": "842"
+                    }
+                }
+            }
+
++ Response 201
+
+    [CollectionRole][]
+
+# Group CollectionPreference
+Resources related to setting preferences for _Panoptes Collections_
+
+## CollectionPreference [/collection_preferences/{id}{?include}]
+A Collection Preference resource captures a user's settings for a
+particular collection.
+
+It has the following attributes:
+
+- id
+- created_at
+- updated_at
+- preferences
+
+*id*, *created_at*, and *updated_at* are set the by the API. Collection
+ preferences are only visible to user they belong to.
+
++ Parameters
+  + id (required, integer) ... integer identifier of resource
+
++ Model
+
+    + Body
+
+            {
+                "links": {
+                    "collection_preferences.user": {
+                        "href": "/user/{collection_preferences.user}",
+                        "type": "users"
+                    },
+                    "collection_preferences.collection": {
+                        "href": "/collections/{collection_preferences.collection}",
+                        "type": "collections"
+                    }
+                },
+                "collection_preferences": [{
+                    "id": "942",
+                    "preferences": {
+                        "display": "grid" 
+                    },
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "user" : "30",
+                        "collection": "11"
+                    }
+                }]
+            }
+
+### Retrieve a single CollectionPreference [GET]
++ Parameters
+  + include (optional, string) ... comma seperated list of linked resources to load
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
++ Response 200
+
+    [CollectionPreference][]
+
+### Edit a CollectionPreference [PUT]
+Only the owning user may edit a Collection Preference resource. The
+preferences field may be edited.
+
+Editing the preferences field requires a full represenation of the
+preferences object to be sent.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "collection_preferences": {
+                    "preferences": {
+                        "receive_updates": false,
+                    }
+                }
+            }
+
++ Response 200
+
+    [CollectionPreference][]
+
+## CollectionPreference Collection [/collection_preferences{?user_id,collection_id,page,per_page,sort,include}]
+A Collection of CollectionPreference resources.
+
+All collections add a meta attribute hash containing paging
+information.
+
+CollectionPreferences are returned as an array under *collection_preferences*.
+
++ Model
+
+            {
+                "links": {
+                    "collection_preferences.user": {
+                        "href": "/user/{collection_preferences.user}",
+                        "type": "users"
+                    },
+                    "collection_preferences.collection": {
+                        "href": "/collections/{collection_preferences.collection}",
+                        "type": "collections"
+                    }
+                },
+                "meta": {
+                    "collection_preferences": {
+                        "page": 1,
+                        "page_size": 2,
+                        "count": 28,
+                        "include": [],
+                        "page_count": 14,
+                        "previous_page": 14,
+                        "next_page": 2,
+                        "first_href": "/collection_preferences?page_size=2",
+                        "previous_href": "/collection_preferences?page=14page_size=2",
+                        "next_href": "/collection_preferences?page=2&page_size=2",
+                        "last_href": "/collection_preferences?page=14&page_size=2"
+                    }
+                },
+                "collection_preferences": [{
+                    "id": "942",
+                    "preferences": {
+                        "display": "grid" 
+                    },
+                    "created_at": "2014-03-20T06:23:12Z",
+                    "updated_at": "2014-04-21T08:22:22Z",
+                    "links": {
+                        "user" : "30",
+                        "collection": "11"
+                    }
+                },{
+                    "id": "949",
+                    "preferences": {
+                        "display": "grid" 
+                    },
+                    "created_at": "2014-08-20T06:23:12Z",
+                    "updated_at": "2014-09-21T08:22:22Z",
+                    "links": {
+                        "user" : "33",
+                        "collection": "81"
+                    }
+                }]
+            }
+
+### List all CollectionPreferences [GET]
++ Parameters
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + sort (optional, string) ... field to sort by
+  + user_id (optional, integer) ... user_id to see preferences for
+  + collection_id (optional, integer) ... collection_id to see preferences for
+  + include (optional, string) ... comma seperated list of linked resources to load
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
++ Response 200
+
+    [CollectionPreference Collection][]
+
+### Create a CollectionPreference [POST]
+Creating a Collection Preference requires only a link to a
+collection. Optionally an object of settings for preferences may be included.
+
+Since a user can only create, read, or modify their own preferences
+the currently logged in user is always set as the linked user on
+creation.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "collection_preferences": {
+                    "preferences": {
+                        "display": "grid" 
+                    },
+                    "links": {
+                        "collection": "1"
+                    }
+                }
+            }
+
++ Response 201
+
+    [CollectionPreference][]
