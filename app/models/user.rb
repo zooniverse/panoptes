@@ -38,6 +38,8 @@ class User < ActiveRecord::Base
   can_be_linked :user_subject_queue, :all
   can_be_linked :user_project_preference, :all
   can_be_linked :user_collection_preference, :all
+  can_be_linked :project, :scope_for, :update, :user
+  can_be_linked :collection, :scope_for, :update, :user
 
   attr_accessor :migrated_user
 

@@ -3,6 +3,7 @@ module JsonApiController
   
   class PreconditionNotPresent < StandardError; end
   class PreconditionFailed < StandardError; end
+  class NotLinkable < StandardError; end
 
   module ClassMethods
     def resource_actions(*actions)

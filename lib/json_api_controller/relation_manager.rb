@@ -52,11 +52,12 @@ module JsonApiController
     def relation_find(find_arg)
       relation = yield
       relation = relation.where(id: find_arg)
-      relation = relation.to_a
+      objects = relation.to_a
       # a Subject trying to link to a project its not allowed to link to raises
       # a TypeError from Arel. I'm not sure what's causing that issue yet. 
-      return find_arg.is_a?(Array) ? relation : relation.first unless relation.empty?
-      raise ActiveRecord::RecordNotFound.new("Couldn't find resource")
+      return find_arg.is_a?(Array) ? objects : objects.first unless objects.empty?
+      error_name = find_arg.is_a?(Array) ? :plural : :singular
+      raise JsonApiController::NotLinkable.new("Couldn't find linked #{relation.klass.model_name.send(error_name)} for current user")
     end
   end
 end
