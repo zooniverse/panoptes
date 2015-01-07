@@ -122,6 +122,19 @@ describe Api::V1::ProjectsController, type: :controller do
             expect(project_name).to eq(filtered_project.display_name)
           end
         end
+
+        describe "filter by name" do
+          let(:index_options) { { name: new_project.name } }
+
+          it "should respond with 1 item" do
+            expect(json_response[api_resource_name].length).to eq(1)
+          end
+
+          it "should respond with the correct item" do
+            project_name = json_response[api_resource_name][0]['name']
+            expect(project_name).to eq(new_project.name)
+          end
+        end
       end
 
       describe "include params" do
@@ -218,22 +231,22 @@ describe Api::V1::ProjectsController, type: :controller do
 
           it "should create an associated project_content model" do
             expect(Project.find(created_project_id)
-                   .project_contents.first).to_not be_nil
+                    .project_contents.first).to_not be_nil
           end
 
           it 'should set the contents title do' do
             expect(Project.find(created_project_id)
-                   .project_contents.first.title).to eq('New Zoo')
+                    .project_contents.first.title).to eq('New Zoo')
           end
 
           it 'should set the description' do
             expect(Project.find(created_project_id)
-                   .project_contents.first.description).to eq('A new Zoo for you!')
+                    .project_contents.first.description).to eq('A new Zoo for you!')
           end
 
           it 'should set the language' do
             expect(Project.find(created_project_id)
-                   .project_contents.first.language).to eq('en')
+                    .project_contents.first.language).to eq('en')
           end
         end
       end
@@ -286,15 +299,15 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:test_attr_value) { "A Better Name" }
     let(:update_params) do
       {
-       projects: {
-                  display_name: "A Better Name",
-                  name: "something_new",
-                  links: {
-                          workflows: [workflow.id.to_s],
-                          subject_sets: [subject_set.id.to_s]
-                         }
+        projects: {
+          display_name: "A Better Name",
+          name: "something_new",
+          links: {
+            workflows: [workflow.id.to_s],
+            subject_sets: [subject_set.id.to_s]
+          }
 
-                 }
+        }
       }
     end
 
