@@ -24,8 +24,6 @@ module Linkable
         case item
         when :user
           user
-        when :groups
-          user.groups_for(default_args.first, self)
         when :model
           model
         else
@@ -35,7 +33,7 @@ module Linkable
     end
 
     def default_link_to_scope(user)
-      scope_for(:show, user.groups_for(:show, self))
+      scope_for(:show, user)
     end
   end
 end

@@ -1,7 +1,6 @@
 class Api::V1::ClassificationsController < Api::ApiController
   skip_before_filter :require_login, only: :create
   doorkeeper_for :show, :index, :destroy, :update, scopes: [:classification]
-  setup_access_control_for_user!
   
   resource_actions :default
 
@@ -79,10 +78,10 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def completed_error
-    if resource_ids.length == 1
-      "Classification with id='#{resource_ids.first}' is complete"
-    else
+    if resource_ids.is_a?(Array)
       "Classifications with ids='#{resource_ids.join(',')}' are complete"
+    else
+      "Classification with id='#{resource_ids}' is complete"
     end
   end
 end

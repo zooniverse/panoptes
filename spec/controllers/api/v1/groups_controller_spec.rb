@@ -39,7 +39,7 @@ describe Api::V1::GroupsController, type: :controller do
         
         get :index, name: user_groups[1].name
         
-        expect(json_response["user_groups"]).to all( include(name: user_groups[1].name) )
+        expect(json_response["user_groups"]).to all( include("name" => user_groups[1].name) )
       end
     end
 

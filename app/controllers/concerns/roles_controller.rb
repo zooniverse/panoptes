@@ -3,8 +3,8 @@ module RolesController
 
   included do
     prepend_before_filter :require_login
+    
     resource_actions :index, :show, :create, :update
-    setup_access_control_for_groups!
 
     include BuildOverride
   end

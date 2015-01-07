@@ -4,8 +4,6 @@ class Api::V1::GroupsController < Api::ApiController
   resource_actions :show, :index, :update, :deactivate, :create
   schema_type :strong_params
 
-  setup_access_control_for_groups!
-
   alias_method :user_group, :controlled_resource
   
   allowed_params :create, :name, :display_name, links: [ users: [] ]

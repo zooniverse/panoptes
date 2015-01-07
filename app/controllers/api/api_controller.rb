@@ -4,7 +4,7 @@ module Api
   class ApiController < ApplicationController
     include JsonApiController
     include RoleControl::RoledController
-
+    
     API_ACCEPTED_CONTENT_TYPES = ['application/json',
                                   'application/vnd.api+json']
     API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
@@ -28,11 +28,11 @@ module Api
                 JsonSchema::ValidationError,
                 RestPack::Serializer::InvalidInclude,    with: :unprocessable_entity
 
-    before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
-                                        API_ALLOWED_METHOD_OVERRIDES)
+    prepend_before_action :require_login, only: [:create, :update, :destroy]
+    prepend_before_action :ban_user, only: [:create, :update, :destroy]
+    prepend_before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
+                                                API_ALLOWED_METHOD_OVERRIDES)
 
-    before_action :require_login, only: [:create, :update, :destroy]
-    before_action :ban_user, only: [:create, :update, :destroy]
     skip_before_action :verify_authenticity_token
 
     def current_resource_owner

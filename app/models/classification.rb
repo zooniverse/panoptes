@@ -17,19 +17,17 @@ class Classification < ActiveRecord::Base
   scope :incomplete, -> { where(completed: false) }
   scope :created_by, -> (user) { where(user: user) }
 
-  def self.scope_for(action, actor, project: nil, user_group: nil, as_admin: nil)
+  def self.scope_for(action, actor, opts={})
     case action
     when :show, :index
-      case
-      when actor.is_admin? && as_admin
-        all
-      when project
-        where(project: Project.scope_for(action, actor.groups_for(:update, Project)))
-      when user_group
-        where(user_group: actor.user_groups)
-      else
-        actor.classifications
-      end
+      query = joins(:project).merge(Project.scope_for(:update, actor))
+        .union_all(joins(:user_group).merge(actor.user_groups))
+        .union_all(actor.classifications)
+      # Workaround Broken Bind Value Assignment in Subqueries in Rails 4.1
+      # This is fixed in Rails 4.2 when we're able to to migrate to that
+      # Unfortunately this isn't need in JRuby so I have to test for platform on this class
+      query.bind_values = [query.bind_values.first] unless RUBY_PLATFORM == 'java'
+      query
     when :update, :destroy
       incomplete.merge(created_by(actor.user))
     else

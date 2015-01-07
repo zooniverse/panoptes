@@ -3,7 +3,7 @@ class ApiUser
   
   attr_reader :user
 
-  delegate :groups_for, :is_admin?, :owns?, :id, :languages,
+  delegate :memberships_for, :is_admin?, :owns?, :id, :languages,
            :user_groups, :project_preferences, :collection_preferences,
            :classifications, :user_groups, to: :user, allow_nil: true
 

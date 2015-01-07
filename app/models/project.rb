@@ -1,6 +1,6 @@
 class Project < ActiveRecord::Base
-  include RoleControl::Controlled
   include RoleControl::Owned
+  include RoleControl::Controlled
   include SubjectCounts
   include Activatable
   include Linkable
@@ -29,10 +29,13 @@ class Project < ActiveRecord::Base
                                               :translator,
                                               :scientist,
                                               :moderator ]
+  
+  can_by_role :translate, roles: [ :owner, :translator ]
 
-  can_be_linked :subject_set, :scope_for, :update, :groups
-  can_be_linked :subject, :scope_for, :update, :groups
-  can_be_linked :workflow, :scope_for, :update, :groups
+  can_be_linked :subject_set, :scope_for, :update, :user
+  can_be_linked :subject, :scope_for, :update, :user
+
+  can_be_linked :workflow, :scope_for, :update, :user
   can_be_linked :user_group, :scope_for, :edit_project, :user
 
   preferences_model :user_project_preference

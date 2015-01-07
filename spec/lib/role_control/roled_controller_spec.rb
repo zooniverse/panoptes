@@ -3,7 +3,7 @@ require 'spec_helper'
 describe RoleControl::RoledController, type: :controller do
   setup_role_control_tables
 
-  let!(:enrolled_actor) { EnrolledActorTable.create! }
+  let!(:enrolled_actor) { create(:user) }
   
   let!(:controlled) do
     ControlledTable.create! do |c|
@@ -13,10 +13,9 @@ describe RoleControl::RoledController, type: :controller do
 
   controller(ApplicationController) do
     include RoleControl::RoledController
-    setup_access_control!(:show, :update) { |user| user }
 
     def api_user
-      EnrolledActorTable.first
+      ApiUser.new(User.first)
     end
 
     def resource_class

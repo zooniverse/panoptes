@@ -1,61 +1,52 @@
 module RoleControl
   class AccessDenied < StandardError; end
-  
+
   module RoledController
     extend ActiveSupport::Concern
 
-    DEFAULT_ACCESS_CONTROL_ACTIONS = %i(update show index destroy update_links destory_links)
-
-    module ClassMethods
-      def setup_access_control_for_user!(*actions)
-        actions = DEFAULT_ACCESS_CONTROL_ACTIONS if actions.blank?
-        setup_access_control!(*actions) { |user| user }
-      end
-
-      def setup_access_control_for_groups!(*actions)
-        actions = DEFAULT_ACCESS_CONTROL_ACTIONS if actions.blank?
-        setup_access_control!(*actions) do |user, action, klass|
-          user.groups_for(action, klass).try(:select, :id)
-        end
-      end
-      
-      def setup_access_control!(*actions, &block)
-        define_method(:controlled_block) { block }
-        before_action only: actions do |controller|
-          unless controller.controlled_resources.exists?
-            raise RoleControl::AccessDenied, send(:rejected_message)
-          end
-        end
+    included do
+      before_action :check_controller_resources, except: :create
+    end
+    
+    def check_controller_resources
+      unless resources_exist?
+        raise RoleControl::AccessDenied, send(:rejected_message)
       end
     end
-
-    protected
+    
+    def resources_exist?
+      resource_ids.blank? ? true : controlled_resources.exists?(id: resource_ids)
+    end
 
     def controlled_resources
-      @controlled_resources ||= api_user
-                              .do(action_name.to_sym, &controlled_block)
+      @controlled_resources ||= api_user.do(action_name.to_sym)
                               .to(resource_class, scope_context)
                               .with_ids(resource_ids)
                               .scope
     end
 
     def rejected_message
-      if resource_ids.length == 1
-        "Could not find #{resource_name} with id='#{resource_ids.first}'"
-      else
+      if resource_ids.is_a?(Array)
         "Could not find #{resource_sym} with ids='#{resource_ids.join(',')}'"
+      else
+        "Could not find #{resource_name} with id='#{resource_ids}'"
       end
     end
 
     def resource_ids
-      @resource_ids =
-        if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
-          params["#{ resource_name }_id"]
-        elsif params.has_key?(:id)
-          params[:id]
-        else
-          ''
-        end.split(',')
+      @resource_ids = _resource_ids
+    end
+
+    def _resource_ids
+      ids = if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
+              params["#{ resource_name }_id"]
+            elsif params.has_key?(:id)
+              params[:id]
+            else
+              ''
+            end.split(',')
+
+      ids.length < 2 ? ids.first : ids
     end
 
     def scope_context

@@ -12,8 +12,8 @@ module JsonApiController
 
     def update
       resource_class.transaction do
-        resource_ids.zip(Array.wrap(update_params)).each do |id, update_hash|
-          controlled_resources.update(id, build_update_hash(update_hash, id))
+        controlled_resources.zip(Array.wrap(update_params)).each do |resource, update_hash|
+          resource.update(build_update_hash(update_hash,resource))
         end
       end
       
@@ -41,10 +41,10 @@ module JsonApiController
 
     protected
 
-    def build_update_hash(update_params, id)
+    def build_update_hash(update_params, resource)
       return update_params unless links = update_params.delete(:links)
       links.try(:reduce, update_params) do |params, (k, v)|
-        params[k] = update_relation(resource_class.find(id), k.to_sym, v)
+        params[k] = update_relation(resource, k.to_sym, v)
         params
       end
     end
@@ -56,7 +56,7 @@ module JsonApiController
     end
 
     def update_response(resources)
-      serializer.resource({}, resource_scope(resources), context)
+      serializer.resource({}, controlled_resources, context)
     end
 
     def relation

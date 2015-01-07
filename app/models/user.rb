@@ -41,6 +41,11 @@ class User < ActiveRecord::Base
 
   attr_accessor :migrated_user
 
+  def memberships_for(action, klass)
+    membership_roles = UserGroup.roles_allowed_to_access(action, klass)
+    active_memberships.where.overlap(roles: membership_roles)
+  end
+
   def self.scope_for(action, user, opts={})
     case action
     when :show, :index
@@ -75,18 +80,7 @@ class User < ActiveRecord::Base
   def password_required?
     super && hash_func != 'sha1'
   end
-
-  def groups_for(action, klass=nil)
-    roles = case action
-                when :show, :index
-                  [:group_admin, :group_member]
-                else
-                  [:group_admin]
-                end
-    roles.push :"#{klass.name.underscore}_editor" if klass
-    user_groups.where.overlap(memberships: { roles: roles })
-  end
-
+  
   def valid_password?(password)
     if hash_func == 'bcrypt'
       super(password)

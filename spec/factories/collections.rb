@@ -14,7 +14,7 @@ FactoryGirl.define do
 
     factory :collection_with_subjects do
       after(:create) do |col|
-        create_list(:subject, 2, collections: [col])
+        create_list(:subject, 2, collections: [col], project: col.project)
       end
     end
   end

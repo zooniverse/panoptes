@@ -139,12 +139,6 @@ describe Classification, :type => :model do
       expected = classifications[0]
       expect(Classification.scope_for(:show, user)).to include(expected)
     end
-
-    it 'should all classifications for an admin' do
-      admin_double = double({ is_admin?: true })
-      expect(Classification.scope_for(:show, admin_double, as_admin: true))
-        .to match_array(classifications)
-    end
   end
   
   describe "#creator?" do

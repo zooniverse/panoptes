@@ -5,8 +5,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   resource_actions :default
   schema_type :json_schema
 
-  alias_method :workflow, :controlled_resource
-
   def show
     load_cellect
     super

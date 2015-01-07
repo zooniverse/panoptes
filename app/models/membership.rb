@@ -1,4 +1,6 @@
 class Membership < ActiveRecord::Base
+  include RoleControl::ParentalControlled
+  
   belongs_to :user_group
   belongs_to :user
   enum state: [:active, :invited, :inactive]
@@ -11,18 +13,30 @@ class Membership < ActiveRecord::Base
   validates_associated :user_group
   validates_presence_of :state, :user_group
 
-  def self.scope_for(action, user, opts={})
-    case action
-    when :show, :index
-      where(user_group: UserGroup.public_groups, state: states[:active])
-        .union(where(user: user.user))
-        .union(where(user_group: user.groups_for(:show)))
-    when :update, :destroy
-      where(user_group: user.groups_for(:update)).where.not(state: states[:invited])
-        .union(where(user: user.user))
-    end.where(identity: false)
+  can_through_parent :user_group, :update, :index, :show, :destroy, :update_links,
+                     :destroy_links
+
+  scope :private_scope, -> { joins(@parent).merge(parent_class.private_scope) }
+  scope :public_scope, -> {
+    joins(@parent).where(state: states[:active]).merge(parent_class.public_scope)
+  }
+
+  def self.joins_for
+    @parent
   end
 
+  def self.private_query(query, action, target, roles)
+    user = target.user
+    with(groups: user.user_groups.where.overlap(memberships: {roles: roles}))
+      .joins("JOIN \"groups\" ON \"memberships\".\"user_group_id\" = \"groups\".\"id\"")
+      .where.not(user: user)
+      .union_all(user.memberships)
+  end
+
+  def self.scope_for(action, target, opts={})
+    super.where(identity: false)
+  end
+  
   def disable!
     inactive!
   end

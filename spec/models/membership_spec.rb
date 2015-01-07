@@ -50,11 +50,11 @@ describe Membership, :type => :model do
     end
 
     context ":update, :destroy" do
-      it 'should return all memberships belong to the user' do
+      it 'should return all memberships belonging to the user' do
         actor.user.memberships << memberships
         actor.user.save!
 
-        expect(Membership.scope_for(:show, actor)).to match_array(memberships)
+        expect(Membership.scope_for(:update, actor)).to match_array(memberships)
       end
 
       it 'should return all memmbership belonging to a group the user administrates' do
@@ -66,7 +66,7 @@ describe Membership, :type => :model do
         ug.save!
 
         memberships.push(membership)
-        expect(Membership.scope_for(:show, actor)).to match_array(memberships)
+        expect(Membership.scope_for(:destroy, actor)).to match_array(memberships)
       end
     end
   end

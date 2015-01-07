@@ -125,20 +125,20 @@ RSpec.describe UserSubjectQueue, :type => :model do
     end
   end
 
-  describe "#sample_subjects" do
-    let(:subjects) { create_list(:set_member_subject, 20) }
-    let(:ues) { build(:user_subject_queue, set_member_subject_ids: subjects.map(&:id)) }
+  describe "#next_subjects" do
+    let(:ids) { (0..60).to_a }
+    let(:ues) { build(:user_subject_queue, set_member_subject_ids: ids) }
     
     it 'should return a collection of ids' do
-      expect(ues.sample_subjects).to all( be_a(Fixnum) )
+      expect(ues.next_subjects).to all( be_a(Fixnum) )
     end
 
     it 'should return 10 by default' do
-      expect(ues.sample_subjects.length).to eq(10)
+      expect(ues.next_subjects.length).to eq(10)
     end
 
     it 'should accept an optional limit argument' do
-      expect(ues.sample_subjects(20).length).to eq(20)
+      expect(ues.next_subjects(20).length).to eq(20)
     end
   end
 

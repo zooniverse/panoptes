@@ -2,12 +2,9 @@ class Api::V1::UsersController < Api::ApiController
   doorkeeper_for :me, :show, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show
-  setup_access_control_for_user!
   
   schema_type :strong_params
 
-  setup_access_control_for_user!
-  
   allowed_params :update, :display_name, :email, :credited_name
 
   alias_method :user, :controlled_resource

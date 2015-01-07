@@ -280,9 +280,9 @@ describe User, :type => :model do
     it_behaves_like "it has a cached counter for classifications"
   end
 
-  describe "::groups_for" do
+  describe "::memberships_for" do
     let(:user) { create(:user_group_member) }
-    let(:query_sql) { user.groups_for(action, test_class).to_sql }
+    let(:query_sql) { user.memberships_for(action, test_class).to_sql }
     let(:test_class) { Project }
     let(:action) { :update }
     

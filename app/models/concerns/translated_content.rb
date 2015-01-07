@@ -19,13 +19,13 @@ module TranslatedContent
       translated_for.to_s.camelize.constantize
     end
 
-    def scope_for(action, groups, opts={})
+    def scope_for(action, user, opts={})
       case action
       when :show, :index
         super
       else
         joins(translated_for)
-          .where(translated_for => translated_class.scope_for(:translate, groups, opts))
+          .merge(translated_class.scope_for(:translate, user, opts))
           .where.not("\"#{translated_class.table_name}\".\"primary_language\" = \"#{table_name}\".\"language\"")
       end
     end

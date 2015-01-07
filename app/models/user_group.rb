@@ -26,25 +26,44 @@ class UserGroup < ActiveRecord::Base
 
   can_by_role :show, :index,
               public: :public_groups,
-              role_association: :active_memberships,
               roles: [ :group_admin,
                        :project_editor,
                        :collection_editor,
                        :group_member ]
   
   can_by_role :update, :destroy, :update_links, :destroy_links,
-              role_association: :active_memberships,
               roles: [ :group_admin ]
-              
-  can_by_role :edit_project, role_association: :active_memberships,
+  
+  can_by_role :edit_project,
               roles: [ :group_admin, :project_editor ]
 
-  can_by_role :edit_subject, role_association: :active_memberships,
+  can_by_role :edit_collection,
               roles: [ :group_admin, :collection_editor ]
+
+  def self.memberships_query(action, target)
+    target.memberships_for(action)
+  end
   
-  can_by_role :edit_collection, role_association: :active_memberships,
-              roles: [ :group_admin, :subject_editor ]
+  def self.joins_for
+    :memberships
+  end
+
+  def self.private_query(query, action, target, roles)
+    query.merge(target.memberships_for(action, self))
+      .where(memberships: { identity: false })
+  end
   
+  def self.roles_allowed_to_access(action, klass=nil)
+    roles = case action
+            when :show, :index
+              [:group_admin, :group_member]
+            else
+              [:group_admin]
+            end
+    roles.push :"#{klass.name.underscore}_editor" if klass
+    roles
+  end
+
   def owns?(resource)
     owned_resources.exists?(resource_id: resource.id,
                             resource_type: resource.class.to_s)

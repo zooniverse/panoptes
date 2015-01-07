@@ -45,7 +45,7 @@ describe Linkable do
       before(:each) do
         test_class.instance_eval do
           can_be_linked :project, :fake_method, :user, :model, 10
-          can_be_linked :collection, :fake_method, :update, :groups
+          can_be_linked :collection, :fake_method, :update, :user
 
           def self.fake_method(actor, model, int)
             [actor, model, int]
@@ -64,12 +64,6 @@ describe Linkable do
       it 'should call the given method' do
         expect(test_class).to receive(:fake_method).with(actor, model, 10)
         test_class.link_to_resource(model, actor)
-      end
-
-      it 'should call groups_for for a user if the :groups arg is included' do
-        expect(actor).to receive(:groups_for).with(:update, test_class)
-        allow(test_class).to receive(:fake_method)
-        test_class.link_to_resource(alt_model, actor)
       end
     end
   end

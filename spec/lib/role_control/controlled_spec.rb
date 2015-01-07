@@ -5,9 +5,9 @@ describe RoleControl::Controlled do
   
   let(:subject) { ControlledTable }
   
-  let(:enrolled_actor) { EnrolledActorTable.create! }
+  let(:enrolled_actor) { create(:user) }
   
-  let(:unenrolled_actor) { EnrolledActorTable.create! }
+  let(:unenrolled_actor) { create(:user) }
 
   describe "::scope_for" do
     let!(:group_tables) do
@@ -46,17 +46,20 @@ describe RoleControl::Controlled do
       expected_records = group_tables.values_at(0)
       expect(visible_records).to match_array(expected_records)
     end
+
+    it 'should not include public records when the class does not allow public scopes' do
+      visible_records = subject.scope_for(:update, enrolled_actor)
+      expect(visible_records).to_not include(group_tables[2])
+    end
   end
 
   describe "::can_by_role" do
     it 'should define an object that can be used by scope_for' do
       subject.can_by_role :edit,
-                          public: :pub_scope,
-                          role_association: :assoc,
+                          public: false,
                           roles: [ :a_role, :another ]
 
-      expect(subject.roles(:edit)).to include(:pub_scope,
-                                              :assoc,
+      expect(subject.roles(:edit)).to include(false,
                                               [ :a_role, :another ])
     end
   end

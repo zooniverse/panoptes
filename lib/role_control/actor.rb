@@ -1,17 +1,15 @@
 module RoleControl
   module Actor
     class DoChain
-      attr_reader :scope, :action, :actor, :block
+      attr_reader :scope, :action, :actor
       
-      def initialize(actor, action, &block)
+      def initialize(actor, action)
         @action = action
         @actor = actor
-        @block = block
       end
       
       def to(klass, context={})
-        actors = block.call(actor, action, klass, context)
-        @scope = klass.scope_for(action, actors, context)
+        @scope = klass.scope_for(action, actor, context)
         self
       end
 

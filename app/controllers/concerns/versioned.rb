@@ -1,10 +1,6 @@
 module Versioned
   extend ActiveSupport::Concern
 
-  included do
-    setup_access_control_for_groups!(:versions, :version)
-  end
-
   def versions
     render json_api: VersionSerializer.page(params, version_scope)
   end

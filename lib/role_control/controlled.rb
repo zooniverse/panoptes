@@ -4,35 +4,50 @@ module RoleControl
 
     included do
       @roles_for = Hash.new
-      @public = Hash.new
+
+      scope :public_scope, -> { where(private: false) }
+      scope :private_scope, -> { where(private: true) }
     end
 
     module ClassMethods
       def can_by_role(*actions,
                       roles: [],
-                      public: nil,
-                      role_association: :access_control_lists)
+                      public: false)
 
         actions.each do |action|
           @roles_for[action] = [roles,
-                                role_association,
                                 public]
         end
       end
 
+      def joins_for
+        { access_control_lists: { user_group: :memberships } }
+      end
+
+      def memberships_query(action, target)
+        target.memberships_for(action, self)
+      end
+
+      def private_query(query, action, target, roles)
+        query.merge(memberships_query(action, target))
+          .where.overlap(access_control_lists: { roles: roles })
+      end
+
+      def public_query(query, public)
+        if public
+          query.merge(private_scope).union_all(public_scope)
+        else
+          query
+        end
+      end
+
       def scope_for(action, target, opts={})
-        roles, assoc, public_scope = roles(action)
+        roles, public = roles(action)
 
         if target
-          target_class = target.try(:klass) || target.class
-          target_name = target_class.name.underscore
-          assoc_table = reflect_on_association(assoc).table_name
-        
-          query = joins(assoc)
-                  .where(assoc_table => { target_name => target })
-                  .where.overlap(assoc_table => { roles: roles })
-
-          public_scope ? query.union(send(public_scope)) : query
+          query = private_query(joins(joins_for), action, target, roles)
+          #p public_query(query, public).bind_values
+          public_query(query, public)
         elsif public_scope
           send(public_scope)
         else

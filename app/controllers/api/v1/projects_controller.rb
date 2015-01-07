@@ -5,8 +5,6 @@ class Api::V1::ProjectsController < Api::ApiController
   resource_actions :default
   schema_type :json_schema
 
-  setup_access_control_for_groups!
-
   alias_method :project, :controlled_resource
 
   CONTENT_PARAMS = [:description,

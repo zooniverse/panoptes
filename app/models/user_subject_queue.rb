@@ -36,8 +36,8 @@ class UserSubjectQueue < ActiveRecord::Base
       .exists?(user: user, workflow: workflow)
   end
   
-  def sample_subjects(limit=10)
-    set_member_subject_ids.sample(limit)
+  def next_subjects(limit=10)
+    set_member_subject_ids[0,limit]
   end
   
   def set_member_subjects=(subjects)
