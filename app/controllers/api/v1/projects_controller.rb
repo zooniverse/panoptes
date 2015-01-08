@@ -22,9 +22,6 @@ class Api::V1::ProjectsController < Api::ApiController
 
   INDEX_FIELDS = [:title, :description]
 
-  allowed_params :create
-  allowed_params :update
-
   before_action :add_owner_ids_to_filter_param!, only: :index
 
   private

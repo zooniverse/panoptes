@@ -42,14 +42,14 @@ describe Api::V1::SubjectSetsController, type: :controller do
     let(:test_relation_ids) { subjects.map(&:id) }
     let(:update_params) do
       {
-       subject_sets: {
-                  display_name: "A Better Name",
-                  links: {
-                          workflow: workflow.id.to_s,
-                          subjects: subjects.map(&:id).map(&:to_s)
-                         }
-                  
-                 }
+        subject_sets: {
+          display_name: "A Better Name",
+          links: {
+            workflow: workflow.id.to_s,
+            subjects: subjects.map(&:id).map(&:to_s)
+          }
+          
+        }
       }
     end
 
@@ -63,18 +63,46 @@ describe Api::V1::SubjectSetsController, type: :controller do
     let(:test_attr_value) { 'Test subject set' }
     let(:create_params) do
       {
-       subject_sets: {
-                      display_name: 'Test subject set',
-                      metadata: {
-                        location: "Africa"
-                      },
-                      links: {
-                              project: project.id
-                             }
-                     }
+        subject_sets: {
+          display_name: 'Test subject set',
+          metadata: {
+            location: "Africa"
+          },
+          links: {
+            project: project.id
+          }
+        }
       }
     end
-    it_behaves_like "is creatable"
+    
+    context "create a new subject set" do
+      it_behaves_like "is creatable"
+    end
+
+    context "create a subject set from a collection" do
+      
+      before(:each) do
+        ps = create_params
+        ps[:subject_sets][:links][:collection] = collection.id.to_s
+        default_request user_id: authorized_user.id, scopes: scopes
+        post :create, ps
+      end
+      
+      context "when a user can access the collection" do
+      let(:collection) { create(:collection_with_subjects) }
+        it "should create a new subject set with the collection's subjects" do
+          set = SubjectSet.find(created_instance_id(api_resource_name))
+          expect(set.subjects).to match(collection.subjects)
+        end
+      end
+
+      context "when the user cannot access the collection" do
+      let(:collection) { create(:collection_with_subjects, visible_to: ["collaborator"]) }
+         it "should return 404" do
+           expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
   end
 
   describe '#destroy' do

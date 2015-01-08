@@ -14,7 +14,6 @@ module Api
     rescue_from Api::UnauthorizedTokenError,             with: :not_authenticated
     rescue_from Api::UnsupportedMediaType,               with: :unsupported_media_type
     rescue_from ControlControl::AccessDenied,            with: :not_authorized
-    rescue_from ActiveRecord::StatementInvalid,          with: :bad_query
     rescue_from Api::PatchResourceError,                 with: :unprocessable_entity
     rescue_from Api::UserSeenSubjectIdError,             with: :unprocessable_entity
     rescue_from ActionController::UnpermittedParameters, with: :unprocessable_entity

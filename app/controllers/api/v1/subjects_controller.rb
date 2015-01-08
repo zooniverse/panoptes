@@ -7,9 +7,6 @@ class Api::V1::SubjectsController < Api::ApiController
   resource_actions :show, :create, :update, :destroy
   schema_type :json_schema
   
-  allowed_params :create
-  allowed_params :update
-
   alias_method :subject, :controlled_resource
 
   def index

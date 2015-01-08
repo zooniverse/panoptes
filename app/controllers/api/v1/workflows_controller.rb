@@ -6,9 +6,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   resource_actions :create, :update, :destroy
   schema_type :json_schema
 
-  allowed_params :create
-  allowed_params :update
-
   alias_method :workflow, :controlled_resource
 
   def show

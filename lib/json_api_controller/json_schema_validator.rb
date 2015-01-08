@@ -2,15 +2,15 @@ module JsonApiController
   module JsonSchemaValidator
     extend ActiveSupport::Concern
 
-    module ClassMethods
-      def allowed_params(action, &block)
-        @action_params[action] = if block_given?
-                                   JsonSchema.build(&block)
-                                 else
-                                   schema_class(action).new
-                                 end
-      end
+    included do
+      @action_params = Hash.new
 
+      %i(update create).each do |action|
+        @action_params[action] = schema_class(action).new
+      end
+    end
+
+    module ClassMethods
       def action_params
         @action_params
       end
