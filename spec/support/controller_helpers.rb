@@ -25,6 +25,10 @@ module APIRequestHelpers
     request.headers["Content-Type"] = "application/json-patch"
   end
 
+  def set_preconditions
+    request.headers["If-Unmodified-Since"] = 1.minute.from_now.utc
+  end
+
   def stub_token(scopes: [], user_id: nil)
     allow(controller).to receive(:doorkeeper_token).and_return(token(scopes, user_id))
   end
@@ -51,6 +55,7 @@ module APIRequestHelpers
   def default_request(scopes: ["public"], user_id: nil)
     set_accept
     set_accept_language
+    set_preconditions
     stub_content_filter
     stub_token(scopes: scopes, user_id: user_id)
   end
@@ -58,6 +63,7 @@ module APIRequestHelpers
   def unauthenticated_request
     set_accept
     set_accept_language
+    set_preconditions
     stub_content_filter
     allow(controller).to receive(:doorkeeper_token).and_return(nil)
   end

@@ -1,6 +1,14 @@
 module JsonApiController
   module UpdatableResource
+    extend ActiveSupport::Concern
     include RelationManager
+    include PreconditionCheck
+
+    included do
+      before_action only: :update do |controller|
+        controller.precondition_check
+      end
+    end
 
     def update
       ActiveRecord::Base.transaction do

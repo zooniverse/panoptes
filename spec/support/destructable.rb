@@ -2,6 +2,7 @@ shared_examples "is destructable" do
   context "an authorized user" do
     before(:each) do
       stub_token(scopes: scopes, user_id: authorized_user.id)
+      set_preconditions
       delete :destroy, id: resource.id
     end
 

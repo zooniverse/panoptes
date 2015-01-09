@@ -2,6 +2,7 @@ shared_examples 'is deactivatable' do
   context "an authorized user" do
     before(:each) do
       stub_token(scopes: scopes, user_id: authorized_user.id)
+      set_preconditions
     end
 
     it "should call Activation#disable_instances! with instances to disable" do

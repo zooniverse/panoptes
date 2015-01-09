@@ -42,7 +42,7 @@ FactoryGirl.define do
 
     factory :project_with_contents do
       after(:create) do |p|
-        create_list(:project_content, 1, project: p)
+        create_list(:project_content, 1, project: p, language: p.primary_language)
       end
     end
   end
