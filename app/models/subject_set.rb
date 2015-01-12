@@ -10,6 +10,8 @@ class SubjectSet < ActiveRecord::Base
 
   validates_presence_of :project
 
+  scope :expert_sets, -> { where(expert_set: true) }
+
   can_through_parent :project, :update, :show, :destroy
   can_be_linked :workflow, :same_project?, :model
   can_be_linked :set_member_subject, :scope_for, :update, :actor
