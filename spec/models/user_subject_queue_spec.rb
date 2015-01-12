@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 RSpec.describe UserSubjectQueue, :type => :model do
+  let(:locked_factory) { :user_subject_queue }
+  let(:locked_update) { {set_member_subject_ids: [1, 2, 3, 4]} }
+  
+  it_behaves_like "optimistically locked"
+  
   it 'should have a valid factory' do
     expect(build(:user_subject_queue)).to be_valid
   end

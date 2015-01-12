@@ -11,6 +11,10 @@ describe UserGroup, :type => :model do
   let(:activatable) { user_group }
   let(:owner) { user_group }
   let(:owned) { build(:project, owner: owner) }
+  let(:locked_factory) { :user_group }
+  let(:locked_update) { {display_name: "A differet name"} }
+  
+  it_behaves_like "optimistically locked"
 
   it_behaves_like "is owner nameable"
   it_behaves_like "activatable"

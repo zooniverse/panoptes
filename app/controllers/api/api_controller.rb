@@ -25,6 +25,8 @@ module Api
     rescue_from RestPack::Serializer::InvalidInclude,    with: :unprocessable_entity
     rescue_from JsonApiController::PreconditionNotPresent, with: :precondition_required
     rescue_from JsonApiController::PreconditionFailed,   with: :precondition_failed
+    rescue_from ActiveRecord::StaleObjectError,          with: :conflict
+    
     before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
                                         API_ALLOWED_METHOD_OVERRIDES)
 

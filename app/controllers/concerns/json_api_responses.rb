@@ -51,4 +51,8 @@ module JSONApiResponses
   def precondition_failed(exception)
     json_api_render(:precondition_failed, exception)
   end
+
+  def conflict(exception)
+    json_api_render(:conflict, exception)
+  end
 end

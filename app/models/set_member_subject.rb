@@ -2,7 +2,7 @@ class SetMemberSubject < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include Linkable
   
-  belongs_to :subject_set, counter_cache: true
+  belongs_to :subject_set, counter_cache: true, touch: true
   belongs_to :subject
   has_many :classifications
 

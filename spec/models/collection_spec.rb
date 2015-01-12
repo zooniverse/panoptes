@@ -5,6 +5,10 @@ describe Collection, :type => :model do
   let(:owned) { collection }
   let(:not_owned) { build(:collection, owner: nil) }
   let(:activatable) { collection }
+  let(:locked_factory) { :collection }
+  let(:locked_update) { {display_name: "A differet name"} }
+  
+  it_behaves_like "optimistically locked"
 
   it_behaves_like "is ownable"
   it_behaves_like "activatable"

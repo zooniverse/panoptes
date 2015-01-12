@@ -3,22 +3,18 @@ require 'spec_helper'
 describe "api should allow conditional requests", type: :request do
   include APIRequestHelpers
   let(:user) { create(:user) }
+  let(:access_token) { create(:access_token, resource_owner_id: user.id, scopes: "public project") }
   let!(:project) { create(:project_with_contents, owner: user) }
   let(:url) { "/api/projects/#{project.id}" }
   
-  before(:each) do
-    allow_any_instance_of(Api::ApiController)
-      .to receive(:doorkeeper_token)
-           .and_return(token(["public", "project"], user.id))
-  end
-
   shared_examples "precondition required" do
     let(:ok_status) { method == :put ? :ok : :no_content }
     
     it "should require if-unmodified-since header" do
       send method, url, body.to_json,
            { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-             "CONTENT_TYPE" => "application/json" }
+             "CONTENT_TYPE" => "application/json",
+             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
       expect(response).to have_http_status(:precondition_required)
     end
 
@@ -29,7 +25,8 @@ describe "api should allow conditional requests", type: :request do
       send method, url, body.to_json,
            { "If-Unmodified-Since" => last_modified,
              "CONTENT_TYPE" => "application/json",
-             "HTTP_ACCEPT" => "application/vnd.api+json; version=1" }
+             "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
+             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
       expect(response).to have_http_status(:precondition_failed)
     end
 
@@ -38,7 +35,8 @@ describe "api should allow conditional requests", type: :request do
       send method, url, body.to_json,
            { "If-Unmodified-Since" => last_modified,
              "CONTENT_TYPE" => "application/json",
-             "HTTP_ACCEPT" => "application/vnd.api+json; version=1" }
+             "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
+             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
       expect(response).to have_http_status(ok_status)
     end
   end
@@ -46,7 +44,8 @@ describe "api should allow conditional requests", type: :request do
   shared_examples "returns last modified" do
     before(:each) do
       get url, nil, 
-          { "HTTP_ACCEPT" => "application/vnd.api+json; version=1" }
+          { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
+             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
     end
     
     it "should return the Last-Modified Header" do

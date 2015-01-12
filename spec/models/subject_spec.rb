@@ -3,6 +3,10 @@ require 'spec_helper'
 describe Subject, :type => :model do
 
   let(:subject) { build(:subject) }
+  let(:locked_factory) { :subject }
+  let(:locked_update) { {metadata: { "Test" => "data" } } }
+  
+  it_behaves_like "optimistically locked"
 
   it "should have a valid factory" do
     expect(subject).to be_valid
