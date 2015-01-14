@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/edpaget/restpack_serializer.git
-  revision: 834ef0b0597a1f5b57b2ba7f78824b31fd5f1aa1
+  revision: 31a51c84a1634a3047e7c07b109772a6dc731762
   branch: dev
   specs:
     restpack_serializer (0.5.6)
@@ -131,7 +131,7 @@ GEM
       http_parser.rb (~> 0.6.0)
     http_parser.rb (0.6.0)
     http_parser.rb (0.6.0-java)
-    i18n (0.6.11)
+    i18n (0.7.0)
     ice_nine (0.11.1)
     jar-dependencies (0.1.7)
     jbundler (0.7.1)
@@ -144,8 +144,8 @@ GEM
     jquery-rails (3.1.2)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
-    json (1.8.1)
-    json (1.8.1-java)
+    json (1.8.2)
+    json (1.8.2-java)
     json-schema (2.4.1)
     jwt (1.0.0)
     kaminari (0.16.1)
@@ -172,7 +172,7 @@ GEM
     method_source (0.8.2)
     mime-types (2.4.3)
     mini_portile (0.6.1)
-    minitest (5.5.0)
+    minitest (5.5.1)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -231,7 +231,7 @@ GEM
     rack-cors (0.2.9)
     rack-protection (1.5.3)
       rack
-    rack-test (0.6.2)
+    rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.1.7)
       actionmailer (= 4.1.7)
