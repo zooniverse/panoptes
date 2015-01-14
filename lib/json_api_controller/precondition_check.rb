@@ -10,9 +10,7 @@ module JsonApiController
     
     def precondition
       case action_name
-      when "show"
-        request.headers["If-Modified-Since"]
-      else
+      when "update", "destroy"
         request.headers["If-Unmodified-Since"]
       end
     end
