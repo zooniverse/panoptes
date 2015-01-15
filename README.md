@@ -12,10 +12,10 @@ If you're interested in how Panoptes is implemented check out the [wiki](https:/
 
 ## Requirements
 
-Panoptes is primarily developed against stable JRuby, currently 1.7.16. It is tested against the following versions:
+Panoptes is primarily developed against stable JRuby, currently 1.7.18. It is tested against the following versions:
 
-* 1.7.16
-* 2.1.2
+* 1.7.18
+* 2.1.5
 
 It uses a couple of Ruby 2.0 features, so you'll need to put JRuby in 2.0 mode by setting `JRUBY_OPTS=--2.0` in your environment.
 
@@ -40,83 +40,34 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
   * [Ubuntu](https://docs.docker.com/installation/ubuntulinux/) - Docker
   * [Windows](http://docs.docker.com/installation/windows/) - Boot2Docker
 
+* [fig](http://fig.sh)
+
 #### Installation
 
-1. Ensure your repo directory starts with a lowercase letter - you may need to move `/Panoptes` to `/panoptes`.
+1. Run `rake configure FIG_RAKE=off`
 
-2. Prepare your development environment config files, you should only have to do this before the first boot. **Note:** The fig docker environment uses linked docker containers, so your Postgres and Zookeeper hosts urls need to refer to these containers.
-  * Copy all the `config/*.yml.hudson` files to `config/*.yml`. The default values should work out of the box.
+2. Run `fig up`
 
-3. Run `scripts/fig/build_panoptes.sh` to build the docker containers
+3. Open a new terminal and run `rake db:create db:migrate`
 
-4. Run, `scripts/fig/migrate_db_panoptes.sh` to setup the database.
-  * Use this command to apply any schema migrations during development. **Note:** This script runs in a separately built container and can be applied when the server is running.
-
-5. Once step 4 is finished, run `scripts/fig/run_cmd_panoptes.sh "rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
+4. Once step 3 is finished, run `rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb`
   * This will seed the development database with an Admin user and a Doorkeeper client application for API access.
-
-6. Run `fig up ` OR `scripts/fig/up_panoptes.sh` to start all Panoptes services.
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
 If you've added new gems you'll need to rebuild the docker image via the command in step 4.
 
-Finally there are some helper scripts to get access to a console, bash shell etc. **Note:** these commands build a new container on each run, see [Fig CLI](http://www.fig.sh/cli.html).
-  * To get a rails console `scripts/fig/rails_console_panoptes.sh`
-    + **Note:** you can override the RAILS_ENV by passing a valid argument, just make sure you've set the DB for the env!
-  * To get a bash console `scripts/fig/run_cmd_panoptes.sh bash`
-  * You can also attach a bash process to the running container, e.g. `docker exec -it panoptes_panoptes_1 bash`
-    + Assuming the 'panoptes_panoptes_1' container is running, use `fig ps` or `docker ps` to check.
-
 ### 2. Run manually with self installed and run dependencies
 
 Setup the following services to get Panoptes up and running:
 
-#### Postgresql
+* [Postgresql](http://postgresql.org) version > 9.3
+* [Zookeeper](http://zookeeper.apache.org) version > 3.4.6
+* [Cellect Server](https://github.com/zooniverse/Cellect) version > 0.1.0
+* [Kafka](http://kafka.apache.org) version > 0.8.1.1
+* [Redis](http://redis.io) version > 2.8.19
 
-If you don't want to use docker then just install Postgresql 9.3+ and setup as per a normal Rails app.
-
-#### Cellect Server
-
-See the Cellect server gem and docker file - http://rubygems.org/gems/cellect-server
-
-#### Redis
-
-Normal redis config and configure sidekiq (`config/sidekiq.yml`) to access redis.
-
-#### Kafka
-
-Setup kafka and then configure the `config/kafka.yml` file
-
-#### Zookeeper
-A really easy way to get Zookeeper running on your local machine, if you don't want to use the Vagrant configuration, is to run it in a docker container. First install docker ([OS X Docs](https://docs.docker.com/installation/mac/), [Ubuntu docs](https://docs.docker.com/installation/ubuntulinux/)), then run the following command to pull and run a Zookeeper container:
-
-```
-  sudo docker run -d --name zk --publish 2181:2181 zooniverse/zookeeper
-```
-
-Make sure you don't have anything else running on port 2181 that will conflict with the container. Or change the second number to map to a different port and adjust the port in your `cellect.yml` file.
-
-### 3. Vagrant
-
-If you're just looking to run Panoptes to develop against its API. I recommend looking at [Devoptes](https://github.com/zooniverse/Devoptes). **Note:** Devoptes is no longer under active development!
-
-Panoptes comes with [Vagrant](http://vagrantup.com) (version > 1.5.0) and [VirtualBox](https://www.virtualbox.org/) (version > 4.3) configuration to make a test environment easy to get up and running. Use the following commands to get started:
-
-```
-  vagrant up
-  vagrant ssh
-```
-
-The Rails application running in the VM will be available at `http://localhost:3000`. Note that it will take a few minutes for Panoptes to
-start. Monitor it with `docker logs panoptes`.
-
-After Panoptes starts you can access a rails console within the vagrant box by running:
-
-```
-  vagrant ssh #if not already logged in
-  ./panoptes/vagrant-scripts/console.sh
-```
+We strongly recommend using fig and docker to run Panoptes
 
 ## Contributing
 
@@ -135,6 +86,6 @@ Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panop
 
 ## License
 
-Copyright 2014 by the Zooniverse
+Copyright 2014-2015 by the Zooniverse
 
 Distributed under the Apache Public License v2. See LICENSE

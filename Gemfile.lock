@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/edpaget/fig_rake.git
+  revision: b31a019ce53986a1d74fc0f480e1c4fef0f89cb7
+  specs:
+    fig_rake (0.0.1)
+
+GIT
   remote: git://github.com/edpaget/restpack_serializer.git
   revision: 31a51c84a1634a3047e7c07b109772a6dc731762
   branch: dev
@@ -364,6 +370,7 @@ DEPENDENCIES
   devise
   doorkeeper (~> 1.4.1)
   factory_girl_rails (~> 4.4.1)
+  fig_rake!
   foreman
   guard-rspec (~> 4.2.9)
   honeybadger
