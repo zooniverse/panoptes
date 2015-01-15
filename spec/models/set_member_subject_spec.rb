@@ -3,6 +3,10 @@ require 'spec_helper'
 describe SetMemberSubject, :type => :model do
 
   let(:set_member_subject) { build(:set_member_subject) }
+  let(:locked_factory) { :set_member_subject }
+  let(:locked_update) { {state: 1} }
+  
+  it_behaves_like "optimistically locked"
 
   it "should have a valid factory" do
     expect(set_member_subject).to be_valid

@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe SubjectSet, :type => :model do
   let(:subject_set) { create(:subject_set) }
+  let(:locked_factory) { :subject_set }
+  let(:locked_update) { {display_name: "A Different Name"} }
+  
+  it_behaves_like "optimistically locked"
 
   it "should have a valid factory" do
     expect(build(:subject_set)).to be_valid

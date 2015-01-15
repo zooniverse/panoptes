@@ -5,7 +5,10 @@ describe Workflow, :type => :model do
   let(:subject_relation) { create(:workflow_with_subjects) }
   let(:translatable) { create(:workflow_with_contents) }
   let(:primary_language_factory) { :workflow }
-
+  let(:locked_factory) { :workflow }
+  let(:locked_update) { {display_name: "A Different Name"} }
+  
+  it_behaves_like "optimistically locked"
   it_behaves_like "has subject_count"
   it_behaves_like "is translatable"
 

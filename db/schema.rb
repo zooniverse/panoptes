@@ -60,6 +60,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.integer  "activated_state", default: 0,  null: false
     t.string   "display_name"
     t.string   "visible_to",      default: [], null: false, array: true
+    t.integer  "lock_version",    default: 0
   end
 
   add_index "collections", ["display_name", "owner_id", "owner_type"], name: "index_collections_on_display_name_and_owner_id_and_owner_type", unique: true, using: :btree
@@ -167,6 +168,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.string   "visible_to",            default: [], null: false, array: true
     t.text     "avatar"
     t.text     "background_image"
+    t.integer  "lock_version",          default: 0
   end
 
   add_index "projects", ["display_name", "owner_id", "owner_type"], name: "index_projects_on_display_name_and_owner_id_and_owner_type", using: :btree
@@ -181,6 +183,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.datetime "updated_at"
     t.integer  "classifications_count", default: 0, null: false
     t.decimal  "priority"
+    t.integer  "lock_version",          default: 0
   end
 
   add_index "set_member_subjects", ["subject_id"], name: "index_set_member_subjects_on_subject_id", using: :btree
@@ -194,6 +197,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.integer  "set_member_subjects_count", default: 0, null: false
     t.json     "metadata"
     t.integer  "workflow_id"
+    t.integer  "lock_version",              default: 0
     t.boolean  "expert_set"
   end
 
@@ -210,6 +214,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.integer  "project_id"
     t.string   "owner_type"
     t.boolean  "migrated"
+    t.integer  "lock_version",  default: 0
   end
 
   add_index "subjects", ["owner_id"], name: "index_subjects_on_owner_id", using: :btree
@@ -236,6 +241,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.integer  "activated_state",       default: 0,    null: false
     t.string   "display_name"
     t.boolean  "private",               default: true, null: false
+    t.integer  "lock_version",          default: 0
   end
 
   add_index "user_groups", ["name"], name: "index_user_groups_on_name", unique: true, using: :btree
@@ -270,6 +276,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.integer  "set_member_subject_ids", default: [], null: false, array: true
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "lock_version",           default: 0
   end
 
   add_index "user_subject_queues", ["user_id", "workflow_id"], name: "index_user_subject_queues_on_user_id_and_workflow_id", unique: true, using: :btree
@@ -341,6 +348,7 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.string   "primary_language"
     t.string   "first_task"
     t.integer  "tutorial_subject_id"
+    t.integer  "lock_version",          default: 0
   end
 
   add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree

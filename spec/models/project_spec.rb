@@ -8,6 +8,9 @@ describe Project, :type => :model do
   let(:activatable) { project }
   let(:translatable) { create(:project_with_contents) }
   let(:primary_language_factory) { :project }
+  let(:locked_factory) { :project }
+  let(:locked_update) { {display_name: "A Different Name"} }
+  it_behaves_like "optimistically locked"
 
   it_behaves_like "is ownable"
   it_behaves_like "has subject_count"

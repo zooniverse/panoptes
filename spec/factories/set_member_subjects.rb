@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :set_member_subject do
-    state { SetMemberSubject.states.keys.sample }
+    state 0
     subject_set
     subject
   end

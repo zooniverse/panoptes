@@ -43,4 +43,16 @@ module JSONApiResponses
   def unprocessable_entity(exception)
     json_api_render(:unprocessable_entity, exception)
   end
+
+  def precondition_required(exception)
+    json_api_render(:precondition_required, exception)
+  end
+
+  def precondition_failed(exception)
+    json_api_render(:precondition_failed, exception)
+  end
+
+  def conflict(exception)
+    json_api_render(:conflict, exception)
+  end
 end

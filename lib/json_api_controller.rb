@@ -1,5 +1,8 @@
 module JsonApiController
   extend ActiveSupport::Concern
+  
+  class PreconditionNotPresent < StandardError; end
+  class PreconditionFailed < StandardError; end
 
   included do
     @action_params = Hash.new
@@ -73,7 +76,7 @@ module JsonApiController
   def context
     {}
   end
-
+  
   private
 
   def resource_scope(resource)
