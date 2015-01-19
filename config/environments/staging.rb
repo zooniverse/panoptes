@@ -90,7 +90,7 @@ Rails.application.configure do
       origins(/^https?:\/\/(127\.0\.0\.1|localhost|10\.0\.2\.2|[a-z0-9-]+\.zooniverse\.org)(:\d+)?$/)
       resource '*', headers: :any,
                methods: [:delete, :get, :post, :options, :put],
-               expose: ['ETag'] 
+               expose: ['Last-Modified'] 
     end
   end
 
