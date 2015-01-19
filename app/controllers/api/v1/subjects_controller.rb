@@ -13,7 +13,9 @@ class Api::V1::SubjectsController < Api::ApiController
   alias_method :subject, :controlled_resource
 
   def index
-    render json_api: selector.create_response
+    subjects = selector.create_response
+    fresh_when last_modified: subjects.maximum(:updated_at)
+    render json_api: SubjectSerializer.page(params, subjects)
   end
 
   private

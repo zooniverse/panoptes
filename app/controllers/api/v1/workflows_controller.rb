@@ -3,7 +3,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   include Versioned
 
   doorkeeper_for :update, :create, :destroy, scopes: [:project]
-  resource_actions :create, :update, :destroy
+  resource_actions :default
   schema_type :json_schema
 
   allowed_params :create
@@ -13,15 +13,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def show
     load_cellect
-    render json_api: serializer.resource(params,
-                                         visible_scope,
-                                         languages: current_languages)
-  end
-
-  def index
-    render json_api: serializer.page(params,
-                                     visible_scope,
-                                     languages: current_languages)
+    super
   end
 
   private
@@ -40,6 +32,16 @@ class Api::V1::WorkflowsController < Api::ApiController
     return unless api_user.logged_in?
     Cellect::Client.connection.load_user(**cellect_params)
   end
+
+  def context
+    case action_name
+    when "show", "index"
+      { languages: current_languages }
+    else
+      {}
+    end
+  end
+    
 
   def build_resource_for_update(update_params)
     if update_params.has_key? :tasks
