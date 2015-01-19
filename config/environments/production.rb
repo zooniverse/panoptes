@@ -87,4 +87,13 @@ Rails.application.configure do
 
   # Enable the logstasher logs for the current environment
   config.logstasher.enabled = true
+
+  config.middleware.insert_before 0, Rack::Cors do
+    allow do
+      origins '*'
+      resource '/api/*', headers: :any,
+               methods: [:delete, :get, :post, :options, :put],
+               expose: ['ETag'] 
+    end
+  end
 end

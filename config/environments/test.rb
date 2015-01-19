@@ -44,4 +44,13 @@ Rails.application.configure do
   config.to_prepare do
     Doorkeeper::ApplicationsController.helper Doorkeeper::Helpers::Controller
   end
+  
+  config.middleware.insert_before 0, Rack::Cors do
+    allow do
+      origins '*'
+      resource '/api/*', headers: :any,
+               methods: [:delete, :get, :post, :options, :put],
+               expose: ['ETag'] 
+    end
+  end
 end
