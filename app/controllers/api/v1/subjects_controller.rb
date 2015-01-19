@@ -14,8 +14,9 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def index
     subjects = selector.create_response
-    fresh_when last_modified: subjects.maximum(:updated_at)
-    render json_api: SubjectSerializer.page(params, subjects)
+    if stale?(last_modified: subjects.maximum(:updated_at))
+      render json_api: SubjectSerializer.page(params, subjects)
+    end
   end
 
   private
