@@ -11,7 +11,7 @@ describe "api should allow conditional requests", type: :request do
         { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
           "CONTENT_TYPE" => "application/json",
           "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
-          "If-Unmodified-Since" => 1.minute.from_now }
+          "If-Unmodified-Since" => 1.minute.from_now.httpdate }
   end
   
   context "when a record is locked" do

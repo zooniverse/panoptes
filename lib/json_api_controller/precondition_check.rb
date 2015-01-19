@@ -16,7 +16,8 @@ module JsonApiController
     end
 
     def precondition_fails?
-      !resource_class.where("updated_at <= ?", precondition).exists?(params[:id])
+      date = Time.httpdate(precondition).utc
+      !resource_class.where("updated_at <= ?", date).exists?(params[:id])
     end
 
     def precondition_error_msg

@@ -26,7 +26,7 @@ module APIRequestHelpers
   end
 
   def set_preconditions
-    request.headers["If-Unmodified-Since"] = 1.minute.from_now.utc
+    request.headers["If-Unmodified-Since"] = 1.minute.from_now.utc.httpdate
   end
 
   def stub_token(scopes: [], user_id: nil)
