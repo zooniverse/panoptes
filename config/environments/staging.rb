@@ -85,7 +85,7 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.middleware.insert_before Warden::Manager, Rack::Cors do
+  config.middleware.insert_before 0, Rack::Cors do
     allow do
       origins /^https?:\/\/(127\.0\.0\.1|localhost|10\.0\.2\.2|[a-z0-9-]+\.zooniverse\.org)(:\d+)?$/
       resource '*', headers: :any,
