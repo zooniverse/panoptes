@@ -87,9 +87,10 @@ Rails.application.configure do
 
   config.middleware.insert_before 0, Rack::Cors do
     allow do
-      origins /^https?:\/\/(127\.0\.0\.1|localhost|10\.0\.2\.2|[a-z0-9-]+\.zooniverse\.org)(:\d+)?$/
+      origins(/^https?:\/\/(127\.0\.0\.1|localhost|10\.0\.2\.2|[a-z0-9-]+\.zooniverse\.org)(:\d+)?$/)
       resource '*', headers: :any,
-                    methods: [:get, :post, :put, :delete, :options, :patch]
+               methods: [:delete, :get, :post, :options, :put],
+               expose: ['ETag'] 
     end
   end
 
