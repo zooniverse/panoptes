@@ -14,7 +14,7 @@ class SubjectSelector
     when 'queued'
       queued_subjects
     else
-      query_subjects
+      @scope
     end
   end
 
@@ -30,14 +30,10 @@ class SubjectSelector
     selected_subjects(Cellect::Client.connection.get_subjects(**cellect_params))
   end
 
-  def query_subjects
-    SubjectSerializer.page(params, @scope)
-  end
-
   def selected_subjects(subject_ids)
     set_member_subjects = SetMemberSubject.where(id: subject_ids).select(:subject_id)
     subjects = @scope.where(id: set_member_subjects)
-    SubjectSerializer.page({}, subjects)
+    subjects
   end
 
   private

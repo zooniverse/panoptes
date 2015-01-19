@@ -50,7 +50,7 @@ Rails.application.configure do
       origins '*'
       resource '/api/*', headers: :any,
                methods: [:delete, :get, :post, :options, :put],
-               expose: ['ETag'] 
+               expose: ['Last-Modified'] 
     end
   end
 end

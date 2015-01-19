@@ -19,7 +19,7 @@ describe "api should allow conditional requests", type: :request do
     end
 
     it "should fail request if precondition not met" do
-      last_modified = project.updated_at
+      last_modified = project.updated_at.httpdate
       project.name = "gazorpazorp"
       project.save!
       send method, url, body.to_json,
@@ -31,7 +31,7 @@ describe "api should allow conditional requests", type: :request do
     end
 
     it "should succeed if precondition is met" do 
-      last_modified = project.updated_at
+      last_modified = (project.updated_at + 1.minute).httpdate
       send method, url, body.to_json,
            { "If-Unmodified-Since" => last_modified,
              "CONTENT_TYPE" => "application/json",
@@ -50,6 +50,20 @@ describe "api should allow conditional requests", type: :request do
     
     it "should return the Last-Modified Header" do
       expect(response.headers['Last-Modified']).to eq(project.updated_at.httpdate)
+    end
+  end
+
+  shared_examples "304s when not modified" do
+    before(:each) do
+      last_modified = project.updated_at.httpdate
+      get url, nil, 
+          { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
+             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
+             "If-Modified-Since" => last_modified }
+    end
+
+    it 'should return not modified' do
+      expect(response).to have_http_status(:not_modified)
     end
   end
   
@@ -72,12 +86,14 @@ describe "api should allow conditional requests", type: :request do
   context "GET requests" do
     context "show actions" do
       it_behaves_like "returns last modified"
+      it_behaves_like "304s when not modified"
     end
     
     context "index actions" do
       let(:url) { "/api/projects" }
       
       it_behaves_like "returns last modified"
+      it_behaves_like "304s when not modified"
     end
   end
 

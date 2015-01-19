@@ -40,7 +40,8 @@ Rails.application.configure do
     allow do
       origins '*'
       resource '*', headers: :any,
-                    methods: [:get, :post, :put, :delete, :options, :patch]
+               methods: [:get, :post, :put, :delete, :options, :patch],
+               expose: ['Last-Modified'] 
     end
   end
 end
