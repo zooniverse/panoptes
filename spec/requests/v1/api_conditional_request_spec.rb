@@ -6,6 +6,7 @@ describe "api should allow conditional requests", type: :request do
   let(:access_token) { create(:access_token, resource_owner_id: user.id, scopes: "public project") }
   let!(:project) { create(:project_with_contents, owner: user) }
   let(:url) { "/api/projects/#{project.id}" }
+  let!(:last_modified) { project.updated_at.httpdate }
   
   shared_examples "precondition required" do
     let(:ok_status) { method == :put ? :ok : :no_content }
@@ -19,7 +20,7 @@ describe "api should allow conditional requests", type: :request do
     end
 
     it "should fail request if precondition not met" do
-      last_modified = project.updated_at.httpdate
+      sleep 1
       project.name = "gazorpazorp"
       project.save!
       send method, url, body.to_json,
@@ -31,7 +32,6 @@ describe "api should allow conditional requests", type: :request do
     end
 
     it "should succeed if precondition is met" do 
-      last_modified = (project.updated_at + 1.minute).httpdate
       send method, url, body.to_json,
            { "If-Unmodified-Since" => last_modified,
              "CONTENT_TYPE" => "application/json",
@@ -55,7 +55,6 @@ describe "api should allow conditional requests", type: :request do
 
   shared_examples "304s when not modified" do
     before(:each) do
-      last_modified = project.updated_at.httpdate
       get url, nil, 
           { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
              "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
