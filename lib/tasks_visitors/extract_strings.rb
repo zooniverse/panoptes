@@ -16,6 +16,7 @@ module TasksVisitors
       path
     end
 
+    alias :visit_instruction :substitute_string
     alias :visit_label :substitute_string
     alias :visit_question :substitute_string
   end

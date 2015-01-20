@@ -32,7 +32,27 @@ RSpec.describe TasksVisitors::ExtractStrings do
           {value: 'sorta', label: 'In between'},
           {value: 'not', label: 'Cigar shaped'}
         ],
-        next: nil}
+        next: nil
+      },
+      "location" => {
+        "type" => "marking",
+        "instruction" => "Mark any stray ghost particles or slime bubbles you can see.",
+        "features" => [
+          {
+            "shape" => "point",
+            "value" => "particle",
+            "label" => "Ghost particle",
+            "color" => "pink"
+          },
+          {
+            "shape" => "ellipse",
+            "value" => "bubble",
+            "label" => "Slime bubble",
+            "color" => "lime"
+          }
+        ],
+        "next" => nil
+      }
     }
   end
 
@@ -73,9 +93,9 @@ RSpec.describe TasksVisitors::ExtractStrings do
 
       it 'should populate the collector with strings' do
         expect(collector).to include("interest.question" => "Color some points",
-                                             "interest.tools.0.label" => 'Red',
-                                             "roundness.question" => 'How round is it?',
-                                             "roundness.answers.2.label" => "Cigar shaped")
+                                     "interest.tools.0.label" => 'Red',
+                                     "roundness.question" => 'How round is it?',
+                                     "roundness.answers.2.label" => "Cigar shaped")
       end
     end
 

@@ -10,6 +10,7 @@ module TasksVisitors
       @strings[n]
     end
 
+    alias :visit_instruction :inject_string
     alias :visit_question :inject_string
     alias :visit_label :inject_string
   end
