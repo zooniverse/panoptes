@@ -4,31 +4,29 @@ sudo: false
 
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
-  - rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson
-  - RACK_ENV=test bundle exec rake db:create db:migrate
+  - FIG_RAKE=off RACK_ENV=test bundle exec rake configure:travis db:create db:migrate
 
 jruby_before_script: &jruby_before_script
   - bundle exec jbundle install
   - psql -c 'create database travis_ci_test;' -U postgres
-  - rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson
-  - RACK_ENV=test bundle exec rake db:create db:migrate
+  - FIG_RAKE=off RACK_ENV=test bundle exec rake configure:travis db:create db:migrate
 
 matrix:
   fast_finish: true
   allow_failures:
+    - rvm: 2.1.5
     - rvm: ruby-head
     - rvm: jruby-head
     - rvm: 2.2.0
   include:
-    - rvm: 2.1.5
-    - rvm: jruby
-      env: JRUBY_OPTS=--2.0
+    - rvm: 2.1.2
+    - rvm: jruby-1.7.17
+      env: JRUBY_OPTS=--2.0 FIG_RAKE=off
       jdk: openjdk7
       before_script: *jruby_before_script
+    - rvm: 2.1.5
     - rvm: 2.2.0
     - rvm: ruby-head
-    - rvm: jruby-head
-      before_script: *jruby_before_script
       
 services:
   - postgresql
@@ -36,4 +34,4 @@ services:
 addons:
   postgresql: "9.3"
 
-script: RACK_ENV=test bundle exec rake spec
+script: FIG_RAKE=off RACK_ENV=test bundle exec rake spec

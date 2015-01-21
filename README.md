@@ -42,7 +42,7 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
 
 * [fig](http://fig.sh)
 
-#### Installation
+#### Usage
 
 1. Run `rake configure FIG_RAKE=off`
 

@@ -3,19 +3,17 @@ default: &default
   encoding: unicode
   user: panoptes
   password: panoptes
-  host: localhost
+  host: postgres
   pool: 5
   port: 5432
 
 development:
   <<: *default
-  host: postgres
   database: panoptes_development
 
 test:
-  adapter: postgresql
-  database: travis_ci_test
-  username: postgres
+  <<: *default
+  database: panoptes_development
 
 zooniverse_home_development:
   <<: *default
