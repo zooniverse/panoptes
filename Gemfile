@@ -40,7 +40,7 @@ group :development do
   gem 'spring'
   gem 'mysql2', platforms: :ruby
   gem 'activerecord-jdbcmysql-adapter', platforms: :jruby
-  gem 'fig_rake', github: 'edpaget/fig_rake'
+  gem 'fig_rake', '~> 0.9.0'
 end
 
 group :development, :test do
