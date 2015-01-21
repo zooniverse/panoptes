@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/edpaget/fig_rake.git
-  revision: b31a019ce53986a1d74fc0f480e1c4fef0f89cb7
+  revision: f2017c710bb9e4ff87da088f3aeea4244c9cb272
   specs:
     fig_rake (0.0.1)
 

@@ -1,7 +1,6 @@
 postgres:
   image: zooniverse/postgresql
   environment:
-    - "DB=panoptes_development"
     - "PG_USER=panoptes"
     - "PASS=panoptes"
 
