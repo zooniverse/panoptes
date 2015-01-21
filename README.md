@@ -12,10 +12,10 @@ If you're interested in how Panoptes is implemented check out the [wiki](https:/
 
 ## Requirements
 
-Panoptes is primarily developed against stable JRuby, currently 1.7.16. It is tested against the following versions:
+Panoptes is primarily developed against stable JRuby, currently 1.7.19. It is tested against the following versions:
 
-* 1.7.16
-* 2.1.2
+* 1.7.19
+* 2.2.0
 
 It uses a couple of Ruby 2.0 features, so you'll need to put JRuby in 2.0 mode by setting `JRUBY_OPTS=--2.0` in your environment.
 
