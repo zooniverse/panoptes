@@ -25,6 +25,10 @@ class SubjectSetCreateSchema < JsonSchema
         type "string", "integer"
       end
 
+      property "collection" do
+        type "string", "integer"
+      end
+
       property "subjects" do
         type "array"
         items do

@@ -2221,6 +2221,10 @@ Subject Sets are returned as an array under *subject_sets*.
 A subject set must supply a display_name and a link to a project. Optionally,
 it may include links to subjects and a single workflow.
 
+Instead of a list of subjects a SubjectSet may include a link to a
+Collection which will import the collection's subjects into a new
+SubjectSet.
+
 + Request
 
     + Headers
