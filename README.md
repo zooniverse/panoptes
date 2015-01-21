@@ -44,36 +44,29 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
 
 1. Ensure your repo directory starts with a lowercase letter - you may need to move `/Panoptes` to `/panoptes`.
 
-2. Prepare your fig development environment config files. You should only have to do this before the first boot. **Note:** The fig docker environment uses linked docker containers, so your Postgres and Zookeeper hosts urls need to refer to these containers.
+2. Prepare your development environment config files, you should only have to do this before the first boot. **Note:** The fig docker environment uses linked docker containers, so your Postgres and Zookeeper hosts urls need to refer to these containers.
+  * Copy all the `config/*.yml.hudson` files to `config/*.yml`. The default values should work out of the box.
 
-3. Copy all the `config/*.yml.hudson` files to `config/*.yml`. The default values should work out of the box.
+3. Run `scripts/fig/build_panoptes.sh` to build the docker containers
 
-4. Run `./scripts/fig/up_panoptes.sh`.
-    * On the first run it will build the docker containers, setup the database and install the development and test environment gems.
-    * **Note:** It will not start the rails server(s), and will exit after db migration.
+4. Run, `scripts/fig/migrate_db_panoptes.sh` to setup the database.
+  * Use this command to apply any schema migrations during development. **Note:** This script runs in a separately built container and can be applied when the server is running.
 
-5. Run `./scripts/fig/up_panoptes.sh` again.
-  * On second run the script will start Panoptes and all the dependent services.
-  * **Note:** this script does not recreate containers to avoid installing gems and migrating the database.
-   * If you've added new gems, or you otherwise need to recreate the build image, run `fig up`.
+5. Once step 4 is finished, run `scripts/fig/run_cmd_panoptes.sh "rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
+  * This will seed the development database with an Admin user and a Doorkeeper client application for API access.
 
-6. Run `scripts/fig/run_cmd_panoptes.sh "bundle install && rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb"`
-    * This will seed the fig development database in the docker container.
-    * **Note:** Run this only after step 4 has completed successfully.
-
-7. Finally, if you want to apply schema migrations, run `scripts/fig/migrate_db_panoptes.sh`
-
+6. Run `fig up ` OR `scripts/fig/up_panoptes.sh` to start all Panoptes services.
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
-Finally there are some helper scripts to get access to a console, bash shell etc. **Note:** these commands build a new run container
-* To get a rails console `scripts/fig/rails_console_panoptes.sh`
-  + **Note:** you can override the RAILS_ENV by passing a valid argument, just make sure you've setup the DB for it!
-* To get a bash console `scripts/fig/run_cmd_panoptes.sh bash`
-* You can also attach a bash process to the running container, e.g. `docker exec -it panoptes_panoptes_1 bash`
-  + Assuming the 'panoptes_panoptes_1' container is running, use `fig ps` or `docker ps` to check.
+If you've added new gems you'll need to rebuild the docker image via the command in step 4.
 
-**Note:** if you've ever built a Panoptes docker container before you should just run `fig up` instead of the `./scripts/fig/up_panoptes.sh` to ensure the previously built container is not re-used. After rebuilding you should be good to use `./scripts/fig/up_panoptes.sh` script to use the re-created containers.
+Finally there are some helper scripts to get access to a console, bash shell etc. **Note:** these commands build a new container on each run, see [Fig CLI](http://www.fig.sh/cli.html).
+  * To get a rails console `scripts/fig/rails_console_panoptes.sh`
+    + **Note:** you can override the RAILS_ENV by passing a valid argument, just make sure you've set the DB for the env!
+  * To get a bash console `scripts/fig/run_cmd_panoptes.sh bash`
+  * You can also attach a bash process to the running container, e.g. `docker exec -it panoptes_panoptes_1 bash`
+    + Assuming the 'panoptes_panoptes_1' container is running, use `fig ps` or `docker ps` to check.
 
 ### 2. Run manually with self installed and run dependencies
 
@@ -133,12 +126,12 @@ Thanks a bunch for wanting to help Zooniverse. Here are few quick guidelines to 
 2. Clone the code and follow one of the above guides to setup a dev environment.
 3. Create a new git branch and make your changes.
 4. Make sure the tests still pass by running `bundle exec rspec`.
-5. Add tests if you introduced new functionality. 
+5. Add tests if you introduced new functionality.
 6. Commit your changes. Try to make your commit message [informative](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html), but we're not sticklers about it. Do try to to add `Closes #issue` or `Fixes #issue` somewhere in your message if it's addressing a specific open issue.
 7. Submit a Pull Request
 8. Wait for feedback or a merge!
 
-Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.1.2 and JRuby 1.7.16 before we take a look at it. 
+Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.1.2 and JRuby 1.7.16 before we take a look at it.
 
 ## License
 
