@@ -15,7 +15,6 @@ module Api
     rescue_from Api::UnauthorizedTokenError,             with: :not_authenticated
     rescue_from Api::UnsupportedMediaType,               with: :unsupported_media_type
     rescue_from RoleControl::AccessDenied,               with: :not_found
-    rescue_from ActiveRecord::StatementInvalid,          with: :bad_query
     rescue_from JsonApiController::PreconditionNotPresent, with: :precondition_required
     rescue_from JsonApiController::PreconditionFailed,   with: :precondition_failed
     rescue_from ActiveRecord::StaleObjectError,          with: :conflict

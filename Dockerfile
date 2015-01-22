@@ -1,4 +1,4 @@
-FROM zooniverse/ruby:jruby-1.7.18
+FROM zooniverse/ruby:2.1.5
 
 WORKDIR /rails_app
 
@@ -9,10 +9,10 @@ RUN apt-get update && apt-get -y upgrade && \
 
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
-ADD ./Jarfile /rails_app/
-ADD ./Jarfile.lock /rails_app/
+#ADD ./Jarfile /rails_app/
+#ADD ./Jarfile.lock /rails_app/
 
-RUN bundle install && jbundle install
+RUN bundle install #&& jbundle install
 
 ADD ./ /rails_app
 
