@@ -44,18 +44,17 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
 
 #### Usage
 
-1. Run `rake configure FIG_RAKE=off`
+1. Setup the application configuration files by running `rake configure FIG_RAKE=off`
 
-2. Run `fig up`
+2. Create and run the application containers by running `fig up`
 
-3. Open a new terminal and run `rake db:create db:migrate`
+3. Open a new terminal and run `rake db:create db:migrate` to setup the database
 
-4. Once step 3 is finished, run `rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb`
-  * This will seed the development database with an Admin user and a Doorkeeper client application for API access.
+4. Once step 3 is finished, run `rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb` to seed the development database with an Admin user and a Doorkeeper client application for API access.
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
-If you've added new gems you'll need to rebuild the docker image via the command in step 4.
+If you've added new gems you'll need to rebuild the docker image by running `fig build`.
 
 ### 2. Run manually with self installed and run dependencies
 
