@@ -4,14 +4,12 @@ sudo: false
 
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
-  - rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson
-  - RACK_ENV=test bundle exec rake db:create db:migrate
+  - RACK_ENV=test bundle exec rake configure:travis db:create db:migrate
 
 jruby_before_script: &jruby_before_script
   - bundle exec jbundle install
   - psql -c 'create database travis_ci_test;' -U postgres
-  - rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson
-  - RACK_ENV=test bundle exec rake db:create db:migrate
+  - RACK_ENV=test bundle exec rake configure:travis db:create db:migrate
 
 matrix:
   fast_finish: true
