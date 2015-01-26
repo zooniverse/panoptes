@@ -3,7 +3,6 @@ FROM zooniverse/ruby:jruby-1.7.18
 WORKDIR /rails_app
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV FIG_RAKE off
 
 RUN apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y git && apt-get clean

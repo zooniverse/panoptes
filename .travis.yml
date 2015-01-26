@@ -4,12 +4,12 @@ sudo: false
 
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
-  - FIG_RAKE=off RACK_ENV=test bundle exec rake configure:travis db:create db:migrate
+  - RACK_ENV=test bundle exec rake configure:travis db:create db:migrate
 
 jruby_before_script: &jruby_before_script
   - bundle exec jbundle install
   - psql -c 'create database travis_ci_test;' -U postgres
-  - FIG_RAKE=off RACK_ENV=test bundle exec rake configure:travis db:create db:migrate
+  - RACK_ENV=test bundle exec rake configure:travis db:create db:migrate
 
 matrix:
   fast_finish: true
@@ -21,7 +21,7 @@ matrix:
   include:
     - rvm: 2.1.2
     - rvm: jruby-1.7.17
-      env: JRUBY_OPTS=--2.0 FIG_RAKE=off
+      env: JRUBY_OPTS=--2.0
       jdk: openjdk7
       before_script: *jruby_before_script
     - rvm: 2.1.5
@@ -34,4 +34,4 @@ services:
 addons:
   postgresql: "9.3"
 
-script: FIG_RAKE=off RACK_ENV=test bundle exec rake spec
+script: RACK_ENV=test bundle exec rake spec
