@@ -1,5 +1,5 @@
 class Api::V1::UsersController < Api::ApiController
-  doorkeeper_for :me, :show, scopes: [:public]
+  doorkeeper_for :me, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show
   
