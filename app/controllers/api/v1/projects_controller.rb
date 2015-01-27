@@ -1,6 +1,6 @@
 class Api::V1::ProjectsController < Api::ApiController
   include FilterByOwner
-  
+
   doorkeeper_for :update, :create, :destroy, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
@@ -25,7 +25,7 @@ class Api::V1::ProjectsController < Api::ApiController
   before_action :add_owner_ids_to_filter_param!, only: :index
 
   private
-  
+
   def create_response(projects)
     serializer.resource({ include: 'owners' },
                         resource_scope(projects),

@@ -7,6 +7,15 @@ shared_examples "is ownable" do
     expect(not_owned).to_not be_valid
   end
 
+  it "should not create an ACL instance when the model is invalid and built" do
+    expect{ not_owned }.not_to change{ AccessControlList.count }
+  end
+
+  it "should remove the ACL instance when the owned instance is destroyed" do
+    owned.save
+    expect{ owned.destroy }.to change{ AccessControlList.count }.from(1).to(0)
+  end
+
   describe "#owner?" do
     it "should return truthy when passed its owner object" do
       expect(owned.owner?(owned.owner)).to be_truthy
