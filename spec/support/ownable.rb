@@ -13,7 +13,7 @@ shared_examples "is ownable" do
 
   it "should remove the ACL instance when the owned instance is destroyed" do
     owned.save
-    expect{ owned.destroy }.to change{ AccessControlList.count }.from(1).to(0)
+    expect{ owned.destroy }.to change{ AccessControlList.count }.from(AccessControlList.count).to(AccessControlList.count - 1)
   end
 
   describe "#owner?" do

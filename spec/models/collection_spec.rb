@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Collection, :type => :model do
   let(:collection) { create(:collection) }
   let(:owned) { collection }
-  let(:not_owned) { build(:collection, owner: nil) }
+  let(:not_owned) { build(:collection, owner: nil, project: nil) }
   let(:activatable) { collection }
   let(:locked_factory) { :collection }
   let(:locked_update) { {display_name: "A differet name"} }

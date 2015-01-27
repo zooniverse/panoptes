@@ -3,11 +3,13 @@ module JsonApiController
     include RelationManager
 
     def create
-      resources = ActiveRecord::Base.transaction do
-        Array.wrap(create_params).map do |ps|
-          resource = build_resource_for_create(ps)
-          resource.save!
-          resource
+      resources = ActiveRecord::Base.transaction(requires_new: true) do
+        begin
+          Array.wrap(create_params).map do |ps|
+            resource = build_resource_for_create(ps)
+            resource.save!
+            resource
+          end
         end
       end
 

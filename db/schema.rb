@@ -69,8 +69,8 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.datetime "updated_at"
     t.integer  "activated_state", default: 0, null: false
     t.string   "display_name"
-    t.integer  "lock_version",    default: 0
     t.boolean  "private"
+    t.integer  "lock_version",    default: 0
   end
 
   add_index "collections", ["project_id"], name: "index_collections_on_project_id", using: :btree
@@ -174,8 +174,8 @@ ActiveRecord::Schema.define(version: 20150112192525) do
     t.string   "primary_language"
     t.text     "avatar"
     t.text     "background_image"
-    t.integer  "lock_version",          default: 0
     t.boolean  "private"
+    t.integer  "lock_version",          default: 0
   end
 
   create_table "set_member_subjects", force: true do |t|

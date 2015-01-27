@@ -2,6 +2,7 @@ class AccessControlList < ActiveRecord::Base
   belongs_to :user_group
   belongs_to :resource, polymorphic: true
 
+  validates_presence_of :user_group
 
   def self.scope_for(action, groups, resource_type: nil)
     case action

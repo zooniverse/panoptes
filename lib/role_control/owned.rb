@@ -3,7 +3,7 @@ module RoleControl
     extend ActiveSupport::Concern
     
     included do
-      has_many :access_control_lists, as: :resource
+      has_many :access_control_lists, as: :resource, dependent: :destroy
       has_one :owner_control_list, -> { where.overlap(roles: ["owner"]) }, as: :resource, class_name: "AccessControlList"
       has_one :owner, through: :owner_control_list, source: :user_group, as: :resource, class_name: "UserGroup"
 

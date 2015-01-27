@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::ProjectsController, type: :controller do
   let!(:user) { create(:user) }
-  let(:projects) {create_list(:project_with_contents, 2, owner: user) }
+  let!(:projects) {create_list(:project_with_contents, 2, owner: user) }
 
   let(:api_resource_name) { "projects" }
   let(:api_resource_attributes) do
@@ -262,7 +262,7 @@ describe Api::V1::ProjectsController, type: :controller do
           # this is happening outside the in it's own transaction outside the create one.
           # when building for create (maybe update if the links don't already exist)
           # we should use the model.relation.build params method instead of the realtion= setter
-          it "should not orphan an ACL instance when the model is invalid", :focus do
+          it "should not orphan an ACL instance when the model is invalid" do
             default_request scopes: scopes, user_id: authorized_user.id
             create_params[:projects] = create_params[:projects].except(:primary_language)
             expect{ post :create, create_params }.not_to change{ AccessControlList.count }
