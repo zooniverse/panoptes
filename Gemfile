@@ -28,7 +28,7 @@ gem 'json-schema'
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
   gem 'therubyrhino'
-  gem 'jruby-kafka', github: 'joekiller/jruby-kafka'
+  gem 'jruby-kafka', '1.0.0.beta'
 end
 
 platforms :ruby do

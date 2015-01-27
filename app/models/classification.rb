@@ -16,6 +16,7 @@ class Classification < ActiveRecord::Base
 
   scope :incomplete, -> { where(completed: false) }
   scope :created_by, -> (user) { where(user: user) }
+  scope :complete, -> { where(completed: true) }
 
   def self.scope_for(action, actor, opts={})
     case action

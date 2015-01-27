@@ -8,20 +8,13 @@ GIT
 
 GIT
   remote: git://github.com/edpaget/restpack_serializer.git
-  revision: 31a51c84a1634a3047e7c07b109772a6dc731762
+  revision: 0d48b79da0ea879ea3a85e3e4e7512dc0ccc7f9a
   branch: dev
   specs:
-    restpack_serializer (0.5.6)
+    restpack_serializer (0.5.7.pre1)
       activerecord (>= 4.0.3, < 5.0)
       activesupport (>= 4.0.3, < 5.0)
       kaminari (~> 0.16.1)
-
-GIT
-  remote: git://github.com/joekiller/jruby-kafka.git
-  revision: 2ca14364bd872926d9b44e438711f9fe67772578
-  specs:
-    jruby-kafka (1.0.0.beta-java)
-      jar-dependencies (~> 0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -157,6 +150,8 @@ GEM
     jquery-rails (3.1.2)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
+    jruby-kafka (1.0.0.beta-java)
+      jar-dependencies (~> 0.1)
     json (1.8.2)
     json (1.8.2-java)
     json-schema (2.5.0)
@@ -391,7 +386,7 @@ DEPENDENCIES
   honeybadger
   jbundler
   jquery-rails
-  jruby-kafka!
+  jruby-kafka (= 1.0.0.beta)
   json-schema
   logstasher
   mysql2

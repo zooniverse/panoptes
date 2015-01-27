@@ -16,19 +16,19 @@ class Api::V1::ClassificationsController < Api::ApiController
   private
 
   def access_denied(exception)
-    case action_name
-    when "update", "destroy"
-      if Classification.created_by(api_user.user)
-          .where(id: resource_ids, completed: true).exists?
-        error = StandardError.new(completed_error)
-        not_authorized(error)
-      else
-        not_found(exception)
-      end
+    if %w(update destroy).include?(action_name) && resources_completed?
+      not_authorized(StandardError.new(completed_error))
     else
       not_found(exception)
     end
   end
+
+  def resources_completed?
+    Classification.created_by(api_user.user)
+      .merge(Classification.complete)
+      .exists?(id: resource_ids)
+  end
+  
   
   def build_resource_for_update(update_params)
     classification = super
@@ -37,7 +37,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-   classification = super(create_params) do |create_params, link_params|
+    classification = super(create_params) do |create_params, link_params|
       link_params[:user] = api_user.user
       create_params[:user_ip] = request_ip
     end
@@ -79,9 +79,9 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def completed_error
     if resource_ids.is_a?(Array)
-      "Classifications with ids='#{resource_ids.join(',')}' are complete"
+      "#{controller_name} with ids='#{resource_ids.join(',')}' are complete"
     else
-      "Classification with id='#{resource_ids}' is complete"
+      "#{controller_name} with id='#{resource_ids}' is complete"
     end
   end
 end
