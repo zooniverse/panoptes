@@ -21,16 +21,18 @@ class ClassificationLifecycle
 
   def update_cellect(cellect_host)
     return unless should_update_seen?
-    Cellect::Client.connection
-      .add_seen(user_id: user.try(:id),
-                workflow_id: workflow.id,
-                subject_id: set_member_subject.id,
-                host: cellect_host)
+    set_member_subject_ids.each do |id|
+      Cellect::Client.connection
+        .add_seen(user_id: user.try(:id),
+                  workflow_id: workflow.id,
+                  subject_id: id,
+                  host: cellect_host)
+    end
   end
 
   def dequeue_subject
     return unless should_dequeue_subject?
-    UserSubjectQueue.dequeue_subject_for_user(**user_workflow_subject)
+    UserSubjectQueue.dequeue_subjects_for_user(**user_workflow_subject)
   end
 
   def create_project_preference
@@ -44,7 +46,7 @@ class ClassificationLifecycle
 
   def update_seen_subjects
     return unless should_update_seen?
-    UserSeenSubject.add_seen_subject_for_user(**user_workflow_subject)
+    UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
   end
 
   def publish_to_kafka
@@ -68,7 +70,7 @@ class ClassificationLifecycle
 
   def should_dequeue_subject?
     !classification.anonymous? &&
-      UserSubjectQueue.is_subject_queued?(**user_workflow_subject)
+      UserSubjectQueue.are_subjects_queued?(**user_workflow_subject)
   end
 
   def should_create_project_preference?
@@ -87,15 +89,15 @@ class ClassificationLifecycle
     @project ||= classification.project
   end
 
-  def set_member_subject
-    @set_member_subject ||= classification.set_member_subject
+  def set_member_subject_ids
+    @set_member_subject_ids ||= classification.set_member_subject_ids
   end
 
   def user_workflow_subject
     @user_workflow_subject ||= {
       user: user,
       workflow: workflow,
-      set_member_subject: set_member_subject
+      set_member_subject_ids: set_member_subject_ids
     }
   end
 end

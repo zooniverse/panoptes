@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150129122349) do
+ActiveRecord::Schema.define(version: 20150129171400) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,7 +41,6 @@ ActiveRecord::Schema.define(version: 20150129122349) do
   add_index "authorizations", ["user_id"], name: "index_authorizations_on_user_id", using: :btree
 
   create_table "classifications", force: true do |t|
-    t.integer  "set_member_subject_id"
     t.integer  "project_id"
     t.integer  "user_id"
     t.integer  "workflow_id"
@@ -50,14 +49,14 @@ ActiveRecord::Schema.define(version: 20150129122349) do
     t.datetime "updated_at"
     t.integer  "user_group_id"
     t.inet     "user_ip"
-    t.boolean  "completed",             default: true, null: false
+    t.boolean  "completed",              default: true, null: false
     t.boolean  "gold_standard"
     t.integer  "expert_classifier"
-    t.json     "metadata",              default: {},   null: false
+    t.json     "metadata",               default: {},   null: false
+    t.integer  "set_member_subject_ids", default: [],                array: true
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
-  add_index "classifications", ["set_member_subject_id"], name: "index_classifications_on_set_member_subject_id", using: :btree
   add_index "classifications", ["user_group_id"], name: "index_classifications_on_user_group_id", using: :btree
   add_index "classifications", ["user_id"], name: "index_classifications_on_user_id", using: :btree
   add_index "classifications", ["workflow_id"], name: "index_classifications_on_workflow_id", using: :btree
@@ -169,14 +168,13 @@ ActiveRecord::Schema.define(version: 20150129122349) do
   end
 
   create_table "set_member_subjects", force: true do |t|
-    t.integer  "state",                 default: 0, null: false
+    t.integer  "state",          default: 0, null: false
     t.integer  "subject_set_id"
     t.integer  "subject_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "classifications_count", default: 0, null: false
     t.decimal  "priority"
-    t.integer  "lock_version",          default: 0
+    t.integer  "lock_version",   default: 0
   end
 
   add_index "set_member_subjects", ["subject_id"], name: "index_set_member_subjects_on_subject_id", using: :btree
