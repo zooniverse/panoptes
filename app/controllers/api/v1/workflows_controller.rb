@@ -20,28 +20,10 @@ class Api::V1::WorkflowsController < Api::ApiController
       {}
     end
   end
-
-  def create_response(workflow)
-    serializer.resource({},
-                        resource_scope(workflow))
-  end
-
-  def update_response(workflow)
-    create_response(workflow)
-  end
-
+  
   def load_cellect
     return unless api_user.logged_in?
     Cellect::Client.connection.load_user(**cellect_params)
-  end
-
-  def context
-    case action_name
-    when "show", "index"
-      { languages: current_languages }
-    else
-      {}
-    end
   end
 
   def build_update_hash(update_params, id)
