@@ -21,9 +21,6 @@ describe Project, :type => :model do
     expect(project).to be_valid
   end
 
-  it { is_expected.to permit_field(:visible_to).for_action(:show) }
-  it { is_expected.to permit_roles(:collaborator).for_action(:update) }
-
   it 'should require unique names for an ower' do
     owner = create(:user)
     expect(create(:project, name: "hi_fives", owner: owner)).to be_valid
@@ -35,7 +32,7 @@ describe Project, :type => :model do
     expect(create(:project, name: "test_project", owner: create(:user))).to be_valid
   end
 
-  it 'should require unique dispalys name for an owner' do
+  it 'should require unique displays name for an owner' do
     owner = create(:user)
     expect(create(:project, display_name: "hi fives", owner: owner)).to be_valid
     expect(build(:project, display_name: "hi fives", owner: owner)).to_not be_valid
@@ -106,13 +103,13 @@ describe Project, :type => :model do
 
   describe "#project_roles" do
     let!(:preferences) do
-      [create(:user_project_preference, project: project, roles: []),
-       create(:user_project_preference, project: project, roles: ["tester"]),
-       create(:user_project_preference, project: project, roles: ["collaborator"])]
+      [create(:access_control_list, resource: project, roles: []),
+       create(:access_control_list, resource: project, roles: ["tester"]),
+       create(:access_control_list, resource: project, roles: ["collaborator"])]
     end
 
     it 'should include models with assigned roles' do
-      expect(project.project_roles).to match_array(preferences[1..-1])
+      expect(project.project_roles).to include(*preferences[1..-1])
     end
 
     it 'should not include models without assigned roles' do
@@ -124,9 +121,9 @@ describe Project, :type => :model do
     let(:project_user) { create(:user) }
     let(:roles) { [] }
     let(:prefs) do
-      create(:user_project_preference, user: project_user,
-                                       project: project,
-                                       roles: roles)
+      create(:access_control_list, user_group: project_user.identity_group,
+                                   resource: project,
+                                   roles: roles)
     end
 
     before(:each) do
@@ -173,11 +170,11 @@ describe Project, :type => :model do
       let!(:roles) { ["collaborator"] }
 
       it '#expert_classifier_level should be nil' do
-        expect(project.expert_classifier_level(prefs.user)).to be_nil
+        expect(project.expert_classifier_level(project_user)).to be_nil
       end
 
       it "#expert_classifier? should be falsey" do
-        expect(project.expert_classifier?(prefs.user)).to be_falsey
+        expect(project.expert_classifier?(project_user)).to be_falsey
       end
     end
 

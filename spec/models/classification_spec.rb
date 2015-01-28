@@ -106,7 +106,7 @@ describe Classification, :type => :model do
     end
   end
 
-  describe "::visible_to" do
+  describe "::scope_for" do
     let(:user) { ApiUser.new(create(:user)) }
     let(:project) { create(:project, owner: user.owner) }
     let(:user_group) { create(:user_group) }
@@ -120,30 +120,27 @@ describe Classification, :type => :model do
     end
 
     it 'should return an ActiveRecord::Relation' do
-      expect(Classification.visible_to(user)).to be_a(ActiveRecord::Relation)
+      expect(Classification.scope_for(:show, user)).to be_a(ActiveRecord::Relation)
     end
 
-    it 'should return all classifications for a project if the user can updateit' do
+    it 'should return all classifications for a project if the user can update it' do
       expected = classifications[1]
-      expect(Classification.visible_to(user)).to include(expected)
+      expect(Classification.scope_for(:show, user, project: true))
+        .to include(expected)
     end
 
-    it 'should return all classifications for a user group if the user can update it' do
+    it 'should return all classifications for a user group if the user can see it' do
       expected = classifications[2]
-      expect(Classification.visible_to(user)).to include(expected)
+      expect(Classification.scope_for(:show, user, user_group: true))
+        .to include(expected)
     end
 
     it 'should return all classifications a user has made' do
       expected = classifications[0]
-      expect(Classification.visible_to(user)).to include(expected)
-    end
-
-    it 'should all classifications for an admin' do
-      admin_double = double({ is_admin?: true })
-      expect(Classification.visible_to(admin_double, as_admin: true))
-        .to match_array(classifications)
+      expect(Classification.scope_for(:show, user)).to include(expected)
     end
   end
+  
   describe "#creator?" do
     let(:user) { ApiUser.new(build(:user)) }
 
@@ -166,22 +163,6 @@ describe Classification, :type => :model do
     it "should be falsy if completed attribute is true" do
       expect(build(:classification, completed: true).incomplete?).to be_falsy
     end
-  end
-
-  describe "#in_show_scope?" do
-    let(:user) { ApiUser.new(create(:user)) }
-
-    it "should be truthy if the classification is in the actor's visible_scope" do
-      classification = create(:classification, user: user.owner)
-      expect(classification.in_show_scope?(user)).to be_truthy
-
-    end
-
-    it "should be falsy if the classification is not in the actor's visible_scope" do
-      classification = create(:classification)
-      expect(classification.in_show_scope?(user)).to be_falsy
-    end
-
   end
 
   describe "#user_groups" do

@@ -1,5 +1,4 @@
 class Api::V1::ProjectContentsController < Api::ApiController
-  include JsonApiController
   include Versioned
 
   doorkeeper_for :all, scopes: [:project]

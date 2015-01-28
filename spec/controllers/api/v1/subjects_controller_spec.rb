@@ -197,7 +197,7 @@ describe Api::V1::SubjectsController, type: :controller do
   end
 
   describe "#update" do
-    let(:resource) { create(:subject, owner: user) }
+    let(:resource) { create(:subject, project: create(:project, owner: user)) }
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
       {
@@ -265,8 +265,6 @@ describe Api::V1::SubjectsController, type: :controller do
       end
     end
 
-    it_behaves_like "is creatable"
-
     context "when the user is not-the owner of the project" do
       let(:unauthorised_user) { create(:user) }
 
@@ -283,16 +281,28 @@ describe Api::V1::SubjectsController, type: :controller do
         expect(response.body).to eq(json_error_message("Couldn't find resource"))
       end
     end
+
+    context "when the project is owned by the user" do
+      it_behaves_like "is creatable"
+    end
+
+    context "when the project is owned by a user_group the user may edit" do
+      let(:membership) { create(:membership, state: 0, roles: ["project_editor"]) }
+      let(:project) { create(:project, owner: membership.user_group) }
+      let(:authorized_user) { membership.user }
+      
+      it_behaves_like "is creatable"
+    end
   end
 
   describe "#destroy" do
-    let(:resource) { create(:subject, owner: user) }
+    let(:resource) { create(:subject, project: create(:project, owner: user)) }
 
     it_behaves_like "is destructable"
   end
 
   describe "versioning" do
-    let(:resource) { create(:subject, owner: user) }
+    let(:resource) { create(:subject, project: create(:project, owner: user)) }
     let!(:existing_versions) { resource.versions.length }
     let(:num_times) { 10 }
     let(:update_proc) do

@@ -7,21 +7,27 @@ module TranslatedContent
     validates :language, format: {with: /\A[a-z]{2}(\z|-[A-z]{2})/}
     belongs_to translated_for
 
-    can_through_parent translated_for, :show
-
-    can :update do |actor|
-      !is_primary? && (parent.can_update?(actor) || is_translator?(actor))
-    end
-    
-    can :destroy do |actor|
-      !is_primary? && parent.can_destroy?(actor)
-    end
-    
+    can_through_parent translated_for, :show, :index, :versions, :version
   end
 
   module ClassMethods
     def translated_for
       name[0..-8].downcase.to_sym
+    end
+
+    def translated_class
+      translated_for.to_s.camelize.constantize
+    end
+
+    def scope_for(action, user, opts={})
+      case action
+      when :show, :index
+        super
+      else
+        joins(translated_for)
+          .merge(translated_class.scope_for(:translate, user, opts))
+          .where.not("\"#{translated_class.table_name}\".\"primary_language\" = \"#{table_name}\".\"language\"")
+      end
     end
   end
 

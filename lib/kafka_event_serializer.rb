@@ -33,11 +33,12 @@ class KafkaEventSerializer
           { link => model.send(link).pluck(:id).map(&:to_s) }
         end
       when :has_one, :belongs_to
-        if reflection.polymorphic?
+        if reflection.polymorphic? || reflection.name == :owner
           linked = model.send(link)
           {link => {id: linked.id.to_s,
                     type: linked.class.model_name.singular}}
         else
+          p reflection.name
           { link => model.send(link).id.to_s }
         end
       end

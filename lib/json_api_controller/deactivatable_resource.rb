@@ -12,5 +12,9 @@ module JsonApiController
       Activation.disable_instances!(to_disable)
       deleted_resource_response
     end
+
+    def to_disable
+      controlled_resources
+    end
   end
 end

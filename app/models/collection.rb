@@ -1,19 +1,20 @@
 class Collection < ActiveRecord::Base
   include RoleControl::Controlled
-  include RoleControl::Ownable
-  include RoleControl::Adminable
+  include RoleControl::Owned
   include Activatable
   include Linkable
   include PreferencesLink
   
   belongs_to :project
   has_and_belongs_to_many :subjects
+  
+  ## TODO: This potential has locking issues
+  validates_with UniqueForOwnerValidator
 
-  validates_uniqueness_of :name, case_sensitive: false, scope: :owner
-  validates_uniqueness_of :display_name, scope: :owner
-
-  can_by_role :update, roles: [ :collaborator ]
-  can_by_role :show, public: true, roles: :visible_to
+  can_by_role :destroy, :update, :update_links, :destroy_links,
+              roles: [ :owner, :collaborator ]
+  can_by_role :index, :show, public: :public_scope,
+              roles: [ :owner, :collaborator, :viewer ]
   
   preferences_model :user_collection_preference
 end

@@ -1,82 +1,56 @@
 module RoleControl
+  class AccessDenied < StandardError; end
+
   module RoledController
     extend ActiveSupport::Concern
 
-    module ClassMethods
-      def access_control_action(controller_action, test_action, actor_method: :api_user, &block)
-        method_name = :"access_control_for_#{ controller_action }"
-
-        define_method method_name do
-          resource = send(:controlled_resource)
-          act_as = send(:owner_from_params)
-
-          actor(block || actor_method).do(test_action)
-            .to(resource)
-            .as(act_as, allow_nil: false)
-            .allowed?
-        end
-        
-        before_action method_name, only: [controller_action]
-      end
-
-      def access_control_for(*actions)
-        actions.each do |(controller_action, test_action)|
-          test_action ||= controller_action
-          access_control_action(controller_action, test_action)
-        end
+    included do
+      before_action :check_controller_resources, except: :create
+    end
+    
+    def check_controller_resources
+      unless resources_exist?
+        raise RoleControl::AccessDenied, send(:rejected_message)
       end
     end
-
-    protected
-
-    def actor(actor_method)
-      @actor ||= if actor_method.is_a?(Symbol)
-                   send(actor_method)
-                 else
-                   actor_method.call(request)
-                 end
+    
+    def resources_exist?
+      resource_ids.blank? ? true : controlled_resources.exists?(id: resource_ids)
     end
 
-    def controlled_resource
-      @controlled_resource ||= 
-        if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
-          resource_class.find(params["#{ resource_name }_id"])
-        elsif params.has_key?(:id)
-          resource_class.find(params[:id])
-        else
-          resource_class
-        end
+    def controlled_resources
+      @controlled_resources ||= api_user.do(action_name.to_sym)
+                              .to(resource_class, scope_context)
+                              .with_ids(resource_ids)
+                              .scope
     end
 
-    def owner_from_params
-      @owner ||=
-        if params[:owner]
-          OwnerName.where(name: params[:owner]).first.try(:resource)
-        else
-          owner_from_links_params
-        end
-    end
-
-    def visible_scope(actor)
-      @scope ||= resource_class.scope_for(:show, actor)
-    end
-
-    protected
-
-    def owner_from_links_params
-      id, type = params.fetch(resource_sym, {})
-                 .fetch(:links, {})
-                 .fetch(:owner, {})
-                 .values_at(:id, :type)
-      if id && type
-        type = type.singularize.camelize.constantize
-        
-        unless type < RoleControl::Owner
-          raise StandardError.new('type is not owner')
-        end
-        
-        type.find(id)
+    def rejected_message
+      if resource_ids.is_a?(Array)
+        "Could not find #{resource_sym} with ids='#{resource_ids.join(',')}'"
+      else
+        "Could not find #{resource_name} with id='#{resource_ids}'"
       end
+    end
+
+    def resource_ids
+      @resource_ids = _resource_ids
+    end
+
+    def _resource_ids
+      ids = if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
+              params["#{ resource_name }_id"]
+            elsif params.has_key?(:id)
+              params[:id]
+            else
+              ''
+            end.split(',')
+
+      ids.length < 2 ? ids.first : ids
+    end
+
+    def scope_context
+      {}
     end
   end
 end

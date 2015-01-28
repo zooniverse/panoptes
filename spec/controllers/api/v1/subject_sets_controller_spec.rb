@@ -19,7 +19,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#index' do
-    let(:private_project) { create(:project, visible_to: ["collaborator"]) }
+    let(:private_project) { create(:project, private: true) }
     let!(:private_resource) { create(:subject_set, project: private_project)  }
     let(:n_visible) { 2 }
     
@@ -89,7 +89,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
       
       context "when a user can access the collection" do
-      let(:collection) { create(:collection_with_subjects) }
+        let(:collection) { create(:collection_with_subjects) }
         it "should create a new subject set with the collection's subjects" do
           set = SubjectSet.find(created_instance_id(api_resource_name))
           expect(set.subjects).to match(collection.subjects)
@@ -97,9 +97,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
 
       context "when the user cannot access the collection" do
-      let(:collection) { create(:collection_with_subjects, visible_to: ["collaborator"]) }
-         it "should return 404" do
-           expect(response).to have_http_status(:not_found)
+        let(:collection) { create(:collection_with_subjects, private: true) }
+        it "should return 404" do
+          expect(response).to have_http_status(:not_found)
         end
       end
     end

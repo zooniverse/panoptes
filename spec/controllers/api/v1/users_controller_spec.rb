@@ -15,8 +15,8 @@ describe Api::V1::UsersController, type: :controller do
     [ "users.projects",
       "users.collections",
       "users.classifications",
-      "users.subjects",
-      "users.project_preferences" ]
+      "users.project_preferences",
+      "users.collection_preferences" ]
   end
 
   describe "#index" do
@@ -73,12 +73,12 @@ describe Api::V1::UsersController, type: :controller do
 
     it 'should include a customized url for projects' do
       projects_link = json_response['links']['users.projects']['href']
-      expect(projects_link).to eq("/projects?owner={users.owner_name}")
+      expect(projects_link).to eq("/projects?owner={users.login}")
     end
 
     it 'should include a customized url for collections' do
       collections_link = json_response['links']['users.collections']['href']
-      expect(collections_link).to eq("/collections?owner={users.owner_name}")
+      expect(collections_link).to eq("/collections?owner={users.login}")
     end
     
     it_behaves_like "an api response"
@@ -121,7 +121,7 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should return a specific error message in the response body" do
-        error_message = json_error_message("Couldn't find User with 'id'=#{user_id}")
+        error_message = json_error_message("Could not find user with id='#{user_id}'")
         expect(response.body).to eq(error_message)
       end
     end

@@ -9,7 +9,7 @@ module JsonApiController
     end
     
     def destroy
-      controlled_resource.destroy!
+      controlled_resources.destroy_all
       deleted_resource_response
     end
   end

@@ -3,20 +3,19 @@ require 'spec_helper'
 describe RoleControl::RoledController, type: :controller do
   setup_role_control_tables
 
-  let!(:enrolled_actor) { EnrolledActorTable.create! }
+  let!(:enrolled_actor) { create(:user) }
   
   let!(:controlled) do
     ControlledTable.create! do |c|
-      c.visible_to = ["admin"]
+      c.private = true
     end
   end
 
   controller(ApplicationController) do
     include RoleControl::RoledController
-    access_control_for :update, [:show, :read]
 
     def api_user
-      EnrolledActorTable.first
+      ApiUser.new(User.first)
     end
 
     def resource_class
@@ -27,18 +26,16 @@ describe RoleControl::RoledController, type: :controller do
       :controlled_tables
     end
 
+    def resource_name
+      "controlled_table"
+    end
+
     def update 
       render nothing: true 
     end
 
     def show
       render nothing: true
-    end
-  end
-
-  describe "#access_control_action" do
-    it 'should create a method named access_control_for_#{action}' do
-      expect(controller).to respond_to(:access_control_for_update)
     end
   end
 
@@ -63,8 +60,8 @@ describe RoleControl::RoledController, type: :controller do
   end
 
   describe "user is not enrolled on controlled object" do
-    it 'should raise a ControlControl::AccessDenied error' do
-      expect{ put :update, id: controlled.id }.to raise_error(ControlControl::AccessDenied)
+    it 'should raise an AccessDenied error' do
+      expect{ put :update, id: controlled.id }.to raise_error(RoleControl::AccessDenied)
     end
   end
 end

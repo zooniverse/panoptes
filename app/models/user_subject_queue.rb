@@ -6,15 +6,15 @@ class UserSubjectQueue < ActiveRecord::Base
 
   validates_presence_of :user, :workflow
 
-  can_through_parent :workflow, :update, :destroy
+  can_through_parent :workflow, :update, :destroy, :update_links, :destroy_links
 
   delegate :add_subject, to: :set_member_subjects
   delegate :remove_subject, to: :set_member_subjects
 
-  def self.scope_for(action, actor)
+  def self.scope_for(action, groups, opts={})
     case action
-    when :show
-      where(workflow: Workflow.scope_for(:update, actor))
+    when :show, :index
+      where(workflow: Workflow.scope_for(:update, groups, opts))
     else
       super
     end
@@ -36,8 +36,8 @@ class UserSubjectQueue < ActiveRecord::Base
       .exists?(user: user, workflow: workflow)
   end
   
-  def sample_subjects(limit=10)
-    set_member_subject_ids.sample(limit)
+  def next_subjects(limit=10)
+    set_member_subject_ids[0,limit]
   end
   
   def set_member_subjects=(subjects)

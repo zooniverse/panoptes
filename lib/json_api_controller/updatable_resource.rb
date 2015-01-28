@@ -11,38 +11,42 @@ module JsonApiController
     end
 
     def update
-      ActiveRecord::Base.transaction do
-        build_resource_for_update(update_params)
-        controlled_resource.save!
+      resource_class.transaction(requires_new: true) do
+        controlled_resources.zip(Array.wrap(update_params)).each do |resource, update_hash|
+          resource.update(build_update_hash(update_hash,resource))
+        end
       end
-
-      controlled_resource.reload
-      updated_resource_response(controlled_resource)
+      
+      updated_resource_response(controlled_resources)
     end
 
     def update_links
       check_relation
-      ActiveRecord::Base.transaction do
-        add_relation(relation, params[relation])
-        controlled_resource.save!
+      resource = controlled_resources.first
+      resource_class.transaction(requires_new: true) do
+        add_relation(resource, relation, params[relation])
+        resource.save!
       end
 
-      updated_resource_response(controlled_resource)
+      updated_resource_response(resource)
     end
 
     def destroy_links
-      ActiveRecord::Base.transaction do
-        destroy_relation(relation, params[:link_ids])
+      resource = controlled_resources.first
+      resource_class.transaction do
+        destroy_relation(resource, relation, params[:link_ids])
       end
       deleted_resource_response
     end
 
     protected
 
-    def build_resource_for_update(update_params)
-      links = update_params.delete(:links)
-      controlled_resource.assign_attributes(update_params)
-      links.try(:each) { |k, v| update_relation(k.to_sym, v) }
+    def build_update_hash(update_params, resource)
+      return update_params unless links = update_params.delete(:links)
+      links.try(:reduce, update_params) do |params, (k, v)|
+        params[k] = update_relation(resource, k.to_sym, v)
+        params
+      end
     end
 
     def check_relation
@@ -51,8 +55,8 @@ module JsonApiController
       end
     end
 
-    def update_response(resource)
-      serializer.resource({}, resource_scope(resource), context)
+    def update_response(resources)
+      serializer.resource({}, controlled_resources, context)
     end
 
     def relation

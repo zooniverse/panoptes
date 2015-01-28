@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 describe Api::V1::CollectionsController, type: :controller do
-  let!(:collections) { create_list :collection_with_subjects, 2 }
+  let(:owner) { create(:user) }
+  let!(:collections) { create_list :collection_with_subjects, 2, owner: owner }
   let(:collection) { collections.first }
   let(:project) { collection.project }
-  let(:owner) { collection.owner }
   let(:api_resource_name) { 'collections' }
 
   let(:api_resource_attributes) { %w(id name display_name created_at updated_at) }
@@ -20,7 +20,7 @@ describe Api::V1::CollectionsController, type: :controller do
 
   describe '#index' do
     let!(:private_resource) do
-      create :collection_with_subjects, visible_to: ['collaborator']
+      create :collection_with_subjects, private: true
     end
 
     let(:n_visible) { 2 }
@@ -51,6 +51,7 @@ describe Api::V1::CollectionsController, type: :controller do
                     }
       }
     end
+
 
     it_behaves_like "is updatable"
     it_behaves_like "has updatable links"

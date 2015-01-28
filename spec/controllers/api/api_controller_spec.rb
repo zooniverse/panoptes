@@ -1,31 +1,41 @@
 require 'spec_helper'
 
-def setup_controller(api_controller)
-  api_controller.controller do
-    yield(self) if block_given?
-
-    def index
-      render json_api: { tests: [{ all: "good" },
-                                 { at: "least" },
-                                 { thats: "what I pretend" } ] }
-    end
-  end
-end
-
 describe Api::ApiController, type: :controller do
   let(:user) { create(:user) }
+  let!(:collection) { create(:collection, private: false) }
 
-  describe "without doorkeeper" do
-    setup_controller(self)
+  before(:each) do
+    allow_any_instance_of(described_class).to receive(:resource_class).and_return(Collection)
+  end
+  
+  context "without doorkeeper" do
+    controller do
 
-    it "should return 200 without a logged in user" do
-      get :index
-      expect(response.status).to eq(200)
+      def index
+        render json_api: { tests: [{ all: "good" },
+                                   { at: "least" },
+                                   { thats: "what I pretend" } ] }
+      end
+    end
+
+    describe "without doorkeeper" do
+      it "should return 200 without a logged in user" do
+        get :index
+        expect(response.status).to eq(200)
+      end
     end
   end
 
-  describe "with doorkeeper" do
-    setup_controller(self) { |controller| controller.doorkeeper_for :index, scopes: [:public] }
+  context "with doorkeeper" do
+    controller do
+      doorkeeper_for :index, scopes: [:public]
+      def index
+        render json_api: { tests: [{ all: "good" },
+                                   { at: "least" },
+                                   { thats: "what I pretend" } ] }
+      end
+      
+    end
 
     it "should return 401 without a logged in user" do
       get :index
@@ -79,25 +89,6 @@ describe Api::ApiController, type: :controller do
     end
   end
 
-  describe "authenticated with doorkeeper but unauthorized for the action" do
-    controller do
-      doorkeeper_for :index, scopes: [:public]
-      def index
-        resource = User.find(params[:id])
-        api_user.do(:show).to(resource).call do 
-          render json_api: { tests: [ { all: "good" }, { at: "least" }, { thats: "what I pretend" } ] }
-        end
-      end
-    end
-
-    it "should return 403 with a logged in user" do
-      default_request(scopes: ["public"], user_id: user.id)
-      allow_any_instance_of(User).to receive(:can_show?).and_return(false)
-      get :index, id: user.id
-      expect(response.status).to eq(403)
-    end
-  end
-
   describe "#current_language" do
     controller do
       def index
@@ -123,93 +114,7 @@ describe Api::ApiController, type: :controller do
       expect(json_response[-3..-1]).to include('zh', 'zh-tw', 'fr-fr')
     end
   end
-
-  describe "default access control" do
-    controller do
-      def update
-        render nothing: true
-      end
-
-      def destroy
-        render nothing: true
-      end
-
-      def create
-        render nothing: true
-      end
-
-      def update_links
-        render nothing: true
-      end
-
-      def destroy_links
-        render nothing: true
-      end
-
-      def resource_sym
-        :collections
-      end
-
-      def resource_class
-        Collection
-      end
-    end
-
-    let(:api_user) { ApiUser.new(user) }
-    let(:collection) { create(:collection, owner: user) }
-    
-    before(:each) do
-      routes.draw do
-        put "update" => "api/api#update"
-        post "create" => "api/api#create"
-        delete "destroy" => "api/api#destroy"
-        post "update_links" => "api/api#update_links"
-        delete "destroy_links" => "api/api#destroy_links"
-      end
-
-      allow(controller).to receive(:controlled_resource).and_return(collection)
-      allow(controller).to receive(:api_user).and_return(api_user)
-      allow(controller).to receive(:current_actor).and_return(api_user)
-      @request.env["CONTENT_TYPE"] = "application/json"
-    end
-
-    context "put #update request" do
-      it 'should call can_update? on the requested collection' do
-        expect(collection).to receive(:can_update?).with(api_user)
-        put :update, id: collection.id
-      end
-    end
-
-    context "delete #destroy request" do
-      it 'should call can_destroy? on the requested collection' do
-        expect(collection).to receive(:can_destroy?).with(api_user)
-        delete :destroy, id: collection.id
-      end
-    end
-
-    context "post #create request" do
-      it 'should call can_create? on the Collection class' do
-        allow(controller).to receive(:controlled_resource).and_return(Collection)
-        expect(Collection).to receive(:can_create?).with(api_user)
-        post :create
-      end
-    end
-
-    context "post #update_links request" do
-      it 'should call can_update? on the requested collection' do
-        expect(collection).to receive(:can_update?).with(api_user)
-        post :update_links, id: collection.id
-      end
-    end
-
-    context "delete #destroy_links request" do
-      it 'should call can_update? on the requested collection' do
-        expect(collection).to receive(:can_update?).with(api_user)
-        delete :destroy_links, id: collection.id
-      end
-    end
-  end
-
+  
   describe "when a banned user attempts to take an action" do
     let(:user) { create(:user, banned: true) }
     

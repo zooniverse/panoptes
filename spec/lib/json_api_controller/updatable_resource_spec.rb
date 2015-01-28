@@ -17,8 +17,8 @@ describe JsonApiController::UpdatableResource, type: :controller do
       Collection
     end
 
-    def controlled_resource
-      @controlled_resource ||= Collection.find(params[:id])
+    def controlled_resources
+      @controlled_resources ||= Collection.where(id: params[:id])
     end
 
     def serializer

@@ -15,63 +15,58 @@ describe Membership, :type => :model do
       expect(membership.user_group).to be_a(UserGroup)
     end
   end
-
-  describe "#allowed_to_change?" do
-    context "a user" do
-      let(:user) { ApiUser.new(create(:user)) }
-
-      it 'should be truthy for a user in the membership' do
-        membership = create(:membership, user: user.user)
-        expect(membership.allowed_to_change?(user)).to be_truthy
-      end
-
-      it 'should be falsy for a user not in the membership' do
-        membership = create(:membership)
-        expect(membership.allowed_to_change?(user)).to be_falsy
-      end
-    end
-
-    context "a user_group" do
-      let(:user_group) { create(:user_group) }
-      
-      it 'should be truthy for a user in the membership hwne it is active' do
-        membership = create(:membership, user_group: user_group, state: :active)
-        expect(membership.allowed_to_change?(user_group)).to be_truthy
-      end
-
-      it 'should be falsy for a user not in the membership' do
-        membership = create(:membership)
-        expect(membership.allowed_to_change?(user_group)).to be_falsy
-      end
-
-      it 'should be falsy for a user_group in the memberhsip when it is not active' do
-        membership = create(:membership, user_group: user_group, state: :inactive)
-        expect(membership.allowed_to_change?(user_group)).to be_falsy
-      end
-    end
-  end
-
+  
   describe "::scope_for" do
     let(:memberships) { [create(:membership, state: :active),
                          create(:membership, state: :inactive),
                          create(:membership, state: :invited)] }
-    context "a user actor" do
-      it 'should return all memberships' do
-        actor = ApiUser.new(create(:user))
+    
+    let(:actor) { ApiUser.new(create(:user)) }
+    
+    context ":show, :index" do
+      it 'should return all a users memberships' do
         actor.user.memberships << memberships
         actor.user.save!
 
-        expect(Membership.scope_for(:show, actor)).to eq(memberships)
+        expect(Membership.scope_for(:show, actor)).to match_array(memberships)
+      end
+
+      it 'should return all memberships in a group the user is member of' do
+        ug = create(:user_group, private: true)
+        ug.memberships << memberships
+        membership = ug.memberships.build(user: actor.user, state: :active)
+        ug.save!
+
+        memberships.push(membership)
+        expect(Membership.scope_for(:show, actor)).to match_array(memberships)
+      end
+
+      it 'should return all active memberships of public groups' do
+        ug = create(:user_group, private: false)
+        ug.memberships << memberships
+        ug.save!
+        expect(Membership.scope_for(:show, actor)).to match_array([memberships[0]])
       end
     end
 
-    context "a user_group actor" do
-      it 'should return only active memberships' do
-        actor = create(:user_group)
-        actor.memberships << memberships
-        actor.save!
+    context ":update, :destroy" do
+      it 'should return all memberships belonging to the user' do
+        actor.user.memberships << memberships
+        actor.user.save!
 
-        expect(Membership.scope_for(:show, actor)).to all( be_active )
+        expect(Membership.scope_for(:update, actor)).to match_array(memberships)
+      end
+
+      it 'should return all memmbership belonging to a group the user administrates' do
+        ug = create(:user_group, private: true)
+        ug.memberships << memberships
+        membership = ug.memberships.build(user: actor.user,
+                                          state: :active,
+                                          roles: ["group_admin"])
+        ug.save!
+
+        memberships.push(membership)
+        expect(Membership.scope_for(:destroy, actor)).to match_array(memberships)
       end
     end
   end

@@ -12,7 +12,7 @@ RSpec::Matchers.define :link_to do |rel|
   end
 
   failure_message do
-    "expected #{ @link_scope } to eq #{ @scope_scope }"
+    "expected #{ @link_scope.to_sql } to eq #{ @scope_scope.to_sql }"
   end
 
   match do |actual|

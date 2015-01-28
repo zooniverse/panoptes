@@ -2,7 +2,7 @@ module Linkable
   extend ActiveSupport::Concern
 
   included do
-    @link_scopes = Hash.new([:default_link_to_scope, :actor])
+    @link_scopes = Hash.new([:default_link_to_scope, :user])
   end
 
   module ClassMethods
@@ -11,19 +11,19 @@ module Linkable
       @link_scopes[rel_class] = [scope] | args
     end
 
-    def link_to_resource(model, actor, *args)
+    def link_to_resource(model, user, *args)
       method, *default_args = @link_scopes[model.class]
-      scope_args = link_scope_arguments(default_args, model, actor, args)
+      scope_args = link_scope_arguments(default_args, model, user, args)
       send(method, *scope_args)
     end
 
     protected
 
-    def link_scope_arguments(default_args, model, actor, additional_args)
+    def link_scope_arguments(default_args, model, user, additional_args)
       (default_args | additional_args).map do |item|
         case item
-        when :actor
-          actor
+        when :user
+          user
         when :model
           model
         else
@@ -32,8 +32,8 @@ module Linkable
       end
     end
 
-    def default_link_to_scope(actor)
-      scope_for(:show, actor)
+    def default_link_to_scope(user)
+      scope_for(:show, user)
     end
   end
 end

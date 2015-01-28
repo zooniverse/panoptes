@@ -3,11 +3,6 @@ require 'spec_helper'
 describe UserGroup, :type => :model do
   let(:user_group) { create(:user_group) }
   let(:named) { user_group }
-  let(:unnamed) do
-    unnamed = build(:user_group)
-    unnamed.owner_name = nil
-    unnamed
-  end
   let(:activatable) { user_group }
   let(:owner) { user_group }
   let(:owned) { build(:project, owner: owner) }
@@ -16,7 +11,6 @@ describe UserGroup, :type => :model do
   
   it_behaves_like "optimistically locked"
 
-  it_behaves_like "is owner nameable"
   it_behaves_like "activatable"
   it_behaves_like "is an owner"
 
@@ -57,7 +51,6 @@ describe UserGroup, :type => :model do
   end
 
   describe "#name" do
-
     it 'should validate presence' do
       ug = build(:user_group, name: "")
       expect(ug.valid?).to be false
@@ -82,20 +75,6 @@ describe UserGroup, :type => :model do
       dup_user_group.valid?
       expect(dup_user_group.errors[:name]).to include("has already been taken")
     end
-
-    context "when a user with the same login exists" do
-      let!(:user_group) { build(:user_group) }
-      let!(:user) { create(:user, login: user_group.name) }
-
-      it "should not be valid" do
-        expect(user_group).to_not be_valid
-      end
-
-      it "should have the correct error message on the owner_name association" do
-        user_group.valid?
-        expect(user_group.errors[:"owner_name.name"]).to include("has already been taken")
-      end
-    end
   end
 
   describe "#users" do
@@ -119,10 +98,20 @@ describe UserGroup, :type => :model do
     end
   end
 
-  describe "#subjects" do
-    let(:relation_instance) { user_group }
+  describe "#projects" do
+    let(:user_group) { create(:user_group_with_projects) }
 
-    it_behaves_like "it has a subjects association"
+    it 'should have many projects' do
+      expect(user_group.projects).to all( be_a(Project) )
+    end
+  end
+
+  describe "#collections" do
+    let(:user_group) { create(:user_group_with_collections) }
+
+    it 'should have many collections' do
+      expect(user_group.collections).to all( be_a(Collection) )
+    end
   end
 
   describe "#classifcations_count" do

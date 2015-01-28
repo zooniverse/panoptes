@@ -1,12 +1,9 @@
 class Api::V1::WorkflowsController < Api::ApiController
-  include JsonApiController
   include Versioned
 
   doorkeeper_for :update, :create, :destroy, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
-
-  alias_method :workflow, :controlled_resource
 
   def show
     load_cellect
@@ -14,21 +11,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   private
-
-  def create_response(workflow)
-    serializer.resource({},
-                        resource_scope(workflow),
-                        languages: [workflow.primary_language])
-  end
-
-  def update_response(workflow)
-    create_response(workflow)
-  end
-
-  def load_cellect
-    return unless api_user.logged_in?
-    Cellect::Client.connection.load_user(**cellect_params)
-  end
 
   def context
     case action_name
@@ -38,15 +20,19 @@ class Api::V1::WorkflowsController < Api::ApiController
       {}
     end
   end
-    
+  
+  def load_cellect
+    return unless api_user.logged_in?
+    Cellect::Client.connection.load_user(**cellect_params)
+  end
 
-  def build_resource_for_update(update_params)
+  def build_update_hash(update_params, id)
     if update_params.has_key? :tasks
       stripped_tasks, strings = extract_strings(update_params[:tasks])
       update_params[:tasks] = stripped_tasks
-      workflow.primary_content.update_attributes(strings: strings)
+      Workflow.find(id).primary_content.update_attributes(strings: strings)
     end
-    super(update_params)
+    super(update_params, id)
   end
 
   def build_resource_for_create(create_params)

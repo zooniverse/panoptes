@@ -9,7 +9,7 @@ require 'moped'
 mongo = Moped::Session.new ['127.0.0.1:27017']
 mongo.use 'ouroboros'
 
-zooniverse_user = User.find_by_login('the_zooniverse')
+zooniverse_user = User.find_by(login: 'the_zooniverse')
 unless zooniverse_user
   zooniverse_user = User.new({
     login: 'the_zooniverse',
@@ -17,7 +17,7 @@ unless zooniverse_user
     email: 'panoptes@zooniverse.org',
     password: 'asdf123456789'
   })
-  zooniverse_user.owner_name = OwnerName.new name: 'the_zooniverse', resource: zooniverse_user
+  zooniverse_user.build_identity_group
   zooniverse_user.save!
 end
 
@@ -43,8 +43,8 @@ unless project
   project = p
 end
 
-workflow = Workflow.find_by_name('galaxy_zoo_5') || Workflow.create({
-  name: 'galaxy_zoo_5',
+workflow = Workflow.find_by(display_name: 'galaxy_zoo_5') || Workflow.create({
+  display_name: 'galaxy_zoo_5',
   tasks: [],
   project_id: project.id,
   grouped: true
@@ -63,7 +63,7 @@ user_query.each do |user|
   index += 1
   puts "Migrating users: #{ index } / #{ total }" if index % 500 == 0
   
-  migrated_user = User.find_by_login user['name']
+  migrated_user = User.find_by(login: user['name'])
   unless migrated_user
     begin
       migrated_user = User.new({
@@ -72,7 +72,7 @@ user_query.each do |user|
         email: user['email'],
         password: 'asdf123456789'
       })
-      migrated_user.owner_name = OwnerName.new name: migrated_user.login, resource: migrated_user
+      migrated_user.build_identity_group
       
       migrated_user.save!
     rescue => e
@@ -96,11 +96,11 @@ mongo[:galaxy_zoo_groups].find.each do |group|
   index += 1
   puts "Migrating groups: #{ index } / #{ total }"
   
-  subject_set = SubjectSet.find_by_name group['name']
+  subject_set = SubjectSet.find_by(name: group['name'])
   
   unless subject_set
     subject_set = SubjectSet.create({
-      name: group['name'],
+      display_name: group['name'],
       project_id: project.id
     })
     workflow.subject_sets << subject_set
@@ -121,7 +121,7 @@ mongo[:galaxy_zoo_subjects].find.each do |subject|
   index += 1
   puts "Migrating subjects: #{ index } / #{ total }"
   
-  migrated_subject = Subject.find_by_zooniverse_id subject['zooniverse_id']
+  migrated_subject = Subject.find_by(zooniverse_id: subject['zooniverse_id'])
   
   unless migrated_subject
     migrated_subject = Subject.new

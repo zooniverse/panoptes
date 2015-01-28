@@ -7,8 +7,8 @@ shared_examples "is creatable" do
       post :create, create_params
     end
 
-    it "should return 201" do
-      expect(response.status).to eq(201)
+    it "should return created" do
+      expect(response).to have_http_status(:created)
     end
 
     it 'should create the new resource' do
@@ -38,8 +38,8 @@ shared_examples "is creatable" do
       post :create, create_params
     end
 
-    it "should return 401" do
-      expect(response.status).to eq(401)
+    it "should return unauthorized" do
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 end

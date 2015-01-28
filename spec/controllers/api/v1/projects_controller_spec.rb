@@ -78,7 +78,7 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "filter by owner" do
-          let(:index_options) { { owner: project_owner.owner_uniq_name } }
+          let(:index_options) { { owner: project_owner.identity_group.name } }
 
           it "should respond with 1 item" do
             expect(json_response[api_resource_name].length).to eq(1)
@@ -105,11 +105,13 @@ describe Api::V1::ProjectsController, type: :controller do
 
         describe "filter by display_name & owner" do
           let!(:filtered_project) do
-            projects.first.update_attribute(:owner_id, project_owner.id)
+            projects.first.owner = project_owner
+            projects.first.save!
             projects.first
           end
+
           let(:index_options) do
-            {owner: project_owner.owner_uniq_name,
+            {owner: project_owner.identity_group.name,
              display_name: filtered_project.display_name}
           end
 
@@ -221,7 +223,6 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "owner links" do
-
           it "should include the link" do
             expect(json_response['linked']['owners']).to_not be_nil
           end
@@ -253,6 +254,20 @@ describe Api::V1::ProjectsController, type: :controller do
 
       context "created with user as owner" do
         it_behaves_like "is creatable"
+
+        context "with invalid create params" do
+
+          #so it looks like adding the owner via owner= is autosaving the
+          # has_one :owner_control_list relation as well (since the owner relation is through this one).
+          # this is happening outside the in it's own transaction outside the create one.
+          # when building for create (maybe update if the links don't already exist)
+          # we should use the model.relation.build params method instead of the realtion= setter
+          it "should not orphan an ACL instance when the model is invalid" do
+            default_request scopes: scopes, user_id: authorized_user.id
+            create_params[:projects] = create_params[:projects].except(:primary_language)
+            expect{ post :create, create_params }.not_to change{ AccessControlList.count }
+          end
+        end
       end
 
       context "create with user_group as owner" do

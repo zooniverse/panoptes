@@ -22,7 +22,7 @@ class SubjectSelector
     raise workflow_id_error unless params.has_key?(:workflow_id)
     user_enqueued = UserSubjectQueue
       .find_by!(user: user.user, workflow_id: params[:workflow_id])
-    selected_subjects(user_enqueued.sample_subjects(10 || params[:limit]))
+    selected_subjects(user_enqueued.next_subjects(10 || params[:limit]))
   end
 
   def cellect_subjects

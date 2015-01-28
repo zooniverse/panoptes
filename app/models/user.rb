@@ -1,40 +1,37 @@
 class User < ActiveRecord::Base
-  extend ControlControl::Resource
-  include Nameable
   include Activatable
-  include RoleControl::Owner
-  include RoleControl::Enrolled
   include Linkable
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable, omniauth_providers: [:facebook, :gplus]
 
-  has_many :user_groups, through: :active_memberships
   has_many :classifications
   has_many :authorizations
-  has_many :user_collection_preferences
+  has_many :collection_preferences, class_name: "UserCollectionPreference"
   has_many :project_preferences, class_name: "UserProjectPreference"
+  has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
 
   has_many :memberships
   has_many :active_memberships, -> { active }, class_name: 'Membership'
+  has_one :identity_membership, -> { identity }, class_name: 'Membership'
+  
+  has_many :user_groups, through: :active_memberships
+  has_one :identity_group, through: :identity_membership, source: :user_group, class_name: "UserGroup"
 
-  owns :projects
-  owns :collections
-  owns :subjects
-  owns :oauth_applications, class_name: "Doorkeeper::Application"
-
-  enrolled_for :projects, through: :project_preferences
-  enrolled_for :collections, through: :user_collection_preferences
-  enrolled_for :user_groups, through: :active_memberships
+  has_many :project_roles, through: :identity_group
+  has_many :collection_roles, through: :identity_group
 
   validates :login, presence: true, uniqueness: true
-  validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated_user?
-  validates :admin, inclusion: { in: [ true, false ], message: "must be a boolean value" }
+  validates_length_of :password, within: 8..128, allow_blank: true,
+                      unless: :migrated_user?
 
-  can :show, proc { |requester| requester.user == self }
-  can :update, proc { |requester| requester.user == self }
-  can :destroy, proc { |requester| requester.user == self }
+  validates_with IdentityGroupNameValidator
+
+  delegate :projects, to: :identity_group
+  delegate :collections, to: :identity_group
+  delegate :subjects, to: :identity_group
+  delegate :owns?, to: :identity_group
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
@@ -44,6 +41,20 @@ class User < ActiveRecord::Base
 
   attr_accessor :migrated_user
 
+  def memberships_for(action, klass)
+    membership_roles = UserGroup.roles_allowed_to_access(action, klass)
+    active_memberships.where.overlap(roles: membership_roles)
+  end
+
+  def self.scope_for(action, user, opts={})
+    case action
+    when :show, :index
+      all
+    else
+      where(id: user.id)
+    end
+  end
+
   def self.from_omniauth(auth_hash)
     auth = Authorization.from_omniauth(auth_hash)
     auth.user ||= create do |u|
@@ -52,15 +63,24 @@ class User < ActiveRecord::Base
       name = auth_hash.info.name
       u.display_name = name
       u.login = StringConverter.downcase_and_replace_spaces(name)
-      u.owner_name = OwnerName.new(name: u.login, resource: u)
+      u.build_identity_group
       u.authorizations << auth
+    end
+  end
+
+  def self.reflect_on_association(association_name)
+    case association_name.to_sym
+    when :projects, :collections
+      UserGroup.reflect_on_association(association_name)
+    else
+      super
     end
   end
 
   def password_required?
     super && hash_func != 'sha1'
   end
-
+  
   def valid_password?(password)
     if hash_func == 'bcrypt'
       super(password)
@@ -91,6 +111,17 @@ class User < ActiveRecord::Base
     authorizations.blank?
   end
 
+  def build_identity_group
+    raise StandardError, "Identity Group Exists" if identity_group
+    build_identity_membership
+    name = StringConverter.downcase_and_replace_spaces(login)
+    self.identity_group = identity_membership.build_user_group(name: name)
+  end
+
+  def is_admin?
+    !!admin
+  end
+  
   protected
 
   def migrated_user?

@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe "api versioning with accept headers", type: :request do
+  before(:each) do
+    create_list(:user, 2)
+  end
+  
   describe "html format" do
     it "should raise a route not found error" do
       options = [ nil, { "HTTP_ACCEPT" => "text/html" } ]
@@ -13,8 +17,8 @@ describe "api versioning with accept headers", type: :request do
       get "/api/users", nil, { "HTTP_ACCEPT" => "application/json" }
     end
 
-    it "should response with 404 not found status" do
-      expect(response.status).to eq(404)
+    it "should respond with not found" do
+      expect(response).to have_http_status(:not_found)
     end
 
     it "should have the error in the body response" do
@@ -26,7 +30,7 @@ describe "api versioning with accept headers", type: :request do
   describe "JSON-API version 1 format" do
     it "allows access" do
       get "/api/users", nil, { "HTTP_ACCEPT" => "application/vnd.api+json; version=1" }
-      expect(response.status).to eq(200)
+      expect(response).to have_http_status(:ok)
     end
   end
 end

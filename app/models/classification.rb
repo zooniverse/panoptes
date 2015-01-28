@@ -1,7 +1,4 @@
 class Classification < ActiveRecord::Base
-  extend ControlControl::Resource
-  include RoleControl::Adminable
-
   belongs_to :set_member_subject, counter_cache: true
   belongs_to :project, counter_cache: true
   belongs_to :user, counter_cache: true
@@ -17,24 +14,30 @@ class Classification < ActiveRecord::Base
   validate :metadata, :required_metadata_present
   validate :validate_gold_standard
 
-  can :show, :in_show_scope?
-  can :update, :created_and_incomplete?
-  can :destroy, :created_and_incomplete?
+  scope :incomplete, -> { where(completed: false) }
+  scope :created_by, -> (user) { where(user: user) }
+  scope :complete, -> { where(completed: true) }
 
-  def self.visible_to(actor, as_admin: false)
-    ClassificationVisibilityQuery.new(actor, self).build(as_admin)
-  end
-
-  def self.can_create?(actor)
-    true
+  def self.scope_for(action, actor, opts={})
+    case action
+    when :show, :index
+      query = joins(:project).merge(Project.scope_for(:update, actor))
+        .union_all(joins(:user_group).merge(actor.user_groups))
+        .union_all(actor.classifications)
+      # Workaround Broken Bind Value Assignment in Subqueries in Rails 4.1
+      # This is fixed in Rails 4.2 when we're able to to migrate to that
+      # Unfortunately this isn't need in JRuby so I have to test for platform on this class
+      query.bind_values = [query.bind_values.first] unless RUBY_PLATFORM == 'java'
+      query
+    when :update, :destroy
+      incomplete.merge(created_by(actor.user))
+    else
+      none
+    end
   end
 
   def created_and_incomplete?(actor)
     creator?(actor) && incomplete?
-  end
-
-  def in_show_scope?(actor)
-    self.class.visible_to(actor).exists?(self)
   end
 
   def creator?(actor)

@@ -4,43 +4,62 @@ module RoleControl
 
     included do
       @roles_for = Hash.new
+
+      scope :public_scope, -> { where(private: false) }
+      scope :private_scope, -> { where(private: true) }
     end
 
     module ClassMethods
-      include ControlControl::Resource
-      include ControlControl::ActAs
+      def can_by_role(*actions,
+                      roles: [],
+                      public: false)
 
-      def can_by_role(action, act_as: nil, public: false, roles: nil)
-        if act_as
-          can_as action, &dispatch_can_as(action)
-          can_as "#{ action }_#{ act_as }", &role_test_proc(action)
-        else
-          can action, &role_test_proc(action)
+        actions.each do |action|
+          @roles_for[action] = [roles,
+                                public]
         end
-        
-        @roles_for[action] = RoleScope.new(roles, public, self)
       end
 
-      def can_create?(actor, *args)
-        !actor.blank?
+      def joins_for
+        { access_control_lists: { user_group: :memberships } }
       end
 
-      def scope_for(action, actor, target: nil, extra_tests: [])
-        @roles_for[action].build(actor, target, extra_tests)
+      def memberships_query(action, target)
+        target.memberships_for(action, self)
+      end
+
+      def private_query(query, action, target, roles)
+        query.merge(memberships_query(action, target))
+          .where.overlap(access_control_lists: { roles: roles })
+      end
+
+      def public_query(query, public)
+        if public
+          query.merge(private_scope).union_all(public_scope)
+        else
+          query
+        end
+      end
+
+      def scope_for(action, target, opts={})
+        roles, public = roles(action)
+
+        if target
+          query = private_query(joins(joins_for), action, target, roles)
+          #p public_query(query, public).bind_values
+          public_query(query, public)
+        elsif public_scope
+          send(public_scope)
+        else
+          none
+        end
+      end
+
+      def roles(action)
+        @roles_for[action]
       end
 
       protected
-
-      def dispatch_can_as(action)
-        proc do |enrolled, target|
-          begin
-            klass = target.is_a?(Class) ? target : target.class
-            send("can_#{ action }_#{ klass }_as?", enrolled)
-          rescue NoMethodError
-            false
-          end
-        end
-      end
 
       def role_test_proc(action)
         proc do |enrolled|

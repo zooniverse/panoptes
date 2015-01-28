@@ -409,7 +409,7 @@ A User may delete an incomplete classification.
 
 + Response 204
 
-## Classification Collection [/classifications{?page,per_page,sort,project_id,group_id,include}]
+## Classification Collection [/classifications{?page,per_page,sort,project_id,user_group_id,include,for}]
 A representation of all the Classifications in a collection
 
 All collections add a *meta* attribute hash containing
@@ -512,13 +512,24 @@ Only lists a classifications the active user has made,
 classifications from other members of a user_group, or projects the
 user has edit permissions for.
 
+Classifications have the special *for* parameter that indicates the
+scope of classifications you'd like to retrieve. Possible options are:
+
++ 'user' will fetch the current user's past classifications.
++ 'user_groups' will fetch classifications from groups a user is a member of
++ 'projects' will fetch classifications from projects a user has 'edit' permissions for
+
+Any of the for scopes may be further filtered using the *project_id*
+and *user_group_id* parameters. 
+
 + Parameters
     + page (optional, integer) ... index of the collection page, 1 is default
     + per_page (optional, integer) ... number of items on a page. 20 is default
     + sort (optional, string) ... fields to sort collection by. updated_at is default
     + project_id (optional, integer) ... only retrieve classifications for a specific project
-    + group_id (optional, integer) ... only retrieve classifications for a specific user group
+    + user_group_id (optional, integer) ... only retrieve classifications for a specific user group
     + include (optional, string) ... comma seperated list of linked resources to return with the collection
+    + for (optional, string) ... one of 'projects', 'user', 'user_groups', 'user' by default (see explanation above).
 
 + Request
 
@@ -614,12 +625,7 @@ the API.
                         "lens_type": "50mm"
                     },
                     "links": {
-                        "project": "1",
-                        "owner": {
-                            "id": "2",
-                            "href": "/users/2",
-                            "type": "users"
-                        }
+                        "project": "1"
                     }
                 }]
             }
@@ -637,9 +643,9 @@ the API.
     [Subject][]
 
 ### Edit a single Subject [PUT]
-Users are permitted to edit subjects they own or subjects
-belonging to projects a user has edit permissions for. A user may
-not change the project or owner of a subject.
+Users are permitted to edit subjects belonging to projects a user
+has edit permissions for. A user may not change the project of a
+subject.
 
 The *locations* array should have the mime-types of the subject's
 associated media. The response will contain signed s3 urls the client
@@ -876,12 +882,7 @@ Subjects are returned as an array under the _subject_ key.
                         "lens_type": "50mm"
                     },
                     "links": {
-                        "project": "1",
-                        "owner": {
-                            "id": "2",
-                            "href": "/users/2",
-                            "type": "users"
-                        }
+                        "project": "1"
                     }
                 },{
                     "id": "2",
@@ -895,12 +896,7 @@ Subjects are returned as an array under the _subject_ key.
                         "lens_type": "50mm"
                     },
                     "links": {
-                        "project": "1",
-                        "owner": {
-                            "id": "4",
-                            "href": "/groups/4",
-                            "type": "user_groups"
-                        }
+                        "project": "1"
                     }
                 }]
             }
@@ -933,15 +929,19 @@ classify, usually for expert classifiers.
     [Subject Collection][]
 
 ### Create a Subject [POST]
-A *locations* attributes and a project link are required.
+A *locations* attribute and a project link are required.
 
 The *locations* array should have the mime-types of the subject's
-associated media. The response will contain signed s3 urls the client
-may make a PUT request containing the media to. The signed urls will
-be valid for 20 minutes.
+associated media. If a particular piece of media has multiple
+representations (such as video encoded as WebM and MPEG-4) it's
+mimetypes should be a subarray within the *locations* array, eg, for
+subject whose media include an image and a video its *locations* array
+would look like `"locations":["image/png", ["video/webm", "video/mp4"]]`.
 
-The *metadata* attribute and a link to an owner besides
-the active user are optional.
+The response will contain signed s3 urls the client may make a PUT
+request containing the media to. The signed urls will be valid for 20 minutes.
+
+The *metadata* attribute is optional.
 
 + Request
 
@@ -955,17 +955,17 @@ the active user are optional.
             {
                 "subjects": {
                     "locations": [
-                        "image/png"
+                        "image/png",
+                        [
+                            "video/webm",
+                            "video/mp4"
+                        ]
                     ],
                     "metadata": {
                         "lens_type": "50mm"
                     },
                     "links": {
-                        "project": "1",
-                        "owner": {
-                            "id": "4",
-                            "type": "user_groups"
-                        }
+                        "project": "1"
                     }
                 }
             }

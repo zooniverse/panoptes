@@ -11,6 +11,8 @@ shared_examples "it has a subjects association" do
 
     it "should return the linked subjects" do
       relation_instance.subjects << subject
+      relation_instance.save!
+      relation_instance.reload
       expect(relation_instance.subjects).to eq([subject])
     end
   end

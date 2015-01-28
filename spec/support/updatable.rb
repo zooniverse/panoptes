@@ -18,7 +18,7 @@ shared_examples "is updatable" do
     end
 
     it 'should return 200' do
-      expect(response.status).to eq(200)
+      expect(response).to have_http_status(:ok)
     end
 
     it_behaves_like 'an api response'
@@ -37,8 +37,8 @@ shared_examples "is updatable" do
       put :update, params
     end
 
-    it 'should return 403' do
-      expect(response.status).to eq(403)
+    it 'should return not found' do
+      expect(response).to have_http_status(:not_found)
     end
 
     it 'should not have modified the resource' do
