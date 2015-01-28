@@ -15,4 +15,5 @@ production:
 :queues:
   - high
   - medium
+  - default
   - low
