@@ -14,7 +14,6 @@ module KafkaEvent
     end
 
     def publish_to_kafka(topic, key, *ids)
-      #where(id: ids).explain
       find(ids).map do |model|
         @serializers[key].serialize(model)
       end.each do |result|

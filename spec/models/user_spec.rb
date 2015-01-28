@@ -144,6 +144,11 @@ describe User, :type => :model do
       it 'should have a group with the same name as the user login' do
         expect(user.identity_group.name).to eq(user.login)
       end
+
+      it 'should raise error if a user has an identity group' do
+        user = create(:user)
+        expect{ user.build_identity_group }.to raise_error(StandardError, "Identity Group Exists")
+      end
     end
     
     context "when a user_group with the same name in different case exists" do
