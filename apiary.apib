@@ -289,7 +289,7 @@ A classifications has the following attributes:
 - id
 - created_at
 - updated_at
-- complete
+- completed
 - metadata
 - gold_standard
 - annotations
@@ -331,7 +331,7 @@ classification including:
                     "id": 1001,
                     "created_at": "2014-08-24T22:24:32Z",
                     "updated_at": "2014-08-24T22:24:32Z",
-                    "complete": false,
+                    "completed": false,
                     "metadata": {
                         "started_at": "2014-08-24T22:20:21Z",
                         "finished_at": "2014-08-24T22:24:31Z",
@@ -389,7 +389,7 @@ of the annotations array.
                         {"key": "workflow-1", "value": [10.4, 12.4, 13.2]},
                         {"key": "workflow-2", "value": "fishy"},
                     ],
-                    "complete": true
+                    "completed": true
                 }
             }
 
@@ -463,7 +463,7 @@ key.
                     "id": 1001,
                     "created_at": "2014-08-24T22:24:32Z",
                     "updated_at": "2014-08-24T22:24:32Z",
-                    "complete": false,
+                    "completed": false,
                     "metadata": {
                         "started_at": "2014-08-24T22:20:21Z",
                         "finished_at": "2014-08-24T22:24:31Z",
@@ -485,7 +485,7 @@ key.
                    "id": 1002,
                     "created_at": "2014-08-24T22:25:32Z",
                     "updated_at": "2014-08-24T22:28:32Z",
-                    "complete": true,
+                    "completed": true,
                     "metadata": {
                         "started_at": "2014-08-24T22:24:21Z",
                         "finished_at": "2014-08-24T22:28:31Z",
@@ -559,7 +559,7 @@ which will be set to true by default.
 
             {
                 "classifications": {
-                    "complete": false,
+                    "completed": false,
                     "metadata": {
                         "started_at": "2014-08-24T22:20:21Z",
                         "finished_at": "2014-08-24T22:24:31Z",
@@ -571,7 +571,7 @@ which will be set to true by default.
                         {"workflow-1": [10.4, 12.4, 13.2]},
                     ],
                     "links": {
-                        "subject": "11",
+                        "subjects": ["11"],
                         "workflow": "81",
                         "project": "2"
                     }
