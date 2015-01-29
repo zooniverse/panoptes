@@ -33,7 +33,7 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
   describe "4xx erro requests" do
     context "401 request" do
       before(:each) do
-        get "/api/users/#{user.id}", nil, { "HTTP_ACCEPT" => "application/vnd.api+json; version=1", "HTTP_ORIGIN" => "example.com" }
+        delete "/api/users/#{user.id}", nil, { "HTTP_ACCEPT" => "application/vnd.api+json; version=1", "HTTP_ORIGIN" => "example.com" }
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
