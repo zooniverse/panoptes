@@ -25,6 +25,7 @@ module Api
                 SubjectSelector::MissingParameter,
                 Api::RolesExist,
                 JsonSchema::ValidationError,
+                JsonApiController::NotLinkable,
                 RestPack::Serializer::InvalidInclude,    with: :unprocessable_entity
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]

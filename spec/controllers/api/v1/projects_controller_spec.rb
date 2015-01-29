@@ -193,12 +193,22 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:test_attr) { :display_name }
       let(:test_attr_value) { "New Zoo" }
       let(:display_name) { test_attr_value }
+      let(:owner_params) { nil }
 
-      let(:create_params) do
+      let(:default_create_params) do
         { projects: { display_name: display_name,
                       name: "new_zoo",
                       description: "A new Zoo for you!",
                       primary_language: 'en' } }
+      end
+
+      let (:create_params) do
+        ps = default_create_params
+        if owner_params
+          ps[:projects][:links] ||= Hash.new
+          ps[:projects][:links][:owner] = owner_params
+        end
+        ps
       end
 
       describe "correct serializer configuration" do
@@ -270,6 +280,44 @@ describe Api::V1::ProjectsController, type: :controller do
         end
       end
 
+      context "created with specified user as owner" do
+        context "user is the current user" do
+          let(:owner_params) do
+            {
+              id: authorized_user.id.to_s,
+              type: "users"
+            }
+          end
+          
+          it_behaves_like "is creatable"
+        end
+
+        context "user is not the current user" do
+          let(:req) do
+            default_request scopes: scopes, user_id: authorized_user.id
+            post :create, create_params
+          end
+
+
+          let(:owner_params) do
+            user = create(:user)
+            {
+              id: user.id.to_s,
+              type: "users"
+            }
+          end
+          
+          it "should not create a new project" do
+            expect{ req }.to_not change{Project.count}
+          end
+
+          it "should return 422" do
+            req
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+        end
+      end
+
       context "create with user_group as owner" do
         let(:owner) { create(:user_group) }
         let!(:membership) { create(:membership,
@@ -278,19 +326,10 @@ describe Api::V1::ProjectsController, type: :controller do
                                    user_group: owner,
                                    roles: ["group_admin"]) }
 
-        let(:create_params) do
+        let(:owner_params) do
           {
-            projects: {
-              display_name: "New Zoo",
-              primary_language: "en-us",
-              description: "stuff to do",
-              links: {
-                owner: {
-                  id: owner.id.to_s,
-                  type: "user_groups"
-                }
-              }
-            }
+            id: owner.id.to_s,
+            type: "user_groups"
           }
         end
 

@@ -37,6 +37,17 @@ describe JsonApiController::RelationManager do
                                                 subjects.map(&:id).map(&:to_s))
         expect(updated).to match_array(subjects)
       end
+      
+      context "not found" do
+        it 'should raise an error' do
+          expect do
+            test_instance.update_relation(resource,
+                                          :subjects,
+                                          [-10, -2])
+          end.to raise_error(JsonApiController::NotLinkable, /subjects\s/)
+        end
+      end
+
     end
 
     context "one-to-many" do
@@ -44,6 +55,16 @@ describe JsonApiController::RelationManager do
         updated = test_instance.update_relation(resource,
                                                 :project, project.id)
         expect(updated).to eq(project)
+      end
+      
+      context "not found" do
+        it 'should raise an error' do
+          expect do
+            test_instance.update_relation(resource,
+                                          :project,
+                                          -10)
+          end.to raise_error(JsonApiController::NotLinkable, /project\s/)
+        end
       end
     end
 

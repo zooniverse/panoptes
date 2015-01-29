@@ -273,12 +273,12 @@ describe Api::V1::SubjectsController, type: :controller do
         post :create, create_params
       end
 
-      it 'should return a 404' do
-        expect(response.status).to eq(404)
+      it 'should return unprocessable entity' do
+        expect(response).to have_http_status(:unprocessable_entity)
       end
 
       it 'should scrub any schema sql from the error message' do
-        expect(response.body).to eq(json_error_message("Couldn't find resource"))
+        expect(response.body).to eq(json_error_message("Couldn't find linked project for current user"))
       end
     end
 
