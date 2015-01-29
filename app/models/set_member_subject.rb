@@ -4,7 +4,6 @@ class SetMemberSubject < ActiveRecord::Base
   
   belongs_to :subject_set, counter_cache: true, touch: true
   belongs_to :subject
-  has_many :classifications
 
   enum state: [:active, :inactive, :retired]
 

@@ -1,5 +1,4 @@
 class Classification < ActiveRecord::Base
-  belongs_to :set_member_subject, counter_cache: true
   belongs_to :project, counter_cache: true
   belongs_to :user, counter_cache: true
   belongs_to :workflow, counter_cache: true
@@ -7,8 +6,8 @@ class Classification < ActiveRecord::Base
 
   enum expert_classifier: [:expert, :owner]
 
-  validates_presence_of :set_member_subject, :project, :workflow,
-                        :annotations, :user_ip
+  validates_presence_of :set_member_subject_ids, :project,
+                        :workflow, :annotations, :user_ip
 
   validates :user, presence: true, if: :incomplete?
   validate :metadata, :required_metadata_present
@@ -26,7 +25,7 @@ class Classification < ActiveRecord::Base
         .union_all(actor.classifications)
       # Workaround Broken Bind Value Assignment in Subqueries in Rails 4.1
       # This is fixed in Rails 4.2 when we're able to to migrate to that
-      # Unfortunately this isn't need in JRuby so I have to test for platform on this class
+      # Unfortunately this isn't needed in JRuby so I have to test for platform on this class
       query.bind_values = [query.bind_values.first] unless RUBY_PLATFORM == 'java'
       query
     when :update, :destroy

@@ -13,7 +13,6 @@ describe SetMemberSubject, :type => :model do
   end
 
   describe "#subject_set" do
-
     it "must have a subject set" do
       set_member_subject.subject_set = nil
       expect(set_member_subject).to_not be_valid
@@ -25,7 +24,6 @@ describe SetMemberSubject, :type => :model do
   end
 
   describe "#subject" do
-
     it "must have a subject" do
       set_member_subject.subject = nil
       expect(set_member_subject).to_not be_valid
@@ -34,17 +32,5 @@ describe SetMemberSubject, :type => :model do
     it "should belong to a subject" do
       expect(set_member_subject.subject).to be_a(Subject)
     end
-  end
-
-  describe "#classifications" do
-    let(:relation_instance) { set_member_subject }
-
-    it_behaves_like "it has a classifications assocation"
-  end
-
-  describe "#classifcations_count" do
-    let(:relation_instance) { set_member_subject }
-
-    it_behaves_like "it has a cached counter for classifications"
   end
 end

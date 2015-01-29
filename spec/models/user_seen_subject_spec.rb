@@ -11,9 +11,9 @@ RSpec.describe UserSeenSubject, :type => :model do
     expect(user_seen_subject).to be_valid
   end
 
-  describe "::add_seen_subject_for_user" do
+  describe "::add_seen_subjects_for_user" do
     let(:subject) { create(:subject) }
-    let(:params) { { user: user, workflow: workflow, set_member_subject: subject } }
+    let(:params) { { user: user, workflow: workflow, set_member_subject_ids: [subject.id] } }
 
     context "when no user or workflow exists" do
       let(:workflow) { nil }
@@ -21,7 +21,7 @@ RSpec.describe UserSeenSubject, :type => :model do
 
       it "should fail" do
         expect do
-          UserSeenSubject.add_seen_subject_for_user(params)
+          UserSeenSubject.add_seen_subjects_for_user(params)
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
@@ -34,12 +34,12 @@ RSpec.describe UserSeenSubject, :type => :model do
 
         it "should create a new user_seen_subject" do
           expect do
-            UserSeenSubject.add_seen_subject_for_user(params)
+            UserSeenSubject.add_seen_subjects_for_user(params)
           end.to change{ UserSeenSubject.count }.by(1)
         end
 
         it "should add the subject id to the set_member_subject_ids array" do
-          UserSeenSubject.add_seen_subject_for_user(params)
+          UserSeenSubject.add_seen_subjects_for_user(params)
           expect(created_uss.set_member_subject_ids).to eq([ subject.id ])
         end
       end
@@ -49,12 +49,12 @@ RSpec.describe UserSeenSubject, :type => :model do
 
         it "should not create a new user_seen_subejct" do
           expect do
-            UserSeenSubject.add_seen_subject_for_user(params)
+            UserSeenSubject.add_seen_subjects_for_user(params)
           end.not_to change{ UserSeenSubject.count }
         end
 
         it "should add the subject id to the set_member_subject_ids array" do
-          UserSeenSubject.add_seen_subject_for_user(params)
+          UserSeenSubject.add_seen_subjects_for_user(params)
           user_seen_subject.reload
           expect(user_seen_subject.set_member_subject_ids).to include(subject.id)
         end
@@ -82,12 +82,12 @@ RSpec.describe UserSeenSubject, :type => :model do
     end
   end
 
-  describe "#add_set_member_subject" do
+  describe "#add_set_member_subjects" do
     let(:uss) { user_seen_subject }
     
     it "should add a subject's id to the set_member_subject_ids array" do
       s = create(:subject)
-      uss.add_set_member_subject(s)
+      uss.add_set_member_subjects([s])
       uss.reload
       expect(uss.set_member_subject_ids).to include(s.id)
     end

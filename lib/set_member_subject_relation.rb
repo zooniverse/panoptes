@@ -22,23 +22,25 @@ class SetMemberSubjectRelation
   def concat(*models)
     models = models.flatten
     owner.set_member_subject_ids_will_change!
-    owner.set_member_subject_ids.concat(models.map(&:id))
+    ids = models.map { |m| m.try(:id) || m }
+    owner.set_member_subject_ids.concat(ids)
     owner.save!
   end
 
   def destroy(*models)
     models = models.flatten
     owner.set_member_subject_ids_will_change!
-    owner.set_member_subject_ids.delete(*models.map(&:id))
+    ids = models.map { |m| m.try(:id) || m }
+    owner.set_member_subject_ids.delete(*ids)
     owner.save!
   end
   
-  def add_subject(model)
-    concat([model])
+  def add_subjects(models)
+    concat([models])
   end
 
-  def remove_subject(model)
-    destroy(model)
+  def remove_subjects(models)
+    destroy(models)
   end
 end
 

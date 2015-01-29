@@ -36,10 +36,23 @@ class Api::V1::ClassificationsController < Api::ApiController
     classification
   end
 
+  def sms_ids_from_links(link_params)
+    sms = if ids = link_params.delete(:set_member_subjects)
+      SetMemberSubject.select(:id).find(ids)
+    elsif ids = link_params.delete(:subjects)
+      SetMemberSubject.joins(:subject_set)
+        .where(subject_sets: {workflow_id: link_params[:workflow]})
+        .select(:id)
+        .find_by(subject_id: ids)
+    end
+    sms.try(:map, &:id) || [sms.id]
+  end
+
   def build_resource_for_create(create_params)
     classification = super(create_params) do |create_params, link_params|
       link_params[:user] = api_user.user
       create_params[:user_ip] = request_ip
+      create_params[:set_member_subject_ids] = sms_ids_from_links(link_params)
     end
     lifecycle(:create, classification)
     classification
@@ -69,7 +82,8 @@ class Api::V1::ClassificationsController < Api::ApiController
   def create_params
     param_set = create_update_params | [ links: [:project,
                                                  :workflow,
-                                                 :set_member_subject] ]
+                                                 set_member_subjects: [],
+                                                 subjects: []] ]
     params.require(:classifications).permit(param_set)
   end
 

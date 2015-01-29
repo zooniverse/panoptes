@@ -1,19 +1,19 @@
 shared_context "a classification create" do
   it "should return 201" do
-    create_classification
+    create_action
     expect(response).to have_http_status(:created)
   end
 
 
   it "should set the Location header as per JSON-API specs" do
-    create_classification
+    create_action
     id = created_classification_id
     expect(response.headers["Location"]).to eq("http://test.host/api/classifications/#{id}")
   end
 
   it "should create the classification" do
     expect do
-      create_classification
+      create_action
     end.to change{Classification.count}.from(0).to(1)
   end
 end
@@ -31,16 +31,16 @@ shared_context "a classification lifecycle event" do
 
   it "should call the classification lifecycle update_cellect method" do
     expect(lifecycle).to receive(:update_cellect)
-    create_classification
+    create_action
   end
 
   it "should call the classification lifecycle queue method" do
     expect(lifecycle).to receive(:queue).with(:create)
-    create_classification
+    create_action
   end
 
   it "should set the user" do
-    create_classification
+    create_action
     id = created_instance_id("classifications")
     expect(Classification.find(created_classification_id)
             .user.id).to eq(user.id)
@@ -53,7 +53,7 @@ shared_context "a gold standard classfication" do
     let!(:gold_standard) { false }
 
     before(:each) do
-      create_classification
+      create_action
     end
 
     it "should respond with bad request" do
@@ -70,7 +70,7 @@ shared_context "a gold standard classfication" do
     let!(:gold_standard) { true }
 
     before(:each) do
-      create_classification
+      create_action
     end
 
     context "when the classifier is not an expert on the project" do

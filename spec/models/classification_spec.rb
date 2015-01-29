@@ -9,8 +9,8 @@ describe Classification, :type => :model do
     expect(build(:classification, project: nil)).to_not be_valid
   end
 
-  it "must have a set_member_subject" do
-    expect(build(:classification, set_member_subject: nil)).to_not be_valid
+  it "must have an array of set_member_subjects" do
+    expect(build(:classification, set_member_subject_ids: nil)).to_not be_valid
   end
 
   it "must have a workflow" do

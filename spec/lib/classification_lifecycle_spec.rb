@@ -108,14 +108,14 @@ describe ClassificationLifecycle do
           create(:user_subject_queue,
                  user: classification.user,
                  workflow: classification.workflow,
-                 set_member_subject_ids: [classification.set_member_subject_id])
+                 set_member_subject_ids: classification.set_member_subject_ids)
         end
 
         it 'should call dequeue_subject_for_user' do
-          expect(UserSubjectQueue).to receive(:dequeue_subject_for_user)
+          expect(UserSubjectQueue).to receive(:dequeue_subjects_for_user)
                                        .with(user: classification.user,
                                              workflow: classification.workflow,
-                                             set_member_subject: classification.set_member_subject)
+                                             set_member_subject_ids: classification.set_member_subject_ids)
         end
       end
 
@@ -190,10 +190,10 @@ describe ClassificationLifecycle do
     context "with a user" do
       let(:classification) { build(:classification) }
       it 'should add the set_member_subject_id to the seen subjects' do
-        expect(UserSeenSubject).to receive(:add_seen_subject_for_user)
+        expect(UserSeenSubject).to receive(:add_seen_subjects_for_user)
                                     .with(user: classification.user,
                                           workflow: classification.workflow,
-                                          set_member_subject: classification.set_member_subject)
+                                          set_member_subject_ids: classification.set_member_subject_ids)
       end
     end
 
@@ -211,7 +211,7 @@ describe ClassificationLifecycle do
     it "should setup the add seen command to cellect" do
       expect(stubbed_cellect_connection).to receive(:add_seen)
                                              .with(
-                                               subject_id: classification.set_member_subject.id,
+                                               subject_id: classification.set_member_subject_ids.first,
                                                workflow_id: classification.workflow.id,
                                                user_id: classification.user.id,
                                                host: 'http://test.host/'

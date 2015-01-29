@@ -15,7 +15,7 @@ def annotation_values
     { "age" => "adult"} ]
 end
 
-def setup_create_request(project_id, workflow_id, set_member_subject)
+def setup_create_request(project_id, workflow_id, sms: nil, subject: nil)
   request.session = { cellect_hosts: { workflow_id.to_s => "example.com" } }
   params =
     {
@@ -25,8 +25,7 @@ def setup_create_request(project_id, workflow_id, set_member_subject)
         annotations: annotation_values,
         links: {
           project: project_id,
-          workflow: workflow_id,
-          set_member_subject: set_member_subject.id,
+          workflow: workflow_id
         }
       }
     }
@@ -34,11 +33,21 @@ def setup_create_request(project_id, workflow_id, set_member_subject)
     params[:classifications].merge!(gold_standard: gold_standard)
   end
   
+  if sms
+   params[:classifications][:links][:set_member_subjects] = [sms.id]
+  elsif subject
+   params[:classifications][:links][:subjects] = [subject.id]
+  end
+
   post :create, params
 end
 
-def create_classification
-  setup_create_request(project.id, workflow.id, set_member_subject)
+def create_classification_with_sms
+  setup_create_request(project.id, workflow.id, sms: set_member_subject)
+end
+
+def create_classification_with_subject
+  setup_create_request(project.id, workflow.id, subject: subject)
 end
 
 describe Api::V1::ClassificationsController, type: :controller do
@@ -48,6 +57,7 @@ describe Api::V1::ClassificationsController, type: :controller do
   let(:project) { create(:full_project) }
   let!(:workflow) { project.workflows.first }
   let!(:set_member_subject) { workflow.subject_sets.first.set_member_subjects.first }
+  let!(:subject) { set_member_subject.subject }
   let(:created_classification_id) { created_instance_id("classifications") }
 
   let(:api_resource_name) { "classifications" }
@@ -56,7 +66,7 @@ describe Api::V1::ClassificationsController, type: :controller do
   end
   let(:api_resource_links) do
     [ "classifications.project",
-      "classifications.set_member_subject",
+      "classifications.set_member_subjects",
       "classifications.user",
       "classifications.user_group" ]
   end
@@ -84,10 +94,21 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
 
     describe "#create" do
-
-      it_behaves_like "a classification create"
-      it_behaves_like "a classification lifecycle event"
-      it_behaves_like "a gold standard classfication"
+      context "with set_member_subject_ids" do
+        let(:create_action) { create_classification_with_sms }
+        
+        it_behaves_like "a classification create"
+        it_behaves_like "a classification lifecycle event"
+        it_behaves_like "a gold standard classfication"
+      end
+      
+      context "with subject_ids" do
+        let(:create_action) { create_classification_with_subject }
+        
+        it_behaves_like "a classification create"
+        it_behaves_like "a classification lifecycle event"
+        it_behaves_like "a gold standard classfication"
+      end
     end
   end
 
@@ -147,12 +168,22 @@ describe Api::V1::ClassificationsController, type: :controller do
     describe "#create" do
 
       it "should not set the user" do
-        create_classification
+        create_classification_with_sms
         user = Classification.find(created_classification_id).user
         expect(user).to be_blank
       end
 
-      it_behaves_like "a classification create"
+      context "with set_member_subject_ids" do
+        let(:create_action) { create_classification_with_sms }
+        
+        it_behaves_like "a classification create"
+      end
+      
+      context "with subject_ids" do
+        let(:create_action) { create_classification_with_subject }
+        
+        it_behaves_like "a classification create"
+      end
     end
   end
 end
