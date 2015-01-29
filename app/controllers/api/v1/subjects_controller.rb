@@ -5,7 +5,7 @@ class Api::V1::SubjectsController < Api::ApiController
                  scopes: [:subject]
   resource_actions :show, :create, :update, :destroy
   schema_type :json_schema
-  
+
   alias_method :subject, :controlled_resource
 
   def index
@@ -29,6 +29,7 @@ class Api::V1::SubjectsController < Api::ApiController
   def build_resource_for_create(create_params)
     create_params[:locations] = add_subject_path(create_params[:locations],
                                                  create_params[:links][:project])
+    create_params[:upload_user_id] = api_user.id
     subject = super(create_params)
     subject
   end
@@ -47,7 +48,7 @@ class Api::V1::SubjectsController < Api::ApiController
                                       controlled_resources,
                                       cellect_host(params[:workflow_id]))
   end
-  
+
   def add_subject_path(locations, project_id)
     locations.map.with_index do |mime, idx|
       mime.split(',').reduce({}) do |location, mime|

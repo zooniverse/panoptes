@@ -1,6 +1,8 @@
 FactoryGirl.define do
   factory :subject do
     project
+    upload_user_id "1"
+
     sequence(:zooniverse_id) { |n| "TES#{n.to_s(26).rjust(8, '0')}" }
     metadata({distance_from_earth: "42 light years",
               brightness: -20,

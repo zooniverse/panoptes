@@ -5,7 +5,7 @@ describe Subject, :type => :model do
   let(:subject) { build(:subject) }
   let(:locked_factory) { :subject }
   let(:locked_update) { {metadata: { "Test" => "data" } } }
-  
+
   it_behaves_like "optimistically locked"
 
   it "should have a valid factory" do
@@ -45,6 +45,11 @@ describe Subject, :type => :model do
 
   it "should be invalid without a project_id" do
     subject.project = nil
+    expect(subject).to_not be_valid
+  end
+
+  it "should be invalid without an upload_user_id" do
+    subject.upload_user_id = nil
     expect(subject).to_not be_valid
   end
 
