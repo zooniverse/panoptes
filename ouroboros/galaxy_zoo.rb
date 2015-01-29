@@ -130,7 +130,6 @@ mongo[:galaxy_zoo_subjects].find.each do |subject|
     migrated_subject.locations = subject['location']
     migrated_subject.created_at = subject['created_at']
     migrated_subject.updated_at = subject['updated_at']
-    migrated_subject.owner = zooniverse_user
     migrated_subject.project = project
     migrated_subject.save!
     
