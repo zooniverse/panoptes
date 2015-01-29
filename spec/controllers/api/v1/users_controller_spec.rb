@@ -9,7 +9,7 @@ describe Api::V1::UsersController, type: :controller do
 
   let(:api_resource_name) { "users" }
   let(:api_resource_attributes) do
-    [ "id", "login", "display_name", "credited_name", "email", "created_at", "updated_at" ]
+    [ "id", "login", "display_name", "credited_name", "email", "created_at", "updated_at", "type" ]
   end
   let(:api_resource_links) do
     [ "users.projects",
