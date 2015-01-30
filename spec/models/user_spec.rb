@@ -338,4 +338,32 @@ describe User, :type => :model do
       end
     end
   end
+
+  describe "::scope_for" do
+    let(:users) do
+      [ create(:user, activated_state: 0),
+        create(:user, activated_state: 0),
+        create(:user, activated_state: 1) ]
+    end
+
+    let(:actor) { ApiUser.new(users.first) } 
+                    
+    context "action is show" do
+      it 'should return the active users' do
+        expect(User.scope_for(:show, actor)).to match_array(users.values_at(0,1))
+      end
+    end
+
+    context "action is index" do
+      it 'should return the active users' do
+        expect(User.scope_for(:show, actor)).to match_array(users.values_at(0,1))
+      end
+    end
+
+    context "action is destroy or update" do
+      it 'should only return the acting user' do
+        expect(User.scope_for(:destroy, actor)).to match_array(users.first)
+      end
+    end
+  end
 end

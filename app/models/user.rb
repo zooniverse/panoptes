@@ -51,7 +51,7 @@ class User < ActiveRecord::Base
   def self.scope_for(action, user, opts={})
     case action
     when :show, :index
-      all
+      active
     else
       where(id: user.id)
     end

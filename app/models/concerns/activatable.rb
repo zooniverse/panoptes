@@ -3,8 +3,7 @@ module Activatable
 
   included do
     enum activated_state: [:active, :inactive]
-    scope :active, -> { where(actived_state: :active) }
-    scope :disabled, -> { where(actived_state: :inactive) }
+    self.singleton_class.send(:alias_method, :disabled, :inactive)
   end
 
   def disabled?
