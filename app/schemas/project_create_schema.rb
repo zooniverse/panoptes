@@ -2,6 +2,7 @@ class ProjectCreateSchema < JsonSchema
   schema do
     type "object"
     description "A Project"
+    required "name", "description", "primary_language", "private"
     additional_properties false
 
     property "display_name" do
