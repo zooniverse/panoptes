@@ -17,6 +17,8 @@ class Project < ActiveRecord::Base
 
   accepts_nested_attributes_for :project_contents
 
+  validates_inclusion_of :private, in: [true, false]
+
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
@@ -29,7 +31,7 @@ class Project < ActiveRecord::Base
                                               :translator,
                                               :scientist,
                                               :moderator ]
-  
+
   can_by_role :translate, roles: [ :owner, :translator ]
 
   can_be_linked :subject_set, :scope_for, :update, :user
@@ -39,7 +41,7 @@ class Project < ActiveRecord::Base
   can_be_linked :user_group, :scope_for, :edit_project, :user
 
   preferences_model :user_project_preference
-  
+
   def expert_classifier_level(classifier)
     expert_role = project_roles.where(user_group: classifier.identity_group)
                   .where.overlap(roles: EXPERT_ROLES)
