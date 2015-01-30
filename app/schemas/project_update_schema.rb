@@ -19,6 +19,10 @@ class ProjectUpdateSchema < JsonSchema
       description "Two character ISO 638 language code, optionally include two character ISO 3166-1 alpha-2 country code seperated by a hyphen for specific locale. ie 'en', 'zh-tw', 'es_MX'"
     end
 
+    property "private" do
+      type "boolean"
+    end
+
     property "title" do
       type "string"
       description "Translatable name for the project"
@@ -53,15 +57,15 @@ class ProjectUpdateSchema < JsonSchema
         property "name" do
           type "string"
         end
-        
+
         property "bio" do
           type "string"
         end
-        
+
         property "twitter" do
           type "string"
         end
-        
+
         property "institution" do
           type "string"
         end
@@ -78,7 +82,7 @@ class ProjectUpdateSchema < JsonSchema
 
     property "links" do
       type "object"
-      
+
       property "workflows" do
         type "array"
         items do
