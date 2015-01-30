@@ -26,29 +26,29 @@ describe RoleControl::Controlled do
     end
 
     it 'should return an active record relation' do
-      expect(subject.scope_for(:read, enrolled_actor)).to be_an(ActiveRecord::Relation)
+      expect(subject.scope_for(:read, ApiUser.new(enrolled_actor))).to be_an(ActiveRecord::Relation)
     end
 
     it 'should fetch all records that are visible to an actor' do
-      visible_records = subject.scope_for(:read, enrolled_actor)
+      visible_records = subject.scope_for(:read, ApiUser.new(enrolled_actor))
       expected_records = group_tables.values_at(0,1)
       expect(visible_records).to match_array(expected_records)
     end
 
     it 'should not fetch records that the unenrolled actor has no roles on' do
-      visible_records = subject.scope_for(:read, unenrolled_actor)
+      visible_records = subject.scope_for(:read, ApiUser.new(unenrolled_actor))
       no_roles_instance = group_tables.values_at(2)
       expect(visible_records).not_to include(no_roles_instance)
     end
 
     it 'should fetch all publicly visible records for unenrolled actor' do
-      visible_records = subject.scope_for(:read, unenrolled_actor)
+      visible_records = subject.scope_for(:read, ApiUser.new(unenrolled_actor))
       expected_records = group_tables.values_at(0)
       expect(visible_records).to match_array(expected_records)
     end
 
     it 'should not include public records when the class does not allow public scopes' do
-      visible_records = subject.scope_for(:update, enrolled_actor)
+      visible_records = subject.scope_for(:update, ApiUser.new(enrolled_actor))
       expect(visible_records).to_not include(group_tables[2])
     end
   end
