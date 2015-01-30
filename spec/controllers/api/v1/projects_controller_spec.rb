@@ -3,6 +3,7 @@ require 'spec_helper'
 describe Api::V1::ProjectsController, type: :controller do
   let!(:user) { create(:user) }
   let!(:projects) {create_list(:project_with_contents, 2, owner: user) }
+  let(:authorized_user) { user }
 
   let(:api_resource_name) { "projects" }
   let(:api_resource_attributes) do
@@ -21,24 +22,13 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:scopes) { %w(public project) }
   let(:authorized_user) { user }
   let(:resource_class) { Project }
+  let!(:private_resource) { create(:project, private: true) }
 
   describe "when not logged in" do
-
     describe "#index" do
-
-      before(:each) do
-        get :index
-      end
-
-      it "should return 200" do
-        expect(response.status).to eq(200)
-      end
-
-      it "should have 2 items by default" do
-        expect(json_response[api_resource_name].length).to eq(2)
-      end
-
-      it_behaves_like "an api response"
+      let(:authorized_user) { nil }
+      let(:n_visible) { 2 }
+      it_behaves_like "is indexable"
     end
   end
 
@@ -49,22 +39,9 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe "#index" do
-
       describe "with no filtering" do
-
-        before(:each) do
-          get :index
-        end
-
-        it "should return 200" do
-          expect(response.status).to eq(200)
-        end
-
-        it "should have 2 items by default" do
-          expect(json_response[api_resource_name].length).to eq(2)
-        end
-
-        it_behaves_like "an api response"
+        let(:n_visible) { 2 }
+        it_behaves_like "is indexable"
       end
 
       describe "filter params" do

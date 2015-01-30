@@ -1,6 +1,6 @@
 shared_examples "is indexable" do
   before(:each) do
-    default_request scopes: scopes, user_id: authorized_user.id
+    default_request scopes: scopes, user_id: authorized_user.id if authorized_user
     get :index
   end
 

@@ -37,15 +37,15 @@ describe UserGroup, :type => :model do
       end
       
       it "should return groups the user is an active member of" do
-        expect(UserGroup.scope_for(:show, member)).to include(user_group)
+        expect(UserGroup.scope_for(:show, ApiUser.new(member))).to include(user_group)
       end
 
       it "should return groups that are public" do
-        expect(UserGroup.scope_for(:show, member)).to include(public_group)
+        expect(UserGroup.scope_for(:show, ApiUser.new(member))).to include(public_group)
       end
 
       it "should not return private groups a user is not a member of" do
-        expect(UserGroup.scope_for(:show, member)).not_to include(private_group)
+        expect(UserGroup.scope_for(:show, ApiUser.new(member))).not_to include(private_group)
       end
     end
   end
