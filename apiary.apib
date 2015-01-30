@@ -22,11 +22,11 @@ Describe Authentication Workflow).
 # Headers
 Panotpes API sometime requires specific headers to be sent as part of requests.
 
-All requests should set `Accept: application/vnd.api+json; version=1`. You will receive a `404 Not Found` without it. 
+All requests should set `Accept: application/vnd.api+json; version=1`. You will receive a `404 Not Found` without it.
 
-All PUT and POST requests should set `Content-Type: application/vnd.api+json; version=1` or `Content-Type: application/json`. You will receive a `415 Unsupported Media Type` without one of those two headers. 
+All PUT and POST requests should set `Content-Type: application/vnd.api+json; version=1` or `Content-Type: application/json`. You will receive a `415 Unsupported Media Type` without one of those two headers.
 
-All PUT and DELETE requests should set the `If-Unmodified-Since` header to the value of the `Last-Modified` header of the request where the resource was originally retrieved. You will receive a `428 Precondition Required` without the header and a `412 Precondition Failed` if the date is older than the last change to the resource. 
+All PUT and DELETE requests should set the `If-Unmodified-Since` header to the value of the `Last-Modified` header of the request where the resource was originally retrieved. You will receive a `428 Precondition Required` without the header and a `412 Precondition Failed` if the date is older than the last change to the resource.
 
 # Group Panoptes API Root [/]
 Panoptes API entry point.
@@ -520,7 +520,7 @@ scope of classifications you'd like to retrieve. Possible options are:
 + 'projects' will fetch classifications from projects a user has 'edit' permissions for
 
 Any of the for scopes may be further filtered using the *project_id*
-and *user_group_id* parameters. 
+and *user_group_id* parameters.
 
 + Parameters
     + page (optional, integer) ... index of the collection page, 1 is default
@@ -1314,7 +1314,7 @@ Projects are returned as an array under the _projects_ key.
 
 
 ### Create a Project [POST]
-Requires at least a *name*, *description*, and *primary_language*. Workflows
+Requires at least a *name*, *description*, *primary_language* and *private*. Workflows
 and Subject sets added as links will be copied and their new ids
 returned.
 
@@ -1332,6 +1332,7 @@ returned.
                     "name": "galaxy_zoo",
                     "description": "A doubleplus good project",
                     "primary_language": "en-us",
+                    "private": true,
                     "links": {
                         "workflows": ["1", "2"]
                         "owner": {
@@ -2586,7 +2587,7 @@ It has the following attributes:
 Membership *state* can be "invited", "active", "inactive". When a user
 is added to a group, their state is set to "invited". After they take
 action to join the group their state becomes "active". A User who leaves
-a group has their state set to "inactive". 
+a group has their state set to "inactive".
 
 + Model
 
@@ -4904,7 +4905,7 @@ It has the following attributes:
                 "collection_preferences": [{
                     "id": "942",
                     "preferences": {
-                        "display": "grid" 
+                        "display": "grid"
                     },
                     "created_at": "2014-03-20T06:23:12Z",
                     "updated_at": "2014-04-21T08:22:22Z",
@@ -4997,7 +4998,7 @@ CollectionPreferences are returned as an array under *collection_preferences*.
                 "collection_preferences": [{
                     "id": "942",
                     "preferences": {
-                        "display": "grid" 
+                        "display": "grid"
                     },
                     "created_at": "2014-03-20T06:23:12Z",
                     "updated_at": "2014-04-21T08:22:22Z",
@@ -5008,7 +5009,7 @@ CollectionPreferences are returned as an array under *collection_preferences*.
                 },{
                     "id": "949",
                     "preferences": {
-                        "display": "grid" 
+                        "display": "grid"
                     },
                     "created_at": "2014-08-20T06:23:12Z",
                     "updated_at": "2014-09-21T08:22:22Z",
@@ -5059,7 +5060,7 @@ creation.
             {
                 "collection_preferences": {
                     "preferences": {
-                        "display": "grid" 
+                        "display": "grid"
                     },
                     "links": {
                         "collection": "1"

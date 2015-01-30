@@ -9,7 +9,7 @@ describe Api::V1::ProjectsController, type: :controller do
     ["id", "name", "display_name", "classifications_count", "subjects_count",
      "updated_at", "created_at", "available_languages", "title", "avatar",
      "description", "team_members", "guide", "science_case", "introduction",
-     "background_image"]
+     "background_image", "private"]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
@@ -199,7 +199,8 @@ describe Api::V1::ProjectsController, type: :controller do
         { projects: { display_name: display_name,
                       name: "new_zoo",
                       description: "A new Zoo for you!",
-                      primary_language: 'en' } }
+                      primary_language: 'en',
+                      private: true } }
       end
 
       let (:create_params) do
@@ -267,11 +268,6 @@ describe Api::V1::ProjectsController, type: :controller do
 
         context "with invalid create params" do
 
-          #so it looks like adding the owner via owner= is autosaving the
-          # has_one :owner_control_list relation as well (since the owner relation is through this one).
-          # this is happening outside the in it's own transaction outside the create one.
-          # when building for create (maybe update if the links don't already exist)
-          # we should use the model.relation.build params method instead of the realtion= setter
           it "should not orphan an ACL instance when the model is invalid" do
             default_request scopes: scopes, user_id: authorized_user.id
             create_params[:projects] = create_params[:projects].except(:primary_language)
@@ -288,7 +284,7 @@ describe Api::V1::ProjectsController, type: :controller do
               type: "users"
             }
           end
-          
+
           it_behaves_like "is creatable"
         end
 
@@ -306,7 +302,7 @@ describe Api::V1::ProjectsController, type: :controller do
               type: "users"
             }
           end
-          
+
           it "should not create a new project" do
             expect{ req }.to_not change{Project.count}
           end

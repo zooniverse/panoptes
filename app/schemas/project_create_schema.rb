@@ -2,6 +2,7 @@ class ProjectCreateSchema < JsonSchema
   schema do
     type "object"
     description "A Project"
+    required "name", "description", "primary_language", "private"
     additional_properties false
 
     property "display_name" do
@@ -17,6 +18,10 @@ class ProjectCreateSchema < JsonSchema
     property "primary_language" do
       type "string"
       description "Two character ISO 638 language code, optionally include two character ISO 3166-1 alpha-2 country code seperated by a hyphen for specific locale. ie 'en', 'zh-tw', 'es_MX'"
+    end
+
+    property "private" do
+      type "boolean"
     end
 
     property "title" do
@@ -53,15 +58,15 @@ class ProjectCreateSchema < JsonSchema
         property "name" do
           type "string"
         end
-        
+
         property "bio" do
           type "string"
         end
-        
+
         property "twitter" do
           type "string"
         end
-        
+
         property "institution" do
           type "string"
         end
@@ -78,7 +83,7 @@ class ProjectCreateSchema < JsonSchema
 
     property "links" do
       type "object"
-      
+
       property "owner" do
         type "object"
         required "id", "type"

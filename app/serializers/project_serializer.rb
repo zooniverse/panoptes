@@ -3,7 +3,7 @@ class ProjectSerializer
   attributes :id, :name, :display_name, :classifications_count,
     :subjects_count, :created_at, :updated_at, :available_languages,
     :title, :description, :guide, :team_members, :science_case,
-    :introduction, :avatar, :background_image
+    :introduction, :avatar, :background_image, :private
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles
