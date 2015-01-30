@@ -33,7 +33,7 @@ describe Api::V1::UsersController, type: :controller do
       it "should have twenty items by default" do
         expect(json_response[api_resource_name].length).to eq(20)
       end
-      
+
       it_behaves_like "an api response"
     end
 
@@ -49,6 +49,26 @@ describe Api::V1::UsersController, type: :controller do
 
       it 'should have a nil credited name' do
         expect(json_response[api_resource_name]).to all( include("credited_name" => nil) )
+      end
+    end
+
+    describe "filter params" do
+      let(:user) { users.sample(1).first }
+
+      before(:each) do
+        get :index, index_options
+      end
+
+      describe "filter by login" do
+        let(:index_options) { { login: user.login } }
+
+        it "should respond with 1 item" do
+          expect(json_response[api_resource_name].length).to eq(1)
+        end
+
+        it "should respond with the correct item" do
+          expect(json_response[api_resource_name][0]['login']).to eq(user.login)
+        end
       end
     end
   end
@@ -80,7 +100,7 @@ describe Api::V1::UsersController, type: :controller do
       collections_link = json_response['links']['users.collections']['href']
       expect(collections_link).to eq("/collections?owner={users.login}")
     end
-    
+
     it_behaves_like "an api response"
   end
 
@@ -188,7 +208,7 @@ describe Api::V1::UsersController, type: :controller do
     let(:user) { users.first}
     let(:user_id) { user.id }
     let(:access_token) { create(:access_token) }
-    
+
     before(:each) do
       default_request(scopes: scopes, user_id: users.first.id)
       allow(Doorkeeper).to receive(:authenticate).and_return(access_token)
@@ -198,12 +218,12 @@ describe Api::V1::UsersController, type: :controller do
       expect(UserInfoScrubber).to receive(:scrub_personal_info!).with(user)
       delete :destroy, id: user_id
     end
-    
+
     it "should revoke the request doorkeeper token" do
       delete :destroy, id: user_id
       expect(access_token.reload.revoked?).to eq(true)
     end
-    
+
     let(:authorized_user) { user }
     let(:resource) { user }
     let(:instances_to_disable) do
