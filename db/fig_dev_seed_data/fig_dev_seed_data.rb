@@ -40,7 +40,7 @@ attrs = { display_name: 'Zooniverse Admin',
           login: 'zooniverse_admin',
           email: 'no-reply@zooniverse.org' }
 admin = User.create(attrs) do |user|
-  user.owner_name = OwnerName.new(name: user.login, resource: user)
+  user.build_identity_group
 end
 puts "\nAdmin details:"
 puts "login: #{green(admin.login)}"
