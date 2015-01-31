@@ -71,6 +71,23 @@ describe Api::V1::UsersController, type: :controller do
         end
       end
     end
+
+    describe "overridden serialiser instance assocation links" do
+
+      before(:each) do
+        user = users.first
+        create(:classification, user: user)
+        get :index, { login: user.login }
+      end
+
+      it "should respond with 1 item" do
+        expect(json_response[api_resource_name].length).to eq(1)
+      end
+
+      it "should respond with the no model links" do
+        expect(json_response[api_resource_name][0]['links']).to eq({})
+      end
+    end
   end
 
   describe "#show" do
