@@ -29,4 +29,8 @@ class UserSerializer
     @context[:requester] && @context[:requester].logged_in? &&
       (@context[:requester].is_admin? || @model.id == @context[:requester].id)
   end
+
+  def add_links(model, data)
+    data[:links] = {}
+  end
 end
