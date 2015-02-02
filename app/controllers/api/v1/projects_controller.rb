@@ -60,6 +60,13 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def context
-    { languages: current_languages, fields: INDEX_FIELDS }
+    case action_name
+    when "index"
+      { languages: current_languages, fields: INDEX_FIELDS }
+    when "show"
+      { languages: current_languages, fields: CONTENT_FIELDS }
+    else
+      { fields: CONTENT_FIELDS }
+    end
   end
 end

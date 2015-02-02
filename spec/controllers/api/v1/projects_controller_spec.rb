@@ -341,15 +341,21 @@ describe Api::V1::ProjectsController, type: :controller do
     it_behaves_like "is updatable"
 
     context "project_contents" do
-      it 'should update the default contents when the display_name or description is updated' do
+      before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        params = update_params.merge(id: resource.id)
+        params = update_params
+        params[:projects][:science_case] = 'SC'
+        params = params.merge(id: resource.id)
         put :update, params
-
-        contents_title = resource.project_contents
-                         .where(language: resource.primary_language).first.title
-
+      end
+      
+      it 'should update the default contents when the display_name is updated' do
+        contents_title = resource.primary_content.title
         expect(contents_title).to eq(test_attr_value)
+      end
+
+      it 'should update the default contents when the science case changes' do
+        expect(json_response['projects'][0]['science_case']).to eq('SC')
       end
     end
 

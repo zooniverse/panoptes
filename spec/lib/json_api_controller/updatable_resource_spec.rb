@@ -5,7 +5,7 @@ describe JsonApiController::UpdatableResource, type: :controller do
   controller(ApplicationController) do
     include JsonApiController::UpdatableResource
 
-    def updated_resource_response(controlled_resource)
+    def updated_resource_response
       render nothing: true
     end
 

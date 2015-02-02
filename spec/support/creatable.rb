@@ -21,6 +21,11 @@ shared_examples "is creatable" do
       end
     end
 
+    it 'should include a Last-Modified header' do
+      updated_at = resource_class.find(created_id).updated_at.httpdate
+      expect(response.headers).to include('Last-Modified' => updated_at)
+    end
+
     it "should set the Location header as per JSON-API specs" do
       name = defined?(resource_name) ? resource_name : api_resource_name
       id = created_id
