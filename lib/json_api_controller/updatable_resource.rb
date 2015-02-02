@@ -17,7 +17,7 @@ module JsonApiController
         end
       end
       
-      updated_resource_response(controlled_resources)
+      updated_resource_response
     end
 
     def update_links
@@ -28,7 +28,7 @@ module JsonApiController
         resource.save!
       end
 
-      updated_resource_response(resource)
+      updated_resource_response
     end
 
     def destroy_links
@@ -55,7 +55,7 @@ module JsonApiController
       end
     end
 
-    def update_response(resources)
+    def update_response
       serializer.resource({}, controlled_resources, context)
     end
 

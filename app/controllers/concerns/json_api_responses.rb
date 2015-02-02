@@ -1,14 +1,19 @@
 module JSONApiResponses
   extend ActiveSupport::Concern
 
-  def created_resource_response(resource)
+  def created_resource_response(resources)
+    scope = resource_scope(resources)
+    response.headers['Last-Modified'] = scope.maximum(:updated_at).httpdate
     json_api_render(:created,
-                    create_response(resource),
-                    link_header(resource))
+                    create_response(scope),
+                    link_header(resources))
   end
 
-  def updated_resource_response(resource)
-    json_api_render(:ok, update_response(resource))
+  def updated_resource_response
+    most_recent = controlled_resources.maximum(:updated_at) ||
+                  controlled_resources.max(&:updated_at).updated_at
+    response.headers['Last-Modified'] = most_recent.httpdate
+    json_api_render(:ok, update_response)
   end
 
   def deleted_resource_response

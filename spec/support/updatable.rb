@@ -21,6 +21,11 @@ shared_examples "is updatable" do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'should include a Last-Modified header' do
+      modified = updated_resource.updated_at.httpdate
+      expect(response.headers).to include('Last-Modified' => modified)
+    end
+
     it_behaves_like 'an api response'
   end
   

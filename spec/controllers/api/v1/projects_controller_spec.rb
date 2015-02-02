@@ -354,7 +354,7 @@ describe Api::V1::ProjectsController, type: :controller do
         expect(contents_title).to eq(test_attr_value)
       end
 
-      it 'should update the default contents when the science case changes', :focus do
+      it 'should update the default contents when the science case changes' do
         expect(json_response['projects'][0]['science_case']).to eq('SC')
       end
     end
