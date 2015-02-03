@@ -88,6 +88,39 @@ describe RegistrationsController, type: :controller do
           expect(response.body).to eq(json_error_message(error_body))
         end
       end
+
+      context "when the password is too short" do
+
+        let(:extra_attributes) { { password: "123456" } }
+
+        it "should return 422" do
+          post :create, user: user_attributes
+          expect(response.status).to eq(422)
+        end
+
+        it "should not increase the count of users" do
+          expect{ post :create, user: user_attributes }.not_to change{ User.count }
+        end
+
+        it "should provide an error message in the response body" do
+          post :create, user: user_attributes
+          error_body = { "password" => ["is too short (minimum is 8 characters)"] }
+          expect(response.body).to eq(json_error_message(error_body))
+        end
+
+        it "should not orphan an identity User Group", :focus do
+          attrs = user_attributes.merge(login: "test_user", password: '123456')
+          expect{ post :create, user: attrs }.not_to change{ UserGroup.count }
+        end
+
+        context "HTML form signups", :focus do
+
+          it "should not orphan an identity User Group" do
+            attrs = user_attributes.merge(login: "test_user", password: '123456')
+            expect{ post :create, user: attrs }.not_to change{ UserGroup.count }
+          end
+        end
+      end
     end
   end
 

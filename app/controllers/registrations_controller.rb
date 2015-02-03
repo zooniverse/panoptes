@@ -11,8 +11,10 @@ class RegistrationsController < Devise::RegistrationsController
   private
 
   def create_from_json
-    build_resource(sign_up_params)
-    resource_saved = resource.save
+    resource_saved = ActiveRecord::Base.transaction(requires_new: true) do
+      build_resource(sign_up_params)
+      raise ActiveRecord::Rollback unless resource.save
+    end
     yield resource if block_given?
     status, content = registrations_response(resource_saved)
     clean_up_passwords resource
