@@ -24,6 +24,7 @@ gem 'sidekiq'
 gem 'sinatra', '>= 1.3.0', :require => nil
 gem 'aws-sdk'
 gem 'json-schema'
+gem 'p3p'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
