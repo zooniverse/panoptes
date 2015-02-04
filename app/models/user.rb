@@ -15,9 +15,11 @@ class User < ActiveRecord::Base
   has_many :memberships
   has_many :active_memberships, -> { active }, class_name: 'Membership'
   has_one :identity_membership, -> { identity }, class_name: 'Membership'
-  
+
   has_many :user_groups, through: :active_memberships
-  has_one :identity_group, through: :identity_membership, source: :user_group, class_name: "UserGroup"
+  has_one :identity_group, through: :identity_membership,
+                          source: :user_group,
+                          class_name: "UserGroup"
 
   has_many :project_roles, through: :identity_group
   has_many :collection_roles, through: :identity_group
@@ -82,7 +84,7 @@ class User < ActiveRecord::Base
   def password_required?
     super && hash_func != 'sha1'
   end
-  
+
   def valid_password?(password)
     if hash_func == 'bcrypt'
       super(password)
@@ -117,13 +119,13 @@ class User < ActiveRecord::Base
     raise StandardError, "Identity Group Exists" if identity_group
     build_identity_membership
     name = StringConverter.downcase_and_replace_spaces(login)
-    self.identity_group = identity_membership.build_user_group(name: name)
+    identity_membership.build_user_group(name: name)
   end
 
   def is_admin?
     !!admin
   end
-  
+
   protected
 
   def migrated_user?

@@ -13,7 +13,7 @@ describe User, :type => :model do
     it "should allow membership links to any user" do
       expect(User).to link_to(Membership).with_scope(:all)
     end
-    
+
     it "should allow user_gruop links to any user" do
       expect(User).to link_to(UserGroup).with_scope(:all)
     end
@@ -124,19 +124,19 @@ describe User, :type => :model do
 
       it { is_expected.to be_valid }
     end
-    
+
   end
 
   describe "#build_identity_group" do
     let(:user) { build(:user, build_group: false) }
-    
+
     context "when a user has a valid login" do
       before(:each) do
         user.build_identity_group
         user.save!
         user.reload
       end
-      
+
       it 'should a new membership with identity set to true' do
         expect(user.identity_membership.identity).to eq(true)
       end
@@ -150,7 +150,7 @@ describe User, :type => :model do
         expect{ user.build_identity_group }.to raise_error(StandardError, "Identity Group Exists")
       end
     end
-    
+
     context "when a user_group with the same name in different case exists" do
       let!(:user_group) { create(:user_group, name: user.login.upcase) }
 
@@ -161,13 +161,24 @@ describe User, :type => :model do
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
 
-      it "should have the correct error message on the owner_name association" do
+      it "should have the correct error message on the identity_group attribute" do
         user.build_identity_group
         user.valid?
         expect(user.errors[:"identity_group.name"]).to include("has already been taken")
       end
     end
 
+    context "when the identity group is missing" do
+
+      it "should not be valid" do
+        expect(user.valid?).to be_falsy
+      end
+
+      it "should have the correct error message on the identity_group association" do
+        user.valid?
+        expect(user.errors[:identity_group]).to include("can't be blank")
+      end
+    end
   end
 
   describe "#password_required?" do
@@ -290,7 +301,7 @@ describe User, :type => :model do
     let(:query_sql) { user.memberships_for(action, test_class).to_sql }
     let(:test_class) { Project }
     let(:action) { :update }
-    
+
     context "supplied class" do
       it 'should query for editor roles for the supplied class' do
         expect(query_sql).to match(/project_editor/)
@@ -306,11 +317,11 @@ describe User, :type => :model do
 
     context "action is show" do
       let(:action) { :show }
-      
+
       it 'should query for group_admin' do
         expect(query_sql).to match(/group_admin/)
       end
-      
+
       it 'should query for group_member' do
         expect(query_sql).to match(/group_member/)
       end
@@ -318,11 +329,11 @@ describe User, :type => :model do
 
     context "action is index" do
       let(:action) { :index }
-      
+
       it 'should query for group_admin' do
         expect(query_sql).to match(/group_admin/)
       end
-      
+
       it 'should query for group_member' do
         expect(query_sql).to match(/group_member/)
       end
@@ -346,8 +357,8 @@ describe User, :type => :model do
         create(:user, activated_state: 1) ]
     end
 
-    let(:actor) { ApiUser.new(users.first) } 
-                    
+    let(:actor) { ApiUser.new(users.first) }
+
     context "action is show" do
       it 'should return the active users' do
         expect(User.scope_for(:show, actor)).to match_array(users.values_at(0,1))
