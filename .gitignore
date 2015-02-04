@@ -26,3 +26,6 @@ bin/**
 .env
 *~
 .jbundler/
+
+#ignore the api commit file
+public/commit_id.txt

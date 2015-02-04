@@ -10,6 +10,7 @@ fi
 if [ "$RAILS_ENV" == "development" ]; then
   exec foreman start
 else
+  TERM=xterm git log --format="%H" -n 1 > public/commit_id.txt
   mkdir -p tmp/pids/
   rm -f tmp/pids/*.pid
   bundle exec sidekiq &
