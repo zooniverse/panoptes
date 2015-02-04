@@ -1,11 +1,11 @@
 class IdentityGroupNameValidator < ActiveModel::Validator
   def validate(user)
-    if user.identity_group
-      unless user.identity_group.valid?
-        user.errors[:"identity_group.name"].concat(user.identity_group.errors[:name])
+    if identity_group = user.try(:identity_membership).try(:user_group)
+      unless identity_group.valid?
+        user.errors[:"identity_group.name"].concat(identity_group.errors[:name])
       end
     else
-      user.errors[:"identity_group"] = "must have identity_group"
+      user.errors.add(:identity_group, "can't be blank")
     end
   end
 end
