@@ -1,0 +1,26 @@
+test:
+  enable_starttls_auto: true
+  address:
+  port:
+  domain:
+  authentication:
+  user_name:
+  password:
+
+development:
+  enable_starttls_auto: true
+  address:
+  port:
+  domain:
+  authentication:
+  user_name:
+  password:
+
+production:
+  enable_starttls_auto: true
+  address:
+  port:
+  domain:
+  authentication:
+  user_name:
+  password:
