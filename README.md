@@ -17,18 +17,6 @@ Panoptes is primarily developed against stable JRuby, currently 1.7.18. It is te
 * 1.7.18
 * 2.1.5
 
-It uses a couple of Ruby 2.0 features, so you'll need to put JRuby in 2.0 mode by setting `JRUBY_OPTS=--2.0` in your environment.
-
-To get Ruby 2.0 set up on Ubuntu, read [Local-installation-on-an-Ubuntu-VM](https://github.com/zooniverse/Panoptes/wiki/Local-installation-on-an-Ubuntu-VM#software) to get started with RVM.
-
-You will need the following services available:
-
-* Postgresql 9.3
-* Kafka 0.8.1
-* [Cellect Server](https://github.com/zooniverse/Cellect)
-* Zookeeper 3.4.6
-* Redis
-
 You will also need:
 
 * MySQL (`brew install mysql` on OSX)
@@ -54,7 +42,7 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
 
 2. Create and run the application containers by running `fig up`
 
-3. Enable Fig Rake for your terminal session by running `export FIG_RAKE=on`. If you need to run a task without Fig Rake either open a new terminal window or run `unset FIG_RAKE`.
+3. Enable Fig Rake for your terminal session by running `export FIG_RAKE=on`. If you need to run a task without `fig_rake`, either open a new terminal window or run `unset FIG_RAKE`.
 
 4. Open a new terminal and run `rake db:create db:migrate` to setup the database
 
@@ -64,7 +52,15 @@ This will get you a working copy of the checked out code base. Keep your code up
 
 If you've added new gems you'll need to rebuild the docker image by running `fig build`.
 
-### 2. Run manually with self installed and run dependencies
+### 2. Manual installation of Panoptes and dependencies
+
+*We strongly recommend using `fig` and `docker` to run Panoptes.* However, you can also install the required dependencies manually.
+
+#### Requirements
+
+* Ruby
+
+    Panoptes uses some Ruby 2.0 features, so you'll need to put JRuby in 2.0 mode by setting `JRUBY_OPTS=--2.0` in your environment. There are also some caveats to getting Ruby 2.0 set up on Ubuntu; read [Local-installation-on-an-Ubuntu-VM](https://github.com/zooniverse/Panoptes/wiki/Local-installation-on-an-Ubuntu-VM#software) for more.
 
 Setup the following services to get Panoptes up and running:
 
@@ -73,8 +69,6 @@ Setup the following services to get Panoptes up and running:
 * [Cellect Server](https://github.com/zooniverse/Cellect) version > 0.1.0
 * [Kafka](http://kafka.apache.org) version > 0.8.1.1
 * [Redis](http://redis.io) version > 2.8.19
-
-We strongly recommend using fig and docker to run Panoptes
 
 ## Contributing
 
