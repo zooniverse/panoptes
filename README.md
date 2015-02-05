@@ -17,10 +17,6 @@ Panoptes is primarily developed against stable JRuby, currently 1.7.18. It is te
 * 1.7.18
 * 2.1.5
 
-You will also need:
-
-* MySQL (`brew install mysql` on OSX)
-
 ## Installation
 
 ### 1. Setup a development environment with Fig and Docker
@@ -38,7 +34,11 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
 
 #### Usage
 
-1. Setup the application configuration files by running `rake configure`
+1. Setup the application configuration files by either
+  + If you've got ruby and rake already installed run `rake configure`
+    + Don't try and install these just to run this command, use the shell script below.
+  + If not and you have a bash prompt run `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
+    + If you're running a different shell then you should be able to figure this out!
 
 2. Create and run the application containers by running `fig up`
 
@@ -61,6 +61,11 @@ If you've added new gems you'll need to rebuild the docker image by running `fig
 * Ruby
 
     Panoptes uses some Ruby 2.0 features, so you'll need to put JRuby in 2.0 mode by setting `JRUBY_OPTS=--2.0` in your environment. There are also some caveats to getting Ruby 2.0 set up on Ubuntu; read [Local-installation-on-an-Ubuntu-VM](https://github.com/zooniverse/Panoptes/wiki/Local-installation-on-an-Ubuntu-VM#software) for more.
+
+* MySQL (`brew install mysql` on OSX)
+
+  You will to have MySQL installed to install the mysql gem via bundle install.
+
 
 Setup the following services to get Panoptes up and running:
 
