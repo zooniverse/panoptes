@@ -19,6 +19,8 @@ Panoptes is primarily developed against stable JRuby, currently 1.7.18. It is te
 
 It uses a couple of Ruby 2.0 features, so you'll need to put JRuby in 2.0 mode by setting `JRUBY_OPTS=--2.0` in your environment.
 
+To get Ruby 2.0 set up on Ubuntu, read [Local-installation-on-an-Ubuntu-VM](https://github.com/zooniverse/Panoptes/wiki/Local-installation-on-an-Ubuntu-VM#software) to get started with RVM.
+
 You will need the following services available:
 
 * Postgresql 9.3
