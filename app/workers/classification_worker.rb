@@ -3,7 +3,7 @@ class ClassificationWorker
 
   sidekiq_options queue: :high
 
-  def self.perform(id, action)
+  def perform(id, action)
     classification = ClassificationLifecycle.new(Classification.find(id))
     case action
     when :update
