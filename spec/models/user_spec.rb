@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe User, :type => :model do
+describe User, type: :model do
   let(:user) { create(:user) }
   let(:activatable) { user }
   let(:owner) { user }
@@ -100,7 +100,32 @@ describe User, :type => :model do
       dup_user.valid?
       expect(dup_user.errors[:login]).to include("has already been taken")
     end
+  end
 
+  describe '#display_name' do
+    it 'should validate presence' do
+      expect(build(:user, display_name: "").valid?).to be false
+    end
+
+    it 'should have non-blank error' do
+      user = build(:user, display_name: "")
+      user.valid?
+      expect(user.errors[:display_name]).to include("can't be blank")
+    end
+
+    it 'should validate uniqueness to enable filtering by the display name' do
+      display_name = 'Mista Bob Dobalina'
+      expect{ create(:user, display_name: display_name) }.to_not raise_error
+      expect{ create(:user, display_name: display_name.upcase, email: 'test2@example.com') }.to raise_error
+      expect{ create(:user, display_name: display_name.downcase, email: 'test3@example.com') }.to raise_error
+    end
+
+    it "should have the correct case-insensitive uniqueness error" do
+      user = create(:user)
+      dup_user = build(:user, display_name: user.display_name.upcase)
+      dup_user.valid?
+      expect(dup_user.errors[:display_name]).to include("has already been taken")
+    end
   end
 
   describe '#email' do
@@ -188,7 +213,7 @@ describe User, :type => :model do
     end
 
     it 'should not require a password when creating a user from an import' do
-      attrs = {login: "t", hash_func: 'sha1', email: "test@example.com"}
+      attrs = {login: "t", display_name: "Mr. T", hash_func: 'sha1', email: "test@example.com"}
       expect do
         User.create!(attrs) do |u|
           u.build_identity_group

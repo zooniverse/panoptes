@@ -25,6 +25,8 @@ class User < ActiveRecord::Base
   has_many :collection_roles, through: :identity_group
 
   validates :login, presence: true, uniqueness: true
+  validates_presence_of :display_name
+  validates_uniqueness_of :display_name, case_sensitive: false
   validates_length_of :password, within: 8..128, allow_blank: true,
                       unless: :migrated_user?
 

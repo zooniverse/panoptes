@@ -3,12 +3,12 @@ FactoryGirl.define do
     transient do
       build_group true
     end
-    
+
     hash_func 'bcrypt'
     sequence(:email) {|n| "example#{n}@example.com"}
     password 'password'
     encrypted_password { User.new.send(:password_digest, 'password') }
-    display_name 'New User'
+    sequence(:display_name) { |n| "New User #{n}" }
     credited_name 'Dr User'
     activated_state :active
     sequence(:login) { |n| "new_user_#{n}" }
