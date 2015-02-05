@@ -5,7 +5,7 @@ class UserSerializer
               projects: { param: "owner", value: "login" },
               collections: { param: "owner", value: "login" }
 
-  can_filter_by :login
+  can_filter_by :login, :display_name
 
   def credited_name
     @model.credited_name if permitted_requester?
