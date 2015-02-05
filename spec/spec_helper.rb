@@ -32,8 +32,22 @@ RSpec.configure do |config|
     end
   end
 
-  config.before(:each) do
+  config.before(:each) do |example|
     DatabaseCleaner.start
+
+    # Clears out the jobs for tests using the fake testing
+    Sidekiq::Worker.clear_all
+
+    case example.metadata[:sidekiq]
+    when :fake
+      Sidekiq::Testing.fake!
+    when :inline
+      Sidekiq::Testing.inline!
+    when :feature
+      Sidekiq::Testing.inline!
+    else
+      Sidekiq::Testing.fake!
+    end
   end
 
   config.before(:each, type: :controller) do
