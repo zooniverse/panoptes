@@ -27,6 +27,10 @@ You will need the following services available:
 * Zookeeper 3.4.6
 * Redis
 
+You will also need:
+
+* MySQL (`brew install mysql` on OSX)
+
 ## Installation
 
 ### 1. Setup a development environment with Fig and Docker
