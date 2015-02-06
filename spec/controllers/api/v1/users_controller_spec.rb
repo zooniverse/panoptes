@@ -70,6 +70,18 @@ describe Api::V1::UsersController, type: :controller do
           expect(json_response[api_resource_name][0]['login']).to eq(user.login)
         end
       end
+
+      describe "filter by display_name" do
+        let(:index_options) { { display_name: user.display_name } }
+
+        it "should respond with 1 item" do
+          expect(json_response[api_resource_name].length).to eq(1)
+        end
+
+        it "should respond with the correct item" do
+          expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+        end
+      end
     end
 
     describe "overridden serialiser instance assocation links" do

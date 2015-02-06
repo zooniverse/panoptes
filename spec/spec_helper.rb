@@ -20,24 +20,28 @@ RSpec.configure do |config|
 
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
-  config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = false
 
   Devise.mailer = Devise::Mailer
 
   config.before(:suite) do
-    begin
-      DatabaseCleaner.strategy = :transaction
-    ensure
-      DatabaseCleaner.clean_with(:truncation)
-    end
+    DatabaseCleaner.clean_with(:truncation)
   end
 
   config.before(:each) do
-    DatabaseCleaner.start
+    DatabaseCleaner.strategy = :transaction
   end
 
   config.before(:each, type: :controller) do
     stub_cellect_connection
+  end
+
+  config.before(:each, no_transaction: true) do
+    DatabaseCleaner.strategy = :deletion
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
   end
 
   config.after(:each) do
