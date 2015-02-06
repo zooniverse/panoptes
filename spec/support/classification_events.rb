@@ -4,6 +4,10 @@ shared_context "a classification create" do
     expect(response).to have_http_status(:created)
   end
 
+  it "should call the classification lifecycle from the yield block" do
+    expect(controller).to receive(:lifecycle).with(:create, anything)
+    create_action
+  end
 
   it "should set the Location header as per JSON-API specs" do
     create_action
