@@ -11,18 +11,22 @@ describe ClassificationLifecycle do
   end
 
   describe "#queue" do
-    let(:classification) { create(:classification) }
-
-    after(:each) do
-      subject.queue(test_method)
-    end
+    let(:classification) { build(:classification) }
 
     context "with create action" do
       let(:test_method) { :create }
 
       it 'should queue other actions' do
+        allow(classification).to receive(:persisted?).and_return(true)
         expect(ClassificationWorker).to receive(:perform_async)
                                          .with(classification.id, :create)
+        subject.queue(test_method)
+      end
+
+      it 'should raise en error if the classification is not persisted' do
+        expect do
+          subject.queue(test_method)
+        end.to raise_error(ClassificationLifecycle::ClassificationNotPersisted)
       end
     end
 
@@ -30,8 +34,16 @@ describe ClassificationLifecycle do
       let(:test_method) { :update }
 
       it 'should queue other actions' do
+        allow(classification).to receive(:persisted?).and_return(true)
         expect(ClassificationWorker).to receive(:perform_async)
                                          .with(classification.id, :update )
+        subject.queue(test_method)
+      end
+
+      it 'should raise en error if the classification is not persisted' do
+        expect do
+          subject.queue(test_method)
+        end.to raise_error(ClassificationLifecycle::ClassificationNotPersisted)
       end
     end
   end

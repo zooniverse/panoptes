@@ -1,7 +1,7 @@
 class ClassificationWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :high
+  sidekiq_options queue: :high, retry: 3
 
   def perform(id, action)
     classification = ClassificationLifecycle.new(Classification.find(id))

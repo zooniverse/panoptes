@@ -1,7 +1,7 @@
 class Api::V1::ClassificationsController < Api::ApiController
   skip_before_filter :require_login, only: :create
   doorkeeper_for :show, :index, :destroy, :update, scopes: [:classification]
-  
+
   resource_actions :default
 
   rescue_from RoleControl::AccessDenied, with: :access_denied
@@ -12,6 +12,14 @@ class Api::V1::ClassificationsController < Api::ApiController
                      :user_language,
                      :workflow_version,
                      :user_agent]
+
+  def create
+    super { |classification| lifecycle(:create, classification) }
+  end
+
+  def update
+    super { |classification| lifecycle(:update, classification) }
+  end
 
   private
 
@@ -28,13 +36,7 @@ class Api::V1::ClassificationsController < Api::ApiController
       .merge(Classification.complete)
       .exists?(id: resource_ids)
   end
-  
-  
-  def build_resource_for_update(update_params)
-    classification = super
-    lifecycle(:update, classification)
-    classification
-  end
+
 
   def sms_ids_from_links(link_params)
     sms = if ids = link_params.delete(:set_member_subjects)
@@ -54,7 +56,6 @@ class Api::V1::ClassificationsController < Api::ApiController
       create_params[:user_ip] = request_ip
       create_params[:set_member_subject_ids] = sms_ids_from_links(link_params)
     end
-    lifecycle(:create, classification)
     classification
   end
 

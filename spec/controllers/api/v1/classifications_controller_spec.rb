@@ -32,7 +32,7 @@ def setup_create_request(project_id, workflow_id, sms: nil, subject: nil)
   unless gold_standard.nil?
     params[:classifications].merge!(gold_standard: gold_standard)
   end
-  
+
   if sms
    params[:classifications][:links][:set_member_subjects] = [sms.id]
   elsif subject
@@ -96,15 +96,15 @@ describe Api::V1::ClassificationsController, type: :controller do
     describe "#create" do
       context "with set_member_subject_ids" do
         let(:create_action) { create_classification_with_sms }
-        
+
         it_behaves_like "a classification create"
         it_behaves_like "a classification lifecycle event"
         it_behaves_like "a gold standard classfication"
       end
-      
+
       context "with subject_ids" do
         let(:create_action) { create_classification_with_subject }
-        
+
         it_behaves_like "a classification create"
         it_behaves_like "a classification lifecycle event"
         it_behaves_like "a gold standard classfication"
@@ -127,6 +127,13 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it_behaves_like "is updatable"
+
+      it "should call the classification lifecycle from the yield block" do
+        expect(controller).to receive(:lifecycle).with(:update, resource)
+        default_request scopes: scopes, user_id: authorized_user.id
+        params = update_params.merge(id: resource.id)
+        put :update, params
+      end
     end
 
     context "a complete classification" do
@@ -175,13 +182,13 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       context "with set_member_subject_ids" do
         let(:create_action) { create_classification_with_sms }
-        
+
         it_behaves_like "a classification create"
       end
-      
+
       context "with subject_ids" do
         let(:create_action) { create_classification_with_subject }
-        
+
         it_behaves_like "a classification create"
       end
     end
