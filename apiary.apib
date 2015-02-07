@@ -340,7 +340,10 @@ classification including:
                         "workflow_version": "11.12"
                     },
                     "annotations": [
-                        {"workflow-1": [10.4, 12.4, 13.2]},
+                        {
+                            "task": "task-1",
+                            "value": [10.4, 12.4, 13.2]
+                        }
                     ],
                     "links": {
                         "user": "1",
@@ -386,8 +389,14 @@ of the annotations array.
             {
                 "classifications": {
                     "annotations": [
-                        {"key": "workflow-1", "value": [10.4, 12.4, 13.2]},
-                        {"key": "workflow-2", "value": "fishy"},
+                        {
+                            "task": "task-1",
+                            "value": [10.4, 12.4, 13.2]
+                        },
+                        {
+                            "task": "workflow-2",
+                            "value": "fishy"
+                        }
                     ],
                     "completed": true
                 }
@@ -472,8 +481,11 @@ key.
                         "workflow_version": "11.12"
                     },
                     "annotations": [
-                        {"workflow-1": [10.4, 12.4, 13.2]},
-                    ],
+                        {
+                            "task": "task-1",
+                            "value": [10.4, 12.4, 13.2]
+                        }
+                        ],
                     "links": {
                         "user": "1",
                         "set_member_subject": "10",
@@ -494,8 +506,14 @@ key.
                         "workflow_version": "11.12"
                     },
                     "annotations": [
-                        {"workflow-1": [10.4, 12.4, 13.2]},
-                        {"workflow-2": "starry"},
+                        {
+                            "task": "task-1",
+                            "value": [10.4, 12.4, 13.2]
+                        },
+                        {
+                            "task": "task-2",
+                            "value": "workflow-2": "starry"
+                        }
                     ],
                     "links": {
                         "user": "1",
