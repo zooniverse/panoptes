@@ -11,8 +11,10 @@ def metadata_values
 end
 
 def annotation_values
-  [ { "question_key" => "question_answer"},
-    { "age" => "adult"} ]
+  [ { "task" => "question_key",
+       "value" => "question_answer" },
+    { "task" => "age",
+      "value" => "adult"} ]
 end
 
 def setup_create_request(project_id, workflow_id, sms: nil, subject: nil)
@@ -121,7 +123,8 @@ describe Api::V1::ClassificationsController, type: :controller do
         {
           classifications: {
             completed: true,
-            annotations: [{ "q-1" => "round" }]
+            annotations: [{ "task" => "q-1",
+                            "value" => "round" }]
           }
         }
       end

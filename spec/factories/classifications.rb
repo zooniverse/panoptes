@@ -7,8 +7,10 @@ FactoryGirl.define do
                workflow_version: "1.1",
                user_language: 'en',
              })
-    annotations [{an_annotation: true},
-                 {another_one: [1, 2]}]
+    annotations [{task: "an_annotation",
+                  value: true},
+                 {task: "another_one",
+                  value: [1, 2]}]
     user_ip "192.168.0.1"
     completed true
     user
