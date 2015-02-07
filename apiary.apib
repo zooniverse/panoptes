@@ -562,12 +562,12 @@ and *user_group_id* parameters.
 
 ### Create a Classification [POST]
 Create a classification by providing a JSON-API formatted object that
-must include metadata, annotations and a links hash containing a subject,
-a project, and a workflow. The metadata hash must contain the keys specified
+must include metadata, annotations and a links hash containing a subjects hash,
+a project and workflow ids. The metadata hash must contain the keys specified
 below. Of note the workflow version should be the value retured from the
 specific workflow representation. The annotations array must be in the
 format specified, i.e. an array of task name value answers objects. Optionally
-may include the complete field, which will be set to true by default.
+may include the completed field, which will be set to true by default.
 
 
 + Request
