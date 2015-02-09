@@ -143,6 +143,11 @@ describe Api::V1::UsersController, type: :controller do
       expect(response.status).to eq(200)
     end
 
+    it "should return the Last-Modified header" do
+      expected_date = users.first.updated_at.httpdate
+      expect(response.headers["Last-Modified"]).to eq(expected_date)
+    end
+
     it "should have a single user" do
       expect(json_response[api_resource_name].length).to eq(1)
     end
