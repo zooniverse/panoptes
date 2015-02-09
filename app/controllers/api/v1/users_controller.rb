@@ -2,7 +2,7 @@ class Api::V1::UsersController < Api::ApiController
   doorkeeper_for :me, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show
-  
+
   schema_type :strong_params
 
   allowed_params :update, :display_name, :email, :credited_name
@@ -10,7 +10,11 @@ class Api::V1::UsersController < Api::ApiController
   alias_method :user, :controlled_resource
 
   def me
-    render json_api: serializer.resource({}, resource_scope(current_resource_owner), context)
+    if stale?(last_modified: current_resource_owner.updated_at)
+      render json_api: serializer.resource({},
+                                           resource_scope(current_resource_owner),
+                                           context)
+    end
   end
 
   def destroy
