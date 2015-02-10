@@ -294,8 +294,8 @@ A classifications has the following attributes:
 - gold_standard
 - annotations
 
-Annotations is an array of maps of the form `{ "question_key":
-"question answer" }`. Metadata contains additional information about a
+Annotations is an array of maps of the form `{ "task": "task_key",
+"value": "question answer" }`. Metadata contains additional information about a
 classification including:
 
 - started_at
@@ -323,7 +323,7 @@ classification including:
                         "type": "workflows"
                     },
                     "classifications.subject": {
-                        "href": "/set_member_subjects/{classifications.set_member_subject}",
+                        "href": "/subjects/{classifications.subjects}",
                         "type": "subjects"
                     }
                 },
@@ -347,7 +347,7 @@ classification including:
                     ],
                     "links": {
                         "user": "1",
-                        "set_member_subject": "10",
+                        "subjects": ["10"],
                         "workflow": "81",
                         "project": "2"
                     }
@@ -449,7 +449,7 @@ key.
                         "type": "workflows"
                     },
                     "classifications.subject": {
-                        "href": "/set_member_subjects/{classifications.set_member_subject}",
+                        "href": "/subjects/{classifications.subjects}",
                         "type": "subjects"
                     }
                 },
@@ -488,7 +488,7 @@ key.
                         ],
                     "links": {
                         "user": "1",
-                        "set_member_subject": "10",
+                        "subjects": ["10"],
                         "workflow": "81",
                         "project": "2"
                     }
@@ -517,7 +517,7 @@ key.
                     ],
                     "links": {
                         "user": "1",
-                        "set_member_subject": "11",
+                        "subjects": ["11"],
                         "workflow": "81",
                         "project": "2"
                     }
@@ -3136,7 +3136,7 @@ subjects with a new queue of subjects.
             {
                 "subject_queues: {
                     "links"; {
-                        "set_member_subjects": ["10", "22"]
+                        "subjects": ["10", "22"]
                     }
                 }
             }
@@ -3157,7 +3157,7 @@ Removes the queue entirely
 
 + Response 204
 
-## Add set_member_subject links [/subject_queues/{id}/links/set_member_subjects]
+## Add subject links [/subject_queues/{id}/links/subjects]
 Add subjects to a queue.
 
 ### Add links [POST]
@@ -3174,14 +3174,14 @@ have edit permissions.
     + Body
 
             {
-                "set_member_subjects": ["1", "2"]
+                "subjects": ["1", "2"]
             }
 
 + Response 200
 
     [SubjectQueue][]
 
-## Remove subject links [/subject_queues/{id}/links/set_member_subjects/{link_ids}]
+## Remove subject links [/subject_queues/{id}/links/subjects/{link_ids}]
 Remove subjects from a queue.
 
 ### Remove links [DELETE]
@@ -3223,9 +3223,9 @@ SubjectQueues are returned as an array under *subject_queues*.
                         "href": "/workflows/{subject_queues.workflow}",
                         "type": "workflows"
                     },
-                    "subject_queues.set_member_subjects": {
-                        "href": "/subjects?set_member_subject_ids={subject_queues.set_member_subjects}",
-                        "type": "set_member_subjects"
+                    "subject_queues.subjects": {
+                        "href": "/subjects?subject_ids={subject_queues.subjects}",
+                        "type": "subjects"
                     }
                 },
                 "meta": {
@@ -3283,7 +3283,7 @@ SubjectQueues are returned as an array under *subject_queues*.
 
 ### Create SubjectQueue [POST]
 Creating a subject queue only requires a user and a workflow link. You
-may optionally include a list of set_member_subjects to populate the queue.
+may optionally include a list of subjects to populate the queue.
 
 + Request
 
@@ -3299,7 +3299,7 @@ may optionally include a list of set_member_subjects to populate the queue.
                     "links": {
                         "user": "10",
                         "workflow": "42",
-                        "set_member_subjects": ["3", "12321", "8004"]
+                        "subjects": ["3", "12321", "8004"]
                     }
                 }
             }
