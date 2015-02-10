@@ -36,7 +36,6 @@ def setup_create_request(project_id, workflow_id, subject_id)
     params[:classifications].merge!(gold_standard: gold_standard)
   end
 
-
   post :create, params
 end
 
@@ -94,6 +93,19 @@ describe Api::V1::ClassificationsController, type: :controller do
         it_behaves_like "a classification create"
         it_behaves_like "a classification lifecycle event"
         it_behaves_like "a gold standard classfication"
+
+        context "when invalid link id strings are used", :focus do
+
+          it "should fail via the schema validator" do
+            req_params = [ project.id,
+                           "MOCK_WORKFLOW_FOR_CLASSIFIER",
+                           "MOCK_SUBJECT_FOR_CLASSIFIER" ]
+            setup_create_request(*req_params)
+            error = json_response["errors"].first["message"]
+            expected = /MOCK_SUBJECT_FOR_CLASSIFIER.*did not match the regex/
+            expect(error).to match(expected)
+          end
+        end
       end
     end
   end

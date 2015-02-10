@@ -1,13 +1,13 @@
 class JsonSchema
   class ValidationError < StandardError; end
-  
+
   class Builder
     attr_reader :schema
-    
+
     def initialize(schema={})
       @schema = schema
     end
-    
+
     def build(&block)
       instance_exec(&block)
       schema
@@ -18,13 +18,17 @@ class JsonSchema
     def additional_properties(bool)
       schema[:additionalProperties] = bool
     end
-    
+
     def title(title)
       schema[:title] = title
     end
 
     def type(*type)
       schema[:type] = type.length == 1 ? type.first : type
+    end
+
+    def pattern(pattern)
+      schema[:pattern] = pattern
     end
 
     def description(desc)
@@ -66,7 +70,7 @@ class JsonSchema
       Builder.new.build(&block)
     end
   end
-  
+
   def self.build(&block)
     new(Builder.new.build(&block))
   end
@@ -75,7 +79,7 @@ class JsonSchema
     return @schema unless block_given?
     @schema = Builder.new.build(&block)
   end
-  
+
   def initialize(schema=self.class.schema)
     @schema = schema
   end
