@@ -4,12 +4,12 @@ describe Api::V1::SubjectQueuesController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:api_resource_name) { 'subject_queues' }
   let(:api_resource_attributes) { %w(id) }
-  let(:api_resource_links) { %w(subject_queues.user subject_queues.workflow subject_queues.set_member_subjects) }
+  let(:api_resource_links) { %w(subject_queues.user subject_queues.workflow subject_queues.subjects) }
 
   let(:project) { create(:project, owner: authorized_user) }
   let(:workflow) { create(:workflow, project: project) }
   let(:resource) { create(:user_subject_queue, workflow: workflow) }
-  let(:subjects) { create_list(:set_member_subject, 3) }
+  let(:subjects) { create_list(:subject, 3) }
   let(:subject_ids) { subjects.map(&:id).map(&:to_s) }
 
   let(:scopes) { %w(public project) }
@@ -30,13 +30,13 @@ describe Api::V1::SubjectQueuesController, type: :controller do
   end
 
   describe "#update" do
-    let(:test_attr) { :set_member_subject_ids }
+    let(:test_attr) { :subject_ids }
     let(:test_attr_value) { subject_ids.map(&:to_i) }
     let(:update_params) do
       {
        user_subject_queues: {
                              links: {
-                                     set_member_subjects: subject_ids
+                                     subjects: subject_ids
                                     }
                             }
       }
@@ -46,7 +46,7 @@ describe Api::V1::SubjectQueuesController, type: :controller do
   end
 
   describe "#create" do
-    let(:test_attr) { :set_member_subject_ids }
+    let(:test_attr) { :subject_ids }
     let(:test_attr_value) { subject_ids.map(&:to_i) }
     let(:create_params) do
       {
@@ -54,7 +54,7 @@ describe Api::V1::SubjectQueuesController, type: :controller do
                              links: {
                                      workflow: workflow,
                                      user: create(:user),
-                                     set_member_subjects: subject_ids
+                                     subjects: subject_ids
                                     }
                             }
       }

@@ -16,7 +16,7 @@ FactoryGirl.define do
     user
     project
     workflow
-    set_member_subject_ids { create_list(:set_member_subject, 2).map(&:id) }
+    subject_ids { create_list(:set_member_subject, 2).map(&:subject).map(&:id) }
 
     factory :classifaction_with_user_group do
       user_group

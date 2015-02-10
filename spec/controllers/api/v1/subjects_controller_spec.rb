@@ -5,7 +5,7 @@ UUIDv4Regex = /[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-
 describe Api::V1::SubjectsController, type: :controller do
   let!(:workflow) { create(:workflow_with_subject_sets) }
   let!(:subject_set) { workflow.subject_sets.first }
-  let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+  let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set).map(&:subject) }
   let!(:user) { create(:user) }
 
   let(:scopes) { %w(subject) }
@@ -70,7 +70,7 @@ describe Api::V1::SubjectsController, type: :controller do
             create(:user_subject_queue,
                    user: user,
                    workflow: workflow,
-                   set_member_subject_ids: subjects.map(&:id))
+                   subject_ids: subjects.map(&:id))
             get :index, request_params
           end
 

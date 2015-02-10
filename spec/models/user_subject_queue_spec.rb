@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe UserSubjectQueue, :type => :model do
   let(:locked_factory) { :user_subject_queue }
-  let(:locked_update) { {set_member_subject_ids: [1, 2, 3, 4]} }
+  let(:locked_update) { {subject_ids: [1, 2, 3, 4]} }
   
   it_behaves_like "optimistically locked"
   
@@ -19,9 +19,9 @@ RSpec.describe UserSubjectQueue, :type => :model do
   end
 
   describe "::are_subjects_queued" do
-    let(:subject) { create(:set_member_subject) }
+    let(:subject) { create(:subject) }
     let!(:subject_queue) do
-      create(:user_subject_queue, set_member_subject_ids: [subject.id])
+      create(:user_subject_queue, subject_ids: [subject.id])
     end
     
     context "subject is queued" do
@@ -30,7 +30,7 @@ RSpec.describe UserSubjectQueue, :type => :model do
         workflow = subject_queue.workflow
         result = UserSubjectQueue.are_subjects_queued?(user: user,
                                                        workflow: workflow,
-                                                       set_member_subject_ids: [subject.id])
+                                                       subject_ids: [subject.id])
         expect(result).to be_truthy
       end
 
@@ -40,7 +40,7 @@ RSpec.describe UserSubjectQueue, :type => :model do
           workflow = subject_queue.workflow
           result = UserSubjectQueue.are_subjects_queued?(user: user,
                                                          workflow: workflow,
-                                                         set_member_subject_ids: [create(:set_member_subject).id])
+                                                         subject_ids: [create(:subject).id])
           expect(result).to be_falsy
         end
       end
@@ -51,7 +51,7 @@ RSpec.describe UserSubjectQueue, :type => :model do
           workflow = create(:workflow) 
           result = UserSubjectQueue.are_subjects_queued?(user: user,
                                                          workflow: workflow,
-                                                         set_member_subject_ids: [create(:set_member_subject).id])
+                                                         subject_ids: [create(:subject).id])
           expect(result).to be_falsy
         end
 
@@ -62,14 +62,14 @@ RSpec.describe UserSubjectQueue, :type => :model do
   describe "::enqueue_subject_for_user" do
     let(:user) { create(:user) }
     let(:workflow) { create(:workflow) }
-    let(:subject) { create(:set_member_subject) }
+    let(:subject) { create(:subject) }
     
     context "nothing for user" do
       it 'should create a new user_enqueue_subject' do
         expect do
           UserSubjectQueue.enqueue_subject_for_user(user: user,
                                                     workflow: workflow,
-                                                    set_member_subject: subject)
+                                                    subject: subject)
         end.to change{ UserSubjectQueue.count }.from(0).to(1)
       end
 
@@ -80,7 +80,7 @@ RSpec.describe UserSubjectQueue, :type => :model do
         expect(ues).to receive(:add_subjects).with(subject)
         UserSubjectQueue.enqueue_subject_for_user(user: user,
                                                   workflow: workflow,
-                                                  set_member_subject: subject)
+                                                  subject: subject)
       end
       
     end
@@ -90,8 +90,8 @@ RSpec.describe UserSubjectQueue, :type => :model do
       it 'should call add_subject_id on the existing subject queue' do
         UserSubjectQueue.enqueue_subject_for_user(user: user,
                                                   workflow: workflow,
-                                                  set_member_subject: subject)
-        expect(ues.reload.set_member_subject_ids).to include(subject.id)
+                                                  subject: subject)
+        expect(ues.reload.subject_ids).to include(subject.id)
       end
     end
   end
@@ -99,27 +99,27 @@ RSpec.describe UserSubjectQueue, :type => :model do
   describe "::dequeue_subjects_for_user" do
     let(:user) { create(:user) }
     let(:workflow) { create(:workflow) }
-    let(:subjects) { create_list(:set_member_subject, 2) }
+    let(:subjects) { create_list(:subject, 2) }
     
     it 'should remove the subject given a user and workflow' do
       ues = create(:user_subject_queue,
                    user: user,
                    workflow: workflow,
-                   set_member_subject_ids: subjects.map(&:id))
+                   subject_ids: subjects.map(&:id))
       UserSubjectQueue.dequeue_subjects_for_user(user: user,
                                                  workflow: workflow,
-                                                 set_member_subject_ids: [subjects.first.id])
-      expect(ues.reload.set_member_subject_ids).to_not include(subjects.first.id)
+                                                 subject_ids: [subjects.first.id])
+      expect(ues.reload.subject_ids).to_not include(subjects.first.id)
     end
 
     it 'should destroy the model if there are no more subject_ids' do
       ues = create(:user_subject_queue,
                    user: user,
                    workflow: workflow,
-                   set_member_subject_ids: [subjects.first.id])
+                   subject_ids: [subjects.first.id])
       UserSubjectQueue.dequeue_subjects_for_user(user: user,
                                                  workflow: workflow,
-                                                 set_member_subject_ids: [subjects.first.id])
+                                                 subject_ids: [subjects.first.id])
       expect(UserSubjectQueue.exists?(ues)).to be_falsy
 
     end
@@ -127,7 +127,7 @@ RSpec.describe UserSubjectQueue, :type => :model do
 
   describe "#next_subjects" do
     let(:ids) { (0..60).to_a }
-    let(:ues) { build(:user_subject_queue, set_member_subject_ids: ids) }
+    let(:ues) { build(:user_subject_queue, subject_ids: ids) }
     
     it 'should return a collection of ids' do
       expect(ues.next_subjects).to all( be_a(Fixnum) )
@@ -146,19 +146,19 @@ RSpec.describe UserSubjectQueue, :type => :model do
     let(:ues) { build(:user_subject_queue) }
     
     it 'should add the id to the subject_ids array' do
-      subject = create(:set_member_subject)
+      subject = create(:subject)
       ues.add_subjects(subject)
-      expect(ues.set_member_subject_ids).to include(subject.id)
+      expect(ues.subject_ids).to include(subject.id)
     end
   end
 
   describe "#remove_subject" do
-    let(:subject) { create(:set_member_subject) }
-    let(:ues) { build(:user_subject_queue, set_member_subject_ids: [subject.id]) }
+    let(:subject) { create(:subject) }
+    let(:ues) { build(:user_subject_queue, subject_ids: [subject.id]) }
     
     it 'should remove the id from the subject ids' do
       ues.remove_subjects(subject)
-      expect(ues.set_member_subject_ids).to_not include(subject.id)
+      expect(ues.subject_ids).to_not include(subject.id)
     end
   end
 end
