@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150210025312) do
+ActiveRecord::Schema.define(version: 20150210055339) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,11 +49,11 @@ ActiveRecord::Schema.define(version: 20150210025312) do
     t.datetime "updated_at"
     t.integer  "user_group_id"
     t.inet     "user_ip"
-    t.boolean  "completed",              default: true, null: false
+    t.boolean  "completed",         default: true, null: false
     t.boolean  "gold_standard"
     t.integer  "expert_classifier"
-    t.json     "metadata",               default: {},   null: false
-    t.integer  "set_member_subject_ids", default: [],                array: true
+    t.json     "metadata",          default: {},   null: false
+    t.integer  "subject_ids",       default: [],                array: true
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
@@ -253,7 +253,7 @@ ActiveRecord::Schema.define(version: 20150210025312) do
     t.integer  "workflow_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "set_member_subject_ids", default: [], null: false, array: true
+    t.integer  "subject_ids", default: [], null: false, array: true
   end
 
   add_index "user_seen_subjects", ["user_id", "workflow_id"], name: "index_user_seen_subjects_on_user_id_and_workflow_id", using: :btree
@@ -262,10 +262,10 @@ ActiveRecord::Schema.define(version: 20150210025312) do
   create_table "user_subject_queues", force: true do |t|
     t.integer  "user_id"
     t.integer  "workflow_id"
-    t.integer  "set_member_subject_ids", default: [], null: false, array: true
+    t.integer  "subject_ids",  default: [], null: false, array: true
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "lock_version",           default: 0
+    t.integer  "lock_version", default: 0
   end
 
   add_index "user_subject_queues", ["user_id", "workflow_id"], name: "index_user_subject_queues_on_user_id_and_workflow_id", unique: true, using: :btree

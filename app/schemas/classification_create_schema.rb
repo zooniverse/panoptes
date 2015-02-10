@@ -21,22 +21,23 @@ class ClassificationCreateSchema < JsonSchema
       end
 
       property "started_at" do
-        type ""
+        type "string"
       end
 
       property "finished_at" do
-        type ""
+        type "string"
       end
-
+      
       property "user_language" do
+        type "string"
       end
 
       property "workflow_version" do
-        type ""
+        type "string"
       end
 
       property "user_agent" do
-        type ""
+        type "string"
       end
     end
 
@@ -68,13 +69,6 @@ class ClassificationCreateSchema < JsonSchema
         type "string", "integer"
       end
 
-      property "set_member_subjects" do
-        type "array"
-        items do
-          type "string", "integer"
-        end
-      end
-      
       property "subjects" do
         type "array"
         items do

@@ -13,17 +13,17 @@ class UserSubjectQueueSerializer
   end
 
   def links
-    {set_member_subjects: @model.set_member_subject_ids,
+    {subjects: @model.subject_ids,
      user: @model.user.id,
      workflow: @model.workflow.id}
   end
 
   def self.links
     links = super
-    links["subject_queues.set_member_subjects"] = {
-                                                   href: "/subjects?set_member_subject_ids={subject_queues.set_member_subjects}",
-                                                   type: "set_member_subjects",
-                                                  }
+    links["subject_queues.subjects"] = {
+      href: "/subjects?subject_ids={subject_queues.subjects}",
+      type: "subjects",
+    }
     links
   end
 end

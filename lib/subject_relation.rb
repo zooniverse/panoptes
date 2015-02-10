@@ -7,7 +7,7 @@
 ## This doesn't replicate all of AR:A just enough to fool RestPack and
 ## JsonApiController into thinking its one. 
 
-class SetMemberSubjectRelation
+class SubjectRelation
   include Enumerable
   
   attr_reader :owner
@@ -16,22 +16,22 @@ class SetMemberSubjectRelation
   
   def initialize(owner)
     @owner = owner
-    @relation = SetMemberSubject.where(id: owner.set_member_subject_ids)
+    @relation = Subject.where(id: owner.subject_ids)
   end
 
   def concat(*models)
     models = models.flatten
-    owner.set_member_subject_ids_will_change!
+    owner.subject_ids_will_change!
     ids = models.map { |m| m.try(:id) || m }
-    owner.set_member_subject_ids.concat(ids)
+    owner.subject_ids.concat(ids)
     owner.save!
   end
 
   def destroy(*models)
     models = models.flatten
-    owner.set_member_subject_ids_will_change!
+    owner.subject_ids_will_change!
     ids = models.map { |m| m.try(:id) || m }
-    owner.set_member_subject_ids.delete(*ids)
+    owner.subject_ids.delete(*ids)
     owner.save!
   end
   

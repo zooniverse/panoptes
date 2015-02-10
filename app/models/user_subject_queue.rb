@@ -8,8 +8,8 @@ class UserSubjectQueue < ActiveRecord::Base
 
   can_through_parent :workflow, :update, :destroy, :update_links, :destroy_links
 
-  delegate :add_subjects, to: :set_member_subjects
-  delegate :remove_subjects, to: :set_member_subjects
+  delegate :add_subjects, to: :subjects
+  delegate :remove_subjects, to: :subjects
 
   def self.scope_for(action, groups, opts={})
     case action
@@ -20,40 +20,40 @@ class UserSubjectQueue < ActiveRecord::Base
     end
   end
 
-  def self.enqueue_subject_for_user(user: nil, workflow: nil, set_member_subject: nil)
+  def self.enqueue_subject_for_user(user: nil, workflow: nil, subject: nil)
     ues = find_or_create_by!(user: user, workflow: workflow)
-    ues.add_subjects(set_member_subject)
+    ues.add_subjects(subject)
   end
 
-  def self.dequeue_subjects_for_user(user: nil, workflow: nil, set_member_subject_ids: nil)
+  def self.dequeue_subjects_for_user(user: nil, workflow: nil, subject_ids: nil)
     ues = find_by!(user: user, workflow: workflow)
-    ues.remove_subjects(set_member_subject_ids)
-    ues.destroy if ues.set_member_subject_ids.empty?
+    ues.remove_subjects(subject_ids)
+    ues.destroy if ues.subject_ids.empty?
   end
 
-  def self.are_subjects_queued?(user: nil, workflow: nil, set_member_subject_ids: nil)
-    where.overlap(set_member_subject_ids: set_member_subject_ids)
+  def self.are_subjects_queued?(user: nil, workflow: nil, subject_ids: nil)
+    where.overlap(subject_ids: subject_ids)
       .exists?(user: user, workflow: workflow)
   end
   
   def next_subjects(limit=10)
-    set_member_subject_ids[0,limit]
+    subject_ids[0,limit]
   end
   
-  def set_member_subjects=(subjects)
-    set_member_subject_ids_will_change!
-    self.set_member_subject_ids = subjects.map(&:id)
+  def subjects=(subjects)
+    subject_ids_will_change!
+    self.subject_ids = subjects.map(&:id)
     save! && reload if persisted?
     subjects
   end
 
   def reload
     super
-    @set_member_subject_relation ||= SetMemberSubjectRelation.new(self)
+    @subject_relation ||= SubjectRelation.new(self)
     self
   end
 
-  def set_member_subjects
-    @set_member_subject_relation ||= SetMemberSubjectRelation.new(self)
+  def subjects
+    @subject_relation ||= SubjectRelation.new(self)
   end
 end

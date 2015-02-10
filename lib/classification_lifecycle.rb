@@ -28,7 +28,7 @@ class ClassificationLifecycle
 
   def update_cellect(cellect_host)
     return unless should_update_seen?
-    set_member_subject_ids.each do |id|
+    subject_ids.each do |id|
       Cellect::Client.connection
         .add_seen(user_id: user.try(:id),
                   workflow_id: workflow.id,
@@ -96,15 +96,15 @@ class ClassificationLifecycle
     @project ||= classification.project
   end
 
-  def set_member_subject_ids
-    @set_member_subject_ids ||= classification.set_member_subject_ids
+  def subject_ids
+    @subject_ids ||= classification.subject_ids
   end
 
   def user_workflow_subject
     @user_workflow_subject ||= {
       user: user,
       workflow: workflow,
-      set_member_subject_ids: set_member_subject_ids
+      subject_ids: subject_ids
     }
   end
 end

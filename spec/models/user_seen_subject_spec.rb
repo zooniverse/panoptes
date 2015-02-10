@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 def created_uss
-  UserSeenSubject.where(params.except(:set_member_subject)).first
+  UserSeenSubject.where(params.except(:subject)).first
 end
 
 RSpec.describe UserSeenSubject, :type => :model do
-  let(:user_seen_subject) { build(:user_seen_subject, set_member_subject_ids: []) }
+  let(:user_seen_subject) { build(:user_seen_subject, subject_ids: []) }
 
   it "should have a valid factory" do
     expect(user_seen_subject).to be_valid
@@ -13,7 +13,7 @@ RSpec.describe UserSeenSubject, :type => :model do
 
   describe "::add_seen_subjects_for_user" do
     let(:subject) { create(:subject) }
-    let(:params) { { user: user, workflow: workflow, set_member_subject_ids: [subject.id] } }
+    let(:params) { { user: user, workflow: workflow, subject_ids: [subject.id] } }
 
     context "when no user or workflow exists" do
       let(:workflow) { nil }
@@ -38,9 +38,9 @@ RSpec.describe UserSeenSubject, :type => :model do
           end.to change{ UserSeenSubject.count }.by(1)
         end
 
-        it "should add the subject id to the set_member_subject_ids array" do
+        it "should add the subject id to the subject_ids array" do
           UserSeenSubject.add_seen_subjects_for_user(params)
-          expect(created_uss.set_member_subject_ids).to eq([ subject.id ])
+          expect(created_uss.subject_ids).to eq([ subject.id ])
         end
       end
 
@@ -53,10 +53,10 @@ RSpec.describe UserSeenSubject, :type => :model do
           end.not_to change{ UserSeenSubject.count }
         end
 
-        it "should add the subject id to the set_member_subject_ids array" do
+        it "should add the subject id to the subject_ids array" do
           UserSeenSubject.add_seen_subjects_for_user(params)
           user_seen_subject.reload
-          expect(user_seen_subject.set_member_subject_ids).to include(subject.id)
+          expect(user_seen_subject.subject_ids).to include(subject.id)
         end
       end
     end
@@ -82,14 +82,14 @@ RSpec.describe UserSeenSubject, :type => :model do
     end
   end
 
-  describe "#add_set_member_subjects" do
+  describe "#add_subjects" do
     let(:uss) { user_seen_subject }
     
-    it "should add a subject's id to the set_member_subject_ids array" do
+    it "should add a subject's id to the subject_ids array" do
       s = create(:subject)
-      uss.add_set_member_subjects([s])
+      uss.add_subjects([s])
       uss.reload
-      expect(uss.set_member_subject_ids).to include(s.id)
+      expect(uss.subject_ids).to include(s.id)
     end
   end
 end

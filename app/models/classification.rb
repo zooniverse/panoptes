@@ -6,7 +6,7 @@ class Classification < ActiveRecord::Base
 
   enum expert_classifier: [:expert, :owner]
 
-  validates_presence_of :set_member_subject_ids, :project,
+  validates_presence_of :subject_ids, :project,
                         :workflow, :annotations, :user_ip
 
   validates :user, presence: true, if: :incomplete?

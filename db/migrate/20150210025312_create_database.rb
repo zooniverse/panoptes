@@ -1,5 +1,6 @@
 class CreateDatabase < ActiveRecord::Migration
   def change
+    # These are extensions that must be enabled in order to support this database
     enable_extension "plpgsql"
 
     create_table "access_control_lists", force: true do |t|
@@ -35,11 +36,11 @@ class CreateDatabase < ActiveRecord::Migration
       t.datetime "updated_at"
       t.integer  "user_group_id"
       t.inet     "user_ip"
-      t.boolean  "completed",              default: true, null: false
+      t.boolean  "completed",         default: true, null: false
       t.boolean  "gold_standard"
       t.integer  "expert_classifier"
-      t.json     "metadata",               default: {},   null: false
-      t.integer  "set_member_subject_ids", default: [],                array: true
+      t.json     "metadata",          default: {},   null: false
+      t.integer  "subject_ids",       default: [],                array: true
     end
 
     add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
@@ -239,7 +240,7 @@ class CreateDatabase < ActiveRecord::Migration
       t.integer  "workflow_id"
       t.datetime "created_at"
       t.datetime "updated_at"
-      t.integer  "set_member_subject_ids", default: [], null: false, array: true
+      t.integer  "subject_ids", default: [], null: false, array: true
     end
 
     add_index "user_seen_subjects", ["user_id", "workflow_id"], name: "index_user_seen_subjects_on_user_id_and_workflow_id", using: :btree
@@ -248,10 +249,10 @@ class CreateDatabase < ActiveRecord::Migration
     create_table "user_subject_queues", force: true do |t|
       t.integer  "user_id"
       t.integer  "workflow_id"
-      t.integer  "set_member_subject_ids", default: [], null: false, array: true
+      t.integer  "subject_ids",  default: [], null: false, array: true
       t.datetime "created_at"
       t.datetime "updated_at"
-      t.integer  "lock_version",           default: 0
+      t.integer  "lock_version", default: 0
     end
 
     add_index "user_subject_queues", ["user_id", "workflow_id"], name: "index_user_subject_queues_on_user_id_and_workflow_id", unique: true, using: :btree
@@ -329,5 +330,6 @@ class CreateDatabase < ActiveRecord::Migration
 
     add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree
     add_index "workflows", ["tutorial_subject_id"], name: "index_workflows_on_tutorial_subject_id", using: :btree
+
   end
 end

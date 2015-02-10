@@ -4,6 +4,6 @@ FactoryGirl.define do
   factory :user_seen_subject do
     user
     workflow
-    set_member_subject_ids [1,2,3]
+    subject_ids { create_list(:set_member_subject, 2).map(&:subject).map(&:id) }
   end
 end

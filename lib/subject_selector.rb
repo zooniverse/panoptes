@@ -31,8 +31,7 @@ class SubjectSelector
   end
 
   def selected_subjects(subject_ids)
-    set_member_subjects = SetMemberSubject.where(id: subject_ids).select(:subject_id)
-    subjects = @scope.where(id: set_member_subjects)
+    subjects = @scope.where(id: subject_ids) 
     subjects
   end
 
