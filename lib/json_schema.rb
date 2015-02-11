@@ -1,6 +1,8 @@
 class JsonSchema
   class ValidationError < StandardError; end
 
+  ERROR_FORMAT_REGEX = /'#\/(.*)'\s(.+)\sin/
+
   class Builder
     attr_reader :schema
 
@@ -93,7 +95,8 @@ class JsonSchema
 
   def format_errors_to_hash(errors_array)
     errors_array.collect do |error|
-      error.scan(/'#\/(.+)'.+(did.+)\sin/).flatten
+      field, message = error.scan(ERROR_FORMAT_REGEX).flatten
+      [ field.blank? ? 'schema' : field, message ]
     end.to_h
   end
 end
