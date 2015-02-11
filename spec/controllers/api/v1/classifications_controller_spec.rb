@@ -32,8 +32,11 @@ def setup_create_request(project_id, workflow_id, subject_id)
         }
       }
     }
-  unless gold_standard.nil?
+  case
+  when !gold_standard.nil?
     params[:classifications].merge!(gold_standard: gold_standard)
+  when invalid_property
+    params[:classifications].merge!(invalid_property => "a fake value")
   end
 
   post :create, params
@@ -46,6 +49,7 @@ end
 describe Api::V1::ClassificationsController, type: :controller do
   let!(:user) { create(:user) }
   let(:gold_standard) { nil }
+  let(:invalid_property) { nil }
   let(:classification) { create(:classification, user: user) }
   let(:project) { create(:full_project) }
   let!(:workflow) { project.workflows.first }
@@ -94,16 +98,29 @@ describe Api::V1::ClassificationsController, type: :controller do
         it_behaves_like "a classification lifecycle event"
         it_behaves_like "a gold standard classfication"
 
+        context "when extra invalid classifcation properties are added" do
+          let!(:invalid_property) { :custom_field }
+
+          it "should fail via the schema validator with the correct message" do
+            create_action
+            error = json_response["errors"].first["message"]
+            expected_error = {
+              "schema" => "contains additional properties [\"custom_field\"] outside of the schema when none are allowed"
+            }.to_s
+            expect(error).to match(expected_error)
+          end
+        end
+
         context "when invalid link id strings are used" do
 
-          it "should fail via the schema validator" do
+          it "should fail via the schema validator with the correct message" do
             req_params = [ project.id,
                            "MOCK_WORKFLOW_FOR_CLASSIFIER",
                            "MOCK_SUBJECT_FOR_CLASSIFIER" ]
             setup_create_request(*req_params)
             error = json_response["errors"].first["message"]
-            expected_error = { "links/workflow"   => "did not match the regex '^[0-9]*$'",
-                               "links/subjects/0" => "did not match the regex '^[0-9]*$'"}.to_s
+            expected_error = { "links/workflow"   => "value \"MOCK_WORKFLOW_FOR_CLASSIFIER\" did not match the regex '^[0-9]*$'",
+                               "links/subjects/0" => "value \"MOCK_SUBJECT_FOR_CLASSIFIER\" did not match the regex '^[0-9]*$'"}.to_s
             expect(error).to match(expected_error)
           end
         end
