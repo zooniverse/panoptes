@@ -1,9 +1,9 @@
 class Api::V1::ProjectRolesController < Api::ApiController
   include RolesController
-
-  doorkeeper_for :all, scopes: [:project]
+  skip_before_filter :require_login, only: :index
+  doorkeeper_for :show, :create, :update, scopes: [:project]
   schema_type :strong_params
-  
+
   allowed_params :create, roles: [], links: [:user, :project]
 
   allowed_params :update, roles: []

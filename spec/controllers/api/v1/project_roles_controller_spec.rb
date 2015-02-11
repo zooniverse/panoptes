@@ -1,14 +1,15 @@
 require 'spec_helper'
 
 RSpec.describe Api::V1::ProjectRolesController, type: :controller do
-  let(:authorized_user) { create(:user) }
-  let(:project) { create(:project, owner: authorized_user) }
-  
+  let(:user) { create(:user) }
+  let(:authorized_user) { user }
+  let(:project) { create(:project, owner: user) }
+
   let!(:acls) do
     create_list :access_control_list, 2, resource: project,
                 roles: ["tester"]
   end
-  
+
   let(:api_resource_name) { 'project_roles' }
   let(:api_resource_attributes) { %w(id roles) }
   let(:api_resource_links) { %w(project_roles.project) }
@@ -21,7 +22,16 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     let!(:private_resource) { create(:access_control_list, resource: create(:project, private: true)) }
     let(:n_visible) { 3 }
 
-    it_behaves_like "is indexable"
+    context "when not logged in" do
+      let(:authorized_user) { nil }
+
+      it_behaves_like "is indexable"
+    end
+
+    describe "a logged in user" do
+
+      it_behaves_like "is indexable"
+    end
   end
 
   describe "#show" do
