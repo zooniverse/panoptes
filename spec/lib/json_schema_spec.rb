@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe JsonSchema do
+  let(:formated_error_messages) do
+    { "name" => "did not match the following type: string",
+      "metadata" => "did not contain a required property of 'start'" }.to_s
+  end
   shared_examples "validates json" do
     context "valid json" do
       let(:valid_json) do
@@ -34,9 +38,15 @@ RSpec.describe JsonSchema do
           subject.validate!(invalid_json)
         end.to raise_error(JsonSchema::ValidationError)
       end
+
+      it 'should format the error message for use in the API response' do
+        expect do
+          subject.validate!(invalid_json)
+        end.to raise_error(formated_error_messages)
+      end
     end
   end
-  
+
   describe "::schema" do
     subject do
       Class.new(JsonSchema) do
@@ -85,7 +95,7 @@ RSpec.describe JsonSchema do
         property "metadata" do
           type "object"
           required "start", "end"
-          
+
           property "start" do
             type "integer"
           end
@@ -96,7 +106,7 @@ RSpec.describe JsonSchema do
         end
       end
     end
-    
+
     it_behaves_like "validates json"
   end
 end

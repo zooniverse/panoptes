@@ -86,6 +86,14 @@ class JsonSchema
 
   def validate!(json)
     errors = JSON::Validator.fully_validate(@schema, json)
-    raise ValidationError, errors unless errors.empty?
+    unless errors.empty?
+      raise ValidationError, format_errors_to_hash(errors)
+    end
+  end
+
+  def format_errors_to_hash(errors_array)
+    errors_array.collect do |error|
+      error.scan(/'#\/(.+)'.+(did.+)\sin/).flatten
+    end.to_h
   end
 end
