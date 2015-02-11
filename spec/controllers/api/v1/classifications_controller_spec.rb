@@ -94,7 +94,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         it_behaves_like "a classification lifecycle event"
         it_behaves_like "a gold standard classfication"
 
-        context "when invalid link id strings are used", :focus do
+        context "when invalid link id strings are used" do
 
           it "should fail via the schema validator" do
             req_params = [ project.id,
@@ -102,8 +102,9 @@ describe Api::V1::ClassificationsController, type: :controller do
                            "MOCK_SUBJECT_FOR_CLASSIFIER" ]
             setup_create_request(*req_params)
             error = json_response["errors"].first["message"]
-            expected = /MOCK_SUBJECT_FOR_CLASSIFIER.*did not match the regex/
-            expect(error).to match(expected)
+            expected_error = { "links/workflow"   => "did not match the regex '^[0-9]*$'",
+                               "links/subjects/0" => "did not match the regex '^[0-9]*$'"}.to_s
+            expect(error).to match(expected_error)
           end
         end
       end
