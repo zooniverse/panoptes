@@ -31,6 +31,27 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     describe "a logged in user" do
 
       it_behaves_like "is indexable"
+
+      describe "filter params" do
+        let!(:new_project) { create(:project) }
+
+        before(:each) do
+          get :index, index_options
+        end
+
+        describe "filter by project_id" do
+          let(:index_options) { { resource_id: new_project.id } }
+
+          it "should respond with 1 item" do
+            expect(json_response[api_resource_name].length).to eq(1)
+          end
+
+          it "should respond with the correct item" do
+            project_id = json_response[api_resource_name][0]['links']['project']
+            expect(project_id).to eq(new_project.id.to_s)
+          end
+        end
+      end
     end
   end
 
