@@ -1,7 +1,9 @@
-class CollectionRoleSerializer < AccessControlListSerializer
+class CollectionRoleSerializer
+  include ACLSerializer
+
   attributes :id, :roles
   can_include :user_group, :resource
-  
+
   def self.key
     "collection_roles"
   end

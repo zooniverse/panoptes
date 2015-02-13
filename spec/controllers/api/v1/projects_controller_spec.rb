@@ -122,10 +122,13 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         context "when the serializer models are known" do
-          let(:includes) { "workflows,subject_sets" }
+          let(:included_models) do
+            %w(workflows subject_sets project_contents project_roles)
+          end
+          let(:includes) { included_models.join(',') }
 
           it "should include the relations in the response as linked" do
-            expect(json_response['linked'].keys).to match_array(%w(workflows subject_sets))
+            expect(json_response['linked'].keys).to match_array(included_models)
           end
         end
 
@@ -348,7 +351,7 @@ describe Api::V1::ProjectsController, type: :controller do
         params = params.merge(id: resource.id)
         put :update, params
       end
-      
+
       it 'should update the default contents when the display_name is updated' do
         contents_title = resource.primary_content.title
         expect(contents_title).to eq(test_attr_value)
