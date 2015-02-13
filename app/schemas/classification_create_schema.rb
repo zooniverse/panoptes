@@ -27,7 +27,7 @@ class ClassificationCreateSchema < JsonSchema
       property "finished_at" do
         type "string"
       end
-      
+
       property "user_language" do
         type "string"
       end
@@ -45,11 +45,11 @@ class ClassificationCreateSchema < JsonSchema
       type "array"
       items do
         type "object"
-        
+
         property "task" do
           type "string"
         end
-        
+
         property "value" do
           type "string", "object", "array", "float", "integer"
         end
@@ -63,16 +63,19 @@ class ClassificationCreateSchema < JsonSchema
 
       property "project" do
         type "string", "integer"
+        pattern "^[0-9]*$"
       end
 
       property "workflow" do
         type "string", "integer"
+        pattern "^[0-9]*$"
       end
 
       property "subjects" do
         type "array"
         items do
           type "string", "integer"
+          pattern "^[0-9]*$"
         end
       end
     end
