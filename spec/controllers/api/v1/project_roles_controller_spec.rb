@@ -40,7 +40,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
         end
 
         describe "filter by project_id" do
-          let(:index_options) { { resource_id: new_project.id } }
+          let(:index_options) { { project_id: new_project.id } }
 
           it "should respond with 1 item" do
             expect(json_response[api_resource_name].length).to eq(1)
