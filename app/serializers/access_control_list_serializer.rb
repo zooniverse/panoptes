@@ -26,7 +26,7 @@ class AccessControlListSerializer
     links.delete("#{key}.user_group")
     link_type = resource_type.pluralize
     links["#{key}.#{resource_type}"] = { type: link_type,
-                                         href: "/#{link_type}/{#{key}.#{resource_type}" }
+                                         href: "/#{link_type}/{#{key}.#{resource_type}}" }
     links
   end
 end

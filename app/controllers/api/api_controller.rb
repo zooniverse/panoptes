@@ -4,7 +4,7 @@ module Api
   class ApiController < ApplicationController
     include JsonApiController
     include RoleControl::RoledController
-    
+
     API_ACCEPTED_CONTENT_TYPES = ['application/json',
                                   'application/vnd.api+json']
     API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
@@ -79,7 +79,9 @@ module Api
     end
 
     def require_login
-      raise Api::NotLoggedIn unless api_user.logged_in?
+      unless api_user.logged_in?
+        raise Api::NotLoggedIn.new("You must be logged in to access this resource.")
+      end
     end
 
     def ban_user

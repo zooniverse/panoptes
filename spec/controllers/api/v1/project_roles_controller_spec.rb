@@ -1,14 +1,15 @@
 require 'spec_helper'
 
 RSpec.describe Api::V1::ProjectRolesController, type: :controller do
-  let(:authorized_user) { create(:user) }
-  let(:project) { create(:project, owner: authorized_user) }
-  
+  let(:user) { create(:user) }
+  let(:authorized_user) { user }
+  let(:project) { create(:project, owner: user) }
+
   let!(:acls) do
     create_list :access_control_list, 2, resource: project,
                 roles: ["tester"]
   end
-  
+
   let(:api_resource_name) { 'project_roles' }
   let(:api_resource_attributes) { %w(id roles) }
   let(:api_resource_links) { %w(project_roles.project) }
@@ -21,7 +22,37 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     let!(:private_resource) { create(:access_control_list, resource: create(:project, private: true)) }
     let(:n_visible) { 3 }
 
-    it_behaves_like "is indexable"
+    context "when not logged in" do
+      let(:authorized_user) { nil }
+
+      it_behaves_like "is indexable"
+    end
+
+    describe "a logged in user" do
+
+      it_behaves_like "is indexable"
+
+      describe "filter params" do
+        let!(:new_project) { create(:project) }
+
+        before(:each) do
+          get :index, index_options
+        end
+
+        describe "filter by project_id" do
+          let(:index_options) { { project_id: new_project.id } }
+
+          it "should respond with 1 item" do
+            expect(json_response[api_resource_name].length).to eq(1)
+          end
+
+          it "should respond with the correct item" do
+            project_id = json_response[api_resource_name][0]['links']['project']
+            expect(project_id).to eq(new_project.id.to_s)
+          end
+        end
+      end
+    end
   end
 
   describe "#show" do
