@@ -94,9 +94,11 @@ class JsonSchema
   end
 
   def format_errors_to_hash(errors_array)
-    errors_array.collect do |error|
+    formatted_errors = errors_array.collect do |error|
       field, message = error.scan(ERROR_FORMAT_REGEX).flatten
       [ field.blank? ? 'schema' : field, message ]
-    end.to_h
+    end.flatten
+    # TODO: bump to array.to_h when jruby supports MRI 2.2
+    Hash[*formatted_errors]
   end
 end
