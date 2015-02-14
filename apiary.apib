@@ -20,7 +20,7 @@ Panoptes API provides an OAuth 2.0 authentication mechanism. (TODO:
 Describe Authentication Workflow).
 
 # Headers
-Panotpes API sometime requires specific headers to be sent as part of requests.
+Panoptes API sometime requires specific headers to be sent as part of requests.
 
 All requests should set `Accept: application/vnd.api+json; version=1`. You will receive a `404 Not Found` without it.
 
@@ -31,7 +31,7 @@ All PUT and DELETE requests should set the `If-Unmodified-Since` header to the v
 # Group Panoptes API Root [/]
 Panoptes API entry point.
 
-This resource does not have attributes intstead it lists links to the
+This resource does not have attributes instead it lists links to the
 available resources.
 
 ## Retrieve Entry Point [GET]
@@ -170,7 +170,7 @@ cannot edit linked resources.
 
     [User][]
 
-### Destory a single User [DELETE]
+### Destroy a single User [DELETE]
 The current logged in User may delete themself. This does not fully
 remove the user resource; instead, it deactivates their projects
 and removes personally identifying information including the
@@ -264,7 +264,7 @@ User resources are included a an array under the _users_ key
     + page (optional, integer) ... index of the collection page, 1 is default
     + per_page (optional, integer) ... number of items on a page. 20 is default
     + sort (optional, string) ... fields to sort collection by. id is default
-    + include (optional, string) ... comma seperated list of linked resources to include
+    + include (optional, string) ... comma separated list of linked resources to include
 
 + Request
 
@@ -546,7 +546,7 @@ and *user_group_id* parameters.
     + sort (optional, string) ... fields to sort collection by. updated_at is default
     + project_id (optional, integer) ... only retrieve classifications for a specific project
     + user_group_id (optional, integer) ... only retrieve classifications for a specific user group
-    + include (optional, string) ... comma seperated list of linked resources to return with the collection
+    + include (optional, string) ... comma separated list of linked resources to return with the collection
     + for (optional, string) ... one of 'projects', 'user', 'user_groups', 'user' by default (see explanation above).
 
 + Request
@@ -561,13 +561,19 @@ and *user_group_id* parameters.
     [Classification Collection][]
 
 ### Create a Classification [POST]
-Create a classification by providing a JSON-API formatted object that
-must include metadata, annotations and a links hash containing a subjects hash,
-a project and workflow ids. The metadata hash must contain the keys specified
-below. Of note the workflow version should be the value retured from the
+Create a classification by providing a JSON-API formatted object, that
+must include _metadata_, _annotations_ and a _links_ hash. Optionally, it
+may include the _completed_ field, which if not included defaults to true.
+The completed field is used to store half-completed classifications, so the user
+can later continue from where he stopped.
+
+The _links_ hash must contain a _subjects_ hash, a _project_ and a _workflow_. 
+The _metadata_ hash must contain all the keys specified in the example. 
+Please note, the _workflow_version_ should be the value returned from the
 specific workflow representation. The annotations array must be in the
-format specified, i.e. an array of task name value answers objects. Optionally
-may include the completed field, which will be set to true by default.
+format specified in the example, i.e. an array of objects, containing a _task_ and a _value_. 
+The _task_ can be anything and must not necessarily align with the tasks of the workflow 
+(even though that is generally not advised).
 
 
 + Request
@@ -610,7 +616,7 @@ Resources related to _Panoptes Subjects_.
 
 ## Subject [/subjects/{id}{?include}]
 A single Subject object. A Subject is a resource that describe a
-peice of media to be classified including metadata about the object.
+piece of media to be classified including metadata about the object.
 
 - id
 - zooniverse_id
@@ -861,7 +867,7 @@ Subject Versions are returned as an array under *versions*.
     [Subject Version Collection][]
 
 ## Subject Collection [/subjects{?page,per_page,sort,workflow_id,subject_set_id}]
-Represenents a collection of subjects.
+Represents a collection of subjects.
 
 All collections add a *meta* attribute hash containing paging information.
 
@@ -937,8 +943,8 @@ classify, usually for expert classifiers.
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by 'cellect' and 'queued' have special behaviour
-  + workflow_id (optional, intger) ... filter to subjects belonging to a specific workflow. Required when sort is 'random'
-  + subject_set_id (optional, intger) ... return subjects belonging to the identified subject_set
+  + workflow_id (optional, integer) ... filter to subjects belonging to a specific workflow. Required when sort is 'random'
+  + subject_set_id (optional, integer) ... return subjects belonging to the identified subject_set
 
 + Request
 
@@ -1090,7 +1096,7 @@ It has the following attributes:
 
 ### Retrieve a single Project [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to include in the response
+  + include (optional, string) ... comma separated list of linked resources to include in the response
 
 + Request
 
@@ -1111,7 +1117,7 @@ workflow to be destroyed. Adding a workflow or subject set causes
 the original to be copied and a new id to be returned.
 
 Setting has may links through a PUT, while supported, is not
-recommened. Instead, use the link endpoints explained below.
+recommended. Instead, use the link endpoints explained below.
 
 + Request
 
@@ -1182,7 +1188,7 @@ of the complete Project representation response.
 The recommended way to destroy project links.
 
 ### Destroy a Link [DELETE]
-Will destroy the comma seperated list of link ids for the given link
+Will destroy the comma separated list of link ids for the given link
 type. For Projects, only workflow and subject_set links can be
 destroyed in this manner. The linked object will be destroyed with
 this action.
@@ -1190,7 +1196,7 @@ this action.
 + Parameters
   + id (required, integer) ... the id of the project to modify
   + link_type (required, string) ... the name of the link to edit. May only be subject_set or workflow
-  + link_ids (required, string) ... comma seperated list of ids to destroy
+  + link_ids (required, string) ... comma separated list of ids to destroy
 
 + Request
 
@@ -1322,7 +1328,7 @@ Projects are returned as an array under the _projects_ key.
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + owner (optional, string) ... string owner name of either a user or a user group to filter by.
-  + include (optional, string) ... comma seperated list of linked resources to include in the response
+  + include (optional, string) ... comma separated list of linked resources to include in the response
 
 + Request
 
@@ -1505,7 +1511,7 @@ Each tool has a string `color`, which is applied to the marks made by the tool. 
 
 ### Retrieve a single Workflow [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to include in the response
+  + include (optional, string) ... comma separated list of linked resources to include in the response
 
 + Request
 
@@ -1583,13 +1589,13 @@ the subject set if it belongs do a different project.
 ## Destroy subject set links [/workflows/{id}/links/subject_set/{subject_set_ids}]
 The recommended way to remove links.
 
-### Destroy stubject set [DELETE]
+### Destroy subject set [DELETE]
 Removes workflow's links to the given subject_sets. It does not
 destroy the subject set models.
 
 + Parameters
   + id (required, integer) ... id of workflow to update
-  + subject_set_ids (required, string) ... comma seperated list of ids to destroy
+  + subject_set_ids (required, string) ... comma separated list of ids to destroy
 
 + Request
 
@@ -1614,8 +1620,8 @@ It has the following attributes:
 It is not editable.
 
 + Parameters
-  + workflow_id (required, integer) ... id of the workflow to retreive versions for
-  + id (required, integer) ... id of the version resource to retreive
+  + workflow_id (required, integer) ... id of the workflow to retrieve versions for
+  + id (required, integer) ... id of the version resource to retrieve
 
 + Model
 
@@ -1668,7 +1674,7 @@ information.
 Workflow Versions are returned as an array under *versions*.
 
 + Parameters
-  + workflow_id (required, integer) ... id of the workflow to retreive versions for
+  + workflow_id (required, integer) ... id of the workflow to retrieve versions for
 
 + Model
 
@@ -1897,7 +1903,7 @@ Workflows are returned as an array under the _workflows_ key.
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by id by default
   + project_id (optional, integer) ... filter workflows by project id
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
@@ -2038,7 +2044,7 @@ All attributes except display_name are set by the API
 
 ### Retrieve a single Subject Set [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to include in the response
+  + include (optional, string) ... comma separated list of linked resources to include in the response
 
 + Request
 
@@ -2126,13 +2132,13 @@ Only Subjects links may be edited.
     [SubjectSet][]
 
 ## Destroy Subject Set Links [/subject_sets/{id}/links/{link_type}/{link_ids}]
-Allows links to be removed without sending a full represenation of the
+Allows links to be removed without sending a full representation of the
 linked relationship.
 
 + Parameters
   + id (required, integer) ... the id of the Subject Set to modify
   + link_type (required, string) ... the relationship to modify
-  + link_ids (required, integer) ... comma seperated list of ids to remove
+  + link_ids (required, integer) ... comma separated list of ids to remove
 
 ### Destroy some links [DELETE]
 Will only remove the link. This operation does not destroy the linked object.
@@ -2228,7 +2234,7 @@ Subject Sets are returned as an array under *subject_sets*.
   + sort (optional, string) ... field to sort by, id by default
   + project_id (optional, integer) ... filter by linked project
   + workflow_id (optional, integer) ... filter by linked workflow
-  + include (optional, string) ... comma seperated list of linked resources to include in the response
+  + include (optional, string) ... comma separated list of linked resources to include in the response
 
 + Request
 
@@ -2344,7 +2350,7 @@ A User Group has the following attributes:
 
 ### Retrieve a single User Group [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to include in the response
+  + include (optional, string) ... comma separated list of linked resources to include in the response
 
 + Request
 
@@ -2441,7 +2447,7 @@ membership set to 'inactive'.
 + Parameters
   + id (required, integer) ... id of the group to be edited.
   + link_type (required, string) ... name of the link to modify
-  + link_ids (required, string) ... comma seperated list of ids to remove
+  + link_ids (required, string) ... comma separated list of ids to remove
 
 ### Remove links [DELETE]
 
@@ -2543,7 +2549,7 @@ User Groups are returned as an array under *user_groups*.
   + per_page (optional, integer) ... number of items per page 20 by default
   + sort (optional, string) ... field to sort by, id by default
   + user_id (optional, integer) ... filter list to groups a user is part of
-  + include (optional, string) ... comma seperated list of linked resources to include in the response
+  + include (optional, string) ... comma separated list of linked resources to include in the response
 
 + Request
 
@@ -2853,7 +2859,7 @@ It has the following attributes:
     [Collection][]
 
 ### Edit a collection [PUT]
-A user may edit a collecion they are the owner of or have edit
+A user may edit a collection they are the owner of or have edit
 permissions for. A user may edit a collection's name, display_name, or
 visible_to array, and may also send a full representation of a
 collections subject links.
@@ -2924,12 +2930,12 @@ have edit permissions.
 Remove subjects from a collection.
 
 ### Remove links [DELETE]
-A user is permitted to remove subjects if they are the colleciton
+A user is permitted to remove subjects if they are the collection
 owner or have edit permissions.
 
 + Parameters
   + id (required, integer) ... id of collection to edit
-  + link_ids (required, string) ... comma seperated list of ids to remove
+  + link_ids (required, string) ... comma separated list of ids to remove
 
 + Request
 
@@ -3061,7 +3067,7 @@ owner, and links to subjects.
 Resources related to _Panotpes SubjectQueues_
 
 ## SubjectQueue [/subject_queues/{id}{?include}]
-A subject queue is a list of subjects for classifiation by a
+A subject queue is a list of subjects for classification by a
 user that is created by a project owner or editor. When a user
 requests subjects to classify using the `?sort=queued` param they we
 be given a randomly selection from their queue if it exists.
@@ -3107,7 +3113,7 @@ All attributes are assigned by the API.
 
 ### Retrieve a single SubjectQueue [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to include
+  + include (optional, string) ... comma separated list of linked resources to include
 
 + Request
 
@@ -3190,7 +3196,7 @@ or have edit permissions.
 
 + Parameters
   + id (required, integer) ... id of queue to edit
-  + link_ids (required, string) ... comma seperated list of ids to remove
+  + link_ids (required, string) ... comma separated list of ids to remove
 
 + Request
 
@@ -3268,7 +3274,7 @@ SubjectQueues are returned as an array under *subject_queues*.
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + workflow_id (optional, integer) ... workflow queue belongs to
   + user_id (optional, integer) ... user id queue belongs to
-  + include (optional, string) ... comma seperated list of linked resources to include
+  + include (optional, string) ... comma separated list of linked resources to include
 
 + Request
 
@@ -3357,7 +3363,7 @@ roles are visible to the project owner and the user given roles.
 
 ### Retrieve a single ProjectRole [GET]
 + Parameters
-  + include (optional, string) ... comma seperate list of linked resources to load
+  + include (optional, string) ... comma separate list of linked resources to load
 
 + Request
 
@@ -3462,7 +3468,7 @@ ProjectRoles are returned as an array under *project_roles*.
   + sort (optional, string) ... field to sort by
   + user_id (optional, integer) ... user_id to see roles for
   + project_id (optional, integer) ... project_id to see roles for
-  + include (optional, string) ... comma seperate list of linked resources to load
+  + include (optional, string) ... comma separate list of linked resources to load
 
 + Request
 
@@ -3555,7 +3561,7 @@ It has the following attributes:
 
 ### Retrieve a single ProjectPreference [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
@@ -3572,7 +3578,7 @@ It has the following attributes:
 Only the owning user may edit a Project Preference resource. The
 email_communication field and the preferences field may be edited.
 
-Editing the preferences field requires a full represenation of the
+Editing the preferences field requires a full representation of the
 preferences hash to be sent.
 
 + Request
@@ -3666,7 +3672,7 @@ ProjectPreferences are returned as an array under *project_preferences*.
   + sort (optional, string) ... field to sort by
   + user_id (optional, integer) ... user_id to see preferences for
   + project_id (optional, integer) ... project_id to see preferences for
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
@@ -3788,7 +3794,7 @@ zh_HK).
 
 ### Retrieve a single ProjectContent [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
@@ -3831,7 +3837,7 @@ primary_language field may not be edited.
     [ProjectContent][]
 
 ### Destroy a ProjectConent [DELETE]
-Only users who edit premissions for the parent project may remove
+Only users who edit permissions for the parent project may remove
 project content models.
 
 Project Contents that have the same language as their parent project's
@@ -4058,7 +4064,7 @@ Project Contents are returned as an array under *project_contents*.
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + project_id (optional, integer) ... project_id to see contents for
   + language (optional, string) ... language code to search for
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
@@ -4164,7 +4170,7 @@ zh_HK).
 
 ### Retrieve a single WorkflowContent [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
@@ -4181,7 +4187,7 @@ zh_HK).
 Only users with edit permissions for the parent project or users who
 have the "translator" roles may edit workflow contents.
 
-The *strings* field must be edited as a full respresentation. The
+The *strings* field must be edited as a full representation. The
 *language* field may not be changed.
 
 Workflow Contents that have the same language as their parent workflow's
@@ -4209,7 +4215,7 @@ primary_language field may not be edited.
     [WorkflowContent][]
 
 ### Destroy a WorkflowConent [DELETE]
-Only users who edit premissions for the parent project may remove
+Only users who edit permissions for the parent project may remove
 workflow content models.
 
 Workflow Contents that have the same language as their parent workflow's
@@ -4238,7 +4244,7 @@ It has the following attributes:
 It is not editable.
 
 + Parameters
-  + workflow_contents_id (required, integer) ... id of the workflow to retreive versions for
+  + workflow_contents_id (required, integer) ... id of the workflow to retrieve versions for
   + id (required, integer) ... integer id of the version to load
 
 + Model
@@ -4294,7 +4300,7 @@ information.
 Workflow Content Versions are returned as an array under *versions*.
 
 + Parameters
-  + workflow_contents_id (required, integer) ... id of the workflow to retreive versions for
+  + workflow_contents_id (required, integer) ... id of the workflow to retrieve versions for
 
 + Model
 
@@ -4448,7 +4454,7 @@ Workflow Contents are returned as an array under *workflow_contents*.
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + workflow_id (optional, integer) ... id of workflow to see contents for
   + language (optional, string) ... language code to search for
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
@@ -4498,7 +4504,7 @@ Resources that represent _Panoptes Subjects_ within _Panoptes SubjectSets_.
 A Set Member Subject resource contains the state of a subject that is
 included in a resource.
 
-It has the following attribtues
+It has the following attributes
 
 - id
 - created_at
@@ -4541,7 +4547,7 @@ It has the following attribtues
 
 ### Retrieve a Single SetMemberSubject [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
@@ -4579,7 +4585,7 @@ SubjectSet belongs to may edit the *state* and *priority* attributes.
 
 ### Destroy a SetMemberSubject [DELETE]
 A user with edit permissions for the project a SetMemberSubject's
-Subject belongs to may destory a SetMemberSubject resource. This
+Subject belongs to may destroy a SetMemberSubject resource. This
 removes the linked Subject form the linked SubjectSet
 
 + Response 204
@@ -4651,7 +4657,7 @@ SetMemberSubjects are returned as an array under *set_member_subjects*.
   + per_page (optional, integer) ... number of items to include on a page default is 20
   + subject_id (optional, integer) ... id of subject to see set_member_subjects for
   + subject_set_id (optional, integer) ... id of subject_set to see set_member_subjects for
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
@@ -4745,7 +4751,7 @@ roles are visible to the collection owner and the user given roles.
 
 ### Retrieve a single CollectionRole [GET]
 + Parameters
-  + include (optional, string) ... comma seperate list of linked resources to load
+  + include (optional, string) ... comma separate list of linked resources to load
 
 + Request
 
@@ -4850,7 +4856,7 @@ CollectionRoles are returned as an array under *collection_roles*.
   + sort (optional, string) ... field to sort by
   + user_id (optional, integer) ... user_id to see roles for
   + collection_id (optional, integer) ... collection_id to see roles for
-  + include (optional, string) ... comma seperate list of linked resources to load
+  + include (optional, string) ... comma separate list of linked resources to load
 
 + Request
 
@@ -4941,7 +4947,7 @@ It has the following attributes:
 
 ### Retrieve a single CollectionPreference [GET]
 + Parameters
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
@@ -4958,7 +4964,7 @@ It has the following attributes:
 Only the owning user may edit a Collection Preference resource. The
 preferences field may be edited.
 
-Editing the preferences field requires a full represenation of the
+Editing the preferences field requires a full representation of the
 preferences object to be sent.
 
 + Request
@@ -5050,7 +5056,7 @@ CollectionPreferences are returned as an array under *collection_preferences*.
   + sort (optional, string) ... field to sort by
   + user_id (optional, integer) ... user_id to see preferences for
   + collection_id (optional, integer) ... collection_id to see preferences for
-  + include (optional, string) ... comma seperated list of linked resources to load
+  + include (optional, string) ... comma separated list of linked resources to load
 
 + Request
 
