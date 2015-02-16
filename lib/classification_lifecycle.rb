@@ -14,6 +14,11 @@ class ClassificationLifecycle
       raise ClassificationNotPersisted.new(message)
     end
     ClassificationWorker.perform_async(classification.id, action)
+    if classification.complete?
+      classification.subject_ids.each do |sid|
+        ClassificationCountWorker.perform_async(sid, classification.workflow_id)
+      end
+    end
   end
 
   def transact!(&block)

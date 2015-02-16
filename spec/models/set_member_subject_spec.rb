@@ -33,4 +33,13 @@ describe SetMemberSubject, :type => :model do
       expect(set_member_subject.subject).to be_a(Subject)
     end
   end
+
+  describe "::by_subject_workflow" do
+    it "should retrieve and object by subject and workflow id" do
+      set_member_subject.save!
+      sid = set_member_subject.subject_id
+      wid = set_member_subject.subject_set.workflow_id
+      expect(SetMemberSubject.by_subject_workflow(sid, wid)).to include(set_member_subject)
+    end
+  end
 end

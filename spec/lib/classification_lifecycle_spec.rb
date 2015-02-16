@@ -46,6 +46,30 @@ describe ClassificationLifecycle do
         end.to raise_error(ClassificationLifecycle::ClassificationNotPersisted)
       end
     end
+
+    context 'when classification is complete' do
+      before(:each) do
+        allow(classification).to receive(:persisted?).and_return(true)
+        allow(classification).to receive(:complete?).and_return(true)
+      end
+      
+      it 'should queue the count worker' do
+        expect(ClassificationCountWorker).to receive(:perform_async).twice
+        subject.queue(:create)
+      end
+    end
+    
+    context 'when classification is incomplete' do
+      before(:each) do
+        allow(classification).to receive(:persisted?).and_return(true)
+        allow(classification).to receive(:complete?).and_return(false)
+      end
+      
+      it 'should not queue the count worker' do
+        expect(ClassificationCountWorker).to_not receive(:perform_async)
+        subject.queue(:create)
+      end
+    end
   end
 
   describe "#transact!" do
