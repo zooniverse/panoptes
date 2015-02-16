@@ -12,7 +12,7 @@ ADD ./Gemfile.lock /rails_app/
 ADD ./Jarfile /rails_app/
 ADD ./Jarfile.lock /rails_app/
 
-RUN bundle install && jbundle install
+RUN bundle install
 
 ADD ./ /rails_app
 
