@@ -29,7 +29,7 @@ module ACLSerializer
     group = model.user_group
     group = group.users.first if group.identity?
     data[:links][:owner] = { id: group.id.to_s,
-                             to_s: group.class.model_name.plural,
+                             type: group.class.model_name.plural,
                              href: group.class.model_name.route_key}
     data
   end

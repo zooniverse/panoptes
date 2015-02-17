@@ -26,6 +26,14 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
       let(:authorized_user) { nil }
 
       it_behaves_like "is indexable"
+
+      it "should have the custom owner resource links" do
+        get :index
+        resource_links = json_response[api_resource_name].map do |resource|
+          resource["links"]["owner"].keys
+        end
+        expect(resource_links.flatten.uniq).to eq %w(id type href)
+      end
     end
 
     describe "a logged in user" do
