@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150210025312) do
+ActiveRecord::Schema.define(version: 20150216192936) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -168,13 +168,14 @@ ActiveRecord::Schema.define(version: 20150210025312) do
   end
 
   create_table "set_member_subjects", force: true do |t|
-    t.integer  "state",          default: 0, null: false
+    t.integer  "state",                default: 0, null: false
     t.integer  "subject_set_id"
     t.integer  "subject_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.decimal  "priority"
-    t.integer  "lock_version",   default: 0
+    t.integer  "lock_version",         default: 0
+    t.integer  "classification_count", default: 0
   end
 
   add_index "set_member_subjects", ["subject_id"], name: "index_set_member_subjects_on_subject_id", using: :btree
@@ -185,11 +186,12 @@ ActiveRecord::Schema.define(version: 20150210025312) do
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "set_member_subjects_count", default: 0, null: false
+    t.integer  "set_member_subjects_count", default: 0,  null: false
     t.json     "metadata"
     t.integer  "workflow_id"
     t.integer  "lock_version",              default: 0
     t.boolean  "expert_set"
+    t.json     "retirement",                default: {}
   end
 
   add_index "subject_sets", ["project_id"], name: "index_subject_sets_on_project_id", using: :btree

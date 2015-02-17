@@ -44,6 +44,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
       {
         subject_sets: {
           display_name: "A Better Name",
+          retirement: {
+            criteria: "classification_count"
+          },
           links: {
             workflow: workflow.id.to_s,
             subjects: subjects.map(&:id).map(&:to_s)
@@ -65,6 +68,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
       {
         subject_sets: {
           display_name: 'Test subject set',
+          retirement: {
+            criteria: "classification_count"
+          },
           metadata: {
             location: "Africa"
           },

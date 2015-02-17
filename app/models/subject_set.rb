@@ -10,6 +10,16 @@ class SubjectSet < ActiveRecord::Base
 
   validates_presence_of :project
 
+  DEFAULT_CRITERIA = 'classification_count'
+  DEFAULT_OPTS = { 'count' => 15 }
+
+  validate do |set|
+    criteria = %w(classification_count)
+    unless set.retirement.empty? || criteria.include?(set.retirement['criteria'])
+      set.errors.add(:"retirement.criteria", "Retirement criteria must be one of #{criteria.join(', ')}")
+    end
+  end
+
   scope :expert_sets, -> { where(expert_set: true) }
 
   can_through_parent :project, :update, :show, :destroy, :index, :update_links,
@@ -20,5 +30,19 @@ class SubjectSet < ActiveRecord::Base
 
   def self.same_project?(workflow)
     where(project: workflow.project)
+  end
+
+  def retire_member?(sms)
+    retirement_scheme.retire?(sms)
+  end
+
+  def retirement_scheme
+    case retirement.fetch('criteria', DEFAULT_CRITERIA)
+    when 'classification_count'
+      params = retirement.fetch('options', DEFAULT_OPTS).values_at('count')
+      RetirementSchemes::ClassificationCount.new(*params)
+    else
+      raise StandardError, 'invalid retirement scheme'
+    end
   end
 end
