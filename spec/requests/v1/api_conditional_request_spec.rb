@@ -45,7 +45,7 @@ describe "api should allow conditional requests", type: :request do
     before(:each) do
       get url, nil, 
           { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
+            "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
     end
     
     it "should return the Last-Modified Header" do
@@ -57,8 +57,8 @@ describe "api should allow conditional requests", type: :request do
     before(:each) do
       get url, nil, 
           { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
-             "If-Modified-Since" => last_modified }
+            "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
+            "If-Modified-Since" => last_modified }
     end
 
     it 'should return not modified' do
@@ -89,12 +89,22 @@ describe "api should allow conditional requests", type: :request do
     end
     
     context "index actions" do
+      let!(:project) { create_list(:project_with_contents, 2, owner: user).first }
       let(:url) { "/api/projects" }
       
       it_behaves_like "returns last modified"
       it_behaves_like "304s when not modified"
+
+      context 'when an item is deleted from the collection' do
+        it 'should return 200 ' do
+          project.destroy!
+          get url, nil, 
+              { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
+                "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
+                "If-Modified-Since" => last_modified }
+          expect(response).to have_http_status(:ok)
+        end
+      end
     end
   end
-
-  
 end
