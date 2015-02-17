@@ -1403,6 +1403,15 @@ A workflow has the following attributes
 *id*, *created_at*, *updated_at*, *workflow_version*, *content_language*,
 and *classifications_count* are assigned by the API
 
+Three parameters: _grouped_, _prioritized_, and _pairwise_ configure
+how [Cellect](https://github.com/zooniverse/Cellect) chooses subjects
+for classification. They are all false by default, which will give a
+random selection of subjects from all subject\_sets that are part of a
+workflow. _grouped_ enables selecting subjects from a specific subject
+set. _prioritized_ ensures that users will see subjects in a
+predetermined order. _pairwise_ will select two subjects at a time
+for classification.
+
 A workflow's `tasks` is a hash of keys to task definitions.
 
 A workflow's `first_task` is a string matching the key of its first task. (The order of keys in JSON hashes is not guaranteed).
