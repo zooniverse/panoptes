@@ -9,10 +9,7 @@ class Api::V1::SubjectsController < Api::ApiController
   alias_method :subject, :controlled_resource
 
   def index
-    subjects = selector.create_response
-    if stale?(last_modified: subjects.maximum(:updated_at))
-      render json_api: SubjectSerializer.page(params, subjects)
-    end
+    selector.create_response
   end
 
   private
@@ -46,7 +43,8 @@ class Api::V1::SubjectsController < Api::ApiController
     @selector ||= SubjectSelector.new(api_user,
                                       params,
                                       controlled_resources,
-                                      cellect_host(params[:workflow_id]))
+                                      cellect_host(params[:workflow_id]),
+                                      self)
   end
 
   def add_subject_path(locations, project_id)
