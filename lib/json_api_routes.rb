@@ -22,6 +22,11 @@ module JsonApiRoutes
     get "/versions/:id", to: "#{ path }#version", format: false,
         constraints: id_constraint(path)
   end
+
+  def create_head(path)
+    match path, to: "#{path}#index", via: :head, format: false
+    match "#{path}/:id", to: "#{path}#show", via: :head, format: false
+  end
   
   def json_api_resources(path, options={})
     links = options.delete(:links)
@@ -30,6 +35,7 @@ module JsonApiRoutes
     options = options.merge(except: [:new, :edit],
                             constraints: { id: VALID_IDS },
                             format: false)
+    create_head(path)
     resources(path, options) do
       create_links(path, links) if links
       create_versions(path) if versioned

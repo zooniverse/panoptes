@@ -1,7 +1,7 @@
 module JsonApiController
   module ShowableResource
     def show
-      if stale?(last_modified: controlled_resource.updated_at)
+      if stale?(controlled_resources)
         render json_api: serializer.resource(params, visible_scope, context)
       end
     end

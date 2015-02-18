@@ -14,7 +14,7 @@ class SubjectSelector
     when 'queued'
       @controller.render json_api: SubjectSerializer.page(params, queued_subjects)
     else
-      if @controller.stale?(last_modified: @scope.maximum(:updated_at))
+      if @controller.stale?(@scope)
         @controller.render json_api: SubjectSerializer.page(params, @scope)
       end
     end
