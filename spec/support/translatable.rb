@@ -1,8 +1,22 @@
 shared_examples "is translatable" do
+
+  context "missing content_association" do
+
+    it "should not be valid" do
+      expect(translatable_without_content).to be_invalid
+    end
+
+    it "should have the correct error message" do
+      translatable_without_content.valid?
+      error_key = "#{locked_factory}_contents".to_sym
+      expect(translatable_without_content.errors[error_key]).to eq(["can't be blank"])
+    end
+  end
+
   describe "#primary_language" do
     let(:factory) { primary_language_factory }
     let(:locale_field) { :primary_language }
-    
+
     it_behaves_like "a locale field"
   end
 
@@ -31,10 +45,10 @@ shared_examples "is translatable" do
     let(:users) { create_list(:user, 2) }
     let!(:private_model) do
       project = create(:project, private: true)
-      return project if :project == primary_language_factory 
+      return project if :project == primary_language_factory
       create(primary_language_factory, project: project)
     end
-    
+
     let!(:acl) do
       project = translatable.try(:project) || translatable
       create(:access_control_list,
