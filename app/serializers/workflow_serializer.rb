@@ -2,7 +2,7 @@ class WorkflowSerializer
   include RestPack::Serializer
   attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
              :created_at, :updated_at, :first_task, :primary_language,
-             :version, :content_language
+             :version, :content_language, :prioritized, :grouped, :pairwise
   
   can_include :project, :subject_sets, :tutorial_subject, :expert_subject_set
 
