@@ -6,22 +6,39 @@ class WorkflowSerializer
   
   can_include :project, :subject_sets, :tutorial_subject, :expert_subject_set
 
+  DEFAULT_VERSION_NUM = 1
+
   def version
-    "#{@model.versions.last.id}.#{content.versions.last.id}"
+    "#{version_index_number(@model)}.#{version_index_number(content)}"
   end
 
   def content_language
-    content.language
+    content.language if content
   end
 
   def tasks
-    tasks = @model.tasks.dup
-    TasksVisitors::InjectStrings.new(content.strings).visit(tasks)
-    tasks
+    if content
+      tasks = @model.tasks.dup
+      TasksVisitors::InjectStrings.new(content.strings).visit(tasks)
+      tasks
+    else
+      {}
+    end
   end
 
   def content
+    return @content if @content
     languages = @context[:languages] || [@model.primary_language]
     @content = @model.content_for(languages, [:strings, :language, :id])
+  end
+
+  private
+
+  def version_index_number(model)
+    if model && last_version = model.versions.last
+      last_version.id
+    else
+      DEFAULT_VERSION_NUM
+    end
   end
 end

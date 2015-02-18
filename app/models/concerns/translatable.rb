@@ -3,9 +3,11 @@ module Translatable
 
   included do
     validates :primary_language, format: {with: /\A[a-z]{2}(\z|-[A-z]{2})/}
-    has_many content_association, autosave: true
+    has_many content_association, autosave: true, inverse_of: name.downcase.to_sym
 
     can_be_linked content_model.name.underscore.to_sym, :scope_for, :translate, :user
+
+    validates content_association, presence: true
   end
 
   module ClassMethods
@@ -28,7 +30,7 @@ module Translatable
   end
 
   def content_association
-    @content_associattion ||= send(self.class.content_association)
+    @content_association ||= send(self.class.content_association)
   end
 
   def primary_content

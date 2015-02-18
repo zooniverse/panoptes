@@ -1,5 +1,9 @@
 FactoryGirl.define do
-  factory :workflow do
+  factory :workflow, aliases: [:workflow_with_contents] do
+    transient do
+      build_contents true
+    end
+
     display_name "A Workflow"
 
     first_task "interest"
@@ -28,12 +32,18 @@ FactoryGirl.define do
         }
       }
     )
-    
+
     pairwise false
     grouped false
     prioritized false
     primary_language 'en'
     project
+
+    after(:build) do |w, env|
+      if env.build_contents
+        w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: w.primary_language)
+      end
+    end
 
     factory :workflow_with_subject_set do
       after(:create) do |w|
@@ -50,12 +60,6 @@ FactoryGirl.define do
     factory :workflow_with_subjects do
       after(:create) do |w|
         create_list(:subject_set_with_subjects, 2, workflow: w)
-      end
-    end
-
-    factory :workflow_with_contents do
-      after(:create) do |w|
-        create_list(:workflow_content, 1, workflow: w, language: w.primary_language)
       end
     end
   end

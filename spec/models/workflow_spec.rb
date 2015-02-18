@@ -4,10 +4,11 @@ describe Workflow, :type => :model do
   let(:workflow) { build(:workflow) }
   let(:subject_relation) { create(:workflow_with_subjects) }
   let(:translatable) { create(:workflow_with_contents) }
+  let(:translatable_without_content) { build(:workflow, build_contents: false) }
   let(:primary_language_factory) { :workflow }
   let(:locked_factory) { :workflow }
   let(:locked_update) { {display_name: "A Different Name"} }
-  
+
   it_behaves_like "optimistically locked"
   it_behaves_like "has subject_count"
   it_behaves_like "is translatable"
@@ -19,7 +20,7 @@ describe Workflow, :type => :model do
   describe "links" do
     let(:project) { create(:project) }
     let(:subject_set) { create(:subject_set, project: project) }
-    
+
     it 'should allow links to subject_sets in the same project' do
       expect(Workflow).to link_to(subject_set)
         .with_scope(:where, { project: project })
@@ -60,7 +61,7 @@ describe Workflow, :type => :model do
 
   describe "versioning" do
     let(:workflow) { create(:workflow) }
-    
+
     it { is_expected.to be_versioned }
 
     it 'should track changes to tasks', versioning: true do
