@@ -15,7 +15,7 @@ describe Api::V1::GroupsController, type: :controller do
     [ "id", "display_name", "classifications_count", "created_at", "updated_at", "type" ]
   end
   let(:api_resource_links) do
-    [ "user_groups.memberships", "user_groups.users", "user_groups.projects", "user_groups.collections" ]
+    [ "user_groups.memberships", "user_groups.users", "user_groups.projects", "user_groups.collections", "user_groups.recents" ]
   end
 
   let(:scopes) { %w(public group) }
@@ -157,5 +157,13 @@ describe Api::V1::GroupsController, type: :controller do
     end
 
     it_behaves_like "supports update_links"
+  end
+  
+  describe "#recents" do
+    let(:resource) { user_groups.first }
+    let(:resource_key) { :user_group }
+    let(:resource_key_id) { :group_id }
+
+    it_behaves_like "has recents"
   end
 end

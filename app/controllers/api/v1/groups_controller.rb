@@ -1,4 +1,5 @@
 class Api::V1::GroupsController < Api::ApiController
+  include Recents
   doorkeeper_for :create, :update, :destroy, scopes: [:group]
   resource_actions :show, :index, :update, :deactivate, :create
   schema_type :strong_params

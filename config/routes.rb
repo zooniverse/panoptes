@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   use_doorkeeper do
     controllers authorizations: 'authorizations',
-      tokens: 'tokens'
+                tokens: 'tokens'
   end
 
   devise_for :users, controllers: { omniauth_callbacks: 'omniauth_callbacks', passwords: 'passwords' }, skip: [ :sessions, :registrations ]
@@ -49,9 +49,13 @@ Rails.application.routes.draw do
       json_api_resources :subjects, versioned: true
 
       json_api_resources :users, except: [:new, :edit, :create],
-        links: [:user_groups]
+                         links: [:user_groups] do
+        get "/recents", to: "users#recents", format: false
+      end
 
-      json_api_resources :groups, links: [:users]
+      json_api_resources :groups, links: [:users] do
+        get "/recents", to: "groups#recents", format: false
+      end
 
       json_api_resources :projects, links: [:subject_sets, :workflows]
 
