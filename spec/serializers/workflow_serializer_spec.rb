@@ -31,7 +31,11 @@ describe WorkflowSerializer do
   end
 
   context "when there is no content_association" do
-    let!(:workflow) { create(:workflow) }
+    let!(:workflow) do
+      create(:workflow) do |workflow|
+        workflow.workflow_contents = []
+      end
+    end
 
     it "should not have a content association" do
       expect(workflow.content_association).to be_empty
