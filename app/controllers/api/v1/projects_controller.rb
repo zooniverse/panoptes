@@ -56,7 +56,13 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def new_items(resource, relation, value)
-    super(resource, relation, value).map(&:dup)
+    super(resource, relation, value).map do |object|
+      object.dup.tap do |dup_object|
+        if dup_object.is_a?(Workflow)
+          dup_object.workflow_contents = object.workflow_contents.map(&:dup)
+        end
+      end
+    end
   end
 
   def context
