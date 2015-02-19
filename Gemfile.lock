@@ -67,16 +67,16 @@ GEM
     bcrypt (3.1.10)
     bcrypt (3.1.10-java)
     builder (3.2.2)
-    cellect-client (0.0.9)
-      celluloid (= 0.16.0.pre)
-      celluloid-io (= 0.16.0.pre)
+    cellect-client (0.1.2.pre.jruby)
+      celluloid (= 0.16.0)
+      celluloid-io (= 0.16.0)
       http (~> 0.6)
       multi_json (~> 1.10.1)
       zk (~> 1.9)
-    celluloid (0.16.0.pre)
-      timers (~> 2.0.0)
-    celluloid-io (0.16.0.pre)
-      celluloid (>= 0.16.0.pre)
+    celluloid (0.16.0)
+      timers (~> 4.0.0)
+    celluloid-io (0.16.0)
+      celluloid (>= 0.16.0)
       nio4r (>= 1.0.0)
     coderay (1.1.0)
     coercible (1.0.0)
@@ -341,7 +341,7 @@ GEM
     thread_safe (0.3.4)
     thread_safe (0.3.4-java)
     tilt (1.4.1)
-    timers (2.0.0)
+    timers (4.0.1)
       hitimes
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
@@ -377,7 +377,7 @@ DEPENDENCIES
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter
   aws-sdk
-  cellect-client (~> 0.0.8)
+  cellect-client (= 0.1.2.pre.jruby)
   database_cleaner (~> 1.2.0)
   devise
   doorkeeper (~> 1.4.1)

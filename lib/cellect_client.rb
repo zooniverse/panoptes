@@ -71,7 +71,11 @@ module CellectClient
     end
 
     def host
-      @host ||= @session[workflow_id] || choose_host
+      @host ||= if (h = @session[workflow_id]) && Cellect::Client.host_exists?(h)
+                  h
+                else
+                  choose_host
+                end
     end
 
     def reset_host
