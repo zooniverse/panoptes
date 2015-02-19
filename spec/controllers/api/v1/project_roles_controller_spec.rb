@@ -22,9 +22,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     let!(:private_resource) { create(:access_control_list, resource: create(:project, private: true)) }
     let(:n_visible) { 3 }
 
-    describe "custom owner links" do
-      it_behaves_like "an ACL roles serializer"
-    end
+    it_behaves_like "it has custom owner links"
 
     context "when not logged in" do
       let(:authorized_user) { nil }

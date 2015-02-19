@@ -26,6 +26,7 @@ describe Api::V1::CollectionsController, type: :controller do
     let(:n_visible) { 2 }
 
     it_behaves_like "is indexable"
+    it_behaves_like "it has custom owner links"
   end
 
   describe '#show' do

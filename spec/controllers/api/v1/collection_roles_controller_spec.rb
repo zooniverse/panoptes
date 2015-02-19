@@ -29,7 +29,7 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
         get :index
       end
 
-      it_behaves_like "an ACL roles serializer"
+      it_behaves_like "it has custom owner links"
     end
 
   end

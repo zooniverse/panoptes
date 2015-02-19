@@ -29,6 +29,7 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:authorized_user) { nil }
       let(:n_visible) { 2 }
       it_behaves_like "is indexable"
+      it_behaves_like "it has custom owner links"
     end
   end
 
@@ -39,6 +40,15 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe "#index" do
+
+      describe "custom owner links" do
+        before(:each) do
+          get :index
+        end
+
+        it_behaves_like "it has custom owner links"
+      end
+
       describe "with no filtering" do
         let(:n_visible) { 2 }
         it_behaves_like "is indexable"
