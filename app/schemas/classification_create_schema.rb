@@ -2,7 +2,7 @@ class ClassificationCreateSchema < JsonSchema
   schema do
     type "object"
     description "A Classification"
-    required "metadata", "annotations"
+    required "metadata", "annotations", "links"
     additional_properties false
 
     property "completed" do
@@ -15,7 +15,8 @@ class ClassificationCreateSchema < JsonSchema
 
     property "metadata" do
       type "object"
-
+      required "started_at", "finished_at", "user_agent", "user_language", "workflow_version"
+      
       property "screen_resolution" do
         type "string"
       end
@@ -59,7 +60,7 @@ class ClassificationCreateSchema < JsonSchema
     property "links" do
       type "object"
 
-      required "project", "workflow"
+      required "project", "workflow", "subjects"
 
       property "project" do
         type "string", "integer"
