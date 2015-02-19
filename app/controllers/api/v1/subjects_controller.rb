@@ -3,15 +3,19 @@ class Api::V1::SubjectsController < Api::ApiController
 
   doorkeeper_for :update, :create, :destroy, :version, :versions,
                  scopes: [:subject]
-  resource_actions :show, :create, :update, :destroy
+  resource_actions :default
   schema_type :json_schema
 
   alias_method :subject, :controlled_resource
 
   def index
-    subjects = selector.create_response
-    if stale?(last_modified: subjects.maximum(:updated_at))
-      render json_api: SubjectSerializer.page(params, subjects)
+    case params[:sort]
+    when 'cellect'
+      render json_api: SubjectSerializer.page(params, selector.cellect_subjects)
+    when 'queued'
+      render json_api: SubjectSerializer.page(params, selector.queued_subjects)
+    else
+      super
     end
   end
 

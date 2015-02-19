@@ -1,27 +1,16 @@
 class SubjectSelector
   class MissingParameter < StandardError; end
 
-  attr_reader :user, :params
+  attr_reader :user, :params 
 
   def initialize(user, params, scope, host)
     @user, @params, @scope, @host = user, params, scope, host
   end
 
-  def create_response
-    case params[:sort]
-    when 'cellect'
-      cellect_subjects
-    when 'queued'
-      queued_subjects
-    else
-      @scope
-    end
-  end
-
   def queued_subjects
     raise workflow_id_error unless params.has_key?(:workflow_id)
     user_enqueued = UserSubjectQueue
-      .find_by!(user: user.user, workflow_id: params[:workflow_id])
+                    .find_by!(user: user.user, workflow_id: params[:workflow_id])
     selected_subjects(user_enqueued.next_subjects(10 || params[:limit]))
   end
 
