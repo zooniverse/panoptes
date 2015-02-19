@@ -19,21 +19,30 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
 
   describe "#index" do
     let!(:private_resource) { create(:access_control_list, resource: create(:collection, private: true)) }
-
     let(:n_visible) { 3 }
 
     it_behaves_like "is indexable"
+
+    describe "custom owner links" do
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id if authorized_user
+        get :index
+      end
+
+      it_behaves_like "an ACL roles serializer"
+    end
+
   end
 
   describe "#show" do
     it_behaves_like "is showable"
   end
-  
+
   describe "#update" do
     let(:unauthorized_user) { create(:user) }
     let(:test_attr) { :roles }
     let(:test_attr_value) { %w(collaborator) }
-    
+
     let(:update_params) do
       { collection_roles: { roles: ["collaborator"] } }
     end

@@ -18,6 +18,8 @@ module ACLSerializer
       link_type = resource_type.pluralize
       links["#{key}.#{resource_type}"] = { type: link_type,
                                            href: "/#{link_type}/{#{key}.#{resource_type}}" }
+      links["#{key}.owner"] = { type: "owners",
+                                href: "/{#{key}.owner.href}/{#{key}.owner.id}" }
       links
     end
   end
