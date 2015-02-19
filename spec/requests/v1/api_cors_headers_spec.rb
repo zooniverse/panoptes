@@ -9,8 +9,12 @@ shared_examples 'cors headers' do
     expect(response.headers).to include('Access-Control-Expose-Headers')
   end
 
+  it 'should expose the correct headers' do
+    expect(response.headers["Access-Control-Expose-Headers"]).to eq('ETag')
+  end
+
   it 'should have Access-Control-Allow-Methods header' do
-    expect(response.headers).to include('Access-Control-Allow-Methods' => "DELETE, GET, POST, OPTIONS, PUT")
+    expect(response.headers).to include('Access-Control-Allow-Methods' => "DELETE, GET, POST, OPTIONS, PUT, HEAD")
   end
 end
 
@@ -18,14 +22,14 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
   include APIRequestHelpers
 
   let(:user) { create(:user) }
-  
+
   describe "non-error requests" do
     before(:each) do
       allow_any_instance_of(Api::ApiController).to receive(:doorkeeper_token).and_return(token(["public", "user"], user.id))
       get "/api/users/#{user.id}", nil, { "HTTP_ACCEPT" => "application/vnd.api+json; version=1", "HTTP_ORIGIN" => "example.com" }
     end
 
-    it { expect(response).to have_http_status(:ok) } 
+    it { expect(response).to have_http_status(:ok) }
 
     it_behaves_like "cors headers"
   end
@@ -37,7 +41,7 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
-    
+
       it_behaves_like "cors headers"
     end
 
@@ -48,7 +52,7 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
       end
 
       it { expect(response).to have_http_status(:not_found) }
-      
+
       it_behaves_like "cors headers"
     end
   end

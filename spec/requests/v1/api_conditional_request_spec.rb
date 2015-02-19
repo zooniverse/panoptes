@@ -12,16 +12,27 @@ describe "api should allow conditional requests", type: :request do
           "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
     response.headers['ETag']
   end
-  
+
   shared_examples "precondition required" do
     let(:ok_status) { method == :put ? :ok : :no_content }
-    
-    it "should require if-unmodified-since header" do
-      send method, url, body.to_json,
-           { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-             "CONTENT_TYPE" => "application/json",
-             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
-      expect(response).to have_http_status(:precondition_required)
+
+    context "when the if-match header is not supplied" do
+
+      before(:each) do
+        send method, url, body.to_json,
+             { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
+               "CONTENT_TYPE" => "application/json",
+               "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
+      end
+
+      it "should require if-match header" do
+        expect(response).to have_http_status(:precondition_required)
+      end
+
+      it "should have the required header message as response body" do
+        error_message = "Request requires If-Match header to be present"
+        expect(response.body).to eq(json_error_message(error_message))
+      end
     end
 
     it "should fail request if precondition not met" do
@@ -35,7 +46,7 @@ describe "api should allow conditional requests", type: :request do
       expect(response).to have_http_status(:precondition_failed)
     end
 
-    it "should succeed if precondition is met" do 
+    it "should succeed if precondition is met" do
       send method, url, body.to_json,
            { "If-Match" => etag,
              "CONTENT_TYPE" => "application/json",
@@ -47,19 +58,19 @@ describe "api should allow conditional requests", type: :request do
 
   shared_examples "returns etag" do
     before(:each) do
-      send method, url, nil, 
+      send method, url, nil,
           { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
     end
-    
+
     it "should return the ETag Header" do
-      expect(response.headers['ETag']).to_not be_nil 
+      expect(response.headers['ETag']).to_not be_nil
     end
   end
 
   shared_examples "304s when not modified" do
     before(:each) do
-      send method, url, nil, 
+      send method, url, nil,
           { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
             "If-None-Match" => etag }
@@ -69,7 +80,7 @@ describe "api should allow conditional requests", type: :request do
       expect(response).to have_http_status(:not_modified)
     end
   end
-  
+
   context "PUT requests"  do
     let(:method) { :put }
     let(:body) do
@@ -88,30 +99,30 @@ describe "api should allow conditional requests", type: :request do
 
   context "HEAD requests" do
     let(:method) { :head }
-    
+
     it_behaves_like "returns etag"
     it_behaves_like "304s when not modified"
   end
-  
+
   context "GET requests" do
     let(:method) { :get }
-    
+
     context "show actions" do
       it_behaves_like "returns etag"
       it_behaves_like "304s when not modified"
     end
-    
+
     context "index actions" do
       let!(:project) { create_list(:project_with_contents, 2, owner: user).first }
       let(:url) { "/api/projects" }
-      
+
       it_behaves_like "returns etag"
       it_behaves_like "304s when not modified"
 
       context 'when an item is deleted from the collection' do
         it 'should return 200 ' do
           project.destroy!
-          get url, nil, 
+          get url, nil,
               { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
                 "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
                 "If-None-Match" => etag }
