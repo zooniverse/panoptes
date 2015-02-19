@@ -3,13 +3,20 @@ class Api::V1::SubjectsController < Api::ApiController
 
   doorkeeper_for :update, :create, :destroy, :version, :versions,
                  scopes: [:subject]
-  resource_actions :show, :create, :update, :destroy
+  resource_actions :default
   schema_type :json_schema
 
   alias_method :subject, :controlled_resource
 
   def index
-    selector.create_response
+    case params[:sort]
+    when 'cellect'
+      render json_api: SubjectSerializer.page(params, selector.cellect_subjects)
+    when 'queued'
+      render json_api: SubjectSerializer.page(params, selector.queued_subjects)
+    else
+      super
+    end
   end
 
   private
@@ -43,8 +50,7 @@ class Api::V1::SubjectsController < Api::ApiController
     @selector ||= SubjectSelector.new(api_user,
                                       params,
                                       controlled_resources,
-                                      cellect_host(params[:workflow_id]),
-                                      self)
+                                      cellect_host(params[:workflow_id]))
   end
 
   def add_subject_path(locations, project_id)

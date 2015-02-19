@@ -3,21 +3,8 @@ class SubjectSelector
 
   attr_reader :user, :params 
 
-  def initialize(user, params, scope, host, controller)
-    @user, @params, @scope, @host, @controller = user, params, scope, host, controller
-  end
-
-  def create_response
-    case params[:sort]
-    when 'cellect'
-      @controller.render json_api: SubjectSerializer.page(params, cellect_subjects)
-    when 'queued'
-      @controller.render json_api: SubjectSerializer.page(params, queued_subjects)
-    else
-      if @controller.stale?(@scope)
-        @controller.render json_api: SubjectSerializer.page(params, @scope)
-      end
-    end
+  def initialize(user, params, scope, host)
+    @user, @params, @scope, @host = user, params, scope, host
   end
 
   def queued_subjects
