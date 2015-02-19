@@ -1,5 +1,7 @@
 class ProjectSerializer
   include RestPack::Serializer
+  include OwnerLinkSerializer
+
   attributes :id, :name, :display_name, :classifications_count,
     :subjects_count, :created_at, :updated_at, :available_languages,
     :title, :description, :guide, :team_members, :science_case,
@@ -31,21 +33,6 @@ class ProjectSerializer
 
   def introduction
     content[:introduction]
-  end
-
-  def add_links(model, data)
-    data = super
-
-    data[:links][:owner] = {id: @model.owner.id.to_s,
-                            type: @model.owner.class.model_name.plural,
-                            href: "#{@model.owner.class.model_name.route_key}/#{@model.owner.id}"}
-    data
-  end
-
-  def self.links
-    links = super
-    links.delete("#{key}.owner")
-    links
   end
 
   def content

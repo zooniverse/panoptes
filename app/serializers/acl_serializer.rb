@@ -16,8 +16,9 @@ module ACLSerializer
       links = super
       links.delete("#{key}.user_group")
       link_type = resource_type.pluralize
-      links["#{key}.#{resource_type}"] = { type: link_type,
-                                           href: "/#{link_type}/{#{key}.#{resource_type}}" }
+      links["#{key}.#{resource_type}"] = { href: "/#{link_type}/{#{key}.#{resource_type}}",
+                                           type: link_type }
+      links["#{key}.owner"] = { href: "/{#{key}.owner.href}", type: "owners" }
       links
     end
   end
@@ -30,7 +31,7 @@ module ACLSerializer
     group = group.users.first if group.identity?
     data[:links][:owner] = { id: group.id.to_s,
                              type: group.class.model_name.plural,
-                             href: group.class.model_name.route_key}
+                             href: "#{group.class.model_name.route_key}/#{group.id.to_s}" }
     data
   end
 end

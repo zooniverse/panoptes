@@ -22,18 +22,12 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     let!(:private_resource) { create(:access_control_list, resource: create(:project, private: true)) }
     let(:n_visible) { 3 }
 
+    it_behaves_like "it has custom owner links"
+
     context "when not logged in" do
       let(:authorized_user) { nil }
 
       it_behaves_like "is indexable"
-
-      it "should have the custom owner resource links" do
-        get :index
-        resource_links = json_response[api_resource_name].map do |resource|
-          resource["links"]["owner"].keys
-        end
-        expect(resource_links.flatten.uniq).to eq %w(id type href)
-      end
     end
 
     describe "a logged in user" do
@@ -44,6 +38,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
         let!(:new_project) { create(:project) }
 
         before(:each) do
+          default_request scopes: scopes, user_id: authorized_user.id if authorized_user
           get :index, index_options
         end
 
