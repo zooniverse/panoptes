@@ -567,12 +567,12 @@ may include the _completed_ field, which if not included defaults to true.
 The completed field is used to store half-completed classifications, so the user
 can later continue from where they stopped.
 
-The _links_ hash must contain a _subjects_ hash, a _project_ and a _workflow_. 
-The _metadata_ hash must contain all the keys specified in the example. 
+The _links_ hash must contain a _subjects_ hash, a _project_ and a _workflow_.
+The _metadata_ hash must contain all the keys specified in the example.
 Please note, the _workflow_version_ should be the value returned from the
 specific workflow representation. The annotations array must be in the
-format specified in the example, i.e. an array of objects, containing a _task_ and a _value_. 
-The _task_ can be anything and must not necessarily align with the tasks of the workflow 
+format specified in the example, i.e. an array of objects, containing a _task_ and a _value_.
+The _task_ can be anything and must not necessarily align with the tasks of the workflow
 (even though that is generally not advised).
 
 
@@ -1057,6 +1057,10 @@ It has the following attributes:
                     "projects.subject_sets": {
                         "href": "/subject_sets/{projects.subject_sets}",
                         "type": "subject_sets"
+                    },
+                    "projects.owner": {
+                        "href": "/{projects.owner.href}",
+                        "type": "owners"
                     }
                 },
                 "projects": [{
@@ -1238,6 +1242,10 @@ Projects are returned as an array under the _projects_ key.
                     "projects.subject_sets": {
                         "href": "/subject_sets/{projects.subject_sets}",
                         "type": "subject_sets"
+                    },
+                    "projects.owner": {
+                        "href": "/{projects.owner.href}",
+                        "type": "owners"
                     }
                 },
                 "meta": {
@@ -1366,7 +1374,8 @@ returned.
                         "workflows": ["1", "2"]
                         "owner": {
                             "id": 10,
-                            "type": "user_groups"
+                            "type": "user_groups",
+                            "href": "user_groups/10"
                         }
                     }
                 }
@@ -3037,8 +3046,8 @@ Collections are returned as an array under *collections*.
                     "links": {
                         "owner": {
                             "id": "11",
-                            "href": "/groups/11",
-                            "type": "user_groups"
+                            "type": "user_groups",
+                            "href": "/groups/11"
                         }
                     }
                 }]
@@ -3086,7 +3095,8 @@ owner, and links to subjects.
                     "links": {
                         "owner": {
                             "id" : "10",
-                            "type": "user_groups"
+                            "type": "user_groups",
+                            "href": "/groups/10"
                         }
                     }
                 }
@@ -3373,9 +3383,9 @@ roles are visible to the project owner and the user given roles.
 
             {
                 "links": {
-                    "project_roles.user": {
-                        "href": "/user/{project_roles.user}",
-                        "type": "users"
+                    "project_roles.owner": {
+                        "href": "/{project_roles.owner.href}",
+                        "type": "owners"
                     },
                     "project_roles.project": {
                         "href": "/projects/{project_roles.project}",
@@ -3388,8 +3398,12 @@ roles are visible to the project owner and the user given roles.
                     "created_at": "2014-03-20T06:23:12Z",
                     "updated_at": "2014-04-21T08:22:22Z",
                     "links": {
-                        "user" : "30",
                         "project": "11"
+                        "owner": {
+                            "id": "3",
+                            "type": "users",
+                            "href": "users/3"
+                        }
                     }
                 }]
             }
@@ -3449,9 +3463,9 @@ ProjectRoles are returned as an array under *project_roles*.
 
             {
                 "links": {
-                    "project_roles.user": {
-                        "href": "/user/{project_roles.user}",
-                        "type": "users"
+                    "project_roles.owner": {
+                        "href": "/{project_roles.owner.href}",
+                        "type": "owners"
                     },
                     "project_roles.project": {
                         "href": "/projects/{project_roles.project}",
@@ -3479,8 +3493,12 @@ ProjectRoles are returned as an array under *project_roles*.
                     "created_at": "2014-03-20T06:23:12Z",
                     "updated_at": "2014-04-21T08:22:22Z",
                     "links": {
-                        "user" : "30",
-                        "project": "11"
+                        "project": "11",
+                        "owner": {
+                            "id": "3",
+                            "type": "users",
+                            "href": "users/3"
+                        }
                     }
                 },{
                 "id": "949",
@@ -3488,8 +3506,12 @@ ProjectRoles are returned as an array under *project_roles*.
                     "created_at": "2014-08-20T06:23:12Z",
                     "updated_at": "2014-09-21T08:22:22Z",
                     "links": {
-                        "user" : "33",
-                        "project": "81"
+                        "project": "81",
+                        "owner": {
+                            "id": "33",
+                            "type": "users",
+                            "href": "users/33"
+                        }
                     }
                 }]
             }
@@ -3532,7 +3554,11 @@ project. You may also include an array of roles.
                     "roles": ["collaborator"],
                     "links": {
                         "project": "1",
-                        "user": "842"
+                        "owner": {
+                            "id": "842",
+                            "type": "users",
+                            "href": "users/842"
+                        }
                     }
                 }
             }
@@ -4761,9 +4787,9 @@ roles are visible to the collection owner and the user given roles.
 
             {
                 "links": {
-                    "collection_roles.user": {
-                        "href": "/user/{collection_roles.user}",
-                        "type": "users"
+                    "collection_roles.owner": {
+                        "href": "/{collection_roles.owner.href}",
+                        "type": "owners"
                     },
                     "collection_roles.collection": {
                         "href": "/collections/{collection_roles.collection}",
@@ -4776,8 +4802,12 @@ roles are visible to the collection owner and the user given roles.
                     "created_at": "2014-03-20T06:23:12Z",
                     "updated_at": "2014-04-21T08:22:22Z",
                     "links": {
-                        "user" : "30",
-                        "collection": "11"
+                        "collection": "11",
+                        "owner": {
+                            "id": "4",
+                            "type": "user_groups",
+                            "href"=>"user_groups/4"
+                        }
                     }
                 }]
             }
@@ -4837,9 +4867,9 @@ CollectionRoles are returned as an array under *collection_roles*.
 
             {
                 "links": {
-                    "collection_roles.user": {
-                        "href": "/user/{collection_roles.user}",
-                        "type": "users"
+                    "collection_roles.owner": {
+                        "href": "/{collection_roles.owner.href}",
+                        "type": "owners"
                     },
                     "collection_roles.collection": {
                         "href": "/collections/{collection_roles.collection}",
@@ -4867,8 +4897,12 @@ CollectionRoles are returned as an array under *collection_roles*.
                     "created_at": "2014-03-20T06:23:12Z",
                     "updated_at": "2014-04-21T08:22:22Z",
                     "links": {
-                        "user" : "30",
-                        "collection": "11"
+                        "collection": "11",
+                        "owner": {
+                            "id": "4",
+                            "type": "user_groups",
+                            "href"=>"user_groups/4"
+                        }
                     }
                 },{
                 "id": "949",
@@ -4876,8 +4910,12 @@ CollectionRoles are returned as an array under *collection_roles*.
                     "created_at": "2014-08-20T06:23:12Z",
                     "updated_at": "2014-09-21T08:22:22Z",
                     "links": {
-                        "user" : "33",
-                        "collection": "81"
+                        "collection": "81",
+                        "owner": {
+                            "id": "1",
+                            "type": "users",
+                            "href"=>"users/1"
+                        }
                     }
                 }]
             }
@@ -4920,7 +4958,11 @@ collection. You may also include an array of roles.
                     "roles": ["collaborator"],
                     "links": {
                         "collection": "1",
-                        "user": "842"
+                        "owner": {
+                            "id": "842",
+                            "type": "users",
+                            "href"=>"users/842"
+                        }
                     }
                 }
             }
