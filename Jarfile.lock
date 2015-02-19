@@ -1,13 +1,14 @@
 ---
 :runtime:
-- org.slf4j:slf4j-api:jar:1.7.2
+- log4j:log4j:jar:1.2.17
+- org.slf4j:slf4j-api:jar:1.7.5
+- org.slf4j:slf4j-log4j12:jar:1.7.5
 - com.yammer.metrics:metrics-core:jar:2.2.0
-- log4j:log4j:jar:1.2.14
 - org.apache.zookeeper:zookeeper:jar:3.3.4
 - org.scala-lang:scala-library:jar:2.9.2
-- org.apache.kafka:kafka_2.9.2:jar:0.8.1.1
 - net.sf.jopt-simple:jopt-simple:jar:3.2
+- org.apache.kafka:kafka_2.9.2:jar:0.8.1.1
 - jline:jline:jar:0.9.94
 - com.101tec:zkclient:jar:0.3
-- org.xerial.snappy:snappy-java:jar:1.0.5
 - junit:junit:jar:3.8.1
+- org.xerial.snappy:snappy-java:jar:1.0.5

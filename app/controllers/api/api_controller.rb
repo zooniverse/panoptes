@@ -65,11 +65,6 @@ module Api
       language_extractor.parse_languages
     end
 
-    def cellect_host(workflow_id)
-      host = cellect_session[workflow_id] || Cellect::Client.choose_host
-      cellect_session[workflow_id] = host
-    end
-
     def cellect_session
       session[:cellect_hosts] ||= {}
     end

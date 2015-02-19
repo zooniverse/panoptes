@@ -3,8 +3,8 @@ class SubjectSelector
 
   attr_reader :user, :params 
 
-  def initialize(user, params, scope, host)
-    @user, @params, @scope, @host = user, params, scope, host
+  def initialize(user, params, scope, session)
+    @user, @params, @scope, @session = user, params, scope, session
   end
 
   def queued_subjects
@@ -16,7 +16,7 @@ class SubjectSelector
 
   def cellect_subjects
     raise workflow_id_error unless params.has_key?(:workflow_id)
-    selected_subjects(Cellect::Client.connection.get_subjects(**cellect_params))
+    selected_subjects(CellectClient.get_subjects(*cellect_params))
   end
 
   def selected_subjects(subject_ids)
@@ -31,12 +31,10 @@ class SubjectSelector
   end
 
   def cellect_params
-    {
-      workflow_id: params[:workflow_id],
-      group_id: params[:subject_set_id],
-      limit: params[:per_page] || 10,
-      host: @host,
-      user_id: user.id
-    }
+    [@session,
+     params[:workflow_id],
+     user.id,
+     params[:subject_set_id],
+     params[:per_page] || 10]
   end
 end

@@ -50,7 +50,7 @@ class Api::V1::SubjectsController < Api::ApiController
     @selector ||= SubjectSelector.new(api_user,
                                       params,
                                       controlled_resources,
-                                      cellect_host(params[:workflow_id]))
+                                      cellect_session)
   end
 
   def add_subject_path(locations, project_id)

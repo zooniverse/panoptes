@@ -7,10 +7,9 @@ class RetirementWorker
     sms = SetMemberSubject.find(sms_id)
     if sms.retire?
       sms.retired!
-      Cellect::Client.connection
-        .remove_subject(sms.subject_id,
-                        workflow_id: workflow_id,
-                        group_id: sms.subject_set_id)
+      CellectClient.remove_subject(sms.subject_id,
+                                   workflow_id,
+                                   sms.subject_set_id)
     end
   end
 end

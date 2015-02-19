@@ -139,7 +139,7 @@ GEM
     http_parser.rb (0.6.0-java)
     i18n (0.7.0)
     ice_nine (0.11.1)
-    jar-dependencies (0.1.7)
+    jar-dependencies (0.1.8)
     jbundler (0.7.2)
       bundler (~> 1.5)
       jar-dependencies (~> 0.1.7)
