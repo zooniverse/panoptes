@@ -39,9 +39,10 @@ Rails.application.configure do
   config.middleware.insert_before 0, Rack::Cors do
     allow do
       origins '*'
-      resource '*', headers: :any,
-               methods: [:get, :post, :put, :delete, :options, :patch],
-               expose: ['Last-Modified'] 
+      resource '*',
+        headers: CorsConfig.request_headers,
+        methods: CorsConfig.request_methods,
+        expose: CorsConfig.expose_headers
     end
   end
 end

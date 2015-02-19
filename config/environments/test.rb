@@ -44,13 +44,14 @@ Rails.application.configure do
   config.to_prepare do
     Doorkeeper::ApplicationsController.helper Doorkeeper::Helpers::Controller
   end
-  
+
   config.middleware.insert_before 0, Rack::Cors do
     allow do
       origins '*'
-      resource '/api/*', headers: :any,
-               methods: [:delete, :get, :post, :options, :put],
-               expose: ['Last-Modified'] 
+      resource '/api/*',
+        headers: CorsConfig.request_headers,
+        methods: CorsConfig.request_methods,
+        expose: CorsConfig.expose_headers
     end
   end
 end
