@@ -16,15 +16,10 @@ describe UserInfoScrubber do
         expect(user.email).to be_nil
       end
 
-      it "should replace their display name" do
+      it "should not replace their display name" do
+        prev_user_login = user.display_name
         scrub_user_details(user)
-        expect(user.display_name).to match(/deleted_user_.*/)
-      end
-
-      it "should not change their login" do
-        prev_user_login = user.login
-        scrub_user_details(user)
-        expect(user.login).to eq(prev_user_login)
+        expect(user.display_name).to eq(prev_user_login)
       end
     end
 
@@ -37,36 +32,6 @@ describe UserInfoScrubber do
 
       it "should not raise an error scrubbing the second user" do
         expect{ scrub_user_details(user) }.to_not raise_error
-      end
-    end
-
-    context "when a previously scrubbed user has the same UUID value (incredibly unlikely)" do
-      let(:setup_deleted_user) do
-        user = create(:user)
-        scrub_user_details(user)
-      end
-      let(:user) { create(:user) }
-
-      it "should not raise an error scrubbing the second user" do
-        setup_deleted_user
-        expect{ scrub_user_details(user) }.to_not raise_error
-      end
-
-      context "when the uuid is the same on each retry", :no_transaction do
-        let(:uuid) { SecureRandom.uuid }
-        before(:each) do
-          allow(SecureRandom).to receive(:uuid).and_return(uuid)
-          setup_deleted_user
-        end
-
-        it "should not raise an error scrubbing the second user" do
-          expect { scrub_user_details(user) }.to_not raise_error
-        end
-
-        it "should have added a 1 suffix to the display_name on retry" do
-          scrub_user_details(user)
-          expect(user.display_name).to eq("#{UserInfoScrubber::DELETED_USER_NAME}_#{uuid}1")
-        end
       end
     end
 

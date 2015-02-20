@@ -13,7 +13,7 @@ module JsonApiController
     def update
       resource_class.transaction(requires_new: true) do
         controlled_resources.zip(Array.wrap(update_params)).each do |resource, update_hash|
-          resource.update(build_update_hash(update_hash,resource))
+          resource.update!(build_update_hash(update_hash,resource))
           yield resource if block_given?
         end
       end

@@ -14,7 +14,7 @@ class UniqueForOwnerValidator < ActiveModel::Validator
   end
 
   def unique_fields
-    %i(name display_name)
+    %i(display_name)
   end
 
   def owner_records(klass, owner)

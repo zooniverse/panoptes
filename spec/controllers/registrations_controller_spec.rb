@@ -11,7 +11,7 @@ describe RegistrationsController, type: :controller do
 
   context "as json" do
     let(:user_params) do
-      [ :email, :password, :password_confirmation, :login, :name,
+      [ :email, :password, :password_confirmation, :display_name,
         :global_email_communication, :project_email_communication ]
     end
 
@@ -23,7 +23,7 @@ describe RegistrationsController, type: :controller do
 
       context "with valid user attributes" do
         let(:login) { "mcMMO-Dev" }
-        let(:extra_attributes) { {login: login, display_name: nil} }
+        let(:extra_attributes) { { display_name: login} }
 
         it "should return 201" do
           post :create, user: user_attributes
@@ -48,25 +48,20 @@ describe RegistrationsController, type: :controller do
           expect(subject).to receive(:clean_up_passwords)
           post :create, user: user_attributes
         end
-
-        it "should set the display name to be the exact replica of the login field" do
-          post :create, user: user_attributes
-          expect(User.find(created_instance_id("users")).display_name).to eq(login)
-        end
       end
 
-      context "with caps and spaces in the login name" do
-        let(:extra_attributes) { { login: "Test User Login" } }
+      context "with caps and spaces in the display name" do
+        let(:extra_attributes) { { display_name: "Test_User_Login" } }
 
         it "should convert the identity_group#name field correctly" do
           post :create, user: user_attributes
-          owner_uniq_name = User.find(created_instance_id("users")).identity_group.name
-          expect(owner_uniq_name).to eq("test_user_login")
+          owner_uniq_name = User.find(created_instance_id("users")).identity_group.display_name
+          expect(owner_uniq_name).to eq("Test_User_Login")
         end
       end
 
       context "with invalid user attributes" do
-        let(:extra_attributes) { { login: nil } }
+        let(:extra_attributes) { { display_name: nil } }
 
         it "should return 422" do
           post :create, user: user_attributes
@@ -79,12 +74,12 @@ describe RegistrationsController, type: :controller do
 
         it "should not persist the user account" do
           post :create, user: user_attributes
-          expect(User.where(login: user_attributes[:login])).to_not exist
+          expect(User.where(display_name: user_attributes[:display_name])).to_not exist
         end
 
         it "should provide an error message in the response body" do
           post :create, user: user_attributes
-          error_keys = %w(login display_name identity_group.name)
+          error_keys = %w(display_name identity_group.display_name)
           error_body = Hash[error_keys.zip(Array.new(3, ["can't be blank"]))]
           expect(response.body).to eq(json_error_message(error_body))
         end
@@ -110,7 +105,7 @@ describe RegistrationsController, type: :controller do
         end
 
         it "should not orphan an identity User Group" do
-          attrs = user_attributes.merge(login: "test_user", password: '123456')
+          attrs = user_attributes.merge(display_name: "test_user", password: '123456')
           expect{ post :create, user: attrs }.not_to change{ UserGroup.count }
         end
       end
@@ -118,7 +113,7 @@ describe RegistrationsController, type: :controller do
   end
 
   context "as html" do
-    let(:user_params) { [ :email, :password, :password_confirmation, :login ] }
+    let(:user_params) { [ :email, :password, :password_confirmation, :display_name ] }
 
     before(:each) do
       request.env["HTTP_ACCEPT"] = "text/html"
@@ -128,7 +123,7 @@ describe RegistrationsController, type: :controller do
 
       context "with valid user attributes" do
         let(:login) { "zoonser" }
-        let(:extra_attributes) { { login: login } }
+        let(:extra_attributes) { { display_name: login } }
 
         it "should return redirect" do
           post :create, user: user_attributes
@@ -141,33 +136,28 @@ describe RegistrationsController, type: :controller do
 
         it "should persist the user account" do
           post :create, user: user_attributes
-          expect(User.find_by_login(login)).to_not be_nil
+          expect(User.find_by_display_name(login)).to_not be_nil
         end
 
         it "should sign the user in" do
           expect(subject).to receive(:sign_in)
           post :create, user: user_attributes
         end
-
-        it "should set the display name to be the exact replica of the login field" do
-          post :create, user: user_attributes
-          expect(User.find_by_login(login).display_name).to eq(login)
-        end
       end
 
       context "with caps and spaces in the login name" do
-        let(:login) { "Test User Login" }
-        let(:extra_attributes) { { login: login } }
+        let(:login) { "Test_User_Login" }
+        let(:extra_attributes) { { display_name: login } }
 
         it "should convert the identity_group#name field correctly" do
           post :create, user: user_attributes
-          owner_uniq_name = User.find_by_login(login.downcase).identity_group.name
-          expect(owner_uniq_name).to eq("test_user_login")
+          owner_uniq_name = User.find_by_display_name(login).identity_group.display_name
+          expect(owner_uniq_name).to eq("Test_User_Login")
         end
       end
 
       context "with invalid user attributes" do
-        let(:extra_attributes) { { login: nil } }
+        let(:extra_attributes) { { display_name: nil } }
 
         it "should return 200" do
           post :create, user: user_attributes
@@ -180,7 +170,7 @@ describe RegistrationsController, type: :controller do
 
         it "should not persist the user account" do
           post :create, user: user_attributes
-          expect(User.where(login: user_attributes[:login])).to_not exist
+          expect(User.where(display_name: user_attributes[:display_name])).to_not exist
         end
       end
 
@@ -198,7 +188,7 @@ describe RegistrationsController, type: :controller do
         end
 
         it "should not orphan an identity User Group" do
-          attrs = user_attributes.merge(login: "test_user", password: '123456')
+          attrs = user_attributes.merge(display_name: "test_user", password: '123456')
           expect{ post :create, user: attrs }.not_to change{ UserGroup.count }
         end
       end

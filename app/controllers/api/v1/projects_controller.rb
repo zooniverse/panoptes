@@ -41,7 +41,6 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    Namer.set_name_fields(create_params)
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
     add_user_as_linked_owner(create_params)
     super(create_params)

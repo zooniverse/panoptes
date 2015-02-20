@@ -9,7 +9,7 @@ describe Api::V1::UsersController, type: :controller do
 
   let(:api_resource_name) { "users" }
   let(:api_resource_attributes) do
-    [ "id", "login", "display_name", "credited_name", "email", "created_at", "updated_at", "type" ]
+    [ "id", "display_name", "credited_name", "email", "created_at", "updated_at", "type" ]
   end
   let(:api_resource_links) do
     [ "users.projects",
@@ -59,18 +59,6 @@ describe Api::V1::UsersController, type: :controller do
         get :index, index_options
       end
 
-      describe "filter by login" do
-        let(:index_options) { { login: user.login } }
-
-        it "should respond with 1 item" do
-          expect(json_response[api_resource_name].length).to eq(1)
-        end
-
-        it "should respond with the correct item" do
-          expect(json_response[api_resource_name][0]['login']).to eq(user.login)
-        end
-      end
-
       describe "filter by display_name" do
         let(:index_options) { { display_name: user.display_name } }
 
@@ -89,7 +77,7 @@ describe Api::V1::UsersController, type: :controller do
       before(:each) do
         user = users.first
         create(:classification, user: user)
-        get :index, { login: user.login }
+        get :index, { display_name: user.display_name }
       end
 
       it "should respond with 1 item" do
@@ -122,12 +110,12 @@ describe Api::V1::UsersController, type: :controller do
 
     it 'should include a customized url for projects' do
       projects_link = json_response['links']['users.projects']['href']
-      expect(projects_link).to eq("/projects?owner={users.login}")
+      expect(projects_link).to eq("/projects?owner={users.display_name}")
     end
 
     it 'should include a customized url for collections' do
       collections_link = json_response['links']['users.collections']['href']
-      expect(collections_link).to eq("/collections?owner={users.login}")
+      expect(collections_link).to eq("/collections?owner={users.display_name}")
     end
 
     it_behaves_like "an api response"
@@ -181,13 +169,13 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     context "with a valid replace put operation" do
-      let(:new_display_name) { "Mr Creosote" }
+      let(:new_display_name) { "Mr_Creosote" }
       let(:put_operations) do
         { users: { display_name: new_display_name } }
       end
 
       it "should return 200 status" do
-        expect(response.status).to eq(200)
+        expect(response).to have_http_status(:ok)
       end
 
       it "should have updated the attribute" do
@@ -216,24 +204,6 @@ describe Api::V1::UsersController, type: :controller do
       it "should not updated the resource attribute" do
         prev_display_name = user.display_name
         expect(user.reload.display_name).to eq(prev_display_name)
-      end
-    end
-
-    context "with and put operation that sets a required attribute to nil" do
-      let(:put_operations) { {users: { login: "" }} }
-
-      it "should return a bad request status" do
-        expect(response.status).to eq(422)
-      end
-
-      it "should return a specific error message in the response body" do
-        error_message = json_error_message("found unpermitted parameters: login")
-        expect(response.body).to eq(error_message)
-      end
-
-      it "should not updated the resource attribute" do
-        prev_login = user.login
-        expect(user.reload.login).to eq(prev_login)
       end
     end
   end

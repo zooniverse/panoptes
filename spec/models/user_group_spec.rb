@@ -7,7 +7,7 @@ describe UserGroup, :type => :model do
   let(:owner) { user_group }
   let(:owned) { build(:project, owner: owner) }
   let(:locked_factory) { :user_group }
-  let(:locked_update) { {display_name: "A differet name"} }
+  let(:locked_update) { {display_name: "A-different_name"} }
   
   it_behaves_like "optimistically locked"
 
@@ -50,28 +50,39 @@ describe UserGroup, :type => :model do
     end
   end
 
-  describe "#name" do
+  describe "#display_name" do
     it 'should validate presence' do
-      ug = build(:user_group, name: "")
-      expect(ug.valid?).to be false
+      expect(build(:user_group, display_name: "")).to_not be_valid
+    end
+    
+    it 'should not have whitespace' do
+      expect(build(:user_group, display_name: " asdf asdf")).to_not be_valid
+    end
+
+    it 'should not have a dollar sign' do
+      expect(build(:user_group, display_name: "$asdfasdf")).to_not be_valid
+    end
+
+    it 'should not ahve an at sign' do
+      expect(build(:user_group, display_name: "@asdfasdf")).to_not be_valid
     end
 
     it 'should have non-blank error' do
-      ug = build(:user_group, name: "")
+      ug = build(:user_group, display_name: "")
       ug.valid?
-      expect(ug.errors[:name]).to include("can't be blank")
+      expect(ug.errors[:display_name]).to include("can't be blank")
     end
 
     it 'should validate uniqueness' do
       name = "FancyUserGroup"
-      expect{ create(:user_group, name: name) }.to_not raise_error
-      expect{ create(:user_group, name: name.upcase) }.to raise_error
-      expect{ create(:user_group, name: name.downcase) }.to raise_error
+      expect{ create(:user_group, display_name: name) }.to_not raise_error
+      expect{ create(:user_group, display_name: name.upcase) }.to raise_error
+      expect{ create(:user_group, display_name: name.downcase) }.to raise_error
     end
 
     it "should have the correct case-insensitive uniqueness error" do
       user_group = create(:user_group)
-      dup_user_group = build(:user_group, name: user_group.name.upcase)
+      dup_user_group = build(:user_group, display_name: user_group.display_name.upcase)
       dup_user_group.valid?
       expect(dup_user_group.errors[:name]).to include("has already been taken")
     end

@@ -7,7 +7,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
   let(:api_resource_name) { "projects" }
   let(:api_resource_attributes) do
-    ["id", "name", "display_name", "classifications_count", "subjects_count",
+    ["id", "display_name", "classifications_count", "subjects_count",
      "updated_at", "created_at", "available_languages", "title", "avatar",
      "description", "team_members", "guide", "science_case", "introduction",
      "background_image", "private"]
@@ -65,7 +65,7 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "filter by owner" do
-          let(:index_options) { { owner: project_owner.identity_group.name } }
+          let(:index_options) { { owner: project_owner.identity_group.display_name } }
 
           it "should respond with 1 item" do
             expect(json_response[api_resource_name].length).to eq(1)
@@ -98,7 +98,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
 
           let(:index_options) do
-            {owner: project_owner.identity_group.name,
+            {owner: project_owner.identity_group.display_name,
              display_name: filtered_project.display_name}
           end
 
@@ -109,19 +109,6 @@ describe Api::V1::ProjectsController, type: :controller do
           it "should respond with the correct item" do
             project_name = json_response[api_resource_name][0]['display_name']
             expect(project_name).to eq(filtered_project.display_name)
-          end
-        end
-
-        describe "filter by name" do
-          let(:index_options) { { name: new_project.name } }
-
-          it "should respond with 1 item" do
-            expect(json_response[api_resource_name].length).to eq(1)
-          end
-
-          it "should respond with the correct item" do
-            project_name = json_response[api_resource_name][0]['name']
-            expect(project_name).to eq(new_project.name)
           end
         end
       end
@@ -187,7 +174,6 @@ describe Api::V1::ProjectsController, type: :controller do
 
       let(:default_create_params) do
         { projects: { display_name: display_name,
-                      name: "new_zoo",
                       description: "A new Zoo for you!",
                       primary_language: 'en',
                       private: true } }

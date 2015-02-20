@@ -1,11 +1,11 @@
 class UserSerializer
   include RestPack::Serializer
-  attributes :id, :login, :display_name, :credited_name, :email, :created_at, :updated_at, :type
+  attributes :id, :display_name, :credited_name, :email, :created_at, :updated_at, :type
   can_include :classifications, :project_preferences, :collection_preferences,
-              projects: { param: "owner", value: "login" },
-              collections: { param: "owner", value: "login" }
+              projects: { param: "owner", value: "display_name" },
+              collections: { param: "owner", value: "display_name" }
 
-  can_filter_by :login, :display_name
+  can_filter_by :display_name
 
   def credited_name
     @model.credited_name if permitted_requester?

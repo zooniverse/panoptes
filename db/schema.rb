@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150216192936) do
+ActiveRecord::Schema.define(version: 20150220000430) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -235,6 +235,7 @@ ActiveRecord::Schema.define(version: 20150216192936) do
     t.integer  "lock_version",          default: 0
   end
 
+  add_index "user_groups", ["display_name"], name: "index_user_groups_on_display_name", unique: true, using: :btree
   add_index "user_groups", ["name"], name: "index_user_groups_on_name", unique: true, using: :btree
 
   create_table "user_project_preferences", force: true do |t|
@@ -285,7 +286,6 @@ ActiveRecord::Schema.define(version: 20150216192936) do
     t.string   "last_sign_in_ip"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "login",                                          null: false
     t.string   "hash_func",                   default: "bcrypt"
     t.string   "password_salt"
     t.string   "display_name"
@@ -302,7 +302,6 @@ ActiveRecord::Schema.define(version: 20150216192936) do
 
   add_index "users", ["display_name"], name: "index_users_on_display_name", unique: true, using: :btree
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
-  add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "versions", force: true do |t|

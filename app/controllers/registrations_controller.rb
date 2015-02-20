@@ -21,9 +21,6 @@ class RegistrationsController < Devise::RegistrationsController
 
   def build_resource(sign_up_params)
     super(sign_up_params)
-    login = sign_up_params[:login]
-    resource.display_name = login
-    resource.login = login
     resource.build_identity_group
   end
 

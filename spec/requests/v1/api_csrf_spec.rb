@@ -21,8 +21,7 @@ describe 'api should not require csrf protection', type: :request do
     allow_any_instance_of(Api::V1::ProjectsController).to receive(:doorkeeper_token)
       .and_return(token)
 
-    post "/api/projects", { projects: { name: "new_hotness",
-                                        display_name: "New Hotness!",
+    post "/api/projects", { projects: { display_name: "New Hotness!",
                                         description: "Your shits busted",
                                         primary_language: 'en',
                                         private: false } }.to_json,

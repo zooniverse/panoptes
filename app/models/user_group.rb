@@ -18,7 +18,8 @@ class UserGroup < ActiveRecord::Base
   has_many :collections, through: :owned_resources, source: :resource,
            source_type: "Collection"
 
-  validates :name, presence: true, uniqueness: { case_sensistive: false }
+  validates :display_name, presence: true, format: { without: /\$|@|\s+/ }
+  validates :name, presence: true, uniqueness: true
 
   before_validation :downcase_case_insensitive_fields
 
@@ -76,8 +77,8 @@ class UserGroup < ActiveRecord::Base
   private
   
   def downcase_case_insensitive_fields
-    if name
-      self.name = name.downcase
+    if name.nil? && display_name
+      self.name = display_name.downcase
     end
   end
 end

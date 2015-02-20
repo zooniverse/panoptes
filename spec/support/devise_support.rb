@@ -4,7 +4,7 @@ module ValidUserRequestHelper
 
     def sign_in_as_a_valid_user(user_factory=:user)
         @user ||= FactoryGirl.create user_factory
-        post_via_redirect user_session_path, 'user[login]' => @user.login,
+        post_via_redirect user_session_path, 'user[display_name]' => @user.display_name,
                                              'user[password]' => @user.password
     end
 end
