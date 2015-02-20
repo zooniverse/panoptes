@@ -41,13 +41,9 @@ class Api::V1::ClassificationsController < Api::ApiController
     classification
   end
 
-  def cellect_host(classification)
-    super(classification.workflow.id)
-  end
-
   def lifecycle(action, classification)
     lifecycle = ClassificationLifecycle.new(classification)
-    lifecycle.update_cellect(cellect_host(classification))
+    lifecycle.update_cellect(cellect_session)
     lifecycle.queue(action)
   end
 

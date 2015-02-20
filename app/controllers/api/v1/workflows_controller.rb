@@ -23,7 +23,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   
   def load_cellect
     return unless api_user.logged_in?
-    Cellect::Client.connection.load_user(**cellect_params)
+    CellectClient.load_user(cellect_session, params[:id], api_user.id)
   end
 
   def build_update_hash(update_params, id)
@@ -53,11 +53,4 @@ class Api::V1::WorkflowsController < Api::ApiController
     [tasks, task_string_extractor.collector]
   end
 
-  def cellect_params
-    {
-      host: cellect_host(params[:id]),
-      user_id: api_user.id,
-      workflow_id: params[:id]
-    }
-  end
 end

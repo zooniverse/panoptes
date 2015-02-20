@@ -250,9 +250,9 @@ describe ClassificationLifecycle do
                                                subject_id: classification.subject_ids.first,
                                                workflow_id: classification.workflow.id,
                                                user_id: classification.user.id,
-                                               host: 'http://test.host/'
+                                               host: 'example.com'
                                              )
-      subject.update_cellect('http://test.host/')
+      subject.update_cellect(workflow_id: 'example.com')
     end
   end
 

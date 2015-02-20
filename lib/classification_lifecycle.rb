@@ -31,14 +31,10 @@ class ClassificationLifecycle
     end
   end
 
-  def update_cellect(cellect_host)
+  def update_cellect(session)
     return unless should_update_seen?
     subject_ids.each do |id|
-      Cellect::Client.connection
-        .add_seen(user_id: user.try(:id),
-                  workflow_id: workflow.id,
-                  subject_id: id,
-                  host: cellect_host)
+      CellectClient.add_seen(session, workflow.id, user.try(:id), id)
     end
   end
 
