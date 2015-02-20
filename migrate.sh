@@ -4,4 +4,9 @@ cd /rails_app
 
 ln -sf /rails_conf/* ./config/
 
-exec rake db:migrate RAILS_ENV="production"
+if [ -z "$RAILS_ENV" ]
+then
+    export RAILS_ENV="production"
+fi
+
+exec rake db:migrate
