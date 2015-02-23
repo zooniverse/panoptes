@@ -5,4 +5,8 @@ Honeybadger.configure do |config|
                   {}
                 end
   config.api_key = config_file.fetch(Rails.env, {}).symbolize_keys[:api_key]
+
+  config.async do |notice|
+    HoneybadgerWorker.perform_async(notice.to_json)
+  end
 end
