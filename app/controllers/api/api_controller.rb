@@ -1,3 +1,4 @@
+
 module Api
   include ApiErrors
 
@@ -42,7 +43,7 @@ module Api
     end
 
     def api_user
-      @api_user ||= ApiUser.new(current_resource_owner)
+      @api_user ||= ApiUser.new(current_resource_owner, admin: admin_flag?)
     end
 
     def current_languages
@@ -77,6 +78,10 @@ module Api
       unless api_user.logged_in?
         raise Api::NotLoggedIn.new("You must be logged in to access this resource.")
       end
+    end
+
+    def admin_flag?
+      !!params[:admin]
     end
 
     def ban_user
