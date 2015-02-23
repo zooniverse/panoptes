@@ -24,9 +24,8 @@ class User < ActiveRecord::Base
   has_many :project_roles, through: :identity_group
   has_many :collection_roles, through: :identity_group
 
-  validates :login, presence: true, uniqueness: true
-  validates_presence_of :display_name
-  validates_uniqueness_of :display_name, case_sensitive: false
+  validates :display_name, presence: true, uniqueness: { case_sensitive: false },
+            format: { without: /\$|@|\s+/ }
   validates_length_of :password, within: 8..128, allow_blank: true,
                       unless: :migrated_user?
 
@@ -67,8 +66,7 @@ class User < ActiveRecord::Base
       u.email = auth_hash.info.email
       u.password = Devise.friendly_token[0,20]
       name = auth_hash.info.name
-      u.display_name = name
-      u.login = StringConverter.downcase_and_replace_spaces(name)
+      u.display_name = StringConverter.replace_spaces(name)
       u.build_identity_group
       u.authorizations << auth
     end
@@ -120,8 +118,7 @@ class User < ActiveRecord::Base
   def build_identity_group
     raise StandardError, "Identity Group Exists" if identity_group
     build_identity_membership
-    name = StringConverter.downcase_and_replace_spaces(login)
-    identity_membership.build_user_group(name: name)
+    identity_membership.build_user_group(display_name: display_name)
   end
 
   def is_admin?

@@ -13,18 +13,18 @@ describe SessionsController, type: :controller do
 
     describe "#create" do
       it "should respond with the user object" do
-        post :create, user: {login: user.login, password: user.password}
+        post :create, user: {display_name: user.display_name, password: user.password}
         expect(json_response).to include("users")
       end
 
       it "should respond with a 200" do
-        post :create, user: {login: user.login, password: user.password}
+        post :create, user: {display_name: user.display_name, password: user.password}
         expect(response.status).to eq(200)
       end
 
       it "should sign in the user" do
         expect(controller).to receive(:sign_in)
-        post :create, user: {login: user.login, password: user.password}
+        post :create, user: {display_name: user.display_name, password: user.password}
       end
     end
 

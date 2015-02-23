@@ -2,17 +2,12 @@ class ProjectCreateSchema < JsonSchema
   schema do
     type "object"
     description "A Project"
-    required "name", "description", "primary_language", "private"
+    required "display_name", "description", "primary_language", "private"
     additional_properties false
 
     property "display_name" do
       type "string"
       description "Human readable name for a project ie Galaxy Zoo"
-    end
-
-    property "name" do
-      type "string"
-      description "URL string for a project downcased and underscored ie galaxy_zoo"
     end
 
     property "primary_language" do

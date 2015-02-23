@@ -5,14 +5,12 @@ class Api::V1::GroupsController < Api::ApiController
 
   alias_method :user_group, :controlled_resource
   
-  allowed_params :create, :name, :display_name, links: [ users: [] ]
+  allowed_params :create, :display_name, links: [ users: [] ]
   allowed_params :update, :display_name
   
   private
 
   def build_resource_for_create(create_params)
-    Namer.set_name_fields(create_params)
-
     group = super(create_params)
     group.memberships.build(**initial_member)
     group

@@ -17,17 +17,6 @@ describe Collection, :type => :model do
     expect(build(:collection)).to be_valid
   end
 
-  it 'should require unique names for an ower' do
-    owner = create(:user)
-    expect(create(:collection, name: "hi_fives", owner: owner)).to be_valid
-    expect(build(:collection, name: "hi_fives", owner: owner)).to_not be_valid
-  end
-
-  it 'should not require name uniquenames between owners' do
-    expect(create(:collection, name: "test_collection", owner: create(:user))).to be_valid
-    expect(create(:collection, name: "test_collection", owner: create(:user))).to be_valid
-  end
-
   it 'should require unique displays name for an owner' do
     owner = create(:user)
     expect(create(:collection, display_name: "hi fives", owner: owner)).to be_valid
