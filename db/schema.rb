@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150220000430) do
+ActiveRecord::Schema.define(version: 20150223200017) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 20150220000430) do
   end
 
   add_index "access_control_lists", ["resource_id", "resource_type"], name: "index_access_control_lists_on_resource_id_and_resource_type", using: :btree
+  add_index "access_control_lists", ["roles"], name: "index_access_control_lists_on_roles", using: :gin
   add_index "access_control_lists", ["user_group_id"], name: "index_access_control_lists_on_user_group_id", using: :btree
 
   create_table "authorizations", force: true do |t|
@@ -57,6 +58,7 @@ ActiveRecord::Schema.define(version: 20150220000430) do
   end
 
   add_index "classifications", ["project_id"], name: "index_classifications_on_project_id", using: :btree
+  add_index "classifications", ["subject_ids"], name: "index_classifications_on_subject_ids", using: :gin
   add_index "classifications", ["user_group_id"], name: "index_classifications_on_user_group_id", using: :btree
   add_index "classifications", ["user_id"], name: "index_classifications_on_user_id", using: :btree
   add_index "classifications", ["workflow_id"], name: "index_classifications_on_workflow_id", using: :btree
