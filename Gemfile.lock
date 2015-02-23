@@ -130,7 +130,8 @@ GEM
     hike (1.2.3)
     hitimes (1.2.2)
     hitimes (1.2.2-java)
-    honeybadger (2.0.6)
+    honeybadger (1.16.7)
+      json
     http (0.7.1)
       form_data (~> 0.1.0)
       http_parser.rb (~> 0.6.0)
@@ -385,7 +386,7 @@ DEPENDENCIES
   fig_rake (~> 0.9.2)
   foreman
   guard-rspec (~> 4.2.9)
-  honeybadger
+  honeybadger (~> 1.16.7)
   jbundler
   jquery-rails
   jruby-kafka (= 1.0.0.beta)
