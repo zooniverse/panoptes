@@ -139,6 +139,11 @@ describe Classification, :type => :model do
       expected = classifications[0]
       expect(Classification.scope_for(:show, user)).to include(expected)
     end
+
+    it 'should return all classifications for an admin user' do
+      user = ApiUser.new(create(:user, admin: true), admin: true)
+      expect(Classification.scope_for(:show, user)).to match_array(classifications) 
+    end
   end
   
   describe "#creator?" do

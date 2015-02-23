@@ -44,10 +44,13 @@ module RoleControl
       def scope_for(action, target, opts={})
         roles, public = roles(action)
 
-        if target.logged_in?
+        case
+        when target.is_admin?
+          all
+        when target.logged_in?
           query = private_query(joins(joins_for), action, target, roles)
           public_query(query, public)
-        elsif public_scope
+        when public_scope
           public_scope
         else
           none

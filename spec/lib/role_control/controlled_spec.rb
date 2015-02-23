@@ -9,6 +9,8 @@ describe RoleControl::Controlled do
   
   let(:unenrolled_actor) { create(:user) }
 
+  let(:admin_actor) { create(:user, admin: true) }
+
   describe "::scope_for" do
     let!(:group_tables) do
       gt1 = subject.new(private: false)
@@ -50,6 +52,11 @@ describe RoleControl::Controlled do
     it 'should not include public records when the class does not allow public scopes' do
       visible_records = subject.scope_for(:update, ApiUser.new(enrolled_actor))
       expect(visible_records).to_not include(group_tables[2])
+    end
+
+    it 'should incluced all rocords when the actor is an admin' do
+      visible_records = subject.scope_for(:update, ApiUser.new(admin_actor, admin: true))
+      expect(visible_records).to match_array(group_tables)
     end
   end
 

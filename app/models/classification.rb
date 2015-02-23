@@ -18,6 +18,7 @@ class Classification < ActiveRecord::Base
   scope :complete, -> { where(completed: true) }
 
   def self.scope_for(action, actor, opts={})
+    return all if actor.is_admin?
     case action
     when :show, :index
       query = joins(:project).merge(Project.scope_for(:update, actor))

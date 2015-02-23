@@ -14,6 +14,7 @@ module Preferences
     end
     
     def scope_for(action, user, opts={})
+      return all if user.is_admin?
       user.send("#{@preferences_for}_preferences")
     end
   end
