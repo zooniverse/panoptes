@@ -32,6 +32,18 @@ class ProjectUpdateSchema < JsonSchema
       type "string"
     end
 
+    property "result" do
+      type "string"
+    end
+
+    property "faq" do
+      type "string"
+    end
+
+    property "education_content" do
+      type "string"
+    end
+
     property "guide" do
       type "array"
       items  do

@@ -5,7 +5,8 @@ class ProjectSerializer
   attributes :id, :display_name, :classifications_count,
     :subjects_count, :created_at, :updated_at, :available_languages,
     :title, :description, :guide, :team_members, :science_case,
-    :introduction, :avatar, :background_image, :private
+    :introduction, :avatar, :background_image, :private, :faq, :result,
+    :education_content
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles
@@ -33,6 +34,18 @@ class ProjectSerializer
 
   def introduction
     content[:introduction]
+  end
+
+  def education_content
+    content[:education_content]
+  end
+
+  def faq
+    content[:faq]
+  end
+
+  def result
+    content[:result]
   end
 
   def content
