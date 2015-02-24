@@ -19,6 +19,7 @@ class Workflow < ActiveRecord::Base
   
   can_be_linked :subject_set, :same_project?, :model
   can_be_linked :user_subject_queue, :scope_for, :update, :user
+  can_be_linked :aggregation, :scope_for, :update, :user
 
   def self.same_project?(subject_set)
     where(project: subject_set.project)

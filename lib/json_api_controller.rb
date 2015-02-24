@@ -7,11 +7,12 @@ module JsonApiController
 
   module ClassMethods
     def resource_actions(*actions)
+      @actions = actions
       if actions.first == :default
-        actions = [:show, :index, :create, :update, :destroy]
+        @actions = [:show, :index, :create, :update, :destroy]
       end
 
-      actions.each do |action|
+      @actions.each do |action|
         case action
         when :show
           include JsonApiController::ShowableResource

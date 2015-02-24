@@ -16,6 +16,10 @@ module JSONApiResponses
     json_api_render(:ok, update_response)
   end
 
+  def method_not_allowed(exception)
+    json_api_render(:method_not_allowed, exception)
+  end
+
   def deleted_resource_response
     json_api_render(:no_content, {})
   end
