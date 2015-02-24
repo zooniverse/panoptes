@@ -89,7 +89,7 @@ class User < ActiveRecord::Base
     if hash_func == 'bcrypt'
       super(password)
     elsif hash_func == 'sha1'
-      if encrypted_password = sha1_encrypt(password)
+      if encrypted_password == sha1_encrypt(password)
         logger.info "User #{id} is using sha1 password. Updating..."
         self.password = password
         self.hash_func = 'bcrypt'

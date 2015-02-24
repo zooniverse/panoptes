@@ -27,7 +27,7 @@ FactoryGirl.define do
     factory :insecure_user do
       hash_func 'sha1'
       password 'tajikistan'
-      encrypted_password 'gFlanK5bXjD2YS7LSYndVJNGGdY='
+      encrypted_password 'zKUhbXyjCsgmcv6Fh5rQiHTzJWI='
       password_salt 'nK5bXjD2YS7LSYndVJNGGdY='
     end
 
