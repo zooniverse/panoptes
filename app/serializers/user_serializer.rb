@@ -1,5 +1,7 @@
 class UserSerializer
   include RestPack::Serializer
+  include RecentLinkSerializer
+  
   attributes :id, :display_name, :credited_name, :email, :created_at, :updated_at, :type
   can_include :classifications, :project_preferences, :collection_preferences,
               projects: { param: "owner", value: "display_name" },
@@ -18,7 +20,7 @@ class UserSerializer
   def type
     "users"
   end
-
+  
   private
 
   def permitted_requester?

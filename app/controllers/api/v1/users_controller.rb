@@ -1,4 +1,6 @@
 class Api::V1::UsersController < Api::ApiController
+  include Recents
+  
   doorkeeper_for :me, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show

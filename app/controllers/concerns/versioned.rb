@@ -1,6 +1,4 @@
 module Versioned
-  extend ActiveSupport::Concern
-
   def versions
     render json_api: VersionSerializer.page(params, version_scope)
   end

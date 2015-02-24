@@ -16,7 +16,8 @@ describe Api::V1::UsersController, type: :controller do
       "users.collections",
       "users.classifications",
       "users.project_preferences",
-      "users.collection_preferences" ]
+      "users.collection_preferences",
+      "users.recents" ]
   end
 
   describe "#index" do
@@ -238,5 +239,14 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     it_behaves_like "is deactivatable"
+  end
+
+  describe "#recents" do
+    let(:authorized_user) { users.first }
+    let(:resource) { authorized_user }
+    let(:resource_key) { :user }
+    let(:resource_key_id) { :user_id }
+
+    it_behaves_like "has recents"
   end
 end
