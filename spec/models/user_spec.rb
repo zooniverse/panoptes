@@ -212,22 +212,29 @@ describe User, type: :model do
       expect(create(:user).valid_password?('password')).to be_truthy
     end
 
-    it 'should validate imported user with sha1+salt password' do
-      expect(create(:insecure_user).valid_password?('tajikistan')).to be_truthy
-    end
-
-    it 'should update an imported user to use bcrypt hashing' do
-      user = create(:insecure_user)
-      user.valid_password?('tajikistan')
-      expect(user.hash_func).to eq("bcrypt")
-    end
-
     it 'should validate length of user passwords' do
       user_errors = ->(attrs){ User.new(attrs).tap{ |u| u.valid? }.errors }
       expect(user_errors.call(password: 'ab12')).to have_key :password
       expect(user_errors.call(password: 'abcd1234')).to_not have_key :password
       expect(user_errors.call(migrated_user: true, password: 'ab')).to have_key :password
       expect(user_errors.call(migrated_user: true, password: 'ab12')).to_not have_key :password
+    end
+
+    context "with the old sha1 hashing alg" do
+      let(:user) { create(:insecure_user) }
+
+      it 'should validate imported user with sha1+salt password' do
+        expect(user.valid_password?('tajikistan')).to be_truthy
+      end
+
+      it 'should not validate an imported user with an invalid password' do
+        expect(user.valid_password?('nottheirpassword')).to be_falsey
+      end
+
+      it 'should update an imported user to use bcrypt hashing' do
+        user.valid_password?('tajikistan')
+        expect(user.hash_func).to eq("bcrypt")
+      end
     end
   end
 
