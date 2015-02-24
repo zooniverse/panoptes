@@ -114,7 +114,9 @@ describe Classification, :type => :model do
       create(:membership, roles: ['group_admin'], user: user.owner,
              user_group: user_group, state: :active)
       [create(:classification, user: user.owner),
+       create(:classification, user: user.owner, completed: false),
        create(:classification, project: project),
+       create(:classification, project: project, completed: false),
        create(:classification, user_group: user_group),
        create(:classification)]
     end
@@ -124,20 +126,24 @@ describe Classification, :type => :model do
     end
 
     it 'should return all classifications for a project if the user can update it' do
-      expected = classifications[1]
+      expected = classifications[2]
       expect(Classification.scope_for(:show, user, project: true))
         .to include(expected)
     end
 
-    it 'should return all classifications for a user group if the user can see it' do
-      expected = classifications[2]
-      expect(Classification.scope_for(:show, user, user_group: true))
-        .to include(expected)
+    it 'should return all incomplete classifications a user has made' do
+      expected = classifications[1]
+      expect(Classification.scope_for(:show, user)).to include(expected)
     end
 
-    it 'should return all classifications a user has made' do
+    it 'should not return completed classifications for a user' do
       expected = classifications[0]
-      expect(Classification.scope_for(:show, user)).to include(expected)
+      expect(Classification.scope_for(:show, user)).to_not include(expected)
+    end
+
+    it 'should not return incomplete classifications for a project' do
+      expected = classifications[3]
+      expect(Classification.scope_for(:show, user)).to_not include(expected)
     end
 
     it 'should return all classifications for an admin user' do

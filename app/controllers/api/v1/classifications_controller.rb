@@ -6,6 +6,8 @@ class Api::V1::ClassificationsController < Api::ApiController
   
   schema_type :json_schema
 
+  before_action :filter_by_subject_id, only: :index
+
   rescue_from RoleControl::AccessDenied, with: :access_denied
 
   def create
@@ -17,6 +19,14 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   private
+
+  def filter_by_subject_id
+    subject_ids = params.delete(:subject_id).try(:split, ',')
+    unless subject_ids.blank?
+      @controlled_resources = controlled_resources
+                              .where.overlap(subject_ids: subject_ids)
+    end
+  end
 
   def access_denied(exception)
     if %w(update destroy).include?(action_name) && resources_completed?

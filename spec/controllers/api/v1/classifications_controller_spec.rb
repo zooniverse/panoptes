@@ -78,15 +78,35 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
 
     describe "#index" do
-      let!(:classifications) { create_list(:classification, 2, user: user) }
-      let!(:private_resource) { create(:classification) }
-      let(:n_visible) { 2 }
+      context "a user retrieving their own incomplete classifications" do
+        let!(:classifications) { create_list(:classification, 2, user: user, completed: false) }
+        let!(:private_resource) { create(:classification) }
+        let(:n_visible) { 2 }
 
-      it_behaves_like "is indexable"
+        it_behaves_like "is indexable"
+      end
+
+      context "a project owner retreiving classifications for the project" do 
+        let!(:classifications) { create_list(:classification, 2, project: project) }
+        let(:authorized_user) { project.owner }
+        
+        it 'should be filterable by subject_id' do
+          default_request scopes: scopes, user_id: authorized_user.id
+          get :index, subject_id: classifications.first.subject_ids.first
+          expect(json_response['classifications'].first['id'].to_i).to eq(classifications.first.id)
+        end
+
+        it 'should be filterable by a list of subject ids' do
+          ids = classifications.map{|c| c.subject_ids.first}.join(',')
+          default_request scopes: scopes, user_id: authorized_user.id
+          get :index, subject_id: ids
+          expect(json_response['classifications'].map{|c| c['id'].to_i}).to match_array(classifications.map(&:id))
+        end
+      end
     end
 
     describe "#show" do
-      let(:resource) { classification }
+      let(:resource) { create(:classification, user: user, completed: false) }
       it_behaves_like "is showable"
     end
 
