@@ -8,6 +8,9 @@ FactoryGirl.define do
     description "Some Lorem Ipsum"
     introduction "MORE IPSUM"
     science_case "asdfasdf asdfasdf"
+    education_content "asdfasdf asdfasdf"
+    result "asdfasdf asdfasdf"
+    faq "asdfasdf asdfasdf"
     team_members []
     guide({ "example_1" => "A descripton of it" })
   end

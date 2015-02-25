@@ -10,7 +10,7 @@ describe Api::V1::ProjectsController, type: :controller do
     ["id", "display_name", "classifications_count", "subjects_count",
      "updated_at", "created_at", "available_languages", "title", "avatar",
      "description", "team_members", "guide", "science_case", "introduction",
-     "background_image", "private"]
+     "faq", "result", "education_content", "background_image", "private"]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
@@ -176,6 +176,9 @@ describe Api::V1::ProjectsController, type: :controller do
         { projects: { display_name: display_name,
                       description: "A new Zoo for you!",
                       primary_language: 'en',
+                      education_content: "asdfasdf",
+                      faq: "some other stuff",
+                      result: "another string",
                       private: true } }
       end
 
@@ -328,6 +331,9 @@ describe Api::V1::ProjectsController, type: :controller do
         projects: {
           display_name: "A Better Name",
           name: "something_new",
+          education_content: "asdfasdf",
+          faq: "some other stuff",
+          result: "another string",
           links: {
             workflows: [workflow.id.to_s],
             subject_sets: [subject_set.id.to_s]

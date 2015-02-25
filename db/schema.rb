@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150224161921) do
+ActiveRecord::Schema.define(version: 20150224211450) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -150,6 +150,9 @@ ActiveRecord::Schema.define(version: 20150224161921) do
     t.text     "science_case"
     t.json     "team_members"
     t.json     "guide"
+    t.string   "faq"
+    t.string   "result"
+    t.string   "education_content"
   end
 
   add_index "project_contents", ["project_id"], name: "index_project_contents_on_project_id", using: :btree

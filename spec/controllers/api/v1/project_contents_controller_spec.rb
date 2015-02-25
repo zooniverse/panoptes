@@ -12,7 +12,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
 
   let(:api_resource_name) { 'project_contents' }
   let(:api_resource_attributes) do
-    %w(id title description science_case introduction guide language team_members)
+    %w(id title description science_case introduction guide language team_members faq result education_content)
   end
   let(:api_resource_links) { %w(project_contents.project) }
 
@@ -40,14 +40,17 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   describe "#create" do
     let(:create_params) do
       { project_contents: {
-                           title: "A Bad Title",
-                           description: "Worse Content",
-                           introduction: "Useless Science",
-                           language: "en-CA",
-                           guide: [{image: "http://test.host/index.jpg",
-                                    explanation: "Somethign Cool"}],
-                           links: { project: project.id.to_s }
-                          }
+          title: "A Bad Title",
+          description: "Worse Content",
+          introduction: "Useless Science",
+          language: "en-CA",
+          education_content: "asdfasdf",
+          faq: "some other stuff",
+          result: "another string",
+          guide: [{image: "http://test.host/index.jpg",
+                   explanation: "Somethign Cool"}],
+          links: { project: project.id.to_s }
+        }
       }
     end
 
@@ -60,9 +63,12 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   describe "#update" do
     let(:update_params) do
       { project_contents: {
-                           team_members: [{name: "Sandra Rodriguez",
-                                           twitter: "sandrarod"}]
-                          }
+          education_content: "asdfasdf",
+          faq: "some other stuff",
+          result: "another string",
+          team_members: [{name: "Sandra Rodriguez",
+                          twitter: "sandrarod"}]
+        }
       }
     end
 
