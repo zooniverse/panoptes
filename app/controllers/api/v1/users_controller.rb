@@ -1,6 +1,6 @@
 class Api::V1::UsersController < Api::ApiController
   include Recents
-  
+
   doorkeeper_for :me, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show
@@ -29,7 +29,7 @@ class Api::V1::UsersController < Api::ApiController
   private
 
   def context
-    { requester: api_user }
+    { requester: api_user, include_firebase_token: true }
   end
 
   def sign_out_current_user!

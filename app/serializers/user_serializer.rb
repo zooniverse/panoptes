@@ -19,7 +19,7 @@ class UserSerializer
   end
 
   def firebase_auth_token
-    FirebaseUserToken.generate(@model) if requester_is_user?
+    FirebaseUserToken.generate(@model) if show_firebase_token?
   end
 
   def type
@@ -39,6 +39,10 @@ class UserSerializer
 
   def requester_is_user?
     @model.id == @context[:requester].id
+  end
+
+  def show_firebase_token?
+    @context[:include_firebase_token] && requester_is_user?
   end
 
   def add_links(model, data)

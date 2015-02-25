@@ -125,7 +125,7 @@ describe Api::V1::UsersController, type: :controller do
   describe "#me" do
 
     before(:each) do
-      default_request(scopes: scopes, user_id: users.first)
+      default_request(scopes: scopes, user_id: users.first.id)
       get :me
     end
 
@@ -167,7 +167,7 @@ describe Api::V1::UsersController, type: :controller do
 
       it "should not have a firebase auth token for the user" do
         allow_any_instance_of(UserSerializer)
-          .to receive(:requester_is_user?).and_return(false)
+          .to receive(:show_firebase_token?).and_return(false)
         get :me
         expect(response_fb_token).to be_nil
       end
