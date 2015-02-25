@@ -19,6 +19,9 @@ describe Api::V1::UsersController, type: :controller do
       "users.collection_preferences",
       "users.recents" ]
   end
+  let(:response_fb_token) do
+    json_response[api_resource_name][0]["firebase_auth_token"]
+  end
 
   describe "#index" do
     context "with an authenticated user" do
@@ -92,38 +95,73 @@ describe Api::V1::UsersController, type: :controller do
   end
 
   describe "#show" do
-    before(:each) do
-      default_request(scopes: scopes, user_id: users.first.id)
-      get :show, id: users.first.id
+
+    context "when showing the requesting user" do
+
+      before(:each) do
+        default_request(scopes: scopes, user_id: users.first.id)
+        get :show, id: users.first.id
+      end
+
+      it "should return 200" do
+        expect(response.status).to eq(200)
+      end
+
+      it "should have a single user" do
+        expect(json_response["users"].length).to eq(1)
+      end
+
+      it "should have the user's email" do
+        expect(json_response['users'][0]['email']).to_not be_nil
+      end
+
+      it 'should include a customized url for projects' do
+        projects_link = json_response['links']['users.projects']['href']
+        expect(projects_link).to eq("/projects?owner={users.display_name}")
+      end
+
+      it 'should include a customized url for collections' do
+        collections_link = json_response['links']['users.collections']['href']
+        expect(collections_link).to eq("/collections?owner={users.display_name}")
+      end
+
+      it_behaves_like "an api response"
     end
 
-    it "should return 200" do
-      expect(response.status).to eq(200)
-    end
+    describe "firebase JWT token" do
+      let(:show_id) { users.first.id }
 
-    it "should have a single user" do
-      expect(json_response["users"].length).to eq(1)
-    end
+      before(:each) do
+        default_request(scopes: scopes, user_id: requesting_user_id)
+        allow_any_instance_of(UserSerializer)
+          .to receive(:show_firebase_token?).and_return(false)
+        get :show, id: show_id
+      end
 
-    it "should have the user's email" do
-      expect(json_response['users'][0]['email']).to_not be_nil
-    end
+      context "when showing the a different user to the requesting user" do
+        let(:requesting_user_id) { users.last.id }
 
-    it 'should include a customized url for projects' do
-      projects_link = json_response['links']['users.projects']['href']
-      expect(projects_link).to eq("/projects?owner={users.display_name}")
-    end
+        it "should not have a firebase auth token for the user" do
+          expect(response_fb_token).to be_nil
+        end
+      end
 
-    it 'should include a customized url for collections' do
-      collections_link = json_response['links']['users.collections']['href']
-      expect(collections_link).to eq("/collections?owner={users.display_name}")
-    end
+      context "when showing the requesting user" do
+        let(:requesting_user_id) { show_id }
 
-    it_behaves_like "an api response"
+        it "should not have a firebase auth token for the user" do
+          expect(response_fb_token).to be_nil
+        end
+      end
+    end
   end
 
   describe "#me" do
+    let(:jwt_token) { "completely_fake_jwt_token" }
+
     before(:each) do
+      allow_any_instance_of(Firebase::FirebaseTokenGenerator)
+        .to receive(:create_token).and_return(jwt_token)
       default_request(scopes: scopes, user_id: users.first.id)
       get :me
     end
@@ -139,6 +177,10 @@ describe Api::V1::UsersController, type: :controller do
 
     it "should have a single user" do
       expect(json_response[api_resource_name].length).to eq(1)
+    end
+
+    it "should have a firebase auth token for the user" do
+      expect(response_fb_token).to eq(jwt_token)
     end
 
     it_behaves_like "an api response"

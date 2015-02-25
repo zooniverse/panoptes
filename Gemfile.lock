@@ -109,6 +109,7 @@ GEM
     ffi (1.9.6)
     ffi (1.9.6-java)
     fig_rake (0.9.2)
+    firebase_token_generator (2.0.0)
     foreman (0.77.0)
       dotenv (~> 1.0.2)
       thor (~> 0.19.1)
@@ -384,9 +385,10 @@ DEPENDENCIES
   doorkeeper (~> 1.4.1)
   factory_girl_rails (~> 4.5.0)
   fig_rake (~> 0.9.2)
+  firebase_token_generator
   foreman
   guard-rspec (~> 4.2.9)
-  honeybadger (~> 1.16.7)
+  honeybadger
   jbundler
   jquery-rails
   jruby-kafka (= 1.0.0.beta)
