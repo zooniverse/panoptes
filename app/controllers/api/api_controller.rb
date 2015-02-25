@@ -1,4 +1,3 @@
-
 module Api
   include ApiErrors
 

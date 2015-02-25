@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150224211450) do
+ActiveRecord::Schema.define(version: 20150224223657) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,6 +28,17 @@ ActiveRecord::Schema.define(version: 20150224211450) do
   add_index "access_control_lists", ["resource_id", "resource_type"], name: "index_access_control_lists_on_resource_id_and_resource_type", using: :btree
   add_index "access_control_lists", ["roles"], name: "index_access_control_lists_on_roles", using: :gin
   add_index "access_control_lists", ["user_group_id"], name: "index_access_control_lists_on_user_group_id", using: :btree
+
+  create_table "aggregations", force: true do |t|
+    t.integer  "workflow_id"
+    t.integer  "subject_id"
+    t.json     "aggregation", default: {}, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "aggregations", ["subject_id"], name: "index_aggregations_on_subject_id", using: :btree
+  add_index "aggregations", ["workflow_id"], name: "index_aggregations_on_workflow_id", using: :btree
 
   create_table "authorizations", force: true do |t|
     t.integer  "user_id"

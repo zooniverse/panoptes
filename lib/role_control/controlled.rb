@@ -51,7 +51,7 @@ module RoleControl
           query = private_query(joins(joins_for), action, target, roles)
           public_query(query, public)
         when public_scope
-          public_scope
+          public ? public_scope : none
         else
           none
         end
