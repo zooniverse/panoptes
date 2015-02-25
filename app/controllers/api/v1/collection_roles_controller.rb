@@ -1,9 +1,6 @@
 class Api::V1::CollectionRolesController < Api::ApiController
   include RolesController
-
-  prepend_before_filter :require_login
-  doorkeeper_for :all, scopes: [:collection]
-  schema_type :strong_params
+  doorkeeper_for :create, :update, scopes: [:collection]
 
   allowed_params :create, roles: [], links: [:user, :collection]
   allowed_params :update, roles: []

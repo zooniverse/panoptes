@@ -1,10 +1,12 @@
+
 module RolesController
   extend ActiveSupport::Concern
 
   included do
-    prepend_before_filter :require_login
-    
     resource_actions :index, :show, :create, :update
+    schema_type :strong_params
+    
+    before_filter :format_filter_params, only: :index
 
     include BuildOverride
   end
@@ -25,12 +27,23 @@ module RolesController
     { resource_type: enrolled_resource.camelize.constantize }
   end
 
+  def format_filter_params
+    if filter = params.delete("#{enrolled_resource}_id")
+      params[:resource_id] = filter
+      params[:resource_type] = enrolled_resource.capitalize
+    end
+  end
+
   module BuildOverride
     def build_resource_for_create(create_params)
-      create_params[:links][:user_group] = User.find(create_params[:links].delete(:user))
-                                         .identity_group
-      create_params[:links][:resource] = { type: enrolled_resource.pluralize,
-                                         id: create_params[:links].delete(enrolled_resource) }
+      ig = User.find(create_params[:links].delete(:user))
+           .identity_group
+      
+      create_params[:links][:user_group] = ig
+      create_params[:links][:resource] =
+        { type: enrolled_resource.pluralize,
+          id: create_params[:links].delete(enrolled_resource) }
+      
       super(create_params)
     end
   end
