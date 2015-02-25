@@ -123,8 +123,9 @@ describe Api::V1::UsersController, type: :controller do
   end
 
   describe "#me" do
+
     before(:each) do
-      default_request(scopes: scopes, user_id: users.first.id)
+      default_request(scopes: scopes, user_id: users.first)
       get :me
     end
 
@@ -142,6 +143,35 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     it_behaves_like "an api response"
+  end
+
+  describe "#me's firebase token" do
+    let!(:default_scope) { default_request(scopes: scopes, user_id: users.first.id) }
+    let(:jwt_token) { "completely_fake_jwt_token" }
+    let(:token_hash_key) { "firebase_auth_token" }
+    let(:response_fb_token) { json_response[api_resource_name][0][token_hash_key] }
+
+    before(:each) do
+      allow_any_instance_of(Firebase::FirebaseTokenGenerator)
+        .to receive(:create_token).and_return(jwt_token)
+    end
+
+    context "when the requesting user is the resource owner" do
+      it "should have a firebase auth token for the user" do
+        get :me
+        expect(response_fb_token).to eq(jwt_token)
+      end
+    end
+
+    context "when the requesting user is not the resource owner" do
+
+      it "should not have a firebase auth token for the user" do
+        allow_any_instance_of(UserSerializer)
+          .to receive(:requester_is_user?).and_return(false)
+        get :me
+        expect(response_fb_token).to be_nil
+      end
+    end
   end
 
   describe "#update" do
