@@ -2,6 +2,7 @@ postgres:
   image: zooniverse/postgresql
   environment:
     - "PG_USER=panoptes"
+    - "DB=panoptes_development"
     - "PASS=panoptes"
 
 zookeeper:
