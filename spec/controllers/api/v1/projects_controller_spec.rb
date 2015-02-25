@@ -10,7 +10,7 @@ describe Api::V1::ProjectsController, type: :controller do
     ["id", "display_name", "classifications_count", "subjects_count",
      "updated_at", "created_at", "available_languages", "title", "avatar",
      "description", "team_members", "guide", "science_case", "introduction",
-     "faq", "result", "education_content", "background_image", "private"]
+     "faq", "result", "education_content", "background_image", "private", "retired_subjects_count"]
   end
   let(:api_resource_links) do
     [ "projects.workflows",

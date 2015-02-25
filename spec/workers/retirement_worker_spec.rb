@@ -11,15 +11,23 @@ RSpec.describe RetirementWorker do
   
   describe "#perform" do
     context "sms is retireable" do
-      it 'should retire the sms' do
+      before(:each) do
         allow_any_instance_of(SetMemberSubject).to receive(:retire?).and_return(true)
+      end
+      
+      it 'should retire the sms' do
         worker.perform(sms.id, workflow_id)
         sms.reload
         expect(sms).to be_retired
       end
 
+      it "should increment the subject set's retirement count" do
+        expect{ worker.perform(sms.id, workflow_id) }.to change{
+          SubjectSet.find(sms.subject_set_id).retired_set_member_subjects_count
+        }.from(0).to(1)
+      end
+
       it 'should call cellect remote subject' do
-        allow_any_instance_of(SetMemberSubject).to receive(:retire?).and_return(true)
         expect(stubbed_cellect_connection).to receive(:remove_subject)
                                                .with(sms.subject_id,
                                                      workflow_id: workflow_id,
