@@ -6,7 +6,7 @@ class CatchApiJsonParseErrors
   def call(env)
     begin
       @app.call(env)
-    rescue ActionDispatch::ParamsParser::ParseError => e
+    rescue ActionDispatch::ParamsParser::ParseError, JSON::ParserError => e
       if json_api_call?(env)
         return error.respond(e)
       else

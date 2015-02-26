@@ -55,4 +55,18 @@ describe CatchApiJsonParseErrors do
       it_behaves_like 'a json error response'
     end
   end
+  
+  context "call errors with JSON::ParserError" do
+    let(:error) { JSON::ParserError.new('test') }
+    
+    before(:each) do
+      allow(app).to receive(:call).and_raise(error)
+    end
+
+    let(:request) {  middle.call(good_env) }
+    let(:status) { 400 }
+    let(:msg) { /There was a problem in the JSON you submitted/ }
+
+    it_behaves_like 'a json error response'
+  end
 end
