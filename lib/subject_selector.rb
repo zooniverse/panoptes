@@ -16,7 +16,12 @@ class SubjectSelector
 
   def cellect_subjects
     raise workflow_id_error unless params.has_key?(:workflow_id)
-    selected_subjects(CellectClient.get_subjects(*cellect_params))
+    subjects = CellectClient.get_subjects(*cellect_params)
+    if subjects.blank?
+      subjects = PostgresqlSelection.new(Workflow.find(params[:workflow_id]), user)
+                 .select(limit: default_page_size, subject_set_id: params[:subject_set_id])
+    end
+    selected_subjects(subjects)
   end
 
   def selected_subjects(subject_ids)

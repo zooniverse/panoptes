@@ -169,6 +169,23 @@ describe Api::V1::SubjectsController, type: :controller do
               expect(response_page_size).to eq(10)
             end
           end
+
+          context "when cellect returns an empty response" do
+            let(:psql_double) { double select: cellect_results }
+            
+            it 'should fall back on postgresql selection' do
+              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
+              expect(PostgresqlSelection).to receive(:new).and_return(psql_double)
+              get :index, request_params
+            end
+
+            it 'should pass correct properties to the select method' do
+              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
+              allow(PostgresqlSelection).to receive(:new).and_return(psql_double)
+              expect(psql_double).to receive(:select).with(limit: 10, subject_set_id: nil)
+              get :index, request_params
+            end
+          end
         end
 
         describe "testing the cellect client setup" do
