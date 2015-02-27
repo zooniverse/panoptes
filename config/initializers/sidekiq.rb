@@ -5,9 +5,9 @@ module SidekiqConfig
 
   def self.default_redis
     {
-     host: 'localhost',
-     port: 6379,
-     db: 0
+      host: 'localhost',
+      port: 6379,
+      db: 0
     }
   end
 
@@ -23,12 +23,12 @@ module SidekiqConfig
 
   def self.read_redis_config
     begin
-       config = YAML.load(File.read(Rails.root.join('config/redis.yml')))
-       config[Rails.env]['sidekiq'].symbolize_keys
-     rescue Errno::ENOENT, NoMethodError
-       { }
-     end
-   end
+      config = YAML.load(File.read(Rails.root.join('config/redis.yml')))
+      config[Rails.env]['sidekiq'].symbolize_keys
+    rescue Errno::ENOENT, NoMethodError
+      { }
+    end
+  end
 end
 
 Sidekiq.configure_client do |config|
