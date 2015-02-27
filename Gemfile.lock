@@ -225,7 +225,7 @@ GEM
     pg_array_parser (0.0.9)
     pg_array_parser (0.0.9-java)
     poseidon (0.0.5)
-    postgres_ext (2.4.0)
+    postgres_ext (2.4.1)
       activerecord (>= 4.0.0)
       arel (>= 4.0.1)
       pg_array_parser (~> 0.0.9)
@@ -403,7 +403,7 @@ DEPENDENCIES
   paper_trail
   pg
   poseidon
-  postgres_ext (= 2.4.0)
+  postgres_ext (~> 2.4.0)
   pry-rails (~> 0.3.2)
   puma
   rack-cors
