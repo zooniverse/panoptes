@@ -8,10 +8,13 @@ module JsonApiController
           Array.wrap(create_params).map do |ps|
             resource = build_resource_for_create(ps)
             resource.save!
-            yield resource if block_given?
             resource
           end
         end
+      end
+
+      resources.each do |resource|
+        yield resource if block_given?
       end
 
       created_resource_response(resources)
