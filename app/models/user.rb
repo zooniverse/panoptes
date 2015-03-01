@@ -25,9 +25,8 @@ class User < ActiveRecord::Base
   has_many :collection_roles, through: :identity_group
 
   validates :display_name, presence: true, uniqueness: { case_sensitive: false },
-            format: { without: /\$|@|\s+/ }
-  validates_length_of :password, within: 8..128, allow_blank: true,
-                      unless: :migrated_user?
+            format: { without: /\$|@|\s+/ }, unless: :migrated
+  validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated
 
   validates_with IdentityGroupNameValidator
 
@@ -43,8 +42,6 @@ class User < ActiveRecord::Base
   can_be_linked :user_collection_preference, :all
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :collection, :scope_for, :update, :user
-
-  attr_accessor :migrated_user
 
   def memberships_for(action, klass)
     membership_roles = UserGroup.roles_allowed_to_access(action, klass)
@@ -126,10 +123,6 @@ class User < ActiveRecord::Base
   end
 
   protected
-
-  def migrated_user?
-    !!migrated_user
-  end
 
   def sha1_encrypt(plain_password)
     bytes = plain_password.each_char.inject(''){ |bytes, c| bytes + c + "\x00" }
