@@ -11,8 +11,9 @@ ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 ADD ./Jarfile /rails_app/
 ADD ./Jarfile.lock /rails_app/
+ADD vendor/cache /rails_app/vendor/cache
 
-RUN bundle install
+RUN bundle install --no-cache
 
 ADD ./ /rails_app
 
