@@ -61,9 +61,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "a queued request" do
-        let(:request_params) do
-          { sort: 'queued', workflow_id: workflow.id.to_s }
-        end
+        let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
 
         context "with queued subjects" do
           before(:each) do
@@ -130,7 +128,9 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "with cellect sort" do
-        let(:request_params) { { sort: 'cellect', workflow_id: workflow.id.to_s } }
+        let(:request_params) do
+          { sort: 'cellect', workflow_id: workflow.id.to_s }
+        end
         let(:cellect_results) { subjects.take(2).map(&:id) }
 
         describe "testing the response" do
@@ -161,6 +161,14 @@ describe Api::V1::SubjectsController, type: :controller do
               expect(response.status).to eq(422)
             end
           end
+
+          context "when no per_page size is specified" do
+
+            it "should set the page_size param to 10" do
+              response_page_size = json_response["meta"][api_resource_name]["page_size"]
+              expect(response_page_size).to eq(10)
+            end
+          end
         end
 
         describe "testing the cellect client setup" do
@@ -180,7 +188,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
     context "location urls" do
       let(:url) { json_response['subjects'][0]['locations'][0]['image/jpeg'] }
-      
+
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
         get :show, id: resource.id
@@ -204,7 +212,7 @@ describe Api::V1::SubjectsController, type: :controller do
         "interesting_data" => "Tested Collection",
         "an_interesting_array" => ["1", "2", "asdf", "99.99"]
       }
-    end 
+    end
     let(:update_params) do
       {
         subjects: {
@@ -290,7 +298,7 @@ describe Api::V1::SubjectsController, type: :controller do
       let(:membership) { create(:membership, state: 0, roles: ["project_editor"]) }
       let(:project) { create(:project, owner: membership.user_group) }
       let(:authorized_user) { membership.user }
-      
+
       it_behaves_like "is creatable"
     end
   end

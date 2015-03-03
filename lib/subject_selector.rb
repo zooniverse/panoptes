@@ -1,7 +1,7 @@
 class SubjectSelector
   class MissingParameter < StandardError; end
 
-  attr_reader :user, :params 
+  attr_reader :user, :params
 
   def initialize(user, params, scope, session)
     @user, @params, @scope, @session = user, params, scope, session
@@ -11,7 +11,7 @@ class SubjectSelector
     raise workflow_id_error unless params.has_key?(:workflow_id)
     user_enqueued = UserSubjectQueue
                     .find_by!(user: user.user, workflow_id: params[:workflow_id])
-    selected_subjects(user_enqueued.next_subjects(10 || params[:limit]))
+    selected_subjects(user_enqueued.next_subjects(default_page_size))
   end
 
   def cellect_subjects
@@ -20,7 +20,7 @@ class SubjectSelector
   end
 
   def selected_subjects(subject_ids)
-    subjects = @scope.where(id: subject_ids) 
+    subjects = @scope.where(id: subject_ids)
     subjects
   end
 
@@ -35,6 +35,10 @@ class SubjectSelector
      params[:workflow_id],
      user.id,
      params[:subject_set_id],
-     params[:per_page] || 10]
+     default_page_size]
+  end
+
+  def default_page_size
+    params[:page_size] ||= 10
   end
 end
