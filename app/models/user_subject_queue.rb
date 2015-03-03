@@ -36,9 +36,8 @@ class UserSubjectQueue < ActiveRecord::Base
       .exists?(user: user, workflow: workflow)
   end
 
-  def next_subjects(limit)
-    limit ||= 10
-    subject_ids[0,limit.to_i-1]
+  def next_subjects(limit=10)
+    subject_ids[0,limit.to_i]
   end
 
   def subjects=(subjects)
