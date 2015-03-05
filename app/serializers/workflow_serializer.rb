@@ -3,10 +3,10 @@ class WorkflowSerializer
   attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
              :created_at, :updated_at, :first_task, :primary_language,
              :version, :content_language, :prioritized, :grouped, :pairwise
-  
+
   can_include :project, :subject_sets, :tutorial_subject, :expert_subject_set
 
-  DEFAULT_VERSION_NUM = 1
+  DEFAULT_WORKFLOW_VERSION_NUM = 1
 
   def version
     "#{version_index_number(@model)}.#{version_index_number(content)}"
@@ -38,7 +38,7 @@ class WorkflowSerializer
     if model && last_version = model.versions.last
       last_version.id
     else
-      DEFAULT_VERSION_NUM
+      DEFAULT_WORKFLOW_VERSION_NUM
     end
   end
 end
