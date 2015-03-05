@@ -1,6 +1,6 @@
 class UserSubjectQueue < ActiveRecord::Base
   include RoleControl::ParentalControlled
-  
+
   belongs_to :user
   belongs_to :workflow
 
@@ -35,11 +35,11 @@ class UserSubjectQueue < ActiveRecord::Base
     where.overlap(subject_ids: subject_ids)
       .exists?(user: user, workflow: workflow)
   end
-  
+
   def next_subjects(limit=10)
-    subject_ids[0,limit]
+    subject_ids[0,limit.to_i]
   end
-  
+
   def subjects=(subjects)
     subject_ids_will_change!
     self.subject_ids = subjects.map(&:id)
