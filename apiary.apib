@@ -5165,6 +5165,9 @@ creation.
 
     [CollectionPreference][]
 
+# Group Aggregation
+Resources related to setting preferences for _Panoptes Collections_
+
 ## Aggregation [/aggregation/{id}{?include}]
 An Aggregation resource captures the results of the aggregation engine for
 the set of classifications for a particular workflow and subject.
@@ -5227,7 +5230,7 @@ only visible to users with rights on the workflow's associated project.
 
 + Response 200
 
-    [Aggeregation][]
+    [Aggregation][]
 
 ### Edit an Aggregation [PUT]
 Only a user with rights on the workflow's project may edit an Aggregation resource.
@@ -5257,7 +5260,7 @@ aggregation object to be sent.
 
     [Aggregation][]
 
-## Aggregation [/aggregations{?workflow_id,subject_id,page,per_page,sort,include}]
+## Aggregation Collection [/aggregations{?workflow_id,subject_id,page,per_page,sort,include}]
 A Collection of Aggregation resources.
 
 All collections add a meta attribute hash containing paging
@@ -5342,7 +5345,7 @@ Aggregations are returned as an array under *aggregations*.
 
 + Response 200
 
-    [Aggreation Collection][]
+    [Aggregation Collection][]
 
 ### Create a Aggregation [POST]
 Creating an Aggregation requires an aggregation hash with the _workflow_version_
