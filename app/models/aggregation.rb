@@ -4,6 +4,8 @@ class Aggregation < ActiveRecord::Base
   belongs_to :workflow
   belongs_to :subject
 
+  has_paper_trail only: [:aggregation]
+
   can_through_parent :workflow, :update, :destroy, :update_links,
                      :destroy_links, :versions, :version
 

@@ -85,4 +85,16 @@ RSpec.describe Aggregation, :type => :model do
       it_behaves_like "correctly scoped"
     end
   end
+
+  describe "versioning" do
+    let(:aggregation) { create(:aggregation) }
+
+    it { is_expected.to be_versioned }
+
+    it 'should track changes to aggregation', versioning: true do
+      new_aggregation = { "mean" => "1", "std" => "1", "count" => ["1","1","1"] }
+      aggregation.update!(aggregation: new_aggregation)
+      expect(aggregation.previous_version.aggregation).to_not eq(new_aggregation)
+    end
+  end
 end
