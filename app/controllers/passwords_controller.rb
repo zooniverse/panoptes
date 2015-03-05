@@ -9,7 +9,9 @@ class PasswordsController < Devise::PasswordsController
   def update
     respond_to do |format|
       format.json_api { update_from_json }
-      format.html { super }
+      format.html do
+        super { |resource| update_zooniverse_user(resource) }
+      end
     end
   end
 
@@ -17,6 +19,7 @@ class PasswordsController < Devise::PasswordsController
 
     def update_from_json
       resource = resource_class.reset_password_by_token(resource_params)
+      update_zooniverse_user(resource)
       yield resource if block_given?
       respond_to_request(resource.errors.empty?)
     end
@@ -34,6 +37,14 @@ class PasswordsController < Devise::PasswordsController
     def respond_to_request(action_status)
       response_status = action_status ? :ok : :unprocessable_entity
       render status: response_status, json: {}
+    end
+
+    def update_zooniverse_user(resource)
+      if resource.errors.empty? && ZooHomeConfiguration.use_zoo_home?
+        zu = ZooniverseUser.find_from_user(resource)
+        zu.password = resource_params[:password]
+        zu.save!
+      end
     end
 
     def able_to_reset_password?

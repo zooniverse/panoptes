@@ -37,4 +37,15 @@ Devise.setup do |config|
   end
 
   omniauth_config_for(config, providers: [:facebook, :gplus])
+
+  # Warden
+
+  require 'zoo_user_warden_strategy'
+  require 'zoo_home_configuration'
+
+  config.warden do |manager|
+    if ZooHomeConfiguration.use_zoo_home?
+      manager.default_strategies(scope: :user).unshift :zoo_user
+    end
+  end
 end
