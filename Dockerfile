@@ -13,7 +13,7 @@ ADD ./Jarfile /rails_app/
 ADD ./Jarfile.lock /rails_app/
 ADD vendor/cache /rails_app/vendor/cache
 
-RUN bundle install --no-cache
+RUN bundle install
 
 ADD ./ /rails_app
 
