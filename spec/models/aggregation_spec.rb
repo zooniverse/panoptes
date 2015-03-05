@@ -7,12 +7,30 @@ RSpec.describe Aggregation, :type => :model do
     expect(aggregation).to be_valid
   end
 
+  it 'should not be valid without an aggregation hash' do
+    expect(build(:aggregation, aggregation: nil)).to_not be_valid
+  end
+
   it 'should not be valid without a workflow' do
     expect(build(:aggregation, workflow: nil)).to_not be_valid
   end
 
   it 'should not be valid without a subject' do
     expect(build(:aggregation, subject: nil)).to_not be_valid
+  end
+
+  context "when missing the workflow_version aggregation metadata" do
+    let(:no_workflow_version) { build(:aggregation, aggregation: { test: 1}) }
+
+    it 'should not be valid' do
+      expect(no_workflow_version).to_not be_valid
+    end
+
+    it 'should not have the correct error message' do
+      no_workflow_version.valid?
+      error_message = "must have workflow_version metadata"
+      expect(no_workflow_version.errors[:aggregation]).to include(error_message)
+    end
   end
 
   context "when there is a duplicate subject_id workflow_id entry" do
@@ -92,7 +110,10 @@ RSpec.describe Aggregation, :type => :model do
     it { is_expected.to be_versioned }
 
     it 'should track changes to aggregation', versioning: true do
-      new_aggregation = { "mean" => "1", "std" => "1", "count" => ["1","1","1"] }
+      new_aggregation = { "mean" => "1",
+                          "std" => "1",
+                          "count" => ["1","1","1"],
+                          "workflow_version" => "1.2" }
       aggregation.update!(aggregation: new_aggregation)
       expect(aggregation.previous_version.aggregation).to_not eq(new_aggregation)
     end

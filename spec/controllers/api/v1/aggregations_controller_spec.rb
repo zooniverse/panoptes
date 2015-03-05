@@ -9,7 +9,6 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
   let(:scopes) { %w(public project) }
   let(:resource_class) { Aggregation }
 
-
   describe "#index" do
     let(:workflow) { create(:workflow) }
     let!(:aggregations) { create_list(:aggregation, 2, workflow: workflow) }
@@ -32,12 +31,13 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
     let(:subject) { workflow.subject_sets.first.subjects.first }
     let(:authorized_user) { workflow.project.owner }
     let(:test_attr) { :aggregation }
-    let(:test_attr_value) { { "something" => "HERE" } }
+    let(:test_attr_value) { { "something" => "HERE",
+                              "workflow_version" => "1.1" } }
 
     let(:create_params) do
       { aggregations:
           {
-            aggregation: { something: "HERE" },
+            aggregation: test_attr_value,
             links: {
               subject: subject.id.to_s,
               workflow: workflow.id.to_s
@@ -55,7 +55,10 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
     let(:authorized_user) { resource.workflow.project.owner }
     let(:resource) { create(:aggregation, workflow: workflow) }
     let(:aggregation_results) do
-      { "mean" => "1", "std" => "1", "count" => ["1","1","1"] }
+      { "mean" => "1",
+        "std" => "1",
+        "count" => ["1","1","1"],
+        "workflow_version" => "1.1" }
     end
     let(:test_attr) { :aggregation }
     let(:test_attr_value) { aggregation_results }
