@@ -13,7 +13,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         request.env["CONTENT_TYPE"] = "application/json"
       end
 
-      let(:user) { create(:user) }
+      let(:user) { create(:user, build_zoo_user: true) }
       let(:email_attributes) { user.attributes.slice("email") }
       let(:user_email_attrs) { { user: email_attributes } }
 
@@ -126,7 +126,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         request.env["CONTENT_TYPE"] = "application/json"
       end
 
-      let(:user) { create(:user) }
+      let(:user) { create(:user, build_zoo_user: true) }
       let(:new_password) { "87654321" }
       let(:passwords) do
         { password: new_password, password_confirmation: new_password }

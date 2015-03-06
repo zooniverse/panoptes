@@ -4,7 +4,9 @@ class RegistrationsController < Devise::RegistrationsController
   def create
     respond_to do |format|
       format.json { create_from_json }
-      format.html { super }
+      format.html do
+        head :unsupported_media_type
+      end
     end
   end
 
@@ -12,7 +14,7 @@ class RegistrationsController < Devise::RegistrationsController
 
   def create_from_json
     build_resource(sign_up_params)
-    resource_saved = resource.save
+    resource_saved = create_zoo_user(resource) && resource.save
     yield resource if block_given?
     status, content = registrations_response(resource_saved)
     clean_up_passwords resource
@@ -22,6 +24,20 @@ class RegistrationsController < Devise::RegistrationsController
   def build_resource(sign_up_params)
     super(sign_up_params)
     resource.build_identity_group
+  end
+
+  def create_zoo_user(resource)
+    if resource.valid? && ZooHomeConfiguration.use_zoo_home?
+      zu = ZooniverseUser.create_from_user(resource)
+      if zu.persisted?
+        true
+      else
+        zu.errors.each do |attr, errors|
+          resource.errors.add(attr, errors)
+        end
+        false
+      end
+    end
   end
 
   def registrations_response(resource_saved)

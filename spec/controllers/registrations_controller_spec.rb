@@ -48,6 +48,24 @@ describe RegistrationsController, type: :controller do
           expect(subject).to receive(:clean_up_passwords)
           post :create, user: user_attributes
         end
+
+        it "should create a new ZooniverseUser" do
+          post :create, user: user_attributes
+          expect(ZooniverseUser.where(login: login).first).to_not be_nil
+        end
+        
+        context "when the user already exists in zooniverse_home" do
+          let!(:existing_zoo_user) { create(:zooniverse_user, login: login) }
+
+          it "should not create the panotpes user" do
+            expect { post :create, user: user_attributes }.not_to change{ User.count }
+          end
+
+          it "should return 422" do
+            post :create, user: user_attributes
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+        end
       end
 
       context "with caps and spaces in the display name" do
@@ -119,7 +137,7 @@ describe RegistrationsController, type: :controller do
       request.env["HTTP_ACCEPT"] = "text/html"
     end
 
-    describe "#create" do
+    describe "#create", disabled: true do
 
       context "with valid user attributes" do
         let(:login) { "zoonser" }
@@ -142,6 +160,19 @@ describe RegistrationsController, type: :controller do
         it "should sign the user in" do
           expect(subject).to receive(:sign_in)
           post :create, user: user_attributes
+        end
+
+        it "should create a new ZooniverseUser" do
+          post :create, user: user_attributes
+          expect(ZooniverseUser.where(login: login).first).to_not be_nil
+        end
+
+        context "when the user already exists in zooniverse_home" do
+          let!(:existing_zoo_user) { create(:zooniverse_user, login: login) }
+
+          it "should not create the panotpes user" do
+            expect { post :create, user: user_attributes }.not_to change{ User.count }
+          end
         end
       end
 

@@ -18,3 +18,9 @@ test:
 zooniverse_home_development:
   <<: *default
   database: zooniverse_home_development
+  
+zooniverse_home_test:
+  adapter: sqlite3
+  database: db/not_used.sqlite3
+
+  

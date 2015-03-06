@@ -86,7 +86,7 @@ class User < ActiveRecord::Base
     if hash_func == 'bcrypt'
       super(password)
     elsif hash_func == 'sha1'
-      if encrypted_password == sha1_encrypt(password)
+      if encrypted_password == Sha1Encryption.encrypt(password, salt: password_salt)
         logger.info "User #{id} is using sha1 password. Updating..."
         self.password = password
         self.hash_func = 'bcrypt'
@@ -122,12 +122,4 @@ class User < ActiveRecord::Base
     !!admin
   end
 
-  protected
-
-  def sha1_encrypt(plain_password)
-    bytes = plain_password.each_char.inject(''){ |bytes, c| bytes + c + "\x00" }
-    concat = Base64.decode64(password_salt).force_encoding('utf-8') + bytes
-    sha1 = Digest::SHA1.digest concat
-    Base64.encode64(sha1).strip
-  end
 end

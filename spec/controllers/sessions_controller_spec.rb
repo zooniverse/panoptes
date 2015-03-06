@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe SessionsController, type: :controller do
-  let!(:users) { create_list(:user, 2) }
+  let!(:users) { create_list(:user, 2, build_zoo_user: true) }
   let(:user) { users.first }
+  let(:zoo_user) { create(:zooniverse_user) }
 
   context "using json" do
     before(:each) do
@@ -25,6 +26,17 @@ describe SessionsController, type: :controller do
       it "should sign in the user" do
         expect(controller).to receive(:sign_in)
         post :create, user: {display_name: user.display_name, password: user.password}
+      end
+
+      it "should test against the ZooniverseUser table" do
+        expect(ZooniverseUser).to receive(:authenticate).with(user.display_name, user.password)
+        post :create, user: {display_name: user.display_name, password: user.password}
+      end
+
+      it "should import the zooniverse user into the User table" do
+        expect do
+          post :create, user: {display_name: zoo_user.login, password: zoo_user.password}
+        end.to change{User.count}.from(2).to(3)
       end
     end
 

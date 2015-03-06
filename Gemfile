@@ -30,6 +30,7 @@ gem 'firebase_token_generator'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
+  gem 'activerecord-jdbcmysql-adapter'
   gem 'therubyrhino'
   gem 'jruby-kafka', '1.0.0.beta'
 end
@@ -38,13 +39,14 @@ platforms :ruby do
   gem 'therubyracer'
   gem 'pg'
   gem 'poseidon'
+  gem 'mysql2'
 end
 
 group :development do
   gem 'spring'
-  gem 'mysql2', platforms: :ruby
-  gem 'activerecord-jdbcmysql-adapter', platforms: :jruby
   gem 'fig_rake', '~> 0.9.2'
+  gem 'sqlite3', platform: :ruby
+  gem 'activerecord-jdbcsqlite3-adapter', platform: :jruby
 end
 
 group :development, :test do
