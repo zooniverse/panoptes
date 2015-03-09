@@ -145,17 +145,32 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
         context "with a database user" do
 
-          before(:each) do
-            put :update, user: passwords.merge(reset_password_token: valid_token)
-          end
-
           it "should return 200" do
+            put :update, user: passwords.merge(reset_password_token: valid_token)
             expect(response.status).to eq(200)
           end
 
           it "should update the password" do
+            put :update, user: passwords.merge(reset_password_token: valid_token)
             user.reload
             expect(user.valid_password?(new_password)).to eq(true)
+          end
+
+          it "should update the zooniverse user password" do
+            put :update, user: passwords.merge(reset_password_token: valid_token)
+            zu = ZooniverseUser.find_from_user(user)
+            expect(zu.authenticate(new_password)).to eq(zu)
+          end
+
+          context "when there is no associated zooniverse user" do
+            #may have been deleted via ouroboros / zoo home
+
+            it "should not raise an error" do
+              allow(ZooniverseUser).to receive(:find_from_user).and_return(nil)
+              expect do
+                put :update, user: passwords.merge(reset_password_token: valid_token)
+              end.to_not raise_error
+            end
           end
         end
       end

@@ -41,9 +41,12 @@ class PasswordsController < Devise::PasswordsController
 
     def update_zooniverse_user(resource)
       if resource.errors.empty? && ZooHomeConfiguration.use_zoo_home?
-        zu = ZooniverseUser.find_from_user(resource)
-        zu.password = resource_params[:password]
-        zu.save!
+        # this will only update zooniverse user accounts that have been migrated
+        # to panoptes and include the zooniverse_id to link the resources
+        if zu = ZooniverseUser.find_from_user(resource)
+          zu.password = resource_params[:password]
+          zu.save!
+        end
       end
     end
 
