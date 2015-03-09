@@ -53,7 +53,7 @@ describe RegistrationsController, type: :controller do
           post :create, user: user_attributes
           expect(ZooniverseUser.where(login: login).first).to_not be_nil
         end
-        
+
         context "when the user already exists in zooniverse_home" do
           let!(:existing_zoo_user) { create(:zooniverse_user, login: login) }
 
@@ -130,14 +130,14 @@ describe RegistrationsController, type: :controller do
     end
   end
 
-  context "as html" do
+  context "as html", disabled: true do
     let(:user_params) { [ :email, :password, :password_confirmation, :display_name ] }
 
     before(:each) do
       request.env["HTTP_ACCEPT"] = "text/html"
     end
 
-    describe "#create", disabled: true do
+    describe "#create" do
 
       context "with valid user attributes" do
         let(:login) { "zoonser" }

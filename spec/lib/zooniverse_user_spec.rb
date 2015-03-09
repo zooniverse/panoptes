@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe ZooniverseUser, type: :model do
   describe "::import_users" do
     let!(:zus) { create_list(:zooniverse_user, 2) }
-    
+
     context "with no arguments" do
       it 'should import all zooniverse users' do
         ZooniverseUser.import_users
@@ -22,22 +22,22 @@ RSpec.describe ZooniverseUser, type: :model do
       end
     end
   end
-  
+
   describe "::authenticate" do
     let!(:zu) { create(:zooniverse_user) }
-    
+
     it 'should return the user when supplied the password of a user with a matching login' do
       expect(ZooniverseUser.authenticate(zu.login, zu.password)).to eq(zu)
     end
 
     it 'should return nil when no user matches' do
-      expect(ZooniverseUser.authenticate("asdfasdf", zu.password)).to be_nil 
+      expect(ZooniverseUser.authenticate("asdfasdf", zu.password)).to be_nil
     end
   end
-  
+
   describe "::create_from_user" do
     let(:user) { create(:user) }
-    
+
     it 'should create a ZooniverseUser from a User' do
       expect(ZooniverseUser.create_from_user(user).login).to eq(user.display_name)
     end
@@ -49,7 +49,7 @@ RSpec.describe ZooniverseUser, type: :model do
       expect(user.zooniverse_id).to eq(zu.id.to_s)
     end
   end
-  
+
   describe "#password=" do
     subject do
       zu = build(:zooniverse_user, password: nil)
@@ -57,7 +57,7 @@ RSpec.describe ZooniverseUser, type: :model do
       zu.save!
       zu
     end
-    
+
     it 'should set the password_salt' do
       expect(subject.password_salt).to_not be_nil
     end
@@ -66,7 +66,7 @@ RSpec.describe ZooniverseUser, type: :model do
       expect(subject.crypted_password).to_not be_nil
     end
   end
-  
+
   describe "#import" do
     context 'when the User has not already be imported' do
       it 'should create a User from a Zooniverse User' do
@@ -79,15 +79,16 @@ RSpec.describe ZooniverseUser, type: :model do
       it 'should update the User' do
         user = create(:user, migrated: true, build_zoo_user: true)
         zu = ZooniverseUser.find(user.zooniverse_id.to_i)
-        zu.update!(login: "a new login")
-        expect(zu.import.display_name).to eq("a new login")
+        new_email = "new_test_email@test.com"
+        zu.update!(email: new_email)
+        expect(zu.import.email).to eq(new_email)
       end
     end
   end
-  
+
   describe "#authenticate" do
     let(:zu) { create(:zooniverse_user) }
-    
+
     context "when password matches" do
       it 'should return itself' do
         expect(zu.authenticate(zu.password)).to eq(zu)
@@ -96,11 +97,11 @@ RSpec.describe ZooniverseUser, type: :model do
 
     context "when password doesn't match" do
       it 'should return nil' do
-        expect(zu.authenticate("asdfasd")).to be_nil 
+        expect(zu.authenticate("asdfasd")).to be_nil
       end
     end
   end
-  
+
   describe "#set_tokens!" do
     subject do
       zu = build(:zooniverse_user, persistence_token: nil, single_access_token: nil, perishable_token: nil)
@@ -108,7 +109,7 @@ RSpec.describe ZooniverseUser, type: :model do
       zu.save!
       zu
     end
-    
+
     it 'should set the persistence token' do
       expect(subject.persistence_token).to_not be_nil
     end
