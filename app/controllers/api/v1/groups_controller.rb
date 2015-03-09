@@ -8,6 +8,13 @@ class Api::V1::GroupsController < Api::ApiController
   
   allowed_params :create, :display_name, links: [ users: [] ]
   allowed_params :update, :display_name
+
+  def destroy_links
+    controlled_resources.first.memberships
+      .where(user_id: params[:link_ids].split(',').map(&:to_i))
+      .update_all(state: Membership.states[:inactive])
+    deleted_resource_response
+  end
   
   private
 
@@ -34,9 +41,9 @@ class Api::V1::GroupsController < Api::ApiController
 
   def initial_member
     {
-     user: api_user.user,
-     state: :active,
-     roles: ["group_admin"]
+      user: api_user.user,
+      state: :active,
+      roles: ["group_admin"]
     }
   end
 end
