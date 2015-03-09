@@ -41,6 +41,7 @@ An easy way to get the full Panoptes stack running (see `fig.yml` to dig into th
     + If you're running a different shell then you should be able to figure this out!
 
 2. Create and run the application containers by running `fig up`
+  + Any error like *Invalid repository name (Panoptes), only [a­z0­9­_.] are allowed* mean the directory that you have the panoptes source code has capitals in it. Please rename the parent directory to be all lowercase, e.g `Panoptes` becomes `panotpes`.
 
 3. Enable Fig Rake for your terminal session by running `export FIG_RAKE=on`. If you need to run a task without `fig_rake`, either open a new terminal window or run `unset FIG_RAKE`.
 
