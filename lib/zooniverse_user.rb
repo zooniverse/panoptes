@@ -44,7 +44,7 @@ class ZooniverseUser < ActiveRecord::Base
   end
 
   def authenticate(plain_password)
-    crypted_password == Sha1Encryption.encrypt(plain_password, salt: password_salt) ? self : nil
+    (crypted_password == Sha1Encryption.encrypt(plain_password, salt: password_salt)) ? self : nil
   end
 
   def import

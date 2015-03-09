@@ -24,8 +24,9 @@ Doorkeeper.configure do
   end
 
   resource_owner_from_credentials do
-    if params[:display_name] && u = User.find_for_database_authentication(display_name: params[:display_name])
-      valid_non_disabled_user = u.valid_password?(params[:password]) && !u.disabled?
+    if params[:display_name] && u = ZooniverseUser.authenticate(params[:display_name],
+                                                                params[:password]).try(:import)
+      valid_non_disabled_user = !u.disabled?
     else
       u = current_user
       valid_non_disabled_user = !u.blank? && !u.disabled?
@@ -36,7 +37,7 @@ Doorkeeper.configure do
   admin_authenticator do |routes|
     if u = current_user
       u.admin ? u :
-                (render file: "#{Rails.root}/public/403.html", status: 403, layout: false)
+        (render file: "#{Rails.root}/public/403.html", status: 403, layout: false)
     else
       redirect_to(new_user_session_path)
     end

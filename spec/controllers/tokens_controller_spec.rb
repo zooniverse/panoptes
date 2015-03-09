@@ -14,7 +14,7 @@ shared_context "a valid login" do
 end
 
 describe TokensController, type: :controller do
-  let(:owner) { create(:user)}
+  let(:owner) { create(:user, build_zoo_user: true)}
 
   describe "resource owner password credentials flow" do
     let(:params) { { "grant_type" => "password",
