@@ -3,9 +3,8 @@ require 'spec_helper'
 describe SessionsController, type: :controller do
   let!(:users) { create_list(:user, 2, build_zoo_user: true) }
   let(:user) { users.first }
-  let(:zoo_user) { create(:zooniverse_user) }
 
-  context "using json" do
+  context "using json", :zoo_home_user do
     before(:each) do
       request.env["HTTP_ACCEPT"] = "application/json"
       request.env["CONTENT_TYPE"] = "application/json"
@@ -33,10 +32,34 @@ describe SessionsController, type: :controller do
         post :create, user: {display_name: user.display_name, password: user.password}
       end
 
-      it "should import the zooniverse user into the User table" do
-        expect do
-          post :create, user: {display_name: zoo_user.login, password: zoo_user.password}
-        end.to change{User.count}.from(2).to(3)
+      context "when signing in a zooniverse wide user account" do
+        let(:zoo_user) { create(:zooniverse_user) }
+
+        it "should import the zooniverse user into the User table" do
+          expect do
+            post :create, user: {display_name: zoo_user.login, password: zoo_user.password}
+          end.to change{User.count}.from(2).to(3)
+        end
+
+        context "when an existing panoptes user account exists" do
+          let!(:dup_user) do
+            create(:user, display_name: zoo_user.login, email: zoo_user.email)
+          end
+
+          it "should not raise an error" do
+            expect do
+              post :create, user: {display_name: zoo_user.login, password: zoo_user.password}
+            end.to_not raise_error
+          end
+
+          it "should update the existing panoptes account with zoo home details" do
+            panoptes_user = User.find_by(email: zoo_user.email)
+            expect(panoptes_user.hash_func).to eq("bcrypt")
+            post :create, user: { display_name: zoo_user.login,
+                                  password: zoo_user.password }
+            expect(panoptes_user.reload.hash_func).to eq("sha1")
+          end
+        end
       end
     end
 

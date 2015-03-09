@@ -22,9 +22,9 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.use_transactional_fixtures = false
 
-  Devise.mailer = Devise::Mailer
-
   config.filter_run_excluding disabled: true
+
+  Devise.mailer = Devise::Mailer
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
@@ -56,6 +56,10 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :deletion
   end
 
+  config.before(:each, zoo_home_user: true) do
+    ZooniverseUser.delete_all
+  end
+
   config.after(:each) do
     ZooniverseUser.destroy_all
   end
@@ -72,7 +76,7 @@ RSpec.configure do |config|
     ActiveRecord::Migration.suppress_messages do
       ActiveRecord::Migration.run(CreateZooniverserUserDatabase, direction: :down)
     end
-    
+
     ActiveRecord::Base.establish_connection(:"#{Rails.env}")
   end
 

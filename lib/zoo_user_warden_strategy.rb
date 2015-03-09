@@ -4,11 +4,9 @@ Warden::Strategies.add(:zoo_user) do
   end
 
   def authenticate!
-    u = ZooniverseUser.authenticate(params['user']['display_name'], params['user']['password'])
-    if u.nil?
-      fail!("Could not log in")
-    else
-      success!(u.import)
-    end
+    zoo_home_user = ZooniverseUser.authenticate(params['user']['display_name'],
+                                                params['user']['password'])
+    imported_user = zoo_home_user.import if zoo_home_user
+    imported_user ? success!(imported_user) : fail!("Could not log in")
   end
 end

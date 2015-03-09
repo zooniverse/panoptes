@@ -26,7 +26,7 @@ class ZooniverseUser < ActiveRecord::Base
 
   def self.create_from_user(user)
     zu = create do |u|
-      u.login = user.display_name 
+      u.login = user.display_name
       u.name = user.display_name
       u.password = user.password
       u.email = user.email
@@ -48,23 +48,10 @@ class ZooniverseUser < ActiveRecord::Base
   end
 
   def import
-    user = User.find_or_initialize_by(zooniverse_id: id.to_s) do |u|
-      u.display_name = login
-      u.created_at = created_at
-      u.updated_at = updated_at
-      u.hash_func = 'sha1'
-      u.migrated = true
-      u.zooniverse_id = id.to_s
-      u.build_identity_group
-    end
-    
-    user.display_name = login
-    user.email = email
-    user.encrypted_password = crypted_password
-    user.password_salt = password_salt
-    
-    user.save!
-    user
+    #use the indexed field
+    user = User.find_or_initialize_by(display_name: login)
+    setup_panoptes_user_account(user)
+    user.save ? user : nil
   end
 
   def set_tokens!
@@ -81,5 +68,29 @@ class ZooniverseUser < ActiveRecord::Base
 
   def hex_token
     SecureRandom.hex 64
+  end
+
+  def setup_panoptes_user_account(u)
+    panoptes_account_exists = panoptes_user_account_exists?(u)
+    new_account = !u.persisted?
+    u.display_name = login
+    u.email = email
+    u.encrypted_password = crypted_password
+    u.password_salt = password_salt
+    if new_account || panoptes_account_exists
+      u.created_at = created_at
+      u.updated_at = updated_at
+      u.hash_func = 'sha1'
+      u.migrated = true
+      u.zooniverse_id = id.to_s
+      u.build_identity_group if new_account
+    end
+  end
+
+  def panoptes_user_account_exists?(user)
+    user.display_name = login &&
+    user.zooniverse_id.nil? &&
+    user.hash_func == 'bcrypt' &&
+    user.migrated.blank?
   end
 end
