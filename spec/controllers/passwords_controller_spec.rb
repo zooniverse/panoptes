@@ -135,7 +135,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
       context "when not supplying a valid reset token" do
 
         it "should return 422" do
-          put :update, user: { reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" }
+          put :update, user: passwords.merge(reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
           expect(response.status).to eq(422)
         end
       end
@@ -151,6 +151,57 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
           it "should return 200" do
             expect(response.status).to eq(200)
+          end
+
+          it "should update the password" do
+            user.reload
+            expect(user.valid_password?(new_password)).to eq(true)
+          end
+        end
+      end
+    end
+  end
+
+  context "as html" do
+
+    before(:each) do
+      request.env["HTTP_ACCEPT"] = "text/html"
+    end
+
+    describe "#update" do
+
+      let(:user) { create(:user, build_zoo_user: true) }
+      let(:new_password) { "87654321" }
+      let(:passwords) do
+        { password: new_password, password_confirmation: new_password }
+      end
+
+      context "when not supplying a valid reset token" do
+        before(:each) do
+          put :update, user: { reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" }
+        end
+
+        it "should return 200" do
+          expect(response.status).to eq(200)
+        end
+
+        it "should not have updated the password" do
+          user.reload
+          expect(user.valid_password?(new_password)).to_not eq(true)
+        end
+      end
+
+      context "when supplying a valid reset token" do
+        let(:valid_token) { user.send_reset_password_instructions }
+
+        context "with a database user" do
+
+          before(:each) do
+            put :update, user: passwords.merge(reset_password_token: valid_token)
+          end
+
+          it "should return 302 redirect" do
+            expect(response.status).to eq(302)
           end
 
           it "should update the password" do
