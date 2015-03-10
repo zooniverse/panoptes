@@ -29,16 +29,14 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def create_zoo_user(resource)
-    if resource.valid? && ZooHomeConfiguration.use_zoo_home?
+    return true unless ZooHomeConfiguration.use_zoo_home?
+    if resource.valid?
       zu = ZooniverseUser.create_from_user(resource)
-      if zu.persisted?
-        true
-      else
-        zu.errors.each do |attr, errors|
-          resource.errors.add(attr, errors)
-        end
-        false
+      return true if zu.persisted?
+      zu.errors.each do |attr, errors|
+        resource.errors.add(attr, errors)
       end
+      false
     end
   end
 
