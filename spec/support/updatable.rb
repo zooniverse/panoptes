@@ -59,7 +59,7 @@ shared_examples "is updatable" do
   end
 end
 
-shared_examples "has updatable links" do
+RSpec.shared_examples "has updatable links" do
   let(:old_ids) { resource.send(test_relation).map(&:id) }
   let(:updated_resource) { resource.reload }
 

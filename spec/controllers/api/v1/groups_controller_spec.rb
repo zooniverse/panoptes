@@ -143,7 +143,7 @@ describe Api::V1::GroupsController, type: :controller do
     let(:test_relation) { :users }
     let(:test_relation_ids) { [ new_user.id.to_s ] }
     let(:resource_id) { :group_id }
-
+    
     context "created membership" do
       before(:each) do
         
@@ -157,6 +157,25 @@ describe Api::V1::GroupsController, type: :controller do
     end
 
     it_behaves_like "supports update_links"
+  end
+
+  describe "#destroy_links" do
+    let(:resource) { user_groups.first }
+    let(:test_relation) { :users }
+    let(:resource_id) { :group_id }
+    let(:test_relation_ids) { [ resource.users.first.id.to_s ] }
+    
+    context "setting membership to inactive" do
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        delete :destroy_links, group_id: resource.id, link_ids: test_relation_ids.join(','), link_relation: "users"
+      end
+      
+      it 'should give the delete user membership to inactive' do
+        expect(Membership.where(user_id: test_relation_ids,
+                                user_group_id: resource.id)).to all( be_inactive )
+      end
+    end
   end
   
   describe "#recents" do

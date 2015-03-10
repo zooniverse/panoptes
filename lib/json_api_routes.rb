@@ -12,7 +12,7 @@ module JsonApiRoutes
     post "/links/:link_relation", to: "#{ path }#update_links",
          constraints: constraints, format: :false
     
-    delete "/links/:link_relation/:link_ids", to: "#{ path }#update_links",
+    delete "/links/:link_relation/:link_ids", to: "#{ path }#destroy_links",
            constraints: constraints, format: :false
   end
 
