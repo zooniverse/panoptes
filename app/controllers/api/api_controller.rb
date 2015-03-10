@@ -95,5 +95,12 @@ module Api
         end
       end
     end
+
+    private
+
+    # Turn on paper trail for all API controllers
+    def paper_trail_enabled_for_controller
+      true
+    end
   end
 end

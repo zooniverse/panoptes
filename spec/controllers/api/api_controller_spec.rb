@@ -7,7 +7,7 @@ describe Api::ApiController, type: :controller do
   before(:each) do
     allow_any_instance_of(described_class).to receive(:resource_class).and_return(Collection)
   end
-  
+
   context "without doorkeeper" do
     controller do
 
@@ -24,6 +24,18 @@ describe Api::ApiController, type: :controller do
         expect(response.status).to eq(200)
       end
     end
+
+    describe "calling paper trail whodunnit before filter" do
+
+      it "should enable current user lookup" do
+        expect(subject.send(:paper_trail_enabled_for_controller)).to be_truthy
+      end
+
+      it "should call the current_user method" do
+        expect(subject).to receive(:user_for_paper_trail).once
+        get :index
+      end
+    end
   end
 
   context "with doorkeeper" do
@@ -34,7 +46,7 @@ describe Api::ApiController, type: :controller do
                                    { at: "least" },
                                    { thats: "what I pretend" } ] }
       end
-      
+
     end
 
     it "should return 401 without a logged in user" do
@@ -114,10 +126,10 @@ describe Api::ApiController, type: :controller do
       expect(json_response[-3..-1]).to include('zh', 'zh-tw', 'fr-fr')
     end
   end
-  
+
   describe "when a banned user attempts to take an action" do
     let(:user) { create(:user, banned: true) }
-    
+
     controller do
       def update
         render nothing: true
@@ -133,14 +145,14 @@ describe Api::ApiController, type: :controller do
     end
 
     let(:api_user) { ApiUser.new(user) }
-    
+
     before(:each) do
-      routes.draw do 
+      routes.draw do
         put "update" => "api/api#update"
         post "create" => "api/api#create"
         delete "destroy" => "api/api#destroy"
       end
-      
+
       allow(controller).to receive(:api_user).and_return(api_user)
       @request.env["CONTENT_TYPE"] = "application/json"
     end
@@ -151,14 +163,14 @@ describe Api::ApiController, type: :controller do
         expect(response.status).to eq(201)
       end
     end
-    
+
     context "update action" do
       it 'should return an empty okay response' do
         put :update
         expect(response.status).to eq(200)
       end
     end
-    
+
     context "destroy action" do
       it 'should return an empty no content response' do
         delete :destroy
