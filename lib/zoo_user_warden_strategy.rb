@@ -7,6 +7,6 @@ Warden::Strategies.add(:zoo_user) do
     zoo_home_user = ZooniverseUser.authenticate(params['user']['display_name'],
                                                 params['user']['password'])
     imported_user = zoo_home_user.import if zoo_home_user
-    imported_user ? success!(imported_user) : fail!("Could not log in")
+    imported_user ? success!(imported_user) : fail!(I18n.t("devise.failure.invalid"))
   end
 end

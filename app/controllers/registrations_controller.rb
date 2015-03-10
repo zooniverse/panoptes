@@ -14,7 +14,9 @@ class RegistrationsController < Devise::RegistrationsController
 
   def create_from_json
     build_resource(sign_up_params)
-    resource_saved = create_zoo_user(resource) && resource.save
+    if create_zoo_user(resource)
+      resource_saved = resource.save
+    end
     yield resource if block_given?
     status, content = registrations_response(resource_saved)
     clean_up_passwords resource
