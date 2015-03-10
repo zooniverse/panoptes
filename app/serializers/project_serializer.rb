@@ -6,7 +6,7 @@ class ProjectSerializer
     :subjects_count, :created_at, :updated_at, :available_languages,
     :title, :description, :guide, :team_members, :science_case,
     :introduction, :avatar, :background_image, :private, :faq, :result,
-    :education_content, :retired_subjects_count
+    :education_content, :retired_subjects_count, :avatar, :background_image
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles
