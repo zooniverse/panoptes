@@ -10,7 +10,8 @@ describe Api::V1::ProjectsController, type: :controller do
     ["id", "display_name", "classifications_count", "subjects_count",
      "updated_at", "created_at", "available_languages", "title", "avatar",
      "description", "team_members", "guide", "science_case", "introduction",
-     "faq", "result", "education_content", "background_image", "private", "retired_subjects_count"]
+     "faq", "result", "education_content", "background_image", "private",
+     "retired_subjects_count", "avatar", "background_image"]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
@@ -179,6 +180,8 @@ describe Api::V1::ProjectsController, type: :controller do
                       education_content: "asdfasdf",
                       faq: "some other stuff",
                       result: "another string",
+                      avatar: "an avatar",
+                      background_image: "and image",
                       private: true } }
       end
 
@@ -334,6 +337,8 @@ describe Api::V1::ProjectsController, type: :controller do
           education_content: "asdfasdf",
           faq: "some other stuff",
           result: "another string",
+          avatar: "an avatar",
+          background_image: "and image",
           links: {
             workflows: [workflow.id.to_s],
             subject_sets: [subject_set.id.to_s]
