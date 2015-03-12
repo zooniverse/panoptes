@@ -13,7 +13,7 @@ RSpec.describe PostgresqlSelection do
       let!(:uss) { create(:user_seen_subject, user: user, subject_ids: sms.sample(5).map(&:subject_id), workflow: workflow) }
       
       it 'should return an unseen subject' do
-        expect(uss.subject_ids).to_not include(subject.select(**args.merge(limit: 1)).first.subject_id)
+        expect(uss.subject_ids).to_not include(subject.select(**args.merge(limit: 1)).first)
       end
 
       it 'should no have duplicates' do
