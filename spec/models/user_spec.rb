@@ -394,4 +394,30 @@ describe User, type: :model do
       end
     end
   end
+
+  describe "has_finished?" do
+    let(:user) { create(:user) }
+    subject { user.has_finished?(workflow) }
+    
+    context 'when the user has classified all subjects in a workflow' do
+      let(:workflow) do
+        workflow = create(:workflow_with_subjects)
+        ids = workflow.subject_sets.flat_map(&:subjects).map(&:id)
+        create(:user_seen_subject, user: user, workflow: workflow, subject_ids: ids)
+        workflow
+      end
+      
+      it { is_expected.to be true }
+    end
+
+    context 'when the user not finished classifying a workflow' do
+      let(:workflow) do
+        workflow = create(:workflow_with_subjects)
+        create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [])
+        workflow
+      end
+      
+      it { is_expected.to be false }
+    end
+  end
 end

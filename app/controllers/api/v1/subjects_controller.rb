@@ -11,15 +11,23 @@ class Api::V1::SubjectsController < Api::ApiController
   def index
     case params[:sort]
     when 'cellect'
-      render json_api: SubjectSerializer.page(params, selector.cellect_subjects)
+      render json_api: SubjectSerializer.page(params,
+                                              selector.cellect_subjects,
+                                              selector_context)
     when 'queued'
-      render json_api: SubjectSerializer.page(params, selector.queued_subjects)
+      render json_api: SubjectSerializer.page(params,
+                                              selector.queued_subjects)
     else
       super
     end
   end
 
   private
+
+  def selector_context
+    { retired: workflow.finished?,
+      already_seen: api_user.has_finished?(workflow) }
+  end
 
   def context
     case action_name
@@ -28,6 +36,10 @@ class Api::V1::SubjectsController < Api::ApiController
     else
       { }
     end
+  end
+
+  def workflow
+    @workflow ||= Workflow.where(id: params[:workflow_id]).first
   end
 
   def build_resource_for_create(create_params)
@@ -48,6 +60,7 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def selector
     @selector ||= SubjectSelector.new(api_user,
+                                      workflow,
                                       params,
                                       controlled_resources,
                                       cellect_session)

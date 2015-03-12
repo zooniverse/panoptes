@@ -20,11 +20,13 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def self.available(workflow, user)
-    if workflow.finished?
-      select('"set_member_subjects"."subject_id", "set_member_subjects"."random"')
+    fields = '"set_member_subjects"."subject_id", "set_member_subjects"."random"'
+    if workflow.finished? || user.has_finished?(workflow)
+      select(fields)
+        .joins(subject_set: :workflow )
         .where(subject_sets: { workflow_id: workflow.id })
     else
-      select('"set_member_subjects"."subject_id", "set_member_subjects"."random"')
+      select(fields)
         .joins(subject_set: { workflow: :user_seen_subjects })
         .where(subject_sets: { workflow_id: workflow.id })
         .where(user_seen_subjects: { user_id: user.id })
