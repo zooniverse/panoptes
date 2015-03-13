@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe JsonApiController::UpdatableResource, type: :controller do
-  class Api::BadLinkParams < StandardError; end
+  class JsonApiController::BadLinkParams < StandardError; end
   controller(ApplicationController) do
     include JsonApiController::UpdatableResource
 
@@ -56,7 +56,7 @@ describe JsonApiController::UpdatableResource, type: :controller do
           post :update_links, {id: resource.id,
                                link_relation: :sujbcts,
                                subjects: subjects.map(&:id).map(&:to_s)}
-        end.to raise_error(Api::BadLinkParams)
+        end.to raise_error(JsonApiController::BadLinkParams)
       end
     end
 
