@@ -55,7 +55,7 @@ module JsonApiController
 
     def check_relation
       if params[relation].nil?
-        raise Api::BadLinkParams.new("Link relation must match body keys")
+        raise BadLinkParams.new("Link relation #{relation} must match body key")
       end
     end
 

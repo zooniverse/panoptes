@@ -62,7 +62,7 @@ Rails.application.routes.draw do
 
       json_api_resources :workflows, links: [:subject_sets], versioned: true
 
-      json_api_resources :subject_sets, links: [:workflows, :subjects]
+      json_api_resources :subject_sets, links: [:subjects]
 
       json_api_resources :collections, links: [:subjects]
 
