@@ -12,23 +12,17 @@ class Api::V1::SubjectsController < Api::ApiController
     case params[:sort]
     when 'cellect'
       render json_api: SubjectSerializer.page(params,
-                                              selector.cellect_subjects,
-                                              selector_context)
+                                              *selector.cellect_subjects)
     when 'queued'
       render json_api: SubjectSerializer.page(params,
-                                              selector.queued_subjects)
+                                              *selector.queued_subjects)
     else
       super
     end
   end
 
   private
-
-  def selector_context
-    { retired: workflow.finished?,
-      already_seen: api_user.has_finished?(workflow) }
-  end
-
+  
   def context
     case action_name
     when "update", "create"

@@ -30,6 +30,7 @@ class SetMemberSubject < ActiveRecord::Base
         .joins(subject_set: { workflow: :user_seen_subjects })
         .where(subject_sets: { workflow_id: workflow.id })
         .where(user_seen_subjects: { user_id: user.id })
+        .where(state: states[:active])
         .where.not('"set_member_subjects"."subject_id" = ANY("user_seen_subjects"."subject_ids")')
     end
   end

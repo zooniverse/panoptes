@@ -197,7 +197,7 @@ describe Api::V1::SubjectsController, type: :controller do
             it 'should mark subjects already seen when the user is finished with the workflow' do
               allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
               allow(PostgresqlSelection).to receive(:new).and_return(psql_double)
-              allow_any_instance_of(User).to receive(:has_finsished?).and_return(true)
+              allow_any_instance_of(User).to receive(:has_finished?).and_return(true)
               get :index, request_params
               expect(json_response['subjects'].first['already_seen']).to be true
             end
