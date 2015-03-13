@@ -9,6 +9,7 @@ class Workflow < ActiveRecord::Base
   belongs_to :project
   has_many :subject_sets
   has_many :classifications
+  has_many :user_seen_subjects
   has_one :expert_subject_set, -> { expert_sets }, class_name: "SubjectSet"
   belongs_to :tutorial_subject, class_name: "Subject"
 
@@ -32,4 +33,5 @@ class Workflow < ActiveRecord::Base
   def tasks
     read_attribute(:tasks).with_indifferent_access
   end
+
 end

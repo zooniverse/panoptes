@@ -52,6 +52,18 @@ RSpec.describe Api::V1::SetMemberSubjectsController, type: :controller do
     end
 
     it_behaves_like "is creatable"
+    
+    context "set the random value" do
+      before(:each) do
+        default_request user_id: authorized_user.id, scopes: scopes
+        post :create, create_params
+      end
+
+      it 'should set the random value for a subject' do
+        sms = SetMemberSubject.find(created_instance_id(api_resource_name))
+        expect(sms.random).to_not be_nil
+      end
+    end
   end
 
   describe "#destroy" do

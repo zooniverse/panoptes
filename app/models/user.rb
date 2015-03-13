@@ -23,6 +23,7 @@ class User < ActiveRecord::Base
 
   has_many :project_roles, through: :identity_group
   has_many :collection_roles, through: :identity_group
+  has_many :user_seen_subjects
 
   validates :display_name, presence: true, uniqueness: { case_sensitive: false },
             format: { without: /\$|@|\s+/ }, unless: :migrated
@@ -122,4 +123,11 @@ class User < ActiveRecord::Base
     !!admin
   end
 
+  def has_finished?(workflow)
+    seen_count = user_seen_subjects.where(workflow_id: workflow.id)
+      .select('array_length("user_seen_subjects"."subject_ids", 1) as subject_count')
+      .first.try(:subject_count)
+
+    seen_count == workflow.subjects_count
+  end
 end

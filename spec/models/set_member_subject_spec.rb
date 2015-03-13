@@ -12,6 +12,10 @@ describe SetMemberSubject, :type => :model do
     expect(set_member_subject).to be_valid
   end
 
+  it "should have a random value when created" do
+    expect(create(:set_member_subject).random).to_not be_nil
+  end
+
   describe "#subject_set" do
     it "must have a subject set" do
       set_member_subject.subject_set = nil

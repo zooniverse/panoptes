@@ -15,7 +15,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
   let(:api_resource_name) { "subjects" }
   let(:api_resource_attributes) do
-    [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at"]
+    [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at", "retired", "already_seen"]
   end
   let(:api_resource_links) { [ "subjects.project" ] }
 
@@ -167,6 +167,39 @@ describe Api::V1::SubjectsController, type: :controller do
             it "should set the page_size param to 10" do
               response_page_size = json_response["meta"][api_resource_name]["page_size"]
               expect(response_page_size).to eq(10)
+            end
+          end
+
+          context "when cellect returns an empty response" do
+            let(:psql_double) { double select: cellect_results }
+            
+            it 'should fall back on postgresql selection' do
+              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
+              expect(PostgresqlSelection).to receive(:new).and_return(psql_double)
+              get :index, request_params
+            end
+
+            it 'should pass correct properties to the select method' do
+              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
+              allow(PostgresqlSelection).to receive(:new).and_return(psql_double)
+              expect(psql_double).to receive(:select).with(limit: 10, subject_set_id: nil)
+              get :index, request_params
+            end
+
+            it 'should mark subjects retired when the workflow is finished' do
+              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
+              allow(PostgresqlSelection).to receive(:new).and_return(psql_double)
+              allow_any_instance_of(Workflow).to receive(:finished?).and_return(true)
+              get :index, request_params
+              expect(json_response['subjects'].first['retired']).to be true
+            end
+
+            it 'should mark subjects already seen when the user is finished with the workflow' do
+              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
+              allow(PostgresqlSelection).to receive(:new).and_return(psql_double)
+              allow_any_instance_of(User).to receive(:has_finished?).and_return(true)
+              get :index, request_params
+              expect(json_response['subjects'].first['already_seen']).to be true
             end
           end
         end
