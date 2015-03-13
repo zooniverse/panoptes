@@ -23,9 +23,12 @@ module CellectClient
       .request(:get_subjects, group_id: group_id, user_id: user_id, limit: limit)
   end
 
-  def set_client_params(params)
-    set_host_param(params)
-    set_workflow_param(params)
+  singleton_class.class_eval do
+    include ::NewRelic::Agent::MethodTracer
+
+    %i(add_seen load_user remove_subject get_subjects).each do |client_method|
+      add_method_tracer client_method, "cellect/#{client_method}"
+    end
   end
 
   class Request
