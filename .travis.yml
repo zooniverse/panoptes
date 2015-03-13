@@ -14,17 +14,13 @@ jruby_before_script: &jruby_before_script
 matrix:
   fast_finish: true
   allow_failures:
-    - rvm: jruby-head
-    - rvm: 2.2.0
   include:
-    - rvm: 2.1.5
+    - rvm: 2.2.1
     - rvm: jruby-1.7.18
       env: JRUBY_OPTS=--2.0
       jdk: openjdk7
       before_script: *jruby_before_script
-    - rvm: 2.2.0
-    - rvm: jruby-head
-      
+
 services:
   - postgresql
 
