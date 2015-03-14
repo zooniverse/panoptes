@@ -16,6 +16,10 @@ shared_examples 'cors headers' do
   it 'should have Access-Control-Allow-Methods header' do
     expect(response.headers).to include('Access-Control-Allow-Methods' => "DELETE, GET, POST, OPTIONS, PUT, HEAD")
   end
+
+  it 'should have the correct Access-Control-Max-Age header' do
+    expect(response.headers).to include('Access-Control-Max-Age' => "300")
+  end
 end
 
 RSpec.describe "api should return CORS headers on all requests", type: :request do
