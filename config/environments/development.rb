@@ -42,7 +42,8 @@ Rails.application.configure do
       resource '*',
         headers: CorsConfig.request_headers,
         methods: CorsConfig.request_methods,
-        expose: CorsConfig.expose_headers
+        expose: CorsConfig.expose_headers,
+        max_age: CorsConfig.max_age
     end
   end
 end
