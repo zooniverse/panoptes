@@ -90,6 +90,15 @@ Rails.application.configure do
 
   config.middleware.insert_before 0, Rack::Cors do
     allow do
+      origins /^https?:\/\/([a-z0-9-]+\.zooniverse\.org)(:\d+)?$/
+      resource '*',
+        headers: CorsConfig.request_headers,
+        methods: CorsConfig.request_methods,
+        expose: CorsConfig.expose_headers,
+        max_age: CorsConfig.max_age
+    end
+
+    allow do
       origins '*'
       resource '/api/*',
         headers: CorsConfig.request_headers,
