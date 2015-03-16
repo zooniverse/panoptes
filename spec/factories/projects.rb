@@ -2,6 +2,7 @@ FactoryGirl.define do
   factory :project, aliases: [:project_with_contents] do
     transient do
       build_contents true
+      build_extra_contents false
     end
 
     sequence(:name) { |n| "test_project_#{ n }" }
@@ -18,6 +19,10 @@ FactoryGirl.define do
     after(:build) do |p, env|
       if env.build_contents
         p.project_contents << build_list(:project_content, 1, project: p, language: p.primary_language)
+        if env.build_extra_contents
+          p.project_contents << build_list(:project_content, 1, project: p, language: 'zh-TW')
+          p.project_contents << build_list(:project_content, 1, project: p, language: 'en-US')
+        end
       end
     end
 

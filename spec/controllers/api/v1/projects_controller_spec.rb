@@ -360,6 +360,7 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       it 'should update the default contents when the display_name is updated' do
+        contents_title = resource.primary_content.reload
         contents_title = resource.primary_content.title
         expect(contents_title).to eq(test_attr_value)
       end
