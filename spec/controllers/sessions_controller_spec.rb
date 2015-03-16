@@ -60,6 +60,26 @@ describe SessionsController, type: :controller do
             expect(panoptes_user.reload.hash_func).to eq("sha1")
           end
         end
+
+        context "when an existing panoptes user account has been deleted" do
+          let!(:disabled_dup_user) do
+            user = create(:user, display_name: zoo_user.login, email: zoo_user.email)
+            user.disable!
+            user
+          end
+
+          it "should not raise an error" do
+            expect do
+              post :create, user: {display_name: zoo_user.login, password: zoo_user.password}
+            end.to_not raise_error
+          end
+
+          it "should not sign the user in" do
+            post :create, user: { display_name: zoo_user.login,
+                                  password: zoo_user.password }
+            expect(response.status).to eq(401)
+          end
+        end
       end
     end
 
