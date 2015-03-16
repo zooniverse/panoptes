@@ -70,7 +70,7 @@ GEM
     bcrypt (3.1.10)
     bcrypt (3.1.10-java)
     builder (3.2.2)
-    cellect-client (0.1.2.pre.jruby)
+    cellect-client (0.1.2)
       celluloid (= 0.16.0)
       celluloid-io (= 0.16.0)
       http (~> 0.6)
@@ -245,6 +245,8 @@ GEM
       pry (>= 0.9.10)
     puma (2.11.0)
       rack (>= 1.1, < 2.0)
+    puma (2.11.0-java)
+      rack (>= 1.1, < 2.0)
     rack (1.5.2)
     rack-cors (0.3.1)
     rack-protection (1.5.3)
@@ -382,7 +384,7 @@ DEPENDENCIES
   activerecord-jdbcpostgresql-adapter
   activerecord-jdbcsqlite3-adapter
   aws-sdk
-  cellect-client (= 0.1.2.pre.jruby)
+  cellect-client
   database_cleaner (~> 1.2.0)
   devise
   doorkeeper (~> 1.4.1)
