@@ -4,7 +4,7 @@ gem 'jbundler', platform: :jruby
 gem 'rails', '4.1.9'
 gem 'postgres_ext', '~> 2.4.0'
 gem 'active_record_union', github: "edpaget/active_record_union", branch: "union-all"
-gem 'sdoc', '~> 0.4.0',          group: :doc
+gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'doorkeeper', '~> 1.4.1'
 gem 'devise'
 gem 'versionist'
@@ -22,7 +22,7 @@ gem 'jquery-rails'
 gem 'uglifier'
 gem 'sidekiq'
 gem 'sinatra', '>= 1.3.0', :require => nil
-gem 'aws-sdk'
+gem 'aws-sdk-v1'
 gem 'json-schema'
 gem 'p3p'
 gem 'newrelic_rpm'
