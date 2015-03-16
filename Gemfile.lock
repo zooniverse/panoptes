@@ -58,8 +58,6 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.3.6)
     arel (5.0.1.20140414130214)
-    aws-sdk (1.61.0)
-      aws-sdk-v1 (= 1.61.0)
     aws-sdk-v1 (1.61.0)
       json (~> 1.4)
       nokogiri (>= 1.4.4)
@@ -381,8 +379,8 @@ DEPENDENCIES
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter
   activerecord-jdbcsqlite3-adapter
-  aws-sdk
-  cellect-client (= 0.1.2.pre.jruby)
+  aws-sdk-v1
+  cellect-client
   database_cleaner (~> 1.2.0)
   devise
   doorkeeper (~> 1.4.1)
