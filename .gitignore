@@ -30,3 +30,4 @@ bin/**
 #ignore the api commit file
 public/commit_id.txt
 vendor/cache/
+vendor/bundle/
