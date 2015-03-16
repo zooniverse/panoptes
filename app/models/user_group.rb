@@ -49,8 +49,8 @@ class UserGroup < ActiveRecord::Base
     :memberships
   end
 
-  def self.private_query(query, action, target, roles)
-    query.merge(target.memberships_for(action, self))
+  def self.private_query(action, target, roles)
+    joins(:memberships).merge(target.memberships_for(action, self))
       .where(memberships: { identity: false })
   end
   

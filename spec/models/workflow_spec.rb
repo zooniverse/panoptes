@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Workflow, :type => :model do
   let(:workflow) { build(:workflow) }
   let(:subject_relation) { create(:workflow_with_subjects) }
-  let(:translatable) { create(:workflow_with_contents) }
+  let(:translatable) { create(:workflow_with_contents, build_extra_contents: true) }
   let(:translatable_without_content) { build(:workflow, build_contents: false) }
   let(:primary_language_factory) { :workflow }
   let(:locked_factory) { :workflow }

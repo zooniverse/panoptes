@@ -23,6 +23,8 @@ module RoleControl
                               .to(resource_class, scope_context)
                               .with_ids(resource_ids)
                               .scope
+      #p @controlled_resources.to_sql
+      @controlled_resources
     end
 
     def rejected_message

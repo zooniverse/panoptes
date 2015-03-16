@@ -25,18 +25,25 @@ class Membership < ActiveRecord::Base
     @parent
   end
 
-  def self.private_query(query, action, target, roles)
-    user = target.user
-    with(groups: user.user_groups.where.overlap(memberships: {roles: roles}))
-      .joins("JOIN \"groups\" ON \"memberships\".\"user_group_id\" = \"groups\".\"id\"")
-      .where.not(user: user)
-      .union_all(user.memberships)
+
+  def self.scope_for(action, user, opts={})
+    return all if user.is_admin?
+    roles, _ = parent_class.roles(action)
+    accessible_groups = user.user_groups.where.overlap(memberships: {roles: roles})
+    query = where(user_group_id: accessible_groups)
+            .or(Membership.where(user_id: user.id))
+            .where(identity: false)
+    
+    case action
+    when :show, :index
+      query.or(Membership.where(user_group_id: UserGroup.public_scope,
+                                identity: false,
+                                state: states[:active]))
+    else
+      query
+    end
   end
 
-  def self.scope_for(action, target, opts={})
-    super.where(identity: false)
-  end
-  
   def disable!
     inactive!
   end

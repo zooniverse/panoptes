@@ -40,11 +40,11 @@ class ZooniverseUser < ActiveRecord::Base
     return unless plain_password
     @password = plain_password
     self.password_salt = simple_token
-    self.crypted_password = Sha1Encryption.encrypt(plain_password, salt: password_salt)
+    self.crypted_password = Sha1Encryption.encrypt(plain_password, password_salt)
   end
 
   def authenticate(plain_password)
-    (crypted_password == Sha1Encryption.encrypt(plain_password, salt: password_salt)) ? self : nil
+    (crypted_password == Sha1Encryption.encrypt(plain_password, password_salt)) ? self : nil
   end
 
   def import
