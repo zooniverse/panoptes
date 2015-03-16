@@ -50,6 +50,7 @@ class ZooniverseUser < ActiveRecord::Base
   def import
     #use the indexed field
     user = User.find_or_initialize_by(display_name: login)
+    return nil if user.disabled?
     setup_panoptes_user_account(user)
     user.save ? user : nil
   end
