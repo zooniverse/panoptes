@@ -31,7 +31,7 @@ module ACLSerializer
     group = group.users.first if group.identity?
     data[:links][:owner] = { id: group.id.to_s,
                              type: group.class.model_name.plural,
-                             href: "#{group.class.model_name.route_key}/#{group.id.to_s}" }
+                             href: "/#{group.class.model_name.route_key}/#{group.id.to_s}" }
     data
   end
 end
