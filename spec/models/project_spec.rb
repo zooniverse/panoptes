@@ -6,7 +6,7 @@ describe Project, :type => :model do
   let(:not_owned) { build(:project, owner: nil) }
   let(:subject_relation) { create(:project_with_subjects) }
   let(:activatable) { project }
-  let(:translatable) { create(:project_with_contents, build_extra_contents: true) }
+  let(:translatable) { create(:project_with_contents) }
   let(:translatable_without_content) { build(:project, build_contents: false) }
   let(:primary_language_factory) { :project }
   let(:locked_factory) { :project }

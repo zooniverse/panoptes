@@ -1,6 +1,5 @@
 class Api::V1::ProjectsController < Api::ApiController
   include FilterByOwner
-  include TranslatableResource
 
   doorkeeper_for :update, :create, :destroy, scopes: [:project]
   resource_actions :default
@@ -9,7 +8,6 @@ class Api::V1::ProjectsController < Api::ApiController
   alias_method :project, :controlled_resource
 
   CONTENT_PARAMS = [:description,
-                    :title,
                     :science_case,
                     :introduction,
                     :faq,
