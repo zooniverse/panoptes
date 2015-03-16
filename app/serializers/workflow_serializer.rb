@@ -27,9 +27,7 @@ class WorkflowSerializer
   end
 
   def content
-    return @content if @content
-    languages = @context[:languages] || [@model.primary_language]
-    @content = @model.content_for(languages, [:strings, :language, :id])
+    @content ||= @model.content_for(@context[:languages])
   end
 
   private
