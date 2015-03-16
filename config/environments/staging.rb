@@ -98,4 +98,6 @@ Rails.application.configure do
 
   # Enable the logstasher logs for the current environment
   config.logstasher.enabled = true
+  # Enable logging of controller params
+  config.logstasher.log_controller_parameters = true
 end
