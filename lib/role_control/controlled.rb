@@ -20,38 +20,33 @@ module RoleControl
         end
       end
 
-      def joins_for
-        { access_control_lists: { user_group: :memberships } }
-      end
-
       def memberships_query(action, target)
         target.memberships_for(action, self)
       end
 
-      def private_query(query, action, target, roles)
-        query.merge(memberships_query(action, target))
-          .where.overlap(access_control_lists: { roles: roles })
+      def private_query(action, target, roles)
+        AccessControlList.joins(user_group: :memberships)
+          .select(:resource_id)
+          .merge(memberships_query(action, target))
+          .where.overlap(roles: roles)
       end
 
-      def public_query(query, public)
-        if public
-          query.merge(private_scope).union_all(public_scope)
-        else
-          query
-        end
+      def public_query(private_query, public_flag)
+        query = where(id: private_query)
+        query = query.or(public_scope) if public_flag
+        query
       end
 
-      def scope_for(action, target, opts={})
-        roles, public = roles(action)
+      def scope_for(action, user, opts={})
+        roles, public_flag = roles(action)
 
         case
-        when target.is_admin?
+        when user.is_admin?
           all
-        when target.logged_in?
-          query = private_query(joins(joins_for), action, target, roles)
-          public_query(query, public)
+        when user.logged_in?
+          public_query(private_query(action, user, roles), public_flag)
         when public_scope
-          public ? public_scope : none
+          public_flag ? public_scope : none
         else
           none
         end
