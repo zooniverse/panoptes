@@ -5,7 +5,8 @@ WORKDIR /rails_app
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get -y upgrade && \
-    apt-get install --no-install-recommends -y git curl && apt-get clean
+    apt-get install --no-install-recommends -y git curl supervisor  && \
+    apt-get clean
 
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
@@ -14,6 +15,7 @@ ADD ./Jarfile.lock /rails_app/
 
 RUN bundle install --without development test
 
+ADD supervisord.conf /etc/supervisor/conf.d/panoptes.conf
 ADD ./ /rails_app
 
 EXPOSE 80

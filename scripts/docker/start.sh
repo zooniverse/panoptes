@@ -21,6 +21,5 @@ else
   fi
 
   TERM=xterm git log --format="%H" -n 1 > public/commit_id.txt
-  bundle exec sidekiq &
-  exec bundle exec rails s puma -p 80 $*
+  exec /usr/bin/supervisord
 fi
