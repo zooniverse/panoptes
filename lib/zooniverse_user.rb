@@ -44,7 +44,13 @@ class ZooniverseUser < ActiveRecord::Base
   end
 
   def authenticate(plain_password)
-    (crypted_password == Sha1Encryption.encrypt(plain_password, password_salt)) ? self : nil
+    if (crypted_password == Sha1Encryption.encrypt(plain_password, password_salt))
+      self
+    elsif (crypted_password == Sha1Encryption.encrypt(plain_password, password_salt, -3))
+      self
+    else
+      nil
+    end
   end
 
   def import
@@ -90,8 +96,8 @@ class ZooniverseUser < ActiveRecord::Base
 
   def panoptes_user_account_exists?(user)
     user.display_name = login &&
-    user.zooniverse_id.nil? &&
-    user.hash_func == 'bcrypt' &&
-    user.migrated.blank?
+                        user.zooniverse_id.nil? &&
+                        user.hash_func == 'bcrypt' &&
+                        user.migrated.blank?
   end
 end
