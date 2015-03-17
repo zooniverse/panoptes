@@ -59,4 +59,8 @@ module JSONApiResponses
   def conflict(exception)
     json_api_render(:conflict, exception)
   end
+
+  def service_unavailable(exception)
+    json_api_render(:service_unavailable, exception)
+  end
 end
