@@ -14,9 +14,9 @@ class AcceptLanguageExtractor
   private
 
   def priority_list_of_languages
-    sorted_languages = @prioritized_languages.sort_by do |(_, priority_a), (_, priority_b)|
-      priority_b <=> priority_a
-    end
+    sorted_languages = @prioritized_languages
+                       .delete_if{ |(lang, _)| !(lang =~ /[A-z\-_]+/)}
+                       .sort_by{ |(_, a), (_, b)| b <=> a }
     sorted_languages.map(&:first)
   end
 
