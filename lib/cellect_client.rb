@@ -42,7 +42,7 @@ module CellectClient
       tries ||= MAX_TRIES
       Cellect::Client.connection.send(action, *params)
     rescue StandardError => e
-      raise ConnectionError, e if tries <= 0
+      raise ConnectionError, "Cellect is unavailable" if tries <= 0
       tries -= 1
       yield if block_given?
       retry
