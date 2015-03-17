@@ -9,7 +9,9 @@ describe Api::V1::UsersController, type: :controller do
 
   let(:api_resource_name) { "users" }
   let(:api_resource_attributes) do
-    [ "id", "display_name", "credited_name", "email", "created_at", "updated_at", "type" ]
+    [ "id", "display_name", "credited_name", "email",
+      "created_at", "updated_at", "type",
+      "global_email_communication" ]
   end
   let(:api_resource_links) do
     [ "users.projects",
@@ -183,6 +185,10 @@ describe Api::V1::UsersController, type: :controller do
       expect(response_fb_token).to eq(jwt_token)
     end
 
+    it "should have a the global email communication for the user" do
+      expect(json_response[api_resource_name][0]["global_email_communication"]).to eq(true)
+    end
+
     it_behaves_like "an api response"
   end
 
@@ -213,16 +219,21 @@ describe Api::V1::UsersController, type: :controller do
 
     context "with a valid replace put operation" do
       let(:new_display_name) { "Mr_Creosote" }
+      let(:new_gec) { true }
       let(:put_operations) do
-        { users: { display_name: new_display_name } }
+        { users: { display_name: new_display_name, global_email_communication: new_gec } }
       end
 
       it "should return 200 status" do
         expect(response).to have_http_status(:ok)
       end
 
-      it "should have updated the attribute" do
+      it "should have updated the display_name attribute" do
         expect(user.reload.display_name).to eq(new_display_name)
+      end
+
+      it "should have updated the global email communication attribute" do
+        expect(user.reload.global_email_communication).to eq(new_gec)
       end
 
       it "should have a single group" do

@@ -3,7 +3,7 @@ class UserSerializer
   include RecentLinkSerializer
 
   attributes :id, :display_name, :credited_name, :email, :created_at,
-             :updated_at, :type, :firebase_auth_token
+             :updated_at, :type, :firebase_auth_token, :global_email_communication
   can_include :classifications, :project_preferences, :collection_preferences,
               projects: { param: "owner", value: "display_name" },
               collections: { param: "owner", value: "display_name" }
@@ -16,6 +16,10 @@ class UserSerializer
 
   def email
     @model.email if permitted_requester?
+  end
+
+  def global_email_communication
+    @model.global_email_communication if permitted_requester?
   end
 
   def firebase_auth_token
