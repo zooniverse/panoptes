@@ -70,6 +70,14 @@ class ZooniverseUser < ActiveRecord::Base
 
   private
 
+  def avatar_to_url
+    if avatar_file_name
+      "http://zooniverse-avatars.s3.amazonaws.com/users/#{ id }/forum#{ File.extname(avatar_file_name) }"
+    else
+      "http://zooniverse-avatars.s3.amazonaws.com/default_forum_avatar.png"
+    end
+  end
+
   def simple_token
     SecureRandom.base64(15).tr('+/=', '').strip.delete "\n"
   end
@@ -82,6 +90,7 @@ class ZooniverseUser < ActiveRecord::Base
     panoptes_account_exists = panoptes_user_account_exists?(u)
     new_account = !u.persisted?
     u.display_name = login
+    u.avatar = avatar_to_url
     u.email = email
     u.encrypted_password = crypted_password
     u.password_salt = password_salt

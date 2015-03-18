@@ -79,9 +79,23 @@ RSpec.describe ZooniverseUser, type: :model do
 
   describe "#import" do
     context 'when the User has not already be imported' do
+      let(:zu) { create(:zooniverse_user) }
       it 'should create a User from a Zooniverse User' do
-        zu = create(:zooniverse_user)
         expect(zu.import.display_name).to eq(zu.login)
+      end
+
+      context "when the avatar is nil" do
+        it 'should set the users avatar' do
+          expect(zu.import.avatar).to match(/default_forum_avatar.png/)
+        end
+
+      end
+
+      context "when the avatar exists" do
+      let(:zu) { create(:zooniverse_user, avatar_file_name: "/test.png") }
+        it 'should set the users avatar' do
+          expect(zu.import.avatar).to match(/\/#{zu.id}\/.+\.png/)
+        end
       end
     end
 
