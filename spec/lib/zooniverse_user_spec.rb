@@ -1,6 +1,16 @@
 require 'spec_helper'
 
 RSpec.describe ZooniverseUser, type: :model do
+  it 'should not be valid without an non-case_sensitive unique email' do
+    zu = create(:zooniverse_user)
+    expect(build(:zooniverse_user, email: zu.email.upcase)).to_not be_valid
+  end
+  
+  it 'should not be valid without an non-case_sensitive unique login' do
+    zu = create(:zooniverse_user)
+    expect(build(:zooniverse_user, login: zu.login.upcase)).to_not be_valid
+  end
+  
   describe "::import_users" do
     let!(:zus) { create_list(:zooniverse_user, 2) }
 

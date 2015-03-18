@@ -4,7 +4,7 @@ class ZooniverseUser < ActiveRecord::Base
 
   attr_reader :password
 
-  validates_uniqueness_of :email, :login
+  validates_uniqueness_of :email, :login, case_sensitive: false
 
   def self.import_users(users=nil)
     if users.blank?
