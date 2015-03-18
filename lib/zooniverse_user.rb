@@ -44,13 +44,14 @@ class ZooniverseUser < ActiveRecord::Base
   end
 
   def authenticate(plain_password)
-    if (crypted_password == Sha1Encryption.encrypt(plain_password, password_salt))
-      self
-    elsif (crypted_password == Sha1Encryption.encrypt(plain_password, password_salt, -3))
-      self
-    else
-      nil
+    worked = nil
+    1.upto(25).each do |n|
+      if crypted_password == Sha1Encryption.encrypt(plain_password, password_salt, -n)
+        worked = n
+        break
+      end
     end
+    worked ? self : nil
   end
 
   def import
