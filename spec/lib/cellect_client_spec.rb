@@ -11,7 +11,7 @@ RSpec.describe CellectClient do
       (counter += 1) <= times ? raise(StandardError) : true
     end
   end
-  
+
   describe "#add_seen" do
     it 'should call the method on the cellect client' do
       expect(Cellect::Client.connection).to receive(:add_seen)
@@ -29,7 +29,7 @@ RSpec.describe CellectClient do
                                                    workflow_id: 1,
                                                    user_id: 2,
                                                    subject_id: 4)
-      
+
       CellectClient.add_seen({ 1 => 'test.host' }, 1, 2, 4)
     end
 
@@ -55,12 +55,12 @@ RSpec.describe CellectClient do
       allow(Cellect::Client.connection).to receive(:load_user) do
         (counter += 1) == 1 ? raise(StandardError) : true
       end
-      
+
       expect(Cellect::Client.connection).to receive(:load_user)
                                              .with(host: 'example.com',
                                                    workflow_id: 1,
                                                    user_id: 2)
-      
+
       CellectClient.load_user({ 1 => 'test.host' }, 1, 2)
     end
 
@@ -89,12 +89,12 @@ RSpec.describe CellectClient do
       allow(Cellect::Client.connection).to receive(:remove_subject) do
         (counter += 1) == 1 ? raise(StandardError) : true
       end
-      
+
       expect(Cellect::Client.connection).to receive(:remove_subject)
                                              .with(1,
                                                    workflow_id: 2,
                                                    group_id: 4)
-      
+
       CellectClient.remove_subject(1, 2, 4)
     end
   end
@@ -115,14 +115,14 @@ RSpec.describe CellectClient do
       allow(Cellect::Client.connection).to receive(:get_subjects) do
         (counter += 1) == 1 ? raise(StandardError) : true
       end
-      
+
       expect(Cellect::Client.connection).to receive(:get_subjects)
                                              .with(host: 'example.com',
                                                    workflow_id: 1,
                                                    user_id: 2,
                                                    group_id: nil,
                                                    limit: 4)
-      
+
       CellectClient.get_subjects({ 1 => 'test.host' }, 1, 2, nil, 4)
     end
   end
@@ -131,11 +131,6 @@ RSpec.describe CellectClient do
     it 'should call the method on the cellect client' do
       expect(Cellect::Client.connection).to receive(:reload_workflow)
                                              .with(1)
-      CellectClient.reload_workflow(1)
-    end
-
-    it 'should have a 30 second timeout' do
-      expect(Timeout).to receive(:timeout).with(30)
       CellectClient.reload_workflow(1)
     end
   end
