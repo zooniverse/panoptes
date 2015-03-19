@@ -2,6 +2,7 @@ module CellectClient
   ConnectionError = Class.new(StandardError)
 
   MAX_TRIES = 1
+  TIMEOUT = 0.03
   
   def self.add_seen(session, workflow_id, user_id, subject_id)
     RequestToHost.new(session, workflow_id)
@@ -9,12 +10,12 @@ module CellectClient
   end
 
   def self.load_user(session, workflow_id, user_id)
-    RequestToHost.new(session, workflow_id)
+    RequestToHost.new(session, workflow_id, retries: 3)
       .request(:load_user, user_id: user_id)
   end
 
   def self.reload_workflow(workflow_id)
-    RequestToAll.new(workflow_id).request(:reload_workflow)
+    RequestToAll.new(workflow_id, timeout: 30).request(:reload_workflow)
   end
 
   def self.remove_subject(subject_id, workflow_id, group_id)
@@ -36,16 +37,19 @@ module CellectClient
   end
 
   class Request
-    attr_reader :workflow_id
+    attr_reader :workflow_id, :retries, :timeout
     
-    def initialize(workflow_id)
+    def initialize(workflow_id, retries: MAX_TRIES, timeout: TIMEOUT)
       @workflow_id = workflow_id
+      @retries = retries
+      @timeout = timeout
     end
 
     def request(action, *params)
-      tries ||= MAX_TRIES
-      Cellect::Client.connection.send(action, *params)
+      tries ||= retries
+      Timeout.timeout(timeout) { Cellect::Client.connection.send(action, *params) }
     rescue StandardError => e
+      Thread.pass
       raise ConnectionError, "Cellect is unavailable" if tries <= 0
       tries -= 1
       yield if block_given?
@@ -69,9 +73,9 @@ module CellectClient
   end
 
   class RequestToHost < Request
-    def initialize(session, workflow_id)
+    def initialize(session, workflow_id, retries: MAX_TRIES, timeout: TIMEOUT)
       @session = session
-      super workflow_id
+      super workflow_id, retries: retries, timeout: timeout
     end
 
     def request(action, params={})
