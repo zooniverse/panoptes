@@ -26,8 +26,13 @@ class Workflow < ActiveRecord::Base
     where(project: subject_set.project)
   end
   
-  def self.scope_for(action, groups, opt={})
-    super
+  def self.scope_for(action, user, opts={})
+    case action
+    when :reload_cellect
+      super :update, user, opts
+    else
+      super
+    end
   end
 
   def tasks

@@ -13,6 +13,10 @@ module CellectClient
       .request(:load_user, user_id: user_id)
   end
 
+  def self.reload_workflow(workflow_id)
+    RequestToAll.new(workflow_id).request(:reload_workflow)
+  end
+
   def self.remove_subject(subject_id, workflow_id, group_id)
     RequestToAll.new(workflow_id)
       .request(:remove_subject, subject_id, group_id: group_id)
@@ -51,7 +55,10 @@ module CellectClient
 
   class RequestToAll < Request
     def request(action, *params)
+      params = nil if params.blank?
       case params
+      when NilClass
+        params = [workflow_id]
       when Hash
         params[:workflow_id] = workflow_id
       when Array

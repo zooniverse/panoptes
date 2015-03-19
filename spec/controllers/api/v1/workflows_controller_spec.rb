@@ -231,4 +231,41 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     it_behaves_like "a versioned resource"
   end
+
+  describe "#reload_cellect" do
+    context "with authorized user" do
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'should return 204' do
+        post :reload_cellect, workflow_id: workflow.id
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it 'should queue the worker' do
+        expect(WorkflowReloadWorker).to receive(:perform_async)
+                                         .with(workflow.id.to_s)
+        post :reload_cellect, workflow_id: workflow.id
+      end
+    end
+
+    context "with unauthorized user" do
+      let(:user) { create(:user) }
+      before(:each) do
+        default_request scopes: scopes, user_id: user.id
+      end
+      
+      it 'should return 404' do
+        post :reload_cellect, workflow_id: workflow.id
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'should not queue the worker' do
+        expect(WorkflowReloadWorker).to_not receive(:perform_async)
+                                             .with(workflow.id)
+        post :reload_cellect, workflow_id: workflow.id
+      end
+    end
+  end
 end
