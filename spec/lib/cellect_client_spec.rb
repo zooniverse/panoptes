@@ -63,6 +63,16 @@ RSpec.describe CellectClient do
       
       CellectClient.load_user({ 1 => 'test.host' }, 1, 2)
     end
+
+    it 'should retry four times' do
+      counter = 0
+      allow(Cellect::Client.connection).to receive(:load_user) do
+        (counter += 1) < 4 ? raise(StandardError) : true
+      end
+
+      CellectClient.load_user({ 1 => 'test.host' }, 1, 2)
+      expect(counter).to eq(4)
+    end
   end
 
   describe "#remove_subject" do
@@ -121,6 +131,11 @@ RSpec.describe CellectClient do
     it 'should call the method on the cellect client' do
       expect(Cellect::Client.connection).to receive(:reload_workflow)
                                              .with(1)
+      CellectClient.reload_workflow(1)
+    end
+
+    it 'should have a 30 second timeout' do
+      expect(Timeout).to receive(:timeout).with(30)
       CellectClient.reload_workflow(1)
     end
   end
