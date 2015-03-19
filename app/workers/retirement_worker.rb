@@ -1,8 +1,8 @@
 class RetirementWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :high, retry: 3
-  
+  sidekiq_options queue: :high
+
   def perform(sms_id, workflow_id)
     sms = SetMemberSubject.find(sms_id)
     if sms.retire?
