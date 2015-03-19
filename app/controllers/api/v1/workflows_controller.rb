@@ -11,6 +11,11 @@ class Api::V1::WorkflowsController < Api::ApiController
     super
   end
 
+  def reload_cellect
+    WorkflowReloadWorker.perform_async(params[:workflow_id])
+    deleted_resource_response
+  end
+
   private
 
   def context

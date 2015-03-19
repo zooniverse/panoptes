@@ -116,4 +116,12 @@ RSpec.describe CellectClient do
       CellectClient.get_subjects({ 1 => 'test.host' }, 1, 2, nil, 4)
     end
   end
+
+  describe "::reload_workflow" do
+    it 'should call the method on the cellect client' do
+      expect(Cellect::Client.connection).to receive(:reload_workflow)
+                                             .with(1)
+      CellectClient.reload_workflow(1)
+    end
+  end
 end

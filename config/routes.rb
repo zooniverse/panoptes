@@ -60,7 +60,9 @@ Rails.application.routes.draw do
 
       json_api_resources :projects, links: [:subject_sets, :workflows]
 
-      json_api_resources :workflows, links: [:subject_sets], versioned: true
+      json_api_resources :workflows, links: [:subject_sets], versioned: true do
+        post "/reload_cellect", to: "workflows#reload_cellect", format: false
+      end
 
       json_api_resources :subject_sets, links: [:subjects]
 
