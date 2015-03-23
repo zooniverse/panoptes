@@ -86,7 +86,7 @@ GEM
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.8)
-    fig_rake (0.9.2)
+    fig_rake (0.9.3)
     firebase_token_generator (2.0.0)
     foreman (0.78.0)
       thor (~> 0.19.1)
@@ -315,7 +315,7 @@ DEPENDENCIES
   devise
   doorkeeper (~> 1.4.1)
   factory_girl_rails (~> 4.5.0)
-  fig_rake (~> 0.9.2)
+  fig_rake (~> 0.9.3)
   firebase_token_generator
   foreman
   guard-rspec (~> 4.2.9)
