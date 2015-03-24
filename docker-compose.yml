@@ -16,7 +16,7 @@ cellect:
     - zookeeper:zk
 
 redis:
-  image: redis:latest
+  image: redis
   command: redis-server --appendonly yes
 
 kafka:
@@ -26,7 +26,7 @@ kafka:
   command: -i 1 -H kafka -p 9092 -z zk:2181
 
 panoptes:
-  build: .
+  build: ./
   volumes:
     - ./:/rails_app
   ports:
