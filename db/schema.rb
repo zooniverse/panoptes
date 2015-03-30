@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150318221605) do
+ActiveRecord::Schema.define(version: 20150327184058) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -213,7 +213,7 @@ ActiveRecord::Schema.define(version: 20150318221605) do
     t.integer  "retired_set_member_subjects_count", default: 0,  null: false
   end
 
-  add_index "subject_sets", ["project_id"], name: "index_subject_sets_on_project_id", using: :btree
+  add_index "subject_sets", ["project_id", "display_name"], name: "index_subject_sets_on_project_id_and_display_name", using: :btree
   add_index "subject_sets", ["workflow_id"], name: "index_subject_sets_on_workflow_id", using: :btree
 
   create_table "subjects", force: true do |t|

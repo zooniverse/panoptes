@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :subject_set do
-    display_name "A Subject set"
+    sequence(:display_name) { |n| "Subject Set #{n}" }
+
     metadata({ just_some: "stuff" })
     project
     workflow

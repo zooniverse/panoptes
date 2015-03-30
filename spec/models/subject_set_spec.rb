@@ -11,6 +11,11 @@ describe SubjectSet, :type => :model do
     expect(build(:subject_set)).to be_valid
   end
 
+  it "display_names should be unqiue within a project" do
+    s = create(:subject_set)
+    expect(build(:subject_set, project: s.project, display_name: s.display_name)).to_not be_valid
+  end
+
   describe "links" do
     let(:project) { create(:project) }
     let(:workflow) { create(:workflow, project: project) }

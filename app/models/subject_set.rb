@@ -10,6 +10,8 @@ class SubjectSet < ActiveRecord::Base
 
   validates_presence_of :project
 
+  validates_uniqueness_of :display_name, scope: :project_id
+
   DEFAULT_CRITERIA = 'classification_count'
   DEFAULT_OPTS = { 'count' => 15 }
 
