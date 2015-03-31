@@ -3371,6 +3371,13 @@ It has the following attributes:
 *id*, *created_at*, and *updated_at* are set the by the API. Project
 roles are visible to the project owner and the user given roles.
 
+roles for a project may be:
+- collaborator - full access to edit or delete a project
+- tester - Able to see a private project
+- scientist - Able to moderate project Talk and see a private project
+- moderator - Able to moderate project Talk and see a private project
+- translator - Able to create new and edit project and workflow translations
+
 + Parameters
   + id (required, integer) ... integer identifier of the project role resource
 
@@ -4770,6 +4777,10 @@ It has the following attributes:
 
 *id*, *created_at*, and *updated_at* are set the by the API. Collection
 roles are visible to the collection owner and the user given roles.
+
+Collection roles may be:
+- `collaborator` - full access to edit or delete a collection
+- `viewer` - may view a private collection
 
 + Parameters
   + id (required, integer) ... integer identifier of the collection role resource
