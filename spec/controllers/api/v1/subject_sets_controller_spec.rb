@@ -7,7 +7,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
   let(:owner) { project.owner }
   let(:api_resource_name) { 'subject_sets' }
 
-  let(:api_resource_attributes) { %w(id display_name retired_set_member_subjects_count set_member_subjects_count created_at updated_at) }
+  let(:api_resource_attributes) { %w(id display_name retired_set_member_subjects_count set_member_subjects_count created_at updated_at retirement metadata) }
   let(:api_resource_links) { %w(subject_sets.project subject_sets.workflow) }
   
   let(:scopes) { %w(public project) }
