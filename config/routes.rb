@@ -10,7 +10,8 @@ Rails.application.routes.draw do
 
   use_doorkeeper do
     controllers authorizations: 'authorizations',
-                tokens: 'tokens'
+                tokens: 'tokens',
+                applications: 'applications'
   end
 
   devise_for :users, controllers: { omniauth_callbacks: 'omniauth_callbacks', passwords: 'passwords' }, skip: [ :sessions, :registrations ]

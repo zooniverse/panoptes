@@ -18,7 +18,8 @@ describe RejectPatchRequests do
   end
 
   context "when a request is a PATCH" do
-    let(:env) { { 'REQUEST_METHOD' => 'PATCH' } }
+    let(:env) { { 'REQUEST_METHOD' => 'PATCH',
+                  'PATH_INFO' => '/api/subjects' } }
     let(:request) { middle.call(env) }
     let(:status) { 501 }
     let(:msg) { "PATCH Requests are not currently supported" }

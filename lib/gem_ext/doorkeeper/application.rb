@@ -4,7 +4,8 @@ Doorkeeper::Application.class_eval do
   enum trust_level: [:insecure, :secure, :first_party]
 
   def scopes
-    Doorkeeper::OAuth::Scopes.from_array(default_scope)
+    scope = default_scope.blank? ? 'public' : default_scope
+    Doorkeeper::OAuth::Scopes.from_array(scope)
   end
 
   def allowed_grants
