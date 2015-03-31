@@ -28,6 +28,7 @@ module Api
                 JsonSchema::ValidationError,
                 JsonApiController::NotLinkable,
                 JsonApiController::BadLinkParams,
+                Api::NoUserError,
                 RestPack::Serializer::InvalidInclude,    with: :unprocessable_entity
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]

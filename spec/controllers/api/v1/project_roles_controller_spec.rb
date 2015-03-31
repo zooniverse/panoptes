@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Api::V1::ProjectRolesController, type: :controller do
-  let(:user) { create(:user) }
-  let(:authorized_user) { user }
-  let(:project) { create(:project, owner: user) }
+  let(:authorized_user) { create(:user) }
+  let(:project) { create(:project, owner: authorized_user) }
 
   let!(:acls) do
     create_list :access_control_list, 2, resource: project,
@@ -25,6 +24,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     it_behaves_like "it has custom owner links"
 
     context "when not logged in" do
+      let(:project) { create(:project) }
       let(:authorized_user) { nil }
 
       it_behaves_like "is indexable"
@@ -82,13 +82,49 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
         project_roles: {
           roles: ["collaborator"],
           links: {
-            user: create(:user).id.to_s,
+            user: user,
             project: project.id.to_s
           }
         }
       }
     end
 
-    it_behaves_like "is creatable"
+    context "when the user exists" do
+      let(:user) { create(:user).id.to_s }
+      it_behaves_like "is creatable"
+    end
+
+    shared_examples "no user" do
+      before(:each) do
+        default_request user_id: authorized_user.id, scopes: scopes
+        post :create, create_params
+      end
+      
+      it 'should return 422' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'should have an error saying the user does not exist' do
+        msg = json_response['errors'][0]['message']
+        expect(msg).to match(/No User with id: [\-0-9]+ exists/)
+      end
+    end
+
+    context "when the user does not exist" do
+      let(:user) { "-1" }
+      
+      it_behaves_like "no user"
+    end
+
+    context "when the user exists but is inactive" do
+      let(:user) do
+        u = create(:user)
+        u.disable!
+        u.memberships.each(&:disable!)
+        u.id.to_s
+      end
+
+      it_behaves_like "no user"
+    end
   end
 end
