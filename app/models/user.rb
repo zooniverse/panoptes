@@ -83,6 +83,11 @@ class User < ActiveRecord::Base
     super && hash_func != 'sha1'
   end
 
+  def password=(new_password)
+    super
+    self.hash_func = 'bcrypt' if @password.present?
+  end
+
   def valid_password?(password)
     if hash_func == 'bcrypt'
       super(password)
