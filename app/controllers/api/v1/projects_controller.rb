@@ -28,7 +28,6 @@ class Api::V1::ProjectsController < Api::ApiController
                     :science_case,
                     :introduction]
 
-  INDEX_FIELDS = [:title, :description]
 
   before_action :add_owner_ids_to_filter_param!, only: :index
 
@@ -74,9 +73,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def context
     case action_name
-    when "index"
-      { languages: current_languages, fields: INDEX_FIELDS }
-    when "show"
+    when "show", "index"
       { languages: current_languages, fields: CONTENT_FIELDS }
     else
       { fields: CONTENT_FIELDS }
