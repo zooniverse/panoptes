@@ -5,7 +5,7 @@ class RegistrationsController < Devise::RegistrationsController
     respond_to do |format|
       format.json { create_from_json }
       format.html do
-        head :unsupported_media_type
+        super
       end
     end
   end
