@@ -68,4 +68,8 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
 
     it_behaves_like "is creatable"
   end
+  
+  describe "#destroy" do
+    it_behaves_like "is destructable"
+  end
 end

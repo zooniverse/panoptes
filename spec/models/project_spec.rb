@@ -112,16 +112,13 @@ describe Project, :type => :model do
   end
 
   describe "#expert_classifier_level and #expert_classifier?" do
+    let(:project) { create(:project) }
     let(:project_user) { create(:user) }
     let(:roles) { [] }
-    let(:prefs) do
+    let!(:prefs) do
       create(:access_control_list, user_group: project_user.identity_group,
-                                   resource: project,
-                                   roles: roles)
-    end
-
-    before(:each) do
-      prefs
+             resource: project,
+             roles: roles)
     end
 
     context "when they are the project owner" do
@@ -149,7 +146,12 @@ describe Project, :type => :model do
 
     context "when they are an owner and they have marked themselves as a project expert" do
       let!(:project_user) { project.owner }
-      let!(:roles) { ["expert"] }
+      let!(:prefs) do
+        AccessControlList.where(user_group: project_user.identity_group,
+                                resource: project)
+          .first
+          .update!(roles: ["owner", "expert"])
+      end
 
       it '#expert_classifier_level should be :owner' do
         expect(project.expert_classifier_level(project_user)).to eq(:owner)

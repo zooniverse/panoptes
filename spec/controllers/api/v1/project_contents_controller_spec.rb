@@ -3,13 +3,6 @@ require 'spec_helper'
 RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:project) { create(:project_with_contents) }
-  let!(:acl) do
-    create(:access_control_list,
-           user_group: authorized_user.identity_group,
-           resource: project,
-           roles: ["translator"])
-  end
-
   let(:api_resource_name) { 'project_contents' }
   let(:api_resource_attributes) do
     %w(id title description science_case introduction guide language team_members faq result education_content)
@@ -24,6 +17,14 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   let(:primary_content) { project.primary_content }
 
   describe "#index" do
+    let!(:acl) do
+      create(:access_control_list,
+             user_group: authorized_user.identity_group,
+             resource: project,
+             roles: ["translator"])
+    end
+
+
     let!(:private_resource) do
       create(:project_with_contents, private: true)
         .project_contents.first
@@ -34,10 +35,26 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   end
 
   describe "#show" do
+    let!(:acl) do
+      create(:access_control_list,
+             user_group: authorized_user.identity_group,
+             resource: project,
+             roles: ["translator"])
+    end
+
+
     it_behaves_like "is showable"
   end
 
   describe "#create" do
+    let!(:acl) do
+      create(:access_control_list,
+             user_group: authorized_user.identity_group,
+             resource: project,
+             roles: ["translator"])
+    end
+
+
     let(:create_params) do
       { project_contents: {
           title: "A Bad Title",
@@ -61,6 +78,14 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   end
 
   describe "#update" do
+    let!(:acl) do
+      create(:access_control_list,
+             user_group: authorized_user.identity_group,
+             resource: project,
+             roles: ["translator"])
+    end
+
+
     let(:update_params) do
       { project_contents: {
           education_content: "asdfasdf",
@@ -125,6 +150,14 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   end
 
   describe "versioning" do
+    let!(:acl) do
+      create(:access_control_list,
+             user_group: authorized_user.identity_group,
+             resource: project,
+             roles: ["translator"])
+    end
+
+
     let!(:existing_versions) { resource.versions.length }
     let(:num_times) { 11 }
     let(:update_proc) { Proc.new { |resource, n| resource.update!(title: n.to_s) } }
