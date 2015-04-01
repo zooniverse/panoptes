@@ -3,13 +3,6 @@ require 'spec_helper'
 RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:workflow) { create(:workflow_with_contents) }
-  let!(:acl) do
-    create(:access_control_list,
-           user_group: authorized_user.identity_group,
-           resource: workflow.project,
-           roles: ["translator"])
-  end
-
   let(:api_resource_name) { 'workflow_contents' }
   let(:api_resource_attributes) { %w(id strings language) }
   let(:api_resource_links) { %w(workflow_contents.workflow) }
@@ -22,6 +15,14 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
   let(:primary_content) { workflow.primary_content }
 
   describe "#index" do
+    let!(:acl) do
+      create(:access_control_list,
+             user_group: authorized_user.identity_group,
+             resource: workflow.project,
+             roles: ["translator"])
+    end
+
+
     let!(:private_resource) do
       project = create(:project, private: true)
       create(:workflow_with_contents, project: project)
@@ -34,10 +35,26 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
   end
 
   describe "#show" do
+    let!(:acl) do
+      create(:access_control_list,
+             user_group: authorized_user.identity_group,
+             resource: workflow.project,
+             roles: ["translator"])
+    end
+
+
     it_behaves_like "is showable"
   end
 
   describe "#create" do
+    let!(:acl) do
+      create(:access_control_list,
+             user_group: authorized_user.identity_group,
+             resource: workflow.project,
+             roles: ["translator"])
+    end
+
+
     let(:create_params) do
       {
         workflow_contents: {
@@ -58,6 +75,14 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
 
 
   describe "#update" do
+    let!(:acl) do
+      create(:access_control_list,
+             user_group: authorized_user.identity_group,
+             resource: workflow.project,
+             roles: ["translator"])
+    end
+
+
     let(:update_params) do
       { workflow_contents: {
           strings: %w(new strings)
@@ -114,6 +139,14 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
   end
 
   describe "versioning" do
+    let!(:acl) do
+      create(:access_control_list,
+             user_group: authorized_user.identity_group,
+             resource: workflow.project,
+             roles: ["translator"])
+    end
+
+
     let(:num_times) { 11 }
     let!(:existing_versions) { resource.versions.length }
     let(:update_proc) { Proc.new { |resource, n| resource.update!(strings: [n.to_s]) } }
