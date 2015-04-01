@@ -2,7 +2,7 @@ module RolesController
   extend ActiveSupport::Concern
 
   included do
-    resource_actions :index, :show, :create, :update
+    resource_actions :default
     schema_type :strong_params
     
     before_filter :format_filter_params, only: :index

@@ -94,6 +94,28 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
       it_behaves_like "is creatable"
     end
 
+    context "when the user has an acl" do
+      let(:user) do
+        u = create(:user)
+        create(:access_control_list, user_group: u.identity_group, resource: project)
+        u.id.to_s
+      end
+      
+      before(:each) do
+        default_request user_id: authorized_user.id, scopes: scopes
+        post :create, create_params
+      end
+      
+      it 'should return 400' do
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it 'should have an error message' do
+        msg = json_response['errors'][0]['message']
+        expect(msg).to match(/Roles have already been set for this user or group/)
+      end
+    end
+
     shared_examples "no user" do
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
@@ -126,5 +148,9 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
 
       it_behaves_like "no user"
     end
+  end
+
+  describe "#destroy" do
+    it_behaves_like "is destructable"
   end
 end
