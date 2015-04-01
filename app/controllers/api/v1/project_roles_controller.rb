@@ -8,6 +8,4 @@ class Api::V1::ProjectRolesController < Api::ApiController
   def resource_name
     "project_role"
   end
-
-  private
 end

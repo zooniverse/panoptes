@@ -1,4 +1,3 @@
-
 module RolesController
   extend ActiveSupport::Concern
 
@@ -36,14 +35,17 @@ module RolesController
 
   module BuildOverride
     def build_resource_for_create(create_params)
-      ig = User.find(create_params[:links].delete(:user))
-           .identity_group
+      user_id = create_params[:links].delete(:user)
       
+      ig = User.where(id: user_id).first
+           .try(:identity_group)
+
+      raise Api::NoUserError, "No User with id: #{user_id} exists" unless ig
+
       create_params[:links][:user_group] = ig
       create_params[:links][:resource] =
         { type: enrolled_resource.pluralize,
           id: create_params[:links].delete(enrolled_resource) }
-      
       super(create_params)
     end
   end
