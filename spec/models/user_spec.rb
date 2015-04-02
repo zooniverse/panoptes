@@ -221,7 +221,12 @@ describe User, type: :model do
     end
 
     context "with the old sha1 hashing alg" do
-      let(:user) { create(:insecure_user) }
+      let(:user) do
+        u = create(:insecure_user)
+        u.hash_func = 'sha1'
+        u.save
+        u
+      end
 
       it 'should validate imported user with sha1+salt password' do
         expect(user.valid_password?('tajikistan')).to be_truthy
@@ -418,6 +423,14 @@ describe User, type: :model do
       end
       
       it { is_expected.to be false }
+    end
+  end
+
+  describe "#password" do
+    it "should set a user's hash_func to bcrypt" do
+      u = build(:insecure_user)
+      u.password = 'newpassword'
+      expect(u.hash_func).to eq('bcrypt')
     end
   end
 end

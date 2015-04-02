@@ -19,12 +19,29 @@ describe Api::V1::SubjectsController, type: :controller do
   end
   let(:api_resource_links) { [ "subjects.project" ] }
 
-  context "logged in user" do
-    before(:each) do
-      default_request user_id: user.id, scopes: scopes
-    end
+  describe "#index" do
+    context "logged out user" do
+     context "without any sort" do
+        before(:each) do
+          get :index
+        end
 
-    describe "#index" do
+        it "should return 200" do
+          expect(response.status).to eq(200)
+        end
+
+        it "should return a page of 2 objects" do
+          expect(json_response[api_resource_name].length).to eq(2)
+        end
+
+        it_behaves_like "an api response"
+      end
+    end
+    
+    context "logged in user" do
+      before(:each) do
+        default_request user_id: user.id, scopes: scopes
+      end
 
       context "with a migrated project subject" do
         let!(:migrated_subject) { create(:migrated_project_subject) }
