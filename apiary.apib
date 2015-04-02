@@ -176,7 +176,7 @@ and removes personally identifying information including the
 
 + Response 204
 
-## Users Collection [/users{?page,per_page,sort,include}]
+## Users Collection [/users{?page,page_size,sort,include}]
 Collection of all Users
 
 All collections add a *meta* attribute hash containing
@@ -256,7 +256,7 @@ User resources are included a an array under the _users_ key
 ### List all Users [GET]
 + Parameters
     + page (optional, integer) ... index of the collection page, 1 is default
-    + per_page (optional, integer) ... number of items on a page. 20 is default
+    + page_size (optional, integer) ... number of items on a page. 20 is default
     + sort (optional, string) ... fields to sort collection by. id is default
     + include (optional, string) ... comma separated list of linked resources to include
 
@@ -412,7 +412,7 @@ A User may delete an incomplete classification.
 
 + Response 204
 
-## Classification Collection [/classifications{?page,per_page,sort,project_id,user_group_id,include,for}]
+## Classification Collection [/classifications{?page,page_size,sort,project_id,user_group_id,include,for}]
 A representation of all the Classifications in a collection
 
 All collections add a *meta* attribute hash containing
@@ -536,7 +536,7 @@ and *user_group_id* parameters.
 
 + Parameters
     + page (optional, integer) ... index of the collection page, 1 is default
-    + per_page (optional, integer) ... number of items on a page. 20 is default
+    + page_size (optional, integer) ... number of items on a page. 20 is default
     + sort (optional, string) ... fields to sort collection by. updated_at is default
     + project_id (optional, integer) ... only retrieve classifications for a specific project
     + user_group_id (optional, integer) ... only retrieve classifications for a specific user group
@@ -770,7 +770,7 @@ It is not editable.
 
     [Subject Version][]
 
-## Subject Version Collection [/subjects/{subject_id}/versions{?per_page,page}]
+## Subject Version Collection [/subjects/{subject_id}/versions{?page_size,page}]
 A collection of Subject Version resources.
 
 All collections add a meta attribute hash containing paging
@@ -847,7 +847,7 @@ Subject Versions are returned as an array under *versions*.
 ### List all Subject Versions [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
 
 + Request
 
@@ -860,7 +860,7 @@ Subject Versions are returned as an array under *versions*.
 
     [Subject Version Collection][]
 
-## Subject Collection [/subjects{?page,per_page,sort,workflow_id,subject_set_id}]
+## Subject Collection [/subjects{?page,page_size,sort,workflow_id,subject_set_id}]
 Represents a collection of subjects.
 
 All collections add a *meta* attribute hash containing paging information.
@@ -935,7 +935,7 @@ classify, usually for expert classifiers.
 
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by 'cellect' and 'queued' have special behaviour
   + workflow_id (optional, integer) ... filter to subjects belonging to a specific workflow. Required when sort is 'random'
   + subject_set_id (optional, integer) ... return subjects belonging to the identified subject_set
@@ -1205,7 +1205,7 @@ this action.
 
 + Response 204
 
-## Project Collection [/projects{?page,per_page,sort,owner,include}]
+## Project Collection [/projects{?page,page_size,sort,owner,include}]
 A collection of _Panotpes Project_ resources.
 
 All collections add a *meta* attribute hash containing
@@ -1327,7 +1327,7 @@ Projects are returned as an array under the _projects_ key.
 ### List All Projects [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + owner (optional, string) ... string owner name of either a user or a user group to filter by.
   + include (optional, string) ... comma separated list of linked resources to include in the response
@@ -1677,7 +1677,7 @@ It is not editable.
     [Workflow Version][]
 
 
-## Workflow Version Collection [/workflows/{workflow_id}/versions{?per_page,page}]
+## Workflow Version Collection [/workflows/{workflow_id}/versions{?page_size,page}]
 A collection of Workflow Version resources.
 
 All collections add a meta attribute hash containing paging
@@ -1749,7 +1749,7 @@ Workflow Versions are returned as an array under *versions*.
 + Parameters
   + workflow_id (required, integer) ... integer id of the workflow resource
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
 
 + Request
 
@@ -1762,7 +1762,7 @@ Workflow Versions are returned as an array under *versions*.
 
     [Workflow Version Collection][]
 
-## Workflow Collection [/workflows{?page,per_page,sort,project_id,include}]
+## Workflow Collection [/workflows{?page,page_size,sort,project_id,include}]
 A collection of _Panotpes Workflow_ resources.
 
 All collections add a *meta* attribute hash containing
@@ -1912,7 +1912,7 @@ Workflows are returned as an array under the _workflows_ key.
 ### List All Workflows [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by id by default
   + project_id (optional, integer) ... filter workflows by project id
   + include (optional, string) ... comma separated list of linked resources to load
@@ -2169,7 +2169,7 @@ Will only remove the link. This operation does not destroy the linked object.
 
 + Response 204
 
-## SubjectSet Collection [/subject_sets{?page,per_page,sort,project_id,workflow_id,include}]
+## SubjectSet Collection [/subject_sets{?page,page_size,sort,project_id,workflow_id,include}]
 A collection of SubjectSet resources.
 
 All collections add a meta attribute hash containing paging
@@ -2253,7 +2253,7 @@ Subject Sets are returned as an array under *subject_sets*.
 ### Retrieve a list of Subject Sets [GET]
 + Parameters
   + page (optional, integer) ... index of the page to retrieve 1 by default
-  + per_page (optional, integer) ... number of items per page 20 by default
+  + page_size (optional, integer) ... number of items per page 20 by default
   + sort (optional, string) ... field to sort by, id by default
   + project_id (optional, integer) ... filter by linked project
   + workflow_id (optional, integer) ... filter by linked workflow
@@ -2499,7 +2499,7 @@ membership set to 'inactive'.
 
 + Response 204
 
-## UserGroup Collection [/groups{?page,per_page,sort,user_id,include}]
+## UserGroup Collection [/groups{?page,page_size,sort,user_id,include}]
 A collection of User Group resources.
 
 All collections add a meta attribute hash containing paging
@@ -2585,7 +2585,7 @@ User Groups are returned as an array under *user_groups*.
 ### List all User Groups [GET]
 + Parameters
   + page (optional, integer) ... index of the page to retrieve 1 by default
-  + per_page (optional, integer) ... number of items per page 20 by default
+  + page_size (optional, integer) ... number of items per page 20 by default
   + sort (optional, string) ... field to sort by, id by default
   + user_id (optional, integer) ... filter list to groups a user is part of
   + include (optional, string) ... comma separated list of linked resources to include in the response
@@ -2728,7 +2728,7 @@ user group may destroy membership for that group.
 
 + Response 204
 
-## Membership Collection [/memberships{?page,per_page,sort,user_id,user_group_id}]
+## Membership Collection [/memberships{?page,page_size,sort,user_id,user_group_id}]
 A collection of Membership resources.
 
 All collections add a meta attribute hash containing paging
@@ -2792,7 +2792,7 @@ Memberships are returned as an array under *memberships*.
 ### List all memberships [GET]
 + Parameters
   + page (optional, integer) ... index of the page to retrieve 1 by default
-  + per_page (optional, integer) ... number of items per page 20 by default
+  + page_size (optional, integer) ... number of items per page 20 by default
   + sort (optional, string) ... field to sort by, id by default
   + user_id (optional, integer) ... filter list to memberships for a user
   + user_group_id (optional, integer) ... filter list to memberships for a user group
@@ -2985,7 +2985,7 @@ owner or have edit permissions.
 
 + Response 204
 
-## Collection Collection [/collections{?page,per_page,sort,owner}]
+## Collection Collection [/collections{?page,page_size,sort,owner}]
 A collection of Collection resources.
 
 All collections add a meta attribute hash containing paging
@@ -3053,7 +3053,7 @@ Collections are returned as an array under *collections*.
 ### List all collections [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + owner (optional, string) ... string name of either a user or user group to filter by
 
@@ -3247,7 +3247,7 @@ or have edit permissions.
 
 + Response 204
 
-## SubjectQueue Collection [/subject_queues?{page,per_page,workflow_id,user_id,include}]
+## SubjectQueue Collection [/subject_queues?{page,page_size,workflow_id,user_id,include}]
 A collection of SubjectQueue resources.
 
 All collections add a meta attribute hash containing paging
@@ -3311,7 +3311,7 @@ SubjectQueues are returned as an array under *subject_queues*.
 ### List all collections [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + workflow_id (optional, integer) ... workflow queue belongs to
   + user_id (optional, integer) ... user id queue belongs to
   + include (optional, string) ... comma separated list of linked resources to include
@@ -3453,7 +3453,7 @@ Editing requires sending a full representation of the roles array.
 
     [ProjectRole][]
 
-## ProjectRole Collection [/project_roles{?user_id,project_id,page,per_page,sort,include}]
+## ProjectRole Collection [/project_roles{?user_id,project_id,page,page_size,sort,include}]
 A Collection of ProjectRole resources.
 
 All collections add a meta attribute hash containing paging
@@ -3523,7 +3523,7 @@ ProjectRoles are returned as an array under *project_roles*.
 ### List all ProjectRoles [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + user_id (optional, integer) ... user_id to see roles for
   + project_id (optional, integer) ... project_id to see roles for
@@ -3661,7 +3661,7 @@ preferences hash to be sent.
 
     [ProjectPreference][]
 
-## ProjectPreference Collection [/project_preferences{?user_id,project_id,page,per_page,sort,include}]
+## ProjectPreference Collection [/project_preferences{?user_id,project_id,page,page_size,sort,include}]
 A Collection of ProjectPreference resources.
 
 All collections add a meta attribute hash containing paging
@@ -3727,7 +3727,7 @@ ProjectPreferences are returned as an array under *project_preferences*.
 ### List all ProjectPreferences [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + user_id (optional, integer) ... user_id to see preferences for
   + project_id (optional, integer) ... project_id to see preferences for
@@ -3960,7 +3960,7 @@ It is not editable.
     [ProjectContent Version][]
 
 
-## ProjectContent Version Collection [/project_contents/{project_contents_id}/versions{?per_page,page}]
+## ProjectContent Version Collection [/project_contents/{project_contents_id}/versions{?page_size,page}]
 A collection of Project Content Version resources.
 
 All collections add a meta attribute hash containing paging
@@ -4022,7 +4022,7 @@ Project Content Versions are returned as an array under *versions*.
 ### List all Project Content Versions [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
 
 + Request
 
@@ -4035,7 +4035,7 @@ Project Content Versions are returned as an array under *versions*.
 
     [ProjectContent Version Collection][]
 
-## ProjectContent Collection [/project_contents{?project_id,language,page,per_page,include}]
+## ProjectContent Collection [/project_contents{?project_id,language,page,page_size,include}]
 A collection of Project Content resources.
 
 All collections add a meta attribute hash containing paging
@@ -4120,7 +4120,7 @@ Project Contents are returned as an array under *project_contents*.
 ### List all ProjectContents [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + project_id (optional, integer) ... project_id to see contents for
   + language (optional, string) ... language code to search for
   + include (optional, string) ... comma separated list of linked resources to load
@@ -4350,7 +4350,7 @@ It is not editable.
     [WorkflowContent Version][]
 
 
-## WorkflowContent Version Collection [/workflow_contents/{workflow_contents_id}/versions{?per_page,page}]
+## WorkflowContent Version Collection [/workflow_contents/{workflow_contents_id}/versions{?page_size,page}]
 A collection of Workflow Content Version resources.
 
 All collections add a meta attribute hash containing paging
@@ -4431,7 +4431,7 @@ Workflow Content Versions are returned as an array under *versions*.
 ### List all Workflow Content Versions [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
 
 + Request
 
@@ -4444,7 +4444,7 @@ Workflow Content Versions are returned as an array under *versions*.
 
     [WorkflowContent Version Collection][]
 
-## WorkflowContent Collection [/workflow_contents{?workflow_id,language,page,per_page,include}]
+## WorkflowContent Collection [/workflow_contents{?workflow_id,language,page,page_size,include}]
 A collection of Workflow Content resources.
 
 All collections add a meta attribute hash containing paging
@@ -4510,7 +4510,7 @@ Workflow Contents are returned as an array under *workflow_contents*.
 ### List all WorkflowContents [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + workflow_id (optional, integer) ... id of workflow to see contents for
   + language (optional, string) ... language code to search for
   + include (optional, string) ... comma separated list of linked resources to load
@@ -4649,7 +4649,7 @@ removes the linked Subject form the linked SubjectSet
 
 + Response 204
 
-## SetMemberSubject Collection [/set_member_subjects{?subject_set_id,subject_id,page,per_page,include}]
+## SetMemberSubject Collection [/set_member_subjects{?subject_set_id,subject_id,page,page_size,include}]
 A collection of SetMemberSubject resources.
 
 All collections add a meta attribute hash containing paging
@@ -4713,7 +4713,7 @@ SetMemberSubjects are returned as an array under *set_member_subjects*.
 ### List all SetMemberSubjects [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + subject_id (optional, integer) ... id of subject to see set_member_subjects for
   + subject_set_id (optional, integer) ... id of subject_set to see set_member_subjects for
   + include (optional, string) ... comma separated list of linked resources to load
@@ -4857,7 +4857,7 @@ Editing requires sending a full representation of the roles array.
 
     [CollectionRole][]
 
-## CollectionRole Collection [/collection_roles{?user_id,collection_id,page,per_page,sort,include}]
+## CollectionRole Collection [/collection_roles{?user_id,collection_id,page,page_size,sort,include}]
 A Collection of CollectionRole resources.
 
 All collections add a meta attribute hash containing paging
@@ -4927,7 +4927,7 @@ CollectionRoles are returned as an array under *collection_roles*.
 ### List all CollectionRoles [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + user_id (optional, integer) ... user_id to see roles for
   + collection_id (optional, integer) ... collection_id to see roles for
@@ -5063,7 +5063,7 @@ preferences object to be sent.
 
     [CollectionPreference][]
 
-## CollectionPreference Collection [/collection_preferences{?user_id,collection_id,page,per_page,sort,include}]
+## CollectionPreference Collection [/collection_preferences{?user_id,collection_id,page,page_size,sort,include}]
 A Collection of CollectionPreference resources.
 
 All collections add a meta attribute hash containing paging
@@ -5127,7 +5127,7 @@ CollectionPreferences are returned as an array under *collection_preferences*.
 ### List all CollectionPreferences [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + user_id (optional, integer) ... user_id to see preferences for
   + collection_id (optional, integer) ... collection_id to see preferences for
@@ -5271,7 +5271,7 @@ aggregation object to be sent.
 
     [Aggregation][]
 
-## Aggregation Collection [/aggregations{?workflow_id,subject_id,page,per_page,sort,include}]
+## Aggregation Collection [/aggregations{?workflow_id,subject_id,page,page_size,sort,include}]
 A Collection of Aggregation resources.
 
 All collections add a meta attribute hash containing paging
@@ -5341,7 +5341,7 @@ Aggregations are returned as an array under *aggregations*.
 ### List all Aggregations [GET]
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
-  + per_page (optional, integer) ... number of items to include on a page default is 20
+  + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + workflow_id (optional, integer) ... workflow to see aggregations for
   + subject_id (optional, integer) ... subject_id to see aggregations for
