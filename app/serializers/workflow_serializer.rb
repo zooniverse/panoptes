@@ -8,6 +8,13 @@ class WorkflowSerializer
 
   DEFAULT_WORKFLOW_VERSION_NUM = 1
 
+  def self.links
+    links = super
+    ess = links.delete('workflows.expert_subject_sets')
+    links['workflows.expert_subject_set'] = ess
+    links
+  end
+
   def version
     "#{version_index_number(@model)}.#{version_index_number(content)}"
   end
