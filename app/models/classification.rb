@@ -27,7 +27,7 @@ class Classification < ActiveRecord::Base
       # Workaround Broken Bind Value Assignment in Subqueries in Rails 4.1
       # This is fixed in Rails 4.2 when we're able to to migrate to that
       # Unfortunately this isn't needed in JRuby so I have to test for platform on this class
-      query.bind_values = [query.bind_values.first] unless RUBY_PLATFORM == 'java'
+#      query.bind_values = [query.bind_values.first] unless RUBY_PLATFORM == 'java'
       query
     when :update, :destroy
       incomplete_for_user(user)

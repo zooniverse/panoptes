@@ -36,6 +36,7 @@ ActiveRecord::QueryMethods.module_eval do
         common << Arel::Nodes::Or.new(Arel::Nodes::Grouping.new(mine.first), Arel::Nodes::Grouping.new(theirs.first))
       end
       send("#{combining}_values=", common)
+      bind_values.concat(other.bind_values)
     end
     self
   end
