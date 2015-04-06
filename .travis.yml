@@ -21,6 +21,6 @@ services:
   - postgresql
 
 addons:
-  postgresql: "9.3"
+  postgresql: "9.4"
 
 script: RACK_ENV=test bundle exec rake spec
