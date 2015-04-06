@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe SessionsController, type: :controller do
-  let!(:users) { create_list(:user, 2, build_zoo_user: true) }
+  let!(:users) { create_list(:user, 2) }
   let(:user) { users.first }
 
   context "using json", :zoo_home_user do
@@ -25,61 +25,6 @@ describe SessionsController, type: :controller do
       it "should sign in the user" do
         expect(controller).to receive(:sign_in)
         post :create, user: {display_name: user.display_name, password: user.password}
-      end
-
-      it "should test against the ZooniverseUser table" do
-        expect(ZooniverseUser).to receive(:authenticate).with(user.display_name, user.password)
-        post :create, user: {display_name: user.display_name, password: user.password}
-      end
-
-      context "when signing in a zooniverse wide user account" do
-        let(:zoo_user) { create(:zooniverse_user) }
-
-        it "should import the zooniverse user into the User table" do
-          expect do
-            post :create, user: {display_name: zoo_user.login, password: zoo_user.password}
-          end.to change{User.count}.from(2).to(3)
-        end
-
-        context "when an existing panoptes user account exists" do
-          let!(:dup_user) do
-            create(:user, display_name: zoo_user.login, email: zoo_user.email)
-          end
-
-          it "should not raise an error" do
-            expect do
-              post :create, user: {display_name: zoo_user.login, password: zoo_user.password}
-            end.to_not raise_error
-          end
-
-          it "should update the existing panoptes account with zoo home details" do
-            panoptes_user = User.find_by(email: zoo_user.email)
-            expect(panoptes_user.hash_func).to eq("bcrypt")
-            post :create, user: { display_name: zoo_user.login,
-                                  password: zoo_user.password }
-            expect(panoptes_user.reload.hash_func).to eq("sha1")
-          end
-        end
-
-        context "when an existing panoptes user account has been deleted" do
-          let!(:disabled_dup_user) do
-            user = create(:user, display_name: zoo_user.login, email: zoo_user.email)
-            user.disable!
-            user
-          end
-
-          it "should not raise an error" do
-            expect do
-              post :create, user: {display_name: zoo_user.login, password: zoo_user.password}
-            end.to_not raise_error
-          end
-
-          it "should not sign the user in" do
-            post :create, user: { display_name: zoo_user.login,
-                                  password: zoo_user.password }
-            expect(response.status).to eq(401)
-          end
-        end
       end
     end
 
