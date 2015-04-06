@@ -11,12 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150327184058) do
+ActiveRecord::Schema.define(version: 20150406095027) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "access_control_lists", force: true do |t|
+  create_table "access_control_lists", force: :cascade do |t|
     t.integer  "user_group_id"
     t.string   "roles",         default: [], null: false, array: true
     t.integer  "resource_id"
@@ -29,10 +29,10 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "access_control_lists", ["roles"], name: "index_access_control_lists_on_roles", using: :gin
   add_index "access_control_lists", ["user_group_id"], name: "index_access_control_lists_on_user_group_id", using: :btree
 
-  create_table "aggregations", force: true do |t|
+  create_table "aggregations", force: :cascade do |t|
     t.integer  "workflow_id"
     t.integer  "subject_id"
-    t.json     "aggregation", default: {}, null: false
+    t.jsonb    "aggregation", default: {}, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -40,7 +40,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "aggregations", ["subject_id"], name: "index_aggregations_on_subject_id", using: :btree
   add_index "aggregations", ["workflow_id"], name: "index_aggregations_on_workflow_id", using: :btree
 
-  create_table "authorizations", force: true do |t|
+  create_table "authorizations", force: :cascade do |t|
     t.integer  "user_id"
     t.string   "provider"
     t.string   "uid"
@@ -52,11 +52,11 @@ ActiveRecord::Schema.define(version: 20150327184058) do
 
   add_index "authorizations", ["user_id"], name: "index_authorizations_on_user_id", using: :btree
 
-  create_table "classifications", force: true do |t|
+  create_table "classifications", force: :cascade do |t|
     t.integer  "project_id"
     t.integer  "user_id"
     t.integer  "workflow_id"
-    t.json     "annotations"
+    t.jsonb    "annotations",       default: {}
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_group_id"
@@ -64,7 +64,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
     t.boolean  "completed",         default: true, null: false
     t.boolean  "gold_standard"
     t.integer  "expert_classifier"
-    t.json     "metadata",          default: {},   null: false
+    t.jsonb    "metadata",          default: {},   null: false
     t.integer  "subject_ids",       default: [],                array: true
   end
 
@@ -74,7 +74,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "classifications", ["user_id"], name: "index_classifications_on_user_id", using: :btree
   add_index "classifications", ["workflow_id"], name: "index_classifications_on_workflow_id", using: :btree
 
-  create_table "collections", force: true do |t|
+  create_table "collections", force: :cascade do |t|
     t.string   "name"
     t.integer  "project_id"
     t.datetime "created_at"
@@ -87,12 +87,12 @@ ActiveRecord::Schema.define(version: 20150327184058) do
 
   add_index "collections", ["project_id"], name: "index_collections_on_project_id", using: :btree
 
-  create_table "collections_subjects", id: false, force: true do |t|
+  create_table "collections_subjects", id: false, force: :cascade do |t|
     t.integer "subject_id",    null: false
     t.integer "collection_id", null: false
   end
 
-  create_table "memberships", force: true do |t|
+  create_table "memberships", force: :cascade do |t|
     t.integer  "state",         default: 2,                null: false
     t.integer  "user_group_id"
     t.integer  "user_id"
@@ -106,7 +106,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "memberships", ["user_id", "identity"], name: "index_memberships_on_user_id_and_identity", unique: true, where: "(identity = true)", using: :btree
   add_index "memberships", ["user_id"], name: "index_memberships_on_user_id", using: :btree
 
-  create_table "oauth_access_grants", force: true do |t|
+  create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false
     t.integer  "application_id",    null: false
     t.string   "token",             null: false
@@ -119,7 +119,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
 
   add_index "oauth_access_grants", ["token"], name: "index_oauth_access_grants_on_token", unique: true, using: :btree
 
-  create_table "oauth_access_tokens", force: true do |t|
+  create_table "oauth_access_tokens", force: :cascade do |t|
     t.integer  "resource_owner_id"
     t.integer  "application_id"
     t.string   "token",             null: false
@@ -134,7 +134,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "oauth_access_tokens", ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id", using: :btree
   add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true, using: :btree
 
-  create_table "oauth_applications", force: true do |t|
+  create_table "oauth_applications", force: :cascade do |t|
     t.string   "name",                       null: false
     t.string   "uid",                        null: false
     t.string   "secret",                     null: false
@@ -150,7 +150,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "oauth_applications", ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type", using: :btree
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
-  create_table "project_contents", force: true do |t|
+  create_table "project_contents", force: :cascade do |t|
     t.integer  "project_id"
     t.string   "language"
     t.string   "title"
@@ -168,7 +168,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
 
   add_index "project_contents", ["project_id"], name: "index_project_contents_on_project_id", using: :btree
 
-  create_table "projects", force: true do |t|
+  create_table "projects", force: :cascade do |t|
     t.string   "name"
     t.string   "display_name"
     t.integer  "user_count"
@@ -183,7 +183,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
     t.integer  "lock_version",          default: 0
   end
 
-  create_table "set_member_subjects", force: true do |t|
+  create_table "set_member_subjects", force: :cascade do |t|
     t.integer  "state",                default: 0, null: false
     t.integer  "subject_set_id"
     t.integer  "subject_id"
@@ -199,27 +199,27 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "set_member_subjects", ["subject_id"], name: "index_set_member_subjects_on_subject_id", using: :btree
   add_index "set_member_subjects", ["subject_set_id"], name: "index_set_member_subjects_on_subject_set_id", using: :btree
 
-  create_table "subject_sets", force: true do |t|
+  create_table "subject_sets", force: :cascade do |t|
     t.string   "display_name"
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "set_member_subjects_count",         default: 0,  null: false
-    t.json     "metadata"
+    t.jsonb    "metadata",                          default: {}
     t.integer  "workflow_id"
     t.integer  "lock_version",                      default: 0
     t.boolean  "expert_set"
-    t.json     "retirement",                        default: {}
+    t.jsonb    "retirement",                        default: {}
     t.integer  "retired_set_member_subjects_count", default: 0,  null: false
   end
 
   add_index "subject_sets", ["project_id", "display_name"], name: "index_subject_sets_on_project_id_and_display_name", using: :btree
   add_index "subject_sets", ["workflow_id"], name: "index_subject_sets_on_workflow_id", using: :btree
 
-  create_table "subjects", force: true do |t|
+  create_table "subjects", force: :cascade do |t|
     t.string   "zooniverse_id"
-    t.json     "metadata"
-    t.json     "locations"
+    t.jsonb    "metadata",       default: {}
+    t.jsonb    "locations",      default: {}
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "project_id"
@@ -231,8 +231,8 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "subjects", ["project_id"], name: "index_subjects_on_project_id", using: :btree
   add_index "subjects", ["zooniverse_id"], name: "index_subjects_on_zooniverse_id", unique: true, using: :btree
 
-  create_table "user_collection_preferences", force: true do |t|
-    t.json     "preferences"
+  create_table "user_collection_preferences", force: :cascade do |t|
+    t.jsonb    "preferences",   default: {}
     t.string   "roles",         default: [], null: false, array: true
     t.integer  "user_id"
     t.integer  "collection_id"
@@ -243,7 +243,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "user_collection_preferences", ["collection_id"], name: "index_user_collection_preferences_on_collection_id", using: :btree
   add_index "user_collection_preferences", ["user_id"], name: "index_user_collection_preferences_on_user_id", using: :btree
 
-  create_table "user_groups", force: true do |t|
+  create_table "user_groups", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -257,11 +257,11 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "user_groups", ["display_name"], name: "index_user_groups_on_display_name", unique: true, using: :btree
   add_index "user_groups", ["name"], name: "index_user_groups_on_name", unique: true, using: :btree
 
-  create_table "user_project_preferences", force: true do |t|
+  create_table "user_project_preferences", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "project_id"
     t.boolean  "email_communication"
-    t.json     "preferences"
+    t.jsonb    "preferences",         default: {}
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "roles",               default: [], null: false, array: true
@@ -270,7 +270,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "user_project_preferences", ["project_id"], name: "index_user_project_preferences_on_project_id", using: :btree
   add_index "user_project_preferences", ["user_id"], name: "index_user_project_preferences_on_user_id", using: :btree
 
-  create_table "user_seen_subjects", force: true do |t|
+  create_table "user_seen_subjects", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "workflow_id"
     t.datetime "created_at"
@@ -281,7 +281,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "user_seen_subjects", ["user_id", "workflow_id"], name: "index_user_seen_subjects_on_user_id_and_workflow_id", using: :btree
   add_index "user_seen_subjects", ["workflow_id"], name: "index_user_seen_subjects_on_workflow_id", using: :btree
 
-  create_table "user_subject_queues", force: true do |t|
+  create_table "user_subject_queues", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "workflow_id"
     t.integer  "subject_ids",  default: [], null: false, array: true
@@ -292,7 +292,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
 
   add_index "user_subject_queues", ["user_id", "workflow_id"], name: "index_user_subject_queues_on_user_id_and_workflow_id", unique: true, using: :btree
 
-  create_table "users", force: true do |t|
+  create_table "users", force: :cascade do |t|
     t.string   "email",                       default: ""
     t.string   "encrypted_password",          default: "",       null: false
     t.string   "reset_password_token"
@@ -325,7 +325,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
-  create_table "versions", force: true do |t|
+  create_table "versions", force: :cascade do |t|
     t.string   "item_type",      null: false
     t.integer  "item_id",        null: false
     t.string   "event",          null: false
@@ -337,7 +337,7 @@ ActiveRecord::Schema.define(version: 20150327184058) do
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
-  create_table "workflow_contents", force: true do |t|
+  create_table "workflow_contents", force: :cascade do |t|
     t.integer  "workflow_id"
     t.string   "language"
     t.datetime "created_at"
@@ -347,9 +347,9 @@ ActiveRecord::Schema.define(version: 20150327184058) do
 
   add_index "workflow_contents", ["workflow_id"], name: "index_workflow_contents_on_workflow_id", using: :btree
 
-  create_table "workflows", force: true do |t|
+  create_table "workflows", force: :cascade do |t|
     t.string   "display_name"
-    t.json     "tasks"
+    t.jsonb    "tasks",                 default: {}
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
