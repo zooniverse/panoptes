@@ -19,7 +19,7 @@ module JsonApiController
 
     def precondition_fails?
       query = resource_class.where(id: resource_ids)
-      etag = combine_etags(query)
+      etag = combine_etags(etag: query)
       key = ActiveSupport::Cache.expand_cache_key(etag)
       etag = %("#{Digest::MD5.hexdigest(key)}")
       !(etag == precondition)

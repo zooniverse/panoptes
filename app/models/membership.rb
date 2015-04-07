@@ -9,6 +9,8 @@ class Membership < ActiveRecord::Base
                               state: states[:active],
                               roles: ["group_admin"]) }
 
+  scope :not_identity, -> { where(identity: false) }
+
   validates_presence_of :user, unless: :identity
   validates_associated :user_group
   validates_presence_of :state, :user_group
@@ -25,20 +27,18 @@ class Membership < ActiveRecord::Base
     @parent
   end
 
-
   def self.scope_for(action, user, opts={})
     return all if user.is_admin?
     roles, _ = parent_class.roles(action)
     accessible_groups = user.user_groups.where.overlap(memberships: {roles: roles})
-    query = where(user_group_id: accessible_groups)
-            .or(Membership.where(user_id: user.id))
-            .where(identity: false)
+    query = not_identity.where(user_group_id: accessible_groups)
+            .or(not_identity.where(user_id: user.id))
     
+
     case action
     when :show, :index
-      query.or(Membership.where(user_group_id: UserGroup.public_scope,
-                                identity: false,
-                                state: states[:active]))
+      query.union_all(not_identity.where(state: states[:active])
+                       .joins(:user_group).merge(UserGroup.public_scope))
     else
       query
     end

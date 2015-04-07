@@ -13,7 +13,8 @@ RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
   config.include Devise::TestHelpers, type: :controller
   config.include APIRequestHelpers, type: :controller
-  config.include APIResponseHelpers, [ type: :controller, type: :request ]
+  config.include APIResponseHelpers, type: :controller
+  config.include APIResponseHelpers, type: :request
   config.include ValidUserRequestHelper, type: :request
   config.include CellectHelpers
   config.extend RSpec::Helpers::ActiveRecordMocks
