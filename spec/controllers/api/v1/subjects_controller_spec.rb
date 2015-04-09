@@ -82,10 +82,10 @@ describe Api::V1::SubjectsController, type: :controller do
 
         context "with queued subjects" do
           before(:each) do
-            create(:user_subject_queue,
+            create(:subject_queue,
                    user: user,
                    workflow: workflow,
-                   subject_ids: subjects.map(&:id))
+                   set_member_subject_ids: subjects.map(&:id))
             get :index, request_params
           end
 

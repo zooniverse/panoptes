@@ -9,13 +9,16 @@ class SubjectSelector
 
   def queued_subjects
     raise workflow_id_error unless workflow
-    user_enqueued = UserSubjectQueue
-                    .find_by!(user: user.user, workflow_id: params[:workflow_id])
+    raise group_id_error if needs_set_id? 
+    user_enqueued = SubjectQueue.find_by!(user: user.user,
+                                          workflow_id: params[:workflow_id],
+                                          subject_set_id: params[:subject_set_id])
     selected_subjects(user_enqueued.next_subjects(default_page_size))
   end
 
   def cellect_subjects
     raise workflow_id_error unless workflow
+    raise group_id_error if needs_set_id?
     subjects = CellectClient.get_subjects(*cellect_params)
     selector_context = {}
     if subjects.blank?
@@ -33,9 +36,17 @@ class SubjectSelector
   end
 
   private
+
+  def needs_set_id?
+    workflow.grouped && !params.has_key(:group_id)
+  end
   
   def workflow_id_error
     MissingParameter.new("workflow_id parameter missing")
+  end
+
+  def group_id_error
+    MissingParameter.new("subject_set_id parameter missing for grouped workflow")
   end
 
   def cellect_params

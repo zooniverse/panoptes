@@ -141,14 +141,14 @@ describe ClassificationLifecycle do
 
       context "is queued" do
         let!(:subject_queue) do
-          create(:user_subject_queue,
+          create(:subject_queue,
                  user: classification.user,
                  workflow: classification.workflow,
-                 subject_ids: classification.subject_ids)
+                 set_member_subject_ids: classification.subject_ids)
         end
 
         it 'should call dequeue_subject_for_user' do
-          expect(UserSubjectQueue).to receive(:dequeue_subjects_for_user)
+          expect(SubjectQueue).to receive(:dequeue_subjects_for_user)
                                        .with(user: classification.user,
                                              workflow: classification.workflow,
                                              subject_ids: classification.subject_ids)
@@ -158,7 +158,7 @@ describe ClassificationLifecycle do
       context "is not queued" do
         it 'should not call dequeue_subject_for_user when not enqueued' do
           classification = create(:classification, completed: true)
-          expect(UserSubjectQueue).to_not receive(:dequeue_subject_for_user)
+          expect(SubjectQueue).to_not receive(:dequeue_subject_for_user)
         end
       end
     end
@@ -167,7 +167,7 @@ describe ClassificationLifecycle do
       let(:classification) { create(:classification, completed: false) }
 
       it 'should not call dequeue_subject_for_use when incomplete' do
-        expect(UserSubjectQueue).to_not receive(:dequeue_subject_for_user)
+        expect(SubjectQueue).to_not receive(:dequeue_subject_for_user)
       end
     end
   end

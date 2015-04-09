@@ -38,7 +38,7 @@ class User < ActiveRecord::Base
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
-  can_be_linked :user_subject_queue, :all
+  can_be_linked :subject_queue, :all
   can_be_linked :user_project_preference, :all
   can_be_linked :user_collection_preference, :all
   can_be_linked :project, :scope_for, :update, :user

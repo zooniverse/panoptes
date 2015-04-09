@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150406095027) do
+ActiveRecord::Schema.define(version: 20150409130306) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -199,6 +199,18 @@ ActiveRecord::Schema.define(version: 20150406095027) do
   add_index "set_member_subjects", ["subject_id"], name: "index_set_member_subjects_on_subject_id", using: :btree
   add_index "set_member_subjects", ["subject_set_id"], name: "index_set_member_subjects_on_subject_set_id", using: :btree
 
+  create_table "subject_queues", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "workflow_id"
+    t.integer  "set_member_subject_ids", default: [], null: false, array: true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "lock_version",           default: 0
+    t.integer  "subject_set_id"
+  end
+
+  add_index "subject_queues", ["user_id", "workflow_id"], name: "index_subject_queues_on_user_id_and_workflow_id", unique: true, using: :btree
+
   create_table "subject_sets", force: :cascade do |t|
     t.string   "display_name"
     t.integer  "project_id"
@@ -280,17 +292,6 @@ ActiveRecord::Schema.define(version: 20150406095027) do
 
   add_index "user_seen_subjects", ["user_id", "workflow_id"], name: "index_user_seen_subjects_on_user_id_and_workflow_id", using: :btree
   add_index "user_seen_subjects", ["workflow_id"], name: "index_user_seen_subjects_on_workflow_id", using: :btree
-
-  create_table "user_subject_queues", force: :cascade do |t|
-    t.integer  "user_id"
-    t.integer  "workflow_id"
-    t.integer  "subject_ids",  default: [], null: false, array: true
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "lock_version", default: 0
-  end
-
-  add_index "user_subject_queues", ["user_id", "workflow_id"], name: "index_user_subject_queues_on_user_id_and_workflow_id", unique: true, using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                       default: ""

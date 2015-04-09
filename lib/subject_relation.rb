@@ -4,8 +4,8 @@
 ## hairy and I'd like to finish a basic version of this feature as
 ## quickly as possible
 
-## This doesn't replicate all of AR:A just enough to fool RestPack and
-## JsonApiController into thinking its one. 
+## This doesn't replicate all of AR::A just enough to fool RestPack and
+## JsonApiController into thinking it's one. 
 
 class SubjectRelation
   include Enumerable
@@ -16,30 +16,30 @@ class SubjectRelation
   
   def initialize(owner)
     @owner = owner
-    @relation = Subject.where(id: owner.subject_ids)
+    @relation = SetMemberSubject.where(id: owner.set_member_subject_ids)
   end
 
   def concat(*models)
     models = models.flatten
-    owner.subject_ids_will_change!
+    owner.set_member_subject_ids_will_change!
     ids = models.map { |m| m.try(:id) || m }
-    owner.subject_ids.concat(ids)
+    owner.set_member_subject_ids.concat(ids)
     owner.save!
   end
 
   def destroy(*models)
     models = models.flatten
-    owner.subject_ids_will_change!
+    owner.set_member_subject_ids_will_change!
     ids = models.map { |m| m.try(:id) || m }
-    owner.subject_ids.delete(*ids)
+    owner.set_member_subject_ids.delete(*ids)
     owner.save!
   end
   
-  def add_subjects(models)
+  def add_set_member_subjects(models)
     concat([models])
   end
 
-  def remove_subjects(models)
+  def remove_set_member_subjects(models)
     destroy(models)
   end
 end

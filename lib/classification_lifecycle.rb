@@ -40,7 +40,7 @@ class ClassificationLifecycle
 
   def dequeue_subject
     return unless should_dequeue_subject?
-    UserSubjectQueue.dequeue_subjects_for_user(**user_workflow_subject)
+    SubjectQueue.dequeue_subjects_for_user(**user_workflow_subject)
   end
 
   def create_project_preference
@@ -78,7 +78,7 @@ class ClassificationLifecycle
 
   def should_dequeue_subject?
     !classification.anonymous? &&
-      UserSubjectQueue.are_subjects_queued?(**user_workflow_subject)
+      SubjectQueue.are_subjects_queued?(**user_workflow_subject)
   end
 
   def should_create_project_preference?
