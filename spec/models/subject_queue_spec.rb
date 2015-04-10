@@ -14,29 +14,54 @@ RSpec.describe SubjectQueue, :type => :model do
     expect(build(:subject_queue, workflow: nil)).to_not be_valid
   end
 
-  describe "::are_subjects_queued" do
-    let(:subject) { create(:subject) }
+  describe "::dequeue_for_all" do
+    let(:subject) { create(:set_member_subject) }
+    let(:workflow) { create(:workflow) }
+    let(:queue) { create_list(:subject_queue, 2, workflow: workflow, set_member_subject_ids: [subject.id]) }
+    
+    it "should remove the subject for all queues of the workflow" do
+      SubjectQueue.dequeue_for_all(workflow, subject.id)
+      expect(SubjectQueue.all.map(&:set_member_subject_ids)).to all( be_empty )
+    end
+  end
+
+  describe "::enqueue_for_all" do
+    let(:subject) { create(:set_member_subject) }
+    let(:workflow) { create(:workflow) }
+    let(:queue) { create_list(:subject_queue, 2, workflow: workflow) }
+    
+    it "should remove the subject for all queues of the workflow" do
+      SubjectQueue.enqueue_for_all(workflow, subject.id)
+      expect(SubjectQueue.all.map(&:set_member_subject_ids)).to all( include(subject.id) )
+    end
+  end
+
+  describe "::subjects_queued?" do
+    let(:subject) { create(:set_member_subject) }
     let!(:subject_queue) do
       create(:subject_queue, set_member_subject_ids: [subject.id])
     end
-    
-    context "subject is queued" do
-      it 'should return truthy' do
-        user = subject_queue.user
-        workflow = subject_queue.workflow
-        result = SubjectQueue.are_subjects_queued?(user: user,
-                                                       workflow: workflow,
-                                                       subject_ids: [subject.id])
-        expect(result).to be_truthy
+
+    context "with a user" do
+      context "subject is queued" do
+        it 'should return truthy' do
+          user = subject_queue.user
+          workflow = subject_queue.workflow
+          result = SubjectQueue.subjects_queued?(workflow,
+                                                 [subject.id],
+                                                 user: user)
+          expect(result).to be_truthy
+        end
       end
 
       context "subject is not queued" do
         it 'should return falsy' do
           user = subject_queue.user
           workflow = subject_queue.workflow
-          result = SubjectQueue.are_subjects_queued?(user: user,
-                                                         workflow: workflow,
-                                                         subject_ids: [create(:subject).id])
+          result = SubjectQueue.subjects_queued?(workflow,
+                                                 [create(:set_member_subject).id],
+                                                 user: user)
+          
           expect(result).to be_falsy
         end
       end
@@ -45,78 +70,79 @@ RSpec.describe SubjectQueue, :type => :model do
         it 'should return falsy' do
           user = create(:user)
           workflow = create(:workflow) 
-          result = SubjectQueue.are_subjects_queued?(user: user,
-                                                         workflow: workflow,
-                                                         subject_ids: [create(:subject).id])
+          result = SubjectQueue.subjects_queued?(workflow,
+                                                 [create(:set_member_subject).id],
+                                                 user: user)
           expect(result).to be_falsy
         end
-
       end
     end
   end
 
-  describe "::enqueue_subject_for_user" do
-    let(:user) { create(:user) }
+  describe "::enqueue" do
     let(:workflow) { create(:workflow) }
-    let(:subject) { create(:subject) }
-    
-    context "nothing for user" do
-      it 'should create a new user_enqueue_subject' do
-        expect do
-          SubjectQueue.enqueue_subject_for_user(user: user,
-                                                    workflow: workflow,
-                                                    subject: subject)
-        end.to change{ SubjectQueue.count }.from(0).to(1)
-      end
+    let(:subject) { create(:set_member_subject) }
 
-      it 'should call add_set_member_subjects' do
-        ues = double
-        allow(SubjectQueue).to receive(:find_or_create_by!).and_return(ues)
+    context "with a user" do
+      let(:user) { create(:user) }
+      context "nothing for user" do
+        it 'should create a new user_enqueue_subject' do
+          expect do
+            SubjectQueue.enqueue(workflow,
+                                 subject,
+                                 user: user)
+          end.to change{ SubjectQueue.count }.from(0).to(1)
+        end
+
+        it 'should add subjects' do
+          SubjectQueue.enqueue(workflow,
+                               subject,
+                               user: user)
+          queue = SubjectQueue.find_by(workflow: workflow, user: user)
+          expect(queue.set_member_subject_ids).to include(subject.id)
+        end
         
-        expect(ues).to receive(:add_set_member_subjects).with(subject)
-        SubjectQueue.enqueue_subject_for_user(user: user,
-                                                  workflow: workflow,
-                                                  subject: subject)
       end
-      
-    end
 
-    context "list exists for user" do
-      let!(:ues) { create(:subject_queue, user: user, workflow: workflow) }
-      it 'should call add_subject_id on the existing subject queue' do
-        SubjectQueue.enqueue_subject_for_user(user: user,
-                                                  workflow: workflow,
-                                                  subject: subject)
-        expect(ues.reload.set_member_subject_ids).to include(subject.id)
+      context "list exists for user" do
+        let!(:ues) { create(:subject_queue, user: user, workflow: workflow) }
+        it 'should call add_subject_id on the existing subject queue' do
+          SubjectQueue.enqueue(workflow,
+                               subject,
+                               user: user)
+          expect(ues.reload.set_member_subject_ids).to include(subject.id)
+        end
       end
     end
   end
 
-  describe "::dequeue_subjects_for_user" do
-    let(:user) { create(:user) }
+  describe "::dequeue" do
     let(:workflow) { create(:workflow) }
-    let(:subjects) { create_list(:subject, 2) }
-    
-    it 'should remove the subject given a user and workflow' do
-      ues = create(:subject_queue,
-                   user: user,
-                   workflow: workflow,
-                   set_member_subject_ids: subjects.map(&:id))
-      SubjectQueue.dequeue_subjects_for_user(user: user,
-                                                 workflow: workflow,
-                                                 subject_ids: [subjects.first.id])
-      expect(ues.reload.set_member_subject_ids).to_not include(subjects.first.id)
-    end
+    let(:subjects) { create_list(:set_member_subject, 2) }
 
-    it 'should destroy the model if there are no more set_member_subject_ids' do
-      ues = create(:subject_queue,
-                   user: user,
-                   workflow: workflow,
-                   set_member_subject_ids: [subjects.first.id])
-      SubjectQueue.dequeue_subjects_for_user(user: user,
-                                                 workflow: workflow,
-                                                 subject_ids: [subjects.first.id])
-      expect(SubjectQueue.exists?(ues)).to be_falsy
+    context "with a user" do
+      let(:user) { create(:user) }
+      it 'should remove the subject given a user and workflow' do
+        ues = create(:subject_queue,
+                     user: user,
+                     workflow: workflow,
+                     set_member_subject_ids: subjects.map(&:id))
+        SubjectQueue.dequeue(workflow,
+                             [subjects.first.id],
+                             user: user)
+        expect(ues.reload.set_member_subject_ids).to_not include(subjects.first.id)
+      end
+
+      it 'should destroy the model if there are no more set_member_subject_ids' do
+        ues = create(:subject_queue,
+                     user: user,
+                     workflow: workflow,
+                     set_member_subject_ids: [subjects.first.id])
+        SubjectQueue.dequeue(workflow,
+                             [subjects.first.id],
+                             user: user)
+        expect(SubjectQueue.exists?(ues)).to be_falsy
+      end
     end
   end
 

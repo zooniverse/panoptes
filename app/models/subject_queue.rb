@@ -12,6 +12,10 @@ class SubjectQueue < ActiveRecord::Base
   delegate :add_set_member_subjects, to: :subjects
   delegate :remove_set_member_subjects, to: :subjects
 
+  def self.scoped_to_set(set)
+    set ? where(subject_set_id: set) : all
+  end
+
   def self.scope_for(action, groups, opts={})
     case action
     when :show, :index
@@ -21,23 +25,31 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
-  def self.enqueue_subject_for_user(user: nil, workflow: nil, subject: nil)
-    ues = find_or_create_by!(user: user, workflow: workflow)
-    ues.add_set_member_subjects(subject)
-  end
-  
-  def self.enqueue_subjects(workflow, subject_ids, user: nil, set: nil)
-    ues = find_or_create_by!(user: user, workflow: workflow, subject_set_id: set)
-    ues.add_set_member_subjects(subject_ids)
+  def self.enqueue(workflow, subject_ids, user: nil, set: nil)
+    ues = scoped_to_set(set).find_or_create_by!(user: user, workflow: workflow)
+    ues.add_set_member_subjects(Array.wrap(subject_ids))
   end
 
-  def self.dequeue_subjects_for_user(user: nil, workflow: nil, subject_ids: nil)
-    ues = find_by!(user: user, workflow: workflow)
+  def self.dequeue(workflow, subject_ids, user: nil, set: nil)
+    ues = scoped_to_set(set).find_by!(user: user, workflow: workflow)
     ues.remove_set_member_subjects(subject_ids)
     ues.destroy if ues.set_member_subject_ids.empty?
   end
 
-  def self.are_subjects_queued?(user: nil, workflow: nil, subject_ids: nil)
+  def self.enqueue_for_all(workflow, subject_ids)
+    subject_ids = Array.wrap(subject_ids)
+    raise ArgumentError, "must be an integer" if subject_ids.index{ |sub| !sub.is_a?(Fixnum) }
+    where(workflow: workflow)
+      .update_all("set_member_subject_ids = array_cat(set_member_subject_ids, ARRAY[#{subject_ids.join(",")}])")
+  end
+
+  def self.dequeue_for_all(workflow, subject_id)
+    where(workflow: workflow)
+      .update_all(["set_member_subject_ids = array_remove(set_member_subject_ids, ?)",
+                  subject_id])
+  end
+
+  def self.subjects_queued?(workflow, subject_ids, user: nil)
     where.overlap(set_member_subject_ids: subject_ids)
       .exists?(user: user, workflow: workflow)
   end
