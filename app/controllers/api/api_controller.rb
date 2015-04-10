@@ -18,7 +18,6 @@ module Api
     rescue_from JsonApiController::PreconditionNotPresent, with: :precondition_required
     rescue_from JsonApiController::PreconditionFailed,   with: :precondition_failed
     rescue_from ActiveRecord::StaleObjectError,          with: :conflict
-    rescue_from CellectClient::ConnectionError,          with: :service_unavailable
     rescue_from Api::PatchResourceError,
                 Api::UserSeenSubjectIdError,
                 ActionController::UnpermittedParameters,
@@ -66,10 +65,6 @@ module Api
                            .new(request.env['HTTP_ACCEPT_LANGUAGE'])
 
       language_extractor.parse_languages
-    end
-
-    def cellect_session
-      session[:cellect_hosts] ||= {}
     end
 
     def request_ip

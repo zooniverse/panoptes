@@ -10,8 +10,6 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def index
     case params[:sort]
-    when 'cellect'
-      render json_api: SubjectSerializer.page(params, *selector.cellect_subjects)
     when 'queued'
       render json_api: SubjectSerializer.page(params, *selector.queued_subjects)
     else
@@ -54,8 +52,7 @@ class Api::V1::SubjectsController < Api::ApiController
     @selector ||= SubjectSelector.new(api_user,
                                       workflow,
                                       params,
-                                      controlled_resources,
-                                      cellect_session)
+                                      controlled_resources)
   end
 
   def add_subject_path(locations, project_id)

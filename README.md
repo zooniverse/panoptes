@@ -26,7 +26,6 @@ You'll need to have the following services running:
 
 * [Postgresql](http://postgresql.org) version > 9.4
 * [Zookeeper](http://zookeeper.apache.org) version > 3.4.6
-* [Cellect Server](https://github.com/zooniverse/Cellect) version > 0.1.0
 * [Redis](http://redis.io) version > 2.8.19
 
 Optionally you can run

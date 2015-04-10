@@ -9,14 +9,7 @@ class RetirementWorker
       ActiveRecord::Base.transaction(requires_new: true) do
         SetMemberSubject.update(sms.id, state: SetMemberSubject.states[:retired])
         SubjectSet.increment_counter(:retired_set_member_subjects_count, sms.subject_set.id)
-      end
-
-      sms.reload
-
-      if sms.retired?
-        CellectClient.remove_subject(sms.subject_id,
-                                     workflow_id,
-                                     sms.subject_set_id)
+        SubjectQueue.dequeue_for_all(Workflow.find(workflow_id), sms)
       end
     end
   end

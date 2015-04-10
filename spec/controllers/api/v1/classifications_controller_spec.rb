@@ -18,7 +18,6 @@ def annotation_values
 end
 
 def setup_create_request(project_id, workflow_id, subject_id)
-  request.session = { cellect_hosts: { workflow_id.to_s => "example.com" } }
   params =
     {
       classifications: {

@@ -27,15 +27,10 @@ shared_context "a classification lifecycle event" do
   let(:lifecycle ) { double }
 
   before(:each) do
-    [ :update_cellect, :queue ].each do |stub|
+    [ :queue ].each do |stub|
       allow(lifecycle).to receive(stub)
     end
     allow(ClassificationLifecycle).to receive(:new).and_return(lifecycle)
-  end
-
-  it "should call the classification lifecycle update_cellect method" do
-    expect(lifecycle).to receive(:update_cellect)
-    create_action
   end
 
   it "should call the classification lifecycle queue method" do

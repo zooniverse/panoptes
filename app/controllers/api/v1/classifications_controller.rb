@@ -53,7 +53,6 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def lifecycle(action, classification)
     lifecycle = ClassificationLifecycle.new(classification)
-    lifecycle.update_cellect(cellect_session)
     lifecycle.queue(action)
   end
 

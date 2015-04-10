@@ -9,12 +9,6 @@ zookeeper:
   image: zooniverse/zookeeper
   command: /usr/share/zookeeper/bin/zkServer.sh start-foreground -c localhost:2888:3888 -i 1
 
-cellect:
-  image: zooniverse/cellect-panoptes
-  links:
-    - postgres:pg
-    - zookeeper:zk
-
 redis:
   image: redis
   command: redis-server --appendonly yes
@@ -36,6 +30,5 @@ panoptes:
   links:
     - postgres
     - zookeeper
-    - cellect
     - kafka
     - redis

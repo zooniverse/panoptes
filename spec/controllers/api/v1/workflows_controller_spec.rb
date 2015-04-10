@@ -191,35 +191,6 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:resource) { workflows.first }
 
     it_behaves_like "is showable"
-
-    context "with a logged in user" do
-      before(:each) do
-        default_request user_id: user.id, scopes: scopes
-        get :show, id: workflows.first.id
-      end
-
-      it "should set the cellect host for the user and workflow" do
-        user.reload
-        expect(session[:cellect_hosts]).to include( workflows.first.id.to_s )
-        expect(session[:cellect_hosts][workflows.first.id.to_s]).to eq("example.com")
-      end
-
-      it "should set a load user command to cellect" do
-        expect(stubbed_cellect_connection).to receive(:load_user)
-                                               .with(user_id: user.id,
-                                                     host: 'example.com',
-                                                     workflow_id: workflows.first.id.to_s)
-        get :show, id: workflows.first.id
-      end
-    end
-
-    context "without a logged in user" do
-      it "should not send a load user command to cellect" do
-        expect(stubbed_cellect_connection).to_not receive(:load_user)
-        default_request scopes: %w(public project)
-        get :show, id: workflows.first.id
-      end
-    end
   end
 
   describe "versioning" do
@@ -230,42 +201,5 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:resource_param) { :workflow_id }
 
     it_behaves_like "a versioned resource"
-  end
-
-  describe "#reload_cellect" do
-    context "with authorized user" do
-      before(:each) do
-        default_request scopes: scopes, user_id: authorized_user.id
-      end
-
-      it 'should return 204' do
-        post :reload_cellect, workflow_id: workflow.id
-        expect(response).to have_http_status(:no_content)
-      end
-
-      it 'should queue the worker' do
-        expect(WorkflowReloadWorker).to receive(:perform_async)
-                                         .with(workflow.id.to_s)
-        post :reload_cellect, workflow_id: workflow.id
-      end
-    end
-
-    context "with unauthorized user" do
-      let(:user) { create(:user) }
-      before(:each) do
-        default_request scopes: scopes, user_id: user.id
-      end
-      
-      it 'should return 404' do
-        post :reload_cellect, workflow_id: workflow.id
-        expect(response).to have_http_status(:not_found)
-      end
-
-      it 'should not queue the worker' do
-        expect(WorkflowReloadWorker).to_not receive(:perform_async)
-                                             .with(workflow.id)
-        post :reload_cellect, workflow_id: workflow.id
-      end
-    end
   end
 end

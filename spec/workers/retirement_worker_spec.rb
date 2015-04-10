@@ -5,10 +5,6 @@ RSpec.describe RetirementWorker do
   let(:sms) { create(:set_member_subject) }
   let(:workflow_id) { sms.subject_set.workflow_id }
 
-  before(:each) do
-    stub_cellect_connection
-  end
-  
   describe "#perform" do
     context "sms is retireable" do
       before(:each) do
@@ -25,14 +21,6 @@ RSpec.describe RetirementWorker do
         expect{ worker.perform(sms.id, workflow_id) }.to change{
           SubjectSet.find(sms.subject_set_id).retired_set_member_subjects_count
         }.from(0).to(1)
-      end
-
-      it 'should call cellect remote subject' do
-        expect(stubbed_cellect_connection).to receive(:remove_subject)
-                                               .with(sms.subject_id,
-                                                     workflow_id: workflow_id,
-                                                     group_id: sms.subject_set_id)
-        worker.perform(sms.id, workflow_id)
       end
     end
 
