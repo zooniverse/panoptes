@@ -21,7 +21,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe "#index" do
     context "logged out user" do
-     context "without any sort" do
+      context "without any sort" do
         before(:each) do
           get :index
         end
@@ -35,6 +35,47 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         it_behaves_like "an api response"
+      end
+
+      context "a queued request" do
+        let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
+        let!(:queue) do
+          create(:subject_queue,
+                 user: nil,
+                 workflow: workflow,
+                 set_member_subject_ids: subjects.map(&:id))
+        end
+
+        context "with queued subjects" do
+          before(:each) do
+            get :index, request_params
+          end
+
+          it "should return 200" do
+            expect(response.status).to eq(200)
+          end
+
+          it 'should return a page of 2 objects' do
+            expect(json_response[api_resource_name].length).to eq(2)
+          end
+
+          it_behaves_like "an api response"
+
+          context 'when the queue is below minimum' do
+            it 'should reload the queue' do
+              expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, user: nil)
+              get :index, request_params
+            end
+          end
+
+          context 'when the queue is not below minimum)' do
+            let(:subjects) { create_list(:set_member_subject, 21) }
+            it 'should reload the queue' do
+              expect(SubjectQueueWorker).to_not receive(:perform_async)
+              get :index, request_params
+            end
+          end
+        end
       end
     end
     
@@ -79,13 +120,16 @@ describe Api::V1::SubjectsController, type: :controller do
 
       context "a queued request" do
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
-
         context "with queued subjects" do
-          before(:each) do
+          let!(:queue) do
             create(:subject_queue,
                    user: user,
                    workflow: workflow,
                    set_member_subject_ids: subjects.map(&:id))
+          end
+
+
+          before(:each) do
             get :index, request_params
           end
 
@@ -98,6 +142,21 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           it_behaves_like "an api response"
+
+          context 'when the queue is below minimum' do
+            it 'should reload the queue' do
+              expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, user: user.id)
+              get :index, request_params
+            end
+          end
+
+          context 'when the queue is not below minimum)' do
+            let(:subjects) { create_list(:set_member_subject, 21) }
+            it 'should reload the queue' do
+              expect(SubjectQueueWorker).to_not receive(:perform_async)
+              get :index, request_params
+            end
+          end
         end
 
         context "without a workflow id" do

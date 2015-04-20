@@ -4,6 +4,7 @@ RSpec.describe RetirementWorker do
   let(:worker) { described_class.new }
   let(:sms) { create(:set_member_subject) }
   let(:workflow_id) { sms.subject_set.workflow_id }
+  let!(:queue) { create(:subject_queue, workflow_id: workflow_id, set_member_subject_ids: [sms.id]) } 
 
   describe "#perform" do
     context "sms is retireable" do
@@ -21,6 +22,12 @@ RSpec.describe RetirementWorker do
         expect{ worker.perform(sms.id, workflow_id) }.to change{
           SubjectSet.find(sms.subject_set_id).retired_set_member_subjects_count
         }.from(0).to(1)
+      end
+
+      it "should dequeue all instances of the subject" do
+        worker.perform(sms.id, workflow_id)
+        queue.reload
+        expect(queue.set_member_subject_ids).to_not include(sms.id)
       end
     end
 

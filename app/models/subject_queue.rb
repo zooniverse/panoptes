@@ -1,6 +1,9 @@
 class SubjectQueue < ActiveRecord::Base
   include RoleControl::ParentalControlled
-
+  
+  DEFAULT_LENGTH = 100
+  MINIMUM_LENGTH = 20
+  
   belongs_to :user
   belongs_to :workflow
   belongs_to :subject_set
@@ -52,6 +55,10 @@ class SubjectQueue < ActiveRecord::Base
   def self.subjects_queued?(workflow, subject_ids, user: nil)
     where.overlap(set_member_subject_ids: subject_ids)
       .exists?(user: user, workflow: workflow)
+  end
+
+  def below_minimum?
+    set_member_subject_ids.length < MINIMUM_LENGTH
   end
 
   def next_subjects(limit=10)

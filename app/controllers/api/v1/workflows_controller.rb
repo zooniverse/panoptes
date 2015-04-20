@@ -52,5 +52,4 @@ class Api::V1::WorkflowsController < Api::ApiController
     task_string_extractor.visit(tasks)
     [tasks, task_string_extractor.collector]
   end
-
 end

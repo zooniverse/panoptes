@@ -1,11 +1,9 @@
 class SubjectQueueWorker
   include Sidekiq::Worker
 
-  DEFAULT_LENGTH = 100
-
   attr_reader :workflow, :user, :limit
 
-  def perform(workflow, user: nil, limit: DEFAULT_LENGTH)
+  def perform(workflow, user: nil, limit: SubjectQueue::DEFAULT_LENGTH)
     @workflow = Workflow.find(workflow)
     @user = User.find(user) if user
     @limit = limit

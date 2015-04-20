@@ -182,4 +182,24 @@ RSpec.describe SubjectQueue, :type => :model do
       expect(ues.set_member_subject_ids).to_not include(subject.id)
     end
   end
+
+  describe "#below_minimum?" do
+    let(:queue) { build(:subject_queue, set_member_subject_ids: subject_ids) }
+    
+    context "when less than 20 items" do
+      let(:subject_ids) { create_list(:set_member_subject, 2).map(&:id) }
+      
+      it 'should return true' do
+        expect(queue.below_minimum?).to be true 
+      end
+    end
+
+    context "when more than 20 items" do
+      let(:subject_ids) { create_list(:set_member_subject, 21).map(&:id) }
+      
+      it 'should return false' do
+        expect(queue.below_minimum?).to be false
+      end
+    end
+  end
 end

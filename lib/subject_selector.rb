@@ -10,11 +10,12 @@ class SubjectSelector
   def queued_subjects
     raise workflow_id_error unless workflow
     raise group_id_error if needs_set_id? 
-    user_enqueued = SubjectQueue
-                    .scoped_to_set(params[:subject_set_id])
-                    .find_by!(user: user.user,
-                              workflow_id: params[:workflow_id])
-    selected_subjects(user_enqueued.next_subjects(default_page_size))
+    queue = SubjectQueue.scoped_to_set(params[:subject_set_id])
+            .find_by!(user: user.user, workflow: workflow)
+
+    SubjectQueueWorker.perform_async(workflow.id, user: user.id) if queue.below_minimum?
+    
+    selected_subjects(queue.next_subjects(default_page_size))
   end
   
   def selected_subjects(subject_ids, selector_context={})

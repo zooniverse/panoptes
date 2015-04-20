@@ -10,7 +10,7 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def index
     case params[:sort]
-    when 'queued'
+    when 'queued', 'cellect' #temporary to not break compatibility with front-end
       render json_api: SubjectSerializer.page(params, *selector.queued_subjects)
     else
       super

@@ -191,6 +191,21 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:resource) { workflows.first }
 
     it_behaves_like "is showable"
+
+    context "with a logged in user" do
+      it "should load a user's subject queue" do
+        expect(SubjectQueueWorker).to receive(:perform_async).with(resource.id.to_s, user: authorized_user.id)
+        default_request scopes: scopes, user_id: authorized_user.id
+        get :show, id: resource.id
+      end
+    end
+
+    context "with a logged out user" do
+      it "should load the general subject queue" do
+        expect(SubjectQueueWorker).to receive(:perform_async).with(resource.id.to_s, user: nil)
+        get :show, id: resource.id
+      end
+    end
   end
 
   describe "versioning" do
