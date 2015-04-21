@@ -1,6 +1,6 @@
 class PostgresqlSelection
   attr_reader :workflow, :user, :opts
-  
+
   def initialize(workflow, user=nil)
     @workflow, @user = workflow, user
   end
@@ -8,28 +8,28 @@ class PostgresqlSelection
   def select(options={})
     @opts = options
     limit = opts.fetch(:limit, 20).to_i
-    
+
     results = []
     enough_available = false
     first_pass = true
     until results.length >= limit do
       if !enough_available && !first_pass
-        if limit < available_count 
+        if limit < available_count
           enough_available = true
         else
           results = available.all.shuffle
-          break 
+          break
         end
       end
-      
-      results = results | selection_statement.limit(limit - results.length).map(&:subject_id)
+
+      results = results | selection_statement.limit(limit - results.length).map(&:id)
       first_pass = false
     end
     return results.take(limit)
   end
 
   private
-  
+
   def selection_statement
     @selection ||= case
                    when workflow.grouped && workflow.prioritized
@@ -42,7 +42,7 @@ class PostgresqlSelection
                      random
                    end
   end
-  
+
   def available
     return @available if @available
     query = SetMemberSubject.available(workflow, user)
@@ -59,14 +59,14 @@ class PostgresqlSelection
   end
 
   def grouped(group_id=nil)
-    SetMemberSubject.with.recursive(sample: sample)
-      .select('"sample"."subject_id"')
+    SetMemberSubject.with.recursive(sample: sample(available.where(subject_set_id: group_id)))
+      .select('"sample"."id"')
       .from("sample")
   end
 
   def random
     SetMemberSubject.with.recursive(sample: sample)
-      .select('"sample"."subject_id"')
+      .select('"sample"."id"')
       .from("sample")
   end
 
@@ -77,9 +77,9 @@ class PostgresqlSelection
   def prioritized_grouped(limit, group_id=nil)
     raise NotImplementedError
   end
-  
-  def sample
-    sampler = available.where('"set_member_subjects"."random" BETWEEN random() AND random()')
+
+  def sample(query=available)
+    sampler = query.where('"set_member_subjects"."random" BETWEEN random() AND random()')
     "#{sampler.to_sql} UNION #{sampler.to_sql}"
   end
 end

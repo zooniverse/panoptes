@@ -38,6 +38,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "a queued request" do
+        let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
         let!(:queue) do
           create(:subject_queue,
@@ -78,7 +79,7 @@ describe Api::V1::SubjectsController, type: :controller do
         end
       end
     end
-    
+
     context "logged in user" do
       before(:each) do
         default_request user_id: user.id, scopes: scopes
@@ -119,6 +120,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "a queued request" do
+        let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
         context "with queued subjects" do
           let!(:queue) do
