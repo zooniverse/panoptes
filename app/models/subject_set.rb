@@ -1,10 +1,10 @@
 class SubjectSet < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include Linkable
-  
+
   belongs_to :project
-  belongs_to :workflow
-  
+  has_and_belongs_to_many :workflows
+
   has_many :set_member_subjects
   has_many :subjects, through: :set_member_subjects
 
@@ -26,7 +26,7 @@ class SubjectSet < ActiveRecord::Base
 
   can_through_parent :project, :update, :show, :destroy, :index, :update_links,
                      :destroy_links
-  
+
   can_be_linked :workflow, :same_project?, :model
   can_be_linked :set_member_subject, :scope_for, :update, :user
 

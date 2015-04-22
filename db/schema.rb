@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150409130306) do
+ActiveRecord::Schema.define(version: 20150421191603) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -184,15 +184,14 @@ ActiveRecord::Schema.define(version: 20150409130306) do
   end
 
   create_table "set_member_subjects", force: :cascade do |t|
-    t.integer  "state",                default: 0, null: false
     t.integer  "subject_set_id"
     t.integer  "subject_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.decimal  "priority"
     t.integer  "lock_version",         default: 0
-    t.integer  "classification_count", default: 0
     t.decimal  "random",                           null: false
+    t.integer  "retired_workflow_ids",                          array: true
   end
 
   add_index "set_member_subjects", ["random"], name: "index_set_member_subjects_on_random", using: :btree
@@ -218,7 +217,6 @@ ActiveRecord::Schema.define(version: 20150409130306) do
     t.datetime "updated_at"
     t.integer  "set_member_subjects_count",         default: 0,  null: false
     t.jsonb    "metadata",                          default: {}
-    t.integer  "workflow_id"
     t.integer  "lock_version",                      default: 0
     t.boolean  "expert_set"
     t.jsonb    "retirement",                        default: {}
@@ -226,7 +224,14 @@ ActiveRecord::Schema.define(version: 20150409130306) do
   end
 
   add_index "subject_sets", ["project_id", "display_name"], name: "index_subject_sets_on_project_id_and_display_name", using: :btree
-  add_index "subject_sets", ["workflow_id"], name: "index_subject_sets_on_workflow_id", using: :btree
+
+  create_table "subject_sets_workflows", force: :cascade do |t|
+    t.integer "workflow_id"
+    t.integer "subject_set_id"
+  end
+
+  add_index "subject_sets_workflows", ["subject_set_id"], name: "index_subject_sets_workflows_on_subject_set_id", using: :btree
+  add_index "subject_sets_workflows", ["workflow_id"], name: "index_subject_sets_workflows_on_workflow_id", using: :btree
 
   create_table "subjects", force: :cascade do |t|
     t.string   "zooniverse_id"
@@ -367,4 +372,6 @@ ActiveRecord::Schema.define(version: 20150409130306) do
   add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree
   add_index "workflows", ["tutorial_subject_id"], name: "index_workflows_on_tutorial_subject_id", using: :btree
 
+  add_foreign_key "subject_sets_workflows", "subject_sets"
+  add_foreign_key "subject_sets_workflows", "workflows"
 end
