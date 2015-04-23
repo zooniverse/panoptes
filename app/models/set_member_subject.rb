@@ -1,9 +1,11 @@
 class SetMemberSubject < ActiveRecord::Base
   include RoleControl::ParentalControlled
+  include BelongsToMany
   include Linkable
-  
+
   belongs_to :subject_set, counter_cache: true, touch: true
   belongs_to :subject
+  belongs_to_many :retired_workflows, class_name: "Workflow"
 
   enum state: [:active, :inactive, :retired]
 
@@ -43,7 +45,7 @@ class SetMemberSubject < ActiveRecord::Base
         .where.not('"set_member_subjects"."subject_id" = ANY("user_seen_subjects"."subject_ids")')
     end
   end
-  
+
   def retire?
     subject_set.retire_member?(self)
   end
