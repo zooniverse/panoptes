@@ -14,7 +14,9 @@ Rails.application.routes.draw do
                 applications: 'applications'
   end
 
-  devise_for :users, controllers: { omniauth_callbacks: 'omniauth_callbacks', passwords: 'passwords' }, skip: [ :sessions, :registrations ]
+  devise_for :users,
+    controllers: { omniauth_callbacks: 'omniauth_callbacks', passwords: 'passwords' },
+    skip: [ :sessions, :registrations ]
 
   as :user do
     get "/users/sign_in" => "sessions#new", as: :new_user_session
@@ -31,14 +33,14 @@ Rails.application.routes.draw do
       json_api_resources :aggregations
 
       json_api_resources :collection_roles
-      
+
       json_api_resources :collection_preferences
-      
+
       json_api_resources :workflow_contents, versioned: true
 
       json_api_resources :project_contents, versioned: true
 
-      json_api_resources :set_member_subjects
+      json_api_resources :set_member_subjects, links: [:retired_workflows]
 
       json_api_resources :project_roles
 

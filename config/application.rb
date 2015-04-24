@@ -13,7 +13,8 @@ module Panoptes
   class Application < Rails::Application
     config.autoload_paths += %W(#{config.root}/lib)
     config.autoload_paths += Dir[Rails.root.join('app', 'models', '**/')]
-   
+    config.autoload_paths += Dir[Rails.root.join('app', 'serializers', '**/')]
+
     config.middleware.insert_before ActionDispatch::ParamsParser, "RejectPatchRequests"
     config.action_controller.action_on_unpermitted_parameters = :raise
     config.middleware.insert_before ActionDispatch::ParamsParser, "CatchApiJsonParseErrors"
