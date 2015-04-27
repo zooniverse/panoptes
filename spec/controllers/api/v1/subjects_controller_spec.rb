@@ -64,7 +64,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
           context 'when the queue is below minimum' do
             it 'should reload the queue' do
-              expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, user: nil)
+              expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil)
               get :index, request_params
             end
           end
@@ -147,7 +147,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
           context 'when the queue is below minimum' do
             it 'should reload the queue' do
-              expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, user: user.id)
+              expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, user.id)
               get :index, request_params
             end
           end

@@ -21,9 +21,9 @@ class Api::V1::WorkflowsController < Api::ApiController
       {}
     end
   end
-  
+
   def load_queue
-    SubjectQueueWorker.perform_async(params[:id], user: api_user.id) 
+    SubjectQueueWorker.perform_async(params[:id], api_user.id)
   end
 
   def build_update_hash(update_params, id)

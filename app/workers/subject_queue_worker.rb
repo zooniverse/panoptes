@@ -3,7 +3,7 @@ class SubjectQueueWorker
 
   attr_reader :workflow, :user, :limit
 
-  def perform(workflow, user: nil, limit: SubjectQueue::DEFAULT_LENGTH)
+  def perform(workflow, user=nil, limit=SubjectQueue::DEFAULT_LENGTH)
     @workflow = Workflow.find(workflow)
     @user = User.find(user) if user
     @limit = limit
