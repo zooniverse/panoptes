@@ -127,7 +127,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:membership) { create(:membership, state: 0, roles: ["project_editor"]) }
       let(:project) { create(:project, owner: membership.user_group) }
       let(:authorized_user) { membership.user }
-      
+
       it_behaves_like "is creatable"
     end
 
@@ -143,16 +143,16 @@ describe Api::V1::WorkflowsController, type: :controller do
     context "creates an expert subject set" do
       let(:subject_set_id) { json_response["workflows"][0]["links"]["expert_subject_set"] }
       let(:instance) { SubjectSet.find(subject_set_id) }
-      
+
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
         post :create, create_params
       end
-      
+
       it 'should have a link to the created set' do
         expect(subject_set_id).to_not be_nil
       end
-      
+
       it 'should have expert_set flag set to true' do
         expect(instance.expert_set).to be_truthy
       end
@@ -164,13 +164,13 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     context "includes a tutorial subject" do
       let(:tut_sub) { create(:subject, project: project).id.to_s }
-      
+
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
         create_params[:workflows][:links][:tutorial_subject] = tut_sub
         post :create, create_params
       end
-      
+
       it 'responds with tutorial subject link' do
         expect(json_response['workflows'][0]['links']['tutorial_subject']).to eq(tut_sub)
       end
@@ -194,7 +194,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     context "with a logged in user" do
       it "should load a user's subject queue" do
-        expect(SubjectQueueWorker).to receive(:perform_async).with(resource.id.to_s, user: authorized_user.id)
+        expect(SubjectQueueWorker).to receive(:perform_async).with(resource.id.to_s, authorized_user.id)
         default_request scopes: scopes, user_id: authorized_user.id
         get :show, id: resource.id
       end
@@ -202,7 +202,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     context "with a logged out user" do
       it "should load the general subject queue" do
-        expect(SubjectQueueWorker).to receive(:perform_async).with(resource.id.to_s, user: nil)
+        expect(SubjectQueueWorker).to receive(:perform_async).with(resource.id.to_s, nil)
         get :show, id: resource.id
       end
     end
