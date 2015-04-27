@@ -9,7 +9,8 @@ module Api
                                   'application/vnd.api+json']
     API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
 
-    rescue_from ActiveRecord::RecordNotFound,            with: :not_found
+    rescue_from ActiveRecord::RecordNotFound,
+                SubjectSelector::MissingSubjectQueue,     with: :not_found
     rescue_from ActiveRecord::RecordInvalid,             with: :invalid_record
     rescue_from Api::NotLoggedIn,                        with: :not_authenticated
     rescue_from Api::UnauthorizedTokenError,             with: :not_authenticated

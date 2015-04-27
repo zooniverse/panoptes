@@ -48,19 +48,22 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         context "with queued subjects" do
-          before(:each) do
-            get :index, request_params
-          end
 
-          it "should return 200" do
-            expect(response.status).to eq(200)
-          end
+          context "when firing the request before the test" do
+            before(:each) do
+              get :index, request_params
+            end
 
-          it 'should return a page of 2 objects' do
-            expect(json_response[api_resource_name].length).to eq(2)
-          end
+            it "should return 200" do
+              expect(response.status).to eq(200)
+            end
 
-          it_behaves_like "an api response"
+            it 'should return a page of 2 objects' do
+              expect(json_response[api_resource_name].length).to eq(2)
+            end
+
+            it_behaves_like "an api response"
+          end
 
           context 'when the queue is below minimum' do
             it 'should reload the queue' do
@@ -175,13 +178,22 @@ describe Api::V1::SubjectsController, type: :controller do
           end
         end
 
-        context "without queued subejcts" do
-          before(:each) do
+        context "without queued subjects" do
+
+          it 'should create the queue' do
+            expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, user.id)
             get :index, request_params
           end
 
           it 'should return 404' do
+            get :index, request_params
             expect(response.status).to eq(404)
+          end
+
+          it 'should have a useful error message' do
+            get :index, request_params
+            message = "No queue defined for user. Building one now, please try again."
+            expect(response.body).to eq(json_error_message(message))
           end
         end
       end
