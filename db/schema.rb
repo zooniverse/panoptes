@@ -190,8 +190,8 @@ ActiveRecord::Schema.define(version: 20150421191603) do
     t.datetime "updated_at"
     t.decimal  "priority"
     t.integer  "lock_version",         default: 0
-    t.decimal  "random",                           null: false
-    t.integer  "retired_workflow_ids",                          array: true
+    t.decimal  "random",                            null: false
+    t.integer  "retired_workflow_ids", default: [],              array: true
   end
 
   add_index "set_member_subjects", ["random"], name: "index_set_member_subjects_on_random", using: :btree

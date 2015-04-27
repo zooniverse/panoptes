@@ -1,6 +1,6 @@
 class AddWorkflowStateToSetMemberSubjects < ActiveRecord::Migration
   def change
-    add_column :set_member_subjects, :retired_workflow_ids, :integer, array: true, index: :gin
+    add_column :set_member_subjects, :retired_workflow_ids, :integer, array: true, index: :gin, default: []
     SetMemberSubject.retired.find_each do |sms|
       sms.update(retired_workflows: sms.subject_set.workflows)
     end

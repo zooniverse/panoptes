@@ -39,25 +39,78 @@ describe SetMemberSubject, :type => :model do
   describe "::by_subject_workflow" do
     it "should retrieve and object by subject and workflow id" do
       set_member_subject.save!
+      workflow = create(:workflow, subject_sets: [set_member_subject.subject_set])
       sid = set_member_subject.subject_id
-      wid = set_member_subject.subject_set.workflow_id
+      wid = workflow.id
       expect(SetMemberSubject.by_subject_workflow(sid, wid)).to include(set_member_subject)
     end
   end
 
   describe "::available" do
+    let(:workflow) { create(:workflow) }
+    let(:subject_set) { create(:subject_set, workflows: [workflow]) }
+    let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+    let!(:uss) do
+      create(:user_seen_subject, workflow: workflow, subject_ids: [sms.first.subject_id])
+    end
+    let(:user) { uss.user }
+
+    subject { SetMemberSubject.available(workflow, user).pluck(:subject_id) }
+
     context "when the workflow is finished" do
+      let!(:sms) do
+        create_list(:set_member_subject, 2, subject_set: subject_set, retired_workflows: [workflow])
+      end
+
+      it 'should select retired subjects' do
+        expect(subject).to include(sms.first.subject_id)
+      end
     end
 
     context "when the user is finished with the workflow" do
+      let!(:uss) do
+        create(:user_seen_subject, workflow: workflow, subject_ids: sms.map(&:subject_id))
+      end
+
+
+      it 'should select subjects a user has seen' do
+        expect(subject).to include(sms.first.subject_id)
+      end
+    end
+
+    context "when no uss exsits" do
+      let!(:uss) { nil }
+      let(:user) { create(:user) }
+
+      it 'should return an active subject' do
+        expect(subject).to include(*sms.map(&:subject_id))
+      end
     end
 
     context "when workflow is unfinished" do
-      
+      let!(:retired_sms) do
+        create(:set_member_subject, subject_set: subject_set, retired_workflows: [workflow])
+      end
+
+      it 'should select active subjects' do
+        expect(subject).to include(sms[1].subject_id)
+      end
+
+      it 'should not select retired subjects' do
+        expect(subject).to_not include(retired_sms.subject_id)
+      end
+
+      it 'should select subjects a user has not seen' do
+        expect(subject).to include(sms[1].subject_id)
+      end
+
+      it 'should not select subjects a user has seen' do
+        expect(subject).to_not include(sms[0].subject_id)
+      end
     end
   end
 
-  describe "#retired_workflows", :focus do
+  describe "#retired_workflows" do
     let(:subject_set) { create(:subject_set) }
     let(:workflows) { create_list(:workflow, 2, subject_sets: [subject_set])}
 

@@ -4,7 +4,7 @@ class WorkflowSerializer
              :created_at, :updated_at, :first_task, :primary_language,
              :version, :content_language, :prioritized, :grouped, :pairwise
 
-  can_include :project, :subject_sets, :tutorial_subject, :expert_subject_set
+  can_include :project, :subject_sets, :tutorial_subject, :expert_subject_sets
 
   DEFAULT_WORKFLOW_VERSION_NUM = 1
 
