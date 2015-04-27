@@ -15,7 +15,7 @@ RSpec.describe RetirementWorker do
 
       it 'should retire the subject for the workflow' do
         worker.perform(count)
-        count.reload
+        sms.reload
         expect(sms.retired_workflows).to include(workflow)
       end
 
@@ -36,7 +36,7 @@ RSpec.describe RetirementWorker do
       it 'should not retire subject for the workflow' do
         allow_any_instance_of(SubjectWorkflowCount).to receive(:retire?).and_return(false)
         worker.perform(count)
-        count.reload
+        sms.reload
         expect(sms.retired_workflows).to_not include(workflow)
       end
     end

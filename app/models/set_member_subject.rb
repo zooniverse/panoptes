@@ -18,8 +18,8 @@ class SetMemberSubject < ActiveRecord::Base
   can_be_linked :subject_queue, :in_workflow, :model
 
   def self.in_workflow(queue)
-    query = joins(:subject_set)
-      .where(subject_sets: { workflow_id: queue.workflow.id })
+    query = joins(subject_set: :workflows)
+      .where(workflows: { id: queue.workflow.id })
     query = query.where(subject_set_id: queue.subject_set.id) if queue.subject_set
     query
   end
@@ -30,7 +30,7 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def self.available(workflow, user)
-    fields = '"set_member_subjects"."subject_id", "set_member_subjects"."random"'
+    fields = '"set_member_subjects"."id", "set_member_subjects"."random"'
     if select_from_all?(workflow, user)
       workflow.set_member_subjects.select(fields)
     else

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150427181152) do
+ActiveRecord::Schema.define(version: 20150427204917) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -195,6 +195,7 @@ ActiveRecord::Schema.define(version: 20150427181152) do
   end
 
   add_index "set_member_subjects", ["random"], name: "index_set_member_subjects_on_random", using: :btree
+  add_index "set_member_subjects", ["retired_workflow_ids"], name: "index_set_member_subjects_on_retired_workflow_ids", using: :gin
   add_index "set_member_subjects", ["subject_id"], name: "index_set_member_subjects_on_subject_id", using: :btree
   add_index "set_member_subjects", ["subject_set_id"], name: "index_set_member_subjects_on_subject_set_id", using: :btree
 

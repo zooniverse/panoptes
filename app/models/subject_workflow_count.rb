@@ -12,7 +12,7 @@ class SubjectWorkflowCount < ActiveRecord::Base
     ActiveRecord::Base.transaction(requires_new: true) do
       set_member_subject.retire_workflow(workflow)
       Workflow.increment_counter(:retired_set_member_subjects_count, workflow.id)
-      yeild if block_given?
+      yield if block_given?
     end
   end
 end
