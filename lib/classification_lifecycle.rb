@@ -31,16 +31,9 @@ class ClassificationLifecycle
     end
   end
 
-  def update_cellect(session)
-    return unless should_update_seen?
-    subject_ids.each do |id|
-      CellectClient.add_seen(session, workflow.id, user.try(:id), id)
-    end
-  end
-
   def dequeue_subject
     return unless should_dequeue_subject?
-    UserSubjectQueue.dequeue_subjects_for_user(**user_workflow_subject)
+    SubjectQueue.dequeue(workflow, subject_ids, user: user)
   end
 
   def create_project_preference
@@ -77,8 +70,7 @@ class ClassificationLifecycle
   end
 
   def should_dequeue_subject?
-    !classification.anonymous? &&
-      UserSubjectQueue.are_subjects_queued?(**user_workflow_subject)
+    SubjectQueue.subjects_queued?(workflow, subject_ids, user: user)
   end
 
   def should_create_project_preference?

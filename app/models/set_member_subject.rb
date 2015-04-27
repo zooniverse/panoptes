@@ -14,14 +14,23 @@ class SetMemberSubject < ActiveRecord::Base
 
   before_create :set_random
 
+  can_be_linked :subject_queue, :in_workflow, :model
+
+  def self.in_workflow(queue)
+    query = joins(:subject_set)
+      .where(subject_sets: { workflow_id: queue.workflow.id })
+    query = query.where(subject_set_id: queue.subject_set.id) if queue.subject_set
+    query
+  end
+
   def self.by_subject_workflow(subject, workflow)
     joins(:subject_set)
       .where(subject_id: subject, subject_sets: { workflow_id: workflow })
   end
 
   def self.available(workflow, user)
-    fields = '"set_member_subjects"."subject_id", "set_member_subjects"."random"'
-    if workflow.finished? || user.has_finished?(workflow)
+    fields = '"set_member_subjects"."id", "set_member_subjects"."random"'
+    if !user || workflow.finished? || user.has_finished?(workflow)
       select(fields)
         .joins(subject_set: :workflow )
         .where(subject_sets: { workflow_id: workflow.id })

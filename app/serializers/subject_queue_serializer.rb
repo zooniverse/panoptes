@@ -2,26 +2,20 @@
 # on arrays of foreign keys. Hopefully it'll replaced with a normal
 # restpack serializer when that's figured out. 
 
-class UserSubjectQueueSerializer
+class SubjectQueueSerializer
   include RestPack::Serializer
   
-  attributes :id, :links
-  can_include :user, :workflow
+  attributes :id
+  can_include :user, :workflow, :subject_set
 
   def self.key
     "subject_queues"
   end
 
-  def links
-    {subjects: @model.subject_ids,
-     user: @model.user.id,
-     workflow: @model.workflow.id}
-  end
-
   def self.links
     links = super
     links["subject_queues.subjects"] = {
-      href: "/subjects?subject_ids={subject_queues.subjects}",
+      href: "/subjects?sort=queue-{subject_queues.id}",
       type: "subjects",
     }
     links

@@ -3,13 +3,26 @@ class Api::V1::SubjectQueuesController < Api::ApiController
   resource_actions :default
   schema_type :strong_params
 
-  allowed_params :create, links: [:user, :workflow, subjects: []]
+  allowed_params :create, links: [:user, :workflow, :subject_set, subjects: []]
   allowed_params :update, links: [subjects: []]
 
   protected
 
+  def new_items(resource, relation, value, *args)
+    case relation 
+    when "subjects", :subjects
+      relation = SetMemberSubject.link_to_resource(resource, api_user, *args)
+        .where(subject_id: value)
+      objects = relation.to_a
+
+      objects_or_error(objects, relation, true)
+    else
+      super
+    end
+  end
+
   def resource_name
-    "user_subject_queue"
+    "subject_queue"
   end
 
   def link_header(resource)

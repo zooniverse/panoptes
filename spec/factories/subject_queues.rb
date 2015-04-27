@@ -1,9 +1,10 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 FactoryGirl.define do
-  factory :user_subject_queue do
+  factory :subject_queue do
     user
     workflow
-    subject_ids []
+    subject_set
+    set_member_subject_ids []
   end
 end

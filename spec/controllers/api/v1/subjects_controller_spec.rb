@@ -21,7 +21,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe "#index" do
     context "logged out user" do
-     context "without any sort" do
+      context "without any sort" do
         before(:each) do
           get :index
         end
@@ -36,8 +36,50 @@ describe Api::V1::SubjectsController, type: :controller do
 
         it_behaves_like "an api response"
       end
+
+      context "a queued request" do
+        let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+        let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
+        let!(:queue) do
+          create(:subject_queue,
+                 user: nil,
+                 workflow: workflow,
+                 set_member_subject_ids: subjects.map(&:id))
+        end
+
+        context "with queued subjects" do
+          before(:each) do
+            get :index, request_params
+          end
+
+          it "should return 200" do
+            expect(response.status).to eq(200)
+          end
+
+          it 'should return a page of 2 objects' do
+            expect(json_response[api_resource_name].length).to eq(2)
+          end
+
+          it_behaves_like "an api response"
+
+          context 'when the queue is below minimum' do
+            it 'should reload the queue' do
+              expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, user: nil)
+              get :index, request_params
+            end
+          end
+
+          context 'when the queue is not below minimum)' do
+            let(:subjects) { create_list(:set_member_subject, 21) }
+            it 'should reload the queue' do
+              expect(SubjectQueueWorker).to_not receive(:perform_async)
+              get :index, request_params
+            end
+          end
+        end
+      end
     end
-    
+
     context "logged in user" do
       before(:each) do
         default_request user_id: user.id, scopes: scopes
@@ -78,14 +120,18 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "a queued request" do
+        let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
-
         context "with queued subjects" do
-          before(:each) do
-            create(:user_subject_queue,
+          let!(:queue) do
+            create(:subject_queue,
                    user: user,
                    workflow: workflow,
-                   subject_ids: subjects.map(&:id))
+                   set_member_subject_ids: subjects.map(&:id))
+          end
+
+
+          before(:each) do
             get :index, request_params
           end
 
@@ -98,6 +144,21 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           it_behaves_like "an api response"
+
+          context 'when the queue is below minimum' do
+            it 'should reload the queue' do
+              expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, user: user.id)
+              get :index, request_params
+            end
+          end
+
+          context 'when the queue is not below minimum)' do
+            let(:subjects) { create_list(:set_member_subject, 21) }
+            it 'should reload the queue' do
+              expect(SubjectQueueWorker).to_not receive(:perform_async)
+              get :index, request_params
+            end
+          end
         end
 
         context "without a workflow id" do
@@ -142,91 +203,6 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         it_behaves_like "an api response"
-      end
-
-      context "with cellect sort" do
-        let(:request_params) do
-          { sort: 'cellect', workflow_id: workflow.id.to_s }
-        end
-        let(:cellect_results) { subjects.take(2).map(&:id) }
-
-        describe "testing the response" do
-
-          before(:each) do
-            allow(stubbed_cellect_connection).to receive(:get_subjects).and_return(cellect_results)
-            get :index, request_params
-          end
-
-          it "should return 200" do
-            get :index, request_params
-            expect(response.status).to eq(200)
-          end
-
-          it 'should return a page of 2 objects' do
-            get :index, request_params
-            expect(json_response[api_resource_name].length).to eq(2)
-          end
-
-          it_behaves_like "an api response"
-
-          context "without a workflow id" do
-            let(:request_params) do
-              { sort: 'cellect' }
-            end
-
-            it 'should return 422' do
-              expect(response.status).to eq(422)
-            end
-          end
-
-          context "when no per_page size is specified" do
-
-            it "should set the page_size param to 10" do
-              response_page_size = json_response["meta"][api_resource_name]["page_size"]
-              expect(response_page_size).to eq(10)
-            end
-          end
-
-          context "when cellect returns an empty response" do
-            let(:psql_double) { double select: cellect_results }
-            
-            it 'should fall back on postgresql selection' do
-              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
-              expect(PostgresqlSelection).to receive(:new).and_return(psql_double)
-              get :index, request_params
-            end
-
-            it 'should pass correct properties to the select method' do
-              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
-              allow(PostgresqlSelection).to receive(:new).and_return(psql_double)
-              expect(psql_double).to receive(:select).with(limit: 10, subject_set_id: nil)
-              get :index, request_params
-            end
-
-            it 'should mark subjects retired when the workflow is finished' do
-              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
-              allow(PostgresqlSelection).to receive(:new).and_return(psql_double)
-              allow_any_instance_of(Workflow).to receive(:finished?).and_return(true)
-              get :index, request_params
-              expect(json_response['subjects'].first['retired']).to be true
-            end
-
-            it 'should mark subjects already seen when the user is finished with the workflow' do
-              allow(stubbed_cellect_connection).to receive(:get_subjects).and_return([])
-              allow(PostgresqlSelection).to receive(:new).and_return(psql_double)
-              allow_any_instance_of(User).to receive(:has_finished?).and_return(true)
-              get :index, request_params
-              expect(json_response['subjects'].first['already_seen']).to be true
-            end
-          end
-        end
-
-        describe "testing the cellect client setup" do
-          it 'should make a request against Cellect' do
-            expect(stubbed_cellect_connection).to receive(:get_subjects).and_return(cellect_results)
-            get :index, request_params
-          end
-        end
       end
     end
   end

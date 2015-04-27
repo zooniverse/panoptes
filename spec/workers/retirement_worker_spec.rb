@@ -4,11 +4,8 @@ RSpec.describe RetirementWorker do
   let(:worker) { described_class.new }
   let(:sms) { create(:set_member_subject) }
   let(:workflow_id) { sms.subject_set.workflow_id }
+  let!(:queue) { create(:subject_queue, workflow_id: workflow_id, set_member_subject_ids: [sms.id]) } 
 
-  before(:each) do
-    stub_cellect_connection
-  end
-  
   describe "#perform" do
     context "sms is retireable" do
       before(:each) do
@@ -27,12 +24,10 @@ RSpec.describe RetirementWorker do
         }.from(0).to(1)
       end
 
-      it 'should call cellect remote subject' do
-        expect(stubbed_cellect_connection).to receive(:remove_subject)
-                                               .with(sms.subject_id,
-                                                     workflow_id: workflow_id,
-                                                     group_id: sms.subject_set_id)
+      it "should dequeue all instances of the subject" do
         worker.perform(sms.id, workflow_id)
+        queue.reload
+        expect(queue.set_member_subject_ids).to_not include(sms.id)
       end
     end
 

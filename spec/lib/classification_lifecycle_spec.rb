@@ -7,7 +7,6 @@ describe ClassificationLifecycle do
 
   before(:each) do
     allow(MultiKafkaProducer).to receive(:publish)
-    stub_cellect_connection
   end
 
   describe "#queue" do
@@ -141,24 +140,24 @@ describe ClassificationLifecycle do
 
       context "is queued" do
         let!(:subject_queue) do
-          create(:user_subject_queue,
+          create(:subject_queue,
                  user: classification.user,
                  workflow: classification.workflow,
-                 subject_ids: classification.subject_ids)
+                 set_member_subject_ids: classification.subject_ids)
         end
 
         it 'should call dequeue_subject_for_user' do
-          expect(UserSubjectQueue).to receive(:dequeue_subjects_for_user)
-                                       .with(user: classification.user,
-                                             workflow: classification.workflow,
-                                             subject_ids: classification.subject_ids)
+          expect(SubjectQueue).to receive(:dequeue)
+                                       .with(classification.workflow,
+                                             classification.subject_ids,
+                                             user: classification.user)
         end
       end
 
       context "is not queued" do
         it 'should not call dequeue_subject_for_user when not enqueued' do
           classification = create(:classification, completed: true)
-          expect(UserSubjectQueue).to_not receive(:dequeue_subject_for_user)
+          expect(SubjectQueue).to_not receive(:dequeue_subject_for_user)
         end
       end
     end
@@ -167,7 +166,7 @@ describe ClassificationLifecycle do
       let(:classification) { create(:classification, completed: false) }
 
       it 'should not call dequeue_subject_for_use when incomplete' do
-        expect(UserSubjectQueue).to_not receive(:dequeue_subject_for_user)
+        expect(SubjectQueue).to_not receive(:dequeue_subject_for_user)
       end
     end
   end
@@ -238,21 +237,6 @@ describe ClassificationLifecycle do
       it 'should do nothing' do
         expect(UserSeenSubject).to_not receive(:add_seen_subject_for_user)
       end
-    end
-  end
-
-  describe "#update_cellect" do
-    let(:classification) { create(:classification) }
-
-    it "should setup the add seen command to cellect" do
-      expect(stubbed_cellect_connection).to receive(:add_seen)
-                                             .with(
-                                               subject_id: classification.subject_ids.first,
-                                               workflow_id: classification.workflow.id,
-                                               user_id: classification.user.id,
-                                               host: 'example.com'
-                                             )
-      subject.update_cellect(workflow_id: 'example.com')
     end
   end
 

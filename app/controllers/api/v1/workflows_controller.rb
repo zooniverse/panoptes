@@ -7,13 +7,8 @@ class Api::V1::WorkflowsController < Api::ApiController
   schema_type :json_schema
 
   def show
-    load_cellect
+    load_queue
     super
-  end
-
-  def reload_cellect
-    WorkflowReloadWorker.perform_async(params[:workflow_id])
-    deleted_resource_response
   end
 
   private
@@ -27,9 +22,8 @@ class Api::V1::WorkflowsController < Api::ApiController
     end
   end
   
-  def load_cellect
-    return unless api_user.logged_in?
-    CellectClient.load_user(cellect_session, params[:id], api_user.id)
+  def load_queue
+    SubjectQueueWorker.perform_async(params[:id], user: api_user.id) 
   end
 
   def build_update_hash(update_params, id)
@@ -58,5 +52,4 @@ class Api::V1::WorkflowsController < Api::ApiController
     task_string_extractor.visit(tasks)
     [tasks, task_string_extractor.collector]
   end
-
 end
