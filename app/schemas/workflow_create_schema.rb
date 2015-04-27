@@ -17,8 +17,21 @@ class WorkflowCreateSchema < JsonSchema
     property "grouped" do
       type "boolean"
     end
-    
-    property "prioritized" do
+
+    property "retirement" do
+      type "object"
+      additional_properties false
+
+      property "criteria" do
+        type "string"
+      end
+
+      property "options" do
+        type "object"
+      end
+    end
+
+   property "prioritized" do
       type "boolean"
     end
 

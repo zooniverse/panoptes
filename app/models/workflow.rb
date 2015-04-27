@@ -14,7 +14,17 @@ class Workflow < ActiveRecord::Base
   has_and_belongs_to_many :expert_subject_sets, -> { expert_sets }, class_name: "SubjectSet"
   belongs_to :tutorial_subject, class_name: "Subject"
 
+  DEFAULT_CRITERIA = 'classification_count'
+  DEFAULT_OPTS = { 'count' => 15 }
+
   validates_presence_of :project
+
+  validate do |workflow|
+    criteria = %w(classification_count)
+    unless workflow.retirement.empty? || criteria.include?(workflow.retirement['criteria'])
+      workflow.errors.add(:"retirement.criteria", "Retirement criteria must be one of #{criteria.join(', ')}")
+    end
+  end
 
   can_through_parent :project, :update, :index, :show, :destroy, :update_links,
     :destroy_links, :translate, :versions, :version
@@ -31,9 +41,17 @@ class Workflow < ActiveRecord::Base
     read_attribute(:tasks).with_indifferent_access
   end
 
-  def finished?
-    @finished ||= !set_member_subjects
-      .where.not('? = ANY("set_member_subjects"."retired_workflow_ids")', id)
-      .exists?
+  def retirement_scheme
+    case retirement.fetch('criteria', DEFAULT_CRITERIA)
+    when 'classification_count'
+      params = retirement.fetch('options', DEFAULT_OPTS).values_at('count')
+      RetirementSchemes::ClassificationCount.new(*params)
+    else
+      raise StandardError, 'invalid retirement scheme'
+    end
+  end
+
+  def retired_subjects_count
+    retired_set_member_subjects_count
   end
 end

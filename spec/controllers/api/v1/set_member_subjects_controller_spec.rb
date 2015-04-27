@@ -5,7 +5,7 @@ RSpec.describe Api::V1::SetMemberSubjectsController, type: :controller do
   let(:subject_set) { create(:subject_set, project: create(:project, owner: authorized_user)) }
   let!(:set_member_subjects) { create_list(:set_member_subject, 2, subject_set: subject_set) }
   let(:api_resource_name) { 'set_member_subjects' }
-  let(:api_resource_attributes) { %w(id state priority) }
+  let(:api_resource_attributes) { %w(id priority) }
   let(:api_resource_links) { %w(set_member_subjects.subject set_member_subjects.subject_set set_member_subjects.retired_workflows) }
 
   let(:scopes) { %w(public project) }

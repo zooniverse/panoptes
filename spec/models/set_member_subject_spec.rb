@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe SetMemberSubject, :type => :model do
-
   let(:set_member_subject) { build(:set_member_subject) }
   let(:locked_factory) { :set_member_subject }
   let(:locked_update) { {state: 1} }
@@ -36,16 +35,6 @@ describe SetMemberSubject, :type => :model do
     end
   end
 
-  describe "::by_subject_workflow" do
-    it "should retrieve and object by subject and workflow id" do
-      set_member_subject.save!
-      workflow = create(:workflow, subject_sets: [set_member_subject.subject_set])
-      sid = set_member_subject.subject_id
-      wid = workflow.id
-      expect(SetMemberSubject.by_subject_workflow(sid, wid)).to include(set_member_subject)
-    end
-  end
-
   describe "::available" do
     let(:workflow) { create(:workflow) }
     let(:subject_set) { create(:subject_set, workflows: [workflow]) }
@@ -62,6 +51,10 @@ describe SetMemberSubject, :type => :model do
         create_list(:set_member_subject, 2, subject_set: subject_set, retired_workflows: [workflow])
       end
 
+      before(:each) do
+        workflow.update!(retired_set_member_subjects_count: sms.length)
+      end
+
       it 'should select retired subjects' do
         expect(subject).to include(sms.first.subject_id)
       end
@@ -71,7 +64,6 @@ describe SetMemberSubject, :type => :model do
       let!(:uss) do
         create(:user_seen_subject, workflow: workflow, subject_ids: sms.map(&:subject_id))
       end
-
 
       it 'should select subjects a user has seen' do
         expect(subject).to include(sms.first.subject_id)
@@ -148,6 +140,26 @@ describe SetMemberSubject, :type => :model do
         .where(workflows: { id: workflows.first.id }).first
 
       expect(rw).to eq(subject)
+    end
+  end
+
+  describe "#retire_workflow" do
+    it 'should add the workflow the retired_workflows relationship' do
+      sms = set_member_subject
+      sms.save!
+      workflow = sms.subject_set.workflows.first
+      sms.retire_workflow(workflow)
+      sms.reload
+      expect(sms.retired_workflows).to include(workflow)
+    end
+  end
+
+  describe "::by_subject_workflow" do
+    it "should retrieve and object by subject and workflow id" do
+      set_member_subject.save!
+      sid = set_member_subject.subject_id
+      wid = set_member_subject.subject_set.workflows.first.id
+      expect(SetMemberSubject.by_subject_workflow(sid, wid)).to include(set_member_subject)
     end
   end
 end

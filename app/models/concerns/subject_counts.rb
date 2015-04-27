@@ -6,10 +6,10 @@ module SubjectCounts
   end
 
   def retired_subjects_count
-    @retired_subject_count ||= subject_sets.sum :retired_set_member_subjects_count
+    @retired_subject_count ||= workflows.sum :retired_set_member_subjects_count
   end
-  
+
   def finished?
-    subjects_count == retired_subjects_count
+    retired_subjects_count >= subjects_count
   end
 end

@@ -11,7 +11,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:authorized_user) { owner }
 
   let(:api_resource_attributes) do
-    %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version grouped prioritized pairwise)
+    %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version grouped prioritized pairwise retirement)
   end
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets workflows.tutorial_subject workflows.expert_subject_set) }
   let(:scopes) { %w(public project) }
@@ -43,25 +43,28 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:test_relation_ids) { subject_set.id }
     let(:update_params) do
       {
-        workflows: {
-          display_name: "A Better Name",
-          tasks: {
-            interest: {
-              type: "draw",
-              question: "Draw a Circle",
-              next: "shape",
-              tools: [
-                {value: "red", label: "Red", type: 'point', color: 'red'},
-                {value: "green", label: "Green", type: 'point', color: 'lime'},
-                {value: "blue", label: "Blue", type: 'point', color: 'blue'},
-              ]
-            }
-          },
-          links: {
-            subject_sets: [subject_set.id.to_s],
-          }
+       workflows: {
+                   display_name: "A Better Name",
+                   retirement: {
+                                criteria: "classification_count"
+                               },
+                   tasks: {
+                           interest: {
+                                      type: "draw",
+                                      question: "Draw a Circle",
+                                      next: "shape",
+                                      tools: [
+                                              {value: "red", label: "Red", type: 'point', color: 'red'},
+                                              {value: "green", label: "Green", type: 'point', color: 'lime'},
+                                              {value: "blue", label: "Blue", type: 'point', color: 'blue'},
+                                             ]
+                                     }
+                          },
+                   links: {
+                           subject_sets: [subject_set.id.to_s],
+                          }
 
-        }
+                  }
       }
     end
 
@@ -84,38 +87,41 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:test_attr_value) { 'Test workflow' }
     let(:create_params) do
       {
-        workflows: {
-          display_name: 'Test workflow',
-          first_task: 'interest',
-          tasks: {
-            interest: {
-              type: "draw",
-              question: "Draw a Circle",
-              next: "shape",
-              tools: [
-                {value: "red", label: "Red", type: 'point', color: 'red'},
-                {value: "green", label: "Green", type: 'point', color: 'lime'},
-                {value: "blue", label: "Blue", type: 'point', color: 'blue'},
-              ]
-            },
-            shape: {
-              type: 'multiple',
-              question: "What shape is this galaxy?",
-              answers: [
-                {value: 'smooth', label: "Smooth"},
-                {value: 'features', label: "Features"},
-                {value: 'other', label: 'Star or artifact'}
-              ],
-              next: nil
-            }
-          },
-          grouped: true,
-          prioritized: true,
-          primary_language: 'en',
-          links: {
-            project: project.id.to_s
-          }
-        }
+       workflows: {
+                   display_name: 'Test workflow',
+                   first_task: 'interest',
+                   retirement: {
+                                criteria: "classification_count"
+                               },
+                   tasks: {
+                           interest: {
+                                      type: "draw",
+                                      question: "Draw a Circle",
+                                      next: "shape",
+                                      tools: [
+                                              {value: "red", label: "Red", type: 'point', color: 'red'},
+                                              {value: "green", label: "Green", type: 'point', color: 'lime'},
+                                              {value: "blue", label: "Blue", type: 'point', color: 'blue'},
+                                             ]
+                                     },
+                           shape: {
+                                   type: 'multiple',
+                                   question: "What shape is this galaxy?",
+                                   answers: [
+                                             {value: 'smooth', label: "Smooth"},
+                                             {value: 'features', label: "Features"},
+                                             {value: 'other', label: 'Star or artifact'}
+                                            ],
+                                   next: nil
+                                  }
+                          },
+                   grouped: true,
+                   prioritized: true,
+                   primary_language: 'en',
+                   links: {
+                           project: project.id.to_s
+                          }
+                  }
       }
     end
 

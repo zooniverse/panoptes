@@ -4,7 +4,6 @@ FactoryGirl.define do
 
     metadata({ just_some: "stuff" })
     project
-    retired_set_member_subjects_count 0
 
     after(:create) do |ss|
       create_list(:workflow, 1, subject_sets: [ss])

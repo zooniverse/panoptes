@@ -6,13 +6,12 @@ class SetMemberSubject < ActiveRecord::Base
   belongs_to :subject_set, counter_cache: true, touch: true
   belongs_to :subject
   belongs_to_many :retired_workflows, class_name: "Workflow"
-
-  enum state: [:active, :inactive, :retired]
+  has_many :subject_workflow_counts, dependent: :destroy
 
   validates_presence_of :subject_set, :subject
 
   can_through_parent :subject_set, :update, :show, :destroy, :index, :update_links,
-                     :destroy_links
+    :destroy_links
 
   before_create :set_random
 
@@ -25,8 +24,9 @@ class SetMemberSubject < ActiveRecord::Base
     query
   end
 
-  def self.by_subject_workflow(subject, workflow)
-    Workflow.find(workflow_id).set_member_subjects.where(subject_id: subject_id)
+  def self.by_subject_workflow(subject_id, workflow_id)
+    joins(subject_set: :workflows)
+      .where(subject_id: subject_id, workflows: {id: workflow_id })
   end
 
   def self.available(workflow, user)
@@ -45,13 +45,14 @@ class SetMemberSubject < ActiveRecord::Base
 
   def self.select_from_all?(workflow, user)
     !user ||
-    !user.user_seen_subjects.where(workflow: workflow).exists? ||
+      !user.user_seen_subjects.where(workflow: workflow).exists? ||
       workflow.finished? ||
       user.has_finished?(workflow)
   end
 
-  def retire?
-    subject_set.retire_member?(self)
+  def retire_workflow(workflow)
+    retired_workflows << workflow
+    save!
   end
 
   def set_random

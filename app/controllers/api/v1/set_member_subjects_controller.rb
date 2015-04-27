@@ -3,6 +3,6 @@ class Api::V1::SetMemberSubjectsController < Api::ApiController
   resource_actions :default
   schema_type :strong_params
 
-  allowed_params :create, :priority, :state, links: [:subject, :subject_set, retired_workflows: []]
+  allowed_params :create, :priority, links: [:subject, :subject_set, retired_workflows: []]
   allowed_params :update, :priority, links: [retired_workflows: []]
 end

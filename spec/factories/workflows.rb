@@ -39,6 +39,7 @@ FactoryGirl.define do
     prioritized false
     primary_language 'en'
     project
+    retired_set_member_subjects_count 0
 
     after(:build) do |w, env|
       if env.build_contents

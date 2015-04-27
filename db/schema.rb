@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150421191603) do
+ActiveRecord::Schema.define(version: 20150427181152) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -215,12 +215,10 @@ ActiveRecord::Schema.define(version: 20150421191603) do
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "set_member_subjects_count",         default: 0,  null: false
-    t.jsonb    "metadata",                          default: {}
-    t.integer  "lock_version",                      default: 0
+    t.integer  "set_member_subjects_count", default: 0,  null: false
+    t.jsonb    "metadata",                  default: {}
+    t.integer  "lock_version",              default: 0
     t.boolean  "expert_set"
-    t.jsonb    "retirement",                        default: {}
-    t.integer  "retired_set_member_subjects_count", default: 0,  null: false
   end
 
   add_index "subject_sets", ["project_id", "display_name"], name: "index_subject_sets_on_project_id_and_display_name", using: :btree
@@ -232,6 +230,17 @@ ActiveRecord::Schema.define(version: 20150421191603) do
 
   add_index "subject_sets_workflows", ["subject_set_id"], name: "index_subject_sets_workflows_on_subject_set_id", using: :btree
   add_index "subject_sets_workflows", ["workflow_id"], name: "index_subject_sets_workflows_on_workflow_id", using: :btree
+
+  create_table "subject_workflow_counts", force: :cascade do |t|
+    t.integer  "set_member_subject_id"
+    t.integer  "workflow_id"
+    t.integer  "classifications_count", default: 0
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "subject_workflow_counts", ["set_member_subject_id"], name: "index_subject_workflow_counts_on_set_member_subject_id", using: :btree
+  add_index "subject_workflow_counts", ["workflow_id"], name: "index_subject_workflow_counts_on_workflow_id", using: :btree
 
   create_table "subjects", force: :cascade do |t|
     t.string   "zooniverse_id"
@@ -355,18 +364,20 @@ ActiveRecord::Schema.define(version: 20150421191603) do
 
   create_table "workflows", force: :cascade do |t|
     t.string   "display_name"
-    t.jsonb    "tasks",                 default: {}
+    t.jsonb    "tasks",                             default: {}
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "classifications_count", default: 0,     null: false
-    t.boolean  "pairwise",              default: false, null: false
-    t.boolean  "grouped",               default: false, null: false
-    t.boolean  "prioritized",           default: false, null: false
+    t.integer  "classifications_count",             default: 0,     null: false
+    t.boolean  "pairwise",                          default: false, null: false
+    t.boolean  "grouped",                           default: false, null: false
+    t.boolean  "prioritized",                       default: false, null: false
     t.string   "primary_language"
     t.string   "first_task"
     t.integer  "tutorial_subject_id"
-    t.integer  "lock_version",          default: 0
+    t.integer  "lock_version",                      default: 0
+    t.integer  "retired_set_member_subjects_count", default: 0
+    t.jsonb    "retirement",                        default: {}
   end
 
   add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree
@@ -374,4 +385,6 @@ ActiveRecord::Schema.define(version: 20150421191603) do
 
   add_foreign_key "subject_sets_workflows", "subject_sets"
   add_foreign_key "subject_sets_workflows", "workflows"
+  add_foreign_key "subject_workflow_counts", "set_member_subjects"
+  add_foreign_key "subject_workflow_counts", "workflows"
 end
