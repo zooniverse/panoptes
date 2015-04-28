@@ -14,6 +14,24 @@ RSpec.describe SubjectQueue, :type => :model do
     expect(build(:subject_queue, workflow: nil)).to_not be_valid
   end
 
+  describe "::create_for_user" do
+    let(:workflow) {create(:workflow)}
+    let(:user) { create(:user) }
+
+    context "no logged out queue" do
+      it 'should return nil' do
+        expect(SubjectQueue.create_for_user(workflow, user)).to be_nil
+      end
+    end
+
+    context "queue saves" do
+      it 'should return the new queue' do
+        create(:subject_queue, workflow: workflow, user: nil, subject_set: nil)
+        expect(SubjectQueue.create_for_user(workflow, user)).to be_a(SubjectQueue)
+      end
+    end
+  end
+
   describe "::reload" do
     let(:subject) { create(:set_member_subject) }
     let(:subjects) { create_list(:set_member_subject, 3).map(&:id) }

@@ -21,7 +21,7 @@ class SubjectSelector
 
   def selected_subjects(sms_ids, selector_context={})
     subjects = @scope.joins(:set_member_subjects)
-               .where(set_member_subjects: {id: sms_ids})
+      .where(set_member_subjects: {id: sms_ids})
     [subjects, selector_context]
   end
 
@@ -45,8 +45,12 @@ class SubjectSelector
 
   def retrieve_subject_queue
     queue = SubjectQueue.scoped_to_set(params[:subject_set_id])
-              .find_by(user: user.user, workflow: workflow)
-    if queue.nil? || queue.below_minimum?
+      .find_by(user: user.user, workflow: workflow)
+
+    case
+    when queue.nil?
+      queue = SubjectQueue.create_for_user(workflow, user.user, set: params[:subject_set_id])
+    when queue.below_minimum?
       SubjectQueueWorker.perform_async(workflow.id, user.id)
     end
     queue

@@ -55,7 +55,17 @@ class SubjectQueue < ActiveRecord::Base
   def self.dequeue_for_all(workflow, subject_id)
     where(workflow: workflow)
       .update_all(["set_member_subject_ids = array_remove(set_member_subject_ids, ?)",
-                  subject_id])
+                   subject_id])
+  end
+
+  def self.create_for_user(workflow, user, set: nil)
+    logged_out_queue = scoped_to_set(set).find_by(workflow: workflow, user: nil)
+    return nil unless logged_out_queue
+    queue = create(workflow: workflow,
+                   user: user,
+                   subject_set_id: set,
+                   set_member_subjects: logged_out_queue.set_member_subjects)
+    return queue if queue.persisted?
   end
 
   def self.subjects_queued?(workflow, subject_ids, user: nil)
