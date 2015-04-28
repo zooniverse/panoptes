@@ -9,8 +9,8 @@ class CreateSubjectWorkflowCounts < ActiveRecord::Migration
     end
 
     SetMemberSubject.find_each do |sms|
-      sms.subject_set.workflows.each do |w|
-        SubjectWorkflowCount.create!(set_member_subject: sms, workflow: w, classifications_count: sms.classifications_count)
+      (sms.subject_set.try(:workflows) || []).each do |w|
+        SubjectWorkflowCount.create!(set_member_subject: sms, workflow: w, classifications_count: sms.classification_count)
       end
     end
 
