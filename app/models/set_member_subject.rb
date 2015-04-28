@@ -30,24 +30,7 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def self.available(workflow, user)
-    fields = '"set_member_subjects"."id", "set_member_subjects"."random"'
-    if select_from_all?(workflow, user)
-      workflow.set_member_subjects.select(fields)
-    else
-      select(fields)
-        .joins(subject_set: {workflows: :user_seen_subjects})
-        .where(user_seen_subjects: {user_id: user.id},
-               workflows: {id: workflow.id})
-        .where.not('? = ANY("set_member_subjects"."retired_workflow_ids")', workflow.id)
-        .where.not('"set_member_subjects"."subject_id" = ANY("user_seen_subjects"."subject_ids")')
-    end
-  end
-
-  def self.select_from_all?(workflow, user)
-    !user ||
-      !user.user_seen_subjects.where(workflow: workflow).exists? ||
-      workflow.finished? ||
-      user.has_finished?(workflow)
+    SetMemberSubjectSelector.new(workflow, user).set_member_subjects
   end
 
   def retire_workflow(workflow)
