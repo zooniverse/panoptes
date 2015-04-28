@@ -4,7 +4,7 @@ describe SubjectSet, :type => :model do
   let(:subject_set) { create(:subject_set) }
   let(:locked_factory) { :subject_set }
   let(:locked_update) { {display_name: "A Different Name"} }
-  
+
   it_behaves_like "optimistically locked"
 
   it "should have a valid factory" do
@@ -19,7 +19,7 @@ describe SubjectSet, :type => :model do
   describe "links" do
     let(:project) { create(:project) }
     let(:workflow) { create(:workflow, project: project) }
-    
+
     it 'should allow links to workflows in the same project' do
       expect(SubjectSet).to link_to(workflow)
         .with_scope(:where, { project: project })
@@ -36,14 +36,14 @@ describe SubjectSet, :type => :model do
     end
   end
 
-  describe "#workflow" do
-    it "should belong to a workflow" do
-      expect(subject_set.workflow).to be_a(Workflow)
+  describe "#workflows" do
+    it "should have many workflows" do
+      expect(subject_set.workflows).to all( be_a(Workflow) )
     end
   end
 
   describe "#subjects" do
-    let(:subject_set) { create(:subject_set_with_subjects) } 
+    let(:subject_set) { create(:subject_set_with_subjects) }
 
     it "should have many subjects" do
       expect(subject_set.subjects).to all( be_a(Subject) )
@@ -68,66 +68,6 @@ describe SubjectSet, :type => :model do
       it "should have a count of the number of set member subjects in the set" do
         expect(subject_set.set_member_subjects_count).to eq(subject_set.set_member_subjects.count)
       end
-    end
-  end
-
-  describe "#retirement" do
-    subject { build(:subject_set, retirement: retirement) }
-    
-    context "empty" do
-      let(:retirement) { Hash.new }
-
-      it { is_expected.to be_valid }
-    end
-
-    context "classification_count" do
-      let(:retirement) { { 'criteria' => 'classification_count' } }
-                           
-      it { is_expected.to be_valid }
-    end
-
-    context "anything else" do
-      let(:retirement) { { 'criteria' => 'anything else' } }
-      
-      it { is_expected.to_not be_valid }
-    end
-  end
-
-  describe "#retirement_scheme" do
-    subject { build(:subject_set, retirement: retirement) }
-    
-    context "empty" do
-      let(:retirement) { Hash.new }
-
-      it "it should return a classification count scheme" do
-        expect(subject.retirement_scheme).to be_a(RetirementSchemes::ClassificationCount)
-      end
-    end
-
-    context "classification_count" do
-      let(:retirement) { { 'criteria' => 'classification_count' } }
-                           
-      it "it should return a classification count scheme" do
-        expect(subject.retirement_scheme).to be_a(RetirementSchemes::ClassificationCount)
-      end
-    end
-
-    context "anything else" do
-      let(:retirement) { { 'criteria' => 'anything else' } }
-
-      it 'should raise an error' do
-        expect{subject.retirement_scheme}.to raise_error(StandardError, 'invalid retirement scheme')
-      end
-    end
-  end
-
-  describe "#retire_member?" do
-    it "should call the scheme's retire? method" do
-      scheme_double = double :retire? => true
-      sms = build(:set_member_subject)
-      allow(subject_set).to receive(:retirement_scheme).and_return(scheme_double)
-      expect(scheme_double).to receive(:retire?).with(sms)
-      subject_set.retire_member?(sms)
     end
   end
 end

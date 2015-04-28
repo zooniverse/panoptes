@@ -8,7 +8,7 @@ class JsonToJsonb < ActiveRecord::Migration
     [:user_project_preferences, :preferences],
     [:workflows, :tasks]
   ]
-  
+
   def up
     TO_CHANGE.each do |(table, columns)|
       Array.wrap(columns).each do |column|

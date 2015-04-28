@@ -28,6 +28,7 @@ module RoleControl
         AccessControlList.joins(user_group: :memberships)
           .select(:resource_id)
           .merge(memberships_query(action, target))
+          .where(resource_type: name)
           .where.overlap(roles: roles)
       end
 

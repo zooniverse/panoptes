@@ -13,29 +13,19 @@ class SubjectSetCreateSchema < JsonSchema
       type "object"
     end
 
-    property "retirement" do
-      type "object"
-      additional_properties false
-
-      property "criteria" do
-        type "string"
-      end
-
-      property "options" do
-        type "object"
-      end
-    end
-
     property "links" do
       type "object"
       required "project"
-      
+
       property "project" do
         type "string", "integer"
       end
-      
-      property "workflow" do
-        type "string", "integer"
+
+      property "workflows" do
+        type "array"
+        items do
+          type "string", "integer"
+        end
       end
 
       property "collection" do

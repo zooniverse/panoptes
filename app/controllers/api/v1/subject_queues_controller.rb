@@ -9,7 +9,7 @@ class Api::V1::SubjectQueuesController < Api::ApiController
   protected
 
   def new_items(resource, relation, value, *args)
-    case relation 
+    case relation
     when "subjects", :subjects
       relation = SetMemberSubject.link_to_resource(resource, api_user, *args)
         .where(subject_id: value)

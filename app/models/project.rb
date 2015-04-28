@@ -25,7 +25,7 @@ class Project < ActiveRecord::Base
   can_by_role :destroy, :update, :update_links, :destroy_links, roles: [ :owner,
                                                                          :collaborator ]
   can_by_role :show, :index, :versions, :version,
-              public: :public_scope, roles: [ :owner,
+              public: true, roles: [ :owner,
                                               :collaborator,
                                               :tester,
                                               :translator,

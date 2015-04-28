@@ -4,7 +4,7 @@ describe Project, :type => :model do
   let(:project) { build(:project) }
   let(:owned) { project }
   let(:not_owned) { build(:project, owner: nil) }
-  let(:subject_relation) { create(:project_with_subjects) }
+  let(:subject_relation) { create(:full_project) }
   let(:activatable) { project }
   let(:translatable) { create(:project_with_contents, build_extra_contents: true) }
   let(:translatable_without_content) { build(:project, build_contents: false) }
@@ -183,6 +183,25 @@ describe Project, :type => :model do
       it "#expert_classifier? should be falsey" do
         expect(project.expert_classifier?(project_user)).to be_falsey
       end
+    end
+  end
+
+  describe "#retired_subjects_count" do
+    it "return a count of the associated retired subjects" do
+      expect(subject_relation.retired_subjects_count).to eq(subject_relation
+                                                             .workflows
+                                                             .flat_map{ |w| w.set_member_subjects.map{ |s| s.retired_workflows.include?(w) ? 1 : 0 } }
+                                                             .reduce(&:+))
+    end
+  end
+
+  describe "#finished?" do
+    it 'should be true when the subject count and retired count are equal' do
+      subject_relation.workflows.each do |w|
+        w.update!(retired_set_member_subjects_count: w.subjects_count)
+      end
+
+      expect(subject_relation).to be_finished
     end
   end
 end

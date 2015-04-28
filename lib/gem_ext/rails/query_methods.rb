@@ -5,7 +5,7 @@ require 'active_record/relation/query_methods'
 # https://github.com/rails/rails/pull/16052/files
 
 ActiveRecord::QueryMethods.module_eval do
-  
+
   # Returns a new relation, which is the logical union of this relation and the one passed as an
   # argument.
   #
@@ -19,7 +19,7 @@ ActiveRecord::QueryMethods.module_eval do
   def or(other)
     spawn.or!(other)
   end
-  
+
   def or!(other)
     combining = group_values.any? ? :having : :where
     unless other.is_a?(ActiveRecord::NullRelation)

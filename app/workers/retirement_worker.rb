@@ -3,13 +3,11 @@ class RetirementWorker
 
   sidekiq_options queue: :high
 
-  def perform(sms_id, workflow_id)
-    sms = SetMemberSubject.find(sms_id)
-    if sms.retire?
-      ActiveRecord::Base.transaction(requires_new: true) do
-        SetMemberSubject.update(sms.id, state: SetMemberSubject.states[:retired])
-        SubjectSet.increment_counter(:retired_set_member_subjects_count, sms.subject_set.id)
-        SubjectQueue.dequeue_for_all(Workflow.find(workflow_id), sms.id)
+  def perform(count_id)
+    count = SubjectWorkflowCount.find(count_id)
+    if count.retire?
+      count.retire! do
+        SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject.id)
       end
     end
   end

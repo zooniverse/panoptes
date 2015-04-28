@@ -76,4 +76,68 @@ describe Workflow, :type => :model do
       expect(workflow.previous_version).to be_nil
     end
   end
+
+  describe "#retirement_scheme" do
+    subject { build(:workflow, retirement: retirement) }
+
+    context "empty" do
+      let(:retirement) { Hash.new }
+
+      it "it should return a classification count scheme" do
+        expect(subject.retirement_scheme).to be_a(RetirementSchemes::ClassificationCount)
+      end
+    end
+
+    context "classification_count" do
+      let(:retirement) { { 'criteria' => 'classification_count' } }
+
+      it "it should return a classification count scheme" do
+        expect(subject.retirement_scheme).to be_a(RetirementSchemes::ClassificationCount)
+      end
+    end
+
+    context "anything else" do
+      let(:retirement) { { 'criteria' => 'anything else' } }
+
+      it 'should raise an error' do
+        expect{subject.retirement_scheme}.to raise_error(StandardError, 'invalid retirement scheme')
+      end
+    end
+  end
+
+  describe "#retirement" do
+    subject { build(:workflow, retirement: retirement) }
+
+    context "empty" do
+      let(:retirement) { Hash.new }
+
+      it { is_expected.to be_valid }
+    end
+
+    context "classification_count" do
+      let(:retirement) { { 'criteria' => 'classification_count' } }
+
+      it { is_expected.to be_valid }
+    end
+
+    context "anything else" do
+      let(:retirement) { { 'criteria' => 'anything else' } }
+
+      it { is_expected.to_not be_valid }
+    end
+  end
+
+  describe "#retired_subjects_count" do
+    it "should be an alias for retired set_member_subjects count" do
+      expect(subject_relation.retired_subjects_count).to eq(subject_relation.retired_set_member_subjects_count)
+    end
+  end
+
+  describe "#finished?" do
+    it 'should be true when and retired count is equal or greater than the subject count ' do
+      subject_relation.retired_set_member_subjects_count = subject_relation.subjects_count
+      subject_relation.save!
+      expect(subject_relation).to be_finished
+    end
+  end
 end

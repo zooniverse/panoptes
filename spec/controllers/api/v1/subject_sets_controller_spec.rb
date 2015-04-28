@@ -7,9 +7,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
   let(:owner) { project.owner }
   let(:api_resource_name) { 'subject_sets' }
 
-  let(:api_resource_attributes) { %w(id display_name retired_set_member_subjects_count set_member_subjects_count created_at updated_at retirement metadata) }
-  let(:api_resource_links) { %w(subject_sets.project subject_sets.workflow) }
-  
+  let(:api_resource_attributes) { %w(id display_name set_member_subjects_count created_at updated_at metadata) }
+  let(:api_resource_links) { %w(subject_sets.project subject_sets.workflows) }
+
   let(:scopes) { %w(public project) }
   let(:resource_class) { SubjectSet }
   let(:authorized_user) { owner }
@@ -22,13 +22,13 @@ describe Api::V1::SubjectSetsController, type: :controller do
     let(:private_project) { create(:project, private: true) }
     let!(:private_resource) { create(:subject_set, project: private_project)  }
     let(:n_visible) { 2 }
-    
+
     it_behaves_like 'is indexable'
   end
 
   describe '#show' do
     let(:resource) { subject_set }
-    
+
     it_behaves_like 'is showable'
   end
 
@@ -42,17 +42,14 @@ describe Api::V1::SubjectSetsController, type: :controller do
     let(:test_relation_ids) { subjects.map(&:id) }
     let(:update_params) do
       {
-        subject_sets: {
-          display_name: "A Better Name",
-          retirement: {
-            criteria: "classification_count"
-          },
-          links: {
-            workflow: workflow.id.to_s,
-            subjects: subjects.map(&:id).map(&:to_s)
-          }
-          
-        }
+       subject_sets: {
+                      display_name: "A Better Name",
+                      links: {
+                              workflows: [workflow.id.to_s],
+                              subjects: subjects.map(&:id).map(&:to_s)
+                             }
+
+                     }
       }
     end
 
@@ -66,34 +63,31 @@ describe Api::V1::SubjectSetsController, type: :controller do
     let(:test_attr_value) { 'Test subject set' }
     let(:create_params) do
       {
-        subject_sets: {
-          display_name: 'Test subject set',
-          retirement: {
-            criteria: "classification_count"
-          },
-          metadata: {
-            location: "Africa"
-          },
-          links: {
-            project: project.id
-          }
-        }
+       subject_sets: {
+                      display_name: 'Test subject set',
+                      metadata: {
+                                 location: "Africa"
+                                },
+                      links: {
+                              project: project.id
+                             }
+                     }
       }
     end
-    
+
     context "create a new subject set" do
       it_behaves_like "is creatable"
     end
 
     context "create a subject set from a collection" do
-      
+
       before(:each) do
         ps = create_params
         ps[:subject_sets][:links][:collection] = collection.id.to_s
         default_request user_id: authorized_user.id, scopes: scopes
         post :create, ps
       end
-      
+
       context "when a user can access the collection" do
         let(:collection) { create(:collection_with_subjects) }
         it "should create a new subject set with the collection's subjects" do
