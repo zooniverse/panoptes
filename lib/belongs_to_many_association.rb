@@ -18,6 +18,11 @@ class BelongsToManyAssociation < ActiveRecord::Associations::CollectionAssociati
     ids_writer(other_ary.map(&:id))
   end
 
+  def delete_records(records, method)
+    owner[reflection.foreign_key] = owner[reflection.foreign_key] - records.map(&:id)
+    owner.save!
+  end
+
   def insert_record(record, validate=true, raise=true)
     set_inverse_instance(record)
 

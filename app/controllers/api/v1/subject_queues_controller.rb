@@ -15,7 +15,7 @@ class Api::V1::SubjectQueuesController < Api::ApiController
         .where(subject_id: value)
       objects = relation.to_a
 
-      objects_or_error(objects, relation, true)
+      objects_or_error(objects, :set_member_subjects, true)
     else
       super
     end

@@ -1,19 +1,18 @@
 class SubjectQueue < ActiveRecord::Base
   include RoleControl::ParentalControlled
-  
+  include BelongsToMany
+
   DEFAULT_LENGTH = 100
   MINIMUM_LENGTH = 20
-  
+
   belongs_to :user
   belongs_to :workflow
   belongs_to :subject_set
+  belongs_to_many :set_member_subjects
 
   validates_presence_of :workflow
 
   can_through_parent :workflow, :update, :destroy, :update_links, :destroy_links
-
-  delegate :add_set_member_subjects, to: :subjects
-  delegate :remove_set_member_subjects, to: :subjects
 
   def self.scoped_to_set(set)
     set ? where(subject_set_id: set) : all
@@ -28,14 +27,21 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
+  def self.reload(workflow, subject_ids, user: nil, set: nil)
+    ues = scoped_to_set(set).find_or_create_by!(user: user, workflow: workflow)
+    ues.set_member_subject_ids_will_change!
+    ues.set_member_subject_ids = subject_ids
+    ues.save!
+  end
+
   def self.enqueue(workflow, subject_ids, user: nil, set: nil)
     ues = scoped_to_set(set).find_or_create_by!(user: user, workflow: workflow)
-    ues.add_set_member_subjects(Array.wrap(subject_ids))
+    ues.set_member_subjects.concat(Array.wrap(subject_ids))
   end
 
   def self.dequeue(workflow, subject_ids, user: nil, set: nil)
     ues = scoped_to_set(set).find_by!(user: user, workflow: workflow)
-    ues.remove_set_member_subjects(subject_ids)
+    ues.set_member_subjects.delete(*subject_ids)
     ues.destroy if ues.set_member_subject_ids.empty?
   end
 
@@ -63,22 +69,5 @@ class SubjectQueue < ActiveRecord::Base
 
   def next_subjects(limit=10)
     set_member_subject_ids[0..limit-1]
-  end
-
-  def subjects=(subjects)
-    set_member_subject_ids_will_change!
-    self.set_member_subject_ids = subjects.map(&:id)
-    save! && reload if persisted?
-    subjects
-  end
-
-  def reload
-    super
-    @subject_relation ||= SubjectRelation.new(self)
-    self
-  end
-
-  def subjects
-    @subject_relation ||= SubjectRelation.new(self)
   end
 end

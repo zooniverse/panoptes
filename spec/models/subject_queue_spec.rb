@@ -3,9 +3,9 @@ require 'spec_helper'
 RSpec.describe SubjectQueue, :type => :model do
   let(:locked_factory) { :subject_queue }
   let(:locked_update) { {set_member_subject_ids: [1, 2, 3, 4]} }
-  
+
   it_behaves_like "optimistically locked"
-  
+
   it 'should have a valid factory' do
     expect(build(:subject_queue)).to be_valid
   end
@@ -14,11 +14,108 @@ RSpec.describe SubjectQueue, :type => :model do
     expect(build(:subject_queue, workflow: nil)).to_not be_valid
   end
 
+  describe "::reload" do
+    let(:subject) { create(:set_member_subject) }
+    let(:subjects) { create_list(:set_member_subject, 3).map(&:id) }
+    let(:workflow) { create(:workflow) }
+
+    context "when passed a subject set" do
+      let(:subject_set) { create(:subject_set) }
+      let(:not_updated_set) { create(:subject_set) }
+
+      context "when the queue exists" do
+
+        let!(:queue) do
+          create(:subject_queue,
+                 user: nil,
+                 workflow: workflow,
+                 set_member_subject_ids: [subject.id],
+                 subject_set: subject_set)
+        end
+
+        let!(:not_updated_queue) do
+          create(:subject_queue,
+                 user: nil,
+                 workflow: workflow,
+                 set_member_subject_ids: [subject.id],
+                 subject_set: not_updated_set)
+        end
+
+        before(:each) do
+          SubjectQueue.reload(workflow, subjects, set: subject_set.id)
+          queue.reload
+          not_updated_queue.reload
+        end
+
+        it 'should completely replace the queue for the given set' do
+          expect(queue.set_member_subject_ids).to eq(subjects)
+        end
+
+        it 'should not update the set without the name' do
+          expect(not_updated_queue.set_member_subject_ids).to_not eq(subjects)
+        end
+      end
+
+      context "when no queue exists" do
+        before(:each) do
+          SubjectQueue.reload(workflow, subjects, set: subject_set.id)
+        end
+
+        subject { SubjectQueue.find_by(workflow: workflow, subject_set: subject_set) }
+
+        it 'should create a new queue with the given workflow' do
+          expect(subject.workflow).to eq(workflow)
+        end
+
+        it 'should create a new queue with the given subject set' do
+          expect(subject.subject_set).to eq(subject_set)
+        end
+
+         it 'should queue subject' do
+          expect(subject.set_member_subject_ids).to eq(subjects)
+        end
+      end
+    end
+
+    context "when not passed a subject set" do
+      context "when a queue exists" do
+        let!(:queue) do
+          create(:subject_queue,
+                 user: nil,
+                 workflow: workflow,
+                 set_member_subject_ids: [subject.id])
+        end
+
+        it 'should reload the workflow queue' do
+          SubjectQueue.reload(workflow, subjects)
+          queue.reload
+          expect(queue.set_member_subject_ids).to eq(subjects)
+        end
+      end
+
+      context "when a queue does not exist" do
+        before(:each) do
+          SubjectQueue.reload(workflow, subjects)
+        end
+
+        subject { SubjectQueue.find_by(workflow: workflow) }
+
+        it 'should create a new queue with the given workflow' do
+          expect(subject.workflow).to eq(workflow)
+        end
+
+        it 'should queue subject' do
+          expect(subject.set_member_subject_ids).to eq(subjects)
+        end
+      end
+    end
+  end
+
   describe "::dequeue_for_all" do
     let(:subject) { create(:set_member_subject) }
     let(:workflow) { create(:workflow) }
     let(:queue) { create_list(:subject_queue, 2, workflow: workflow, set_member_subject_ids: [subject.id]) }
-    
+
     it "should remove the subject for all queues of the workflow" do
       SubjectQueue.dequeue_for_all(workflow, subject.id)
       expect(SubjectQueue.all.map(&:set_member_subject_ids)).to all( be_empty )
@@ -29,7 +126,7 @@ RSpec.describe SubjectQueue, :type => :model do
     let(:subject) { create(:set_member_subject) }
     let(:workflow) { create(:workflow) }
     let(:queue) { create_list(:subject_queue, 2, workflow: workflow) }
-    
+
     it "should remove the subject for all queues of the workflow" do
       SubjectQueue.enqueue_for_all(workflow, subject.id)
       expect(SubjectQueue.all.map(&:set_member_subject_ids)).to all( include(subject.id) )
@@ -146,10 +243,10 @@ RSpec.describe SubjectQueue, :type => :model do
     end
   end
 
-  describe "#subjects" do
+  describe "#next_subjects" do
     let(:ids) { (0..60).to_a }
     let(:ues) { build(:subject_queue, set_member_subject_ids: ids) }
-    
+
     it 'should return a collection of ids' do
       expect(ues.next_subjects).to all( be_a(Fixnum) )
     end
@@ -163,32 +260,12 @@ RSpec.describe SubjectQueue, :type => :model do
     end
   end
 
-  describe "#add_set_member_subject" do
-    let(:ues) { build(:subject_queue) }
-    
-    it 'should add the id to the set_member_subject_ids array' do
-      subject = create(:subject)
-      ues.add_set_member_subjects(subject)
-      expect(ues.set_member_subject_ids).to include(subject.id)
-    end
-  end
-
-  describe "#remove_set_member_subject" do
-    let(:subject) { create(:subject) }
-    let(:ues) { build(:subject_queue, set_member_subject_ids: [subject.id]) }
-    
-    it 'should remove the id from the subject ids' do
-      ues.remove_set_member_subjects(subject)
-      expect(ues.set_member_subject_ids).to_not include(subject.id)
-    end
-  end
-
   describe "#below_minimum?" do
     let(:queue) { build(:subject_queue, set_member_subject_ids: subject_ids) }
-    
+
     context "when less than 20 items" do
       let(:subject_ids) { create_list(:set_member_subject, 2).map(&:id) }
-      
+
       it 'should return true' do
         expect(queue.below_minimum?).to be true 
       end
@@ -196,7 +273,7 @@ RSpec.describe SubjectQueue, :type => :model do
 
     context "when more than 20 items" do
       let(:subject_ids) { create_list(:set_member_subject, 21).map(&:id) }
-      
+
       it 'should return false' do
         expect(queue.below_minimum?).to be false
       end
