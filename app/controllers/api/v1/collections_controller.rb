@@ -1,6 +1,6 @@
 class Api::V1::CollectionsController < Api::ApiController
   include FilterByOwner
-  
+
   doorkeeper_for :create, :update, :destroy, scopes: [:collection]
   resource_actions :default
   schema_type :strong_params
@@ -9,7 +9,7 @@ class Api::V1::CollectionsController < Api::ApiController
     links: [ :project, subjects: [], owner: polymorphic ]
 
   allowed_params :update, :name, :display_name, links: [ subjects: [] ]
-  
+
   protected
 
   def build_resource_for_create(create_params)

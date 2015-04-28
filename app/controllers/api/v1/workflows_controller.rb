@@ -11,6 +11,22 @@ class Api::V1::WorkflowsController < Api::ApiController
     super
   end
 
+  def create
+    super { |workflow| refresh_queue(workflow) }
+  end
+
+  def update
+    super { |workflow| refresh_queue(workflow) }
+  end
+
+  def update_links
+    super { |workflow| refresh_queue(workflow) }
+  end
+
+  def destroy_links 
+    super { |workflow| refresh_queue(workflow) }
+  end
+
   private
 
   def context
@@ -20,6 +36,10 @@ class Api::V1::WorkflowsController < Api::ApiController
     else
       {}
     end
+  end
+
+  def refresh_queue(workflow)
+    ReloadQueueWorker.perform_async(workflow.id) if workflow.set_member_subjects.exists?
   end
 
   def load_queue

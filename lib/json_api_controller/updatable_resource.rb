@@ -32,6 +32,8 @@ module JsonApiController
         resource.save!
       end
 
+      yield resource if block_given?
+
       updated_resource_response
     end
 
@@ -40,6 +42,9 @@ module JsonApiController
       resource_class.transaction do
         destroy_relation(resource, relation, params[:link_ids])
       end
+
+      yield resource if block_given?
+
       deleted_resource_response
     end
 

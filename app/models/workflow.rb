@@ -11,6 +11,7 @@ class Workflow < ActiveRecord::Base
   has_many :set_member_subjects, through: :subject_sets
   has_many :classifications
   has_many :user_seen_subjects
+  has_many :subject_queues, dependent: :destroy
   has_and_belongs_to_many :expert_subject_sets, -> { expert_sets }, class_name: "SubjectSet"
   belongs_to :tutorial_subject, class_name: "Subject"
 
