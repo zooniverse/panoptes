@@ -4,8 +4,6 @@ postgres:
     - "PG_USER=panoptes"
     - "DB=panoptes_development"
     - "PASS=panoptes"
-  ports:
-    - "5432:5432"
 
 zookeeper:
   image: zooniverse/zookeeper
