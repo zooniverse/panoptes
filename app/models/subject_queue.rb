@@ -14,6 +14,8 @@ class SubjectQueue < ActiveRecord::Base
 
   can_through_parent :workflow, :update, :destroy, :update_links, :destroy_links
 
+  alias_method :subjects=, :set_member_subjects=
+
   def self.scoped_to_set(set)
     set ? where(subject_set_id: set) : all
   end

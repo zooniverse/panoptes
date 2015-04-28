@@ -15,18 +15,10 @@ class Api::V1::SubjectQueuesController < Api::ApiController
         .where(subject_id: value)
       objects = relation.to_a
 
-      objects_or_error(objects, :set_member_subjects, true)
+      objects_or_error(objects, relation, true)
     else
       super
     end
-  end
-
-  def resource_name
-    "subject_queue"
-  end
-
-  def link_header(resource)
-    api_subject_queue_url(resource)
   end
 
   def assoc_class(relation)
