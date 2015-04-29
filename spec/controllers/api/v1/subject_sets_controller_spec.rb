@@ -56,6 +56,67 @@ describe Api::V1::SubjectSetsController, type: :controller do
     it_behaves_like "is updatable"
 
     it_behaves_like "has updatable links"
+
+    context "reload subject queue" do
+      let(:workflows) { [create(:workflow, project: project)] }
+      let(:resource) do
+        ss = create(:subject_set,
+               project: project,
+               subjects: subjects)
+
+        ss.workflows = workflows
+        ss.save!
+        ss
+      end
+
+      context "when the subject set has a workflow" do
+        it 'should call the reload queue worker' do
+          expect(ReloadQueueWorker).to receive(:perform_async).with(workflows.first.id)
+          default_request scopes: scopes, user_id: authorized_user.id
+          update_params[:subject_sets][:links].delete(:workflows)
+          put :update, update_params.merge(id: resource.id)
+        end
+      end
+
+      context "when the subject set has multiple workflows" do
+        let(:workflows) { create_list(:workflow, 2, project: project) }
+        it 'should call the reload queue worker' do
+          expect(ReloadQueueWorker).to receive(:perform_async).twice
+          default_request scopes: scopes, user_id: authorized_user.id
+          update_params[:subject_sets][:links].delete(:workflows)
+          put :update, update_params.merge(id: resource.id)
+        end
+      end
+
+      context "when the subject set has no workflows" do
+        let(:workflows) { [] }
+        it 'should not call the reload queue worker' do
+          expect(ReloadQueueWorker).to_not receive(:perform_async)
+          default_request scopes: scopes, user_id: authorized_user.id
+          update_params[:subject_sets][:links].delete(:workflows)
+          put :update, update_params.merge(id: resource.id)
+        end
+      end
+
+      context "when the subject set has multiple subjects" do
+        it 'should call the reload queue worker' do
+          expect(ReloadQueueWorker).to receive(:perform_async).with(workflows.first.id)
+          default_request scopes: scopes, user_id: authorized_user.id
+          update_params[:subject_sets][:links].delete(:workflows)
+          put :update, update_params.merge(id: resource.id)
+        end
+      end
+
+      context "when the subject set has no subjects" do
+        let(:subjects) { [] }
+        it 'should not call the reload queue worker' do
+          expect(ReloadQueueWorker).to_not receive(:perform_async)
+          default_request scopes: scopes, user_id: authorized_user.id
+          update_params[:subject_sets].delete(:links)
+          put :update, update_params.merge(id: resource.id)
+        end
+      end
+    end
   end
 
   describe '#create' do
@@ -80,7 +141,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
     end
 
     context "create a subject set from a collection" do
-
       before(:each) do
         ps = create_params
         ps[:subject_sets][:links][:collection] = collection.id.to_s

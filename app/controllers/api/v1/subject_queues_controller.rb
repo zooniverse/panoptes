@@ -21,14 +21,6 @@ class Api::V1::SubjectQueuesController < Api::ApiController
     end
   end
 
-  def resource_name
-    "subject_queue"
-  end
-
-  def link_header(resource)
-    api_subject_queue_url(resource)
-  end
-
   def assoc_class(relation)
     if relation.to_sym == :subjects
       Subject

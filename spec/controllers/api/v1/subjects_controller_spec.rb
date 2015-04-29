@@ -20,6 +20,13 @@ describe Api::V1::SubjectsController, type: :controller do
   let(:api_resource_links) { [ "subjects.project" ] }
 
   describe "#index" do
+    let!(:queue) do
+      create(:subject_queue,
+             user: nil,
+             workflow: workflow,
+             set_member_subject_ids: subjects.map(&:id))
+    end
+
     context "logged out user" do
       context "without any sort" do
         before(:each) do
@@ -40,13 +47,6 @@ describe Api::V1::SubjectsController, type: :controller do
       context "a queued request" do
         let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
-        let!(:queue) do
-          create(:subject_queue,
-                 user: nil,
-                 workflow: workflow,
-                 set_member_subject_ids: subjects.map(&:id))
-        end
-
         context "with queued subjects" do
 
           context "when firing the request before the test" do
@@ -178,22 +178,21 @@ describe Api::V1::SubjectsController, type: :controller do
           end
         end
 
-        context "without queued subjects" do
+        context "without already queued subjects" do
+          before(:each) do
+            get :index, request_params
+          end
 
           it 'should create the queue' do
-            expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, user.id)
-            get :index, request_params
+            expect(SubjectQueue.find_by(user: user, workflow: workflow)).to_not be_nil
           end
 
-          it 'should return 404' do
-            get :index, request_params
-            expect(response.status).to eq(404)
+          it 'should return 200' do
+            expect(response.status).to eq(200)
           end
 
-          it 'should have a useful error message' do
-            get :index, request_params
-            message = "No queue defined for user. Building one now, please try again."
-            expect(response.body).to eq(json_error_message(message))
+          it 'should return a page of 2 objects' do
+            expect(json_response[api_resource_name].length).to eq(2)
           end
         end
       end

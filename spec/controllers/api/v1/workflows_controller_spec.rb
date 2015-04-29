@@ -80,6 +80,34 @@ describe Api::V1::WorkflowsController, type: :controller do
         expect(instance.tasks["interest"]["question"]).to eq("interest.question")
       end
     end
+
+    context "with authorized user" do
+      context "when the workflow has subjects" do
+        let(:subject_set) { create(:subject_set_with_subjects, project: resource.project) }
+
+        it 'should call the reload queue worker' do
+          expect(ReloadQueueWorker).to receive(:perform_async).with(resource.id)
+          default_request scopes: scopes, user_id: authorized_user.id
+          put :update, update_params.merge(id: resource.id)
+        end
+      end
+
+      context "when the workflow has no subjects" do
+        it "should not queue the worker" do
+          expect(ReloadQueueWorker).to_not receive(:perform_async).with(resource.id)
+          default_request scopes: scopes, user_id: authorized_user.id
+          put :update, update_params.merge(id: resource.id)
+        end
+      end
+    end
+
+    context "without authorized user" do
+      it 'should not call the reload queue worker' do
+        expect(ReloadQueueWorker).to_not receive(:perform_async).with(resource.id)
+        default_request scopes: scopes, user_id: create(:user).id
+        put :update, update_params.merge(id: resource.id)
+      end
+    end
   end
 
   describe '#create' do
