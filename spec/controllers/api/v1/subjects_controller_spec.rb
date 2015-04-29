@@ -20,6 +20,13 @@ describe Api::V1::SubjectsController, type: :controller do
   let(:api_resource_links) { [ "subjects.project" ] }
 
   describe "#index" do
+    let!(:queue) do
+      create(:subject_queue,
+             user: nil,
+             workflow: workflow,
+             set_member_subject_ids: subjects.map(&:id))
+    end
+
     context "logged out user" do
       context "without any sort" do
         before(:each) do
@@ -40,13 +47,6 @@ describe Api::V1::SubjectsController, type: :controller do
       context "a queued request" do
         let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
-        let!(:queue) do
-          create(:subject_queue,
-                 user: nil,
-                 workflow: workflow,
-                 set_member_subject_ids: subjects.map(&:id))
-        end
-
         context "with queued subjects" do
 
           context "when firing the request before the test" do
@@ -181,8 +181,8 @@ describe Api::V1::SubjectsController, type: :controller do
         context "without queued subjects" do
 
           it 'should create the queue' do
-            expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, user.id)
             get :index, request_params
+            expect(SubjectQueue.find_by(user: user, workflow: workflow)).to_not be_nil
           end
 
           it 'should return 404' do
