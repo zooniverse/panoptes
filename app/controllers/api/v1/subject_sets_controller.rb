@@ -4,19 +4,19 @@ class Api::V1::SubjectSetsController < Api::ApiController
   schema_type :json_schema
 
   def create
-    super { |workflow| refresh_queue(workflow) }
+    super { |subject_set| refresh_queue(subject_set) }
   end
 
   def update
-    super { |workflow| refresh_queue(workflow) }
+    super { |subject_set| refresh_queue(subject_set) }
   end
 
   def update_links
-    super { |workflow| refresh_queue(workflow) }
+    super { |subject_set| refresh_queue(subject_set) }
   end
 
   def destroy_links
-    super { |workflow| refresh_queue(workflow) }
+    super { |subject_set| refresh_queue(subject_set) }
   end
 
   protected
