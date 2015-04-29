@@ -66,7 +66,7 @@ class SubjectQueue < ActiveRecord::Base
     queue = create(workflow: workflow,
                    user: user,
                    subject_set_id: set,
-                   set_member_subjects: logged_out_queue.set_member_subjects)
+                   set_member_subject_ids: logged_out_queue.set_member_subject_ids)
     return queue if queue.persisted?
   end
 
