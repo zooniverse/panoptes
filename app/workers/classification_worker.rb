@@ -6,10 +6,12 @@ class ClassificationWorker
   def perform(id, action)
     classification = ClassificationLifecycle.new(Classification.find(id))
     case action
-    when :update
+    when "update"
       classification.transact!
-    when :create
+    when "create"
       classification.transact! { create_project_preference }
+    else
+      raise "Invalid Post-Classification Action"
     end
   end
 end
