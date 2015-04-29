@@ -178,22 +178,21 @@ describe Api::V1::SubjectsController, type: :controller do
           end
         end
 
-        context "without queued subjects" do
+        context "without already queued subjects", :focus do
+          before(:each) do
+            get :index, request_params
+          end
 
           it 'should create the queue' do
-            get :index, request_params
             expect(SubjectQueue.find_by(user: user, workflow: workflow)).to_not be_nil
           end
 
-          it 'should return 404' do
-            get :index, request_params
-            expect(response.status).to eq(404)
+          it 'should return 200' do
+            expect(response.status).to eq(200)
           end
 
-          it 'should have a useful error message' do
-            get :index, request_params
-            message = "No queue defined for user. Building one now, please try again."
-            expect(response.body).to eq(json_error_message(message))
+          it 'should return a page of 2 objects' do
+            expect(json_response[api_resource_name].length).to eq(2)
           end
         end
       end
