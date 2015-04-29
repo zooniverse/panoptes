@@ -178,7 +178,7 @@ describe Api::V1::SubjectsController, type: :controller do
           end
         end
 
-        context "without already queued subjects", :focus do
+        context "without already queued subjects" do
           before(:each) do
             get :index, request_params
           end
