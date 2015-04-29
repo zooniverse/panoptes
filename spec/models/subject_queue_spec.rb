@@ -145,7 +145,7 @@ RSpec.describe SubjectQueue, :type => :model do
     let(:workflow) { create(:workflow) }
     let(:queue) { create_list(:subject_queue, 2, workflow: workflow) }
 
-    it "should remove the subject for all queues of the workflow" do
+    it "should add the subject for all queues of the workflow" do
       SubjectQueue.enqueue_for_all(workflow, subject.id)
       expect(SubjectQueue.all.map(&:set_member_subject_ids)).to all( include(subject.id) )
     end
@@ -176,7 +176,7 @@ RSpec.describe SubjectQueue, :type => :model do
           result = SubjectQueue.subjects_queued?(workflow,
                                                  [create(:set_member_subject).id],
                                                  user: user)
-          
+
           expect(result).to be_falsy
         end
       end
@@ -204,26 +204,25 @@ RSpec.describe SubjectQueue, :type => :model do
         it 'should create a new user_enqueue_subject' do
           expect do
             SubjectQueue.enqueue(workflow,
-                                 subject,
+                                 subject.id,
                                  user: user)
           end.to change{ SubjectQueue.count }.from(0).to(1)
         end
 
         it 'should add subjects' do
           SubjectQueue.enqueue(workflow,
-                               subject,
+                               subject.id,
                                user: user)
           queue = SubjectQueue.find_by(workflow: workflow, user: user)
           expect(queue.set_member_subject_ids).to include(subject.id)
         end
-        
       end
 
       context "list exists for user" do
         let!(:ues) { create(:subject_queue, user: user, workflow: workflow) }
         it 'should call add_subject_id on the existing subject queue' do
           SubjectQueue.enqueue(workflow,
-                               subject,
+                               subject.id,
                                user: user)
           expect(ues.reload.set_member_subject_ids).to include(subject.id)
         end
