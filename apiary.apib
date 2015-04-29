@@ -1421,29 +1421,24 @@ A workflow's `first_task` is a string matching the key of its first task. (The o
 
 Each task has a `type` string of "single" or "multiple" choice, or "drawing". (More task types to come, e.g. Serengeti-style filter and Sunspotter's comparison.)
 
-Each task has a `next` string, linking to the next task in the workflow. If this is `null` or not defined, the workflow ends.
+"multiple" and "drawing" tasks have a `next` string, linking to the next task in the workflow. If this string is empty, the workflow ends. In "single" tasks, each answer has a `next` string, allowing branching based on the user's decisions.
 
-Each task may have an optional number `required`, which when set will force the user to provide a certain number of values before moving on to the next task. (This had been a boolean; `true` will be cast to `1`, `false` to `0`).
+"single" and "multiple" tasks have a `question` string, which the user must answer. Answers to the question are in an `answers` array. Each answer has a `label` string displayed to the user.
 
-Each task has a `question` string telling the user how to complete the task.
+"single" and "multiple" tasks may define a boolean `required`, which when true will force the user to provide an answer before moving on to the next task.
 
-"single"- and "multiple"-type tasks have an `answers` array.
+"drawing" tasks have an `instruction` string telling the user how to complete the task.
 
-Each answer has a `value` (of any type) recorded in the classification and a `label` string displayed to the user.
+"drawing" tasks have a `tools` array.
 
-Each answer in a "single"-type task may have an optional `next` string overriding the task's when the answer is chosen. Explicitly setting this to `null` ends the workflow.
-
-"drawing"-type tasks have a `tools` array.
-
-Each tool has a `value` and a `label`, just like an answer.
+Each tool has a `label` shown to the user.
 
 Each tool has a string `type`. Options include:
 
 + point
 + ellipse
 + circle
-+ linke
-+ axes
++ line
 + rectangle
 + polygon
 
