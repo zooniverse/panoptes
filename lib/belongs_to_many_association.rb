@@ -26,15 +26,10 @@ class BelongsToManyAssociation < ActiveRecord::Associations::CollectionAssociati
   def insert_record(record, validate=true, raise=true)
     set_inverse_instance(record)
 
-    if raise
-      record.save!(:validate => validate)
-      update_owner_foreign_key(record)
-      owner.save!(:validate => validate)
-    else
-      record.save(:validate => validate)
-      update_owner_foreign_key(record)
-      owner.save(:validate => validate)
-    end
+    save_method = raise ? :save! : :save
+    record.send(save_method, validate: validate)
+    update_owner_foreign_key(record)
+    owner.send(save_method, validate: validate)
   end
 
   private
