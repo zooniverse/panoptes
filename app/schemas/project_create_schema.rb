@@ -19,6 +19,18 @@ class ProjectCreateSchema < JsonSchema
       type "boolean"
     end
 
+    property "approved" do
+      type "boolean"
+    end
+
+    property "beta" do
+      type "boolean"
+    end
+
+    property "configuration" do
+      type "object"
+    end
+
     property "title" do
       type "string"
       description "Translatable name for the project"

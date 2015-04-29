@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::ProjectsController, type: :controller do
   let!(:user) { create(:user) }
-  let!(:projects) {create_list(:project_with_contents, 2, owner: user) }
+  let!(:projects) {create_list(:project_with_contents, 2, owner: user, approved: true) }
   let(:authorized_user) { user }
 
   let(:api_resource_name) { "projects" }
@@ -24,6 +24,8 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:authorized_user) { user }
   let(:resource_class) { Project }
   let!(:private_resource) { create(:project, private: true) }
+  let!(:beta_resource) { create(:project, beta: true, approved: true) }
+  let!(:unapproved_resource) { create(:project, beta: false, approved: false) }
 
   describe "when not logged in" do
     describe "#index" do
@@ -41,7 +43,6 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe "#index" do
-
       describe "custom owner links" do
         before(:each) do
           get :index
@@ -53,6 +54,18 @@ describe Api::V1::ProjectsController, type: :controller do
       describe "with no filtering" do
         let(:n_visible) { 2 }
         it_behaves_like "is indexable"
+
+        it "should not have beta projects" do
+          get :index
+          ids = json_response["projects"].map{ |p| p["id"] }
+          expect(Project.find(ids)).to_not include(beta_resource)
+        end
+
+        it "should not have unapproved projects" do
+          get :index
+          ids = json_response["projects"].map{ |p| p["id"] }
+          expect(Project.find(ids)).to_not include(unapproved_resource)
+        end
       end
 
       describe "filter params" do
@@ -63,6 +76,24 @@ describe Api::V1::ProjectsController, type: :controller do
 
         before(:each) do
           get :index, index_options
+        end
+
+        describe "filter by beta" do
+          let(:index_options) { { beta: "true" } }
+
+          it "should respond with the beta project" do
+            ids = json_response["projects"].map{ |p| p["id"] }
+            expect(Project.find(ids)).to include(beta_resource)
+          end
+        end
+
+        describe "filter by approved" do
+          let(:index_options) { { approved: "false" } }
+
+          it "should respond with the unapproved project" do
+            ids = json_response["projects"].map{ |p| p["id"] }
+            expect(Project.find(ids)).to include(unapproved_resource)
+          end
         end
 
         describe "filter by owner" do
@@ -182,6 +213,10 @@ describe Api::V1::ProjectsController, type: :controller do
                       result: "another string",
                       avatar: "an avatar",
                       background_image: "and image",
+                      configuration: {
+                                      an_option: "a setting"
+                                     },
+                      beta: true,
                       private: true } }
       end
 
@@ -192,6 +227,30 @@ describe Api::V1::ProjectsController, type: :controller do
           ps[:projects][:links][:owner] = owner_params
         end
         ps
+      end
+
+      describe "approved option" do
+        before(:each) do
+          ps = create_params
+          ps[:admin] = true
+          ps[:projects][:approved] = true
+          default_request scopes: scopes, user_id: authorized_user.id
+          post :create, ps
+        end
+
+        context "when the user is an admin" do
+          let(:authorized_user) { create(:admin_user) }
+          it "should create the project" do
+            expect(response).to have_http_status(:created)
+          end
+        end
+
+        context "when the user is not an admin" do
+          let(:authorized_user) { create(:user) }
+          it "should not create the project" do
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+        end
       end
 
       describe "correct serializer configuration" do
@@ -333,12 +392,16 @@ describe Api::V1::ProjectsController, type: :controller do
       {
         projects: {
           display_name: "A Better Name",
+          beta: true,
           name: "something_new",
           education_content: "asdfasdf",
           faq: "some other stuff",
           result: "another string",
           avatar: "an avatar",
           background_image: "and image",
+          configuration: {
+                          an_option: "a setting"
+                         },
           links: {
             workflows: [workflow.id.to_s],
             subject_sets: [subject_set.id.to_s]
@@ -349,6 +412,30 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     it_behaves_like "is updatable"
+
+    describe "approved option" do
+      before(:each) do
+        ps = update_params
+        ps[:admin] = true
+        ps[:projects][:approved] = true
+        default_request scopes: scopes, user_id: authorized_user.id
+        put :update, ps.merge(id: resource.id)
+      end
+
+      context "when the user is an admin" do
+        let(:authorized_user) { create(:admin_user) }
+        it "should update the project" do
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context "when the user is not an admin" do
+        let(:authorized_user) { create(:user) }
+        it "should not update the project" do
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+    end
 
     context "project_contents" do
       before(:each) do

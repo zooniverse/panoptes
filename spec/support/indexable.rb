@@ -2,7 +2,7 @@ shared_examples "is indexable" do
   let(:resource_ids) do
     json_response[api_resource_name].collect{ |h| h['id'].to_i }
   end
-  
+
   context 'for a normal user' do
     before(:each) do
       default_request scopes: scopes, user_id: authorized_user.id if authorized_user
@@ -20,7 +20,7 @@ shared_examples "is indexable" do
     it 'should not include nonvisible resources' do
       expect(resource_ids).to_not include private_resource.id
     end
-    
+
     it_behaves_like 'an api response'
   end
 
@@ -31,7 +31,7 @@ shared_examples "is indexable" do
       it 'should include the non-visible resource' do
         default_request scopes: scopes, user_id: authorized_user.id if authorized_user
         get :index, admin: 'literally_anything!'
-        
+
         expect(resource_ids).to include private_resource.id
       end
     end
@@ -40,7 +40,7 @@ shared_examples "is indexable" do
       it 'should not include the non-visible resource' do
         default_request scopes: scopes, user_id: authorized_user.id if authorized_user
         get :index
-        
+
         expect(resource_ids).to_not include private_resource.id
       end
     end

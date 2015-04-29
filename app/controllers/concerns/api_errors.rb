@@ -6,6 +6,7 @@ module ApiErrors
   class UserSeenSubjectIdError < PanoptesApiError; end
   class NotLoggedIn < PanoptesApiError; end
   class NoUserError < PanoptesApiError; end
+  class UnpermittedParameter < PanoptesApiError; end
   class RolesExist < StandardError
     def initialize
       super("Cannot create roles resource when one exists for the user and project")

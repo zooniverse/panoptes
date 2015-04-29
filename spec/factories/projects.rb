@@ -13,6 +13,8 @@ FactoryGirl.define do
     avatar "http://test.host/x02234.jpg.gif.png.webp"
     background_image "http://test.host/12312asd.jp2"
     private false
+    approved true
+    beta false
 
     association :owner, factory: :user
 

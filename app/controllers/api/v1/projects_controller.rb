@@ -30,6 +30,12 @@ class Api::V1::ProjectsController < Api::ApiController
 
 
   before_action :add_owner_ids_to_filter_param!, only: :index
+  before_action :add_approved_and_beta_to_filter_param!, only: :index
+
+  def add_approved_and_beta_to_filter_param!
+    params[:approved] = "true" unless params.has_key? :approved
+    params[:beta] = "false" unless params.has_key? :beta
+  end
 
   private
 
@@ -48,17 +54,23 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
+    allowed_to_approve
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
     add_user_as_linked_owner(create_params)
     super(create_params)
   end
 
   def build_update_hash(update_params, id)
+    allowed_to_approve
     content_update = content_from_params(update_params)
     unless content_update.blank?
       Project.find(id).primary_content.update!(content_update)
     end
     super(update_params, id)
+  end
+
+  def allowed_to_approve
+    raise Api::UnpermittedParameter, "Only Admins may Approve Projects" if create_params.has_key?(:approved) && !api_user.is_admin?
   end
 
   def new_items(resource, relation, value)

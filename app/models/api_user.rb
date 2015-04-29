@@ -1,6 +1,6 @@
 class ApiUser
   include RoleControl::Actor
-  
+
   attr_reader :user
 
   delegate :memberships_for, :owns?, :id, :languages, :user_groups,
@@ -14,7 +14,7 @@ class ApiUser
   def logged_in?
     !!user
   end
-  
+
   def owner
     user
   end

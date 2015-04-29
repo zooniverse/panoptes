@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150427204917) do
+ActiveRecord::Schema.define(version: 20150429163442) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -181,6 +181,9 @@ ActiveRecord::Schema.define(version: 20150427204917) do
     t.text     "background_image"
     t.boolean  "private"
     t.integer  "lock_version",          default: 0
+    t.jsonb    "configuration"
+    t.boolean  "approved"
+    t.boolean  "beta"
   end
 
   create_table "set_member_subjects", force: :cascade do |t|
