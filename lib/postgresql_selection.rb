@@ -17,7 +17,7 @@ class PostgresqlSelection
         if limit < available_count
           enough_available = true
         else
-          results = available.all.shuffle
+          results = available.all.shuffle.map(&:id)
           break
         end
       end

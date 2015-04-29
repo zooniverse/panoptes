@@ -38,12 +38,16 @@ class SubjectQueue < ActiveRecord::Base
 
   def self.enqueue(workflow, subject_ids, user: nil, set: nil)
     ues = scoped_to_set(set).find_or_create_by!(user: user, workflow: workflow)
-    ues.set_member_subjects.concat(Array.wrap(subject_ids))
+    ues.set_member_subject_ids_will_change!
+    ues.set_member_subject_ids = ues.set_member_subject_ids | Array.wrap(subject_ids)
+    ues.save!
   end
 
   def self.dequeue(workflow, subject_ids, user: nil, set: nil)
     ues = scoped_to_set(set).find_by!(user: user, workflow: workflow)
-    ues.set_member_subjects.delete(*subject_ids)
+    ues.set_member_subject_ids_will_change!
+    ues.set_member_subject_ids = ues.set_member_subject_ids - (Array.wrap(subject_ids))
+    ues.save!
     ues.destroy if ues.set_member_subject_ids.empty?
   end
 
