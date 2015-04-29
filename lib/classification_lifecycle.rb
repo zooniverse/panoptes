@@ -13,7 +13,7 @@ class ClassificationLifecycle
       message = "Background process called before persisting the classification."
       raise ClassificationNotPersisted.new(message)
     end
-    ClassificationWorker.perform_async(classification.id, action)
+    ClassificationWorker.perform_async(classification.id, action.to_s)
     if classification.complete?
       classification.subject_ids.each do |sid|
         ClassificationCountWorker.perform_async(sid, classification.workflow_id)

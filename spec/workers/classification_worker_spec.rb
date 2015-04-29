@@ -15,7 +15,7 @@ RSpec.describe ClassificationWorker do
 
     context ":update" do
       after(:each) do
-        classification_worker.perform(classification.id, :update)
+        classification_worker.perform(classification.id, "update")
       end
 
       it 'should call update_seen_subject' do
@@ -34,7 +34,7 @@ RSpec.describe ClassificationWorker do
 
     context ":create" do
       after(:each) do
-        classification_worker.perform(classification.id, :create)
+        classification_worker.perform(classification.id, "create")
       end
 
       it 'should call create_project_preferences' do
@@ -51,6 +51,14 @@ RSpec.describe ClassificationWorker do
 
       it 'should call publish to kafka' do
         expect_any_instance_of(ClassificationLifecycle).to receive(:publish_to_kafka)
+      end
+    end
+
+    context "anything else" do
+      it 'should raise an error' do
+       expect do
+         classification_worker.perform(classification.id, nil)
+       end.to raise_error("Invalid Post-Classification Action")
       end
     end
   end

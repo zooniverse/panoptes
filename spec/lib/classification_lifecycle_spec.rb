@@ -18,7 +18,7 @@ describe ClassificationLifecycle do
       it 'should queue other actions' do
         allow(classification).to receive(:persisted?).and_return(true)
         expect(ClassificationWorker).to receive(:perform_async)
-                                         .with(classification.id, :create)
+                                         .with(classification.id, "create")
         subject.queue(test_method)
       end
 
@@ -35,7 +35,7 @@ describe ClassificationLifecycle do
       it 'should queue other actions' do
         allow(classification).to receive(:persisted?).and_return(true)
         expect(ClassificationWorker).to receive(:perform_async)
-                                         .with(classification.id, :update )
+                                         .with(classification.id, "update")
         subject.queue(test_method)
       end
 
@@ -51,19 +51,19 @@ describe ClassificationLifecycle do
         allow(classification).to receive(:persisted?).and_return(true)
         allow(classification).to receive(:complete?).and_return(true)
       end
-      
+
       it 'should queue the count worker' do
         expect(ClassificationCountWorker).to receive(:perform_async).twice
         subject.queue(:create)
       end
     end
-    
+
     context 'when classification is incomplete' do
       before(:each) do
         allow(classification).to receive(:persisted?).and_return(true)
         allow(classification).to receive(:complete?).and_return(false)
       end
-      
+
       it 'should not queue the count worker' do
         expect(ClassificationCountWorker).to_not receive(:perform_async)
         subject.queue(:create)
