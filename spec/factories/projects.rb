@@ -34,14 +34,6 @@ FactoryGirl.define do
       private(true)
     end
 
-    factory :approved_project do
-      approved(true)
-    end
-
-    factory :live_project do
-      live(true)
-    end
-
     factory :full_project do
       after(:create) do |p|
         workflow = create(:workflow, project: p)
