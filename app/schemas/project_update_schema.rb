@@ -23,6 +23,10 @@ class ProjectUpdateSchema < JsonSchema
       type "boolean"
     end
 
+    property "live" do
+      type "boolean"
+    end
+
     property "approved" do
       type "boolean"
     end

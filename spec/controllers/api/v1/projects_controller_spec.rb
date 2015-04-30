@@ -11,13 +11,13 @@ describe Api::V1::ProjectsController, type: :controller do
      "updated_at", "created_at", "available_languages", "title", "avatar",
      "description", "team_members", "guide", "science_case", "introduction",
      "faq", "result", "education_content", "background_image", "private",
-     "retired_subjects_count", "avatar", "background_image"]
+     "live", "retired_subjects_count", "avatar", "background_image"]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
-     "projects.subject_sets",
-     "projects.project_contents",
-     "projects.project_roles" ]
+      "projects.subject_sets",
+      "projects.project_contents",
+      "projects.project_roles" ]
   end
 
   let(:scopes) { %w(public project) }
@@ -49,11 +49,6 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         it_behaves_like "it has custom owner links"
-      end
-
-      describe "with no filtering" do
-        let(:n_visible) { 4 }
-        it_behaves_like "is indexable"
       end
 
       describe "filter params" do
@@ -217,18 +212,18 @@ describe Api::V1::ProjectsController, type: :controller do
 
       let(:default_create_params) do
         { projects: { display_name: display_name,
-                     description: "A new Zoo for you!",
-                     primary_language: 'en',
-                     education_content: "asdfasdf",
-                     faq: "some other stuff",
-                     result: "another string",
-                     avatar: "an avatar",
-                     background_image: "and image",
-                     configuration: {
-                                     an_option: "a setting"
-                                    },
-                     beta: true,
-                     private: true } }
+                      description: "A new Zoo for you!",
+                      primary_language: 'en',
+                      education_content: "asdfasdf",
+                      faq: "some other stuff",
+                      result: "another string",
+                      avatar: "an avatar",
+                      background_image: "and image",
+                      configuration: {
+                                      an_option: "a setting"
+                                     },
+                      beta: true,
+                      private: true } }
       end
 
       let (:create_params) do
@@ -295,22 +290,22 @@ describe Api::V1::ProjectsController, type: :controller do
 
           it "should create an associated project_content model" do
             expect(Project.find(created_project_id)
-                   .project_contents.first).to_not be_nil
+                    .project_contents.first).to_not be_nil
           end
 
           it 'should set the contents title do' do
             expect(Project.find(created_project_id)
-                   .project_contents.first.title).to eq('New Zoo')
+                    .project_contents.first.title).to eq('New Zoo')
           end
 
           it 'should set the description' do
             expect(Project.find(created_project_id)
-                   .project_contents.first.description).to eq('A new Zoo for you!')
+                    .project_contents.first.description).to eq('A new Zoo for you!')
           end
 
           it 'should set the language' do
             expect(Project.find(created_project_id)
-                   .project_contents.first.language).to eq('en')
+                    .project_contents.first.language).to eq('en')
           end
         end
       end
@@ -332,8 +327,8 @@ describe Api::V1::ProjectsController, type: :controller do
         context "user is the current user" do
           let(:owner_params) do
             {
-             id: authorized_user.id.to_s,
-             type: "users"
+              id: authorized_user.id.to_s,
+              type: "users"
             }
           end
 
@@ -351,7 +346,7 @@ describe Api::V1::ProjectsController, type: :controller do
             user = create(:user)
             {
               id: user.id.to_s,
-                type: "users"
+              type: "users"
             }
           end
 
@@ -376,8 +371,8 @@ describe Api::V1::ProjectsController, type: :controller do
 
         let(:owner_params) do
           {
-           id: owner.id.to_s,
-           type: "user_groups"
+            id: owner.id.to_s,
+            type: "user_groups"
           }
         end
 
@@ -401,24 +396,25 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:test_attr_value) { "A Better Name" }
     let(:update_params) do
       {
-       projects: {
-                  display_name: "A Better Name",
-                  beta: true,
-                  name: "something_new",
-                  education_content: "asdfasdf",
-                  faq: "some other stuff",
-                  result: "another string",
-                  avatar: "an avatar",
-                  background_image: "and image",
-                  configuration: {
-                                  an_option: "a setting"
-                                 },
-                  links: {
-                          workflows: [workflow.id.to_s],
-                          subject_sets: [subject_set.id.to_s]
-                         }
+        projects: {
+          display_name: "A Better Name",
+          name: "something_new",
+          education_content: "asdfasdf",
+          faq: "some other stuff",
+          result: "another string",
+          avatar: "an avatar",
+          background_image: "and image",
+          configuration: {
+                          an_option: "a setting"
+                         },
+          beta: true,
+          live: true,
+          links: {
+            workflows: [workflow.id.to_s],
+            subject_sets: [subject_set.id.to_s]
+          }
 
-                 }
+        }
       }
     end
 

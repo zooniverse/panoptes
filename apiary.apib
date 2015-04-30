@@ -26,7 +26,7 @@ All requests should set `Accept: application/vnd.api+json; version=1`. You will 
 
 All PUT and POST requests should set `Content-Type: application/vnd.api+json; version=1` or `Content-Type: application/json`. You will receive a `415 Unsupported Media Type` without one of those two headers.
 
-All PUT and DELETE requests should set the `If-Match` header to the value of the `ETag` header of the request where the resource was originally retrieved. You will receive a `428 Precondition Required` without the header and a `412 Precondition Failed` if the etags do not match. 
+All PUT and DELETE requests should set the `If-Match` header to the value of the `ETag` header of the request where the resource was originally retrieved. You will receive a `428 Precondition Required` without the header and a `412 Precondition Failed` if the etags do not match.
 
 # Group Panoptes API Root [/]
 Panoptes API entry point.
@@ -541,7 +541,7 @@ and *user_group_id* parameters.
     + project_id (optional, integer) ... only retrieve classifications for a specific project
     + user_group_id (optional, integer) ... only retrieve classifications for a specific user group
     + include (optional, string) ... comma separated list of linked resources to return with the collection
-    + for (optional, string) ... one of 'projects', 'user', 'user_groups', 'user' by default (see explanation above).
+    + for (optional, string) ... one of 'projects', 'user', 'user_groups', 'user' by default (see explanation above)
 
 + Request
 
@@ -1000,7 +1000,7 @@ The *metadata* attribute is optional.
 # Group Projects
 Resources related to _Panoptes Projects_.
 
-## Project [/projects/{id}{?include}]
+## Project [/projects/{id}{?include,display_name,approved,beta,live}]
 A Project is a collection of subjects and task workflows that a
 volunteer performs on subjects. The project also holds supplementary
 text describing the tasks volunteers perform.
@@ -1008,26 +1008,39 @@ text describing the tasks volunteers perform.
 It has the following attributes:
 
 - id
+- display_name
+- classification_count
+- subject_counts
 - created_at
 - updated_at
-- name
-- display_name
-- user_count
-- classification_count
-- activated_state
-- primary_language
+- available_languages
 - title
 - description
-- introduction
-- science_case
-- team_members
 - guide
+- team_members
+- science_case
+- introduction
+- avatar
+- background_image
+- private
+- faq
+- result
+- education_content
+- retired_subjects_count
+- configuration
+- beta
+- approved
+- live
 
 *id*, *created_at*, *updated_at*, *user_count*, and
 *classification_count* are set by the API.
 
 + Parameters
   + id (required, integer) ... integer id of the resource to retrieve
+  + display_name (string) ... project name filter
+  + approved (boolean) ... approved state filter
+  + beta (boolean) ... beta state filter
+  + live (boolean) ... live state filter
 
 + Model
 
@@ -1058,28 +1071,37 @@ It has the following attributes:
                 },
                 "projects": [{
                     "id": "1",
+                    "display_name": "Galaxy Zoo",
+                    "classification_count": "1000000",
+                    "subjects_count": "10000",
                     "created_at": "2014-03-24T10:42:21Z",
                     "updated_at": "2014-03-24T10:42:21Z",
-                    "name": "galaxy_zoo",
-                    "display_name": "Galaxy Zoo",
-                    "primary_language": "en",
-                    "user_count": "10000",
-                    "classification_count": "1000000",
-                    "activated_state": 0,
+                    "available_languages": ["en"],
                     "title": "Galaxy Zoo",
                     "description": "A Project ...",
-                    "introduction": "asdfasdf",
-                    "science_case": "88mph + 1.21 GW = 1955",
+                    "guide": [{
+                        "image": "http://something.example.com/delorean.jpg",
+                        "explanation": "our ride"
+                    }],
                     "team_members": [{
                         "name": "Doc Brown",
                         "bio": "",
                         "twitter": "thatsmydelorean",
                         "insitution": nil
                     }],
-                    "guide": [{
-                        "image": "http://something.example.com/delorean.jpg",
-                        "explanation": "our ride"
-                    }],
+                    "science_case": "88mph + 1.21 GW = 1955",
+                    "introduction": "asdfasdf",
+                    "avatar": "http://test.host/x02234.png",
+                    "background_image": "http://test.host/12312asd.jp2",
+                    "private": false,
+                    "faq": "This project uses..",
+                    "result": "We found amazing things",
+                    "education_content": "Educator content goes here",
+                    "retired_subjects_count": "5000",
+                    "configuration": { "option_1": "value" },
+                    "beta": "false",
+                    "approved": "true",
+                    "live": "true",
                     "links": {
                         "owner": {
                             "id": "2",

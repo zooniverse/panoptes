@@ -9,12 +9,14 @@ FactoryGirl.define do
     sequence(:display_name) { |n| "Test Project #{ n }" }
     user_count { 10 + rand(1000) }
     activated_state Project.activated_states[:active]
+    configuration { { x: "y", z: "q" } }
     primary_language "en"
     avatar "http://test.host/x02234.jpg.gif.png.webp"
     background_image "http://test.host/12312asd.jp2"
     private false
     approved true
     beta false
+    live true
 
     association :owner, factory: :user
 

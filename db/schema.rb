@@ -174,8 +174,8 @@ ActiveRecord::Schema.define(version: 20150430132128) do
     t.integer  "user_count"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "classifications_count", default: 0,     null: false
-    t.integer  "activated_state",       default: 0,     null: false
+    t.integer  "classifications_count", default: 0, null: false
+    t.integer  "activated_state",       default: 0, null: false
     t.string   "primary_language"
     t.text     "avatar"
     t.text     "background_image"
@@ -184,7 +184,7 @@ ActiveRecord::Schema.define(version: 20150430132128) do
     t.jsonb    "configuration"
     t.boolean  "approved",              default: false
     t.boolean  "beta",                  default: false
-    t.boolean  "live",                  default: false
+    t.boolean  "live",                  default: false, null: false
   end
 
   add_index "projects", ["approved"], name: "index_projects_on_approved", using: :btree
