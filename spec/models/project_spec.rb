@@ -21,7 +21,7 @@ describe Project, :type => :model do
   it "should have a valid factory" do
     expect(project).to be_valid
   end
-  
+
   it 'should require unique displays name for an owner' do
     owner = create(:user)
     expect(create(:project, display_name: "hi fives", owner: owner)).to be_valid
@@ -62,6 +62,21 @@ describe Project, :type => :model do
     it "should allow collections to link user has show permissions" do
       expect(Project).to link_to(Collection).given_args(user)
                           .with_scope(:scope_for, :show, user)
+    end
+  end
+
+  describe "#live" do
+    before(:each) do
+      project.update_attributes(live: nil)
+    end
+
+    it "should not accept nil values" do
+      expect(project.valid?).to eq(false)
+    end
+
+    it "should have a useful error message" do
+      project.valid?
+      expect(project.errors[:live]).to include("must be true or false")
     end
   end
 
