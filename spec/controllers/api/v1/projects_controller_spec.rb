@@ -15,9 +15,9 @@ describe Api::V1::ProjectsController, type: :controller do
   end
   let(:api_resource_links) do
     [ "projects.workflows",
-      "projects.subject_sets",
-      "projects.project_contents",
-      "projects.project_roles" ]
+     "projects.subject_sets",
+     "projects.project_contents",
+     "projects.project_roles" ]
   end
 
   let(:scopes) { %w(public project) }
@@ -30,7 +30,7 @@ describe Api::V1::ProjectsController, type: :controller do
   describe "when not logged in" do
     describe "#index" do
       let(:authorized_user) { nil }
-      let(:n_visible) { 2 }
+      let(:n_visible) { 4 }
       it_behaves_like "is indexable"
       it_behaves_like "it has custom owner links"
     end
@@ -52,20 +52,8 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       describe "with no filtering" do
-        let(:n_visible) { 2 }
+        let(:n_visible) { 4 }
         it_behaves_like "is indexable"
-
-        it "should not have beta projects" do
-          get :index
-          ids = json_response["projects"].map{ |p| p["id"] }
-          expect(Project.find(ids)).to_not include(beta_resource)
-        end
-
-        it "should not have unapproved projects" do
-          get :index
-          ids = json_response["projects"].map{ |p| p["id"] }
-          expect(Project.find(ids)).to_not include(unapproved_resource)
-        end
       end
 
       describe "filter params" do
@@ -79,21 +67,44 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "filter by beta" do
-          let(:index_options) { { beta: "true" } }
+          context "for beta projects" do
+            let(:index_options) { { beta: "true" } }
 
-          it "should respond with the beta project" do
-            ids = json_response["projects"].map{ |p| p["id"] }
-            expect(Project.find(ids)).to include(beta_resource)
+            it "should respond with the beta project" do
+              ids = json_response["projects"].map{ |p| p["id"] }
+              expect(Project.find(ids)).to include(beta_resource)
+            end
+          end
+
+          context "for non-beta projects" do
+            let(:index_options) { { beta: "false" } }
+
+            it "should not have beta projects" do
+              ids = json_response["projects"].map{ |p| p["id"] }
+              expect(Project.find(ids)).to_not include(beta_resource)
+            end
           end
         end
 
         describe "filter by approved" do
-          let(:index_options) { { approved: "false" } }
+          context "for unapproved projects" do
+            let(:index_options) { { approved: "false" } }
 
-          it "should respond with the unapproved project" do
-            ids = json_response["projects"].map{ |p| p["id"] }
-            expect(Project.find(ids)).to include(unapproved_resource)
+            it "should respond with the unapproved project" do
+              ids = json_response["projects"].map{ |p| p["id"] }
+              expect(Project.find(ids)).to include(unapproved_resource)
+            end
           end
+
+          context "for approved projects" do
+            let(:index_options) { { approved: "true" } }
+            it "should not have unapproved projects" do
+              ids = json_response["projects"].map{ |p| p["id"] }
+              expect(Project.find(ids)).to_not include(unapproved_resource)
+            end
+          end
+
+
         end
 
         describe "filter by owner" do
@@ -206,18 +217,18 @@ describe Api::V1::ProjectsController, type: :controller do
 
       let(:default_create_params) do
         { projects: { display_name: display_name,
-                      description: "A new Zoo for you!",
-                      primary_language: 'en',
-                      education_content: "asdfasdf",
-                      faq: "some other stuff",
-                      result: "another string",
-                      avatar: "an avatar",
-                      background_image: "and image",
-                      configuration: {
-                                      an_option: "a setting"
-                                     },
-                      beta: true,
-                      private: true } }
+                     description: "A new Zoo for you!",
+                     primary_language: 'en',
+                     education_content: "asdfasdf",
+                     faq: "some other stuff",
+                     result: "another string",
+                     avatar: "an avatar",
+                     background_image: "and image",
+                     configuration: {
+                                     an_option: "a setting"
+                                    },
+                     beta: true,
+                     private: true } }
       end
 
       let (:create_params) do
@@ -284,22 +295,22 @@ describe Api::V1::ProjectsController, type: :controller do
 
           it "should create an associated project_content model" do
             expect(Project.find(created_project_id)
-                    .project_contents.first).to_not be_nil
+                   .project_contents.first).to_not be_nil
           end
 
           it 'should set the contents title do' do
             expect(Project.find(created_project_id)
-                    .project_contents.first.title).to eq('New Zoo')
+                   .project_contents.first.title).to eq('New Zoo')
           end
 
           it 'should set the description' do
             expect(Project.find(created_project_id)
-                    .project_contents.first.description).to eq('A new Zoo for you!')
+                   .project_contents.first.description).to eq('A new Zoo for you!')
           end
 
           it 'should set the language' do
             expect(Project.find(created_project_id)
-                    .project_contents.first.language).to eq('en')
+                   .project_contents.first.language).to eq('en')
           end
         end
       end
@@ -321,8 +332,8 @@ describe Api::V1::ProjectsController, type: :controller do
         context "user is the current user" do
           let(:owner_params) do
             {
-              id: authorized_user.id.to_s,
-              type: "users"
+             id: authorized_user.id.to_s,
+             type: "users"
             }
           end
 
@@ -340,7 +351,7 @@ describe Api::V1::ProjectsController, type: :controller do
             user = create(:user)
             {
               id: user.id.to_s,
-              type: "users"
+                type: "users"
             }
           end
 
@@ -365,8 +376,8 @@ describe Api::V1::ProjectsController, type: :controller do
 
         let(:owner_params) do
           {
-            id: owner.id.to_s,
-            type: "user_groups"
+           id: owner.id.to_s,
+           type: "user_groups"
           }
         end
 
@@ -390,24 +401,24 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:test_attr_value) { "A Better Name" }
     let(:update_params) do
       {
-        projects: {
-          display_name: "A Better Name",
-          beta: true,
-          name: "something_new",
-          education_content: "asdfasdf",
-          faq: "some other stuff",
-          result: "another string",
-          avatar: "an avatar",
-          background_image: "and image",
-          configuration: {
-                          an_option: "a setting"
-                         },
-          links: {
-            workflows: [workflow.id.to_s],
-            subject_sets: [subject_set.id.to_s]
-          }
+       projects: {
+                  display_name: "A Better Name",
+                  beta: true,
+                  name: "something_new",
+                  education_content: "asdfasdf",
+                  faq: "some other stuff",
+                  result: "another string",
+                  avatar: "an avatar",
+                  background_image: "and image",
+                  configuration: {
+                                  an_option: "a setting"
+                                 },
+                  links: {
+                          workflows: [workflow.id.to_s],
+                          subject_sets: [subject_set.id.to_s]
+                         }
 
-        }
+                 }
       }
     end
 

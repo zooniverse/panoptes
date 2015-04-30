@@ -30,12 +30,6 @@ class Api::V1::ProjectsController < Api::ApiController
 
 
   before_action :add_owner_ids_to_filter_param!, only: :index
-  before_action :add_approved_and_beta_to_filter_param!, only: :index
-
-  def add_approved_and_beta_to_filter_param!
-    params[:approved] = "true" unless params.has_key? :approved
-    params[:beta] = "false" unless params.has_key? :beta
-  end
 
   private
 
