@@ -415,7 +415,6 @@ describe Api::V1::ProjectsController, type: :controller do
       {
         projects: {
           display_name: "A Better Name",
-          beta: true,
           name: "something_new",
           education_content: "asdfasdf",
           faq: "some other stuff",
@@ -425,6 +424,8 @@ describe Api::V1::ProjectsController, type: :controller do
           configuration: {
                           an_option: "a setting"
                          },
+          beta: true,
+          live: true,
           links: {
             workflows: [workflow.id.to_s],
             subject_sets: [subject_set.id.to_s]
