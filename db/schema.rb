@@ -184,7 +184,7 @@ ActiveRecord::Schema.define(version: 20150430132128) do
     t.jsonb    "configuration"
     t.boolean  "approved",              default: false
     t.boolean  "beta",                  default: false
-    t.boolean  "live",                  default: false
+    t.boolean  "live",                  default: false, null: false
   end
 
   add_index "projects", ["approved"], name: "index_projects_on_approved", using: :btree
