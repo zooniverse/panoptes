@@ -10,9 +10,10 @@ class Project < ActiveRecord::Base
   EXPERT_ROLES = [:expert, :owner]
 
   has_many :workflows
-  has_many :subject_sets
+  has_many :subject_sets, dependent: :destroy
   has_many :classifications
   has_many :subjects
+  has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
   has_many :project_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
 
   accepts_nested_attributes_for :project_contents

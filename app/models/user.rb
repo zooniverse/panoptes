@@ -25,7 +25,7 @@ class User < ActiveRecord::Base
   has_many :collection_roles, through: :identity_group
   has_many :user_seen_subjects
 
-  has_many :subject_queues, dependent: :destroy
+  has_many :subject_queues
 
   validates :display_name, presence: true, uniqueness: { case_sensitive: false },
             format: { without: /\$|@|\s+/ }, unless: :migrated
