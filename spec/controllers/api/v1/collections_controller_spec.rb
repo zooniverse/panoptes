@@ -19,6 +19,7 @@ describe Api::V1::CollectionsController, type: :controller do
   end
 
   describe '#index' do
+    let(:resources) { collections }
     let!(:private_resource) do
       create :collection_with_subjects, private: true
     end
@@ -27,6 +28,7 @@ describe Api::V1::CollectionsController, type: :controller do
 
     it_behaves_like "is indexable"
     it_behaves_like "it has custom owner links"
+    it_behaves_like 'has many filterable', :subjects
   end
 
   describe '#show' do

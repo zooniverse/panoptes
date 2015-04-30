@@ -27,11 +27,13 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe '#index' do
+    let(:resources) { create_list(:workflow_with_subjects, 2) }
     let(:private_project) { create(:private_project) }
     let!(:private_resource) { create(:workflow, project: private_project) }
     let(:n_visible) { 2 }
 
     it_behaves_like 'is indexable'
+    it_behaves_like 'has many filterable', :subject_sets
   end
 
   describe '#update' do

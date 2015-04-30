@@ -57,7 +57,7 @@ module JsonApiController
     end
 
     def objects_or_error(objects, relation, multi)
-      # THis is a workaround for  https://github.com/rails/arel/pull/349
+      # This is a workaround for  https://github.com/rails/arel/pull/349
       return multi ? objects : objects.first unless objects.empty?
       error_name = multi ? :plural : :singular
       raise JsonApiController::NotLinkable.new("Couldn't find linked #{relation.klass.model_name.send(error_name)} for current user")

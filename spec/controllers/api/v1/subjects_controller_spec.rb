@@ -29,6 +29,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
     context "logged out user" do
       context "without any sort" do
+        let(:resources) { create_list(:collection_with_subjects, 2).flat_map(&:subjects) }
         before(:each) do
           get :index
         end
@@ -42,6 +43,7 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         it_behaves_like "an api response"
+        it_behaves_like 'has many filterable', :collections
       end
 
       context "a queued request" do
