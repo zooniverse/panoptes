@@ -1016,7 +1016,6 @@ It has the following attributes:
 - classification_count
 - activated_state
 - primary_language
-- visible_to
 - title
 - description
 - introduction
@@ -1067,7 +1066,6 @@ It has the following attributes:
                     "user_count": "10000",
                     "classification_count": "1000000",
                     "activated_state": 0,
-                    "visible_to": [],
                     "title": "Galaxy Zoo",
                     "description": "A Project ...",
                     "introduction": "asdfasdf",
@@ -1267,7 +1265,6 @@ Projects are returned as an array under the _projects_ key.
                     "user_count": "10000",
                     "classification_count": "1000000",
                     "activated_state": 0,
-                    "visible_to": [],
                     "title": "Galaxy Zoo",
                     "description": "A Project ...",
                     "introduction": "asdfasdf",
@@ -1299,7 +1296,6 @@ Projects are returned as an array under the _projects_ key.
                     "user_count": "10000",
                     "classification_count": "1000000",
                     "activated_state": 0,
-                    "visible_to": [],
                     "title": "Galaxy Zoo",
                     "description": "A Project ...",
                     "introduction": "asdfasdf",
@@ -2845,11 +2841,8 @@ It has the following attributes:
 - updated_at
 - name
 - display_name
-- visible_to
 
-*id*, *created_at*, and *updated_at* are set by the API. If visible_to
- is set to anything except an empty array it will only be visible to
- users assigned one of the visible roles for the collection.
+*id*, *created_at*, and *updated_at* are set by the API.
 
 + Model
 
@@ -2868,7 +2861,6 @@ It has the following attributes:
                     "updated_at": "2014-04-20T06:23:12Z",
                     "name" : "flowers",
                     "display_name": "Lots of Pretty flowers",
-                    "visible_to": [],
                     "links": {
                         "owner": {
                             "id": "10",
@@ -2894,9 +2886,8 @@ It has the following attributes:
 
 ### Edit a collection [PUT]
 A user may edit a collection they are the owner of or have edit
-permissions for. A user may edit a collection's name, display_name, or
-visible_to array, and may also send a full representation of a
-collections subject links.
+permissions for. A user may edit a collection's name, or display_name,
+and may also send a full representation of a collections subject links.
 
 Sending subject links through a put is not recommend, especially if a
 collection has many subjects.
@@ -2915,7 +2906,6 @@ Removing subjects from a collection does not destroy the subject record.
             {
                 "collections": {
                     "name": "flower_power",
-                    "visible_to": ["collaborators"]
                 }
             }
 
@@ -3020,7 +3010,6 @@ Collections are returned as an array under *collections*.
                     "updated_at": "2014-04-20T06:23:12Z",
                     "name" : "flowers",
                     "display_name": "Lots of Pretty flowers",
-                    "visible_to": [],
                     "links": {
                         "owner": {
                             "id": "10",
@@ -3034,7 +3023,6 @@ Collections are returned as an array under *collections*.
                     "updated_at": "2014-04-21T16:23:12Z",
                     "name" : "bad_flowers",
                     "display_name": "Lots of Ugly flowers",
-                    "visible_to": ["collaborators"],
                     "links": {
                         "owner": {
                             "id": "11",
@@ -3065,11 +3053,10 @@ Collections are returned as an array under *collections*.
 
 ### Create Collection [POST]
 A Collection only needs a *display name* to be created. By default
-*visible_to* will be set to an empty array, name will be the
-underscored and downcased version of *display_name*, and the current
-user will be set as the owner.
+name will be the underscored and downcased version of *display_name*,
+and the current user will be set as the owner.
 
-Optionally a create request may include name, visible_to, a link to an
+Optionally a create request may include name, a link to an
 owner, and links to subjects.
 
 + Request
