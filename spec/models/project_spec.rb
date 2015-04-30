@@ -37,6 +37,10 @@ describe Project, :type => :model do
     expect(build(:project, private: nil)).to_not be_valid
   end
 
+  it 'should require a live field to be set' do
+    expect(build(:project, live: nil)).to_not be_valid
+  end
+
   describe "links" do
     let(:user) { ApiUser.new(create(:user)) }
 

@@ -15,6 +15,7 @@ FactoryGirl.define do
     private false
     approved true
     beta false
+    live false
 
     association :owner, factory: :user
 
@@ -30,6 +31,10 @@ FactoryGirl.define do
 
     factory :private_project do
       private(true)
+    end
+
+    factory :live_project do
+      live(true)
     end
 
     factory :full_project do

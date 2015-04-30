@@ -17,7 +17,7 @@ class Project < ActiveRecord::Base
 
   accepts_nested_attributes_for :project_contents
 
-  validates_inclusion_of :private, in: [true, false]
+  validates_inclusion_of :private, :live, in: [true, false]
 
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
