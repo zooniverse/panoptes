@@ -51,23 +51,6 @@ describe Api::V1::ProjectsController, type: :controller do
         it_behaves_like "it has custom owner links"
       end
 
-      describe "with no filtering" do
-        let(:n_visible) { 4 }
-        it_behaves_like "is indexable"
-
-        it "should not have beta projects" do
-          get :index
-          ids = json_response["projects"].map{ |p| p["id"] }
-          expect(Project.find(ids)).to_not include(beta_resource)
-        end
-
-        it "should not have unapproved projects" do
-          get :index
-          ids = json_response["projects"].map{ |p| p["id"] }
-          expect(Project.find(ids)).to_not include(unapproved_resource)
-        end
-      end
-
       describe "filter params" do
         let!(:project_owner) { create(:user) }
         let!(:new_project) do
