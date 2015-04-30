@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150429163442) do
+ActiveRecord::Schema.define(version: 20150430132128) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -174,17 +174,21 @@ ActiveRecord::Schema.define(version: 20150429163442) do
     t.integer  "user_count"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "classifications_count", default: 0, null: false
-    t.integer  "activated_state",       default: 0, null: false
+    t.integer  "classifications_count", default: 0,     null: false
+    t.integer  "activated_state",       default: 0,     null: false
     t.string   "primary_language"
     t.text     "avatar"
     t.text     "background_image"
     t.boolean  "private"
     t.integer  "lock_version",          default: 0
     t.jsonb    "configuration"
-    t.boolean  "approved"
-    t.boolean  "beta"
+    t.boolean  "approved",              default: false
+    t.boolean  "beta",                  default: false
+    t.boolean  "live",                  default: false
   end
+
+  add_index "projects", ["approved"], name: "index_projects_on_approved", using: :btree
+  add_index "projects", ["beta"], name: "index_projects_on_beta", using: :btree
 
   create_table "set_member_subjects", force: :cascade do |t|
     t.integer  "subject_set_id"
