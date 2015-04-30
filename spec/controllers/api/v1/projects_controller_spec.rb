@@ -15,9 +15,9 @@ describe Api::V1::ProjectsController, type: :controller do
   end
   let(:api_resource_links) do
     [ "projects.workflows",
-     "projects.subject_sets",
-     "projects.project_contents",
-     "projects.project_roles" ]
+      "projects.subject_sets",
+      "projects.project_contents",
+      "projects.project_roles" ]
   end
 
   let(:scopes) { %w(public project) }
