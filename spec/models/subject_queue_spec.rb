@@ -151,49 +151,6 @@ RSpec.describe SubjectQueue, :type => :model do
     end
   end
 
-  describe "::subjects_queued?" do
-    let(:subject) { create(:set_member_subject) }
-    let!(:subject_queue) do
-      create(:subject_queue, set_member_subject_ids: [subject.id])
-    end
-
-    context "with a user" do
-      context "subject is queued" do
-        it 'should return truthy' do
-          user = subject_queue.user
-          workflow = subject_queue.workflow
-          result = SubjectQueue.subjects_queued?(workflow,
-                                                 [subject.id],
-                                                 user: user)
-          expect(result).to be_truthy
-        end
-      end
-
-      context "subject is not queued" do
-        it 'should return falsy' do
-          user = subject_queue.user
-          workflow = subject_queue.workflow
-          result = SubjectQueue.subjects_queued?(workflow,
-                                                 [create(:set_member_subject).id],
-                                                 user: user)
-
-          expect(result).to be_falsy
-        end
-      end
-
-      context "queue doesn't exist" do
-        it 'should return falsy' do
-          user = create(:user)
-          workflow = create(:workflow) 
-          result = SubjectQueue.subjects_queued?(workflow,
-                                                 [create(:set_member_subject).id],
-                                                 user: user)
-          expect(result).to be_falsy
-        end
-      end
-    end
-  end
-
   describe "::enqueue" do
     let(:workflow) { create(:workflow) }
     let(:subject) { create(:set_member_subject) }

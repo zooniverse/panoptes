@@ -1,6 +1,13 @@
 require 'spec_helper'
 
 describe ClassificationLifecycle do
+  let!(:subject_queue) do
+    create(:subject_queue,
+           user: classification.user,
+           workflow: classification.workflow,
+           set_member_subject_ids: classification.subject_ids)
+  end
+
   subject do
     ClassificationLifecycle.new(classification)
   end
@@ -18,7 +25,7 @@ describe ClassificationLifecycle do
       it 'should queue other actions' do
         allow(classification).to receive(:persisted?).and_return(true)
         expect(ClassificationWorker).to receive(:perform_async)
-                                         .with(classification.id, "create")
+          .with(classification.id, "create")
         subject.queue(test_method)
       end
 
@@ -35,7 +42,7 @@ describe ClassificationLifecycle do
       it 'should queue other actions' do
         allow(classification).to receive(:persisted?).and_return(true)
         expect(ClassificationWorker).to receive(:perform_async)
-                                         .with(classification.id, "update")
+          .with(classification.id, "update")
         subject.queue(test_method)
       end
 
@@ -119,7 +126,7 @@ describe ClassificationLifecycle do
       it 'should publish to kafka' do
         serialized = ClassificationSerializer.serialize(classification).to_json
         expect(MultiKafkaProducer).to receive(:publish)
-                                       .with('classifications', [classification.project.id, serialized])
+          .with('classifications', [classification.project.id, serialized])
       end
     end
 
@@ -138,27 +145,15 @@ describe ClassificationLifecycle do
     context "complete classification" do
       let(:classification) { create(:classification, completed: true) }
 
-      context "is queued" do
-        let!(:subject_queue) do
-          create(:subject_queue,
-                 user: classification.user,
-                 workflow: classification.workflow,
-                 set_member_subject_ids: classification.subject_ids)
-        end
-
-        it 'should call dequeue_subject_for_user' do
-          expect(SubjectQueue).to receive(:dequeue)
-                                       .with(classification.workflow,
-                                             classification.subject_ids,
-                                             user: classification.user)
-        end
-      end
-
-      context "is not queued" do
-        it 'should not call dequeue_subject_for_user when not enqueued' do
-          classification = create(:classification, completed: true)
-          expect(SubjectQueue).to_not receive(:dequeue_subject_for_user)
-        end
+      it 'should call dequeue_subject_for_user' do
+        ss = create(:subject_set, workflows: [classification.workflow])
+        sms_ids = classification.subject_ids.map do |s_id|
+          create(:set_member_subject, subject_set: ss, subject_id: s_id)
+        end.map(&:id)
+        expect(SubjectQueue).to receive(:dequeue)
+          .with(classification.workflow,
+                sms_ids,
+                user: classification.user)
       end
     end
 
@@ -185,10 +180,10 @@ describe ClassificationLifecycle do
         it "should set the communication preferences to the user's default" do
           subject.create_project_preference
           email_pref = UserProjectPreference
-                       .where(user: classification.user, project: classification.project)
-                       .first.email_communication
+            .where(user: classification.user, project: classification.project)
+            .first.email_communication
           expect(email_pref).to eq(classification.user
-                                    .project_email_communication)
+                                   .project_email_communication)
         end
 
       end
@@ -226,9 +221,9 @@ describe ClassificationLifecycle do
       let(:classification) { build(:classification) }
       it 'should add the subject_id to the seen subjects' do
         expect(UserSeenSubject).to receive(:add_seen_subjects_for_user)
-                                    .with(user: classification.user,
-                                          workflow: classification.workflow,
-                                          subject_ids: classification.subject_ids)
+          .with(user: classification.user,
+                workflow: classification.workflow,
+                subject_ids: classification.subject_ids)
       end
     end
 
