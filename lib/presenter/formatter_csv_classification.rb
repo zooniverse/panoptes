@@ -43,11 +43,11 @@ module Formatter
       end
 
       def metadata
-        classification.metadata.to_s
+        classification.metadata.to_json
       end
 
       def annotations
-        classification.annotations.to_s
+        classification.annotations.to_json
       end
 
       def expert
