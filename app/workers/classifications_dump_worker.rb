@@ -17,6 +17,7 @@ class ClassificationsDumpWorker
           end
         end
         write_to_s3
+        email_owner
       ensure
         FileUtils.rm(temp_file_path)
       end
@@ -30,7 +31,7 @@ class ClassificationsDumpWorker
   end
 
   def completed_project_classifications
-    project.classifications.where(completed:true)
+    project.classifications.where(completed: true)
   end
 
   def project_file_path
@@ -45,7 +46,15 @@ class ClassificationsDumpWorker
     ::Panoptes.subjects_bucket.objects[upload_file_path]
   end
 
+  def s3_url
+    s3_object.url_for(:read, expires: 1.hour.from_now)
+  end
+
   def write_to_s3
     s3_object.write(file: temp_file_path, content_type: "text/csv")
+  end
+
+  def email_owner
+    ClassificationDataMailerWorker.perform_async(@project.id, s3_url.to_s)
   end
 end

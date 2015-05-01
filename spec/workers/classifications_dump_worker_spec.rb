@@ -41,6 +41,11 @@ RSpec.describe ClassificationsDumpWorker do
         expect(FileUtils).to receive(:rm).with(temp_file_path)
         worker.perform(project.id)
       end
+
+      it "should queue a worker to send an email" do
+        expect(ClassificationDataMailerWorker).to receive(:perform_async).with(project.id, anything)
+        worker.perform(project.id)
+      end
     end
   end
 end
