@@ -17,6 +17,7 @@ RSpec.describe SubjectWorkflowCount, type: :model do
   describe "#retire!" do
     it 'should add the workflow the set_member_subjects retired list' do
       count.retire!
+      count.reload
       expect(count.set_member_subject.retired_workflows).to include(count.workflow)
     end
 
