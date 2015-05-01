@@ -6,7 +6,7 @@ class SubjectSet < ActiveRecord::Base
   has_many :subject_sets_workflows, dependent: :destroy
   has_many :workflows, through: :subject_sets_workflows
 
-  has_many :set_member_subjects
+  has_many :set_member_subjects, dependent: :destroy
   has_many :subjects, through: :set_member_subjects
 
   validates_presence_of :project
