@@ -32,8 +32,11 @@ class ClassificationLifecycle
   end
 
   def dequeue_subject
-    return unless should_dequeue_subject?
-    SubjectQueue.dequeue(workflow, subject_ids, user: user)
+    SubjectQueue.dequeue(workflow,
+                         SetMemberSubject.by_subject_workflow(subject_ids,
+                                                              classification.workflow)
+                           .pluck(:id),
+                         user: user)
   end
 
   def create_project_preference
@@ -67,10 +70,6 @@ class ClassificationLifecycle
 
   def should_update_seen?
     !classification.anonymous? && classification.complete?
-  end
-
-  def should_dequeue_subject?
-    SubjectQueue.subjects_queued?(workflow, subject_ids, user: user)
   end
 
   def should_create_project_preference?

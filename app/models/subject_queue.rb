@@ -74,11 +74,6 @@ class SubjectQueue < ActiveRecord::Base
     return queue if queue.persisted?
   end
 
-  def self.subjects_queued?(workflow, subject_ids, user: nil)
-    where.overlap(set_member_subject_ids: subject_ids)
-      .exists?(user: user, workflow: workflow)
-  end
-
   def below_minimum?
     set_member_subject_ids.length < MINIMUM_LENGTH
   end
