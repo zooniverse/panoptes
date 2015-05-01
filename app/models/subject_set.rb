@@ -3,7 +3,8 @@ class SubjectSet < ActiveRecord::Base
   include Linkable
 
   belongs_to :project
-  has_and_belongs_to_many :workflows
+  has_many :subject_sets_workflows
+  has_many :workflows, through: :subject_sets_workflows
 
   has_many :set_member_subjects
   has_many :subjects, through: :set_member_subjects

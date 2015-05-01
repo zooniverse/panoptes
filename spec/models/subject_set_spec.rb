@@ -16,6 +16,16 @@ describe SubjectSet, :type => :model do
     expect(build(:subject_set, project: s.project, display_name: s.display_name)).to_not be_valid
   end
 
+  it "should only have a workflow assigned once" do
+    w = create(:workflow)
+    subject_set.workflows << w
+    subject_set.save!
+    expect do
+      subject_set.workflows << w
+    end.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
+
   describe "links" do
     let(:project) { create(:project) }
     let(:workflow) { create(:workflow, project: project) }

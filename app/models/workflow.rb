@@ -7,7 +7,8 @@ class Workflow < ActiveRecord::Base
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
   belongs_to :project
-  has_and_belongs_to_many :subject_sets
+  has_many :subject_sets_workflows
+  has_many :subject_sets, through: :subject_sets_workflows
   has_many :set_member_subjects, through: :subject_sets
   has_many :classifications
   has_many :user_seen_subjects

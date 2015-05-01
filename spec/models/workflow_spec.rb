@@ -17,6 +17,15 @@ describe Workflow, :type => :model do
     expect(workflow).to be_valid
   end
 
+  it "should only have a subject set assigned once" do
+    ss = create(:subject_set)
+    workflow.subject_sets << ss
+    workflow.save!
+    expect do
+      workflow.subject_sets << ss
+    end.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
   describe "links" do
     let(:project) { create(:project) }
     let(:subject_set) { create(:subject_set, project: project) }
