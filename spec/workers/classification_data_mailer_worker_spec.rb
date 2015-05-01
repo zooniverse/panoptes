@@ -1,0 +1,10 @@
+require 'spec_helper'
+
+RSpec.describe ClassificationDataMailerWorker do
+  let(:project) { create(:project) }
+  let(:s3_url) { "https://fake.s3.url.example.com" }
+
+  it 'should deliver the mail' do
+    expect{ subject.perform(project.id, s3_url) }.to change{ ActionMailer::Base.deliveries.count }.by(1)
+  end
+end
