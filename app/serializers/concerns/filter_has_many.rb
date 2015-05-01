@@ -10,7 +10,7 @@ module FilterHasMany
       end
 
       scope = filters.reduce(scope || self.model_class.all) do |query, filter|
-        scope.joins(filter[0]).where(filter[0] => {id: filter[2]})
+        query.joins(filter[0]).where(filter[0] => {id: filter[2]})
       end
 
       super params, scope, context
