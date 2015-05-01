@@ -16,7 +16,7 @@ RSpec.describe SubjectQueueWorker do
       end
     end
 
-    context "when a workflow id string is passed in", :inline do
+    context "when a workflow id string is passed in" do
       it "should not raise an error" do
         expect{subject.perform(workflow.id.to_s)}.to_not raise_error
       end
