@@ -17,6 +17,10 @@ module Panoptes
   def self.bucket_path
     @bucket_path ||= aws_config[:bucket_path]
   end
+
+  def self.export_bucket_path
+    @bucket_path ||= aws_config[:export_bucket_path]
+  end
 end
 
 keys = Panoptes.aws_config.slice(:access_key_id, :secret_access_key)

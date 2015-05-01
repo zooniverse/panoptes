@@ -11,7 +11,7 @@ Bundler.require(*Rails.groups)
 
 module Panoptes
   class Application < Rails::Application
-    config.autoload_paths += %W(#{config.root}/lib)
+    config.autoload_paths += Dir[Rails.root.join('lib', '**/')]
     config.autoload_paths += Dir[Rails.root.join('app', 'models', '**/')]
     config.autoload_paths += Dir[Rails.root.join('app', 'serializers', '**/')]
 
