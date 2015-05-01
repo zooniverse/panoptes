@@ -19,11 +19,13 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#index' do
+    let(:resources) { subject_sets }
     let(:private_project) { create(:project, private: true) }
     let!(:private_resource) { create(:subject_set, project: private_project)  }
     let(:n_visible) { 2 }
 
     it_behaves_like 'is indexable'
+    it_behaves_like 'has many filterable', :workflows
   end
 
   describe '#show' do

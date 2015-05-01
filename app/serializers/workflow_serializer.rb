@@ -1,5 +1,7 @@
 class WorkflowSerializer
   include RestPack::Serializer
+  include FilterHasMany
+
   attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
              :created_at, :updated_at, :first_task, :primary_language,
              :version, :content_language, :prioritized, :grouped, :pairwise,

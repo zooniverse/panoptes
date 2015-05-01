@@ -174,8 +174,8 @@ ActiveRecord::Schema.define(version: 20150430132128) do
     t.integer  "user_count"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "classifications_count", default: 0, null: false
-    t.integer  "activated_state",       default: 0, null: false
+    t.integer  "classifications_count", default: 0,     null: false
+    t.integer  "activated_state",       default: 0,     null: false
     t.string   "primary_language"
     t.text     "avatar"
     t.text     "background_image"
