@@ -7,25 +7,26 @@ class User < ActiveRecord::Base
          :omniauthable, omniauth_providers: [:facebook, :gplus]
 
   has_many :classifications
-  has_many :authorizations
-  has_many :collection_preferences, class_name: "UserCollectionPreference"
-  has_many :project_preferences, class_name: "UserProjectPreference"
-  has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
+  has_many :authorizations, dependent: :destroy
+  has_many :collection_preferences, class_name: "UserCollectionPreference", dependent: :destroy
+  has_many :project_preferences, class_name: "UserProjectPreference", dependent: :destroy
+  has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner, dependent: :destroy
 
-  has_many :memberships
+  has_many :memberships, dependent: :destroy
   has_many :active_memberships, -> { active }, class_name: 'Membership'
   has_one :identity_membership, -> { identity }, class_name: 'Membership'
 
   has_many :user_groups, through: :active_memberships
   has_one :identity_group, through: :identity_membership,
                           source: :user_group,
-                          class_name: "UserGroup"
+                          class_name: "UserGroup",
+                          dependent: :destroy
 
   has_many :project_roles, through: :identity_group
   has_many :collection_roles, through: :identity_group
-  has_many :user_seen_subjects
+  has_many :user_seen_subjects, dependent: :destroy
 
-  has_many :subject_queues
+  has_many :subject_queues, dependent: :destroy
 
   validates :display_name, presence: true, uniqueness: { case_sensitive: false },
             format: { without: /\$|@|\s+/ }, unless: :migrated
