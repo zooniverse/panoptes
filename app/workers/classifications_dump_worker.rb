@@ -43,7 +43,7 @@ class ClassificationsDumpWorker
   end
 
   def s3_object
-    ::Panoptes.subjects_bucket.objects[upload_file_path]
+    @s3_object ||= ::Panoptes.subjects_bucket.objects[upload_file_path]
   end
 
   def s3_url

@@ -10,7 +10,9 @@ RSpec.describe ClassificationsDumpWorker do
   describe "#perform" do
 
     before(:each) do
-      AWS.stub!
+      s3_double = double(objects: double(:[] => double(write: true,
+                                                       url_for: "https://fake.s3.url.example.com")))
+      allow(::Panoptes).to receive(:subjects_bucket).and_return(s3_double)
     end
 
     context "when the project id doesn't correspond to a project" do
