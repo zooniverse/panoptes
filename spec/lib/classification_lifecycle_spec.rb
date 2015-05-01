@@ -152,7 +152,7 @@ describe ClassificationLifecycle do
         end.map(&:id)
         expect(SubjectQueue).to receive(:dequeue)
           .with(classification.workflow,
-                sms_ids,
+                array_including(sms_ids),
                 user: classification.user)
       end
     end
