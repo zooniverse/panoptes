@@ -5,8 +5,20 @@ RSpec.describe ClassificationDataMailer, :type => :mailer do
   let(:owner) { project.owner }
   let(:mail) { ClassificationDataMailer.classification_data(project, "https://fake.s3.url.example.com")}
 
+  let!(:collaborators) do
+    users = create_list(:user, 2)
+    users.map(&:identity_group).each do |u|
+      create(:access_control_list, roles: ["collaborator"], resource: project, user_group: u)
+    end
+    users
+  end
+
   it 'should mail the project owner' do
     expect(mail.to).to include(owner.email)
+  end
+
+  it 'should mail any project collaborators' do
+    expect(mail.to).to include(*collaborators.map(&:email))
   end
 
   it 'should come from no-reply@zooniverse.org' do
