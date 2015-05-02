@@ -35,7 +35,7 @@ class ClassificationsDumpWorker
   end
 
   def project_file_path
-    "#{project.name.downcase.gsub(/\s/, "_")}.csv"
+    "#{project.display_name.downcase.gsub(/\s/, "_")}.csv"
   end
 
   def upload_file_path

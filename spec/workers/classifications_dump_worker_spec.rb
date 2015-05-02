@@ -26,7 +26,7 @@ RSpec.describe ClassificationsDumpWorker do
 
     context "when the project exists" do
 
-      let(:project_file_name) { "#{project.name.downcase.gsub(/\s/, "_")}.csv" }
+      let(:project_file_name) { "#{project.display_name.downcase.gsub(/\s/, "_")}.csv" }
       let(:temp_file_path) { "#{Rails.root}/tmp/#{project_file_name}" }
 
       it "should create a csv file with the correct number of entries" do
