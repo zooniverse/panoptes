@@ -16,10 +16,22 @@ RSpec.describe ClassificationsDumpWorker do
     end
 
     context "when the project id doesn't correspond to a project" do
-
-      it "should not do anything" do
+      before(:each) do
         allow(Project).to receive(:find).and_return(nil)
-        expect(Tempfile).to_not receive(:open)
+      end
+
+      it "should not open a csv file" do
+        expect(CSV).to_not receive(:open)
+        worker.perform(another_project.id)
+      end
+
+      it "should not push a file to s3" do
+        expect(worker).to_not receive(:write_to_s3)
+        worker.perform(another_project.id)
+      end
+
+      it "should not queue a worker to send an email" do
+        expect(ClassificationDataMailerWorker).to_not receive(:perform_async)
         worker.perform(another_project.id)
       end
     end
