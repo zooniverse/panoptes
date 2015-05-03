@@ -1,7 +1,7 @@
 module Formatter
   module CSV
     class Classification
-      attr_reader :classification, :project
+      attr_reader :classification, :project, :show_user_id
 
       delegate :workflow_id, :created_at, :gold_standard, to: :classification
 
@@ -11,12 +11,13 @@ module Formatter
             linked_subjects_data )
       end
 
-      def initialize(classification, project)
-        @classification = classification
+      def initialize(project, show_user_id: true)
         @project = project
+        @show_user_id = show_user_id
       end
 
-      def to_array
+      def to_array(classification)
+        @classification = classification
         self.class.project_headers.map do |attribute|
           send(attribute)
         end
@@ -24,22 +25,23 @@ module Formatter
 
       private
 
-      def project_name
-        project.name
-      end
-
       def user_id
-        if user_id = classification.user_id
-          "#{user_id}".hash
-        end
+        user_id = classification.user_id
+        return user_id if show_user_id
+        "#{user_id}".hash
       end
 
       def user_ip
         classification.user_ip.to_s
       end
 
-      def subject_ids
-        classification.subject_ids.join(", ")
+      def linked_subjects_data
+        {}.tap do |subjects_and_metadata|
+          subjects = Subject.where(id: classification.subject_ids)
+          subjects.each do |subject|
+            subjects_and_metadata[subject.id] = subject.metadata
+          end
+        end.to_json
       end
 
       def metadata

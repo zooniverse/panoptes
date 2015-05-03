@@ -7,13 +7,14 @@ class ClassificationsDumpWorker
 
   attr_reader :project
 
-  def perform(project_id)
+  def perform(project_id, show_user_id=false)
     if @project = Project.find(project_id)
       begin
+        csv_formatter = Formatter::CSV::Classification.new(project, show_user_id: show_user_id)
         CSV.open(temp_file_path, 'wb') do |csv|
           csv << Formatter::CSV::Classification.project_headers
           completed_project_classifications.find_each do |classification|
-            csv << Formatter::CSV::Classification.new(classification, project).to_array
+            csv << csv_formatter.to_array(classification)
           end
         end
         write_to_s3
