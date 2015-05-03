@@ -4,11 +4,13 @@ sudo: false
 
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
+  - mkdir -p tmp
   - RACK_ENV=test bundle exec rake configure:travis db:create db:migrate
 
 jruby_before_script: &jruby_before_script
   - bundle exec jbundle install
   - psql -c 'create database travis_ci_test;' -U postgres
+  - mkdir -p tmp
   - RACK_ENV=test bundle exec rake configure:travis db:create db:migrate
 
 matrix:
