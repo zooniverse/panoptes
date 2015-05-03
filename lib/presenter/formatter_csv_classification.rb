@@ -6,9 +6,9 @@ module Formatter
       delegate :workflow_id, :created_at, :gold_standard, to: :classification
 
       def self.project_headers
-        %w( project_name user_id user_ip workflow_id created_at
-            gold_standard expert subject_ids metadata
-            annotations )
+        %w( user_id user_ip workflow_id created_at
+            gold_standard expert metadata annotations
+            linked_subjects_data )
       end
 
       def initialize(classification, project)
