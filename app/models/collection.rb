@@ -6,7 +6,8 @@ class Collection < ActiveRecord::Base
   include PreferencesLink
 
   belongs_to :project
-  has_and_belongs_to_many :subjects
+  has_many :collections_subjects, dependent: :destroy
+  has_many :subjects, through: :collections_subjects
 
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator

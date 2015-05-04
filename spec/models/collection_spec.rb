@@ -7,7 +7,7 @@ describe Collection, :type => :model do
   let(:activatable) { collection }
   let(:locked_factory) { :collection }
   let(:locked_update) { {display_name: "A differet name"} }
-  
+
   it_behaves_like "optimistically locked"
 
   it_behaves_like "is ownable"
@@ -22,13 +22,19 @@ describe Collection, :type => :model do
     expect(create(:collection, display_name: "hi fives", owner: owner)).to be_valid
     expect(build(:collection, display_name: "hi fives", owner: owner)).to_not be_valid
   end
- 
+
   it 'should not require display name uniquenames between owners' do
     expect(create(:collection, display_name: "test collection", owner: create(:user))).to be_valid
     expect(create(:collection, display_name: "test collection", owner: create(:user))).to be_valid
   end
 
-  describe "#subject" do
+  it 'should be valid when a subject is added twice' do
+    col = create(:collection_with_subjects)
+    sub = col.subjects.first
+    expect{ col.subjects << sub }.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
+  describe "#subjects" do
     let(:collection) { create(:collection_with_subjects) }
 
     it "should have many subjects" do

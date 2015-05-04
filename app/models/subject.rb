@@ -5,7 +5,8 @@ class Subject < ActiveRecord::Base
   has_paper_trail only: [:metadata, :locations]
 
   belongs_to :project
-  has_and_belongs_to_many :collections
+  has_many :collections_subjects
+  has_many :collections, through: :collections_subjects
   has_many :subject_sets, through: :set_member_subjects
   has_many :set_member_subjects
 
