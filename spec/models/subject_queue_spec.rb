@@ -14,6 +14,16 @@ RSpec.describe SubjectQueue, :type => :model do
     expect(build(:subject_queue, workflow: nil)).to_not be_valid
   end
 
+  it 'should not be valid unless its is unique for the set, workflow, and user' do
+    q = create(:subject_queue)
+    expect(build(:subject_queue, subject_set: q.subject_set, workflow: q.workflow, user: q.user)).to_not be_valid
+  end
+
+  it 'should be valid if the subject set is different but the workflow and user are the same' do
+    q = create(:subject_queue)
+    expect(build(:subject_queue, workflow: q.workflow, user: q.user)).to be_valid
+  end
+
   describe "::create_for_user" do
     let(:workflow) {create(:workflow)}
     let(:user) { create(:user) }

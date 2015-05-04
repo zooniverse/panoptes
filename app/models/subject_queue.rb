@@ -11,6 +11,7 @@ class SubjectQueue < ActiveRecord::Base
   belongs_to_many :set_member_subjects
 
   validates_presence_of :workflow
+  validates_uniqueness_of :user_id, scope: [:subject_set_id, :workflow_id]
 
   can_through_parent :workflow, :update, :destroy, :update_links, :destroy_links
 
