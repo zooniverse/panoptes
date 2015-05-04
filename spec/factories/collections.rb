@@ -7,7 +7,7 @@ FactoryGirl.define do
     private false
 
     association :owner, factory: :user
-    
+
     factory :private_collection do
       private true
     end

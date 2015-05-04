@@ -2,7 +2,7 @@ FactoryGirl.define do
   factory :user do
     transient do
       build_group true
-      build_zoo_user false 
+      build_zoo_user false
     end
 
     hash_func 'bcrypt'
@@ -22,7 +22,7 @@ FactoryGirl.define do
         u.identity_group = build(:user_group, display_name: u.display_name)
         u.identity_membership = build(:membership, user: u, user_group: u.identity_group, state: 0, identity: true, roles: ["group_admin"])
       end
-      
+
       if env.build_zoo_user
         zu = create(:zooniverse_user, login: u.display_name, password: u.password, email: u.email)
         u.zooniverse_id = zu.id.to_s
