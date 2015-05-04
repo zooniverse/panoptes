@@ -1,7 +1,11 @@
 class ClassificationSerializer
   include RestPack::Serializer
-  attributes :id, :annotations, :created_at
+  attributes :id, :annotations, :created_at, :metadata
   can_include :project, :user, :user_group, :workflow
+
+  def metadata
+    @model.metadata.merge(workflow_version: @model.workflow_version)
+  end
 
   def add_links(model, data)
     data = super(model, data)

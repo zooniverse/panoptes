@@ -7,7 +7,7 @@ class Classification < ActiveRecord::Base
   enum expert_classifier: [:expert, :owner]
 
   validates_presence_of :subject_ids, :project,
-                        :workflow, :annotations, :user_ip
+    :workflow, :annotations, :user_ip, :workflow_version
 
   validates :user, presence: true, if: :incomplete?
   validate :metadata, :required_metadata_present
@@ -24,10 +24,6 @@ class Classification < ActiveRecord::Base
       query = joins(:project).merge(Project.scope_for(:update, user))
               .merge(complete)
               .union_all(incomplete_for_user(user))
-      # Workaround Broken Bind Value Assignment in Subqueries in Rails 4.1
-      # This is fixed in Rails 4.2 when we're able to to migrate to that
-      # Unfortunately this isn't needed in JRuby so I have to test for platform on this class
-#      query.bind_values = [query.bind_values.first] unless RUBY_PLATFORM == 'java'
       query
     when :update, :destroy
       incomplete_for_user(user)
@@ -67,7 +63,7 @@ class Classification < ActiveRecord::Base
   private
 
   def required_metadata_present
-    %i(started_at finished_at workflow_version user_language user_agent).each do |key|
+    %i(started_at finished_at user_language user_agent).each do |key|
       unless metadata.has_key? key
         errors.add(:metadata, "must have #{key} metadata")
       end
