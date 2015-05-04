@@ -221,16 +221,42 @@ RSpec.describe SubjectQueue, :type => :model do
     let(:ids) { (0..60).to_a }
     let(:ues) { build(:subject_queue, set_member_subject_ids: ids) }
 
-    it 'should return a collection of ids' do
-      expect(ues.next_subjects).to all( be_a(Fixnum) )
+    context "when the queue has a user" do
+      it 'should return a collection of ids' do
+        expect(ues.next_subjects).to all( be_a(Fixnum) )
+      end
+
+      it 'should return 10 by default' do
+        expect(ues.next_subjects.length).to eq(10)
+      end
+
+      it 'should accept an optional limit argument' do
+        expect(ues.next_subjects(20).length).to eq(20)
+      end
+
+      it 'should return the first subjects in the queue' do
+        expect(ues.next_subjects).to match_array(ues.set_member_subject_ids[0..9])
+      end
     end
 
-    it 'should return 10 by default' do
-      expect(ues.next_subjects.length).to eq(10)
-    end
+    context "when the queue does not have a user" do
+      let(:ues) { build(:subject_queue, set_member_subject_ids: ids, user: nil) }
 
-    it 'should accept an optional limit argument' do
-      expect(ues.next_subjects(20).length).to eq(20)
+      it 'should return a collection of ids' do
+        expect(ues.next_subjects).to all( be_a(Fixnum) )
+      end
+
+      it 'should return 10 by default' do
+        expect(ues.next_subjects.length).to eq(10)
+      end
+
+      it 'should accept an optional limit argument' do
+        expect(ues.next_subjects(20).length).to eq(20)
+      end
+
+      it 'should randomly sample from the subject_ids' do
+        expect(ues.next_subjects).to_not match_array(ues.set_member_subject_ids[0..9])
+      end
     end
   end
 
@@ -241,7 +267,7 @@ RSpec.describe SubjectQueue, :type => :model do
       let(:subject_ids) { create_list(:set_member_subject, 2).map(&:id) }
 
       it 'should return true' do
-        expect(queue.below_minimum?).to be true 
+        expect(queue.below_minimum?).to be true
       end
     end
 
