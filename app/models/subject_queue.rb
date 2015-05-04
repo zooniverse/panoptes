@@ -29,39 +29,32 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
-  def self.reload(workflow, subject_ids, user: nil, set: nil)
+  def self.reload(workflow, sms_ids, user: nil, set: nil)
     ues = scoped_to_set(set).find_or_create_by!(user: user, workflow: workflow)
     ues.set_member_subject_ids_will_change!
-    ues.set_member_subject_ids = subject_ids
+    ues.set_member_subject_ids = sms_ids
     ues.save!
   end
 
-  def self.enqueue(workflow, subject_ids, user: nil, set: nil)
+  def self.enqueue(workflow, sms_ids, user: nil, set: nil)
     ues = scoped_to_set(set).find_or_create_by!(user: user, workflow: workflow)
-    ues.set_member_subject_ids_will_change!
-    ues.set_member_subject_ids = ues.set_member_subject_ids | Array.wrap(subject_ids)
-    ues.save!
+    enqueue_update(where(id: ues.id), sms_ids)
   end
 
-  def self.dequeue(workflow, subject_ids, user: nil, set: nil)
-    ues = scoped_to_set(set).find_by!(user: user, workflow: workflow)
-    ues.set_member_subject_ids_will_change!
-    ues.set_member_subject_ids = ues.set_member_subject_ids - (Array.wrap(subject_ids))
-    ues.save!
-    ues.destroy if ues.set_member_subject_ids.empty?
+  def self.dequeue(workflow, sms_ids, user: nil, set: nil)
+    return if sms_ids.nil?
+    ues = scoped_to_set(set).where(user: user, workflow: workflow)
+    dequeue_update(ues, sms_ids)
   end
 
-  def self.enqueue_for_all(workflow, subject_ids)
-    subject_ids = Array.wrap(subject_ids)
-    raise ArgumentError, "must be an integer" if subject_ids.index{ |sub| !sub.is_a?(Fixnum) }
-    where(workflow: workflow)
-      .update_all("set_member_subject_ids = array_cat(set_member_subject_ids, ARRAY[#{subject_ids.join(",")}])")
+  def self.enqueue_for_all(workflow, sms_ids)
+    sms_ids = Array.wrap(sms_ids)
+    enqueue_update(where(workflow: workflow), sms_ids)
   end
 
-  def self.dequeue_for_all(workflow, subject_id)
-    where(workflow: workflow)
-      .update_all(["set_member_subject_ids = array_remove(set_member_subject_ids, ?)",
-                   subject_id])
+  def self.dequeue_for_all(workflow, sms_id)
+    return if sms_id.nil?
+    dequeue_update(where(workflow: workflow), sms_id)
   end
 
   def self.create_for_user(workflow, user, set: nil)
@@ -72,6 +65,14 @@ class SubjectQueue < ActiveRecord::Base
                    subject_set_id: set,
                    set_member_subject_ids: logged_out_queue.set_member_subject_ids)
     return queue if queue.persisted?
+  end
+
+  def self.dequeue_update(query, sms_ids)
+    query.update_all(["set_member_subject_ids = ARRAY(SELECT unnest(set_member_subject_ids) except SELECT unnest(array[?]))", sms_ids])
+  end
+
+  def self.enqueue_update(query, sms_ids)
+    query.update_all(["set_member_subject_ids = array_cat(set_member_subject_ids, array[?])", sms_ids])
   end
 
   def below_minimum?
