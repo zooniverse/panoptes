@@ -203,17 +203,6 @@ RSpec.describe SubjectQueue, :type => :model do
                              user: user)
         expect(ues.reload.set_member_subject_ids).to_not include(subjects.first.id)
       end
-
-      it 'should destroy the model if there are no more set_member_subject_ids' do
-        ues = create(:subject_queue,
-                     user: user,
-                     workflow: workflow,
-                     set_member_subject_ids: [subjects.first.id])
-        SubjectQueue.dequeue(workflow,
-                             [subjects.first.id],
-                             user: user)
-        expect(SubjectQueue.exists?(ues)).to be_falsy
-      end
     end
   end
 

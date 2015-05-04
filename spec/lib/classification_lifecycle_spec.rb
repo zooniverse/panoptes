@@ -1,6 +1,13 @@
 require 'spec_helper'
 
 describe ClassificationLifecycle do
+  let!(:subject_set) { create(:subject_set, workflows: [classification.workflow]) }
+  let!(:sms_ids) do
+    classification.subject_ids.map do |s_id|
+          create(:set_member_subject, subject_set: subject_set, subject_id: s_id)
+    end.map(&:id)
+  end
+
   let!(:subject_queue) do
     create(:subject_queue,
            user: classification.user,
@@ -146,10 +153,6 @@ describe ClassificationLifecycle do
       let(:classification) { create(:classification, completed: true) }
 
       it 'should call dequeue_subject_for_user' do
-        ss = create(:subject_set, workflows: [classification.workflow])
-        sms_ids = classification.subject_ids.map do |s_id|
-          create(:set_member_subject, subject_set: ss, subject_id: s_id)
-        end.map(&:id)
         expect(SubjectQueue).to receive(:dequeue)
           .with(classification.workflow,
                 array_including(sms_ids),
@@ -160,8 +163,8 @@ describe ClassificationLifecycle do
     context "incomplete classification" do
       let(:classification) { create(:classification, completed: false) }
 
-      it 'should not call dequeue_subject_for_use when incomplete' do
-        expect(SubjectQueue).to_not receive(:dequeue_subject_for_user)
+      it 'should call dequeue when incomplete' do
+        expect(SubjectQueue).to receive(:dequeue)
       end
     end
   end
