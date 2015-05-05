@@ -18,7 +18,7 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   private
-  
+
   def context
     case action_name
     when "update", "create"
@@ -33,19 +33,14 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    create_params[:locations] = add_subject_path(create_params[:locations],
-                                                 create_params[:links][:project])
-    create_params[:upload_user_id] = api_user.id
-    subject = super(create_params)
-    subject
-  end
-
-  def build_update_hash(update_params, id)
-    if update_params.has_key? :locations
-      update_params[:locations] = add_subject_path(update_params[:locations],
-                                                   controlled_resource.project.id)
+    locations = create_params.delete(:locations)
+    subject = super(create_params) do |object, linked|
+      object[:upload_user_id] = api_user.id
     end
-    super(update_params, id)
+    locations.each do |loc|
+      subject.locations.build(content_type: loc)
+    end
+    subject
   end
 
   def selector
@@ -53,19 +48,5 @@ class Api::V1::SubjectsController < Api::ApiController
                                       workflow,
                                       params,
                                       controlled_resources)
-  end
-
-  def add_subject_path(locations, project_id)
-    locations.map.with_index do |mime, idx|
-      mime.split(',').reduce({}) do |location, mime|
-        location[mime] = subject_path(idx, mime, project_id)
-        location
-      end
-    end
-  end
-
-  def subject_path(location, mime, project_id)
-    extension = MIME::Types[mime].first.extensions.first
-    "#{::Panoptes.bucket_path}/#{project_id}/#{location}/#{SecureRandom.uuid}.#{extension}"
   end
 end

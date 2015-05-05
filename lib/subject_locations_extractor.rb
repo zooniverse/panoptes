@@ -42,13 +42,7 @@ class SubjectLocationsExtractor
 
   def s3_url(path, mime_type)
     if @context[:post_urls]
-      obj = ::Panoptes.subjects_bucket.objects[path]
-      obj.url_for(:write, {secure: true,
-                           content_type: mime_type,
-                           expires_in: 20.minutes.from_now,
-                           response_content_type: mime_type,
-                           acl: 'public-read'}).to_s
-    else
+   else
       "https://#{path}"
     end
   end

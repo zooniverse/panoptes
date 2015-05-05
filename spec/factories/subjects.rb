@@ -7,11 +7,11 @@ FactoryGirl.define do
     metadata({distance_from_earth: "42 light years",
               brightness: -20,
               loudness: 11})
-    locations([ {"image/jpeg" => "panoptes-uploads.zooniverse.org/1/1/#{SecureRandom.uuid}.jpeg"} ])
 
     factory :subject_with_collections do
       after(:create) do |s|
         create_list(:collection, 2, subjects: [s])
+        create_list(:locations, 2, linked: s)
       end
     end
 

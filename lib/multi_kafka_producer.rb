@@ -4,11 +4,11 @@ module MultiKafkaProducer
       super("Kafka adapter #{ adapter.adapter_name } is not connected")
     end
   end
-  
+
   def self.adapter=(adapter)
     @adapter = load_adapter(adapter)
   end
-  
+
   def self.adapter
     @adapter ||= default_adapter
   end
