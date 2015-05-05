@@ -173,7 +173,7 @@ RSpec.describe SubjectQueue, :type => :model do
           expect(queue.set_member_subject_ids).to include(subject.id)
         end
 
-        context "passing an empty set of sms_ids", :focus do
+        context "passing an empty set of sms_ids" do
 
           it 'should not raise an error' do
             expect {
@@ -224,6 +224,29 @@ RSpec.describe SubjectQueue, :type => :model do
                              [subjects.first.id],
                              user: user)
         expect(ues.reload.set_member_subject_ids).to_not include(subjects.first.id)
+      end
+
+      context "passing an empty set of sms_ids" do
+
+        it 'should not raise an error' do
+          expect {
+            SubjectQueue.dequeue(workflow, [], user: user)
+          }.to_not raise_error
+        end
+
+        it 'not attempt find the queue' do
+          expect(SubjectQueue).to_not receive(:where)
+          SubjectQueue.dequeue(workflow, [], user: user)
+        end
+
+        it 'should not call #dequeue_update' do
+          expect_any_instance_of(SubjectQueue).to_not receive(:dequeue_update)
+          SubjectQueue.dequeue(workflow, [], user: user)
+        end
+
+        it 'should return nil' do
+          expect(SubjectQueue.dequeue(workflow, [], user: user)).to be_nil
+        end
       end
     end
   end
