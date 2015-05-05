@@ -3,11 +3,14 @@ require "spec_helper"
 RSpec.describe SubjectQueueWorker do
   subject { described_class.new }
   let(:workflow) { create(:workflow_with_subject_set) }
-  let!(:subjects) do
-    create_list(:set_member_subject, 100, subject_set: workflow.subject_sets.first)
-  end
 
   describe "#perform" do
+
+    before(:each) do
+      available_smss = (1..100).to_a
+      allow_any_instance_of(PostgresqlSelection).to receive(:select).and_return(available_smss)
+    end
+
     context "with no user or set" do
       it 'should create a subject queue with the default number of items' do
         subject.perform(workflow.id)
