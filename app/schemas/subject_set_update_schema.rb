@@ -12,6 +12,10 @@ class SubjectSetUpdateSchema < JsonSchema
       type "object"
     end
 
+    property "expert_set" do
+      type "boolean"
+    end
+
     property "links" do
       type "object"
 

@@ -176,28 +176,6 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
     end
 
-    context "creates an expert subject set" do
-      let(:subject_set_id) { json_response["workflows"][0]["links"]["expert_subject_sets"] }
-      let(:expert_set) { SubjectSet.find(subject_set_id) }
-
-      before(:each) do
-        default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
-      end
-
-      it 'should have a link to the created set' do
-        expect(subject_set_id).to_not be_nil
-      end
-
-      it 'should have expert_set flag set to true' do
-        expect(expert_set.map(&:expert_set)).to all( be_truthy )
-      end
-
-      it 'should be named based on the workflow' do
-        expect(expert_set.map(&:display_name)).to all( eq("Expert Set for Test workflow") )
-      end
-    end
-
     context "includes a tutorial subject" do
       let(:tut_sub) { create(:subject, project: project).id.to_s }
 

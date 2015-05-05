@@ -59,9 +59,6 @@ class Api::V1::WorkflowsController < Api::ApiController
     stripped_tasks, strings = extract_strings(create_params[:tasks])
     create_params[:tasks] = stripped_tasks
     workflow = super(create_params)
-    workflow.expert_subject_sets.build(project: workflow.project,
-                                       display_name: "Expert Set for #{workflow.display_name}",
-                                       expert_set: true)
     workflow.workflow_contents.build(strings: strings,
                                      language: workflow.primary_language)
     workflow
