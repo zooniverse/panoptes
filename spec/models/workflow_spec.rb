@@ -17,6 +17,12 @@ describe Workflow, :type => :model do
     expect(workflow).to be_valid
   end
 
+  it "should be destroyable when it has subject counts" do
+    workflow.save!
+    create(:subject_workflow_count, workflow: workflow)
+    expect{ workflow.destroy }.to_not raise_error
+  end
+
   it "should only have a subject set assigned once" do
     ss = create(:subject_set)
     workflow.subject_sets << ss

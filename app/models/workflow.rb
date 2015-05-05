@@ -7,6 +7,7 @@ class Workflow < ActiveRecord::Base
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
   belongs_to :project
+  has_many :subject_workflow_counts, dependent: :destroy
   has_many :subject_sets_workflows, dependent: :destroy
   has_many :subject_sets, through: :subject_sets_workflows
   has_many :set_member_subjects, through: :subject_sets
