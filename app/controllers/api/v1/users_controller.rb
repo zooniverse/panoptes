@@ -36,10 +36,6 @@ class Api::V1::UsersController < Api::ApiController
     sign_out if current_user && (current_user == user)
   end
 
-  def visible_scope
-    User.all
-  end
-
   def to_disable
     [ user ] |
       user.projects |

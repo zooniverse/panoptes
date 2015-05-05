@@ -64,10 +64,6 @@ module JsonApiController
     @resource_class ||= resource_name.camelize.constantize
   end
 
-  def visible_scope
-    controlled_resources
-  end
-
   def context
     {}
   end
@@ -77,6 +73,12 @@ module JsonApiController
   end
 
   private
+
+  def gen_etag(query)
+    etag = combine_etags(etag: query)
+    key = ActiveSupport::Cache.expand_cache_key(etag)
+    %("#{Digest::MD5.hexdigest(key)}")
+  end
 
   def resource_scope(resources)
     return resources if resources.is_a?(ActiveRecord::Relation)

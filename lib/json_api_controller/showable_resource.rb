@@ -1,9 +1,8 @@
 module JsonApiController
   module ShowableResource
     def show
-      if stale?(controlled_resources)
-        render json_api: serializer.resource(params, visible_scope, context)
-      end
+      headers['ETag'] = gen_etag(controlled_resources)
+      render json_api: serializer.resource(params, controlled_resources, context)
     end
   end
 end

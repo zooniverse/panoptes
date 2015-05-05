@@ -1,9 +1,8 @@
 module JsonApiController
   module IndexableResource
     def index
-      if stale?(visible_scope)
-        render json_api: serializer.page(params, visible_scope, context)
-      end
+      headers['ETag'] = gen_etag(controlled_resources)
+      render json_api: serializer.page(params, controlled_resources, context)
     end
   end
 end
