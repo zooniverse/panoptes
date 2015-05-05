@@ -21,5 +21,26 @@ RSpec.describe SubjectQueueWorker do
         expect{subject.perform(workflow.id.to_s)}.to_not raise_error
       end
     end
+
+    describe "#load_subjects" do
+
+      context "when there are selected subjects to queue" do
+
+        it 'should attempt to queue an empty set' do
+          allow_any_instance_of(PostgresqlSelection).to receive(:select).and_return([1])
+          expect(SubjectQueue).to receive(:enqueue)
+          subject.perform(workflow.id)
+        end
+      end
+
+      context "when there are no selected subjects to queue" do
+
+        it 'should not attempt to queue an empty set' do
+          allow_any_instance_of(PostgresqlSelection).to receive(:select).and_return([])
+          expect(SubjectQueue).to_not receive(:enqueue)
+          subject.perform(workflow.id)
+        end
+      end
+    end
   end
 end
