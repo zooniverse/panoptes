@@ -1,10 +1,9 @@
 FactoryGirl.define do
   factory :classification do
     metadata({
-               user_agent: "CURL",
+               user_agent: "cURL",
                started_at: 2.minutes.ago.to_s,
                finished_at: 1.minute.ago.to_s,
-               workflow_version: "1.1",
                user_language: 'en',
              })
     annotations [{task: "an_annotation",
@@ -12,6 +11,7 @@ FactoryGirl.define do
                  {task: "another_one",
                   value: [1, 2]}]
     user_ip "192.168.0.1"
+    workflow_version "15.15"
     completed true
     user
     project

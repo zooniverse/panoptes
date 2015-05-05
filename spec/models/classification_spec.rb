@@ -34,9 +34,13 @@ describe Classification, :type => :model do
     expect(classification).to_not be_valid
   end
 
+  it 'should not be valid without workflow_version' do
+    expect(build(:classification, workflow_version: nil)).to_not be_valid
+  end
+
   describe "#metadata" do
     let(:metadata) { build(:classification).metadata }
-    
+
     it 'must have started_at' do
       metadata.delete(:started_at)
       expect(build(:classification, metadata: metadata)).to_not be_valid
@@ -44,11 +48,6 @@ describe Classification, :type => :model do
 
     it 'must have finished_at' do
       metadata.delete(:finished_at)
-      expect(build(:classification, metadata: metadata)).to_not be_valid
-    end
-
-    it 'must have workflow_version' do
-      metadata.delete(:workflow_version)
       expect(build(:classification, metadata: metadata)).to_not be_valid
     end
 

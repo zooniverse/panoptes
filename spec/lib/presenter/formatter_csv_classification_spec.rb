@@ -6,25 +6,26 @@ RSpec.describe Formatter::CSV::Classification do
   def project_headers
     %w( user_id user_ip workflow_id created_at
         gold_standard expert metadata annotations
-        subject_data )
+        subject_data workflow_version)
   end
 
   def subject_data
     {
-      "1" => { loudness: 11, brightness: -20, distance_from_earth: "42 light years" }
+     "1" => { loudness: 11, brightness: -20, distance_from_earth: "42 light years" }
     }.to_json
- end
+  end
 
   def formatted_data
     [ classification.user_id.hash,
-      classification.user_ip.to_s,
-      classification.workflow_id,
-      classification.created_at,
-      classification.gold_standard,
-      classification.expert_classifier,
-      classification.metadata.to_json,
-      classification.annotations.to_json,
-      subject_data
+     classification.user_ip.to_s,
+     classification.workflow_id,
+     classification.created_at,
+     classification.gold_standard,
+     classification.expert_classifier,
+     classification.metadata.to_json,
+     classification.annotations.to_json,
+     subject_data,
+     classification.workflow_version
     ]
   end
 

@@ -3,7 +3,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   doorkeeper_for :show, :index, :destroy, :update, scopes: [:classification]
 
   resource_actions :default
-  
+
   schema_type :json_schema
 
   before_action :filter_by_subject_id, only: :index
@@ -43,12 +43,12 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    classification = super(create_params) do |create_params, link_params|
+    super do |body_params, link_params|
       link_params[:user] = api_user.user
-      create_params[:user_ip] = request_ip
-      create_params[:subject_ids] = link_params.delete(:subjects)
+      body_params[:user_ip] = request_ip
+      body_params[:subject_ids] = link_params.delete(:subjects)
+      body_params[:workflow_version] = body_params[:metadata].delete(:workflow_version)
     end
-    classification
   end
 
   def lifecycle(action, classification)

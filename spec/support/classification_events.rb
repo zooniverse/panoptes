@@ -15,6 +15,11 @@ shared_context "a classification create" do
     expect(response.headers["Location"]).to eq("http://test.host/api/classifications/#{id}")
   end
 
+  it "should set the workflow_version field from the metadata" do
+    create_action
+    expect(Classification.find(created_classification_id).workflow_version).to eq("1.1")
+  end
+
   it "should create the classification" do
     expect do
       create_action

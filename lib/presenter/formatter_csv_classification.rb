@@ -3,12 +3,12 @@ module Formatter
     class Classification
       attr_reader :classification, :project, :show_user_id
 
-      delegate :workflow_id, :created_at, :gold_standard, to: :classification
+      delegate :workflow_id, :created_at, :gold_standard, :workflow_version, to: :classification
 
       def self.project_headers
         %w( user_id user_ip workflow_id created_at
             gold_standard expert metadata annotations
-            subject_data )
+            subject_data workflow_version )
       end
 
       def initialize(project, show_user_id: false)

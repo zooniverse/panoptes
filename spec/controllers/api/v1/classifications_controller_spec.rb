@@ -58,7 +58,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
   let(:api_resource_name) { "classifications" }
   let(:api_resource_attributes) do
-    [ "id", "annotations", "created_at" ]
+    [ "id", "annotations", "created_at", "metadata" ]
   end
   let(:api_resource_links) do
     [ "classifications.project",
@@ -88,7 +88,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       context "a project owner retreiving classifications for the project" do 
         let!(:classifications) { create_list(:classification, 2, project: project) }
         let(:authorized_user) { project.owner }
-        
+
         it 'should be filterable by subject_id' do
           default_request scopes: scopes, user_id: authorized_user.id
           get :index, subject_id: classifications.first.subject_ids.first
