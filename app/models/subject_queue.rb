@@ -38,23 +38,25 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.enqueue(workflow, sms_ids, user: nil, set: nil)
+    return if sms_ids.blank?
     ues = scoped_to_set(set).find_or_create_by!(user: user, workflow: workflow)
     enqueue_update(where(id: ues.id), sms_ids)
   end
 
   def self.dequeue(workflow, sms_ids, user: nil, set: nil)
-    return if sms_ids.nil?
+    return if sms_ids.blank?
     ues = scoped_to_set(set).where(user: user, workflow: workflow)
     dequeue_update(ues, sms_ids)
   end
 
   def self.enqueue_for_all(workflow, sms_ids)
+    return if sms_ids.blank?
     sms_ids = Array.wrap(sms_ids)
     enqueue_update(where(workflow: workflow), sms_ids)
   end
 
   def self.dequeue_for_all(workflow, sms_id)
-    return if sms_id.nil?
+    return if sms_id.blank?
     dequeue_update(where(workflow: workflow), sms_id)
   end
 
@@ -69,7 +71,8 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.dequeue_update(query, sms_ids)
-    query.update_all(["set_member_subject_ids = ARRAY(SELECT unnest(set_member_subject_ids) except SELECT unnest(array[?]))", sms_ids])
+    dequeue_sql = "set_member_subject_ids = ARRAY(SELECT unnest(set_member_subject_ids) except SELECT unnest(array[?]))"
+    query.update_all([dequeue_sql, sms_ids])
   end
 
   def self.enqueue_update(query, sms_ids)
