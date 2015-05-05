@@ -49,7 +49,7 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.enqueue_for_all(workflow, sms_ids)
-    return if sms_id.blank?
+    return if sms_ids.blank?
     sms_ids = Array.wrap(sms_ids)
     enqueue_update(where(workflow: workflow), sms_ids)
   end
