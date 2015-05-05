@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150504171133) do
+ActiveRecord::Schema.define(version: 20150504193426) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -218,7 +218,8 @@ ActiveRecord::Schema.define(version: 20150504171133) do
     t.integer  "subject_set_id"
   end
 
-  add_index "subject_queues", ["user_id", "workflow_id"], name: "index_subject_queues_on_user_id_and_workflow_id", unique: true, using: :btree
+  add_index "subject_queues", ["subject_set_id", "workflow_id", "user_id"], name: "idx_queues_on_ssid_wid_and_id", unique: true, using: :btree
+  add_index "subject_queues", ["workflow_id", "user_id"], name: "index_subject_queues_on_workflow_id_and_user_id", using: :btree
 
   create_table "subject_sets", force: :cascade do |t|
     t.string   "display_name"
