@@ -158,6 +158,7 @@ RSpec.describe SubjectQueue, :type => :model do
     context "with a user" do
       let(:user) { create(:user) }
       context "nothing for user" do
+
         it 'should create a new user_enqueue_subject' do
           expect do
             SubjectQueue.enqueue(workflow,
@@ -167,11 +168,32 @@ RSpec.describe SubjectQueue, :type => :model do
         end
 
         it 'should add subjects' do
-          SubjectQueue.enqueue(workflow,
-                               subject.id,
-                               user: user)
+          SubjectQueue.enqueue(workflow, subject.id, user: user)
           queue = SubjectQueue.find_by(workflow: workflow, user: user)
           expect(queue.set_member_subject_ids).to include(subject.id)
+        end
+
+        context "passing an empty set of sms_ids", :focus do
+
+          it 'should not raise an error' do
+            expect {
+              SubjectQueue.enqueue(workflow, [], user: user)
+            }.to_not raise_error
+          end
+
+          it 'not attempt to find or create a queue' do
+            expect(SubjectQueue).to_not receive(:find_or_create_by!)
+            SubjectQueue.enqueue(workflow, [], user: user)
+          end
+
+          it 'should not call #enqueue_update' do
+            expect_any_instance_of(SubjectQueue).to_not receive(:enqueue_update)
+            SubjectQueue.enqueue(workflow, [], user: user)
+          end
+
+          it 'should return nil' do
+            expect(SubjectQueue.enqueue(workflow, [], user: user)).to be_nil
+          end
         end
       end
 
