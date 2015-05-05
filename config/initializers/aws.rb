@@ -19,7 +19,7 @@ module Panoptes
   end
 
   def self.export_bucket_path
-    @bucket_path ||= aws_config[:export_bucket_path]
+    @export_bucket_path ||= aws_config[:export_bucket_path]
   end
 end
 
