@@ -46,6 +46,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
       {
        subject_sets: {
                       display_name: "A Better Name",
+                      expert_set: true,
                       links: {
                               workflows: [workflow.id.to_s],
                               subjects: subjects.map(&:id).map(&:to_s)
@@ -128,6 +129,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
       {
        subject_sets: {
                       display_name: 'Test subject set',
+                      expert_set: true,
                       metadata: {
                                  location: "Africa"
                                 },
