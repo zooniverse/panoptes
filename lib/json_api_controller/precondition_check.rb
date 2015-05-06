@@ -19,7 +19,8 @@ module JsonApiController
 
     def precondition_fails?
       query = resource_class.where(id: resource_ids)
-      !(gen_etag(query) == precondition)
+      response_obj = serializer.resource(params, query, context)
+      !(gen_etag(response_obj) == precondition)
     end
 
     def precondition_error_msg
