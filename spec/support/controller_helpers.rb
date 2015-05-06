@@ -10,6 +10,10 @@ module APIResponseHelpers
   def created_instance_id(instance_type)
     json_response[instance_type][0]["id"]
   end
+
+  def created_instance_ids(instance_type)
+    json_response[instance_type].collect{ |h| h['id'] }
+  end
 end
 
 module APIRequestHelpers
