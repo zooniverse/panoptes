@@ -29,7 +29,10 @@ describe Api::V1::SubjectsController, type: :controller do
 
     context "logged out user" do
       context "without any sort" do
-        let(:resources) { create_list(:collection_with_subjects, 2).flat_map(&:subjects) }
+        let(:filtered_resources) do
+          create_list(:collection_with_subjects, 2).first.subjects
+        end
+
         before(:each) do
           get :index
         end
