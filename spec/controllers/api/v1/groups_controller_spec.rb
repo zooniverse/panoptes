@@ -36,9 +36,9 @@ describe Api::V1::GroupsController, type: :controller do
                state: :active,
                user: user,
                user_group: user_groups[1])
-        
+
         get :index, display_name: user_groups[1].display_name
-        
+
         expect(json_response["user_groups"]).to all( include("display_name" => user_groups[1].display_name) )
       end
     end
@@ -47,7 +47,7 @@ describe Api::V1::GroupsController, type: :controller do
       it_behaves_like "is indexable"
     end
   end
-  
+
   describe "#update" do
     let(:resource) { user_groups.first }
     let(:test_attr) { :display_name}
@@ -70,7 +70,7 @@ describe Api::V1::GroupsController, type: :controller do
       before(:each) do
         get :show, id: resource.id
       end
-      
+
       it 'should include a url for projects' do
         projects_link = json_response['links']['user_groups.projects']['href']
         expect(projects_link).to eq("/projects?owner={user_groups.display_name}")
@@ -81,7 +81,7 @@ describe Api::V1::GroupsController, type: :controller do
         expect(collections_link).to eq("/collections?owner={user_groups.display_name}")
       end
     end
-    
+
     it_behaves_like "is showable"
   end
 
@@ -99,7 +99,7 @@ describe Api::V1::GroupsController, type: :controller do
         default_request scopes: scopes, user_id: authorized_user.id
         post :create, create_params
       end
-      
+
       it "should make a the creating user a member" do
         membership = Membership.where(user_group_id: group_id).first
         expect(authorized_user.memberships).to include(membership)
@@ -143,14 +143,14 @@ describe Api::V1::GroupsController, type: :controller do
     let(:test_relation) { :users }
     let(:test_relation_ids) { [ new_user.id.to_s ] }
     let(:resource_id) { :group_id }
-    
+
     context "created membership" do
       before(:each) do
-        
+
         default_request scopes: scopes, user_id: authorized_user.id
         post :update_links, group_id: resource.id, users: [ new_user.id.to_s ], link_relation: "users"
       end
-      
+
       it 'should give the user a group_member role' do
         expect(new_membership.roles).to eq(%w(group_member))
       end
@@ -164,20 +164,20 @@ describe Api::V1::GroupsController, type: :controller do
     let(:test_relation) { :users }
     let(:resource_id) { :group_id }
     let(:test_relation_ids) { [ resource.users.first.id.to_s ] }
-    
+
     context "setting membership to inactive" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
         delete :destroy_links, group_id: resource.id, link_ids: test_relation_ids.join(','), link_relation: "users"
       end
-      
+
       it 'should give the delete user membership to inactive' do
         expect(Membership.where(user_id: test_relation_ids,
                                 user_group_id: resource.id)).to all( be_inactive )
       end
     end
   end
-  
+
   describe "#recents" do
     let(:resource) { user_groups.first }
     let(:resource_key) { :user_group }
