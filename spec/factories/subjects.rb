@@ -8,10 +8,13 @@ FactoryGirl.define do
               brightness: -20,
               loudness: 11})
 
+    after(:create) do |s|
+      create_list(:medium, 2, linked: s)
+    end
+
     factory :subject_with_collections do
       after(:create) do |s|
         create_list(:collection, 2, subjects: [s])
-        create_list(:locations, 2, linked: s)
       end
     end
 
@@ -21,9 +24,9 @@ FactoryGirl.define do
       end
     end
 
-    factory :migrated_project_subject do
-      locations({standard: "http://www.galaxyzoo.org.s3.amazonaws.com/subjects/standard/1237679543502373086.jpg"})
-      migrated true
-    end
+    #factory :migrated_project_subject do
+      #locations(standard: "http://www.galaxyzoo.org.s3.amazonaws.com/subjects/standard/1237679543502373086.jpg")
+      #migrated true
+    #end
   end
 end

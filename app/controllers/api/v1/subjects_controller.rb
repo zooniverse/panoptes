@@ -37,9 +37,18 @@ class Api::V1::SubjectsController < Api::ApiController
     subject = super(create_params) do |object, linked|
       object[:upload_user_id] = api_user.id
     end
-    locations.each do |loc|
-      subject.locations.build(content_type: loc)
-    end
+    add_locations(locations, subject)
+  end
+
+  def build_update_hash(update_params, id)
+    locations = update_params.delete(:locations)
+    subject = Subject.find(id)
+    add_locations(locations, subject)
+    super(update_params, id)
+  end
+
+  def add_locations(locations, subject)
+    locations.each { |loc| subject.locations.build(content_type: loc) }
     subject
   end
 

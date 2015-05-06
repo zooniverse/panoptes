@@ -1,3 +1,6 @@
+require 'media_storage/test_adapter'
+require 'media_storage/aws_adapter'
+
 module MediaStorage
   class NoMediaStorage < StandardError
     def initialize(*args)
@@ -6,7 +9,7 @@ module MediaStorage
   end
 
   class << self
-    delegate :stored_path, :get_path, :put_path, to: :adapter
+    delegate :stored_path, :get_path, :put_path, :put_file, to: :adapter
 
     def adapter(adapter=nil, opts={})
       if adapter
@@ -15,6 +18,8 @@ module MediaStorage
         @adapter ||= default_adapter
       end
     end
+
+    private
 
     def default_adapter
       raise NoMediaStorage

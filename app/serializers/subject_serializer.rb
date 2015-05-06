@@ -7,11 +7,11 @@ class SubjectSerializer
   can_include :project, :collections
 
   def locations
-    @model.locations.reduce({}) do |hash, loc|
+    @model.locations.map do |loc|
       {
-       loc.content_type => @content[:post_urls] ? loc.put_url : loc.get_url
+       loc.content_type => @context[:post_urls] ? loc.put_url : loc.get_url
       }
-    end.reduce(&:merge)
+    end
   end
 
   def retired

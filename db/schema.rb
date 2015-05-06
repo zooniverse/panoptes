@@ -96,6 +96,21 @@ ActiveRecord::Schema.define(version: 20150507120651) do
 
   add_index "collections_subjects", ["collection_id", "subject_id"], name: "index_collections_subjects_on_collection_id_and_subject_id", unique: true, using: :btree
 
+  create_table "media", force: :cascade do |t|
+    t.string   "type"
+    t.integer  "linked_id"
+    t.string   "linked_type"
+    t.string   "content_type"
+    t.text     "src"
+    t.text     "path_opts",    default: [],                 array: true
+    t.boolean  "private",      default: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "media", ["linked_type", "linked_id"], name: "index_media_on_linked_type_and_linked_id", using: :btree
+  add_index "media", ["type"], name: "index_media_on_type", using: :btree
+
   create_table "memberships", force: :cascade do |t|
     t.integer  "state",         default: 2,                null: false
     t.integer  "user_group_id"

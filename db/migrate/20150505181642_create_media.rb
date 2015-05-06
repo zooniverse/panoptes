@@ -5,7 +5,8 @@ class CreateMedia < ActiveRecord::Migration
       t.references :linked, polymorphic: true, index: true
       t.string :content_type
       t.text :src
-      t.text :path_opts, array: true
+      t.text :path_opts, array: true, default: []
+      t.boolean :private, default: false
 
       t.timestamps null: false
     end
