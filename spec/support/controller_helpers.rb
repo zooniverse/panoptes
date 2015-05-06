@@ -14,6 +14,10 @@ module APIResponseHelpers
   def created_instance_ids(instance_type)
     json_response[instance_type].collect{ |h| h['id'] }
   end
+
+  def formated_string_ids(resources)
+    resources.map { |r| r.id.to_s }
+  end
 end
 
 module APIRequestHelpers
