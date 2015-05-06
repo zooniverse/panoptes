@@ -28,11 +28,22 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     context "logged out user" do
+
+      describe "filtering" do
+        let(:filterable_resources) do
+          create_list(:collection_with_subjects, 2).first.subjects
+        end
+        let(:expected_filtered_ids) { formated_string_ids(filterable_resources) }
+
+        it_behaves_like 'has many filterable', :collections
+      end
+
       context "without any sort" do
-        let(:resources) { create_list(:collection_with_subjects, 2).flat_map(&:subjects) }
         before(:each) do
           get :index
         end
+
+        it_behaves_like "an api response"
 
         it "should return 200" do
           expect(response.status).to eq(200)
@@ -41,9 +52,6 @@ describe Api::V1::SubjectsController, type: :controller do
         it "should return a page of 2 objects" do
           expect(json_response[api_resource_name].length).to eq(2)
         end
-
-        it_behaves_like "an api response"
-        it_behaves_like 'has many filterable', :collections
       end
 
       context "a queued request" do

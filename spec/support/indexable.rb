@@ -1,6 +1,6 @@
 shared_examples "is indexable" do
   let(:resource_ids) do
-    json_response[api_resource_name].collect{ |h| h['id'].to_i }
+    created_instance_ids(api_resource_name).map(&:to_i)
   end
 
   context 'for a normal user' do

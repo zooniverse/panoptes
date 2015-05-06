@@ -19,7 +19,8 @@ describe Api::V1::CollectionsController, type: :controller do
   end
 
   describe '#index' do
-    let(:resources) { collections }
+    let(:filterable_resources) { collections }
+    let(:expected_filtered_ids) { [ filterable_resources.first.id.to_s ] }
     let!(:private_resource) do
       create :collection_with_subjects, private: true
     end

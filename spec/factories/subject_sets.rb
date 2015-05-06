@@ -6,7 +6,9 @@ FactoryGirl.define do
     project
 
     after(:create) do |ss|
-      create_list(:workflow, 1, subject_sets: [ss])
+      if ss.workflows.empty?
+        create_list(:workflow, 1, subject_sets: [ss])
+      end
     end
 
     factory :subject_set_with_subjects do
