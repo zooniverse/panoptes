@@ -7,13 +7,13 @@ module RoleControl
     included do
       before_action :check_controller_resources, except: :create
     end
-    
+
     def check_controller_resources
       unless resources_exist?
         raise RoleControl::AccessDenied, send(:rejected_message)
       end
     end
-    
+
     def resources_exist?
       resource_ids.blank? ? true : controlled_resources.exists?(id: resource_ids)
     end
@@ -23,8 +23,6 @@ module RoleControl
                               .to(resource_class, scope_context)
                               .with_ids(resource_ids)
                               .scope
-      #p @controlled_resources.to_sql
-      @controlled_resources
     end
 
     def rejected_message
