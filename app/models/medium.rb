@@ -12,7 +12,7 @@ class Medium < ActiveRecord::Base
   end
 
   def create_path
-    self.src = MediaStorage.stored_path(content_type, type, *path_opts)
+    self.src ||= MediaStorage.stored_path(content_type, type, *path_opts)
   end
 
   def put_url
