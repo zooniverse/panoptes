@@ -1,12 +1,7 @@
 class Medium < ActiveRecord::Base
-  include RoleControl::ParentalControlled
-
   belongs_to :linked, polymorphic: true
 
-  before_save :create_path
-
-  can_through_parent :linked, :update, :index, :show, :destroy, :update_links,
-    :destroy_links, :translate, :versions, :version
+  before_save :create_path, unless: :external_link
 
   def self.inheritance_column
     nil
@@ -21,11 +16,19 @@ class Medium < ActiveRecord::Base
   end
 
   def put_url
-    MediaStorage.put_path(src, indifferent_attributes)
+    if external_link
+      src
+    else
+      MediaStorage.put_path(src, indifferent_attributes)
+    end
   end
 
   def get_url
-    MediaStorage.get_path(src, indifferent_attributes)
+    if external_link
+      src
+    else
+      MediaStorage.get_path(src, indifferent_attributes)
+    end
   end
 
   def put_file(file_path)

@@ -1,6 +1,7 @@
 class Subject < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include Linkable
+  default_scope { eager_load(:locations) }
 
   has_paper_trail only: [:metadata, :locations]
 

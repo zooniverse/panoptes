@@ -5,12 +5,12 @@ RSpec.describe ZooniverseUser, type: :model do
     zu = create(:zooniverse_user)
     expect(build(:zooniverse_user, email: zu.email.upcase)).to_not be_valid
   end
-  
+
   it 'should not be valid without an non-case_sensitive unique login' do
     zu = create(:zooniverse_user)
     expect(build(:zooniverse_user, login: zu.login.upcase)).to_not be_valid
   end
-  
+
   describe "::import_users" do
     let!(:zus) { create_list(:zooniverse_user, 2) }
 
@@ -86,7 +86,7 @@ RSpec.describe ZooniverseUser, type: :model do
 
       context "when the avatar is nil" do
         it 'should set the users avatar' do
-          expect(zu.import.avatar).to match(/default_forum_avatar.png/)
+          expect(zu.import.avatar.src).to match(/default_forum_avatar.png/)
         end
 
       end
@@ -94,7 +94,7 @@ RSpec.describe ZooniverseUser, type: :model do
       context "when the avatar exists" do
       let(:zu) { create(:zooniverse_user, avatar_file_name: "/test.png") }
         it 'should set the users avatar' do
-          expect(zu.import.avatar).to match(/\/#{zu.id}\/.+\.png/)
+          expect(zu.import.avatar.src).to match(/\/#{zu.id}\/.+\.png/)
         end
       end
     end

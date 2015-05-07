@@ -4,7 +4,7 @@ class Api::V1::MediaController < Api::ApiController
 
   schema_type :strong_params
 
-  allowed_params :create, :content_type
+  allowed_params :create, :content_type, :external_link
   allowed_params :update, :content_type
 
   def index
@@ -13,12 +13,15 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def show
+    raise NotImplementedError
   end
 
   def update
+    raise NotImplementedError
   end
 
   def destroy
+    raise NotImplementedError
   end
 
   def create
@@ -32,6 +35,9 @@ class Api::V1::MediaController < Api::ApiController
     assoc = resource_class.reflect_on_association(media_name)
     created = case assoc.macro
               when :has_one
+                if old_resource = controlled_resource.send(media_name)
+                  old_resource.destroy
+                end
                 controlled_resource.send("create_#{media_name}", create_params)
               when :has_many
                 controlled_resource.send(media_name).create(create_params)

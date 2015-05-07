@@ -90,7 +90,8 @@ class ZooniverseUser < ActiveRecord::Base
     panoptes_account_exists = panoptes_user_account_exists?(u)
     new_account = !u.persisted?
     u.display_name = login
-    u.avatar = avatar_to_url
+    u.build_avatar(external_link: true,
+                   src: avatar_to_url)
     u.email = email
     u.encrypted_password = crypted_password
     u.password_salt = password_salt

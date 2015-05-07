@@ -2,7 +2,6 @@ require 'spec_helper'
 
 RSpec.describe Api::V1::MediaController, type: :controller do
   let(:authorized_user) { create(:user) }
-  let!(:resource) { resources.first }
   let(:api_resource_name){ 'media' }
   let(:resource_class) { Medium }
   let(:api_resource_attributes) { %w(id src media_type) }
@@ -69,12 +68,14 @@ RSpec.describe Api::V1::MediaController, type: :controller do
     end
 
     describe "#create" do
+      let!(:resource) { parent.send(media_type) }
       let(:resource_url) { "http://test.host/api/#{parent_name}s/#{parent.id}/#{media_type}" }
       let(:test_attr) { :type }
       let(:test_attr_value) { "#{parent_name}_#{media_type}" }
+      let(:new_resource) { resource_class.find(created_instance_id(api_resource_name)) }
       let(:create_params) do
         params = {
-         media: { content_type: "image/jpeg" }
+                  media: { content_type: "image/jpeg" }
                  }
         params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
       end
@@ -84,8 +85,23 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       it "should return the medium's put url" do
         default_request user_id: authorized_user.id, scopes: scopes
         post :create, create_params
-        resource = resource_class.find(created_instance_id(api_resource_name))
-        expect(json_response["media"][0]["src"]).to eq(resource.put_url)
+        expect(json_response["media"][0]["src"]).to eq(new_resource.put_url)
+      end
+
+      describe "updates relationship" do
+        before(:each) do
+          default_request user_id: authorized_user.id, scopes: scopes
+          post :create, create_params
+        end
+
+        it "should replace the old media" do
+          parent.reload
+          expect(parent.send(media_type)).to eq(new_resource)
+        end
+
+        it "should destroy the old media" do
+          expect{ resource.reload }.to raise_error(ActiveRecord::RecordNotFound)
+        end
       end
     end
   end
