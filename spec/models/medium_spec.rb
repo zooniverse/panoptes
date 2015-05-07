@@ -13,6 +13,16 @@ RSpec.describe Medium, :type => :model do
     expect(m.external_link).to be false
   end
 
+  it 'should not be valid without a valid content_type' do
+    m = build(:medium, content_type: "video/mp4")
+    expect(m).to_not be_valid
+  end
+
+  it 'should be valid with a valid content_type' do
+    m = build(:medium, content_type: "image/png")
+    expect(m).to be_valid
+  end
+
   describe "#create_path" do
     context "when not externally linked" do
       it 'should create src path when saved' do
