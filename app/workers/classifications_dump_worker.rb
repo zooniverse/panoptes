@@ -44,6 +44,7 @@ class ClassificationsDumpWorker
     @medium ||= Medium.create(content_type: "text/csv",
                               type: "classifications_export",
                               path_opts: project_file_path,
+                              linked: project,
                               private: true)
   end
 

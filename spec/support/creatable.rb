@@ -13,7 +13,7 @@ shared_examples "is creatable" do
 
     it 'should create the new resource' do
       field = resource_class.find(created_id).send(test_attr)
-      
+
       if field.is_a?(Array)
         expect(field).to match_array(test_attr_value)
       else
@@ -30,10 +30,10 @@ shared_examples "is creatable" do
       name = defined?(resource_name) ? resource_name : api_resource_name
       id = created_id
       location_header = response.headers["Location"]
-      resource_url = "http://test.host/api/#{ name }/#{ id }"
-      expect(location_header).to eq(resource_url)
+      url = defined?(resource_url) ? resource_url : "http://test.host/api/#{ name }/#{ id }"
+      expect(location_header).to eq(url)
     end
-    
+
     it_behaves_like 'an api response'
   end
 

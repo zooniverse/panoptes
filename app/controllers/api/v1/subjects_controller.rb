@@ -19,15 +19,6 @@ class Api::V1::SubjectsController < Api::ApiController
 
   private
 
-  def context
-    case action_name
-    when "update", "create"
-      { post_urls: true }
-    else
-      { }
-    end
-  end
-
   def workflow
     @workflow ||= Workflow.where(id: params[:workflow_id]).first
   end

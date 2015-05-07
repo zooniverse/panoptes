@@ -1,7 +1,12 @@
 class Medium < ActiveRecord::Base
+  include RoleControl::ParentalControlled
+
   belongs_to :linked, polymorphic: true
 
   before_save :create_path
+
+  can_through_parent :linked, :update, :index, :show, :destroy, :update_links,
+    :destroy_links, :translate, :versions, :version
 
   def self.inheritance_column
     nil
@@ -10,7 +15,6 @@ class Medium < ActiveRecord::Base
   def indifferent_attributes
     attributes.dup.with_indifferent_access
   end
-
 
   def create_path
     self.src = MediaStorage.stored_path(content_type, type, *path_opts)

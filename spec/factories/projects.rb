@@ -11,8 +11,6 @@ FactoryGirl.define do
     activated_state Project.activated_states[:active]
     configuration { { x: "y", z: "q" } }
     primary_language "en"
-    avatar "http://test.host/x02234.jpg.gif.png.webp"
-    background_image "http://test.host/12312asd.jp2"
     private false
     approved true
     beta false
@@ -21,6 +19,8 @@ FactoryGirl.define do
     association :owner, factory: :user
 
     after(:build) do |p, env|
+      p.avatar = build(:medium, type: "project_avatar", linked: p)
+      p.background = build(:medium, type: "project_background", linked: p)
       if env.build_contents
         p.project_contents << build_list(:project_content, 1, project: p, language: p.primary_language)
         if env.build_extra_contents

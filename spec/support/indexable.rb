@@ -9,7 +9,7 @@ shared_examples "is indexable" do
       get :index
     end
 
-    it 'should return 200' do
+    it 'should return 200', :focus do
       expect(response.status).to eq 200
     end
 

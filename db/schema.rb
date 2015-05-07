@@ -196,8 +196,6 @@ ActiveRecord::Schema.define(version: 20150507120651) do
     t.integer  "classifications_count", default: 0,     null: false
     t.integer  "activated_state",       default: 0,     null: false
     t.string   "primary_language"
-    t.text     "avatar"
-    t.text     "background_image"
     t.boolean  "private"
     t.integer  "lock_version",          default: 0
     t.jsonb    "configuration"
@@ -362,7 +360,6 @@ ActiveRecord::Schema.define(version: 20150507120651) do
     t.boolean  "admin",                       default: false,    null: false
     t.boolean  "banned",                      default: false,    null: false
     t.boolean  "migrated",                    default: false
-    t.text     "avatar"
     t.boolean  "valid_email",                 default: true,     null: false
   end
 

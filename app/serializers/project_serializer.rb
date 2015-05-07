@@ -10,7 +10,7 @@ class ProjectSerializer
              :beta, :approved, :live
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
-              :project_roles
+              :project_roles, :avatar, :background
   can_filter_by :display_name, :beta, :approved
 
   def title

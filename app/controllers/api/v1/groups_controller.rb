@@ -5,7 +5,7 @@ class Api::V1::GroupsController < Api::ApiController
   schema_type :strong_params
 
   alias_method :user_group, :controlled_resource
-  
+
   allowed_params :create, :display_name, links: [ users: [] ]
   allowed_params :update, :display_name
 
@@ -15,7 +15,7 @@ class Api::V1::GroupsController < Api::ApiController
       .update_all(state: Membership.states[:inactive])
     deleted_resource_response
   end
-  
+
   private
 
   def build_resource_for_create(create_params)

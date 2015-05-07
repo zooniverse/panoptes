@@ -52,16 +52,18 @@ Rails.application.routes.draw do
 
       json_api_resources :subjects, versioned: true
 
-      json_api_resources :users, except: [:new, :edit, :create],
-                         links: [:user_groups] do
+      json_api_resources :users, except: [:new, :edit, :create], links: [:user_groups] do
         get "/recents", to: "users#recents", format: false
+        media_resources :avatar
       end
 
       json_api_resources :groups, links: [:users] do
         get "/recents", to: "groups#recents", format: false
       end
 
-      json_api_resources :projects, links: [:subject_sets, :workflows]
+      json_api_resources :projects, links: [:subject_sets, :workflows] do
+        media_resources :avatar, :background
+      end
 
       json_api_resources :workflows, links: [:subject_sets], versioned: true 
 
