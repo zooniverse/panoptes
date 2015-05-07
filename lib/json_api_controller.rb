@@ -1,6 +1,6 @@
 module JsonApiController
   extend ActiveSupport::Concern
-  
+
   class BadLinkParams < StandardError; end
   class PreconditionNotPresent < StandardError; end
   class PreconditionFailed < StandardError; end
@@ -74,10 +74,8 @@ module JsonApiController
 
   private
 
-  def gen_etag(query)
-    etag = combine_etags(etag: query)
-    key = ActiveSupport::Cache.expand_cache_key(etag)
-    %("#{Digest::MD5.hexdigest(key)}")
+  def gen_etag(response_obj)
+    %(#{Digest::MD5.hexdigest(response_obj.to_json)})
   end
 
   def resource_scope(resources)
