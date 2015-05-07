@@ -6,10 +6,8 @@ module Recents
   end
 
   def recent_scope
-    Classification.joins(resource_name.to_sym)
-      .merge(controlled_resources)
-      .where(completed: true)
-      .joins('INNER JOIN "subjects" ON "subjects"."id" = ANY("classifications"."subject_ids")')
-      .select('"classifications"."id", "classifications"."project_id", "classifications"."workflow_id", "classifications"."updated_at", "classifications"."created_at", "subjects"."locations", "subjects"."id" as subject_id')
+    Recent.joins(:classification)
+      .eager_load(:subject, :locations)
+      .where(classifications: { :"#{resource_name}_id" => resource_ids})
   end
 end
