@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150504193426) do
+ActiveRecord::Schema.define(version: 20150507120651) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -348,6 +348,7 @@ ActiveRecord::Schema.define(version: 20150504193426) do
     t.boolean  "banned",                      default: false,    null: false
     t.boolean  "migrated",                    default: false
     t.text     "avatar"
+    t.boolean  "valid_email",                 default: true,     null: false
   end
 
   add_index "users", ["display_name"], name: "index_users_on_display_name", unique: true, using: :btree

@@ -134,7 +134,29 @@ describe User, type: :model do
 
       it { is_expected.to be_valid }
     end
+  end
 
+  describe '#valid_email' do
+    let(:user) { build(:user, email: 'isitvalid@example.com') }
+
+    it 'should set the valid_email field to true' do
+      expect(user.valid_email).to be_truthy
+    end
+
+    describe "setting the field to nil" do
+      before(:each) do
+        user.valid_email = nil
+      end
+
+      it 'should not be valid' do
+        expect(user.valid?).to be_falsey
+      end
+
+      it 'should have the correct error message' do
+        user.valid?
+        expect(user.errors[:valid_email]).to include("must be true or false")
+      end
+    end
   end
 
   describe "#build_identity_group" do
@@ -403,7 +425,7 @@ describe User, type: :model do
   describe "has_finished?" do
     let(:user) { create(:user) }
     subject { user.has_finished?(workflow) }
-    
+
     context 'when the user has classified all subjects in a workflow' do
       let(:workflow) do
         workflow = create(:workflow_with_subjects)
@@ -411,7 +433,7 @@ describe User, type: :model do
         create(:user_seen_subject, user: user, workflow: workflow, subject_ids: ids)
         workflow
       end
-      
+
       it { is_expected.to be true }
     end
 
@@ -421,7 +443,7 @@ describe User, type: :model do
         create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [])
         workflow
       end
-      
+
       it { is_expected.to be false }
     end
   end

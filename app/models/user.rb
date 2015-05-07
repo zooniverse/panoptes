@@ -31,6 +31,7 @@ class User < ActiveRecord::Base
   validates :display_name, presence: true, uniqueness: { case_sensitive: false },
             format: { without: /\$|@|\s+/ }, unless: :migrated
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated
+  validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
 
   validates_with IdentityGroupNameValidator
 
