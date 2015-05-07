@@ -6,7 +6,7 @@ RSpec.describe MediaStorage::AwsAdapter do
   let(:prefix) { "panoptes_staging" }
   let(:bucket) { "media.zooniverse.org" }
   let(:adapter) do
-    described_class.new(prefix: prefix, bucket: bucket)
+    described_class.new(prefix: prefix, bucket: bucket, access_key_id: 'fake', secret_access_key: 'keys')
   end
 
   context 'when keys are passed to the initializer' do

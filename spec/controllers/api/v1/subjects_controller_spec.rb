@@ -97,24 +97,6 @@ describe Api::V1::SubjectsController, type: :controller do
         default_request user_id: user.id, scopes: scopes
       end
 
-      context "with a migrated project subject", :disabled do
-        let!(:migrated_subject) { create(:migrated_project_subject) }
-
-        before(:each) do
-          get :index
-        end
-
-        it "should return 200" do
-          expect(response.status).to eq(200)
-        end
-
-        it "should return a page of 2 objects" do
-          expect(json_response[api_resource_name].length).to eq(3)
-        end
-
-        it_behaves_like "an api response"
-      end
-
       context "without any sort" do
         before(:each) do
           get :index
