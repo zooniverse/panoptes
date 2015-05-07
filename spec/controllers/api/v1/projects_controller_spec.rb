@@ -8,10 +8,9 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:api_resource_name) { "projects" }
   let(:api_resource_attributes) do
     ["id", "display_name", "classifications_count", "subjects_count",
-     "updated_at", "created_at", "available_languages", "title", "avatar",
+     "updated_at", "created_at", "available_languages", "title",
      "description", "team_members", "guide", "science_case", "introduction",
-     "faq", "result", "education_content", "background_image", "private",
-     "live", "retired_subjects_count", "avatar", "background_image"]
+     "faq", "result", "education_content", "private", "live", "retired_subjects_count"]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
@@ -53,7 +52,7 @@ describe Api::V1::ProjectsController, type: :controller do
         it_behaves_like "it has custom owner links"
       end
 
-      describe "filter params" do
+      describe "params" do
         let!(:project_owner) { create(:user) }
         let!(:new_project) do
           create(:project, display_name: "Non-test project", owner: project_owner)
@@ -61,6 +60,20 @@ describe Api::V1::ProjectsController, type: :controller do
 
         before(:each) do
           get :index, index_options
+        end
+
+        describe "include avatar and background" do
+          let(:index_options) { {include: 'avatar,background'} }
+
+          it 'should include avatar' do
+            expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
+              .to include(*projects.map(&:avatar).map(&:id).map(&:to_s))
+          end
+
+          it 'should include background' do
+            expect(json_response["linked"]["backgrounds"].map{ |r| r['id'] })
+              .to include(*projects.map(&:background).map(&:id).map(&:to_s))
+          end
         end
 
         describe "filter by beta" do
@@ -100,8 +113,6 @@ describe Api::V1::ProjectsController, type: :controller do
               expect(Project.find(ids)).to_not include(unapproved_resource)
             end
           end
-
-
         end
 
         describe "filter by owner" do
@@ -219,8 +230,6 @@ describe Api::V1::ProjectsController, type: :controller do
                       education_content: "asdfasdf",
                       faq: "some other stuff",
                       result: "another string",
-                      avatar: "an avatar",
-                      background_image: "and image",
                       configuration: {
                                       an_option: "a setting"
                                      },
@@ -404,8 +413,6 @@ describe Api::V1::ProjectsController, type: :controller do
           education_content: "asdfasdf",
           faq: "some other stuff",
           result: "another string",
-          avatar: "an avatar",
-          background_image: "and image",
           configuration: {
                           an_option: "a setting"
                          },

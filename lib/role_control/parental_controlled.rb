@@ -17,8 +17,7 @@ module RoleControl
       end
 
       def parent_class
-        p reflect_on_association(@parent)
-        @parent_class ||= reflect_on_association(@parent).klass
+        @parent_class ||= @parent.to_s.camelize.constantize
       end
 
       def scope_for(action, user, opts={})
