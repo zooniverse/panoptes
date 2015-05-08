@@ -1,5 +1,8 @@
 module MediaStorage
   class AbstractAdapter
+
+    class EmptyPathError < StandardError; end
+
     def initialize(opts={})
       @opts = opts
     end
@@ -22,6 +25,14 @@ module MediaStorage
 
     def configure
       yield self if block_given?
+    end
+
+    private
+
+    def check_path(path)
+      if path.blank?
+        raise EmptyPathError.new("A storage path must be specified.")
+      end
     end
   end
 end

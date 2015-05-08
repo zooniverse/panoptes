@@ -73,7 +73,6 @@ RSpec.describe MediaStorage::AwsAdapter do
       allow(adapter).to receive(:object).and_return(obj_double)
     end
 
-
     context "when opts[:private] is true" do
       it 'should call write with the content_type, file, and private acl' do
         expect(obj_double).to receive(:write).with(file: file_path,
@@ -90,6 +89,16 @@ RSpec.describe MediaStorage::AwsAdapter do
                                                    acl: 'public-read')
         adapter.put_file("src", file_path, content_type: content_type, private: false)
       end
+    end
+  end
+
+  context "when missing an s3 object path" do
+
+    it 'should raise an error' do
+      error_message = "A storage path must be specified."
+      expect do
+        adapter.send(:object, nil)
+      end.to raise_error(MediaStorage::AbstractAdapter::EmptyPathError, error_message)
     end
   end
 end
