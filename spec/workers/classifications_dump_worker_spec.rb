@@ -42,6 +42,15 @@ RSpec.describe ClassificationsDumpWorker do
         worker.perform(project.id)
       end
 
+      it "should create a linked media resource" do
+        expect(Medium).to receive(:create!).and_call_original
+        worker.perform(project.id)
+      end
+
+      it "should not fail to create a linked media resource" do
+        expect { worker.perform(project.id) }.to_not raise_error
+      end
+
       it "push the file to s3" do
         expect(worker).to receive(:write_to_s3).once
         worker.perform(project.id)

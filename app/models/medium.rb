@@ -1,17 +1,22 @@
 class Medium < ActiveRecord::Base
+
+  class MissingPutFilePath < StandardError; end
+
   belongs_to :linked, polymorphic: true
 
-  before_save :create_path, unless: :external_link
+  before_validation :create_path, unless: :external_link
+  validates :src, presence: true, unless: :external_link
 
   def self.inheritance_column
     nil
   end
 
-  ALLOWED_CONTENT_TYPES = %w(image/jpeg image/png image/gif)
+  ALLOWED_UPLOAD_CONTENT_TYPES = %w(image/jpeg image/png image/gif)
+  ALLOWED_EXPORT_CONTENT_TYPES  = %w(text/csv)
 
   validate do |medium|
-    unless ALLOWED_CONTENT_TYPES.include?(medium.content_type)
-      medium.errors.add(:content_type, "Content-Type must be one of #{ALLOWED_CONTENT_TYPES.join(", ")}")
+    unless allowed_content_types.include?(medium.content_type)
+      medium.errors.add(:content_type, "Content-Type must be one of #{allowed_content_types.join(", ")}")
     end
   end
 
@@ -40,6 +45,17 @@ class Medium < ActiveRecord::Base
   end
 
   def put_file(file_path)
+    if file_path.blank?
+      raise MissingPutFilePath.new("Must specify a file_path to store")
+    end
     MediaStorage.put_file(src, file_path, indifferent_attributes)
+  end
+
+  def allowed_content_types
+    if type == "classifications_export"
+      ALLOWED_EXPORT_CONTENT_TYPES
+    else
+      ALLOWED_UPLOAD_CONTENT_TYPES
+    end
   end
 end

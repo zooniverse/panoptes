@@ -23,8 +23,24 @@ RSpec.describe Medium, :type => :model do
     expect(m).to be_valid
   end
 
+  context "when the src field is blank" do
+    before(:each) do
+      allow(MediaStorage).to receive(:stored_path).and_return(nil)
+    end
+
+    it 'should not be valid without a src' do
+      expect(medium).to be_invalid
+    end
+
+    it 'should have a useful error message' do
+      medium.valid?
+      expect(medium.errors[:src]).to include("can't be blank")
+    end
+  end
+
   describe "#create_path" do
     context "when not externally linked" do
+
       it 'should create src path when saved' do
         medium.save!
         expect(medium.src).to be_a(String)
@@ -86,6 +102,33 @@ RSpec.describe Medium, :type => :model do
       let(:medium) { create(:medium, external_link: true) }
       it 'should return the src' do
         expect(medium.get_url).to eq(medium.src)
+      end
+    end
+  end
+
+  describe "#put_file" do
+
+    let(:file_path) { "#{Rails.root}/tmp/project_x_dump.csv" }
+    let(:media_storage_put_file_params) { [ medium.src, file_path, medium.attributes ]}
+
+    it 'should call MediaStorage with the src and other attributes' do
+      expect(MediaStorage).to receive(:put_file).with(*media_storage_put_file_params)
+      medium.put_file(file_path)
+    end
+
+    it 'should pass attributes as hash with indifferent access' do
+      expect(MediaStorage).to receive(:put_file)
+        .with(anything, anything, be_a(HashWithIndifferentAccess))
+      medium.put_file(file_path)
+    end
+
+    context "when passed a blank file_path" do
+      let!(:file_path) { "" }
+
+      it 'should raise and error' do
+        expect {
+          medium.put_file(file_path)
+        }.to raise_error(Medium::MissingPutFilePath, "Must specify a file_path to store")
       end
     end
   end

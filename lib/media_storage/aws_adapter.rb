@@ -1,5 +1,6 @@
 module MediaStorage
   class AwsAdapter < AbstractAdapter
+
     DEFAULT_PUT_EXPIRATION = 20
     DEFAULT_GET_EXPIRATION = 60
 
@@ -62,6 +63,7 @@ module MediaStorage
     private
 
     def object(path)
+      check_path(path)
       bucket.objects[path]
     end
 
