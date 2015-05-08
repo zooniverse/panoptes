@@ -6,6 +6,7 @@ class Project < ActiveRecord::Base
   include Linkable
   include Translatable
   include PreferencesLink
+  include AssociationCacheKey
 
   EXPERT_ROLES = [:expert, :owner]
 
@@ -20,6 +21,9 @@ class Project < ActiveRecord::Base
     as: :linked
   has_many :classification_exports, -> { where(type: "classifications_export")},
     class_name: "Medium", as: :linked
+
+  cache_by_association :project_contents
+  cache_by_resource_method :subjects_count, :retired_subjects_count, :finished?
 
   accepts_nested_attributes_for :project_contents
 
