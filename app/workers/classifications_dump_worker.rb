@@ -41,11 +41,11 @@ class ClassificationsDumpWorker
   end
 
   def medium
-    @medium ||= Medium.create(content_type: "text/csv",
-                              type: "classifications_export",
-                              path_opts: project_file_path,
-                              linked: project,
-                              private: true)
+    @medium ||= Medium.create!(content_type: "text/csv",
+                               type: "classifications_export",
+                               path_opts: project_file_path,
+                               linked: project,
+                               private: true)
   end
 
   def write_to_s3
