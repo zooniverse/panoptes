@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :recent do
-    classification nil
-subject nil
+    classification
+    subject
   end
-
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150507120651) do
+ActiveRecord::Schema.define(version: 20150507212315) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -207,6 +207,16 @@ ActiveRecord::Schema.define(version: 20150507120651) do
 
   add_index "projects", ["approved"], name: "index_projects_on_approved", using: :btree
   add_index "projects", ["beta"], name: "index_projects_on_beta", using: :btree
+
+  create_table "recents", force: :cascade do |t|
+    t.integer  "classification_id"
+    t.integer  "subject_id"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+  end
+
+  add_index "recents", ["classification_id"], name: "index_recents_on_classification_id", using: :btree
+  add_index "recents", ["subject_id"], name: "index_recents_on_subject_id", using: :btree
 
   create_table "set_member_subjects", force: :cascade do |t|
     t.integer  "subject_set_id"
@@ -410,6 +420,8 @@ ActiveRecord::Schema.define(version: 20150507120651) do
   add_index "workflows", ["project_id"], name: "index_workflows_on_project_id", using: :btree
   add_index "workflows", ["tutorial_subject_id"], name: "index_workflows_on_tutorial_subject_id", using: :btree
 
+  add_foreign_key "recents", "classifications"
+  add_foreign_key "recents", "subjects"
   add_foreign_key "subject_sets_workflows", "subject_sets"
   add_foreign_key "subject_sets_workflows", "workflows"
   add_foreign_key "subject_workflow_counts", "set_member_subjects"

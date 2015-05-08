@@ -8,5 +8,13 @@ class Recent < ActiveRecord::Base
   has_one :workflow, through: :classification
   has_one :user, through: :classification
   has_one :user_group, through: :classification
+
+  validates_presence_of :classification, :subject
+
+  def self.create_from_classification(classification)
+    classification.subject_ids.each do |sid|
+      create!(subject_id: sid, classification: classification)
+    end
+  end
 end
 

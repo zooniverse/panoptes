@@ -18,6 +18,18 @@ class Api::V1::GroupsController < Api::ApiController
 
   private
 
+  def _resource_ids
+    ids = if params.has_key?("group_id")
+            params["group_id"]
+          elsif params.has_key?(:id)
+            params[:id]
+          else
+            ''
+          end.split(',')
+
+    ids.length < 2 ? ids.first : ids
+  end
+
   def build_resource_for_create(create_params)
     group = super(create_params)
     group.memberships.build(**initial_member)
@@ -41,9 +53,9 @@ class Api::V1::GroupsController < Api::ApiController
 
   def initial_member
     {
-      user: api_user.user,
-      state: :active,
-      roles: ["group_admin"]
+     user: api_user.user,
+     state: :active,
+     roles: ["group_admin"]
     }
   end
 end
