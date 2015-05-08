@@ -1,4 +1,7 @@
 class Medium < ActiveRecord::Base
+
+  class MissingPutFilePath < StandardError; end
+
   belongs_to :linked, polymorphic: true
 
   before_validation :create_path, unless: :external_link
@@ -42,6 +45,9 @@ class Medium < ActiveRecord::Base
   end
 
   def put_file(file_path)
+    if file_path.blank?
+      raise MissingPutFilePath.new("Must specify a file_path to store")
+    end
     MediaStorage.put_file(src, file_path, indifferent_attributes)
   end
 

@@ -105,4 +105,31 @@ RSpec.describe Medium, :type => :model do
       end
     end
   end
+
+  describe "#put_file" do
+
+    let(:file_path) { "#{Rails.root}/tmp/project_x_dump.csv" }
+    let(:media_storage_put_file_params) { [ medium.src, file_path, medium.attributes ]}
+
+    it 'should call MediaStorage with the src and other attributes' do
+      expect(MediaStorage).to receive(:put_file).with(*media_storage_put_file_params)
+      medium.put_file(file_path)
+    end
+
+    it 'should pass attributes as hash with indifferent access' do
+      expect(MediaStorage).to receive(:put_file)
+        .with(anything, anything, be_a(HashWithIndifferentAccess))
+      medium.put_file(file_path)
+    end
+
+    context "when passed a blank file_path" do
+      let!(:file_path) { "" }
+
+      it 'should raise and error' do
+        expect {
+          medium.put_file(file_path)
+        }.to raise_error(Medium::MissingPutFilePath, "Must specify a file_path to store")
+      end
+    end
+  end
 end
