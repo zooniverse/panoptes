@@ -7,11 +7,12 @@ class Medium < ActiveRecord::Base
     nil
   end
 
-  ALLOWED_CONTENT_TYPES = %w(image/jpeg image/png image/gif)
+  ALLOWED_UPLOAD_CONTENT_TYPES = %w(image/jpeg image/png image/gif)
+  ALLOWED_EXPORT_CONTENT_TYPES  = %w(text/csv)
 
   validate do |medium|
-    unless ALLOWED_CONTENT_TYPES.include?(medium.content_type)
-      medium.errors.add(:content_type, "Content-Type must be one of #{ALLOWED_CONTENT_TYPES.join(", ")}")
+    unless allowed_content_types.include?(medium.content_type)
+      medium.errors.add(:content_type, "Content-Type must be one of #{allowed_content_types.join(", ")}")
     end
   end
 
@@ -41,5 +42,13 @@ class Medium < ActiveRecord::Base
 
   def put_file(file_path)
     MediaStorage.put_file(src, file_path, indifferent_attributes)
+  end
+
+  def allowed_content_types
+    if type == "classifications_export"
+      ALLOWED_EXPORT_CONTENT_TYPES
+    else
+      ALLOWED_UPLOAD_CONTENT_TYPES
+    end
   end
 end
