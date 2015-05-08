@@ -1,24 +1,19 @@
 class RemoveAvatarBackgroundFromProject < ActiveRecord::Migration
   def change
-    ps_with_avatar_or_background = Project.where.not(avatar: nil)
-      .or(Project.where.not(background_image: nil))
+    ps_with_avatar_or_background = Project.where("avatar IS NOT NULL OR background_image IS NOT NULL")
     total = ps_with_avatar_or_background.count
     ps_with_avatar_or_background.find_each.with_index do |ps, i|
       p "#{i+1} of #{total}"
       if ps.avatar
-        Medium.create!(external_link: true,
-                       content_type: "image/*",
-                       src: ps.avatar,
-                       linked: ps,
-                       type: "project_avatar")
+        ps.create_avatar(external_link: true,
+                         content_type: "image/*",
+                         src: ps.avatar)
       end
 
       if ps.background_image
-        Medium.create!(external_link: true,
-                       content_type: "image/*",
-                       src: ps.background_iamge,
-                       linked: ps,
-                       type: "project_background")
+        ps.create_background(external_link: true,
+                             content_type: "image/*",
+                             src: ps.background_iamge)
       end
     end
     remove_column :projects, :avatar, :text
