@@ -23,8 +23,24 @@ RSpec.describe Medium, :type => :model do
     expect(m).to be_valid
   end
 
+  context "when the src field is blank" do
+    before(:each) do
+      allow(MediaStorage).to receive(:stored_path).and_return(nil)
+    end
+
+    it 'should not be valid without a src' do
+      expect(medium).to be_invalid
+    end
+
+    it 'should have a useful error message' do
+      medium.valid?
+      expect(medium.errors[:src]).to include("can't be blank")
+    end
+  end
+
   describe "#create_path" do
     context "when not externally linked" do
+
       it 'should create src path when saved' do
         medium.save!
         expect(medium.src).to be_a(String)

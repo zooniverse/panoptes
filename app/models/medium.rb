@@ -1,7 +1,8 @@
 class Medium < ActiveRecord::Base
   belongs_to :linked, polymorphic: true
 
-  before_save :create_path, unless: :external_link
+  before_validation :create_path, unless: :external_link
+  validates :src, presence: true, unless: :external_link
 
   def self.inheritance_column
     nil
