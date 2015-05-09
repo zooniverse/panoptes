@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe RegistrationsController, type: :controller do
   let(:user_attributes) do
+    p extra_attributes
     attributes_for(:user, **extra_attributes).slice(*user_params)
   end
 
@@ -12,7 +13,7 @@ describe RegistrationsController, type: :controller do
   context "as json" do
     let(:user_params) do
       [ :email, :password, :password_confirmation, :display_name,
-        :global_email_communication, :project_email_communication ]
+       :global_email_communication, :project_email_communication ]
     end
 
     before(:each) do
@@ -46,6 +47,23 @@ describe RegistrationsController, type: :controller do
 
         it "should clear the password attributes" do
           expect(subject).to receive(:clean_up_passwords)
+          post :create, user: user_attributes
+        end
+      end
+
+      context "when email communications are true" do
+        let(:extra_attributes) { { display_name: 'asdfasdfasdf', global_email_communication: true } }
+        it 'should call subscribe worker' do
+          expect(SubscribeWorker).to receive(:perform_async)
+            .with(user_attributes[:email], user_attributes[:display_name])
+          post :create, user: user_attributes
+        end
+      end
+
+      context "when email communications are true" do
+        let(:extra_attributes) { { display_name: 'asdfasdf', global_email_communication: false } }
+        it 'should call subscribe worker' do
+          expect(SubscribeWorker).to_not receive(:perform_async)
           post :create, user: user_attributes
         end
       end
@@ -113,7 +131,7 @@ describe RegistrationsController, type: :controller do
   end
 
   context "as html" do
-    let(:user_params) { [ :email, :password, :password_confirmation, :display_name ] }
+    let(:user_params) { [ :email, :password, :password_confirmation, :display_name, :global_email_communication ] }
 
     before(:each) do
       request.env["HTTP_ACCEPT"] = "text/html"
@@ -141,6 +159,25 @@ describe RegistrationsController, type: :controller do
 
         it "should sign the user in" do
           expect(subject).to receive(:sign_in)
+          post :create, user: user_attributes
+        end
+
+      end
+
+      context "when email communications are true" do
+        let(:extra_attributes) { { display_name: 'asdfasdf', global_email_communication: true } }
+        it 'should call subscribe worker' do
+          expect(SubscribeWorker).to receive(:perform_async)
+            .with(user_attributes[:email], user_attributes[:display_name])
+          p user_attributes
+          post :create, user: user_attributes
+        end
+      end
+
+      context "when email communications are true" do
+        let(:extra_attributes) { { display_name: 'asdfasdf', global_email_communication: false } }
+        it 'should call subscribe worker' do
+          expect(SubscribeWorker).to_not receive(:perform_async)
           post :create, user: user_attributes
         end
       end

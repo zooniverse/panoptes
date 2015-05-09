@@ -22,6 +22,9 @@ class RegistrationsController < Devise::RegistrationsController
   def build_resource(sign_up_params)
     super(sign_up_params)
     resource.build_identity_group
+    if resource.global_email_communication
+      SubscribeWorker.perform_async(resource.email, resource.display_name)
+    end
   end
 
   def registrations_response(resource_saved)

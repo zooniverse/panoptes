@@ -13,6 +13,7 @@ describe Api::V1::UsersController, type: :controller do
       "created_at", "updated_at", "type",
       "global_email_communication" ]
   end
+
   let(:api_resource_links) do
     [ "users.projects",
       "users.avatar",
@@ -22,6 +23,7 @@ describe Api::V1::UsersController, type: :controller do
       "users.collection_preferences",
       "users.recents" ]
   end
+
   let(:response_fb_token) do
     json_response[api_resource_name][0]["firebase_auth_token"]
   end
@@ -206,14 +208,93 @@ describe Api::V1::UsersController, type: :controller do
     let(:user) { users.first }
     let(:user_id) { user.id }
 
-    before(:each) do
-      default_request(scopes: scopes, user_id: users.first.id)
+    def update_request
+      default_request(scopes: scopes, user_id: user.id)
       params = put_operations || Hash.new
       params[:id] = user_id
       put :update, params
     end
 
+    context "when changing email" do
+      let(:put_operations) { {users: {email: "test@example.com"}} }
+
+      after(:each) do
+        update_request
+      end
+
+      context 'when email preferences are true' do
+        it 'should subscribe the new email' do
+          expect(SubscribeWorker).to receive(:perform_async).with("test@example.com",
+                                                                  user.display_name)
+        end
+
+        it 'should remove the old email' do
+          expect(UnsubscribeWorker).to receive(:perform_async).with(user.email)
+        end
+      end
+
+      context 'when email prefences are false' do
+        let(:user) { create(:user, global_email_communication: false) }
+        it 'should subscribe the new email' do
+          expect(SubscribeWorker).to_not receive(:perform_async)
+        end
+
+        it 'should not call unsubscribe' do
+          expect(UnsubscribeWorker).to_not receive(:perform_async)
+        end
+      end
+    end
+
+    context "when changing global_email_communication" do
+      after(:each) do
+        update_request
+      end
+
+      context "from false to true" do
+        let(:user) { create(:user, global_email_communication: false) }
+        let(:put_operations) { {users: {global_email_communication: true}} }
+
+        it 'should queue a subscribe worker' do
+          expect(SubscribeWorker).to receive(:perform_async).with(user.email,
+                                                                  user.display_name)
+        end
+      end
+
+      context "from true to false" do
+        let(:user) { create(:user, global_email_communication: true) }
+        let(:put_operations) { {users: {display_name: "TEST", global_email_communication: false}} }
+        it 'should queue an unsubscribe worker' do
+          expect(UnsubscribeWorker).to receive(:perform_async).with(user.email)
+        end
+      end
+
+      context "from true to true" do
+        let(:user) { create(:user, global_email_communication: true) }
+        let(:put_operations) { {users: {global_email_communication: true}} }
+        it 'should not queue a subscribe worker' do
+          expect(SubscribeWorker).to_not receive(:perform_async)
+        end
+
+        it 'should not queue a unsubscribe worker' do
+          expect(UnsubscribeWorker).to_not receive(:perform_async)
+        end
+      end
+
+      context "from false to false" do
+        let(:user) { create(:user, global_email_communication: false) }
+        let(:put_operations) { {users: {global_email_communication: false}} }
+        it 'should not queue a subscribe worker' do
+          expect(SubscribeWorker).to_not receive(:perform_async)
+        end
+
+        it 'should not queue a unsubscribe worker' do
+          expect(UnsubscribeWorker).to_not receive(:perform_async)
+        end
+      end
+    end
+
     context "when updating a non-existant user" do
+      before(:each) { update_request }
       let!(:user_id) { User.last.id + 1 }
       let(:put_operations) { nil }
 
@@ -228,6 +309,7 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     context "with a valid replace put operation" do
+      before(:each) { update_request }
       let(:new_display_name) { "Mr_Creosote" }
       let(:new_gec) { true }
       let(:put_operations) do
@@ -254,6 +336,7 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     context "with a an invalid put operation" do
+      before(:each) { update_request }
       let(:put_operations) { {} }
 
       it "should return an error status" do
