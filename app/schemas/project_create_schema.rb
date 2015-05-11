@@ -52,14 +52,6 @@ class ProjectCreateSchema < JsonSchema
       type "string"
     end
 
-    property "avatar" do
-      type "string"
-    end
-
-    property "background_image" do
-      type "string"
-    end
-
     property "guide" do
       type "array"
       items  do

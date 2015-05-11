@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-UUIDv4Regex = /[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/
 
 describe Api::V1::SubjectsController, type: :controller do
   let!(:workflow) { create(:workflow_with_subject_sets) }
@@ -96,24 +95,6 @@ describe Api::V1::SubjectsController, type: :controller do
     context "logged in user" do
       before(:each) do
         default_request user_id: user.id, scopes: scopes
-      end
-
-      context "with a migrated project subject" do
-        let!(:migrated_subject) { create(:migrated_project_subject) }
-
-        before(:each) do
-          get :index
-        end
-
-        it "should return 200" do
-          expect(response.status).to eq(200)
-        end
-
-        it "should return a page of 2 objects" do
-          expect(json_response[api_resource_name].length).to eq(3)
-        end
-
-        it_behaves_like "an api response"
       end
 
       context "without any sort" do
@@ -232,23 +213,6 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:resource) { create(:subject) }
 
     it_behaves_like "is showable"
-
-    context "location urls" do
-      let(:url) { json_response['subjects'][0]['locations'][0]['image/jpeg'] }
-
-      before(:each) do
-        default_request scopes: scopes, user_id: authorized_user.id
-        get :show, id: resource.id
-      end
-
-      it 'should return the location path as an id' do
-        expect(url).to match(/https:\/\/panoptes-uploads.zooniverse.org/)
-      end
-
-      it 'should return the uuid file name' do
-        expect(url).to match(UUIDv4Regex)
-      end
-    end
   end
 
   describe "#update" do
@@ -291,33 +255,6 @@ describe Api::V1::SubjectsController, type: :controller do
           }
         }
       }
-    end
-
-    context "s3 urls" do
-      before(:each) do
-        default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
-      end
-
-      let(:standard_url) do
-        json_response['subjects'][0]['locations'][0]['image/jpeg']
-      end
-
-      it 'should return locations as a hash of signed s3 urls' do
-        expect(standard_url).to match(/Expires=[0-9]+&Signature=[%A-z0-9]+/)
-      end
-
-      it "should set a uuidv4 id as the file name" do
-        expect(standard_url).to match(UUIDv4Regex)
-      end
-
-      it "should set the file extension from the provided mime-type" do
-        expect(standard_url).to match(/\.jpeg/)
-      end
-
-      it "should set the bucket with a path prefix" do
-        expect(standard_url).to match(/s3_subject_bucket\/test_bucket_path/)
-      end
     end
 
     context "when the user is not-the owner of the project" do

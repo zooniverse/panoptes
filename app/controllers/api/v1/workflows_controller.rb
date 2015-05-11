@@ -23,7 +23,7 @@ class Api::V1::WorkflowsController < Api::ApiController
     super { |workflow| refresh_queue(workflow) }
   end
 
-  def destroy_links 
+  def destroy_links
     super { |workflow| refresh_queue(workflow) }
   end
 

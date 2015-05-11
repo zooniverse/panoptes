@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe RoleControl::Controlled do
   setup_role_control_tables
-  
+
   let(:subject) { ControlledTable }
-  
+
   let(:enrolled_actor) { create(:user) }
-  
+
   let(:unenrolled_actor) { create(:user) }
 
   let(:admin_actor) { create(:user, admin: true) }
@@ -18,12 +18,12 @@ describe RoleControl::Controlled do
       gt3 = subject.new
 
       [gt1,gt2,gt3].each(&:save!)
-      
+
       create_roles_join_instance(%w(admin), gt1, enrolled_actor)
       create_roles_join_instance(%w(test_role), gt2, enrolled_actor)
       create_roles_join_instance([], gt3, enrolled_actor)
       create_roles_join_instance([], gt3, unenrolled_actor)
-      
+
       [gt1, gt2, gt3]
     end
 

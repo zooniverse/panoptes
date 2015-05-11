@@ -1,6 +1,6 @@
 module JsonApiController
   extend ActiveSupport::Concern
-  
+
   class BadLinkParams < StandardError; end
   class PreconditionNotPresent < StandardError; end
   class PreconditionFailed < StandardError; end

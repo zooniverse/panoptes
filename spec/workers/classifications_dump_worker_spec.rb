@@ -9,12 +9,6 @@ RSpec.describe ClassificationsDumpWorker do
 
   describe "#perform" do
 
-    before(:each) do
-      s3_double = double(objects: double(:[] => double(write: true,
-                                                       url_for: "https://fake.s3.url.example.com")))
-      allow(::Panoptes).to receive(:subjects_bucket).and_return(s3_double)
-    end
-
     context "when the project id doesn't correspond to a project" do
       before(:each) do
         allow(Project).to receive(:find).and_return(nil)
@@ -37,13 +31,24 @@ RSpec.describe ClassificationsDumpWorker do
     end
 
     context "when the project exists" do
+      let(:project_file_name) do
+        "#{project.owner.display_name}_#{project.display_name.downcase.gsub(/\s/, "_")}.csv"
+      end
 
-      let(:project_file_name) { "#{project.display_name.downcase.gsub(/\s/, "_")}.csv" }
       let(:temp_file_path) { "#{Rails.root}/tmp/#{project_file_name}" }
 
       it "should create a csv file with the correct number of entries" do
         expect_any_instance_of(CSV).to receive(:<<).exactly(6).times
         worker.perform(project.id)
+      end
+
+      it "should create a linked media resource" do
+        expect(Medium).to receive(:create!).and_call_original
+        worker.perform(project.id)
+      end
+
+      it "should not fail to create a linked media resource" do
+        expect { worker.perform(project.id) }.to_not raise_error
       end
 
       it "push the file to s3" do

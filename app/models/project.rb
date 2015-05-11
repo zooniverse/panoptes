@@ -15,6 +15,11 @@ class Project < ActiveRecord::Base
   has_many :subjects
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
   has_many :project_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
+  has_one :avatar, -> { where(type: "project_avatar") }, class_name: "Medium", as: :linked
+  has_one :background, -> { where(type: "project_background") }, class_name: "Medium",
+    as: :linked
+  has_many :classification_exports, -> { where(type: "classifications_export")},
+    class_name: "Medium", as: :linked
 
   accepts_nested_attributes_for :project_contents
 

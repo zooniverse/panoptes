@@ -10,11 +10,12 @@ describe Api::V1::UsersController, type: :controller do
   let(:api_resource_name) { "users" }
   let(:api_resource_attributes) do
     [ "id", "display_name", "credited_name", "email",
-      "created_at", "updated_at", "type", "avatar",
+      "created_at", "updated_at", "type",
       "global_email_communication" ]
   end
   let(:api_resource_links) do
     [ "users.projects",
+      "users.avatar",
       "users.collections",
       "users.classifications",
       "users.project_preferences",
@@ -58,7 +59,7 @@ describe Api::V1::UsersController, type: :controller do
       end
     end
 
-    describe "filter params" do
+    describe "params" do
       let(:user) { users.sample(1).first }
 
       before(:each) do
@@ -74,6 +75,15 @@ describe Api::V1::UsersController, type: :controller do
 
         it "should respond with the correct item" do
           expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+        end
+      end
+
+      describe "include avatars" do
+        let(:index_options) { { include: 'avatar' } }
+
+        it 'should have the included resources' do
+          expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
+            .to match_array(users.take(20).map(&:avatar).map(&:id).map(&:to_s))
         end
       end
     end

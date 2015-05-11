@@ -1,6 +1,7 @@
 class Subject < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include Linkable
+  default_scope { eager_load(:locations) }
 
   has_paper_trail only: [:metadata, :locations]
 
@@ -9,6 +10,7 @@ class Subject < ActiveRecord::Base
   has_many :collections, through: :collections_subjects
   has_many :subject_sets, through: :set_member_subjects
   has_many :set_member_subjects
+  has_many :locations, -> { where(type: 'subject_location') }, class_name: "Medium", as: :linked
 
   validates_presence_of :project, :upload_user_id
 

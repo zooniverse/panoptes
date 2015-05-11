@@ -28,34 +28,31 @@ class ClassificationsDumpWorker
   private
 
   def temp_file_path
-    "#{Rails.root}/tmp/#{project_file_path}"
+    "#{Rails.root}/tmp/#{project_file_path.join("_")}.csv"
   end
 
   def completed_project_classifications
-    project.classifications.where(completed: true)
+    project.classifications.complete
   end
 
   def project_file_path
-    "#{project.display_name.downcase.gsub(/\s/, "_")}.csv"
+    [project.owner.display_name, project.display_name]
+      .map{ |name_part| name_part.downcase.gsub(/\s/, "_")}
   end
 
-  def upload_file_path
-    "#{::Panoptes.export_bucket_path}/#{project.id}/#{project_file_path}"
-  end
-
-  def s3_object
-    @s3_object ||= ::Panoptes.subjects_bucket.objects[upload_file_path]
-  end
-
-  def s3_url
-    s3_object.url_for(:read, expires: 1.hour.from_now)
+  def medium
+    @medium ||= Medium.create!(content_type: "text/csv",
+                               type: "classifications_export",
+                               path_opts: project_file_path,
+                               linked: project,
+                               private: true)
   end
 
   def write_to_s3
-    s3_object.write(file: temp_file_path, content_type: "text/csv")
+    medium.put_file(temp_file_path)
   end
 
   def email_owner
-    ClassificationDataMailerWorker.perform_async(@project.id, s3_url.to_s)
+    ClassificationDataMailerWorker.perform_async(@project.id, medium.get_url)
   end
 end

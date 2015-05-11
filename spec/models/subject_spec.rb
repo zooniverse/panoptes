@@ -24,12 +24,6 @@ describe Subject, :type => :model do
       end.to change{subject.versions.length}.from(1).to(2)
     end
 
-    it "should track location changes", versioning: true do
-      new_loc = { standard: "http://test.host/img.jpg.gif" }
-      subject.update!(locations: new_loc)
-      expect(subject.previous_version.locations).to_not eq(new_loc)
-    end
-
     it "should track metadata changes", versioning: true do
       new_meta = { more: "META" }
       subject.update!(metadata: new_meta)

@@ -7,7 +7,10 @@ FactoryGirl.define do
     metadata({distance_from_earth: "42 light years",
               brightness: -20,
               loudness: 11})
-    locations([ {"image/jpeg" => "panoptes-uploads.zooniverse.org/1/1/#{SecureRandom.uuid}.jpeg"} ])
+
+    after(:create) do |s|
+      create_list(:medium, 2, linked: s)
+    end
 
     factory :subject_with_collections do
       after(:create) do |s|
@@ -19,11 +22,6 @@ FactoryGirl.define do
       after(:create) do |s|
         create_list(:set_member_subject, 2, subject: s)
       end
-    end
-
-    factory :migrated_project_subject do
-      locations({standard: "http://www.galaxyzoo.org.s3.amazonaws.com/subjects/standard/1237679543502373086.jpg"})
-      migrated true
     end
   end
 end

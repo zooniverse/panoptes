@@ -1,17 +1,19 @@
 class ProjectSerializer
   include RestPack::Serializer
   include OwnerLinkSerializer
+  include MediaLinksSerializer
 
   attributes :id, :display_name, :classifications_count,
-             :subjects_count, :created_at, :updated_at, :available_languages,
-             :title, :description, :guide, :team_members, :science_case,
-             :introduction, :avatar, :background_image, :private, :faq, :result,
-             :education_content, :retired_subjects_count, :configuration,
-             :beta, :approved, :live
+    :subjects_count, :created_at, :updated_at, :available_languages,
+    :title, :description, :guide, :team_members, :science_case,
+    :introduction, :private, :faq, :result,
+    :education_content, :retired_subjects_count, :configuration,
+    :beta, :approved, :live
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
-              :project_roles
+    :project_roles
   can_filter_by :display_name, :beta, :approved
+  media_include :avatar, :background
 
   def title
     content[:title]
