@@ -19,9 +19,28 @@ class Api::V1::UsersController < Api::ApiController
     end
   end
 
+  def update
+    super do |user|
+      case
+      when user.global_email_communication_changed?
+        if user.global_email_communication
+          SubscribeWorker.perform_async(user.email, user.display_name)
+        else
+          UnsubscribeWorker.perform_async(user.email)
+        end
+      when user.email_change # I cannot figure out why but user.email_changed? returns true when no change has happened
+        if user.global_email_communication
+          SubscribeWorker.perform_async(user.email, user.display_name)
+          UnsubscribeWorker.perform_async(user.changes[:email].first)
+        end
+      end
+    end
+  end
+
   def destroy
     sign_out_current_user!
     revoke_doorkeeper_request_token!
+    UnsubscribeWorker.perform_async(user.email)
     UserInfoScrubber.scrub_personal_info!(user)
     super
   end
