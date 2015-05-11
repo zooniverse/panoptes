@@ -13,7 +13,7 @@ class RemoveAvatarBackgroundFromProject < ActiveRecord::Migration
       if ps.background_image
         ps.create_background(external_link: true,
                              content_type: "image/*",
-                             src: ps.background_iamge)
+                             src: ps.background_image)
       end
     end
     remove_column :projects, :avatar, :text
