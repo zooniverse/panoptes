@@ -6,7 +6,7 @@ class Project < ActiveRecord::Base
   include Linkable
   include Translatable
   include PreferencesLink
-  include AssociationCacheKey
+  include ExtendedCacheKey
 
   EXPERT_ROLES = [:expert, :owner]
 

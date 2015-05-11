@@ -1,4 +1,4 @@
-module AssociationCacheKey
+module ExtendedCacheKey
   extend ActiveSupport::Concern
 
   included do
