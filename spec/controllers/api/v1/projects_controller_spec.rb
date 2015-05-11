@@ -10,7 +10,8 @@ describe Api::V1::ProjectsController, type: :controller do
     ["id", "display_name", "classifications_count", "subjects_count",
      "updated_at", "created_at", "available_languages", "title",
      "description", "team_members", "guide", "science_case", "introduction",
-     "faq", "result", "education_content", "private", "live", "retired_subjects_count"]
+     "faq", "result", "education_content", "private", "live", "retired_subjects_count",
+     "urls"]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
@@ -230,6 +231,7 @@ describe Api::V1::ProjectsController, type: :controller do
                       education_content: "asdfasdf",
                       faq: "some other stuff",
                       result: "another string",
+                      urls: [{label: "Twitter", url: "http://twitter.com/example"}],
                       configuration: {
                                       an_option: "a setting"
                                      },
@@ -298,25 +300,31 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "project contents" do
+          let(:contents) { Project.find(created_project_id).project_contents.first }
 
           it "should create an associated project_content model" do
-            expect(Project.find(created_project_id)
-                    .project_contents.first).to_not be_nil
+            expect(contents).to_not be_nil
+          end
+
+          it 'should extract labels from the urls' do
+            expect(Project.find(created_project_id).urls).to eq([{"label" => "0.label", "url" => "http://twitter.com/example"}])
+          end
+
+
+          it 'should save labels to contents' do
+            expect(contents.url_labels).to eq({"0.label" => "Twitter"})
           end
 
           it 'should set the contents title do' do
-            expect(Project.find(created_project_id)
-                    .project_contents.first.title).to eq('New Zoo')
+            expect(contents.title).to eq('New Zoo')
           end
 
           it 'should set the description' do
-            expect(Project.find(created_project_id)
-                    .project_contents.first.description).to eq('A new Zoo for you!')
+            expect(contents.description).to eq('A new Zoo for you!')
           end
 
           it 'should set the language' do
-            expect(Project.find(created_project_id)
-                    .project_contents.first.language).to eq('en')
+            expect(contents.language).to eq('en')
           end
         end
       end

@@ -26,7 +26,8 @@ class Api::V1::ProjectsController < Api::ApiController
                     :result,
                     :team_members,
                     :science_case,
-                    :introduction]
+                    :introduction,
+                    :url_labels]
 
 
   before_action :add_owner_ids_to_filter_param!, only: :index
@@ -43,6 +44,11 @@ class Api::V1::ProjectsController < Api::ApiController
     ps[:title] = ps[:display_name]
     content = ps.slice(*CONTENT_FIELDS)
     content[:language] = ps[:primary_language]
+    if ps.has_key? :urls
+      urls, labels = extract_url_labels(ps[:urls])
+      content[:url_labels] = labels
+      ps[:urls] = urls
+    end
     ps.except!(*CONTENT_FIELDS)
     content.select { |k,v| !!v }
   end
@@ -75,6 +81,12 @@ class Api::V1::ProjectsController < Api::ApiController
         end
       end
     end
+  end
+
+  def extract_url_labels(urls)
+    visitor = TasksVisitors::ExtractStrings.new
+    visitor.visit(urls)
+    [urls, visitor.collector]
   end
 
   def context

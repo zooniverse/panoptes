@@ -15,6 +15,7 @@ FactoryGirl.define do
     approved true
     beta false
     live true
+    urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
 
     association :owner, factory: :user
 
