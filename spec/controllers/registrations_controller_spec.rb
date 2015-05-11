@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe RegistrationsController, type: :controller do
   let(:user_attributes) do
-    p extra_attributes
     attributes_for(:user, **extra_attributes).slice(*user_params)
   end
 
@@ -169,7 +168,6 @@ describe RegistrationsController, type: :controller do
         it 'should call subscribe worker' do
           expect(SubscribeWorker).to receive(:perform_async)
             .with(user_attributes[:email], user_attributes[:display_name])
-          p user_attributes
           post :create, user: user_attributes
         end
       end
