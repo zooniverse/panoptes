@@ -9,7 +9,7 @@ module ExtendedCacheKey
   module ClassMethods
     def cache_by_association(*associations)
       associations.each do |association|
-        if self.reflect_on_association(association)
+        if self.reflect_on_association(association) && !@included_associations.include?(association)
           @included_associations << association
         end
       end
@@ -17,7 +17,9 @@ module ExtendedCacheKey
 
     def cache_by_resource_method(*resource_methods)
       resource_methods.each do |method|
-        @included_resource_methods << method if self.method_defined?(method)
+        if self.method_defined?(method) && !@included_resource_methods.include?(method)
+          @included_resource_methods << method
+        end
       end
     end
 
@@ -33,8 +35,8 @@ module ExtendedCacheKey
   def cache_key
     cache_key = super
     associations_cache_key = compound_association_cache_keys.join("+")
-    methods_cache_key = compound_method_cache_keys.join("+")
-    "#{cache_key}+#{associations_cache_key}+#{methods_cache_key}"
+    methods_cache_key = compound_method_cache_keys.join("")
+    create_append_cache_key(cache_key, methods_cache_key, associations_cache_key)
   end
 
   private
@@ -47,7 +49,14 @@ module ExtendedCacheKey
 
   def compound_method_cache_keys
     self.class.included_resource_methods.map do |method|
-      "#{method}/#{self.send(method)}"
+      "#{method}:#{self.send(method)}"
+    end
+  end
+
+  def create_append_cache_key(key_base, methods_key, associations_key)
+    key_base.tap do |base|
+      base << "+#{methods_key}" unless methods_key.empty?
+      base << "+#{associations_key}" unless associations_key.empty?
     end
   end
 end
