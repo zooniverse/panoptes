@@ -8,10 +8,13 @@ describe Workflow, :type => :model do
   let(:primary_language_factory) { :workflow }
   let(:locked_factory) { :workflow }
   let(:locked_update) { {display_name: "A Different Name"} }
+  let(:cached_resource) { workflow }
 
   it_behaves_like "optimistically locked"
   it_behaves_like "has subject_count"
   it_behaves_like "is translatable"
+  it_behaves_like "has an extended cache key", [:workflow_contents],
+    [:subjects_count, :finished?]
 
   it "should have a valid factory" do
     expect(workflow).to be_valid

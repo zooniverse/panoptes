@@ -3,6 +3,7 @@ class Workflow < ActiveRecord::Base
   include Translatable
   include RoleControl::ParentalControlled
   include SubjectCounts
+  include ExtendedCacheKey
 
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
@@ -16,6 +17,9 @@ class Workflow < ActiveRecord::Base
   has_many :subject_queues, dependent: :destroy
   has_and_belongs_to_many :expert_subject_sets, -> { expert_sets }, class_name: "SubjectSet"
   belongs_to :tutorial_subject, class_name: "Subject"
+
+  cache_by_association :workflow_contents
+  cache_by_resource_method :subjects_count, :finished?
 
   DEFAULT_CRITERIA = 'classification_count'
   DEFAULT_OPTS = { 'count' => 15 }
