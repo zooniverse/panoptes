@@ -11,12 +11,15 @@ describe Project, :type => :model do
   let(:primary_language_factory) { :project }
   let(:locked_factory) { :project }
   let(:locked_update) { {display_name: "A Different Name"} }
-  it_behaves_like "optimistically locked"
+  let(:cached_resource) { project }
 
+  it_behaves_like "optimistically locked"
   it_behaves_like "is ownable"
   it_behaves_like "has subject_count"
   it_behaves_like "activatable"
   it_behaves_like "is translatable"
+  it_behaves_like "has an extended cache key", [:project_contents],
+    [:subjects_count, :retired_subjects_count, :finished?]
 
   it "should have a valid factory" do
     expect(project).to be_valid
