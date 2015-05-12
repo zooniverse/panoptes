@@ -97,6 +97,10 @@ RSpec.describe ZooniverseUser, type: :model do
           expect(zu.import.avatar.src).to match(/\/#{zu.id}\/.+\.png/)
         end
       end
+
+      it 'should copy the users valid_email field' do
+        expect(zu.import.valid_email).to_not be_nil
+      end
     end
 
     context 'when the User has been imported' do

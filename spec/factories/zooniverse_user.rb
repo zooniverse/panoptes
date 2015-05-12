@@ -6,5 +6,6 @@ FactoryGirl.define do
     single_access_token "asdfasdf"
     perishable_token "asdfasd"
     password 'tajikistan'
+    valid_email false
   end
 end

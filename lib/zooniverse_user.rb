@@ -95,6 +95,7 @@ class ZooniverseUser < ActiveRecord::Base
     u.email = email
     u.encrypted_password = crypted_password
     u.password_salt = password_salt
+    u.valid_email = valid_email || true
     if new_account || panoptes_account_exists
       u.created_at = created_at
       u.updated_at = updated_at
