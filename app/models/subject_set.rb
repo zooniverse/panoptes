@@ -24,5 +24,4 @@ class SubjectSet < ActiveRecord::Base
   def self.same_project?(workflow)
     where(project: workflow.project)
   end
-
 end

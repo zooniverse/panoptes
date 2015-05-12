@@ -7,6 +7,7 @@ class SetMemberSubject < ActiveRecord::Base
   belongs_to :subject
   belongs_to_many :retired_workflows, class_name: "Workflow"
   has_many :subject_workflow_counts, dependent: :destroy
+  has_many :workflows, through: :subject_set
 
   validates_presence_of :subject_set, :subject
 
@@ -14,6 +15,7 @@ class SetMemberSubject < ActiveRecord::Base
     :destroy_links
 
   before_create :set_random
+  before_destroy :remove_from_queues
 
   can_be_linked :subject_queue, :in_workflow, :model
 
@@ -36,6 +38,10 @@ class SetMemberSubject < ActiveRecord::Base
   def retire_workflow(workflow)
     retired_workflows << workflow
     save!
+  end
+
+  def remove_from_queues
+    QueueRemovalWorker.perform_async(id, subject_set.workflows.pluck(:id))
   end
 
   def set_random
