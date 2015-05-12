@@ -12,6 +12,7 @@ FactoryGirl.define do
     result "asdfasdf asdfasdf"
     faq "asdfasdf asdfasdf"
     team_members []
+    url_labels({"0.label" => "Blog", "1.label" => "Twitter"})
     guide({ "example_1" => "A descripton of it" })
   end
 end

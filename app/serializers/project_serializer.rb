@@ -8,7 +8,7 @@ class ProjectSerializer
     :title, :description, :guide, :team_members, :science_case,
     :introduction, :private, :faq, :result,
     :education_content, :retired_subjects_count, :configuration,
-    :beta, :approved, :live
+    :beta, :approved, :live, :urls
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles
@@ -49,6 +49,16 @@ class ProjectSerializer
 
   def result
     content[:result]
+  end
+
+  def urls
+    if content
+      urls = @model.urls.dup
+      TasksVisitors::InjectStrings.new(content[:url_labels]).visit(urls)
+      urls
+    else
+      []
+    end
   end
 
   def content
