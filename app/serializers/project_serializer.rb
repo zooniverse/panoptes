@@ -8,7 +8,7 @@ class ProjectSerializer
     :title, :description, :guide, :team_members, :science_case,
     :introduction, :private, :faq, :result,
     :education_content, :retired_subjects_count, :configuration,
-    :beta, :approved, :live, :urls
+    :beta, :approved, :live, :urls, :migrated
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles

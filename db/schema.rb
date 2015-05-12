@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150511151058) do
+ActiveRecord::Schema.define(version: 20150512012101) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -205,6 +205,7 @@ ActiveRecord::Schema.define(version: 20150511151058) do
     t.boolean  "beta",                  default: false
     t.boolean  "live",                  default: false, null: false
     t.jsonb    "urls",                  default: []
+    t.boolean  "migrated",              default: false
   end
 
   add_index "projects", ["approved"], name: "index_projects_on_approved", using: :btree
