@@ -16,6 +16,14 @@ RSpec.describe ReloadQueueWorker do
       end
     end
 
+    context "when the workflow does not exist" do
+      it 'should not raise an error' do
+        expect do
+          subject.perform(-1)
+        end.to_not raise_error
+      end
+    end
+
     context "with an existing queue" do
       let(:os) { create(:subject).id }
       let!(:queue) do

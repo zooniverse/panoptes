@@ -15,6 +15,8 @@ class SubjectQueueWorker
     else
       load_subjects
     end
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 
   private

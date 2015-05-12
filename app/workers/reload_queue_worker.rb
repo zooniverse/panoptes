@@ -13,6 +13,8 @@ class ReloadQueueWorker
     else
       reload_subjects
     end
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 
   def reload_subjects(set=nil)
