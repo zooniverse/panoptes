@@ -66,6 +66,11 @@ class ClassificationLifecycle
     end
   end
 
+  def create_recent
+    return unless should_update_seen?
+    Recent.create_from_classification(classification)
+  end
+
   private
 
   def should_update_seen?

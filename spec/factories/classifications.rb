@@ -1,10 +1,10 @@
 FactoryGirl.define do
   factory :classification do
     metadata({
-               user_agent: "cURL",
-               started_at: 2.minutes.ago.to_s,
-               finished_at: 1.minute.ago.to_s,
-               user_language: 'en',
+              user_agent: "cURL",
+              started_at: 2.minutes.ago.to_s,
+              finished_at: 1.minute.ago.to_s,
+              user_language: 'en',
              })
     annotations [{task: "an_annotation",
                   value: true},
@@ -17,6 +17,15 @@ FactoryGirl.define do
     project
     workflow
     subject_ids { create_list(:set_member_subject, 2).map(&:subject).map(&:id) }
+
+    factory(:classification_with_recents) do
+      after(:build) do |c|
+        c.subject_ids.each do |sid|
+          c.recents << build(:recent, classification: c, subject_id: sid)
+        end
+      end
+    end
+
 
     factory :classifaction_with_user_group do
       user_group

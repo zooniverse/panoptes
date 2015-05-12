@@ -2,14 +2,14 @@ module Recents
   def recents
     ps = params.dup
     ps.delete "#{resource_name}_id"
-    render json_api: RecentsSerializer.page(ps, recent_scope, { type: resource_sym.to_s })
+    render json_api: RecentSerializer.page(ps, recent_scope, { type: resource_sym.to_s })
   end
 
   def recent_scope
-    Classification.joins(resource_name.to_sym)
-      .merge(controlled_resources)
-      .where(completed: true)
-      .joins('INNER JOIN "subjects" ON "subjects"."id" = ANY("classifications"."subject_ids")')
-      .select('"classifications"."id", "classifications"."project_id", "classifications"."workflow_id", "classifications"."updated_at", "classifications"."created_at", "subjects"."locations", "subjects"."id" as subject_id')
+    classification_query = { :"#{resource_name}_id" => resource_ids }
+    classification_query['project_id'] = params[:project_id] if params.has_key?(:project_id)
+    classification_query['workflow_id'] = params[:workflow_id] if params.has_key?(:workflow_id)
+    Recent.eager_load(:locations, :classification)
+      .where(classifications: classification_query)
   end
 end
