@@ -20,7 +20,7 @@ module MediaStorage
     end
 
     def bucket
-      @bucket unless @bucket.is_a?(String)
+      return @bucket unless @bucket.is_a?(String)
       @bucket = s3.buckets[@bucket]
     end
 
