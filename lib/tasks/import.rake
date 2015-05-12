@@ -8,3 +8,11 @@ namespace :user do
     ZooniverseUser.import_users(users)
   end
 end
+
+namespace :project do
+  desc 'import comma seperated list of projects from Zoo Home'
+  task import: :environment do
+    projects = ENV['PROJECTS'].try(:split, ",")
+    ZooniverseProject.import_zoo_projects(projects)
+  end
+end
