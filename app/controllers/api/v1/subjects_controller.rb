@@ -39,8 +39,17 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def add_locations(locations, subject)
-    locations.each { |loc| subject.locations.build(content_type: loc) }
+    (locations || []).each { |loc| subject.locations.build(content_type: loc) }
     subject
+  end
+
+  def context
+    case action_name
+    when "create", "update"
+      { post_urls: true }
+    else
+      {}
+    end
   end
 
   def selector

@@ -26,7 +26,9 @@ module MediaStorage
 
     def stored_path(content_type, medium_type, *path_prefix)
       extension = MIME::Types[content_type].first.extensions.first
-      path = "#{prefix}/#{medium_type}/"
+      path = "#{prefix}"
+      path += "/" unless path[-1] == '/'
+      path += "#{medium_type}/"
       path += "#{path_prefix.join('/')}/" unless path_prefix.empty?
       path += "#{SecureRandom.uuid}.#{extension}"
       path
