@@ -28,7 +28,7 @@ class SubjectSelector
   private
 
   def needs_set_id?
-    workflow.grouped && !params.has_key?(:group_id)
+    workflow.grouped && !params.has_key?(:subject_set_id)
   end
 
   def workflow_id_error
