@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150512012101) do
+ActiveRecord::Schema.define(version: 20150512123559) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -299,7 +299,6 @@ ActiveRecord::Schema.define(version: 20150512012101) do
 
   create_table "user_collection_preferences", force: :cascade do |t|
     t.jsonb    "preferences",   default: {}
-    t.string   "roles",         default: [], null: false, array: true
     t.integer  "user_id"
     t.integer  "collection_id"
     t.datetime "created_at"
@@ -330,7 +329,7 @@ ActiveRecord::Schema.define(version: 20150512012101) do
     t.jsonb    "preferences",         default: {}
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "roles",               default: [], null: false, array: true
+    t.integer  "activity_count"
   end
 
   add_index "user_project_preferences", ["project_id"], name: "index_user_project_preferences_on_project_id", using: :btree

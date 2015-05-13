@@ -3,12 +3,12 @@ require 'spec_helper'
 RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:project) { create(:project) }
-  
+
   let!(:upps) do
     create_list :user_project_preference, 2, user: authorized_user,
-      roles: ["tester"], email_communication: true
+      email_communication: true
   end
-  
+
   let(:api_resource_name) { 'project_preferences' }
   let(:api_resource_attributes) { %w(id email_communication preferences) }
   let(:api_resource_links) { %w(project_preferences.user project_preferences.project) }

@@ -42,8 +42,13 @@ class CreateZooniverserUserDatabase < ActiveRecord::Migration
       t.text "facebook_oauth_token"
       t.string "source"
       t.string "privacy", :default => "0"
+      t.datetime "first_email_reminder"
+      t.datetime "second_email_reminder"
+      t.integer "email_template"
+      t.boolean "valid_email"
+
     end
-    
+
     add_index "users", ["display_name"], :name => "display_name_index", :length => {"display_name"=>30}
     add_index "users", ["email"], :name => "email_index", :unique => true
     add_index "users", ["login"], :name => "login_index", :unique => true
