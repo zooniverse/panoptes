@@ -2,4 +2,3 @@ development:
 
 test:
   subjects: 100
-  projects: 100
