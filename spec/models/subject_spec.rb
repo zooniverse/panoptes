@@ -87,4 +87,11 @@ describe Subject, :type => :model do
       expect(subject.migrated_subject?).to be_truthy
     end
   end
+
+  describe "#uploader" do
+    it "should have a counter cache" do
+      subject.save!
+      expect(subject.uploader.uploaded_subjects_count).to eq(1)
+    end
+  end
 end

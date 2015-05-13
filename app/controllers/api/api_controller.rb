@@ -20,6 +20,7 @@ module Api
     rescue_from JsonApiController::PreconditionNotPresent, with: :precondition_required
     rescue_from JsonApiController::PreconditionFailed,   with: :precondition_failed
     rescue_from ActiveRecord::StaleObjectError,          with: :conflict
+    rescue_from Api::LimitExceeded,                      with: :not_authorized
     rescue_from Api::PatchResourceError,
       Api::UserSeenSubjectIdError,
       ActionController::UnpermittedParameters,

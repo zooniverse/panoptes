@@ -26,6 +26,7 @@ class User < ActiveRecord::Base
   has_many :project_roles, through: :identity_group
   has_many :collection_roles, through: :identity_group
   has_many :user_seen_subjects, dependent: :destroy
+  has_many :uploaded_subjects, class_name: "Subject", foreign_key: "upload_user_id"
 
   has_many :subject_queues, dependent: :destroy
 
