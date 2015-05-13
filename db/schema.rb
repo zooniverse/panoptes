@@ -329,7 +329,7 @@ ActiveRecord::Schema.define(version: 20150512123559) do
     t.jsonb    "preferences",         default: {}
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.jsonb    "activity_count",      default: {}
+    t.integer  "activity_count"
   end
 
   add_index "user_project_preferences", ["project_id"], name: "index_user_project_preferences_on_project_id", using: :btree
