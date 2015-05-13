@@ -4,7 +4,8 @@ require 'spec_helper'
 describe Api::V1::SubjectsController, type: :controller do
   let!(:workflow) { create(:workflow_with_subject_sets) }
   let!(:subject_set) { workflow.subject_sets.first }
-  let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set).map(&:subject) }
+  let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+  let!(:subjects) { sms.map(&:subject) }
   let!(:user) { create(:user) }
 
   let(:scopes) { %w(subject) }
@@ -19,11 +20,11 @@ describe Api::V1::SubjectsController, type: :controller do
   let(:api_resource_links) { [ "subjects.project" ] }
 
   describe "#index" do
-    let!(:queue) do
+    let!(:non_user_queue) do
       create(:subject_queue,
              user: nil,
              workflow: workflow,
-             set_member_subject_ids: subjects.map(&:id))
+             set_member_subject_ids: sms.map(&:id))
     end
 
     context "logged out user" do
@@ -54,7 +55,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "a queued request" do
-        let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+        let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
         context "with queued subjects" do
 
@@ -82,7 +83,7 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           context 'when the queue is not below minimum)' do
-            let(:subjects) { create_list(:set_member_subject, 21) }
+            let(:sms) { create_list(:set_member_subject, 21) }
             it 'should reload the queue' do
               expect(SubjectQueueWorker).to_not receive(:perform_async)
               get :index, request_params
@@ -114,14 +115,14 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "a queued request" do
-        let!(:subjects) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+        let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
         context "with queued subjects" do
           let!(:queue) do
             create(:subject_queue,
                    user: user,
                    workflow: workflow,
-                   set_member_subject_ids: subjects.map(&:id))
+                   set_member_subject_ids: sms.map(&:id))
           end
 
 
@@ -137,6 +138,16 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(json_response[api_resource_name].length).to eq(2)
           end
 
+          it 'should return already_seen as false' do
+            already_seen = json_response["subjects"].map{ |s| s['already_seen']}
+            expect(already_seen).to all( be false )
+          end
+
+          it 'should return retired as false' do
+            retired = json_response["subjects"].map{ |s| s['retired']}
+            expect(retired).to all( be false )
+          end
+
           it_behaves_like "an api response"
 
           context 'when the queue is below minimum' do
@@ -147,11 +158,60 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           context 'when the queue is not below minimum)' do
-            let(:subjects) { create_list(:set_member_subject, 21) }
+            let(:sms) { create_list(:set_member_subject, 21) }
             it 'should reload the queue' do
               expect(SubjectQueueWorker).to_not receive(:perform_async)
               get :index, request_params
             end
+          end
+        end
+
+        context "user has classified all subjects in the workflow" do
+          let!(:seen_subjects) do
+            create(:user_seen_subject,
+                   user: user,
+                   workflow: workflow,
+                   subject_ids: subjects.map(&:id))
+          end
+
+          it 'should return already_seen true for each subject' do
+            get :index, request_params
+            already_seen = json_response["subjects"].map{ |s| s['already_seen']}
+            expect(already_seen).to all( be true )
+          end
+        end
+
+        context "a workflow is finished" do
+          let!(:workflow) do
+            create(:workflow_with_subject_sets,
+                   retired_set_member_subjects_count: 100)
+          end
+
+          let!(:sms) do
+            create_list(:set_member_subject, 2,
+                        retired_workflows: [workflow],
+                        subject_set: subject_set)
+          end
+
+          let!(:seen_subjects) do
+            create(:user_seen_subject,
+                   user: user,
+                   workflow: workflow,
+                   subject_ids: [subjects.first.id])
+          end
+
+          before(:each) do
+            get :index, request_params
+          end
+
+          it 'should return already_seen as true for seen subject' do
+            already_seen = json_response["subjects"].map{ |s| s['already_seen']}
+            expect(already_seen).to include(true)
+          end
+
+          it 'should return retired as false' do
+            retired = json_response["subjects"].map{ |s| s['retired']}
+            expect(retired).to all( be true )
           end
         end
 
@@ -220,19 +280,19 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
       {
-        "interesting_data" => "Tested Collection",
-        "an_interesting_array" => ["1", "2", "asdf", "99.99"]
+       "interesting_data" => "Tested Collection",
+       "an_interesting_array" => ["1", "2", "asdf", "99.99"]
       }
     end
     let(:update_params) do
       {
-        subjects: {
-          metadata: {
-            interesting_data: "Tested Collection",
-            an_interesting_array: ["1", "2", "asdf", "99.99"]
-          },
-          locations: [ "image/jpeg" ]
-        }
+       subjects: {
+                  metadata: {
+                             interesting_data: "Tested Collection",
+                             an_interesting_array: ["1", "2", "asdf", "99.99"]
+                            },
+                  locations: [ "image/jpeg" ]
+                 }
       }
     end
 
@@ -247,13 +307,13 @@ describe Api::V1::SubjectsController, type: :controller do
 
     let(:create_params) do
       {
-        subjects: {
-          metadata: { cool_factor: "11" },
-          locations: ["image/jpeg", "image/jpeg", "image/jpeg"],
-          links: {
-            project: project.id
-          }
-        }
+       subjects: {
+                  metadata: { cool_factor: "11" },
+                  locations: ["image/jpeg", "image/jpeg", "image/jpeg"],
+                  links: {
+                          project: project.id
+                         }
+                 }
       }
     end
 

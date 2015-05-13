@@ -3,7 +3,10 @@ class SubjectSerializer
   include FilterHasMany
 
   attributes :id, :metadata, :locations, :zooniverse_id,
-    :created_at, :updated_at, :retired, :already_seen
+    :created_at, :updated_at
+
+  attribute :retired, if: :selected?
+  attribute :already_seen, if: :selected?
   can_include :project, :collections
 
   def locations
@@ -15,10 +18,23 @@ class SubjectSerializer
   end
 
   def retired
-    @context[:retired]
+    !!(workflow && @model.set_member_subjects.first
+       .retired_workflow_ids.include?(workflow.id))
   end
 
   def already_seen
-    @context[:already_seen]
+    !!(user_seen && user_seen.subject_ids.include?(@model.id))
+  end
+
+  def selected?
+    @context[:selected]
+  end
+
+  def workflow
+    @context[:workflow]
+  end
+
+  def user_seen
+    @context[:user_seen].try(:first)
   end
 end
