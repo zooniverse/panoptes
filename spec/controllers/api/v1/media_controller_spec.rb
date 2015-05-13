@@ -51,20 +51,39 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
   RSpec.shared_examples "has_one media" do |parent_name, media_type|
     describe "#index" do
-      before(:each) do
-        default_request user_id: authorized_user.id, scopes: scopes
-        get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+      context "when media exists" do
+        before(:each) do
+          default_request user_id: authorized_user.id, scopes: scopes
+          get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+        end
+
+        it 'should return ok' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'should include 1 item' do
+          expect(json_response["media"].length).to eq(1)
+        end
+
+        it_behaves_like "an api response"
       end
 
-      it 'should return ok' do
-        expect(response).to have_http_status(:ok)
-      end
+      context "when media does not exist" do
+        before(:each) do
+          parent.send(media_type).destroy
+          default_request user_id: authorized_user.id, scopes: scopes
+          get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+        end
 
-      it 'should include 1 item' do
-        expect(json_response["media"].length).to eq(1)
-      end
+        it 'should return 404' do
+          expect(response).to have_http_status(:not_found)
+        end
 
-      it_behaves_like "an api response"
+        it 'should return an error message' do
+          msg = json_response['errors'][0]['message']
+          expect(msg).to match(/No #{media_type} exists for #{parent_name} ##{parent.id}/)
+        end
+      end
     end
 
     describe "#create" do

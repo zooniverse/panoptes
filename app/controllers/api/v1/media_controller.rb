@@ -8,8 +8,13 @@ class Api::V1::MediaController < Api::ApiController
   allowed_params :update, :content_type
 
   def index
-    @controlled_resources = Medium.where(id: controlled_resource.send(media_name).id)
-    super
+    media = controlled_resource.send(media_name)
+    unless media.blank?
+      @controlled_resources = Medium.where(id: media.id)
+      super
+    else
+      raise Api::NoMediaError.new(media_name, resource_name, resource_ids)
+    end
   end
 
   def show
