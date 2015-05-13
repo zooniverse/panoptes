@@ -455,4 +455,18 @@ describe User, type: :model do
       expect(u.hash_func).to eq('bcrypt')
     end
   end
+
+  describe "#uploaded_subjects" do
+    it 'should list the subjects a user has uploaded' do
+      uploader = create(:user_with_uploaded_subjects)
+      expect(uploader.uploaded_subjects).to all( be_a(Subject) )
+    end
+  end
+
+  describe "#uploaded_subjects_count" do
+    it 'should have a count of the subjects a user has uploaded' do
+      uploader = create(:user_with_uploaded_subjects)
+      expect(uploader.uploaded_subjects_count).to eq(2)
+    end
+  end
 end

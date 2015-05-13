@@ -274,6 +274,24 @@ describe Api::V1::SubjectsController, type: :controller do
       end
     end
 
+    context "when the user has exceeded the allowed number of subjects" do
+      let(:authorised_user) { create(:user, uploaded_subjects_count: 101) }
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorised_user.id
+        post :create, create_params
+      end
+
+      it 'should return 403' do
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'should have an error message' do
+        msg = json_response["errors"][0]["message"]
+        expect(msg).to match(/User has uploaded [0-9]+ subjects of [0-9]+ maximum/)
+      end
+    end
+
     context "when the project is owned by the user" do
       it_behaves_like "is creatable"
     end

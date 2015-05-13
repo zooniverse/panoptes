@@ -12,6 +12,7 @@ module ApiErrors
       super("No #{media_type} exists for #{parent} ##{parent_id}")
     end
   end
+  class LimitExceeded < PanoptesApiError; end
   class RolesExist < StandardError
     def initialize
       super("Cannot create roles resource when one exists for the user and project")

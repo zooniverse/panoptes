@@ -71,6 +71,13 @@ FactoryGirl.define do
     factory :admin_user do
       admin true
     end
+
+    factory :user_with_uploaded_subjects do
+      after(:create) do |u|
+        u.uploaded_subjects = create_list(:subject, 2, uploader: u)
+        u.save!
+      end
+    end
   end
 
   factory :omniauth_user, class: :user do

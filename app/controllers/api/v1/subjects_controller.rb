@@ -8,6 +8,8 @@ class Api::V1::SubjectsController < Api::ApiController
 
   alias_method :subject, :controlled_resource
 
+  before_action :check_subject_limit, only: :create
+
   def index
     case params[:sort]
     when 'queued', 'cellect' #temporary to not break compatibility with front-end
@@ -19,6 +21,12 @@ class Api::V1::SubjectsController < Api::ApiController
 
   private
 
+  def check_subject_limit
+    if Panoptes.max_subjects && api_user.uploaded_subjects_count >= Panoptes.max_subjects
+      raise Api::LimitExceeded, "User has uploaded #{api_user.uploaded_subjects_count} subjects of #{Panoptes.max_subjects} maximum"
+    end
+  end
+
   def workflow
     @workflow ||= Workflow.where(id: params[:workflow_id]).first
   end
@@ -26,7 +34,7 @@ class Api::V1::SubjectsController < Api::ApiController
   def build_resource_for_create(create_params)
     locations = create_params.delete(:locations)
     subject = super(create_params) do |object, linked|
-      object[:upload_user_id] = api_user.id
+      object[:uploader] = api_user.user
     end
     add_locations(locations, subject)
   end
