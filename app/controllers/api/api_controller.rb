@@ -10,27 +10,28 @@ module Api
     API_ALLOWED_METHOD_OVERRIDES = { 'PATCH' => 'application/patch+json' }
 
     rescue_from ActiveRecord::RecordNotFound,
-                SubjectSelector::MissingSubjectQueue,     with: :not_found
+      Api::NoMediaError,
+      RoleControl::AccessDenied,
+      SubjectSelector::MissingSubjectQueue,     with: :not_found
     rescue_from ActiveRecord::RecordInvalid,             with: :invalid_record
     rescue_from Api::NotLoggedIn,                        with: :not_authenticated
     rescue_from Api::UnauthorizedTokenError,             with: :not_authenticated
     rescue_from Api::UnsupportedMediaType,               with: :unsupported_media_type
-    rescue_from RoleControl::AccessDenied,               with: :not_found
     rescue_from JsonApiController::PreconditionNotPresent, with: :precondition_required
     rescue_from JsonApiController::PreconditionFailed,   with: :precondition_failed
     rescue_from ActiveRecord::StaleObjectError,          with: :conflict
     rescue_from Api::PatchResourceError,
-                Api::UserSeenSubjectIdError,
-                ActionController::UnpermittedParameters,
-                ActionController::ParameterMissing,
-                SubjectSelector::MissingParameter,
-                Api::RolesExist,
-                JsonSchema::ValidationError,
-                JsonApiController::NotLinkable,
-                JsonApiController::BadLinkParams,
-                Api::NoUserError,
-                Api::UnpermittedParameter,
-                RestPack::Serializer::InvalidInclude,    with: :unprocessable_entity
+      Api::UserSeenSubjectIdError,
+      ActionController::UnpermittedParameters,
+      ActionController::ParameterMissing,
+      SubjectSelector::MissingParameter,
+      Api::RolesExist,
+      JsonSchema::ValidationError,
+      JsonApiController::NotLinkable,
+      JsonApiController::BadLinkParams,
+      Api::NoUserError,
+      Api::UnpermittedParameter,
+      RestPack::Serializer::InvalidInclude,    with: :unprocessable_entity
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]
@@ -64,7 +65,7 @@ module Api
 
     def parse_http_accept_languages
       language_extractor = AcceptLanguageExtractor
-                           .new(request.env['HTTP_ACCEPT_LANGUAGE'])
+        .new(request.env['HTTP_ACCEPT_LANGUAGE'])
 
       language_extractor.parse_languages
     end

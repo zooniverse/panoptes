@@ -7,6 +7,11 @@ module ApiErrors
   class NotLoggedIn < PanoptesApiError; end
   class NoUserError < PanoptesApiError; end
   class UnpermittedParameter < PanoptesApiError; end
+  class NoMediaError < PanoptesApiError
+    def initialize(media_type, parent, parent_id)
+      super("No #{media_type} exists for #{parent} ##{parent_id}")
+    end
+  end
   class RolesExist < StandardError
     def initialize
       super("Cannot create roles resource when one exists for the user and project")
