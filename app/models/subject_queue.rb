@@ -79,6 +79,10 @@ class SubjectQueue < ActiveRecord::Base
     query.update_all(["set_member_subject_ids = array_cat(set_member_subject_ids, array[?])", sms_ids])
   end
 
+  def self.below_minimum
+    where("cardinality(set_member_subject_ids) < ?", MINIMUM_LENGTH)
+  end
+
   def below_minimum?
     set_member_subject_ids.length < MINIMUM_LENGTH
   end

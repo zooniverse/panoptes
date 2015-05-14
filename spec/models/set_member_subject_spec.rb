@@ -162,4 +162,13 @@ describe SetMemberSubject, :type => :model do
       expect(SetMemberSubject.by_subject_workflow(sid, wid)).to include(set_member_subject)
     end
   end
+
+  describe "#remove_from_queues" do
+    it 'should queue a removal worker' do
+      set_member_subject.save!
+      expect(QueueRemovalWorker).to receive(:perform_async)
+        .with(set_member_subject.id, set_member_subject.subject_set.workflows.pluck(:id))
+      set_member_subject.remove_from_queues
+    end
+  end
 end

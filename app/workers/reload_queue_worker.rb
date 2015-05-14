@@ -13,11 +13,14 @@ class ReloadQueueWorker
     else
       reload_subjects
     end
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 
   def reload_subjects(set=nil)
     subjects = PostgresqlSelection.new(workflow, nil)
       .select(limit: SubjectQueue::DEFAULT_LENGTH, subject_set_id: set)
+      .compact
 
     SubjectQueue.reload(workflow, subjects, set: set)
   end

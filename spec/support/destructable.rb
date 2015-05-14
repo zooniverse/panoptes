@@ -22,7 +22,7 @@ shared_examples "is destructable" do
         set_preconditions
         delete :destroy, id: resource.id
       end
-      
+
       it "should return forbidden with a non-scoped token" do
         expect(response).to have_http_status(:forbidden)
       end
