@@ -4,7 +4,7 @@ describe ClassificationLifecycle do
   let!(:subject_set) { create(:subject_set, workflows: [classification.workflow]) }
   let!(:sms_ids) do
     classification.subject_ids.map do |s_id|
-          create(:set_member_subject, subject_set: subject_set, subject_id: s_id)
+      create(:set_member_subject, subject_set: subject_set, subject_id: s_id)
     end.map(&:id)
   end
 
@@ -12,7 +12,7 @@ describe ClassificationLifecycle do
     create(:subject_queue,
            user: classification.user,
            workflow: classification.workflow,
-           set_member_subject_ids: classification.subject_ids)
+           set_member_subject_ids: sms_ids)
   end
 
   subject do
@@ -60,18 +60,6 @@ describe ClassificationLifecycle do
       end
     end
 
-    context 'when classification is complete' do
-      before(:each) do
-        allow(classification).to receive(:persisted?).and_return(true)
-        allow(classification).to receive(:complete?).and_return(true)
-      end
-
-      it 'should queue the count worker' do
-        expect(ClassificationCountWorker).to receive(:perform_async).twice
-        subject.queue(:create)
-      end
-    end
-
     context 'when classification is incomplete' do
       before(:each) do
         allow(classification).to receive(:persisted?).and_return(true)
@@ -88,37 +76,66 @@ describe ClassificationLifecycle do
   describe "#transact!" do
     let(:classification) { create(:classification) }
 
-    describe "the classification lifecycle methods" do
+    after(:each) do
+      subject.transact! { true }
+    end
 
+    context "when the user has not already classified the subjects" do
       it "should wrap the calls in a transaction" do
-        subject
         expect(Classification).to receive(:transaction)
-        subject.transact!
       end
 
       it "should call the #mark_expert_classifier method" do
         expect(subject).to receive(:mark_expert_classifier).once
-        subject.transact!
       end
 
       it "should call the #update_seen_subjects method" do
         expect(subject).to receive(:update_seen_subjects).once
-        subject.transact!
       end
 
       it "should call the #dequeue_subject method" do
         expect(subject).to receive(:dequeue_subject).once
-        subject.transact!
       end
 
-      it "should call the instance_eval on the block if passed a block" do
+      it "should call the instance_eval on the passed block" do
         expect(subject).to receive(:instance_eval).once
-        subject.transact! { true }
       end
 
       it "should call the #publish_to_kafka method" do
         expect(subject).to receive(:publish_to_kafka).once
-        subject.transact!
+      end
+    end
+
+    context "when the user has already classified the subjects" do
+      let!(:seen) do
+        create(:user_seen_subject,
+               user: classification.user,
+               workflow: classification.workflow,
+               subject_ids: classification.subject_ids)
+      end
+
+      it "should wrap the calls in a transaction" do
+        expect(Classification).to receive(:transaction)
+      end
+
+      it "should not call the #mark_expert_classifier method" do
+        expect(subject).to_not receive(:mark_expert_classifier)
+      end
+
+      it "should not call the #update_seen_subjects method" do
+        expect(subject).to_not receive(:update_seen_subjects)
+      end
+
+      it "should not call the #dequeue_subject method" do
+        expect(subject).to_not receive(:dequeue_subject)
+      end
+
+      it "should not call the instance_eval on the passed block" do
+        expect(subject).to_not receive(:instance_eval)
+      end
+
+      it "should call the #publish_to_kafka method" do
+        expect(subject).to receive(:publish_to_kafka).once
       end
     end
   end

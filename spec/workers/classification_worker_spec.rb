@@ -52,6 +52,10 @@ RSpec.describe ClassificationWorker do
       it 'should call publish to kafka' do
         expect_any_instance_of(ClassificationLifecycle).to receive(:publish_to_kafka)
       end
+
+      it 'should call classification count worker' do
+        expect(ClassificationCountWorker).to receive(:perform_async).twice
+      end
     end
 
     context "anything else" do

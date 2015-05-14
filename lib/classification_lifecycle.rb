@@ -14,27 +14,24 @@ class ClassificationLifecycle
       raise ClassificationNotPersisted.new(message)
     end
     ClassificationWorker.perform_async(classification.id, action.to_s)
-    if classification.complete?
-      classification.subject_ids.each do |sid|
-        ClassificationCountWorker.perform_async(sid, classification.workflow_id)
-      end
-    end
   end
 
   def transact!(&block)
     Classification.transaction do
-      mark_expert_classifier
-      update_seen_subjects
-      dequeue_subject
-      instance_eval &block if block_given?
+      unless seen_subjects.subjects_seen?(subject_ids)
+        mark_expert_classifier
+        update_seen_subjects
+        dequeue_subject
+        instance_eval(&block) if block_given?
+      end
       publish_to_kafka
     end
   end
 
   def dequeue_subject
     SubjectQueue.dequeue(workflow,
-                         SetMemberSubject.by_subject_workflow(subject_ids,
-                                                              classification.workflow)
+                         SetMemberSubject
+                           .by_subject_workflow(subject_ids, classification.workflow)
                            .pluck(:id),
                          user: user)
   end
@@ -71,14 +68,16 @@ class ClassificationLifecycle
     Recent.create_from_classification(classification)
   end
 
-  private
-
   def should_update_seen?
     !classification.anonymous? && classification.complete?
   end
 
   def should_create_project_preference?
     !classification.anonymous?
+  end
+
+  def seen_subjects
+    @seen_subjects ||= UserSeenSubject.find_or_create_by!(user: user, workflow: workflow)
   end
 
   def user
