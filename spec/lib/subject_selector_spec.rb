@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe SubjectSelector do
-  let(:workflow) { create(:workflow) }
+  let(:workflow) { create(:workflow_with_subjects) }
   let(:user) { ApiUser.new(create(:user)) }
   describe "#queued_subjects" do
     subject { described_class.new(user, workflow, {}, Subject.all)}

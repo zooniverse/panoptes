@@ -5,7 +5,7 @@ class UserSeenSubject < ActiveRecord::Base
   validates_presence_of :user, :workflow
 
   def self.add_seen_subjects_for_user(user: nil, workflow: nil, subject_ids: nil)
-    uss = self.find_or_create_by!(user: user, workflow: workflow)
+    uss = find_or_create_by!(user: user, workflow: workflow)
     uss.add_subjects(subject_ids)
   end
 
@@ -13,5 +13,9 @@ class UserSeenSubject < ActiveRecord::Base
     subject_ids_will_change!
     subject_ids.concat(subjects)
     save!
+  end
+
+  def already_seen?(ids)
+    (subject_ids & ids).empty?
   end
 end

@@ -9,7 +9,12 @@ class ClassificationWorker
     when "update"
       classification.transact!
     when "create"
-      classification.transact! { create_project_preference }
+      classification.transact! do
+        classification.subject_ids.each do |sid|
+          ClassificationCountWorker.perform_async(sid, classification.workflow.id)
+        end
+        create_project_preference
+      end
     else
       raise "Invalid Post-Classification Action"
     end

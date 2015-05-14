@@ -139,6 +139,6 @@ class User < ActiveRecord::Base
       .select('array_length("user_seen_subjects"."subject_ids", 1) as subject_count')
       .first.try(:subject_count)
 
-    seen_count && seen_count >= workflow.subjects_count
+    !!(seen_count && seen_count >= workflow.subjects_count)
   end
 end
