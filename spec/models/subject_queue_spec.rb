@@ -24,6 +24,19 @@ RSpec.describe SubjectQueue, :type => :model do
     expect(build(:subject_queue, workflow: q.workflow, user: q.user)).to be_valid
   end
 
+  describe "::below_minimum" do
+    let(:subjects) { create_list(:set_member_subject, 21) }
+    let!(:above_minimum) { create(:subject_queue, set_member_subjects: subjects) }
+    let!(:below_minimum) { create(:subject_queue, set_member_subjects: subjects[0..5]) }
+    it 'should return all the queues with less than the minimum number of subjects' do
+      expect(SubjectQueue.below_minimum).to include(below_minimum)
+    end
+
+    it 'should not return queues with more than minimum' do
+      expect(SubjectQueue.below_minimum).to_not include(above_minimum)
+    end
+  end
+
   describe "::create_for_user" do
     let(:workflow) {create(:workflow)}
     let(:user) { create(:user) }

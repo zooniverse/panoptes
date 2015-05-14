@@ -41,6 +41,11 @@ RSpec.describe QueueRemovalWorker do
       queues.each(&:reload)
       expect(queues[0..1].map(&:set_member_subject_ids)).to all( be_empty )
     end
+
+    it 'should queue rebuilds' do
+      expect(SubjectQueueWorker).to receive(:perform_async).exactly(2).times
+      subject.perform(first_set_sms_ids, workflows.first.id)
+    end
   end
 
   context "with multiple workflows" do
@@ -48,6 +53,11 @@ RSpec.describe QueueRemovalWorker do
       subject.perform(second_set_sms_ids, workflows[1..2].map(&:id))
       queues.each(&:reload)
       expect(queues[2..-1].map(&:set_member_subject_ids)).to all( be_empty )
+    end
+
+    it 'should queue rebuilds' do
+      expect(SubjectQueueWorker).to receive(:perform_async).exactly(4).times
+      subject.perform(second_set_sms_ids, workflows[1..2].map(&:id))
     end
   end
 end
