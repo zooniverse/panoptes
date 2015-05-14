@@ -22,6 +22,7 @@ shared_examples "is indexable" do
     end
 
     it_behaves_like 'an api response'
+    it_behaves_like 'an indexable etag response'
   end
 
   context 'when the authorized_user is an admin' do
