@@ -18,7 +18,7 @@ class ClassificationLifecycle
 
   def transact!(&block)
     Classification.transaction do
-      if seen_subjects.already_seen?(subject_ids)
+      unless seen_subjects.subjects_seen?(subject_ids)
         mark_expert_classifier
         update_seen_subjects
         dequeue_subject

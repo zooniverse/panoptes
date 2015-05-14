@@ -80,7 +80,7 @@ describe ClassificationLifecycle do
       subject.transact! { true }
     end
 
-    context "when the classification subjects have not been seen" do
+    context "when the user has not already classified the subjects" do
       it "should wrap the calls in a transaction" do
         expect(Classification).to receive(:transaction)
       end
@@ -106,7 +106,7 @@ describe ClassificationLifecycle do
       end
     end
 
-    context "when the classification subjects have not been seen" do
+    context "when the user has already classified the subjects" do
       let!(:seen) do
         create(:user_seen_subject,
                user: classification.user,

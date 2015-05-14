@@ -15,7 +15,9 @@ class UserSeenSubject < ActiveRecord::Base
     save!
   end
 
-  def already_seen?(ids)
-    (subject_ids & ids).empty?
+  def subjects_seen?(ids)
+    ids.find do |id|
+      subject_ids.include?(id)
+    end
   end
 end
