@@ -44,6 +44,7 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it_behaves_like "an api response"
+      it_behaves_like 'an indexable etag response'
     end
 
     context "an unauthenticated request" do
