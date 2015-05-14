@@ -1,5 +1,4 @@
 class Medium < ActiveRecord::Base
-
   class MissingPutFilePath < StandardError; end
 
   belongs_to :linked, polymorphic: true
@@ -7,9 +6,7 @@ class Medium < ActiveRecord::Base
   before_validation :create_path, unless: :external_link
   validates :src, presence: true, unless: :external_link
 
-  def self.inheritance_column
-    nil
-  end
+  before_destroy :queue_medium_removal
 
   ALLOWED_UPLOAD_CONTENT_TYPES = %w(image/jpeg image/png image/gif)
   ALLOWED_EXPORT_CONTENT_TYPES  = %w(text/csv)
@@ -18,6 +15,10 @@ class Medium < ActiveRecord::Base
     unless allowed_content_types.include?(medium.content_type)
       medium.errors.add(:content_type, "Content-Type must be one of #{allowed_content_types.join(", ")}")
     end
+  end
+
+  def self.inheritance_column
+    nil
   end
 
   def indifferent_attributes
@@ -57,5 +58,9 @@ class Medium < ActiveRecord::Base
     else
       ALLOWED_UPLOAD_CONTENT_TYPES
     end
+  end
+
+  def queue_medium_removal
+    MediumRemovalWorker.perform_async(src)
   end
 end

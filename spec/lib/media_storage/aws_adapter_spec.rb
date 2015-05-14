@@ -64,6 +64,19 @@ RSpec.describe MediaStorage::AwsAdapter do
     it_behaves_like "signed s3 url"
   end
 
+  describe "#delete_file" do
+    let(:obj_double) { double(write: true) }
+
+    before(:each) do
+      allow(adapter).to receive(:object).and_return(obj_double)
+    end
+
+    it 'should call #delete on the s3 object' do
+      expect(obj_double).to receive(:delete)
+      adapter.delete_file("blash.txt")
+    end
+  end
+
   describe "#put_file" do
     let(:obj_double) { double(write: true) }
     let(:file_path) { "a_path.txt" }
@@ -93,7 +106,6 @@ RSpec.describe MediaStorage::AwsAdapter do
   end
 
   context "when missing an s3 object path" do
-
     it 'should raise an error' do
       error_message = "A storage path must be specified."
       expect do

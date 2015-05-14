@@ -56,5 +56,19 @@ RSpec.describe MediaStorage do
         MediaStorage.put_path
       end
     end
+
+    describe "::put_path" do
+      it 'should call stored path on the adapter' do
+        expect(adapter).to receive(:put_file)
+        MediaStorage.put_file
+      end
+    end
+
+    describe "::put_path" do
+      it 'should call stored path on the adapter' do
+        expect(adapter).to receive(:delete_file)
+        MediaStorage.delete_file
+      end
+    end
   end
 end

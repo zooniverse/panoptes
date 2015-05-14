@@ -132,4 +132,12 @@ RSpec.describe Medium, :type => :model do
       end
     end
   end
+
+  describe "queue_medium_removal" do
+    it 'should queue a worker to remove the attached files' do
+      medium = create(:medium)
+      expect(MediumRemovalWorker).to receive(:perform_async).with(medium.src)
+      medium.queue_medium_removal
+    end
+  end
 end
