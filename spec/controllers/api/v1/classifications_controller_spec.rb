@@ -85,7 +85,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         it_behaves_like "is indexable"
       end
 
-      context "a project owner retreiving classifications for the project" do 
+      context "a project owner retreiving classifications for the project" do
         let!(:classifications) { create_list(:classification, 2, project: project) }
         let(:authorized_user) { project.owner }
 

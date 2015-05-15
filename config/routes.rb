@@ -27,6 +27,10 @@ Rails.application.routes.draw do
     post "/users" => "registrations#create", as: :user_registration
   end
 
+  namespace :api, constraints: { format: 'json' } do
+    post "/events" => "events#create"
+  end
+
   namespace :api do
     api_version(module: "V1", header: {name: "Accept", value: "application/vnd.api+json; version=1"}) do
       get "/me", to: 'users#me', format: false
@@ -65,7 +69,7 @@ Rails.application.routes.draw do
         media_resources :avatar, :background
       end
 
-      json_api_resources :workflows, links: [:subject_sets], versioned: true 
+      json_api_resources :workflows, links: [:subject_sets], versioned: true
 
       json_api_resources :subject_sets, links: [:subjects]
 

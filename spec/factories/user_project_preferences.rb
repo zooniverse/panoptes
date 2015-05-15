@@ -4,6 +4,6 @@ FactoryGirl.define do
     project
     email_communication true
     preferences '{"tutorial": "done"}'
-    activity_count { { asteroid: { count: "19", updated_at: "2014-10-14 17:29:23 UTC" } } }
+    activity_count 19
   end
 end
