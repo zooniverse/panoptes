@@ -54,9 +54,9 @@ class Api::V1::SubjectsController < Api::ApiController
   def context
     case action_name
     when "create", "update"
-      { post_urls: true }
+      { url_format: :put }
     else
-      {}
+      { url_format: :get }
     end
   end
 

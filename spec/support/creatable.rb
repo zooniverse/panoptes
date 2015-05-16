@@ -1,10 +1,11 @@
-shared_examples "is creatable" do
+shared_examples "is creatable" do |action|
   let(:created_id) { created_instance_id(api_resource_name) }
 
   context "a logged in user" do
     before(:each) do
+      action ||= :create
       default_request scopes: scopes, user_id: authorized_user.id
-      post :create, create_params
+      post action, create_params
     end
 
     it "should return created" do
@@ -31,7 +32,7 @@ shared_examples "is creatable" do
       id = created_id
       location_header = response.headers["Location"]
       url = defined?(resource_url) ? resource_url : "http://test.host/api/#{ name }/#{ id }"
-      expect(location_header).to eq(url)
+      expect(location_header).to match(url)
     end
 
     it_behaves_like 'an api response'
@@ -39,8 +40,9 @@ shared_examples "is creatable" do
 
   context "a non-logged in user" do
     before(:each) do
+      action ||= :create
       default_request
-      post :create, create_params
+      post action, create_params
     end
 
     it "should return unauthorized" do

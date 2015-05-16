@@ -4,48 +4,148 @@ RSpec.describe Api::V1::MediaController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:api_resource_name){ 'media' }
   let(:resource_class) { Medium }
-  let(:api_resource_attributes) { %w(id src media_type) }
+  let(:api_resource_attributes) { %w(id src media_type content_type created_at) }
   let(:api_resource_links) { [] }
   let(:scopes) { %w(public medium) }
 
-  RSpec.shared_examples "has_many media" do |parent_name, media_type|
-    describe "#index" do
-      let(:private_resource) { create(:project, private: true).avatar }
-      let(:n_visisble) { 2 }
-
-      it_behaves_like 'is indexable'
+  RSpec.shared_examples "has_many media" do |parent_name, media_type, actions|
+    let!(:resources) do
+      create_list :medium, 2, linked: parent, content_type: "text/csv",
+        type: "#{parent_name}_#{media_type.to_s.singularize}"
     end
 
-    describe "#show" do
-      it_behaves_like "is showable"
+    if actions.include? :index
+      describe "#index" do
+        context "when media exists" do
+          before(:each) do
+            default_request user_id: authorized_user.id, scopes: scopes
+            get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+          end
+
+          it 'should return ok' do
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'should include 2 items' do
+            expect(json_response["media"].length).to eq(2)
+          end
+
+          it_behaves_like "an api response"
+        end
+
+        context "when media does not exist" do
+          let!(:resources) { [] }
+
+          before(:each) do
+            parent.send(media_type).destroy
+            default_request user_id: authorized_user.id, scopes: scopes
+            get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+          end
+
+          it 'should return 404' do
+            expect(response).to have_http_status(:not_found)
+          end
+
+          it 'should return an error message' do
+            msg = json_response['errors'][0]['message']
+            expect(msg).to match(/No #{media_type} exists for #{parent_name} ##{parent.id}/)
+          end
+        end
+      end
     end
 
-    describe "#destroy" do
-      it_behaves_like "is destructable"
+    if actions.include? :show
+      describe "#show" do
+        context "when media exists" do
+          before(:each) do
+            default_request user_id: authorized_user.id, scopes: scopes
+            get :show, :"#{parent_name}_id" => parent.id, :media_name => media_type,
+              :id => resources.first.id
+          end
+
+          it 'should return ok' do
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'should include 1 item' do
+            expect(json_response["media"].length).to eq(1)
+          end
+
+          it_behaves_like "an api response"
+        end
+
+        context "when media does not exist" do
+          let(:media_id) {(Medium.last.id + 100)}
+          before(:each) do
+            parent.send(media_type).destroy
+            default_request user_id: authorized_user.id, scopes: scopes
+            get :show, :"#{parent_name}_id" => parent.id, :media_name => media_type,
+              :id => media_id
+          end
+
+          it 'should return 404' do
+            expect(response).to have_http_status(:not_found)
+          end
+
+          it 'should return an error message' do
+            msg = json_response['errors'][0]['message']
+            expect(msg).to match(/No #{media_type} ##{media_id} exists for #{parent_name} ##{parent.id}/)
+          end
+        end
+      end
     end
 
-    describe "#create" do
-      let(:test_attr) { :type }
-      let(:test_attr_value) { :project_avatar }
-      let(:create_params) do
-        {
-         media: { content_type: "image/jpeg" }
-        }
+    if actions.include? :destroy
+      describe "#destroy" do
+        let(:resource) { resources.first }
+
+        before(:each) do
+          stub_token(scopes: scopes, user_id: authorized_user.id)
+          set_preconditions
+          delete :destroy, :id => resource.id, :"#{parent_name}_id" => parent.id,
+            :media_name => media_type
+        end
+
+        it "should return 204" do
+          expect(response).to have_http_status(:no_content)
+        end
+
+        it "should delete the resource" do
+          expect{resource_class.find(resource.id)}.to raise_error(ActiveRecord::RecordNotFound)
+        end
+      end
+    end
+
+    if actions.include? :create
+      describe "#create" do
+        let!(:resource) { parent.send(media_type) }
+        let(:resource_url) { "http://test.host/api/#{parent_name}s/#{parent.id}/#{media_type}/#{json_response["media"][0]["id"]}" }
+        let(:test_attr) { :type }
+        let(:test_attr_value) { "#{parent_name}_#{media_type.to_s.singularize}" }
+        let(:new_resource) { resource_class.find(created_instance_id(api_resource_name)) }
+        let(:create_params) do
+          params = {
+                    media: { content_type: "text/csv" }
+                   }
+          params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
+        end
 
         it_behaves_like "is creatable"
       end
     end
 
-    describe "#update" do
-      let(:test_attr) { :content_type }
-      let(:test_attr_value) { "image/png" }
-      let(:update_params) do
-        {
-         media: { content_type: "image/png" }
-        }
-      end
+    if actions.include? :update
+      describe "#update" do
+        let(:test_attr) { :content_type }
+        let(:test_attr_value) { "image/png" }
+        let(:update_params) do
+          {
+           media: { content_type: "image/png" }
+          }
+        end
 
-      it_behaves_like "is updatable"
+        it_behaves_like "is updatable"
+      end
     end
   end
 
@@ -132,6 +232,25 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
     it_behaves_like "has_one media", :project, :avatar
     it_behaves_like "has_one media", :project, :background
+    it_behaves_like "has_many media", :project, :classifications_exports, %i(index show destroy)
+
+    describe "classifications_exports #index" do
+      let!(:resources) do
+        create_list :medium, 2, linked: parent, content_type: "text/csv",
+          type: "project_classifications_export"
+      end
+
+      it 'should return 404 without an authorized_user' do
+        default_request user_id: create(:user).id, scopes: scopes
+        get :index, :project_id => parent.id, :media_name => "classifications_exports"
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'should return 404 without a user' do
+        get :index, :project_id => parent.id, :media_name => "classifications_exports"
+        expect(response).to have_http_status(:not_found)
+      end
+    end
   end
 
   describe "parent is a user" do

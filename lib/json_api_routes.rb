@@ -10,17 +10,17 @@ module JsonApiRoutes
     constraints = { link_relation: links_regex }.merge(id_constraint(path))
 
     post "/links/:link_relation", to: "#{ path }#update_links",
-         constraints: constraints, format: :false
+      constraints: constraints, format: :false
 
     delete "/links/:link_relation/:link_ids", to: "#{ path }#destroy_links",
-           constraints: constraints, format: :false
+      constraints: constraints, format: :false
   end
 
   def create_versions(path)
     get "/versions", to: "#{ path }#versions", format: false,
-        constraints: id_constraint(path)
+      constraints: id_constraint(path)
     get "/versions/:id", to: "#{ path }#version", format: false,
-        constraints: id_constraint(path)
+      constraints: id_constraint(path)
   end
 
   def create_head(path)
@@ -28,19 +28,33 @@ module JsonApiRoutes
     match "#{path}/:id", to: "#{path}#show", via: :head, format: false
   end
 
-  def media_resources(*names)
-    opts = names.last.is_a?(Hash) ? names.last : {}
-    opts[:constraints] = {media_name: /(#{ names.map(&:to_s).join('|') })/ }
-    opts[:except] = [:new, :edit]
+  def media_resource(name, opts={})
+    exceptions = opts.delete(:except) || []
+    opts[:constraints] = {media_name: /(#{ name })/ }
     # Create links for has_one media relations
-    get "/:media_name", to: "media#index", **opts
-    post "/:media_name", to: "media#create", **opts
+    get "/:media_name", to: "media#index", **opts unless exceptions.include?(:index)
+    post "/:media_name", to: "media#create", **opts unless exceptions.include?(:create)
     # Create links for has_many media relations
-    names = names.select{ |n| n.to_s == n.to_s.pluralize }
-    opts[:constraints] = {media_name: /(#{ names.map(&:to_s).join('|') })/ }
-    get "/:media_name/:id", to: "media#show", **opts
-    put "/:media_name/:id", to: "media#update", **opts
-    delete "/:media_name/:id", to: "media#destroy", **opts
+    if name.to_s.pluralize == name.to_s
+      get "/:media_name/:id", to: "media#show", **opts unless exceptions.include?(:show)
+      put "/:media_name/:id", to: "media#update", **opts unless exceptions.include?(:update)
+      delete "/:media_name/:id", to: "media#destroy", **opts unless exceptions.include?(:destroy)
+    end
+  end
+
+  def media_resources(*names)
+    names.each do |name|
+      case name
+      when Symbol
+        media_resource(name)
+      when Hash
+        name.each do |key, opts|
+          media_resource(key, opts)
+        end
+      else
+        raise StandardError, "How did this get here?"
+      end
+    end
   end
 
   def json_api_resources(path, options={})

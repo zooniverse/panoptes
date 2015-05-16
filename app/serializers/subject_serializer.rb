@@ -9,7 +9,7 @@ class SubjectSerializer
   def locations
     @model.locations.map do |loc|
       {
-       loc.content_type => @context[:post_urls] ? loc.put_url : loc.get_url
+       loc.content_type => loc.url_for_format(@context[:url_format])
       }
     end
   end

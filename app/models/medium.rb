@@ -29,6 +29,17 @@ class Medium < ActiveRecord::Base
     self.src ||= MediaStorage.stored_path(content_type, type, *path_opts)
   end
 
+  def url_for_format(format)
+    case format
+    when :put
+      put_url
+    when :get
+      get_url
+    else
+      ""
+    end
+  end
+
   def put_url
     if external_link
       src
@@ -53,7 +64,7 @@ class Medium < ActiveRecord::Base
   end
 
   def allowed_content_types
-    if type == "classifications_export"
+    if type == "project_classifications_export"
       ALLOWED_EXPORT_CONTENT_TYPES
     else
       ALLOWED_UPLOAD_CONTENT_TYPES

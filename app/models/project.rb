@@ -19,7 +19,7 @@ class Project < ActiveRecord::Base
   has_one :avatar, -> { where(type: "project_avatar") }, class_name: "Medium", as: :linked
   has_one :background, -> { where(type: "project_background") }, class_name: "Medium",
     as: :linked
-  has_many :classification_exports, -> { where(type: "classifications_export")},
+  has_many :classifications_exports, -> { where(type: "project_classifications_export")},
     class_name: "Medium", as: :linked
 
   cache_by_association :project_contents
@@ -32,15 +32,11 @@ class Project < ActiveRecord::Base
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
-  can_by_role :destroy, :update, :update_links, :destroy_links, roles: [ :owner,
-                                                                         :collaborator ]
-  can_by_role :show, :index, :versions, :version,
-              public: true, roles: [ :owner,
-                                              :collaborator,
-                                              :tester,
-                                              :translator,
-                                              :scientist,
-                                              :moderator ]
+  can_by_role :destroy, :update, :update_links, :destroy_links, :create_export,
+    roles: [ :owner, :collaborator ]
+
+  can_by_role :show, :index, :versions, :version, public: true,
+    roles: [ :owner, :collaborator, :tester, :translator, :scientist, :moderator ]
 
   can_by_role :translate, roles: [ :owner, :translator ]
 
@@ -54,7 +50,7 @@ class Project < ActiveRecord::Base
 
   def expert_classifier_level(classifier)
     expert_role = project_roles.where(user_group: classifier.identity_group)
-                  .where.overlap(roles: EXPERT_ROLES)
+      .where.overlap(roles: EXPERT_ROLES)
     expert_role.first.try(:roles).try(:first).try(:to_sym)
   end
 

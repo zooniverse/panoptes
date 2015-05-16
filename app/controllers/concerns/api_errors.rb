@@ -8,8 +8,13 @@ module ApiErrors
   class NoUserError < PanoptesApiError; end
   class UnpermittedParameter < PanoptesApiError; end
   class NoMediaError < PanoptesApiError
-    def initialize(media_type, parent, parent_id)
-      super("No #{media_type} exists for #{parent} ##{parent_id}")
+    def initialize(media_type, parent, parent_id, media_id=nil)
+      super("No #{media_type}#{ media_string(media_id) }exists for #{parent} ##{parent_id}")
+    end
+
+    def media_string(media_id)
+      return ' ' unless media_id
+      " ##{media_id} "
     end
   end
   class LimitExceeded < PanoptesApiError; end
