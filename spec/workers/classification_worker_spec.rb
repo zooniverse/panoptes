@@ -56,6 +56,20 @@ RSpec.describe ClassificationWorker do
       it 'should call classification count worker' do
         expect(ClassificationCountWorker).to receive(:perform_async).twice
       end
+
+      context "when a user has seen the subjects before" do
+
+        it 'should not call the classification count worker' do
+          expect(ClassificationCountWorker).to_not receive(:perform_async).twice
+        end
+      end
+
+      context "when a user is anonymous" do
+
+        it 'should call the classification count worker' do
+          expect(ClassificationCountWorker).to receive(:perform_async).twice
+        end
+      end
     end
 
     context "anything else" do
