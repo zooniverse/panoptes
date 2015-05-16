@@ -18,12 +18,12 @@ class ClassificationLifecycle
 
   def transact!(&block)
     Classification.transaction do
-      unless seen_subjects.subjects_seen?(subject_ids)
+      if unseen_subjects_for_user?
         mark_expert_classifier
         update_seen_subjects
         dequeue_subject
-        instance_eval(&block) if block_given?
       end
+      instance_eval(&block) if block_given?
       publish_to_kafka
     end
   end
@@ -40,9 +40,9 @@ class ClassificationLifecycle
     return unless should_create_project_preference?
     UserProjectPreference.where(user: user, project: project)
       .first_or_create do |up|
-      up.email_communication = user.project_email_communication
-      up.preferences = {}
-    end
+        up.email_communication = user.project_email_communication
+        up.preferences = {}
+      end
   end
 
   def update_seen_subjects
@@ -76,8 +76,18 @@ class ClassificationLifecycle
     !classification.anonymous?
   end
 
-  def seen_subjects
-    @seen_subjects ||= UserSeenSubject.find_or_create_by!(user: user, workflow: workflow)
+  def should_count_towards_retirement?
+    classification.anonymous? || unseen_subjects_for_user?
+  end
+
+  def unseen_subjects_for_user?
+    return @unseen_subjects if @unseen_subjects
+    @unseen_subjects = if user.nil?
+      false
+    else
+      seen_subjects = UserSeenSubject.find_or_create_by!(user: user, workflow: workflow)
+      !seen_subjects.subjects_seen?(subject_ids)
+    end
   end
 
   def user

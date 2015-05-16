@@ -80,6 +80,22 @@ describe ClassificationLifecycle do
       subject.transact! { true }
     end
 
+    context "when an anonymour user classification" do
+      let!(:classification) { create(:classification, user: nil) }
+
+      it "should wrap the calls in a transaction" do
+        expect(Classification).to receive(:transaction)
+      end
+
+      it "should not attempt to update the seen subjects" do
+        expect_any_instance_of(UserSeenSubject).to_not receive(:subjects_seen?)
+      end
+
+      it "should still evaluate the block" do
+        expect(subject).to receive(:instance_eval)
+      end
+    end
+
     context "when the user has not already classified the subjects" do
       it "should wrap the calls in a transaction" do
         expect(Classification).to receive(:transaction)
@@ -130,8 +146,8 @@ describe ClassificationLifecycle do
         expect(subject).to_not receive(:dequeue_subject)
       end
 
-      it "should not call the instance_eval on the passed block" do
-        expect(subject).to_not receive(:instance_eval)
+      it "should call the instance_eval on the passed block" do
+        expect(subject).to receive(:instance_eval)
       end
 
       it "should call the #publish_to_kafka method" do
