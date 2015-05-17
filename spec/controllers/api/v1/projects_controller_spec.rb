@@ -11,7 +11,7 @@ describe Api::V1::ProjectsController, type: :controller do
      "updated_at", "created_at", "available_languages", "title",
      "description", "team_members", "guide", "science_case", "introduction", "migrated",
      "faq", "result", "education_content", "private", "live", "retired_subjects_count",
-     "urls"]
+     "urls", "classifiers_count" ]
   end
   let(:api_resource_links) do
     [ "projects.workflows",

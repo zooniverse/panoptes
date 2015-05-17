@@ -7,9 +7,9 @@ module Preferences
   end
 
   module ClassMethods
-    def preferences_for(preference)
+    def preferences_for(preference, counter_cache = false)
       @preferences_for = preference
-      belongs_to @preferences_for
+      belongs_to @preferences_for, dependent: :destroy, counter_cache: counter_cache
       validates_presence_of @preferences_for
     end
 
