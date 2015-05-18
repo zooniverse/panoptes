@@ -95,18 +95,11 @@ class User < ActiveRecord::Base
   end
 
   def valid_password?(password)
-    if hash_func == 'bcrypt'
+    case hash_func
+    when 'bcrypt'
       super(password)
-    elsif hash_func == 'sha1'
-      if encrypted_password == Sha1Encryption.encrypt(password, password_salt)
-        logger.info "User #{id} is using sha1 password. Updating..."
-        self.password = password
-        self.hash_func = 'bcrypt'
-        self.save
-        true
-      else
-        false
-      end
+    when 'sha1'
+      valid_sha1_password?(password)
     else
       false
     end
@@ -140,5 +133,20 @@ class User < ActiveRecord::Base
       .first.try(:subject_count)
 
     !!(seen_count && seen_count >= workflow.subjects_count)
+  end
+
+  def valid_sha1_password?(plain_password)
+    worked = nil
+    1.upto(25).each do |n|
+      if encrypted_password == Sha1Encryption.encrypt(plain_password, password_salt, -n)
+        worked = n
+        logger.info "User #{id} is using sha1 password. Updating..."
+        self.password = plain_password
+        self.hash_func = 'bcrypt'
+        self.save!
+        break
+      end
+    end
+    !!worked
   end
 end

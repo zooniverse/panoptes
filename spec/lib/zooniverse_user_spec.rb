@@ -33,18 +33,6 @@ RSpec.describe ZooniverseUser, type: :model do
     end
   end
 
-  describe "::authenticate" do
-    let!(:zu) { create(:zooniverse_user) }
-
-    it 'should return the user when supplied the password of a user with a matching login' do
-      expect(ZooniverseUser.authenticate(zu.login, zu.password)).to eq(zu)
-    end
-
-    it 'should return nil when no user matches' do
-      expect(ZooniverseUser.authenticate("asdfasdf", zu.password)).to be_nil
-    end
-  end
-
   describe "::create_from_user" do
     let(:user) { create(:user) }
 
@@ -110,22 +98,6 @@ RSpec.describe ZooniverseUser, type: :model do
         new_email = "new_test_email@test.com"
         zu.update!(email: new_email)
         expect(zu.import.email).to eq(new_email)
-      end
-    end
-  end
-
-  describe "#authenticate" do
-    let(:zu) { create(:zooniverse_user) }
-
-    context "when password matches" do
-      it 'should return itself' do
-        expect(zu.authenticate(zu.password)).to eq(zu)
-      end
-    end
-
-    context "when password doesn't match" do
-      it 'should return nil' do
-        expect(zu.authenticate("asdfasd")).to be_nil
       end
     end
   end

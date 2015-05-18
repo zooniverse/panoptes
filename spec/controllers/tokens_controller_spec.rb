@@ -3,7 +3,7 @@ require 'spec_helper'
 shared_context "a valid login" do
   it "it should respond with 200" do
     req
-    expect(response.status).to eq(200)
+    expect(response).to have_http_status(:ok)
   end
 
   it "it should return the expected response format" do
@@ -14,7 +14,7 @@ shared_context "a valid login" do
 end
 
 describe TokensController, type: :controller do
-  let(:owner) { create(:user, build_zoo_user: true)}
+  let(:owner) { create(:user)}
 
   describe "resource owner password credentials flow" do
     let(:params) { { "grant_type" => "password",
@@ -36,12 +36,12 @@ describe TokensController, type: :controller do
 
         it "it should respond with 422" do
           post :create, params.merge!("client_id" => '')
-          expect(response.status).to eq(422)
+          expect(response).to have_http_status(:unprocessable_entity)
         end
 
         it "it should respond with 422" do
           post :create, params.except("client_id")
-          expect(response.status).to eq(422)
+          expect(response).to have_http_status(:unprocessable_entity)
         end
       end
 
@@ -62,7 +62,7 @@ describe TokensController, type: :controller do
           it 'should return a unprocessable entity error' do
             params['scope'] = 'public murder_one'
             req
-            expect(response.status).to eq(422)
+            expect(response).to have_http_status(:unprocessable_entity)
           end
         end
 
@@ -100,7 +100,7 @@ describe TokensController, type: :controller do
 
       it 'should reject the token request with unprocessable entity' do
         post :create, params
-        expect(response.status).to eq(422)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
 
@@ -109,7 +109,7 @@ describe TokensController, type: :controller do
 
       it 'should reject the token request with unprocessable entity' do
         post :create, params
-        expect(response.status).to eq(422)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end
