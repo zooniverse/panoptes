@@ -86,30 +86,20 @@ class ZooniverseUser < ActiveRecord::Base
     SecureRandom.hex 64
   end
 
-  def setup_panoptes_user_account(u)
-    panoptes_account_exists = panoptes_user_account_exists?(u)
-    new_account = !u.persisted?
-    u.display_name = login
-    u.build_avatar(external_link: true,
-                   src: avatar_to_url)
-    u.email = email
-    u.encrypted_password = crypted_password
-    u.password_salt = password_salt
-    u.valid_email = valid_email || true
-    if new_account || panoptes_account_exists
-      u.created_at = created_at
-      u.updated_at = updated_at
-      u.hash_func = 'sha1'
-      u.migrated = true
-      u.zooniverse_id = id.to_s
-      u.build_identity_group if new_account
+  def setup_panoptes_user_account(pu)
+    if new_account = !pu.persisted?
+      pu.build_avatar(external_link: true, src: avatar_to_url)
+      pu.build_identity_group
     end
-  end
-
-  def panoptes_user_account_exists?(user)
-    user.display_name = login &&
-                        user.zooniverse_id.nil? &&
-                        user.hash_func == 'bcrypt' &&
-                        user.migrated.blank?
+    pu.display_name = login
+    pu.email = email
+    pu.encrypted_password = crypted_password
+    pu.password_salt = password_salt
+    pu.valid_email = valid_email || true
+    pu.created_at = created_at
+    pu.updated_at = updated_at
+    pu.hash_func = 'sha1'
+    pu.migrated = true
+    pu.zooniverse_id = id.to_s
   end
 end
