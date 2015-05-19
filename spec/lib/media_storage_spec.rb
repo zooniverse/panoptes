@@ -64,7 +64,7 @@ RSpec.describe MediaStorage do
       end
     end
 
-    describe "::put_path" do
+    describe "::delete_path" do
       it 'should call stored path on the adapter' do
         expect(adapter).to receive(:delete_file)
         MediaStorage.delete_file
