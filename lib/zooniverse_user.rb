@@ -14,10 +14,6 @@ class ZooniverseUser < ActiveRecord::Base
     end.find_each(&:import)
   end
 
-  def self.authenticate(username, password)
-    find_by(login: username).try(:authenticate, password)
-  end
-
   def self.find_from_user(user)
     if user.zooniverse_id
       return find(user.zooniverse_id)
@@ -41,17 +37,6 @@ class ZooniverseUser < ActiveRecord::Base
     @password = plain_password
     self.password_salt = simple_token
     self.crypted_password = Sha1Encryption.encrypt(plain_password, password_salt)
-  end
-
-  def authenticate(plain_password)
-    worked = nil
-    1.upto(25).each do |n|
-      if crypted_password == Sha1Encryption.encrypt(plain_password, password_salt, -n)
-        worked = n
-        break
-      end
-    end
-    worked ? self : nil
   end
 
   def import
