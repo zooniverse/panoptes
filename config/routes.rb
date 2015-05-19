@@ -66,7 +66,7 @@ Rails.application.routes.draw do
       end
 
       json_api_resources :projects, links: [:subject_sets, :workflows] do
-        media_resources :avatar, :background, classifications_exports: { except: [:update, :create] }
+        media_resources :avatar, :background, :attached_images, classifications_exports: { except: [:update, :create] }
         post "/classifications_exports", to: "projects#create_export", format: false
       end
 

@@ -8,9 +8,9 @@ RSpec.describe Api::V1::MediaController, type: :controller do
   let(:api_resource_links) { [] }
   let(:scopes) { %w(public medium) }
 
-  RSpec.shared_examples "has_many media" do |parent_name, media_type, actions|
+  RSpec.shared_examples "has_many media" do |parent_name, media_type, actions, content_type|
     let!(:resources) do
-      create_list :medium, 2, linked: parent, content_type: "text/csv",
+      create_list :medium, 2, linked: parent, content_type: content_type,
         type: "#{parent_name}_#{media_type.to_s.singularize}"
     end
 
@@ -125,26 +125,12 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         let(:new_resource) { resource_class.find(created_instance_id(api_resource_name)) }
         let(:create_params) do
           params = {
-                    media: { content_type: "text/csv" }
+                    media: { content_type: content_type }
                    }
           params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
         end
 
         it_behaves_like "is creatable"
-      end
-    end
-
-    if actions.include? :update
-      describe "#update" do
-        let(:test_attr) { :content_type }
-        let(:test_attr_value) { "image/png" }
-        let(:update_params) do
-          {
-           media: { content_type: "image/png" }
-          }
-        end
-
-        it_behaves_like "is updatable"
       end
     end
   end
@@ -232,7 +218,8 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
     it_behaves_like "has_one media", :project, :avatar
     it_behaves_like "has_one media", :project, :background
-    it_behaves_like "has_many media", :project, :classifications_exports, %i(index show destroy)
+    it_behaves_like "has_many media", :project, :attached_images, %i(index create show destroy), 'image/jpeg'
+    it_behaves_like "has_many media", :project, :classifications_exports, %i(index show destroy), 'text/csv'
 
     describe "classifications_exports #index" do
       let!(:resources) do
