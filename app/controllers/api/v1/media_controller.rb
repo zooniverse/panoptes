@@ -22,10 +22,6 @@ class Api::V1::MediaController < Api::ApiController
     super
   end
 
-  def update
-    raise NotImplementedError
-  end
-
   def destroy
     error_unless_exists
     set_controlled_resources
