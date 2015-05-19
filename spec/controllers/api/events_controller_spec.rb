@@ -25,7 +25,7 @@ describe Api::EventsController, type: :controller do
           events: {
             kind: event_kind, project_id: project.id, project: project.name,
             zooniverse_user_id: user.id, workflow: workflow.display_name,
-            count: event_count, updated_at: created_at
+            count: event_count, created_at: created_at
           }
         }
       end

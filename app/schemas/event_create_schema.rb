@@ -36,7 +36,7 @@ class EventCreateSchema < JsonSchema
       type "string"
     end
 
-    property "updated_at" do
+    property "created_at" do
       type "string"
     end
   end
