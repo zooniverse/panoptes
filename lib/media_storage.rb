@@ -9,7 +9,7 @@ module MediaStorage
   end
 
   class << self
-    delegate :stored_path, :get_path, :put_path, :put_file, to: :adapter
+    delegate :stored_path, :get_path, :put_path, :put_file, :delete_file, to: :adapter
 
     def adapter(adapter=nil, opts={})
       if adapter

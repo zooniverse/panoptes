@@ -19,10 +19,14 @@ module RoleControl
     end
 
     def controlled_resources
-      @controlled_resources ||= api_user.do(action_name.to_sym)
-                              .to(resource_class, scope_context)
-                              .with_ids(resource_ids)
-                              .scope
+      @controlled_resources ||= api_user.do(controlled_scope)
+        .to(resource_class, scope_context)
+        .with_ids(resource_ids)
+        .scope
+    end
+
+    def controlled_scope
+      action_name.to_sym
     end
 
     def rejected_message

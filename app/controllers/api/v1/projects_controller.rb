@@ -2,7 +2,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include FilterByOwner
   include TranslatableResource
 
-  doorkeeper_for :update, :create, :destroy, scopes: [:project]
+  doorkeeper_for :update, :create, :destroy, :create_export, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
 
@@ -31,6 +31,16 @@ class Api::V1::ProjectsController < Api::ApiController
 
 
   before_action :add_owner_ids_to_filter_param!, only: :index
+  prepend_before_action :require_login, only: [:create, :update, :destroy, :create_export]
+
+  def create_export
+    media_create_params = params.require(:media).permit(:content_type)
+    medium = controlled_resource.classifications_exports.create!(media_create_params)
+    ClassificationsDumpWorker.perform_async(controlled_resource.id, medium.id)
+    headers['Location'] = "#{request.protocol}#{request.host_with_port}/api/projects/#{controlled_resource.id}/classifications_exports/#{medium.id}"
+    headers['Last-Modified'] = medium.updated_at.httpdate
+    json_api_render(:created, MediumSerializer.resource({}, Medium.where(id: medium.id)))
+  end
 
   private
 

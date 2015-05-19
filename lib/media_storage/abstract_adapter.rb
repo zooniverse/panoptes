@@ -23,6 +23,10 @@ module MediaStorage
       raise NotImplementedError
     end
 
+    def delete_file(path)
+      raise NotImplementedError
+    end
+
     def configure
       yield self if block_given?
     end

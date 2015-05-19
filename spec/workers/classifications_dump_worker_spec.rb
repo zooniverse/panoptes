@@ -8,7 +8,6 @@ RSpec.describe ClassificationsDumpWorker do
   let!(:other_project_classifications) { create(:classification, project: another_project) }
 
   describe "#perform" do
-
     context "when the project id doesn't correspond to a project" do
       before(:each) do
         allow(Project).to receive(:find).and_return(nil)
@@ -64,6 +63,28 @@ RSpec.describe ClassificationsDumpWorker do
       it "should queue a worker to send an email" do
         expect(ClassificationDataMailerWorker).to receive(:perform_async).with(project.id, anything)
         worker.perform(project.id)
+      end
+    end
+
+    context "when a medium id is also provided" do
+      let(:medium) do
+        create(:medium,
+               linked: project,
+               content_type: "text/csv",
+               type: "project_classifications_export")
+      end
+
+      it 'should update the path on the object' do
+        worker.perform(project.id, medium.id)
+        medium.reload
+        expect(medium.path_opts).to match_array([project.owner.display_name.gsub(/\s/, "_"),
+                                                 project.display_name.downcase.gsub(/\s/, "_")])
+      end
+
+      it 'should set the medium to private' do
+        worker.perform(project.id, medium.id)
+        medium.reload
+        expect(medium.private).to be true
       end
     end
   end

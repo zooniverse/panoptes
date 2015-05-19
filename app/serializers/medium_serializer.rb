@@ -1,7 +1,8 @@
 class MediumSerializer
   include RestPack::Serializer
 
-  attributes :id, :href, :src, :content_type, :media_type, :external_link
+  attributes :id, :href, :src, :content_type, :media_type, :external_link,
+    :created_at
 
   can_include :linked
 
@@ -10,6 +11,6 @@ class MediumSerializer
   end
 
   def src
-    @context[:post_urls] ? @model.put_url : @model.get_url
+    @model.url_for_format(@context[:url_format])
   end
 end

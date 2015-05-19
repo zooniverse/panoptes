@@ -510,6 +510,35 @@ describe Api::V1::ProjectsController, type: :controller do
     end
   end
 
+  describe "#create_export" do
+    let(:resource) { create(:full_project, owner: user) }
+    let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/classifications_exports\/[0-9]+/ }
+    let(:test_attr) { :type }
+    let(:test_attr_value) { "project_classifications_export" }
+    let(:new_resource) { Medium.find(created_instance_id(api_resource_name)) }
+    let(:api_resource_name) { "media" }
+    let(:api_resource_attributes) do
+      ["id", "src", "created_at", "content_type", "media_type", "href"]
+    end
+    let(:api_resource_links) { [] }
+    let(:resource_class) { Medium }
+
+    let(:create_params) do
+      params = {
+                media: { content_type: "text/csv" }
+               }
+      params.merge(project_id: resource.id, media_name: "classifications_exports")
+    end
+
+    it_behaves_like "is creatable", :create_export
+
+    it 'should queue an export worker' do
+      expect(ClassificationsDumpWorker).to receive(:perform_async).with(resource.id, an_instance_of(Fixnum))
+      default_request scopes: scopes, user_id: user.id
+      post :create_export, create_params
+    end
+  end
+
   describe "#destroy" do
     let(:resource) { create(:full_project, owner: user) }
 

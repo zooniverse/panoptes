@@ -15,7 +15,7 @@ module JsonApiController
       end
 
       private
-      
+
       def schema_class(action)
         "#{ resource_name }_#{ action }_schema".camelize.constantize
       end
@@ -28,7 +28,7 @@ module JsonApiController
       self.class.action_params[action].validate!(ps)
       ps
     end
-    
+
     alias_method :create_params, :params_for
     alias_method :update_params, :params_for
   end

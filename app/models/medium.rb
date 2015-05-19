@@ -1,5 +1,4 @@
 class Medium < ActiveRecord::Base
-
   class MissingPutFilePath < StandardError; end
 
   belongs_to :linked, polymorphic: true
@@ -7,9 +6,7 @@ class Medium < ActiveRecord::Base
   before_validation :create_path, unless: :external_link
   validates :src, presence: true, unless: :external_link
 
-  def self.inheritance_column
-    nil
-  end
+  before_destroy :queue_medium_removal
 
   ALLOWED_UPLOAD_CONTENT_TYPES = %w(image/jpeg image/png image/gif)
   ALLOWED_EXPORT_CONTENT_TYPES  = %w(text/csv)
@@ -20,12 +17,27 @@ class Medium < ActiveRecord::Base
     end
   end
 
+  def self.inheritance_column
+    nil
+  end
+
   def indifferent_attributes
     attributes.dup.with_indifferent_access
   end
 
   def create_path
     self.src ||= MediaStorage.stored_path(content_type, type, *path_opts)
+  end
+
+  def url_for_format(format)
+    case format
+    when :put
+      put_url
+    when :get
+      get_url
+    else
+      ""
+    end
   end
 
   def put_url
@@ -52,10 +64,14 @@ class Medium < ActiveRecord::Base
   end
 
   def allowed_content_types
-    if type == "classifications_export"
+    if type == "project_classifications_export"
       ALLOWED_EXPORT_CONTENT_TYPES
     else
       ALLOWED_UPLOAD_CONTENT_TYPES
     end
+  end
+
+  def queue_medium_removal
+    MediumRemovalWorker.perform_async(src)
   end
 end

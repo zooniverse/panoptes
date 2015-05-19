@@ -62,6 +62,10 @@ module MediaStorage
                          acl: opts[:private] ? 'private' : 'public-read')
     end
 
+    def delete_file(path)
+      object(path).delete
+    end
+
     private
 
     def object(path)

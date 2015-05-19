@@ -7,8 +7,9 @@ class ClassificationsDumpWorker
 
   attr_reader :project
 
-  def perform(project_id, show_user_id=false)
+  def perform(project_id, medium_id=nil, show_user_id=false)
     if @project = Project.find(project_id)
+      @medium_id = medium_id
       begin
         csv_formatter = Formatter::CSV::Classification.new(project, show_user_id: show_user_id)
         CSV.open(temp_file_path, 'wb') do |csv|
@@ -41,11 +42,21 @@ class ClassificationsDumpWorker
   end
 
   def medium
-    @medium ||= Medium.create!(content_type: "text/csv",
-                               type: "classifications_export",
-                               path_opts: project_file_path,
-                               linked: project,
-                               private: true)
+    @medium ||= @medium_id ? load_medium : create_medium
+  end
+
+  def create_medium
+    Medium.create!(content_type: "text/csv",
+                   type: "project_classifications_export",
+                   path_opts: project_file_path,
+                   linked: project,
+                   private: true)
+  end
+
+  def load_medium
+    m = Medium.find(@medium_id)
+    m.update!(path_opts: project_file_path, private: true)
+    m
   end
 
   def write_to_s3

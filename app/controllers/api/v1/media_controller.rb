@@ -8,9 +8,8 @@ class Api::V1::MediaController < Api::ApiController
   allowed_params :update, :content_type
 
   def index
-    media = controlled_resource.send(media_name)
     unless media.blank?
-      @controlled_resources = Medium.where(id: media.id)
+      @controlled_resources = Medium.where(id: media.try(:id) || media)
       super
     else
       raise Api::NoMediaError.new(media_name, resource_name, resource_ids)
@@ -18,7 +17,9 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def show
-    raise NotImplementedError
+    error_unless_exists
+    set_controlled_resources
+    super
   end
 
   def update
@@ -26,7 +27,9 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def destroy
-    raise NotImplementedError
+    error_unless_exists
+    set_controlled_resources
+    super
   end
 
   def create
@@ -43,19 +46,33 @@ class Api::V1::MediaController < Api::ApiController
                 if old_resource = controlled_resource.send(media_name)
                   old_resource.destroy
                 end
-                controlled_resource.send("create_#{media_name}", create_params)
+                controlled_resource.send("create_#{media_name}!", create_params)
               when :has_many
-                controlled_resource.send(media_name).create(create_params)
+                controlled_resource.send(media_name).create!(create_params)
               end
 
     created_resource_response(created)
+  end
+
+  def set_controlled_resources
+    @controlled_resources = media.where(id: params[:id])
+  end
+
+  def media
+    @media ||= controlled_resource.send(media_name)
+  end
+
+  def error_unless_exists
+    unless media.exists?(params[:id])
+      raise Api::NoMediaError.new(media_name, resource_name, resource_ids, params[:id])
+    end
   end
 
   def link_header(resource)
     identifier = if media_name == media_name.singularize
                    media_name
                  else
-                   "/#{media_name}/#{resource.id}"
+                   "#{media_name}/#{resource.id}"
                  end
 
     "#{request.protocol}#{request.host_with_port}/api/#{resource_name}s/#{resource_ids}/#{identifier}"
@@ -64,9 +81,9 @@ class Api::V1::MediaController < Api::ApiController
   def context
     case action_name
     when "update", "create"
-      { post_urls: true }
+      { url_format: :put }
     else
-      { }
+      { url_format: :get }
     end
   end
 
@@ -84,6 +101,15 @@ class Api::V1::MediaController < Api::ApiController
 
   def media_name
     params[:media_name]
+  end
+
+  def controlled_scope
+    case media_name
+    when "classifications_exports"
+      :update
+    else
+      action_name.to_sym
+    end
   end
 
   private
