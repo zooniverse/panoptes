@@ -3,17 +3,19 @@ require 'spec_helper'
 RSpec.describe SubjectSelector do
   let(:workflow) { create(:workflow_with_subjects) }
   let(:user) { ApiUser.new(create(:user)) }
-  describe "#queued_subjects" do
-    subject { described_class.new(user, workflow, {}, Subject.all)}
-    context "when the user doesn't have a queue" do
-      let!(:queue) do
-        create(:subject_queue,
-               workflow: workflow,
-               user: nil,
-               subject_set: nil,
-               set_member_subjects: create_list(:set_member_subject, 10))
-      end
 
+  let!(:non_logged_in_queue) do
+    create(:subject_queue,
+           workflow: workflow,
+           user: nil,
+           subject_set: nil,
+           set_member_subjects: create_list(:set_member_subject, 10))
+  end
+
+  subject { described_class.new(user, workflow, {}, Subject.all)}
+
+  describe "#queued_subjects" do
+    context "when the user doesn't have a queue" do
       before(:each) do
         subject.queued_subjects
       end
@@ -24,8 +26,13 @@ RSpec.describe SubjectSelector do
 
       it 'should add the logged out subjects to the new queue' do
         new_queue = SubjectQueue.find_by(workflow: workflow, user: user.user)
-        expect(new_queue.set_member_subjects).to match_array(queue.set_member_subjects)
+        expect(new_queue.set_member_subjects).to match_array(non_logged_in_queue.set_member_subjects)
       end
+    end
+
+    it 'should return url_format: :get in the context object' do
+      _, ctx = subject.queued_subjects
+      expect(ctx).to include(url_format: :get)
     end
   end
 end
