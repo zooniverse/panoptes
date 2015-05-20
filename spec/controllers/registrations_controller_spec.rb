@@ -19,6 +19,68 @@ describe RegistrationsController, type: :controller do
       request.env["HTTP_ACCEPT"] = "application/json"
     end
 
+    describe "#update" do
+      let(:user) { create(:user) }
+
+      before(:each) do
+        sign_in user
+        put :update, user: params
+      end
+
+      context "with the correct old password" do
+        let(:params) do
+          {
+           password: 'testpassword',
+           password_confirmation: 'testpassword',
+           current_password: user.password
+          }
+        end
+
+        it 'should set the new password' do
+          user.reload
+          expect(user.valid_password?('testpassword')).to be_truthy
+        end
+
+        it 'should respond 204' do
+          expect(response).to have_http_status(:no_content)
+        end
+      end
+
+      context "without the correct old password" do
+        let(:params) do
+          {
+           password: 'testpassword',
+           password_confirmation: 'testpassword',
+           current_password: 'jamesbaxter'
+          }
+        end
+
+        it 'should not change the password' do
+          user.reload
+          expect(user.valid_password?('testpassword')).to be_falsy
+        end
+
+        it 'should respond 422' do
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context "with extra parameters" do
+        let(:params) do
+          {
+           password: 'testpassword',
+           password_confirmation: 'testpassword',
+           current_password: user.password,
+           email: 'ohno@example.com'
+          }
+        end
+
+        it 'should return 422' do
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+    end
+
     describe "#create" do
 
       context "with valid user attributes" do

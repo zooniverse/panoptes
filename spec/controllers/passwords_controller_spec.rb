@@ -6,6 +6,17 @@ describe PasswordsController, type: [ :controller, :mailer ] do
     request.env["devise.mapping"] = Devise.mappings[:user]
   end
 
+  describe "#edit" do
+    context "when a redirect is configured" do
+      it 'should redirect ' do
+        test_base_url = "http://localhost:2727/#/reset-password"
+        token = "asdfasdfasdf"
+        get :edit, reset_password_token: token
+        expect(response).to redirect_to("#{test_base_url}?reset_password_token=#{token}")
+      end
+    end
+  end
+
   context "as json" do
     describe "#create" do
       before(:each) do
