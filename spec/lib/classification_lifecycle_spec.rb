@@ -36,7 +36,7 @@ describe ClassificationLifecycle do
         subject.queue(test_method)
       end
 
-      it 'should raise en error if the classification is not persisted' do
+      it 'should raise an error if the classification is not persisted' do
         expect do
           subject.queue(test_method)
         end.to raise_error(ClassificationLifecycle::ClassificationNotPersisted)
@@ -80,7 +80,7 @@ describe ClassificationLifecycle do
       subject.transact! { true }
     end
 
-    context "when an anonymour user classification" do
+    context "when an anonymous user classification" do
       let!(:classification) { create(:classification, user: nil) }
 
       it "should wrap the calls in a transaction" do
@@ -93,6 +93,14 @@ describe ClassificationLifecycle do
 
       it "should still evaluate the block" do
         expect(subject).to receive(:instance_eval)
+      end
+
+      context "when the classification has the already_seen metadata value" do
+        let!(:classification) { create(:anonymous_already_seen_classification) }
+
+        it 'should not count towards retirement' do
+          expect(subject.should_count_towards_retirement?).to be false
+        end
       end
     end
 
@@ -153,11 +161,19 @@ describe ClassificationLifecycle do
       it "should call the #publish_to_kafka method" do
         expect(subject).to receive(:publish_to_kafka).once
       end
+
+      it 'should not count towards retirement' do
+        expect(subject.should_count_towards_retirement?).to be_falsey
+      end
+
+      it 'should not queue the count worker' do
+        expect(ClassificationCountWorker).to_not receive(:perform_async)
+      end
     end
   end
 
 
-  describe "publish_to_kafka" do
+  describe "#publish_to_kafka" do
     after(:each) { subject.publish_to_kafka }
 
     context "when classificaiton is completed" do
