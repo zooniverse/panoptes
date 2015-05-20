@@ -60,14 +60,28 @@ RSpec.describe ClassificationWorker do
       context "when a user has seen the subjects before" do
 
         it 'should not call the classification count worker' do
-          expect(ClassificationCountWorker).to_not receive(:perform_async).twice
+          create(:user_seen_subject,
+                 user: classification.user,
+                 workflow: classification.workflow,
+                 subject_ids: classification.subject_ids)
+          expect(ClassificationCountWorker).to_not receive(:perform_async)
         end
       end
 
       context "when a user is anonymous" do
 
+        let!(:classification) { create(:classification, user: nil) }
+
         it 'should call the classification count worker' do
           expect(ClassificationCountWorker).to receive(:perform_async).twice
+        end
+
+        context "when the classification has the already_seen metadata value" do
+          let!(:classification) { create(:anonymous_already_seen_classification) }
+
+          it 'should not call the classification count worker' do
+            expect(ClassificationCountWorker).to_not receive(:perform_async)
+          end
         end
       end
     end

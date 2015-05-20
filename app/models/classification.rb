@@ -12,7 +12,7 @@ class Classification < ActiveRecord::Base
     :workflow, :annotations, :user_ip, :workflow_version
 
   validates :user, presence: true, if: :incomplete?
-  validate :metadata, :required_metadata_present
+  validate :metadata, :validate_metadata
   validate :validate_gold_standard
 
   scope :incomplete, -> { where(completed: false) }
@@ -58,17 +58,36 @@ class Classification < ActiveRecord::Base
     !user
   end
 
+  def seen_before?
+    if seen_before = metadata[:seen_before]
+      !!"#{seen_before}".match(/^true$/i)
+    else
+      false
+    end
+  end
+
   def metadata
     read_attribute(:metadata).with_indifferent_access
   end
 
   private
 
+  def validate_metadata
+    validate_seen_before
+    required_metadata_present
+  end
+
   def required_metadata_present
     %i(started_at finished_at user_language user_agent).each do |key|
       unless metadata.has_key? key
         errors.add(:metadata, "must have #{key} metadata")
       end
+    end
+  end
+
+  def validate_seen_before
+    if metadata.has_key?(:seen_before) && !seen_before?
+      errors.add(:metadata, "seen_before attribute can only be set to 'true'")
     end
   end
 

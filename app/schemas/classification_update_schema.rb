@@ -31,6 +31,10 @@ class ClassificationUpdateSchema < JsonSchema
       property "user_agent" do
         type "string"
       end
+
+      property "seen_before" do
+        type "boolean"
+      end
     end
 
     property "annotations" do
@@ -41,7 +45,7 @@ class ClassificationUpdateSchema < JsonSchema
         property "task" do
           type "string"
         end
-        
+
         property "value" do
           type "string", "object", "array", "float", "integer"
         end

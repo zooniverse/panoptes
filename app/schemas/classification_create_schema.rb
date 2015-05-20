@@ -16,7 +16,7 @@ class ClassificationCreateSchema < JsonSchema
     property "metadata" do
       type "object"
       required "started_at", "finished_at", "user_agent", "user_language", "workflow_version"
-      
+
       property "screen_resolution" do
         type "string"
       end
@@ -39,6 +39,10 @@ class ClassificationCreateSchema < JsonSchema
 
       property "user_agent" do
         type "string"
+      end
+
+      property "seen_before" do
+        type "boolean"
       end
     end
 

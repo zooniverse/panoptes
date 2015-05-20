@@ -18,7 +18,7 @@ class ClassificationLifecycle
 
   def transact!(&block)
     Classification.transaction do
-      if unseen_subjects_for_user?
+      if subjects_are_unseen_for_user?
         mark_expert_classifier
         update_seen_subjects
         dequeue_subject
@@ -63,6 +63,13 @@ class ClassificationLifecycle
     end
   end
 
+  def should_count_towards_retirement?
+    return false if classification.seen_before?
+    classification.anonymous? || subjects_are_unseen_for_user?
+  end
+
+  private
+
   def create_recent
     return unless should_update_seen?
     Recent.create_from_classification(classification)
@@ -76,11 +83,7 @@ class ClassificationLifecycle
     !classification.anonymous?
   end
 
-  def should_count_towards_retirement?
-    classification.anonymous? || unseen_subjects_for_user?
-  end
-
-  def unseen_subjects_for_user?
+  def subjects_are_unseen_for_user?
     return @unseen_subjects if @unseen_subjects
     @unseen_subjects = if user.nil?
       false

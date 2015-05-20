@@ -84,12 +84,26 @@ RSpec.describe UserSeenSubject, :type => :model do
 
   describe "#add_subjects" do
     let(:uss) { user_seen_subject }
-    
+
     it "should add a subject's id to the subject_ids array" do
       s = create(:subject)
       uss.add_subjects([s.id])
       uss.reload
       expect(uss.subject_ids).to include(s.id)
+    end
+  end
+
+  describe "#subjects_seen?" do
+    let(:uss) { build(:user_seen_subject) }
+
+    it "should return true if any id param is in the list" do
+      seen_id = uss.subject_ids.sample(1)
+      expect(uss.subjects_seen?(seen_id)).to be_truthy
+    end
+
+    it "should return false if no id param is in the list" do
+      seen_id = uss.subject_ids.last + 1
+      expect(uss.subjects_seen?(seen_id)).to be_falsey
     end
   end
 end
