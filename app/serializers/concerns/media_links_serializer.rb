@@ -8,6 +8,10 @@ module MediaLinksSerializer
       @media_links = links
     end
 
+    def media_links
+      @media_links || []
+    end
+
     def links
       links = super
       @media_links.each do |link|
@@ -31,5 +35,22 @@ module MediaLinksSerializer
     def supported_association?(association_macro)
       super || :has_one == association_macro
     end
+  end
+
+  def add_links(model, data)
+    data = super
+    self.class.media_links.each do |link|
+      id = data[:links].delete(link)
+      data[:links][link] = {
+                            href: media_href(model, link),
+                            type: link.to_s.pluralize
+                           }
+      data[:links][link][:id] = id if id
+    end
+    data
+  end
+
+  def media_href(model, link)
+    "/#{self.class.key}/#{model.id}/#{link}"
   end
 end

@@ -1,12 +1,14 @@
 require 'spec_helper'
 
 describe ProjectSerializer do
+  let(:project) { create(:project_with_contents) }
+  let(:context) { {languages: ['en'], fields: [:title, :url_labels]} }
+
   let(:serializer) do
     s = ProjectSerializer.new
 
-    s.instance_variable_set(:@model, create(:project_with_contents))
-    s.instance_variable_set(:@context, {languages: ['en'],
-                                        fields: [:title, :url_labels]})
+    s.instance_variable_set(:@model, project)
+    s.instance_variable_set(:@context, context)
     s
   end
 
@@ -24,6 +26,31 @@ describe ProjectSerializer do
               {"label" => "Twitter",
                "url" => "http://twitter.com/example"}]
       expect(serializer.urls).to eq(urls)
+    end
+  end
+
+  describe "media links" do
+    let(:links) { [:attached_images, :avatar, :background] }
+    let(:serialized) { ProjectSerializer.resource({}, Project.where(id: project.id), context) }
+
+    it 'should include top level links for media' do
+      expect(serialized[:links]).to include(*links.map{ |l| "projects.#{l}" })
+    end
+
+    it 'should include resource level links for media' do
+      expect(serialized[:projects][0][:links]).to include(*links)
+    end
+
+    it 'should include hrefs for links' do
+      serialized[:projects][0][:links].slice(*links).each do |_, linked|
+        expect(linked).to include(:href)
+      end
+    end
+
+    it 'should include the id for single links' do
+      serialized[:projects][0][:links].slice(:avatar, :background).each do |_, linked|
+        expect(linked).to include(:id)
+      end
     end
   end
 end
