@@ -17,12 +17,15 @@ def annotation_values
       "value" => "adult"} ]
 end
 
-def setup_create_request(project_id, workflow_id, subject_id)
+def setup_create_request(project_id: project.id,
+                         workflow_id: workflow.id,
+                         subject_id: subject.id,
+                         metadata: metadata_values)
   params =
     {
       classifications: {
         completed: true,
-        metadata: metadata_values,
+        metadata: metadata,
         annotations: annotation_values,
         links: {
           project: project_id,
@@ -37,12 +40,7 @@ def setup_create_request(project_id, workflow_id, subject_id)
   when invalid_property
     params[:classifications].merge!(invalid_property => "a fake value")
   end
-
   post :create, params
-end
-
-def create_classification_with_subject
-  setup_create_request(project.id, workflow.id, subject.id)
 end
 
 describe Api::V1::ClassificationsController, type: :controller do
@@ -111,7 +109,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
     describe "#create" do
       context "with subject_ids" do
-        let(:create_action) { create_classification_with_subject }
+        let(:create_action) { setup_create_request }
 
         it_behaves_like "a classification create"
         it_behaves_like "a classification lifecycle event"
@@ -133,14 +131,24 @@ describe Api::V1::ClassificationsController, type: :controller do
         context "when invalid link id strings are used" do
 
           it "should fail via the schema validator with the correct message" do
-            req_params = [ project.id,
-                           "MOCK_WORKFLOW_FOR_CLASSIFIER",
-                           "MOCK_SUBJECT_FOR_CLASSIFIER" ]
-            setup_create_request(*req_params)
+            req_params = { project_id: project.id,
+                           workflow_id: "MOCK_WORKFLOW_FOR_CLASSIFIER",
+                           subject_id: "MOCK_SUBJECT_FOR_CLASSIFIER" }
+            setup_create_request(req_params)
             error = json_response["errors"].first["message"]
             expected_error = { "links/workflow"   => "value \"MOCK_WORKFLOW_FOR_CLASSIFIER\" did not match the regex '^[0-9]*$'",
                                "links/subjects/0" => "value \"MOCK_SUBJECT_FOR_CLASSIFIER\" did not match the regex '^[0-9]*$'"}.to_s
             expect(error).to match(expected_error)
+          end
+        end
+
+        context "when a subject has been classified before" do
+          let(:create_action) { setup_create_request(metadata: metadata_values.merge(seen_before: true)) }
+          it_behaves_like "a classification create"
+
+          it "should not count towards retirement" do
+            expect(ClassificationCountWorker).to_not receive(:perform_async)
+            create_action
           end
         end
       end
@@ -211,13 +219,13 @@ describe Api::V1::ClassificationsController, type: :controller do
     describe "#create" do
 
       it "should not set the user" do
-        create_classification_with_subject
+        setup_create_request
         user = Classification.find(created_classification_id).user
         expect(user).to be_blank
       end
 
       context "with subject_ids" do
-        let(:create_action) { create_classification_with_subject }
+        let(:create_action) { setup_create_request }
 
         it_behaves_like "a classification create"
       end
