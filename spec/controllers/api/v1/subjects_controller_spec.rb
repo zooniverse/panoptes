@@ -15,7 +15,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
   let(:api_resource_name) { "subjects" }
   let(:api_resource_attributes) do
-    [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at", "retired", "already_seen"]
+    [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at" ]
   end
   let(:api_resource_links) { [ "subjects.project" ] }
 
@@ -51,6 +51,20 @@ describe Api::V1::SubjectsController, type: :controller do
 
         it "should return a page of 2 objects" do
           expect(json_response[api_resource_name].length).to eq(2)
+        end
+
+        describe "optional context attributes" do
+          let(:attr_field_set) do
+            json_response[api_resource_name].map { |s| s.has_key?(optional_attr) }.uniq
+          end
+
+          %w( retired already_seen ).each do |attr|
+            let(:optional_attr) { attr }
+
+            it "should not serialize the #{attr} attribute" do
+              expect(attr_field_set).to match([false])
+            end
+          end
         end
       end
 
