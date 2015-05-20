@@ -592,4 +592,18 @@ describe User, type: :model do
       end
     end
   end
+
+  describe "#send_welcome_email after_create callback", :focus do
+    let(:user) { build(:user) }
+
+    it "should send the welcome email the discussion" do
+      expect(user).to receive(:send_welcome_email).once
+      user.save!
+    end
+
+    it "should send it via the correct mailer" do
+      expect(UserWelcomeMailerWorker).to receive(:perform_async).once
+      user.save!
+    end
+  end
 end

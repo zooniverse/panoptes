@@ -5,6 +5,8 @@ class User < ActiveRecord::Base
   ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
 
+  after_create :send_welcome_email
+
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
     :omniauthable, omniauth_providers: [:facebook, :gplus]
@@ -205,5 +207,9 @@ class User < ActiveRecord::Base
     if self.login
       self.unsubscribe_token ||= UserUnsubscribeMessageVerifier.create_access_token(self.login)
     end
+  end
+
+  def send_welcome_email
+    UserWelcomeMailerWorker.perform_async(id)
   end
 end
