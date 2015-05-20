@@ -16,8 +16,6 @@ class UserSeenSubject < ActiveRecord::Base
   end
 
   def subjects_seen?(ids)
-    ids.find do |id|
-      subject_ids.include?(id)
-    end
+    Array.wrap(ids).any? { |id| subject_ids.include?(id) }
   end
 end
