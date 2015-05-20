@@ -26,7 +26,6 @@ FactoryGirl.define do
       end
     end
 
-
     factory :classifaction_with_user_group do
       user_group
     end
@@ -38,6 +37,16 @@ FactoryGirl.define do
 
     factory :fake_gold_standard_classification do
       gold_standard false
+    end
+
+    factory :already_seen_classification do
+      after(:build) do |c|
+        c.metadata = c.metadata.merge(seen_before: "true")
+      end
+
+      factory :anonymous_already_seen_classification do
+        user nil
+      end
     end
   end
 end

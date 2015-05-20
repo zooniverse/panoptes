@@ -60,6 +60,21 @@ describe Classification, :type => :model do
       metadata.delete(:user_agent)
       expect(build(:classification, metadata: metadata)).to_not be_valid
     end
+
+    describe "seen_before attribute" do
+
+      it 'should be valid when set to true' do
+        expect(build(:already_seen_classification, metadata: metadata)).to be_valid
+      end
+
+      it 'should not be valid when set to nil' do
+        expect(build(:already_seen_classification, metadata: metadata)).to be_valid
+      end
+
+      it 'should not be valid when set to false' do
+        expect(build(:already_seen_classification, metadata: metadata)).to be_valid
+      end
+    end
   end
 
   describe "validate gold_standard" do
@@ -147,10 +162,10 @@ describe Classification, :type => :model do
 
     it 'should return all classifications for an admin user' do
       user = ApiUser.new(create(:user, admin: true), admin: true)
-      expect(Classification.scope_for(:show, user)).to match_array(classifications) 
+      expect(Classification.scope_for(:show, user)).to match_array(classifications)
     end
   end
-  
+
   describe "#creator?" do
     let(:user) { ApiUser.new(build(:user)) }
 
@@ -207,6 +222,16 @@ describe Classification, :type => :model do
         classification = build(:fake_gold_standard_classification)
         expect(classification.gold_standard?).to be_falsey
       end
+    end
+  end
+
+  describe "#seen_before?" do
+    it "should be truthy if seen_before metadata attribute is true" do
+      expect(build(:already_seen_classification).seen_before?).to be_truthy
+    end
+
+    it "should be falsey if missing the seen_before metadata attribute" do
+      expect(build(:classification).seen_before?).to be_falsey
     end
   end
 end
