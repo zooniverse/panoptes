@@ -19,7 +19,8 @@ describe Api::V1::ProjectsController, type: :controller do
       "projects.project_contents",
       "projects.project_roles",
       "projects.avatar",
-      "projects.background" ]
+      "projects.background",
+      "projects.attached_images" ]
   end
 
   let(:scopes) { %w(public project) }
