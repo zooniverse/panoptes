@@ -8,6 +8,13 @@ class RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  def update
+    respond_to do |format|
+      format.json { update_from_json }
+      format.html { super }
+    end
+  end
+
   private
 
   def create_from_json
@@ -17,6 +24,17 @@ class RegistrationsController < Devise::RegistrationsController
     status, content = registrations_response(resource_saved)
     clean_up_passwords resource
     render status: status, json_api: content
+  end
+
+  def update_from_json
+    self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
+    if resource.update_with_password(account_update_params)
+      render json: {}, status: :no_content
+    else
+      render json: {errors: [{message: "Current password was incorrect, or new passwords did not match"}]}, status: :unprocessable_entity
+    end
+  rescue ActionController::UnpermittedParameters => e
+    render json: {errors: [{message: e.message}]}, status: :unprocessable_entity
   end
 
   def build_resource(sign_up_params)

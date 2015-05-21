@@ -25,6 +25,7 @@ Rails.application.routes.draw do
 
     get "/users/sign_up" => "registrations#new", as: :new_user_registration
     post "/users" => "registrations#create", as: :user_registration
+    put "/users" => "registrations#update"
   end
 
   namespace :api, constraints: { format: 'json' } do

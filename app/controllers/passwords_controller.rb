@@ -13,6 +13,14 @@ class PasswordsController < Devise::PasswordsController
     end
   end
 
+  def edit
+    if Panoptes.password_reset_redirect
+      redirect_to "#{Panoptes.password_reset_redirect}?reset_password_token=#{params[:reset_password_token]}"
+    else
+      super
+    end
+  end
+
   private
 
     def update_from_json
