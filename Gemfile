@@ -26,6 +26,7 @@ gem 'json-schema'
 gem 'p3p'
 gem 'newrelic_rpm'
 gem 'firebase_token_generator'
+gem 'stringex'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'

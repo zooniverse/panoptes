@@ -10,6 +10,8 @@ class Project < ActiveRecord::Base
 
   EXPERT_ROLES = [:expert, :owner]
 
+  acts_as_url :display_name, sync_url: true, url_attribute: :slug
+
   has_many :workflows
   has_many :subject_sets, dependent: :destroy
   has_many :classifications

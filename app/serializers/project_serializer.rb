@@ -8,11 +8,11 @@ class ProjectSerializer
     :title, :description, :guide, :team_members, :science_case,
     :introduction, :private, :faq, :result, :education_content,
     :retired_subjects_count, :configuration, :beta, :approved, :live,
-    :urls, :migrated, :classifiers_count
+    :urls, :migrated, :classifiers_count, :slug
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles
-  can_filter_by :display_name, :beta, :approved
+  can_filter_by :display_name, :slug, :beta, :approved
   media_include :avatar, :background, :attached_images
 
   def title

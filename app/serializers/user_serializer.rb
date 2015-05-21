@@ -4,10 +4,11 @@ class UserSerializer
   include MediaLinksSerializer
 
   attributes :id, :display_name, :credited_name, :email, :created_at,
-    :updated_at, :type, :firebase_auth_token, :global_email_communication
+    :updated_at, :type, :firebase_auth_token, :global_email_communication,
+    :slug
   can_include :classifications, :project_preferences, :collection_preferences,
-    projects: { param: "owner", value: "display_name" },
-    collections: { param: "owner", value: "display_name" }
+    projects: { param: "owner", value: "slug" },
+    collections: { param: "owner", value: "slug" }
 
   can_filter_by :display_name
 

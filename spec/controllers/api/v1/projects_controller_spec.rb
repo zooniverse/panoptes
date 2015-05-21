@@ -118,7 +118,7 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "filter by owner" do
-          let(:index_options) { { owner: project_owner.identity_group.display_name } }
+          let(:index_options) { { owner: project_owner.identity_group.slug } }
 
           it "should respond with 1 item" do
             expect(json_response[api_resource_name].length).to eq(1)
@@ -143,7 +143,20 @@ describe Api::V1::ProjectsController, type: :controller do
           end
         end
 
-        describe "filter by display_name & owner" do
+        describe "filter by slug" do
+          let(:index_options) { { slug: new_project.slug } }
+
+          it "should respond with 1 item" do
+            expect(json_response[api_resource_name].length).to eq(1)
+          end
+
+          it "should respond with the correct item" do
+            project_slug = json_response[api_resource_name][0]['slug']
+            expect(project_slug).to eq(new_project.slug)
+          end
+        end
+
+        describe "filter by slug & owner" do
           let!(:filtered_project) do
             projects.first.owner = project_owner
             projects.first.save!
@@ -151,8 +164,8 @@ describe Api::V1::ProjectsController, type: :controller do
           end
 
           let(:index_options) do
-            {owner: project_owner.identity_group.display_name,
-             display_name: filtered_project.display_name}
+            {owner: project_owner.identity_group.slug,
+             slug: filtered_project.slug}
           end
 
           it "should respond with 1 item" do

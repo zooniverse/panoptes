@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150517015229) do
+ActiveRecord::Schema.define(version: 20150521160726) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -81,10 +81,11 @@ ActiveRecord::Schema.define(version: 20150517015229) do
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "activated_state", default: 0, null: false
+    t.integer  "activated_state", default: 0,  null: false
     t.string   "display_name"
     t.boolean  "private"
     t.integer  "lock_version",    default: 0
+    t.string   "slug",            default: ""
   end
 
   add_index "collections", ["project_id"], name: "index_collections_on_project_id", using: :btree
@@ -207,6 +208,7 @@ ActiveRecord::Schema.define(version: 20150517015229) do
     t.jsonb    "urls",                  default: []
     t.boolean  "migrated",              default: false
     t.integer  "classifiers_count",     default: 0
+    t.string   "slug",                  default: ""
   end
 
   add_index "projects", ["approved"], name: "index_projects_on_approved", using: :btree
@@ -318,6 +320,7 @@ ActiveRecord::Schema.define(version: 20150517015229) do
     t.string   "display_name"
     t.boolean  "private",               default: true, null: false
     t.integer  "lock_version",          default: 0
+    t.string   "slug",                  default: ""
   end
 
   add_index "user_groups", ["display_name"], name: "index_user_groups_on_display_name", unique: true, using: :btree
@@ -375,6 +378,7 @@ ActiveRecord::Schema.define(version: 20150517015229) do
     t.boolean  "migrated",                    default: false
     t.boolean  "valid_email",                 default: true,     null: false
     t.integer  "uploaded_subjects_count",     default: 0
+    t.string   "slug",                        default: ""
   end
 
   add_index "users", ["display_name"], name: "index_users_on_display_name", unique: true, using: :btree
