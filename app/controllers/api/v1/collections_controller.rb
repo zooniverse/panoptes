@@ -1,5 +1,6 @@
 class Api::V1::CollectionsController < Api::ApiController
   include FilterByOwner
+  include FilterByCurrentUserRoles
 
   doorkeeper_for :create, :update, :destroy, scopes: [:collection]
   resource_actions :default

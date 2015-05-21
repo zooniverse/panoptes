@@ -130,6 +130,34 @@ describe Api::V1::ProjectsController, type: :controller do
           end
         end
 
+        describe "filter by current_user_roles" do
+          let(:index_options) { collab_acls; { current_user_roles: 'owner,collaborator' } }
+          let(:collab_acls) do
+            create(:access_control_list,
+                   resource: beta_resource,
+                   user_group: user.identity_group,
+                   roles: ["viewer"])
+            create(:access_control_list,
+                   resource: new_project,
+                   user_group: user.identity_group,
+                   roles: ["collaborator"])
+          end
+
+          let(:response_ids) { json_response[api_resource_name].map{ |p| p['id'] } }
+
+          it "should respond with 3 items" do
+            expect(json_response[api_resource_name].length).to eq(3)
+          end
+
+          it 'should not have a project where the user has a different role' do
+            expect(response_ids).to_not include(beta_resource.id.to_s)
+          end
+
+          it "should respond with the correct item" do
+            expect(response_ids).to include(new_project.id.to_s, *projects.map(&:id).map(&:to_s))
+          end
+        end
+
         describe "filter by display_name" do
           let(:index_options) { { display_name: new_project.display_name } }
 
@@ -227,17 +255,17 @@ describe Api::V1::ProjectsController, type: :controller do
 
       let(:default_create_params) do
         { projects: { display_name: display_name,
-                      description: "A new Zoo for you!",
-                      primary_language: 'en',
-                      education_content: "asdfasdf",
-                      faq: "some other stuff",
-                      result: "another string",
-                      urls: [{label: "Twitter", url: "http://twitter.com/example"}],
-                      configuration: {
-                                      an_option: "a setting"
-                                     },
-                      beta: true,
-                      private: true } }
+                     description: "A new Zoo for you!",
+                     primary_language: 'en',
+                     education_content: "asdfasdf",
+                     faq: "some other stuff",
+                     result: "another string",
+                     urls: [{label: "Twitter", url: "http://twitter.com/example"}],
+                     configuration: {
+                                     an_option: "a setting"
+                                    },
+                     beta: true,
+                     private: true } }
       end
 
       let (:create_params) do
@@ -347,8 +375,8 @@ describe Api::V1::ProjectsController, type: :controller do
         context "user is the current user" do
           let(:owner_params) do
             {
-              id: authorized_user.id.to_s,
-              type: "users"
+             id: authorized_user.id.to_s,
+             type: "users"
             }
           end
 
@@ -366,7 +394,7 @@ describe Api::V1::ProjectsController, type: :controller do
             user = create(:user)
             {
               id: user.id.to_s,
-              type: "users"
+                type: "users"
             }
           end
 
@@ -391,8 +419,8 @@ describe Api::V1::ProjectsController, type: :controller do
 
         let(:owner_params) do
           {
-            id: owner.id.to_s,
-            type: "user_groups"
+           id: owner.id.to_s,
+           type: "user_groups"
           }
         end
 
@@ -416,23 +444,23 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:test_attr_value) { "A Better Name" }
     let(:update_params) do
       {
-        projects: {
-          display_name: "A Better Name",
-          name: "something_new",
-          education_content: "asdfasdf",
-          faq: "some other stuff",
-          result: "another string",
-          configuration: {
-                          an_option: "a setting"
-                         },
-          beta: true,
-          live: true,
-          links: {
-            workflows: [workflow.id.to_s],
-            subject_sets: [subject_set.id.to_s]
-          }
+       projects: {
+                  display_name: "A Better Name",
+                  name: "something_new",
+                  education_content: "asdfasdf",
+                  faq: "some other stuff",
+                  result: "another string",
+                  configuration: {
+                                  an_option: "a setting"
+                                 },
+                  beta: true,
+                  live: true,
+                  links: {
+                          workflows: [workflow.id.to_s],
+                          subject_sets: [subject_set.id.to_s]
+                         }
 
-        }
+                 }
       }
     end
 
