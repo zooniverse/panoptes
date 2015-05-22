@@ -1,5 +1,6 @@
 class Api::V1::ProjectsController < Api::ApiController
   include FilterByOwner
+  include FilterByCurrentUserRoles
   include TranslatableResource
 
   doorkeeper_for :update, :create, :destroy, :create_export, scopes: [:project]

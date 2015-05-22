@@ -10,9 +10,9 @@ module FilterByOwner
     unless owner_filter.blank?
       groups = UserGroup.where(slug: owner_filter)
       @controlled_resources = controlled_resources
-                              .joins(:access_control_lists)
-                              .where(access_control_lists: {user_group: groups})
-                              .where.overlap(access_control_lists: { roles: ["owner"] })
+        .joins(:access_control_lists)
+        .where(access_control_lists: {user_group: groups})
+        .where.overlap(access_control_lists: { roles: ["owner"] })
     end
   end
 end
