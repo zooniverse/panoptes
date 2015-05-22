@@ -8,7 +8,7 @@ describe UserGroup, :type => :model do
   let(:owned) { build(:project, owner: owner) }
   let(:locked_factory) { :user_group }
   let(:locked_update) { {display_name: "A-different_name"} }
-  
+
   it_behaves_like "optimistically locked"
 
   it_behaves_like "activatable"
@@ -35,7 +35,7 @@ describe UserGroup, :type => :model do
       let(:private_group) do
         create(:user_group, private: true)
       end
-      
+
       it "should return groups the user is an active member of" do
         expect(UserGroup.scope_for(:show, ApiUser.new(member))).to include(user_group)
       end
@@ -54,7 +54,7 @@ describe UserGroup, :type => :model do
     it 'should validate presence' do
       expect(build(:user_group, display_name: "")).to_not be_valid
     end
-    
+
     it 'should not have whitespace' do
       expect(build(:user_group, display_name: " asdf asdf")).to_not be_valid
     end
@@ -71,6 +71,30 @@ describe UserGroup, :type => :model do
       ug = build(:user_group, display_name: "")
       ug.valid?
       expect(ug.errors[:display_name]).to include("can't be blank")
+    end
+
+    context "when an identity group" do
+      let!(:stub_identity?) do
+        allow_any_instance_of(UserGroup).to receive(:identity?).and_return(true)
+      end
+
+      it 'should allow a whitespace' do
+        expect(build(:user_group, display_name: " asdf asdf")).to be_valid
+      end
+
+      it 'should allow a dollar sign' do
+        expect(build(:user_group, display_name: "$asdfasdf")).to be_valid
+      end
+
+      it 'should allow an at sign' do
+        expect(build(:user_group, display_name: "@asdfasdf")).to be_valid
+      end
+
+      it 'should have non-blank error' do
+        ug = build(:user_group, display_name: "")
+        ug.valid?
+        expect(ug.errors[:display_name]).to include("can't be blank")
+      end
     end
 
     it 'should validate uniqueness' do

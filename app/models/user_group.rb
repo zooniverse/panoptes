@@ -7,7 +7,7 @@ class UserGroup < ActiveRecord::Base
 
   has_many :memberships
   has_many :active_memberships, -> { active.where(identity: false) },
-           class_name: "Membership" 
+           class_name: "Membership"
   has_many :users, through: :memberships
   has_many :classifications
   has_many :access_control_lists
@@ -20,7 +20,8 @@ class UserGroup < ActiveRecord::Base
   has_many :collections, through: :owned_resources, source: :resource,
            source_type: "Collection"
 
-  validates :display_name, presence: true, format: { without: /\$|@|\s+/ }
+  validates :display_name, presence: true
+  validates :display_name, format: { without: /\$|@|\s+/ }, unless: :identity?
   validates :name, presence: true, uniqueness: true
 
   before_validation :downcase_case_insensitive_fields
