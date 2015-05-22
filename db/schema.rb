@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150521160726) do
+ActiveRecord::Schema.define(version: 20150522155815) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -108,6 +108,7 @@ ActiveRecord::Schema.define(version: 20150521160726) do
     t.boolean  "external_link", default: false
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
+    t.jsonb    "metadata"
   end
 
   add_index "media", ["linked_type", "linked_id"], name: "index_media_on_linked_type_and_linked_id", using: :btree

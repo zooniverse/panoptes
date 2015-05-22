@@ -125,7 +125,10 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         let(:new_resource) { resource_class.find(created_instance_id(api_resource_name)) }
         let(:create_params) do
           params = {
-                    media: { content_type: content_type }
+                    media: {
+                            content_type: content_type,
+                            metadata: { filename: "image.png" }
+                           }
                    }
           params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
         end
@@ -180,7 +183,10 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       let(:new_resource) { resource_class.find(created_instance_id(api_resource_name)) }
       let(:create_params) do
         params = {
-                  media: { content_type: "image/jpeg" }
+                  media: {
+                          content_type: "image/jpeg",
+                          metadata: { filename: "image.png" }
+                         }
                  }
         params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
       end
