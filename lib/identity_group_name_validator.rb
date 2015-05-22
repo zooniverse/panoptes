@@ -16,8 +16,8 @@ class IdentityGroupNameValidator < ActiveModel::Validator
     [].tap do |error_list|
       %i( display_name name ).each do |attr|
         attr_errors = identity_group.errors[attr]
-        error_list.concat(attr_errors) unless attr_errors.empty?
+        error_list.concat(attr_errors)
       end
-    end
+    end.uniq
   end
 end
