@@ -2,10 +2,11 @@ class Api::V1::MediaController < Api::ApiController
   doorkeeper_for :update, :create, :destroy, scopes: [:medium]
   resource_actions :default
 
-  schema_type :strong_params
+  schema_type :json_schema
 
-  allowed_params :create, :content_type, :external_link
-  allowed_params :update, :content_type
+  def schema_class(action)
+    "medium_#{ action }_schema".camelize.constantize
+  end
 
   def index
     unless media.blank?
