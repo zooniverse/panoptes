@@ -12,7 +12,7 @@ class AddSlugToProjectsCollectionsAndUsers < ActiveRecord::Migration
     end
 
     user_count = User.count
-    User.find_each.with_index do |user, i|
+    User.active.find_each.with_index do |user, i|
       p "#{i+1} of #{user_count}"
       user.slug = user.display_name.to_url
       user.save!
@@ -26,7 +26,7 @@ class AddSlugToProjectsCollectionsAndUsers < ActiveRecord::Migration
     end
 
     group_count = UserGroup.count
-    UserGroup.find_each.with_index do |ug, i|
+    UserGroup.active.find_each.with_index do |ug, i|
       p "#{i+1} of #{group_count}"
       ug.slug = ug.display_name.to_url
       ug.save!
