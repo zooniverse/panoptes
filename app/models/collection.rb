@@ -5,6 +5,8 @@ class Collection < ActiveRecord::Base
   include Linkable
   include PreferencesLink
 
+  acts_as_url :display_name, sync_url: true, url_attribute: :slug
+
   belongs_to :project
   has_many :collections_subjects, dependent: :destroy
   has_many :subjects, through: :collections_subjects

@@ -3,16 +3,18 @@ class UserGroup < ActiveRecord::Base
   include Activatable
   include Linkable
 
+  acts_as_url :display_name, sync_url: true, url_attribute: :slug
+
   has_many :memberships
   has_many :active_memberships, -> { active.where(identity: false) },
            class_name: "Membership" 
   has_many :users, through: :memberships
   has_many :classifications
   has_many :access_control_lists
-  
+
   has_many :owned_resources, -> { where(roles: ["owner"]) },
            class_name: "AccessControlList"
-  
+
   has_many :projects, through: :owned_resources, source: :resource,
            source_type: "Project"
   has_many :collections, through: :owned_resources, source: :resource,
@@ -31,10 +33,10 @@ class UserGroup < ActiveRecord::Base
                        :project_editor,
                        :collection_editor,
                        :group_member ]
-  
+
   can_by_role :update, :destroy, :update_links, :destroy_links,
               roles: [ :group_admin ]
-  
+
   can_by_role :edit_project,
               roles: [ :group_admin, :project_editor ]
 
@@ -44,7 +46,7 @@ class UserGroup < ActiveRecord::Base
   def self.memberships_query(action, target)
     target.memberships_for(action)
   end
-  
+
   def self.joins_for
     :memberships
   end
@@ -53,7 +55,7 @@ class UserGroup < ActiveRecord::Base
     joins(:memberships).merge(target.memberships_for(action, self))
       .where(memberships: { identity: false })
   end
-  
+
   def self.roles_allowed_to_access(action, klass=nil)
     roles = case action
             when :show, :index
@@ -75,7 +77,7 @@ class UserGroup < ActiveRecord::Base
   end
 
   private
-  
+
   def downcase_case_insensitive_fields
     if name.nil? && display_name
       self.name = display_name.downcase

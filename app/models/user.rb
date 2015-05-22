@@ -3,8 +3,10 @@ class User < ActiveRecord::Base
   include Linkable
 
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable,
-         :omniauthable, omniauth_providers: [:facebook, :gplus]
+    :recoverable, :rememberable, :trackable, :validatable,
+    :omniauthable, omniauth_providers: [:facebook, :gplus]
+
+  acts_as_url :display_name, sync_url: true, url_attribute: :slug
 
   has_many :classifications
   has_many :authorizations, dependent: :destroy
@@ -19,9 +21,7 @@ class User < ActiveRecord::Base
 
   has_many :user_groups, through: :active_memberships
   has_one :identity_group, through: :identity_membership,
-                          source: :user_group,
-                          class_name: "UserGroup",
-                          dependent: :destroy
+    source: :user_group, class_name: "UserGroup", dependent: :destroy
 
   has_many :project_roles, through: :identity_group
   has_many :collection_roles, through: :identity_group
@@ -31,7 +31,7 @@ class User < ActiveRecord::Base
   has_many :subject_queues, dependent: :destroy
 
   validates :display_name, presence: true, uniqueness: { case_sensitive: false },
-            format: { without: /\$|@|\s+/ }, unless: :migrated
+    format: { without: /\$|@|\s+/ }, unless: :migrated
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated
   validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
 

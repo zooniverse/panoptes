@@ -132,12 +132,12 @@ describe Api::V1::UsersController, type: :controller do
 
       it 'should include a customized url for projects' do
         projects_link = json_response['links']['users.projects']['href']
-        expect(projects_link).to eq("/projects?owner={users.display_name}")
+        expect(projects_link).to eq("/projects?owner={users.slug}")
       end
 
       it 'should include a customized url for collections' do
         collections_link = json_response['links']['users.collections']['href']
-        expect(collections_link).to eq("/collections?owner={users.display_name}")
+        expect(collections_link).to eq("/collections?owner={users.slug}")
       end
 
       it_behaves_like "an api response"
