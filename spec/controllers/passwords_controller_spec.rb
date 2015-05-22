@@ -20,7 +20,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
   context "as json" do
     describe "#create" do
       before(:each) do
-        request.env["HTTP_ACCEPT"] = "application/vnd.api+json"
+        request.env["HTTP_ACCEPT"] = "application/json"
         request.env["CONTENT_TYPE"] = "application/json"
       end
 
@@ -133,7 +133,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
     describe "#update" do
       before(:each) do
-        request.env["HTTP_ACCEPT"] = "application/vnd.api+json"
+        request.env["HTTP_ACCEPT"] = "application/json"
         request.env["CONTENT_TYPE"] = "application/json"
       end
 
