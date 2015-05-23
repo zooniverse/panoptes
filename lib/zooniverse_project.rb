@@ -19,6 +19,7 @@ class ZooniverseProject < ActiveRecord::Base
       pp.owner = zooniverse_user
       pp.project_contents << legacy_project_contents
       pp.configuration = project_configuration(pp)
+      pp.redirect = URI::HTTP.build(host: self.location).to_s
     end
     migrated_project.save!
   end
@@ -39,7 +40,6 @@ class ZooniverseProject < ActiveRecord::Base
 
   def preferences_obj
     {
-      redirect: URI::HTTP.build(host: self.location).to_s,
       zoo_home_project_id: self.id,
       legacy_attributes: legacy_attributes
     }

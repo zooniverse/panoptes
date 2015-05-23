@@ -290,28 +290,12 @@ describe Api::V1::ProjectsController, type: :controller do
         ps
       end
 
+      describe "redirect option" do
+        it_behaves_like "admin only option", :redirect, "http://example.com"
+      end
+
       describe "approved option" do
-        before(:each) do
-          ps = create_params
-          ps[:admin] = true
-          ps[:projects][:approved] = true
-          default_request scopes: scopes, user_id: authorized_user.id
-          post :create, ps
-        end
-
-        context "when the user is an admin" do
-          let(:authorized_user) { create(:admin_user) }
-          it "should create the project" do
-            expect(response).to have_http_status(:created)
-          end
-        end
-
-        context "when the user is not an admin" do
-          let(:authorized_user) { create(:user) }
-          it "should not create the project" do
-            expect(response).to have_http_status(:unprocessable_entity)
-          end
-        end
+        it_behaves_like "admin only option", :approved, true
       end
 
       describe "correct serializer configuration" do

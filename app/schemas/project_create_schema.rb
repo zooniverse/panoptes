@@ -30,6 +30,10 @@ class ProjectCreateSchema < JsonSchema
       end
     end
 
+    property "redirect" do
+      type "string"
+    end
+
     property "private" do
       type "boolean"
     end
