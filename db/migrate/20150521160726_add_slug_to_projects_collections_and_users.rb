@@ -5,7 +5,7 @@ class AddSlugToProjectsCollectionsAndUsers < ActiveRecord::Migration
     end
 
     project_count = Project.count
-    Project.find_each.with_index do |project, i|
+    Project.active.find_each.with_index do |project, i|
       p "#{i+1} of #{project_count}"
       project.slug = project.display_name.to_url
       project.save!
@@ -19,7 +19,7 @@ class AddSlugToProjectsCollectionsAndUsers < ActiveRecord::Migration
     end
 
     collection_count = Collection.count
-    Collection.find_each.with_index do |col, i|
+    Collection.active.find_each.with_index do |col, i|
       p "#{i+1} of #{collection_count}"
       col.slug = col.display_name.to_url
       col.save!
