@@ -65,14 +65,14 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    allowed_to_approve
+    admin_allowed(:approved, :redirect)
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
     add_user_as_linked_owner(create_params)
     super(create_params)
   end
 
   def build_update_hash(update_params, id)
-    allowed_to_approve
+    admin_allowed(:approved, :redirect)
     content_update = content_from_params(update_params)
     unless content_update.blank?
       Project.find(id).primary_content.update!(content_update)
@@ -80,8 +80,12 @@ class Api::V1::ProjectsController < Api::ApiController
     super(update_params, id)
   end
 
-  def allowed_to_approve
-    raise Api::UnpermittedParameter, "Only Admins may Approve Projects" if create_params.has_key?(:approved) && !api_user.is_admin?
+  def admin_allowed(*parameters)
+    parameters.each do |param|
+      if create_params.has_key?(param) && !api_user.is_admin?
+        raise Api::UnpermittedParameter, "Only Admins may set field #{param} for projects"
+      end
+    end
   end
 
   def new_items(resource, relation, value)
