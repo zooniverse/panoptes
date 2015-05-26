@@ -34,6 +34,10 @@ class UserSerializer
     "users"
   end
 
+  def slug
+    @model.identity_group.slug
+  end
+
   private
 
   def permitted_requester?

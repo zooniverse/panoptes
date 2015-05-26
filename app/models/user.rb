@@ -6,8 +6,6 @@ class User < ActiveRecord::Base
     :recoverable, :rememberable, :trackable, :validatable,
     :omniauthable, omniauth_providers: [:facebook, :gplus]
 
-  acts_as_url :display_name, sync_url: true, url_attribute: :slug
-
   has_many :classifications
   has_many :authorizations, dependent: :destroy
   has_many :collection_preferences, class_name: "UserCollectionPreference", dependent: :destroy
