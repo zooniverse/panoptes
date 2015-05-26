@@ -26,9 +26,12 @@ module Formatter
       private
 
       def user_id
-        user_id = classification.user_id
-        return user_id if show_user_id
-        user_id.hash
+        if user_id = classification.user_id
+          return user_id if show_user_id
+          user_id.hash
+        else
+          "not logged in"
+        end
       end
 
       def user_ip
