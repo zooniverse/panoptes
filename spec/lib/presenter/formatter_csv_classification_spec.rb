@@ -57,5 +57,13 @@ RSpec.describe Formatter::CSV::Classification do
         expect(user_id).to eq(classification.user_id)
       end
     end
+
+    context "when the classifier is logged out" do
+      it 'should should return not logged in' do
+        allow(classification).to receive(:user_id).and_return(nil)
+        user_id = formatter.to_array(classification)[0]
+        expect(user_id).to eq("not logged in")
+      end
+    end
   end
 end
