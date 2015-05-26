@@ -76,7 +76,7 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.enqueue_update(query, sms_ids)
-    query.update_all(["set_member_subject_ids = array_cat(set_member_subject_ids, array[?])", sms_ids])
+    query.update_all(["set_member_subject_ids = set_member_subject_ids || array[?]", sms_ids])
   end
 
   def self.below_minimum
