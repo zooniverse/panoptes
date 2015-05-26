@@ -182,22 +182,23 @@ RSpec.describe SubjectQueue, :type => :model do
       let(:user) { create(:user) }
       context "nothing for user" do
 
-        it 'should create a new user_enqueue_subject' do
-          expect do
-            SubjectQueue.enqueue(workflow,
-                                 subject.id,
-                                 user: user)
-          end.to change{ SubjectQueue.count }.from(0).to(1)
+        shared_examples "queues something" do
+          it 'should create a new user_enqueue_subject' do
+            expect do
+              SubjectQueue.enqueue(workflow,
+                                   ids,
+                                   user: user)
+            end.to change{ SubjectQueue.count }.from(0).to(1)
+          end
+
+          it 'should add subjects' do
+            SubjectQueue.enqueue(workflow, ids, user: user)
+            queue = SubjectQueue.find_by(workflow: workflow, user: user)
+            expect(queue.set_member_subject_ids).to include(*ids)
+          end
         end
 
-        it 'should add subjects' do
-          SubjectQueue.enqueue(workflow, subject.id, user: user)
-          queue = SubjectQueue.find_by(workflow: workflow, user: user)
-          expect(queue.set_member_subject_ids).to include(subject.id)
-        end
-
-        context "passing an empty set of sms_ids" do
-
+        shared_examples "does not queue anything" do |arg|
           it 'should not raise an error' do
             expect {
               SubjectQueue.enqueue(workflow, [], user: user)
@@ -217,6 +218,26 @@ RSpec.describe SubjectQueue, :type => :model do
           it 'should return nil' do
             expect(SubjectQueue.enqueue(workflow, [], user: user)).to be_nil
           end
+        end
+
+        context "passing one sms_id" do
+          let(:ids) { subject.id }
+
+          it_behaves_like "queues something"
+        end
+
+        context "passing a set of sms_ids" do
+          let(:ids) { create_list(:set_member_subject, 5).map(&:id) }
+
+          it_behaves_like "queues something"
+        end
+
+        context "passing an empty set of sms_ids" do
+          it_behaves_like "does not queue anything", []
+        end
+
+        context "passing a set with one nil value" do
+          it_behaves_like "does not queue anything", [nil]
         end
       end
 
