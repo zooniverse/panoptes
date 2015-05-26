@@ -31,7 +31,7 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.reload(workflow, sms_ids, user: nil, set: nil)
-    ues = scoped_to_set(set).find_or_create_by!(user: user, workflow: workflow)
+    ues = scoped_to_set(set).find_or_initialize_by(user: user, workflow: workflow)
     ues.set_member_subject_ids_will_change!
     ues.set_member_subject_ids = sms_ids
     ues.save!
@@ -39,8 +39,14 @@ class SubjectQueue < ActiveRecord::Base
 
   def self.enqueue(workflow, sms_ids, user: nil, set: nil)
     return if sms_ids.blank?
-    ues = scoped_to_set(set).find_or_create_by!(user: user, workflow: workflow)
-    enqueue_update(where(id: ues.id), sms_ids)
+    ues = scoped_to_set(set).find_or_initialize_by(user: user, workflow: workflow)
+    if ues.persisted?
+      enqueue_update(where(id: ues.id), sms_ids)
+    else
+      ues.set_member_subject_ids_will_change!
+      ues.set_member_subject_ids = Array.wrap(sms_ids)
+      ues.save!
+    end
   end
 
   def self.dequeue(workflow, sms_ids, user: nil, set: nil)
