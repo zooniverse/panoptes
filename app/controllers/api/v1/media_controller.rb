@@ -66,13 +66,7 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def link_header(resource)
-    identifier = if media_name == media_name.singularize
-                   media_name
-                 else
-                   "#{media_name}/#{resource.id}"
-                 end
-
-    "#{request.protocol}#{request.host_with_port}/api/#{resource_name}s/#{resource_ids}/#{identifier}"
+    "#{request.protocol}#{request.host_with_port}/api#{resource.location}"
   end
 
   def context

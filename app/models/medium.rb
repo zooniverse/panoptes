@@ -29,6 +29,18 @@ class Medium < ActiveRecord::Base
     self.src ||= MediaStorage.stored_path(content_type, type, *path_opts)
   end
 
+  # TODO: This method is a good argument for converting this into a STI model
+  def location
+    case type
+    when "project_avatar", "user_avatar", "project_background"
+      resource, media_type = type.split("_")
+      "/#{resource.pluralize}/#{linked_id}/#{media_type}"
+    when "project_classifications_export", "project_attached_image"
+      resource, *media_type = type.split("_")
+      "/#{resource.pluralize}/#{linked_id}/#{media_type.join("_").pluralize}/#{id}"
+    end
+  end
+
   def url_for_format(format)
     case format
     when :put

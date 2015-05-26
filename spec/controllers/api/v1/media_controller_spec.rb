@@ -4,7 +4,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:api_resource_name){ 'media' }
   let(:resource_class) { Medium }
-  let(:api_resource_attributes) { %w(id src media_type content_type created_at) }
+  let(:api_resource_attributes) { %w(id src media_type content_type created_at href metadata) }
   let(:api_resource_links) { [] }
   let(:scopes) { %w(public medium) }
 
