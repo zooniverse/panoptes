@@ -133,11 +133,28 @@ RSpec.describe Medium, :type => :model do
     end
   end
 
-  describe "queue_medium_removal" do
+  describe "#queue_medium_removal" do
     it 'should queue a worker to remove the attached files' do
       medium = create(:medium)
       expect(MediumRemovalWorker).to receive(:perform_async).with(medium.src)
       medium.queue_medium_removal
+    end
+  end
+
+  describe "#locations" do
+    let(:project) { create(:project) }
+    context "when type is one of project_avatar, user_avatar, or project_background" do
+      it 'should return the href the resource can be found at' do
+        medium = create(:medium, type: "project_avatar", linked: project)
+        expect(medium.location).to match(/\/projects\/[0-9]+\/avatar/)
+      end
+    end
+
+    context "when type is one of project_classifications_exports or project_attached_image" do
+      it 'should return the href the resource can be found at' do
+        medium = create(:medium, type: "project_attached_image", linked: project)
+        expect(medium.location).to match(/\/projects\/[0-9]+\/attached_images\/[0-9]+/)
+      end
     end
   end
 end
