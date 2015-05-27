@@ -10,38 +10,20 @@ class PostgresqlSelection
     limit = opts.fetch(:limit, 20).to_i
 
     results = []
-    enough_available = false
-    first_pass = true
-    until results.length >= limit do
-      if !enough_available && !first_pass
-        if limit < available_count
-          enough_available = true
-        else
-          results = available.all.shuffle.map(&:id)
-          break
-        end
+    enough_available = limit < available_count
+    if enough_available
+      results = sample.limit(limit).pluck(:id)
+      until results.length >= limit do
+        results = results | sample.limit(limit).pluck(:id)
       end
-
-      results = results | selection_statement.limit(limit - results.length).map(&:id)
-      first_pass = false
+    else
+      results = available.pluck(:id).shuffle
     end
+
     return results.take(limit)
   end
 
   private
-
-  def selection_statement
-    @selection ||= case
-                   when workflow.grouped && workflow.prioritized
-                     prioritized_grouped(opts[:subject_set_id])
-                   when workflow.grouped
-                     grouped(opts[:subject_set_id])
-                   when workflow.prioritized
-                     prioritized
-                   else
-                     random
-                   end
-  end
 
   def available
     return @available if @available
@@ -49,6 +31,10 @@ class PostgresqlSelection
     @available = case
                  when workflow.grouped
                    query.where(subject_set_id: opts[:subject_set_id])
+                 when workflow.prioritized
+                   raise NotImplementedError
+                 when workflow.grouped && workflow.prioritized
+                   raise NotImplementedError
                  else
                    query
                  end
@@ -58,28 +44,7 @@ class PostgresqlSelection
     available.except(:select).count
   end
 
-  def grouped(group_id=nil)
-    SetMemberSubject.with.recursive(sample: sample(available.where(subject_set_id: group_id)))
-      .select('"sample"."id"')
-      .from("sample")
-  end
-
-  def random
-    SetMemberSubject.with.recursive(sample: sample)
-      .select('"sample"."id"')
-      .from("sample")
-  end
-
-  def prioritized(limit)
-    raise NotImplementedError
-  end
-
-  def prioritized_grouped(limit, group_id=nil)
-    raise NotImplementedError
-  end
-
   def sample(query=available)
-    sampler = query.where('"set_member_subjects"."random" BETWEEN random() AND random()')
-    "#{sampler.to_sql} UNION #{sampler.to_sql}"
+    query.where('"set_member_subjects"."random" BETWEEN random() AND random()')
   end
 end

@@ -30,6 +30,23 @@ RSpec.describe SubjectSelector do
       end
     end
 
+    context "queue is empty" do
+      let!(:non_logged_in_queue) do
+        create(:subject_queue,
+               workflow: workflow,
+               user: user.user,
+               subject_set: nil,
+               set_member_subjects: [])
+      end
+
+      let!(:subjects) { create_list(:set_member_subject, 10, subject_set: workflow.subject_sets.first) }
+
+      it 'should return 5 subjects' do
+        subjects, _ = subject.queued_subjects
+        expect(subjects.length).to eq(5)
+      end
+    end
+
     it 'should return url_format: :get in the context object' do
       _, ctx = subject.queued_subjects
       expect(ctx).to include(url_format: :get)

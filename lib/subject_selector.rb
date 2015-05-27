@@ -15,7 +15,12 @@ class SubjectSelector
     queue, context = retrieve_subject_queue
 
     if queue
-      selected_subjects(queue.next_subjects(default_page_size), context)
+      subjects = queue.next_subjects(default_page_size)
+      if subjects.blank?
+        selected_subjects(select_from_database, context)
+      else
+        selected_subjects(subjects, context)
+      end
     else
       raise MissingSubjectQueue.new("No queue defined for user. Building one now, please try again.")
     end
@@ -28,6 +33,11 @@ class SubjectSelector
   end
 
   private
+
+  def select_from_database
+    PostgresqlSelection.new(workflow, user.user)
+      .select(limit: 5, subject_set_id: params[:subject_set_id])
+  end
 
   def needs_set_id?
     workflow.grouped && !params.has_key?(:subject_set_id)
