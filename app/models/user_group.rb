@@ -3,7 +3,8 @@ class UserGroup < ActiveRecord::Base
   include Activatable
   include Linkable
 
-  acts_as_url :display_name, sync_url: true, url_attribute: :slug
+  # Acts as url uses a LIKE query which can't be indexed we'll ensure uniqueness on our own
+  acts_as_url :display_name, sync_url: true, url_attribute: :slug, allow_duplicates: true
 
   has_many :memberships
   has_many :active_memberships, -> { active.where(identity: false) },
@@ -23,6 +24,7 @@ class UserGroup < ActiveRecord::Base
   validates :display_name, presence: true
   validates :display_name, format: { without: /\$|@|\s+/ }, unless: :identity?
   validates :name, presence: true, uniqueness: true
+  validates :slug, uniqueness: true
 
   before_validation :downcase_case_insensitive_fields
 
