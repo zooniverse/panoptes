@@ -53,7 +53,7 @@ class SubjectSelector
                             [user.user, {}]
                           end
 
-    queue = SubjectQueue.scoped_to_set(params[:subject_set_id])
+    queue = SubjectQueue.by_set(params[:subject_set_id])
       .find_by(user: queue_user, workflow: workflow)
 
     case

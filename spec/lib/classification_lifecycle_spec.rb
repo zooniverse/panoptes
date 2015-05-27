@@ -43,6 +43,18 @@ describe ClassificationLifecycle do
       end
     end
 
+    it "should call the #update_seen_subjects method" do
+      classification.save!
+      expect(subject).to receive(:update_seen_subjects).once
+      subject.queue(:create)
+    end
+
+    it "should call the #dequeue_subject method" do
+      classification.save!
+      expect(subject).to receive(:dequeue_subject).once
+      subject.queue(:update)
+    end
+
     context "with update action" do
       let(:test_method) { :update }
 
@@ -113,14 +125,6 @@ describe ClassificationLifecycle do
         expect(subject).to receive(:mark_expert_classifier).once
       end
 
-      it "should call the #update_seen_subjects method" do
-        expect(subject).to receive(:update_seen_subjects).once
-      end
-
-      it "should call the #dequeue_subject method" do
-        expect(subject).to receive(:dequeue_subject).once
-      end
-
       it "should call the instance_eval on the passed block" do
         expect(subject).to receive(:instance_eval).once
       end
@@ -146,14 +150,6 @@ describe ClassificationLifecycle do
         expect(subject).to_not receive(:mark_expert_classifier)
       end
 
-      it "should not call the #update_seen_subjects method" do
-        expect(subject).to_not receive(:update_seen_subjects)
-      end
-
-      it "should not call the #dequeue_subject method" do
-        expect(subject).to_not receive(:dequeue_subject)
-      end
-
       it "should call the instance_eval on the passed block" do
         expect(subject).to receive(:instance_eval)
       end
@@ -171,7 +167,6 @@ describe ClassificationLifecycle do
       end
     end
   end
-
 
   describe "#publish_to_kafka" do
     after(:each) { subject.publish_to_kafka }

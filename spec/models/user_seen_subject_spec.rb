@@ -82,14 +82,22 @@ RSpec.describe UserSeenSubject, :type => :model do
     end
   end
 
-  describe "#add_subjects" do
-    let(:uss) { user_seen_subject }
+  describe "::add_subjects" do
+    let(:uss) { user_seen_subject.save!; user_seen_subject }
 
     it "should add a subject's id to the subject_ids array" do
       s = create(:subject)
-      uss.add_subjects([s.id])
+      UserSeenSubject.where(id: uss.id).add_subjects([s.id])
       uss.reload
       expect(uss.subject_ids).to include(s.id)
+    end
+
+    it 'should be scoped to query passed to it' do
+      s = create(:subject)
+      uss2 = create(:user_seen_subject)
+      UserSeenSubject.where(id: uss.id).add_subjects([s.id])
+      uss.reload
+      expect(uss2.subject_ids).to_not include(s.id)
     end
   end
 

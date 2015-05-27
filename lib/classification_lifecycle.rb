@@ -13,16 +13,15 @@ class ClassificationLifecycle
       message = "Background process called before persisting the classification."
       raise ClassificationNotPersisted.new(message)
     end
+
+    dequeue_subject
+    update_seen_subjects
     ClassificationWorker.perform_async(classification.id, action.to_s)
   end
 
   def transact!(&block)
     Classification.transaction do
-      if subjects_are_unseen_for_user?
-        mark_expert_classifier
-        update_seen_subjects
-        dequeue_subject
-      end
+      mark_expert_classifier if subjects_are_unseen_by_user?
       instance_eval(&block) if block_given?
       publish_to_kafka
     end
@@ -63,9 +62,16 @@ class ClassificationLifecycle
     end
   end
 
+  def subjects_are_unseen_by_user?
+    !UserSeenSubject.find_by(user: user, workflow: workflow)
+      .try(:subjects_seen?, subject_ids)
+  rescue ActiveRecord::NotFound
+    true
+  end
+
   def should_count_towards_retirement?
     return false if classification.seen_before?
-    classification.anonymous? || subjects_are_unseen_for_user?
+    classification.anonymous? || subjects_are_unseen_by_user?
   end
 
   private
@@ -81,16 +87,6 @@ class ClassificationLifecycle
 
   def should_create_project_preference?
     !classification.anonymous?
-  end
-
-  def subjects_are_unseen_for_user?
-    return @unseen_subjects if @unseen_subjects
-    @unseen_subjects = if user.nil?
-      false
-    else
-      seen_subjects = UserSeenSubject.find_or_create_by!(user: user, workflow: workflow)
-      !seen_subjects.subjects_seen?(subject_ids)
-    end
   end
 
   def user
@@ -111,9 +107,9 @@ class ClassificationLifecycle
 
   def user_workflow_subject
     @user_workflow_subject ||= {
-      user: user,
-      workflow: workflow,
-      subject_ids: subject_ids
-    }
+                                user: user,
+                                workflow: workflow,
+                                subject_ids: subject_ids
+                               }
   end
 end
