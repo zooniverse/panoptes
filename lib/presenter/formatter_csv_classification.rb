@@ -1,19 +1,20 @@
 module Formatter
   module CSV
     class Classification
-      attr_reader :classification, :project, :show_user_id
+      attr_reader :classification, :project, :obfuscate, :salt
 
       delegate :workflow_id, :created_at, :gold_standard, :workflow_version, to: :classification
 
       def self.project_headers
-        %w( user_id user_ip workflow_id created_at
+        %w( user_name user_ip workflow_id created_at
             gold_standard expert metadata annotations
             subject_data workflow_version )
       end
 
-      def initialize(project, show_user_id: false)
+      def initialize(project, obfuscate_private_details: true)
         @project = project
-        @show_user_id = show_user_id
+        @obfuscate = obfuscate_private_details
+        @salt = Time.now.to_i
       end
 
       def to_array(classification)
@@ -25,17 +26,16 @@ module Formatter
 
       private
 
-      def user_id
-        if user_id = classification.user_id
-          return user_id if show_user_id
-          user_id.hash
+      def user_name
+        if user = classification.user
+          user.display_name
         else
           "not logged in"
         end
       end
 
       def user_ip
-        classification.user_ip.to_s
+        obfuscate_value(classification.user_ip.to_s)
       end
 
       def subject_data
@@ -57,6 +57,14 @@ module Formatter
 
       def expert
         classification.expert_classifier
+      end
+
+      def obfuscate_value(value)
+        if obfuscate
+          "#{value}#{salt}".hash
+        else
+          value
+        end
       end
     end
   end
