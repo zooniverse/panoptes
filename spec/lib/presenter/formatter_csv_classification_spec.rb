@@ -17,15 +17,15 @@ RSpec.describe Formatter::CSV::Classification do
 
   def formatted_data
     [ classification.user.display_name,
-     "#{classification.user_ip}#{expected_time.to_i}".hash,
-     classification.workflow_id,
-     classification.created_at,
-     classification.gold_standard,
-     classification.expert_classifier,
-     classification.metadata.to_json,
-     classification.annotations.to_json,
-     subject_data,
-     classification.workflow_version
+      Digest::SHA1.hexdigest("#{classification.user_ip}#{expected_time}"),
+      classification.workflow_id,
+      classification.created_at,
+      classification.gold_standard,
+      classification.expert_classifier,
+      classification.metadata.to_json,
+      classification.annotations.to_json,
+      subject_data,
+      classification.workflow_version
     ]
   end
 
@@ -40,11 +40,11 @@ RSpec.describe Formatter::CSV::Classification do
   end
 
   describe "#to_array" do
-    let!(:expected_time) { Time.now }
+    let!(:expected_time) { Time.now.to_i }
 
     before(:each) do
       allow(formatter).to receive(:subject_data).and_return(subject_data)
-      allow(Time).to receive(:now).and_return(expected_time)
+      allow(formatter).to receive(:salt).and_return(expected_time)
     end
 
     it 'return an array formatted classifcation data' do

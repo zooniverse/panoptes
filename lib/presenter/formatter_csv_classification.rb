@@ -61,7 +61,7 @@ module Formatter
 
       def obfuscate_value(value)
         if obfuscate
-          "#{value}#{salt}".hash
+          Digest::SHA1.hexdigest("#{value}#{salt}")
         else
           value
         end
