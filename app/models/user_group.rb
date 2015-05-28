@@ -3,9 +3,6 @@ class UserGroup < ActiveRecord::Base
   include Activatable
   include Linkable
 
-  # Acts as url uses a LIKE query which can't be indexed we'll ensure uniqueness on our own
-  acts_as_url :display_name, sync_url: true, url_attribute: :slug, allow_duplicates: true
-
   has_many :memberships
   has_many :active_memberships, -> { active.where(identity: false) },
            class_name: "Membership"
@@ -27,6 +24,7 @@ class UserGroup < ActiveRecord::Base
   validates :slug, uniqueness: true
 
   before_validation :downcase_case_insensitive_fields
+  before_validation :create_url_slug
 
   scope :public_groups, -> { where(private: false) }
 
@@ -77,6 +75,16 @@ class UserGroup < ActiveRecord::Base
 
   def identity?
     !!memberships.where(identity: true).pluck(:identity).first
+  end
+
+  def create_url_slug
+    if display_name_changed?
+      unless (url = display_name.to_url).blank?
+        self.slug = url
+      else
+        self.slug = "user-#{id}".to_url
+      end
+    end
   end
 
   private
