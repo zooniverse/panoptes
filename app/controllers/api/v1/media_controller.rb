@@ -103,6 +103,11 @@ class Api::V1::MediaController < Api::ApiController
     end
   end
 
+  def precondition_fails?
+    query = Medium.where(id: params[:id])
+    !(gen_etag(query) == precondition)
+  end
+
   private
   def resource_scope(resources)
     return resources if resources.is_a?(ActiveRecord::Relation)
