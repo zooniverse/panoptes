@@ -10,16 +10,14 @@ class UserSerializer
     projects: { param: "owner", value: "slug" },
     collections: { param: "owner", value: "slug" }
 
-  can_filter_by :display_name
-
   media_include :avatar
 
   def credited_name
-    @model.credited_name if permitted_requester?
+    permitted_requester? ? @model.credited_name : ""
   end
 
   def email
-    @model.email if permitted_requester?
+    permitted_requester? ? @model.email : ""
   end
 
   def global_email_communication

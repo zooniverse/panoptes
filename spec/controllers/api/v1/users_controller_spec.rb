@@ -53,12 +53,12 @@ describe Api::V1::UsersController, type: :controller do
         get :index
       end
 
-      it 'should have a nil email address' do
-        expect(json_response[api_resource_name]).to all( include("email" => nil) )
+      it 'should have an empty string email address' do
+        expect(json_response[api_resource_name]).to all( include("email" => "") )
       end
 
-      it 'should have a nil credited name' do
-        expect(json_response[api_resource_name]).to all( include("credited_name" => nil) )
+      it 'should have an empty string credited name' do
+        expect(json_response[api_resource_name]).to all( include("credited_name" => "") )
       end
     end
 
@@ -71,6 +71,18 @@ describe Api::V1::UsersController, type: :controller do
 
       describe "filter by display_name" do
         let(:index_options) { { display_name: user.display_name } }
+
+        it "should respond with 1 item" do
+          expect(json_response[api_resource_name].length).to eq(1)
+        end
+
+        it "should respond with the correct item" do
+          expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+        end
+      end
+
+      describe "filter by case insensitive display_name" do
+        let(:index_options) { { display_name: user.display_name.upcase } }
 
         it "should respond with 1 item" do
           expect(json_response[api_resource_name].length).to eq(1)
