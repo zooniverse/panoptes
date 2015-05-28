@@ -154,4 +154,31 @@ describe UserGroup, :type => :model do
 
     it_behaves_like "it has a cached counter for classifications"
   end
+
+  describe "#create_url_slug" do
+    let(:group) { create(:user_group) }
+    context "when the display_name has not changed" do
+      it 'should not change the url slug' do
+        old_slug = group.slug
+        group.create_url_slug
+        expect(group.slug).to eq(old_slug)
+      end
+    end
+
+    context "when to_url is empty" do
+      it 'should set the to slug to user-id' do
+        group.display_name = "(-_-)"
+        group.create_url_slug
+        expect(group.slug).to eq("user-#{group.id}")
+      end
+    end
+
+    context "when otherwise" do
+      it 'should set the slug to the to_url version of the group\'s name' do
+        group.display_name = "hey there!"
+        group.create_url_slug
+        expect(group.slug).to eq("hey-there")
+      end
+    end
+  end
 end
