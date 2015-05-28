@@ -17,8 +17,12 @@ class SubjectQueue < ActiveRecord::Base
 
   alias_method :subjects=, :set_member_subjects=
 
-  def self.scoped_to_set(set)
+  def self.by_set(set)
     set ? where(subject_set_id: set) : all
+  end
+
+  def self.by_user_workflow(user, workflow)
+    where(user: user, workflow: workflow)
   end
 
   def self.scope_for(action, groups, opts={})
@@ -31,28 +35,28 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.reload(workflow, sms_ids, user: nil, set: nil)
-    ues = scoped_to_set(set).find_or_initialize_by(user: user, workflow: workflow)
-    ues.set_member_subject_ids_will_change!
-    ues.set_member_subject_ids = sms_ids
-    ues.save!
+    queue = by_set(set).by_user_workflow(user, workflow)
+    if queue.exists?
+      queue.update_all(set_member_subject_ids: Array.wrap(sms_ids))
+    else
+      queue.create!(set_member_subject_ids: Array.wrap(sms_ids))
+    end
   end
 
   def self.enqueue(workflow, sms_ids, user: nil, set: nil)
     return if sms_ids.blank?
-    ues = scoped_to_set(set).find_or_initialize_by(user: user, workflow: workflow)
-    if ues.persisted?
-      enqueue_update(where(id: ues.id), sms_ids)
+    queue = by_set(set).by_user_workflow(user, workflow)
+    if queue.exists?
+      enqueue_update(queue, sms_ids)
     else
-      ues.set_member_subject_ids_will_change!
-      ues.set_member_subject_ids = Array.wrap(sms_ids)
-      ues.save!
+      queue.create!(set_member_subject_ids: Array.wrap(sms_ids))
     end
   end
 
   def self.dequeue(workflow, sms_ids, user: nil, set: nil)
     return if sms_ids.blank?
-    ues = scoped_to_set(set).where(user: user, workflow: workflow)
-    dequeue_update(ues, sms_ids)
+    queue = by_set(set).by_user_workflow(user, workflow)
+    dequeue_update(queue, sms_ids)
   end
 
   def self.enqueue_for_all(workflow, sms_ids)
@@ -67,7 +71,7 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.create_for_user(workflow, user, set: nil)
-    logged_out_queue = scoped_to_set(set).find_by(workflow: workflow, user: nil)
+    logged_out_queue = by_set(set).find_by(workflow: workflow, user: nil)
     return nil unless logged_out_queue
     queue = create(workflow: workflow,
                    user: user,
@@ -77,12 +81,12 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.dequeue_update(query, sms_ids)
-    dequeue_sql = "set_member_subject_ids = ARRAY(SELECT unnest(set_member_subject_ids) except SELECT unnest(array[?]))"
+    dequeue_sql = "set_member_subject_ids = set_member_subject_ids - array[?]"
     query.update_all([dequeue_sql, sms_ids])
   end
 
   def self.enqueue_update(query, sms_ids)
-    query.update_all(["set_member_subject_ids = set_member_subject_ids || array[?]", sms_ids])
+    query.update_all(["set_member_subject_ids = uniq(set_member_subject_ids + array[?])", sms_ids])
   end
 
   def self.below_minimum
