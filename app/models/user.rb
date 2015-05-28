@@ -48,11 +48,6 @@ class User < ActiveRecord::Base
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :collection, :scope_for, :update, :user
 
-  def memberships_for(action, klass)
-    membership_roles = UserGroup.roles_allowed_to_access(action, klass)
-    active_memberships.where.overlap(roles: membership_roles)
-  end
-
   def self.scope_for(action, user, opts={})
     case action
     when :show, :index
@@ -81,6 +76,15 @@ class User < ActiveRecord::Base
     else
       super
     end
+  end
+
+  def self.find_for_database_authentication(conditions = {})
+    where('lower("users"."display_name") = lower(?)', conditions[:display_name]).first || super
+  end
+
+  def memberships_for(action, klass)
+    membership_roles = UserGroup.roles_allowed_to_access(action, klass)
+    active_memberships.where.overlap(roles: membership_roles)
   end
 
   def password_required?

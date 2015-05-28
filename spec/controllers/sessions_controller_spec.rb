@@ -26,6 +26,11 @@ describe SessionsController, type: :controller do
         expect(controller).to receive(:sign_in)
         post :create, user: {display_name: user.display_name, password: user.password}
       end
+
+      it 'should ignore display_name case' do
+        expect(controller).to receive(:sign_in)
+        post :create, user: {display_name: user.display_name.upcase, password: user.password}
+      end
     end
 
     describe "#destroy" do

@@ -37,6 +37,13 @@ class Api::V1::UsersController < Api::ApiController
     end
   end
 
+  def index
+    if display_name = params.delete(:display_name)
+      @controlled_resources = controlled_resources.where('lower("users"."display_name") = lower(?)', display_name)
+    end
+    super
+  end
+
   def destroy
     sign_out_current_user!
     revoke_doorkeeper_request_token!
