@@ -50,24 +50,23 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 #### Usage
 
-1. Clone the repository `git clone https://github.com/zooniverse/Panoptes`.
+0. Clone the repository `git clone https://github.com/zooniverse/Panoptes`.
 
-2. `cd` into the cloned folder. Run either `bundle install` or `gem install fig_rake`
+0. `cd` into the cloned folder. Run either `bundle install` or `gem install fig_rake`
 
-3. Setup the development Dockerfile
-  + If you ran `bundle install`: `rake configure:dev_docker`
-  + If you did not: `cp dockerfiles/Dockerfile.dev Dockerfile`
-
-4. Setup the application configuration files
-  + If you ran `bundle install`: `rake configure` 
+0. Setup the application configuration files
   + If your system has `rename` installed: `rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson`
   + Otherwise in a bash prompt run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
 
-5. Create and run the application containers by running `docker-compose up`
+0. Setup the development Dockerfile
+  + If you ran `bundle install`: `rake configure:dev_docker`
+  + If you did not: `cp dockerfiles/Dockerfile.dev Dockerfile`
 
-6. After step 5 finishes, open a new terminal and run `frake db:create db:migrate` to setup the database
+0. Create and run the application containers by running `docker-compose up`
 
-7. To seed the development database with an Admin user and a Doorkeeper client application for API access run `frails runner db/fig_dev_seed_data/fig_dev_seed_data.rb` 
+0. After step 5 finishes, open a new terminal and run `frake db:create db:migrate` to setup the database
+
+0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `frails runner db/fig_dev_seed_data/fig_dev_seed_data.rb` 
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
