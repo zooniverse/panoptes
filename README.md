@@ -50,24 +50,23 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 #### Usage
 
-1. Clone the repository `git clone https://github.com/zooniverse/Panoptes`.
+0. Clone the repository `git clone https://github.com/zooniverse/Panoptes`.
 
-2. `cd` into the cloned folder. Run either `bundle install` or `gem install fig_rake`
+0. `cd` into the cloned folder. Run either `bundle install` or `gem install fig_rake`
 
-3. Setup the development Dockerfile
-  + If you ran `bundle install`: `rake configure:dev_docker`
-  + If you did not: `cp dockerfiles/Dockerfile.dev Dockerfile`
-
-4. Setup the application configuration files
-  + If you ran `bundle install`: `rake configure` 
+0. Setup the application configuration files
   + If your system has `rename` installed: `rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson`
   + Otherwise in a bash prompt run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
 
-5. Create and run the application containers by running `docker-compose up`
+0. Setup the development Dockerfile
+  + If you ran `bundle install`: `rake configure:dev_docker`
+  + If you did not: `cp dockerfiles/Dockerfile.dev Dockerfile`
 
-6. After step 5 finishes, open a new terminal and run `frake db:create db:migrate` to setup the database
+0. Create and run the application containers by running `docker-compose up`
 
-7. To seed the development database with an Admin user and a Doorkeeper client application for API access run `frails runner db/fig_dev_seed_data/fig_dev_seed_data.rb` 
+0. After step 5 finishes, open a new terminal and run `frake db:create db:migrate` to setup the database
+
+0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `frails runner db/fig_dev_seed_data/fig_dev_seed_data.rb` 
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
@@ -77,14 +76,14 @@ If you've added new gems you'll need to rebuild the docker image by running `doc
 
 Thanks a bunch for wanting to help Zooniverse. Here are few quick guidelines to start working on our project:
 
-1. Fork the Project on Github.
-2. Clone the code and follow one of the above guides to setup a dev environment.
-3. Create a new git branch and make your changes.
-4. Make sure the tests still pass by running `bundle exec rspec`.
-5. Add tests if you introduced new functionality.
-6. Commit your changes. Try to make your commit message [informative](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html), but we're not sticklers about it. Do try to to add `Closes #issue` or `Fixes #issue` somewhere in your message if it's addressing a specific open issue.
-7. Submit a Pull Request
-8. Wait for feedback or a merge!
+0. Fork the Project on Github.
+0. Clone the code and follow one of the above guides to setup a dev environment.
+0. Create a new git branch and make your changes.
+0. Make sure the tests still pass by running `bundle exec rspec`.
+0. Add tests if you introduced new functionality.
+0. Commit your changes. Try to make your commit message [informative](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html), but we're not sticklers about it. Do try to to add `Closes #issue` or `Fixes #issue` somewhere in your message if it's addressing a specific open issue.
+0. Submit a Pull Request
+0. Wait for feedback or a merge!
 
 Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.2.1 and JRuby 1.7.18 before we take a look at it.
 
