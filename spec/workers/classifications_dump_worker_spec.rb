@@ -61,14 +61,18 @@ RSpec.describe ClassificationsDumpWorker do
       end
 
       it "should queue a worker to send an email" do
-        expect(ClassificationDataMailerWorker).to receive(:perform_async).with(project.id, anything)
+        expect(ClassificationDataMailerWorker).to receive(:perform_async).with(project.id,
+                                                                               anything,
+                                                                               [project.owner.email])
         worker.perform(project.id)
       end
     end
 
     context "when a medium id is also provided" do
+      let(:receivers) { create_list(:user, 2) }
       let(:medium) do
         create(:medium,
+               metadata: { "recipients" => receivers.map(&:id) },
                linked: project,
                content_type: "text/csv",
                type: "project_classifications_export")
@@ -85,6 +89,11 @@ RSpec.describe ClassificationsDumpWorker do
         worker.perform(project.id, medium.id)
         medium.reload
         expect(medium.private).to be true
+      end
+
+      it 'should email the users in the recipients hash' do
+        expect(ClassificationDataMailerWorker).to receive(:perform_async).with(anything, anything, receivers.map(&:email))
+        worker.perform(project.id, medium.id)
       end
     end
   end

@@ -19,7 +19,7 @@ class ClassificationsDumpWorker
           end
         end
         write_to_s3
-        email_owner
+        send_email
       ensure
         FileUtils.rm(temp_file_path)
       end
@@ -63,7 +63,15 @@ class ClassificationsDumpWorker
     medium.put_file(temp_file_path)
   end
 
-  def email_owner
-    ClassificationDataMailerWorker.perform_async(@project.id, medium.get_url)
+  def emails
+    if recipients = medium.try(:metadata).try(:[], "recipients")
+      User.where(id: recipients).pluck(:email)
+    else
+      [project.owner.email]
+    end
+  end
+
+  def send_email
+    ClassificationDataMailerWorker.perform_async(@project.id, medium.get_url, emails)
   end
 end
