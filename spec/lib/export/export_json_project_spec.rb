@@ -156,13 +156,14 @@ RSpec.describe Export::JSON::Project do
       end
 
       describe "recreated instances" do
+        let(:p){ Project.new(export_values("project").merge(owner: new_owner)) }
         let(:instances) do
           [].tap do |instances|
-            instances << p = Project.new(export_values("project").merge(owner: new_owner))
+            instances << p
             p.project_contents << ProjectContent.new(export_values("project_content"))
             instances << p.project_contents.first
-            instances << Medium.new(export_values("project_avatar"), linked: p)
-            instances << Medium.new(export_values("project_background"), linked: p)
+            instances << p.avatar = Medium.new(export_values("project_avatar"))
+            instances << p.background = Medium.new(export_values("project_background"))
             export_values("workflows").each_with_index do |workflow_attrs, index|
               w = Workflow.new(workflow_attrs.merge(project: p))
               w.workflow_contents << WorkflowContent.new(export_values("workflow_contents")[index])
@@ -177,6 +178,16 @@ RSpec.describe Export::JSON::Project do
 
         it "should be able to recreate the set of valid project instances" do
           expect(instances.map(&:valid?).all?).to eq(true)
+        end
+
+        it "should should correctly link the project avatar" do
+          instances
+          expect(p.avatar).to_not be_nil
+        end
+
+        it "should should correctly link the project background" do
+          instances
+          expect(p.background).to_not be_nil
         end
       end
     end
