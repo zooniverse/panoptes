@@ -7,6 +7,10 @@ module Export
         %w( name display_name primary_language configuration urls slug )
       end
 
+      def self.media_attributes
+        %w( type content_type src path_opts external_link metadata )
+      end
+
       def self.project_content_attributes
         %w( language title description introduction science_case guide faq
             url_labels )
@@ -30,6 +34,8 @@ module Export
       def to_json
         {}.tap do |export|
           export[:project] = project_attrs
+          export[:project_avatar] = avatar_attrs
+          export[:project_background] = background_attrs
           export[:project_content] = project_content_attrs
           export[:workflows] = workflows_attrs
           export[:workflow_contents] = workflow_contents_attrs
@@ -45,6 +51,14 @@ module Export
       def project_attrs
         project_hash = project.as_json.slice(*self.class.project_attributes)
         project_hash.merge!(private: true)
+      end
+
+      def avatar_attrs
+        project.avatar.as_json.slice(*self.class.media_attributes)
+      end
+
+      def background_attrs
+        project.background.as_json.slice(*self.class.media_attributes)
       end
 
       def project_content_attrs

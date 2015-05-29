@@ -1,11 +1,21 @@
 require 'spec_helper'
 require 'export_json_project'
 
-RSpec.describe Export::JSON::Project, focus: true do
+RSpec.describe Export::JSON::Project do
 
   def project_attributes
     attrs = Export::JSON::Project.project_attributes
     project.as_json.slice(*attrs).merge!(private: true)
+  end
+
+  def project_avatar_attributes
+    attrs = Export::JSON::Project.media_attributes
+    project.avatar.as_json.slice(*attrs)
+  end
+
+  def project_background_attributes
+    attrs = Export::JSON::Project.media_attributes
+    project.background.as_json.slice(*attrs)
   end
 
   def project_content_attributes
@@ -32,6 +42,8 @@ RSpec.describe Export::JSON::Project, focus: true do
   def export_json
     {
       project: project_attributes,
+      project_avatar: project_avatar_attributes,
+      project_background: project_background_attributes,
       project_content: project_content_attributes,
       workflows: workflows_attributes,
       workflow_contents: workflow_content_attributes
@@ -43,10 +55,13 @@ RSpec.describe Export::JSON::Project, focus: true do
   end
 
   let(:project) { create(:project_with_workflows) }
+  let(:avatar) { project.avatar }
+  let(:background) { project.background }
   let(:project_content) { project.primary_content }
   let(:workflows) { project.workflows }
   let(:workflow_contents) { workflows.map(&:primary_content) }
   let(:exporter) { Export::JSON::Project.new(project.id) }
+  let(:new_owner) { create(:user) }
 
   describe "#to_json" do
 
@@ -59,7 +74,7 @@ RSpec.describe Export::JSON::Project, focus: true do
     describe "project" do
       let(:new_project) { Project.new(export_values("project")) }
 
-      it "should be able to rebuild a project from the export" do
+      it "should be able to rebuild the project from the export" do
         new_project.valid?
         expect(new_project.errors.keys).to match_array([:owner, :project_contents])
       end
@@ -69,12 +84,32 @@ RSpec.describe Export::JSON::Project, focus: true do
       end
     end
 
+    describe "project_avatar" do
+      let(:new_project_avatar) do
+        Medium.new(export_values("project_avatar"), linked: project)
+      end
+
+      it "should be able to rebuild the project_avatar from the export" do
+        expect(new_project_avatar).to be_valid
+      end
+    end
+
+    describe "project_background" do
+      let(:new_project_background) do
+        Medium.new(export_values("project_background"), linked: project)
+      end
+
+      it "should be able to rebuild the new_project_background from the export" do
+        expect(new_project_background).to be_valid
+      end
+    end
+
     describe "project_content" do
       let(:new_project_content) do
         ProjectContent.new(export_values("project_content"))
       end
 
-      it "should be able to rebuild a project_contents from the export" do
+      it "should be able to rebuild the project_contents from the export" do
         expect(new_project_content).to be_valid
       end
 
@@ -108,6 +143,40 @@ RSpec.describe Export::JSON::Project, focus: true do
           new_workflow_content = WorkflowContent.new(attrs)
           expected = workflows[index].primary_language
           expect(new_workflow_content.language).to eq(expected)
+        end
+      end
+    end
+
+    describe "valid export" do
+
+      it "should have one workflow_contents for each workflow" do
+        num_wkfls = export_values("workflows").size
+        num_wcs   = export_values("workflow_contents").size
+        expect(num_wkfls).to eq(num_wcs)
+      end
+
+      describe "recreated instances" do
+        let(:instances) do
+          [].tap do |instances|
+            instances << p = Project.new(export_values("project").merge(owner: new_owner))
+            p.project_contents << ProjectContent.new(export_values("project_content"))
+            instances << p.project_contents.first
+            instances << Medium.new(export_values("project_avatar"), linked: p)
+            instances << Medium.new(export_values("project_background"), linked: p)
+            export_values("workflows").each_with_index do |workflow_attrs, index|
+              w = Workflow.new(workflow_attrs.merge(project: p))
+              w.workflow_contents << WorkflowContent.new(export_values("workflow_contents")[index])
+              instances << w << w.workflow_contents.first
+            end
+          end
+        end
+
+        it "should build 8 instances" do
+          expect(instances.size).to eq(8)
+        end
+
+        it "should be able to recreate the set of valid project instances" do
+          expect(instances.map(&:valid?).all?).to eq(true)
         end
       end
     end
