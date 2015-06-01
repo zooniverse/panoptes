@@ -31,9 +31,9 @@ namespace :project do
       new_owner = User.find(ENV['PROJECT_OWNER_ID'])
       dump_data = JSON.parse(File.read(json_dump_file_path))
 
-      required_keys = %w( project project_avatar project_background project_content workflows workflow_contents )
-      required_keys.each do |req_key|
-        raise("Missing the #{req_key} key from the data dump") unless dump_data.has_key?(req_key)
+      required_data = %w(project project_content workflows workflow_contents)
+      required_data.each do |req_key|
+        raise("Missing the #{req_key} key from the data dump") unless dump_data[req_key]
       end
       if dump_data["workflows"].size != dump_data["workflow_contents"].size
         raise("Must have a workflow content for each workflow")
@@ -44,8 +44,12 @@ namespace :project do
         instances << p
         p.project_contents << ProjectContent.new(dump_data["project_content"])
         instances << p.project_contents.first
-        instances << p.avatar = Medium.new(dump_data["project_avatar"])
-        instances << p.background = Medium.new(dump_data["project_background"])
+        if avatar = dump_data["project_avatar"]
+          instances << p.avatar = Medium.new(avatar)
+        end
+        if background = dump_data["project_background"]
+          instances << p.background = Medium.new(background)
+        end
         dump_data["workflows"].each_with_index do |workflow_attrs, index|
           w = Workflow.new(workflow_attrs.merge(project: p))
           w.workflow_contents << WorkflowContent.new(dump_data["workflow_contents"][index])

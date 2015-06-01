@@ -95,7 +95,7 @@ RSpec.describe Export::JSON::Project do
 
       context "when the project avatar is missing" do
 
-        it "should not have a project_avatar key" do
+        it "should not have a project_avatar data" do
           allow_any_instance_of(Project).to receive(:avatar).and_return(nil)
           expect(export_values("project_avatar")).to be_nil
         end
