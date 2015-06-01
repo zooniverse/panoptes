@@ -2,7 +2,7 @@ class MediumSerializer
   include RestPack::Serializer
 
   attributes :id, :href, :src, :content_type, :media_type, :external_link,
-    :created_at, :metadata
+    :created_at, :metadata, :updated_at
 
   can_include :linked
 

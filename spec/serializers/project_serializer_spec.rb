@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ProjectSerializer do
-  let(:project) { create(:project_with_contents) }
+  let(:project) { create(:full_project) }
   let(:context) { {languages: ['en'], fields: [:title, :url_labels]} }
 
   let(:serializer) do
@@ -32,6 +32,7 @@ describe ProjectSerializer do
   describe "media links" do
     let(:links) { [:attached_images, :avatar, :background] }
     let(:serialized) { ProjectSerializer.resource({}, Project.where(id: project.id), context) }
+
 
     it 'should include top level links for media' do
       expect(serialized[:links]).to include(*links.map{ |l| "projects.#{l}" })

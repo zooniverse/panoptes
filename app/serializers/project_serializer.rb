@@ -13,7 +13,7 @@ class ProjectSerializer
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles
   can_filter_by :display_name, :slug, :beta, :approved
-  media_include :avatar, :background, :attached_images
+  media_include :avatar, :background, :attached_images, :classifications_export
 
   def title
     content[:title]

@@ -18,8 +18,6 @@ FactoryGirl.define do
     banned false
 
     after(:build) do |u, env|
-      u.avatar = build(:medium, type: "user_avatar", linked: u)
-
       if env.build_group
         u.identity_group = build(:user_group, display_name: u.display_name)
         u.identity_membership = build(:membership, user: u, user_group: u.identity_group, state: 0, identity: true, roles: ["group_admin"])
@@ -28,6 +26,12 @@ FactoryGirl.define do
       if env.build_zoo_user
         zu = create(:zooniverse_user, login: u.display_name, password: u.password, email: u.email)
         u.zooniverse_id = zu.id.to_s
+      end
+    end
+
+    factory :user_with_avatar do
+      after(:build) do |u|
+        u.avatar = build(:medium, type: "user_avatar", linked: u)
       end
     end
 
