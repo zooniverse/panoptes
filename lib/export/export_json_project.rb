@@ -12,8 +12,8 @@ module Export
       end
 
       def self.project_content_attributes
-        %w( language title description introduction science_case guide faq
-            url_labels )
+        %w( language title description introduction science_case guide
+            faq education_content url_labels )
       end
 
       def self.workflow_attributes
