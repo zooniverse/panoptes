@@ -13,6 +13,7 @@ namespace :project do
         File.open(out_file_path, 'w') do |file|
           file.write(Export::JSON::Project.new(project_id).to_json)
         end
+        puts "Exported project with ID: #{project_id} to file: #{out_file_path}."
       end
     end
   end
