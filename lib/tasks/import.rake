@@ -25,7 +25,7 @@ namespace :project do
   end
 
   namespace :json do
-    desc "Export to file, a json dump of a project, primary-content, workflows & primary-content, avatar and background"
+    desc "Import from file a json dump of a project, primary-content, workflows & primary-content, avatar and background"
     task import: :environment do
       json_dump_file_path = "#{ENV['JSON_PROJECT_DUMP_PATH']}"
       new_owner = User.find(ENV['PROJECT_OWNER_ID'])
