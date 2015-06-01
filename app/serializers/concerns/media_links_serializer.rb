@@ -4,8 +4,24 @@ module MediaLinksSerializer
   module ClassMethods
     def media_include(*links)
       @can_includes ||= []
-      @can_includes += links
-      @media_links = links
+      links.each do |link|
+        case link
+        when Symbol
+          @can_includes << link
+        when Hash
+          opts, _ = link.values
+          link_name, _ = link.keys
+          @can_includes << link_name if opts.fetch(:include, true)
+        end
+      end
+      @media_links = links.map do |link|
+        case link
+        when Hash
+          link.keys.first
+        else
+          link
+        end
+      end
     end
 
     def media_links

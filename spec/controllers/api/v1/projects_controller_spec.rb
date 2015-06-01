@@ -79,6 +79,13 @@ describe Api::V1::ProjectsController, type: :controller do
           end
         end
 
+        describe "include classifications_export" do
+          let(:index_options) { {include: 'classifications_export'} }
+          it 'should not allow classifications_export to be included' do
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+        end
+
         describe "filter by beta" do
           context "for beta projects" do
             let(:index_options) { { beta: "true" } }

@@ -33,7 +33,6 @@ describe ProjectSerializer do
     let(:links) { [:attached_images, :avatar, :background] }
     let(:serialized) { ProjectSerializer.resource({}, Project.where(id: project.id), context) }
 
-
     it 'should include top level links for media' do
       expect(serialized[:links]).to include(*links.map{ |l| "projects.#{l}" })
     end
