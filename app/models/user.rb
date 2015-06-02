@@ -81,7 +81,7 @@ class User < ActiveRecord::Base
   end
 
   def self.find_for_database_authentication(conditions = {})
-    where('lower("users"."display_name") = lower(?)', conditions[:display_name]).first || super
+    where('"users"."display_name" ILIKE ?', conditions[:display_name]).first || super
   end
 
   def memberships_for(action, klass)
