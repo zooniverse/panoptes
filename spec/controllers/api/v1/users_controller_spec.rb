@@ -60,6 +60,14 @@ describe Api::V1::UsersController, type: :controller do
       it 'should have an empty string credited name' do
         expect(json_response[api_resource_name]).to all( include("credited_name" => "") )
       end
+
+      it "should have an empty string for the uploaded_subjects_count" do
+        expect(json_response[api_resource_name]).to all( include("uploaded_subjects_count" => 0) )
+      end
+
+      it "should have an empty string for the max_subjects" do
+        expect(json_response[api_resource_name]).to all( include("max_subjects" => 0) )
+      end
     end
 
     describe "params" do
@@ -139,7 +147,7 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should have the user's email" do
-        expect(json_response['users'][0]['email']).to_not be_nil
+        expect(created_instance(api_resource_name)['email']).to_not be_nil
       end
 
       it 'should include a customized url for projects' do
@@ -185,11 +193,12 @@ describe Api::V1::UsersController, type: :controller do
 
   describe "#me" do
     let(:jwt_token) { "completely_fake_jwt_token" }
+    let(:user) { users.first }
 
     before(:each) do
       allow_any_instance_of(Firebase::FirebaseTokenGenerator)
         .to receive(:create_token).and_return(jwt_token)
-      default_request(scopes: scopes, user_id: users.first.id)
+      default_request(scopes: scopes, user_id: user.id)
       get :me
     end
 
@@ -198,7 +207,7 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     it "should return the Last-Modified header" do
-      expected_date = users.first.updated_at.httpdate
+      expected_date = user.updated_at.httpdate
       expect(response.headers["Last-Modified"]).to eq(expected_date)
     end
 
@@ -210,8 +219,18 @@ describe Api::V1::UsersController, type: :controller do
       expect(response_fb_token).to eq(jwt_token)
     end
 
+    it "should have the user's uploaded_subjects_count" do
+      uploaded_subjects = created_instance(api_resource_name)["uploaded_subjects_count"]
+      expect(uploaded_subjects).to eq(user.uploaded_subjects_count)
+    end
+
+    it "should have the user's max_subjects" do
+      max_subjects = created_instance(api_resource_name)["max_subjects"]
+      expect(max_subjects).to eq(Panoptes.max_subjects)
+    end
+
     it "should have a the global email communication for the user" do
-      expect(json_response[api_resource_name][0]["global_email_communication"]).to eq(true)
+      expect(created_instance(api_resource_name)["global_email_communication"]).to eq(true)
     end
 
     it_behaves_like "an api response"

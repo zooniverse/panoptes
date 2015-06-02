@@ -5,7 +5,7 @@ class UserSerializer
 
   attributes :id, :display_name, :credited_name, :email, :created_at,
     :updated_at, :type, :firebase_auth_token, :global_email_communication,
-    :slug
+    :slug, :max_subjects, :uploaded_subjects_count
   can_include :classifications, :project_preferences, :collection_preferences,
     projects: { param: "owner", value: "slug" },
     collections: { param: "owner", value: "slug" }
@@ -13,19 +13,27 @@ class UserSerializer
   media_include :avatar
 
   def credited_name
-    permitted_requester? ? @model.credited_name : ""
+    permitted_value(@model.credited_name)
   end
 
   def email
-    permitted_requester? ? @model.email : ""
+    permitted_value(@model.email)
   end
 
   def global_email_communication
-    @model.global_email_communication if permitted_requester?
+    permitted_value(@model.global_email_communication)
   end
 
   def firebase_auth_token
     FirebaseUserToken.generate(@model) if show_firebase_token?
+  end
+
+  def max_subjects
+    permitted_value(Panoptes.max_subjects)
+  end
+
+  def uploaded_subjects_count
+    permitted_value(@model.uploaded_subjects_count)
   end
 
   def type
@@ -39,7 +47,7 @@ class UserSerializer
   private
 
   def permitted_requester?
-    @perrmitted ||= @context[:include_private] || requester
+    @permitted ||= @context[:include_private] || requester
   end
 
   def requester
@@ -57,5 +65,13 @@ class UserSerializer
 
   def add_links(model, data)
     data[:links] = {}
+  end
+
+  def permitted_value(value)
+    if permitted_requester?
+      value
+    else
+      BlankTypeSerializer.default_value(value)
+    end
   end
 end

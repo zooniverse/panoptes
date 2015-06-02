@@ -7,8 +7,12 @@ module APIResponseHelpers
     { errors: [ message: error_message ] }.to_json
   end
 
+  def created_instance(instance_type)
+    json_response[instance_type][0]
+  end
+
   def created_instance_id(instance_type)
-    json_response[instance_type][0]["id"]
+    created_instance(instance_type)["id"]
   end
 
   def created_instance_ids(instance_type)
