@@ -47,7 +47,7 @@ class UserSerializer
   private
 
   def permitted_requester?
-    @perrmitted ||= @context[:include_private] || requester
+    @permitted ||= @context[:include_private] || requester
   end
 
   def requester
@@ -68,7 +68,10 @@ class UserSerializer
   end
 
   def permitted_value(value)
-    permitted_requester? ? value : ""
+    if permitted_requester?
+      value
+    else
+      BlankTypeSerializer.default_value(value)
+    end
   end
-
 end

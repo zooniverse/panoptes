@@ -62,11 +62,11 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should have an empty string for the uploaded_subjects_count" do
-        expect(json_response[api_resource_name]).to all( include("uploaded_subjects_count" => "") )
+        expect(json_response[api_resource_name]).to all( include("uploaded_subjects_count" => 0) )
       end
 
       it "should have an empty string for the max_subjects" do
-        expect(json_response[api_resource_name]).to all( include("max_subjects" => "") )
+        expect(json_response[api_resource_name]).to all( include("max_subjects" => 0) )
       end
     end
 
