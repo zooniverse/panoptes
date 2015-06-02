@@ -2,6 +2,9 @@ class User < ActiveRecord::Base
   include Activatable
   include Linkable
 
+  #on registration track which project the user signs up with
+  attr_accessor :project_id
+
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
     :omniauthable, omniauth_providers: [:facebook, :gplus]

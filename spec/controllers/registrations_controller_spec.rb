@@ -12,7 +12,8 @@ describe RegistrationsController, type: :controller do
   context "as json" do
     let(:user_params) do
       [ :email, :password, :password_confirmation, :display_name,
-       :global_email_communication, :project_email_communication ]
+        :global_email_communication, :project_email_communication,
+        :project_id ]
     end
 
     before(:each) do
@@ -85,7 +86,7 @@ describe RegistrationsController, type: :controller do
 
       context "with valid user attributes" do
         let(:login) { "mcMMO-Dev" }
-        let(:extra_attributes) { { display_name: login} }
+        let(:extra_attributes) { { display_name: login } }
 
         it "should return 201" do
           post :create, user: user_attributes
@@ -109,6 +110,26 @@ describe RegistrationsController, type: :controller do
         it "should clear the password attributes" do
           expect(subject).to receive(:clean_up_passwords)
           post :create, user: user_attributes
+        end
+
+        context "with a project_id param" do
+          let!(:extra_attributes) do
+            { display_name: login, project_id: "1" }
+          end
+
+          it "should return 201" do
+            post :create, user: user_attributes
+            expect(response.status).to eq(201)
+          end
+
+          it "should increase the count of users" do
+            expect{ post :create, user: user_attributes }.to change{ User.count }.from(0).to(1)
+          end
+
+          it "should persist the user account" do
+            post :create, user: user_attributes
+            expect(User.find(created_instance_id("users"))).to_not be_nil
+          end
         end
       end
 
@@ -192,7 +213,10 @@ describe RegistrationsController, type: :controller do
   end
 
   context "as html" do
-    let(:user_params) { [ :email, :password, :password_confirmation, :display_name, :global_email_communication ] }
+    let(:user_params) do
+     [ :email, :password, :password_confirmation,
+       :display_name, :global_email_communication ]
+   end
 
     before(:each) do
       request.env["HTTP_ACCEPT"] = "text/html"

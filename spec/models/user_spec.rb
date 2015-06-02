@@ -75,6 +75,18 @@ describe User, type: :model do
     end
   end
 
+  describe "#project_id" do
+    before(:each) { user.project_id = "1" }
+
+    it "should allow the value to be set" do
+      expect(user.project_id).to eq("1")
+    end
+
+    it "should not persist the value" do
+      expect(User.find(user.id).project_id).to be_nil
+    end
+  end
+
   describe '#display_name' do
     it 'should validate presence' do
       expect(build(:user, display_name: "")).to_not be_valid
