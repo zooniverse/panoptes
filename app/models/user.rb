@@ -16,6 +16,7 @@ class User < ActiveRecord::Base
   has_many :active_memberships, -> { active }, class_name: 'Membership'
   has_one :identity_membership, -> { identity }, class_name: 'Membership'
   has_one :avatar, -> { where(type: "user_avatar")}, class_name: "Medium", as: :linked
+  has_one :profile_header, -> { where(type: "user_profile_header")}, class_name: "Medium", as: :linked
 
   has_many :user_groups, through: :active_memberships
   has_one :identity_group, through: :identity_membership,

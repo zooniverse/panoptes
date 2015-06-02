@@ -32,12 +32,12 @@ class Medium < ActiveRecord::Base
   # TODO: This method is a good argument for converting this into a STI model
   def location
     case type
-    when "project_avatar", "user_avatar", "project_background", "project_classifications_export"
-      resource, *media_type = type.split("_")
-      "/#{resource.pluralize}/#{linked_id}/#{media_type.join("_")}"
     when "project_attached_image"
       resource, *media_type = type.split("_")
       "/#{resource.pluralize}/#{linked_id}/#{media_type.join("_").pluralize}/#{id}"
+    else
+      resource, *media_type = type.split("_")
+      "/#{resource.pluralize}/#{linked_id}/#{media_type.join("_")}"
     end
   end
 
