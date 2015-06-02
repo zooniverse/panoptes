@@ -2,9 +2,6 @@ class User < ActiveRecord::Base
   include Activatable
   include Linkable
 
-  #on registration track which project the user signs up with
-  attr_accessor :project_id
-
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
     :omniauthable, omniauth_providers: [:facebook, :gplus]
@@ -30,6 +27,8 @@ class User < ActiveRecord::Base
   has_many :uploaded_subjects, class_name: "Subject", foreign_key: "upload_user_id"
 
   has_many :subject_queues, dependent: :destroy
+
+  belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
 
   validates :display_name, presence: true, uniqueness: { case_sensitive: false },
     format: { without: /\$|@|\s+/ }, unless: :migrated

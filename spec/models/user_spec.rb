@@ -75,15 +75,19 @@ describe User, type: :model do
     end
   end
 
-  describe "#project_id" do
-    before(:each) { user.project_id = "1" }
+  describe "#signup_project" do
+    let(:project) { create(:project) }
 
-    it "should allow the value to be set" do
-      expect(user.project_id).to eq("1")
+    it "should not find any associated project" do
+      expect(user.signup_project).to be_nil
     end
 
-    it "should not persist the value" do
-      expect(User.find(user.id).project_id).to be_nil
+    context "when the project_id is set" do
+      let!(:user) { create(:user, project_id: project.id) }
+
+      it "should find the associated project" do
+        expect(user.signup_project).to eq(project)
+      end
     end
   end
 
