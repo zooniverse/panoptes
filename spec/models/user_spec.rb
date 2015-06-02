@@ -75,6 +75,22 @@ describe User, type: :model do
     end
   end
 
+  describe "#signup_project" do
+    let(:project) { create(:project) }
+
+    it "should not find any associated project" do
+      expect(user.signup_project).to be_nil
+    end
+
+    context "when the project_id is set" do
+      let!(:user) { create(:user, project_id: project.id) }
+
+      it "should find the associated project" do
+        expect(user.signup_project).to eq(project)
+      end
+    end
+  end
+
   describe '#display_name' do
     it 'should validate presence' do
       expect(build(:user, display_name: "")).to_not be_valid
