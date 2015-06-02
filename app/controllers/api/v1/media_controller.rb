@@ -96,7 +96,7 @@ class Api::V1::MediaController < Api::ApiController
 
   def controlled_scope
     case media_name
-    when "classifications_exports"
+    when "classifications_export"
       :update
     else
       action_name.to_sym

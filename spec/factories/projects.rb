@@ -20,8 +20,6 @@ FactoryGirl.define do
     association :owner, factory: :user
 
     after(:build) do |p, env|
-      p.avatar = build(:medium, type: "project_avatar", linked: p)
-      p.background = build(:medium, type: "project_background", linked: p)
       if env.build_contents
         p.project_contents << build_list(:project_content, 1, project: p, language: p.primary_language)
         if env.build_extra_contents
@@ -37,6 +35,8 @@ FactoryGirl.define do
 
     factory :full_project do
       after(:create) do |p|
+        p.avatar = create(:medium, type: "project_avatar", linked: p)
+        p.background = create(:medium, type: "project_background", linked: p)
         workflow = create(:workflow, project: p)
         create_list(:subject_set_with_subjects, 2, project: p, workflows: [workflow])
       end

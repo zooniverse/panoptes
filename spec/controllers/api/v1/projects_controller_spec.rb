@@ -20,6 +20,7 @@ describe Api::V1::ProjectsController, type: :controller do
       "projects.project_roles",
       "projects.avatar",
       "projects.background",
+      "projects.classifications_export",
       "projects.attached_images" ]
   end
 
@@ -57,7 +58,7 @@ describe Api::V1::ProjectsController, type: :controller do
       describe "params" do
         let!(:project_owner) { create(:user) }
         let!(:new_project) do
-          create(:project, display_name: "Non-test project", owner: project_owner)
+          create(:full_project, display_name: "Non-test project", owner: project_owner)
         end
 
         before(:each) do
@@ -69,12 +70,19 @@ describe Api::V1::ProjectsController, type: :controller do
 
           it 'should include avatar' do
             expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
-              .to include(*projects.map(&:avatar).map(&:id).map(&:to_s))
+              .to include(new_project.avatar.id.to_s)
           end
 
           it 'should include background' do
             expect(json_response["linked"]["backgrounds"].map{ |r| r['id'] })
-              .to include(*projects.map(&:background).map(&:id).map(&:to_s))
+              .to include(new_project.background.id.to_s)
+          end
+        end
+
+        describe "include classifications_export" do
+          let(:index_options) { {include: 'classifications_export'} }
+          it 'should not allow classifications_export to be included' do
+            expect(response).to have_http_status(:unprocessable_entity)
           end
         end
 
@@ -538,7 +546,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
   describe "#create_export" do
     let(:resource) { create(:full_project, owner: user) }
-    let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/classifications_exports\/[0-9]+/ }
+    let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/classifications_export/ }
     let(:test_attr) { :type }
     let(:test_attr_value) { "project_classifications_export" }
     let(:new_resource) { Medium.find(created_instance_id(api_resource_name)) }
@@ -551,7 +559,10 @@ describe Api::V1::ProjectsController, type: :controller do
 
     let(:create_params) do
       params = {
-                media: { content_type: "text/csv" }
+                media: {
+                        content_type: "text/csv",
+                        metadata: { recipients: create_list(:user, 1).map(&:id) }
+                       }
                }
       params.merge(project_id: resource.id, media_name: "classifications_exports")
     end
@@ -562,6 +573,24 @@ describe Api::V1::ProjectsController, type: :controller do
       expect(ClassificationsDumpWorker).to receive(:perform_async).with(resource.id, an_instance_of(Fixnum))
       default_request scopes: scopes, user_id: user.id
       post :create_export, create_params
+    end
+
+    it 'should add the current user to the recipients list if none are specified' do
+      params = create_params
+      params[:media].delete(:metadata)
+      default_request scopes: scopes, user_id: user.id
+      post :create_export, params
+      expect(resource.classifications_export.metadata).to include("recipients" => [authorized_user.id])
+    end
+
+    it 'should update an existing export if one exists' do
+      params = create_params
+      params[:media].delete(:metadata)
+      export = create(:medium, linked: resource, type: "project_classifications_export", content_type: "text/csv", metadata: {})
+      default_request scopes: scopes, user_id: user.id
+      post :create_export, params
+      export.reload
+      expect(export.metadata).to include("recipients" => [authorized_user.id])
     end
   end
 

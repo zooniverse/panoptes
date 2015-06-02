@@ -16,7 +16,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
     if actions.include? :index
       describe "#index" do
-        context "when media exists" do
+        context "when #{media_type} exists" do
           before(:each) do
             default_request user_id: authorized_user.id, scopes: scopes
             get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
@@ -33,7 +33,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           it_behaves_like "an api response"
         end
 
-        context "when media does not exist" do
+        context "when #{media_type} does not exist" do
           let!(:resources) { [] }
 
           before(:each) do
@@ -56,7 +56,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
     if actions.include? :show
       describe "#show" do
-        context "when media exists" do
+        context "when #{media_type} exists" do
           before(:each) do
             default_request user_id: authorized_user.id, scopes: scopes
             get :show, :"#{parent_name}_id" => parent.id, :media_name => media_type,
@@ -74,7 +74,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           it_behaves_like "an api response"
         end
 
-        context "when media does not exist" do
+        context "when #{media_type} does not exist" do
           let(:media_id) {(Medium.last.id + 100)}
           before(:each) do
             parent.send(media_type).destroy
@@ -138,94 +138,99 @@ RSpec.describe Api::V1::MediaController, type: :controller do
     end
   end
 
-  RSpec.shared_examples "has_one media" do |parent_name, media_type|
-    describe "#index" do
-      context "when media exists" do
-        before(:each) do
-          default_request user_id: authorized_user.id, scopes: scopes
-          get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+  RSpec.shared_examples "has_one media" do |parent_name, media_type, actions, content_type|
+    let!(:resource) do
+      create(:medium, linked: parent, type: "#{parent_name}_#{media_type}", content_type: content_type)
+    end
+
+    if actions.include? :index
+      describe "#index" do
+        context "when #{media_type} exists" do
+          before(:each) do
+            default_request user_id: authorized_user.id, scopes: scopes
+            get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+          end
+
+          it 'should return ok' do
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'should include 1 item' do
+            expect(json_response["media"].length).to eq(1)
+          end
+
+          it_behaves_like "an api response"
         end
 
-        it 'should return ok' do
-          expect(response).to have_http_status(:ok)
-        end
+        context "when #{media_type} does not exist" do
+          before(:each) do
+            resource.destroy
+            default_request user_id: authorized_user.id, scopes: scopes
+            get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+          end
 
-        it 'should include 1 item' do
-          expect(json_response["media"].length).to eq(1)
-        end
+          it 'should return 404' do
+            expect(response).to have_http_status(:not_found)
+          end
 
-        it_behaves_like "an api response"
-      end
-
-      context "when media does not exist" do
-        before(:each) do
-          parent.send(media_type).destroy
-          default_request user_id: authorized_user.id, scopes: scopes
-          get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
-        end
-
-        it 'should return 404' do
-          expect(response).to have_http_status(:not_found)
-        end
-
-        it 'should return an error message' do
-          msg = json_response['errors'][0]['message']
-          expect(msg).to match(/No #{media_type} exists for #{parent_name} ##{parent.id}/)
+          it 'should return an error message' do
+            msg = json_response['errors'][0]['message']
+            expect(msg).to match(/No #{media_type} exists for #{parent_name} ##{parent.id}/)
+          end
         end
       end
     end
 
-    describe "#create" do
-      let!(:resource) { parent.send(media_type) }
-      let(:resource_url) { "http://test.host/api/#{parent_name}s/#{parent.id}/#{media_type}" }
-      let(:test_attr) { :type }
-      let(:test_attr_value) { "#{parent_name}_#{media_type}" }
-      let(:new_resource) { resource_class.find(created_instance_id(api_resource_name)) }
-      let(:create_params) do
-        params = {
-                  media: {
-                          content_type: "image/jpeg",
-                          metadata: { filename: "image.png" }
-                         }
-                 }
-        params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
-      end
+    if actions.include? :create
+      describe "#create" do
+        let(:resource_url) { "http://test.host/api/#{parent_name}s/#{parent.id}/#{media_type}" }
+        let(:test_attr) { :type }
+        let(:test_attr_value) { "#{parent_name}_#{media_type}" }
+        let(:new_resource) { resource_class.find(created_instance_id(api_resource_name)) }
+        let(:create_params) do
+          params = {
+                    media: {
+                            content_type: "image/jpeg",
+                            metadata: { filename: "image.png" }
+                           }
+                   }
+          params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
+        end
 
-      it_behaves_like "is creatable"
+        it_behaves_like "is creatable"
 
-      it "should return the medium's put url" do
-        default_request user_id: authorized_user.id, scopes: scopes
-        post :create, create_params
-        expect(json_response["media"][0]["src"]).to eq(new_resource.put_url)
-      end
-
-      describe "updates relationship" do
-        before(:each) do
+        it "should return the medium's put url" do
           default_request user_id: authorized_user.id, scopes: scopes
           post :create, create_params
+          expect(json_response["media"][0]["src"]).to eq(new_resource.put_url)
         end
 
-        it "should replace the old media" do
-          parent.reload
-          expect(parent.send(media_type)).to eq(new_resource)
-        end
+        describe "updates relationship" do
+          before(:each) do
+            default_request user_id: authorized_user.id, scopes: scopes
+            post :create, create_params
+          end
 
-        it "should destroy the old media" do
-          expect{ resource.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          it "should replace the old #{media_type}" do
+            parent.reload
+            expect(parent.send(media_type)).to eq(new_resource)
+          end
+
+          it "should destroy the old #{media_type}" do
+            expect{ resource.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          end
         end
       end
     end
   end
 
   describe "parent is a project" do
-    let(:project) { create(:project, owner: authorized_user) }
-    let(:resources) { [project.avatar, project.background] }
-    let(:parent) { project }
+    let(:parent) { create(:project, owner: authorized_user) }
 
-    it_behaves_like "has_one media", :project, :avatar
-    it_behaves_like "has_one media", :project, :background
+    it_behaves_like "has_one media", :project, :avatar, %i(create index), "image/jpeg"
+    it_behaves_like "has_one media", :project, :background, %i(create index), "image/jpeg"
     it_behaves_like "has_many media", :project, :attached_images, %i(index create show destroy), 'image/jpeg'
-    it_behaves_like "has_many media", :project, :classifications_exports, %i(index show destroy), 'text/csv'
+    it_behaves_like "has_one media", :project, :classifications_export, %i(index), 'text/csv'
 
     describe "classifications_exports #index" do
       let!(:resources) do
@@ -235,12 +240,12 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
       it 'should return 404 without an authorized_user' do
         default_request user_id: create(:user).id, scopes: scopes
-        get :index, :project_id => parent.id, :media_name => "classifications_exports"
+        get :index, :project_id => parent.id, :media_name => "classifications_export"
         expect(response).to have_http_status(:not_found)
       end
 
       it 'should return 404 without a user' do
-        get :index, :project_id => parent.id, :media_name => "classifications_exports"
+        get :index, :project_id => parent.id, :media_name => "classifications_export"
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -248,8 +253,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
   describe "parent is a user" do
     let(:parent) { authorized_user }
-    let(:resources) { [authorized_user.avatar] }
 
-    it_behaves_like "has_one media", :user, :avatar
+    it_behaves_like "has_one media", :user, :avatar, %i(create index), "image/jpeg"
   end
 end

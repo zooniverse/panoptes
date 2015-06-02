@@ -21,7 +21,7 @@ class Project < ActiveRecord::Base
   has_one :avatar, -> { where(type: "project_avatar") }, class_name: "Medium", as: :linked
   has_one :background, -> { where(type: "project_background") }, class_name: "Medium",
     as: :linked
-  has_many :classifications_exports, -> { where(type: "project_classifications_export")},
+  has_one :classifications_export, -> { where(type: "project_classifications_export")},
     class_name: "Medium", as: :linked
   has_many :attached_images, -> { where(type: "project_attached_image") }, class_name: "Medium",
     as: :linked

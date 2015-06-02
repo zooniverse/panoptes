@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ProjectSerializer do
-  let(:project) { create(:project_with_contents) }
+  let(:project) { create(:full_project) }
   let(:context) { {languages: ['en'], fields: [:title, :url_labels]} }
 
   let(:serializer) do

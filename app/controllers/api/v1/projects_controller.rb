@@ -35,10 +35,16 @@ class Api::V1::ProjectsController < Api::ApiController
   prepend_before_action :require_login, only: [:create, :update, :destroy, :create_export]
 
   def create_export
-    media_create_params = params.require(:media).permit(:content_type)
-    medium = controlled_resource.classifications_exports.create!(media_create_params)
+    media_create_params = params.require(:media).permit(:content_type, metadata: [recipients: []])
+    media_create_params[:metadata] ||= { recipients: [api_user.id] }
+    if medium = controlled_resource.classifications_export
+      medium.update!(media_create_params)
+    else
+      medium = controlled_resource.create_classifications_export(media_create_params)
+    end
+
     ClassificationsDumpWorker.perform_async(controlled_resource.id, medium.id)
-    headers['Location'] = "#{request.protocol}#{request.host_with_port}/api/projects/#{controlled_resource.id}/classifications_exports/#{medium.id}"
+    headers['Location'] = "#{request.protocol}#{request.host_with_port}/api#{medium.location}"
     headers['Last-Modified'] = medium.updated_at.httpdate
     json_api_render(:created, MediumSerializer.resource({}, Medium.where(id: medium.id)))
   end

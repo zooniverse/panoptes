@@ -54,7 +54,7 @@ RSpec.describe Export::JSON::Project do
     JSON.parse(exporter.to_json)[object_key]
   end
 
-  let(:project) { create(:project_with_workflows) }
+  let(:project) { create(:full_project) }
   let(:avatar) { project.avatar }
   let(:background) { project.background }
   let(:project_content) { project.primary_content }
@@ -119,7 +119,6 @@ RSpec.describe Export::JSON::Project do
     end
 
     describe "workflows" do
-
       it "should be able to rebuild each workflow from the export" do
         export_values("workflows").each do |workflow_attrs|
           new_workflow = Workflow.new(workflow_attrs)
@@ -173,7 +172,7 @@ RSpec.describe Export::JSON::Project do
         end
 
         it "should build 8 instances" do
-          expect(instances.size).to eq(8)
+          expect(instances.size).to eq(6)
         end
 
         it "should be able to recreate the set of valid project instances" do
