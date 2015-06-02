@@ -366,6 +366,25 @@ describe Api::V1::UsersController, type: :controller do
         expect(user.reload.display_name).to eq(prev_display_name)
       end
     end
+
+    context "when attempting to update the project_id" do
+      let!(:prev_project_id) { user.project_id }
+      let(:put_operations) { { users: { project_id: 2 } } }
+      before(:each) { update_request }
+
+      it "should return an error status" do
+        expect(response.status).to eq(422)
+      end
+
+      it "should return a specific error message in the response body" do
+        error_message = json_error_message("found unpermitted parameter: project_id")
+        expect(response.body).to eq(error_message)
+      end
+
+      it "should not updated the resource attribute" do
+        expect(user.reload.project_id).to eq(prev_project_id)
+      end
+    end
   end
 
   describe "#destroy" do
