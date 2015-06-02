@@ -19,8 +19,9 @@ describe WorkflowSerializer do
   end
 
   describe "#version" do
-    it 'should be a string of the current workflow version id and the workflow content version id', :versioning do
-      expect(serializer.version).to eq("#{workflow.versions.last.id}.#{content.versions.last.id}")
+    it 'should be the current workflow and workflow content version number', :versioning do
+      expected = "#{workflow.versions.last.index+1}.#{content.versions.last.index+1}"
+      expect(serializer.version).to eq(expected)
     end
   end
 
@@ -44,7 +45,7 @@ describe WorkflowSerializer do
     describe "#version", versioning: true do
 
       it "should use a 1 suffix for missing content versions" do
-        version_num = workflow.versions.last.id
+        version_num = workflow.versions.last.index + 1
         expect(serializer.version).to eq("#{version_num}.1")
       end
     end

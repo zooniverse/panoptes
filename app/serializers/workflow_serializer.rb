@@ -44,7 +44,7 @@ class WorkflowSerializer
 
   def version_index_number(model)
     if model && last_version = model.versions.last
-      last_version.id
+      last_version.index + 1
     else
       DEFAULT_WORKFLOW_VERSION_NUM
     end
