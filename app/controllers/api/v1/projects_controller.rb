@@ -49,6 +49,10 @@ class Api::V1::ProjectsController < Api::ApiController
     json_api_render(:created, MediumSerializer.resource({}, Medium.where(id: medium.id)))
   end
 
+  def create
+    super { |project| TalkAdminCreateWorker.perform_async(project.id) }
+  end
+
   private
 
   def create_response(projects)

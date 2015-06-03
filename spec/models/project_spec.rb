@@ -226,4 +226,48 @@ describe Project, :type => :model do
       expect(subject_relation).to be_finished
     end
   end
+
+  describe "#owners_and_collaborators" do
+    let!(:collaborators) do
+      project.save!
+      col1 = create(:user)
+      col2 = create(:user)
+      expert = create(:user)
+
+      create(:access_control_list, user_group: col1.identity_group, resource: project, roles: ["collaborator"])
+      create(:access_control_list, user_group: col2.identity_group, resource: project, roles: ["collaborator"])
+      create(:access_control_list, user_group: expert.identity_group, resource: project, roles: ["expert"])
+      [col1, col2, expert]
+    end
+
+    it 'should load the owner' do
+      expect(project.owners_and_collaborators.map(&:id)).to include(project.owner.id)
+    end
+
+    it 'should include the collaborators' do
+      expect(project.owners_and_collaborators.map(&:id)).to include(*collaborators[0..1].map(&:id))
+    end
+
+    it 'should not include users with other roles' do
+      expect(project.owners_and_collaborators.map(&:id)).to_not include(collaborators.last.id)
+    end
+
+    it 'should not include owners of other projects' do
+      owner = create(:project).owner
+      expect(project.owners_and_collaborators.map(&:id)).to_not include(owner.id)
+    end
+  end
+
+  describe "#create_talk_admin" do
+    let(:resource) { double(create: true) }
+    let(:client) { double(roles: resource) }
+
+    it 'should create roles' do
+      project.save!
+      expect(resource).to receive(:create).with(name: 'admin',
+                                                user_id: project.owner.id,
+                                                section: "#{project.id}-#{project.display_name}")
+      project.create_talk_admin(client)
+    end
+  end
 end

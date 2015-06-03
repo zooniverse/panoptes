@@ -306,6 +306,14 @@ describe Api::V1::ProjectsController, type: :controller do
         it_behaves_like "admin only option", :approved, true
       end
 
+      describe "create talk admin" do
+        it 'should queue a talk admin create worker' do
+          expect(TalkAdminCreateWorker).to receive(:perform_async).with(instance_of Fixnum)
+          default_request scopes: scopes, user_id: authorized_user.id
+          post :create, create_params
+        end
+      end
+
       describe "correct serializer configuration" do
         before(:each) do
           default_request scopes: scopes, user_id: authorized_user.id
