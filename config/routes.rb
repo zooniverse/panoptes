@@ -59,7 +59,7 @@ Rails.application.routes.draw do
 
       json_api_resources :users, except: [:new, :edit, :create], links: [:user_groups] do
         get "/recents", to: "users#recents", format: false
-        media_resources :avatar
+        media_resources :avatar, :profile_header
       end
 
       json_api_resources :groups, links: [:users] do

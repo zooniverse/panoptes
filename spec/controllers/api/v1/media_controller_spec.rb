@@ -255,5 +255,6 @@ RSpec.describe Api::V1::MediaController, type: :controller do
     let(:parent) { authorized_user }
 
     it_behaves_like "has_one media", :user, :avatar, %i(create index), "image/jpeg"
+    it_behaves_like "has_one media", :user, :profile_header, %i(create index), "image/jpeg"
   end
 end

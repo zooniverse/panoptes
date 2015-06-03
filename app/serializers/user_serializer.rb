@@ -10,7 +10,7 @@ class UserSerializer
     projects: { param: "owner", value: "slug" },
     collections: { param: "owner", value: "slug" }
 
-  media_include :avatar
+  media_include :avatar, :profile_header
 
   def credited_name
     permitted_value(@model.credited_name)
