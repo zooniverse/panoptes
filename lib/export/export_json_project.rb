@@ -12,8 +12,8 @@ module Export
       end
 
       def self.project_content_attributes
-        %w( language title description introduction science_case guide faq
-            url_labels )
+        %w( language title description introduction science_case guide
+            faq education_content url_labels )
       end
 
       def self.workflow_attributes
@@ -48,28 +48,34 @@ module Export
         project.workflows
       end
 
+      def model_attributes(model, attrs)
+        model.try(:as_json).try(:slice, *attrs).tap do |model_attrs|
+          yield model_attrs if block_given?
+        end
+      end
+
       def project_attrs
-        project_hash = project.as_json.slice(*self.class.project_attributes)
-        project_hash.merge!(private: true)
+        model_attributes(project, self.class.project_attributes) do |project_hash|
+          project_hash.merge!(private: true)
+        end
       end
 
       def avatar_attrs
-        project.avatar.as_json.slice(*self.class.media_attributes)
+        model_attributes(project.avatar, self.class.media_attributes)
       end
 
       def background_attrs
-        project.background.as_json.slice(*self.class.media_attributes)
+        model_attributes(project.background, self.class.media_attributes)
       end
 
       def project_content_attrs
-        primary_content = project.primary_content
-        primary_content.as_json.slice(*self.class.project_content_attributes)
+        model_attributes(project.primary_content, self.class.project_content_attributes)
       end
 
       def workflows_attrs
         [].tap do |workflows|
           project_workflows.each do |workflow|
-             workflows << workflow.as_json.slice(*self.class.workflow_attributes)
+            workflows << model_attributes(workflow, self.class.workflow_attributes)
           end
         end
       end
@@ -78,7 +84,7 @@ module Export
         [].tap do |workflow_contents|
           project_workflows.each do |workflow|
             workflow.workflow_contents.each do |content|
-              workflow_contents << content.as_json.slice(*self.class.workflow_content_attributes)
+              workflow_contents << model_attributes(content, self.class.workflow_content_attributes)
             end
           end
         end

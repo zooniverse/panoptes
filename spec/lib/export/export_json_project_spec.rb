@@ -92,6 +92,14 @@ RSpec.describe Export::JSON::Project do
       it "should be able to rebuild the project_avatar from the export" do
         expect(new_project_avatar).to be_valid
       end
+
+      context "when the project avatar is missing" do
+
+        it "should not have a project_avatar data" do
+          allow_any_instance_of(Project).to receive(:avatar).and_return(nil)
+          expect(export_values("project_avatar")).to be_nil
+        end
+      end
     end
 
     describe "project_background" do
