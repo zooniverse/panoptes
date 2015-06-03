@@ -44,6 +44,10 @@ class ClassificationCreateSchema < JsonSchema
       property "seen_before" do
         type "boolean"
       end
+
+      property "utc_offset" do
+        type "string"
+      end
     end
 
     property "annotations" do
