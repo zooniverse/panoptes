@@ -85,6 +85,10 @@ GEM
       railties (>= 3.0.0)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
+    faraday-http-cache (1.1.0)
+      faraday (~> 0.8)
+    faraday_middleware (0.9.1)
+      faraday (>= 0.7.4, < 0.10)
     ffi (1.9.8)
     fig_rake (0.9.3)
     firebase_token_generator (2.0.0)
@@ -315,6 +319,9 @@ DEPENDENCIES
   devise
   doorkeeper (~> 1.4.1)
   factory_girl_rails (~> 4.5.0)
+  faraday
+  faraday-http-cache
+  faraday_middleware
   fig_rake (~> 0.9.3)
   firebase_token_generator
   foreman
