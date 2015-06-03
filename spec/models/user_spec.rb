@@ -104,8 +104,32 @@ describe User, type: :model do
       expect(build(:user, display_name: "$asdfasdf")).to_not be_valid
     end
 
-    it 'should not ahve an at sign' do
+    it 'should not have an at sign' do
       expect(build(:user, display_name: "@asdfasdf")).to_not be_valid
+    end
+
+    context "migrated users" do
+      let(:user) { build(:user, migrated: true) }
+
+      it 'should validate presence' do
+        user.display_name = ""
+        expect(user).to_not be_valid
+      end
+
+      it 'should not have whitespace' do
+        user.display_name = " asdf asdf"
+        expect(user).to be_valid
+      end
+
+      it 'should not have a dollar sign' do
+        user.display_name = "$asdfasdf"
+        expect(user).to be_valid
+      end
+
+      it 'should not have an at sign' do
+        user.display_name = "@asdfasdf"
+        expect(user).to be_valid
+      end
     end
 
     it 'should have non-blank error' do
