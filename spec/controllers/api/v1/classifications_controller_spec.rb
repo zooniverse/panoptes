@@ -6,7 +6,8 @@ def metadata_values
     finished_at: DateTime.now,
     workflow_version: "1.1",
     user_language: 'en',
-    user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0"
+    user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0",
+    utc_offset: Time.now.utc_offset
   }
 end
 
@@ -115,7 +116,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         it_behaves_like "a classification lifecycle event"
         it_behaves_like "a gold standard classfication"
 
-        context "when extra invalid classifcation properties are added" do
+        context "when extra invalid classification properties are added" do
           let!(:invalid_property) { :custom_field }
 
           it "should fail via the schema validator with the correct message" do
