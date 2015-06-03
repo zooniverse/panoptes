@@ -39,7 +39,7 @@ class Api::V1::UsersController < Api::ApiController
 
   def index
     if display_name = params.delete(:display_name)
-      @controlled_resources = controlled_resources.where('lower("users"."display_name") = lower(?)', display_name)
+      @controlled_resources = controlled_resources.where('"users"."display_name" ILIKE ?', display_name + '%')
     end
     super
   end

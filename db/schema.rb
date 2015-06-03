@@ -11,11 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150602140836) do
+ActiveRecord::Schema.define(version: 20150602160633) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "intarray"
+  enable_extension "pg_trgm"
 
   create_table "access_control_lists", force: :cascade do |t|
     t.integer  "user_group_id"
@@ -388,6 +389,7 @@ ActiveRecord::Schema.define(version: 20150602140836) do
   end
 
   add_index "users", ["display_name"], name: "index_users_on_display_name", unique: true, using: :btree
+  add_index "users", ["display_name"], name: "users_display_name_trgm_index", using: :gist, opclass: {"display_name"=>:gist_trgm_ops}
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
