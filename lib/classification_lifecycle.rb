@@ -65,7 +65,7 @@ class ClassificationLifecycle
   def subjects_are_unseen_by_user?
     !UserSeenSubject.find_by(user: user, workflow: workflow)
       .try(:subjects_seen?, subject_ids)
-  rescue ActiveRecord::NotFound
+  rescue ActiveRecord::RecordNotFound
     true
   end
 
