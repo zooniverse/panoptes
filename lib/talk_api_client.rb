@@ -10,8 +10,8 @@ class TalkApiClient
     end
 
     def create(attrs={})
-      connection.request('POST', href) do |req|
-        req.body = attrs.to_json
+      response = connection.request('post', href) do |req|
+        req.body = {@type => attrs}.to_json
       end
     end
 
@@ -47,7 +47,7 @@ class TalkApiClient
 
   attr_reader :connection, :token
 
-  def initialize(adapter = nil)
+  def initialize(adapter = Faraday.default_adapter)
     @resources = {}.with_indifferent_access
     create_token
     create_connection(adapter)
@@ -59,10 +59,11 @@ class TalkApiClient
       ac.resource_owner_id = user_id
       ac.application_id = application_id
       ac.expires_in = 1.day
+      ac.scopes = "public user project"
     end
   end
 
-  def create_connection(adapter = Faraday.default_adapter)
+  def create_connection(adapter)
     @connection = Faraday.new host do |faraday|
       faraday.response :json, content_type: /\bjson$/
       faraday.use :http_cache, store: Rails.cache, logger: Rails.logger
@@ -80,7 +81,7 @@ class TalkApiClient
     connection.send(method, path, *args) do |req|
       req.headers["Accept"] = "application/vnd.api+json"
       req.headers["Content-Type"] = "application/json"
-      req.headers["Authorization"] = "Bearer #{token}"
+      req.headers["Authorization"] = "Bearer #{token.token}"
       yield req if block_given?
     end
   end
