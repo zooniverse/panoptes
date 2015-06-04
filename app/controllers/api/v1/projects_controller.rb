@@ -75,17 +75,21 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    admin_allowed(:approved, :redirect)
+    admin_allowed(:beta_approved, :launch_approved, :redirect)
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
     add_user_as_linked_owner(create_params)
     super(create_params)
   end
 
   def build_update_hash(update_params, id)
-    admin_allowed(:approved, :redirect)
+    admin_allowed(:beta_approved, :launch_approved, :redirect)
     content_update = content_from_params(update_params)
     unless content_update.blank?
       Project.find(id).primary_content.update!(content_update)
+    end
+    if update_params[:live] == false
+      update_params[:launch_approved] = false
+      update_params[:beta_approved] = false
     end
     super(update_params, id)
   end

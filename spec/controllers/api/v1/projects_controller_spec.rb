@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::ProjectsController, type: :controller do
   let!(:user) { create(:user) }
-  let!(:projects) {create_list(:project_with_contents, 2, owner: user, approved: true) }
+  let!(:projects) {create_list(:project_with_contents, 2, owner: user) }
   let(:authorized_user) { user }
 
   let(:api_resource_name) { "projects" }
@@ -28,8 +28,8 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:authorized_user) { user }
   let(:resource_class) { Project }
   let!(:private_resource) { create(:project, private: true) }
-  let!(:beta_resource) { create(:project, beta: true, approved: true) }
-  let!(:unapproved_resource) { create(:project, beta: false, approved: false) }
+  let!(:beta_resource) { create(:project, beta_approved: true, launch_approved: false) }
+  let!(:unapproved_resource) { create(:project, beta_approved: false, launch_approved: false) }
 
   describe "when not logged in" do
     describe "#index" do
@@ -88,7 +88,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
         describe "filter by beta" do
           context "for beta projects" do
-            let(:index_options) { { beta: "true" } }
+            let(:index_options) { { beta_approved: "true" } }
 
             it "should respond with the beta project" do
               ids = json_response["projects"].map{ |p| p["id"] }
@@ -97,7 +97,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
 
           context "for non-beta projects" do
-            let(:index_options) { { beta: "false" } }
+            let(:index_options) { { beta_approved: "false" } }
 
             it "should not have beta projects" do
               ids = json_response["projects"].map{ |p| p["id"] }
@@ -108,7 +108,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
         describe "filter by approved" do
           context "for unapproved projects" do
-            let(:index_options) { { approved: "false" } }
+            let(:index_options) { { launch_approved: "false" } }
 
             it "should respond with the unapproved project" do
               ids = json_response["projects"].map{ |p| p["id"] }
@@ -117,7 +117,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
 
           context "for approved projects" do
-            let(:index_options) { { approved: "true" } }
+            let(:index_options) { { launch_approved: "true" } }
             it "should not have unapproved projects" do
               ids = json_response["projects"].map{ |p| p["id"] }
               expect(Project.find(ids)).to_not include(unapproved_resource)
@@ -285,7 +285,7 @@ describe Api::V1::ProjectsController, type: :controller do
                      configuration: {
                                      an_option: "a setting"
                                     },
-                     beta: true,
+                     beta_requested: true,
                      private: true } }
       end
 
@@ -303,7 +303,11 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       describe "approved option" do
-        it_behaves_like "admin only option", :approved, true
+        it_behaves_like "admin only option", :launch_approved, true
+      end
+
+      describe "approved option" do
+        it_behaves_like "admin only option", :beta_approved, true
       end
 
       describe "create talk admin" do
@@ -466,7 +470,7 @@ describe Api::V1::ProjectsController, type: :controller do
                   configuration: {
                                   an_option: "a setting"
                                  },
-                  beta: true,
+                  beta_requested: true,
                   live: true,
                   links: {
                           workflows: [workflow.id.to_s],
@@ -483,7 +487,7 @@ describe Api::V1::ProjectsController, type: :controller do
       before(:each) do
         ps = update_params
         ps[:admin] = true
-        ps[:projects][:approved] = true
+        ps[:projects][:launch_approved] = true
         default_request scopes: scopes, user_id: authorized_user.id
         put :update, ps.merge(id: resource.id)
       end
@@ -499,6 +503,34 @@ describe Api::V1::ProjectsController, type: :controller do
         let(:authorized_user) { create(:user) }
         it "should not update the project" do
           expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+    end
+
+    context "live option" do
+      context "when set false" do
+        let!(:resource) {create(:project_with_contents, owner: user, beta_approved: true, launch_approved: true) }
+
+        before(:each) do
+          default_request scopes: scopes, user_id: authorized_user.id
+        end
+
+        it 'should set beta approved to false' do
+          expect do
+            ps = update_params
+            ps[:admin] = true
+            ps[:projects][:live] = false
+            put :update, ps.merge(id: resource.id)
+          end.to change{ Project.find(resource).beta_approved}.from(true).to(false)
+        end
+
+        it 'should set launch approved to false' do
+          expect do
+            ps = update_params
+            ps[:admin] = true
+            ps[:projects][:live] = false
+            put :update, ps.merge(id: resource.id)
+          end.to change{ Project.find(resource).launch_approved}.from(true).to(false)
         end
       end
     end

@@ -46,11 +46,19 @@ class ProjectUpdateSchema < JsonSchema
       type "boolean"
     end
 
-    property "approved" do
+    property "launch_approved" do
       type "boolean"
     end
 
-    property "beta" do
+    property "beta_approved" do
+      type "boolean"
+    end
+
+    property "launch_requested" do
+      type "boolean"
+    end
+
+    property "beta_requested" do
       type "boolean"
     end
 

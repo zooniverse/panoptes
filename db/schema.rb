@@ -206,18 +206,22 @@ ActiveRecord::Schema.define(version: 20150605103339) do
     t.boolean  "private"
     t.integer  "lock_version",          default: 0
     t.jsonb    "configuration"
-    t.boolean  "approved",              default: false
-    t.boolean  "beta",                  default: false
     t.boolean  "live",                  default: false, null: false
     t.jsonb    "urls",                  default: []
     t.boolean  "migrated",              default: false
     t.integer  "classifiers_count",     default: 0
     t.string   "slug",                  default: ""
     t.text     "redirect",              default: ""
+    t.boolean  "launch_requested",      default: false
+    t.boolean  "launch_approved",       default: false
+    t.boolean  "beta_requested",        default: false
+    t.boolean  "beta_approved",         default: false
   end
 
-  add_index "projects", ["approved"], name: "index_projects_on_approved", using: :btree
-  add_index "projects", ["beta"], name: "index_projects_on_beta", using: :btree
+  add_index "projects", ["beta_approved"], name: "index_projects_on_beta_approved", using: :btree
+  add_index "projects", ["beta_requested"], name: "index_projects_on_beta_requested", where: "(beta_requested IS TRUE)", using: :btree
+  add_index "projects", ["launch_approved"], name: "index_projects_on_launch_approved", using: :btree
+  add_index "projects", ["launch_requested"], name: "index_projects_on_launch_requested", where: "(launch_requested IS TRUE)", using: :btree
   add_index "projects", ["slug"], name: "index_projects_on_slug", using: :btree
 
   create_table "recents", force: :cascade do |t|

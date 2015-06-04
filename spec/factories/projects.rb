@@ -12,8 +12,7 @@ FactoryGirl.define do
     configuration { { x: "y", z: "q" } }
     primary_language "en"
     private false
-    approved true
-    beta false
+    launch_approved true
     live true
     urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
 
