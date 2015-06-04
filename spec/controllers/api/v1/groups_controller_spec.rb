@@ -146,7 +146,6 @@ describe Api::V1::GroupsController, type: :controller do
 
     context "created membership" do
       before(:each) do
-
         default_request scopes: scopes, user_id: authorized_user.id
         post :update_links, group_id: resource.id, users: [ new_user.id.to_s ], link_relation: "users"
       end

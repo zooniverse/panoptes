@@ -69,4 +69,25 @@ class Api::V1::WorkflowsController < Api::ApiController
     task_string_extractor.visit(tasks)
     [tasks, task_string_extractor.collector]
   end
+
+  def new_items(resource, relation, value)
+    items = construct_new_items(super(resource, relation, value), resource.project_id)
+    if items.any? { |item| item.is_a?(SubjectSet) }
+      items
+    else
+      items.first
+    end
+  end
+
+  def construct_new_items(item_scope, workflow_project_id)
+    Array.wrap(item_scope).map do |item|
+      if item.is_a?(SubjectSet) && !item.belongs_to_project?(workflow_project_id)
+        item.dup.tap do |subject_set|
+          subject_set.project_id = workflow_project_id
+        end
+      else
+        item
+      end
+    end
+  end
 end

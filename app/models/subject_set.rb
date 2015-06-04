@@ -18,10 +18,11 @@ class SubjectSet < ActiveRecord::Base
   can_through_parent :project, :update, :show, :destroy, :index, :update_links,
     :destroy_links
 
-  can_be_linked :workflow, :same_project?, :model
+  can_be_linked :project, :scope_for, :show, :user
+  can_be_linked :workflow, :scope_for, :show, :user
   can_be_linked :set_member_subject, :scope_for, :update, :user
 
-  def self.same_project?(workflow)
-    where(project: workflow.project)
+  def belongs_to_project?(other_project_id)
+    project_id == other_project_id
   end
 end
