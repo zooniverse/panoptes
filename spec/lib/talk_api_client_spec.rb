@@ -103,7 +103,7 @@ RSpec.describe TalkApiClient do
       subject { described_class.new([:test, stubs]).token.attributes }
 
       it { is_expected.to include("resource_owner_id" => user.id) }
-      it { is_expected.to include("application_id" => user.id) }
+      it { is_expected.to include("application_id" => application.id) }
       it { is_expected.to include("expires_in" => 1.day) }
     end
 
