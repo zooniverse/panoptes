@@ -84,6 +84,12 @@ RSpec.describe TalkApiClient do
   context "instance methods" do
     let(:stubs) do
       Faraday::Adapter::Test::Stubs.new do |stub|
+        stub.get('/error') do env
+          [404,
+           {'Content-Type' => 'application/vnd.api+json'},
+           {errors: [message: "Not Found"]}.to_json
+          ]
+        end
         stub.get('/') do |env|
           [200,
            {'Content-Type' => 'application/vnd.api+json'},
@@ -126,6 +132,16 @@ RSpec.describe TalkApiClient do
         expect(subject.connection).to receive(:send).with('get', '/')
         subject.request('get', '/')
       end
+
+      it 'should set the token in the request' do
+        subject.request('get', '/') do |req|
+          expect(req.headers['Authorization']).to match(/Bearer [A-z0-9]+/)
+        end
+      end
+
+      it 'should raise an error on failure' do
+        expect{subject.request('get', '/error')}.to raise_error
+      end
     end
 
     describe "#method_missing" do
@@ -145,10 +161,10 @@ RSpec.describe TalkApiClient do
 
       describe "#create" do
         it 'should send a POST request with a JSON body' do
-          expect(conn_instance).to receive(:request).with('POST', '/roles') do |*args, &block|
+          expect(conn_instance).to receive(:request).with('post', '/roles') do |*args, &block|
             struct = Struct.new(:body).new
             block.call(struct)
-            expect(struct.body).to eq({role: "admin"}.to_json)
+            expect(struct.body).to eq({roles: {role: "admin"}}.to_json)
           end
           conn_instance.roles.create(role: "admin")
         end
