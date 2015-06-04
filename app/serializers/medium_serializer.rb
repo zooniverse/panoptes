@@ -15,6 +15,6 @@ class MediumSerializer
   end
 
   def src
-    @model.url_for_format(@context[:url_format])
+    @model.url_for_format(@context[:url_format] || :get)
   end
 end
