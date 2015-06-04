@@ -44,6 +44,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:test_attr_value) { "A Better Name" }
     let(:test_relation) { :subject_sets }
     let(:test_relation_ids) { subject_set.id }
+    let(:resource_id) { :workflow_id }
     let(:update_params) do
       {
        workflows: {
@@ -72,7 +73,6 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     it_behaves_like "is updatable"
-
     it_behaves_like "has updatable links"
 
     context "extracts strings from workflow" do
@@ -111,6 +111,59 @@ describe Api::V1::WorkflowsController, type: :controller do
         put :update, update_params.merge(id: resource.id)
       end
     end
+  end
+
+  describe "#update_links" do
+    let(:subject_set_project) { project }
+    let(:subject_set) { create(:subject_set, project: subject_set_project) }
+    let(:test_attr) { :display_name }
+    let(:test_attr_value) { "A Better Name" }
+    let(:test_relation) { :subject_sets }
+    let(:test_relation_ids) { [ subject_set.id.to_s ] }
+    let(:resource) { workflow }
+    let(:resource_id) { :workflow_id }
+
+    it_behaves_like "supports update_links"
+
+    context "when the subject_set links belong to another project" do
+      let!(:subject_set_project) do
+        workflows.find { |w| w.project != project }.project
+      end
+      let!(:expected_subject_set_id) do
+        subject_set and (SubjectSet.last.try(:id) || 0) + 1
+      end
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        params = {
+          link_relation: test_relation.to_s,
+          test_relation => test_relation_ids,
+          resource_id => resource.id
+        }
+        post :update_links, params
+      end
+
+      context "copy the linked subject_set" do
+
+        it 'should be successful' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'should have the same name' do
+          expect(resource.subject_sets.first.display_name).to eq(subject_set.display_name)
+        end
+
+        it 'should have the expected id' do
+          expect(resource.subject_sets.first.id).to eq(expected_subject_set_id)
+        end
+
+        it 'should belong to the correct project' do
+          expect(resource.subject_sets.first.project_id).to eq(resource.project_id)
+        end
+      end
+    end
+
+    it_behaves_like "supports update_links"
   end
 
   describe '#create' do
