@@ -1,0 +1,1 @@
+TalkApiClient.load_configuration

@@ -61,4 +61,18 @@ class Project < ActiveRecord::Base
   def expert_classifier?(classifier)
     !!expert_classifier_level(classifier)
   end
+
+  def owners_and_collaborators
+    User.joins(user_groups: :access_control_lists)
+      .merge(acls.where.overlap(roles: %w(owner collaborator)))
+      .select(:id)
+  end
+
+  def create_talk_admin(client)
+    owners_and_collaborators.each do |user|
+      client.roles.create(name: 'admin',
+                          user_id: user.id,
+                          section: "#{id}-#{display_name}")
+    end
+  end
 end
