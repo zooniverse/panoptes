@@ -13,7 +13,7 @@ describe RegistrationsController, type: :controller do
     let(:user_params) do
       [ :email, :password, :password_confirmation, :display_name,
         :global_email_communication, :project_email_communication,
-        :project_id ]
+        :beta_email_communication, :project_id ]
     end
 
     before(:each) do
@@ -102,6 +102,14 @@ describe RegistrationsController, type: :controller do
           expect(User.find(created_instance_id("users"))).to_not be_nil
         end
 
+        it "should set the permitted params on the created user" do
+          post :create, user: user_attributes
+          user = User.find(created_instance_id("users"))
+          user_attributes.except(:password).each do |attr, expected_value|
+            expect(user.send(attr)).to eq(expected_value)
+          end
+        end
+
         it "should sign the user in" do
           expect(subject).to receive(:sign_in)
           post :create, user: user_attributes
@@ -142,7 +150,7 @@ describe RegistrationsController, type: :controller do
         end
       end
 
-      context "when email communications are true" do
+      context "when email communications are false" do
         let(:extra_attributes) { { display_name: 'asdfasdf', global_email_communication: false } }
         it 'should call subscribe worker' do
           expect(SubscribeWorker).to_not receive(:perform_async)

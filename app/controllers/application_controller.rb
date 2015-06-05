@@ -22,7 +22,8 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.for(:sign_up) do |u|
       u.permit(:email, :password, :password_confirmation, :display_name,
                :credited_name, :global_email_communication,
-               :project_email_communication, :project_id)
+               :project_email_communication, :beta_email_communication,
+               :project_id)
     end
   end
 
