@@ -157,7 +157,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
         let(:collection) { create(:collection_with_subjects) }
         it "should create a new subject set with the collection's subjects" do
           set = SubjectSet.find(created_instance_id(api_resource_name))
-          expect(set.subjects).to match(collection.subjects)
+          expect(set.subjects).to match_array(collection.subjects)
         end
       end
 

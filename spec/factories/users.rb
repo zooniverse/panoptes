@@ -14,6 +14,7 @@ FactoryGirl.define do
     sequence(:display_name) { |n| "new_user_#{n}" }
     global_email_communication true
     project_email_communication true
+    beta_email_communication true
     admin false
     banned false
 
