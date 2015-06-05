@@ -6,7 +6,7 @@ class UserSerializer
   attributes :id, :display_name, :credited_name, :email, :created_at,
     :updated_at, :type, :firebase_auth_token, :global_email_communication,
     :project_email_communication, :beta_email_communication,
-    :slug, :max_subjects, :uploaded_subjects_count
+    :slug, :max_subjects, :uploaded_subjects_count, :admin
 
   can_include :classifications, :project_preferences, :collection_preferences,
     projects: { param: "owner", value: "slug" },
@@ -44,6 +44,10 @@ class UserSerializer
 
   def uploaded_subjects_count
     permitted_value(@model.uploaded_subjects_count)
+  end
+
+  def admin
+    requester ? @model.admin : false
   end
 
   def type

@@ -214,6 +214,33 @@ describe Api::V1::UsersController, type: :controller do
         end
       end
     end
+
+    describe "admin" do
+      let(:show_id) { users.first.id }
+      let(:admin_response) { created_instance(api_resource_name)["admin"] }
+
+      before(:each) do
+        allow_any_instance_of(User).to receive(:admin).and_return(true)
+        default_request(scopes: scopes, user_id: requesting_user_id)
+        get :show, id: show_id
+      end
+
+      context "when showing the a different user to the requesting user" do
+        let(:requesting_user_id) { users.last.id }
+
+        it "should not have the admin flag set" do
+          expect(admin_response).to eq(false)
+        end
+      end
+
+      context "when showing the requesting user" do
+        let(:requesting_user_id) { show_id }
+
+        it "should have the admin flag set" do
+          expect(admin_response).to eq(true)
+        end
+      end
+    end
   end
 
   describe "#me" do
