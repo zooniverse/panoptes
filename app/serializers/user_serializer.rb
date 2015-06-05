@@ -5,7 +5,7 @@ class UserSerializer
 
   attributes :id, :display_name, :credited_name, :email, :created_at,
     :updated_at, :type, :firebase_auth_token, :global_email_communication,
-    :slug, :max_subjects, :uploaded_subjects_count
+    :project_email_communication, :slug, :max_subjects, :uploaded_subjects_count
   can_include :classifications, :project_preferences, :collection_preferences,
     projects: { param: "owner", value: "slug" },
     collections: { param: "owner", value: "slug" }
@@ -22,6 +22,10 @@ class UserSerializer
 
   def global_email_communication
     permitted_value(@model.global_email_communication)
+  end
+
+  def project_email_communication
+    permitted_value(@model.project_email_communication)
   end
 
   def firebase_auth_token

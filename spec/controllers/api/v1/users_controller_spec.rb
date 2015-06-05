@@ -11,7 +11,7 @@ describe Api::V1::UsersController, type: :controller do
   let(:api_resource_attributes) do
     [ "id", "display_name", "credited_name", "email",
       "created_at", "updated_at", "type",
-      "global_email_communication" ]
+      "global_email_communication", "project_email_communication" ]
   end
 
   let(:api_resource_links) do
@@ -59,6 +59,14 @@ describe Api::V1::UsersController, type: :controller do
 
       it 'should have an empty string credited name' do
         expect(json_response[api_resource_name]).to all( include("credited_name" => "") )
+      end
+
+      it 'should have an empty string global email communication' do
+        expect(json_response[api_resource_name]).to all( include("global_email_communication" => "") )
+      end
+
+      it 'should have an empty string project email communication' do
+        expect(json_response[api_resource_name]).to all( include("project_email_communication" => "") )
       end
 
       it "should have an empty string for the uploaded_subjects_count" do
@@ -233,6 +241,10 @@ describe Api::V1::UsersController, type: :controller do
       expect(created_instance(api_resource_name)["global_email_communication"]).to eq(true)
     end
 
+    it "should have a the project email communication for the user" do
+      expect(created_instance(api_resource_name)["project_email_communication"]).to eq(true)
+    end
+
     it_behaves_like "an api response"
   end
 
@@ -343,9 +355,12 @@ describe Api::V1::UsersController, type: :controller do
     context "with a valid replace put operation" do
       before(:each) { update_request }
       let(:new_display_name) { "Mr_Creosote" }
-      let(:new_gec) { true }
+      let(:new_gec) { false }
+      let(:new_pec) { false }
       let(:put_operations) do
-        { users: { display_name: new_display_name, global_email_communication: new_gec } }
+        { users: { display_name: new_display_name,
+                   global_email_communication: new_gec,
+                   project_email_communication: new_pec } }
       end
 
       it "should return 200 status" do
@@ -358,6 +373,10 @@ describe Api::V1::UsersController, type: :controller do
 
       it "should have updated the global email communication attribute" do
         expect(user.reload.global_email_communication).to eq(new_gec)
+      end
+
+      it "should have updated the project email communication attribute" do
+        expect(user.reload.project_email_communication).to eq(new_pec)
       end
 
       it "should have a single group" do
