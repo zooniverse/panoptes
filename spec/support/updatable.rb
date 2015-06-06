@@ -1,7 +1,6 @@
 module UpdatableResource
   def self.extract_linked_resource_ids(linked_resource)
-    linked_resource.respond_to?(:map) ? linked_resource.map(&:id)
-                                      : [ linked_resource.id ]
+    Array.wrap(linked_resource).map { |lr| lr.id.to_s }
   end
 end
 
@@ -90,7 +89,8 @@ RSpec.shared_examples "supports update_links" do
   end
 
   it 'should update any included links' do
-    updated_relation_ids = updated_resource.send(test_relation).map(&:id).map(&:to_s)
+    linked_resource = updated_resource.send(test_relation)
+    updated_relation_ids = UpdatableResource.extract_linked_resource_ids(linked_resource)
     expect(updated_relation_ids).to include(*test_relation_ids)
   end
 
