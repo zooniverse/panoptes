@@ -172,8 +172,6 @@ describe Api::V1::WorkflowsController, type: :controller do
         end
       end
     end
-
-    it_behaves_like "supports update_links"
   end
 
   describe '#create' do
