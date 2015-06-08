@@ -115,7 +115,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
   describe "#update_links" do
     let(:subject_set_project) { project }
-    let(:subject_set) { create(:subject_set, project: subject_set_project) }
+    let(:subject_set) { create(:subject_set_with_subjects, project: subject_set_project) }
     let(:test_attr) { :display_name }
     let(:test_attr_value) { "A Better Name" }
     let(:test_relation) { :subject_sets }
@@ -129,11 +129,8 @@ describe Api::V1::WorkflowsController, type: :controller do
       let!(:subject_set_project) do
         workflows.find { |w| w.project != project }.project
       end
-      let!(:expected_subject_set_id) do
-        subject_set and (SubjectSet.last.try(:id) || 0) + 1
-      end
-
-      before(:each) do
+      let(:expected_subjects_count) { subject_set.subjects.count }
+      let(:update_via_links) do
         default_request scopes: scopes, user_id: authorized_user.id
         params = {
           link_relation: test_relation.to_s,
@@ -143,22 +140,35 @@ describe Api::V1::WorkflowsController, type: :controller do
         post :update_links, params
       end
 
+      it 'should subjects to copy' do
+        update_via_links
+        expect(expected_subjects_count).to_not eq(0)
+      end
+
       context "copy the linked subject_set" do
 
         it 'should be successful' do
+          update_via_links
           expect(response).to have_http_status(:ok)
         end
 
         it 'should have the same name' do
+          update_via_links
           expect(resource.subject_sets.first.display_name).to eq(subject_set.display_name)
         end
 
-        it 'should have the expected id' do
-          expect(resource.subject_sets.first.id).to eq(expected_subject_set_id)
+        it 'should create a new subject_set' do
+          subject_set
+          expect{ update_via_links }.to change { SubjectSet.count }.by(1)
         end
 
         it 'should belong to the correct project' do
+          update_via_links
           expect(resource.subject_sets.first.project_id).to eq(resource.project_id)
+        end
+
+        it 'should create copies of every subject via set_member_subjects' do
+          expect{ update_via_links }.to change { SetMemberSubject.count }.by(expected_subjects_count)
         end
       end
     end
