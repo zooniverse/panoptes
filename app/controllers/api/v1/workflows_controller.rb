@@ -96,8 +96,10 @@ class Api::V1::WorkflowsController < Api::ApiController
     orig_subject_set.dup.tap do |subject_set|
       subject_set.project_id = workflow_project_id
       subject_set.set_member_subjects_count = 0
-      subject_set.set_member_subjects = orig_subject_set.set_member_subjects.map do |sms|
-        SetMemberSubject.new(subject_set: subject_set, subject_id: sms.subject_id)
+      subject_set.set_member_subjects = [].tap do |new_smss|
+        orig_subject_set.set_member_subjects.find_each do |sms|
+          new_smss << SetMemberSubject.new(subject_set: subject_set, subject_id: sms.subject_id)
+        end
       end
     end
   end
