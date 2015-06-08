@@ -2,6 +2,7 @@ class ProjectSerializer
   include RestPack::Serializer
   include OwnerLinkSerializer
   include MediaLinksSerializer
+  include BlankTypeSerializer
 
   attributes :id, :display_name, :classifications_count,
     :subjects_count, :created_at, :updated_at, :available_languages,

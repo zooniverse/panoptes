@@ -1,6 +1,7 @@
 class SubjectSerializer
   include RestPack::Serializer
   include FilterHasMany
+  include BlankTypeSerializer
 
   attributes :id, :metadata, :locations, :zooniverse_id,
     :created_at, :updated_at

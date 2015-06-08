@@ -1,5 +1,6 @@
 class ProjectRoleSerializer
   include ACLSerializer
+  include BlankTypeSerializer
 
   attributes :id, :roles
   can_include :user_group, :resource

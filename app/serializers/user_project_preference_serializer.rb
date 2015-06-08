@@ -1,5 +1,6 @@
 class UserProjectPreferenceSerializer
   include RestPack::Serializer
+  include BlankTypeSerializer
   attributes :id, :email_communication, :preferences
   can_include :user, :project
 

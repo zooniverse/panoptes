@@ -1,5 +1,6 @@
 class RecentSerializer
   include RestPack::Serializer
+  include BlankTypeSerializer
 
   attributes :id, :created_at, :locations
   can_include :project, :workflow, :subject

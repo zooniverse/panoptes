@@ -1,6 +1,7 @@
 class SubjectSetSerializer
   include RestPack::Serializer
   include FilterHasMany
+  include BlankTypeSerializer
 
   attributes :id, :display_name, :set_member_subjects_count, :metadata,
     :created_at, :updated_at
