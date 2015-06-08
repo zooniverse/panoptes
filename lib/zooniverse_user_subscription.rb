@@ -9,31 +9,38 @@ class ZooniverseUserSubscription < ActiveRecord::Base
   serialize :summary, Hash
 
   def self.import_zoo_user_subscriptions(user_logins=nil)
-    zoo_subscriptions_scope(user_logins).find_each do |zoo_subscription|
-      zoo_subscription.import
+    zoo_project_subscriptions(user_logins).find_each do |user_project_sub|
+      unless user_project_sub.empty_summary?
+        user_project_sub.import
+      end
     end
   end
 
-  def self.zoo_subscriptions_scope(user_logins)
-    if user_logins.blank?
-      self.includes(:zooniverse_user).joins(:zooniverse_user)
-    else
-      self.includes(:zooniverse_user)
-        .joins(:zooniverse_user)
-        .where(users: { login: user_logins })
+  def self.zoo_project_subscriptions(user_logins)
+    subs_scope = self.where.not(user_id: nil, project_id: nil)
+      .includes(:zooniverse_user)
+      .joins(:zooniverse_user)
+      .distinct
+    unless user_logins.blank?
+      subs_scope = subs_scope.merge(ZooniverseUser.where(users: { login: user_logins }))
     end
+    subs_scope.group(:user_id, :project_id)
   end
 
   def import
-    return if missing_required_information?
+    return if user_id.nil? || empty_summary?
     zoo_project = find_legacy_migrated_project
     if panoptes_user = find_migrated_user
       migrated_upp = UserProjectPreference.find_or_initialize_by(project_id: zoo_project.id,
                                                                  user_id: panoptes_user.id)
-      migrated_upp.activity_count = summate_activity_count(migrated_upp.activity_count)
+      migrated_upp.activity_count = summate_activity_counts
       migrated_upp.email_communication = (notifications || true)
       migrated_upp.save!
     end
+  end
+
+  def empty_summary?
+    summary.empty?
   end
 
   private
@@ -56,13 +63,20 @@ class ZooniverseUserSubscription < ActiveRecord::Base
     migrated_user
   end
 
-  def missing_required_information?
-    user_id.nil? || summary.empty?
+  # Summate all the activity counts for the user : project id combo
+  # original DB has no validations and there are duplicates with different values
+  def summate_activity_counts
+    activity_count = 0
+    all_user_projects_subscriptions.find_each do |subscription|
+      next if subscription.empty_summary?
+      if count = subscription.summary.values.first[:count].to_i
+        activity_count += count
+      end
+    end
+    activity_count
   end
 
-  def summate_activity_count(existing_count)
-    current_count = (existing_count || 0)
-    new_count     = summary.values.first[:count].to_i
-    current_count + new_count
+  def all_user_projects_subscriptions
+    self.class.where(user_id: self.user_id, project_id: self.project_id).select(:id, :summary)
   end
 end
