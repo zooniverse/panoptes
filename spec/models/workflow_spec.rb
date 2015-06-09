@@ -157,5 +157,12 @@ describe Workflow, :type => :model do
       subject_relation.save!
       expect(subject_relation).to be_finished
     end
+
+    context "when no subject_sets relation exist" do
+      it 'should be false' do
+        allow(workflow).to receive(:subjects_count).and_return(0)
+        expect(workflow.finished?).to eq(false)
+      end
+    end
   end
 end
