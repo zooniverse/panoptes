@@ -1,5 +1,6 @@
 class ClassificationSerializer
   include RestPack::Serializer
+  include BlankTypeSerializer
   attributes :id, :annotations, :created_at, :metadata
   can_include :project, :user, :user_group, :workflow
 

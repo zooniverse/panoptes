@@ -62,23 +62,23 @@ describe Api::V1::UsersController, type: :controller do
         expect(json_response[api_resource_name]).to all( include("credited_name" => "") )
       end
 
-      it 'should have an empty string global email communication' do
-        expect(json_response[api_resource_name]).to all( include("global_email_communication" => "") )
+      it 'should have false global email communication' do
+        expect(json_response[api_resource_name]).to all( include("global_email_communication" => false) )
       end
 
-      it 'should have an empty string project email communication' do
-        expect(json_response[api_resource_name]).to all( include("project_email_communication" => "") )
+      it 'should have false project email communication' do
+        expect(json_response[api_resource_name]).to all( include("project_email_communication" => false) )
       end
 
-      it 'should have an empty string beta email communication' do
-        expect(json_response[api_resource_name]).to all( include("beta_email_communication" => "") )
+      it 'should have false beta email communication' do
+        expect(json_response[api_resource_name]).to all( include("beta_email_communication" => false) )
       end
 
-      it "should have an empty string for the uploaded_subjects_count" do
+      it "should have a zero for the uploaded_subjects_count" do
         expect(json_response[api_resource_name]).to all( include("uploaded_subjects_count" => 0) )
       end
 
-      it "should have an empty string for the max_subjects" do
+      it "should have a zero for the max_subjects" do
         expect(json_response[api_resource_name]).to all( include("max_subjects" => 0) )
       end
     end
@@ -202,7 +202,7 @@ describe Api::V1::UsersController, type: :controller do
         let(:requesting_user_id) { users.last.id }
 
         it "should not have a firebase auth token for the user" do
-          expect(response_fb_token).to be_nil
+          expect(response_fb_token).to be_empty
         end
       end
 
@@ -210,7 +210,7 @@ describe Api::V1::UsersController, type: :controller do
         let(:requesting_user_id) { show_id }
 
         it "should not have a firebase auth token for the user" do
-          expect(response_fb_token).to be_nil
+          expect(response_fb_token).to be_empty
         end
       end
     end

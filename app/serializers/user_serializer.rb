@@ -2,11 +2,12 @@ class UserSerializer
   include RestPack::Serializer
   include RecentLinkSerializer
   include MediaLinksSerializer
+  include BlankTypeSerializer
 
   attributes :id, :display_name, :credited_name, :email, :created_at,
-    :updated_at, :type, :firebase_auth_token, :global_email_communication,
-    :project_email_communication, :beta_email_communication,
-    :slug, :max_subjects, :uploaded_subjects_count, :admin
+    :updated_at, :type, :global_email_communication, :project_email_communication,
+    :beta_email_communication, :slug, :uploaded_subjects_count, :admin,
+    max_subjects: {type: :integer}, firebase_auth_token: {type: :string}
 
   can_include :classifications, :project_preferences, :collection_preferences,
     projects: { param: "owner", value: "slug" },
@@ -84,8 +85,6 @@ class UserSerializer
   def permitted_value(value)
     if permitted_requester?
       value
-    else
-      BlankTypeSerializer.default_value(value)
     end
   end
 end

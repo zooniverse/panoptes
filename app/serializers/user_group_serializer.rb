@@ -1,6 +1,7 @@
 class UserGroupSerializer
   include RestPack::Serializer
   include RecentLinkSerializer
+  include BlankTypeSerializer
   attributes :id, :display_name, :classifications_count, :created_at, :updated_at, :type,
     :slug
   can_include :memberships, :users,
