@@ -87,6 +87,20 @@ describe Api::V1::SubjectsController, type: :controller do
             end
 
             it_behaves_like "an api response"
+
+            context "with extraneous filtering params" do
+              let!(:request_params) do
+                { sort: 'queued', workflow_id: workflow.id.to_s, project_id: "1", collection_id: "1" }
+              end
+
+              it "should return 200" do
+                expect(response.status).to eq(200)
+              end
+
+              it 'should return a page of 2 objects' do
+                expect(json_response[api_resource_name].length).to eq(2)
+              end
+            end
           end
 
           context 'when the queue is below minimum' do
