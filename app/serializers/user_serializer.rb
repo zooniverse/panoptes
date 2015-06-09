@@ -3,7 +3,7 @@ class UserSerializer
   include RecentLinkSerializer
   include MediaLinksSerializer
 
-  attributes :id, :display_name, :credited_name, :email, :created_at,
+  attributes :id, :login, :display_name, :credited_name, :email, :created_at,
     :updated_at, :type, :firebase_auth_token, :global_email_communication,
     :project_email_communication, :beta_email_communication,
     :slug, :max_subjects, :uploaded_subjects_count, :admin

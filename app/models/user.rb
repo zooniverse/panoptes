@@ -31,8 +31,9 @@ class User < ActiveRecord::Base
 
   belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
 
-  validates :display_name, presence: true, uniqueness: { case_sensitive: false }
-  validates :display_name, format: { without: /\$|@|\s+/ }, unless: :migrated
+  validates :login, presence: true, uniqueness: { case_sensitive: false }
+  validates :login, format: { with: /\A[\w\-\.]{3,}\z/ }, if: :migrated
+  validates :display_name, presence: true, if: :migrated
 
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated
   validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
@@ -43,6 +44,8 @@ class User < ActiveRecord::Base
   delegate :collections, to: :identity_group
   delegate :subjects, to: :identity_group
   delegate :owns?, to: :identity_group
+
+  before_validation :default_display_name, on: [:create, :update]
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
@@ -65,9 +68,9 @@ class User < ActiveRecord::Base
     auth = Authorization.from_omniauth(auth_hash)
     auth.user ||= create do |u|
       u.email = auth_hash.info.email
+      u.display_name = auth_hash.info.name
+      u.login = u.display_name.gsub /\s+/, '_'
       u.password = Devise.friendly_token[0,20]
-      name = auth_hash.info.name
-      u.display_name = StringConverter.replace_spaces(name)
       u.build_identity_group
       u.authorizations << auth
     end
@@ -82,8 +85,13 @@ class User < ActiveRecord::Base
     end
   end
 
-  def self.find_for_database_authentication(conditions = {})
-    where('"users"."display_name" ILIKE ?', conditions[:display_name]).first || super
+  def self.find_for_database_authentication(conditions = { })
+    conditions = conditions.dup
+    if login = conditions.delete(:login)
+      where(conditions.to_hash).where('lower(login) = :value', value: login.downcase).first
+    else
+      where(conditions.to_hash).first
+    end
   end
 
   def memberships_for(action, klass)
@@ -126,7 +134,7 @@ class User < ActiveRecord::Base
   def build_identity_group
     raise StandardError, "Identity Group Exists" if identity_group
     build_identity_membership
-    identity_membership.build_user_group(display_name: display_name)
+    identity_membership.build_user_group(display_name: login)
   end
 
   def is_admin?
@@ -154,5 +162,9 @@ class User < ActiveRecord::Base
       end
     end
     !!worked
+  end
+
+  def default_display_name
+    self.display_name ||= login
   end
 end

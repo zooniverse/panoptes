@@ -16,7 +16,7 @@ RSpec.describe Formatter::CSV::Classification do
   end
 
   def formatted_data
-    [ classification.user.display_name,
+    [ classification.user.login,
       Digest::SHA1.hexdigest("#{classification.user_ip}#{expected_time}"),
       classification.workflow_id,
       classification.created_at,

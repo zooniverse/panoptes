@@ -11,7 +11,8 @@ FactoryGirl.define do
     encrypted_password { User.new.send(:password_digest, 'password') }
     credited_name 'Dr User'
     activated_state :active
-    sequence(:display_name) { |n| "new_user_#{n}" }
+    sequence(:login) { |n| "new_user_#{n}" }
+    sequence(:display_name){ |n| "New User #{ n }" }
     global_email_communication true
     project_email_communication true
     beta_email_communication true
@@ -20,12 +21,12 @@ FactoryGirl.define do
 
     after(:build) do |u, env|
       if env.build_group
-        u.identity_group = build(:user_group, display_name: u.display_name)
+        u.identity_group = build(:user_group, display_name: u.login)
         u.identity_membership = build(:membership, user: u, user_group: u.identity_group, state: 0, identity: true, roles: ["group_admin"])
       end
 
       if env.build_zoo_user
-        zu = create(:zooniverse_user, login: u.display_name, password: u.password, email: u.email)
+        zu = create(:zooniverse_user, login: u.login, display_name: u.display_name, password: u.password, email: u.email)
         u.zooniverse_id = zu.id.to_s
       end
     end
@@ -65,7 +66,7 @@ FactoryGirl.define do
 
     factory :inactive_user do
       activated_state :inactive
-      display_name 'deleted_user'
+      login 'deleted_user'
       email 'deleted_user@zooniverse.org'
     end
 
@@ -86,7 +87,8 @@ FactoryGirl.define do
   end
 
   factory :omniauth_user, class: :user do
-    sequence(:display_name) { |n| "new_user_#{n}" }
+    sequence(:login) { |n| "new_user_#{n}" }
+    display_name{ login }
     sequence(:email) {|n| "example#{n}@example.com"}
     password 'password'
     credited_name 'Dr New User'
@@ -94,7 +96,7 @@ FactoryGirl.define do
     languages ['en', 'es', 'fr-ca']
 
     after(:build) do |u|
-      u.identity_group = build(:user_group, display_name: u.display_name)
+      u.identity_group = build(:user_group, display_name: u.login)
       u.identity_membership = build(:membership, user: u, user_group: u.identity_group, state: 0, identity: true, roles: ["group_admin"])
       create_list(:authorization, 1, user: u, provider: 'facebook', uid: '12345')
     end

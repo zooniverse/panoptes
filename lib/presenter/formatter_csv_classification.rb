@@ -28,7 +28,7 @@ module Formatter
 
       def user_name
         if user = classification.user
-          user.display_name
+          user.login
         else
           "not logged in"
         end

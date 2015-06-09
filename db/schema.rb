@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150605103339) do
+ActiveRecord::Schema.define(version: 20150609183032) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -391,6 +391,7 @@ ActiveRecord::Schema.define(version: 20150605103339) do
     t.integer  "uploaded_subjects_count",     default: 0
     t.integer  "project_id"
     t.boolean  "beta_email_communication"
+    t.string   "login",                                          null: false
   end
 
   add_index "users", ["beta_email_communication"], name: "index_users_on_beta_email_communication", where: "(beta_email_communication IS TRUE)", using: :btree
@@ -398,6 +399,7 @@ ActiveRecord::Schema.define(version: 20150605103339) do
   add_index "users", ["display_name"], name: "users_display_name_trgm_index", using: :gist, opclass: {"display_name"=>:gist_trgm_ops}
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["global_email_communication"], name: "index_users_on_global_email_communication", where: "(global_email_communication IS TRUE)", using: :btree
+  add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "versions", force: :cascade do |t|

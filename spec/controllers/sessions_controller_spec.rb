@@ -13,23 +13,23 @@ describe SessionsController, type: :controller do
 
     describe "#create" do
       it "should respond with the user object" do
-        post :create, user: {display_name: user.display_name, password: user.password}
+        post :create, user: {login: user.login, password: user.password}
         expect(json_response).to include("users")
       end
 
       it "should respond with a 200" do
-        post :create, user: {display_name: user.display_name, password: user.password}
+        post :create, user: {login: user.login, password: user.password}
         expect(response.status).to eq(200)
       end
 
       it "should sign in the user" do
         expect(controller).to receive(:sign_in)
-        post :create, user: {display_name: user.display_name, password: user.password}
+        post :create, user: {login: user.login, password: user.password}
       end
 
-      it 'should ignore display_name case' do
+      it 'should ignore login case' do
         expect(controller).to receive(:sign_in)
-        post :create, user: {display_name: user.display_name.upcase, password: user.password}
+        post :create, user: {login: user.login.upcase, password: user.password}
       end
     end
 

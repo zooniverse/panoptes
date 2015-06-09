@@ -53,7 +53,7 @@ describe Api::EventsController, type: :controller do
 
         context "with invalid authentication credentials" do
           let!(:basic_auth) do
-            creds = [ user.display_name, user.password ]
+            creds = [ user.login, user.password ]
             ActionController::HttpAuthentication::Basic.encode_credentials(*creds)
           end
 

@@ -7,7 +7,7 @@ class Api::V1::UsersController < Api::ApiController
 
   schema_type :strong_params
 
-  allowed_params :update, :display_name, :email, :credited_name,
+  allowed_params :update, :login, :display_name, :email, :credited_name,
    :global_email_communication, :project_email_communication,
    :beta_email_communication
 

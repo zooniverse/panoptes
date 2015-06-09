@@ -21,7 +21,7 @@ class UserInfoScrubber
     @user.update_columns(email: nil)
   end
 
-  def self.scrubbed_display_name(tries)
+  def self.scrubbed_login(tries)
     suffix = tries > 0 ? tries : nil
     "#{DELETED_USER_NAME}_#{SecureRandom.uuid}#{suffix}"
   end

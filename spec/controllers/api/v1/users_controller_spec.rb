@@ -9,7 +9,7 @@ describe Api::V1::UsersController, type: :controller do
 
   let(:api_resource_name) { "users" }
   let(:api_resource_attributes) do
-    [ "id", "display_name", "credited_name", "email",
+    [ "id", "login", "display_name", "credited_name", "email",
       "created_at", "updated_at", "type",
       "global_email_communication", "project_email_communication",
       "beta_email_communication" ]
@@ -137,15 +137,16 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     describe "overridden serialiser instance assocation links" do
+      let(:user){ users.sample }
 
       before(:each) do
-        user = users.first
         create(:classification, user: user)
         get :index, { display_name: user.display_name }
       end
 
-      it "should respond with 1 item" do
-        expect(json_response[api_resource_name].length).to eq(1)
+      it "should respond with matching users" do
+        names = json_response[api_resource_name].collect{ |h| h['display_name'] }
+        expect(names).to all(match(/^#{ user.display_name }/))
       end
 
       it "should respond with the no model links" do
@@ -354,7 +355,7 @@ describe Api::V1::UsersController, type: :controller do
 
       context "from true to false" do
         let(:user) { create(:user, global_email_communication: true) }
-        let(:put_operations) { {users: {display_name: "TEST", global_email_communication: false}} }
+        let(:put_operations) { {users: {login: "TEST", global_email_communication: false}} }
         it 'should queue an unsubscribe worker' do
           expect(UnsubscribeWorker).to receive(:perform_async).with(user.email)
         end
@@ -402,12 +403,12 @@ describe Api::V1::UsersController, type: :controller do
 
     context "with a valid replace put operation" do
       before(:each) { update_request }
-      let(:new_display_name) { "Mr_Creosote" }
+      let(:new_login) { "Mr_Creosote" }
       let(:new_gec) { false }
       let(:new_pec) { false }
       let(:new_bec) { false }
       let(:put_operations) do
-        { users: { display_name: new_display_name,
+        { users: { login: new_login,
                    global_email_communication: new_gec,
                    project_email_communication: new_pec,
                    beta_email_communication: new_bec } }
@@ -417,8 +418,8 @@ describe Api::V1::UsersController, type: :controller do
         expect(response).to have_http_status(:ok)
       end
 
-      it "should have updated the display_name attribute" do
-        expect(user.reload.display_name).to eq(new_display_name)
+      it "should have updated the login attribute" do
+        expect(user.reload.login).to eq(new_login)
       end
 
       it "should have updated the global email communication attribute" do
@@ -454,8 +455,8 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should not updated the resource attribute" do
-        prev_display_name = user.display_name
-        expect(user.reload.display_name).to eq(prev_display_name)
+        prev_login = user.login
+        expect(user.reload.login).to eq(prev_login)
       end
     end
 
