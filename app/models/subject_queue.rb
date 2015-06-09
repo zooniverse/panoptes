@@ -71,13 +71,16 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.create_for_user(workflow, user, set: nil)
-    logged_out_queue = by_set(set).find_by(workflow: workflow, user: nil)
-    return nil unless logged_out_queue
-    queue = create(workflow: workflow,
-                   user: user,
-                   subject_set_id: set,
-                   set_member_subject_ids: logged_out_queue.set_member_subject_ids)
-    return queue if queue.persisted?
+    if logged_out_queue = by_set(set).find_by(workflow: workflow, user: nil)
+      queue = create(workflow: workflow,
+                     user: user,
+                     subject_set_id: set,
+                     set_member_subject_ids: logged_out_queue.set_member_subject_ids)
+      queue if queue.persisted?
+    else
+      SubjectQueueWorker.perform_async(workflow.id, nil)
+      nil
+    end
   end
 
   def self.dequeue_update(query, sms_ids)

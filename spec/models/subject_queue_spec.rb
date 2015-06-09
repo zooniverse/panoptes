@@ -41,7 +41,13 @@ RSpec.describe SubjectQueue, :type => :model do
     let(:workflow) {create(:workflow)}
     let(:user) { create(:user) }
 
-    context "no logged out queue" do
+    context "when no logged out queue" do
+
+      it 'should attempt to build a logged out queue' do
+        expect(SubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil)
+        SubjectQueue.create_for_user(workflow, user)
+      end
+
       it 'should return nil' do
         expect(SubjectQueue.create_for_user(workflow, user)).to be_nil
       end
