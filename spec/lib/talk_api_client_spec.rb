@@ -81,6 +81,11 @@ RSpec.describe TalkApiClient do
     end
   end
 
+  it 'raise an error when no host is configured' do
+    described_class.host = nil
+    expect{described_class.new}.to raise_error(TalkApiClient::NoTalkHostError, "A talk instance has not been configured for test environment")
+  end
+
   context "instance methods" do
     let(:stubs) do
       Faraday::Adapter::Test::Stubs.new do |stub|

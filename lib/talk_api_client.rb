@@ -1,4 +1,7 @@
 class TalkApiClient
+  class NoTalkHostError < StandardError
+  end
+
   class JSONAPIResource
     attr_reader :type, :href, :connection
     def initialize(connection, type, href)
@@ -10,7 +13,7 @@ class TalkApiClient
     end
 
     def create(attrs={})
-      response = connection.request('post', href) do |req|
+      connection.request('post', href) do |req|
         req.body = {@type => attrs}.to_json
       end
     end
@@ -48,6 +51,9 @@ class TalkApiClient
   attr_reader :connection, :token
 
   def initialize(adapter = Faraday.default_adapter)
+    unless host
+      raise NoTalkHostError, "A talk instance has not been configured for #{Rails.env} environment"
+    end
     @resources = {}.with_indifferent_access
     create_token
     create_connection(adapter)
