@@ -88,7 +88,7 @@ class User < ActiveRecord::Base
   def self.find_for_database_authentication(conditions = { })
     conditions = conditions.dup
     if login = conditions.delete(:login)
-      where(conditions.to_hash).where('lower(login) = :value', value: login.downcase).first
+      where(conditions.to_hash).where('lower(login) = :value or lower(email) = :value or lower(display_name) = :value', value: login.downcase).first
     else
       where(conditions.to_hash).first
     end
