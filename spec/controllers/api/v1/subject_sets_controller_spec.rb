@@ -35,8 +35,8 @@ describe Api::V1::SubjectSetsController, type: :controller do
     it_behaves_like 'is showable'
   end
 
-  describe '#update', :focus do
-    let(:subjects) { create_list(:subject, 4) }
+  describe '#update' do
+    let(:subjects) { create_list(:subject, 4, project: project) }
     let(:workflow) { create(:workflow, project: project) }
     let(:resource) { create(:subject_set, project: project) }
     let(:resource_id) { :subject_set_id }
@@ -62,7 +62,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
     it_behaves_like "has updatable links"
 
-    it_behaves_like "supports update_links", :focus
+    it_behaves_like "supports update_links"
 
     context "reload subject queue" do
       let(:workflows) { [create(:workflow, project: project)] }

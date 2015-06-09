@@ -584,6 +584,69 @@ describe Api::V1::ProjectsController, type: :controller do
     end
   end
 
+  describe "#update_links" do
+    let(:resource) { create(:project_with_contents, owner: authorized_user) }
+    let(:resource_id) { :project_id }
+    let(:test_attr) { :display_name }
+    let(:test_relation_ids) { [ linked_resource.id.to_s ] }
+    let(:copied_resource) { resource.reload.send(test_relation).first }
+
+    describe "linking a workflow" do
+      let!(:linked_resource) { create(:workflow, project: resource) }
+      let(:test_relation) { :workflows }
+      let(:expected_copies_count) { 1 }
+
+      it_behaves_like "supports update_links"
+
+      describe "linking a workflow that belongs to another project", :focus do
+        let!(:linked_resource) { create(:workflow) }
+
+        it_behaves_like "supports update_links via a copy of the original" do
+
+          it 'should have the same name' do
+            update_via_links
+            expect(copied_resource.display_name).to eq(linked_resource.display_name)
+          end
+
+          it 'should belong to the correct project' do
+            update_via_links
+            expect(copied_resource.project_id).to eq(resource.id)
+          end
+        end
+      end
+    end
+
+    # describe "linking a subject_set" do
+    #   let(:linked_resource) { create(:subject_set_with_subjects, project: resource) }
+    #   let(:test_relation) { :subject_sets }
+    #   let(:expected_copies_count) { linked_resource.subjects.count }
+    #
+    #   it_behaves_like "supports update_links"
+    #
+    #   describe "linking a subject_set that belongs to another project" do
+    #     let!(:linked_resource) { create(:subject_set_with_subjects) }
+    #     #TODO: get the subject set copying over with a full copy of the SMS's
+    #
+    #     # it_behaves_like "supports update_links via a copy of the original" do
+    #     #
+    #     #   it 'should have the same name' do
+    #     #     update_via_links
+    #     #     expect(copied_resource.display_name).to eq(linked_resource.display_name)
+    #     #   end
+    #     #
+    #     #   it 'should belong to the correct project' do
+    #     #     update_via_links
+    #     #     expect(copied_resource.project_id).to eq(resource.project_id)
+    #     #   end
+    #     #
+    #     #   it 'should create copies of every subject via set_member_subjects' do
+    #     #     expect{ update_via_links }.to change { SetMemberSubject.count }.by(expected_copies_count)
+    #     #   end
+    #     # end
+    #   end
+    # end
+  end
+
   describe "#create_export" do
     let(:resource) { create(:full_project, owner: user) }
     let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/classifications_export/ }

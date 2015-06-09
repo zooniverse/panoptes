@@ -43,7 +43,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:test_attr) { :display_name }
     let(:test_attr_value) { "A Better Name" }
     let(:test_relation) { :subject_sets }
-    let(:test_relation_ids) { subject_set.id }
+    let(:test_relation_ids) { subject_set.id.to_s }
     let(:resource_id) { :workflow_id }
     let(:update_params) do
       {
@@ -73,6 +73,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     it_behaves_like "is updatable"
+
     it_behaves_like "has updatable links"
 
     context "extracts strings from workflow" do
@@ -115,13 +116,14 @@ describe Api::V1::WorkflowsController, type: :controller do
 
   describe "#update_links" do
     let(:subject_set_project) { project }
-    let(:subject_set) { create(:subject_set_with_subjects, project: subject_set_project) }
+    let(:linked_resource) { create(:subject_set_with_subjects, project: subject_set_project) }
     let(:test_attr) { :display_name }
-    let(:test_attr_value) { "A Better Name" }
     let(:test_relation) { :subject_sets }
-    let(:test_relation_ids) { [ subject_set.id.to_s ] }
+    let(:test_relation_ids) { [ linked_resource.id.to_s ] }
+    let(:expected_copies_count) { linked_resource.subjects.count }
     let(:resource) { workflow }
     let(:resource_id) { :workflow_id }
+    let(:copied_resource) { resource.reload.send(test_relation).first }
 
     it_behaves_like "supports update_links"
 
@@ -129,46 +131,21 @@ describe Api::V1::WorkflowsController, type: :controller do
       let!(:subject_set_project) do
         workflows.find { |w| w.project != project }.project
       end
-      let(:expected_subjects_count) { subject_set.subjects.count }
-      let(:update_via_links) do
-        default_request scopes: scopes, user_id: authorized_user.id
-        params = {
-          link_relation: test_relation.to_s,
-          test_relation => test_relation_ids,
-          resource_id => resource.id
-        }
-        post :update_links, params
-      end
 
-      it 'should subjects to copy' do
-        update_via_links
-        expect(expected_subjects_count).to_not eq(0)
-      end
-
-      context "copy the linked subject_set" do
-
-        it 'should be successful' do
-          update_via_links
-          expect(response).to have_http_status(:ok)
-        end
+      it_behaves_like "supports update_links via a copy of the original" do
 
         it 'should have the same name' do
           update_via_links
-          expect(resource.subject_sets.first.display_name).to eq(subject_set.display_name)
-        end
-
-        it 'should create a new subject_set' do
-          subject_set
-          expect{ update_via_links }.to change { SubjectSet.count }.by(1)
+          expect(copied_resource.display_name).to eq(linked_resource.display_name)
         end
 
         it 'should belong to the correct project' do
           update_via_links
-          expect(resource.subject_sets.first.project_id).to eq(resource.project_id)
+          expect(copied_resource.project_id).to eq(resource.project_id)
         end
 
         it 'should create copies of every subject via set_member_subjects' do
-          expect{ update_via_links }.to change { SetMemberSubject.count }.by(expected_subjects_count)
+          expect{ update_via_links }.to change { SetMemberSubject.count }.by(expected_copies_count)
         end
       end
     end
