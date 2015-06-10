@@ -35,7 +35,8 @@ unless password == second_password
 end
 
 #setup an admin user
-attrs = { password: password,
+attrs = { admin: true,
+          password: password,
           login: 'zooniverse_admin',
           email: 'no-reply@zooniverse.org' }
 admin = User.create(attrs) do |user|
