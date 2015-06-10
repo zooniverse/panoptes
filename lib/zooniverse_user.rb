@@ -41,7 +41,7 @@ class ZooniverseUser < ActiveRecord::Base
 
   def import
     #use the indexed field
-    user = User.find_or_initialize_by login: User.sanitized_login(login)
+    user = User.find_or_initialize_by login: User.sanitize_login(login)
     return nil if user.disabled?
     setup_panoptes_user_account(user)
     user.save ? user : nil
@@ -76,7 +76,7 @@ class ZooniverseUser < ActiveRecord::Base
       pu.build_avatar(external_link: true, src: avatar_to_url)
       pu.build_identity_group
     end
-    pu.login = User.sanitized_login login
+    pu.login = User.sanitize_login login
     pu.display_name = display_name
     pu.email = email
     pu.encrypted_password = crypted_password

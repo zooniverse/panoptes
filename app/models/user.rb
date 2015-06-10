@@ -71,7 +71,7 @@ class User < ActiveRecord::Base
     auth.user ||= create do |u|
       u.email = auth_hash.info.email
       u.display_name = auth_hash.info.name
-      u.login = sanitized_login u.display_name
+      u.login = sanitize_login u.display_name
       u.password = Devise.friendly_token[0,20]
       u.build_identity_group
       u.authorizations << auth
@@ -98,7 +98,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def self.sanitized_login(string)
+  def self.sanitize_login(string)
     string
       .gsub(/\s+/, '_')
       .gsub /[^#{ ALLOWED_LOGIN_CHARACTERS }]/, ''
