@@ -87,7 +87,7 @@ Rails.application.configure do
 
   config.middleware.insert_before 0, Rack::Cors do
     allow do
-      origins(/^https?:\/\/(127\.0\.0\.1|localhost|10\.0\.2\.2|[a-z0-9-]+\.zooniverse\.org)(:\d+)?$/)
+      origins(/^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.[0-9]+\.[0-9]+\.[0-9]+|[a-z0-9-]+\.zooniverse\.org)(:\d+)?$/)
       resource '*',
         headers: CorsConfig.request_headers,
         methods: CorsConfig.request_methods,
