@@ -18,8 +18,8 @@ class SubjectSerializer
   end
 
   def retired
-    !!(workflow && @model.set_member_subjects.first
-       .retired_workflow_ids.include?(workflow.id))
+    @model.retired_for_workflow?(workflow)
+
   end
 
   def already_seen

@@ -23,4 +23,12 @@ class Subject < ActiveRecord::Base
   def migrated_subject?
     !!migrated
   end
+
+  def retired_for_workflow?(workflow)
+    if workflow && workflow.is_a?(Workflow) && workflow.persisted?
+      set_member_subjects.first.retired_workflow_ids.include?(workflow.id)
+    else
+      false
+    end
+  end
 end
