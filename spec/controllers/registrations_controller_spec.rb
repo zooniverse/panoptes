@@ -187,9 +187,11 @@ describe RegistrationsController, type: :controller do
 
         it "should provide an error message in the response body" do
           post :create, user: user_attributes
-          error_keys = %w(login identity_group.display_name)
-          error_body = Hash[error_keys.zip(Array.new(3, ["can't be blank"]))]
-          expect(response.body).to eq(json_error_message(error_body))
+          error_keys = %w(login display_name identity_group.display_name)
+          errors = json_response['errors'].first['message']
+          error_keys.each do |key|
+            expect(errors[key]).to include "can't be blank"
+          end
         end
       end
 

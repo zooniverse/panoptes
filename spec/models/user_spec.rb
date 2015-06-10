@@ -92,47 +92,26 @@ describe User, type: :model do
   end
 
   describe '#login' do
-    context "migrated users" do
-      let(:user) { build(:user, migrated: true) }
+    let(:user) { build(:user, migrated: true) }
 
-      it 'should validate presence' do
-        user.login = ""
-        expect(user).to_not be_valid
-      end
-
-      it 'should not have whitespace' do
-        user.login = " asdf asdf"
-        expect(user).to_not be_valid
-      end
-
-      it 'should not have non alpha characters' do
-        user.login = "asdf!fdsa"
-        expect(user).to_not be_valid
-      end
-
-      it 'should allow dashes and underscores' do
-        user.login = "abc-def_123"
-        expect(user).to be_valid
-      end
+    it 'should validate presence' do
+      user.login = ""
+      expect(user).to_not be_valid
     end
 
-    context "unmigrated users" do
-      let(:user) { build(:user, migrated: false) }
+    it 'should not have whitespace' do
+      user.login = " asdf asdf"
+      expect(user).to_not be_valid
+    end
 
-      it 'should validate presence' do
-        user.login = ""
-        expect(user).to_not be_valid
-      end
+    it 'should not have non alpha characters' do
+      user.login = "asdf!fdsa"
+      expect(user).to_not be_valid
+    end
 
-      it 'should allow whitespace' do
-        user.login = " asdf asdf"
-        expect(user).to be_valid
-      end
-
-      it 'should allow non alpha characters' do
-        user.login = "asdf@+-.fdsa"
-        expect(user).to be_valid
-      end
+    it 'should allow dashes and underscores' do
+      user.login = "abc-def_123"
+      expect(user).to be_valid
     end
 
     it 'should have non-blank error' do

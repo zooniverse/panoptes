@@ -12,7 +12,7 @@ FactoryGirl.define do
     credited_name 'Dr User'
     activated_state :active
     sequence(:login) { |n| "new_user_#{n}" }
-    sequence(:display_name){ |n| "New User #{ n }" }
+    display_name{ login.try(:titleize) || login }
     global_email_communication true
     project_email_communication true
     beta_email_communication true

@@ -31,9 +31,9 @@ class User < ActiveRecord::Base
 
   belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
 
-  validates :login, presence: true, uniqueness: { case_sensitive: false }
-  validates :login, format: { with: /\A[\w\-\.]{3,}\z/ }, if: :migrated
-  validates :display_name, presence: true, if: :migrated
+  validates :login, presence: true, format: { with: /\A[\w\-\.]{3,}\z/ }
+  validates :display_name, presence: true
+  validates_with LoginUniquenessValidator
 
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated
   validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
