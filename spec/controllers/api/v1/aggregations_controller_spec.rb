@@ -63,7 +63,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
     let(:test_attr) { :aggregation }
     let(:test_attr_value) { aggregation_results }
     let(:test_relation) { :subject }
-    let(:test_relation_ids) { subject.id }
+    let(:test_relation_ids) { [ subject.id ] }
     let(:update_params) do
       { aggregations:
           {
