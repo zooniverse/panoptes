@@ -1,7 +1,6 @@
 module UpdatableResource
   def self.extract_linked_resource_ids(linked_resource)
-    linked_resource.respond_to?(:map) ? linked_resource.map(&:id)
-                                      : [ linked_resource.id ]
+    Array.wrap(linked_resource).map { |lr| lr.id.to_s }
   end
 end
 
@@ -61,6 +60,7 @@ end
 
 RSpec.shared_examples "has updatable links" do
   let(:updated_resource) { resource.reload }
+  let(:stringified_test_relation_ids) { Array.wrap(test_relation_ids).map(&:to_s) }
 
   before(:each) do
     default_request scopes: scopes, user_id: authorized_user.id
@@ -71,13 +71,14 @@ RSpec.shared_examples "has updatable links" do
   it 'should update any included links' do
     linked_resource = updated_resource.send(test_relation)
     expected_ids = UpdatableResource.extract_linked_resource_ids(linked_resource)
-    expect(expected_ids).to include(*test_relation_ids)
+    expect(expected_ids).to include(*stringified_test_relation_ids)
   end
 end
 
 RSpec.shared_examples "supports update_links" do
   let!(:old_ids) { resource.send(test_relation).map(&:id) }
   let(:updated_resource) { resource.reload }
+  let(:stringified_test_relation_ids) { Array.wrap(test_relation_ids).map(&:to_s) }
 
   before(:each) do
     default_request scopes: scopes, user_id: authorized_user.id
@@ -90,11 +91,43 @@ RSpec.shared_examples "supports update_links" do
   end
 
   it 'should update any included links' do
-    updated_relation_ids = updated_resource.send(test_relation).map(&:id).map(&:to_s)
-    expect(updated_relation_ids).to include(*test_relation_ids)
+    linked_resource = updated_resource.send(test_relation)
+    updated_relation_ids = UpdatableResource.extract_linked_resource_ids(linked_resource)
+    expect(updated_relation_ids).to include(*stringified_test_relation_ids)
   end
 
   it 'should retain pre-existing links' do
     expect(updated_resource.send(test_relation).map(&:id)).to include(*old_ids)
+  end
+end
+
+
+RSpec.shared_examples "supports update_links via a copy of the original" do
+  let!(:old_ids) { resource.send(test_relation).map(&:id) }
+  let(:updated_resource) { resource.reload }
+
+  let(:update_via_links) do
+    default_request scopes: scopes, user_id: authorized_user.id
+    params = {
+      link_relation: test_relation.to_s,
+      test_relation => test_relation_ids,
+      resource_id => resource.id
+    }
+    post :update_links, params
+  end
+
+  it 'should have resources to copy' do
+    update_via_links
+    expect(expected_copies_count).to_not eq(0)
+  end
+
+  it 'should be successful' do
+    update_via_links
+    expect(response).to have_http_status(:ok)
+  end
+
+  it "should create a new linked_resource" do
+    linked_resource
+    expect{ update_via_links }.to change { linked_resource.class.count }.by(1)
   end
 end
