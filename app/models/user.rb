@@ -144,7 +144,7 @@ class User < ActiveRecord::Base
   def build_identity_group
     raise StandardError, "Identity Group Exists" if identity_group
     build_identity_membership
-    identity_membership.build_user_group(display_name: login)
+    identity_membership.build_user_group(display_name: display_name, name: login)
   end
 
   def is_admin?
