@@ -15,39 +15,39 @@ class UserSerializer
   media_include :avatar, :profile_header
 
   def credited_name
-    permitted_value(@model.credited_name)
+    @model.credited_name
   end
 
   def email
-    permitted_value(@model.email)
+    @model.email
   end
 
   def global_email_communication
-    permitted_value(@model.global_email_communication)
+    @model.global_email_communication
   end
 
   def project_email_communication
-    permitted_value(@model.project_email_communication)
+    @model.project_email_communication
   end
 
   def beta_email_communication
-    permitted_value(@model.beta_email_communication)
+    @model.beta_email_communication
   end
 
   def firebase_auth_token
-    FirebaseUserToken.generate(@model) if show_firebase_token?
+    FirebaseUserToken.generate(@model)
   end
 
   def max_subjects
-    permitted_value(Panoptes.max_subjects)
+    Panoptes.max_subjects
   end
 
   def uploaded_subjects_count
-    permitted_value(@model.uploaded_subjects_count)
+    @model.uploaded_subjects_count
   end
 
   def admin
-    requester ? @model.admin : false
+    !!@model.admin
   end
 
   def type
@@ -64,6 +64,11 @@ class UserSerializer
     @permitted ||= @context[:include_private] || requester
   end
 
+  %w(credited_name email global_email_communication project_email_communication
+     beta_email_communication uploaded_subjects_count max_subjects admin).each do |me_only_attribute|
+    alias_method :"include_#{me_only_attribute}?", :permitted_requester?
+  end
+
   def requester
     @context[:requester] && @context[:requester].logged_in? &&
       (@context[:requester].is_admin? || requester_is_user?)
@@ -73,19 +78,11 @@ class UserSerializer
     @model.id == @context[:requester].id
   end
 
-  def show_firebase_token?
+  def include_firebase_auth_token?
     @context[:include_firebase_token] && requester_is_user?
   end
 
   def add_links(model, data)
     data[:links] = {}
-  end
-
-  def permitted_value(value)
-    if permitted_requester?
-      value
-    else
-      BlankTypeSerializer.default_value(value)
-    end
   end
 end
