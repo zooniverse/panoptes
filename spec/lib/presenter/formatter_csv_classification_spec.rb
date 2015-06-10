@@ -4,28 +4,35 @@ require 'formatter_csv_classification'
 RSpec.describe Formatter::CSV::Classification do
 
   def project_headers
-    %w( user_name user_ip workflow_id created_at
-        gold_standard expert metadata annotations
-        subject_data workflow_version)
+    %w( user_name user_ip workflow_id workflow_name workflow_version
+        created_at gold_standard expert metadata annotations subject_data )
   end
 
   def subject_data
     {
-     "1" => { loudness: 11, brightness: -20, distance_from_earth: "42 light years" }
+     "1" => {
+       loudness: 11, brightness: -20, distance_from_earth: "42 light years",
+       retired: false
+      }
     }.to_json
+  end
+
+  def ip_hash
+    Digest::SHA1.hexdigest("#{classification.user_ip}#{expected_time}")
   end
 
   def formatted_data
     [ classification.user.display_name,
-      Digest::SHA1.hexdigest("#{classification.user_ip}#{expected_time}"),
+      ip_hash,
       classification.workflow_id,
+      classification.workflow.display_name,
+      classification.workflow_version,
       classification.created_at,
       classification.gold_standard,
       classification.expert_classifier,
       classification.metadata.to_json,
       classification.annotations.to_json,
-      subject_data,
-      classification.workflow_version
+      subject_data
     ]
   end
 
@@ -64,7 +71,7 @@ RSpec.describe Formatter::CSV::Classification do
       it 'should should return not logged in' do
         allow(classification).to receive(:user).and_return(nil)
         user_id = formatter.to_array(classification)[0]
-        expect(user_id).to eq("not logged in")
+        expect(user_id).to eq("not-logged-in-#{ip_hash}")
       end
     end
   end
