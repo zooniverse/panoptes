@@ -2,6 +2,8 @@ class User < ActiveRecord::Base
   include Activatable
   include Linkable
 
+  ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
+
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
     :omniauthable, omniauth_providers: [:facebook, :gplus]
@@ -31,7 +33,7 @@ class User < ActiveRecord::Base
 
   belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
 
-  validates :login, presence: true, format: { with: /\A[\w\-\.]{3,}\z/ }
+  validates :login, presence: true, format: { with: /\A#{ ALLOWED_LOGIN_CHARACTERS }{3,}\z/ }
   validates :display_name, presence: true
   validates_with LoginUniquenessValidator
 
@@ -69,7 +71,7 @@ class User < ActiveRecord::Base
     auth.user ||= create do |u|
       u.email = auth_hash.info.email
       u.display_name = auth_hash.info.name
-      u.login = u.display_name.gsub /\s+/, '_'
+      u.login = sanitized_login u.display_name
       u.password = Devise.friendly_token[0,20]
       u.build_identity_group
       u.authorizations << auth
@@ -87,11 +89,19 @@ class User < ActiveRecord::Base
 
   def self.find_for_database_authentication(warden_conditions = { })
     warden_conditions = warden_conditions.dup
-    if login = warden_conditions.delete(:login)
+    login = warden_conditions.delete(:login)
+
+    if login.present?
       where(warden_conditions.to_hash).where('lower(login) = :value or lower(email) = :value or lower(display_name) = :value', value: login.downcase).first
     else
       where(warden_conditions.to_hash).first
     end
+  end
+
+  def self.sanitized_login(string)
+    string
+      .gsub(/\s+/, '_')
+      .gsub /[^#{ ALLOWED_LOGIN_CHARACTERS }]/, ''
   end
 
   def memberships_for(action, klass)
