@@ -21,7 +21,7 @@ FactoryGirl.define do
 
     after(:build) do |u, env|
       if env.build_group
-        u.identity_group = build(:user_group, display_name: u.login)
+        u.identity_group = build(:user_group, name: u.login)
         u.identity_membership = build(:membership, user: u, user_group: u.identity_group, state: 0, identity: true, roles: ["group_admin"])
       end
 

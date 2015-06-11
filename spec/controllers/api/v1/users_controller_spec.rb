@@ -91,7 +91,7 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       describe "filter by display_name" do
-        let(:index_options) { { slug: user.identity_group.slug } }
+        let(:index_options) { { display_name: user.display_name } }
 
         it "should respond with 1 item" do
           expect(json_response[api_resource_name].length).to eq(1)
@@ -178,12 +178,12 @@ describe Api::V1::UsersController, type: :controller do
 
       it 'should include a customized url for projects' do
         projects_link = json_response['links']['users.projects']['href']
-        expect(projects_link).to eq("/projects?owner={users.slug}")
+        expect(projects_link).to eq("/projects?owner={users.login}")
       end
 
       it 'should include a customized url for collections' do
         collections_link = json_response['links']['users.collections']['href']
-        expect(collections_link).to eq("/collections?owner={users.slug}")
+        expect(collections_link).to eq("/collections?owner={users.login}")
       end
 
       it_behaves_like "an api response"

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150609183032) do
+ActiveRecord::Schema.define(version: 20150611145631) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -330,12 +330,7 @@ ActiveRecord::Schema.define(version: 20150609183032) do
     t.string   "display_name"
     t.boolean  "private",               default: true, null: false
     t.integer  "lock_version",          default: 0
-    t.string   "slug",                  default: ""
   end
-
-  add_index "user_groups", ["display_name"], name: "index_user_groups_on_display_name", unique: true, using: :btree
-  add_index "user_groups", ["name"], name: "index_user_groups_on_name", unique: true, using: :btree
-  add_index "user_groups", ["slug"], name: "index_user_groups_on_slug", unique: true, using: :btree
 
   create_table "user_project_preferences", force: :cascade do |t|
     t.integer  "user_id"

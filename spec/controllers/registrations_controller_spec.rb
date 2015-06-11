@@ -163,7 +163,7 @@ describe RegistrationsController, type: :controller do
 
         it "should convert the identity_group#name field correctly" do
           post :create, user: user_attributes
-          owner_uniq_name = User.find(created_instance_id("users")).identity_group.display_name
+          owner_uniq_name = User.find(created_instance_id("users")).identity_group.name
           expect(owner_uniq_name).to eq("Test_User_Login")
         end
       end
@@ -263,7 +263,7 @@ describe RegistrationsController, type: :controller do
         let(:extra_attributes) { { login: 'asdfasdf', global_email_communication: true } }
         it 'should call subscribe worker' do
           expect(SubscribeWorker).to receive(:perform_async)
-            .with(user_attributes[:email], user_attributes[:display_name])
+            .with(user_attributes[:email], 'asdfasdf')
           post :create, user: user_attributes
         end
       end

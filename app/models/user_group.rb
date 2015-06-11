@@ -19,12 +19,9 @@ class UserGroup < ActiveRecord::Base
            source_type: "Collection"
 
   validates :display_name, presence: true
-  validates :display_name, format: { without: /\$|@|\s+/ }, unless: :identity?
-  validates :name, presence: true, uniqueness: true
-  validates :slug, uniqueness: true
+  validates :name, presence: true, uniqueness: { case_sensitive: false }, format: { with: /\A#{ User::ALLOWED_LOGIN_CHARACTERS }{3,}\z/ }
 
-  before_validation :downcase_case_insensitive_fields
-  before_validation :create_url_slug
+  before_validation :default_display_name, on: [:create, :update]
 
   scope :public_groups, -> { where(private: false) }
 
@@ -77,21 +74,9 @@ class UserGroup < ActiveRecord::Base
     !!memberships.where(identity: true).pluck(:identity).first
   end
 
-  def create_url_slug
-    if display_name_changed?
-      unless (url = display_name.to_url).blank?
-        self.slug = url
-      else
-        self.slug = "user-#{id}".to_url
-      end
-    end
-  end
-
   private
 
-  def downcase_case_insensitive_fields
-    if name.nil? && display_name
-      self.name = display_name.downcase
-    end
+  def default_display_name
+    self.display_name ||= name
   end
 end

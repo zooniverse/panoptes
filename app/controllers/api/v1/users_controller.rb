@@ -42,8 +42,6 @@ class Api::V1::UsersController < Api::ApiController
   def index
     if display_name = params.delete(:display_name)
       @controlled_resources = controlled_resources.where('"users"."display_name" ILIKE ?', display_name + '%')
-    elsif slug = params.delete(:slug)
-      @controlled_resources = controlled_resources.joins(:user_groups).where(user_groups: {slug: slug})
     end
     super
   end

@@ -133,6 +133,15 @@ describe User, type: :model do
       dup_user.valid?
       expect(dup_user.errors[:login]).to include("has already been taken")
     end
+
+    it 'should constrain database uniqueness' do
+      user = create :user
+      dup_user = create :user
+
+      expect {
+        dup_user.update_attribute 'login', user.login.upcase
+      }.to raise_error ActiveRecord::RecordNotUnique
+    end
   end
 
   describe '#email' do
@@ -140,7 +149,7 @@ describe User, type: :model do
     context "when a user is setup" do
       let(:user) { create(:user, email: 'test@example.com') }
 
-      it 'should raise an error trying to save a duplcate' do
+      it 'should raise an error trying to save a duplicate' do
         expect{ create(:user, email: user.email.upcase) }.to raise_error
       end
 
@@ -148,6 +157,15 @@ describe User, type: :model do
         dup = build(:user, email: user.email.upcase)
         dup.valid?
         expect(dup.errors[:email]).to include("has already been taken")
+      end
+
+      it 'should constrain database uniqueness' do
+        user = create :user
+        dup_user = create :user
+
+        expect {
+          dup_user.update_attribute 'email', user.email.upcase
+        }.to raise_error ActiveRecord::RecordNotUnique
       end
     end
 
@@ -195,8 +213,8 @@ describe User, type: :model do
         expect(user.identity_membership.identity).to eq(true)
       end
 
-      it 'should have a group with the same display_name as the user login' do
-        expect(user.identity_group.display_name).to eq(user.login)
+      it 'should have a group with the same name as the user login' do
+        expect(user.identity_group.name).to eq(user.login)
       end
 
       it 'should raise error if a user has an identity group' do
@@ -206,7 +224,7 @@ describe User, type: :model do
     end
 
     context "when a user_group with the same name in different case exists" do
-      let!(:user_group) { create(:user_group, display_name: user.login.upcase) }
+      let!(:user_group) { create(:user_group, name: user.login.upcase) }
 
       it "should not be valid" do
         expect do
