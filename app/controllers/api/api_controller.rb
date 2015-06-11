@@ -58,7 +58,9 @@ module Api
       ( param_langs | user_langs | header_langs ).compact
     end
 
-    alias_method :user_for_paper_trail, :current_resource_owner
+    def user_for_paper_trail
+      @whodunnit_id ||= current_resource_owner.try(:id) || "UnauthenticatedUser"
+    end
 
     def user_accept_languages
       api_user.try(:languages) || []
