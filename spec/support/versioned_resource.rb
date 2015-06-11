@@ -30,6 +30,20 @@ RSpec.shared_examples "a versioned resource" do
     PaperTrail.enabled_for_controller = false
   end
 
+  describe "#user_for_paper_trail" do
+
+    it 'should respond with the current user id when logged in' do
+      expect(subject.send(:user_for_paper_trail)).to eq(authorized_user.id)
+    end
+
+    context "when not logged in" do
+      it 'should respond with the current user id' do
+        allow(subject).to receive(:current_resource_owner).and_return(nil)
+        expect(subject.send(:user_for_paper_trail)).to eq("UnauthenticatedUser")
+      end
+    end
+  end
+
   describe "#versions" do
     before(:each) do
       get :versions, { resource_param => resource.id }

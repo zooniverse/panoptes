@@ -6,8 +6,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   resource_actions :default
   schema_type :json_schema
 
-  attr_accessor :workflow_project_id
-
   def show
     load_queue
     super
@@ -73,8 +71,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def new_items(resource, relation, value)
-    @workflow_project_id = resource.project_id
-    items = construct_new_items(super(resource, relation, value))
+    items = construct_new_items(super(resource, relation, value), resource.project_id)
     if items.any? { |item| item.is_a?(SubjectSet) }
       items
     else
@@ -82,24 +79,12 @@ class Api::V1::WorkflowsController < Api::ApiController
     end
   end
 
-  def construct_new_items(item_scope)
+  def construct_new_items(item_scope, workflow_project_id)
     Array.wrap(item_scope).map do |item|
       if item.is_a?(SubjectSet) && !item.belongs_to_project?(workflow_project_id)
-        duplicate_subject_set_and_subjects(item)
+        SubjectSetCopier.new(item, workflow_project_id).duplicate_subject_set_and_subjects
       else
         item
-      end
-    end
-  end
-
-  def duplicate_subject_set_and_subjects(orig_subject_set)
-    orig_subject_set.dup.tap do |subject_set|
-      subject_set.project_id = workflow_project_id
-      subject_set.set_member_subjects_count = 0
-      subject_set.set_member_subjects = [].tap do |new_smss|
-        orig_subject_set.set_member_subjects.find_each do |sms|
-          new_smss << SetMemberSubject.new(subject_set: subject_set, subject_id: sms.subject_id)
-        end
       end
     end
   end

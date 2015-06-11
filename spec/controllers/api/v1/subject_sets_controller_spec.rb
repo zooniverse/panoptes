@@ -36,13 +36,14 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#update' do
-    let(:subjects) { create_list(:subject, 4) }
+    let(:subjects) { create_list(:subject, 4, project: project) }
     let(:workflow) { create(:workflow, project: project) }
     let(:resource) { create(:subject_set, project: project) }
+    let(:resource_id) { :subject_set_id }
     let(:test_attr) { :display_name }
     let(:test_attr_value) { "A Better Name" }
     let(:test_relation) { :subjects }
-    let(:test_relation_ids) { subjects.map(&:id) }
+    let(:test_relation_ids) { subjects.map { |s| s.id.to_s } }
     let(:update_params) do
       {
        subject_sets: {
@@ -60,6 +61,8 @@ describe Api::V1::SubjectSetsController, type: :controller do
     it_behaves_like "is updatable"
 
     it_behaves_like "has updatable links"
+
+    it_behaves_like "supports update_links"
 
     context "reload subject queue" do
       let(:workflows) { [create(:workflow, project: project)] }

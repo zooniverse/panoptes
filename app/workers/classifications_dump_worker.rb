@@ -33,7 +33,7 @@ class ClassificationsDumpWorker
   end
 
   def completed_project_classifications
-    project.classifications.complete.includes(:user)
+    project.classifications.complete.includes(:user, :workflow)
   end
 
   def project_file_path

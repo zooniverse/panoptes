@@ -9,10 +9,7 @@ describe Api::V1::UsersController, type: :controller do
 
   let(:api_resource_name) { "users" }
   let(:api_resource_attributes) do
-    [ "id", "login", "display_name", "credited_name", "email",
-      "created_at", "updated_at", "type",
-      "global_email_communication", "project_email_communication",
-      "beta_email_communication" ]
+    [ "id", "display_name", "created_at", "updated_at", "type"]
   end
 
   let(:api_resource_links) do
@@ -44,6 +41,70 @@ describe Api::V1::UsersController, type: :controller do
         expect(json_response[api_resource_name].length).to eq(20)
       end
 
+
+      context "the record for the requesting user" do
+        let(:requester) { json_response[api_resource_name].find{ |records| records["id"] == users.first.id.to_s } }
+        it 'should have an email address' do
+          expect(requester).to include("email")
+        end
+
+        it 'should have a credited name' do
+          expect(requester).to include("credited_name")
+        end
+
+        it 'should have a global email communication' do
+          expect(requester).to include("global_email_communication")
+        end
+
+        it 'should have a project email communication' do
+          expect(requester).to include("project_email_communication")
+        end
+
+        it 'should have a beta email communication' do
+          expect(requester).to include("beta_email_communication")
+        end
+
+        it "should have a uploaded_subjects_count" do
+          expect(requester).to include("uploaded_subjects_count")
+        end
+
+        it "should have a max_subjects" do
+          expect(requester).to include("max_subjects")
+        end
+      end
+
+      context "a record for a different user" do
+        let(:not_requester) { json_response[api_resource_name].find{ |records| records["id"] != users.first.id.to_s } }
+
+        it 'should not have an email address' do
+          expect(not_requester).to_not include("email")
+        end
+
+        it 'should not have a credited name' do
+          expect(not_requester).to_not include("credited_name")
+        end
+
+        it 'should not have a global email communication' do
+          expect(not_requester).to_not include("global_email_communication")
+        end
+
+        it 'should not have a project email communication' do
+          expect(not_requester).to_not include("project_email_communication")
+        end
+
+        it 'should not have a beta email communication' do
+          expect(not_requester).to_not include("beta_email_communication")
+        end
+
+        it "should not have a uploaded_subjects_count" do
+          expect(not_requester).to_not include("uploaded_subjects_count")
+        end
+
+        it "should not have a max_subjects" do
+          expect(not_requester).to_not include("max_subjects")
+        end
+      end
+
       it_behaves_like "an api response"
       it_behaves_like 'an indexable etag response'
     end
@@ -54,32 +115,32 @@ describe Api::V1::UsersController, type: :controller do
         get :index
       end
 
-      it 'should have an empty string email address' do
-        expect(json_response[api_resource_name]).to all( include("email" => "") )
+      it 'should not have an email address' do
+        expect(json_response[api_resource_name][0]).to_not include("email")
       end
 
-      it 'should have an empty string credited name' do
-        expect(json_response[api_resource_name]).to all( include("credited_name" => "") )
+      it 'should not have a credited name' do
+        expect(json_response[api_resource_name][0]).to_not include("credited_name")
       end
 
-      it 'should have an empty string global email communication' do
-        expect(json_response[api_resource_name]).to all( include("global_email_communication" => "") )
+      it 'should not have a global email communication' do
+        expect(json_response[api_resource_name][0]).to_not include("global_email_communication")
       end
 
-      it 'should have an empty string project email communication' do
-        expect(json_response[api_resource_name]).to all( include("project_email_communication" => "") )
+      it 'should not have a project email communication' do
+        expect(json_response[api_resource_name][0]).to_not include("project_email_communication")
       end
 
-      it 'should have an empty string beta email communication' do
-        expect(json_response[api_resource_name]).to all( include("beta_email_communication" => "") )
+      it 'should not have a beta email communication' do
+        expect(json_response[api_resource_name][0]).to_not include("beta_email_communication")
       end
 
-      it "should have an empty string for the uploaded_subjects_count" do
-        expect(json_response[api_resource_name]).to all( include("uploaded_subjects_count" => 0) )
+      it "should not have a uploaded_subjects_count" do
+        expect(json_response[api_resource_name][0]).to_not include("uploaded_subjects_count")
       end
 
-      it "should have an empty string for the max_subjects" do
-        expect(json_response[api_resource_name]).to all( include("max_subjects" => 0) )
+      it "should not have a max_subjects" do
+        expect(json_response[api_resource_name][0]).to_not include("max_subjects")
       end
     end
 
@@ -195,7 +256,7 @@ describe Api::V1::UsersController, type: :controller do
       before(:each) do
         default_request(scopes: scopes, user_id: requesting_user_id)
         allow_any_instance_of(UserSerializer)
-          .to receive(:show_firebase_token?).and_return(false)
+          .to receive(:include_firebase_auth_token?).and_return(false)
         get :show, id: show_id
       end
 
@@ -229,8 +290,8 @@ describe Api::V1::UsersController, type: :controller do
       context "when showing the a different user to the requesting user" do
         let(:requesting_user_id) { users.last.id }
 
-        it "should not have the admin flag set" do
-          expect(admin_response).to eq(false)
+        it "should not have the admin field" do
+          expect(json_response[api_resource_name][0]).to_not include("admin")
         end
       end
 

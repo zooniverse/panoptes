@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Subject, :type => :model do
-
   let(:subject) { build(:subject) }
   let(:locked_factory) { :subject }
   let(:locked_update) { {metadata: { "Test" => "data" } } }
@@ -92,6 +91,40 @@ describe Subject, :type => :model do
     it "should have a counter cache" do
       subject.save!
       expect(subject.uploader.uploaded_subjects_count).to eq(1)
+    end
+  end
+
+  describe "#retired_for_workflow?" do
+    let(:workflow_id) { 5 }
+    let(:workflow) { build(:workflow_with_subject_sets) }
+    let!(:subject) { create(:subject_with_subject_sets) }
+
+    before(:each) do
+      allow(workflow).to receive(:persisted?).and_return(true)
+      allow(workflow).to receive(:id).and_return(workflow_id)
+      allow_any_instance_of(SubjectSet).to receive(:workflows).and_return([workflow])
+    end
+
+    it "should be false without a workflow" do
+      expect(subject.retired_for_workflow?(workflow)).to eq(false)
+    end
+
+    it "should be false with a non-persisted workflow" do
+      expect(subject.retired_for_workflow?(Workflow.new)).to eq(false)
+    end
+
+    it "should be false when passing in any other type of instace with and id" do
+      expect(subject.retired_for_workflow?(SubjectSet.new)).to eq(false)
+    end
+
+    it "should be true when the retired_workflow_ids match" do
+      allow_any_instance_of(SetMemberSubject).to receive(:retired_workflow_ids)
+        .and_return([workflow.id])
+      expect(subject.retired_for_workflow?(workflow)).to eq(true)
+    end
+
+    it "should be false without any matching retired_workflow_ids" do
+      expect(subject.retired_for_workflow?(workflow)).to eq(false)
     end
   end
 end

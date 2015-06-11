@@ -3,12 +3,12 @@ module Formatter
     class Classification
       attr_reader :classification, :project, :obfuscate, :salt
 
-      delegate :workflow_id, :created_at, :gold_standard, :workflow_version, to: :classification
+      delegate :workflow, :workflow_id, :created_at, :gold_standard,
+        :workflow_version, to: :classification
 
       def self.project_headers
-        %w( user_name user_ip workflow_id created_at
-            gold_standard expert metadata annotations
-            subject_data workflow_version )
+        %w( user_name user_ip workflow_id workflow_name workflow_version
+            created_at gold_standard expert metadata annotations subject_data )
       end
 
       def initialize(project, obfuscate_private_details: true)
@@ -30,7 +30,7 @@ module Formatter
         if user = classification.user
           user.login
         else
-          "not logged in"
+          "not-logged-in-#{hash_value(classification.user_ip.to_s)}"
         end
       end
 
@@ -42,7 +42,8 @@ module Formatter
         {}.tap do |subjects_and_metadata|
           subjects = Subject.where(id: classification.subject_ids)
           subjects.each do |subject|
-            subjects_and_metadata[subject.id] = subject.metadata
+            retired_data = { retired: subject.retired_for_workflow?(workflow.id) }
+            subjects_and_metadata[subject.id] = subject.metadata.merge(retired_data)
           end
         end.to_json
       end
@@ -59,12 +60,16 @@ module Formatter
         classification.expert_classifier
       end
 
+      def workflow_name
+        workflow.display_name
+      end
+
       def obfuscate_value(value)
-        if obfuscate
-          Digest::SHA1.hexdigest("#{value}#{salt}")
-        else
-          value
-        end
+        obfuscate ? hash_value(value) : value
+      end
+
+      def hash_value(value)
+        Digest::SHA1.hexdigest("#{value}#{salt}")
       end
     end
   end
