@@ -40,4 +40,17 @@ class Api::V1::SubjectSetsController < Api::ApiController
       end
     end
   end
+
+  def add_relation(resource, relation, value)
+    if relation == :subjects && value.is_a?(Array)
+      new_smsses = new_items(resource, relation, value).map do |subject|
+        SetMemberSubject.new(subject_set: resource, subject: subject) do |sms|
+          sms.set_random
+        end
+      end
+      SetMemberSubject.import new_smsses
+    else
+      super
+    end
+  end
 end
