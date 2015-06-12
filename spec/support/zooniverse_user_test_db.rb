@@ -1,6 +1,6 @@
 class CreateZooniverserUserDatabase < ActiveRecord::Migration
   def connection
-    @connection ||= ActiveRecord::Base.establish_connection(:"zooniverse_home_#{Rails.env}").connection
+    @connection ||= ZooniverseUser.connection
   end
 
   def change
