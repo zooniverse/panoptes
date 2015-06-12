@@ -45,19 +45,22 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def add_relation(resource, relation, value)
     if relation == :subjects && value.is_a?(Array)
-      subject_set_exists = resource.persisted?
-      subject_ids_to_link = new_items(resource, relation, value).map(&:id)
-      subjects_exists = Subject.where(id: subject_ids_to_link).exists?
-      if !subject_set_exists || !subjects_exists
-        raise ActiveRecord::RecordNotFound.new("Error: check the subject set exists and all the subjects exist.")
-      end
-      #speed up import use cols and values without validation
+      subject_ids_to_link = new_items(resource, relation, value).pluck(:id)
+      check_subjects_exist(subject_ids_to_link)
       new_sms_values = subject_ids_to_link.map do |subject_id|
         [ resource.id, subject_id, rand ]
       end
       SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
     else
       super
+    end
+  end
+
+  private
+
+  def check_subjects_exist(subject_ids)
+    unless Subject.where(id: subject_ids).count == subject_ids.count
+      raise BadLinkParams.new("Error: check the subject set and all the subjects exist.")
     end
   end
 end
