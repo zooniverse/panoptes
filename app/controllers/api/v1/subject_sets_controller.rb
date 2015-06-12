@@ -3,6 +3,8 @@ class Api::V1::SubjectSetsController < Api::ApiController
   resource_actions :default
   schema_type :json_schema
 
+  IMPORT_COLUMNS = %w(subject_set_id subject_id random)
+
   def create
     super { |subject_set| refresh_queue(subject_set) }
   end
@@ -43,12 +45,17 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def add_relation(resource, relation, value)
     if relation == :subjects && value.is_a?(Array)
-      new_smsses = new_items(resource, relation, value).map do |subject|
-        SetMemberSubject.new(subject_set: resource, subject: subject) do |sms|
-          sms.set_random
-        end
+      subject_set_exists = resource.persisted?
+      subject_ids_to_link = new_items(resource, relation, value).map(&:id)
+      subjects_exists = Subject.where(id: subject_ids_to_link).exists?
+      if !subject_set_exists || !subjects_exists
+        raise ActiveRecord::RecordNotFound.new("Error: check the subject set exists and all the subjects exist.")
       end
-      SetMemberSubject.import new_smsses
+      #speed up import use cols and values without validation
+      new_sms_values = subject_ids_to_link.map do |subject_id|
+        [ resource.id, subject_id, rand ]
+      end
+      SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
     else
       super
     end
