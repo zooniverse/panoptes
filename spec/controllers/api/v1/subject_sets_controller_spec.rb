@@ -64,6 +64,25 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
     it_behaves_like "supports update_links"
 
+    context "when the linking resources are not persisted" do
+
+      let(:run_update_links) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        params = {
+          link_relation: test_relation.to_s,
+          test_relation => test_relation_ids,
+          resource_id => resource.id
+        }
+        post :update_links, params
+      end
+
+      it "should return a 422 with a missing subject" do
+        allow(subjects.last).to receive(:id).and_return(0)
+        run_update_links
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
     context "reload subject queue" do
       let(:workflows) { [create(:workflow, project: project)] }
       let(:resource) do

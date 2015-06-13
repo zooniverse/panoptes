@@ -76,7 +76,6 @@ RSpec.configure do |config|
     ActiveRecord::Base.establish_connection(:"#{Rails.env}")
   end
 
-
   config.before(:each) do
     DatabaseCleaner.start
   end

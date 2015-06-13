@@ -51,15 +51,18 @@ module JsonApiController
     def relation_find(find_arg)
       relation = yield
       relation = relation.where(id: find_arg)
-      objects = relation.to_a
-      objects_or_error(objects, relation, find_arg.is_a?(Array))
+      relation_or_error(relation, find_arg.is_a?(Array))
     end
 
-    def objects_or_error(objects, relation, multi)
-      # This is a workaround for  https://github.com/rails/arel/pull/349
-      return multi ? objects : objects.first unless objects.empty?
-      error_name = multi ? :plural : :singular
-      raise JsonApiController::NotLinkable.new("Couldn't find linked #{relation.klass.model_name.send(error_name)} for current user")
+    # This is a workaround for  https://github.com/rails/arel/pull/349
+    def relation_or_error(relation, multi)
+      unless relation.empty?
+        multi ? relation : relation.first
+      else
+        error_name = multi ? :plural : :singular
+        msg = "Couldn't find linked #{relation.klass.model_name.send(error_name)} for current user"
+        raise JsonApiController::NotLinkable.new(msg)
+      end
     end
   end
 end

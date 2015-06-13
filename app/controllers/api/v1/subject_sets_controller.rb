@@ -3,6 +3,8 @@ class Api::V1::SubjectSetsController < Api::ApiController
   resource_actions :default
   schema_type :json_schema
 
+  IMPORT_COLUMNS = %w(subject_set_id subject_id random)
+
   def create
     super { |subject_set| refresh_queue(subject_set) }
   end
@@ -40,4 +42,22 @@ class Api::V1::SubjectSetsController < Api::ApiController
       end
     end
   end
+
+  def add_relation(resource, relation, value)
+    if relation == :subjects && value.is_a?(Array)
+      #ids is returning duplicates even though the AR Relations were uniq
+      subject_ids_to_link = new_items(resource, relation, value).distinct.ids
+      unless Subject.where(id: subject_ids_to_link).count == value.count
+        raise BadLinkParams.new("Error: check the subject set and all the subjects exist.")
+      end
+      new_sms_values = subject_ids_to_link.map do |subject_id|
+        [ resource.id, subject_id, rand ]
+      end
+      SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
+    else
+      super
+    end
+  end
+
+  private
 end
