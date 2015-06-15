@@ -13,9 +13,8 @@ class Api::V1::SubjectQueuesController < Api::ApiController
     when "subjects", :subjects
       relation = SetMemberSubject.link_to_resource(resource, api_user, *args)
         .where(subject_id: value)
-      objects = relation.to_a
 
-      objects_or_error(objects, relation, true)
+      relation_or_error(relation, true)
     else
       super
     end

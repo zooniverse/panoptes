@@ -348,35 +348,56 @@ describe Api::V1::SubjectsController, type: :controller do
     context "when the user is not-the owner of the project" do
       let(:unauthorised_user) { create(:user) }
 
-      before(:each) do
+      let(:upload_subjects) do
         default_request scopes: scopes, user_id: unauthorised_user.id
         post :create, create_params
       end
 
       it 'should return unprocessable entity' do
+        upload_subjects
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
       it 'should scrub any schema sql from the error message' do
+        upload_subjects
         expect(response.body).to eq(json_error_message("Couldn't find linked project for current user"))
+      end
+
+      context "when the user is an admin" do
+
+        it 'should return the created status' do
+          allow_any_instance_of(ApiUser).to receive(:is_admin?).and_return(true)
+          upload_subjects
+          expect(response).to have_http_status(:created)
+        end
       end
     end
 
     context "when the user has exceeded the allowed number of subjects" do
       let(:authorised_user) { create(:user, uploaded_subjects_count: 101) }
-
-      before(:each) do
+      let(:upload_subjects) do
         default_request scopes: scopes, user_id: authorised_user.id
         post :create, create_params
       end
 
       it 'should return 403' do
+        upload_subjects
         expect(response).to have_http_status(:forbidden)
       end
 
       it 'should have an error message' do
+        upload_subjects
         msg = json_response["errors"][0]["message"]
         expect(msg).to match(/User has uploaded [0-9]+ subjects of [0-9]+ maximum/)
+      end
+
+      context "when the user is an admin" do
+
+        it 'should return the created status' do
+          allow_any_instance_of(ApiUser).to receive(:is_admin?).and_return(true)
+          upload_subjects
+          expect(response).to have_http_status(:created)
+        end
       end
     end
 

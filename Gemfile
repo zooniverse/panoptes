@@ -30,6 +30,7 @@ gem 'stringex'
 gem 'faraday'
 gem 'faraday_middleware'
 gem 'faraday-http-cache'
+gem "activerecord-import"
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'

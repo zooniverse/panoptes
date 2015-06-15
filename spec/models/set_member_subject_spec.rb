@@ -9,6 +9,14 @@ describe SetMemberSubject, :type => :model do
     expect(set_member_subject).to be_valid
   end
 
+  it "should be invalid with a duplicate subject_id to subject_set_id" do
+    set_member_subject.save
+    dup = build(:set_member_subject,
+      subject: set_member_subject.subject,
+      subject_set: set_member_subject.subject_set)
+    expect(dup).to be_invalid
+  end
+
   it "should have a random value when created" do
     expect(create(:set_member_subject).random).to_not be_nil
   end

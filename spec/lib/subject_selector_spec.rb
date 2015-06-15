@@ -30,6 +30,15 @@ RSpec.describe SubjectSelector do
       end
     end
 
+    context "when the user doesn't have a queue" do
+      it 'should raise an informative error' do
+        allow_any_instance_of(Workflow).to receive(:subject_sets).and_return([])
+        expect{subject.queued_subjects}.to raise_error(SubjectSelector::MissingSubjectSet,
+          "no subject set is associated with this workflow")
+      end
+    end
+
+
     context "queue is empty" do
       let!(:non_logged_in_queue) do
         create(:subject_queue,
