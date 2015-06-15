@@ -266,7 +266,7 @@ describe Project, :type => :model do
       project.save!
       expect(resource).to receive(:create).with(name: 'admin',
                                                 user_id: project.owner.id,
-                                                section: "#{project.id}-#{project.display_name}")
+                                                section: "project-#{project.id}")
       project.create_talk_admin(client)
     end
   end
