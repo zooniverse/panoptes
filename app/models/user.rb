@@ -92,7 +92,7 @@ class User < ActiveRecord::Base
     login = warden_conditions.delete(:login)
 
     if login.present?
-      where(warden_conditions.to_hash).where('lower(login) = :value or lower(email) = :value or lower(display_name) = :value', value: login.downcase).first
+      where(warden_conditions.to_hash).where('lower(login) = :value or email = :value or lower(display_name) = :value', value: login.downcase).first
     else
       where(warden_conditions.to_hash).first
     end

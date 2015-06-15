@@ -392,6 +392,7 @@ ActiveRecord::Schema.define(version: 20150611164132) do
   add_index "users", ["beta_email_communication"], name: "index_users_on_beta_email_communication", where: "(beta_email_communication IS TRUE)", using: :btree
   add_index "users", ["display_name"], name: "index_users_on_display_name", unique: true, using: :btree
   add_index "users", ["display_name"], name: "users_display_name_trgm_index", using: :gist, opclass: {"display_name"=>:gist_trgm_ops}
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["global_email_communication"], name: "index_users_on_global_email_communication", where: "(global_email_communication IS TRUE)", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
