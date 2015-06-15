@@ -12,15 +12,16 @@ module Api
     rescue_from ActiveRecord::RecordNotFound,
       Api::NoMediaError,
       RoleControl::AccessDenied,
-      SubjectSelector::MissingSubjectQueue,     with: :not_found
-    rescue_from ActiveRecord::RecordInvalid,             with: :invalid_record
-    rescue_from Api::NotLoggedIn,                        with: :not_authenticated
-    rescue_from Api::UnauthorizedTokenError,             with: :not_authenticated
-    rescue_from Api::UnsupportedMediaType,               with: :unsupported_media_type
+      SubjectSelector::MissingSubjectQueue,
+      SubjectSelector::MissingSubjectSet,                  with: :not_found
+    rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
+    rescue_from Api::NotLoggedIn,                          with: :not_authenticated
+    rescue_from Api::UnauthorizedTokenError,               with: :not_authenticated
+    rescue_from Api::UnsupportedMediaType,                 with: :unsupported_media_type
     rescue_from JsonApiController::PreconditionNotPresent, with: :precondition_required
-    rescue_from JsonApiController::PreconditionFailed,   with: :precondition_failed
-    rescue_from ActiveRecord::StaleObjectError,          with: :conflict
-    rescue_from Api::LimitExceeded,                      with: :not_authorized
+    rescue_from JsonApiController::PreconditionFailed,     with: :precondition_failed
+    rescue_from ActiveRecord::StaleObjectError,            with: :conflict
+    rescue_from Api::LimitExceeded,                        with: :not_authorized
     rescue_from Api::PatchResourceError,
       Api::UserSeenSubjectIdError,
       ActionController::UnpermittedParameters,
@@ -32,7 +33,7 @@ module Api
       JsonApiController::BadLinkParams,
       Api::NoUserError,
       Api::UnpermittedParameter,
-      RestPack::Serializer::InvalidInclude,    with: :unprocessable_entity
+      RestPack::Serializer::InvalidInclude, with: :unprocessable_entity
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]
