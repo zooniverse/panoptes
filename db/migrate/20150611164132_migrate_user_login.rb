@@ -20,7 +20,7 @@ class MigrateUserLogin < ActiveRecord::Migration
         validator.validate user
       end
 
-      user.update_attributes login: user.login
+      user.update_attribute :login, user.login
     end
 
     change_column :users, :login, :string, null: false
