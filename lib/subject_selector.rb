@@ -1,6 +1,7 @@
 class SubjectSelector
   class MissingParameter < StandardError; end
   class MissingSubjectQueue < StandardError; end
+  class MissingSubjectSet < StandardError; end
 
   attr_reader :user, :params, :workflow
 
@@ -11,6 +12,7 @@ class SubjectSelector
   def queued_subjects
     raise workflow_id_error unless workflow
     raise group_id_error if needs_set_id?
+    raise missing_subject_set_error if workflow.subject_sets.empty?
 
     queue, context = retrieve_subject_queue
 
@@ -49,6 +51,10 @@ class SubjectSelector
 
   def group_id_error
     MissingParameter.new("subject_set_id parameter missing for grouped workflow")
+  end
+
+  def missing_subject_set_error
+    MissingSubjectSet.new("no subject set is associated with this workflow")
   end
 
   def default_page_size
