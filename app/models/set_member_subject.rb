@@ -10,6 +10,7 @@ class SetMemberSubject < ActiveRecord::Base
   has_many :workflows, through: :subject_set
 
   validates_presence_of :subject_set, :subject
+  validates_uniqueness_of :subject_id, scope: :subject_set_id
 
   can_through_parent :subject_set, :update, :show, :destroy, :index, :update_links,
     :destroy_links
