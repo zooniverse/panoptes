@@ -68,7 +68,7 @@ class User < ActiveRecord::Base
 
   def self.from_omniauth(auth_hash)
     auth = Authorization.from_omniauth(auth_hash)
-    auth.user ||= create do |u|
+    auth.user ||= create! do |u|
       u.email = auth_hash.info.email
       u.display_name = auth_hash.info.name
       u.login = sanitize_login u.display_name
@@ -135,10 +135,6 @@ class User < ActiveRecord::Base
 
   def email_required?
     authorizations.blank? && !disabled?
-  end
-
-  def email_changed?
-    authorizations.blank?
   end
 
   def build_identity_group

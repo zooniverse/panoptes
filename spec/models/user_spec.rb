@@ -70,7 +70,7 @@ describe User, type: :model do
       it 'should raise an exception' do
         create(:user, email: 'examplar@example.com')
         auth_hash = OmniAuth.config.mock_auth[:gplus]
-        expect{ User.from_omniauth(auth_hash) }.to raise_error(ActiveRecord::RecordNotUnique)
+        expect{ User.from_omniauth(auth_hash) }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end
