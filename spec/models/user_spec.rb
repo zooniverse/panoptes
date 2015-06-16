@@ -122,9 +122,15 @@ describe User, type: :model do
 
     it 'should validate uniqueness to enable filtering by the display name' do
       login = 'Mista_Bob_Dobalina'
-      expect{ create(:user, login: login) }.to_not raise_error
-      expect{ create(:user, login: login.upcase, email: 'test2@example.com') }.to raise_error
-      expect{ create(:user, login: login.downcase, email: 'test3@example.com') }.to raise_error
+      aggregate_failures "testing different cases" do
+        expect{ create(:user, login: login) }.not_to raise_error
+        expect{
+          create(:user, login: login.upcase, email: 'test2@example.com')
+        }.to raise_error(ActiveRecord::RecordInvalid)
+        expect{
+          create(:user, login: login.downcase, email: 'test3@example.com')
+        }.to raise_error(ActiveRecord::RecordInvalid)
+      end
     end
 
     it "should have the correct case-insensitive uniqueness error" do
@@ -150,7 +156,7 @@ describe User, type: :model do
       let(:user) { create(:user, email: 'test@example.com') }
 
       it 'should raise an error trying to save a duplicate' do
-        expect{ create(:user, email: user.email.upcase) }.to raise_error
+        expect{ create(:user, email: user.email.upcase) }.to raise_error(ActiveRecord::RecordInvalid)
       end
 
       it 'should validate case insensitive uniqueness' do
@@ -255,8 +261,10 @@ describe User, type: :model do
 
   describe "#password_required?" do
     it 'should require a password when creating with a new user' do
-      expect{ create(:user, password: "password1") }.to_not raise_error
-      expect{ create(:user, password: nil) }.to raise_error
+      aggregate_failures "different cases" do
+        expect{ create(:user, password: "password1") }.not_to raise_error
+        expect{ create(:user, password: nil) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
     end
 
     it 'should not require a password when creating a user from an import' do

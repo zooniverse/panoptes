@@ -1,5 +1,10 @@
-class MigrateUserLogin < ActiveRecord::Migration
-  def up
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+namespace :migrate do
+  desc "Migrate to User login field from display_name"
+  task user_login_field: :environment do
+
     total = User.count
     validator = LoginUniquenessValidator.new
 
@@ -22,10 +27,5 @@ class MigrateUserLogin < ActiveRecord::Migration
 
       user.update_attribute :login, user.login
     end
-
-    change_column :users, :login, :string, null: false
-  end
-
-  def down
   end
 end

@@ -66,17 +66,9 @@ RSpec.configure do |config|
     end
 
     ActiveRecord::Base.establish_connection(:"#{Rails.env}")
-
-    ActiveRecord::Migration.suppress_messages do
-      ActiveRecord::Migration.run(CreateFunctionalIndexes, direction: :up)
-    end
   end
 
   config.after(:all) do
-    ActiveRecord::Migration.suppress_messages do
-      ActiveRecord::Migration.run(CreateFunctionalIndexes, direction: :down)
-    end
-
     ActiveRecord::Migration.suppress_messages do
       ActiveRecord::Migration.run(CreateZooniverserUserDatabase, direction: :down)
     end

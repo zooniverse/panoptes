@@ -72,7 +72,7 @@ class Project < ActiveRecord::Base
     owners_and_collaborators.each do |user|
       client.roles.create(name: 'admin',
                           user_id: user.id,
-                          section: "#{id}-#{display_name}")
+                          section: "project-#{id}")
     end
   end
 end

@@ -73,9 +73,11 @@ describe UserGroup, :type => :model do
 
     it 'should validate uniqueness' do
       name = "FancyUserGroup"
-      expect{ create(:user_group, name: name) }.to_not raise_error
-      expect{ create(:user_group, name: name.upcase) }.to raise_error
-      expect{ create(:user_group, name: name.downcase) }.to raise_error
+      aggregate_failures "different cases" do
+        expect{ create(:user_group, name: name) }.not_to raise_error
+        expect{ create(:user_group, name: name.upcase) }.to raise_error(ActiveRecord::RecordInvalid)
+        expect{ create(:user_group, name: name.downcase) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
     end
 
     it 'should constrain database uniqueness' do
