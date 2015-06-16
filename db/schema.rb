@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(version: 20150616113559) do
 
   create_table "access_control_lists", force: :cascade do |t|
     t.integer  "user_group_id", index: {name: "index_access_control_lists_on_user_group_id"}
-    t.string   "roles",         default: [], null: false, array: true, index: {name: "index_access_control_lists_on_roles", nulls: :gin}
+    t.string   "roles",         default: [], null: false, array: true, index: {name: "index_access_control_lists_on_roles", using: :gin}
     t.integer  "resource_id",   index: {name: "index_access_control_lists_on_resource_id_and_resource_type", with: ["resource_type"]}
     t.string   "resource_type"
     t.datetime "created_at"
@@ -102,7 +102,7 @@ ActiveRecord::Schema.define(version: 20150616113559) do
     t.string   "roles",         default: ["group_member"], null: false, array: true
     t.boolean  "identity",      default: false,            null: false
   end
-  add_index "memberships", ["user_id", "identity"], name: "index_memberships_on_user_id_and_identity", unique: true, opclass: "(identity = true)"
+  add_index "memberships", ["user_id", "identity"], name: "index_memberships_on_user_id_and_identity", unique: true, where: "(identity = true)"
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false
@@ -174,9 +174,9 @@ ActiveRecord::Schema.define(version: 20150616113559) do
     t.integer  "classifiers_count",     default: 0
     t.string   "slug",                  default: "", index: {name: "index_projects_on_slug"}
     t.text     "redirect",              default: ""
-    t.boolean  "launch_requested",      default: false, index: {name: "index_projects_on_launch_requested", opclass: "(launch_requested IS TRUE)"}
+    t.boolean  "launch_requested",      default: false, index: {name: "index_projects_on_launch_requested", where: "(launch_requested IS TRUE)"}
     t.boolean  "launch_approved",       default: false, index: {name: "index_projects_on_launch_approved"}
-    t.boolean  "beta_requested",        default: false, index: {name: "index_projects_on_beta_requested", opclass: "(beta_requested IS TRUE)"}
+    t.boolean  "beta_requested",        default: false, index: {name: "index_projects_on_beta_requested", where: "(beta_requested IS TRUE)"}
     t.boolean  "beta_approved",         default: false, index: {name: "index_projects_on_beta_approved"}
   end
 
@@ -303,7 +303,7 @@ ActiveRecord::Schema.define(version: 20150616113559) do
     t.integer  "classifications_count",       default: 0,        null: false
     t.integer  "activated_state",             default: 0,        null: false
     t.string   "languages",                   default: [],       null: false, array: true
-    t.boolean  "global_email_communication",  index: {name: "index_users_on_global_email_communication", opclass: "(global_email_communication IS TRUE)"}
+    t.boolean  "global_email_communication",  index: {name: "index_users_on_global_email_communication", where: "(global_email_communication IS TRUE)"}
     t.boolean  "project_email_communication"
     t.boolean  "admin",                       default: false,    null: false
     t.boolean  "banned",                      default: false,    null: false
@@ -311,10 +311,10 @@ ActiveRecord::Schema.define(version: 20150616113559) do
     t.boolean  "valid_email",                 default: true,     null: false
     t.integer  "uploaded_subjects_count",     default: 0
     t.integer  "project_id"
-    t.boolean  "beta_email_communication",    index: {name: "index_users_on_beta_email_communication", opclass: "(beta_email_communication IS TRUE)"}
+    t.boolean  "beta_email_communication",    index: {name: "index_users_on_beta_email_communication", where: "(beta_email_communication IS TRUE)"}
     t.string   "login",                       null: false, index: {name: "index_users_on_login", unique: true, case_sensitive: false}
   end
-  add_index "users", ["display_name"], name: "users_display_name_trgm_index", nulls: :gist, operator_class: "gist_trgm_ops"
+  add_index "users", ["display_name"], name: "users_display_name_trgm_index", using: :gist, operator_class: "gist_trgm_ops"
 
   create_table "versions", force: :cascade do |t|
     t.string   "item_type",      null: false, index: {name: "index_versions_on_item_type_and_item_id", with: ["item_id"]}
