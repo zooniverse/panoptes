@@ -30,7 +30,7 @@ class Api::V1::UsersController < Api::ApiController
         else
           UnsubscribeWorker.perform_async(user.email)
         end
-      when user.email_change # I cannot figure out why but user.email_changed? returns true when no change has happened
+      when user.email_changed?
         if user.global_email_communication
           SubscribeWorker.perform_async(user.email, user.display_name)
           UnsubscribeWorker.perform_async(user.changes[:email].first)
