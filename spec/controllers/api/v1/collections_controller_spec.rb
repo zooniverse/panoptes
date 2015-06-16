@@ -49,6 +49,7 @@ describe Api::V1::CollectionsController, type: :controller do
       {
        collections: {
                      display_name: "Tested Collection",
+                     private: false,
                      links: {
                              subjects: subjects.map(&:id).map(&:to_s)
                             }
@@ -69,6 +70,7 @@ describe Api::V1::CollectionsController, type: :controller do
        collections: {
                      name: 'test__collection',
                      display_name: 'Fancy name',
+                     private: false,
                      links: { project: project.id }
                     }
       }
