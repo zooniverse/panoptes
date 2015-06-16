@@ -3,14 +3,14 @@ class UserSerializer
   include RecentLinkSerializer
   include MediaLinksSerializer
 
-  attributes :id, :display_name, :credited_name, :email, :created_at,
+  attributes :id, :login, :display_name, :credited_name, :email, :created_at,
     :updated_at, :type, :firebase_auth_token, :global_email_communication,
     :project_email_communication, :beta_email_communication,
-    :slug, :max_subjects, :uploaded_subjects_count, :admin
+    :max_subjects, :uploaded_subjects_count, :admin
 
   can_include :classifications, :project_preferences, :collection_preferences,
-    projects: { param: "owner", value: "slug" },
-    collections: { param: "owner", value: "slug" }
+    projects: { param: "owner", value: "login" },
+    collections: { param: "owner", value: "login" }
 
   media_include :avatar, :profile_header
 
@@ -52,10 +52,6 @@ class UserSerializer
 
   def type
     "users"
-  end
-
-  def slug
-    @model.identity_group.slug
   end
 
   private

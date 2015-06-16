@@ -31,7 +31,7 @@ RSpec.describe ClassificationsDumpWorker do
 
     context "when the project exists" do
       let(:project_file_name) do
-        "#{project.owner.display_name}_#{project.display_name.downcase.gsub(/\s/, "_")}.csv"
+        "#{project.owner.login}_#{project.display_name.downcase.gsub(/\s/, "_")}.csv"
       end
 
       let(:temp_file_path) { "#{Rails.root}/tmp/#{project_file_name}" }
@@ -81,7 +81,7 @@ RSpec.describe ClassificationsDumpWorker do
       it 'should update the path on the object' do
         worker.perform(project.id, medium.id)
         medium.reload
-        expect(medium.path_opts).to match_array([project.owner.display_name.gsub(/\s/, "_"),
+        expect(medium.path_opts).to match_array([project.owner.login.gsub(/\s/, "_"),
                                                  project.display_name.downcase.gsub(/\s/, "_")])
       end
 

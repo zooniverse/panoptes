@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'api should only accept properly formatted ids', type: :request do
   include APIRequestHelpers
 
-  let(:user) { create(:user, display_name: 'parrish') }
+  let(:user) { create(:user, login: 'parrish') }
   
   before(:each) do
     allow_any_instance_of(Api::ApiController)

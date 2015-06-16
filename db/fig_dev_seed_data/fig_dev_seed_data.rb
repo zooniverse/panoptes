@@ -35,14 +35,15 @@ unless password == second_password
 end
 
 #setup an admin user
-attrs = { password: password,
-          display_name: 'zooniverse_admin',
+attrs = { admin: true,
+          password: password,
+          login: 'zooniverse_admin',
           email: 'no-reply@zooniverse.org' }
 admin = User.create(attrs) do |user|
   user.build_identity_group
 end
 puts "\nAdmin details:"
-puts "login: #{green(admin.display_name)}"
+puts "login: #{green(admin.login)}"
 puts "email: #{green(admin.email)}\n"
 
 #setup a doorkeeper first party oauth application with scopes for the client

@@ -24,7 +24,7 @@ Doorkeeper.configure do
   end
 
   resource_owner_from_credentials do
-    if params[:display_name] && u = User.find_for_database_authentication(display_name: params[:display_name])
+    if params[:login] && u = User.find_for_database_authentication(login: params[:login])
       valid_non_disabled_user = u.valid_password?(params[:password]) && !u.disabled?
     else
       u = current_user

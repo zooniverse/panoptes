@@ -2,6 +2,8 @@ class User < ActiveRecord::Base
   include Activatable
   include Linkable
 
+  ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
+
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
     :omniauthable, omniauth_providers: [:facebook, :gplus]
@@ -31,8 +33,9 @@ class User < ActiveRecord::Base
 
   belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
 
-  validates :display_name, presence: true, uniqueness: { case_sensitive: false }
-  validates :display_name, format: { without: /\$|@|\s+/ }, unless: :migrated
+  validates :login, presence: true, format: { with: /\A#{ ALLOWED_LOGIN_CHARACTERS }{3,}\z/ }
+  validates :display_name, presence: true
+  validates_with LoginUniquenessValidator
 
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated
   validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
@@ -43,6 +46,8 @@ class User < ActiveRecord::Base
   delegate :collections, to: :identity_group
   delegate :subjects, to: :identity_group
   delegate :owns?, to: :identity_group
+
+  before_validation :default_display_name, on: [:create, :update]
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
@@ -63,11 +68,11 @@ class User < ActiveRecord::Base
 
   def self.from_omniauth(auth_hash)
     auth = Authorization.from_omniauth(auth_hash)
-    auth.user ||= create do |u|
+    auth.user ||= create! do |u|
       u.email = auth_hash.info.email
+      u.display_name = auth_hash.info.name
+      u.login = sanitize_login u.display_name
       u.password = Devise.friendly_token[0,20]
-      name = auth_hash.info.name
-      u.display_name = StringConverter.replace_spaces(name)
       u.build_identity_group
       u.authorizations << auth
     end
@@ -82,8 +87,21 @@ class User < ActiveRecord::Base
     end
   end
 
-  def self.find_for_database_authentication(conditions = {})
-    where('"users"."display_name" ILIKE ?', conditions[:display_name]).first || super
+  def self.find_for_database_authentication(warden_conditions = { })
+    warden_conditions = warden_conditions.dup
+    login = warden_conditions.delete(:login)
+
+    if login.present?
+      where(warden_conditions.to_hash).where('lower(login) = :value or email = :value or lower(display_name) = :value', value: login.downcase).first
+    else
+      where(warden_conditions.to_hash).first
+    end
+  end
+
+  def self.sanitize_login(string)
+    string
+      .gsub(/\s+/, '_')
+      .gsub /[^#{ ALLOWED_LOGIN_CHARACTERS }]/, ''
   end
 
   def memberships_for(action, klass)
@@ -119,14 +137,11 @@ class User < ActiveRecord::Base
     authorizations.blank? && !disabled?
   end
 
-  def email_changed?
-    authorizations.blank?
-  end
-
   def build_identity_group
+    default_display_name
     raise StandardError, "Identity Group Exists" if identity_group
     build_identity_membership
-    identity_membership.build_user_group(display_name: display_name)
+    identity_membership.build_user_group(display_name: display_name, name: login)
   end
 
   def is_admin?
@@ -154,5 +169,9 @@ class User < ActiveRecord::Base
       end
     end
     !!worked
+  end
+
+  def default_display_name
+    self.display_name ||= login
   end
 end

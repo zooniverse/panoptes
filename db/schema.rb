@@ -331,12 +331,7 @@ ActiveRecord::Schema.define(version: 20150615153138) do
     t.string   "display_name"
     t.boolean  "private",               default: true, null: false
     t.integer  "lock_version",          default: 0
-    t.string   "slug",                  default: ""
   end
-
-  add_index "user_groups", ["display_name"], name: "index_user_groups_on_display_name", unique: true, using: :btree
-  add_index "user_groups", ["name"], name: "index_user_groups_on_name", unique: true, using: :btree
-  add_index "user_groups", ["slug"], name: "index_user_groups_on_slug", unique: true, using: :btree
 
   create_table "user_project_preferences", force: :cascade do |t|
     t.integer  "user_id"
@@ -392,6 +387,7 @@ ActiveRecord::Schema.define(version: 20150615153138) do
     t.integer  "uploaded_subjects_count",     default: 0
     t.integer  "project_id"
     t.boolean  "beta_email_communication"
+    t.string   "login",                                          null: false
   end
 
   add_index "users", ["beta_email_communication"], name: "index_users_on_beta_email_communication", where: "(beta_email_communication IS TRUE)", using: :btree

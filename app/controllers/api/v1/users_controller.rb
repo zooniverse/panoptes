@@ -7,7 +7,7 @@ class Api::V1::UsersController < Api::ApiController
 
   schema_type :strong_params
 
-  allowed_params :update, :display_name, :email, :credited_name,
+  allowed_params :update, :login, :display_name, :email, :credited_name,
    :global_email_communication, :project_email_communication,
    :beta_email_communication
 
@@ -42,8 +42,6 @@ class Api::V1::UsersController < Api::ApiController
   def index
     if display_name = params.delete(:display_name)
       @controlled_resources = controlled_resources.where('"users"."display_name" ILIKE ?', display_name + '%')
-    elsif slug = params.delete(:slug)
-      @controlled_resources = controlled_resources.joins(:user_groups).where(user_groups: {slug: slug})
     end
     super
   end

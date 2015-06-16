@@ -37,7 +37,7 @@ class ClassificationsDumpWorker
   end
 
   def project_file_path
-    [project.owner.display_name, project.display_name]
+    [project.owner.login, project.display_name]
       .map{ |name_part| name_part.downcase.gsub(/\s/, "_")}
   end
 
