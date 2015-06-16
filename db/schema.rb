@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150616113559) do
+ActiveRecord::Schema.define(version: 20150616134342) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -315,6 +315,7 @@ ActiveRecord::Schema.define(version: 20150616113559) do
     t.string   "login",                       null: false, index: {name: "index_users_on_login", unique: true, case_sensitive: false}
   end
   add_index "users", ["display_name"], name: "users_display_name_trgm_index", using: :gist, operator_class: "gist_trgm_ops"
+  add_index "users", ["email"], name: "index_users_on_lowercase_email", unique: true, case_sensitive: false
 
   create_table "versions", force: :cascade do |t|
     t.string   "item_type",      null: false, index: {name: "index_versions_on_item_type_and_item_id", with: ["item_id"]}
