@@ -170,7 +170,7 @@ describe User, type: :model do
         dup_user = create :user
 
         expect {
-          dup_user.update_attribute 'email', user.email.upcase
+          dup_user.update_attribute 'email', user.email
         }.to raise_error ActiveRecord::RecordNotUnique
       end
     end
