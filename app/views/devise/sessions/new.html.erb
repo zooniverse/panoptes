@@ -1,8 +1,8 @@
 <h2>Sign in</h2>
 
 <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div><%= f.label :display_name %><br />
-  <%= f.text_field :display_name, autofocus: true %></div>
+  <div><%= f.label :login %><br />
+  <%= f.text_field :login, autofocus: true %></div>
 
   <div><%= f.label :password %><br />
     <%= f.password_field :password, autocomplete: "off" %></div>

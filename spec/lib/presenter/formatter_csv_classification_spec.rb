@@ -22,7 +22,7 @@ RSpec.describe Formatter::CSV::Classification do
   end
 
   def formatted_data
-    [ classification.user.display_name,
+    [ classification.user.login,
       ip_hash,
       classification.workflow_id,
       classification.workflow.display_name,

@@ -12,7 +12,7 @@ describe Api::V1::GroupsController, type: :controller do
 
   let(:api_resource_name) { "user_groups" }
   let(:api_resource_attributes) do
-    [ "id", "display_name", "classifications_count", "created_at", "updated_at", "type" ]
+    [ "id", "name", "display_name", "classifications_count", "created_at", "updated_at", "type" ]
   end
   let(:api_resource_links) do
     [ "user_groups.memberships", "user_groups.users", "user_groups.projects", "user_groups.collections", "user_groups.recents" ]
@@ -37,9 +37,9 @@ describe Api::V1::GroupsController, type: :controller do
                user: user,
                user_group: user_groups[1])
 
-        get :index, display_name: user_groups[1].display_name
+        get :index, name: user_groups[1].name
 
-        expect(json_response["user_groups"]).to all( include("display_name" => user_groups[1].display_name) )
+        expect(json_response["user_groups"]).to all( include("name" => user_groups[1].name) )
       end
     end
 
@@ -73,12 +73,12 @@ describe Api::V1::GroupsController, type: :controller do
 
       it 'should include a url for projects' do
         projects_link = json_response['links']['user_groups.projects']['href']
-        expect(projects_link).to eq("/projects?owner={user_groups.slug}")
+        expect(projects_link).to eq("/projects?owner={user_groups.name}")
       end
 
       it 'should include a url for collections' do
         collections_link = json_response['links']['user_groups.collections']['href']
-        expect(collections_link).to eq("/collections?owner={user_groups.slug}")
+        expect(collections_link).to eq("/collections?owner={user_groups.name}")
       end
     end
 
@@ -86,10 +86,10 @@ describe Api::V1::GroupsController, type: :controller do
   end
 
   describe "#create" do
-    let(:test_attr) { :display_name }
+    let(:test_attr) { :name }
     let(:test_attr_value) { "Zooniverse" }
     let(:resource_name) { 'groups' }
-    let(:create_params) { { user_groups: { display_name: "Zooniverse" } } }
+    let(:create_params) { { user_groups: { name: "Zooniverse" } } }
 
     it_behaves_like "is creatable"
 
@@ -113,10 +113,10 @@ describe Api::V1::GroupsController, type: :controller do
       end
     end
 
-    describe "when only a display_name is provided" do
-      it "should set the name to an underscored downcased equvilent" do
+    describe "when only a name is provided" do
+      it "should set the display name" do
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, { user_groups: { display_name: "GalaxyZoo" }}
+        post :create, { user_groups: { name: "GalaxyZoo" }}
 
         group = UserGroup.find(created_instance_id("user_groups"))
         expect(group.display_name).to eq("GalaxyZoo")

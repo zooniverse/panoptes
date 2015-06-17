@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :user_group do
-    sequence(:display_name) {|n| "User_Group_#{n}"}
+    sequence(:name){ |n| "user_group_#{ n }" }
+    display_name{ name.try :titleize }
     activated_state :active
 
     factory :user_group_with_users do

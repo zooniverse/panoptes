@@ -66,9 +66,9 @@ GEM
     celluloid (0.16.0)
       timers (~> 4.0.0)
     coderay (1.1.0)
-    connection_pool (2.1.3)
-    database_cleaner (1.2.0)
-    devise (3.4.1)
+    connection_pool (2.2.0)
+    database_cleaner (1.4.1)
+    devise (3.5.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 3.2.6, < 5)
@@ -79,7 +79,7 @@ GEM
     doorkeeper (1.4.2)
       railties (>= 3.1)
     erubis (2.7.0)
-    execjs (2.4.0)
+    execjs (2.5.2)
     factory_girl (4.5.0)
       activesupport (>= 3.0.0)
     factory_girl_rails (4.5.0)
@@ -87,7 +87,7 @@ GEM
       railties (>= 3.0.0)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
-    faraday-http-cache (1.1.0)
+    faraday-http-cache (1.1.1)
       faraday (~> 0.8)
     faraday_middleware (0.9.1)
       faraday (>= 0.7.4, < 0.10)
@@ -99,7 +99,7 @@ GEM
     formatador (0.2.5)
     globalid (0.3.5)
       activesupport (>= 4.1.0)
-    guard (2.12.5)
+    guard (2.12.6)
       formatador (>= 0.2.4)
       listen (~> 2.7)
       lumberjack (~> 1.0)
@@ -108,26 +108,30 @@ GEM
       pry (>= 0.9.12)
       shellany (~> 0.0)
       thor (>= 0.18.1)
-    guard-rspec (4.2.10)
+    guard-compat (1.2.1)
+    guard-rspec (4.5.2)
       guard (~> 2.1)
-      rspec (>= 2.14, < 4.0)
-    hashie (3.4.1)
+      guard-compat (~> 1.1)
+      rspec (>= 2.99.0, < 4.0)
+    hashie (3.4.2)
     hitimes (1.2.2)
-    honeybadger (2.0.11)
+    honeybadger (2.1.0)
     i18n (0.7.0)
-    jquery-rails (4.0.3)
+    its-it (1.1.1)
+    jquery-rails (4.0.4)
       rails-dom-testing (~> 1.0)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (1.8.3)
     json-schema (2.5.1)
       addressable (~> 2.3.7)
-    jwt (1.4.1)
+    jwt (1.5.0)
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
+    key_struct (0.4.2)
     libv8 (3.16.14.7)
-    listen (2.10.0)
+    listen (2.10.1)
       celluloid (~> 0.16.0)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
@@ -144,12 +148,15 @@ GEM
     mime-types (2.6.1)
     mini_portile (0.6.2)
     minitest (5.7.0)
+    modware (0.1.2)
+      its-it
+      key_struct (~> 0.4)
     multi_json (1.11.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     mysql2 (0.3.18)
     nenv (0.2.0)
-    newrelic_rpm (3.11.1.284)
+    newrelic_rpm (3.12.0.288)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
     notiffany (0.0.6)
@@ -168,18 +175,16 @@ GEM
       omniauth-oauth2 (~> 1.2)
     omniauth-gplus (2.0.1)
       omniauth-oauth2 (~> 1.1)
-    omniauth-oauth2 (1.2.0)
-      faraday (>= 0.8, < 0.10)
-      multi_json (~> 1.3)
+    omniauth-oauth2 (1.3.0)
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
     orm_adapter (0.5.0)
     p3p (1.2.0)
       rack
-    paper_trail (3.0.7)
+    paper_trail (3.0.8)
       activerecord (>= 3.0, < 5.0)
       activesupport (>= 3.0, < 5.0)
-    pg (0.18.1)
+    pg (0.18.2)
     pg_array_parser (0.0.9)
     poseidon (0.0.5)
     postgres_ext (2.4.1)
@@ -192,10 +197,10 @@ GEM
       slop (~> 3.4)
     pry-rails (0.3.4)
       pry (>= 0.9.10)
-    puma (2.11.1)
+    puma (2.11.3)
       rack (>= 1.1, < 2.0)
     rack (1.6.2)
-    rack-cors (0.3.1)
+    rack-cors (0.4.0)
     rack-protection (1.5.3)
       rack
     rack-test (0.6.3)
@@ -225,7 +230,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (10.4.2)
-    rb-fsevent (0.9.4)
+    rb-fsevent (0.9.5)
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
     rdoc (4.2.0)
@@ -258,11 +263,24 @@ GEM
       rspec-mocks (~> 3.3.0)
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
+    schema_monkey (2.1.0)
+      activerecord (~> 4.2)
+      its-it
+      modware (~> 0.1)
+    schema_plus_core (0.5.0)
+      activerecord (~> 4.2)
+      schema_monkey (~> 2.1)
+    schema_plus_indexes (0.2.0)
+      activerecord (~> 4.2)
+      schema_plus_core (~> 0.1)
+    schema_plus_pg_indexes (0.1.4)
+      activerecord (~> 4.2)
+      schema_plus_indexes (~> 0.1, >= 0.1.3)
     sdoc (0.4.1)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
     shellany (0.0.1)
-    sidekiq (3.3.3)
+    sidekiq (3.3.4)
       celluloid (>= 0.16.0)
       connection_pool (>= 2.1.1)
       json
@@ -273,7 +291,7 @@ GEM
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
     slop (3.6.0)
-    spring (1.3.3)
+    spring (1.3.6)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
     sprockets (3.2.0)
@@ -284,7 +302,7 @@ GEM
       sprockets (>= 2.8, < 4.0)
     sqlite3 (1.3.10)
     stringex (2.5.2)
-    therubyracer (0.12.1)
+    therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
       ref
     thor (0.19.1)
@@ -315,17 +333,17 @@ DEPENDENCIES
   activerecord-jdbcpostgresql-adapter
   activerecord-jdbcsqlite3-adapter
   aws-sdk-v1
-  database_cleaner (~> 1.2.0)
+  database_cleaner
   devise
   doorkeeper (~> 1.4.1)
-  factory_girl_rails (~> 4.5.0)
+  factory_girl_rails
   faraday
   faraday-http-cache
   faraday_middleware
   fig_rake (~> 0.9.3)
   firebase_token_generator
   foreman
-  guard-rspec (~> 4.2.9)
+  guard-rspec
   honeybadger
   jbundler
   jquery-rails
@@ -342,24 +360,22 @@ DEPENDENCIES
   pg
   poseidon
   postgres_ext (~> 2.4.0)
-  pry-rails (~> 0.3.2)
+  pry-rails
   puma
   rack-cors
   rails (= 4.2.2)
   restpack_serializer!
   rspec (~> 3.3.0)
-  rspec-rails (~> 3.3.0)
+  rspec-rails
+  schema_plus_pg_indexes
   sdoc (~> 0.4.0)
   sidekiq
   sinatra (>= 1.3.0)
   spring
-  spring-commands-rspec (~> 1.0.2)
+  spring-commands-rspec
   sqlite3
   stringex
   therubyracer
   therubyrhino
   uglifier
   versionist
-
-BUNDLED WITH
-   1.10.1

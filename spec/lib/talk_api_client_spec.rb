@@ -145,7 +145,7 @@ RSpec.describe TalkApiClient do
       end
 
       it 'should raise an error on failure' do
-        expect{subject.request('get', '/error')}.to raise_error
+        expect{subject.request('get', '/error')}.to raise_error(NameError)
       end
     end
 
@@ -157,7 +157,7 @@ RSpec.describe TalkApiClient do
       end
 
       it 'should raise an error if no resource is known' do
-        expect{ subject.boards }.to raise_error
+        expect{ subject.boards }.to raise_error(NoMethodError)
       end
     end
 

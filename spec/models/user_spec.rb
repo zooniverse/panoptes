@@ -35,8 +35,8 @@ describe User, type: :model do
         expect(user_from_auth_hash.email).to eq(auth_hash.info.email)
       end
 
-      it 'should create a user with a display_name' do
-        expect(user_from_auth_hash.display_name).to eq(auth_hash.info.name.gsub(/\s/, '_'))
+      it 'should create a user with a login' do
+        expect(user_from_auth_hash.login).to eq(auth_hash.info.name.gsub(/\s/, '_'))
       end
 
       it 'should create a user with a authorization' do
@@ -70,7 +70,7 @@ describe User, type: :model do
       it 'should raise an exception' do
         create(:user, email: 'examplar@example.com')
         auth_hash = OmniAuth.config.mock_auth[:gplus]
-        expect{ User.from_omniauth(auth_hash) }.to raise_error(ActiveRecord::RecordNotUnique)
+        expect{ User.from_omniauth(auth_hash) }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end
@@ -91,65 +91,62 @@ describe User, type: :model do
     end
   end
 
-  describe '#display_name' do
+  describe '#login' do
+    let(:user) { build(:user, migrated: true) }
+
     it 'should validate presence' do
-      expect(build(:user, display_name: "")).to_not be_valid
+      user.login = ""
+      expect(user).to_not be_valid
     end
 
     it 'should not have whitespace' do
-      expect(build(:user, display_name: " asdf asdf")).to_not be_valid
+      user.login = " asdf asdf"
+      expect(user).to_not be_valid
     end
 
-    it 'should not have a dollar sign' do
-      expect(build(:user, display_name: "$asdfasdf")).to_not be_valid
+    it 'should not have non alpha characters' do
+      user.login = "asdf!fdsa"
+      expect(user).to_not be_valid
     end
 
-    it 'should not have an at sign' do
-      expect(build(:user, display_name: "@asdfasdf")).to_not be_valid
-    end
-
-    context "migrated users" do
-      let(:user) { build(:user, migrated: true) }
-
-      it 'should validate presence' do
-        user.display_name = ""
-        expect(user).to_not be_valid
-      end
-
-      it 'should not have whitespace' do
-        user.display_name = " asdf asdf"
-        expect(user).to be_valid
-      end
-
-      it 'should not have a dollar sign' do
-        user.display_name = "$asdfasdf"
-        expect(user).to be_valid
-      end
-
-      it 'should not have an at sign' do
-        user.display_name = "@asdfasdf"
-        expect(user).to be_valid
-      end
+    it 'should allow dashes and underscores' do
+      user.login = "abc-def_123"
+      expect(user).to be_valid
     end
 
     it 'should have non-blank error' do
-      user = build(:user, display_name: "")
+      user = build(:user, login: "")
       user.valid?
-      expect(user.errors[:display_name]).to include("can't be blank")
+      expect(user.errors[:login]).to include("can't be blank")
     end
 
     it 'should validate uniqueness to enable filtering by the display name' do
-      display_name = 'Mista_Bob_Dobalina'
-      expect{ create(:user, display_name: display_name) }.to_not raise_error
-      expect{ create(:user, display_name: display_name.upcase, email: 'test2@example.com') }.to raise_error
-      expect{ create(:user, display_name: display_name.downcase, email: 'test3@example.com') }.to raise_error
+      login = 'Mista_Bob_Dobalina'
+      aggregate_failures "testing different cases" do
+        expect{ create(:user, login: login) }.not_to raise_error
+        expect{
+          create(:user, login: login.upcase, email: 'test2@example.com')
+        }.to raise_error(ActiveRecord::RecordInvalid)
+        expect{
+          create(:user, login: login.downcase, email: 'test3@example.com')
+        }.to raise_error(ActiveRecord::RecordInvalid)
+      end
     end
 
     it "should have the correct case-insensitive uniqueness error" do
       user = create(:user)
-      dup_user = build(:user, display_name: user.display_name.upcase)
+      dup_user = build(:user, login: user.login.upcase)
       dup_user.valid?
-      expect(dup_user.errors[:display_name]).to include("has already been taken")
+      expect(dup_user.errors[:login]).to include("has already been taken")
+    end
+
+    it 'should constrain database uniqueness' do
+      user = create :user
+      dup_user = create :user
+
+      expect {
+        dup_user.update_attribute 'login', user.login.upcase
+      }.to raise_error ActiveRecord::RecordNotUnique
     end
   end
 
@@ -158,14 +155,23 @@ describe User, type: :model do
     context "when a user is setup" do
       let(:user) { create(:user, email: 'test@example.com') }
 
-      it 'should raise an error trying to save a duplcate' do
-        expect{ create(:user, email: user.email.upcase) }.to raise_error
+      it 'should raise an error trying to save a duplicate' do
+        expect{ create(:user, email: user.email.upcase) }.to raise_error(ActiveRecord::RecordInvalid)
       end
 
       it 'should validate case insensitive uniqueness' do
         dup = build(:user, email: user.email.upcase)
         dup.valid?
         expect(dup.errors[:email]).to include("has already been taken")
+      end
+
+      it 'should constrain database uniqueness' do
+        user = create :user
+        dup_user = create :user
+
+        expect {
+          dup_user.update_attribute 'email', user.email
+        }.to raise_error ActiveRecord::RecordNotUnique
       end
     end
 
@@ -202,7 +208,7 @@ describe User, type: :model do
   describe "#build_identity_group" do
     let(:user) { build(:user, build_group: false) }
 
-    context "when a user has a valid display_name" do
+    context "when a user has a valid login" do
       before(:each) do
         user.build_identity_group
         user.save!
@@ -213,8 +219,8 @@ describe User, type: :model do
         expect(user.identity_membership.identity).to eq(true)
       end
 
-      it 'should have a group with the same display_name as the user display_name' do
-        expect(user.identity_group.display_name).to eq(user.display_name)
+      it 'should have a group with the same name as the user login' do
+        expect(user.identity_group.name).to eq(user.login)
       end
 
       it 'should raise error if a user has an identity group' do
@@ -224,7 +230,7 @@ describe User, type: :model do
     end
 
     context "when a user_group with the same name in different case exists" do
-      let!(:user_group) { create(:user_group, display_name: user.display_name.upcase) }
+      let!(:user_group) { create(:user_group, name: user.login.upcase) }
 
       it "should not be valid" do
         expect do
@@ -255,12 +261,14 @@ describe User, type: :model do
 
   describe "#password_required?" do
     it 'should require a password when creating with a new user' do
-      expect{ create(:user, password: "password1") }.to_not raise_error
-      expect{ create(:user, password: nil) }.to raise_error
+      aggregate_failures "different cases" do
+        expect{ create(:user, password: "password1") }.not_to raise_error
+        expect{ create(:user, password: nil) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
     end
 
     it 'should not require a password when creating a user from an import' do
-      attrs = {display_name: "Mr.T", hash_func: 'sha1', email: "test@example.com"}
+      attrs = {login: "Mr.T", hash_func: 'sha1', email: "test@example.com"}
       expect do
         User.create!(attrs) do |u|
           u.build_identity_group

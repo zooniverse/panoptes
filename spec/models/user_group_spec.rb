@@ -54,59 +54,44 @@ describe UserGroup, :type => :model do
     it 'should validate presence' do
       expect(build(:user_group, display_name: "")).to_not be_valid
     end
+  end
 
+  describe '#name' do
     it 'should not have whitespace' do
-      expect(build(:user_group, display_name: " asdf asdf")).to_not be_valid
+      expect(build(:user_group, name: " asdf asdf")).to_not be_valid
     end
 
-    it 'should not have a dollar sign' do
-      expect(build(:user_group, display_name: "$asdfasdf")).to_not be_valid
-    end
-
-    it 'should not ahve an at sign' do
-      expect(build(:user_group, display_name: "@asdfasdf")).to_not be_valid
+    it 'should not have weird characters' do
+      expect(build(:user_group, name: "$asdfasdf")).to_not be_valid
     end
 
     it 'should have non-blank error' do
-      ug = build(:user_group, display_name: "")
+      ug = build(:user_group, name: "")
       ug.valid?
-      expect(ug.errors[:display_name]).to include("can't be blank")
-    end
-
-    context "when an identity group" do
-      let!(:stub_identity?) do
-        allow_any_instance_of(UserGroup).to receive(:identity?).and_return(true)
-      end
-
-      it 'should allow a whitespace' do
-        expect(build(:user_group, display_name: " asdf asdf")).to be_valid
-      end
-
-      it 'should allow a dollar sign' do
-        expect(build(:user_group, display_name: "$asdfasdf")).to be_valid
-      end
-
-      it 'should allow an at sign' do
-        expect(build(:user_group, display_name: "@asdfasdf")).to be_valid
-      end
-
-      it 'should have non-blank error' do
-        ug = build(:user_group, display_name: "")
-        ug.valid?
-        expect(ug.errors[:display_name]).to include("can't be blank")
-      end
+      expect(ug.errors[:name]).to include("can't be blank")
     end
 
     it 'should validate uniqueness' do
       name = "FancyUserGroup"
-      expect{ create(:user_group, display_name: name) }.to_not raise_error
-      expect{ create(:user_group, display_name: name.upcase) }.to raise_error
-      expect{ create(:user_group, display_name: name.downcase) }.to raise_error
+      aggregate_failures "different cases" do
+        expect{ create(:user_group, name: name) }.not_to raise_error
+        expect{ create(:user_group, name: name.upcase) }.to raise_error(ActiveRecord::RecordInvalid)
+        expect{ create(:user_group, name: name.downcase) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
+
+    it 'should constrain database uniqueness' do
+      user_group = create :user_group
+      dup_group = create :user_group
+
+      expect {
+        dup_group.update_attribute 'name', user_group.name.upcase
+      }.to raise_error ActiveRecord::RecordNotUnique
     end
 
     it "should have the correct case-insensitive uniqueness error" do
       user_group = create(:user_group)
-      dup_user_group = build(:user_group, display_name: user_group.display_name.upcase)
+      dup_user_group = build(:user_group, name: user_group.name.upcase)
       dup_user_group.valid?
       expect(dup_user_group.errors[:name]).to include("has already been taken")
     end
@@ -153,32 +138,5 @@ describe UserGroup, :type => :model do
     let(:relation_instance) { user_group }
 
     it_behaves_like "it has a cached counter for classifications"
-  end
-
-  describe "#create_url_slug" do
-    let(:group) { create(:user_group) }
-    context "when the display_name has not changed" do
-      it 'should not change the url slug' do
-        old_slug = group.slug
-        group.create_url_slug
-        expect(group.slug).to eq(old_slug)
-      end
-    end
-
-    context "when to_url is empty" do
-      it 'should set the to slug to user-id' do
-        group.display_name = "(-_-)"
-        group.create_url_slug
-        expect(group.slug).to eq("user-#{group.id}")
-      end
-    end
-
-    context "when otherwise" do
-      it 'should set the slug to the to_url version of the group\'s name' do
-        group.display_name = "hey there!"
-        group.create_url_slug
-        expect(group.slug).to eq("hey-there")
-      end
-    end
   end
 end

@@ -17,9 +17,9 @@ describe UserInfoScrubber do
       end
 
       it "should not replace their display name" do
-        prev_user_login = user.display_name
+        prev_user_login = user.login
         scrub_user_details(user)
-        expect(user.display_name).to eq(prev_user_login)
+        expect(user.login).to eq(prev_user_login)
       end
     end
 
