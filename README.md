@@ -55,8 +55,7 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 0. `cd` into the cloned folder. Run either `bundle install` or `gem install fig_rake`
 
 0. Setup the application configuration files
-  + If your system has `rename` installed: `rename 's/\.yml.hudson$/\.yml/' config/*.yml.hudson`
-  + Otherwise in a bash prompt run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
+  + Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
 
 0. Setup the development Dockerfile
   + If you ran `bundle install`: `rake configure:dev_docker`
