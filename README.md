@@ -61,6 +61,8 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
   + If you ran `bundle install`: `rake configure:dev_docker`
   + If you did not: `cp dockerfiles/Dockerfile.dev Dockerfile`
 
+0. Install [Docker and Docker Compose](https://docs.docker.com/compose/install/).
+
 0. Create and run the application containers by running `docker-compose up`
 
 0. After step 5 finishes, open a new terminal and run `frake db:create db:migrate` to setup the database
