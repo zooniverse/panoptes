@@ -1,6 +1,6 @@
 class ClassificationSerializer
   include RestPack::Serializer
-  attributes :id, :annotations, :created_at, :metadata
+  attributes :id, :annotations, :created_at, :metadata, :href
   can_include :project, :user, :user_group, :workflow
 
   def metadata
