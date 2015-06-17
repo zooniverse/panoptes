@@ -69,6 +69,10 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `frails runner db/fig_dev_seed_data/fig_dev_seed_data.rb` 
 
+0. Open up the application in your browser:
+  + If on a Mac, run `boot2docker ip` to get the IP-address where the server is running.
+  + Visit either that address or just localhost on port 3000.
+
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
 If you've added new gems you'll need to rebuild the docker image by running `docker-compose build`.
