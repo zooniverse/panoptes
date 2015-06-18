@@ -136,6 +136,19 @@ describe Api::V1::ProjectsController, type: :controller do
             owner_id = json_response[api_resource_name][0]['links']['owner']['id']
             expect(owner_id).to eq(new_project.owner.id.to_s)
           end
+
+          context "when the project owner name has a differnt case to the identity group" do
+            let!(:index_options) { { owner: project_owner.login.upcase } }
+
+            it "should respond with 1 item" do
+              expect(json_response[api_resource_name].length).to eq(1)
+            end
+
+            it "should respond with the correct item" do
+              owner_id = json_response[api_resource_name][0]['links']['owner']['id']
+              expect(owner_id).to eq(new_project.owner.id.to_s)
+            end
+          end
         end
 
         describe "filter by current_user_roles" do
