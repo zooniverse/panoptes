@@ -6,8 +6,6 @@ namespace :migrate do
   task user_login_field: :environment do
 
     user_display_names = ENV['USERS'].try(:split, ",")
-
-    total = User.count
     validator = LoginUniquenessValidator.new
 
     null_login_users = User.where(login: nil)
@@ -15,6 +13,8 @@ namespace :migrate do
       display_name_scope = User.where(display_name: user_display_names)
       null_login_users = null_login_users.merge(display_name_scope)
     end
+
+    total = null_login_users.count
 
     null_login_users.find_each.with_index do |user, index|
       puts "#{ index } / #{ total }" if index % 1_000 == 0
