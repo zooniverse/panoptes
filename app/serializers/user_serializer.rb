@@ -54,6 +54,10 @@ class UserSerializer
     "users"
   end
 
+  def login_prompt
+    @model.migrated && @model.sign_in_count <= 1
+  end
+
   private
 
   def permitted_requester?
@@ -61,7 +65,8 @@ class UserSerializer
   end
 
   %w(credited_name email global_email_communication project_email_communication
-     beta_email_communication uploaded_subjects_count max_subjects admin).each do |me_only_attribute|
+     beta_email_communication uploaded_subjects_count max_subjects admin
+     login_prompt).each do |me_only_attribute|
     alias_method :"include_#{me_only_attribute}?", :permitted_requester?
   end
 
