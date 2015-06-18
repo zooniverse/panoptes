@@ -205,4 +205,38 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
     it_behaves_like "is destructable"
   end
+
+  describe '#destroy_links' do
+    context "removing subjects" do
+      let(:sms) { subject_set.set_member_subjects }
+      it 'should remove the subjects from the set' do
+        delete :destroy_links, subject_set_id: subject_set.id, link_relation: :subjects,
+          link_ids: subject_set.subjects.pluck(:id).join(',')
+        subject_set.reload
+        expect(subject_set.subjects).to be_empty
+      end
+
+      it 'should destroy all subject workflow counts' do
+        swc = create(:subject_workflow_count,
+                     set_member_subject: sms.first,
+                     workflow: subject_set.workflows.first)
+        delete :destroy_links, subject_set_id: subject_set.id, link_relation: :subjects,
+          link_ids: subject_set.subjects.pluck(:id).join(',')
+        expect(SubjectWorkflowCount.exists?(swc.id)).to be false
+      end
+
+      it 'should queue a removal workfer' do
+        expect(QueueRemovalWorker).to receive(:perform_async).with(sms.map(&:id),
+                                                                   subject_set.workflows.pluck(:id))
+        delete :destroy_links, subject_set_id: subject_set.id, link_relation: :subjects,
+          link_ids: subject_set.subjects.pluck(:id).join(',')
+      end
+
+      it 'should queue a count reset worker' do
+        expect(CountResetWorker).to receive(:perform_async).with(subject_set.id)
+        delete :destroy_links, subject_set_id: subject_set.id, link_relation: :subjects,
+          link_ids: subject_set.subjects.pluck(:id).join(',')
+      end
+    end
+  end
 end

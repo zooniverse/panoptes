@@ -60,5 +60,17 @@ class Api::V1::SubjectSetsController < Api::ApiController
     end
   end
 
+  def destroy_relation(resource, relation, value)
+    if relation == :subjects
+      sms = resource.set_member_subjects.where(subject_id: value.split(',').map(&:to_i))
+      SubjectWorkflowCount.where(set_member_subject: sms).delete_all
+      QueueRemovalWorker.perform_async(sms.pluck(:id), resource.workflows.pluck(:id))
+      CountResetWorker.perform_async(resource.id)
+      sms.delete_all
+    else
+      super
+    end
+  end
+
   private
 end
