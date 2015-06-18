@@ -1,7 +1,6 @@
 require 'spec_helper'
-require 'formatter_csv_classification'
 
-RSpec.describe Formatter::CSV::Classification do
+RSpec.describe Formatter::Csv::Classification do
 
   let(:project_headers) do
     %w( user_name user_ip workflow_id workflow_name workflow_version
@@ -38,7 +37,7 @@ RSpec.describe Formatter::CSV::Classification do
 
   let(:project) { build(:project) }
   let(:classification) { create(:classification, project: project) }
-  let(:formatter) { Formatter::CSV::Classification.new(project) }
+  let(:formatter) { described_class.new(project) }
 
   describe "::project_headers?" do
     it 'should be have the expected headers' do

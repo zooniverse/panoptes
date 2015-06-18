@@ -1,9 +1,7 @@
 require 'csv'
-require 'formatter_csv_classification'
 
 class ClassificationsDumpWorker
   include Sidekiq::Worker
-  include Formatter::CSV
   include DumpWorker
 
   attr_reader :project
@@ -12,9 +10,9 @@ class ClassificationsDumpWorker
     if @project = Project.find(project_id)
       @medium_id = medium_id
       begin
-        csv_formatter = Formatter::CSV::Classification.new(project, obfuscate_private_details: obfuscate_private_details)
+        csv_formatter = Formatter::Csv::Classification.new(project, obfuscate_private_details: obfuscate_private_details)
         CSV.open(temp_file_path, 'wb') do |csv|
-          csv << Formatter::CSV::Classification.project_headers
+          csv << Formatter::Csv::Classification.project_headers
           completed_project_classifications.find_each do |classification|
             csv << csv_formatter.to_array(classification)
           end

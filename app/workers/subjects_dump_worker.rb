@@ -1,5 +1,4 @@
 require 'csv'
-require 'formatter_csv_subject'
 
 class SubjectsDumpWorker
   include Sidekiq::Worker
@@ -12,9 +11,9 @@ class SubjectsDumpWorker
     if @project = Project.find(project_id)
       @medium_id = medium_id
       begin
-        csv_formatter = Formatter::CSV::Subject.new(project)
+        csv_formatter = Formatter::Csv::Subject.new(project)
         CSV.open(temp_file_path, 'wb') do |csv|
-          csv << Formatter::CSV::Subject.project_headers
+          csv << Formatter::Csv::Subject.project_headers
           project_subjects.find_each do |subject|
             csv << csv_formatter.to_array(subject)
           end

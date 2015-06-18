@@ -1,5 +1,5 @@
 module Formatter
-  module CSV
+  module Csv
     class Subject
       attr_reader :sms, :project
 

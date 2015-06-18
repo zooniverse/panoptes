@@ -1,5 +1,5 @@
 module Formatter
-  module CSV
+  module Csv
     class Classification
       attr_reader :classification, :project, :obfuscate, :salt
 
@@ -40,7 +40,7 @@ module Formatter
 
       def subject_data
         {}.tap do |subjects_and_metadata|
-          subjects = Subject.where(id: classification.subject_ids)
+          subjects = ::Subject.where(id: classification.subject_ids)
           subjects.each do |subject|
             retired_data = { retired: subject.retired_for_workflow?(workflow.id) }
             subjects_and_metadata[subject.id] = subject.metadata.merge(retired_data)

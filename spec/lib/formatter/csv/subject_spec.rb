@@ -1,7 +1,6 @@
 require "spec_helper"
-require 'formatter_csv_subject'
 
-RSpec.describe Formatter::CSV::Subject do
+RSpec.describe Formatter::Csv::Subject do
   let(:project) { create(:project) }
   let(:workflow) { create(:workflow, project: project) }
   let(:subject_set) { create(:subject_set, project: project, workflows: [workflow]) }
