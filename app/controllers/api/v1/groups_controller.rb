@@ -6,8 +6,8 @@ class Api::V1::GroupsController < Api::ApiController
 
   alias_method :user_group, :controlled_resource
 
-  allowed_params :create, :display_name, links: [ users: [] ]
-  allowed_params :update, :display_name
+  allowed_params :create, :name, :display_name, links: [ users: [] ]
+  allowed_params :update, :name, :display_name
 
   def destroy_links
     controlled_resources.first.memberships

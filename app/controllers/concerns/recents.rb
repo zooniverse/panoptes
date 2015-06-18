@@ -2,7 +2,13 @@ module Recents
   def recents
     ps = params.dup
     ps.delete "#{resource_name}_id"
-    render json_api: RecentSerializer.page(ps, recent_scope, { type: resource_sym.to_s })
+    render json_api: RecentSerializer.page(ps, recent_scope, { type: resource_sym.to_s, owner_id: resource_ids })
+  end
+
+  def recent
+    ps = params.dup
+    ps.delete "#{resource_name}_id"
+    render json_api: RecentSerializer.page(ps, recent_scope, { type: resource_sym.to_s, owner_id: resource_ids })
   end
 
   def recent_scope

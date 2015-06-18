@@ -57,7 +57,7 @@ class ZooniverseUserSubscription < ActiveRecord::Base
   end
 
   def find_migrated_user
-    unless migrated_user = User.find_by(display_name: zooniverse_user.login)
+    unless migrated_user = User.find_by(login: zooniverse_user.login)
       p "Skipping subscription for non-migrated user account: #{zooniverse_user.login}"
     end
     migrated_user

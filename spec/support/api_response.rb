@@ -4,7 +4,8 @@ shared_examples "an api response" do
   end
 
   it "should include allowed attributes" do
-    expect(json_response[api_resource_name]).to all( include(*api_resource_attributes) )
+    attrs = (api_resource_attributes + %w(id href)).uniq
+    expect(json_response[api_resource_name]).to all( include(*attrs) )
   end
 
   it "should have links to other resources" do

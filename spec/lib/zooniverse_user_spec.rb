@@ -17,14 +17,14 @@ RSpec.describe ZooniverseUser, type: :model do
     context "with no arguments" do
       it 'should import all zooniverse users' do
         ZooniverseUser.import_users
-        expect(User.all.map(&:display_name)).to include(*zus.map(&:login))
+        expect(User.all.map(&:login)).to include(*zus.map(&:login))
       end
     end
 
     context "with user_names" do
       it 'should only import the supplied user names' do
         ZooniverseUser.import_users([zus.first.login])
-        expect(User.find_by(zooniverse_id: zus.first.id.to_s).display_name).to match(zus.first.login)
+        expect(User.find_by(zooniverse_id: zus.first.id.to_s).login).to match(zus.first.login)
       end
 
       it 'should not import non-specified users' do
@@ -37,7 +37,7 @@ RSpec.describe ZooniverseUser, type: :model do
     let(:user) { create(:user) }
 
     it 'should create a ZooniverseUser from a User' do
-      expect(ZooniverseUser.create_from_user(user).login).to eq(user.display_name)
+      expect(ZooniverseUser.create_from_user(user).login).to eq(user.login)
     end
 
     it 'should set the zooniverse id of the user' do
@@ -69,7 +69,7 @@ RSpec.describe ZooniverseUser, type: :model do
     context 'when the User has not already be imported' do
       let(:zu) { create(:zooniverse_user) }
       it 'should create a User from a Zooniverse User' do
-        expect(zu.import.display_name).to eq(zu.login)
+        expect(zu.import.login).to eq(zu.login)
       end
 
       context "when the avatar is nil" do

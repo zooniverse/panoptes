@@ -65,7 +65,7 @@ class ZooniverseProject < ActiveRecord::Base
   end
 
   def zooniverse_user
-    @zoo_user ||= User.find_by!(display_name: "zooniverse")
+    @zoo_user ||= User.find_by!(login: "zooniverse")
   end
 
   def project_configuration(zoo_project)

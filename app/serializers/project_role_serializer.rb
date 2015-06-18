@@ -1,7 +1,7 @@
 class ProjectRoleSerializer
   include ACLSerializer
 
-  attributes :id, :roles
+  attributes :id, :roles, :href
   can_include :user_group, :resource
 
   def self.key

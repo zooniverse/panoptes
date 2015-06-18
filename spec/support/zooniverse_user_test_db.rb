@@ -49,10 +49,10 @@ class CreateZooniverserUserDatabase < ActiveRecord::Migration
 
     end
 
-    add_index "users", ["display_name"], :name => "display_name_index", :length => {"display_name"=>30}
-    add_index "users", ["email"], :name => "email_index", :unique => true
-    add_index "users", ["login"], :name => "login_index", :unique => true
-    add_index "users", ["persistence_token"], :name => "users_persistence_token_index"
-    add_index "users", ["single_access_token"], :name => "users_single_access_token_index"
+    # add_index "users", ["display_name"], :name => "display_name_index", :length => {"display_name"=>30}
+    # add_index "users", ["email"], :name => "email_index", :unique => true
+    # add_index "users", ["login"], :name => "login_index", :unique => true
+    # add_index "users", ["persistence_token"], :name => "users_persistence_token_index"
+    # add_index "users", ["single_access_token"], :name => "users_single_access_token_index"
   end
 end
