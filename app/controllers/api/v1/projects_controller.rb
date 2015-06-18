@@ -5,7 +5,8 @@ class Api::V1::ProjectsController < Api::ApiController
   include FilterByCurrentUserRoles
   include TranslatableResource
 
-  doorkeeper_for :update, :create, :destroy, :create_export, scopes: [:project]
+  doorkeeper_for :update, :create, :destroy, :create_classifications_export,
+    :create_subjects_export, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
 
@@ -34,21 +35,21 @@ class Api::V1::ProjectsController < Api::ApiController
 
 
   before_action :add_owner_ids_to_filter_param!, only: :index
-  prepend_before_action :require_login, only: [:create, :update, :destroy, :create_export]
+  prepend_before_action :require_login,
+    only: [:create, :update, :destroy, :create_classifications_export, :create_subjects_export]
 
-  def create_export
-    media_create_params = params.require(:media).permit(:content_type, metadata: [recipients: []])
-    media_create_params[:metadata] ||= { recipients: [api_user.id] }
-    if medium = controlled_resource.classifications_export
-      medium.update!(media_create_params)
-    else
-      medium = controlled_resource.create_classifications_export(media_create_params)
-    end
-
+  def create_classifications_export
+    media_params[:metadata] ||= { recipients: [api_user.id] }
+    medium = create_or_update_medium(:classifications_export, media_params)
     ClassificationsDumpWorker.perform_async(controlled_resource.id, medium.id)
-    headers['Location'] = "#{request.protocol}#{request.host_with_port}/api#{medium.location}"
-    headers['Last-Modified'] = medium.updated_at.httpdate
-    json_api_render(:created, MediumSerializer.resource({}, Medium.where(id: medium.id)))
+    medium_response(medium)
+  end
+
+  def create_subjects_export
+    media_params[:metadata] ||= { recipients: [api_user.id] }
+    medium = create_or_update_medium(:subjects_export, media_params)
+    SubjectsDumpWorker.perform_async(controlled_resource.id, medium.id)
+    medium_response(medium)
   end
 
   def create
@@ -56,6 +57,25 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   private
+
+  def create_or_update_medium(type, media_create_params)
+    if medium = controlled_resource.send(type)
+      medium.update!(media_create_params)
+      medium
+    else
+      controlled_resource.send("create_#{type}", media_create_params)
+    end
+  end
+
+  def media_params
+    @media_params ||= params.require(:media).permit(:content_type, metadata: [recipients: []])
+  end
+
+  def medium_response(medium)
+    headers['Location'] = "#{request.protocol}#{request.host_with_port}/api#{medium.location}"
+    headers['Last-Modified'] = medium.updated_at.httpdate
+    json_api_render(:created, MediumSerializer.resource({}, Medium.where(id: medium.id)))
+  end
 
   def create_response(projects)
     serializer.resource({ include: 'owners' },

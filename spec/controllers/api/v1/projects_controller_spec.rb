@@ -646,11 +646,9 @@ describe Api::V1::ProjectsController, type: :controller do
     end
   end
 
-  describe "#create_export" do
+  context "creating exports" do
     let(:resource) { create(:full_project, owner: user) }
-    let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/classifications_export/ }
     let(:test_attr) { :type }
-    let(:test_attr_value) { "project_classifications_export" }
     let(:new_resource) { Medium.find(created_instance_id(api_resource_name)) }
     let(:api_resource_name) { "media" }
     let(:api_resource_attributes) do
@@ -666,33 +664,23 @@ describe Api::V1::ProjectsController, type: :controller do
                         metadata: { recipients: create_list(:user, 1).map(&:id) }
                        }
                }
-      params.merge(project_id: resource.id, media_name: "classifications_exports")
+      params.merge(project_id: resource.id)
     end
 
-    it_behaves_like "is creatable", :create_export
+    describe "#create_classifications_export" do
+      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/classifications_export/ }
+      let(:test_attr_value) { "project_classifications_export" }
 
-    it 'should queue an export worker' do
-      expect(ClassificationsDumpWorker).to receive(:perform_async).with(resource.id, an_instance_of(Fixnum))
-      default_request scopes: scopes, user_id: user.id
-      post :create_export, create_params
+      it_behaves_like "is creatable", :create_classifications_export
+      it_behaves_like "export create", ClassificationsDumpWorker, "classifications_export"
     end
 
-    it 'should add the current user to the recipients list if none are specified' do
-      params = create_params
-      params[:media].delete(:metadata)
-      default_request scopes: scopes, user_id: user.id
-      post :create_export, params
-      expect(resource.classifications_export.metadata).to include("recipients" => [authorized_user.id])
-    end
+    describe "#create_subjects_export" do
+      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/subjects_export/ }
+      let(:test_attr_value) { "project_subjects_export" }
 
-    it 'should update an existing export if one exists' do
-      params = create_params
-      params[:media].delete(:metadata)
-      export = create(:medium, linked: resource, type: "project_classifications_export", content_type: "text/csv", metadata: {})
-      default_request scopes: scopes, user_id: user.id
-      post :create_export, params
-      export.reload
-      expect(export.metadata).to include("recipients" => [authorized_user.id])
+      it_behaves_like "is creatable", :create_subjects_export
+      it_behaves_like "export create", SubjectsDumpWorker, "subjects_export"
     end
   end
 
