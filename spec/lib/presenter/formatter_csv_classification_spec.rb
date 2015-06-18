@@ -3,12 +3,12 @@ require 'formatter_csv_classification'
 
 RSpec.describe Formatter::CSV::Classification do
 
-  def project_headers
+  let(:project_headers) do
     %w( user_name user_ip workflow_id workflow_name workflow_version
         created_at gold_standard expert metadata annotations subject_data )
   end
 
-  def subject_data
+  let(:subject_data) do
     {
      "1" => {
        loudness: 11, brightness: -20, distance_from_earth: "42 light years",
@@ -17,11 +17,11 @@ RSpec.describe Formatter::CSV::Classification do
     }.to_json
   end
 
-  def ip_hash
+  let(:ip_hash) do
     Digest::SHA1.hexdigest("#{classification.user_ip}#{expected_time}")
   end
 
-  def formatted_data
+  let(:formatted_data) do
     [ classification.user.login,
       ip_hash,
       classification.workflow_id,

@@ -76,7 +76,8 @@ class Medium < ActiveRecord::Base
   end
 
   def allowed_content_types
-    if type == "project_classifications_export"
+    case type
+    when "project_classifications_export", "project_subjects_export"
       ALLOWED_EXPORT_CONTENT_TYPES
     else
       ALLOWED_UPLOAD_CONTENT_TYPES
