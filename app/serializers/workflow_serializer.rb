@@ -5,7 +5,7 @@ class WorkflowSerializer
   attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
              :created_at, :updated_at, :first_task, :primary_language,
              :version, :content_language, :prioritized, :grouped, :pairwise,
-             :retirement, :retired_set_member_subjects_count
+             :retirement, :retired_set_member_subjects_count, :href
 
   can_include :project, :subject_sets, :tutorial_subject, :expert_subject_sets
 

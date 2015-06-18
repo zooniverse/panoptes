@@ -3,7 +3,7 @@ class SubjectSerializer
   include FilterHasMany
 
   attributes :id, :metadata, :locations, :zooniverse_id,
-    :created_at, :updated_at
+    :created_at, :updated_at, :href
 
   optional :retired, :already_seen
 

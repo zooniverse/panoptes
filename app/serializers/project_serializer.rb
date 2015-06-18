@@ -9,7 +9,8 @@ class ProjectSerializer
     :introduction, :private, :faq, :result, :education_content,
     :retired_subjects_count, :configuration, :live,
     :urls, :migrated, :classifiers_count, :slug, :redirect,
-    :beta_requested, :beta_approved, :launch_requested, :launch_approved
+    :beta_requested, :beta_approved, :launch_requested, :launch_approved,
+    :href
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles
