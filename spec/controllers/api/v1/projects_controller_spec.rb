@@ -138,7 +138,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
 
           context "when the project owner name has a differnt case to the identity group" do
-            let!(:index_options) { { owner: project_owner.login.upcase } }
+            let!(:index_options) { { owner: [project_owner.login.upcase, 'SOMETHING'].join(',') } }
 
             it "should respond with 1 item" do
               expect(json_response[api_resource_name].length).to eq(1)
