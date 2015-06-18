@@ -5,10 +5,18 @@ namespace :migrate do
   desc "Migrate to User login field from display_name"
   task user_login_field: :environment do
 
-    total = User.count
+    user_display_names = ENV['USERS'].try(:split, ",")
     validator = LoginUniquenessValidator.new
 
-    User.find_each.with_index do |user, index|
+    null_login_users = User.where(login: nil)
+    unless user_display_names.blank?
+      display_name_scope = User.where(display_name: user_display_names)
+      null_login_users = null_login_users.merge(display_name_scope)
+    end
+
+    total = null_login_users.count
+
+    null_login_users.find_each.with_index do |user, index|
       puts "#{ index } / #{ total }" if index % 1_000 == 0
       sanitized_login = User.sanitize_login user.display_name
 
@@ -29,4 +37,3 @@ namespace :migrate do
     end
   end
 end
-
