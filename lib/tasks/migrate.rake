@@ -54,5 +54,13 @@ namespace :migrate do
       beta_users.update_all(beta_email_communication: true)
       puts "Updated #{ beta_users_count } users to receive emails for beta tests."
     end
+
+    desc "Reset user sign_in_count"
+    task reset_sign_in_count: :environment do
+      user_logins = ENV['USERS'].try(:split, ",")
+      query = User.where(migrated: true).where("sign_in_count > 1")
+      query = query.where(login: user_logins) if user_logins
+      query.update_all(sign_in_count: 0)
+    end
   end
 end
