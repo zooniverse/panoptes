@@ -17,6 +17,7 @@ kafka:
   image: zooniverse/kafka
   links:
     - zookeeper:zk
+  hostname: kafka
   command: -i 1 -H kafka -p 9092 -z zk:2181
 
 panoptes:
@@ -29,6 +30,6 @@ panoptes:
     RAILS_ENV: development
   links:
     - postgres
-    - zookeeper
+    - zookeeper:zk
     - kafka
     - redis

@@ -13,7 +13,7 @@ module MultiKafkaProducer
     def self.publish(topic, msgs_and_keys)
       msgs = msgs_and_keys.map do |msg|
         key, msg = split_msg_pair(msg)
-        ::Poseidon::MessageToSend.new(topic, msg, key)
+        ::Poseidon::MessageToSend.new(topic, msg, key.to_s)
       end
       @connection.send_messages msgs
     end

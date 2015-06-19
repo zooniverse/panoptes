@@ -377,6 +377,3 @@ DEPENDENCIES
   therubyrhino
   uglifier (~> 2.0)
   versionist (~> 1.0)
-
-BUNDLED WITH
-   1.10.4
