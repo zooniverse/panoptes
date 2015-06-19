@@ -18,6 +18,7 @@ FactoryGirl.define do
     beta_email_communication true
     admin false
     banned false
+    unsubscribe_token "whQm5*E9egqd9rJu"
 
     after(:build) do |u, env|
       if env.build_group

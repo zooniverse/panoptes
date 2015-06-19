@@ -521,4 +521,10 @@ describe User, type: :model do
       expect(uploader.uploaded_subjects_count).to eq(2)
     end
   end
+
+  describe "#unsubscribe_token", :focus do
+    it "should not be valid with a duplicate" do
+      expect(build(:user, unsubscribe_token: user.unsubscribe_token)).to be_invalid
+    end
+  end
 end

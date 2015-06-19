@@ -314,7 +314,8 @@ ActiveRecord::Schema.define(version: 20150624155122) do
     t.integer  "uploaded_subjects_count",     default: 0
     t.integer  "project_id"
     t.boolean  "beta_email_communication",    index: {name: "index_users_on_beta_email_communication", where: "(beta_email_communication IS TRUE)"}
-    t.string   "login",                       null: false, index: {name: "index_users_on_login", unique: true, case_sensitive: false}
+    t.string   "login",                       index: {name: "index_users_on_login", unique: true, case_sensitive: false}
+    t.string   "unsubscribe_token",           null: false, index: {name: "index_users_on_unsubscribe_token", unique: true}
   end
   add_index "users", ["display_name"], name: "users_display_name_trgm_index", using: :gist, operator_class: "gist_trgm_ops"
 
