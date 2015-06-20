@@ -11,9 +11,10 @@ Bundler.require(*Rails.groups)
 
 module Panoptes
   class Application < Rails::Application
-    config.autoload_paths += Dir[Rails.root.join('lib', '**/')]
     config.autoload_paths += Dir[Rails.root.join('app', 'models', '**/')]
     config.autoload_paths += Dir[Rails.root.join('app', 'serializers', '**/')]
+    config.autoload_paths += Dir[Rails.root.join('app', 'workers', '**/')]
+    config.autoload_paths += Dir[Rails.root.join('lib', '**/')]
 
     config.action_dispatch.perform_deep_munge = false
     config.middleware.insert_before ActionDispatch::ParamsParser, "RejectPatchRequests"
