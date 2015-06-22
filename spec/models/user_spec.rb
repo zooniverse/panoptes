@@ -114,6 +114,10 @@ describe User, type: :model do
       expect(user).to be_valid
     end
 
+    it 'should not enfore a minimum length' do
+      expect(build(:user, login: "1")).to be_valid
+    end
+
     it 'should have non-blank error' do
       user = build(:user, login: "")
       user.valid?
