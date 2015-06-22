@@ -19,7 +19,9 @@ class UserGroup < ActiveRecord::Base
            source_type: "Collection"
 
   validates :display_name, presence: true
-  validates :name, presence: true, uniqueness: { case_sensitive: false }, format: { with: /\A#{ User::ALLOWED_LOGIN_CHARACTERS }{3,}\z/ }
+  validates :name, presence: true,
+    uniqueness: { case_sensitive: false },
+    format: { with: User::USER_LOGIN_REGEX }
 
   before_validation :default_display_name, on: [:create, :update]
 

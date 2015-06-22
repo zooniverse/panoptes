@@ -65,6 +65,10 @@ describe UserGroup, :type => :model do
       expect(build(:user_group, name: "$asdfasdf")).to_not be_valid
     end
 
+    it 'should not enfore a minimum length' do
+      expect(build(:user, login: "1")).to be_valid
+    end
+
     it 'should have non-blank error' do
       ug = build(:user_group, name: "")
       ug.valid?

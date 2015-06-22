@@ -3,6 +3,7 @@ class User < ActiveRecord::Base
   include Linkable
 
   ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
+  USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
 
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
@@ -33,7 +34,7 @@ class User < ActiveRecord::Base
 
   belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
 
-  validates :login, presence: true, format: { with: /\A#{ ALLOWED_LOGIN_CHARACTERS }{3,}\z/ }
+  validates :login, presence: true, format: { with: USER_LOGIN_REGEX }
   validates :display_name, presence: true
   validates_with LoginUniquenessValidator
 
