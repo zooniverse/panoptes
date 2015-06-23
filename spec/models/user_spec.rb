@@ -75,6 +75,18 @@ describe User, type: :model do
     end
   end
 
+  describe "::user_from_unsubscribe_token" do
+
+    it "should find the user from the token" do
+      found_user = User.user_from_unsubscribe_token(user.unsubscribe_token)
+      expect(found_user.id).to eq(user.id)
+    end
+
+    it "should not return a user for a non-matching signature" do
+      expect(User.user_from_unsubscribe_token("bluirhkj")).to be_nil
+    end
+  end
+
   describe "#signup_project" do
     let(:project) { create(:project) }
 
@@ -522,9 +534,23 @@ describe User, type: :model do
     end
   end
 
-  describe "#unsubscribe_token", :focus do
+  describe "#unsubscribe_token" do
+
+    it "should not build one automatically on build" do
+      expect(build(:user).unsubscribe_token).to be_nil
+    end
+
+    it "should build one automatically on create" do
+      expect(user.unsubscribe_token).to_not be_nil
+    end
+
     it "should not be valid with a duplicate" do
-      expect(build(:user, unsubscribe_token: user.unsubscribe_token)).to be_invalid
+      allow_any_instance_of(User).to receive(:unsubscribe_token).and_return(user.unsubscribe_token)
+      aggregate_failures "error messages" do
+        user = build(:user)
+        expect(user.valid?).to be_falsey
+        expect(user.errors[:unsubscribe_token]).to include("has already been taken")
+      end
     end
   end
 end
