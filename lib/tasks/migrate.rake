@@ -62,5 +62,19 @@ namespace :migrate do
       query = query.where(login: user_logins) if user_logins
       query.update_all(sign_in_count: 0)
     end
+
+    desc "Set unsubscribe tokens for individual users"
+    task setup_unsubscribe_token: :environment do
+      unsubscribe_token_scope = User.where(unsubscribe_token: nil)
+      missing_token_count = unsubscribe_token_scope.count
+      unsubscribe_token_scope.find_each.with_index do |user, index|
+        puts "#{ index } / #{ missing_token_count }" if index % 1_000 == 0
+        if login = user.login
+          token = UserUnsubscribeMessageVerifier.create_access_token(login)
+          user.update_column(:unsubscribe_token, token)
+        end
+      end
+      puts "Updated #{ missing_token_count } users have unsubscribe tokens."
+    end
   end
 end
