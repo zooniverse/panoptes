@@ -17,6 +17,12 @@ module Panoptes
       "#{frontend_url}#{reset}"
     end
   end
+
+  def self.unsubscribe_redirect
+    if unsubscribe = frontend_configuration[:unsubscribe]
+      "#{frontend_url}#{unsubscribe}"
+    end
+  end
 end
 
 Panoptes.frontend_configuration
