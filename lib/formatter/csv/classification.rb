@@ -53,7 +53,20 @@ module Formatter
       end
 
       def annotations
-        classification.annotations.to_json
+        classification.annotations.map do |annotation|
+          annotation = annotation.dup
+          _, task = classification.workflow.tasks.find {|key, task| key == annotation["task"] }
+
+          if task && task["type"] == "drawing"
+            annotation["value"] = annotation["value"].map do |drawn_item|
+              tool = task["tools"][drawn_item["tool"]]
+              tool_label = classification.workflow.workflow_content_for_primary_language.strings[tool["label"]]
+              drawn_item.merge "tool_label" => tool_label
+            end
+          end
+
+          annotation
+        end.to_json
       end
 
       def expert

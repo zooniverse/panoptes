@@ -57,6 +57,19 @@ RSpec.describe Formatter::Csv::Classification do
       expect(formatter.to_array(classification)).to match_array(formatted_data)
     end
 
+    it 'adds labels of drawing tools' do
+      classification.annotations << {
+        "task" => "interest",
+        "value" => [{"x"=>1, "y"=>2, "tool"=>1},
+                    {"x"=>3, "y"=>4, "tool"=>2},
+                    {"x"=>5, "y"=>6, "tool"=>1}]
+      }
+      formatted_annotations = JSON.parse(formatter.to_array(classification)[-2])
+      expect(formatted_annotations.last["value"][0]["tool_label"]).to eq("Green")
+      expect(formatted_annotations.last["value"][1]["tool_label"]).to eq("Blue")
+      expect(formatted_annotations.last["value"][2]["tool_label"]).to eq("Green")
+    end
+
     context "when the obfuscate_private_details flag is false" do
 
       it 'return the real classification ip in the array' do
