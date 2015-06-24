@@ -26,8 +26,8 @@ class EmailsController < ActionController::Base
 
   def revoke_email_subscriptions(user)
     user.update!(UNSUBSCRIBE_USER_ATTRIBUTES)
-    UserProjectPreference.where(user_id: user.id)
-      .update_all(email_communication: false)
+    UserProjectPreference.where(user_id: user.id).update_all(email_communication: false)
+    UnsubscribeWorker.perform_async(user.email)
     true
   rescue ActiveRecord::RecordInvalid
     false

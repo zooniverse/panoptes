@@ -49,6 +49,11 @@ describe EmailsController, type: :controller do
           end
         end
 
+        it 'should queue an unsubscribe maillist worker' do
+          expect(UnsubscribeWorker).to receive(:perform_async).with(user.email)
+          unsubscribe_user
+        end
+
         context "when the user has user project preferences" do
           let!(:upp) do
             create_list(:user_project_preference, 3, user: user)
@@ -63,11 +68,18 @@ describe EmailsController, type: :controller do
         end
 
         context "when the user subscriptions can't be updated" do
+          before(:each) do
+            allow(subject).to receive(:revoke_email_subscriptions).and_return(false)
+          end
 
           it "should redirect to the unsubscribed failure page" do
-            allow(subject).to receive(:revoke_email_subscriptions).and_return(false)
             unsubscribe_user
             expect(response).to redirect_to("#{base_url}?failed=true")
+          end
+
+          it 'should not queue an unsubscribe maillist worker' do
+            expect(UnsubscribeWorker).to_not receive(:perform_async)
+            unsubscribe_user
           end
         end
       end
