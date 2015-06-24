@@ -1,4 +1,6 @@
 class JiscMailer < ApplicationMailer
+  layout 'jisc_mail'
+
   JISC_MAIL_ADDRESS = "listserv@jiscmail.ac.uk"
 
   def subscribe(email, name)
