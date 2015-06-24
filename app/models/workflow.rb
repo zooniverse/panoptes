@@ -48,10 +48,6 @@ class Workflow < ActiveRecord::Base
     read_attribute(:tasks).with_indifferent_access
   end
 
-  def workflow_content_for_primary_language
-    workflow_contents.find_by(language: primary_language)
-  end
-
   def retirement_scheme
     case retirement.fetch('criteria', DEFAULT_CRITERIA)
     when 'classification_count'
