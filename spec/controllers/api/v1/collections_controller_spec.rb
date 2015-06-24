@@ -7,7 +7,7 @@ describe Api::V1::CollectionsController, type: :controller do
   let(:project) { collection.project }
   let(:api_resource_name) { 'collections' }
 
-  let(:api_resource_attributes) { %w(id name display_name created_at updated_at) }
+  let(:api_resource_attributes) { %w(id name display_name created_at updated_at favorite) }
   let(:api_resource_links) { %w(collections.project collections.owner collections.collection_roles collections.subjects) }
 
   let(:scopes) { %w(public collection) }
@@ -30,6 +30,15 @@ describe Api::V1::CollectionsController, type: :controller do
     it_behaves_like "is indexable"
     it_behaves_like "it has custom owner links"
     it_behaves_like 'has many filterable', :subjects
+
+    context "it is filterable by favorite" do
+      let!(:favorite_col) { create(:collection, favorite: true) }
+
+      it 'should only return the favorite collection' do
+        get :index, favorite: true
+        expect(json_response[api_resource_name].map{ |r| r['id'] }).to match_array([favorite_col.id.to_s])
+      end
+    end
   end
 
   describe '#show' do
