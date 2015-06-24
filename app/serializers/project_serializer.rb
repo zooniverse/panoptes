@@ -10,7 +10,7 @@ class ProjectSerializer
     :retired_subjects_count, :configuration, :live,
     :urls, :migrated, :classifiers_count, :slug, :redirect,
     :beta_requested, :beta_approved, :launch_requested, :launch_approved,
-    :href
+    :href, :workflow_description
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles
@@ -23,6 +23,10 @@ class ProjectSerializer
 
   def description
     content[:description]
+  end
+
+  def workflow_description
+    content[:workflow_description]
   end
 
   def guide

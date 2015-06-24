@@ -11,7 +11,7 @@ describe Api::V1::ProjectsController, type: :controller do
      "updated_at", "created_at", "available_languages", "title",
      "description", "team_members", "guide", "science_case", "introduction", "migrated",
      "faq", "result", "education_content", "private", "live", "retired_subjects_count",
-     "urls", "classifiers_count", "redirect" ]
+     "urls", "classifiers_count", "redirect", "workflow_description" ]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
@@ -298,6 +298,7 @@ describe Api::V1::ProjectsController, type: :controller do
                      education_content: "asdfasdf",
                      faq: "some other stuff",
                      result: "another string",
+                     workflow_description: "some more text",
                      urls: [{label: "Twitter", url: "http://twitter.com/example"}],
                      configuration: {
                                      an_option: "a setting"
@@ -484,6 +485,7 @@ describe Api::V1::ProjectsController, type: :controller do
                   education_content: "asdfasdf",
                   faq: "some other stuff",
                   result: "another string",
+                  workflow_description: "some more text",
                   configuration: {
                                   an_option: "a setting"
                                  },

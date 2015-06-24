@@ -75,6 +75,10 @@ class ProjectUpdateSchema < JsonSchema
       type "string"
     end
 
+    property "workflow_description" do
+      type "string"
+    end
+
     property "result" do
       type "string"
     end
