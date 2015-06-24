@@ -36,6 +36,7 @@ class User < ActiveRecord::Base
 
   validates :login, presence: true, format: { with: USER_LOGIN_REGEX }
   validates :display_name, presence: true
+  validates :unsubscribe_token, presence: true, uniqueness: true
   validates_with LoginUniquenessValidator
 
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated
@@ -49,6 +50,7 @@ class User < ActiveRecord::Base
   delegate :owns?, to: :identity_group
 
   before_validation :default_display_name, on: [:create, :update]
+  before_validation :setup_unsubscribe_token, on: [:create]
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
@@ -103,6 +105,13 @@ class User < ActiveRecord::Base
     string
       .gsub(/\s+/, '_')
       .gsub /[^#{ ALLOWED_LOGIN_CHARACTERS }]/, ''
+  end
+
+  def self.user_from_unsubscribe_token(signature)
+    login = UserUnsubscribeMessageVerifier.verify(signature)
+    User.find_by(login: login)
+  rescue ActiveSupport::MessageVerifier::InvalidSignature
+    nil
   end
 
   def memberships_for(action, klass)
@@ -174,5 +183,11 @@ class User < ActiveRecord::Base
 
   def default_display_name
     self.display_name ||= login
+  end
+
+  def setup_unsubscribe_token
+    if self.login
+      self.unsubscribe_token ||= UserUnsubscribeMessageVerifier.create_access_token(self.login)
+    end
   end
 end

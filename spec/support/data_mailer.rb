@@ -6,6 +6,8 @@ RSpec.shared_examples "data mailer" do |data_type, method|
   end
   let(:emails) { %w(test@examples.com admin@example.com) }
 
+  it_behaves_like "email generic unsubscribe links"
+
   it 'should mail the project the included emails' do
     expect(mail.to).to include(*emails)
   end
