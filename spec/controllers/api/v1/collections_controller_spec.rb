@@ -24,6 +24,7 @@ describe Api::V1::CollectionsController, type: :controller do
     let!(:private_resource) do
       create :collection_with_subjects, private: true
     end
+    let(:resource) { collection }
 
     let(:n_visible) { 2 }
 
@@ -39,6 +40,8 @@ describe Api::V1::CollectionsController, type: :controller do
         expect(json_response[api_resource_name].map{ |r| r['id'] }).to match_array([favorite_col.id.to_s])
       end
     end
+
+    it_behaves_like "filter by display_name"
   end
 
   describe '#show' do

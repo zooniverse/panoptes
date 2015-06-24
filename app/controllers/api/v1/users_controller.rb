@@ -1,5 +1,6 @@
 class Api::V1::UsersController < Api::ApiController
   include Recents
+  include FilterByDisplayName
 
   doorkeeper_for :me, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
@@ -40,9 +41,7 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def index
-    if display_name = params.delete(:display_name)
-      @controlled_resources = controlled_resources.where('"users"."display_name" ILIKE ?', display_name + '%')
-    elsif logins = params.delete(:login).try(:split, ',').try(:map, &:downcase)
+    if logins = params.delete(:login).try(:split, ',').try(:map, &:downcase)
       @controlled_resources = controlled_resources.where(User.arel_table[:login].lower.in(logins))
     end
     super
