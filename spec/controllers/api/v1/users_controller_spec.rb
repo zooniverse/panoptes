@@ -146,12 +146,15 @@ describe Api::V1::UsersController, type: :controller do
 
     describe "params" do
       let(:user) { users.sample(1).first }
+      let(:resource) { user }
 
       before(:each) do
         get :index, index_options
       end
 
-      describe "filter by display_name" do
+      it_behaves_like "filter by display_name"
+
+      describe "filter by login" do
         let(:index_options) { { login: user.login } }
 
         it "should respond with 1 item" do
@@ -163,32 +166,8 @@ describe Api::V1::UsersController, type: :controller do
         end
       end
 
-      describe "filter by case insensitive display_name" do
+      describe "filter by case insensitive login" do
         let(:index_options) { { login: user.login.upcase } }
-
-        it "should respond with 1 item" do
-          expect(json_response[api_resource_name].length).to eq(1)
-        end
-
-        it "should respond with the correct item" do
-          expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
-        end
-      end
-
-      describe "filter by display_name" do
-        let(:index_options) { { display_name: user.display_name } }
-
-        it "should respond with 1 item" do
-          expect(json_response[api_resource_name].length).to eq(1)
-        end
-
-        it "should respond with the correct item" do
-          expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
-        end
-      end
-
-      describe "filter by case insensitive display_name" do
-        let(:index_options) { { display_name: user.display_name.upcase } }
 
         it "should respond with 1 item" do
           expect(json_response[api_resource_name].length).to eq(1)

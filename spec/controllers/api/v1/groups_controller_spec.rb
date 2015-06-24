@@ -29,6 +29,7 @@ describe Api::V1::GroupsController, type: :controller do
   describe "#index" do
     let(:private_resource) { user_groups[1] }
     let(:n_visible) { 2 }
+    let(:resource) { user_groups[-1] }
 
     context "filtering by name" do
       it 'should return only the requested group' do
@@ -46,6 +47,8 @@ describe Api::V1::GroupsController, type: :controller do
     context "no filters" do
       it_behaves_like "is indexable"
     end
+
+    it_behaves_like "filter by display_name"
   end
 
   describe "#update" do

@@ -61,9 +61,13 @@ describe Api::V1::ProjectsController, type: :controller do
           create(:full_project, display_name: "Non-test project", owner: project_owner)
         end
 
+        let(:resource) { new_project }
+
         before(:each) do
           get :index, index_options
         end
+
+        it_behaves_like "filter by display_name"
 
         describe "include avatar and background" do
           let(:index_options) { {include: 'avatar,background'} }

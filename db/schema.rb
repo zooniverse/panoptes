@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150624131746) do
+ActiveRecord::Schema.define(version: 20150624135643) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -68,7 +68,7 @@ ActiveRecord::Schema.define(version: 20150624131746) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "activated_state", default: 0,     null: false
-    t.string   "display_name"
+    t.string   "display_name",    index: {name: "collections_display_name_trgm_index", using: :gist, operator_class: "gist_trgm_ops"}
     t.boolean  "private"
     t.integer  "lock_version",    default: 0
     t.string   "slug",            default: "", index: {name: "index_collections_on_slug"}
@@ -159,7 +159,7 @@ ActiveRecord::Schema.define(version: 20150624131746) do
 
   create_table "projects", force: :cascade do |t|
     t.string   "name"
-    t.string   "display_name"
+    t.string   "display_name",          index: {name: "projects_display_name_trgm_index", using: :gist, operator_class: "gist_trgm_ops"}
     t.integer  "user_count"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -260,7 +260,7 @@ ActiveRecord::Schema.define(version: 20150624131746) do
     t.datetime "updated_at"
     t.integer  "classifications_count", default: 0,    null: false
     t.integer  "activated_state",       default: 0,    null: false
-    t.string   "display_name"
+    t.string   "display_name",          index: {name: "user_groups_display_name_trgm_index", using: :gist, operator_class: "gist_trgm_ops"}
     t.boolean  "private",               default: true, null: false
     t.integer  "lock_version",          default: 0
   end
