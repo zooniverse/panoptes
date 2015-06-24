@@ -2,6 +2,8 @@ class ZooniverseUserSubscription < ActiveRecord::Base
 
   class MissingLegacyProject < StandardError; end
 
+  ZOO_USER_BATCH_SIZE = 1000
+
   establish_connection :"zooniverse_home_#{ Rails.env }"
   self.table_name = 'subscriptions'
 
@@ -9,22 +11,40 @@ class ZooniverseUserSubscription < ActiveRecord::Base
   serialize :summary, Hash
 
   def self.import_zoo_user_subscriptions(user_logins=nil)
-    zoo_project_subscriptions(user_logins).find_each do |user_project_sub|
+    zoo_user_scope = zoo_users_to_import(user_logins)
+    total_batches = zoo_user_scope.count / ZOO_USER_BATCH_SIZE
+    zoo_user_scope.find_in_batches.with_index do |zoo_users, batch|
+      puts "Processing zoo user batch: #{ batch + 1} out of #{total_batches}"
+      import_batch(zoo_users)
+    end
+  end
+
+  def self.zoo_users_to_import(user_logins)
+    if user_logins.blank?
+      ZooniverseUser.all
+    else
+      ZooniverseUser.where(users: { login: user_logins })
+    end.select(:id)
+  end
+
+  def self.import_batch(zoo_users)
+    import_user_scope = zoo_project_subscriptions(zoo_users.map(&:id))
+    total = import_user_scope.count.keys.count
+    import_user_scope.find_each.with_index do |user_project_sub, index|
+      puts "#{ index } / #{ total }" if index % 1_000 == 0
       unless user_project_sub.empty_summary?
         user_project_sub.import
       end
     end
   end
 
-  def self.zoo_project_subscriptions(user_logins)
-    subs_scope = self.where.not(user_id: nil, project_id: nil)
-      .includes(:zooniverse_user)
+  def self.zoo_project_subscriptions(user_ids)
+    self.where.not(user_id: nil, project_id: nil)
+      includes(:zooniverse_user)
       .joins(:zooniverse_user)
+      .where(users: { id: user_ids })
       .distinct
-    unless user_logins.blank?
-      subs_scope = subs_scope.merge(ZooniverseUser.where(users: { login: user_logins }))
-    end
-    subs_scope.group(:user_id, :project_id)
+      .group(:user_id, :project_id)
   end
 
   def import
@@ -57,7 +77,10 @@ class ZooniverseUserSubscription < ActiveRecord::Base
   end
 
   def find_migrated_user
-    unless migrated_user = User.find_by(login: zooniverse_user.login)
+    migrated_user = User.where(zooniverse_id: zooniverse_user.id)
+      .or(User.where(email: zooniverse_user.email))
+      .first
+    unless migrated_user
       p "Skipping subscription for non-migrated user account: #{zooniverse_user.login}"
     end
     migrated_user
