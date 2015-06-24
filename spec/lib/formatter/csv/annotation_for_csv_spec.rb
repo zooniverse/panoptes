@@ -12,6 +12,11 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     }
   end
 
+  it 'adds the task label' do
+    formatted = described_class.new(classification, annotation).to_h
+    expect(formatted["task_label"]).to eq("Draw a circle")
+  end
+
   it 'adds the tool labels for drawing tasks' do
     formatted = described_class.new(classification, annotation).to_h
     expect(formatted["value"][0]["tool_label"]).to eq("Green")
