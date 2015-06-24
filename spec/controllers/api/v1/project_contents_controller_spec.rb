@@ -5,7 +5,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   let(:project) { create(:project_with_contents) }
   let(:api_resource_name) { 'project_contents' }
   let(:api_resource_attributes) do
-    %w(id title description science_case introduction guide language team_members faq result education_content)
+    %w(id title description science_case introduction guide language team_members faq result education_content workflow_description)
   end
   let(:api_resource_links) { %w(project_contents.project) }
 
@@ -24,11 +24,11 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
              roles: ["translator"])
     end
 
-
     let!(:private_resource) do
       create(:project_with_contents, private: true)
         .project_contents.first
     end
+
     let(:n_visible) { 2 }
 
     it_behaves_like "is indexable"
@@ -41,7 +41,6 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
              resource: project,
              roles: ["translator"])
     end
-
 
     it_behaves_like "is showable"
   end
@@ -64,6 +63,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
           education_content: "asdfasdf",
           faq: "some other stuff",
           result: "another string",
+          workflow_description: "some more text",
           guide: [{image: "http://test.host/index.jpg",
                    explanation: "Somethign Cool"}],
           links: { project: project.id.to_s }
@@ -91,6 +91,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
           education_content: "asdfasdf",
           faq: "some other stuff",
           result: "another string",
+          workflow_description: "some more text",
           team_members: [{name: "Sandra Rodriguez",
                           twitter: "sandrarod"}]
         }

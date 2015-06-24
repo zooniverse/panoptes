@@ -15,6 +15,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
   CONTENT_PARAMS = [:description,
                     :title,
+                    :workflow_description,
                     :science_case,
                     :introduction,
                     :faq,
@@ -25,6 +26,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
   CONTENT_FIELDS = [:title,
                     :description,
+                    :workflow_description,
                     :guide,
                     :faq,
                     :education_content,
