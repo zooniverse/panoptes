@@ -32,6 +32,20 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
       it_behaves_like "it has custom owner links"
     end
 
+    context "filter by user_id" do
+      before(:each) do
+        get :index, user_id: authorized_user.id
+      end
+
+      it 'should only reutrn roles belonging to the user' do
+        owner_links = json_response[api_resource_name][0]["links"]["owner"]
+        expect(owner_links).to include("type" => "users", "id" => authorized_user.id.to_s)
+      end
+
+      it 'should only return one role' do
+        expect(json_response[api_resource_name].length).to eq(1)
+      end
+    end
   end
 
   describe "#show" do

@@ -8,7 +8,7 @@ describe Api::V1::CollectionsController, type: :controller do
   let(:api_resource_name) { 'collections' }
 
   let(:api_resource_attributes) { %w(id name display_name created_at updated_at) }
-  let(:api_resource_links) { %w(collections.project) }
+  let(:api_resource_links) { %w(collections.project collections.owner collections.collection_roles) }
 
   let(:scopes) { %w(public collection) }
   let(:authorized_user) { owner }
