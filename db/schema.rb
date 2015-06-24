@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150622085848) do
+ActiveRecord::Schema.define(version: 20150624131746) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -67,11 +67,12 @@ ActiveRecord::Schema.define(version: 20150622085848) do
     t.integer  "project_id",      index: {name: "index_collections_on_project_id"}
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "activated_state", default: 0,  null: false
+    t.integer  "activated_state", default: 0,     null: false
     t.string   "display_name"
     t.boolean  "private"
     t.integer  "lock_version",    default: 0
     t.string   "slug",            default: "", index: {name: "index_collections_on_slug"}
+    t.boolean  "favorite",        default: false, null: false, index: {name: "index_collections_on_favorite"}
   end
 
   create_table "collections_subjects", force: :cascade do |t|

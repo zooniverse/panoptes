@@ -6,7 +6,7 @@ class Api::V1::CollectionsController < Api::ApiController
   resource_actions :default
   schema_type :strong_params
 
-  allowed_params :create, :name, :display_name, :private,
+  allowed_params :create, :name, :display_name, :private, :favorite,
     links: [ :project, subjects: [], owner: polymorphic ]
 
   allowed_params :update, :name, :display_name, :private, links: [ subjects: [] ]
