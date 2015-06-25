@@ -53,7 +53,9 @@ module Formatter
       end
 
       def annotations
-        classification.annotations.to_json
+        classification.annotations.map do |annotation|
+          AnnotationForCsv.new(classification, annotation).to_h
+        end.to_json
       end
 
       def expert

@@ -30,7 +30,7 @@ RSpec.describe Formatter::Csv::Classification do
       classification.gold_standard,
       classification.expert_classifier,
       classification.metadata.to_json,
-      classification.annotations.to_json,
+      classification.annotations.map {|ann| Formatter::Csv::AnnotationForCsv.new(classification, ann).to_h }.to_json,
       subject_data
     ]
   end
