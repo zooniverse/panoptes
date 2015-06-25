@@ -534,6 +534,31 @@ describe User, type: :model do
     end
   end
 
+  describe "#update_ouroboros_created" do
+    let(:user) do
+      u = build(:user, login: "NOT ALLOWED", ouroboros_created: true)
+      u.identity_group = nil
+      u.identity_membership = nil
+      u
+    end
+
+    it 'should set login from display_name' do
+      user.update_ouroboros_created
+      expect(user.login).to eq(described_class.sanitize_login(user.display_name))
+    end
+
+    it 'should build an identity group' do
+      user.update_ouroboros_created
+      user.save!
+      user.reload
+      expect(user.identity_group).to be_valid
+    end
+
+    it 'should run on validation' do
+      expect(user).to be_valid
+    end
+  end
+
   describe "#unsubscribe_token" do
 
     it "should not build one automatically on build" do

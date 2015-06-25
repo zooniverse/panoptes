@@ -51,6 +51,7 @@ class User < ActiveRecord::Base
 
   before_validation :default_display_name, on: [:create, :update]
   before_validation :setup_unsubscribe_token, on: [:create]
+  before_validation :update_ouroboros_created, on: [:create]
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
@@ -183,6 +184,14 @@ class User < ActiveRecord::Base
 
   def default_display_name
     self.display_name ||= login
+  end
+
+  def update_ouroboros_created
+    if ouroboros_created
+      self.login = self.class.sanitize_login(display_name)
+      self.ouroboros_created = false
+      build_identity_group
+    end
   end
 
   def setup_unsubscribe_token
