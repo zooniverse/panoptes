@@ -49,7 +49,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     end
 
     it "should clean up the file after sending to s3" do
-      expect(FileUtils).to receive(:rm).with(temp_file_path)
+      expect(FileUtils).to receive(:rm).with(temp_file_path).and_call_original
       worker.perform(project.id)
     end
 
