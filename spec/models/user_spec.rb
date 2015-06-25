@@ -567,6 +567,12 @@ describe User, type: :model do
     end
   end
 
+  describe '#set_zooniverse_id' do
+    let(:user){ create :user }
+    subject{ user.zooniverse_id }
+    it{ is_expected.to eql "panoptes-#{ user.id }" }
+  end
+
   describe "#unsubscribe_token" do
 
     it "should not build one automatically on build" do
