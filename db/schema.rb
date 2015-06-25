@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150624155122) do
+ActiveRecord::Schema.define(version: 20150625043821) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -316,6 +316,7 @@ ActiveRecord::Schema.define(version: 20150624155122) do
     t.boolean  "beta_email_communication",    index: {name: "index_users_on_beta_email_communication", where: "(beta_email_communication IS TRUE)"}
     t.string   "login",                       null: false, index: {name: "index_users_on_login", unique: true, case_sensitive: false}
     t.string   "unsubscribe_token",           index: {name: "index_users_on_unsubscribe_token", unique: true}
+    t.string   "api_key"
   end
   add_index "users", ["display_name"], name: "users_display_name_trgm_index", using: :gist, operator_class: "gist_trgm_ops"
 
