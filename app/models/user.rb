@@ -65,7 +65,7 @@ class User < ActiveRecord::Base
   def self.scope_for(action, user, opts={})
     case action
     when :show, :index
-      active
+      where(ouroboros_created: false).merge(active)
     else
       where(id: user.id)
     end

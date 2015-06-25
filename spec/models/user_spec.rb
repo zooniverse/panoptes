@@ -459,22 +459,30 @@ describe User, type: :model do
   end
 
   describe "::scope_for" do
+    let(:ouroboros_user) do
+      User.skip_callback :save, :before, :update_ouroboros_created
+      u = build(:user, activated_state: 0, ouroboros_created: true, build_group: false)
+      u.save(validate: false)
+      User.set_callback :save, :before, :update_ouroboros_created
+      u
+    end
     let(:users) do
       [ create(:user, activated_state: 0),
         create(:user, activated_state: 0),
+        ouroboros_user,
         create(:user, activated_state: 1) ]
     end
 
     let(:actor) { ApiUser.new(users.first) }
 
     context "action is show" do
-      it 'should return the active users' do
+      it 'should return the active users and non ouroboros_created users' do
         expect(User.scope_for(:show, actor)).to match_array(users.values_at(0,1))
       end
     end
 
     context "action is index" do
-      it 'should return the active users' do
+      it 'should return the active users and non ouroboros_created users' do
         expect(User.scope_for(:show, actor)).to match_array(users.values_at(0,1))
       end
     end

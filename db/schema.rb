@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150625045214) do
+ActiveRecord::Schema.define(version: 20150625160224) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -317,7 +317,7 @@ ActiveRecord::Schema.define(version: 20150625045214) do
     t.string   "login",                       null: false, index: {name: "index_users_on_login", unique: true, case_sensitive: false}
     t.string   "unsubscribe_token",           index: {name: "index_users_on_unsubscribe_token", unique: true}
     t.string   "api_key"
-    t.boolean  "ouroboros_created"
+    t.boolean  "ouroboros_created",           default: false, index: {name: "index_users_on_ouroboros_created", where: "(ouroboros_created IS FALSE)"}
   end
   add_index "users", ["display_name"], name: "users_display_name_trgm_index", using: :gist, operator_class: "gist_trgm_ops"
 
