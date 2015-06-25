@@ -205,6 +205,6 @@ class User < ActiveRecord::Base
   end
 
   def send_welcome_email
-    UserWelcomeMailerWorker.perform_async(id)
+    UserWelcomeMailerWorker.perform_async(id, project_id)
   end
 end
