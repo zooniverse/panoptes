@@ -612,5 +612,14 @@ describe User, type: :model do
         user.save!
       end
     end
+
+    context "when the user is created via a migration" do
+      let!(:user) { build(:user, migrated: true) }
+
+      it "should not queue the worker with the user id" do
+        expect(UserWelcomeMailerWorker).not_to receive(:perform_async)
+        user.save!
+      end
+    end
   end
 end

@@ -5,8 +5,6 @@ class User < ActiveRecord::Base
   ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
 
-  after_create :send_welcome_email
-
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
     :omniauthable, omniauth_providers: [:facebook, :gplus]
@@ -55,6 +53,7 @@ class User < ActiveRecord::Base
   before_validation :setup_unsubscribe_token, on: [:create]
   before_validation :update_ouroboros_created
   before_save :update_ouroboros_created
+  after_create :send_welcome_email, unless: :migrated
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
