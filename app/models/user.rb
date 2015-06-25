@@ -53,6 +53,7 @@ class User < ActiveRecord::Base
   before_validation :setup_unsubscribe_token, on: [:create]
   before_validation :update_ouroboros_created
   before_save :update_ouroboros_created
+  after_create :set_zooniverse_id
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
@@ -194,6 +195,10 @@ class User < ActiveRecord::Base
       build_identity_group
       setup_unsubscribe_token
     end
+  end
+
+  def set_zooniverse_id
+    self.zooniverse_id ||= "panoptes-#{ id }"
   end
 
   def setup_unsubscribe_token
