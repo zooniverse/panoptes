@@ -459,22 +459,30 @@ describe User, type: :model do
   end
 
   describe "::scope_for" do
+    let(:ouroboros_user) do
+      User.skip_callback :save, :before, :update_ouroboros_created
+      u = build(:user, activated_state: 0, ouroboros_created: true, build_group: false)
+      u.save(validate: false)
+      User.set_callback :save, :before, :update_ouroboros_created
+      u
+    end
     let(:users) do
       [ create(:user, activated_state: 0),
         create(:user, activated_state: 0),
+        ouroboros_user,
         create(:user, activated_state: 1) ]
     end
 
     let(:actor) { ApiUser.new(users.first) }
 
     context "action is show" do
-      it 'should return the active users' do
+      it 'should return the active users and non ouroboros_created users' do
         expect(User.scope_for(:show, actor)).to match_array(users.values_at(0,1))
       end
     end
 
     context "action is index" do
-      it 'should return the active users' do
+      it 'should return the active users and non ouroboros_created users' do
         expect(User.scope_for(:show, actor)).to match_array(users.values_at(0,1))
       end
     end
@@ -531,6 +539,31 @@ describe User, type: :model do
     it 'should have a count of the subjects a user has uploaded' do
       uploader = create(:user_with_uploaded_subjects)
       expect(uploader.uploaded_subjects_count).to eq(2)
+    end
+  end
+
+  describe "#update_ouroboros_created" do
+    let(:user) do
+      u = build(:user, login: "NOT ALLOWED", ouroboros_created: true)
+      u.identity_group = nil
+      u.identity_membership = nil
+      u
+    end
+
+    it 'should set login from display_name' do
+      user.update_ouroboros_created
+      expect(user.login).to eq(described_class.sanitize_login(user.display_name))
+    end
+
+    it 'should build an identity group' do
+      user.update_ouroboros_created
+      user.save!
+      user.reload
+      expect(user.identity_group).to be_valid
+    end
+
+    it 'should run on validation' do
+      expect(user).to be_valid
     end
   end
 
