@@ -18,5 +18,7 @@ class Collection < ActiveRecord::Base
               roles: [ :owner, :collaborator ]
   can_by_role :index, :show, public: true, roles: [ :owner, :collaborator, :viewer ]
 
+  can_be_linked :access_control_list, :scope_for, :update, :user
+
   preferences_model :user_collection_preference
 end

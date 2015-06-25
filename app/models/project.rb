@@ -50,6 +50,7 @@ class Project < ActiveRecord::Base
   can_be_linked :subject, :scope_for, :update, :user
 
   can_be_linked :workflow, :scope_for, :update, :user
+  can_be_linked :access_control_list, :scope_for, :update, :user
   can_be_linked :user_group, :scope_for, :edit_project, :user
 
   preferences_model :user_project_preference

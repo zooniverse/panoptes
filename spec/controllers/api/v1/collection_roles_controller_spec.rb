@@ -81,8 +81,21 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
     end
 
     it_behaves_like "is creatable"
+
+    context "a user which cannot edit the collection" do
+      let(:user) { create(:user) }
+
+      before(:each) do
+        default_request scopes: scopes, user_id: user.id
+        post :create, create_params
+      end
+
+      it 'should return an error code' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
   end
-  
+
   describe "#destroy" do
     it_behaves_like "is destructable"
   end
