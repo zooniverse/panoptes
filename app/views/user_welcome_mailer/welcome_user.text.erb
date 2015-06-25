@@ -1,4 +1,4 @@
-Congratulations, <%= @user.display_name %>; welcome to <%= @welcome_location %>!
+Congratulations, <%= @user.display_name %> - welcome to <%= @welcome_location %>!
 
 Your Zooniverse account gives you access to our entire suite (https://zooniverse.org/#/projects) of people-powered research projects and discussion boards (https://zooniverse.org/#/talk), plus a personal profile to keep track of all your contributions. This also lets us credit you for the work you do, and for any unique discoveries you might make. You’re now all set to start exploring interesting images, videos, and other objects, discussing them with fellow volunteers and researchers, and contributing to real research.
 
@@ -8,11 +8,13 @@ We’re really excited to have you with us, and we can’t wait to see what you 
 
 Thanks,
 
-- The Zooniverse Team
+The Zooniverse Team
 
-UNSUBSCRIBE INSTRUCTIONS: You are receiving this email because you have recently registered an account with the Zooniverse.
+UNSUBSCRIBE INSTRUCTIONS:
+You are receiving this email because you have recently registered an account with the Zooniverse.
 <%- if @user %>
-  To unsubscribe to these messages instantly visit <%= unsubscribe_url(token: @user.unsubscribe_token) %>
-  Please be aware that this action will unsubscribe you from ALL Zooniverse emails; if you wish to manage individual project subscriptions, please visit your settings page link below.
+To unsubscribe to these messages instantly visit <%= unsubscribe_url(token: @user.unsubscribe_token) %>
+Please be aware that this action will unsubscribe you from ALL Zooniverse emails; if you wish to manage individual project subscriptions, please visit your settings page link below.
+Alternatively you can <a href="https://zooniverse.org/#/unsubscribe">unsubscribe here</a>.
 <% end %>
 To manage your email subscription preferences visit https://zooniverse.org/#/settings

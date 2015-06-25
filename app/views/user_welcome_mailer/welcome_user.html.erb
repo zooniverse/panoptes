@@ -235,7 +235,7 @@
                                         <div align="left" class="article-content">
 																					<multiline label="Description">
                                             <p>
-                                              Congratulations, <%= @user.display_name %>; welcome to <%= @welcome_location %>!
+                                              Congratulations, <%= @user.display_name %> - welcome to <%= @welcome_location %>!
                                             </p>
                                             <p>
                                               Your Zooniverse account gives you access to our <a href="https://zooniverse.org/#/projects">entire suite</a>
@@ -256,7 +256,7 @@
 																							where you can introduce yourself and chat with us, other volunteers, and the research teams about all the interesting stuff you come across.
 																						</p>
 																						<p>
-                                              Thanks,</br></br>- The Zooniverse Team
+                                              Thanks,<br><br>The Zooniverse Team
 																						</p>
                                           </multiline>
                                         </div>
@@ -286,7 +286,7 @@
                                     <tr>
 																			<td class="w580" width="580">
                                         <div align="left" class="article-content">
-																					<b>UNSUBSCRIBE INSTRUCTIONS:</b>
+																					<h5>UNSUBSCRIBE INSTRUCTIONS:</h5>
 																					<p>
 																						You are receiving this email because you have recently registered an account with the Zooniverse.
 																					</p>
@@ -297,8 +297,8 @@
 																								<%= link_to("click here", unsubscribe_url(token: @user.unsubscribe_token)) %>
 																							</unsubscribe>
 																				  		Please be aware that this action will unsubscribe you from ALL Zooniverse emails;
-																							if you wish to manage individual project subscriptions,
-																							please visit your settings page link below.
+																							if you wish to manage individual project subscriptions, please visit your settings page link below.
+                                              Alternatively you can <a href="https://zooniverse.org/#/unsubscribe">unsubscribe here</a>.
 																						<% end %>
 																					</p>
 																					<p>

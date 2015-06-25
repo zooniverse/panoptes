@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe UserWelcomeMailerWorker, :focus do
+RSpec.describe UserWelcomeMailerWorker do
   let(:project) { create(:project) }
   let(:user) { project.owner }
 
