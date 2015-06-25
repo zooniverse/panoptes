@@ -1,89 +1,369 @@
-<!-- BEGIN TEMPLATE // -->
-<table border="0" cellpadding="0" cellspacing="0" id="templateContainer">
-  	<tr>
-      	<td align="center" valign="top">
-          	<!-- BEGIN PREHEADER // -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templatePreheader">
-                  <tr>
-                      <td valign="top" class="preheaderContent" style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:20px;" mc:edit="preheader_content00">
-                          Use this area to offer a short teaser of your email's content. Text here will show in the preview area of some email clients.
-                      </td>
-                      <!-- *|IFNOT:ARCHIVE_PAGE|* -->
-                      <td valign="top" width="180" class="preheaderContent" style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:0;" mc:edit="preheader_content01">
-                          Email not displaying correctly?<br /><a href="*|ARCHIVE|*" target="_blank">View it in your browser</a>.
-                      </td>
-                      <!-- *|END:IF|* -->
-                  </tr>
-              </table>
-              <!-- // END PREHEADER -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style type="text/css">
+      /* Mobile-specific Styles */
+      @media only screen and (max-device-width: 480px) {
+      table[class=w0], td[class=w0] { width: 0 !important; }
+      table[class=w10], td[class=w10], img[class=w10] { width:10px !important; }
+      table[class=w15], td[class=w15], img[class=w15] { width:5px !important; }
+      table[class=w30], td[class=w30], img[class=w30] { width:10px !important; }
+      table[class=w60], td[class=w60], img[class=w60] { width:10px !important; }
+      table[class=w125], td[class=w125], img[class=w125] { width:80px !important; }
+      table[class=w130], td[class=w130], img[class=w130] { width:55px !important; }
+      table[class=w140], td[class=w140], img[class=w140] { width:90px !important; }
+      table[class=w160], td[class=w160], img[class=w160] { width:180px !important; }
+      table[class=w170], td[class=w170], img[class=w170] { width:100px !important; }
+      table[class=w180], td[class=w180], img[class=w180] { width:80px !important; }
+      table[class=w195], td[class=w195], img[class=w195] { width:80px !important; }
+      table[class=w220], td[class=w220], img[class=w220] { width:80px !important; }
+      table[class=w240], td[class=w240], img[class=w240] { width:180px !important; }
+      table[class=w255], td[class=w255], img[class=w255] { width:185px !important; }
+      table[class=w275], td[class=w275], img[class=w275] { width:135px !important; }
+      table[class=w280], td[class=w280], img[class=w280] { width:135px !important; }
+      table[class=w300], td[class=w300], img[class=w300] { width:140px !important; }
+      table[class=w325], td[class=w325], img[class=w325] { width:95px !important; }
+      table[class=w360], td[class=w360], img[class=w360] { width:140px !important; }
+      table[class=w410], td[class=w410], img[class=w410] { width:180px !important; }
+      table[class=w470], td[class=w470], img[class=w470] { width:200px !important; }
+      table[class=w580], td[class=w580], img[class=w580] { width:280px !important; }
+      table[class=w640], td[class=w640], img[class=w640] { width:300px !important; }
+      table[class*=hide], td[class*=hide], img[class*=hide], p[class*=hide], span[class*=hide] { display:none !important; }
+      table[class=h0], td[class=h0] { height: 0 !important; }
+      p[class=footer-content-left] { text-align: center !important; }
+      #headline p { font-size: 30px !important; }
+      .article-content, #left-sidebar{ -webkit-text-size-adjust: 90% !important; -ms-text-size-adjust: 90% !important; }
+      .header-content, .footer-content-left {-webkit-text-size-adjust: 80% !important; -ms-text-size-adjust: 80% !important;}
+      img { height: auto; line-height: 100%;}
+      }
+      /* Client-specific Styles */
+      #outlook a { padding: 0; }	/* Force Outlook to provide a "view in browser" button. */
+      body { width: 100% !important; }
+      .ReadMsgBody { width: 100%; }
+      .ExternalClass { width: 100%; display:block !important; } /* Force Hotmail to display emails at full width */
+      /* Reset Styles */
+      /* Add 100px so mobile switch bar doesn't cover street address. */
+      body { background-color: #c7c7c7; margin: 0; padding: 0; }
+      img { outline: none; text-decoration: none; display: block;}
+      br, strong br, b br, em br, i br { line-height:100%; }
+      h1, h2, h3, h4, h5, h6 { line-height: 100% !important; -webkit-font-smoothing: antialiased; }
+      h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { color: blue !important; }
+      h1 a:active, h2 a:active,  h3 a:active, h4 a:active, h5 a:active, h6 a:active {	color: red !important; }
+      /* Preferably not the same color as the normal header link color.  There is limited support for psuedo classes in email clients, this was added just for good measure. */
+      h1 a:visited, h2 a:visited,  h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visited { color: purple !important; }
+      /* Preferably not the same color as the normal header link color. There is limited support for psuedo classes in email clients, this was added just for good measure. */
+      table td, table tr { border-collapse: collapse; }
+      .yshortcuts, .yshortcuts a, .yshortcuts a:link,.yshortcuts a:visited, .yshortcuts a:hover, .yshortcuts a span {
+      color: black; text-decoration: none !important; border-bottom: none !important; background: none !important;
+      }	/* Body text color for the New Yahoo.  This example sets the font of Yahoo's Shortcuts to black. */
+      /* This most probably won't work in all email clients. Don't include <code _tmplitem="171" > blocks in email. */
+      code {
+      white-space: normal;
+      word-break: break-all;
+      }
+      #background-table { background-color: #c7c7c7; }
+      /* Webkit Elements */
+      #top-bar { border-radius:6px 6px 0px 0px; -moz-border-radius: 6px 6px 0px 0px; -webkit-border-radius:6px 6px 0px 0px; -webkit-font-smoothing: antialiased; background-color: #2E2E2E; color: #888888; }
+      #top-bar a { font-weight: bold; color: #eeeeee; text-decoration: none;}
+      #footer { border-radius:0px 0px 6px 6px; -moz-border-radius: 0px 0px 6px 6px; -webkit-border-radius:0px 0px 6px 6px; -webkit-font-smoothing: antialiased; }
+      /* Fonts and Content */
+      body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; }
+      .header-content, .footer-content-left, .footer-content-right { -webkit-text-size-adjust: none; -ms-text-size-adjust: none; }
+      /* Prevent Webkit and Windows Mobile platforms from changing default font sizes on header and footer. */
+      .header-content { font-size: 12px; color: #888888; }
+      .header-content a { font-weight: bold; color: #eeeeee; text-decoration: none; }
+      .header-content unsubscribe img { height: 12px; margin: 0 0 0 5px;}
+      #headline img { width: 60%; margin-top: 0; margin-bottom: 20px; }
+      #headline a img { border: none; }
+      #headline p { color: #eeeeee; font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; font-size: 36px; text-align: center; margin-top:0px; margin-bottom:30px; }
+      #headline p a { color: #eeeeee; text-decoration: none; }
+      .article-title { font-size: 18px; line-height:24px; color: #b0b0b0; font-weight:bold; margin-top:0px; margin-bottom:18px; font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; }
+      .article-title a { color: #b0b0b0; text-decoration: none; }
+      .article-title.with-meta {margin-bottom: 0;}
+      .article-meta { font-size: 13px; line-height: 20px; color: #ccc; font-weight: bold; margin-top: 0;}
+      .article-content { font-size: 13px; line-height: 18px; color: #444444; margin-top: 0px; margin-bottom: 18px; font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; }
+      .article-content a { color: #E27F00; font-weight:bold; text-decoration:none; }
+      .article-content img { max-width: 100% }
+      .article-content ol, .article-content ul { margin-top:0px; margin-bottom:18px; margin-left:19px; padding:0; }
+      .article-content li { font-size: 13px; line-height: 18px; color: #444444; }
+      .article-content li a { color: #E27F00; text-decoration:underline; }
+      .article-content p {margin-bottom: 15px;}
+      .footer-content-left { font-size: 12px; line-height: 15px; color: #888888; margin-top: 0px; margin-bottom: 15px; }
+      .footer-content-left a { color: #eeeeee; font-weight: bold; text-decoration: none; }
+      .footer-content-right { font-size: 11px; line-height: 16px; color: #888888; margin-top: 0px; margin-bottom: 15px; }
+      .footer-content-right a { color: #eeeeee; font-weight: bold; text-decoration: none; }
+      #footer { background-color: #000000; color: #888888; }
+      #footer a { color: #eeeeee; text-decoration: none; font-weight: bold; }
+      #permission-reminder { white-space: normal; }
+      #street-address { color: #ffffff; white-space: normal; }
+    </style>
+    <!--[if gte mso 9]>
+    <style _tmplitem="171" >
+      .article-content ol, .article-content ul {
+      margin: 0 0 0 24px;
+      padding: 0;
+      list-style-position: inside;
+      }
+    </style>
+    <![endif]-->
+    <title>Welcome to the Zooniverse</title>
+  </head>
+  <body>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" id="background-table">
+      <tbody>
+        <tr>
+          <td align="center" bgcolor="#c7c7c7">
+            <table class="w640" style="margin:0 10px;" width="640" cellpadding="0" cellspacing="0" border="0">
+              <tbody>
+                <tr>
+                  <td class="w640" width="640" height="20"></td>
+                </tr>
+                <tr>
+                  <td class="w640" width="640">
+                    <table id="top-bar" class="w640" width="640" cellpadding="0" cellspacing="0" border="0" bgcolor="#000000">
+                      <tbody>
+                        <tr>
+                          <td class="w15" width="15"></td>
+                          <td class="w325" width="350" valign="middle" align="left">
+                            <table class="w325" width="350" cellpadding="0" cellspacing="0" border="0">
+                              <tbody>
+                                <tr>
+                                  <td class="w325" width="350" height="8"></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <table class="w325" width="350" cellpadding="0" cellspacing="0" border="0">
+                              <tbody>
+                                <tr>
+                                  <td class="w325" width="350" height="8"></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </td>
+                          <td class="w30" width="30"></td>
+                          <td class="w255" width="255" valign="middle" align="right">
+                            <table class="w255" width="255" cellpadding="0" cellspacing="0" border="0">
+                              <tbody>
+                                <tr>
+                                  <td class="w255" width="255" height="8"></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <table cellpadding="0" cellspacing="0" border="0">
+                              <tbody>
+                                <tr>
+                                  <td valign="middle">
+                                    <fblike><img src="http://zooniverse-resources.s3.amazonaws.com/newsletter_assets/welcome_email/2013/may/fb-glyph.png" border="0" width="8" height="14" alt="Facebook icon"=""></fblike>
+                                  </td>
+                                  <td width="3"></td>
+                                  <td valign="middle">
+                                    <a href="https://www.facebook.com/therealzooniverse">
+                                      <div class="header-content">
+                                        <fblike>Facebook</fblike>
+                                      </div>
+                                    </a>
+                                  </td>
+                                  <td class="w10" width="10"></td>
+                                  <td valign="middle">
+                                    <tweet><img src="http://zooniverse-resources.s3.amazonaws.com/newsletter_assets/welcome_email/2013/may/tw-glyph.png" border="0" width="17" height="13" alt="Twitter icon"=""></tweet>
+                                  </td>
+                                  <td width="3"></td>
+                                  <td valign="middle">
+                                    <a href="http://twitter.com/the_zooniverse">
+                                      <div class="header-content">
+                                        <tweet>Twitter</tweet>
+                                      </div>
+                                    </a>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <table class="w255" width="255" cellpadding="0" cellspacing="0" border="0">
+                              <tbody>
+                                <tr>
+                                  <td class="w255" width="255" height="8"></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </td>
+                          <td class="w15" width="15"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td id="header" class="w640" width="640" align="center" bgcolor="#000000">
+                    <table class="w640" width="640" cellpadding="0" cellspacing="0" border="0">
+                      <tbody>
+                        <tr>
+                          <td class="w30" width="30"></td>
+                          <td class="w580" width="580" height="30"></td>
+                          <td class="w30" width="30"></td>
+                        </tr>
+                        <tr>
+                          <td class="w30" width="30"></td>
+                          <td class="w580" width="580">
+                            <div align="center" id="headline">
+                              <a href="http://zooniverse.org"><img src="http://zooniverse-resources.s3.amazonaws.com/newsletter_assets/welcome_email/2013/may/zooniverse-wordmark.png" alt="Zooniverse Logo" /></a>
+                            </div>
+                          </td>
+                          <td class="w30" width="30"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="w640" width="640" height="30" bgcolor="#ffffff"></td>
+                </tr>
+                <tr id="simple-content-row">
+                  <td class="w640" width="640" bgcolor="#ffffff">
+                    <table class="w640" width="640" cellpadding="0" cellspacing="0" border="0">
+                      <tbody>
+                        <tr>
+                          <td class="w30" width="30"></td>
+                          <td class="w580" width="580">
+                            <repeater>
+                              <layout label="Text only">
+                                <table class="w580" width="580" cellpadding="0" cellspacing="0" border="0">
+                                  <tbody>
+                                    <tr>
+                                      <td class="w580" width="580">
+                                        <div align="left" class="article-content">
+																					<multiline label="Description">
+                                            <p>
+                                              Congratulations, <%= @user.display_name %>; welcome to <%= @welcome_location %>!
+                                            </p>
+                                            <p>
+                                              Your Zooniverse account gives you access to our <a href="https://zooniverse.org/#/projects">entire suite</a>
+																							of people-powered research projects and <a href="https://zooniverse.org/#/talk">discussion boards</a>,
+																							plus a personal profile to keep track of all your contributions.
+																							This also lets us credit you for the work you do, and for any unique discoveries you might make.
+																							You’re now all set to start exploring interesting images, videos, and other objects, discussing them with fellow volunteers and researchers,
+																							and contributing to real research.
+                                            </p>
+																						<p>
+                                              If you’d like to learn a bit more about the site and what you can do, check out our page for <a href="https://zooniverse.org/#/about">people who are new to Zooniverse</a>.
+																							You can also visit our <a href="https://zooniverse.org/#/projects">projects page</a> to get involved right away with a project of your choice,
+																							or go to your <a href="https://zooniverse.org/#/settings">profile settings page</a> to set up your preferences, add a profile picture, or change your password.
+																						</p>
+																						<p>
+                                              We’re really excited to have you with us, and we can’t wait to see what you discover.
+																							Please do join us on the project <a href="https://zooniverse.org/#/talk">discussion boards</a>,
+																							where you can introduce yourself and chat with us, other volunteers, and the research teams about all the interesting stuff you come across.
+																						</p>
+																						<p>
+                                              Thanks,</br></br>- The Zooniverse Team
+																						</p>
+                                          </multiline>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td class="w580" width="580" height="10"></td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </layout>
+                              <layout label="Text with full-width image">
+                                <table class="w580" width="580" cellpadding="0" cellspacing="0" border="0">
+                                  <tbody>
+                                    <tr>
+                                      <td class="w580" width="580"><img editable="true" label="Image" class="w580" title="At planethunters.org you can help astronomers discover planets around other stars!" alt="Planet Hunters banner" width="580" border="0" src="http://planethunters.files.wordpress.com/2012/04/cropped-screen-shot-2012-04-13-at-09-04-52.jpg"></td>
+                                    </tr>
+                                    <tr>
+                                      <td class="w580" width="580" height="10"></td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </layout>
+                              <layout label="Two columns">
+                                <table class="w580" width="580" cellpadding="0" cellspacing="0" border="0">
+                                  <tbody>
+                                    <tr>
+																			<td class="w580" width="580">
+                                        <div align="left" class="article-content">
+																					<b>UNSUBSCRIBE INSTRUCTIONS:</b>
+																					<p>
+																						You are receiving this email because you have recently registered an account with the Zooniverse.
+																					</p>
+																					<p>
+																						<%- if @user %>
+																				    	To unsubscribe to these messages instantly
+																							<unsubscribe>
+																								<%= link_to("click here", unsubscribe_url(token: @user.unsubscribe_token)) %>
+																							</unsubscribe>
+																				  		Please be aware that this action will unsubscribe you from ALL Zooniverse emails;
+																							if you wish to manage individual project subscriptions,
+																							please visit your settings page link below.
+																						<% end %>
+																					</p>
+																					<p>
+																						To manage your email subscription preferences <a href="https://zooniverse.org/#/settings">visit here</a>.
+																					</p>
+																				</div>
+																			</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </layout>
+                            </repeater>
+                          </td>
+                          <td class="w30" width="30"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="w640" width="640" height="15" bgcolor="#ffffff"></td>
+                </tr>
+                <tr>
+                  <td class="w640" width="640">
+                    <table id="footer" class="w640" width="640" cellpadding="0" cellspacing="0" border="0" bgcolor="#000000">
+                      <tbody>
+                        <tr>
+                          <td class="w30" width="30"></td>
+                          <td class="w580 h0" width="360" height="30"></td>
+                          <td class="w0" width="60"></td>
+                          <td class="w0" width="160"></td>
+                          <td class="w30" width="30"></td>
+                        </tr>
+                        <tr>
+                          <td class="w30" width="30"></td>
+                          <td class="w580" width="360" valign="top">
+                            <span class="hide">
+                              <p id="permission-reminder" align="left" class="footer-content-left"></p>
+                            </span>
+                          </td>
+                          <td class="hide w0" width="60"></td>
+                          <td class="hide w0" width="160" valign="top">
+                            <p id="street-address" align="right" class="footer-content-right">Find us online at <a href="http://zooniverse.org">www.zooniverse.org</a></p>
+                          </td>
+                          <td class="w30" width="30"></td>
+                        </tr>
+                        <tr>
+                          <td class="w30" width="30"></td>
+                          <td class="w580 h0" width="360" height="15"></td>
+                          <td class="w0" width="60"></td>
+                          <td class="w0" width="160"></td>
+                          <td class="w30" width="30"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="w640" width="640" height="60"></td>
+                </tr>
+              </tbody>
+            </table>
           </td>
-      </tr>
-  	<tr>
-      	<td align="center" valign="top">
-          	<!-- BEGIN HEADER // -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateHeader">
-                  <tr>
-                      <td valign="top" class="headerContent">
-                      	<img src="http://gallery.mailchimp.com/2425ea8ad3/images/header_placeholder_600px.png" style="max-width:600px;" id="headerImage" mc:label="header_image" mc:edit="header_image" mc:allowdesigner mc:allowtext />
-                      </td>
-                  </tr>
-              </table>
-              <!-- // END HEADER -->
-          </td>
-      </tr>
-  	<tr>
-      	<td align="center" valign="top">
-          	<!-- BEGIN BODY // -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateBody">
-                  <tr>
-                      <td valign="top" class="bodyContent" mc:edit="body_content00">
-                          <h1>Designing Your Template</h1>
-                          <h3>Creating a good-looking email is simple</h3>
-                          Customize your template by clicking on the style editor tabs up above. Set your fonts, colors, and styles. After setting your styling is all done you can click here in this area, delete the text, and start adding your own awesome content.
-                      </td>
-                  </tr>
-              	<tr>
-                  	<td class="bodyContent" style="padding-top:0; padding-bottom:0;">
-                      	<img src="http://gallery.mailchimp.com/27aac8a65e64c994c4416d6b8/images/body_placeholder_650px.png" style="max-width:560px;" id="bodyImage" mc:label="body_image" mc:edit="body_image" mc:allowtext />
-                      </td>
-                  </tr>
-                  <tr>
-                      <td valign="top" class="bodyContent" mc:edit="body_content01">
-                          <h2>Styling Your Content</h2>
-                          <h4>Make your email easy to read</h4>
-                          After you enter your content, highlight the text you want to style and select the options you set in the style editor in the "<em>styles</em>" drop down box. Want to <a href="http://www.mailchimp.com/kb/article/im-using-the-style-designer-and-i-cant-get-my-formatting-to-change" target="_blank">get rid of styling on a bit of text</a>, but having trouble doing it? Just use the "<em>remove formatting</em>" button to strip the text of any formatting and reset your style.
-                      </td>
-                  </tr>
-              </table>
-              <!-- // END BODY -->
-          </td>
-      </tr>
-  	<tr>
-      	<td align="center" valign="top">
-          	<!-- BEGIN FOOTER // -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateFooter">
-                  <tr>
-                      <td valign="top" class="footerContent" mc:edit="footer_content00">
-                          <a href="https://twitter.com/the_zooniverse">Twitter</a>&nbsp;&nbsp;&nbsp;<a href="https://www.facebook.com/therealzooniverse">Facebook</a>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td valign="top" class="footerContent" style="padding-top:0;" mc:edit="footer_content02">
-												<p>
-										      <% if @user %>
-										        To unsubscribe to these messages instantly visit <%= link_to 'Unsubscribe Instantly', unsubscribe_url(token: @user.unsubscribe_token) %>
-										        </br>
-										        Please be aware that this action will unsubscribe you from ALL Zooniverse emails; if you wish to manage individual project subscriptions, please visit your settings page link below.
-										      <% end %>
-												</p>
-												<p>
-										      To manage your email subscription preferences visit <%= link_to 'Manage Email Preferences', "https://zooniverse.org/#/settings" %>
-										    </p>
-                      </td>
-                  </tr>
-              </table>
-              <!-- // END FOOTER -->
-          </td>
-      </tr>
-  </table>
-  <!-- // END TEMPLATE -->
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
