@@ -24,4 +24,14 @@ RSpec.shared_examples "export create" do |export_worker, export_type|
     export.reload
     expect(export.metadata).to include("recipients" => [authorized_user.id])
   end
+
+  it 'should update the updated_at timestamp of the export' do
+    params = create_params
+    params[:media].delete(:metadata)
+    export = create(:medium, linked: resource, type: "project_#{export_type}", content_type: "text/csv", metadata: {recipients: [authorized_user.id]}, updated_at: 5.days.ago)
+    default_request scopes: scopes, user_id: user.id
+    post create_path, params
+    export.reload
+    expect(export.updated_at).to be_within(5.seconds).of(Time.zone.now)
+  end
 end
