@@ -7,6 +7,7 @@ module ApiErrors
   class NotLoggedIn < PanoptesApiError; end
   class NoUserError < PanoptesApiError; end
   class UnpermittedParameter < PanoptesApiError; end
+  class LiveProjectChanges < PanoptesApiError; end
   class NoMediaError < PanoptesApiError
     def initialize(media_type, parent, parent_id, media_id=nil)
       super("No #{media_type}#{ media_string(media_id) }exists for #{parent} ##{parent_id}")

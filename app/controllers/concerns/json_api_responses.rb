@@ -63,4 +63,8 @@ module JSONApiResponses
   def service_unavailable(exception)
     json_api_render(:service_unavailable, exception)
   end
+
+  def forbidden(exception)
+    json_api_render(:forbidden, exception)
+  end
 end

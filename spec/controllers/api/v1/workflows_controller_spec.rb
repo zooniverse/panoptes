@@ -232,6 +232,22 @@ describe Api::V1::WorkflowsController, type: :controller do
         expect(json_response['links']['workflows.tutorial_subject']['href']).to eq("/subjects/{workflows.tutorial_subject}")
       end
     end
+
+    context "when the project is live" do
+      before(:each) do
+        allow_any_instance_of(Project).to receive(:live).and_return(true)
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, create_params
+      end
+
+      it 'returns forbidden with a useful error' do
+        aggregate_failures "status and error" do
+          expect(response).to be_forbidden
+          msg = "Can't create a workflow for a live project."
+          expect(response.body).to eq(json_error_message(msg))
+        end
+      end
+    end
   end
 
   describe '#destroy' do
