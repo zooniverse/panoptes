@@ -13,7 +13,7 @@ FactoryGirl.define do
     primary_language "en"
     private false
     launch_approved true
-    live true
+    live false
     urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
 
     association :owner, factory: :user

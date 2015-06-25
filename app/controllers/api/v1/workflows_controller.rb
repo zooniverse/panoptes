@@ -3,6 +3,8 @@ class Api::V1::WorkflowsController < Api::ApiController
   include TranslatableResource
 
   doorkeeper_for :update, :create, :destroy, scopes: [:project]
+  before_action  :reject_live_project_changes, only: [ :create ]
+
   resource_actions :default
   schema_type :json_schema
 
@@ -86,6 +88,20 @@ class Api::V1::WorkflowsController < Api::ApiController
       else
         item
       end
+    end
+  end
+
+  def reject_live_project_changes
+    project = project_from_params
+    if project && project.live
+      raise Api::LiveProjectChanges.new("Can't create a workflow for a live project.")
+    end
+  end
+
+  def project_from_params
+    project_id = params_for[:links].try(:[], :project)
+    if project_id && project = Project.find_by(id: project_id)
+      project
     end
   end
 end

@@ -15,8 +15,9 @@ module Api
       SubjectSelector::MissingSubjectQueue,
       SubjectSelector::MissingSubjectSet,                  with: :not_found
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
-    rescue_from Api::NotLoggedIn,                          with: :not_authenticated
-    rescue_from Api::UnauthorizedTokenError,               with: :not_authenticated
+    rescue_from Api::LiveProjectChanges,                   with: :forbidden
+    rescue_from Api::NotLoggedIn,
+      Api::UnauthorizedTokenError,                         with: :not_authenticated
     rescue_from Api::UnsupportedMediaType,                 with: :unsupported_media_type
     rescue_from JsonApiController::PreconditionNotPresent, with: :precondition_required
     rescue_from JsonApiController::PreconditionFailed,     with: :precondition_failed
