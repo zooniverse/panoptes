@@ -586,4 +586,40 @@ describe User, type: :model do
       end
     end
   end
+
+  describe "#send_welcome_email after_create callback" do
+    let(:user) { build(:user) }
+
+    before(:each) do
+      allow(user).to receive(:id).and_return(1)
+    end
+
+    it "should send the welcome email" do
+      expect(user).to receive(:send_welcome_email).once
+      user.save!
+    end
+
+    it "should queue the worker with the user id" do
+      expect(UserWelcomeMailerWorker).to receive(:perform_async).with(user.id, nil)
+      user.save!
+    end
+
+    context "when the user has a project id" do
+      let!(:user) { build(:user, project_id: 1) }
+
+      it "should queue the worker with the user id and project id" do
+        expect(UserWelcomeMailerWorker).to receive(:perform_async).with(user.id, 1)
+        user.save!
+      end
+    end
+
+    context "when the user is created via a migration" do
+      let!(:user) { build(:user, migrated: true) }
+
+      it "should not queue the worker with the user id" do
+        expect(UserWelcomeMailerWorker).not_to receive(:perform_async)
+        user.save!
+      end
+    end
+  end
 end

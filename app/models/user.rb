@@ -53,6 +53,7 @@ class User < ActiveRecord::Base
   before_validation :setup_unsubscribe_token, on: [:create]
   before_validation :update_ouroboros_created
   before_save :update_ouroboros_created
+  after_create :send_welcome_email, unless: :migrated
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
@@ -200,5 +201,9 @@ class User < ActiveRecord::Base
     if self.login
       self.unsubscribe_token ||= UserUnsubscribeMessageVerifier.create_access_token(self.login)
     end
+  end
+
+  def send_welcome_email
+    UserWelcomeMailerWorker.perform_async(id, project_id)
   end
 end

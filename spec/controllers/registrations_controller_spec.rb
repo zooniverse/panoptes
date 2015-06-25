@@ -120,6 +120,11 @@ describe RegistrationsController, type: :controller do
           post :create, user: user_attributes
         end
 
+        it "should queue a welcome worker to send an email" do
+          expect(UserWelcomeMailerWorker).to receive(:perform_async)
+          post :create, user: user_attributes
+        end
+
         context "with a project_id param" do
           let!(:extra_attributes) do
             { login: login, project_id: "1" }
@@ -193,6 +198,11 @@ describe RegistrationsController, type: :controller do
             expect(errors[key]).to include "can't be blank"
           end
         end
+
+        it "should not queue a welcome worker to send an email" do
+          expect(UserWelcomeMailerWorker).to_not receive(:perform_async)
+          post :create, user: user_attributes
+        end
       end
 
       context "when the password is too short" do
@@ -257,6 +267,10 @@ describe RegistrationsController, type: :controller do
           post :create, user: user_attributes
         end
 
+        it "should queue a welcome worker to send an email" do
+          expect(UserWelcomeMailerWorker).to receive(:perform_async)
+          post :create, user: user_attributes
+        end
       end
 
       context "when email communications are true" do
@@ -302,6 +316,11 @@ describe RegistrationsController, type: :controller do
         it "should not persist the user account" do
           post :create, user: user_attributes
           expect(User.where(login: user_attributes[:login])).to_not exist
+        end
+
+        it "should not queue a welcome worker to send an email" do
+          expect(UserWelcomeMailerWorker).to_not receive(:perform_async)
+          post :create, user: user_attributes
         end
       end
 
