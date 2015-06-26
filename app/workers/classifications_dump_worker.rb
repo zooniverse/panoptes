@@ -26,6 +26,9 @@ class ClassificationsDumpWorker
   end
 
   def completed_project_classifications
-    project.classifications.complete.includes(:user, workflow: [:workflow_contents])
+    project.classifications
+    .complete
+    .joins(:workflow)
+    .includes(:user, workflow: [:workflow_contents])
   end
 end
