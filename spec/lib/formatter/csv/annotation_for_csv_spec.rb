@@ -29,4 +29,10 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     formatted = described_class.new(classification, annotation).to_h
     expect(formatted["value"][0]["tool_label"]).to be_nil
   end
+
+  it 'returns an empty list of values when annotation itself has no value' do
+    annotation = {"task" => "interest"}
+    formatted = described_class.new(classification, annotation).to_h
+    expect(formatted["value"]).to be_empty
+  end
 end

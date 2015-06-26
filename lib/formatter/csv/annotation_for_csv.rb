@@ -13,7 +13,7 @@ module Formatter
 
         case task["type"]
         when "drawing"
-          value_with_tool = annotation["value"].map do |drawn_item|
+          value_with_tool = (annotation["value"] || []).map do |drawn_item|
             drawn_item.merge "tool_label" => tool_label(drawn_item)
           end
 
