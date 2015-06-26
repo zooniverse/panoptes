@@ -6,7 +6,7 @@ class UserSerializer
   attributes :id, :login, :display_name, :credited_name, :email, :created_at,
     :updated_at, :type, :firebase_auth_token, :global_email_communication,
     :project_email_communication, :beta_email_communication,
-    :max_subjects, :uploaded_subjects_count, :admin, :href
+    :max_subjects, :uploaded_subjects_count, :admin, :href, :login_prompt
 
   can_include :classifications, :project_preferences, :collection_preferences,
     projects: { param: "owner", value: "login" },
