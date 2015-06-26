@@ -30,8 +30,8 @@ module Formatter
       end
 
       def tool_label(drawn_item)
-        tool = task["tools"][drawn_item["tool"]]
-        translate(tool["label"])
+        tool = task["tools"] && task["tools"][drawn_item["tool"]]
+        translate(tool["label"]) if tool
       end
 
       def translate(string)

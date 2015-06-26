@@ -23,4 +23,10 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     expect(formatted["value"][1]["tool_label"]).to eq("Blue")
     expect(formatted["value"][2]["tool_label"]).to eq("Green")
   end
+
+  it 'has a nil label when the tool is not found in the workflow' do
+    annotation = {"task" => "interest", "value" => [{"x"=>1, "y"=>2, "tool"=>1000}]}
+    formatted = described_class.new(classification, annotation).to_h
+    expect(formatted["value"][0]["tool_label"]).to be_nil
+  end
 end
