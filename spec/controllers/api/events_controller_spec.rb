@@ -16,7 +16,11 @@ describe Api::EventsController, type: :controller do
     describe "#create" do
       let(:workflow) { create(:workflow) }
       let(:project) { workflow.project }
-      let(:user) { project.owner }
+      let(:user) do
+        user = project.owner
+        user.update_column(:zooniverse_id, 1)
+        user
+      end
       let(:event_count) { 10 }
       let(:created_at) { project.created_at.to_s }
       let(:event_kind) { "workflow_activity" }
@@ -24,7 +28,7 @@ describe Api::EventsController, type: :controller do
         {
           events: {
             kind: event_kind, project_id: project.id, project: project.name,
-            zooniverse_user_id: user.id, workflow: workflow.display_name,
+            zooniverse_user_id: user.zooniverse_id, workflow: workflow.display_name,
             count: event_count, created_at: created_at
           }
         }
@@ -132,6 +136,16 @@ describe Api::EventsController, type: :controller do
         it "should update the upp activity_count to the correct value" do
           post :create, first_visit_event_params
           expect(user_project_pref.activity_count).to eq(event_count)
+        end
+
+        context "with an unknown user zooniverse_id" do
+
+          it "should not create the user project preference model (upp)" do
+            allow(User).to receive(:find_by).and_return(nil)
+            expect do
+              post :create, first_visit_event_params
+            end.not_to change { UserProjectPreference.count }
+          end
         end
       end
 

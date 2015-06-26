@@ -32,9 +32,10 @@ module Api
     def process_incoming_event
       response_status = :unprocessable_entity
       if event_params_sanity_check
-        upp = user_project_preference
-        upp.activity_count = create_params[:count]
-        response_status = :ok if upp.save
+        if upp = user_project_preference
+          upp.activity_count = create_params[:count]
+          response_status = :ok if upp.save
+        end
       end
       render status: response_status, nothing: true
     end
@@ -66,8 +67,11 @@ module Api
     end
 
     def user_project_preference
-      UserProjectPreference.find_or_initialize_by(project_id: create_params[:project_id],
-                                                  user_id: create_params[:zooniverse_user_id])
+      user_zoo_id = create_params[:zooniverse_user_id]
+      if user_zoo_id && user_id = User.find_by(zooniverse_id: user_zoo_id).try(:id)
+        UserProjectPreference.find_or_initialize_by(project_id: create_params[:project_id],
+                                                    user_id: user_id)
+      end
     end
 
     def resource_sym
