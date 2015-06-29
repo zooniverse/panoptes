@@ -35,4 +35,8 @@ class ApplicationController < ActionController::Base
   def paper_trail_enabled_for_controller
     false
   end
+
+  def json_request?
+    request.format.json?
+  end
 end

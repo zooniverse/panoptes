@@ -2,6 +2,8 @@ module Api
 
   class EventsController < ApplicationController
 
+    skip_before_action :verify_authenticity_token, if: :json_request?
+
     KNOWN_EVENTS = %w( activity workflow_activity )
 
     def self.resource_name
