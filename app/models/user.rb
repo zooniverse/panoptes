@@ -55,6 +55,7 @@ class User < ActiveRecord::Base
   before_save :update_ouroboros_created
   after_create :set_zooniverse_id
   after_create :send_welcome_email, unless: :migrated
+  before_create :set_ouroboros_api_key
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
@@ -210,5 +211,9 @@ class User < ActiveRecord::Base
 
   def send_welcome_email
     UserWelcomeMailerWorker.perform_async(id, project_id)
+  end
+
+  def set_ouroboros_api_key
+    self.api_key = Digest::SHA1.hexdigest("#{ Time.now.utc }#{ email }")[0...20]
   end
 end

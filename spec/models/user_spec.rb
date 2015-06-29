@@ -628,4 +628,11 @@ describe User, type: :model do
       end
     end
   end
+
+  describe "#set_ouroboros_api_key" do
+    it 'should set the key on creation' do
+      user = create(:user, api_key: nil)
+      expect(user.api_key).to_not be_nil
+    end
+  end
 end
