@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::EventsController, type: :controller do
 
   def overridden_params(new_params)
-    event_params[:events].merge!(new_params)
+    event_params[:event].merge!(new_params)
     event_params
   end
 
@@ -26,7 +26,7 @@ describe Api::EventsController, type: :controller do
       let(:event_kind) { "workflow_activity" }
       let(:event_params) do
         {
-          events: {
+          event: {
             kind: event_kind, project_id: project.id, project: project.name,
             zooniverse_user_id: user.zooniverse_id, workflow: workflow.display_name,
             count: event_count, created_at: created_at
@@ -65,6 +65,25 @@ describe Api::EventsController, type: :controller do
             post :create, event_params
             expect(response.status).to eq(401)
           end
+        end
+      end
+
+      context "with malformed message" do
+        let!(:event_params) { { } }
+
+        it "should return 422" do
+          post :create, event_params
+          expect(response.status).to eq(422)
+        end
+      end
+
+      context "with an invalid json message" do
+
+        it "should return 422" do
+          allow(subject).to receive(:create_params)
+            .and_raise(ActionDispatch::ParamsParser::ParseError.new('test', 'test'))
+          post :create, event_params
+          expect(response.status).to eq(422)
         end
       end
 
