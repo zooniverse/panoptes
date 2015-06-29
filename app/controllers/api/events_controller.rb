@@ -49,7 +49,9 @@ module Api
     def required_params
       params_to_check = [ create_params[:project_id], create_params[:zooniverse_user_id] ]
       params_to_check.all? { |param| !param.blank? }
-    rescue JsonSchema::ValidationError
+    rescue JsonSchema::ValidationError,
+      ActionController::ParameterMissing,
+      ActionDispatch::ParamsParser::ParseError
       return false
     end
 
@@ -77,7 +79,7 @@ module Api
     end
 
     def resource_sym
-      self.class.resource_name.pluralize.to_sym
+      self.class.resource_name.to_sym
     end
   end
 end
