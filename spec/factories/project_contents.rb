@@ -7,12 +7,7 @@ FactoryGirl.define do
     title "A Test Project"
     description "Some Lorem Ipsum"
     introduction "MORE IPSUM"
-    science_case "asdfasdf asdfasdf"
-    education_content "asdfasdf asdfasdf"
-    result "asdfasdf asdfasdf"
-    faq "asdfasdf asdfasdf"
-    team_members []
-    url_labels({"0.label" => "Blog", "1.label" => "Twitter"})
-    guide({ "example_1" => "A descripton of it" })
+    workflow_description "Go outside"
+    url_labels({"0.label" => "Blog", "1.label" => "Twitter", "2.label" => "Science Case"})
   end
 end

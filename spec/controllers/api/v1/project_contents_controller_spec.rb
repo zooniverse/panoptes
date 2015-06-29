@@ -5,7 +5,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
   let(:project) { create(:project_with_contents) }
   let(:api_resource_name) { 'project_contents' }
   let(:api_resource_attributes) do
-    %w(id title description science_case introduction guide language team_members faq result education_content workflow_description)
+    %w(id title description introduction language workflow_description)
   end
   let(:api_resource_links) { %w(project_contents.project) }
 
@@ -60,12 +60,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
           description: "Worse Content",
           introduction: "Useless Science",
           language: "en-CA",
-          education_content: "asdfasdf",
-          faq: "some other stuff",
-          result: "another string",
           workflow_description: "some more text",
-          guide: [{image: "http://test.host/index.jpg",
-                   explanation: "Somethign Cool"}],
           links: { project: project.id.to_s }
         }
       }
@@ -88,20 +83,13 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
 
     let(:update_params) do
       { project_contents: {
-          education_content: "asdfasdf",
-          faq: "some other stuff",
-          result: "another string",
-          workflow_description: "some more text",
-          team_members: [{name: "Sandra Rodriguez",
-                          twitter: "sandrarod"}]
+          workflow_description: "some more text"
         }
       }
     end
 
-    let(:test_attr) { :team_members }
-    let(:test_attr_value) do
-      [{ "name" => "Sandra Rodriguez", "twitter" => "sandrarod" }]
-    end
+    let(:test_attr) { :workflow_description }
+    let(:test_attr_value) { "some more text" }
 
     context "non-primary-language content" do
       it_behaves_like "is updatable"
@@ -122,7 +110,7 @@ RSpec.describe Api::V1::ProjectContentsController, type: :controller do
 
         it 'should not update the content' do
           primary_content.reload
-          expect(primary_content.team_members).to_not eq(test_attr_value)
+          expect(primary_content.workflow_description).to_not eq(test_attr_value)
         end
       end
     end

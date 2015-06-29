@@ -5,10 +5,8 @@ class ProjectSerializer
 
   attributes :id, :display_name, :classifications_count,
     :subjects_count, :created_at, :updated_at, :available_languages,
-    :title, :description, :guide, :team_members, :science_case,
-    :introduction, :private, :faq, :result, :education_content,
-    :retired_subjects_count, :configuration, :live,
-    :urls, :migrated, :classifiers_count, :slug, :redirect,
+    :title, :description, :introduction, :private, :retired_subjects_count,
+    :configuration, :live, :urls, :migrated, :classifiers_count, :slug, :redirect,
     :beta_requested, :beta_approved, :launch_requested, :launch_approved,
     :href, :workflow_description
 
@@ -29,32 +27,8 @@ class ProjectSerializer
     content[:workflow_description]
   end
 
-  def guide
-    content[:guide]
-  end
-
-  def team_members
-    content[:team_members]
-  end
-
-  def science_case
-    content[:science_case]
-  end
-
   def introduction
     content[:introduction]
-  end
-
-  def education_content
-    content[:education_content]
-  end
-
-  def faq
-    content[:faq]
-  end
-
-  def result
-    content[:result]
   end
 
   def urls

@@ -27,12 +27,6 @@ class Api::V1::ProjectsController < Api::ApiController
   CONTENT_FIELDS = [:title,
                     :description,
                     :workflow_description,
-                    :guide,
-                    :faq,
-                    :education_content,
-                    :result,
-                    :team_members,
-                    :science_case,
                     :introduction,
                     :url_labels]
 
