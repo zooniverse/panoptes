@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150625160224) do
+ActiveRecord::Schema.define(version: 20150630144332) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -300,7 +300,7 @@ ActiveRecord::Schema.define(version: 20150625160224) do
     t.string   "hash_func",                   default: "bcrypt"
     t.string   "password_salt"
     t.string   "display_name",                index: {name: "index_users_on_display_name", unique: true, case_sensitive: false}
-    t.string   "zooniverse_id"
+    t.string   "zooniverse_id",               index: {name: "index_users_on_zooniverse_id", unique: true}
     t.string   "credited_name"
     t.integer  "classifications_count",       default: 0,        null: false
     t.integer  "activated_state",             default: 0,        null: false
