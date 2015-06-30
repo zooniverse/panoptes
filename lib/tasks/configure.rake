@@ -24,20 +24,6 @@ zooniverse_home_test:
 YAML
     File.open('config/database.yml', 'w') { |f| f.write(database_config) }
   end
-
-  desc "Setup development Dockerfile"
-  task :dev_docker do
-    sh "rm Dockerfile" if File.exists?('./Dockerfile')
-    sh "cp dockerfiles/Dockerfile.dev Dockerfile"
-    sh "git update-index --assume-unchanged Dockerfile"
-  end
-
-  desc "Setup production Dockerfile"
-  task :prod_docker do
-    sh "rm Dockerfile" if File.exists?('./Dockerfile')
-    sh "cp dockerfiles/Dockerfile.prod Dockerfile"
-    sh "git update-index --no-assume-unchanged Dockerfile"
-  end
 end
 
 task configure: 'configure:local'
