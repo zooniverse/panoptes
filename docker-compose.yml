@@ -21,6 +21,7 @@ kafka:
   command: -i 1 -H kafka -p 9092 -z zk:2181
 
 panoptes:
+  dockerfile: dockerfiles/Dockerfile.dev
   build: ./
   volumes:
     - ./:/rails_app
