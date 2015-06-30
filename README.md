@@ -37,7 +37,7 @@ Optionally you can run
 
 We only support running Panoptes via Docker and Docker Compose. If you'd like to run it outside a container, see the above Requirements sections to get started.
 
-It's possible to run Panoptes only having to install the `fig_rake` gem. Alternatives to various rake tasks are presented. 
+It's possible to run Panoptes only having to install the `fig_rake` gem. Alternatives to various rake tasks are presented.
 
 ### Setup Docker and Docker Compose
 
@@ -57,17 +57,13 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 0. Setup the application configuration files
   + Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
 
-0. Setup the development Dockerfile
-  + If you ran `bundle install`: `rake configure:dev_docker`
-  + If you did not: `cp dockerfiles/Dockerfile.dev Dockerfile`
-
 0. Install [Docker and Docker Compose](https://docs.docker.com/compose/install/).
 
 0. Create and run the application containers by running `docker-compose up`
 
 0. After step 5 finishes, open a new terminal and run `frake db:create db:migrate` to setup the database
 
-0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `frails runner db/fig_dev_seed_data/fig_dev_seed_data.rb` 
+0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `frails runner db/fig_dev_seed_data/fig_dev_seed_data.rb`
 
 0. Open up the application in your browser:
   + If on a Mac, run `boot2docker ip` to get the IP-address where the server is running.
