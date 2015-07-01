@@ -225,6 +225,7 @@ GEM
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
+    rack-timeout (0.2.4)
     rails-deprecated_sanitizer (1.0.3)
       activesupport (>= 4.2.0.alpha)
     rails-dom-testing (1.0.6)
@@ -367,6 +368,7 @@ DEPENDENCIES
   pry-rails (~> 0.3.2)
   puma (~> 2.0)
   rack-cors (~> 0.3)
+  rack-timeout (~> 0.2)
   rails!
   restpack_serializer!
   rspec (~> 3.3.0)
@@ -383,3 +385,6 @@ DEPENDENCIES
   therubyrhino
   uglifier (~> 2.0)
   versionist (~> 1.0)
+
+BUNDLED WITH
+   1.10.1
