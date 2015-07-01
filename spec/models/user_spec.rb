@@ -364,10 +364,10 @@ describe User, type: :model do
 
     context "with the old sha1 hashing alg" do
       let(:user) do
-        u = create(:insecure_user)
-        u.hash_func = 'sha1'
-        u.save
-        u
+        create(:insecure_user) do |u|
+          u.hash_func = 'sha1'
+          u.unsubscribe_token = nil
+        end
       end
 
       it 'should validate imported user with sha1+salt password' do
@@ -381,6 +381,11 @@ describe User, type: :model do
       it 'should update an imported user to use bcrypt hashing' do
         user.valid_password?('tajikistan')
         expect(user.hash_func).to eq("bcrypt")
+      end
+
+      it 'should add the unsubscribe token' do
+        user.valid_password?('tajikistan')
+        expect(user.unsubscribe_token).to_not be_nil
       end
     end
   end
