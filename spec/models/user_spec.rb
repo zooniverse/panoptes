@@ -87,6 +87,62 @@ describe User, type: :model do
     end
   end
 
+  describe '::send_reset_password_instructions' do
+    context 'when the user exists' do
+      let(:user) { create(:user) }
+
+      it 'sends a password reset' do
+        expect_any_instance_of(User).to receive(:send_reset_password_instructions).once
+        User.send_reset_password_instructions(email: user.email)
+      end
+
+      it 'returns the user' do
+        returned_user = User.send_reset_password_instructions(email: user.email)
+        expect(returned_user).to eq(user)
+      end
+    end
+
+    context 'when the user is disabled' do
+      let(:user) { create(:user).tap(&:disable!) }
+
+      it 'does not send a password reset' do
+        expect_any_instance_of(User).to receive(:send_reset_password_instructions).never
+        User.send_reset_password_instructions(email: user.email)
+      end
+
+      it 'returns the user' do
+        returned_user = User.send_reset_password_instructions(email: user.email)
+        expect(returned_user).to eq(user)
+      end
+    end
+
+    context 'when the user has no email' do
+      let(:user) { build(:user, email: nil) }
+
+      it 'does not send a password reset' do
+        expect_any_instance_of(User).to receive(:send_reset_password_instructions).never
+        User.send_reset_password_instructions(email: user.email)
+      end
+
+      it 'returns an unpersisted user' do
+        returned_user = User.send_reset_password_instructions(email: user.email)
+        expect(returned_user).not_to be_persisted
+      end
+    end
+
+    context 'when the user cannot be found' do
+      it 'does not send a password reset' do
+        expect_any_instance_of(User).to receive(:send_reset_password_instructions).never
+        User.send_reset_password_instructions(email: 'unknown@example.com')
+      end
+
+      it 'returns an unpersisted user' do
+        returned_user = User.send_reset_password_instructions(email: 'unknown@example.com')
+        expect(returned_user).not_to be_persisted
+      end
+    end
+  end
+
   describe "#signup_project" do
     let(:project) { create(:project) }
 

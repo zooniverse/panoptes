@@ -30,26 +30,14 @@ class PasswordsController < Devise::PasswordsController
     end
 
     def create_from_json
-      status = false
-      if able_to_reset_password?
-        resource = resource_class.send_reset_password_instructions(resource_params)
-        yield resource if block_given?
-        status = successfully_sent?(resource)
-      end
+      resource = resource_class.send_reset_password_instructions(resource_params)
+      yield resource if block_given?
+      status = resource_params["email"].present? && successfully_sent?(resource)
       respond_to_request(status)
     end
 
     def respond_to_request(action_status)
       response_status = action_status ? :ok : :unprocessable_entity
       render status: response_status, json: {}
-    end
-
-    def able_to_reset_password?
-      if user = resource_class.find_for_authentication(resource_params)
-        disabled_or_omni_auth = user.disabled? || user.email.blank?
-        !disabled_or_omni_auth
-      else
-        false
-      end
     end
 end

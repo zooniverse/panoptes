@@ -11,7 +11,7 @@ Devise.setup do |config|
   config.reconfirmable = true
   config.password_length = 4..128
   config.reset_password_within = 6.hours
-
+  config.paranoid = true
   config.sign_out_via = :delete
 
   # MAILER
