@@ -138,7 +138,9 @@ describe Api::EventsController, type: :controller do
 
       context "with a first event message" do
         let(:first_visit_event_params) do
-          overridden_params(message: "first_visit")
+          params = overridden_params(message: "first_visit")
+          params[:event] = params[:event].except(:count)
+          params
         end
 
         it "should respond with a 200" do
@@ -150,11 +152,6 @@ describe Api::EventsController, type: :controller do
           expect do
             post :create, first_visit_event_params
           end.to change { UserProjectPreference.count }.from(0).to(1)
-        end
-
-        it "should update the upp activity_count to the correct value" do
-          post :create, first_visit_event_params
-          expect(user_project_pref.activity_count).to eq(event_count)
         end
 
         context "with an unknown user zooniverse_id" do
