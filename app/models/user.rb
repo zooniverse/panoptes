@@ -201,6 +201,7 @@ class User < ActiveRecord::Base
 
   def set_zooniverse_id
     self.zooniverse_id ||= "panoptes-#{ id }"
+    save! if zooniverse_id_changed?
   end
 
   def setup_unsubscribe_token
