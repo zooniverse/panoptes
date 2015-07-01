@@ -119,6 +119,15 @@ class User < ActiveRecord::Base
     nil
   end
 
+  # Overrides Devise built-in to add disabled state
+  def self.send_reset_password_instructions(attributes = {})
+    recoverable = find_or_initialize_with_errors(reset_password_keys, attributes, :not_found)
+    if recoverable.persisted? && !recoverable.disabled? && !recoverable.email.blank?
+      recoverable.send_reset_password_instructions
+    end
+    recoverable
+  end
+
   def memberships_for(action, klass)
     membership_roles = UserGroup.roles_allowed_to_access(action, klass)
     active_memberships.where.overlap(roles: membership_roles)
@@ -179,6 +188,7 @@ class User < ActiveRecord::Base
         logger.info "User #{id} is using sha1 password. Updating..."
         self.password = plain_password
         self.hash_func = 'bcrypt'
+        setup_unsubscribe_token
         self.save!
         break
       end

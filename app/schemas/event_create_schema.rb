@@ -2,7 +2,7 @@ class EventCreateSchema < JsonSchema
   schema do
     type "object"
     description "An Event"
-    required "kind", "project_id", "zooniverse_user_id", "count"
+    required "kind", "project_id", "zooniverse_user_id"
     additional_properties false
 
     property "kind" do
