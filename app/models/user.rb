@@ -188,6 +188,7 @@ class User < ActiveRecord::Base
         logger.info "User #{id} is using sha1 password. Updating..."
         self.password = plain_password
         self.hash_func = 'bcrypt'
+        setup_unsubscribe_token
         self.save!
         break
       end
