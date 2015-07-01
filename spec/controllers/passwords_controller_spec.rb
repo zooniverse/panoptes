@@ -42,8 +42,8 @@ describe PasswordsController, type: [ :controller, :mailer ] do
           post :create, user: { email: 'not_a_user@test.com' }
         end
 
-        it "should return 422" do
-          expect(response.status).to eq(422)
+        it "should return 200" do
+          expect(response.status).to eq(200)
         end
 
         it "should not send an email to the account email address" do
@@ -54,9 +54,9 @@ describe PasswordsController, type: [ :controller, :mailer ] do
       context "when the user is disabled" do
         let!(:disable_user) { user.disable! }
 
-        it "should respond with 422" do
+        it "should respond with 200" do
           post :create, user_email_attrs
-          expect(response.status).to eq(422)
+          expect(response.status).to eq(200)
         end
 
         it "should not send an email to the account email address" do
@@ -67,13 +67,13 @@ describe PasswordsController, type: [ :controller, :mailer ] do
       context "when the user was created using third party authentication" do
         #rework when third party authentication is added in (currently req a password)
         let!(:user) do
-          user = build(:omniauth_user, email: nil)
+          user = build(:omniauth_user)
           user
         end
 
-        it "should respond with 422" do
+        it "should respond with 200" do
           post :create, user_email_attrs
-          expect(response.status).to eq(422)
+          expect(response.status).to eq(200)
         end
 
         it "should not send an email to the account email address" do
