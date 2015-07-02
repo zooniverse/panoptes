@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
   include Activatable
   include Linkable
 
-  ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
+  ALLOWED_LOGIN_CHARACTERS = '[[:word:]\-\.]'
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
 
   devise :database_authenticatable, :registerable,
