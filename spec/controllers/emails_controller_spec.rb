@@ -76,9 +76,9 @@ describe EmailsController, type: :controller do
 
       context "when supplying an invalid token" do
 
-        it "should return 422" do
+        it "should redirect" do
           get :unsubscribe, token: "blurghkjsh"
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to redirect_to("#{base_url}")
         end
       end
 
@@ -97,7 +97,7 @@ describe EmailsController, type: :controller do
     describe "#unsubscribe via email" do
 
       let(:unsubscribe_user) do
-        get :unsubscribe, token: user.unsubscribe_token
+        post :unsubscribe, token: user.unsubscribe_token
       end
 
       before(:each) do
@@ -115,15 +115,15 @@ describe EmailsController, type: :controller do
 
       context "when supplying an invalid email" do
 
-        it "should return 422" do
-          get :unsubscribe, email: "not@my.email"
-          expect(response).to have_http_status(:unprocessable_entity)
+        it "should redirect" do
+          post :unsubscribe, email: "not@my.email"
+          expect(response).to redirect_to("#{base_url}")
         end
       end
 
       context "when supplying a valid email" do
         let(:unsubscribe_user) do
-          get :unsubscribe, email: user.email
+          post :unsubscribe, email: user.email
         end
 
         it_behaves_like "it removes user email subscriptions"
