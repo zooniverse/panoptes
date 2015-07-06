@@ -1,6 +1,6 @@
 class Api::V1::GroupsController < Api::ApiController
   include Recents
-  include FilterByDisplayName
+  include IndexSearch
 
   doorkeeper_for :create, :update, :destroy, scopes: [:group]
   resource_actions :show, :index, :update, :deactivate, :create
@@ -10,6 +10,10 @@ class Api::V1::GroupsController < Api::ApiController
 
   allowed_params :create, :name, :display_name, links: [ users: [] ]
   allowed_params :update, :name, :display_name
+
+  search_by do |name, query|
+    query.search_name(name.join(" "))
+  end
 
   def destroy_links
     controlled_resources.first.memberships

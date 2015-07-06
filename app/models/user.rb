@@ -1,6 +1,7 @@
 class User < ActiveRecord::Base
   include Activatable
   include Linkable
+  include PgSearch
 
   ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
@@ -64,6 +65,10 @@ class User < ActiveRecord::Base
   can_be_linked :user_collection_preference, :all
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :collection, :scope_for, :update, :user
+
+  pg_search_scope :search_name,
+    against: [:login, :display_name],
+    using: :trigram
 
   def self.scope_for(action, user, opts={})
     case action

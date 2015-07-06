@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150706133624) do
+ActiveRecord::Schema.define(version: 20150706185722) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -318,8 +318,8 @@ ActiveRecord::Schema.define(version: 20150706133624) do
     t.string   "unsubscribe_token",           index: {name: "index_users_on_unsubscribe_token", unique: true}
     t.string   "api_key"
     t.boolean  "ouroboros_created",           default: false, index: {name: "index_users_on_ouroboros_created", where: "(ouroboros_created = false)"}
+    t.index name: "users_idx_trgm_login_display_name", using: :gin, expression: "((COALESCE((login)::text, ''::text) || ' '::text) || COALESCE((display_name)::text, ''::text))"
   end
-  add_index "users", ["display_name"], name: "users_display_name_trgm_index", using: :gist, operator_class: "gist_trgm_ops"
 
   create_table "versions", force: :cascade do |t|
     t.string   "item_type",      null: false, index: {name: "index_versions_on_item_type_and_item_id", with: ["item_id"]}
