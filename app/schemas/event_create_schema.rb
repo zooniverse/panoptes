@@ -16,7 +16,7 @@ class EventCreateSchema < JsonSchema
 
     property "zooniverse_user_id" do
       type "string", "integer"
-      pattern "^[0-9]*$"
+      pattern "^.+[0-9]*$"
     end
 
     property "count" do
