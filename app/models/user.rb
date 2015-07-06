@@ -68,7 +68,8 @@ class User < ActiveRecord::Base
 
   pg_search_scope :search_name,
     against: [:login, :display_name],
-    using: :trigram
+    using: :trigram,
+    ranked_by: ":trigram"
 
   def self.scope_for(action, user, opts={})
     case action

@@ -46,7 +46,7 @@ class UserGroup < ActiveRecord::Base
 
   pg_search_scope :search_name,
     against: [:name, :display_name],
-    using: { trigram: { threshold: 0.5 } },
+    using: :trigram,
     ranked_by: ":trigram"
 
   def self.memberships_query(action, target)
