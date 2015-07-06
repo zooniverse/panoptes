@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150630144332) do
+ActiveRecord::Schema.define(version: 20150706100343) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -172,7 +172,7 @@ ActiveRecord::Schema.define(version: 20150630144332) do
     t.jsonb    "configuration"
     t.boolean  "live",                  default: false, null: false, index: {name: "index_projects_on_live"}
     t.jsonb    "urls",                  default: []
-    t.boolean  "migrated",              default: false
+    t.boolean  "migrated",              default: false, index: {name: "index_projects_on_migrated", where: "(migrated = true)"}
     t.integer  "classifiers_count",     default: 0
     t.string   "slug",                  default: "", index: {name: "index_projects_on_slug"}
     t.text     "redirect",              default: ""

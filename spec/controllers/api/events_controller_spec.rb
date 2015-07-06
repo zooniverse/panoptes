@@ -14,8 +14,13 @@ describe Api::EventsController, type: :controller do
     end
 
     describe "#create" do
+      let(:zoo_home_project_id) { (10..20).to_a.sample }
       let(:workflow) { create(:workflow) }
-      let(:project) { workflow.project }
+      let(:project) do
+        p = workflow.project
+        p.update_columns(migrated: true, configuration: { zoo_home_project_id: zoo_home_project_id })
+        p
+      end
       let(:user) do
         user = project.owner
         user.update_column(:zooniverse_id, 1)
@@ -27,7 +32,7 @@ describe Api::EventsController, type: :controller do
       let(:event_params) do
         {
           event: {
-            kind: event_kind, project_id: project.id, project: project.name,
+            kind: event_kind, project_id: zoo_home_project_id, project: project.name,
             zooniverse_user_id: user.zooniverse_id, workflow: workflow.display_name,
             count: event_count, created_at: created_at
           }
@@ -132,6 +137,17 @@ describe Api::EventsController, type: :controller do
 
         it "should respond with a 422" do
           post :create, invalid_event_params
+          expect(response.status).to eq(422)
+        end
+      end
+
+      context "when the project id refers to a non-legacy migrated project" do
+        let(:unknown_legacy_project) do
+          overridden_params(project_id: project.id)
+        end
+
+        it "should respond with a 422" do
+          post :create, unknown_legacy_project
           expect(response.status).to eq(422)
         end
       end
