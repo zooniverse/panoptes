@@ -43,7 +43,7 @@ module Api
     end
 
     def event_params_sanity_check
-      required_params && known_event?
+      required_params && known_event? && legacy_zoo_project_exists?
     end
 
     def required_params
@@ -73,13 +73,24 @@ module Api
     def user_project_preference
       user_zoo_id = create_params[:zooniverse_user_id]
       if user_zoo_id && user_id = User.find_by(zooniverse_id: user_zoo_id).try(:id)
-        UserProjectPreference.find_or_initialize_by(project_id: create_params[:project_id],
+        UserProjectPreference.find_or_initialize_by(project_id: legacy_zoo_project.id,
                                                     user_id: user_id)
       end
     end
 
     def resource_sym
       self.class.resource_name.to_sym
+    end
+
+    def legacy_zoo_project
+      @legacy_zoo_project ||=
+        Project.where(migrated: true)
+        .where("configuration ->> 'zoo_home_project_id' = ?", create_params[:project_id])
+        .first
+    end
+
+    def legacy_zoo_project_exists?
+      !!legacy_zoo_project
     end
   end
 end
