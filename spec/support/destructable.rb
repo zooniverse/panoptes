@@ -1,10 +1,14 @@
 shared_examples "is destructable" do
+  let(:dps) do
+    defined?(delete_params) ? delete_params : {}
+  end
+
   context "an authorized user" do
     context "with proper scopes" do
       before(:each) do
         stub_token(scopes: scopes, user_id: authorized_user.id)
         set_preconditions
-        delete :destroy, id: resource.id
+        delete :destroy, dps.merge!(id: resource.id)
       end
 
       it "should return 204" do
@@ -20,7 +24,7 @@ shared_examples "is destructable" do
       before(:each) do
         stub_token(scopes: ["public"], user_id: authorized_user.id)
         set_preconditions
-        delete :destroy, id: resource.id
+        delete :destroy, dps.merge(id: resource.id)
       end
 
       it "should return forbidden with a non-scoped token" do
@@ -38,7 +42,7 @@ shared_examples "is destructable" do
              end
       stub_token(scopes: scopes, user_id: user.id)
       set_preconditions
-      delete :destroy, id: resource.id
+      delete :destroy, dps.merge(id: resource.id)
     end
 
     it "should return not found" do

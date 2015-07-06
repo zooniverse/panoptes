@@ -1,9 +1,8 @@
-shared_examples "is creatable" do |action|
+shared_examples "is creatable" do |action=:create|
   let(:created_id) { created_instance_id(api_resource_name) }
 
   context "a logged in user" do
     before(:each) do
-      action ||= :create
       default_request scopes: scopes, user_id: authorized_user.id
       post action, create_params
     end
@@ -40,7 +39,6 @@ shared_examples "is creatable" do |action|
 
   context "a non-logged in user" do
     before(:each) do
-      action ||= :create
       default_request
       post action, create_params
     end

@@ -4,5 +4,6 @@ FactoryGirl.define do
     url_key "science_case"
     language "en"
     content "Crap about science"
+    project
   end
 end

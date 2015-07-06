@@ -17,6 +17,8 @@ ActiveRecord::Schema.define(version: 20150706185722) do
   enable_extension "plpgsql"
   enable_extension "intarray"
   enable_extension "pg_trgm"
+  enable_extension "hstore"
+  enable_extension "postgres_fdw"
 
   create_table "access_control_lists", force: :cascade do |t|
     t.integer  "user_group_id", index: {name: "index_access_control_lists_on_user_group_id"}
@@ -322,8 +324,9 @@ ActiveRecord::Schema.define(version: 20150706185722) do
     t.string   "unsubscribe_token",           index: {name: "index_users_on_unsubscribe_token", unique: true}
     t.string   "api_key"
     t.boolean  "ouroboros_created",           default: false, index: {name: "index_users_on_ouroboros_created", where: "(ouroboros_created = false)"}
-    t.index name: "users_idx_trgm_login_display_name", using: :gin, expression: "((COALESCE((login)::text, ''::text) || ' '::text) || COALESCE((display_name)::text, ''::text))"
+    t.index name: "users_fts_login_display_name", using: :gin, expression: "((COALESCE((login)::text, ''::text) || ' '::text) || COALESCE((display_name)::text, ''::text))"
   end
+  add_index "users", ["display_name"], name: "users_display_name_trgm_index", using: :gist, operator_class: "gist_trgm_ops"
 
   create_table "versions", force: :cascade do |t|
     t.string   "item_type",      null: false, index: {name: "index_versions_on_item_type_and_item_id", with: ["item_id"]}
