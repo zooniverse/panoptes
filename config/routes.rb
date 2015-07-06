@@ -28,7 +28,7 @@ Rails.application.routes.draw do
     put "/users" => "registrations#update"
   end
 
-  get "unsubscribe", to: "emails#unsubscribe"
+  match "unsubscribe", to: "emails#unsubscribe", via: [ :get, :post ]
 
   namespace :api, constraints: { format: 'json' } do
     post "/events" => "events#create"
