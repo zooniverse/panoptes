@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::UsersController, type: :controller do
   let!(:users) {
-    create_list(:user_with_avatar, 22)
+    create_list(:user_with_avatar, 2)
   }
 
   let(:scopes) { %w(public user) }
@@ -38,7 +38,7 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should have twenty items by default" do
-        expect(json_response[api_resource_name].length).to eq(20)
+        expect(json_response[api_resource_name].length).to eq(2)
       end
 
 
@@ -183,24 +183,20 @@ describe Api::V1::UsersController, type: :controller do
 
         it 'should have the included resources' do
           expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
-            .to match_array(users.take(20).map(&:avatar).map(&:id).map(&:to_s))
+            .to match_array(users.map(&:avatar).map(&:id).map(&:to_s))
         end
       end
+
     end
+
 
     describe "overridden serialiser instance assocation links" do
       let(:user){ users.sample }
 
       before(:each) do
         create(:classification, user: user)
-        get :index, { display_name: user.display_name }
+        get :index, { login: user.login }
       end
-
-      it "should respond with matching users" do
-        names = json_response[api_resource_name].collect{ |h| h['display_name'] }
-        expect(names).to all(match(/^#{ user.display_name }/))
-      end
-
       it "should respond with the no model links" do
         expect(json_response[api_resource_name][0]['links']).to eq({})
       end
@@ -247,7 +243,7 @@ describe Api::V1::UsersController, type: :controller do
       before(:each) do
         default_request(scopes: scopes, user_id: requesting_user_id)
         allow_any_instance_of(UserSerializer)
-          .to receive(:include_firebase_auth_token?).and_return(false)
+        .to receive(:include_firebase_auth_token?).and_return(false)
         get :show, id: show_id
       end
 
@@ -302,7 +298,7 @@ describe Api::V1::UsersController, type: :controller do
 
     before(:each) do
       allow_any_instance_of(Firebase::FirebaseTokenGenerator)
-        .to receive(:create_token).and_return(jwt_token)
+      .to receive(:create_token).and_return(jwt_token)
       default_request(scopes: scopes, user_id: user.id)
       get :me
     end
@@ -461,9 +457,9 @@ describe Api::V1::UsersController, type: :controller do
       let(:new_bec) { false }
       let(:put_operations) do
         { users: { login: new_login,
-                   global_email_communication: new_gec,
-                   project_email_communication: new_pec,
-                   beta_email_communication: new_bec } }
+                  global_email_communication: new_gec,
+                  project_email_communication: new_pec,
+                  beta_email_communication: new_bec } }
       end
 
       it "should return 200 status" do

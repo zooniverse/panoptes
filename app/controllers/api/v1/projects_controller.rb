@@ -4,7 +4,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include FilterByOwner
   include FilterByCurrentUserRoles
   include TranslatableResource
-  include FilterByDisplayName
+  include IndexSearch
 
   doorkeeper_for :update, :create, :destroy, :create_classifications_export,
     :create_subjects_export, scopes: [:project]
@@ -40,6 +40,10 @@ class Api::V1::ProjectsController < Api::ApiController
   before_action :add_owner_ids_to_filter_param!, only: :index
   prepend_before_action :require_login,
     only: [:create, :update, :destroy, :create_classifications_export, :create_subjects_export]
+
+  search_by do |name, query|
+    query.search_display_name(name.join(" "))
+  end
 
   def create_classifications_export
     media_params[:metadata] ||= { recipients: [api_user.id] }

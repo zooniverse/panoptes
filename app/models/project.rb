@@ -7,6 +7,7 @@ class Project < ActiveRecord::Base
   include Translatable
   include PreferencesLink
   include ExtendedCacheKey
+  include PgSearch
 
   EXPERT_ROLES = [:expert, :owner]
 
@@ -54,6 +55,11 @@ class Project < ActiveRecord::Base
   can_be_linked :user_group, :scope_for, :edit_project, :user
 
   preferences_model :user_project_preference
+
+  pg_search_scope :search_display_name,
+    against: :display_name,
+    using: { trigram: { threshold: 0.5 } },
+    ranked_by: ":trigram"
 
   def expert_classifier_level(classifier)
     expert_role = project_roles.where(user_group: classifier.identity_group)

@@ -4,6 +4,7 @@ class Collection < ActiveRecord::Base
   include Activatable
   include Linkable
   include PreferencesLink
+  include PgSearch
 
   acts_as_url :display_name, sync_url: true, url_attribute: :slug, allow_duplicates: true
 
@@ -21,4 +22,9 @@ class Collection < ActiveRecord::Base
   can_be_linked :access_control_list, :scope_for, :update, :user
 
   preferences_model :user_collection_preference
+
+  pg_search_scope :search_display_name,
+    against: :display_name,
+    using: { trigram: { threshold: 0.5 } },
+    ranked_by: ":trigram"
 end

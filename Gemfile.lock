@@ -206,6 +206,10 @@ GEM
       activesupport (>= 3.0, < 5.0)
     pg (0.18.2)
     pg_array_parser (0.0.9)
+    pg_search (1.0.4)
+      activerecord (>= 3.1)
+      activesupport (>= 3.1)
+      arel
     poseidon (0.0.5)
     postgres_ext (2.4.1)
       activerecord (>= 4.0.0)
@@ -362,6 +366,7 @@ DEPENDENCIES
   p3p (~> 1.0)
   paper_trail (~> 3.0)
   pg (~> 0.18)
+  pg_search
   poseidon (~> 0.0.5)
   postgres_ext (~> 2.4.0)
   pry-rails (~> 0.3.2)

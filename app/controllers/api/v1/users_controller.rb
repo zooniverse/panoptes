@@ -1,6 +1,6 @@
 class Api::V1::UsersController < Api::ApiController
   include Recents
-  include FilterByDisplayName
+  include IndexSearch
 
   doorkeeper_for :me, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
@@ -9,10 +9,14 @@ class Api::V1::UsersController < Api::ApiController
   schema_type :strong_params
 
   allowed_params :update, :login, :display_name, :email, :credited_name,
-   :global_email_communication, :project_email_communication,
-   :beta_email_communication
+    :global_email_communication, :project_email_communication,
+    :beta_email_communication
 
   alias_method :user, :controlled_resource
+
+  search_by do |name, query|
+    query.search_name(name.join(" "))
+  end
 
   def me
     if stale?(last_modified: current_resource_owner.updated_at)

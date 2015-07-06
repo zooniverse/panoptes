@@ -21,7 +21,7 @@ shared_examples "is translatable" do
     end
 
     it { is_expected.to_not be_empty }
-    
+
     it 'should include content with the requested languages' do
       subject.each do |translatable|
         expect(translatable.content_association.map(&:language)).to include('en-US')

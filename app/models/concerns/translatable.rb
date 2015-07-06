@@ -20,8 +20,8 @@ module Translatable
 
     def load_with_languages(query, languages=nil)
       where_clause = "#{content_association}.language = #{table_name}.primary_language"
-      query = query.eager_load(content_association)
-      
+      query = query.joins(content_association).eager_load(content_association)
+
       if languages
         where_clause = "#{where_clause} OR #{content_association}.language ~ ?"
         query.where(where_clause, lang_regex(languages))
@@ -43,15 +43,15 @@ module Translatable
     languages = Array.wrap(languages).flat_map do |lang|
       lang.length == 2 ? lang : [lang, lang[0..1]]
     end.uniq
-    
+
     languages.each do |lang|
-      content = content_association.to_a.find{|content| content.language == lang }
+      content = content_association.to_a.find{ |c| c.language == lang }
       if lang.length == 2 && !content
-        content = content_association.to_a.find do |content|
-          content.language =~ /^#{lang[0..1]}.*/ 
+        content = content_association.to_a.find do |c|
+          c.language =~ /^#{lang[0..1]}.*/ 
         end
       end
-      
+
       break if content
     end
     content = primary_content unless content

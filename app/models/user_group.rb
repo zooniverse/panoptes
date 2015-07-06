@@ -2,6 +2,7 @@ class UserGroup < ActiveRecord::Base
   include RoleControl::Controlled
   include Activatable
   include Linkable
+  include PgSearch
 
   has_many :memberships
   has_many :active_memberships, -> { active.where(identity: false) },
@@ -42,6 +43,11 @@ class UserGroup < ActiveRecord::Base
 
   can_by_role :edit_collection,
               roles: [ :group_admin, :collection_editor ]
+
+  pg_search_scope :search_name,
+    against: [:name, :display_name],
+    using: { trigram: { threshold: 0.5 } },
+    ranked_by: ":trigram"
 
   def self.memberships_query(action, target)
     target.memberships_for(action)
