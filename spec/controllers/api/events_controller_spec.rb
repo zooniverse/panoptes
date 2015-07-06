@@ -179,6 +179,17 @@ describe Api::EventsController, type: :controller do
             end.not_to change { UserProjectPreference.count }
           end
         end
+
+        context "with an panoptes-formatted user zooniverse_id" do
+
+          it "should return success" do
+            allow(User).to receive(:find_by).and_return(user)
+            params = overridden_params(message: "first_visit", zooniverse_user_id: "panoptes-1")
+            params[:event] = params[:event].except(:count)
+            post :create, params
+            expect(response.status).to eq(200)
+          end
+        end
       end
 
       context "with an activity event message" do
@@ -197,6 +208,15 @@ describe Api::EventsController, type: :controller do
         it "should update the upp activity_count to the correct value" do
           post :create, event_params
           expect(user_project_pref.activity_count).to eq(event_count)
+        end
+
+        context "with an panoptes-formatted user zooniverse_id" do
+
+          it "should return success" do
+            allow(User).to receive(:find_by).and_return(user)
+            post :create, overridden_params(zooniverse_user_id: "panoptes-1")
+            expect(response.status).to eq(200)
+          end
         end
 
         context "when the user project preference already exists" do
