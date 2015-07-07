@@ -41,6 +41,12 @@ FactoryGirl.define do
       end
     end
 
+    factory :project_with_workflow do
+      after(:create) do |p|
+        workflow = create(:workflow, project: p)
+      end
+    end
+
     factory :project_with_workflows do
       after(:create) do |p|
         create_list(:workflow, 2, project: p)

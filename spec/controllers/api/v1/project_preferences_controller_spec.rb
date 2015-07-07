@@ -10,13 +10,12 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   end
 
   let(:api_resource_name) { 'project_preferences' }
-  let(:api_resource_attributes) { %w(id email_communication preferences) }
+  let(:api_resource_attributes) { %w(id email_communication preferences href activity_count) }
   let(:api_resource_links) { %w(project_preferences.user project_preferences.project) }
 
   let(:scopes) { %w(public project) }
   let(:resource) { upps.first }
   let(:resource_class) { UserProjectPreference }
-
 
   describe "#index" do
     let!(:private_resource) { create(:user_project_preference) }
@@ -26,7 +25,41 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   end
 
   describe "#show" do
+
     it_behaves_like "is showable"
+
+    context "when the upp has no activity count" do
+      let!(:project) { create(:project_with_workflow) }
+      let!(:upps) do
+        create_list :user_project_preference, 2, user: authorized_user,
+          project: project, email_communication: true
+      end
+      let!(:user_seens) do
+        create(:user_seen_subject, user: authorized_user,
+          workflow: project.workflows.first, build_real_subjects: false)
+      end
+      let(:run_get) do
+        allow_any_instance_of(UserProjectPreference).to receive(:activity_count).and_return(nil)
+        default_request scopes: scopes, user_id: authorized_user.id
+        get :show, id: resource.id
+      end
+
+      it "should return the correct count from user seen subjects" do
+        run_get
+        expected_count = created_instance(api_resource_name)["activity_count"]
+        expect(expected_count).to eq(user_seens.subject_ids.size)
+      end
+
+      context "when the use has classified on more than 1 project" do
+
+        it "should return the specific project activity count from user seen subjects" do
+          create(:user_seen_subject, user: authorized_user, build_real_subjects: false)
+          run_get
+          expected_count = created_instance(api_resource_name)["activity_count"]
+          expect(expected_count).to eq(user_seens.subject_ids.size)
+        end
+      end
+    end
   end
 
   describe "#update" do
