@@ -97,6 +97,17 @@ describe Api::V1::ProjectPagesController, type: :controller do
         end
       end
     end
+
+    describe "paging" do
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        get :index, index_params
+      end
+
+      it 'should use correct paging links' do
+        expect(json_response["meta"][api_resource_name]["first_href"]).to match(/projects\/[0-9]+\/pages/)
+      end
+    end
   end
 
   describe "#show" do
