@@ -8,6 +8,11 @@ class UserProjectPreferenceSerializer
   end
 
   def activity_count
-    @model.activity_count || UserSeenSubject.count_user_activity(@model.user_id)
+    @model.activity_count || user_project_activity
+  end
+
+  def user_project_activity
+    project_workflows_ids = Workflow.where(project_id: @model.project_id).pluck(:id)
+    UserSeenSubject.count_user_activity(@model.user_id, project_workflows_ids)
   end
 end

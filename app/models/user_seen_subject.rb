@@ -13,8 +13,13 @@ class UserSeenSubject < ActiveRecord::Base
     end
   end
 
-  def self.count_user_activity(user_id)
-    UserSeenSubject.where(user_id: user_id).sum("cardinality(subject_ids)")
+  def self.count_user_activity(user_id, workflow_ids=[])
+    workflow_ids = Array.wrap(workflow_ids)
+    scope = UserSeenSubject.where(user_id: user_id)
+    unless workflow_ids.empty?
+      scope = scope.where(workflow_id: workflow_ids)
+    end
+    scope.sum("cardinality(subject_ids)")
   end
 
   def subjects_seen?(ids)
