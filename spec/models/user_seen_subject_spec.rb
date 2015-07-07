@@ -62,6 +62,24 @@ RSpec.describe UserSeenSubject, :type => :model do
     end
   end
 
+  describe "::count_user_activity" do
+    let(:user_seen_subject) { create(:user_seen_subject, build_real_subjects: false) }
+
+    it "should sum all the seen subjects across workflows" do
+      count = UserSeenSubject.count_user_activity(user_seen_subject.user_id)
+      expect(count).to eq(user_seen_subject.subject_ids.size)
+    end
+
+    context "when no counts exist for the user" do
+
+      it "should return 0" do
+        count = UserSeenSubject.count_user_activity(user_seen_subject.user_id+1)
+        expect(count).to eq(0)
+      end
+
+    end
+  end
+
   describe "#user" do
     it "should not be valid without a user" do
       expect(build(:user_seen_subject, user: nil)).to_not be_valid

@@ -13,6 +13,10 @@ class UserSeenSubject < ActiveRecord::Base
     end
   end
 
+  def self.count_user_activity(user_id)
+    UserSeenSubject.where(user_id: user_id).sum("cardinality(subject_ids)")
+  end
+
   def subjects_seen?(ids)
     Array.wrap(ids).any? { |id| subject_ids.include?(id) }
   end
