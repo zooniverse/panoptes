@@ -5,7 +5,7 @@ RSpec.describe JiscMailer, :type => :mailer do
 
   describe "::subscribe" do
     context "with a configured password" do
-      let(:mail) { JiscMailer.subscribe(user.email, user.display_name) }
+      let(:mail) { JiscMailer.subscribe(user.email) }
 
       it 'should mail the listserv' do
         expect(mail.to).to include("listserv@jiscmail.ac.uk")
@@ -16,7 +16,7 @@ RSpec.describe JiscMailer, :type => :mailer do
       end
 
       it 'should have the subscribe command' do
-        expect(mail.body.encoded).to eq("quiet add zooniverse #{ user.email } #{ user.display_name } PW=test_password\r\n\r\n")
+        expect(mail.body.encoded).to eq("quiet add zooniverse #{ user.email } * PW=test_password\r\n\r\n")
       end
     end
 
@@ -24,7 +24,7 @@ RSpec.describe JiscMailer, :type => :mailer do
       it 'should raise an error' do
         allow(Panoptes).to receive(:jisc_mail_config).and_return({})
         expect do
-          JiscMailer.subscribe(user.email, user.display_name).deliver
+          JiscMailer.subscribe(user.email).deliver
         end.to raise_error("JISC Mail password required")
       end
     end
