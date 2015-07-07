@@ -5,7 +5,7 @@ RSpec.describe SubscribeWorker do
 
   it 'should send mail' do
     expect do
-      subject.perform(user.email, user.display_name)
+      subject.perform(user.email)
     end.to change{ ActionMailer::Base.deliveries.count }.by(1)
   end
 end

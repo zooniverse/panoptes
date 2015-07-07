@@ -1,9 +1,9 @@
 class SubscribeWorker
   include Sidekiq::Worker
 
-  def perform(email, display_name)
+  def perform(email)
     if Rails.env == 'production' || Rails.env == 'test'
-      JiscMailer.subscribe(email, display_name).deliver
+      JiscMailer.subscribe(email).deliver
     end
   end
 end

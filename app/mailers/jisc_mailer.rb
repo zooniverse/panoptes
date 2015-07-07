@@ -3,10 +3,9 @@ class JiscMailer < ApplicationMailer
 
   JISC_MAIL_ADDRESS = "listserv@jiscmail.ac.uk"
 
-  def subscribe(email, name)
+  def subscribe(email)
     check_config
     @email = email
-    @name = name
     mail(to: JISC_MAIL_ADDRESS)
   end
 
