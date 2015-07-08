@@ -4,11 +4,6 @@ describe EmailsController, type: :controller do
 
   shared_examples "it removes user email subscriptions" do
 
-    it "should redirect to the unsubscribed success page" do
-      unsubscribe_user
-      expect(response).to redirect_to("#{base_url}")
-    end
-
     it "should set all the user *_email_communication fields to false" do
       unsubscribe_user
       user.reload
@@ -34,22 +29,6 @@ describe EmailsController, type: :controller do
         expect(upp_emails).to match_array([false])
       end
     end
-
-    context "when the user subscriptions can't be updated" do
-      before(:each) do
-        allow(subject).to receive(:revoke_email_subscriptions).and_return(false)
-      end
-
-      it "should redirect to the unsubscribed failure page" do
-        unsubscribe_user
-        expect(response).to redirect_to("#{base_url}?failed=true")
-      end
-
-      it 'should not queue an unsubscribe maillist worker' do
-        expect(UnsubscribeWorker).to_not receive(:perform_async)
-        unsubscribe_user
-      end
-    end
   end
 
   let(:user) { create(:user, email_attrs) }
@@ -60,7 +39,7 @@ describe EmailsController, type: :controller do
       beta_email_communication: true
     }
   end
-  let(:base_url) { "http://localhost:2727/#/unsubscribed" }
+  let(:base_url) { "http://localhost:2727/#/unsubscribe" }
 
   context "html" do
 
@@ -69,25 +48,37 @@ describe EmailsController, type: :controller do
       context "when not supplying a token" do
 
         it "should return 422" do
-          get :unsubscribe
+          get :unsubscribe_via_token
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
 
       context "when supplying an invalid token" do
+        let(:token) { "blurghkjsh" }
 
         it "should redirect" do
-          get :unsubscribe, token: "blurghkjsh"
-          expect(response).to redirect_to("#{base_url}")
+          get :unsubscribe_via_token, token: token
+          expect(response.location).to eq("#{base_url}?token=#{token}")
+        end
+
+        it "should redirect to the unsubscribed success page" do
+          get :unsubscribe_via_token, token: token
+          expect(response.location).to eq("#{base_url}?token=#{token}")
         end
       end
 
       context "when supplying a valid token" do
+        let(:token) { user.unsubscribe_token }
         let(:unsubscribe_user) do
-          get :unsubscribe, token: user.unsubscribe_token
+          get :unsubscribe_via_token, token: token
         end
 
         it_behaves_like "it removes user email subscriptions"
+
+        it "should redirect to the unsubscribed success page" do
+          unsubscribe_user
+          expect(response.location).to eq("#{base_url}?token=#{token}")
+        end
       end
     end
   end
@@ -95,10 +86,6 @@ describe EmailsController, type: :controller do
   context "json" do
 
     describe "#unsubscribe via email" do
-
-      let(:unsubscribe_user) do
-        post :unsubscribe, token: user.unsubscribe_token
-      end
 
       before(:each) do
         request.env["HTTP_ACCEPT"] = "application/json"
@@ -108,22 +95,22 @@ describe EmailsController, type: :controller do
       context "when not supplying a email" do
 
         it "should return 422" do
-          get :unsubscribe
+          post :unsubscribe_via_email
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
 
       context "when supplying an invalid email" do
 
-        it "should redirect" do
-          post :unsubscribe, email: "not@my.email"
-          expect(response).to redirect_to("#{base_url}")
+        it "should be successful" do
+          post :unsubscribe_via_email, email: "not@my.email"
+          expect(response).to have_http_status(:ok)
         end
       end
 
       context "when supplying a valid email" do
         let(:unsubscribe_user) do
-          post :unsubscribe, email: user.email
+          post :unsubscribe_via_email, email: user.email
         end
 
         it_behaves_like "it removes user email subscriptions"

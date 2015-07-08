@@ -1,19 +1,19 @@
 development:
   base: "http://localhost:2727"
   password_reset: "/#/reset-password"
-  unsubscribe: "/#/unsubscribed"
+  unsubscribe: "/#/unsubscribe"
 
 test:
   base: "http://localhost:2727"
   password_reset: "/#/reset-password"
-  unsubscribe: "/#/unsubscribed"
+  unsubscribe: "/#/unsubscribe"
 
 staging:
   base: "http://demo.zooniverse.org/panoptes-front-end"
   password_reset: "/#/reset-password"
-  unsubscribe: "/#/unsubscribed"
+  unsubscribe: "/#/unsubscribe"
 
 production:
   base: "https://panoptes.zooniverse.org"
   password_reset: "/#/reset-password"
-  unsubscribe: "/#/unsubscribed"
+  unsubscribe: "/#/unsubscribe"
