@@ -28,7 +28,7 @@ class Api::V1::ProjectPagesController < Api::ApiController
   end
 
   def set_language_from_header
-    params[:language] = current_languages.first
+    params[:language] = current_languages.join(',') # Due to hooking into RestPack Serializer
     params.delete :language if params[:language] == "all"
   end
 end
