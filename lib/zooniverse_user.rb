@@ -40,8 +40,8 @@ class ZooniverseUser < ActiveRecord::Base
   end
 
   def import
-    #use the indexed field
-    user = User.find_or_initialize_by login: User.sanitize_login(login)
+    user = User.find_by("lower(login) = '#{User.sanitize_login(login).downcase}'")
+    user ||= User.new(login: User.sanitize_login(login))
     return nil if user.disabled?
     setup_panoptes_user_account(user)
     user.save ? user : nil

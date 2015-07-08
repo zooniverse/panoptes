@@ -120,7 +120,7 @@ class User < ActiveRecord::Base
 
   def self.user_from_unsubscribe_token(signature)
     login = UserUnsubscribeMessageVerifier.verify(signature)
-    User.find_by(login: login)
+    User.find_by("lower(login) = '#{login.downcase}'")
   rescue ActiveSupport::MessageVerifier::InvalidSignature
     nil
   end
