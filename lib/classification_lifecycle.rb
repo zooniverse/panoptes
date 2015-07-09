@@ -13,16 +13,19 @@ class ClassificationLifecycle
       message = "Background process called before persisting the classification."
       raise ClassificationNotPersisted.new(message)
     end
-
     dequeue_subject
-    update_seen_subjects
     ClassificationWorker.perform_async(classification.id, action.to_s)
   end
 
   def transact!(&block)
     Classification.transaction do
-      mark_expert_classifier if subjects_are_unseen_by_user?
+      #NOTE: ensure the block is evaluated before updating the seen subjects
+      # as the count worker won't fire if the seens are set, see #should_count_towards_retirement 
       instance_eval(&block) if block_given?
+      if subjects_are_unseen_by_user?
+        mark_expert_classifier
+        update_seen_subjects
+      end
       publish_to_kafka
     end
   end
@@ -70,8 +73,11 @@ class ClassificationLifecycle
   end
 
   def should_count_towards_retirement?
-    return false if classification.seen_before?
-    classification.anonymous? || subjects_are_unseen_by_user?
+    if !classification.complete? || classification.seen_before?
+      false
+    else
+      classification.anonymous? || subjects_are_unseen_by_user?
+    end
   end
 
   private

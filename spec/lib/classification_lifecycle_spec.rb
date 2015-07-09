@@ -43,12 +43,6 @@ describe ClassificationLifecycle do
       end
     end
 
-    it "should call the #update_seen_subjects method" do
-      classification.save!
-      expect(subject).to receive(:update_seen_subjects).once
-      subject.queue(:create)
-    end
-
     it "should call the #dequeue_subject method" do
       classification.save!
       expect(subject).to receive(:dequeue_subject).once
@@ -72,14 +66,29 @@ describe ClassificationLifecycle do
       end
     end
 
-    context 'when classification is incomplete' do
+    context 'when classification is incomplete', sidekiq: :inline do
       before(:each) do
-        allow(classification).to receive(:persisted?).and_return(true)
-        allow(classification).to receive(:complete?).and_return(false)
+        classification.completed = false
+        classification.save
       end
 
       it 'should not queue the count worker' do
         expect(ClassificationCountWorker).to_not receive(:perform_async)
+        subject.queue(:create)
+      end
+    end
+
+    context 'when classification is complete', sidekiq: :inline do
+
+      it 'should queue the count worker' do
+        classification.save
+        times = case classification.subject_ids.size
+        when 1
+          :once
+        when 2
+          :twice
+        end
+        expect(ClassificationCountWorker).to receive(:perform_async).send(times)
         subject.queue(:create)
       end
     end
@@ -117,6 +126,13 @@ describe ClassificationLifecycle do
     end
 
     context "when the user has not already classified the subjects" do
+
+      before(:each) do
+        uss = instance_double("UserSeenSubject")
+        allow(uss).to receive(:subjects_seen?).and_return(false)
+        allow(UserSeenSubject).to receive(:find_by).and_return(uss)
+      end
+
       it "should wrap the calls in a transaction" do
         expect(Classification).to receive(:transaction)
       end
@@ -125,12 +141,20 @@ describe ClassificationLifecycle do
         expect(subject).to receive(:mark_expert_classifier).once
       end
 
+      it "should call the #update_seen_subjects method" do
+        expect(subject).to receive(:update_seen_subjects).once
+      end
+
       it "should call the instance_eval on the passed block" do
         expect(subject).to receive(:instance_eval).once
       end
 
       it "should call the #publish_to_kafka method" do
         expect(subject).to receive(:publish_to_kafka).once
+      end
+
+      it 'should count towards retirement' do
+        expect(subject.should_count_towards_retirement?).to be true
       end
     end
 
