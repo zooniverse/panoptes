@@ -15,8 +15,8 @@ namespace :migrate do
 
       null_login_users = User.where(login: nil)
       unless user_display_names.blank?
-        display_name_scope = User.where(display_name: user_display_names)
-        null_login_users = null_login_users.merge(display_name_scope)
+        display_name_scope = User.arel_table[:display_name].lower.in(user_display_names.map(&:downcase))
+        null_login_users = null_login_users.where(display_name_scope)
       end
 
       total = null_login_users.count
@@ -59,7 +59,9 @@ namespace :migrate do
     task reset_sign_in_count: :environment do
       user_logins = ENV['USERS'].try(:split, ",")
       query = User.where(migrated: true).where("sign_in_count > 1")
-      query = query.where(login: user_logins) if user_logins
+      if user_logins
+        query = query.where(User.arel_table[:login].lower.in(user_logins.map(&:downcase)))
+      end
       query.update_all(sign_in_count: 0)
     end
 
