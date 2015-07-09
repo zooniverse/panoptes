@@ -1,7 +1,11 @@
-shared_examples "is showable" do
+RSpec.shared_examples "is showable" do
+  let(:sps) do
+    defined?(show_params) ? show_params : {}
+  end
+
   before(:each) do
     default_request scopes: scopes, user_id: authorized_user.id
-    get :show, id: resource.id
+    get :show, sps.merge(id: resource.id)
   end
 
   it 'should return 200' do

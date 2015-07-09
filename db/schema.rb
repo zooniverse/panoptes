@@ -148,14 +148,18 @@ ActiveRecord::Schema.define(version: 20150706185722) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "introduction",         default: ""
-    t.text     "science_case",         default: ""
-    t.json     "team_members"
-    t.json     "guide"
-    t.text     "faq",                  default: ""
-    t.text     "result",               default: ""
-    t.text     "education_content",    default: ""
     t.jsonb    "url_labels",           default: {}
     t.text     "workflow_description", default: ""
+  end
+
+  create_table "project_pages", force: :cascade do |t|
+    t.string   "url_key"
+    t.text     "title"
+    t.string   "language",   index: {name: "index_project_pages_on_language"}
+    t.text     "content"
+    t.integer  "project_id", index: {name: "index_project_pages_on_project_id"}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "projects", force: :cascade do |t|

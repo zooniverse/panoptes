@@ -5,17 +5,24 @@ class ProjectSerializer
 
   attributes :id, :display_name, :classifications_count,
     :subjects_count, :created_at, :updated_at, :available_languages,
-    :title, :description, :guide, :team_members, :science_case,
-    :introduction, :private, :faq, :result, :education_content,
-    :retired_subjects_count, :configuration, :live,
-    :urls, :migrated, :classifiers_count, :slug, :redirect,
+    :title, :description, :introduction, :private, :retired_subjects_count,
+    :configuration, :live, :urls, :migrated, :classifiers_count, :slug, :redirect,
     :beta_requested, :beta_approved, :launch_requested, :launch_approved,
-    :href, :workflow_description
+    :href, :workflow_description, :primary_language
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
-    :project_roles
+    :project_roles, :pages
   can_filter_by :display_name, :slug, :beta_requested, :beta_approved, :launch_requested, :launch_approved
   media_include :avatar, :background, :attached_images, classifications_export: { include: false}
+
+  def self.links
+    links = super
+    links["projects.pages"] = {
+                               href: "/projects/{projects.id}/pages",
+                               type: "project_pages"
+                              }
+    links
+  end
 
   def title
     content[:title]
@@ -29,32 +36,8 @@ class ProjectSerializer
     content[:workflow_description]
   end
 
-  def guide
-    content[:guide]
-  end
-
-  def team_members
-    content[:team_members]
-  end
-
-  def science_case
-    content[:science_case]
-  end
-
   def introduction
     content[:introduction]
-  end
-
-  def education_content
-    content[:education_content]
-  end
-
-  def faq
-    content[:faq]
-  end
-
-  def result
-    content[:result]
   end
 
   def urls

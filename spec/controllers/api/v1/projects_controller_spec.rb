@@ -9,9 +9,9 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:api_resource_attributes) do
     ["id", "display_name", "classifications_count", "subjects_count",
      "updated_at", "created_at", "available_languages", "title",
-     "description", "team_members", "guide", "science_case", "introduction", "migrated",
-     "faq", "result", "education_content", "private", "live", "retired_subjects_count",
-     "urls", "classifiers_count", "redirect", "workflow_description" ]
+     "description", "introduction", "migrated","private", "live",
+     "retired_subjects_count", "urls", "classifiers_count", "redirect",
+     "workflow_description" ]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
@@ -295,9 +295,6 @@ describe Api::V1::ProjectsController, type: :controller do
         { projects: { display_name: display_name,
                      description: "A new Zoo for you!",
                      primary_language: 'en',
-                     education_content: "asdfasdf",
-                     faq: "some other stuff",
-                     result: "another string",
                      workflow_description: "some more text",
                      urls: [{label: "Twitter", url: "http://twitter.com/example"}],
                      configuration: {
@@ -482,9 +479,6 @@ describe Api::V1::ProjectsController, type: :controller do
        projects: {
                   display_name: "A Better Name",
                   name: "something_new",
-                  education_content: "asdfasdf",
-                  faq: "some other stuff",
-                  result: "another string",
                   workflow_description: "some more text",
                   configuration: {
                                   an_option: "a setting"
@@ -558,7 +552,7 @@ describe Api::V1::ProjectsController, type: :controller do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
         params = update_params
-        params[:projects][:science_case] = 'SC'
+        params[:projects][:description] = 'SC'
         params = params.merge(id: resource.id)
         put :update, params
       end
@@ -569,8 +563,8 @@ describe Api::V1::ProjectsController, type: :controller do
         expect(contents_title).to eq(test_attr_value)
       end
 
-      it 'should update the default contents when the science case changes' do
-        expect(json_response['projects'][0]['science_case']).to eq('SC')
+      it 'should update the default contents when the description changes' do
+        expect(json_response['projects'][0]['description']).to eq('SC')
       end
     end
 

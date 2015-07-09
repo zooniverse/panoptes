@@ -100,12 +100,12 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
         create(:access_control_list, user_group: u.identity_group, resource: project)
         u.id.to_s
       end
-      
+
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
         post :create, create_params
       end
-      
+
       it 'should return 400' do
         expect(response).to have_http_status(:bad_request)
       end
@@ -121,7 +121,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
         default_request user_id: authorized_user.id, scopes: scopes
         post :create, create_params
       end
-      
+
       it 'should return 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
@@ -134,7 +134,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
 
     context "when the user does not exist" do
       let(:user) { "-1" }
-      
+
       it_behaves_like "no user"
     end
 
