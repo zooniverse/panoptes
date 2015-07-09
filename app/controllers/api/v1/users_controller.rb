@@ -31,13 +31,13 @@ class Api::V1::UsersController < Api::ApiController
       case
       when user.global_email_communication_changed?
         if user.global_email_communication
-          SubscribeWorker.perform_async(user.email, user.display_name)
+          SubscribeWorker.perform_async(user.email)
         else
           UnsubscribeWorker.perform_async(user.email)
         end
       when user.email_changed?
         if user.global_email_communication
-          SubscribeWorker.perform_async(user.email, user.display_name)
+          SubscribeWorker.perform_async(user.email)
           UnsubscribeWorker.perform_async(user.changes[:email].first)
         end
       end

@@ -149,8 +149,7 @@ describe RegistrationsController, type: :controller do
       context "when email communications are true" do
         let(:extra_attributes) { { login: 'asdfasdfasdf', global_email_communication: true } }
         it 'should call subscribe worker' do
-          expect(SubscribeWorker).to receive(:perform_async)
-            .with(user_attributes[:email], user_attributes[:display_name])
+          expect(SubscribeWorker).to receive(:perform_async).with(user_attributes[:email])
           post :create, user: user_attributes
         end
       end
@@ -276,8 +275,7 @@ describe RegistrationsController, type: :controller do
       context "when email communications are true" do
         let(:extra_attributes) { { login: 'asdfasdf', global_email_communication: true } }
         it 'should call subscribe worker' do
-          expect(SubscribeWorker).to receive(:perform_async)
-            .with(user_attributes[:email], 'asdfasdf')
+          expect(SubscribeWorker).to receive(:perform_async).with(user_attributes[:email])
           post :create, user: user_attributes
         end
       end

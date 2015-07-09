@@ -365,8 +365,7 @@ describe Api::V1::UsersController, type: :controller do
 
       context 'when email preferences are true' do
         it 'should subscribe the new email' do
-          expect(SubscribeWorker).to receive(:perform_async).with("test@example.com",
-                                                                  user.display_name)
+          expect(SubscribeWorker).to receive(:perform_async).with("test@example.com")
         end
 
         it 'should remove the old email' do
@@ -396,8 +395,7 @@ describe Api::V1::UsersController, type: :controller do
         let(:put_operations) { {users: {global_email_communication: true}} }
 
         it 'should queue a subscribe worker' do
-          expect(SubscribeWorker).to receive(:perform_async).with(user.email,
-                                                                  user.display_name)
+          expect(SubscribeWorker).to receive(:perform_async).with(user.email)
         end
       end
 
