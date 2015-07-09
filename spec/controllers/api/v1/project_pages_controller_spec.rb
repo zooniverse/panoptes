@@ -71,7 +71,7 @@ describe Api::V1::ProjectPagesController, type: :controller do
         end
       end
 
-      describe "filter by language" do
+      describe "filter by language", :disabled do
         context "as a query param" do
           let(:filter_opts) { {language: "zh-tw"} }
 
