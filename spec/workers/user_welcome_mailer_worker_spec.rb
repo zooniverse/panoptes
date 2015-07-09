@@ -21,4 +21,12 @@ RSpec.describe UserWelcomeMailerWorker do
       expect{ subject.perform(nil, project.id) }.to_not change{ ActionMailer::Base.deliveries.count }
     end
   end
+
+  context "when an the user has been scrubbed of email address" do
+
+    it 'should not deliver the mail' do
+      UserInfoScrubber.scrub_personal_info!(user)
+      expect{ subject.perform(user.id) }.to_not change{ ActionMailer::Base.deliveries.count }
+    end
+  end
 end
