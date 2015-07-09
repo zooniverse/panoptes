@@ -42,7 +42,7 @@ class ZooniverseUser < ActiveRecord::Base
   def import
     user = User.find_by(zooniverse_id: id.to_s)
     user ||= User.new(login: User.sanitize_login(login))
-    return nil if user.disabled?
+    return nil if user.disabled? && user.migrated?
     setup_panoptes_user_account(user)
     user.save ? user : nil
   end
