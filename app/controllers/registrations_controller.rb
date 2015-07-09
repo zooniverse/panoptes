@@ -41,7 +41,7 @@ class RegistrationsController < Devise::RegistrationsController
     super(sign_up_params)
     resource.build_identity_group
     if resource.global_email_communication
-      SubscribeWorker.perform_async(resource.email, resource.display_name)
+      SubscribeWorker.perform_async(resource.email)
     end
   end
 
