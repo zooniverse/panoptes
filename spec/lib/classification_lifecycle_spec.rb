@@ -117,6 +117,13 @@ describe ClassificationLifecycle do
     end
 
     context "when the user has not already classified the subjects" do
+
+      before(:each) do
+        uss = instance_double("UserSeenSubject")
+        allow(uss).to receive(:subjects_seen?).and_return(false)
+        allow(UserSeenSubject).to receive(:find_by).and_return(uss)
+      end
+
       it "should wrap the calls in a transaction" do
         expect(Classification).to receive(:transaction)
       end
@@ -131,6 +138,10 @@ describe ClassificationLifecycle do
 
       it "should call the #publish_to_kafka method" do
         expect(subject).to receive(:publish_to_kafka).once
+      end
+
+      it 'should count towards retirement' do
+        expect(subject.should_count_towards_retirement?).to be true
       end
     end
 
