@@ -39,7 +39,7 @@ class UserSerializer
   end
 
   def max_subjects
-    Panoptes.max_subjects
+    @model.subject_limit
   end
 
   def uploaded_subjects_count

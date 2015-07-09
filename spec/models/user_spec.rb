@@ -694,4 +694,20 @@ describe User, type: :model do
       expect(user.api_key).to_not be_nil
     end
   end
+
+  describe '#subject_limit' do
+    context 'the user model has a null limit' do
+      it 'should return the Panotpes.max_subjects value' do
+        user = create(:user)
+        expect(user.subject_limit).to eq(Panoptes.max_subjects)
+      end
+    end
+
+    context 'the user model has a defined limit' do
+      it 'should return that limit' do
+        user = create(:user, subject_limit: 10)
+        expect(user.subject_limit).to eq(10)
+      end
+    end
+  end
 end

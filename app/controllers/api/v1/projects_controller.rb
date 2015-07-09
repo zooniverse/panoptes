@@ -1,10 +1,9 @@
-require 'subject_set_copier'
-
 class Api::V1::ProjectsController < Api::ApiController
   include FilterByOwner
   include FilterByCurrentUserRoles
   include TranslatableResource
   include IndexSearch
+  include AdminAllowed
 
   doorkeeper_for :update, :create, :destroy, :create_classifications_export,
     :create_subjects_export, scopes: [:project]
@@ -93,14 +92,14 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    admin_allowed(:beta_approved, :launch_approved, :redirect)
+    admin_allowed(create_params, :beta_approved, :launch_approved, :redirect)
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
     add_user_as_linked_owner(create_params)
     super(create_params)
   end
 
   def build_update_hash(update_params, id)
-    admin_allowed(:beta_approved, :launch_approved, :redirect)
+    admin_allowed(update_params, :beta_approved, :launch_approved, :redirect)
     content_update = content_from_params(update_params)
     unless content_update.blank?
       Project.find(id).primary_content.update!(content_update)
@@ -110,14 +109,6 @@ class Api::V1::ProjectsController < Api::ApiController
       update_params[:beta_approved] = false
     end
     super(update_params, id)
-  end
-
-  def admin_allowed(*parameters)
-    parameters.each do |param|
-      if create_params.has_key?(param) && !api_user.is_admin?
-        raise Api::UnpermittedParameter, "Only Admins may set field #{param} for projects"
-      end
-    end
   end
 
   def new_items(resource, relation, value)

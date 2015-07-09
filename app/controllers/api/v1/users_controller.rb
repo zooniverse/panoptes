@@ -1,6 +1,7 @@
 class Api::V1::UsersController < Api::ApiController
   include Recents
   include IndexSearch
+  include AdminAllowed
 
   doorkeeper_for :me, scopes: [:public]
   doorkeeper_for :update, :destroy, scopes: [:user]
@@ -9,8 +10,8 @@ class Api::V1::UsersController < Api::ApiController
   schema_type :strong_params
 
   allowed_params :update, :login, :display_name, :email, :credited_name,
-    :global_email_communication, :project_email_communication,
-    :beta_email_communication
+   :global_email_communication, :project_email_communication,
+   :beta_email_communication, :subject_limit
 
   alias_method :user, :controlled_resource
 
@@ -56,6 +57,11 @@ class Api::V1::UsersController < Api::ApiController
     revoke_doorkeeper_request_token!
     UnsubscribeWorker.perform_async(user.email)
     UserInfoScrubber.scrub_personal_info!(user)
+    super
+  end
+
+  def build_update_hash(update_params, id)
+    admin_allowed(update_params, :subject_limit)
     super
   end
 
