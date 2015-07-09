@@ -40,7 +40,7 @@ class ZooniverseUser < ActiveRecord::Base
   end
 
   def import
-    user = User.find_by("lower(login) = '#{User.sanitize_login(login).downcase}'")
+    user = User.find_by(zooniverse_id: id.to_s)
     user ||= User.new(login: User.sanitize_login(login))
     return nil if user.disabled?
     setup_panoptes_user_account(user)
