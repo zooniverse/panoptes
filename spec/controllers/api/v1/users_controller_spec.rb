@@ -356,6 +356,30 @@ describe Api::V1::UsersController, type: :controller do
       put :update, params
     end
 
+    describe "updated subject limit", :focus do
+      before(:each) do
+        update_request
+      end
+
+      context "when user is an admin" do
+        let(:put_operations) { {admin: true, users: {subject_limit: 10}} }
+        let(:user) { create(:user, admin: true) }
+
+        it 'should update users subject_limit' do
+          user.reload
+          expect(user.subject_limit).to eq(10)
+        end
+      end
+
+      context "when user is not an admin" do
+        let(:put_operations) { {users: {subject_limit: 10}} }
+
+        it 'should fail with a 422 error' do
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+    end
+
     context "when changing email" do
       let(:put_operations) { {users: {email: "test@example.com"}} }
 

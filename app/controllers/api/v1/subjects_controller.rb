@@ -23,8 +23,9 @@ class Api::V1::SubjectsController < Api::ApiController
   private
 
   def check_subject_limit
-    if Panoptes.max_subjects && !api_user.is_admin? && api_user.uploaded_subjects_count >= Panoptes.max_subjects
-      raise Api::LimitExceeded, "User has uploaded #{api_user.uploaded_subjects_count} subjects of #{Panoptes.max_subjects} maximum"
+    if api_user.above_subject_limit?
+      current, max = api_user.subject_limits
+      raise Api::LimitExceeded, "User has uploaded #{current} subjects of #{max} maximum"
     end
   end
 
