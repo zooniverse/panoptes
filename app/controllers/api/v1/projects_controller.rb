@@ -25,11 +25,16 @@ class Api::V1::ProjectsController < Api::ApiController
 
 
   before_action :add_owner_ids_to_filter_param!, only: :index
+  before_action :filter_by_tags, only: :index
   prepend_before_action :require_login,
     only: [:create, :update, :destroy, :create_classifications_export, :create_subjects_export]
 
   search_by do |name, query|
     query.search_display_name(name.join(" "))
+  end
+
+  search_by :tag do |name, query|
+    query.joins(:tags).merge(Tag.search_tags(name.first))
   end
 
   def create_classifications_export
@@ -51,6 +56,12 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   private
+
+  def filter_by_tags
+    if tags = params.delete(:tags).try(:split, ",")
+      @controlled_resources = controlled_resources.joins(:tags).where(tags: {name: tags})
+    end
+  end
 
   def create_or_update_medium(type, media_create_params)
     if medium = controlled_resource.send(type)

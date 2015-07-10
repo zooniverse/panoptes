@@ -1,9 +1,9 @@
 class Tag < ActiveRecord::Base
   include PgSearch
   has_many :tagged_resources
-  has_many :resources
+  has_many :resources, through: :tagged_resources
 
-  validates_presence_of :name
+  validates :name, uniqueness: { case_sensitive: false }, presence: true
 
   pg_search_scope :search_tags,
     against: :name,

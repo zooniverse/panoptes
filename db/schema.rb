@@ -258,11 +258,12 @@ ActiveRecord::Schema.define(version: 20150710184447) do
   end
 
   create_table "tags", force: :cascade do |t|
-    t.text     "name",                   null: false, index: {name: "tags_name_trgm_idx", using: :gin, operator_class: "gin_trgm_ops"}
+    t.text     "name",                   null: false, index: {name: "index_tags_on_name", unique: true}
     t.integer  "tagged_resources_count", default: 0
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+  add_index "tags", ["name"], name: "tags_name_trgm_idx", using: :gin, operator_class: "gin_trgm_ops"
 
   create_table "user_collection_preferences", force: :cascade do |t|
     t.jsonb    "preferences",   default: {}

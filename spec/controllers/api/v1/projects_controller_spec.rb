@@ -69,17 +69,62 @@ describe Api::V1::ProjectsController, type: :controller do
 
         it_behaves_like "filter by display_name"
 
+        describe "tag filters" do
+          let!(:tags) do
+            [create(:tag, name: "youreit", resource: new_project),
+             create(:tag, name: "youreout", resource: beta_resource)]
+          end
+
+          let(:tag) { tags.first }
+
+          describe "fuzzy filter by tag name" do
+            context "with full tag" do
+              let(:index_options) { { search: "tag:#{tag.name}" } }
+
+              it 'should return a project with the tag' do
+                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
+              end
+            end
+
+            context "partial tag" do
+              let(:index_options) { { search: "tag:#{tag.name[0..-4]}" } }
+
+              it 'should fuzzymatch' do
+                expect(json_response[api_resource_name].map{ |p| p["id"]}).to match_array([new_project.id.to_s, beta_resource.id.to_s])
+              end
+            end
+          end
+
+          describe "strict filter by tag" do
+            context "with full tag" do
+              let(:index_options) { { tags: tag.name } }
+
+              it 'should return a project with the tag' do
+                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
+              end
+            end
+
+            context "partial tag" do
+              let(:index_options) { { tags: tag.name[0..-4] } }
+
+              it 'should return nothing' do
+                expect(json_response[api_resource_name]).to be_empty
+              end
+            end
+          end
+        end
+
         describe "include avatar and background" do
           let(:index_options) { {include: 'avatar,background'} }
 
           it 'should include avatar' do
             expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
-              .to include(new_project.avatar.id.to_s)
+            .to include(new_project.avatar.id.to_s)
           end
 
           it 'should include background' do
             expect(json_response["linked"]["backgrounds"].map{ |r| r['id'] })
-              .to include(new_project.background.id.to_s)
+            .to include(new_project.background.id.to_s)
           end
         end
 
