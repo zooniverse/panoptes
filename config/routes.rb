@@ -28,8 +28,7 @@ Rails.application.routes.draw do
     put "/users" => "registrations#update"
   end
 
-  get "unsubscribe", to: "emails#unsubscribe_via_token"
-  post "unsubscribe", to: "emails#unsubscribe_via_email"
+  match "unsubscribe", to: "emails#unsubscribe", via: [ :get, :post ]
 
   namespace :api, constraints: { format: 'json' } do
     post "/events" => "events#create"
@@ -84,6 +83,8 @@ Rails.application.routes.draw do
       json_api_resources :collections, links: [:subjects]
 
       json_api_resources :subject_queues, links: [:set_member_subjects]
+
+      json_api_resources :tags, only: [:index, :show]
     end
   end
 

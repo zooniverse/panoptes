@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150709191011) do
+ActiveRecord::Schema.define(version: 20150710184447) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -251,6 +251,19 @@ ActiveRecord::Schema.define(version: 20150709191011) do
     t.string   "upload_user_id"
   end
 
+  create_table "tagged_resources", force: :cascade do |t|
+    t.integer "resource_id"
+    t.string  "resource_type", index: {name: "index_tagged_resources_on_resource_type_and_resource_id", with: ["resource_id"]}
+    t.integer "tag_id",        index: {name: "index_tagged_resources_on_tag_id"}
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.text     "name",                   null: false, index: {name: "tags_name_trgm_idx", using: :gin, operator_class: "gin_trgm_ops"}
+    t.integer  "tagged_resources_count", default: 0
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "user_collection_preferences", force: :cascade do |t|
     t.jsonb    "preferences",   default: {}
     t.integer  "user_id",       index: {name: "index_user_collection_preferences_on_user_id"}
@@ -368,4 +381,5 @@ ActiveRecord::Schema.define(version: 20150709191011) do
   add_foreign_key "subject_sets_workflows", "workflows"
   add_foreign_key "subject_workflow_counts", "set_member_subjects"
   add_foreign_key "subject_workflow_counts", "workflows"
+  add_foreign_key "tagged_resources", "tags"
 end
