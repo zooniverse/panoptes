@@ -356,7 +356,7 @@ describe Api::V1::UsersController, type: :controller do
       put :update, params
     end
 
-    describe "updated subject limit", :focus do
+    describe "updated subject limit" do
       before(:each) do
         update_request
       end

@@ -105,6 +105,7 @@ class Api::V1::ProjectsController < Api::ApiController
   def build_resource_for_create(create_params)
     admin_allowed(create_params, :beta_approved, :launch_approved, :redirect)
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
+    create_params[:tags] = create_or_update_tags(create_params)
     add_user_as_linked_owner(create_params)
     super(create_params)
   end
@@ -114,6 +115,12 @@ class Api::V1::ProjectsController < Api::ApiController
     content_update = content_from_params(update_params)
     unless content_update.blank?
       Project.find(id).primary_content.update!(content_update)
+    end
+    tags = create_or_update_tags(update_params)
+    unless tags.blank?
+      p = Project.find(id)
+      p.tags = tags
+      p.save!
     end
     if update_params[:live] == false
       update_params[:launch_approved] = false
@@ -141,6 +148,12 @@ class Api::V1::ProjectsController < Api::ApiController
         end
       end
     end
+  end
+
+  def create_or_update_tags(hash)
+    hash.delete(:tags).try(:map) do |tag|
+      Tag.find_or_initialize_by(name: tag)
+    end || []
   end
 
   def extract_url_labels(urls)

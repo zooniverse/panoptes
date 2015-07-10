@@ -1,7 +1,7 @@
 class Tag < ActiveRecord::Base
   include PgSearch
   has_many :tagged_resources
-  has_many :resources, through: :tagged_resources
+  has_many :projects, through: :tagged_resources, source: :resource, source_type: "Project"
 
   validates :name, uniqueness: { case_sensitive: false }, presence: true
 

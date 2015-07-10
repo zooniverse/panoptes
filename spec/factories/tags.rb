@@ -1,9 +1,10 @@
 FactoryGirl.define do
   factory :tag do
-    name "MyText"
     transient do
       resource nil
     end
+
+    sequence(:name) { |n| "tag-#{n}" }
 
     before(:create) do |t, env|
       if env.resource
