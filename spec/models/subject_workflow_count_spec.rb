@@ -15,6 +15,11 @@ RSpec.describe SubjectWorkflowCount, type: :model do
   end
 
   describe "#retire!" do
+    before do
+      count.workflow.project.update! live: true
+      count.workflow.update! subject_sets: [count.set_member_subject.subject_set]
+    end
+
     it 'should add the workflow the set_member_subjects retired list' do
       count.retire!
       count.reload

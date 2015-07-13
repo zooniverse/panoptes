@@ -11,6 +11,8 @@ RSpec.describe RetirementWorker do
     context "sms is retireable" do
       before(:each) do
         allow_any_instance_of(SubjectWorkflowCount).to receive(:retire?).and_return(true)
+        workflow.update! subject_sets: [sms.subject_set]
+        workflow.project.update! live: true
       end
 
       it 'should retire the subject for the workflow' do

@@ -9,12 +9,6 @@ class SubjectWorkflowCount < ActiveRecord::Base
   end
 
   def retire!
-    ActiveRecord::Base.transaction(requires_new: true) do
-      SetMemberSubject
-        .where(id: set_member_subject.id)
-        .update_all(["retired_workflow_ids = array_append(retired_workflow_ids, ?)", workflow.id])
-      Workflow.increment_counter(:retired_set_member_subjects_count, workflow.id)
-      yield if block_given?
-    end
+    SubjectRetirementWorker.new.perform(set_member_subject.subject_id, workflow_id)
   end
 end
