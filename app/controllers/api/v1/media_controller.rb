@@ -56,12 +56,13 @@ class Api::V1::MediaController < Api::ApiController
 
   def media
     return @media if @media
-    media = controlled_resource.send(media_name)
-    if media && association_numeration == :single
-      id = params[:id] ? params[:id] : media.id
-      media = media.class.where(id: id)
+    linked_media = controlled_resource.send(media_name)
+    @media = if linked_media && association_numeration == :single
+      id = params[:id] ? params[:id] : linked_media.id
+      linked_media.class.where(id: id)
+    else
+      linked_media
     end
-    @media = media
   end
 
   def error_unless_exists
