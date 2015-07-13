@@ -11,16 +11,18 @@ class SubjectsDumpWorker
       @medium_id = medium_id
       begin
         csv_formatter = Formatter::Csv::Subject.new(project)
-        CSV.open(temp_file_path, 'wb') do |csv|
+        CSV.open(csv_file_path, 'wb') do |csv|
           csv << Formatter::Csv::Subject.project_headers
           project_subjects.find_each do |subject|
             csv << csv_formatter.to_array(subject)
           end
         end
+        to_gzip
         write_to_s3
         send_email
       ensure
-        FileUtils.rm(temp_file_path)
+        FileUtils.rm(csv_file_path)
+        FileUtils.rm(gzip_file_path)
       end
     end
   end
