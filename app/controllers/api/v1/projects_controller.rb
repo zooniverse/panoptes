@@ -25,11 +25,16 @@ class Api::V1::ProjectsController < Api::ApiController
 
 
   before_action :add_owner_ids_to_filter_param!, only: :index
+  before_action :filter_by_tags, only: :index
   prepend_before_action :require_login,
     only: [:create, :update, :destroy, :create_classifications_export, :create_subjects_export]
 
   search_by do |name, query|
     query.search_display_name(name.join(" "))
+  end
+
+  search_by :tag do |name, query|
+    query.joins(:tags).merge(Tag.search_tags(name.first))
   end
 
   def create_classifications_export
@@ -51,6 +56,12 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   private
+
+  def filter_by_tags
+    if tags = params.delete(:tags).try(:split, ",")
+      @controlled_resources = controlled_resources.joins(:tags).where(tags: {name: tags})
+    end
+  end
 
   def create_or_update_medium(type, media_create_params)
     if medium = controlled_resource.send(type)
@@ -94,6 +105,7 @@ class Api::V1::ProjectsController < Api::ApiController
   def build_resource_for_create(create_params)
     admin_allowed(create_params, :beta_approved, :launch_approved, :redirect)
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
+    create_params[:tags] = create_or_update_tags(create_params)
     add_user_as_linked_owner(create_params)
     super(create_params)
   end
@@ -103,6 +115,12 @@ class Api::V1::ProjectsController < Api::ApiController
     content_update = content_from_params(update_params)
     unless content_update.blank?
       Project.find(id).primary_content.update!(content_update)
+    end
+    tags = create_or_update_tags(update_params)
+    unless tags.blank?
+      p = Project.find(id)
+      p.tags = tags
+      p.save!
     end
     if update_params[:live] == false
       update_params[:launch_approved] = false
@@ -130,6 +148,12 @@ class Api::V1::ProjectsController < Api::ApiController
         end
       end
     end
+  end
+
+  def create_or_update_tags(hash)
+    hash.delete(:tags).try(:map) do |tag|
+      Tag.find_or_initialize_by(name: tag)
+    end || []
   end
 
   def extract_url_labels(urls)

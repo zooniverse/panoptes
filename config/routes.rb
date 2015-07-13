@@ -84,6 +84,8 @@ Rails.application.routes.draw do
       json_api_resources :collections, links: [:subjects]
 
       json_api_resources :subject_queues, links: [:set_member_subjects]
+
+      json_api_resources :tags, only: [:index, :show]
     end
   end
 

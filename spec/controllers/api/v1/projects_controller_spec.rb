@@ -69,17 +69,62 @@ describe Api::V1::ProjectsController, type: :controller do
 
         it_behaves_like "filter by display_name"
 
+        describe "tag filters" do
+          let!(:tags) do
+            [create(:tag, name: "youreit", resource: new_project),
+             create(:tag, name: "youreout", resource: beta_resource)]
+          end
+
+          let(:tag) { tags.first }
+
+          describe "fuzzy filter by tag name" do
+            context "with full tag" do
+              let(:index_options) { { search: "tag:#{tag.name}" } }
+
+              it 'should return a project with the tag' do
+                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
+              end
+            end
+
+            context "partial tag" do
+              let(:index_options) { { search: "tag:#{tag.name[0..-4]}" } }
+
+              it 'should fuzzymatch' do
+                expect(json_response[api_resource_name].map{ |p| p["id"]}).to match_array([new_project.id.to_s, beta_resource.id.to_s])
+              end
+            end
+          end
+
+          describe "strict filter by tag" do
+            context "with full tag" do
+              let(:index_options) { { tags: tag.name } }
+
+              it 'should return a project with the tag' do
+                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
+              end
+            end
+
+            context "partial tag" do
+              let(:index_options) { { tags: tag.name[0..-4] } }
+
+              it 'should return nothing' do
+                expect(json_response[api_resource_name]).to be_empty
+              end
+            end
+          end
+        end
+
         describe "include avatar and background" do
           let(:index_options) { {include: 'avatar,background'} }
 
           it 'should include avatar' do
             expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
-              .to include(new_project.avatar.id.to_s)
+            .to include(new_project.avatar.id.to_s)
           end
 
           it 'should include background' do
             expect(json_response["linked"]["backgrounds"].map{ |r| r['id'] })
-              .to include(new_project.background.id.to_s)
+            .to include(new_project.background.id.to_s)
           end
         end
 
@@ -297,6 +342,7 @@ describe Api::V1::ProjectsController, type: :controller do
                      primary_language: 'en',
                      workflow_description: "some more text",
                      urls: [{label: "Twitter", url: "http://twitter.com/example"}],
+                     tags: ["astro", "gastro"],
                      configuration: {
                                      an_option: "a setting"
                                     },
@@ -387,6 +433,37 @@ describe Api::V1::ProjectsController, type: :controller do
           it 'should set the language' do
             expect(contents.language).to eq('en')
           end
+        end
+      end
+
+      describe "tags" do
+        let(:tags) { Tag.where(name: ["astro", "gastro"]) }
+
+        def tag_request
+          default_request scopes: scopes, user_id: authorized_user.id
+          post :create, create_params
+        end
+
+        context "when the tags did not exist" do
+          it 'should create tag models for the project tags' do
+            tag_request
+            expect(tags.pluck(:tagged_resources_count)).to all( eq(1) )
+          end
+        end
+
+        context "when the tags did exist" do
+          it 'should reuse existing tags' do
+            create(:tag, name: "astro")
+            create(:tag, name: "gastro")
+            tag_request
+            expect(tags.pluck(:tagged_resources_count)).to all( eq(2) )
+          end
+        end
+
+        it 'should associate the tags with the project' do
+          tag_request
+          resource_id = json_response[api_resource_name][0]["id"].to_i
+          expect(tags.flat_map{ |t| t.projects.pluck(:id) }).to all( eq(resource_id) )
         end
       end
 
@@ -485,6 +562,7 @@ describe Api::V1::ProjectsController, type: :controller do
                                  },
                   beta_requested: true,
                   live: true,
+                  tags: ["astro", "gastro"],
                   links: {
                           workflows: [workflow.id.to_s],
                           subject_sets: [subject_set.id.to_s]
@@ -495,6 +573,26 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     it_behaves_like "is updatable"
+
+    describe "update tags" do
+      def tag_update
+        default_request scopes: scopes, user_id: authorized_user.id
+        put :update, update_params.merge(id: resource.id)
+      end
+
+      it 'should remove all previous tags' do
+        create(:tag, name: "GONE", resource: resource)
+        tag_update
+        resource.reload
+        expect(resource.tags.pluck(:name)).to_not include("GONE")
+      end
+
+      it 'should update with new tags' do
+        tag_update
+        resource.reload
+        expect(resource.tags.pluck(:name)).to include("astro", "gastro")
+      end
+    end
 
     describe "approved option" do
       before(:each) do

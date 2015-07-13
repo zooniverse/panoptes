@@ -29,6 +29,8 @@ class Project < ActiveRecord::Base
   has_many :attached_images, -> { where(type: "project_attached_image") }, class_name: "Medium",
     as: :linked
   has_many :pages, class_name: "ProjectPage"
+  has_many :tagged_resources, as: :resource
+  has_many :tags, through: :tagged_resources
 
   cache_by_association :project_contents
   cache_by_resource_method :subjects_count, :retired_subjects_count, :finished?

@@ -71,60 +71,11 @@ class ProjectCreateSchema < JsonSchema
       type "string"
     end
 
-    property "result" do
-      type "string"
-    end
-
-    property "faq" do
-      type "string"
-    end
-
-    property "education_content" do
-      type "string"
-    end
-
-    property "guide" do
-      type "array"
-      items  do
-        type "object"
-        required "image", "explanation"
-
-        property "image" do
-          type "string"
-        end
-
-        property "explanation" do
-          type "string"
-        end
-      end
-    end
-
-    property "team_members" do
+    property "tags" do
       type "array"
       items do
-        type "object"
-        required "name"
-
-        property "name" do
-          type "string"
-        end
-
-        property "bio" do
-          type "string"
-        end
-
-        property "twitter" do
-          type "string"
-        end
-
-        property "institution" do
-          type "string"
-        end
+        type "string"
       end
-    end
-
-    property "science_case" do
-      type "string"
     end
 
     property "introduction" do
