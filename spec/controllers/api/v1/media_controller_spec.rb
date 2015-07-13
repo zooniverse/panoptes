@@ -102,8 +102,8 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         before(:each) do
           stub_token(scopes: scopes, user_id: authorized_user.id)
           set_preconditions
-          delete :destroy, :id => resource.id, :"#{parent_name}_id" => parent.id,
-            :media_name => media_type
+          params = { :id => resource.id, :"#{parent_name}_id" => parent.id, :media_name => media_type }
+          delete :destroy, params
         end
 
         it "should return 204" do
@@ -223,52 +223,12 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       end
     end
 
-    if actions.include? :show
-      describe "#show" do
-        context "when #{media_type} exists" do
-          before(:each) do
-            default_request user_id: authorized_user.id, scopes: scopes
-            get :show, :"#{parent_name}_id" => parent.id, :media_name => media_type,
-              :id => resource.id
-          end
-
-          it 'should return ok' do
-            expect(response).to have_http_status(:ok)
-          end
-
-          it 'should include 1 item' do
-            expect(json_response["media"].length).to eq(1)
-          end
-
-          it_behaves_like "an api response"
-        end
-
-        context "when #{media_type} does not exist" do
-          let(:media_id) {(Medium.last.id + 100)}
-          before(:each) do
-            default_request user_id: authorized_user.id, scopes: scopes
-            get :show, :"#{parent_name}_id" => parent.id, :media_name => media_type,
-              :id => media_id
-          end
-
-          it 'should return 404' do
-            expect(response).to have_http_status(:not_found)
-          end
-
-          it 'should return an error message' do
-            msg = json_response['errors'][0]['message']
-            expect(msg).to match(/No #{media_type} ##{media_id} exists for #{parent_name} ##{parent.id}/)
-          end
-        end
-      end
-    end
-
     if actions.include? :destroy
       describe "#destroy" do
         before(:each) do
           stub_token(scopes: scopes, user_id: authorized_user.id)
           set_preconditions
-          delete :destroy, :"#{parent_name}_id" => parent.id, :media_name => media_type
+          delete :destroy, :"#{parent_name}_id" => parent.id, media_name: media_type
         end
 
         it "should return 204" do
@@ -285,11 +245,11 @@ RSpec.describe Api::V1::MediaController, type: :controller do
   describe "parent is a project" do
     let(:parent) { create(:project, owner: authorized_user) }
 
-    it_behaves_like "has_one media", :project, :avatar, %i(create index show destroy), "image/jpeg"
-    it_behaves_like "has_one media", :project, :background, %i(create index show destroy), "image/jpeg"
+    it_behaves_like "has_one media",  :project, :avatar, %i(create index destroy), "image/jpeg"
+    it_behaves_like "has_one media",  :project, :background, %i(create index destroy), "image/jpeg"
     it_behaves_like "has_many media", :project, :attached_images, %i(index create show destroy), 'image/jpeg'
-    it_behaves_like "has_one media", :project, :classifications_export, %i(index), 'text/csv'
-    it_behaves_like "has_one media", :project, :subjects_export, %i(index), 'text/csv'
+    it_behaves_like "has_one media",  :project, :classifications_export, %i(index), 'text/csv'
+    it_behaves_like "has_one media",  :project, :subjects_export, %i(index), 'text/csv'
 
     describe "classifications_exports #index" do
       let!(:resources) do
@@ -310,7 +270,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
     end
   end
 
-  describe "parent is a user", :focus do
+  describe "parent is a user" do
     let(:parent) { authorized_user }
 
     it_behaves_like "has_one media", :user, :avatar, %i(create index destroy), "image/jpeg"

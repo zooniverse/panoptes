@@ -32,15 +32,14 @@ module JsonApiRoutes
     exceptions = opts.delete(:except) || []
     opts[:constraints] = {media_name: /(#{ name })/ }
     get "/:media_name", to: "media#index", **opts unless exceptions.include?(:index)
+    post "/:media_name", to: "media#create", **opts unless exceptions.include?(:create)
     if name.to_s.pluralize == name.to_s
       # Create links for has_many media relations
       get "/:media_name/:id", to: "media#show", **opts unless exceptions.include?(:show)
-      post "/:media_name", to: "media#create_collection", **opts unless exceptions.include?(:create)
-      delete "/:media_name/:id", to: "media#destroy_collection", **opts unless exceptions.include?(:destroy)
+      delete "/:media_name/:id", to: "media#destroy", **opts unless exceptions.include?(:destroy)
     else
       # Create links for has_one media relations
-      post "/:media_name", to: "media#create", **opts unless exceptions.include?(:create)
-      delete "/:media_name/", to: "media#destroy", **opts unless exceptions.include?(:destroy)
+      delete "/:media_name", to: "media#destroy", **opts unless exceptions.include?(:destroy)
     end
   end
 

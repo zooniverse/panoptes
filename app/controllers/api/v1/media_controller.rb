@@ -2,7 +2,7 @@ class Api::V1::MediaController < Api::ApiController
   doorkeeper_for :update, :create, :destroy, scopes: [:medium]
   resource_actions :default
 
-  before_action :create_conditions, only: [ :create, :create_collection ]
+  before_action :create_conditions, only: :create
 
   schema_type :json_schema
 
@@ -27,26 +27,23 @@ class Api::V1::MediaController < Api::ApiController
 
   def destroy
     error_unless_exists
-    @controlled_resources = media
-    super
-  end
-
-  def destroy_collection
-    error_unless_exists
-    set_controlled_resources
+    if association_numeration == :collection
+      set_controlled_resources
+    else
+      @controlled_resources = media
+    end
     super
   end
 
   def create
-    if old_resource = controlled_resource.send(media_name)
-      old_resource.destroy
+    created = if association_numeration == :collection
+      controlled_resource.send(media_name).create!(create_params)
+    else
+      if old_resource = controlled_resource.send(media_name)
+        old_resource.destroy
+      end
+      controlled_resource.send("create_#{media_name}!", create_params)
     end
-    created = controlled_resource.send("create_#{media_name}!", create_params)
-    created_resource_response(created)
-  end
-
-  def create_collection
-    created = controlled_resource.send(media_name).create!(create_params)
     created_resource_response(created)
   end
 
