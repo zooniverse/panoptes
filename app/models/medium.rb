@@ -11,7 +11,7 @@ class Medium < ActiveRecord::Base
   attr_writer :allow_any_content_type
 
   ALLOWED_UPLOAD_CONTENT_TYPES = %w(image/jpeg image/png image/gif)
-  ALLOWED_EXPORT_CONTENT_TYPES  = %w(text/csv)
+  ALLOWED_EXPORT_CONTENT_TYPES  = %w(application/x-gzip)
 
   validate do |medium|
     if !allow_any_content_type && !allowed_content_types.include?(medium.content_type)
