@@ -26,4 +26,12 @@ RSpec.describe Tag, type: :model do
       expect(Project.joins(:tags).merge(described_class.search_tags("tag")).count).to eq(2)
     end
   end
+
+  describe "#downcase_name" do
+    it 'should downcase the name before saving' do
+      tag = build(:tag, name: "ASDF")
+      tag.save!
+      expect(tag.name).to eq('asdf')
+    end
+  end
 end

@@ -5,6 +5,8 @@ class Tag < ActiveRecord::Base
 
   validates :name, uniqueness: { case_sensitive: false }, presence: true
 
+  before_validation :downcase_name
+
   pg_search_scope :search_tags,
     against: :name,
     using: :trigram,
@@ -12,5 +14,9 @@ class Tag < ActiveRecord::Base
 
   def self.scope_for(*args)
     all
+  end
+
+  def downcase_name
+    self.name = name.try(:downcase)
   end
 end
