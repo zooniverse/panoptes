@@ -364,11 +364,22 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "when the user is an admin" do
+        before(:each) do
+          allow_any_instance_of(ApiUser).to receive(:is_admin?).and_return(true)
+        end
 
         it 'should return the created status' do
-          allow_any_instance_of(ApiUser).to receive(:is_admin?).and_return(true)
           upload_subjects
           expect(response).to have_http_status(:created)
+        end
+
+        context "when uploading restricted content_types" do
+
+          it 'should return the created status' do
+            create_params.deep_merge!({ subjects: { locations: [ "video/mp4" ] } })
+            upload_subjects
+            expect(response).to have_http_status(:created)
+          end
         end
       end
     end
