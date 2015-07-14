@@ -31,13 +31,15 @@ module JsonApiRoutes
   def media_resource(name, opts={})
     exceptions = opts.delete(:except) || []
     opts[:constraints] = {media_name: /(#{ name })/ }
-    # Create links for has_one media relations
     get "/:media_name", to: "media#index", **opts unless exceptions.include?(:index)
     post "/:media_name", to: "media#create", **opts unless exceptions.include?(:create)
-    # Create links for has_many media relations
     if name.to_s.pluralize == name.to_s
+      # Create links for has_many media relations
       get "/:media_name/:id", to: "media#show", **opts unless exceptions.include?(:show)
       delete "/:media_name/:id", to: "media#destroy", **opts unless exceptions.include?(:destroy)
+    else
+      # Create links for has_one media relations
+      delete "/:media_name", to: "media#destroy", **opts unless exceptions.include?(:destroy)
     end
   end
 

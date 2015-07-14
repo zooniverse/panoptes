@@ -102,8 +102,8 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         before(:each) do
           stub_token(scopes: scopes, user_id: authorized_user.id)
           set_preconditions
-          delete :destroy, :id => resource.id, :"#{parent_name}_id" => parent.id,
-            :media_name => media_type
+          params = { :id => resource.id, :"#{parent_name}_id" => parent.id, :media_name => media_type }
+          delete :destroy, params
         end
 
         it "should return 204" do
@@ -222,16 +222,34 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         end
       end
     end
+
+    if actions.include? :destroy
+      describe "#destroy" do
+        before(:each) do
+          stub_token(scopes: scopes, user_id: authorized_user.id)
+          set_preconditions
+          delete :destroy, :"#{parent_name}_id" => parent.id, media_name: media_type
+        end
+
+        it "should return 204" do
+          expect(response).to have_http_status(:no_content)
+        end
+
+        it "should delete the resource" do
+          expect{resource_class.find(resource.id)}.to raise_error(ActiveRecord::RecordNotFound)
+        end
+      end
+    end
   end
 
   describe "parent is a project" do
     let(:parent) { create(:project, owner: authorized_user) }
 
-    it_behaves_like "has_one media", :project, :avatar, %i(create index), "image/jpeg"
-    it_behaves_like "has_one media", :project, :background, %i(create index), "image/jpeg"
+    it_behaves_like "has_one media",  :project, :avatar, %i(create index destroy), "image/jpeg"
+    it_behaves_like "has_one media",  :project, :background, %i(create index destroy), "image/jpeg"
     it_behaves_like "has_many media", :project, :attached_images, %i(index create show destroy), 'image/jpeg'
-    it_behaves_like "has_one media", :project, :classifications_export, %i(index), 'text/csv'
-    it_behaves_like "has_one media", :project, :subjects_export, %i(index), 'text/csv'
+    it_behaves_like "has_one media",  :project, :classifications_export, %i(index), 'text/csv'
+    it_behaves_like "has_one media",  :project, :subjects_export, %i(index), 'text/csv'
 
     describe "classifications_exports #index" do
       let!(:resources) do
@@ -255,7 +273,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
   describe "parent is a user" do
     let(:parent) { authorized_user }
 
-    it_behaves_like "has_one media", :user, :avatar, %i(create index), "image/jpeg"
-    it_behaves_like "has_one media", :user, :profile_header, %i(create index), "image/jpeg"
+    it_behaves_like "has_one media", :user, :avatar, %i(create index destroy), "image/jpeg"
+    it_behaves_like "has_one media", :user, :profile_header, %i(create index destroy), "image/jpeg"
   end
 end
