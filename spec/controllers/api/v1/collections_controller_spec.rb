@@ -53,6 +53,7 @@ describe Api::V1::CollectionsController, type: :controller do
   describe '#update' do
     let(:subjects) { create_list(:subject, 4) }
     let(:resource) { collection }
+    let(:resource_id) { :collection_id }
     let(:test_attr) { :display_name }
     let(:test_attr_value) { "Tested Collection" }
     let(:test_relation) { :subjects }
@@ -69,9 +70,28 @@ describe Api::V1::CollectionsController, type: :controller do
       }
     end
 
-
     it_behaves_like "is updatable"
     it_behaves_like "has updatable links"
+    it_behaves_like "supports update_links"
+
+    context "when the subject is already in a collection" do
+      let!(:test_relation_ids) { Array.wrap(collection.subjects.first.id) }
+
+      it "should return a useful error message" do
+        default_request scopes: scopes, user_id: authorized_user.id
+        params = {
+          link_relation: test_relation.to_s,
+          test_relation => test_relation_ids,
+          resource_id => resource.id
+        }
+        post :update_links, params
+        aggregate_failures "dup link ids" do
+          expect(response).to have_http_status(:bad_request)
+          error_body = "Validation failed: Subject is already in the collection"
+          expect(response.body).to eq(json_error_message(error_body))
+        end
+      end
+    end
   end
 
   describe '#create' do
