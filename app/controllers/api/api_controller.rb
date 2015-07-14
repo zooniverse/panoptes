@@ -34,7 +34,8 @@ module Api
       JsonApiController::BadLinkParams,
       Api::NoUserError,
       Api::UnpermittedParameter,
-      RestPack::Serializer::InvalidInclude, with: :unprocessable_entity
+      RestPack::Serializer::InvalidInclude,
+      ActiveRecord::RecordNotUnique, with: :unprocessable_entity
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]

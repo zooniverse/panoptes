@@ -76,20 +76,33 @@ describe Api::V1::CollectionsController, type: :controller do
 
     context "when the subject is already in a collection" do
       let!(:test_relation_ids) { Array.wrap(collection.subjects.first.id) }
-
-      it "should return a useful error message" do
-        default_request scopes: scopes, user_id: authorized_user.id
-        params = {
+      let(:params) do
+        {
           link_relation: test_relation.to_s,
           test_relation => test_relation_ids,
           resource_id => resource.id
         }
+      end
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it "should return a useful error message" do
         post :update_links, params
         aggregate_failures "dup link ids" do
           expect(response).to have_http_status(:bad_request)
           error_body = "Validation failed: Subject is already in the collection"
           expect(response.body).to eq(json_error_message(error_body))
         end
+      end
+
+      it "should handle duplicate index violations gracefully" do
+        msg = "ERROR: duplicate key value violates unique constraint"
+        error = ActiveRecord::RecordNotUnique.new(msg, PG::UniqueViolation)
+        allow(subject).to receive(:add_relation).and_raise(error)
+        post :update_links, params
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end
