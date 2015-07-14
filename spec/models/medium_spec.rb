@@ -13,14 +13,29 @@ RSpec.describe Medium, :type => :model do
     expect(m.external_link).to be false
   end
 
-  it 'should not be valid without a valid content_type' do
-    m = build(:medium, content_type: "video/mp4")
-    expect(m).to_not be_valid
-  end
+  describe "#content_type" do
 
-  it 'should be valid with a valid content_type' do
-    m = build(:medium, content_type: "image/png")
-    expect(m).to be_valid
+    it 'should not be valid without a valid content_type' do
+      m = build(:medium, content_type: "video/mp4")
+      expect(m).to_not be_valid
+    end
+
+    it 'should be valid with a valid content_type' do
+      m = build(:medium, content_type: "image/png")
+      expect(m).to be_valid
+    end
+
+    context "with the allow_any_content_type flag set" do
+
+      it 'should be valid with both content_types' do
+        aggregate_failures "content types" do
+          %w(image/png video/mp4).each do |content_type|
+            m = build(:medium, allow_any_content_type: true, content_type: content_type)
+            expect(m).to be_valid
+          end
+        end
+      end
+    end
   end
 
   context "when the src field is blank" do
@@ -133,14 +148,6 @@ RSpec.describe Medium, :type => :model do
     end
   end
 
-  describe "#queue_medium_removal" do
-    it 'should queue a worker to remove the attached files' do
-      medium = create(:medium)
-      expect(MediumRemovalWorker).to receive(:perform_async).with(medium.src)
-      medium.queue_medium_removal
-    end
-  end
-
   describe "#locations" do
     let(:project) { create(:project) }
     context "when type is one of project_avatar, user_avatar, or project_background" do
@@ -155,6 +162,18 @@ RSpec.describe Medium, :type => :model do
         medium = create(:medium, type: "project_attached_image", linked: project)
         expect(medium.location).to match(/\/projects\/[0-9]+\/attached_images\/[0-9]+/)
       end
+    end
+  end
+
+  describe "before destroy callbacks" do
+
+    it 'should queue a worker to remove the attached files' do
+      medium = create(:medium)
+      aggregate_failures do
+        expect(medium).to receive(:queue_medium_removal).and_call_original
+        expect(MediumRemovalWorker).to receive(:perform_async).with(medium.src)
+      end
+      medium.destroy
     end
   end
 end
