@@ -57,9 +57,12 @@ module MediaStorage
     end
 
     def put_file(path, file_path, opts={})
-      object(path).write(file: file_path,
-                         content_type: opts[:content_type],
-                         acl: opts[:private] ? 'private' : 'public-read')
+      upload_options = {
+                        file: file_path,
+                        content_type: opts[:content_type],
+                        acl: opts[:private] ? 'private' : 'public-read'
+                       }
+      object(path).write(**upload_options)
     end
 
     def delete_file(path)

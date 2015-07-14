@@ -11,16 +11,18 @@ class ClassificationsDumpWorker
       @medium_id = medium_id
       begin
         csv_formatter = Formatter::Csv::Classification.new(project, obfuscate_private_details: obfuscate_private_details)
-        CSV.open(temp_file_path, 'wb') do |csv|
+        CSV.open(csv_file_path, 'wb') do |csv|
           csv << Formatter::Csv::Classification.project_headers
           completed_project_classifications.find_each do |classification|
             csv << csv_formatter.to_array(classification)
           end
         end
+        to_gzip
         write_to_s3
         send_email
       ensure
-        FileUtils.rm(temp_file_path)
+        FileUtils.rm(csv_file_path)
+        FileUtils.rm(gzip_file_path)
       end
     end
   end

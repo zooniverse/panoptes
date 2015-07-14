@@ -49,14 +49,14 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     end
 
     it "should clean up the file after sending to s3" do
-      expect(FileUtils).to receive(:rm).with(temp_file_path).and_call_original
+      expect(FileUtils).to receive(:rm).twice.and_call_original
       worker.perform(project.id)
     end
 
     it "should queue a worker to send an email" do
       expect(mailer_class).to receive(:perform_async).with(project.id,
-                                                                             anything,
-                                                                             [project.owner.email])
+                                                           anything,
+                                                           [project.owner.email])
       worker.perform(project.id)
     end
   end
@@ -67,7 +67,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
       create(:medium,
              metadata: { "recipients" => receivers.map(&:id) },
              linked: project,
-             content_type: "text/csv",
+             content_type: "application/x-gzip",
              type: dump_type)
     end
 

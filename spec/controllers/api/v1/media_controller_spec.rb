@@ -248,12 +248,12 @@ RSpec.describe Api::V1::MediaController, type: :controller do
     it_behaves_like "has_one media",  :project, :avatar, %i(create index destroy), "image/jpeg"
     it_behaves_like "has_one media",  :project, :background, %i(create index destroy), "image/jpeg"
     it_behaves_like "has_many media", :project, :attached_images, %i(index create show destroy), 'image/jpeg'
-    it_behaves_like "has_one media",  :project, :classifications_export, %i(index), 'text/csv'
-    it_behaves_like "has_one media",  :project, :subjects_export, %i(index), 'text/csv'
+    it_behaves_like "has_one media", :project, :classifications_export, %i(index), 'application/x-gzip'
+    it_behaves_like "has_one media", :project, :subjects_export, %i(index), 'application/x-gzip'
 
     describe "classifications_exports #index" do
       let!(:resources) do
-        create_list :medium, 2, linked: parent, content_type: "text/csv",
+        create_list :medium, 2, linked: parent, content_type: "application/x-gzip",
           type: "project_classifications_export"
       end
 

@@ -14,7 +14,15 @@ module DumpWorker
   end
 
   def temp_file_path
+    "#{Rails.root}/tmp/#{project_file_path.join("_")}"
+  end
+
+  def csv_file_path
     "#{Rails.root}/tmp/#{project_file_path.join("_")}.csv"
+  end
+
+  def gzip_file_path
+    "#{Rails.root}/tmp/#{project_file_path.join("_")}.gz"
   end
 
   def project_file_path
@@ -27,7 +35,7 @@ module DumpWorker
   end
 
   def create_medium
-    Medium.create!(content_type: "text/csv",
+    Medium.create!(content_type: "application/x-gzip",
                    type: dump_type,
                    path_opts: project_file_path,
                    linked: project,
@@ -36,12 +44,12 @@ module DumpWorker
 
   def load_medium
     m = Medium.find(@medium_id)
-    m.update!(path_opts: project_file_path, private: true)
+    m.update!(path_opts: project_file_path, private: true, content_type: "application/x-gzip")
     m
   end
 
   def write_to_s3
-    medium.put_file(temp_file_path)
+    medium.put_file(gzip_file_path)
   end
 
   def emails
@@ -54,5 +62,14 @@ module DumpWorker
 
   def send_email
     mailer.perform_async(@project.id, medium.get_url, emails)
+  end
+
+  def to_gzip
+    Zlib::GzipWriter.open(gzip_file_path) do |gz|
+      gz.mtime = File.mtime(csv_file_path)
+      gz.orig_name = File.basename(csv_file_path)
+      gz.write IO.binread(csv_file_path)
+      gz.close
+    end
   end
 end
