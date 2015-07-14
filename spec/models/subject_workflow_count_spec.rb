@@ -15,19 +15,9 @@ RSpec.describe SubjectWorkflowCount, type: :model do
   end
 
   describe "#retire!" do
-    before do
-      count.workflow.project.update! live: true
-      count.workflow.update! subject_sets: [count.set_member_subject.subject_set]
-    end
-
-    it 'should add the workflow the set_member_subjects retired list' do
+    it 'should retire the subject for the workflow' do
+      expect_any_instance_of(SubjectLifecycle).to receive(:retire_for).with(count.workflow)
       count.retire!
-      count.reload
-      expect(count.set_member_subject.retired_workflows).to include(count.workflow)
-    end
-
-    it 'should increment the workflow retired subjects counter' do
-      expect{count.retire!}.to change{Workflow.find(count.workflow).retired_set_member_subjects_count}.from(0).to(1)
     end
   end
 

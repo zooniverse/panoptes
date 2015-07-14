@@ -9,6 +9,6 @@ class SubjectWorkflowCount < ActiveRecord::Base
   end
 
   def retire!
-    SubjectRetirementWorker.new.perform(set_member_subject.subject_id, workflow_id)
+    SubjectLifecycle.new(set_member_subject.subject).retire_for(workflow)
   end
 end
