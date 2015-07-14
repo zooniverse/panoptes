@@ -103,6 +103,15 @@ module Api
       end
     end
 
+    def context
+      case action_name
+      when "show", "index"
+        { languages: current_languages }
+      else
+        { }
+      end
+    end
+
     private
 
     # Turn on paper trail for all API controllers

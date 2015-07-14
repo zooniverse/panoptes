@@ -22,6 +22,21 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     let(:n_visible) { 2 }
 
     it_behaves_like "is indexable"
+
+    describe "include projects" do
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        get :index, include: "project"
+      end
+
+      it 'should be able to include linked projects' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'should return the projects as links' do
+        expect(json_response['linked']['projects']).to_not be_empty
+      end
+    end
   end
 
   describe "#show" do

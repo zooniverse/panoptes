@@ -58,9 +58,13 @@ class ProjectSerializer
     @model.tags.map(&:name)
   end
 
+  def fields
+    %i(title description workflow_description introduction url_labels)
+  end
+
   def _content
     content = @model.content_for(@context[:languages])
-    content = @context[:fields].map{ |k| Hash[k, content.send(k)] }.reduce(&:merge)
+    content = fields.map{ |k| Hash[k, content.send(k)] }.reduce(&:merge)
     content.default_proc = proc { |hash, key| "" }
     content
   end
