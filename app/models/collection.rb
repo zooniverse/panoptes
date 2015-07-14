@@ -12,6 +12,8 @@ class Collection < ActiveRecord::Base
   has_many :collections_subjects, dependent: :destroy
   has_many :subjects, through: :collections_subjects
   has_many :collection_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
+
+  validates :display_name, presence: true
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
