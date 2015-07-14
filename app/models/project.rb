@@ -43,7 +43,7 @@ class Project < ActiveRecord::Base
   validates_with UniqueForOwnerValidator
 
   can_by_role :destroy, :update, :update_links, :destroy_links, :create_classifications_export,
-    :create_subjects_export, roles: [ :owner, :collaborator ]
+    :create_subjects_export, :retire_subject, roles: [ :owner, :collaborator ]
 
   can_by_role :show, :index, :versions, :version, public: true,
     roles: [ :owner, :collaborator, :tester, :translator, :scientist, :moderator ]
