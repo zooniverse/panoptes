@@ -6,7 +6,7 @@ class ClassificationsDumpWorker
 
   attr_reader :project
 
-  def perform(project_id, medium_id=nil, obfuscate_private_details=false)
+  def perform(project_id, medium_id=nil, obfuscate_private_details=true)
     if @project = Project.find(project_id)
       @medium_id = medium_id
       begin
