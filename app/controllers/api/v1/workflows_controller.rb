@@ -2,7 +2,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   include Versioned
   include TranslatableResource
 
-  doorkeeper_for :update, :create, :destroy, scopes: [:project]
+  doorkeeper_for :update, :create, :destroy, :retire_subject, scopes: [:project]
   before_action  :reject_live_project_changes, only: [ :create ]
 
   resource_actions :default
@@ -27,6 +27,11 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def destroy_links
     super { |workflow| refresh_queue(workflow) }
+  end
+
+  def retire_subject
+    SubjectRetirementWorker.perform_async(params[:subject_id], params[:id])
+    head :ok
   end
 
   private

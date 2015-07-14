@@ -277,6 +277,27 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
   end
 
+  describe '#retire_subject' do
+    let(:subject_id) { "1" }
+    let(:workflow_id) { "2" }
+
+    context "with authorized user" do
+      it 'should call the subject retirement worker' do
+        expect(SubjectRetirementWorker).to receive(:perform_async).with(subject_id, workflow_id)
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :retire_subject, subject_id: subject_id, id: workflow_id
+      end
+    end
+
+    context "without authorized user" do
+      it 'should not call the subject retirement worker' do
+        expect(SubjectRetirementWorker).to_not receive(:perform_async).with(subject_id, workflow_id)
+        default_request scopes: scopes, user_id: create(:user).id
+        post :retire_subject, subject_id: subject_id, id: workflow_id
+      end
+    end
+  end
+
   describe "versioning" do
     let(:resource) { workflow }
     let!(:existing_versions) { resource.versions.length }
