@@ -11,7 +11,7 @@ describe Api::V1::ProjectsController, type: :controller do
      "updated_at", "created_at", "available_languages", "title",
      "description", "introduction", "migrated","private", "live",
      "retired_subjects_count", "urls", "classifiers_count", "redirect",
-     "workflow_description" ]
+     "workflow_description", "tags" ]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
@@ -98,6 +98,14 @@ describe Api::V1::ProjectsController, type: :controller do
           describe "strict filter by tag" do
             context "with full tag" do
               let(:index_options) { { tags: tag.name } }
+
+              it 'should return a project with the tag' do
+                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
+              end
+            end
+
+            context "case insensitive" do
+              let(:index_options) { { tags: tag.name.upcase } }
 
               it 'should return a project with the tag' do
                 expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)

@@ -18,7 +18,7 @@ describe Project, :type => :model do
   it_behaves_like "has subject_count"
   it_behaves_like "activatable"
   it_behaves_like "is translatable"
-  it_behaves_like "has an extended cache key", [:project_contents],
+  it_behaves_like "has an extended cache key", [:project_contents, :tags],
     [:subjects_count, :retired_subjects_count, :finished?]
 
   it "should have a valid factory" do

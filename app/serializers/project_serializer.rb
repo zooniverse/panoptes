@@ -8,7 +8,7 @@ class ProjectSerializer
     :title, :description, :introduction, :private, :retired_subjects_count,
     :configuration, :live, :urls, :migrated, :classifiers_count, :slug, :redirect,
     :beta_requested, :beta_approved, :launch_requested, :launch_approved,
-    :href, :workflow_description, :primary_language
+    :href, :workflow_description, :primary_language, :tags
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles, :pages
@@ -52,6 +52,10 @@ class ProjectSerializer
 
   def content
     @content ||= _content
+  end
+
+  def tags
+    @model.tags.map(&:name)
   end
 
   def _content

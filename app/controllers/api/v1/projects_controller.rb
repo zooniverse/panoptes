@@ -37,6 +37,11 @@ class Api::V1::ProjectsController < Api::ApiController
     query.joins(:tags).merge(Tag.search_tags(name.first))
   end
 
+  def index
+    @controlled_resources = controlled_resources.eager_load(:tags)
+    super
+  end
+
   def create_classifications_export
     media_params[:metadata] ||= { recipients: [api_user.id] }
     medium = create_or_update_medium(:classifications_export, media_params)
@@ -58,7 +63,7 @@ class Api::V1::ProjectsController < Api::ApiController
   private
 
   def filter_by_tags
-    if tags = params.delete(:tags).try(:split, ",")
+    if tags = params.delete(:tags).try(:split, ",").try(:map, &:downcase)
       @controlled_resources = controlled_resources.joins(:tags).where(tags: {name: tags})
     end
   end
@@ -152,7 +157,8 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def create_or_update_tags(hash)
     hash.delete(:tags).try(:map) do |tag|
-      Tag.find_or_initialize_by(name: tag)
+      name = tag.downcase
+      Tag.find_or_initialize_by(name: name)
     end || []
   end
 
