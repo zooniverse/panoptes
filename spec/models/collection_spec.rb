@@ -17,6 +17,15 @@ describe Collection, :type => :model do
     expect(build(:collection)).to be_valid
   end
 
+  it "should not be valid without a display_name" do
+    aggregate_failures "display_name validation" do
+      collection = build(:collection, display_name: nil)
+      expect(collection).to be_invalid
+      collection.valid?
+      expect(collection.errors[:display_name]).to include("can't be blank")
+    end
+  end
+
   it 'should require unique displays name for an owner' do
     owner = create(:user)
     expect(create(:collection, display_name: "hi fives", owner: owner)).to be_valid
