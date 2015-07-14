@@ -8,11 +8,13 @@ class Medium < ActiveRecord::Base
 
   before_destroy :queue_medium_removal
 
+  attr_writer :allow_any_content_type
+
   ALLOWED_UPLOAD_CONTENT_TYPES = %w(image/jpeg image/png image/gif)
   ALLOWED_EXPORT_CONTENT_TYPES  = %w(text/csv)
 
   validate do |medium|
-    unless allowed_content_types.include?(medium.content_type)
+    if !allow_any_content_type && !allowed_content_types.include?(medium.content_type)
       medium.errors.add(:content_type, "Content-Type must be one of #{allowed_content_types.join(", ")}")
     end
   end
@@ -73,6 +75,12 @@ class Medium < ActiveRecord::Base
       raise MissingPutFilePath.new("Must specify a file_path to store")
     end
     MediaStorage.put_file(src, file_path, indifferent_attributes)
+  end
+
+  private
+
+  def allow_any_content_type
+    @allow_any_content_type || false
   end
 
   def allowed_content_types
