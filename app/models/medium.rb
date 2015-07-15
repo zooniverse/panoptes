@@ -70,11 +70,11 @@ class Medium < ActiveRecord::Base
     end
   end
 
-  def put_file(file_path)
+  def put_file(file_path, opts={})
     if file_path.blank?
       raise MissingPutFilePath.new("Must specify a file_path to store")
     end
-    MediaStorage.put_file(src, file_path, indifferent_attributes)
+    MediaStorage.put_file(src, file_path, indifferent_attributes.merge(opts))
   end
 
   private

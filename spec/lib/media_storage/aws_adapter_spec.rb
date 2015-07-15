@@ -103,6 +103,16 @@ RSpec.describe MediaStorage::AwsAdapter do
         adapter.put_file("src", file_path, content_type: content_type, private: false)
       end
     end
+
+    context "when opts[:compressed] is true" do
+      it 'should call write wtih the content_encoding set to gzip' do
+        expect(obj_double).to receive(:write).with(file: file_path,
+                                                   content_type: content_type,
+                                                   acl: 'public-read',
+                                                   content_encoding: 'gzip')
+        adapter.put_file("src", file_path, content_type: content_type, private: false, compressed: true)
+      end
+    end
   end
 
   context "when missing an s3 object path" do
