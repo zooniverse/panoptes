@@ -7,7 +7,7 @@ describe Api::V1::CollectionsController, type: :controller do
   let(:project) { collection.project }
   let(:api_resource_name) { 'collections' }
 
-  let(:api_resource_attributes) { %w(id name display_name created_at updated_at favorite) }
+  let(:api_resource_attributes) { %w(id name display_name created_at updated_at favorite private) }
   let(:api_resource_links) { %w(collections.project collections.owner collections.collection_roles collections.subjects) }
 
   let(:scopes) { %w(public collection) }
