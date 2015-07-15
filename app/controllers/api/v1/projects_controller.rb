@@ -167,13 +167,4 @@ class Api::V1::ProjectsController < Api::ApiController
     visitor.visit(urls)
     [urls, visitor.collector]
   end
-
-  def context
-    case action_name
-    when "show", "index"
-      { languages: current_languages, fields: CONTENT_FIELDS }
-    else
-      { fields: CONTENT_FIELDS }
-    end
-  end
 end
