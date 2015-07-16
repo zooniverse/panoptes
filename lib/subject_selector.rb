@@ -58,7 +58,10 @@ class SubjectSelector
   end
 
   def default_page_size
-    params[:page_size] ||= 10
+    page_size = params[:page_size]
+    default = page_size ? page_size.to_i : 10
+    params.merge!(page_size: default)
+    params[:page_size]
   end
 
   def retrieve_subject_queue
