@@ -14,11 +14,27 @@ RSpec.describe ProjectContent, :type => :model do
     expect(build(:project_content, :description => nil )).to_not be_valid
   end
 
+  it 'should restrict the maximum length of desciption' do
+    expect(build(:project_content, description: '0' * 301)).to_not be_valid
+  end
+
+  it 'should restrict the maximum length of workflow_desciption' do
+    expect(build(:project_content, workflow_description: '0' * 501)).to_not be_valid
+  end
+
+  it 'should restrict the maximum length of title' do
+    expect(build(:project_content, title: '0' * 256)).to_not be_valid
+  end
+
+  it 'should restrict the maximum length of introduction' do
+    expect(build(:project_content, introduction: '0' * 1501)).to_not be_valid
+  end
+
   describe "versioning" do
     subject do
       create(:project_content)
     end
-    
+
     it { is_expected.to be_versioned }
 
     it 'should track changes to description', versioning: true do
