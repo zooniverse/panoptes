@@ -38,6 +38,18 @@ RSpec.describe SubjectSelector do
       end
     end
 
+    context "when the params page size is set as a string" do
+      let(:size) { 2 }
+      subject do
+        described_class.new(user, workflow, {page_size: "#{size}"}, Subject.all)
+      end
+
+      it 'should return the page_size number of subjects' do
+        subjects, _ = subject.queued_subjects
+        expect(subjects.length).to eq(size)
+      end
+    end
+
     context "queue is empty" do
       let!(:non_logged_in_queue) do
         create(:subject_queue,
@@ -52,15 +64,6 @@ RSpec.describe SubjectSelector do
       it 'should return 5 subjects' do
         subjects, _ = subject.queued_subjects
         expect(subjects.length).to eq(5)
-      end
-
-      context "when the params page size is set as a string" do
-        subject { described_class.new(user, workflow, {page_size: "2"}, Subject.all)}
-
-        it 'should return the page_size number of subjects' do
-          subjects, _ = subject.queued_subjects
-          expect(subjects.length).to eq(5)
-        end
       end
     end
 
