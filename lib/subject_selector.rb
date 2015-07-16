@@ -17,7 +17,7 @@ class SubjectSelector
     queue, context = retrieve_subject_queue
 
     if queue
-      subjects = queue.next_subjects(default_page_size)
+      subjects = queue.next_subjects(subjects_page_size)
       if subjects.blank?
         selected_subjects(select_from_database, context)
       else
@@ -57,8 +57,10 @@ class SubjectSelector
     MissingSubjectSet.new("no subject set is associated with this workflow")
   end
 
-  def default_page_size
-    params[:page_size] ||= 10
+  def subjects_page_size
+    page_size = params[:page_size] ? params[:page_size].to_i : 10
+    params.merge!(page_size: page_size)
+    page_size
   end
 
   def retrieve_subject_queue
