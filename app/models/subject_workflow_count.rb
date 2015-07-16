@@ -21,6 +21,7 @@ class SubjectWorkflowCount < ActiveRecord::Base
     retired_at.present?
   end
 
+  # TODO: Remove this method after retirements have been migrated
   def perform_legacy_retirement
     SetMemberSubject
       .where(id: set_member_subject.id)
