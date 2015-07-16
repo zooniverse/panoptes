@@ -13,10 +13,10 @@ class SetMemberSubjectSelector
     else
       SetMemberSubject.select(SELECT_FIELDS)
         .joins(subject_set: {workflows: :user_seen_subjects})
-        .joins(:subject_workflow_counts)
+        .joins("LEFT OUTER JOIN subject_workflow_counts ON subject_workflow_counts.set_member_subject_id = set_member_subjects.id")
         .where(user_seen_subjects: {user_id: user.id},
-               workflows: {id: workflow.id},
-               subject_workflow_counts: {workflow_id: workflow.id, retired_at: nil})
+               workflows: {id: workflow.id})
+        .where(never_seen_before_or_not_retired)
         .where.not('? = ANY("set_member_subjects"."retired_workflow_ids")', workflow.id) # TODO: Remove this line after retirements have been migrated
         .where.not('"set_member_subjects"."subject_id" = ANY("user_seen_subjects"."subject_ids")')
     end
@@ -33,5 +33,14 @@ class SetMemberSubjectSelector
 
   def user_has_not_seen_workflow_subjects?
     !user.user_seen_subjects.where(workflow: workflow).exists?
+  end
+
+  def never_seen_before_or_not_retired
+    table = SubjectWorkflowCount.arel_table
+
+    never_seen_before = table[:workflow_id].eq(nil)
+    not_retired = table[:workflow_id].eq(workflow.id).and(table[:retired_at].eq(nil))
+
+    never_seen_before.or(not_retired)
   end
 end
