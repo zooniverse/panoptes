@@ -15,6 +15,12 @@ RSpec.describe SubjectWorkflowCount, type: :model do
   end
 
   describe "#retire!" do
+    it 'marks the record as retired' do
+      count.retire!
+      count.reload
+      expect(count.retired?).to be_truthy
+    end
+
     it 'should add the workflow the set_member_subjects retired list' do
       count.retire!
       count.reload
