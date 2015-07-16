@@ -101,10 +101,6 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def next_subjects(limit=10)
-    if user_id
-      set_member_subject_ids[0..limit-1]
-    else
-      set_member_subject_ids.sample(limit)
-    end
+    set_member_subject_ids.sample(limit)
   end
 end
