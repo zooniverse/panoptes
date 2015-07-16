@@ -10,7 +10,12 @@ module JsonApiController
     def resource_actions(*actions)
       @actions = actions
       if actions.first == :default
-        @actions = [:show, :index, :create, :update, :destroy]
+        default_actions = [:show, :index, :create, :update, :destroy]
+        if actions.length > 1
+          actions.shift
+          default_actions = default_actions | actions
+        end
+        @actions = default_actions
       end
 
       @actions.each do |action|

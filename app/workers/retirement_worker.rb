@@ -6,9 +6,7 @@ class RetirementWorker
   def perform(count_id)
     count = SubjectWorkflowCount.find(count_id)
     if count.retire?
-      count.retire! do
-        SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject.id)
-      end
+      count.retire!
     end
   end
 end
