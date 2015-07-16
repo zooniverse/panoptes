@@ -346,7 +346,7 @@ RSpec.describe SubjectQueue, :type => :model do
       end
 
       it 'should return the first subjects in the queue' do
-        expect(ues.next_subjects).to match_array(ues.set_member_subject_ids[0..9])
+        expect(ues.next_subjects).to_not match_array(ues.set_member_subject_ids[0..9])
       end
     end
 
