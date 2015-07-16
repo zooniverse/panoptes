@@ -7,8 +7,6 @@ describe SetMemberSubjectSelector do
   before do
     count.workflow.subject_sets = [count.set_member_subject.subject_set]
     count.workflow.save!
-
-    SetMemberSubjectSelector
   end
 
   context 'when there is a user and they have participated before' do
