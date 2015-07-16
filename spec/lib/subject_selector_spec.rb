@@ -55,7 +55,6 @@ RSpec.describe SubjectSelector do
       end
 
       context "when the params page size is set as a string" do
-
         subject { described_class.new(user, workflow, {page_size: "2"}, Subject.all)}
 
         it 'should return the page_size number of subjects' do
