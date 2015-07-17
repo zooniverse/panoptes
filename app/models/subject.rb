@@ -25,10 +25,13 @@ class Subject < ActiveRecord::Base
   end
 
   def retired_for_workflow?(workflow)
+    retired = false
     if workflow && workflow.is_a?(Workflow) && workflow.persisted?
-      set_member_subjects.first.retired_workflow_ids.include?(workflow.id)
-    else
-      false
+      sms = workflow.set_member_subjects.where(subject_id: self.id).first
+      if sms && swc = SubjectWorkflowCount.find_by(workflow_id: workflow.id, set_member_subject_id: sms.id)
+        retired = swc.retired?
+      end
     end
+    retired
   end
 end

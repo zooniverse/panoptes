@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe SubjectWorkflowCount, type: :model do
   let(:count) { create(:subject_workflow_count) }
-  it 'should have a balid factory' do
+  it 'should have a valid factory' do
     expect(build(:subject_workflow_count)).to be_valid
   end
 
@@ -12,6 +12,18 @@ RSpec.describe SubjectWorkflowCount, type: :model do
 
   it 'should not be valid without a workflow' do
     expect(build(:subject_workflow_count, workflow: nil)).to_not be_valid
+  end
+
+  context "when there is a duplicate set_member_subject_id workflow_id entry" do
+    let(:duplicate) { count.dup }
+
+    it 'should not allow duplicates' do
+      expect(duplicate).to_not be_valid
+    end
+
+    it "should raise a uniq index db error" do
+      expect{duplicate.save(validate: false)}.to raise_error(ActiveRecord::RecordNotUnique)
+    end
   end
 
   describe "#retire!" do

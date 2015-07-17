@@ -215,9 +215,8 @@ describe Api::V1::SubjectsController, type: :controller do
                    retired_set_member_subjects_count: 100)
           end
 
-          let!(:sms) do
+          let!(:smses) do
             create_list(:set_member_subject, 2,
-                        retired_workflows: [workflow],
                         subject_set: subject_set)
           end
 
@@ -229,6 +228,7 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           before(:each) do
+            allow_any_instance_of(Subject).to receive(:retired_for_workflow?).and_return(true)
             get :index, request_params
           end
 
@@ -237,7 +237,7 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(already_seen).to include(true)
           end
 
-          it 'should return retired as false' do
+          it 'should return all subjects as retired' do
             retired = json_response["subjects"].map{ |s| s['retired']}
             expect(retired).to all( be true )
           end
