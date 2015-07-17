@@ -42,7 +42,7 @@ module Formatter
         {}.tap do |subjects_and_metadata|
           subjects = ::Subject.where(id: classification.subject_ids)
           subjects.each do |subject|
-            retired_data = { retired: subject.retired_for_workflow?(workflow.id) }
+            retired_data = { retired: subject.retired_for_workflow?(workflow) }
             subjects_and_metadata[subject.id] = subject.metadata.merge(retired_data)
           end
         end.to_json

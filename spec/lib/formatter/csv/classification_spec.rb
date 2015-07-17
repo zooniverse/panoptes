@@ -7,14 +7,13 @@ RSpec.describe Formatter::Csv::Classification do
         created_at gold_standard expert metadata annotations subject_data )
   end
 
+  let(:subject) { Subject.find(classification.subject_ids.first) }
+
   let(:subject_data) do
-    {
-     "1" => {
-       loudness: 11, brightness: -20, distance_from_earth: "42 light years",
-       retired: false
-      }
-    }.to_json
+    { "#{subject.id}" => subject.metadata.merge(retired: false) }
   end
+
+  let(:subject_json_data) { subject_data.to_json }
 
   let(:ip_hash) do
     Digest::SHA1.hexdigest("#{classification.user_ip}#{expected_time}")
@@ -31,7 +30,7 @@ RSpec.describe Formatter::Csv::Classification do
       classification.expert_classifier,
       classification.metadata.to_json,
       classification.annotations.map {|ann| Formatter::Csv::AnnotationForCsv.new(classification, ann).to_h }.to_json,
-      subject_data
+      subject_json_data
     ]
   end
 
@@ -49,12 +48,21 @@ RSpec.describe Formatter::Csv::Classification do
     let!(:expected_time) { Time.now.to_i }
 
     before(:each) do
-      allow(formatter).to receive(:subject_data).and_return(subject_data)
+      allow_any_instance_of(Classification).to receive(:subject_ids).and_return([classification.subject_ids.first])
       allow(formatter).to receive(:salt).and_return(expected_time)
     end
 
     it 'return an array formatted classifcation data' do
       expect(formatter.to_array(classification)).to match_array(formatted_data)
+    end
+
+    context "when the subject has been retired for that workflow" do
+
+      it 'return an array formatted classifcation data' do
+        allow_any_instance_of(SetMemberSubject).to receive(:retired_workflow_ids).and_return([classification.workflow_id])
+        subject_data.deep_merge!("#{subject.id}" => { retired: true })
+        expect(formatter.to_array(classification)).to match_array(formatted_data)
+      end
     end
 
     context "when the obfuscate_private_details flag is false" do
