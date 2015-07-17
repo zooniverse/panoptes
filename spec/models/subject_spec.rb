@@ -95,17 +95,15 @@ describe Subject, :type => :model do
   end
 
   describe "#retired_for_workflow?" do
-    let(:workflow_id) { 5 }
-    let(:workflow) { build(:workflow_with_subject_sets) }
-    let!(:subject) { create(:subject_with_subject_sets) }
-
-    before(:each) do
-      allow(workflow).to receive(:persisted?).and_return(true)
-      allow(workflow).to receive(:id).and_return(workflow_id)
-      allow_any_instance_of(SubjectSet).to receive(:workflows).and_return([workflow])
+    let(:workflow) { create(:workflow) }
+    let(:project) { workflow.project }
+    let(:subject_set) { create(:subject_set, project: project, workflows: [workflow]) }
+    let(:subject) { create(:subject, project: project) }
+    let!(:set_member_subject) do
+      create(:set_member_subject, subject_set: subject_set, subject: subject)
     end
 
-    it "should be false without a workflow" do
+    it "should be false when there is no associated SubjectWorkflowCount" do
       expect(subject.retired_for_workflow?(workflow)).to eq(false)
     end
 
@@ -113,18 +111,45 @@ describe Subject, :type => :model do
       expect(subject.retired_for_workflow?(Workflow.new)).to eq(false)
     end
 
-    it "should be false when passing in any other type of instace with and id" do
+    it "should be false when passing in any other type of instance" do
       expect(subject.retired_for_workflow?(SubjectSet.new)).to eq(false)
     end
 
-    it "should be true when the retired_workflow_ids match" do
-      allow_any_instance_of(SetMemberSubject).to receive(:retired_workflow_ids)
-        .and_return([workflow.id])
-      expect(subject.retired_for_workflow?(workflow)).to eq(true)
+    context "with a SubjectWorkflowCount" do
+      let(:swc) { instance_double("SubjectWorkflowCount") }
+      before(:each) do
+        allow(SubjectWorkflowCount).to receive(:find_by).and_return(swc)
+      end
+
+      it "should be true when the swc is retired" do
+        allow(swc).to receive(:retired?).and_return(true)
+        expect(subject.retired_for_workflow?(workflow)).to eq(true)
+      end
+
+      it "should be false when the sec is not retired" do
+        allow(swc).to receive(:retired?).and_return(false)
+        expect(subject.retired_for_workflow?(workflow)).to eq(false)
+      end
     end
 
-    it "should be false without any matching retired_workflow_ids" do
-      expect(subject.retired_for_workflow?(workflow)).to eq(false)
+    context "when the subject belongs to multiple workflows" do
+      let!(:another_workflow) { create(:workflow, project: project) }
+      let(:another_subject_set) do
+        create(:subject_set, project: project, workflows: [another_workflow])
+      end
+      let!(:another_set_member_subject) do
+        create(:set_member_subject, subject_set: another_subject_set, subject: subject)
+      end
+
+      it "should be retired when it looks up the correct set_member_subject" do
+        create(:subject_workflow_count, workflow: workflow, set_member_subject: subject.set_member_subjects.first, retired_at: DateTime.now)
+        expect(subject.retired_for_workflow?(workflow)).to eq(true)
+      end
+
+      it "should not be retired when it looks up the incorrect set_member_subject" do
+        create(:subject_workflow_count, workflow: workflow, set_member_subject: another_subject_set.set_member_subjects.last, retired_at: DateTime.now)
+        expect(subject.retired_for_workflow?(workflow)).to eq(false)
+      end
     end
   end
 end
