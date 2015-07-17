@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150716161318) do
+ActiveRecord::Schema.define(version: 20150717123631) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -241,6 +241,7 @@ ActiveRecord::Schema.define(version: 20150716161318) do
     t.datetime "updated_at",            null: false
     t.datetime "retired_at"
   end
+  add_index "subject_workflow_counts", ["set_member_subject_id", "workflow_id"], name: "index_subject_workflow_counts_on_sms_id_and_workflow_id", unique: true
 
   create_table "subjects", force: :cascade do |t|
     t.string   "zooniverse_id",  index: {name: "index_subjects_on_zooniverse_id", unique: true}

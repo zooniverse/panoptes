@@ -3,6 +3,7 @@ class SubjectWorkflowCount < ActiveRecord::Base
   belongs_to :workflow
 
   validates_presence_of :set_member_subject, :workflow
+  validates_uniqueness_of :set_member_subject_id, scope: :workflow_id
 
   def retire?
     workflow.retirement_scheme.retire?(self)
