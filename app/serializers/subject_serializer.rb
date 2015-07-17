@@ -19,7 +19,6 @@ class SubjectSerializer
 
   def retired
     @model.retired_for_workflow?(workflow)
-
   end
 
   def already_seen

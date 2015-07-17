@@ -7,7 +7,7 @@ RSpec.describe Formatter::Csv::Subject do
   let(:sms) { create(:set_member_subject, subject_set: subject_set) }
   let!(:swc) do
     create :subject_workflow_count, classifications_count: 10, workflow: workflow,
-      set_member_subject: sms
+      set_member_subject: sms, retired_at: DateTime.now
   end
 
   let(:fields) do
@@ -17,7 +17,7 @@ RSpec.describe Formatter::Csv::Subject do
      subject_set.id,
      sms.subject.metadata.to_json,
      {workflow.id => 10}.to_json,
-     [].to_json]
+     [workflow.id].to_json]
   end
 
   let(:header) do
