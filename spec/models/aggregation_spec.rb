@@ -50,6 +50,10 @@ RSpec.describe Aggregation, :type => :model do
       duplicate.valid?
       expect(duplicate.errors[:subject_id]).to include("has already been taken")
     end
+
+    it "should raise a uniq index db error" do
+      expect{duplicate.save(validate: false)}.to raise_error(ActiveRecord::RecordNotUnique)
+    end
   end
 
   describe '::scope_for' do
