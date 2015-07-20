@@ -48,7 +48,7 @@ class Project < ActiveRecord::Base
   can_by_role :show, :index, :versions, :version, public: true,
     roles: [ :owner, :collaborator, :tester, :translator, :scientist, :moderator ]
 
-  can_by_role :translate, roles: [ :owner, :translator ]
+  can_by_role :translate, roles: [ :owner, :translator, :collaborator ]
 
   can_be_linked :subject_set, :scope_for, :update, :user
   can_be_linked :subject, :scope_for, :update, :user
