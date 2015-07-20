@@ -61,7 +61,6 @@ class SetMemberSubject < ActiveRecord::Base
 
   def timestamp_newly_retired_workflows
     retired_subject_workflow_counts.each do |record|
-      # Make sure that any subject workflow count added
       record.retired_at ||= Time.now
       record.save if record.persisted? and record.changed?
     end
