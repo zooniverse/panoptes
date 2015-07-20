@@ -1,5 +1,33 @@
 require 'spec_helper'
 
+shared_examples "cleans up the linked set member subjects" do
+
+  it 'should remove the linked set_member_subjects' do
+    delete_resources
+    expect(SetMemberSubject.where(id: linked_sms_ids)).to be_empty
+  end
+
+  it 'should destroy all subject workflow counts' do
+    swc = create(:subject_workflow_count,
+                 set_member_subject: sms.first,
+                 workflow: subject_set.workflows.first)
+    delete_resources
+    expect(SubjectWorkflowCount.exists?(swc.id)).to be false
+  end
+
+  it 'should queue a removal workfer' do
+    expect(QueueRemovalWorker).to receive(:perform_async).with(sms.map(&:id),
+                                                               subject_set.workflows.pluck(:id))
+    delete_resources
+  end
+
+  it 'should queue a count reset worker' do
+    expect(CountResetWorker).to receive(:perform_async).with(subject_set.id)
+    delete_resources
+  end
+
+end
+
 describe Api::V1::SubjectSetsController, type: :controller do
   let!(:subject_sets) { create_list :subject_set_with_subjects, 2 }
   let(:subject_set) { subject_sets.first }
@@ -202,41 +230,36 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
   describe '#destroy' do
     let(:resource) { subject_set }
+    let(:sms) { resource.set_member_subjects }
+    let(:delete_resources) do
+      delete :destroy, id: subject_set.id
+    end
+    let(:linked_sms_ids) { sms.map(&:id) }
+    let(:linked_subject_sets_workflows_ids) { resource.subject_sets_workflows.map(&:id) }
 
     it_behaves_like "is destructable"
+    it_behaves_like "cleans up the linked set member subjects"
+
+    it "should remove the linked subject_sets_workflow" do
+      aggregate_failures "subject_sets_workflows" do
+        expect(linked_subject_sets_workflows_ids.count).to be > 0
+        delete_resources
+        expect(SubjectSetsWorkflow.where(id: linked_subject_sets_workflows_ids)).to be_empty
+      end
+    end
   end
 
   describe '#destroy_links' do
     context "removing subjects" do
       let(:sms) { subject_set.set_member_subjects }
-      it 'should remove the subjects from the set' do
-        delete :destroy_links, subject_set_id: subject_set.id, link_relation: :subjects,
-          link_ids: subject_set.subjects.pluck(:id).join(',')
-        subject_set.reload
-        expect(subject_set.subjects).to be_empty
-      end
+      let(:linked_sms_ids) { sms.map(&:id) }
 
-      it 'should destroy all subject workflow counts' do
-        swc = create(:subject_workflow_count,
-                     set_member_subject: sms.first,
-                     workflow: subject_set.workflows.first)
-        delete :destroy_links, subject_set_id: subject_set.id, link_relation: :subjects,
-          link_ids: subject_set.subjects.pluck(:id).join(',')
-        expect(SubjectWorkflowCount.exists?(swc.id)).to be false
-      end
-
-      it 'should queue a removal workfer' do
-        expect(QueueRemovalWorker).to receive(:perform_async).with(sms.map(&:id),
-                                                                   subject_set.workflows.pluck(:id))
+      let(:delete_resources) do
         delete :destroy_links, subject_set_id: subject_set.id, link_relation: :subjects,
           link_ids: subject_set.subjects.pluck(:id).join(',')
       end
 
-      it 'should queue a count reset worker' do
-        expect(CountResetWorker).to receive(:perform_async).with(subject_set.id)
-        delete :destroy_links, subject_set_id: subject_set.id, link_relation: :subjects,
-          link_ids: subject_set.subjects.pluck(:id).join(',')
-      end
+      it_behaves_like "cleans up the linked set member subjects"
     end
   end
 end
