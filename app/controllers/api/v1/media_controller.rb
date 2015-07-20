@@ -13,7 +13,13 @@ class Api::V1::MediaController < Api::ApiController
   def index
     unless media.blank?
       @controlled_resources = media
-      super
+      if association_numeration == :single
+        #generate the etag here as we use the index route for linked media has_one relations
+        headers['ETag'] = gen_etag(controlled_resources)
+        render json_api: serializer.page(params, controlled_resources, context)
+      else
+        super
+      end
     else
       raise Api::NoMediaError.new(media_name, resource_name, resource_ids)
     end
@@ -106,12 +112,16 @@ class Api::V1::MediaController < Api::ApiController
     end
   end
 
+  private
+
   def precondition_fails?
-    query = Medium.where(id: params[:id])
+    query = if association_numeration == :single
+      media
+    else
+      Medium.where(id: params[:id])
+    end
     !(gen_etag(query) == precondition)
   end
-
-  private
 
   def resource_scope(resources)
     return resources if resources.is_a?(ActiveRecord::Relation)

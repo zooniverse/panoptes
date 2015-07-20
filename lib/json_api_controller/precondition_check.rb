@@ -10,6 +10,8 @@ module JsonApiController
       end
     end
 
+    private
+
     def precondition
       case action_name
       when "update", "destroy"
