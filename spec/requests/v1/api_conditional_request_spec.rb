@@ -6,10 +6,15 @@ describe "api should allow conditional requests", type: :request do
   let(:access_token) { create(:access_token, resource_owner_id: user.id, scopes: "public project medium") }
   let!(:project) { create(:project_with_contents, owner: user) }
   let(:url) { "/api/projects/#{project.id}" }
-  let!(:etag) do
-    get url, nil,
-        { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-          "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
+  let(:api_default_params) do
+    {
+      "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
+      "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}"
+    }
+  end
+
+  let(:etag) do
+    get url, nil, api_default_params
     response.headers['ETag']
   end
 
@@ -18,15 +23,16 @@ describe "api should allow conditional requests", type: :request do
     project.save!
   end
 
+  let(:request_params) do
+    { "If-Match" => etag, "CONTENT_TYPE" => "application/json" }.merge(api_default_params)
+  end
+
   shared_examples "precondition required" do
     let(:ok_status) { method == :put ? :ok : :no_content }
 
     context "when the if-match header is not supplied" do
       before(:each) do
-        send method, url, body.to_json,
-          { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-           "CONTENT_TYPE" => "application/json",
-           "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
+        send method, url, body.to_json, request_params.except("If-Match")
       end
 
       it "should require if-match header" do
@@ -40,30 +46,21 @@ describe "api should allow conditional requests", type: :request do
     end
 
     it "should fail request if precondition not met" do
+      request_params
       modify
-      send method, url, body.to_json,
-        { "If-Match" => etag,
-         "CONTENT_TYPE" => "application/json",
-         "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-         "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
+      send method, url, body.to_json, request_params
       expect(response).to have_http_status(:precondition_failed)
     end
 
     it "should succeed if precondition is met" do
-      send method, url, body.to_json,
-        { "If-Match" => etag,
-         "CONTENT_TYPE" => "application/json",
-         "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-         "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
+      send method, url, body.to_json, request_params
       expect(response).to have_http_status(ok_status)
     end
   end
 
   shared_examples "returns etag" do
     before(:each) do
-      send method, url, nil,
-        { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-         "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
+      send method, url, nil, api_default_params
     end
 
     it "should return the ETag Header" do
@@ -73,10 +70,7 @@ describe "api should allow conditional requests", type: :request do
 
   shared_examples "304s when not modified" do
     before(:each) do
-      send method, url, nil,
-        { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-         "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
-         "If-None-Match" => etag }
+      send method, url, nil, api_default_params.merge("If-None-Match" => etag)
     end
 
     it 'should return not modified' do
@@ -94,9 +88,10 @@ describe "api should allow conditional requests", type: :request do
   end
 
   context "DELETE requests" do
+    let(:body) { nil }
+    let(:method) { :delete }
+
     context "for projects" do
-      let(:body) { nil }
-      let(:method) { :delete }
 
       it_behaves_like "precondition required"
     end
@@ -106,12 +101,20 @@ describe "api should allow conditional requests", type: :request do
         media.content_type = "image/gif"
         media.save!
       end
-      let!(:media) { create(:medium, linked: project, type: "project_attached_image") }
-      let(:url) { "/api/projects/#{project.id}/attached_images/#{media.id}"}
-      let(:body) { nil }
-      let(:method) { :delete }
 
-      it_behaves_like "precondition required"
+      describe "has_many relations" do
+        let!(:media) { create(:medium, linked: project, type: "project_attached_image") }
+        let(:url) { "/api/projects/#{project.id}/attached_images/#{media.id}"}
+
+        it_behaves_like "precondition required"
+      end
+
+      describe "has_one relations" do
+        let!(:media) { create(:medium, linked: project, type: "project_avatar") }
+        let(:url) { "/api/projects/#{project.id}/avatar"}
+
+        it_behaves_like "precondition required"
+      end
     end
   end
 
@@ -138,12 +141,10 @@ describe "api should allow conditional requests", type: :request do
       it_behaves_like "304s when not modified"
 
       context 'when an item is deleted from the collection' do
-        it 'should return 200 ' do
+        it 'should return 200' do
+          request_params
           project.destroy!
-          get url, nil,
-            { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-             "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
-             "If-None-Match" => etag }
+          get url, nil, request_params.except("CONTENT_TYPE")
           expect(response).to have_http_status(:ok)
         end
       end
