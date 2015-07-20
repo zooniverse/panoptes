@@ -17,6 +17,18 @@ class Api::V1::SubjectSetsController < Api::ApiController
     super { |subject_set| refresh_queue(subject_set) }
   end
 
+  def destroy
+    resource_class.transaction(requires_new: true) do
+      controlled_resources.each do |resource|
+        remove_linked_set_member_subjects(resource, resource.set_member_subjects)
+        resource.subject_sets_workflows.delete_all
+        #avoid optimisitc locking errors
+        resource.reload
+      end
+      super
+    end
+  end
+
   def destroy_links
     super { |subject_set| refresh_queue(subject_set) }
   end
@@ -62,15 +74,19 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def destroy_relation(resource, relation, value)
     if relation == :subjects
-      sms = resource.set_member_subjects.where(subject_id: value.split(',').map(&:to_i))
-      SubjectWorkflowCount.where(set_member_subject: sms).delete_all
-      QueueRemovalWorker.perform_async(sms.pluck(:id), resource.workflows.pluck(:id))
-      CountResetWorker.perform_async(resource.id)
-      sms.delete_all
+      set_member_subjects = resource.set_member_subjects.where(subject_id: value.split(',').map(&:to_i))
+      remove_linked_set_member_subjects(resource, set_member_subjects)
     else
       super
     end
   end
 
   private
+
+  def remove_linked_set_member_subjects(resource, set_member_subjects)
+    SubjectWorkflowCount.where(set_member_subject: set_member_subjects).delete_all
+    QueueRemovalWorker.perform_async(set_member_subjects.pluck(:id), resource.workflows.pluck(:id))
+    CountResetWorker.perform_async(resource.id)
+    set_member_subjects.delete_all
+  end
 end
