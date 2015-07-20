@@ -59,7 +59,7 @@ RSpec.describe Formatter::Csv::Classification do
     context "when the subject has been retired for that workflow" do
 
       it 'return an array formatted classifcation data' do
-        allow_any_instance_of(SetMemberSubject).to receive(:retired_workflow_ids).and_return([classification.workflow_id])
+        allow_any_instance_of(Subject).to receive(:retired_for_workflow?).with(classification.workflow).and_return(true)
         subject_data.deep_merge!("#{subject.id}" => { retired: true })
         expect(formatter.to_array(classification)).to match_array(formatted_data)
       end
