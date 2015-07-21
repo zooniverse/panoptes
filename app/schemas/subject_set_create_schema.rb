@@ -20,6 +20,7 @@ class SubjectSetCreateSchema < JsonSchema
     property "links" do
       type "object"
       required "project"
+      additional_properties false
 
       property "project" do
         type "string", "integer"

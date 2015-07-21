@@ -91,12 +91,22 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
     end
 
+    context "with illegal link properties" do
+      it 'should return 422' do
+        default_request user_id: authorized_user.id, scopes: scopes
+        update_params[:subject_sets][:links].merge!(workflow: '1')
+        update_params.merge!(id: resource.id)
+        put :update, update_params
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
     context "reload subject queue" do
       let(:workflows) { [create(:workflow, project: project)] }
       let(:resource) do
         ss = create(:subject_set,
-               project: project,
-               subjects: subjects)
+                    project: project,
+                    subjects: subjects)
 
         ss.workflows = workflows
         ss.save!
@@ -169,6 +179,15 @@ describe Api::V1::SubjectSetsController, type: :controller do
                              }
                      }
       }
+    end
+
+    context "with illegal link properties" do
+      it 'should return 422' do
+        default_request user_id: authorized_user.id, scopes: scopes
+        create_params[:subject_sets][:links].merge!(workflow: '1')
+        post :create, create_params
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
 
     context "create a new subject set" do
