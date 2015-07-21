@@ -122,7 +122,7 @@ describe Subject, :type => :model do
       end
 
       it "should be true when the swc is retired" do
-        allow(swc).to receive(:retired?).and_return(true)
+        create(:subject_workflow_count, workflow: workflow, set_member_subject: subject.set_member_subjects.first, retired_at: DateTime.now)
         expect(subject.retired_for_workflow?(workflow)).to eq(true)
       end
 
