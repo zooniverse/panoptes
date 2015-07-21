@@ -47,10 +47,6 @@ class SetMemberSubject < ActiveRecord::Base
     retired_workflows.pluck(:id)
   end
 
-  def retired_workflow_ids=(val)
-    raise 'Deprecated'
-  end
-
   def remove_from_queues
     QueueRemovalWorker.perform_async(id, subject_set.workflows.pluck(:id))
   end
