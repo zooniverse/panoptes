@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V1::GroupsController, type: :controller do
+describe Api::V1::UserGroupsController, type: :controller do
   let!(:user_groups) do
     [ create(:user_group_with_users),
       create(:user_group_with_projects),
@@ -91,7 +91,6 @@ describe Api::V1::GroupsController, type: :controller do
   describe "#create" do
     let(:test_attr) { :name }
     let(:test_attr_value) { "Zooniverse" }
-    let(:resource_name) { 'groups' }
     let(:create_params) { { user_groups: { name: "Zooniverse" } } }
 
     it_behaves_like "is creatable"
@@ -145,12 +144,12 @@ describe Api::V1::GroupsController, type: :controller do
     let(:new_membership) { Membership.where(user: new_user, user_group: resource).first }
     let(:test_relation) { :users }
     let(:test_relation_ids) { [ new_user.id.to_s ] }
-    let(:resource_id) { :group_id }
+    let(:resource_id) { :user_group_id }
 
     context "created membership" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        post :update_links, group_id: resource.id, users: [ new_user.id.to_s ], link_relation: "users"
+        post :update_links, user_group_id: resource.id, users: [ new_user.id.to_s ], link_relation: "users"
       end
 
       it 'should give the user a group_member role' do
@@ -164,13 +163,13 @@ describe Api::V1::GroupsController, type: :controller do
   describe "#destroy_links" do
     let(:resource) { user_groups.first }
     let(:test_relation) { :users }
-    let(:resource_id) { :group_id }
+    let(:resource_id) { :user_group_id }
     let(:test_relation_ids) { [ resource.users.first.id.to_s ] }
 
     context "setting membership to inactive" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        delete :destroy_links, group_id: resource.id, link_ids: test_relation_ids.join(','), link_relation: "users"
+        delete :destroy_links, user_group_id: resource.id, link_ids: test_relation_ids.join(','), link_relation: "users"
       end
 
       it 'should give the delete user membership to inactive' do
@@ -183,7 +182,7 @@ describe Api::V1::GroupsController, type: :controller do
   describe "#recents" do
     let(:resource) { user_groups.first }
     let(:resource_key) { :user_group }
-    let(:resource_key_id) { :group_id }
+    let(:resource_key_id) { :user_group_id }
 
     it_behaves_like "has recents"
   end

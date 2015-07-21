@@ -65,8 +65,8 @@ Rails.application.routes.draw do
         media_resources :avatar, :profile_header
       end
 
-      json_api_resources :groups, links: [:users] do
-        get "/recents", to: "groups#recents", format: false
+      json_api_resources :user_groups, links: [:users] do
+        get "/recents", to: "user_groups#recents", format: false
       end
 
       json_api_resources :projects, links: [:subject_sets, :workflows] do
