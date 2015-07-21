@@ -42,6 +42,11 @@ RSpec.describe SubjectWorkflowCount, type: :model do
     it 'should increment the workflow retired subjects counter' do
       expect{count.retire!}.to change{Workflow.find(count.workflow).retired_set_member_subjects_count}.from(0).to(1)
     end
+
+    it 'does nothing when the record is already retired' do
+      count.retired_at = 5.days.ago
+      expect { count.retire! }.not_to change { count.retired_at }
+    end
   end
 
   describe "#retire?" do

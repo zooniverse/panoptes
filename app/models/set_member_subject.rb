@@ -59,10 +59,9 @@ class SetMemberSubject < ActiveRecord::Base
     self.random = rand
   end
 
+  private
+
   def timestamp_newly_retired_workflows
-    retired_subject_workflow_counts.each do |record|
-      record.retired_at ||= Time.now
-      record.save if record.persisted? and record.changed?
-    end
+    retired_subject_workflow_counts.each(&:retire!)
   end
 end

@@ -16,6 +16,8 @@ class SubjectWorkflowCount < ActiveRecord::Base
   end
 
   def retire!
+    return if retired?
+
     ActiveRecord::Base.transaction(requires_new: true) do
       touch(:retired_at)
       Workflow.increment_counter(:retired_set_member_subjects_count, workflow.id)
