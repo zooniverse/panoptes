@@ -8,7 +8,15 @@ class RetirementWorker
     if count.retire?
       count.retire! do
         SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject.id)
+        deactivate_workflow!(count.workflow)
       end
+    end
+  end
+
+  def deactivate_workflow!(workflow)
+    if workflow.finished?
+      workflow.active = false
+      workflow.save!
     end
   end
 end
