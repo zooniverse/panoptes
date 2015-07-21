@@ -24,6 +24,15 @@ RSpec.describe CountResetWorker do
         subject.perform(subject_set.id)
       end.to change{Workflow.find(workflow.id).retired_set_member_subjects_count}.from(4).to(2)
     end
-  end
 
+    context "when the subject_set by id can't be found" do
+
+      it "should stop and not update the workflow retired sms counts" do
+        subject_set_id = subject_set.id
+        subject_set.destroy
+        expect_any_instance_of(Workflow).to_not receive(:save!)
+        subject.perform(subject_set_id)
+      end
+    end
+  end
 end
