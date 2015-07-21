@@ -7,5 +7,6 @@ class CountResetWorker
       w.retired_set_member_subjects_count = SetMemberSubject.where('? = ANY(retired_workflow_ids)', w.id).count
       w.save!
     end
+  rescue ActiveRecord::RecordNotFound
   end
 end
