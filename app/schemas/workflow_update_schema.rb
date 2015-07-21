@@ -13,6 +13,10 @@ class WorkflowUpdateSchema < JsonSchema
       type "boolean"
     end
 
+    property "active" do
+      type "boolean"
+    end
+
     property "retirement" do
       type "object"
       additional_properties false

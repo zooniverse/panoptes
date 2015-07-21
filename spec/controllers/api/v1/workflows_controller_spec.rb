@@ -11,7 +11,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:authorized_user) { owner }
 
   let(:api_resource_attributes) do
-    %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version grouped prioritized pairwise retirement)
+    %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version grouped prioritized pairwise retirement active)
   end
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets workflows.tutorial_subject workflows.expert_subject_set) }
   let(:scopes) { %w(public project) }
@@ -35,6 +35,26 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     it_behaves_like 'is indexable'
     it_behaves_like 'has many filterable', :subject_sets
+
+    describe "filter by" do
+      before(:each) do
+        default_request user_id: user.id, scopes: scopes
+        get :index, filter_opts
+      end
+
+      context "filter by activated" do
+        let!(:inactive_workflow) { create(:workflow, active: false) }
+        let(:filter_opts) { {active: true} }
+
+        it 'should only return activated workflows' do
+          expect(json_response[api_resource_name].map{ |w| w['active'] }).to all( be true )
+        end
+
+        it 'should not include in active workflows' do
+          expect(json_response[api_resource_name].map{ |w| w['id'] }).to_not include(inactive_workflow.id)
+        end
+      end
+    end
   end
 
   describe '#update' do
@@ -49,6 +69,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       {
        workflows: {
                    display_name: "A Better Name",
+                   active: false,
                    retirement: {
                                 criteria: "classification_count"
                                },
@@ -159,6 +180,7 @@ describe Api::V1::WorkflowsController, type: :controller do
        workflows: {
                    display_name: 'Test workflow',
                    first_task: 'interest',
+                   active: true,
                    retirement: {
                                 criteria: "classification_count"
                                },

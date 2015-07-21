@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150717123631) do
+ActiveRecord::Schema.define(version: 20150721221349) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -377,6 +377,7 @@ ActiveRecord::Schema.define(version: 20150717123631) do
     t.integer  "lock_version",                      default: 0
     t.integer  "retired_set_member_subjects_count", default: 0
     t.jsonb    "retirement",                        default: {}
+    t.boolean  "active",                            default: true, index: {name: "index_workflows_on_active", where: "(active = true)"}
   end
 
   add_foreign_key "recents", "classifications"
