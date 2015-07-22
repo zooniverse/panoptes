@@ -3,7 +3,9 @@ require 'spec_helper'
 describe SetMemberSubjectSelector do
   let(:count) { create(:subject_workflow_count) }
   let(:user) { create(:user) }
-  let(:seen_subject) { create(:subject, subject_sets: [count.set_member_subject.subject_set]) }
+  let(:subject_set) { count.set_member_subject.subject_set }
+  let(:seen_subject) { create(:subject, subject_sets: [subject_set]) }
+  let(:user_seen_subject) { create(:user_seen_subject, user: user, workflow: count.workflow, subject_ids: [seen_subject.id]) }
 
   before do
     count.workflow.subject_sets = [count.set_member_subject.subject_set]
@@ -16,20 +18,20 @@ describe SetMemberSubjectSelector do
     let(:sms_to_classify) { SetMemberSubjectSelector.new(count.workflow, user).set_member_subjects }
 
     it 'does not include subjects that have been seen' do
-      seen_subject = create(:subject, subject_sets: [count.set_member_subject.subject_set])
-      create(:user_seen_subject, user: user, workflow: count.workflow, subject_ids: [seen_subject.id])
+      user_seen_subject
       expect(sms_to_classify).to eq([count.set_member_subject])
     end
 
     it 'does not include subjects that are retired' do
+      sms = create(:set_member_subject, subject_set: subject_set)
       count.retire!
-      expect(sms_to_classify).to be_empty
+      expect(sms_to_classify).to eq([sms])
     end
 
-    context "when all the user has seen all non-retired" do
+    context "when a user has seen all non-retired" do
 
       before(:each) do
-        create(:user_seen_subject, user: user, workflow: count.workflow, subject_ids: [seen_subject.id])
+        user_seen_subject
         create(:subject_workflow_count, set_member_subject: seen_subject.set_member_subjects.first, workflow: count.workflow)
         count.retire!
       end
