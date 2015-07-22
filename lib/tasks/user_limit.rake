@@ -15,11 +15,15 @@ namespace :user_limit do
     end
   end
 
+  def find_user_by_login(login)
+    User.find_by!("lower(login) = '#{login.downcase}'")
+  end
+
   desc "update user subject limits"
   task :update_user_subject_limits, [:user_login, :new_subject_limit] => [:environment] do |t, args|
     begin
       login, new_subject_limit = update_user_limit_params(args)
-      user = User.find_by_lower_login(login)
+      user = find_user_by_login(login)
       user.update_column(:subject_limit, new_subject_limit)
       puts "Updated user: #{user.id} - #{user.login} to have new subject limit: #{user.subject_limit}"
     rescue UpdateUserLimitArgsError
@@ -34,7 +38,7 @@ namespace :user_limit do
   task :show_user_subject_limits, [:user_login ] => [:environment] do |t, args|
     begin
       if login = args[:user_login].try(:downcase)
-        user = User.find_by_lower_login(login)
+        user = find_user_by_login(login)
         puts "User #{user.id} - #{user.login} subject limits:"
         puts "Upload limit -> #{user.subject_limit || 'default panoptes limit'}"
         puts "Has uploaded -> #{user.uploaded_subjects_count}"

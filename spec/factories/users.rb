@@ -84,6 +84,11 @@ FactoryGirl.define do
         u.save!
       end
     end
+
+    factory :ouroboros_created_user do
+      build_group false
+      ouroboros_created true
+    end
   end
 
   factory :omniauth_user, class: :user do

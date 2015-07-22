@@ -65,7 +65,7 @@ class ZooniverseProject < ActiveRecord::Base
   end
 
   def zooniverse_user
-    @zoo_user ||= User.find_by_lower_login('zooniverse')
+    @zoo_user ||= User.find_by!("lower(login) = 'zooniverse'")
   end
 
   def project_configuration(zoo_project)
