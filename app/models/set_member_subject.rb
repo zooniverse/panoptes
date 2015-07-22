@@ -45,6 +45,12 @@ class SetMemberSubject < ActiveRecord::Base
     retired_workflows.pluck(:id)
   end
 
+  def retire_associated_subject_workflow_counts
+    retired_subject_workflow_counts.each(&:retire!)
+    subject_workflow_counts.reset
+    workflows.reset
+  end
+
   def remove_from_queues
     QueueRemovalWorker.perform_async(id, subject_set.workflows.pluck(:id))
   end
