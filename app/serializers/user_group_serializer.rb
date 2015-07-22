@@ -11,8 +11,4 @@ class UserGroupSerializer
   def type
     "user_groups"
   end
-
-  def self.recents_base_url
-    "groups"
-  end
 end
