@@ -98,7 +98,7 @@ describe SetMemberSubject, :type => :model do
     end
   end
 
-  describe ":non_retired_for_workflow", :focus do
+  describe ":non_retired_for_workflow" do
     let(:count) { create(:subject_workflow_count) }
     let(:workflow) { count.workflow }
     let!(:another_workflow_sms) { create(:set_member_subject) }
@@ -119,7 +119,7 @@ describe SetMemberSubject, :type => :model do
     end
   end
 
-  describe ":non_retired_for_workflow", :focus do
+  describe ":non_retired_for_workflow" do
     let(:count) { create(:subject_workflow_count) }
     let(:workflow) { count.workflow }
     let!(:another_workflow_sms) { create(:set_member_subject) }
