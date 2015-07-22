@@ -120,7 +120,7 @@ class User < ActiveRecord::Base
 
   def self.user_from_unsubscribe_token(signature)
     login = UserUnsubscribeMessageVerifier.verify(signature)
-    User.find_by("lower(login) = '#{login.downcase}'")
+    find_by_lower_login(login)
   rescue ActiveSupport::MessageVerifier::InvalidSignature
     nil
   end
@@ -132,6 +132,10 @@ class User < ActiveRecord::Base
       recoverable.send_reset_password_instructions
     end
     recoverable
+  end
+
+  def self.find_by_lower_login(login)
+    find_by("lower(login) = '#{login.downcase}'")
   end
 
   def subject_limit
