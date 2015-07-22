@@ -45,5 +45,14 @@ describe SetMemberSubjectSelector do
         sms_to_classify
       end
     end
+
+    context "when there are set_member_subjects from other workfow" do
+
+      it "should only return set_member_subjects from the set workflow" do
+        sms = create(:set_member_subject)
+        all_sms = [count.set_member_subject, sms]
+        expect(sms_to_classify).to eq([count.set_member_subject])
+      end
+    end
   end
 end
