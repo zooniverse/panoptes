@@ -11,13 +11,14 @@ class AggregationCreateSchema < JsonSchema
 
     property "links" do
       type "object"
-      
+      additional_properties false
+
       required "subject", "workflow"
 
       property "subject" do
         type "integer", "string"
       end
-      
+
       property "workflow" do
         type "integer", "string"
       end

@@ -84,6 +84,7 @@ class ProjectCreateSchema < JsonSchema
 
     property "links" do
       type "object"
+      additional_properties false
 
       property "owner" do
         type "object"

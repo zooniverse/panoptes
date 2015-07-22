@@ -11,6 +11,7 @@ class AggregationUpdateSchema < JsonSchema
 
     property "links" do
       type "object"
+      additional_properties false
 
       required "subject", "workflow"
 
