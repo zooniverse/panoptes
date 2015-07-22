@@ -22,7 +22,9 @@ FactoryGirl.define do
 
     trait :with_subject_sets do
       after(:create) do |s|
-        create_list(:set_member_subject, 2, subject: s)
+        2.times do |i|
+          create(:set_member_subject, subject: s, subject_set: create(:subject_set, project: s.project))
+        end
       end
     end
   end
