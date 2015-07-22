@@ -1,6 +1,5 @@
 class SetMemberSubject < ActiveRecord::Base
   include RoleControl::ParentalControlled
-  include BelongsToMany
   include Linkable
 
   belongs_to :subject_set, counter_cache: true, touch: true
@@ -16,7 +15,6 @@ class SetMemberSubject < ActiveRecord::Base
   can_through_parent :subject_set, :update, :show, :destroy, :index, :update_links,
     :destroy_links
 
-  before_save :timestamp_newly_retired_workflows
   before_create :set_random
   before_destroy :remove_from_queues
 
@@ -53,11 +51,5 @@ class SetMemberSubject < ActiveRecord::Base
 
   def set_random
     self.random = rand
-  end
-
-  private
-
-  def timestamp_newly_retired_workflows
-    retired_subject_workflow_counts.each(&:retire!)
   end
 end

@@ -5,4 +5,16 @@ class Api::V1::SetMemberSubjectsController < Api::ApiController
 
   allowed_params :create, :priority, links: [:subject, :subject_set, retired_workflows: []]
   allowed_params :update, :priority, links: [retired_workflows: []]
+
+  def create
+    super { |set_member_subject| set_member_subject.retired_subject_workflow_counts.each(&:retire!) }
+  end
+
+  def update
+    super { |set_member_subject| set_member_subject.retired_subject_workflow_counts.each(&:retire!) }
+  end
+
+  def update_links
+    super { |set_member_subject| set_member_subject.retired_subject_workflow_counts.each(&:retire!) }
+  end
 end
