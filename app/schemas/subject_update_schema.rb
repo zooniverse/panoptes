@@ -17,6 +17,7 @@ class SubjectUpdateSchema < JsonSchema
 
     property "links" do
       type "object"
+      additional_properties false
 
       property "subject_sets" do
         type "array"

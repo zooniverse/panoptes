@@ -48,6 +48,7 @@ class WorkflowUpdateSchema < JsonSchema
 
     property "links" do
       type "object"
+      additional_properties false
 
       property "tutorial_subject" do
         type "string", "integer"

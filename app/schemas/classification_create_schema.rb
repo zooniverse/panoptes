@@ -67,7 +67,7 @@ class ClassificationCreateSchema < JsonSchema
 
     property "links" do
       type "object"
-
+      additional_properties false
       required "project", "workflow", "subjects"
 
       property "project" do

@@ -92,6 +92,7 @@ class ProjectUpdateSchema < JsonSchema
 
     property "links" do
       type "object"
+      additional_properties false
 
       property "workflows" do
         type "array"
