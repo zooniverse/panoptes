@@ -28,7 +28,6 @@ RSpec.describe CountResetWorker do
     end
 
     context "when the subject_set by id can't be found" do
-
       it "should stop and not update the workflow retired sms counts" do
         subject_set_id = subject_set.id
         subject_set.destroy

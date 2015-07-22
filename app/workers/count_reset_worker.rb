@@ -4,6 +4,7 @@ class CountResetWorker
   def perform(subject_set_id)
     reset_set_member_subject_counter(subject_set_id)
     reset_retired_subject_counter(subject_set_id)
+  rescue ActiveRecord::RecordNotFound
   end
 
   private
@@ -18,6 +19,5 @@ class CountResetWorker
       w.retired_set_member_subjects_count = retired_subjects.count
       w.save!
     end
-  rescue ActiveRecord::RecordNotFound
   end
 end
