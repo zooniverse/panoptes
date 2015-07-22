@@ -41,4 +41,26 @@ RSpec.describe RetirementWorker do
       end
     end
   end
+
+  describe "#deactive_workflow!" do
+    let(:workflow) { count.workflow }
+
+    context "workflow is finsihed" do
+      it 'should set workflow.active to false' do
+        allow(workflow).to receive(:finished?).and_return(true)
+        expect do
+          worker.deactivate_workflow!(workflow)
+        end.to change{Workflow.find(workflow.id).active}.from(true).to(false)
+      end
+    end
+
+    context "workflow is not finished" do
+      it 'should not set workflow.actvive to false' do
+        allow(workflow).to receive(:finished?).and_return(false)
+        expect do
+          worker.deactivate_workflow!(workflow)
+        end.to_not change{Workflow.find(workflow.id).active}
+      end
+    end
+  end
 end
