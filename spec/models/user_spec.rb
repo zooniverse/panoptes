@@ -143,6 +143,20 @@ describe User, type: :model do
     end
   end
 
+  describe "::find_by_lower_login" do
+
+    it "should find the user by the login" do
+      user = create(:user)
+      expect(User.find_by_lower_login(user.login.upcase).id).to eq(user.id)
+    end
+
+    context "when no user exits" do
+      it "should not find the user by the login" do
+        expect(User.find_by_lower_login("missing-User")).to be_nil
+      end
+    end
+  end
+
   describe "#signup_project" do
     let(:project) { create(:project) }
 
@@ -605,10 +619,7 @@ describe User, type: :model do
 
   describe "#update_ouroboros_created" do
     let(:user) do
-      u = build(:user, login: "NOT ALLOWED", ouroboros_created: true)
-      u.identity_group = nil
-      u.identity_membership = nil
-      u
+      build(:ouroboros_created_user, login: "NOT ALLOWED")
     end
 
     it 'should set login from display_name' do
@@ -625,6 +636,31 @@ describe User, type: :model do
 
     it 'should run on validation' do
       expect(user).to be_valid
+    end
+
+    context "when the ouroboros created user has a clashing sanitized login" do
+      let(:dup_user) do
+        build(:ouroboros_created_user, display_name: "#{user.login}é")
+      end
+
+      before(:each) { user.save }
+
+      it "should append a suffix to the sanitized login" do
+        dup_user.valid?
+        aggregate_failures "dup user" do
+          expect(dup_user).to be_valid
+          expect(dup_user.login).to eq("#{user.login}-1")
+        end
+      end
+
+      context "when it can't find a non-clashing sanitized login" do
+
+        it "should time out after a set number of tries" do
+          allow(User).to receive(:find_by_lower_login).and_return(user)
+          dup_user.valid?
+          expect(dup_user.login).to eq("#{user.login}-20")
+        end
+      end
     end
   end
 

@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
 
   ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
+  DUP_LOGIN_SANITATION_ATTEMPTS = 20
 
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
@@ -35,28 +36,27 @@ class User < ActiveRecord::Base
 
   belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
 
+  before_validation :default_display_name, on: [:create, :update]
+  before_validation :setup_unsubscribe_token, on: [:create]
+  before_validation :update_ouroboros_created
+
   validates :login, presence: true, format: { with: USER_LOGIN_REGEX }
   validates :display_name, presence: true
   validates :unsubscribe_token, presence: true, uniqueness: true
-  validates_with LoginUniquenessValidator
-
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated
   validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
 
+  validates_with LoginUniquenessValidator
   validates_with IdentityGroupNameValidator
+
+  after_create :set_zooniverse_id
+  after_create :send_welcome_email, unless: :migrated
+  before_create :set_ouroboros_api_key
 
   delegate :projects, to: :identity_group
   delegate :collections, to: :identity_group
   delegate :subjects, to: :identity_group
   delegate :owns?, to: :identity_group
-
-  before_validation :default_display_name, on: [:create, :update]
-  before_validation :setup_unsubscribe_token, on: [:create]
-  before_validation :update_ouroboros_created
-  before_save :update_ouroboros_created
-  after_create :set_zooniverse_id
-  after_create :send_welcome_email, unless: :migrated
-  before_create :set_ouroboros_api_key
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
@@ -120,7 +120,7 @@ class User < ActiveRecord::Base
 
   def self.user_from_unsubscribe_token(signature)
     login = UserUnsubscribeMessageVerifier.verify(signature)
-    User.find_by("lower(login) = '#{login.downcase}'")
+    find_by_lower_login(login)
   rescue ActiveSupport::MessageVerifier::InvalidSignature
     nil
   end
@@ -132,6 +132,10 @@ class User < ActiveRecord::Base
       recoverable.send_reset_password_instructions
     end
     recoverable
+  end
+
+  def self.find_by_lower_login(login)
+    find_by("lower(login) = '#{login.downcase}'")
   end
 
   def subject_limit
@@ -212,7 +216,12 @@ class User < ActiveRecord::Base
 
   def update_ouroboros_created
     if ouroboros_created
-      self.login = self.class.sanitize_login(display_name)
+      counter = 0
+      sanitized_login = User.sanitize_login(display_name)
+      self.login = sanitized_login
+      until User.find_by_lower_login(login).nil? || counter == DUP_LOGIN_SANITATION_ATTEMPTS
+        self.login = "#{ sanitized_login }-#{ counter += 1 }"
+      end
       self.ouroboros_created = false
       build_identity_group
       setup_unsubscribe_token
