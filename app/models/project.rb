@@ -8,6 +8,7 @@ class Project < ActiveRecord::Base
   include PreferencesLink
   include ExtendedCacheKey
   include PgSearch
+  include RankedModel
 
   EXPERT_ROLES = [:expert, :owner]
 
@@ -63,6 +64,9 @@ class Project < ActiveRecord::Base
     against: :display_name,
     using: :trigram,
     ranked_by: ":trigram"
+
+  ranks :launched_row_order
+  ranks :beta_row_order
 
   def expert_classifier_level(classifier)
     expert_role = project_roles.where(user_group: classifier.identity_group)

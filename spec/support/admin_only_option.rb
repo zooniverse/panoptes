@@ -1,6 +1,7 @@
 RSpec.shared_examples 'admin only option' do |option, value|
   before(:each) do
     ps = create_params
+    ps[:format] = :json
     ps[:admin] = true
     ps[:projects][option] = value
     default_request scopes: scopes, user_id: authorized_user.id

@@ -13,6 +13,8 @@ FactoryGirl.define do
     primary_language "en"
     private false
     launch_approved true
+    launched_row_order_position { rand(0..100).to_i }
+    beta_row_order_position { rand(0..100).to_i }
     live false
     urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
 

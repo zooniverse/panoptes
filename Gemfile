@@ -33,6 +33,7 @@ gem 'faraday-http-cache', '~> 1.0'
 gem 'activerecord-import', '~> 0.8'
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'pg_search'
+gem 'ranked-model', '~> 0.4.0'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
