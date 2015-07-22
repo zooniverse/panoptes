@@ -6,6 +6,7 @@ RSpec.describe TasksVisitors::InjectStrings do
       interest: {
         type: 'drawing',
         question: "interest.question",
+        help: "interest.help",
         tools: [
           {value: 'red', label: "interest.tools.0.label", type: 'point', color: 'red'},
           {value: 'green', label: "interest.tools.1.label", type: 'point', color: 'lime'},
@@ -50,14 +51,15 @@ RSpec.describe TasksVisitors::InjectStrings do
         "roundness.question" => "q3",
         "roundness.answers.0.label" => "l7",
         "roundness.answers.1.label" => "l8",
-        "roundness.answers.2.label" => "l9"
+        "roundness.answers.2.label" => "l9",
+        "interest.help" => 'help'
       }
     end
-    
+
     before(:each) do
       TasksVisitors::InjectStrings.new(strings).visit(task_hash)
     end
-    
+
     it 'should substitute question indexes with strings' do
       question_vals = task_hash.values_at(:interest, :shape, :roundness)
                       .map { |hash| hash[:question] }
@@ -73,8 +75,14 @@ RSpec.describe TasksVisitors::InjectStrings do
           hash[:tools].map { |h| h[:label] }
         end
       end
-      
+
       expect(label_vals).to eq(%w(l1 l2 l3 l4 l5 l6 l7 l8 l9))
+    end
+
+    it 'should substitute help strings' do
+      help_vals = task_hash.values_at(:interest, :shape, :roundness)
+                      .map { |hash| hash[:help] }.compact
+      expect(help_vals).to eq(%w(help))
     end
 
     it 'should substitute a string at the correct index' do
