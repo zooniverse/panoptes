@@ -7,7 +7,7 @@ RSpec.describe Formatter::Csv::Classification do
         created_at gold_standard expert metadata annotations subject_data )
   end
 
-  let(:subject) { Subject.find(classification.subject_ids.first) }
+  let(:subject) { build_stubbed(:subject) }
 
   let(:subject_data) do
     { "#{subject.id}" => subject.metadata.merge(retired: false) }
@@ -34,8 +34,9 @@ RSpec.describe Formatter::Csv::Classification do
     ]
   end
 
-  let(:project) { build(:project) }
-  let(:classification) { create(:classification, project: project) }
+  let(:workflow) { build_stubbed(:workflow, build_contents: false) }
+  let(:project) { build_stubbed(:project, workflows: [workflow]) }
+  let(:classification) { build_stubbed(:classification, project: project, workflow: workflow, subject_ids: [subject.id]) }
   let(:formatter) { described_class.new(project) }
 
   describe "::project_headers?" do
@@ -48,7 +49,9 @@ RSpec.describe Formatter::Csv::Classification do
     let!(:expected_time) { Time.now.to_i }
 
     before(:each) do
-      allow_any_instance_of(Classification).to receive(:subject_ids).and_return([classification.subject_ids.first])
+      allow(Subject).to receive(:where).with(id: classification.subject_ids).and_return([subject])
+      allow(subject).to receive(:retired_for_workflow?).and_return(false)
+      allow(workflow).to receive(:primary_content).and_return(build_stubbed(:workflow_content, workflow: workflow))
       allow(formatter).to receive(:salt).and_return(expected_time)
     end
 
@@ -57,16 +60,14 @@ RSpec.describe Formatter::Csv::Classification do
     end
 
     context "when the subject has been retired for that workflow" do
-
       it 'return an array formatted classifcation data' do
-        allow_any_instance_of(Subject).to receive(:retired_for_workflow?).with(classification.workflow).and_return(true)
+        allow(subject).to receive(:retired_for_workflow?).with(classification.workflow).and_return(true)
         subject_data.deep_merge!("#{subject.id}" => { retired: true })
         expect(formatter.to_array(classification)).to match_array(formatted_data)
       end
     end
 
     context "when the obfuscate_private_details flag is false" do
-
       it 'return the real classification ip in the array' do
         allow(formatter).to receive(:obfuscate).and_return(false)
         user_ip = formatter.to_array(classification)[1]
