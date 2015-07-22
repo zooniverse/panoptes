@@ -79,16 +79,4 @@ namespace :migrate do
       puts "Updated #{ missing_token_count } users have unsubscribe tokens."
     end
   end
-
-  namespace :retirement do
-    desc 'Move retirement information from array to boolean'
-    task move_retired_workflow_information: :environment do
-      Workflow.find_each do |workflow|
-        sms_ids = SetMemberSubject.where('? = ANY("set_member_subjects"."retired_workflow_ids")', workflow.id).pluck(:id)
-
-        puts "Workflow #{workflow.id} has #{sms_ids.size} retired subjects"
-        SubjectWorkflowCount.where(set_member_subject_id: sms_ids, workflow_id: workflow.id, retired_at: nil).update_all(retired_at: Time.now)
-      end
-    end
-  end
 end

@@ -1,13 +1,13 @@
 class SetMemberSubject < ActiveRecord::Base
   include RoleControl::ParentalControlled
-  include BelongsToMany
   include Linkable
 
   belongs_to :subject_set, counter_cache: true, touch: true
   belongs_to :subject
-  belongs_to_many :retired_workflows, class_name: "Workflow"
   has_many :subject_workflow_counts, dependent: :destroy
   has_many :workflows, through: :subject_set
+  has_many :retired_subject_workflow_counts, -> { retired }, class_name: 'SubjectWorkflowCount'
+  has_many :retired_workflows, through: :retired_subject_workflow_counts, source: :workflow
 
   validates_presence_of :subject_set, :subject
   validates_uniqueness_of :subject_id, scope: :subject_set_id
@@ -37,8 +37,18 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def retire_workflow(workflow)
-    retired_workflows << workflow
-    save!
+    count = subject_workflow_counts.find_or_create_by!(workflow_id: workflow.id)
+    count.retire!
+  end
+
+  def retired_workflow_ids
+    retired_workflows.pluck(:id)
+  end
+
+  def retire_associated_subject_workflow_counts
+    retired_subject_workflow_counts.each(&:retire!)
+    subject_workflow_counts.reset
+    workflows.reset
   end
 
   def remove_from_queues

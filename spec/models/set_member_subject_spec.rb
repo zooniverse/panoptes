@@ -56,11 +56,12 @@ describe SetMemberSubject, :type => :model do
 
     context "when the workflow is finished" do
       let!(:sms) do
-        create_list(:set_member_subject, 2, subject_set: subject_set, retired_workflows: [workflow])
+        create_list(:set_member_subject, 2, subject_set: subject_set)
       end
 
       before(:each) do
         workflow.update!(retired_set_member_subjects_count: sms.length)
+        sms.each { |i| i.retire_workflow(workflow) }
       end
 
       it 'should select retired subjects' do
@@ -89,7 +90,7 @@ describe SetMemberSubject, :type => :model do
 
     context "when workflow is unfinished" do
       let!(:retired_sms) do
-        create(:set_member_subject, subject_set: subject_set, retired_workflows: [workflow])
+        create(:set_member_subject, subject_set: subject_set).tap { |sms| sms.retire_workflow(workflow) }
       end
 
       it 'should select active subjects' do
@@ -110,55 +111,17 @@ describe SetMemberSubject, :type => :model do
     end
   end
 
-  describe "#retired_workflows" do
-    let(:subject_set) { create(:subject_set) }
-    let(:workflows) { create_list(:workflow, 2, subject_sets: [subject_set])}
-
-    subject do
-      create(:set_member_subject,
-             subject_set: subject_set,
-             retired_workflows: workflows)
-    end
-
-    context "when reloaded" do
-      it "should belong to many retired_workflows" do
-        subject.reload
-        expect(subject.retired_workflows).to include(*workflows)
-      end
-
-      it "should record the id of the retired workflows it belongs to" do
-        subject.reload
-        expect(subject.retired_workflow_ids).to eq(workflows.map(&:id))
-      end
-    end
-
-    context "without reloading" do
-      it "should belong to many retired_workflows" do
-        expect(subject.retired_workflows).to include(*workflows)
-      end
-
-      it "should record the id of the retired workflows it belongs to" do
-        expect(subject.retired_workflow_ids).to eq(workflows.map(&:id))
-      end
-    end
-
-    it "should be able to join the associated models" do
-      subject
-      rw = SetMemberSubject.joins(:retired_workflows)
-        .where(workflows: { id: workflows.first.id }).first
-
-      expect(rw).to eq(subject)
-    end
-  end
-
   describe "#retire_workflow" do
     it 'should add the workflow the retired_workflows relationship' do
       sms = set_member_subject
       sms.save!
-      workflow = sms.subject_set.workflows.first
-      sms.retire_workflow(workflow)
+      workflow1 = sms.subject_set.workflows.first
+      workflow2 = create(:workflow, subject_sets: [sms.subject_set])
+      create(:subject_workflow_count, set_member_subject: sms, workflow: workflow1)
+      create(:subject_workflow_count, set_member_subject: sms, workflow: workflow2)
+      sms.retire_workflow(workflow1)
       sms.reload
-      expect(sms.retired_workflows).to include(workflow)
+      expect(sms.retired_workflows).to eq([workflow1])
     end
   end
 
