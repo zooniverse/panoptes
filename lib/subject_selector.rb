@@ -85,8 +85,6 @@ class SubjectSelector
   end
 
   def dequeue_subject(set_member_subject_ids)
-    sms_ids = SetMemberSubject.by_subject_workflow(set_member_subject_ids, workflow).pluck(:id)
-    SubjectQueue.dequeue(workflow, sms_ids, user: user.user)
+    SubjectQueue.dequeue(workflow, set_member_subject_ids, user: user.user)
   end
-
 end
