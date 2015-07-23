@@ -47,9 +47,9 @@ describe EmailsController, type: :controller do
 
       context "when not supplying a token" do
 
-        it "should return 422" do
+        it "should redirect to the unsubscribe page" do
           get :unsubscribe_via_token
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.location).to eq(base_url)
         end
       end
 
@@ -58,12 +58,12 @@ describe EmailsController, type: :controller do
 
         it "should redirect" do
           get :unsubscribe_via_token, token: token
-          expect(response.location).to eq("#{base_url}?token=#{token}")
+          expect(response.location).to eq("#{base_url}?processed=true")
         end
 
-        it "should redirect to the unsubscribed success page" do
+        it "should redirect to the front end unsubscribed page" do
           get :unsubscribe_via_token, token: token
-          expect(response.location).to eq("#{base_url}?token=#{token}")
+          expect(response.location).to eq("#{base_url}?processed=true")
         end
       end
 
@@ -77,7 +77,7 @@ describe EmailsController, type: :controller do
 
         it "should redirect to the unsubscribed success page" do
           unsubscribe_user
-          expect(response.location).to eq("#{base_url}?token=#{token}")
+          expect(response.location).to eq("#{base_url}?processed=true")
         end
       end
     end
