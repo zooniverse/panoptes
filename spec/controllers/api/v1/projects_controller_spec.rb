@@ -62,6 +62,8 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         let(:resource) { new_project }
+        let(:ids) { json_response["projects"].map{ |p| p["id"] } }
+
 
         before(:each) do
           get :index, index_options
@@ -148,8 +150,12 @@ describe Api::V1::ProjectsController, type: :controller do
             let(:index_options) { { beta_approved: "true" } }
 
             it "should respond with the beta project" do
-              ids = json_response["projects"].map{ |p| p["id"] }
               expect(Project.find(ids)).to include(beta_resource)
+            end
+
+            it 'should return projects in project rank order' do
+              ranked_ids = Project.where(beta_approved: true, private: false).rank(:beta_row_order).pluck(:id).map(&:to_s)
+              expect(ids).to match_array(ranked_ids)
             end
           end
 
@@ -168,7 +174,6 @@ describe Api::V1::ProjectsController, type: :controller do
             let(:index_options) { { launch_approved: "false" } }
 
             it "should respond with the unapproved project" do
-              ids = json_response["projects"].map{ |p| p["id"] }
               expect(Project.find(ids)).to include(unapproved_resource)
             end
           end
@@ -176,8 +181,12 @@ describe Api::V1::ProjectsController, type: :controller do
           context "for approved projects" do
             let(:index_options) { { launch_approved: "true" } }
             it "should not have unapproved projects" do
-              ids = json_response["projects"].map{ |p| p["id"] }
               expect(Project.find(ids)).to_not include(unapproved_resource)
+            end
+
+            it 'should return projects in project rank order' do
+              ranked_ids = Project.where(launch_approved: true, private: false).rank(:launched_row_order).pluck(:id).map(&:to_s)
+              expect(ids).to match_array(ranked_ids)
             end
           end
         end
@@ -377,6 +386,14 @@ describe Api::V1::ProjectsController, type: :controller do
 
       describe "approved option" do
         it_behaves_like "admin only option", :beta_approved, true
+      end
+
+      describe "launched_row_order_position option" do
+        it_behaves_like "admin only option", :launched_row_order_position, 10
+      end
+
+      describe "beta_row_order_position option" do
+        it_behaves_like "admin only option", :beta_row_order_position, 10
       end
 
       describe "create talk admin" do

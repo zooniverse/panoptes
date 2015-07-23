@@ -34,6 +34,14 @@ class ProjectUpdateSchema < JsonSchema
       end
     end
 
+    property "launched_row_order_position" do
+      type "integer"
+    end
+
+    property "beta_row_order_position" do
+      type "integer"
+    end
+
     property "redirect" do
       type "string"
     end

@@ -38,6 +38,14 @@ class ProjectCreateSchema < JsonSchema
       type "boolean"
     end
 
+    property "launched_row_order_position" do
+      type "integer"
+    end
+
+    property "beta_row_order_position" do
+      type "integer"
+    end
+
     property "launch_approved" do
       type "boolean"
     end

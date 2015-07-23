@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150721221349) do
+ActiveRecord::Schema.define(version: 20150722180408) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -185,6 +185,8 @@ ActiveRecord::Schema.define(version: 20150721221349) do
     t.boolean  "launch_approved",       default: false, index: {name: "index_projects_on_launch_approved"}
     t.boolean  "beta_requested",        default: false, index: {name: "index_projects_on_beta_requested", where: "(beta_requested = true)"}
     t.boolean  "beta_approved",         default: false, index: {name: "index_projects_on_beta_approved"}
+    t.integer  "launched_row_order",    index: {name: "index_projects_on_launched_row_order"}
+    t.integer  "beta_row_order",        index: {name: "index_projects_on_beta_row_order"}
   end
 
   create_table "recents", force: :cascade do |t|

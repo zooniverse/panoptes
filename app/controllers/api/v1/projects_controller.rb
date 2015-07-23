@@ -39,6 +39,14 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def index
     @controlled_resources = controlled_resources.eager_load(:tags)
+    @controlled_resources = case
+                            when params.has_key?(:launch_approved)
+                              controlled_resources.rank(:launched_row_order)
+                            when params.has_key?(:beta_approved)
+                              controlled_resources.rank(:beta_row_order)
+                            else
+                              controlled_resources
+                            end
     super
   end
 
@@ -108,7 +116,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    admin_allowed(create_params, :beta_approved, :launch_approved, :redirect)
+    admin_allowed create_params, :beta_approved, :launch_approved, :redirect,
+      :launched_row_order_position, :beta_row_order_position
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
     if create_params.has_key? :tags
       create_params[:tags] = create_or_update_tags(create_params)
@@ -118,7 +127,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def build_update_hash(update_params, id)
-    admin_allowed(update_params, :beta_approved, :launch_approved, :redirect)
+    admin_allowed update_params, :beta_approved, :launch_approved,
+      :redirect, :launched_row_order_position, :beta_row_order_position
     content_update = content_from_params(update_params)
     unless content_update.blank?
       Project.find(id).primary_content.update!(content_update)
