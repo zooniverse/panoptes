@@ -52,6 +52,15 @@ RSpec.describe RetirementWorker do
           worker.deactivate_workflow!(workflow)
         end.to change{Workflow.find(workflow.id).active}.from(true).to(false)
       end
+
+      context "when the workflow optimistic lock is updated" do
+
+        it 'should save the changes and not raise an error' do
+          allow(workflow).to receive(:finished?).and_return(true)
+          Workflow.find(workflow.id).touch
+          expect { worker.deactivate_workflow!(workflow) }.to_not raise_error
+        end
+      end
     end
 
     context "workflow is not finished" do
