@@ -15,15 +15,7 @@ class RetirementWorker
 
   def deactivate_workflow!(workflow)
     if workflow.finished?
-      ignore_optimistic_lock { workflow.update_attribute(:active, false) }
+      Workflow.where(id: workflow.id).update_all(active: false)
     end
-  end
-
-  private
-
-  def ignore_optimistic_lock
-    ActiveRecord::Base.lock_optimistically = false
-    yield
-    ActiveRecord::Base.lock_optimistically = true
   end
 end
