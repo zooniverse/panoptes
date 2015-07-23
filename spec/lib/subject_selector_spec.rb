@@ -4,7 +4,7 @@ RSpec.describe SubjectSelector do
   let(:workflow) { create(:workflow_with_subjects) }
   let(:user) { ApiUser.new(create(:user)) }
 
-  let!(:non_logged_in_queue) do
+  let(:subject_queue) do
     create(:subject_queue,
            workflow: workflow,
            user: nil,
@@ -15,8 +15,16 @@ RSpec.describe SubjectSelector do
   subject { described_class.new(user, workflow, {}, Subject.all)}
 
   describe "#queued_subjects" do
+
+    it 'should return url_format: :get in the context object' do
+      subject_queue
+      _, ctx = subject.queued_subjects
+      expect(ctx).to include(url_format: :get)
+    end
+
     context "when the user doesn't have a queue" do
       before(:each) do
+        subject_queue.set_member_subjects
         subject.queued_subjects
       end
 
@@ -25,8 +33,9 @@ RSpec.describe SubjectSelector do
       end
 
       it 'should add the logged out subjects to the new queue' do
+        smses = subject_queue.set_member_subjects
         new_queue = SubjectQueue.find_by(workflow: workflow, user: user.user)
-        expect(new_queue.set_member_subjects).to match_array(non_logged_in_queue.set_member_subjects)
+        expect(new_queue.set_member_subjects).to match_array(smses)
       end
     end
 
@@ -45,13 +54,14 @@ RSpec.describe SubjectSelector do
       end
 
       it 'should return the page_size number of subjects' do
+        subject_queue
         subjects, _ = subject.queued_subjects
         expect(subjects.length).to eq(size)
       end
     end
 
     context "queue is empty" do
-      let!(:non_logged_in_queue) do
+      let(:subject_queue) do
         create(:subject_queue,
                workflow: workflow,
                user: user.user,
@@ -62,14 +72,45 @@ RSpec.describe SubjectSelector do
       let!(:subjects) { create_list(:set_member_subject, 10, subject_set: workflow.subject_sets.first) }
 
       it 'should return 5 subjects' do
+        subject_queue
         subjects, _ = subject.queued_subjects
         expect(subjects.length).to eq(5)
       end
     end
 
-    it 'should return url_format: :get in the context object' do
-      _, ctx = subject.queued_subjects
-      expect(ctx).to include(url_format: :get)
+    describe "#dequeue for user after selection" do
+      let(:smses) { workflow.set_member_subjects }
+      let(:sms_ids) { smses.map(&:id) }
+      let(:subject_queue) do
+        create(:subject_queue,
+               workflow: workflow,
+               user: queue_owner,
+               subject_set: nil,
+               set_member_subjects: smses)
+      end
+
+      before(:each) { subject_queue }
+
+      context "when the user has a queue" do
+        let(:queue_owner) { user.user }
+
+        it 'should call dequeue_subject for the user' do
+          expect(SubjectQueue).to receive(:dequeue)
+            .with(workflow, array_including(sms_ids), user: user.user)
+          subject.queued_subjects
+        end
+      end
+
+      context "when the queue has no user" do
+        let(:queue_owner) { nil }
+        let(:user) { ApiUser.new(nil) }
+
+        it 'should call dequeue_subject for the user' do
+          expect(SubjectQueue).to receive(:dequeue)
+            .with(workflow, array_including(sms_ids), user: nil)
+          subject.queued_subjects
+        end
+      end
     end
   end
 end

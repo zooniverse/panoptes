@@ -43,12 +43,6 @@ describe ClassificationLifecycle do
       end
     end
 
-    it "should call the #dequeue_subject method" do
-      classification.save!
-      expect(subject).to receive(:dequeue_subject).once
-      subject.queue(:update)
-    end
-
     context "with update action" do
       let(:test_method) { :update }
 
@@ -210,29 +204,6 @@ describe ClassificationLifecycle do
 
       it 'should do nothing' do
         expect(MultiKafkaProducer).to_not receive(:publish)
-      end
-    end
-  end
-
-  describe "#dequeue_subject" do
-    after(:each) { subject.dequeue_subject }
-
-    context "complete classification" do
-      let(:classification) { create(:classification, completed: true) }
-
-      it 'should call dequeue_subject_for_user' do
-        expect(SubjectQueue).to receive(:dequeue)
-          .with(classification.workflow,
-                array_including(sms_ids),
-                user: classification.user)
-      end
-    end
-
-    context "incomplete classification" do
-      let(:classification) { create(:classification, completed: false) }
-
-      it 'should call dequeue when incomplete' do
-        expect(SubjectQueue).to receive(:dequeue)
       end
     end
   end
