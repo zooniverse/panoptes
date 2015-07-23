@@ -23,27 +23,21 @@ RSpec.describe SubjectSelector do
     end
 
     context "when the user doesn't have a queue" do
-      before(:each) do
-        subject_queue.set_member_subjects
+
+      it 'should create a new queue from the logged out queue' do
+        subject_queue
+        expect(SubjectQueue).to receive(:create_for_user)
+          .with(workflow, user.user, set: nil).and_call_original
         subject.queued_subjects
       end
 
-      it 'should create a new queue from the logged out queue' do
-        expect(SubjectQueue.find_by(workflow: workflow, user: user.user)).to_not be_nil
-      end
+      context "when the workflow doesn't have any subject sets" do
 
-      it 'should add the logged out subjects to the new queue' do
-        smses = subject_queue.set_member_subjects
-        new_queue = SubjectQueue.find_by(workflow: workflow, user: user.user)
-        expect(new_queue.set_member_subjects).to match_array(smses)
-      end
-    end
-
-    context "when the user doesn't have a queue" do
-      it 'should raise an informative error' do
-        allow_any_instance_of(Workflow).to receive(:subject_sets).and_return([])
-        expect{subject.queued_subjects}.to raise_error(SubjectSelector::MissingSubjectSet,
-          "no subject set is associated with this workflow")
+        it 'should raise an informative error' do
+          allow_any_instance_of(Workflow).to receive(:subject_sets).and_return([])
+          expect{subject.queued_subjects}.to raise_error(SubjectSelector::MissingSubjectSet,
+            "no subject set is associated with this workflow")
+        end
       end
     end
 
