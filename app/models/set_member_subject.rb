@@ -18,9 +18,9 @@ class SetMemberSubject < ActiveRecord::Base
   before_create :set_random
   before_destroy :remove_from_queues
 
-  can_be_linked :subject_queue, :in_workflow, :model
+  can_be_linked :subject_queue, :in_queue_workflow, :model
 
-  def self.in_workflow(queue)
+  def self.in_queue_workflow(queue)
     query = joins(subject_set: :workflows)
       .where(workflows: { id: queue.workflow.id })
     query = query.where(subject_set_id: queue.subject_set.id) if queue.subject_set
