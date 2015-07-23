@@ -98,6 +98,31 @@ describe SetMemberSubject, :type => :model do
     end
   end
 
+  describe ":by_workflow" do
+
+    it "should retun an empty set" do
+      workflow = create(:workflow)
+      expect(SetMemberSubject.by_workflow(workflow)).to be_empty
+    end
+
+    context "when a workflow sms exist" do
+      let(:workflow_sms) { create(:set_member_subject) }
+      let(:workflow) { workflow_sms.workflows.first }
+
+      it "should return the workflow sms" do
+        expect(SetMemberSubject.by_workflow(workflow)).to eq([workflow_sms])
+      end
+
+      context "when another workflow sms exists" do
+
+        it "should only return the workflow sms" do
+          create(:set_member_subject)
+          expect(SetMemberSubject.by_workflow(workflow)).to eq([workflow_sms])
+        end
+      end
+    end
+  end
+
   describe ":non_retired_for_workflow" do
     let(:count) { create(:subject_workflow_count) }
     let(:workflow) { count.workflow }
