@@ -3,7 +3,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   include TranslatableResource
 
   doorkeeper_for :update, :create, :destroy, scopes: [:project]
-  before_action  :reject_live_project_changes, only: [ :create ]
 
   resource_actions :default
   schema_type :json_schema
@@ -49,10 +48,14 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def build_update_hash(update_params, id)
-    if update_params.has_key? :tasks
-      stripped_tasks, strings = extract_strings(update_params[:tasks])
-      update_params[:tasks] = stripped_tasks
-      Workflow.find(id).primary_content.update_attributes(strings: strings)
+    workflow = Workflow.find(id)
+    WorkflowContent.transaction(requires_new: true) do
+      if update_params.has_key? :tasks
+        stripped_tasks, strings = extract_strings(update_params[:tasks])
+        update_params[:tasks] = stripped_tasks
+        workflow.primary_content.update(strings: strings)
+      end
+      reject_live_project_changes(workflow, update_params)
     end
     super(update_params, id)
   end
@@ -60,6 +63,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   def build_resource_for_create(create_params)
     stripped_tasks, strings = extract_strings(create_params[:tasks])
     create_params[:tasks] = stripped_tasks
+    create_params[:active] = false if project_live?
     workflow = super(create_params)
     workflow.workflow_contents.build(strings: strings,
                                      language: workflow.primary_language)
@@ -91,11 +95,25 @@ class Api::V1::WorkflowsController < Api::ApiController
     end
   end
 
-  def reject_live_project_changes
-    project = project_from_params
-    if project && project.live
-      raise Api::LiveProjectChanges.new("Can't create a workflow for a live project.")
+  def reject_live_project_changes(workflow, update_hash)
+    if workflow.active && workflow.project.live && non_permitted_changes?(workflow, update_hash)
+      raise Api::LiveProjectChanges.new("Can't change an active workflow for a live project.")
     end
+  end
+
+  def non_permitted_changes?(workflow, hash)
+    %i(tasks grouped prioritized pairwise first_task).any? do |field|
+      if hash.has_key? field
+        !(workflow.send(field) == hash[field])
+      else
+        false
+      end
+    end
+  end
+
+
+  def project_live?
+    project_from_params.try(:live)
   end
 
   def project_from_params

@@ -13,6 +13,7 @@ FactoryGirl.define do
         interest: {
           type: 'drawing',
           question: "interest.question",
+          help: "interest.help",
           tools: [
             {value: 'red', label: "interest.tools.0.label", type: 'point', color: 'red'},
             {value: 'green', label: "interest.tools.1.label", type: 'point', color: 'lime'},
@@ -23,6 +24,7 @@ FactoryGirl.define do
         shape: {
           type: 'multiple',
           question: "shape.question",
+          help: "shape.help",
           answers: [
             {value: 'smooth', label: "shape.answers.0.label"},
             {value: 'features', label: "shape.answers.1.label"},
