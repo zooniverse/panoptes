@@ -27,9 +27,9 @@ class EmailsController < ActionController::Base
          User.user_from_unsubscribe_token(token)
       end
       revoke_email_subscriptions(user) if user
-      redirect_to "#{Panoptes.unsubscribe_redirect}?token=#{token}"
+      redirect_to "#{Panoptes.unsubscribe_redirect}?processed=true"
     else
-      head :unprocessable_entity
+      redirect_to "#{Panoptes.unsubscribe_redirect}"
     end
   end
 
