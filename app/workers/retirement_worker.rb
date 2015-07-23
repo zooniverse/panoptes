@@ -15,8 +15,7 @@ class RetirementWorker
 
   def deactivate_workflow!(workflow)
     if workflow.finished?
-      workflow.active = false
-      workflow.save!
+      Workflow.where(id: workflow.id).update_all(active: false)
     end
   end
 end
