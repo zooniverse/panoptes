@@ -7,11 +7,13 @@ RSpec.describe SubjectWorkflowCount, type: :model do
   end
 
   it 'should not be valid without a set_member_subject' do
-    expect(build(:subject_workflow_count, set_member_subject: nil)).to_not be_valid
+    swc = build(:subject_workflow_count, set_member_subject: nil, link_subject_sets: false)
+    expect(swc).to_not be_valid
   end
 
   it 'should not be valid without a workflow' do
-    expect(build(:subject_workflow_count, workflow: nil)).to_not be_valid
+    swc = build(:subject_workflow_count, workflow: nil, link_subject_sets: false)
+    expect(swc).to_not be_valid
   end
 
   context "when there is a duplicate set_member_subject_id workflow_id entry" do
