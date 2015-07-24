@@ -10,7 +10,8 @@ class SubjectSerializer
   can_include :project, :collections
 
   def locations
-    @model.locations.map do |loc|
+    
+    @model.locations.order("\"media\".\"metadata\"->>'index' ASC").map do |loc|
       {
        loc.content_type => loc.url_for_format(@context[:url_format] || :get)
       }
