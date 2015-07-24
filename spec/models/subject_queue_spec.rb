@@ -54,9 +54,20 @@ RSpec.describe SubjectQueue, :type => :model do
     end
 
     context "queue saves" do
-      it 'should return the new queue' do
+      let!(:logged_out_queue) do
         create(:subject_queue, workflow: workflow, user: nil, subject_set: nil)
-        expect(SubjectQueue.create_for_user(workflow, user)).to be_a(SubjectQueue)
+      end
+      let(:new_queue) { SubjectQueue.create_for_user(workflow, user)}
+
+      it 'should return the new queue' do
+        aggregate_failures "copied queue" do
+          expect(new_queue).to be_a(SubjectQueue)
+          expect(new_queue.id).to_not eq(logged_out_queue.id)
+        end
+      end
+
+      it 'should add the logged out subjects to the new queue' do
+        expect(new_queue.set_member_subject_ids).to match_array(logged_out_queue.set_member_subject_ids)
       end
     end
   end

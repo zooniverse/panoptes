@@ -13,14 +13,13 @@ class ClassificationLifecycle
       message = "Background process called before persisting the classification."
       raise ClassificationNotPersisted.new(message)
     end
-    dequeue_subject
     ClassificationWorker.perform_async(classification.id, action.to_s)
   end
 
   def transact!(&block)
     Classification.transaction do
       #NOTE: ensure the block is evaluated before updating the seen subjects
-      # as the count worker won't fire if the seens are set, see #should_count_towards_retirement 
+      # as the count worker won't fire if the seens are set, see #should_count_towards_retirement
       instance_eval(&block) if block_given?
       if subjects_are_unseen_by_user?
         mark_expert_classifier
@@ -28,14 +27,6 @@ class ClassificationLifecycle
       end
       publish_to_kafka
     end
-  end
-
-  def dequeue_subject
-    SubjectQueue.dequeue(workflow,
-                         SetMemberSubject
-                           .by_subject_workflow(subject_ids, classification.workflow)
-                           .pluck(:id),
-                         user: user)
   end
 
   def create_project_preference
