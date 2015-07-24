@@ -18,9 +18,9 @@ class SetMemberSubject < ActiveRecord::Base
   before_create :set_random
   before_destroy :remove_from_queues
 
-  can_be_linked :subject_queue, :in_workflow, :model
+  can_be_linked :subject_queue, :in_queue_workflow, :model
 
-  def self.in_workflow(queue)
+  def self.in_queue_workflow(queue)
     query = joins(subject_set: :workflows)
       .where(workflows: { id: queue.workflow.id })
     query = query.where(subject_set_id: queue.subject_set.id) if queue.subject_set
@@ -34,6 +34,22 @@ class SetMemberSubject < ActiveRecord::Base
 
   def self.available(workflow, user)
     SetMemberSubjectSelector.new(workflow, user).set_member_subjects
+  end
+
+  def self.by_workflow(workflow)
+    joins(:workflows).where(workflows: {id: workflow.id})
+  end
+
+  def self.non_retired_for_workflow(workflow)
+    by_workflow(workflow)
+    .joins("LEFT OUTER JOIN subject_workflow_counts ON subject_workflow_counts.set_member_subject_id = set_member_subjects.id")
+    .where('subject_workflow_counts.id IS NULL OR subject_workflow_counts.retired_at IS NULL')
+  end
+
+  def self.unseen_for_user_by_workflow(user, workflow)
+    by_workflow(workflow)
+    .joins("LEFT OUTER JOIN user_seen_subjects ON user_seen_subjects.user_id = #{user.id} AND user_seen_subjects.workflow_id = #{workflow.id}")
+    .where('user_seen_subjects.id IS NULL OR (NOT "set_member_subjects"."subject_id" = ANY("user_seen_subjects"."subject_ids"))')
   end
 
   def retire_workflow(workflow)

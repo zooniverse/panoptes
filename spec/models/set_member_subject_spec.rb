@@ -21,28 +21,6 @@ describe SetMemberSubject, :type => :model do
     expect(create(:set_member_subject).random).to_not be_nil
   end
 
-  describe "#subject_set" do
-    it "must have a subject set" do
-      set_member_subject.subject_set = nil
-      expect(set_member_subject).to_not be_valid
-    end
-
-    it "should belong to a subject set" do
-      expect(set_member_subject.subject_set).to be_a(SubjectSet)
-    end
-  end
-
-  describe "#subject" do
-    it "must have a subject" do
-      set_member_subject.subject = nil
-      expect(set_member_subject).to_not be_valid
-    end
-
-    it "should belong to a subject" do
-      expect(set_member_subject.subject).to be_a(Subject)
-    end
-  end
-
   describe "::available" do
     let(:workflow) { create(:workflow) }
     let(:subject_set) { create(:subject_set, workflows: [workflow]) }
@@ -111,6 +89,127 @@ describe SetMemberSubject, :type => :model do
     end
   end
 
+  describe "::by_subject_workflow" do
+    it "should retrieve and object by subject and workflow id" do
+      set_member_subject.save!
+      sid = set_member_subject.subject_id
+      wid = set_member_subject.subject_set.workflows.first.id
+      expect(SetMemberSubject.by_subject_workflow(sid, wid)).to include(set_member_subject)
+    end
+  end
+
+  describe ":by_workflow" do
+
+    it "should retun an empty set" do
+      workflow = create(:workflow)
+      expect(SetMemberSubject.by_workflow(workflow)).to be_empty
+    end
+
+    context "when a workflow sms exist" do
+      let(:workflow_sms) { create(:set_member_subject) }
+      let(:workflow) { workflow_sms.workflows.first }
+
+      it "should return the workflow sms" do
+        expect(SetMemberSubject.by_workflow(workflow)).to eq([workflow_sms])
+      end
+
+      context "when another workflow sms exists" do
+
+        it "should only return the workflow sms" do
+          create(:set_member_subject)
+          expect(SetMemberSubject.by_workflow(workflow)).to eq([workflow_sms])
+        end
+      end
+    end
+  end
+
+  describe ":non_retired_for_workflow" do
+    let(:count) { create(:subject_workflow_count) }
+    let(:workflow) { count.workflow }
+    let!(:another_workflow_sms) { create(:set_member_subject) }
+
+    context "when none are retired" do
+
+      it "should return the workflow's non retired sms" do
+        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(count.set_member_subject)
+      end
+    end
+
+    context "when the workflow sms is retired" do
+
+      it "should return an empty set" do
+        count.retire!
+        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to be_empty
+      end
+    end
+  end
+
+  describe ":non_retired_for_workflow" do
+    let(:count) { create(:subject_workflow_count) }
+    let(:workflow) { count.workflow }
+    let!(:another_workflow_sms) { create(:set_member_subject) }
+
+    context "when none are retired" do
+
+      it "should return the workflow's non retired sms" do
+        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(count.set_member_subject)
+      end
+    end
+
+    context "when the workflow sms is retired" do
+
+      it "should return an empty set" do
+        count.retire!
+        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to be_empty
+      end
+    end
+  end
+
+  describe ":unseen_for_user_by_workflow" do
+    let(:user) { create(:user) }
+    let(:workflow) { create(:workflow_with_subjects) }
+    let(:smses){ workflow.set_member_subjects }
+    let!(:another_workflow_sms) { create(:set_member_subject) }
+
+    context "when the user has not seen any workflow subjects" do
+
+      it "should return the all the worflow set_member_subjects " do
+        create(:user_seen_subject, workflow: workflow, user: user, subject_ids: [])
+        expect(SetMemberSubject.unseen_for_user_by_workflow(user, workflow)).to eq(smses)
+      end
+    end
+
+    context "when the user has seen all the workflow subjects" do
+
+      it "should return an empty set" do
+        create(:user_seen_subject, workflow: workflow, user: user, subject_ids: smses.map(&:subject_id))
+        expect(SetMemberSubject.unseen_for_user_by_workflow(user, workflow)).to be_empty
+      end
+    end
+  end
+
+  describe "#subject_set" do
+    it "must have a subject set" do
+      set_member_subject.subject_set = nil
+      expect(set_member_subject).to_not be_valid
+    end
+
+    it "should belong to a subject set" do
+      expect(set_member_subject.subject_set).to be_a(SubjectSet)
+    end
+  end
+
+  describe "#subject" do
+    it "must have a subject" do
+      set_member_subject.subject = nil
+      expect(set_member_subject).to_not be_valid
+    end
+
+    it "should belong to a subject" do
+      expect(set_member_subject.subject).to be_a(Subject)
+    end
+  end
+
   describe "#retire_workflow" do
     it 'should add the workflow the retired_workflows relationship' do
       sms = set_member_subject
@@ -122,15 +221,6 @@ describe SetMemberSubject, :type => :model do
       sms.retire_workflow(workflow1)
       sms.reload
       expect(sms.retired_workflows).to eq([workflow1])
-    end
-  end
-
-  describe "::by_subject_workflow" do
-    it "should retrieve and object by subject and workflow id" do
-      set_member_subject.save!
-      sid = set_member_subject.subject_id
-      wid = set_member_subject.subject_set.workflows.first.id
-      expect(SetMemberSubject.by_subject_workflow(sid, wid)).to include(set_member_subject)
     end
   end
 
