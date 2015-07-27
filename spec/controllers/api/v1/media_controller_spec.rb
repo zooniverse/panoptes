@@ -242,6 +242,12 @@ RSpec.describe Api::V1::MediaController, type: :controller do
     end
   end
 
+  describe "parent is a workflow" do
+    let(:parent) { create(:workflow, project: create(:project, owner: authorized_user)) }
+
+    it_behaves_like "has_many media", :workflow, :attached_images, %i(index create show destroy), 'image/jpeg'
+  end
+
   describe "parent is a project" do
     let(:parent) { create(:project, owner: authorized_user) }
 

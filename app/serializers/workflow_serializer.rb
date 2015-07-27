@@ -1,6 +1,7 @@
 class WorkflowSerializer
   include RestPack::Serializer
   include FilterHasMany
+  include MediaLinksSerializer
 
   attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
              :created_at, :updated_at, :first_task, :primary_language,
@@ -10,6 +11,8 @@ class WorkflowSerializer
   can_include :project, :subject_sets, :tutorial_subject, :expert_subject_sets
 
   can_filter_by :active
+
+  media_include :attached_images
 
   DEFAULT_WORKFLOW_VERSION_NUM = 1
 
