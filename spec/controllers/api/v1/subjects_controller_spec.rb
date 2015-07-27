@@ -338,12 +338,19 @@ describe Api::V1::SubjectsController, type: :controller do
       {
        subjects: {
                   metadata: { cool_factor: "11" },
-                  locations: ["image/jpeg", "image/jpeg", "image/jpeg"],
+                  locations: ["image/jpeg", "image/jpeg", "image/png"],
                   links: {
                           project: project.id
                          }
                  }
       }
+    end
+
+    it "should return locations in the order they were submitted" do
+      default_request user_id: authorized_user.id, scopes: scopes
+      post :create, create_params
+      locations = json_response[api_resource_name][0]["locations"].flat_map(&:keys)
+      expect(locations).to eq(["image/jpeg", "image/jpeg", "image/png"])
     end
 
     context "when the user is not-the owner of the project" do

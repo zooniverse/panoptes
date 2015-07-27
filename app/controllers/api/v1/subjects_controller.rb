@@ -49,8 +49,8 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def add_locations(locations, subject)
-    (locations || []).each do |loc|
-      location_params = { content_type: loc }
+    (locations || []).each.with_index do |loc, i|
+      location_params = { content_type: loc, metadata: { index: i } }
       if api_user.is_admin?
         location_params.merge!(allow_any_content_type: true)
       end
