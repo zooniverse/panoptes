@@ -1,19 +1,21 @@
 require 'spec_helper'
 
 describe ClassificationLifecycle do
-  let!(:subject_set) { create(:subject_set, workflows: [classification.workflow]) }
-  let!(:sms_ids) do
+  let(:subject_set) { create(:subject_set, workflows: [classification.workflow]) }
+  let(:sms_ids) do
     classification.subject_ids.map do |s_id|
       create(:set_member_subject, subject_set: subject_set, subject_id: s_id)
     end.map(&:id)
   end
 
-  let!(:subject_queue) do
+  let(:subject_queue) do
     create(:subject_queue,
            user: classification.user,
            workflow: classification.workflow,
            set_member_subject_ids: sms_ids)
   end
+
+  let(:classification) { build(:classification) }
 
   subject do
     ClassificationLifecycle.new(classification)
@@ -24,7 +26,6 @@ describe ClassificationLifecycle do
   end
 
   describe "#queue" do
-    let(:classification) { build(:classification) }
 
     context "with create action" do
       let(:test_method) { :create }
@@ -89,99 +90,147 @@ describe ClassificationLifecycle do
   end
 
   describe "#transact!" do
-    let(:classification) { create(:classification) }
+    let!(:classification) { create(:classification) }
 
-    after(:each) do
-      subject.transact! { true }
-    end
+    context "transact! after each spec" do
 
-    context "when an anonymous user classification" do
-      let!(:classification) { create(:classification, user: nil) }
-
-      it "should wrap the calls in a transaction" do
-        expect(Classification).to receive(:transaction)
+      after(:each) do
+        subject.transact! { true }
       end
 
-      it "should not attempt to update the seen subjects" do
-        expect_any_instance_of(UserSeenSubject).to_not receive(:subjects_seen?)
+      context "when an anonymous user classification" do
+        let(:classification) { create(:classification, user: nil) }
+
+        it "should wrap the calls in transactions" do
+          expect(Classification).to receive(:transaction).twice
+            .and_call_original
+        end
+
+        it "should not attempt to update the seen subjects" do
+          expect_any_instance_of(UserSeenSubject).to_not receive(:subjects_seen?)
+        end
+
+        it "should call the #add_project_live_state" do
+          expect(subject).to receive(:add_project_live_state)
+        end
+
+        it "should still evaluate the block" do
+          expect(subject).to receive(:instance_eval)
+        end
+
+        context "when the classification has the already_seen metadata value" do
+          let!(:classification) { create(:anonymous_already_seen_classification) }
+
+          it 'should not count towards retirement' do
+            expect(subject.should_count_towards_retirement?).to be false
+          end
+        end
       end
 
-      it "should still evaluate the block" do
-        expect(subject).to receive(:instance_eval)
+      context "when the user has not already classified the subjects" do
+
+        before(:each) do
+          uss = instance_double("UserSeenSubject")
+          allow(uss).to receive(:subjects_seen?).and_return(false)
+          allow(UserSeenSubject).to receive(:find_by).and_return(uss)
+        end
+
+        it "should wrap the calls in transactions" do
+          expect(Classification).to receive(:transaction).twice
+            .and_call_original
+        end
+
+        it "should call the #mark_expert_classifier method" do
+          expect(subject).to receive(:mark_expert_classifier).once
+        end
+
+        it "should call the #update_seen_subjects method" do
+          expect(subject).to receive(:update_seen_subjects).once
+        end
+
+        it "should call the instance_eval on the passed block" do
+          expect(subject).to receive(:instance_eval).once
+        end
+
+        it "should call the #publish_to_kafka method" do
+          expect(subject).to receive(:publish_to_kafka).once
+        end
+
+        it "should call the #add_project_live_state" do
+          expect(subject).to receive(:add_project_live_state)
+        end
+
+        it 'should count towards retirement' do
+          expect(subject.should_count_towards_retirement?).to be true
+        end
       end
 
-      context "when the classification has the already_seen metadata value" do
-        let!(:classification) { create(:anonymous_already_seen_classification) }
+      context "when the user has already classified the subjects" do
+        let!(:seen) do
+          create(:user_seen_subject,
+                 user: classification.user,
+                 workflow: classification.workflow,
+                 subject_ids: classification.subject_ids)
+        end
+
+        it "should wrap the calls in a transaction" do
+          expect(Classification).to receive(:transaction)
+        end
+
+        it "should not call the #mark_expert_classifier method" do
+          expect(subject).to_not receive(:mark_expert_classifier)
+        end
+
+        it "should call the instance_eval on the passed block" do
+          expect(subject).to receive(:instance_eval)
+        end
+
+        it "should call the #publish_to_kafka method" do
+          expect(subject).to receive(:publish_to_kafka).once
+        end
 
         it 'should not count towards retirement' do
-          expect(subject.should_count_towards_retirement?).to be false
+          expect(subject.should_count_towards_retirement?).to be_falsey
+        end
+
+        it 'should not queue the count worker' do
+          expect(ClassificationCountWorker).to_not receive(:perform_async)
         end
       end
     end
 
-    context "when the user has not already classified the subjects" do
-
+    context "when invalid classification updates are made" do
       before(:each) do
-        uss = instance_double("UserSeenSubject")
-        allow(uss).to receive(:subjects_seen?).and_return(false)
-        allow(UserSeenSubject).to receive(:find_by).and_return(uss)
+        allow_any_instance_of(Classification).to receive(:save!)
+          .and_raise(ActiveRecord::RecordInvalid.new(classification))
       end
 
-      it "should wrap the calls in a transaction" do
-        expect(Classification).to receive(:transaction)
+      it 'should not call update_seen_subjects' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:update_seen_subjects)
+          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+        end
       end
 
-      it "should call the #mark_expert_classifier method" do
-        expect(subject).to receive(:mark_expert_classifier).once
+      it 'should not call publish to kafka' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:publish_to_kafka)
+          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+        end
       end
 
-      it "should call the #update_seen_subjects method" do
-        expect(subject).to receive(:update_seen_subjects).once
+      it 'should not call create_project_preferences' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:create_project_preference)
+          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+        end
       end
 
-      it "should call the instance_eval on the passed block" do
-        expect(subject).to receive(:instance_eval).once
-      end
-
-      it "should call the #publish_to_kafka method" do
-        expect(subject).to receive(:publish_to_kafka).once
-      end
-
-      it 'should count towards retirement' do
-        expect(subject.should_count_towards_retirement?).to be true
-      end
-    end
-
-    context "when the user has already classified the subjects" do
-      let!(:seen) do
-        create(:user_seen_subject,
-               user: classification.user,
-               workflow: classification.workflow,
-               subject_ids: classification.subject_ids)
-      end
-
-      it "should wrap the calls in a transaction" do
-        expect(Classification).to receive(:transaction)
-      end
-
-      it "should not call the #mark_expert_classifier method" do
-        expect(subject).to_not receive(:mark_expert_classifier)
-      end
-
-      it "should call the instance_eval on the passed block" do
-        expect(subject).to receive(:instance_eval)
-      end
-
-      it "should call the #publish_to_kafka method" do
-        expect(subject).to receive(:publish_to_kafka).once
-      end
-
-      it 'should not count towards retirement' do
-        expect(subject.should_count_towards_retirement?).to be_falsey
-      end
-
-      it 'should not queue the count worker' do
-        expect(ClassificationCountWorker).to_not receive(:perform_async)
+      it 'should not call should_count_towards_retirement?' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:should_count_towards_retirement?)
+          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+        end
       end
     end
   end
@@ -190,7 +239,6 @@ describe ClassificationLifecycle do
     after(:each) { subject.publish_to_kafka }
 
     context "when classificaiton is completed" do
-      let(:classification) { build(:classification) }
 
       it 'should publish to kafka' do
         serialized = ClassificationSerializer.serialize(classification).to_json
@@ -211,7 +259,6 @@ describe ClassificationLifecycle do
   describe "#create_project_preference" do
     context "with a user" do
       context "when no preference exists"  do
-        let(:classification) { build(:classification) }
 
         it 'should create a project preference' do
           expect do
@@ -260,7 +307,6 @@ describe ClassificationLifecycle do
     after(:each) { subject.update_seen_subjects }
 
     context "with a user" do
-      let(:classification) { build(:classification) }
       it 'should add the subject_id to the seen subjects' do
         expect(UserSeenSubject).to receive(:add_seen_subjects_for_user)
           .with(user: classification.user,
@@ -301,9 +347,7 @@ describe ClassificationLifecycle do
 
       before(:each) do
         classification.user = classification.project.owner if setup_as_owner
-        classification.save
         subject.mark_expert_classifier
-        classification.reload
       end
 
       context "when the classifying user is the project owner" do
@@ -320,6 +364,66 @@ describe ClassificationLifecycle do
         it 'should mark the classification as expert' do
           expect(classification.expert_classifier).to eq('expert')
         end
+      end
+    end
+  end
+
+  describe "#update_classification_data" do
+    let(:update_classification_data) { subject.update_classification_data }
+
+    it "should wrap the calls in a transaction" do
+      expect(Classification).to receive(:transaction)
+      update_classification_data
+    end
+
+    it "should call add_project_live_state" do
+      expect(subject).to receive(:add_project_live_state)
+      update_classification_data
+    end
+
+    it "should call mark_expert_classifier" do
+      expect(subject).to receive(:mark_expert_classifier)
+      update_classification_data
+    end
+
+    it "should call classification save!" do
+      expect(classification).to receive(:save!)
+      update_classification_data
+    end
+
+    context "when the user has seen the subjects before" do
+
+      it "should not call mark_expert_classifier" do
+        allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
+        expect(subject).to_not receive(:mark_expert_classifier)
+        update_classification_data
+      end
+    end
+  end
+
+  describe "#add_project_live_state" do
+
+    it "should leave all other metadata intact" do
+      prev_metadata = classification.metadata
+      subject.add_project_live_state
+      updated_metadata = classification.metadata.except(:live_project)
+      expect(updated_metadata).to eq(prev_metadata)
+    end
+
+    context "when the project is not live" do
+
+      it "should return false for the project live metadata" do
+        subject.add_project_live_state
+        expect(classification.metadata[:live_project]).to eq(false)
+      end
+    end
+
+    context "when the project is live" do
+
+      it "should return false for the project live metadata" do
+        allow_any_instance_of(Project).to receive(:live).and_return(true)
+        subject.add_project_live_state
+        expect(classification.metadata[:live_project]).to eq(true)
       end
     end
   end

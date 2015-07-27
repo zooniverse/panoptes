@@ -21,7 +21,6 @@ RSpec.describe ClassificationWorker do
       it 'should call publish to kafka' do
         expect_any_instance_of(ClassificationLifecycle).to receive(:publish_to_kafka)
       end
-
     end
 
     context ":create" do
@@ -39,6 +38,10 @@ RSpec.describe ClassificationWorker do
 
       it 'should call classification count worker' do
         expect(ClassificationCountWorker).to receive(:perform_async).twice
+      end
+
+      it 'should call update_seen_subjects' do
+        expect_any_instance_of(ClassificationLifecycle).to receive(:update_seen_subjects)
       end
 
       context "when a user has seen the subjects before" do

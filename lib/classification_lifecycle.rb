@@ -18,11 +18,13 @@ class ClassificationLifecycle
 
   def transact!(&block)
     Classification.transaction do
+      update_classification_data
+
       #NOTE: ensure the block is evaluated before updating the seen subjects
       # as the count worker won't fire if the seens are set, see #should_count_towards_retirement
       instance_eval(&block) if block_given?
+
       if subjects_are_unseen_by_user?
-        mark_expert_classifier
         update_seen_subjects
       end
       publish_to_kafka
@@ -49,18 +51,27 @@ class ClassificationLifecycle
     MultiKafkaProducer.publish('classifications', [classification.project.id, classification_json])
   end
 
+  def update_classification_data
+    if subjects_are_unseen_by_user?
+      mark_expert_classifier
+    end
+    add_project_live_state
+    classification.save!
+  end
+
   def mark_expert_classifier
     return unless classification.gold_standard
     if user && expert_level = project.expert_classifier_level(user)
-      classification.update(expert_classifier: expert_level)
+      classification.expert_classifier = expert_level
     end
   end
 
   def subjects_are_unseen_by_user?
-    !UserSeenSubject.find_by(user: user, workflow: workflow)
+    return @unseen if @unseen
+    @unseen = !UserSeenSubject.find_by!(user: user, workflow: workflow)
       .try(:subjects_seen?, subject_ids)
   rescue ActiveRecord::RecordNotFound
-    true
+    @unseen = true
   end
 
   def should_count_towards_retirement?
@@ -69,6 +80,11 @@ class ClassificationLifecycle
     else
       classification.anonymous? || subjects_are_unseen_by_user?
     end
+  end
+
+  def add_project_live_state
+    updated_metadata = classification.metadata.merge(live_project: project.live)
+    classification.metadata = updated_metadata
   end
 
   private
