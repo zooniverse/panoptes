@@ -4,6 +4,8 @@ RSpec.describe UserProjectPreference, :type => :model do
   let(:user_project) { build(:user_project_preference) }
   let(:factory) { :user_project_preference }
 
+  it_behaves_like "has preferences scope"
+
   it 'should have a valid factory' do
     expect(user_project).to be_valid
   end
