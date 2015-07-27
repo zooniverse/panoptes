@@ -13,5 +13,6 @@ module TasksVisitors
     alias :visit_instruction :inject_string
     alias :visit_question :inject_string
     alias :visit_label :inject_string
+    alias :visit_help :inject_string
   end
 end

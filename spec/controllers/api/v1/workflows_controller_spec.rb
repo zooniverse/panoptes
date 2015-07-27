@@ -59,7 +59,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
   describe '#update' do
     let(:subject_set) { create(:subject_set, project: project) }
-    let(:resource) { create(:workflow_with_contents, project: project) }
+    let(:resource) { create(:workflow_with_contents, active: false, project: project) }
     let(:test_attr) { :display_name }
     let(:test_attr_value) { "A Better Name" }
     let(:test_relation) { :subject_sets }
@@ -103,6 +103,94 @@ describe Api::V1::WorkflowsController, type: :controller do
         put :update, update_params.merge(id: resource.id)
         instance = Workflow.find(created_instance_id(api_resource_name))
         expect(instance.tasks["interest"]["question"]).to eq("interest.question")
+      end
+    end
+
+    context "when a project is live" do
+      before(:each) do
+        resource.update!(active: true)
+        project = resource.project
+        project.live = true
+        project.save!
+
+        default_request user_id: authorized_user.id, scopes: scopes
+        put :update, id: resource.id, workflows: update_params
+      end
+
+      context "when the update requests tasks to change" do
+        let(:update_params) do
+          {
+           tasks: {
+                   wintrest: {
+                              type: "draw",
+                              question: "Draw a Circle",
+                              next: "shape",
+                              tools: [
+                                      {value: "red", label: "Red", type: 'point', color: 'red'},
+                                      {value: "green", label: "Green", type: 'point', color: 'lime'},
+                                     ]
+                             }
+                  }
+          }
+        end
+
+        it 'should return 403' do
+          expect(response).to have_http_status(:forbidden)
+        end
+
+        it 'should not have changed the content model' do
+          content = resource.primary_content
+          expect{ content.reload }.to_not change{content.strings}
+        end
+      end
+
+      context "when the update requests grouped to change" do
+        let(:update_params) { { grouped: !resource.grouped } }
+
+        it 'should return 403' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context "when the update requests pairwise to change" do
+        let(:update_params) { { pairwise: !resource.pairwise } }
+
+        it 'should return 403' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context "when the update requests prioritizied to change" do
+        let(:update_params) { { prioritized: !resource.prioritized } }
+
+        it 'should return 403' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context "when the update requests first_task to change" do
+        let(:update_params) { { first_task: "last_task" } }
+
+        it 'should return 403' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context "when the user updates help text within a task" do
+        let(:update_params) do
+          tasks = resource.tasks
+          tasks[:interest][:help] = "Something new"
+          {tasks: tasks}
+        end
+
+        it 'should return 200' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'should update the content model' do
+          content = resource.primary_content
+          expect{ content.reload }.to change{ content.strings }
+        end
       end
     end
 
@@ -262,12 +350,8 @@ describe Api::V1::WorkflowsController, type: :controller do
         post :create, create_params
       end
 
-      it 'returns forbidden with a useful error' do
-        aggregate_failures "status and error" do
-          expect(response).to be_forbidden
-          msg = "Can't create a workflow for a live project."
-          expect(response.body).to eq(json_error_message(msg))
-        end
+      it 'sets the workflow active to false' do
+        expect(Workflow.find(json_response["workflows"][0]["id"]).active).to be false
       end
     end
   end
