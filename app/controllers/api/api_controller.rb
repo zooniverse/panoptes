@@ -42,8 +42,6 @@ module Api
     prepend_before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
                                                 API_ALLOWED_METHOD_OVERRIDES)
 
-    skip_before_action :verify_authenticity_token
-
     def current_resource_owner
       if doorkeeper_token
         @current_resource_owner ||= User.find_by_id(doorkeeper_token.resource_owner_id)

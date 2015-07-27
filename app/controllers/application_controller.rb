@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   include JSONApiRender
   include JSONApiResponses
 
-  protect_from_forgery with: :exception
+  protect_from_forgery with: :null_session
 
   before_filter :configure_permitted_parameters, if: :devise_controller?
 
