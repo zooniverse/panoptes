@@ -2,7 +2,7 @@ class Api::V1::SubjectsController < Api::ApiController
   include Versioned
 
   doorkeeper_for :update, :create, :destroy, :version, :versions,
-                 scopes: [:subject]
+    scopes: [:subject]
   resource_actions :default
   schema_type :json_schema
 
@@ -39,24 +39,29 @@ class Api::V1::SubjectsController < Api::ApiController
       object[:uploader] = api_user.user
     end
     add_locations(locations, subject)
+    subject
   end
 
   def build_update_hash(update_params, id)
     locations = update_params.delete(:locations)
     subject = Subject.find(id)
-    add_locations(locations, subject)
+    subject.locations = add_locations(locations, subject)
+    subject.save!
     super(update_params, id)
   end
 
   def add_locations(locations, subject)
-    (locations || []).each.with_index do |loc, i|
-      location_params = { content_type: loc, metadata: { index: i } }
-      if api_user.is_admin?
-        location_params.merge!(allow_any_content_type: true)
-      end
+    (locations || []).map.with_index do |loc, i|
+      location_params = case loc
+                        when String
+                          { content_type: loc }
+                        when Hash
+                          { content_type: loc.keys.first, external_link: true, src: loc.values.first }
+                        end
+      location_params.merge!(metadata: { index: i })
+      location_params.merge!(allow_any_content_type: true) if api_user.is_admin?
       subject.locations.build(location_params)
     end
-    subject
   end
 
   def context
@@ -70,8 +75,8 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def selector
     @selector ||= SubjectSelector.new(api_user,
-                                      workflow,
-                                      params,
-                                      controlled_resources)
+      workflow,
+      params,
+      controlled_resources)
   end
 end

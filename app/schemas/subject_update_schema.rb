@@ -11,7 +11,7 @@ class SubjectUpdateSchema < JsonSchema
     property "locations" do
       type "array"
       items do
-        type "string"
+        one_of({"type" => "string" }, {"type" => "object" })
       end
     end
 

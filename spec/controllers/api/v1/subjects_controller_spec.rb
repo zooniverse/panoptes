@@ -326,6 +326,20 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     it_behaves_like "is updatable"
+
+
+    it 'should create externally linked media resources' do
+      default_request user_id: authorized_user.id, scopes: scopes
+      external_locs = [{"image/jpeg" => "http://example.com/1.jpg"}, {"image/jpeg" => "http://example.com/2.jpg"}]
+      external_src_urls = external_locs.map { |loc| loc.to_a.flatten[1] }
+      update_params[:subjects].merge!(locations: external_locs)
+      put :update, update_params.merge(id: resource.id)
+      locations = Subject.find(created_instance_id("subjects")).locations
+      aggregate_failures "external srcs" do
+        expect(locations.map(&:external_link)).to all( be true )
+        expect(locations.map(&:src)).to match_array(external_src_urls)
+      end
+    end
   end
 
   describe "#create" do
@@ -351,6 +365,19 @@ describe Api::V1::SubjectsController, type: :controller do
       post :create, create_params
       locations = json_response[api_resource_name][0]["locations"].flat_map(&:keys)
       expect(locations).to eq(["image/jpeg", "image/jpeg", "image/png"])
+    end
+
+    it 'should create externally linked media resources' do
+      default_request user_id: authorized_user.id, scopes: scopes
+      external_locs = [{"image/jpeg" => "http://example.com/1.jpg"}, {"image/jpeg" => "http://example.com/2.jpg"}]
+      external_src_urls = external_locs.map { |loc| loc.to_a.flatten[1] }
+      create_params[:subjects].merge!(locations: external_locs)
+      post :create, create_params
+      locations = Subject.find(created_instance_id("subjects")).locations
+      aggregate_failures "external srcs" do
+        expect(locations.map(&:external_link)).to all( be true )
+        expect(locations.map(&:src)).to match_array(external_src_urls)
+      end
     end
 
     context "when the user is not-the owner of the project" do
