@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'jbundler', platform: :jruby
-gem 'rails', github: "edpaget/rails", branch: "4-2-stable"
+gem 'rails', '~> 4.2.3'
 gem 'postgres_ext', '~> 2.4.0'
 gem 'active_record_union', github: "edpaget/active_record_union", branch: "union-all"
 gem 'sdoc', '~> 0.4.0', group: :doc
