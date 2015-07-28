@@ -78,5 +78,25 @@ namespace :migrate do
       end
       puts "Updated #{ missing_token_count } users have unsubscribe tokens."
     end
+
+    desc "Create project preferences for projects classified on"
+    task create_project_preferences: :environment do
+      project = Project.find(ENV["PROJECT_ID"])
+
+      if user = User.find_by(id: ENV["USER_ID"])
+        p "Updating: #{user.login}"
+        UserProjectPreference.create!(user: user, project: project)
+      else
+        query = User.joins(:classifications)
+                .where(classifications: {project_id: project.id})
+                .where.not(id: UserProjectPreference.where(project: project).select(:user_id))
+                .distinct
+        total = query.count
+        query.find_each.with_index do |user, i|
+          p "Updating: #{i+1} of #{total}"
+          UserProjectPreference.create!(user: user, project: project)
+        end
+      end
+    end
   end
 end

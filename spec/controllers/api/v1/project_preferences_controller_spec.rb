@@ -46,13 +46,13 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     context "when the upp has no activity count" do
       let!(:project) { create(:project_with_workflow) }
       let!(:upps) do
-        create_list :user_project_preference, 2, user: authorized_user,
-          project: project, email_communication: true
+        [create(:user_project_preference, user: authorized_user, email_communication: true, project: project)]
       end
       let!(:user_seens) do
         create(:user_seen_subject, user: authorized_user,
           workflow: project.workflows.first, build_real_subjects: false)
       end
+
       let(:run_get) do
         allow_any_instance_of(UserProjectPreference).to receive(:activity_count).and_return(nil)
         default_request scopes: scopes, user_id: authorized_user.id
@@ -93,12 +93,12 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     let(:test_attr_value) { { "tutorial" => true } }
     let(:create_params) do
       {
-       project_preferences: {
-                             preferences: { tutorial: true },
-                             links: {
-                                     project: project.id.to_s
-                                    }
-                            }
+        project_preferences: {
+          preferences: { tutorial: true },
+          links: {
+            project: project.id.to_s
+          }
+        }
       }
     end
 
