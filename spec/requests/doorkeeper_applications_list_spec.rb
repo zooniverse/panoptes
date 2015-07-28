@@ -15,19 +15,10 @@ describe "doorkeeper applications list", type: :request do
     end
   end
 
-  context "when authenticated as a non-adming" do
-
-    it 'should not allow access but return forbidden' do
-      sign_in_as_a_valid_user
-      get_oauth_apps
-      expect(response.status).to eq(403)
-    end
-  end
-
-  context "when authenticated as an admin user" do
+  context "when authenticated" do
 
     it 'should allow access' do
-      sign_in_as_a_valid_user(:admin_user)
+      sign_in_as_a_valid_user(:user)
       get_oauth_apps
       expect(response.status).to eq(200)
     end
