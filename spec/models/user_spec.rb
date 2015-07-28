@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'spec_helper'
 
 describe User, type: :model do
@@ -746,4 +747,22 @@ describe User, type: :model do
       end
     end
   end
+
+  describe "#sync_identity_group" do
+    it 'should set the identity group login if the user login changes' do
+      user.login = "test"
+      user.save!
+      user.reload
+      expect(user.identity_group.name).to eq("test")
+    end
+
+    it 'should set the identity group display_name if the user display_name changes' do
+      user.display_name = "test"
+      user.save!
+      user.reload
+      expect(user.identity_group.display_name).to eq("test")
+    end
+  end
 end
+
+
