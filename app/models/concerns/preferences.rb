@@ -11,6 +11,7 @@ module Preferences
       @preferences_for = preference
       belongs_to @preferences_for, dependent: :destroy, counter_cache: counter_cache
       validates_presence_of @preferences_for
+      validates_uniqueness_of :user_id, scope: :"#{preference}_id"
     end
 
     def scope_for(action, user, opts={})
