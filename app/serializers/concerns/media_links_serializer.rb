@@ -61,7 +61,12 @@ module MediaLinksSerializer
                             href: media_href(model, link),
                             type: link.to_s.pluralize
                            }
-      data[:links][link][:id] = id if id
+      case id
+      when String
+        data[:links][link][:id] = id
+      when Array
+        data[:links][link][:ids] = id
+      end
     end
     data
   end
