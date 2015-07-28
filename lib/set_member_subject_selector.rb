@@ -30,20 +30,26 @@ class SetMemberSubjectSelector
   end
 
   def select_set_member_subjects_to_classify
-    if select_from_all?
-      select_all_workflow_set_member_subjects
-    else
-      select_non_retired_unseen_for_user
-    end
+    selection = if !user && !workflow.finished?
+                  select_non_retired
+                elsif select_from_all?
+                  select_all_workflow_set_member_subjects
+                else
+                  select_non_retired_unseen_for_user
+                end
+    selection.select(SELECT_FIELDS)
+  end
+
+  def select_non_retired
+    SetMemberSubject.non_retired_for_workflow(workflow)
   end
 
   def select_all_workflow_set_member_subjects
-    workflow.set_member_subjects.select(SELECT_FIELDS)
+    workflow.set_member_subjects
   end
 
   def select_non_retired_unseen_for_user
     SetMemberSubject.unseen_for_user_by_workflow(user, workflow)
-      .merge(SetMemberSubject.non_retired_for_workflow(workflow))
-      .select(SELECT_FIELDS)
+    .merge(SetMemberSubject.non_retired_for_workflow(workflow))
   end
 end
