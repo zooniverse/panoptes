@@ -14,7 +14,7 @@ Doorkeeper::Application.class_eval do
     elsif insecure?
       %w(refresh_token)
     else
-      %w(client_credentails authorization_code password refresh_token)
+      %w(client_credentials authorization_code password refresh_token)
     end
   end
 

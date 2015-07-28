@@ -1,5 +1,6 @@
 require_relative './gem_ext/doorkeeper/application'
 require_relative './gem_ext/doorkeeper/server'
+require_relative './gem_ext/doorkeeper/client_credentials_creator'
 require_relative './gem_ext/rails/query_methods.rb'
 require_relative './gem_ext/rails/reflection.rb'
 require_relative './gem_ext/rails/join_association.rb'
