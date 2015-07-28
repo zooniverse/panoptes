@@ -17,6 +17,7 @@ RSpec.describe TasksVisitors::InjectStrings do
       shape: {
         type: 'multiple',
         question: "shape.question",
+        help: "old",
         answers: [
           {value: 'smooth', label: "shape.answers.0.label"},
           {value: 'features', label: "shape.answers.1.label"},
@@ -82,7 +83,7 @@ RSpec.describe TasksVisitors::InjectStrings do
     it 'should substitute help strings' do
       help_vals = task_hash.values_at(:interest, :shape, :roundness)
                       .map { |hash| hash[:help] }.compact
-      expect(help_vals).to eq(%w(help))
+      expect(help_vals).to eq(%w(help old))
     end
 
     it 'should substitute a string at the correct index' do

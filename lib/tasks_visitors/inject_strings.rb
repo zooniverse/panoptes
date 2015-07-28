@@ -7,7 +7,7 @@ module TasksVisitors
     private
 
     def inject_string(n, path=nil)
-      @strings[n]
+      @strings[n] || n
     end
 
     alias :visit_instruction :inject_string
