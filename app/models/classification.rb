@@ -11,7 +11,7 @@ class Classification < ActiveRecord::Base
   validates_presence_of :subject_ids, :project,
     :workflow, :annotations, :user_ip, :workflow_version
 
-  validates :user, presence: true, if: :incomplete?
+  validates :user, presence: {message: "Only logged in users can store incomplete classifications"}, if: :incomplete?
   validate :metadata, :validate_metadata
   validate :validate_gold_standard
 

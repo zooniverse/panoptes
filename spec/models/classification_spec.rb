@@ -34,6 +34,12 @@ describe Classification, :type => :model do
     expect(classification).to_not be_valid
   end
 
+  it 'should have a reasonable message if it is incomplete with no user' do
+    classification = build(:classification, user: nil, completed: false)
+    classification.valid?
+    expect(classification.errors[:user][0]).to match("Only logged in users can store incomplete classifications")
+  end
+
   it 'should not be valid without workflow_version' do
     expect(build(:classification, workflow_version: nil)).to_not be_valid
   end
