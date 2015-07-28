@@ -98,5 +98,18 @@ namespace :migrate do
         end
       end
     end
+
+    desc "Sync user login/display_name with identity_group"
+    task sync_logins: :environment do
+      query = User.joins(:identity_group).where('"user_groups"."name" != "users"."login" OR "user_groups"."display_name" != "users"."display_name"')
+      total = query.count
+      query.find_each.with_index do |user, i|
+        puts "Updating #{ i+1 } of #{total}"
+        ig = user.identity_group
+        ig.name = user.login
+        ig.display_name = user.display_name
+        ig.save(validate: false)
+      end
+    end
   end
 end

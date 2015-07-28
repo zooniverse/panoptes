@@ -37,6 +37,7 @@ class User < ActiveRecord::Base
   belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
 
   before_validation :default_display_name, on: [:create, :update]
+  before_validation :sync_identity_group, on: [:update]
   before_validation :setup_unsubscribe_token, on: [:create]
   before_validation :update_ouroboros_created
 
@@ -245,5 +246,13 @@ class User < ActiveRecord::Base
 
   def set_ouroboros_api_key
     self.api_key = Digest::SHA1.hexdigest("#{ Time.now.utc }#{ email }")[0...20]
+  end
+
+  def sync_identity_group
+    if identity_group
+      identity_group.name = login if login_changed?
+      identity_group.display_name = display_name if display_name_changed?
+      identity_group.save!
+    end
   end
 end
