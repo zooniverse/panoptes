@@ -12,6 +12,18 @@ describe SetMemberSubjectSelector do
     count.workflow.save!
   end
 
+  context 'when ther is no user' do
+    let(:workflow) { create(:workflow_with_subjects) }
+    let(:selector) { SetMemberSubjectSelector.new(workflow, nil) }
+
+    context 'when the workflow is not finished' do
+      it 'should select from non_retired_for_workflow subjects' do
+        expect(SetMemberSubject).to receive(:non_retired_for_workflow).with(workflow).and_call_original
+        selector.set_member_subjects
+      end
+    end
+  end
+
   context 'when there is a user and they have participated before' do
     before { allow_any_instance_of(SetMemberSubjectSelector).to receive(:select_from_all?).and_return(false) }
 
