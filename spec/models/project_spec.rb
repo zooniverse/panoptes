@@ -270,4 +270,11 @@ describe Project, :type => :model do
       project.create_talk_admin(client)
     end
   end
+
+  describe '#slugged_name' do
+    let(:owner){ create :user, login: 'somebody' }
+    let(:project){ create :project, display_name: 'Some Awesome Project / Other Stuff', owner: owner }
+    subject{ project.slug }
+    it{ is_expected.to eql 'somebody/some-awesome-project-other-stuff' }
+  end
 end

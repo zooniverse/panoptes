@@ -12,7 +12,7 @@ class Project < ActiveRecord::Base
 
   EXPERT_ROLES = [:expert, :owner]
 
-  acts_as_url :display_name, sync_url: true, url_attribute: :slug, allow_duplicates: true
+  acts_as_url :slugged_name, allow_slash: true, sync_url: true, url_attribute: :slug, allow_duplicates: true
 
   has_many :workflows
   has_many :subject_sets, dependent: :destroy
@@ -90,5 +90,9 @@ class Project < ActiveRecord::Base
                           user_id: user.id,
                           section: "project-#{id}")
     end
+  end
+
+  def slugged_name
+    "#{ owner.try(:login) }/#{ display_name.gsub('/', '-') }"
   end
 end
