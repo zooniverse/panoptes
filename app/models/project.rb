@@ -43,6 +43,8 @@ class Project < ActiveRecord::Base
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
+  before_save :send_notifications
+
   can_by_role :destroy, :update, :update_links, :destroy_links, :create_classifications_export,
     :create_subjects_export, roles: [ :owner, :collaborator ]
 
@@ -94,5 +96,16 @@ class Project < ActiveRecord::Base
 
   def slugged_name
     "#{ owner.try(:login) || owner.try(:name) }/#{ display_name.gsub('/', '-') }"
+  end
+
+  def send_notifications
+    if Panoptes.project_request.recipients
+      request_type = if beta_requested_changed? && beta_requested
+                       "beta"
+                     elsif launch_requested_changed? && launch_requested
+                       "launch"
+                     end
+      ProjectRequestEmailWorker.perform_async(request_type, id) if request_type
+    end
   end
 end
