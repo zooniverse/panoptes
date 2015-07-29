@@ -93,6 +93,6 @@ class Project < ActiveRecord::Base
   end
 
   def slugged_name
-    "#{ owner.try(:login) }/#{ display_name.gsub('/', '-') }"
+    "#{ owner.try(:login) || owner.try(:name) }/#{ display_name.gsub('/', '-') }"
   end
 end
