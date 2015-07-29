@@ -52,16 +52,16 @@ class ClassificationLifecycle
   end
 
   def update_classification_data
-    if subjects_are_unseen_by_user?
-      mark_expert_classifier
-    end
+    mark_expert_classifier
+    add_seen_before_for_user
     add_project_live_state
     classification.save!
   end
 
   def mark_expert_classifier
-    return unless classification.gold_standard
-    if user && expert_level = project.expert_classifier_level(user)
+    unseen_gold_std = subjects_are_unseen_by_user? && classification.gold_standard
+    expert_user = user && expert_level = project.expert_classifier_level(user)
+    if unseen_gold_std && expert_user
       classification.expert_classifier = expert_level
     end
   end
@@ -83,8 +83,13 @@ class ClassificationLifecycle
   end
 
   def add_project_live_state
-    updated_metadata = classification.metadata.merge(live_project: project.live)
-    classification.metadata = updated_metadata
+    update_classification_metadata(:live_project, project.live)
+  end
+
+  def add_seen_before_for_user
+    if should_update_seen? && !subjects_are_unseen_by_user?
+      update_classification_metadata(:seen_before, true)
+    end
   end
 
   private
@@ -125,5 +130,10 @@ class ClassificationLifecycle
                                 workflow: workflow,
                                 subject_ids: subject_ids
                                }
+  end
+
+  def update_classification_metadata(key, value)
+    updated_metadata = classification.metadata.merge(key => value)
+    classification.metadata = updated_metadata
   end
 end
