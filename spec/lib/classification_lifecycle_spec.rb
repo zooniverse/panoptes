@@ -114,6 +114,13 @@ describe ClassificationLifecycle do
           expect(subject).to receive(:add_project_live_state)
         end
 
+        it "should call the #create_recent" do
+          aggregate_failures "recents" do
+            expect(subject).to receive(:create_recent).and_call_original
+            expect(Recent).to_not receive(:create_from_classification)
+          end
+        end
+
         it "should still evaluate the block" do
           expect(subject).to receive(:instance_eval)
         end
@@ -148,6 +155,13 @@ describe ClassificationLifecycle do
           expect(subject).to receive(:update_seen_subjects).once
         end
 
+        it "should call the #create_recent" do
+          aggregate_failures "recents" do
+            expect(subject).to receive(:create_recent).and_call_original
+            expect(Recent).to receive(:create_from_classification)
+          end
+        end
+
         it "should call the instance_eval on the passed block" do
           expect(subject).to receive(:instance_eval).once
         end
@@ -179,6 +193,13 @@ describe ClassificationLifecycle do
 
         it "should not call the #mark_expert_classifier method" do
           expect(subject).to_not receive(:mark_expert_classifier)
+        end
+
+        it "should call the #create_recent" do
+          aggregate_failures "recents" do
+            expect(subject).to receive(:create_recent).and_call_original
+            expect(Recent).to_not receive(:create_from_classification)
+          end
         end
 
         it "should call the instance_eval on the passed block" do

@@ -112,4 +112,19 @@ namespace :migrate do
       end
     end
   end
+
+  namespace :recent do
+
+    desc "Create missing recents from classifications"
+    task create_missing_recents: :environment do
+      query = Classification
+        .joins("LEFT OUTER JOIN recents ON recents.classification_id = classifications.id")
+        .where('recents.id IS NULL')
+      total = query.count
+      query.find_each.with_index do |classification, i|
+        puts "#{i+1} of #{total}"
+        Recent.create_from_classification(classification)
+      end
+    end
+  end
 end
