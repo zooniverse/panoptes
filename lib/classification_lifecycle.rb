@@ -24,9 +24,8 @@ class ClassificationLifecycle
       # as the count worker won't fire if the seens are set, see #should_count_towards_retirement
       instance_eval(&block) if block_given?
 
-      if subjects_are_unseen_by_user?
-        update_seen_subjects
-      end
+      create_recent
+      update_seen_subjects
       publish_to_kafka
     end
   end
@@ -41,8 +40,9 @@ class ClassificationLifecycle
   end
 
   def update_seen_subjects
-    return unless should_update_seen?
-    UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
+    if should_update_seen? && subjects_are_unseen_by_user?
+      UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
+    end
   end
 
   def publish_to_kafka
@@ -90,8 +90,9 @@ class ClassificationLifecycle
   private
 
   def create_recent
-    return unless should_update_seen?
-    Recent.create_from_classification(classification)
+    if should_update_seen? && subjects_are_unseen_by_user?
+      Recent.create_from_classification(classification)
+    end
   end
 
   def should_update_seen?
