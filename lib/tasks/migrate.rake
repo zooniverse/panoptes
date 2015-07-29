@@ -113,6 +113,15 @@ namespace :migrate do
     end
   end
 
+  namespace :slug do
+    desc "regenerate slugs"
+    task regenerate: :environment do
+      Project.find_each(&:save!)
+
+      Collection.find_each(&:save!)
+    end
+  end
+
   namespace :recent do
 
     desc "Create missing recents from classifications"

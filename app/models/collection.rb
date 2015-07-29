@@ -5,8 +5,7 @@ class Collection < ActiveRecord::Base
   include Linkable
   include PreferencesLink
   include PgSearch
-
-  acts_as_url :display_name, sync_url: true, url_attribute: :slug, allow_duplicates: true
+  include SluggedName
 
   belongs_to :project
   has_many :collections_subjects, dependent: :destroy

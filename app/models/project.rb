@@ -9,10 +9,9 @@ class Project < ActiveRecord::Base
   include ExtendedCacheKey
   include PgSearch
   include RankedModel
+  include SluggedName
 
   EXPERT_ROLES = [:expert, :owner]
-
-  acts_as_url :slugged_name, allow_slash: true, sync_url: true, url_attribute: :slug, allow_duplicates: true
 
   has_many :workflows
   has_many :subject_sets, dependent: :destroy
