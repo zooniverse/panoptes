@@ -106,12 +106,16 @@ describe ClassificationLifecycle do
             .and_call_original
         end
 
+        it "should call the #update_classification_data" do
+          expect(subject).to receive(:update_classification_data)
+        end
+
         it "should not attempt to update the seen subjects" do
           expect_any_instance_of(UserSeenSubject).to_not receive(:subjects_seen?)
         end
 
-        it "should call the #add_project_live_state" do
-          expect(subject).to receive(:add_project_live_state)
+        it "should evaluate the block" do
+          expect(subject).to receive(:instance_eval)
         end
 
         it "should call the #create_recent" do
@@ -121,8 +125,12 @@ describe ClassificationLifecycle do
           end
         end
 
-        it "should still evaluate the block" do
-          expect(subject).to receive(:instance_eval)
+        it "should call the #update_seen_subjects" do
+          expect(subject).to receive(:update_seen_subjects)
+        end
+
+        it "should call the #publish_to_kafka" do
+          expect(subject).to receive(:publish_to_kafka)
         end
 
         context "when the classification has the already_seen metadata value" do
@@ -147,12 +155,12 @@ describe ClassificationLifecycle do
             .and_call_original
         end
 
-        it "should call the #mark_expert_classifier method" do
-          expect(subject).to receive(:mark_expert_classifier).once
+        it "should call the #update_classification_data" do
+          expect(subject).to receive(:update_classification_data)
         end
 
-        it "should call the #update_seen_subjects method" do
-          expect(subject).to receive(:update_seen_subjects).once
+        it "should evaluate the block" do
+          expect(subject).to receive(:instance_eval)
         end
 
         it "should call the #create_recent" do
@@ -163,15 +171,15 @@ describe ClassificationLifecycle do
         end
 
         it "should call the instance_eval on the passed block" do
-          expect(subject).to receive(:instance_eval).once
+          expect(subject).to receive(:instance_eval)
+        end
+
+        it "should call the #update_seen_subjects" do
+          expect(subject).to receive(:update_seen_subjects)
         end
 
         it "should call the #publish_to_kafka method" do
-          expect(subject).to receive(:publish_to_kafka).once
-        end
-
-        it "should call the #add_project_live_state" do
-          expect(subject).to receive(:add_project_live_state)
+          expect(subject).to receive(:publish_to_kafka)
         end
 
         it 'should count towards retirement' do
@@ -187,27 +195,11 @@ describe ClassificationLifecycle do
                  subject_ids: classification.subject_ids)
         end
 
-        it "should wrap the calls in a transaction" do
-          expect(Classification).to receive(:transaction)
-        end
-
-        it "should not call the #mark_expert_classifier method" do
-          expect(subject).to_not receive(:mark_expert_classifier)
-        end
-
         it "should call the #create_recent" do
           aggregate_failures "recents" do
             expect(subject).to receive(:create_recent).and_call_original
             expect(Recent).to_not receive(:create_from_classification)
           end
-        end
-
-        it "should call the instance_eval on the passed block" do
-          expect(subject).to receive(:instance_eval)
-        end
-
-        it "should call the #publish_to_kafka method" do
-          expect(subject).to receive(:publish_to_kafka).once
         end
 
         it 'should not count towards retirement' do
@@ -226,23 +218,30 @@ describe ClassificationLifecycle do
           .and_raise(ActiveRecord::RecordInvalid.new(classification))
       end
 
-      it 'should not call update_seen_subjects' do
+      it "should not call the instance_eval on the passed block" do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:instance_eval)
+          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
+      it 'should not call #create_recent' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:create_recent)
+          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
+      it 'should not call #update_seen_subjects' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:update_seen_subjects)
           expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
 
-      it 'should not call publish to kafka' do
+      it 'should not call #publish_to_kafka' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:publish_to_kafka)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call create_project_preferences' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:create_project_preference)
           expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
@@ -368,14 +367,23 @@ describe ClassificationLifecycle do
 
       before(:each) do
         classification.user = classification.project.owner if setup_as_owner
-        subject.mark_expert_classifier
       end
 
       context "when the classifying user is the project owner" do
         let!(:setup_as_owner) { true }
 
         it 'should mark the classification as expert' do
+          subject.mark_expert_classifier
           expect(classification.expert_classifier).to eq('owner')
+        end
+
+        context "when the subject is already seen" do
+
+          it "should not mark the classification as expert" do
+            allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
+            subject.mark_expert_classifier
+            expect(classification.expert_classifier).to be_nil
+          end
         end
       end
 
@@ -383,6 +391,7 @@ describe ClassificationLifecycle do
         let(:roles) { ['expert'] }
 
         it 'should mark the classification as expert' do
+          subject.mark_expert_classifier
           expect(classification.expert_classifier).to eq('expert')
         end
       end
@@ -402,6 +411,11 @@ describe ClassificationLifecycle do
       update_classification_data
     end
 
+    it "should call add_seen_before_for_user" do
+      expect(subject).to receive(:add_seen_before_for_user)
+      update_classification_data
+    end
+
     it "should call mark_expert_classifier" do
       expect(subject).to receive(:mark_expert_classifier)
       update_classification_data
@@ -410,15 +424,6 @@ describe ClassificationLifecycle do
     it "should call classification save!" do
       expect(classification).to receive(:save!)
       update_classification_data
-    end
-
-    context "when the user has seen the subjects before" do
-
-      it "should not call mark_expert_classifier" do
-        allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
-        expect(subject).to_not receive(:mark_expert_classifier)
-        update_classification_data
-      end
     end
   end
 
@@ -445,6 +450,44 @@ describe ClassificationLifecycle do
         allow_any_instance_of(Project).to receive(:live).and_return(true)
         subject.add_project_live_state
         expect(classification.metadata[:live_project]).to eq(true)
+      end
+    end
+  end
+
+  describe "#add_seen_before_for_user" do
+
+    it "should leave all other metadata intact" do
+      prev_metadata = classification.metadata
+      subject.add_seen_before_for_user
+      updated_metadata = classification.metadata.except(:seen_before)
+      expect(updated_metadata).to eq(prev_metadata)
+    end
+
+    context "when the classification is anonymous" do
+
+      it "should not add the seen_before metadata value" do
+        subject.add_seen_before_for_user
+        expect(classification.metadata.has_key?(:seen_before)).to eq(false)
+      end
+    end
+
+    context "when the classification is for a user" do
+
+      context "when the user has not seen the subject before" do
+
+        it "should not add the seen_before metadata value" do
+          subject.add_seen_before_for_user
+          expect(classification.metadata.has_key?(:seen_before)).to eq(false)
+        end
+      end
+
+      context "when the user has seen the subject before" do
+
+        it "should add the seen_before metadata value" do
+          allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
+          subject.add_seen_before_for_user
+          expect(classification.metadata[:seen_before]).to eq(true)
+        end
       end
     end
   end
