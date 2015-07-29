@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150722180408) do
+ActiveRecord::Schema.define(version: 20150729165415) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -197,14 +197,13 @@ ActiveRecord::Schema.define(version: 20150722180408) do
   end
 
   create_table "set_member_subjects", force: :cascade do |t|
-    t.integer  "subject_set_id",       index: {name: "index_set_member_subjects_on_subject_set_id"}
-    t.integer  "subject_id",           index: {name: "index_set_member_subjects_on_subject_id"}
+    t.integer  "subject_set_id", index: {name: "index_set_member_subjects_on_subject_set_id"}
+    t.integer  "subject_id",     index: {name: "index_set_member_subjects_on_subject_id"}
     t.datetime "created_at"
     t.datetime "updated_at"
     t.decimal  "priority"
-    t.integer  "lock_version",         default: 0
-    t.decimal  "random",               null: false, index: {name: "index_set_member_subjects_on_random"}
-    t.integer  "retired_workflow_ids", default: [],              array: true, index: {name: "index_set_member_subjects_on_retired_workflow_ids"}
+    t.integer  "lock_version",   default: 0
+    t.decimal  "random",         null: false, index: {name: "index_set_member_subjects_on_random"}
   end
   add_index "set_member_subjects", ["subject_id", "subject_set_id"], name: "index_set_member_subjects_on_subject_id_and_subject_set_id", unique: true
 
