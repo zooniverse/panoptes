@@ -78,14 +78,14 @@ class TalkApiClient
   end
 
   def initial_request
-    request('get', '').body.each do |_, resource|
+    request('get', '', accept_header: "application/json").body.each do |_, resource|
       @resources[resource['type']] = JSONAPIResource.new(self, resource['type'], resource['href'])
     end
   end
 
-  def request(method, path, *args)
+  def request(method, path, *args, accept_header: "application/vnd.api+json")
     connection.send(method, path, *args) do |req|
-      req.headers["Accept"] = "application/vnd.api+json"
+      req.headers["Accept"] = accept_header
       req.headers["Content-Type"] = "application/json"
       req.headers["Authorization"] = "Bearer #{token.token}"
       yield req if block_given?
