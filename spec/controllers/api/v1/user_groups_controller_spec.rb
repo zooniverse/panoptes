@@ -30,6 +30,9 @@ describe Api::V1::UserGroupsController, type: :controller do
     let(:private_resource) { user_groups[1] }
     let(:n_visible) { 2 }
     let(:resource) { user_groups[-1] }
+    let(:deactivated_resource) { create(:user_group, activated_state: :inactive) }
+
+    it_behaves_like "it only lists active resources"
 
     context "filtering by name" do
       it 'should return only the requested group' do

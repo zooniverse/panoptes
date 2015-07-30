@@ -21,6 +21,7 @@ describe Api::V1::UsersController, type: :controller do
       "users.collection_preferences",
       "users.recents" ]
   end
+  let(:deactivated_resource) { create(:user, activated_state: :inactive) }
 
   let(:response_fb_token) do
     json_response[api_resource_name][0]["firebase_auth_token"]
@@ -33,6 +34,8 @@ describe Api::V1::UsersController, type: :controller do
         get :index
       end
 
+      it_behaves_like "it only lists active resources"
+
       it "should return 200" do
         expect(response.status).to eq(200)
       end
@@ -40,7 +43,6 @@ describe Api::V1::UsersController, type: :controller do
       it "should have twenty items by default" do
         expect(json_response[api_resource_name].length).to eq(2)
       end
-
 
       context "the record for the requesting user" do
         let(:requester) { json_response[api_resource_name].find{ |records| records["id"] == users.first.id.to_s } }

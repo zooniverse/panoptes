@@ -25,12 +25,13 @@ describe Api::V1::CollectionsController, type: :controller do
       create :collection_with_subjects, private: true
     end
     let(:resource) { collection }
-
     let(:n_visible) { 2 }
+    let(:deactivated_resource) { create(:collection, activated_state: :inactive) }
 
     it_behaves_like "is indexable"
     it_behaves_like "it has custom owner links"
     it_behaves_like 'has many filterable', :subjects
+    it_behaves_like "it only lists active resources"
 
     context "it is filterable by favorite" do
       let!(:favorite_col) { create(:collection, favorite: true) }
