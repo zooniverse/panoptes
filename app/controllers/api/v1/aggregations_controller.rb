@@ -13,4 +13,12 @@ class Api::V1::AggregationsController < Api::ApiController
                               .where(workflows: { subject_set_id: subject_set_ids } )
     end
   end
+
+  def scope_context
+    {}.tap do |context|
+      if workflow_id = params[:workflow_id]
+        context.merge({ workflow_id: workflow_id })
+      end
+    end
+  end
 end

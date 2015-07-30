@@ -14,8 +14,14 @@ class Aggregation < ActiveRecord::Base
   validate :aggregation, :workflow_version_present
 
   def self.scope_for(action, user, opts={})
-    return super unless (action == :show || action == :index) && !user.is_admin?
-    joins(:workflow).merge(Workflow.scope_for(:update, user, opts))
+    case
+    when action == :index && opts[:workflow_id]
+      joins(:workflow).where(workflow_id: opts[:workflow_id])
+    when (action == :show || action == :index) && !user.is_admin?
+      joins(:workflow).merge(Workflow.scope_for(:update, user, opts))
+    else
+      super
+    end
   end
 
   private

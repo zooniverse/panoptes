@@ -17,6 +17,29 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
     let(:n_visible) { 2 }
 
     it_behaves_like "is indexable"
+
+    context "non-logged in users", :focus do
+      before(:each) do
+        get :index, workflow_id: workflow.id
+      end
+
+      context "when the workflow does not have public aggregation" do
+        let(:workflow) { create(:workflow) }
+
+        it "should return unauthorized" do
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
+      context "when the workflow has the public aggregation flag" do
+        let(:workflow) { create(:workflow, aggregation: { public: true }) }
+
+        it "should return all the workflow data" do
+          get :index, workflow_id: workflow.id
+          expect(json_response[api_resource_name].length).to eq n_visible
+        end
+      end
+    end
   end
 
   describe "#show" do
