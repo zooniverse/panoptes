@@ -30,6 +30,7 @@ describe Api::V1::ProjectsController, type: :controller do
   let!(:private_resource) { create(:project, private: true) }
   let!(:beta_resource) { create(:project, beta_approved: true, launch_approved: false) }
   let!(:unapproved_resource) { create(:project, beta_approved: false, launch_approved: false) }
+  let!(:deactivated_resource) { create(:project, activated_state: :inactive) }
 
   describe "when not logged in" do
     describe "#index" do
@@ -37,6 +38,7 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:n_visible) { 4 }
       it_behaves_like "is indexable"
       it_behaves_like "it has custom owner links"
+      it_behaves_like "it only lists active resources"
     end
   end
 
@@ -185,7 +187,7 @@ describe Api::V1::ProjectsController, type: :controller do
             end
 
             it 'should return projects in project rank order' do
-              ranked_ids = Project.where(launch_approved: true, private: false).rank(:launched_row_order).pluck(:id).map(&:to_s)
+              ranked_ids = Project.active.where(launch_approved: true, private: false).rank(:launched_row_order).pluck(:id).map(&:to_s)
               expect(ids).to match_array(ranked_ids)
             end
           end
