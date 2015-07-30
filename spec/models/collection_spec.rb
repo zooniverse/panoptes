@@ -12,6 +12,7 @@ describe Collection, :type => :model do
 
   it_behaves_like "is ownable"
   it_behaves_like "activatable"
+  it_behaves_like "has slugged name"
 
   it "should have a valid factory" do
     expect(build(:collection)).to be_valid
