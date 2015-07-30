@@ -40,6 +40,15 @@ RSpec.describe RoleControl::Actor do
         do_chain.to(ControlledResource)
       end
 
+      context "when passing add_active_scope: false" do
+
+        it "should not call active" do
+          allow(ControlledResource).to receive(:respond_to?).and_return(true)
+          expect(ControlledResource).to_not receive(:active)
+          do_chain.to(ControlledResource, add_active_scope: false)
+        end
+      end
+
       context "when the klass responds to active" do
 
         it "should not call active" do

@@ -8,9 +8,11 @@ module RoleControl
         @actor = actor
       end
 
-      def to(klass, context={})
+      def to(klass, context={}, add_active_scope: true)
         @scope = klass.scope_for(action, actor, context)
-        @scope = @scope.merge(klass.active) if klass.respond_to?(:active)
+        if add_active_scope && klass.respond_to?(:active)
+          @scope = @scope.merge(klass.active)
+        end
         self
       end
 
