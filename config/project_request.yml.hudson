@@ -1,0 +1,9 @@
+development:
+  base_url: http://localhost:3735
+  recipients:
+    - ed@zooniverse.org
+
+test:
+  base_url: http://example.com
+  recipients:
+    - ed@example.com

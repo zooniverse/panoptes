@@ -273,8 +273,55 @@ describe Project, :type => :model do
 
   describe '#slugged_name' do
     let(:owner){ create :user, login: 'somebody' }
-    let(:project){ create :project, display_name: 'Some Awesome Project / Other Stuff', owner: owner }
+    let(:project) { create :project, display_name: 'Some Awesome Project / Other Stuff', owner: owner }
     subject{ project.slug }
     it{ is_expected.to eql 'somebody/some-awesome-project-other-stuff' }
+  end
+
+  describe "#send_notifications" do
+    let!(:project) { create(:project, field => !value) }
+
+    after(:each) do
+      project.send("#{field}=", value)
+      project.save!
+    end
+
+    context "when beta_requested changed" do
+      let(:field) { "beta_requested" }
+
+      context "when true" do
+        let(:value) { true }
+        it 'should queue the worker' do
+          expect(ProjectRequestEmailWorker).to receive(:perform_async).with("beta", project.id)
+        end
+      end
+
+      context "when false" do
+        let(:value) { false }
+
+        it 'should not queue the worker' do
+          expect(ProjectRequestEmailWorker).not_to receive(:perform_async)
+        end
+      end
+    end
+
+    context "when launch_requested changed" do
+      let(:field) { "launch_requested" }
+
+      context "when true" do
+        let(:value) { true }
+        it 'should queue the worker' do
+          expect(ProjectRequestEmailWorker).to receive(:perform_async).with("launch", project.id)
+        end
+      end
+
+      context "when false" do
+        let(:value) { false }
+
+        it 'should not queue the worker' do
+          expect(ProjectRequestEmailWorker).not_to receive(:perform_async)
+        end
+      end
+    end
   end
 end
