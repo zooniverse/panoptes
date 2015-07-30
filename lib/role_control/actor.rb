@@ -10,6 +10,7 @@ module RoleControl
 
       def to(klass, context={})
         @scope = klass.scope_for(action, actor, context)
+        @scope = @scope.merge(klass.active) if klass.respond_to?(:active)
         self
       end
 
@@ -17,9 +18,6 @@ module RoleControl
         @scope = scope.where(id: ids).order(:id) unless ids.blank?
         self
       end
-
-      private
-
     end
 
     def do(action, &block)
