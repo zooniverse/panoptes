@@ -20,7 +20,7 @@ module RoleControl
 
     def controlled_resources
       @controlled_resources ||= api_user.do(controlled_scope)
-        .to(resource_class, scope_context)
+        .to(resource_class, scope_context, add_active_scope: add_active_resources_scope)
         .with_ids(resource_ids)
         .scope
     end
@@ -55,6 +55,10 @@ module RoleControl
 
     def scope_context
       {}
+    end
+
+    def add_active_resources_scope
+      true
     end
   end
 end

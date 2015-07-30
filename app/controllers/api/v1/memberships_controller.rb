@@ -7,5 +7,9 @@ class Api::V1::MembershipsController < Api::ApiController
   allowed_params :create, links: [:user, :user_group]
   allowed_params :update, :state
 
-  protected
+  private
+
+  def add_active_resources_scope
+    false
+  end
 end
