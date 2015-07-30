@@ -43,7 +43,7 @@ class Project < ActiveRecord::Base
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
-  before_save :send_notifications
+  after_update :send_notifications
 
   can_by_role :destroy, :update, :update_links, :destroy_links, :create_classifications_export,
     :create_subjects_export, roles: [ :owner, :collaborator ]

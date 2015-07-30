@@ -279,47 +279,67 @@ describe Project, :type => :model do
   end
 
   describe "#send_notifications" do
-    let!(:project) { create(:project, field => !value) }
 
-    after(:each) do
-      project.send("#{field}=", value)
-      project.save!
-    end
+    context "when the project does not exist" do
+      let(:project) { build(:project) }
 
-    context "when beta_requested changed" do
-      let(:field) { "beta_requested" }
-
-      context "when true" do
-        let(:value) { true }
-        it 'should queue the worker' do
-          expect(ProjectRequestEmailWorker).to receive(:perform_async).with("beta", project.id)
-        end
-      end
-
-      context "when false" do
-        let(:value) { false }
-
-        it 'should not queue the worker' do
-          expect(ProjectRequestEmailWorker).not_to receive(:perform_async)
-        end
+      it 'should not call the callback' do
+        expect(project).to_not receive(:send_notifications)
+        project.save
       end
     end
 
-    context "when launch_requested changed" do
-      let(:field) { "launch_requested" }
+    context "when the project does exist" do
+      let(:project) { create(:project) }
 
-      context "when true" do
-        let(:value) { true }
-        it 'should queue the worker' do
-          expect(ProjectRequestEmailWorker).to receive(:perform_async).with("launch", project.id)
+      it 'should call the callback' do
+        expect(project).to receive(:send_notifications)
+        project.save
+      end
+    end
+
+    context "when the project exists with inverted field values" do
+      let!(:project) { create(:project, field => !value) }
+      after(:each) do
+        project.send("#{field}=", value)
+        project.save!
+      end
+
+      context "when beta_requested changed" do
+        let(:field) { "beta_requested" }
+
+        context "when true" do
+          let(:value) { true }
+          it 'should queue the worker' do
+            expect(ProjectRequestEmailWorker).to receive(:perform_async).with("beta", project.id)
+          end
+        end
+
+        context "when false" do
+          let(:value) { false }
+
+          it 'should not queue the worker' do
+            expect(ProjectRequestEmailWorker).not_to receive(:perform_async)
+          end
         end
       end
 
-      context "when false" do
-        let(:value) { false }
+      context "when launch_requested changed" do
+        let(:field) { "launch_requested" }
 
-        it 'should not queue the worker' do
-          expect(ProjectRequestEmailWorker).not_to receive(:perform_async)
+        context "when true" do
+          let(:value) { true }
+          it 'should queue the worker' do
+            expect(ProjectRequestEmailWorker).to receive(:perform_async).with("launch", project.id)
+          end
+        end
+
+        context "when false" do
+          let(:value) { false }
+
+          it 'should not queue the worker' do
+            expect(ProjectRequestEmailWorker).not_to receive(:perform_async)
+          end
         end
       end
     end
