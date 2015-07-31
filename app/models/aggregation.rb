@@ -15,8 +15,9 @@ class Aggregation < ActiveRecord::Base
 
   def self.scope_for(action, user, opts={})
     case
-    when action == :index && opts[:workflow_id]
-      joins(:workflow).where(workflow_id: opts[:workflow_id])
+    when action == :index && opts.has_key?(:public_workflow_ids)
+      workflow_ids = opts.delete(:public_workflow_ids)
+      joins(:workflow).where(workflow_id: workflow_ids)
     when (action == :show || action == :index) && !user.is_admin?
       joins(:workflow).merge(Workflow.scope_for(:update, user, opts))
     else

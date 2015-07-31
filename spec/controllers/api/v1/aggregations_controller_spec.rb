@@ -18,15 +18,13 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
     it_behaves_like "is indexable"
 
-    context "non-logged in users", :focus do
-      before(:each) do
-        get :index, workflow_id: workflow.id
-      end
+    context "non-logged in users" do
 
       context "when the workflow does not have public aggregation" do
         let(:workflow) { create(:workflow) }
 
         it "should return unauthorized" do
+          get :index, workflow_id: workflow.id
           expect(response).to have_http_status(:unauthorized)
         end
       end
@@ -34,9 +32,31 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
       context "when the workflow has the public aggregation flag" do
         let(:workflow) { create(:workflow, aggregation: { public: true }) }
 
-        it "should return all the workflow data" do
+        it "should return all the aggregated data for the supplied workflow" do
           get :index, workflow_id: workflow.id
           expect(json_response[api_resource_name].length).to eq n_visible
+        end
+
+        context "when not supplying a workflow id" do
+
+          it "should return unauthorized" do
+            get :index
+            expect(response).to have_http_status(:unauthorized)
+          end
+        end
+
+        context "filtering on subject_id" do
+          let(:subject_id) { "#{aggregations.last.subject_id}" }
+
+          it "should return all the aggregated data for the supplied workflow" do
+            get :index, workflow_id: workflow.id, subject_id: subject_id
+            aggregate_failures "filtering" do
+              resources = json_response[api_resource_name]
+              expect(resources.length).to eq(1)
+              aggregation = resources.first
+              expect(aggregation["links"]["subject"]).to eq(subject_id)
+            end
+          end
         end
       end
     end
