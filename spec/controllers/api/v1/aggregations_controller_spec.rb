@@ -22,9 +22,9 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
       context "when the workflow does not have public aggregation" do
         let(:workflow) { create(:workflow) }
 
-        it "should return unauthorized" do
+        it "should return an empty resource set" do
           get :index, workflow_id: workflow.id
-          expect(response).to have_http_status(:unauthorized)
+          expect(json_response[api_resource_name].length).to eq(0)
         end
       end
 
@@ -38,18 +38,18 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
         context "when not supplying a workflow id" do
 
-          it "should return unauthorized" do
+          it "should return an empty resource set" do
             get :index
-            expect(response).to have_http_status(:unauthorized)
+            expect(json_response[api_resource_name].length).to eq(0)
           end
         end
 
         context "when supplying a mix of public and non public workflow ids" do
 
-          it "should return unauthorized" do
+          it "should return an empty resource set" do
             ids = [ workflow.id, private_resource.workflow_id ]
             get :index, workflow_ids: ids.join(",")
-            expect(response).to have_http_status(:unauthorized)
+            expect(json_response[api_resource_name].length).to eq(0)
           end
         end
 
@@ -76,7 +76,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
     it_behaves_like "is showable"
 
-    context "non-logged in users" do
+    context "non-logged in users", :focus do
 
       context "when the workflow does not have public aggregation" do
         let(:workflow) { create(:workflow) }

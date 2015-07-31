@@ -379,7 +379,8 @@ ActiveRecord::Schema.define(version: 20150730160541) do
     t.integer  "retired_set_member_subjects_count", default: 0
     t.jsonb    "retirement",                        default: {}
     t.boolean  "active",                            default: true, index: {name: "index_workflows_on_active", where: "(active = true)"}
-    t.json     "aggregation",                       default: {},    null: false
+    t.jsonb    "aggregation",                       default: {},    null: false
+    t.index name: "index_workflows_on_aggregation", expression: "(aggregation ->> 'public'::text)"
   end
 
   add_foreign_key "recents", "classifications"
