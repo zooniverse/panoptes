@@ -81,9 +81,9 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
       context "when the workflow does not have public aggregation" do
         let(:workflow) { create(:workflow) }
 
-        it "should return unauthorized" do
+        it "should return not_found" do
           get :show, id: resource.id
-          expect(response).to have_http_status(:unauthorized)
+          expect(response).to have_http_status(:not_found)
         end
       end
 
