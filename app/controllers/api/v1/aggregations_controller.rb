@@ -26,14 +26,17 @@ class Api::V1::AggregationsController < Api::ApiController
   end
 
   def workflow_ids
-    @workflow_ids ||= params[:workflow_id].try(:split, ',')
+    @workflow_ids ||= params.slice(:workflow_id, :workflow_ids)
+      .values.join(",").split(',')
   end
 
   def public_workflows?
     return @public_workflows if @public_workflows
-    return false if workflow_ids.blank?
-    public_count = Workflow.where(id: workflow_ids)
-      .where("aggregation ->> 'public' = 'true'").count
-    @public_workflows = public_count == workflow_ids.size
+    @public_workflows = false
+    unless workflow_ids.blank?
+      public_count = Workflow.where(id: workflow_ids)
+        .where("aggregation ->> 'public' = 'true'").count
+      @public_workflows = public_count == workflow_ids.size
+    end
   end
 end

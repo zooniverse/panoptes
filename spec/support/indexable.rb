@@ -35,20 +35,20 @@ RSpec.shared_examples "is indexable" do |private_test=true|
     context 'when the authorized_user is an admin' do
       let(:authorized_user) { create(:user, admin: true) }
 
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id if authorized_user
+      end
+
       context 'when an admin param is set' do
         it 'should include the non-visible resource' do
-          default_request scopes: scopes, user_id: authorized_user.id if authorized_user
           get :index, ips.merge(admin: 'literally_anything!')
-
           expect(resource_ids).to include private_resource.id
         end
       end
 
       context 'when no admin param is set' do
         it 'should not include the non-visible resource' do
-          default_request scopes: scopes, user_id: authorized_user.id if authorized_user
           get :index, ips
-
           expect(resource_ids).to_not include private_resource.id
         end
       end

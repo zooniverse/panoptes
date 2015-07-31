@@ -2,7 +2,6 @@ require "spec_helper"
 
 RSpec.describe Api::V1::AggregationsController, type: :controller do
   let(:api_resource_name) { 'aggregations' }
-
   let(:api_resource_attributes) { %w(id created_at updated_at aggregation) }
   let(:api_resource_links) { %w(aggregations.workflow aggregations.subject) }
 
@@ -41,6 +40,15 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
           it "should return unauthorized" do
             get :index
+            expect(response).to have_http_status(:unauthorized)
+          end
+        end
+
+        context "when supplying a mix of public and non public workflow ids" do
+
+          it "should return unauthorized" do
+            ids = [ workflow.id, private_resource.workflow_id ]
+            get :index, workflow_ids: ids.join(",")
             expect(response).to have_http_status(:unauthorized)
           end
         end
