@@ -38,7 +38,7 @@ module RoleControl
     end
 
     def resource_ids
-      @resource_ids = _resource_ids
+      @resource_ids ||= _resource_ids
     end
 
     def _resource_ids

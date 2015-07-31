@@ -75,6 +75,30 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
     let(:authorized_user) { resource.workflow.project.owner }
 
     it_behaves_like "is showable"
+
+    context "non-logged in users" do
+
+      context "when the workflow does not have public aggregation" do
+        let(:workflow) { create(:workflow) }
+
+        it "should return unauthorized" do
+          get :show, id: resource.id
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
+      context "when the workflow has the public aggregation flag" do
+
+        it "should return the aggregated resource with a public workflow" do
+          resource.workflow.update_column(:aggregation, { public: true })
+          get :show, id: resource.id
+          aggregate_failures "public show" do
+            expect(json_response[api_resource_name].length).to eq(1)
+            expect(created_instance(api_resource_name)["id"]).to eq("#{resource.id}")
+          end
+        end
+      end
+    end
   end
 
   describe "create" do
