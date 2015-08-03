@@ -4,10 +4,19 @@ RSpec.describe PostgresqlSelection do
 
   shared_examples "select for incomplete_project" do
     let(:args) { {} }
+    let(:unseen_count) do
+      if ss_id = args[:subject_set_id]
+        group_sms = SetMemberSubject.where(subject_set_id: ss_id)
+        group_sms.count - group_sms.where(id: uss.subject_ids).count
+      else
+        SetMemberSubject.count - seen_count
+      end
+    end
 
     context "when a user has only seen a few subjects" do
+      let(:seen_count) { 5 }
       let!(:uss) do
-        subject_ids = sms.sample(5).map(&:subject_id)
+        subject_ids = sms.sample(seen_count).map(&:subject_id)
         create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
       end
 
@@ -20,22 +29,24 @@ RSpec.describe PostgresqlSelection do
         expect(result).to match_array(result.to_a.uniq)
       end
 
-      it 'should always return the requested number of subjects' do
-        20.times do |n|
+      it 'should always return the requested number of subjects up to the unseen limit' do
+        unseen_count.times do |n|
           expect(subject.select(**args.merge(limit: n+1)).length).to eq(n+1)
         end
       end
     end
 
     context "when a user has seen most of the subjects" do
+      let(:seen_count) { 20 }
       let!(:uss) do
-        subject_ids = sms.sample(20).map(&:subject_id)
+        subject_ids = sms.sample(seen_count).map(&:subject_id)
         create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
       end
 
       it 'should return as many subjects as possible' do
-        15.times do |n|
-          expect(subject.select(**args.merge(limit: n+5)).length).to eq(5)
+        unseen_count.times do |n|
+          results = subject.select(**args.merge(limit: n+unseen_count))
+          expect(results.length).to eq(unseen_count)
         end
       end
     end
