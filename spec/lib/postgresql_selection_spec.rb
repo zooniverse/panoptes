@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe PostgresqlSelection do
-  let(:user) { create(:user) }
-  let!(:sms) { create_list(:set_member_subject, 25, subject_set: workflow.subject_sets.first) }
-
-  subject { PostgresqlSelection.new(workflow, user) }
 
   shared_examples "select for incomplete_project" do
     let(:args) { {} }
@@ -40,6 +36,13 @@ RSpec.describe PostgresqlSelection do
   end
 
   describe "#select" do
+    let(:user) { create(:user) }
+    let!(:sms) do
+      create_list(:set_member_subject, 25, subject_set: workflow.subject_sets.first)
+    end
+
+    subject { PostgresqlSelection.new(workflow, user) }
+
     context "grouped selection" do
       let(:workflow) { create(:workflow_with_subject_sets, grouped: true, prioritized: false, pairwise: false) }
 
@@ -62,6 +65,34 @@ RSpec.describe PostgresqlSelection do
       let(:workflow) { create(:workflow_with_subject_sets, grouped: false, prioritized: false, pairwise: false) }
 
       it_behaves_like "select for incomplete_project"
+    end
+
+    describe "priority selection" do
+      let(:workflow) { create(:workflow_with_subject_sets, grouped: false, prioritized: true, pairwise: false) }
+      let!(:sms) do
+        create_list(:set_member_subject, 25, :with_priorities, subject_set: workflow.subject_sets.first)
+      end
+
+      it_behaves_like "select for incomplete_project"
+
+      it 'should select subjects in desc order of the priority field' do
+        desc_priority = sms.map(&:id).reverse
+        result = subject.select(limit: desc_priority.size)
+        desc_priority.each_with_index do |priority, index|
+          expect(result[index]).to eq(priority)
+        end
+      end
+
+      context "with an inverted sort order param" do
+
+        it 'should select subjects in inverted order of the priority field' do
+          asc_priority = sms.map(&:id)
+          result = subject.select(limit: asc_priority.size, order: :asc)
+          asc_priority.each_with_index do |priority, index|
+            expect(result[index]).to eq(priority)
+          end
+        end
+      end
     end
   end
 end
