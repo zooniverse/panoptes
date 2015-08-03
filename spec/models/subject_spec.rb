@@ -47,7 +47,7 @@ describe Subject, :type => :model do
   end
 
   describe "#collections" do
-    let(:subject) { create(:subject_with_collections) }
+    let(:subject) { create(:subject, :with_collections) }
 
     it "should belong to many collections" do
       expect(subject.collections).to all( be_a(Collection) )
@@ -55,7 +55,7 @@ describe Subject, :type => :model do
   end
 
   describe "#subject_sets" do
-    let(:subject) { create(:subject_with_subject_sets) }
+    let(:subject) { create(:subject, :with_subject_sets) }
 
     it "should belong to many subject sets" do
       expect(subject.subject_sets).to all( be_a(SubjectSet) )
@@ -63,7 +63,7 @@ describe Subject, :type => :model do
   end
 
   describe "#set_member_subjects" do
-    let(:set_member_subjects) { create(:subject_with_subject_sets) }
+    let(:set_member_subjects) { create(:subject, :with_subject_sets) }
 
     it "should have many set_member subjects" do
       expect(subject.set_member_subjects).to all( be_a(SetMemberSubject) )

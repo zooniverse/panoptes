@@ -1,7 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe Formatter::Csv::AnnotationForCsv do
-  let(:classification) { create(:classification) }
+  let(:workflow) { build_stubbed(:workflow, build_contents: false) }
+  let(:contents) { build_stubbed(:workflow_content, workflow: workflow) }
+
+  let(:classification) do
+    build_stubbed(:classification, build_real_subjects: false).tap do |c|
+      allow(c.workflow).to receive(:primary_content).and_return(contents)
+    end
+  end
 
   let(:annotation) do
     {
