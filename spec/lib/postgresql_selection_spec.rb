@@ -54,14 +54,19 @@ RSpec.describe PostgresqlSelection do
 
   describe "#select" do
     let(:user) { create(:user) }
-    let!(:sms) do
-      create_list(:set_member_subject, 25, subject_set: workflow.subject_sets.first)
-    end
-
+    let(:workflow) { Workflow.first }
     subject { PostgresqlSelection.new(workflow, user) }
 
     context "grouped selection" do
-      let(:workflow) { create(:workflow_with_subject_sets, grouped: true) }
+
+      before(:all) do
+        created_workflow = create(:workflow_with_subject_sets, grouped: true)
+        create_list(:set_member_subject, 25, subject_set: created_workflow.subject_sets.first)
+      end
+      after(:all) do
+        [ Workflow, SetMemberSubject ].map { |klass| klass.destroy_all }
+      end
+      let(:sms) { SetMemberSubject.all }
 
       it_behaves_like "select for incomplete_project" do
         let(:args) { {subject_set_id: workflow.subject_sets.first.id} }
@@ -79,21 +84,34 @@ RSpec.describe PostgresqlSelection do
     end
 
     describe "random selection" do
-      let(:workflow) { create(:workflow_with_subject_sets) }
+
+      before(:all) do
+        created_workflow = create(:workflow_with_subject_sets)
+        create_list(:set_member_subject, 25, subject_set: created_workflow.subject_sets.first)
+      end
+      after(:all) do
+        [ Workflow, SetMemberSubject ].map { |klass| klass.destroy_all }
+      end
+      let(:sms) { SetMemberSubject.all }
 
       it_behaves_like "select for incomplete_project"
     end
 
     describe "priority selection" do
-      let(:workflow) { create(:workflow_with_subject_sets, prioritized: true) }
-      let!(:sms) do
-        create_list(:set_member_subject, 25, :with_priorities, subject_set: workflow.subject_sets.first)
+
+      before(:all) do
+        created_workflow = create(:workflow_with_subject_sets, prioritized: true)
+        create_list(:set_member_subject, 25, :with_priorities, subject_set: created_workflow.subject_sets.first)
       end
+      after(:all) do
+        [ Workflow, SetMemberSubject ].map { |klass| klass.destroy_all }
+      end
+      let(:sms) { SetMemberSubject.all }
 
       it_behaves_like "select for incomplete_project"
 
       it 'should select subjects in desc order of the priority field' do
-        desc_priority = sms.map(&:id).reverse
+        desc_priority = sms.order(id: :desc).pluck(:id)
         result = subject.select(limit: desc_priority.size)
         desc_priority.each_with_index do |priority, index|
           expect(result[index]).to eq(priority)
@@ -103,7 +121,7 @@ RSpec.describe PostgresqlSelection do
       context "with an inverted sort order param" do
 
         it 'should select subjects in inverted order of the priority field' do
-          asc_priority = sms.map(&:id)
+          asc_priority = sms.order(id: :asc).pluck(:id)
           result = subject.select(limit: asc_priority.size, order: :asc)
           asc_priority.each_with_index do |priority, index|
             expect(result[index]).to eq(priority)
@@ -113,21 +131,24 @@ RSpec.describe PostgresqlSelection do
     end
 
     describe "priority and grouped selection" do
-      let(:workflow) { create(:workflow_with_subject_sets, grouped: true, prioritized: true) }
-      let!(:sms) do
-        create_list(:set_member_subject, 13, :with_priorities, subject_set: workflow.subject_sets.first)
+      before(:all) do
+        created_workflow = create(:workflow_with_subject_sets, grouped: true, prioritized: true)
+        subject_sets = created_workflow.subject_sets
+        create_list(:set_member_subject, 13, :with_priorities, subject_set: subject_sets.first)
+        create_list(:set_member_subject, 12, :with_priorities, subject_set: subject_sets.last)
       end
-      let!(:other_sms) do
-        create_list(:set_member_subject, 12, :with_priorities, subject_set: workflow.subject_sets.last)
+      after(:all) do
+        [ Workflow, SetMemberSubject ].map { |klass| klass.destroy_all }
       end
-      let(:subject_set_id) { workflow.subject_sets.first.id }
+      let(:subject_set_id) { SubjectSet.first.id }
+      let(:sms) { SetMemberSubject.where(subject_set_id: subject_set_id) }
 
-      it_behaves_like "select for incomplete_project", :focus  do
+      it_behaves_like "select for incomplete_project"  do
         let(:args) { {subject_set_id: subject_set_id} }
       end
 
       it 'should only select subjects in the specified group' do
-        desc_priority = sms.map(&:id).reverse
+        desc_priority = sms.order(id: :desc).pluck(:id)
         result = subject.select(subject_set_id: subject_set_id)
         desc_priority.each_with_index do |priority, index|
           expect(result[index]).to eq(priority)
@@ -135,10 +156,10 @@ RSpec.describe PostgresqlSelection do
       end
 
       context "with an inverted sort order param on the second set" do
-        let(:subject_set_id) { workflow.subject_sets.last.id }
+        let(:subject_set_id) { SubjectSet.last.id }
 
         it 'should select subjects in inverted order of the priority field' do
-          asc_priority = other_sms.map(&:id)
+          asc_priority = sms.order(id: :asc).pluck(:id)
           result = subject.select(subject_set_id: subject_set_id, order: :asc)
           asc_priority.each_with_index do |priority, index|
             expect(result[index]).to eq(priority)
