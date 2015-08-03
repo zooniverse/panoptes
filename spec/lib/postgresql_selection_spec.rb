@@ -6,7 +6,10 @@ RSpec.describe PostgresqlSelection do
     let(:args) { {} }
 
     context "when a user has only seen a few subjects" do
-      let!(:uss) { create(:user_seen_subject, user: user, subject_ids: sms.sample(5).map(&:subject_id), workflow: workflow) }
+      let!(:uss) do
+        subject_ids = sms.sample(5).map(&:subject_id)
+        create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
+      end
 
       it 'should return an unseen subject' do
         expect(uss.subject_ids).to_not include(subject.select(**args.merge(limit: 1)).first)
@@ -25,7 +28,10 @@ RSpec.describe PostgresqlSelection do
     end
 
     context "when a user has seen most of the subjects" do
-      let!(:uss) { create(:user_seen_subject, user: user, subject_ids: sms.sample(20).map(&:subject_id), workflow: workflow) }
+      let!(:uss) do
+        subject_ids = sms.sample(20).map(&:subject_id)
+        create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
+      end
 
       it 'should return as many subjects as possible' do
         15.times do |n|
@@ -44,7 +50,7 @@ RSpec.describe PostgresqlSelection do
     subject { PostgresqlSelection.new(workflow, user) }
 
     context "grouped selection" do
-      let(:workflow) { create(:workflow_with_subject_sets, grouped: true, prioritized: false, pairwise: false) }
+      let(:workflow) { create(:workflow_with_subject_sets, grouped: true) }
 
       it_behaves_like "select for incomplete_project" do
         let(:args) { {subject_set_id: workflow.subject_sets.first.id} }
@@ -62,13 +68,13 @@ RSpec.describe PostgresqlSelection do
     end
 
     describe "random selection" do
-      let(:workflow) { create(:workflow_with_subject_sets, grouped: false, prioritized: false, pairwise: false) }
+      let(:workflow) { create(:workflow_with_subject_sets) }
 
       it_behaves_like "select for incomplete_project"
     end
 
     describe "priority selection" do
-      let(:workflow) { create(:workflow_with_subject_sets, grouped: false, prioritized: true, pairwise: false) }
+      let(:workflow) { create(:workflow_with_subject_sets, prioritized: true) }
       let!(:sms) do
         create_list(:set_member_subject, 25, :with_priorities, subject_set: workflow.subject_sets.first)
       end
@@ -88,6 +94,41 @@ RSpec.describe PostgresqlSelection do
         it 'should select subjects in inverted order of the priority field' do
           asc_priority = sms.map(&:id)
           result = subject.select(limit: asc_priority.size, order: :asc)
+          asc_priority.each_with_index do |priority, index|
+            expect(result[index]).to eq(priority)
+          end
+        end
+      end
+    end
+
+    describe "priority and grouped selection" do
+      let(:workflow) { create(:workflow_with_subject_sets, grouped: true, prioritized: true) }
+      let!(:sms) do
+        create_list(:set_member_subject, 13, :with_priorities, subject_set: workflow.subject_sets.first)
+      end
+      let!(:other_sms) do
+        create_list(:set_member_subject, 12, :with_priorities, subject_set: workflow.subject_sets.last)
+      end
+      let(:subject_set_id) { workflow.subject_sets.first.id }
+
+      it_behaves_like "select for incomplete_project", :focus  do
+        let(:args) { {subject_set_id: subject_set_id} }
+      end
+
+      it 'should only select subjects in the specified group' do
+        desc_priority = sms.map(&:id).reverse
+        result = subject.select(subject_set_id: subject_set_id)
+        desc_priority.each_with_index do |priority, index|
+          expect(result[index]).to eq(priority)
+        end
+      end
+
+      context "with an inverted sort order param on the second set" do
+        let(:subject_set_id) { workflow.subject_sets.last.id }
+
+        it 'should select subjects in inverted order of the priority field' do
+          asc_priority = other_sms.map(&:id)
+          result = subject.select(subject_set_id: subject_set_id, order: :asc)
           asc_priority.each_with_index do |priority, index|
             expect(result[index]).to eq(priority)
           end

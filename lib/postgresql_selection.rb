@@ -21,16 +21,13 @@ class PostgresqlSelection
   def available
     return @available if @available
     query = SetMemberSubject.available(workflow, user)
-    @available = case
-                 when workflow.grouped
-                   query.where(subject_set_id: opts[:subject_set_id])
-                 when workflow.prioritized
-                   query.order(priority: opts.fetch(:order, :desc))
-                 when workflow.grouped && workflow.prioritized
-                   raise NotImplementedError
-                 else
-                   query
-                 end
+    if workflow.grouped
+      query = query.where(subject_set_id: opts[:subject_set_id])
+    end
+    if workflow.prioritized
+      query = query.order(priority: opts.fetch(:order, :desc))
+    end
+    @available = query
   end
 
   def available_count
