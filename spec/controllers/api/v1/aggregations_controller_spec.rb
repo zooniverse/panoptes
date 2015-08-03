@@ -30,6 +30,9 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
       context "when the workflow has the public aggregation flag" do
         let(:workflow) { create(:workflow, aggregation: { public: true }) }
+        let(:result_workflow_ids) do
+          json_response[api_resource_name].map { |r| r["links"]["workflow"] }.uniq
+        end
 
         it "should return all the aggregated data for the supplied workflow" do
           get :index, workflow_id: workflow.id
@@ -38,18 +41,26 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
         context "when not supplying a workflow id" do
 
-          it "should return an empty resource set" do
+          it "should return all the public workflow resources" do
             get :index
+            expect(result_workflow_ids).to match_array( [ "#{workflow.id}" ])
+          end
+        end
+
+        context "when supplying just the non public workflow ids" do
+
+          it "should return no results" do
+            get :index, workflow_id: "#{private_resource.workflow_id}"
             expect(json_response[api_resource_name].length).to eq(0)
           end
         end
 
         context "when supplying a mix of public and non public workflow ids" do
 
-          it "should return an empty resource set" do
+          it "should only return the resources for the public workflow" do
             ids = [ workflow.id, private_resource.workflow_id ]
             get :index, workflow_ids: ids.join(",")
-            expect(json_response[api_resource_name].length).to eq(0)
+            expect(result_workflow_ids).to match_array( [ "#{workflow.id}" ])
           end
         end
 
@@ -76,7 +87,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
     it_behaves_like "is showable"
 
-    context "non-logged in users", :focus do
+    context "non-logged in users" do
 
       context "when the workflow does not have public aggregation" do
         let(:workflow) { create(:workflow) }
