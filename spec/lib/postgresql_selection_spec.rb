@@ -2,21 +2,36 @@ require 'spec_helper'
 
 RSpec.describe PostgresqlSelection do
 
+  def update_sms_priorities
+    SetMemberSubject.where(priority: nil).each_with_index do |sms, index|
+      sms.update_column(:priority, index+1)
+    end
+  end
+
   shared_examples "select for incomplete_project" do
     let(:args) { {} }
-    let(:unseen_count) do
+    let(:sms_scope) do
       if ss_id = args[:subject_set_id]
-        group_sms = SetMemberSubject.where(subject_set_id: ss_id)
-        group_sms.count - group_sms.where(id: uss.subject_ids).count
+        SetMemberSubject.where(subject_set_id: ss_id)
       else
-        SetMemberSubject.count - seen_count
+        SetMemberSubject.all
       end
     end
+    let(:unseen_count) do
+      _seen_count = if ss_id = args[:subject_set_id]
+        group_sms = SetMemberSubject.where(subject_set_id: ss_id)
+        group_sms.where(id: uss.subject_ids).count
+      else
+        seen_count
+      end
+      sms_scope.count - _seen_count
+    end
+
 
     context "when a user has only seen a few subjects" do
       let(:seen_count) { 5 }
       let!(:uss) do
-        subject_ids = sms.sample(seen_count).map(&:subject_id)
+        subject_ids = sms_scope.sample(seen_count).map(&:subject_id)
         create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
       end
 
@@ -39,7 +54,7 @@ RSpec.describe PostgresqlSelection do
     context "when a user has seen most of the subjects" do
       let(:seen_count) { 20 }
       let!(:uss) do
-        subject_ids = sms.sample(seen_count).map(&:subject_id)
+        subject_ids = sms_scope.sample(seen_count).map(&:subject_id)
         create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
       end
 
@@ -53,65 +68,62 @@ RSpec.describe PostgresqlSelection do
   end
 
   describe "#select" do
-    let(:user) { create(:user) }
+    let(:user) { User.first }
     let(:workflow) { Workflow.first }
-    subject { PostgresqlSelection.new(workflow, user) }
+    let(:sms) { SetMemberSubject.all }
+
+    before(:all) do
+      uploader = create(:user)
+      created_workflow = create(:workflow_with_subject_sets)
+      create_list(:subject, 25, project: created_workflow.project, uploader: uploader).each do |subject|
+        create(:set_member_subject, subject: subject, subject_set: created_workflow.subject_sets.first)
+      end
+    end
+    after(:all) do
+      DatabaseCleaner.clean_with(:deletion)
+    end
+
+    describe "random selection" do
+      subject { PostgresqlSelection.new(workflow, user) }
+
+      it_behaves_like "select for incomplete_project"
+    end
 
     context "grouped selection" do
+      subject { PostgresqlSelection.new(workflow, user) }
 
-      before(:all) do
-        created_workflow = create(:workflow_with_subject_sets, grouped: true)
-        create_list(:set_member_subject, 25, subject_set: created_workflow.subject_sets.first)
+      before(:each) do
+        allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
       end
-      after(:all) do
-        [ Workflow, SetMemberSubject ].map { |klass| klass.destroy_all }
-      end
-      let(:sms) { SetMemberSubject.all }
 
       it_behaves_like "select for incomplete_project" do
         let(:args) { {subject_set_id: workflow.subject_sets.first.id} }
       end
 
-      it 'should not select subjects not in the specified group' do
+      it 'should only select subjects in the specified group' do
         create(:user_seen_subject,
                user: user,
                subject_ids: sms.sample(5).map(&:subject_id),
                workflow: workflow)
         set_id = workflow.subject_sets.first.id
-        expect(SetMemberSubject.find(subject.select(subject_set_id: set_id))
-                .map(&:subject_set_id)).to all( eq(set_id) )
+        result_ids = subject.select(subject_set_id: set_id)
+        sms_subject_ids = SetMemberSubject.where(id: result_ids).pluck(:subject_set_id)
+        expect(sms_subject_ids).to all( eq(set_id) )
       end
-    end
-
-    describe "random selection" do
-
-      before(:all) do
-        created_workflow = create(:workflow_with_subject_sets)
-        create_list(:set_member_subject, 25, subject_set: created_workflow.subject_sets.first)
-      end
-      after(:all) do
-        [ Workflow, SetMemberSubject ].map { |klass| klass.destroy_all }
-      end
-      let(:sms) { SetMemberSubject.all }
-
-      it_behaves_like "select for incomplete_project"
     end
 
     describe "priority selection" do
+      subject { PostgresqlSelection.new(workflow, user) }
 
-      before(:all) do
-        created_workflow = create(:workflow_with_subject_sets, prioritized: true)
-        create_list(:set_member_subject, 25, :with_priorities, subject_set: created_workflow.subject_sets.first)
+      before(:each) do
+        update_sms_priorities
+        allow_any_instance_of(Workflow).to receive(:prioritized).and_return(true)
       end
-      after(:all) do
-        [ Workflow, SetMemberSubject ].map { |klass| klass.destroy_all }
-      end
-      let(:sms) { SetMemberSubject.all }
 
       it_behaves_like "select for incomplete_project"
 
       it 'should select subjects in desc order of the priority field' do
-        desc_priority = sms.order(id: :desc).pluck(:id)
+        desc_priority = sms.order(priority: :desc).pluck(:id)
         result = subject.select(limit: desc_priority.size)
         desc_priority.each_with_index do |priority, index|
           expect(result[index]).to eq(priority)
@@ -121,7 +133,7 @@ RSpec.describe PostgresqlSelection do
       context "with an inverted sort order param" do
 
         it 'should select subjects in inverted order of the priority field' do
-          asc_priority = sms.order(id: :asc).pluck(:id)
+          asc_priority = sms.order(priority: :asc).pluck(:id)
           result = subject.select(limit: asc_priority.size, order: :asc)
           asc_priority.each_with_index do |priority, index|
             expect(result[index]).to eq(priority)
@@ -131,15 +143,23 @@ RSpec.describe PostgresqlSelection do
     end
 
     describe "priority and grouped selection" do
+      subject { PostgresqlSelection.new(workflow, user) }
+
+      before(:each) do
+        %i( prioritized grouped ).each do |method|
+          allow_any_instance_of(Workflow).to receive(method).and_return(true)
+        end
+      end
+
       before(:all) do
-        created_workflow = create(:workflow_with_subject_sets, grouped: true, prioritized: true)
-        subject_sets = created_workflow.subject_sets
-        create_list(:set_member_subject, 13, :with_priorities, subject_set: subject_sets.first)
-        create_list(:set_member_subject, 12, :with_priorities, subject_set: subject_sets.last)
+        update_sms_priorities
+        created_workflow = Workflow.first
+        subject_set = created_workflow.subject_sets.last
+        create_list(:subject, 12, project: created_workflow.project, uploader: User.first).each do |subject|
+          create(:set_member_subject, :with_priorities, subject: subject, subject_set: subject_set)
+        end
       end
-      after(:all) do
-        [ Workflow, SetMemberSubject ].map { |klass| klass.destroy_all }
-      end
+
       let(:subject_set_id) { SubjectSet.first.id }
       let(:sms) { SetMemberSubject.where(subject_set_id: subject_set_id) }
 
@@ -148,8 +168,8 @@ RSpec.describe PostgresqlSelection do
       end
 
       it 'should only select subjects in the specified group' do
-        desc_priority = sms.order(id: :desc).pluck(:id)
         result = subject.select(subject_set_id: subject_set_id)
+        desc_priority = sms.limit(result.length).order(id: :desc).pluck(:id)
         desc_priority.each_with_index do |priority, index|
           expect(result[index]).to eq(priority)
         end
@@ -159,8 +179,8 @@ RSpec.describe PostgresqlSelection do
         let(:subject_set_id) { SubjectSet.last.id }
 
         it 'should select subjects in inverted order of the priority field' do
-          asc_priority = sms.order(id: :asc).pluck(:id)
           result = subject.select(subject_set_id: subject_set_id, order: :asc)
+          asc_priority = sms.limit(result.length).order(id: :asc).pluck(:id)
           asc_priority.each_with_index do |priority, index|
             expect(result[index]).to eq(priority)
           end
