@@ -20,7 +20,7 @@ RSpec.describe PostgresqlSelection do
     let(:unseen_count) do
       _seen_count = if ss_id = args[:subject_set_id]
         group_sms = SetMemberSubject.where(subject_set_id: ss_id)
-        group_sms.where(id: uss.subject_ids).count
+        group_sms.where(subject_id: uss.subject_ids).count
       else
         seen_count
       end
