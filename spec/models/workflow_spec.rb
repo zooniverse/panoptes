@@ -165,4 +165,24 @@ describe Workflow, :type => :model do
       end
     end
   end
+
+  describe "#aggregation" do
+    let(:workflow) { build(:workflow, aggregation: aggregation_config ) }
+
+    context "empty" do
+      let(:aggregation_config) { Hash.new }
+
+      it "should be valid" do
+        expect(workflow).to be_valid
+      end
+    end
+
+    context "with values" do
+      let(:aggregation_config) { { public: true } }
+
+      it "should be valid" do
+        expect(workflow).to be_valid
+      end
+    end
+  end
 end
