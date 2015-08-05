@@ -1,5 +1,6 @@
 class SessionsController < Devise::SessionsController
   after_filter :set_csrf_headers, only: [:create, :destroy]
+  after_filter :set_csrf_headers, only: :new, if: :json_request?
 
   def new
     respond_to do |format|
