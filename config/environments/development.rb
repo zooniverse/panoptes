@@ -35,15 +35,4 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
-
-  config.middleware.insert_before 0, Rack::Cors do
-    allow do
-      origins '*'
-      resource '*',
-        headers: CorsConfig.request_headers,
-        methods: CorsConfig.request_methods,
-        expose: CorsConfig.expose_headers,
-        max_age: CorsConfig.max_age
-    end
-  end
 end

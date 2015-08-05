@@ -1,8 +1,14 @@
 require 'ostruct'
-cors_config = ActiveSupport::HashWithIndifferentAccess.new.tap do |cors|
-  cors[:request_headers] = :any
-  cors[:request_methods] = %i(delete get post options put head)
-  cors[:expose_headers] = %w(ETag)
-  cors[:max_age] = 300
+module Panoptes
+  def self.cors_config
+    @cors_config ||=OpenStruct
+      .new(**begin
+        file = Rails.root.join('config/cors_config.yml')
+        YAML.load(File.read(file))[Rails.env].symbolize_keys
+      rescue Errno::ENOENT, NoMethodError
+        {  }
+      end)
+  end
 end
-CorsConfig = OpenStruct.new(cors_config)
+
+Panoptes.cors_config
