@@ -85,17 +85,6 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.middleware.insert_before 0, Rack::Cors do
-    allow do
-      origins(/^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.[0-9]+\.[0-9]+\.[0-9]+|[a-z0-9-]+\.zooniverse\.org)(:\d+)?$/)
-      resource '*',
-        headers: CorsConfig.request_headers,
-        methods: CorsConfig.request_methods,
-        expose: CorsConfig.expose_headers,
-        max_age: CorsConfig.max_age
-    end
-  end
-
   # Enable the logstasher logs for the current environment
   config.logstasher.enabled = true
   # Enable logging of controller params
