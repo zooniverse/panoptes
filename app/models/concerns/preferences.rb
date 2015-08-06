@@ -16,7 +16,14 @@ module Preferences
 
     def scope_for(action, user, opts={})
       return all if user.is_admin?
-      user.send("#{@preferences_for}_preferences")
+      case action
+      when "show", "index"
+        self.joins(:user, @preferences_for).where(:users => {private_profile: false},
+          @preferences_for.to_s.pluralize => {private: false})
+          .or(user.send("#{@preferences_for}_preferences"))
+      else
+        user.send("#{@preferences_for}_preferences")
+      end
     end
   end
 end

@@ -1,6 +1,10 @@
 FactoryGirl.define do
   factory :user_project_preference do
-    user
+    transient do
+      public false
+    end
+
+    user { create(:user, private_profile: !public) }
     project
     email_communication true
     preferences '{"tutorial": "done"}'
