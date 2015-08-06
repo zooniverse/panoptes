@@ -26,6 +26,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
   before_action :add_owner_ids_to_filter_param!, only: :index
   before_action :filter_by_tags, only: :index
+  before_action :downcase_slug, only: :index
   prepend_before_action :require_login,
     only: [:create, :update, :destroy, :create_classifications_export, :create_subjects_export]
 
@@ -69,6 +70,12 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   private
+
+  def downcase_slug
+    if params.has_key? "slug"
+      params[:slug] = params[:slug].downcase
+    end
+  end
 
   def filter_by_tags
     if tags = params.delete(:tags).try(:split, ",").try(:map, &:downcase)
