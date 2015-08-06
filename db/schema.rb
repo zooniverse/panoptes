@@ -341,7 +341,7 @@ ActiveRecord::Schema.define(version: 20150730160541) do
     t.string   "api_key"
     t.boolean  "ouroboros_created",           default: false, index: {name: "index_users_on_ouroboros_created", where: "(ouroboros_created = false)"}
     t.integer  "subject_limit"
-    t.boolean  "private_profile",             default: false, index: {name: "index_users_on_private_profile", where: "(private_profile = true)"}
+    t.boolean  "private_profile",             default: true, index: {name: "index_users_on_private_profile", where: "(private_profile = false)"}
     t.index name: "users_idx_trgm_login_display_name", using: :gin, expression: "((COALESCE((login)::text, ''::text) || ' '::text) || COALESCE((display_name)::text, ''::text))"
   end
 
