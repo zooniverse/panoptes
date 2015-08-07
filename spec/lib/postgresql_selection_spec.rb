@@ -125,9 +125,7 @@ RSpec.describe PostgresqlSelection do
       it 'should select subjects in desc order of the priority field' do
         desc_priority = sms.order(priority: :desc).pluck(:id)
         result = subject.select(limit: desc_priority.size)
-        desc_priority.each_with_index do |priority, index|
-          expect(result[index]).to eq(priority)
-        end
+        expect(desc_priority).to eq(result)
       end
 
       context "with an inverted sort order param" do
@@ -135,9 +133,7 @@ RSpec.describe PostgresqlSelection do
         it 'should select subjects in inverted order of the priority field' do
           asc_priority = sms.order(priority: :asc).pluck(:id)
           result = subject.select(limit: asc_priority.size, order: :asc)
-          asc_priority.each_with_index do |priority, index|
-            expect(result[index]).to eq(priority)
-          end
+          expect(asc_priority).to eq(result)
         end
       end
     end
@@ -170,9 +166,7 @@ RSpec.describe PostgresqlSelection do
       it 'should only select subjects in the specified group' do
         result = subject.select(subject_set_id: subject_set_id)
         desc_priority = sms.limit(result.length).order(id: :desc).pluck(:id)
-        desc_priority.each_with_index do |priority, index|
-          expect(result[index]).to eq(priority)
-        end
+        expect(desc_priority).to eq(result)
       end
 
       context "with an inverted sort order param on the second set" do
@@ -181,9 +175,7 @@ RSpec.describe PostgresqlSelection do
         it 'should select subjects in inverted order of the priority field' do
           result = subject.select(subject_set_id: subject_set_id, order: :asc)
           asc_priority = sms.limit(result.length).order(id: :asc).pluck(:id)
-          asc_priority.each_with_index do |priority, index|
-            expect(result[index]).to eq(priority)
-          end
+          expect(asc_priority).to eq(result)
         end
       end
     end

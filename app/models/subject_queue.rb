@@ -83,13 +83,24 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
+  # NOTE: if the query scope returns a large set then
+  # don't use this query outside of a background Worker
+  # SQL optimisations welcome here...no postgres ops preseved order
   def self.dequeue_update(query, sms_ids)
-    dequeue_sql = "set_member_subject_ids = set_member_subject_ids - array[?]"
-    query.update_all([dequeue_sql, sms_ids])
+    query.find_each do |sq|
+      dqd_non_dup_sms_ids = sq.set_member_subject_ids - Array.wrap(sms_ids)
+      sq.update_column(:set_member_subject_ids, dqd_non_dup_sms_ids)
+    end
   end
 
+  # NOTE: if the query scope returns a large set then
+  # don't use this query outside of a background Worker
+  # SQL optimisations welcome here...no postgres ops preseved order
   def self.enqueue_update(query, sms_ids)
-    query.update_all(["set_member_subject_ids = set_member_subject_ids | array[?]", sms_ids])
+    query.find_each do |sq|
+      enqd_non_dup_sms_ids = sq.set_member_subject_ids | Array.wrap(sms_ids)
+      sq.update_column(:set_member_subject_ids, enqd_non_dup_sms_ids)
+    end
   end
 
   def self.below_minimum

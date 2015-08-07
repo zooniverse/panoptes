@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe SubjectQueue, :type => :model do
+RSpec.describe SubjectQueue, type: :model do
   let(:locked_factory) { :subject_queue }
   let(:locked_update) { {set_member_subject_ids: [1, 2, 3, 4]} }
 
@@ -280,6 +280,11 @@ RSpec.describe SubjectQueue, :type => :model do
           expect(sms_ids.size).to eq(sms_ids.uniq.size)
         end
 
+        it 'should maintain the order of the set' do
+          ordered_list = ues.set_member_subject_ids | [ sms.id ]
+          SubjectQueue.enqueue(workflow, sms.id, user: user)
+          expect(ues.reload.set_member_subject_ids).to eq(ordered_list)
+        end
 
         context "when a queue's existing SMSes are deleted", sidekiq: :inline do
           before(:each) do
@@ -299,19 +304,28 @@ RSpec.describe SubjectQueue, :type => :model do
 
   describe "::dequeue" do
     let(:workflow) { create(:workflow) }
-    let(:subjects) { create_list(:set_member_subject, 2) }
+    let(:subject_set) { create(:subject_set, workflows: [workflow], project: workflow.project) }
+    let(:sms) { create(:set_member_subject, subject_set: subject_set) }
+    let!(:smses) { create_list(:set_member_subject, 3, subject_set: sms.subject_set) }
 
     context "with a user" do
       let(:user) { create(:user) }
+      let!(:ues) do
+        create(:subject_queue, user: user, workflow: workflow, set_member_subject_ids: smses.map(&:id))
+      end
+      let(:sms_id_to_dequeue) { smses.sample.id }
+      let(:dequeue_list) { [ sms_id_to_dequeue ] }
+
       it 'should remove the subject given a user and workflow' do
-        ues = create(:subject_queue,
-                     user: user,
-                     workflow: workflow,
-                     set_member_subject_ids: subjects.map(&:id))
-        SubjectQueue.dequeue(workflow,
-                             [subjects.first.id],
-                             user: user)
-        expect(ues.reload.set_member_subject_ids).to_not include(subjects.first.id)
+        SubjectQueue.dequeue(workflow, dequeue_list, user: user)
+        sms_ids = ues.reload.set_member_subject_ids
+        expect(sms_ids).to_not include(sms_id_to_dequeue)
+      end
+
+      it 'should maintain the order of the set' do
+        ordered_list = ues.set_member_subject_ids.reject { |id| id == sms_id_to_dequeue }
+        SubjectQueue.dequeue(workflow, dequeue_list, user: user)
+        expect(ues.reload.set_member_subject_ids).to eq(ordered_list)
       end
 
       context "passing an empty set of sms_ids" do
