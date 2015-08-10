@@ -100,11 +100,12 @@ class SubjectQueue < ActiveRecord::Base
     query.find_each do |sq|
       sms_ids = Array.wrap(sms_ids)
       enqd_non_dup_sms_ids = sq.set_member_subject_ids | sms_ids
-      notify_dup_subject_error(
+      notify_dup_subject_queue_error(
         enq_size: enqd_non_dup_sms_ids.length,
         curr_size: sq.set_member_subject_ids.size,
         append_size: sms_ids.length
       )
+      notify_dup_subject_seen_before_error(sq, enqd_non_dup_sms_ids)
       sq.update_column(:set_member_subject_ids, enqd_non_dup_sms_ids)
     end
   end
@@ -126,7 +127,7 @@ class SubjectQueue < ActiveRecord::Base
   #NOTE: this can be removed when we're happy that
   # https://github.com/zooniverse/Panoptes/issues/1069
   # is resolved.
-  def self.notify_dup_subject_error(enq_size:, curr_size:, append_size:)
+  def self.notify_dup_subject_queue_error(enq_size:, curr_size:, append_size:)
     params = { enq_size: enq_size, curr_size: curr_size, append_size: append_size }
     if enq_size != curr_size + append_size
       Honeybadger.notify(
@@ -141,6 +142,28 @@ class SubjectQueue < ActiveRecord::Base
         error_message: "Queue is growing too large",
         parameters:  params
       )
+    end
+  end
+
+  #NOTE: this can be removed when we're happy that
+  # https://github.com/zooniverse/Panoptes/issues/1069
+  # is resolved.
+  def self.notify_dup_subject_seen_before_error(queue, new_enq)
+    if uss = UserSeenSubject.where(user: queue.user, workflow: queue.workflow).first
+      seen_before = SetMemberSubject.where(id: new_enq).joins(:subject).where(subjects: { id: uss.subject_ids })
+      if seen_before.exists?
+        params = {
+          user_id: queue.user.id,
+          workflow_id: queue.workflow.id,
+          seen_before_sms_ids: seen_before.map(&:id),
+          seen_before_subject_ids: seen_before.map(&:subject_id)
+        }
+        Honeybadger.notify(
+          error_class:   "Subject Queue Seen Before",
+          error_message: "Appending seen before subject to subject queue",
+          parameters: params
+        )
+      end
     end
   end
 end

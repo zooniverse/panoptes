@@ -303,11 +303,11 @@ RSpec.describe SubjectQueue, type: :model do
         # https://github.com/zooniverse/Panoptes/issues/1069
         # is resolved.
         describe "duplicate error messaging" do
+          let(:query) { SubjectQueue.where(id: ues.id) }
 
           context "when the append queue has dups" do
 
-            it "should only have the enqueued subject id in the queue" do
-              query = SubjectQueue.where(id: ues.id)
+            it "should notify HB with a custom error" do
               expect(Honeybadger).to receive(:notify)
               SubjectQueue.enqueue_update(query, ues.set_member_subject_ids)
             end
@@ -315,12 +315,33 @@ RSpec.describe SubjectQueue, type: :model do
 
           context "when the append queue grows too large" do
 
-            it "should only have the enqueued subject id in the queue" do
-              query = SubjectQueue.where(id: ues.id)
+            it "should notify HB with a custom error" do
               expect(Honeybadger).to receive(:notify)
               start = smses.last.id+1
               append_ids = (start..start+SubjectQueue::DEFAULT_LENGTH*2).to_a
               SubjectQueue.enqueue_update(query, append_ids)
+            end
+          end
+
+          context "when the append queue contains a seen before" do
+
+            it "should notify HB with a custom error" do
+              append_ids = [sms.id]
+              create(:user_seen_subject, user: user, workflow: workflow, subject_ids: append_ids)
+              expect(Honeybadger).to receive(:notify)
+              SubjectQueue.enqueue_update(query, append_ids)
+            end
+          end
+
+          context "when the append queue does not contain a seen before" do
+
+            it "should not notify HB with a custom error" do
+              seen_ids = [smses.last.id]
+              create(:user_seen_subject, user: user, workflow: workflow, subject_ids: seen_ids)
+              in_q = (smses - [ smses.last ]).map(&:id)
+              ues.update_column(:set_member_subject_ids, in_q)
+              expect(Honeybadger).to_not receive(:notify)
+              SubjectQueue.enqueue_update(query, [sms.id])
             end
           end
         end
