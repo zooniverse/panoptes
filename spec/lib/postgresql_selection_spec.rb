@@ -114,6 +114,7 @@ RSpec.describe PostgresqlSelection do
 
     describe "priority selection" do
       subject { PostgresqlSelection.new(workflow, user) }
+      let(:ordered) { sms.order(priority: :asc).pluck(:id) }
 
       before(:each) do
         update_sms_priorities
@@ -122,19 +123,22 @@ RSpec.describe PostgresqlSelection do
 
       it_behaves_like "select for incomplete_project"
 
-      it 'should select subjects in desc order of the priority field' do
-        desc_priority = sms.order(priority: :desc).pluck(:id)
-        result = subject.select(limit: desc_priority.size)
-        expect(desc_priority).to eq(result)
+      it 'should select subjects in asc order of the priority field' do
+        result = subject.select(limit: ordered.size)
+        expect(result).to eq(ordered)
       end
 
-      context "with an inverted sort order param" do
+      it 'should ignore any order param on the priority field' do
+        result = subject.select(limit: ordered.size, order: :desc)
+        expect(result).to eq(ordered)
+      end
 
-        it 'should select subjects in inverted order of the priority field' do
-          asc_priority = sms.order(priority: :asc).pluck(:id)
-          result = subject.select(limit: asc_priority.size, order: :asc)
-          expect(asc_priority).to eq(result)
-        end
+      it 'should allow negative numbers to prepend the sort list' do
+        sms_subject = create(:subject,project: workflow.project, uploader: user)
+        sms = create(:set_member_subject, subject: sms_subject,
+          subject_set: workflow.subject_sets.first, priority: -10.to_f)
+        first_id = subject.select(limit: 1).first
+        expect(first_id).to eq(sms.id)
       end
     end
 
@@ -165,18 +169,8 @@ RSpec.describe PostgresqlSelection do
 
       it 'should only select subjects in the specified group' do
         result = subject.select(subject_set_id: subject_set_id)
-        desc_priority = sms.limit(result.length).order(id: :desc).pluck(:id)
-        expect(desc_priority).to eq(result)
-      end
-
-      context "with an inverted sort order param on the second set" do
-        let(:subject_set_id) { SubjectSet.last.id }
-
-        it 'should select subjects in inverted order of the priority field' do
-          result = subject.select(subject_set_id: subject_set_id, order: :asc)
-          asc_priority = sms.limit(result.length).order(id: :asc).pluck(:id)
-          expect(asc_priority).to eq(result)
-        end
+        ordered = sms.limit(result.length).order(priority: :asc).pluck(:id)
+        expect(result).to eq(ordered)
       end
     end
   end

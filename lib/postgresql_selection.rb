@@ -25,7 +25,7 @@ class PostgresqlSelection
       query = query.where(subject_set_id: opts[:subject_set_id])
     end
     if workflow.prioritized
-      query = query.order(priority: opts.fetch(:order, :desc))
+      query = query.order(priority: :asc)
     end
     @available = query
   end
