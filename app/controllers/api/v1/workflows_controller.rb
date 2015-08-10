@@ -69,12 +69,28 @@ class Api::V1::WorkflowsController < Api::ApiController
     [tasks, task_string_extractor.collector]
   end
 
-  def new_items(resource, relation, value)
-    items = construct_new_items(super(resource, relation, value), resource.project_id)
-    if items.any? { |item| item.is_a?(SubjectSet) }
-      items
+  def add_relation(resource, relation, value)
+    if relation == :retired_subjects && value.is_a?(Array)
+      value.each {|id| resource.retire_subject(id) }
     else
-      items.first
+      super
+    end
+  end
+
+  def new_items(resource, relation, value)
+    case relation
+    when :retired_subjects, 'retired_subjects'
+      # TODO: scope_for
+      value.flat_map {|id| resource.retire_subject(id) }
+    when :subject_set, 'subject_set'
+      items = construct_new_items(super(resource, relation, value), resource.project_id)
+      if items.any? { |item| item.is_a?(SubjectSet) }
+        items
+      else
+        items.first
+      end
+    else
+      super
     end
   end
 
@@ -104,7 +120,6 @@ class Api::V1::WorkflowsController < Api::ApiController
     end
   end
 
-
   def project_live?
     project_from_params.try(:live)
   end
@@ -113,6 +128,15 @@ class Api::V1::WorkflowsController < Api::ApiController
     project_id = params_for[:links].try(:[], :project)
     if project_id && project = Project.find_by(id: project_id)
       project
+    end
+  end
+
+  def assoc_class(relation)
+    case relation
+    when :retired_subjects, "retired_subjects"
+      SubjectWorkflowCount
+    else
+      super
     end
   end
 end

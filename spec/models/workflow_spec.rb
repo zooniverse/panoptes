@@ -145,6 +145,37 @@ describe Workflow, :type => :model do
     end
   end
 
+  describe '#retire_subject' do
+    it 'marks a counted subject as retired' do
+      workflow = create(:workflow_with_subject_sets)
+      subject = create(:subject, subject_sets: workflow.subject_sets)
+      count = create(:subject_workflow_count, set_member_subject: subject.set_member_subjects.first, workflow: workflow)
+
+      workflow.retire_subject(subject.id)
+      expect(subject.retired_for_workflow?(workflow)).to be_truthy
+      expect(SubjectWorkflowCount.retired.count).to eq(2)
+    end
+
+    it 'marks an uncounted subject as retired' do
+      workflow = create(:workflow_with_subject_sets)
+      subject = create(:subject, subject_sets: workflow.subject_sets)
+
+      workflow.retire_subject(subject.id)
+      expect(subject.retired_for_workflow?(workflow)).to be_truthy
+      expect(SubjectWorkflowCount.retired.count).to eq(2)
+    end
+
+    it 'leaves a retired subject retired' do
+      workflow = create(:workflow_with_subject_sets)
+      subject = create(:subject, subject_sets: workflow.subject_sets)
+
+      workflow.retire_subject(subject.id)
+      workflow.retire_subject(subject.id)
+      expect(subject.retired_for_workflow?(workflow)).to be_truthy
+      expect(SubjectWorkflowCount.retired.count).to eq(2)
+    end
+  end
+
   describe "#retired_subjects_count" do
     it "should be an alias for retired set_member_subjects count" do
       expect(subject_relation.retired_subjects_count).to eq(subject_relation.retired_set_member_subjects_count)

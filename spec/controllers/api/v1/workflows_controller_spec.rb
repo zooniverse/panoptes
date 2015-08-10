@@ -224,37 +224,55 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe "#update_links" do
-    let(:subject_set_project) { project }
-    let(:linked_resource) { create(:subject_set_with_subjects, project: subject_set_project) }
-    let(:test_attr) { :display_name }
-    let(:test_relation) { :subject_sets }
-    let(:test_relation_ids) { [ linked_resource.id.to_s ] }
-    let(:expected_copies_count) { linked_resource.subjects.count }
-    let(:resource) { workflow }
-    let(:resource_id) { :workflow_id }
-    let(:copied_resource) { resource.reload.send(test_relation).first }
+    context 'linking a subject set' do
+      let(:subject_set_project) { project }
+      let(:linked_resource) { create(:subject_set_with_subjects, project: subject_set_project) }
+      let(:test_attr) { :display_name }
+      let(:test_relation) { :subject_sets }
+      let(:test_relation_ids) { [ linked_resource.id.to_s ] }
+      let(:expected_copies_count) { linked_resource.subjects.count }
+      let(:resource) { workflow }
+      let(:resource_id) { :workflow_id }
+      let(:copied_resource) { resource.reload.send(test_relation).first }
 
-    it_behaves_like "supports update_links"
+      it_behaves_like "supports update_links"
 
-    context "when the subject_set links belong to another project" do
-      let!(:subject_set_project) do
-        workflows.find { |w| w.project != project }.project
+      context "when the subject_set links belong to another project" do
+        let!(:subject_set_project) do
+          workflows.find { |w| w.project != project }.project
+        end
+
+        it_behaves_like "supports update_links via a copy of the original" do
+
+          it 'should have the same name' do
+            update_via_links
+            expect(copied_resource.display_name).to eq(linked_resource.display_name)
+          end
+
+          it 'should belong to the correct project' do
+            update_via_links
+            expect(copied_resource.project_id).to eq(resource.project_id)
+          end
+
+          it 'should create copies of every subject via set_member_subjects' do
+            expect{ update_via_links }.to change { SetMemberSubject.count }.by(expected_copies_count)
+          end
+        end
       end
+    end
 
-      it_behaves_like "supports update_links via a copy of the original" do
+    context 'retiring subjects via links' do
+      let(:subject_set) { create(:subject_set, project: project, workflows: [project.workflows.first]) }
+      let(:linked_resource) { create(:subject, subject_sets: [subject_set]) }
+      let(:test_attr) { :display_name }
+      let(:test_relation) { :retired_subjects }
+      let(:test_relation_ids) { [ linked_resource.id.to_s ] }
+      let(:resource) { workflow }
+      let(:resource_id) { :workflow_id }
 
-        it 'should have the same name' do
-          update_via_links
-          expect(copied_resource.display_name).to eq(linked_resource.display_name)
-        end
-
-        it 'should belong to the correct project' do
-          update_via_links
-          expect(copied_resource.project_id).to eq(resource.project_id)
-        end
-
-        it 'should create copies of every subject via set_member_subjects' do
-          expect{ update_via_links }.to change { SetMemberSubject.count }.by(expected_copies_count)
+      it_behaves_like "supports update_links" do
+        it 'marks the subject as retired' do
+          expect(linked_resource.retired_for_workflow?(resource)).to be_truthy
         end
       end
     end
