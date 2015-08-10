@@ -79,7 +79,7 @@ class SubjectSelector
     when queue.nil?
       queue = SubjectQueue.create_for_user(workflow, user.user, set: params[:subject_set_id])
     when queue.below_minimum?
-      SubjectQueueWorker.perform_async(workflow.id, user.id)
+      EnqueueSubjectQueueWorker.perform_async(workflow.id, user.id)
     end
     [queue, context]
   end

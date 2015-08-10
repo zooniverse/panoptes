@@ -1,4 +1,4 @@
-class ReloadQueueWorker
+class ReloadNonLoggedInQueueWorker
   include Sidekiq::Worker
 
   attr_reader :workflow

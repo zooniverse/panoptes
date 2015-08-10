@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe ReloadQueueWorker do
+RSpec.describe ReloadNonLoggedInQueueWorker do
   subject { described_class.new }
   let(:workflow) { create(:workflow_with_subject_set) }
   let!(:subjects) do
@@ -44,4 +44,3 @@ RSpec.describe ReloadQueueWorker do
     end
   end
 end
-

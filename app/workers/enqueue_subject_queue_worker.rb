@@ -1,4 +1,4 @@
-class SubjectQueueWorker
+class EnqueueSubjectQueueWorker
   include Sidekiq::Worker
 
   attr_reader :workflow, :user, :limit
