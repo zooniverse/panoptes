@@ -35,7 +35,7 @@ Optionally you can run
 
 ## Installation
 
-We only support running Panoptes via Docker and Docker Compose. If you'd like to run it outside a container, see the above Requirements sections to get started. At the moment, Panoptes only with Docker version 1.6.2.
+We only support running Panoptes via Docker and Docker Compose. If you'd like to run it outside a container, see the above Requirements sections to get started. At the moment, Panoptes only works with Docker version 1.6.2.
 
 It's possible to run Panoptes only having to install the `fig_rake` gem. Alternatives to various rake tasks are presented.
 
