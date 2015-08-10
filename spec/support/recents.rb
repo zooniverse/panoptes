@@ -1,6 +1,7 @@
 RSpec.shared_examples "has recents" do
   let!(:classifications) do
-    create_list(:classification_with_recents, 2, resource_key => resource )
+    [create(:classification_with_recents, created_at: 1.hour.ago, resource_key => resource ),
+      create(:classification_with_recents, resource_key => resource )]
   end
 
   let(:links) { recent_json.map{|r| r['links']} }
@@ -31,6 +32,22 @@ RSpec.shared_examples "has recents" do
     end
   end
 
+  context "sorted by created_at asc" do
+    let(:filter_params) { {sort: "+created_at" } }
+
+    it 'should be sorted by created_at in ascending order' do
+      expect(recent_json.map{ |r| r['id'].to_i }).to eq(Recent.order(created_at: :asc).pluck(:id))
+    end
+  end
+
+  context "sorted by created_at desc" do
+    let(:filter_params) { {sort: "-created_at" } }
+
+    it 'should be sorted by created_at in descending order' do
+      expect(recent_json.map{ |r| r['id'].to_i }).to eq(Recent.order(created_at: :desc).pluck(:id))
+    end
+  end
+
   context "filtered by project" do
     let(:filter_params) { {project_id: classifications.first.project.id.to_s} }
     it 'should be filterable' do
@@ -44,7 +61,7 @@ RSpec.shared_examples "has recents" do
 
   context "filtered by workflow" do
     let(:filter_params) { {workflow_id: classifications.first.workflow.id.to_s} }
-     it 'should be filterable' do
+    it 'should be filterable' do
       expect(recent_json.length).to eq(2)
     end
 
