@@ -1,7 +1,7 @@
 class EmptySubjectQueueWorker
   include Sidekiq::Worker
 
-  def perform(workflow_id)
+  def perform(workflow_id=nil)
     queue_scope = SubjectQueue.all
      if workflow_id
       workflow = Workflow.find(workflow_id)

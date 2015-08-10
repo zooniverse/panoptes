@@ -25,7 +25,7 @@ RSpec.describe EmptySubjectQueueWorker do
     context "with no workflow id" do
 
       it 'should empty all the subject queues' do
-        subject.perform(nil)
+        subject.perform
         expect(empty_queues).to all( be true )
       end
     end
