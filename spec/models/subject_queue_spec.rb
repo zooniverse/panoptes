@@ -298,6 +298,32 @@ RSpec.describe SubjectQueue, type: :model do
             expect(ues.reload.set_member_subject_ids).to match_array([ sms.id ])
           end
         end
+
+        #NOTE: this can be removed when we're happy that
+        # https://github.com/zooniverse/Panoptes/issues/1069
+        # is resolved.
+        describe "duplicate error messaging" do
+
+          context "when the append queue has dups" do
+
+            it "should only have the enqueued subject id in the queue" do
+              query = SubjectQueue.where(id: ues.id)
+              expect(Honeybadger).to receive(:notify)
+              SubjectQueue.enqueue_update(query, ues.set_member_subject_ids)
+            end
+          end
+
+          context "when the append queue grows too large" do
+
+            it "should only have the enqueued subject id in the queue" do
+              query = SubjectQueue.where(id: ues.id)
+              expect(Honeybadger).to receive(:notify)
+              start = smses.last.id+1
+              append_ids = (start..start+SubjectQueue::DEFAULT_LENGTH*2).to_a
+              SubjectQueue.enqueue_update(query, append_ids)
+            end
+          end
+        end
       end
     end
   end

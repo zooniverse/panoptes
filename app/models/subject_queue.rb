@@ -98,7 +98,13 @@ class SubjectQueue < ActiveRecord::Base
   # SQL optimisations welcome here...no postgres ops preseved order
   def self.enqueue_update(query, sms_ids)
     query.find_each do |sq|
-      enqd_non_dup_sms_ids = sq.set_member_subject_ids | Array.wrap(sms_ids)
+      sms_ids = Array.wrap(sms_ids)
+      enqd_non_dup_sms_ids = sq.set_member_subject_ids | sms_ids
+      notify_dup_subject_error(
+        enq_size: enqd_non_dup_sms_ids.length,
+        curr_size: sq.set_member_subject_ids.size,
+        append_size: sms_ids.length
+      )
       sq.update_column(:set_member_subject_ids, enqd_non_dup_sms_ids)
     end
   end
@@ -113,5 +119,28 @@ class SubjectQueue < ActiveRecord::Base
 
   def next_subjects(limit=10)
     set_member_subject_ids.sample(limit)
+  end
+
+  private
+
+  #NOTE: this can be removed when we're happy that
+  # https://github.com/zooniverse/Panoptes/issues/1069
+  # is resolved.
+  def self.notify_dup_subject_error(enq_size:, curr_size:, append_size:)
+    params = { enq_size: enq_size, curr_size: curr_size, append_size: append_size }
+    if enq_size != curr_size + append_size
+      Honeybadger.notify(
+        error_class:   "Subject Queue Duplicates",
+        error_message: "Appending duplicates to subject queue",
+        parameters:  params
+      )
+    end
+    if enq_size > (DEFAULT_LENGTH * 2)
+      Honeybadger.notify(
+        error_class:   "Subject Queue Unbound Growth",
+        error_message: "Queue is growing too large",
+        parameters:  params
+      )
+    end
   end
 end
