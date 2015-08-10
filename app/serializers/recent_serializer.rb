@@ -3,6 +3,7 @@ class RecentSerializer
 
   attributes :id, :created_at, :locations, :href
   can_include :project, :workflow, :subject
+  can_sort_by :created_at
 
   def href
     "/#{@context[:type].pluralize}/#{@context[:owner_id]}/recents/#{@model.id}"
