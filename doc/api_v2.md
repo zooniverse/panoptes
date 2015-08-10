@@ -92,26 +92,29 @@ JSON-API provides a standardized way to interact with an API over HTTP. JSON-API
         "last": "https://www.zooniverse.org/api/users?page[number]=13"
     },
     "data": [
-        "type": "users",
-        "id": "1",
-        "attributes": {
-            "login": "zooniverse"
-        },
-        "relationships": {
-            "editable_projects": {
-            "links": {
-                "self": "https://www.zooniverse.org/api/users/1/relationships/editable_projects",
-                "related": "https://www.zooniverse.org/api/users/1/editable_projects"
+        {
+            "type": "users",
+            "id": "1",
+            "attributes": {
+                "login": "zooniverse"
             },
-            "data": [
-                {
-                    "type": "projects",
-                    "id": "10"
+            "relationships": {
+                "editable_projects": {
+                    "links": {
+                        "self": "https://www.zooniverse.org/api/users/1/relationships/editable_projects",
+                        "related": "https://www.zooniverse.org/api/users/1/editable_projects"
+                    },
+                    "data": [
+                        {
+                            "type": "projects",
+                            "id": "10"
+                        }
+                    ]
                 }
-            ],
-        },
-        "links": {
-            "self": "https://www.zooniverse.org/api/users/1"
+            },
+            "links": {
+                "self": "https://www.zooniverse.org/api/users/1"
+            }
         }
     ],
     "included": [
@@ -153,39 +156,90 @@ Clients for JSON-API written in a variety of languages can be found [here]().
 
 ### Resources
 
-Resources are listed below 
-
 #### Users (/users)
 
 Users use a natural number as an `id`.
 
+A User record can only be modified by a token belonging to the user themself. 
+
 ##### Attributes
 
-login
-display_name
-credited_name - Name a user would like to be credited as. 
-email
-global_email_communication
-project_email_communication
-beta_email_communication
-max_subjects
-uploaded_subjects_count
-admin
-private_profile
+| Attribute | Type | View Scope | Edit Scope | Description |
+|-----------|------|------------|------------|-------------|
+| login     | String | Publicly Accessible | user | The user's permanent name |
+| display_name | String | Publicly Accessible | user.edit-details | A freeform name for the user |
+| credited_name | String | user | user | The name the user will be credited as in publications |
+| email | String | user | user | User email address |
+| global_email_communication | Boolean | user | user | Flag to indicate if a user wants to receive Zooniverse emails |
+| project_email_communication | Boolean | user | user | Flag to indicate if a user wants to be automatically subscribed to emails from projects they classify on |
+| beta_email_communication | Boolean | user | user | Flag to indicate if a user wants to be notified about beta tests |
+| max_subjects | Number |subject.create | N/A | Total number of subjects a user can upload |
+| uploaded_subject_count | Number | subject.create | N/A | Total number of a subjects a user has uploaded |
+| admin | Boolean | user | N/A | Whether the use can take administrative actions |
+| private_profile | Boolean | Publically Accessible | user | Flag to hide profile information like classification counts |
+| created_at | Time | Publicly Accessible | user | Creation Timestamp |
+| updated_at | Time  | Publicly Accessible | user | Last updated Timestamp |
 
 ##### Links
+
+| Link | Type | Description |
+|------|------|-------------|
+| Owned Projects | projects | Projects where the User has an 'owner' role |
+| Editable Projects | projects | Projects where the User has an 'owner' or 'collaborator' role or belongs to a group with either role |
+| Viewable Projects | projects | Projects where the User has a role or belongs to a group with a role that allows for viewing the project |
+| Owned Collections | collections | Collections where the User has an 'owner' role |
+| Editable Collections | collections | Collections where the User has an 'owner' or 'collaborator' role or belongs to a group with either role |
+| Viewable Collections | collections | Collections where the User has a role or belongs to a group with a role that allows for viewing the collection |
+| Invited User Groups | user_groups | User Groups that have invited the User to join them |
+| User Groups | user_groups | User Groups that the user is an active member of |
+| Recents | subjects | Subjects the user has classified |
+| Project Roles | roles | Roles a user has been assigned inside a project |
+| Project Preferences | preferences | A user's settings for a project |
+| Collection Roles | roles | Roles a user has been assigned inside a collection |
+| Collection Preferences | preferences | A user's settings for a collection |
 
 #### User Groups (/user_groups)
 
+User Groups use a natural number as their `id`.
+
 ##### Attributes
 
+| Attribute | Type | View Scope | Edit Scope | Description |
+|-----------|------|------------|------------|-------------|
+| name | String | Publicly Accessible / user_group for private groups | user_group | Permanent Name for the user group |
+| display_name | String | Publicly Accessible / user_group for private groups | user_group | Free-form name for the user group |
+| classification_count | Number | Publicly Accessible / user_group for private groups | N/A | Count of Classifications made while members were *classifying in the group* |
+| private | Boolean | user_group | user_group | Flag for whether details about the group are accessible to non-members |
+| created_at | Time | Publicly Accessible / user_group for private groups | user_group | Creation Timestamp |
+| updated_at | Time  | Publicly Accessible / user_group for private groups | user_group | Last updated Timestamp |
+
 ##### Links
+
+| Link | Type | Description |
+|------|------|-------------|
+| Owned Projects | projects | Projects where the User Group has an 'owner' role |
+| Editable Projects | projects | Projects where the User Group has an 'owner' or 'collaborator' role or belongs to a group with either role |
+| Viewable Projects | projects | Projects where the User Group has a role or belongs to a group with a role that allows for viewing the project |
+| Owned Collections | collections | Collections where the User Group has an 'owner' role |
+| Editable Collections | collections | Collections where the User Group has an 'owner' or 'collaborator' role or belongs to a group with either role |
+| Viewable Collections | collections | Collections where the User Group has a role or belongs to a group with a role that allows for viewing the collection |
+| Invited Users | user_groups | Users that have been invited to join the User Group |
+| Users | user_groups | Users who are active members of the user group |
+| Recents | subjects | Subjects the user group has classified |
+| Project Roles | roles | Roles a user has been assigned inside a project |
+| Collection Roles | roles | Roles a user has been assigned inside a collection |
 
 #### Projects (/projects)
 
+Projects use a natural number as their `id`.
+
 ##### Attributes
+| Attribute | Type | View Scope | Edit Scope | Description |
+|-----------|------|------------|------------|-------------|
 
 ##### Links
+| Link | Type | Description |
+|------|------|-------------|
 
 #### Workflows (/workflows)
 
