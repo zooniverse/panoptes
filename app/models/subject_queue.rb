@@ -105,8 +105,8 @@ class SubjectQueue < ActiveRecord::Base
         curr_size: sq.set_member_subject_ids.size,
         append_size: sms_ids.length
       )
-      notify_dup_subject_seen_before_error(sq, enqd_non_dup_sms_ids)
-      sq.update_column(:set_member_subject_ids, enqd_non_dup_sms_ids)
+      enqueue_set = enqueue_sms_ids(sq, enqd_non_dup_sms_ids)
+      sq.update_column(:set_member_subject_ids, enqueue_set)
     end
   end
 
@@ -152,22 +152,38 @@ class SubjectQueue < ActiveRecord::Base
   #NOTE: this can be removed when we're happy that
   # https://github.com/zooniverse/Panoptes/issues/1069
   # is resolved.
-  def self.notify_dup_subject_seen_before_error(queue, new_enq)
+  def self.notify_dup_subject_seen_before_error(queue, seen_before_set)
+    params = {
+      user_id: queue.user.id,
+      workflow_id: queue.workflow.id,
+      seen_before_sms_ids: seen_before_set.map(&:id),
+      seen_before_subject_ids: seen_before_set.map(&:subject_id)
+    }
+    Honeybadger.notify(
+      error_class:   "Subject Queue Seen Before",
+      error_message: "Appending seen before subject to subject queue",
+      parameters: params
+    )
+  end
+
+  def self.seen_before(queue, new_enq)
     if uss = UserSeenSubject.where(user: queue.user, workflow: queue.workflow).first
-      seen_before = SetMemberSubject.where(id: new_enq).joins(:subject).where(subjects: { id: uss.subject_ids })
-      if seen_before.exists?
-        params = {
-          user_id: queue.user.id,
-          workflow_id: queue.workflow.id,
-          seen_before_sms_ids: seen_before.map(&:id),
-          seen_before_subject_ids: seen_before.map(&:subject_id)
-        }
-        Honeybadger.notify(
-          error_class:   "Subject Queue Seen Before",
-          error_message: "Appending seen before subject to subject queue",
-          parameters: params
-        )
-      end
+      SetMemberSubject.where(id: new_enq)
+        .joins(:subject)
+        .where(subjects: { id: uss.subject_ids })
+    else
+      SetMemberSubject.none
     end
+  end
+
+  def self.enqueue_sms_ids(queue, enqd_non_dup_sms_ids)
+    seen_before_set = seen_before(queue, enqd_non_dup_sms_ids)
+    dup_ids = if seen_before_set.exists?
+      notify_dup_subject_seen_before_error(queue, seen_before_set)
+      seen_before_set.map(&:id)
+    else
+      []
+    end
+    enqd_non_dup_sms_ids - dup_ids
   end
 end
