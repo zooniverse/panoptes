@@ -53,6 +53,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def lifecycle(action, classification)
     lifecycle = ClassificationLifecycle.new(classification)
+    lifecycle.dequeue_subjects
     lifecycle.queue(action)
   end
 
