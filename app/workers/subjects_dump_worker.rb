@@ -19,6 +19,7 @@ class SubjectsDumpWorker
         end
         to_gzip
         write_to_s3
+        set_ready_state
         send_email
       ensure
         FileUtils.rm(csv_file_path)

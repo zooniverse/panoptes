@@ -84,6 +84,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_or_update_medium(type, media_create_params)
+    media_create_params.metadata["state"] = 'creating'
     if medium = controlled_resource.send(type)
       medium.update!(media_create_params)
       medium.touch
