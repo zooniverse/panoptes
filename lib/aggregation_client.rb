@@ -1,23 +1,16 @@
 class AggregationClient
-  extend Configurable
+  include Configurable
 
   self.config_file = "aggregation_api"
-
-  cattr_accessor :host
-
-  def self.configure
-    self.host = ENV['AGGREGATION_ENGINE_HOST'] || configuration[:host]
-    self.user_id = (ENV['AGGREGATION_ENGINE_USER'] || configuration[:user]).to_i
-    self.application_id = (ENV['AGGREGATION_ENGINE_APPLICATION'] || configuration[:application]).to_i
-  end
+  self.api_prefix = "aggregation"
 
   attr_reader :connection
 
-  def initialize
-    @connection = connect!
+  def initialize(adapter = Faraday.default_adapter)
+    @connection = connect!(adapter)
   end
 
-  def connect!
+  def connect!(adapter)
     Faraday.new host do |faraday|
       faraday.response :json, content_type: /\bjson$/
       faraday.use :http_cache, store: Rails.cache, logger: Rails.logger
@@ -34,17 +27,19 @@ class AggregationClient
     end
   end
 
-  def aggregate(project, medium)
-    body = {
+  def body(project, medium)
+    {
       project_id: project.id,
-      url: medium.put_file,
+      url: medium.put_url,
       token: generate_token
     }
+  end
 
+  def aggregate(project, medium)
     connection.post('/') do |req|
       req.headers["Accept"] = "application/json"
       req.headers["Content-Type"] = "application/json"
-      req.body = body.to_json
+      req.body = body(project, medium).to_json
     end
   end
 end

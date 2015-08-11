@@ -1,7 +1,8 @@
 class TalkApiClient
-  extend Configurable
+  include Configurable
 
-  self.config_file = "aggregation_api"
+  self.config_file = "talk_api"
+  self.api_prefix = "talk"
 
   class NoTalkHostError < StandardError
   end
@@ -33,14 +34,6 @@ class TalkApiClient
     def index
       raise NotImplementedError
     end
-  end
-
-  cattr_accessor :host, :user_id, :application_id
-
-  def self.load_configuration
-    self.host = ENV['TALK_API_HOST'] || configuration[:host]
-    self.user_id = (ENV['TALK_API_USER'] || configuration[:user]).to_i
-    self.application_id = (ENV['TALK_API_APPLICATION'] || configuration[:application]).to_i
   end
 
   attr_reader :connection, :token
