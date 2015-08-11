@@ -29,7 +29,7 @@ end
 
 shared_context "a classification lifecycle event" do
 
-  let(:lifecycle ) { double }
+  let(:lifecycle ) { double(dequeue_subjects: nil) }
 
   before(:each) do
     [ :queue ].each do |stub|

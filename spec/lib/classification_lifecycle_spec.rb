@@ -25,6 +25,15 @@ describe ClassificationLifecycle do
     allow(MultiKafkaProducer).to receive(:publish)
   end
 
+  describe "#dequeue_subjects" do
+    it 'should dequeue the subjects' do
+      subject_queue
+      subject.dequeue_subjects
+      subject_queue.reload
+      expect(subject_queue.set_member_subject_ids).to_not include(*sms_ids)
+    end
+  end
+
   describe "#queue" do
 
     context "with create action" do

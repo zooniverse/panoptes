@@ -39,6 +39,11 @@ class ClassificationLifecycle
       end
   end
 
+  def dequeue_subjects
+    sms_ids = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id).pluck(:id)
+    SubjectQueue.dequeue(workflow, sms_ids, user: user)
+  end
+
   def update_seen_subjects
     if should_update_seen? && subjects_are_unseen_by_user?
       UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
@@ -69,7 +74,7 @@ class ClassificationLifecycle
   def subjects_are_unseen_by_user?
     return @unseen if @unseen
     @unseen = !UserSeenSubject.find_by!(user: user, workflow: workflow)
-      .try(:subjects_seen?, subject_ids)
+    .try(:subjects_seen?, subject_ids)
   rescue ActiveRecord::RecordNotFound
     @unseen = true
   end
@@ -126,10 +131,10 @@ class ClassificationLifecycle
 
   def user_workflow_subject
     @user_workflow_subject ||= {
-                                user: user,
-                                workflow: workflow,
-                                subject_ids: subject_ids
-                               }
+      user: user,
+      workflow: workflow,
+      subject_ids: subject_ids
+    }
   end
 
   def update_classification_metadata(key, value)
