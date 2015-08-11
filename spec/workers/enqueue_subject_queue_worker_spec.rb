@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SubjectQueueWorker do
+RSpec.describe EnqueueSubjectQueueWorker do
   subject { described_class.new }
   let(:workflow) { create(:workflow_with_subject_set) }
 

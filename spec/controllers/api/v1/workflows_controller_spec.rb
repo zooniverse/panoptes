@@ -199,7 +199,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         let(:subject_set) { create(:subject_set_with_subjects, project: resource.project) }
 
         it 'should call the reload queue worker' do
-          expect(ReloadQueueWorker).to receive(:perform_async).with(resource.id)
+          expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async).with(resource.id)
           default_request scopes: scopes, user_id: authorized_user.id
           put :update, update_params.merge(id: resource.id)
         end
@@ -207,7 +207,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       context "when the workflow has no subjects" do
         it "should not queue the worker" do
-          expect(ReloadQueueWorker).to_not receive(:perform_async).with(resource.id)
+          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async).with(resource.id)
           default_request scopes: scopes, user_id: authorized_user.id
           put :update, update_params.merge(id: resource.id)
         end
@@ -216,7 +216,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     context "without authorized user" do
       it 'should not call the reload queue worker' do
-        expect(ReloadQueueWorker).to_not receive(:perform_async).with(resource.id)
+        expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async).with(resource.id)
         default_request scopes: scopes, user_id: create(:user).id
         put :update, update_params.merge(id: resource.id)
       end
@@ -369,7 +369,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     context "with a logged in user" do
       it "should load a user's subject queue" do
-        expect(SubjectQueueWorker).to receive(:perform_async).with(resource.id.to_s, authorized_user.id)
+        expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(resource.id.to_s, authorized_user.id)
         default_request scopes: scopes, user_id: authorized_user.id
         get :show, id: resource.id
       end
@@ -377,7 +377,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     context "with a logged out user" do
       it "should load the general subject queue" do
-        expect(SubjectQueueWorker).to receive(:perform_async).with(resource.id.to_s, nil)
+        expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(resource.id.to_s, nil)
         get :show, id: resource.id
       end
     end

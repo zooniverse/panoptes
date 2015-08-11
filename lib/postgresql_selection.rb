@@ -51,19 +51,23 @@ class PostgresqlSelection
   end
 
   def select_results_randomly
-    results = []
     enough_available = limit < available_count
     if enough_available
-      until results.length >= limit do
-        results = results | sample.limit(limit).pluck(:id)
-      end
+      construct_random_sample_to_limit
     else
-      results = available.pluck(:id).shuffle
+      available.pluck(:id).shuffle
     end
-    results
   end
 
   def select_results_in_order
     available.limit(limit).pluck(:id)
+  end
+
+  def construct_random_sample_to_limit
+    results = []
+    until results.length >= limit do
+      results = results | sample.limit(limit).pluck(:id)
+    end
+    results
   end
 end
