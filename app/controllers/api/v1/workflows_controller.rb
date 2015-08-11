@@ -8,19 +8,19 @@ class Api::V1::WorkflowsController < Api::ApiController
   schema_type :json_schema
 
   def create
-    super { |workflow| refresh_queue(workflow) }
+    super { |workflow| reload_queue(workflow) }
   end
 
   def update
-    super { |workflow| refresh_queue(workflow) }
+    super { |workflow| reload_queue(workflow) }
   end
 
   def update_links
-    super { |workflow| refresh_queue(workflow) }
+    super { |workflow| reload_queue(workflow) }
   end
 
   def destroy_links
-    super { |workflow| refresh_queue(workflow) }
+    super { |workflow| reload_queue(workflow) }
   end
 
   private
@@ -34,7 +34,10 @@ class Api::V1::WorkflowsController < Api::ApiController
     end
   end
 
-  def refresh_queue(workflow)
+  def reload_queue(workflow)
+    if workflow.set_member_subjects.exists?
+      ReloadNonLoggedInQueueWorker.perform_async(workflow.id)
+    end
   end
 
   def build_update_hash(update_params, id)
