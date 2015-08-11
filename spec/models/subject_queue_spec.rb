@@ -298,6 +298,51 @@ RSpec.describe SubjectQueue, type: :model do
             expect(ues.reload.set_member_subject_ids).to match_array([ sms.id ])
           end
         end
+
+        #NOTE: this can be removed when we're happy that
+        # https://github.com/zooniverse/Panoptes/issues/1069
+        # is resolved.
+        describe "duplicate error messaging" do
+          let(:query) { SubjectQueue.where(id: ues.id) }
+
+          context "when the append queue has dups" do
+
+            it "should notify HB with a custom error" do
+              expect(Honeybadger).to receive(:notify)
+              SubjectQueue.enqueue_update(query, ues.set_member_subject_ids)
+            end
+          end
+
+          context "when the append queue grows too large" do
+
+            it "should notify HB with a custom error" do
+              expect(Honeybadger).to receive(:notify)
+              start = smses.last.id+1
+              append_ids = (start..start+SubjectQueue::DEFAULT_LENGTH*2).to_a
+              SubjectQueue.enqueue_update(query, append_ids)
+            end
+          end
+
+          context "when the append queue contains a seen before" do
+
+            it "should notify HB with a custom error" do
+              create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [sms.subject_id])
+              expect(Honeybadger).to receive(:notify)
+              SubjectQueue.enqueue_update(query, [sms.id])
+            end
+          end
+
+          context "when the append queue does not contain a seen before" do
+
+            it "should not notify HB with a custom error" do
+              create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [smses.last.subject_id])
+              in_q = (smses - [ smses.last ]).map(&:id)
+              ues.update_column(:set_member_subject_ids, in_q)
+              expect(Honeybadger).to_not receive(:notify)
+              SubjectQueue.enqueue_update(query, [sms.id])
+            end
+          end
+        end
       end
     end
   end
