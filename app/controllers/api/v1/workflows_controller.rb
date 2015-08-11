@@ -7,11 +7,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   resource_actions :default
   schema_type :json_schema
 
-  def show
-    load_queue
-    super
-  end
-
   def create
     super { |workflow| refresh_queue(workflow) }
   end
@@ -40,11 +35,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def refresh_queue(workflow)
-    ReloadNonLoggedInQueueWorker.perform_async(workflow.id) if workflow.set_member_subjects.exists?
-  end
-
-  def load_queue
-    EnqueueSubjectQueueWorker.perform_async(params[:id], api_user.id)
   end
 
   def build_update_hash(update_params, id)
