@@ -326,18 +326,16 @@ RSpec.describe SubjectQueue, type: :model do
           context "when the append queue contains a seen before" do
 
             it "should notify HB with a custom error" do
-              append_ids = [sms.id]
-              create(:user_seen_subject, user: user, workflow: workflow, subject_ids: append_ids)
+              create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [sms.subject_id])
               expect(Honeybadger).to receive(:notify)
-              SubjectQueue.enqueue_update(query, append_ids)
+              SubjectQueue.enqueue_update(query, [sms.id])
             end
           end
 
           context "when the append queue does not contain a seen before" do
 
             it "should not notify HB with a custom error" do
-              seen_ids = [smses.last.id]
-              create(:user_seen_subject, user: user, workflow: workflow, subject_ids: seen_ids)
+              create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [smses.last.subject_id])
               in_q = (smses - [ smses.last ]).map(&:id)
               ues.update_column(:set_member_subject_ids, in_q)
               expect(Honeybadger).to_not receive(:notify)
