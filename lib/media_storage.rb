@@ -19,6 +19,10 @@ module MediaStorage
       end
     end
 
+    def get_adapter
+      @adapter
+    end
+
     private
 
     def default_adapter

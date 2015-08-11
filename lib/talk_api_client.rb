@@ -1,4 +1,8 @@
 class TalkApiClient
+  extend Configurable
+
+  self.config_file = "aggregation_api"
+
   class NoTalkHostError < StandardError
   end
 
@@ -37,15 +41,6 @@ class TalkApiClient
     self.host = ENV['TALK_API_HOST'] || configuration[:host]
     self.user_id = (ENV['TALK_API_USER'] || configuration[:user]).to_i
     self.application_id = (ENV['TALK_API_APPLICATION'] || configuration[:application]).to_i
-  end
-
-  def self.configuration
-    @configuration ||= begin
-                         config = YAML.load(ERB.new(File.read(Rails.root.join('config/talk_api.yml'))).result)
-                         config[Rails.env].symbolize_keys
-                       rescue Errno::ENOENT, NoMethodError
-                         {  }
-                       end
   end
 
   attr_reader :connection, :token

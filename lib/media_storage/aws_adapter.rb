@@ -35,7 +35,7 @@ module MediaStorage
     end
 
     def get_path(path, opts={})
-      expires = (@get_expiration || opts[:expires]).minutes.from_now
+      expires = (opts[:get_expires] || @get_expiration).minutes.from_now
       if opts[:private]
         object(path).url_for(:read,
                              secure: true,
@@ -47,7 +47,7 @@ module MediaStorage
 
     def put_path(path, opts={})
       content_type = opts[:content_type]
-      expires = (@put_expiration || opts[:expires]).minutes.from_now
+      expires = (opts[:put_expires] || @put_expiration).minutes.from_now
       object(path).url_for(:write,
                            secure: true,
                            content_type: content_type,
