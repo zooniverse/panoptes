@@ -155,15 +155,16 @@ RSpec.describe PostgresqlSelection do
         update_sms_priorities
         created_workflow = Workflow.first
         subject_set = created_workflow.subject_sets.last
-        create_list(:subject, 12, project: created_workflow.project, uploader: User.first).each do |subject|
-          create(:set_member_subject, :with_priorities, subject: subject, subject_set: subject_set)
+        latest_priority = SetMemberSubject.where.not(priority: nil).order(priority: :desc).limit(1).pluck(:priority).first
+        create_list(:subject, 12, project: created_workflow.project, uploader: User.first).each_with_index do |subject, index|
+          create(:set_member_subject, priority: latest_priority+index+1, subject: subject, subject_set: subject_set)
         end
       end
 
       let(:subject_set_id) { SubjectSet.first.id }
       let(:sms) { SetMemberSubject.where(subject_set_id: subject_set_id) }
 
-      it_behaves_like "select for incomplete_project"  do
+      it_behaves_like "select for incomplete_project" do
         let(:args) { {subject_set_id: subject_set_id} }
       end
 
