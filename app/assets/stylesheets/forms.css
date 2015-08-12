@@ -1,0 +1,84 @@
+/* Base Form Styles */
+
+.form-container {
+  margin: 0 auto;
+  max-width: 510px;
+  width: 100%;
+}
+
+.form-container .form {
+  width: 100%;
+}
+
+.form fieldset {
+  border: 0;
+  margin: 0 0 2em;
+  padding: 0;
+}
+
+.form label {
+  color: #646464;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.form input[type="text"], .form input[type="password"], .form input[type="email"] {
+  background-color:  #ffffff;
+  border: solid 1px #bebfc1;
+  border-radius: 2px;
+  box-sizing: border-box;
+  color: #646464;
+  font-size: 1.4em;
+  max-width: 510px;
+  padding: 0.75em;
+  width: 100%;
+}
+
+.form input[type="text"]:focus, .form input[type="password"]:focus, .form input[type="email"]:focus {
+  border-color:  #0072ff;
+  border-width: 2px;
+  outline: none;
+}
+
+.form input[type="submit"] {
+  background-color: #0072ff;
+  border: 0;
+  border-radius: 4px;
+  max-width: 160px;
+  width: 100%;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  float: right;
+  font-size: 1.4em;
+  margin: 0;
+  outline: none;
+  padding: 1em 0;
+  position: relative;
+  text-align: center;
+}
+
+.form input[type="submit"]:hover {
+  background-color: #33A5FF;
+}
+
+/* Styles for new session form */
+
+.form--new-session > fieldset:last-of-type, .form--new-session > fieldset:nth-last-of-type(2) {
+  margin: 0;
+}
+
+/* Styles for new user form */
+
+.form--new-user .fieldset--password {
+  display: inline-block;
+  float: left;
+}
+
+.form--new-user fieldset.fieldset--password:nth-last-of-type(2) {
+  margin-right: 1em;
+}
+
+.form--new-user .fieldset--password > input[type="password"] {
+  width: 250px;
+}
