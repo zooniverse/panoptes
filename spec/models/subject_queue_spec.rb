@@ -267,7 +267,6 @@ RSpec.describe SubjectQueue, type: :model do
                  user: user,
                  workflow: workflow)
         end
-        let!(:sms_ids) { ues.set_member_subject_ids - [ sms.id ] }
 
         it 'should call add_subject_id on the existing subject queue' do
           SubjectQueue.enqueue(workflow, sms.id, user: user)
@@ -275,9 +274,10 @@ RSpec.describe SubjectQueue, type: :model do
         end
 
         it 'should not have a duplicate in the set' do
+          expected_ids = ues.set_member_subject_ids | [ sms.id ]
           SubjectQueue.enqueue(workflow, sms.id, user: user)
-          sms_ids = ues.reload.set_member_subject_ids
-          expect(sms_ids.size).to eq(sms_ids.uniq.size)
+          new_sms_ids = ues.reload.set_member_subject_ids
+          expect(new_sms_ids).to eq(expected_ids)
         end
 
         it 'should maintain the order of the set' do
@@ -288,28 +288,35 @@ RSpec.describe SubjectQueue, type: :model do
 
         context "when a queue's existing SMSes are deleted", sidekiq: :inline do
           before(:each) do
-            sms_ids.each do |sms_id|
+            smses.map(&:id).each do |sms_id|
               QueueRemovalWorker.perform_async(sms_id, workflow.id)
             end
             SubjectQueue.enqueue(workflow, sms.id, user: user)
           end
 
           it "should only have the enqueued subject id in the queue" do
-            expect(ues.reload.set_member_subject_ids).to match_array([ sms.id ])
+            expect(ues.reload.set_member_subject_ids).to eq([ sms.id ])
           end
         end
 
-        #NOTE: this can be removed when we're happy that
-        # https://github.com/zooniverse/Panoptes/issues/1069
-        # is resolved.
-        describe "duplicate error messaging" do
+        describe "duplicate id queueing" do
           let(:query) { SubjectQueue.where(id: ues.id) }
+          let(:q_dups) do
+            ues.set_member_subject_ids.sample(ues.set_member_subject_ids.size - 1)
+          end
+          let(:enq_ids_with_dups) { [ sms.id ] | q_dups }
 
           context "when the append queue has dups" do
 
             it "should notify HB with a custom error" do
               expect(Honeybadger).to receive(:notify)
               SubjectQueue.enqueue_update(query, ues.set_member_subject_ids)
+            end
+
+            it "should not enqueue dups" do
+              SubjectQueue.enqueue_update(query, enq_ids_with_dups)
+              non_dups = ues.set_member_subject_ids | [ sms.id ]
+              expect(ues.reload.set_member_subject_ids).to eq(non_dups)
             end
           end
 
@@ -323,8 +330,6 @@ RSpec.describe SubjectQueue, type: :model do
             end
           end
 
-          #NOTE: the spec about stripping dups should stay -> extract it to
-          # it's own test to ensure we rip out any dups on enqueues
           context "when the append queue contains a seen before" do
 
             before(:each) do
@@ -336,7 +341,7 @@ RSpec.describe SubjectQueue, type: :model do
               SubjectQueue.enqueue_update(query, [sms.id])
             end
 
-            it "should strip the dups before enqueueing" do
+            it "should not enqueue dups" do
               SubjectQueue.enqueue_update(query, [sms.id])
               expect(ues.reload.set_member_subject_ids).to eq(smses.map(&:id))
             end
