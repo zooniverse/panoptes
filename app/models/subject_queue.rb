@@ -99,13 +99,7 @@ class SubjectQueue < ActiveRecord::Base
   def self.enqueue_update(query, sms_ids)
     query.find_each do |sq|
       sms_ids = Array.wrap(sms_ids)
-      enqd_non_dup_sms_ids = sq.set_member_subject_ids | sms_ids
-      notify_dup_subject_queue_error(
-        enq_size: enqd_non_dup_sms_ids.length,
-        curr_size: sq.set_member_subject_ids.size,
-        append_size: sms_ids.length
-      )
-      enqueue_set = enqueue_sms_ids(sq, enqd_non_dup_sms_ids)
+      enqueue_set = NonDuplicateSmsIds.new(sq, sms_ids).enqueue_sms_ids_set
       sq.update_column(:set_member_subject_ids, enqueue_set)
     end
   end
@@ -124,66 +118,5 @@ class SubjectQueue < ActiveRecord::Base
     else
       set_member_subject_ids.sample(limit)
     end
-  end
-
-  private
-
-  #NOTE: this can be removed when we're happy that
-  # https://github.com/zooniverse/Panoptes/issues/1069
-  # is resolved.
-  def self.notify_dup_subject_queue_error(enq_size:, curr_size:, append_size:)
-    params = { enq_size: enq_size, curr_size: curr_size, append_size: append_size }
-    if enq_size != curr_size + append_size
-      Honeybadger.notify(
-        error_class:   "Subject Queue Duplicates",
-        error_message: "Appending duplicates to subject queue",
-        parameters:  params
-      )
-    end
-    if enq_size > (DEFAULT_LENGTH * 2)
-      Honeybadger.notify(
-        error_class:   "Subject Queue Unbound Growth",
-        error_message: "Queue is growing too large",
-        parameters:  params
-      )
-    end
-  end
-
-  #NOTE: this can be removed when we're happy that
-  # https://github.com/zooniverse/Panoptes/issues/1069
-  # is resolved.
-  def self.notify_dup_subject_seen_before_error(queue, seen_before_set)
-    params = {
-      user_id: queue.user.id,
-      workflow_id: queue.workflow.id,
-      seen_before_sms_ids: seen_before_set.map(&:id),
-      seen_before_subject_ids: seen_before_set.map(&:subject_id)
-    }
-    Honeybadger.notify(
-      error_class:   "Subject Queue Seen Before",
-      error_message: "Appending seen before subject to subject queue",
-      parameters: params
-    )
-  end
-
-  def self.seen_before(queue, new_enq)
-    if uss = UserSeenSubject.where(user: queue.user, workflow: queue.workflow).first
-      SetMemberSubject.where(id: new_enq)
-        .joins(:subject)
-        .where(subjects: { id: uss.subject_ids })
-    else
-      SetMemberSubject.none
-    end
-  end
-
-  def self.enqueue_sms_ids(queue, enqd_non_dup_sms_ids)
-    seen_before_set = seen_before(queue, enqd_non_dup_sms_ids)
-    dup_ids = if seen_before_set.exists?
-      notify_dup_subject_seen_before_error(queue, seen_before_set)
-      seen_before_set.map(&:id)
-    else
-      []
-    end
-    enqd_non_dup_sms_ids - dup_ids
   end
 end
