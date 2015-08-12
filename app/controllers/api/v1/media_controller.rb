@@ -31,41 +31,49 @@ class Api::V1::MediaController < Api::ApiController
     super
   end
 
+  def update
+    error_unless_exists
+    set_controlled_resources
+    super
+
+  end
+
   def destroy
     error_unless_exists
-    if association_numeration == :collection
-      set_controlled_resources
-    else
-      @controlled_resources = media
-    end
+    set_controlled_resources
     super
   end
 
   def create
     created = if association_numeration == :collection
-      controlled_resource.send(media_name).create!(create_params)
-    else
-      if old_resource = controlled_resource.send(media_name)
-        old_resource.destroy
-      end
-      controlled_resource.send("create_#{media_name}!", create_params)
-    end
+                controlled_resource.send(media_name).create!(create_params)
+              else
+                if old_resource = controlled_resource.send(media_name)
+                  old_resource.destroy
+                end
+                controlled_resource.send("create_#{media_name}!", create_params)
+              end
     created_resource_response(created)
   end
 
   def set_controlled_resources
-    @controlled_resources = media.where(id: params[:id])
+    if association_numeration == :collection
+      @controlled_resources = media.where(id: params[:id])
+    else
+      @controlled_resources = media
+    end
+
   end
 
   def media
     return @media if @media
     linked_media = controlled_resource.send(media_name)
     @media = if linked_media && association_numeration == :single
-      id = params[:id] ? params[:id] : linked_media.id
-      linked_media.class.where(id: id)
-    else
-      linked_media
-    end
+               id = params[:id] ? params[:id] : linked_media.id
+               linked_media.class.where(id: id)
+             else
+               linked_media
+             end
   end
 
   def error_unless_exists
@@ -116,10 +124,10 @@ class Api::V1::MediaController < Api::ApiController
 
   def precondition_fails?
     query = if association_numeration == :single
-      media
-    else
-      Medium.where(id: params[:id])
-    end
+              media
+            else
+              Medium.where(id: params[:id])
+            end
     !(gen_etag(query) == precondition)
   end
 
@@ -140,18 +148,18 @@ class Api::V1::MediaController < Api::ApiController
 
   def media_exists?
     case association_numeration
-     when :single
-       media.exists?
-     when :collection
-       media.exists?(params[:id])
-     end
-   end
+    when :single
+      media.exists?
+    when :collection
+      media.exists?(params[:id])
+    end
+  end
 
-   def create_conditions
-     @controlled_resources = api_user.do(:update)
-       .to(resource_class, scope_context)
-       .with_ids(resource_ids)
-       .scope
-     check_controller_resources
-   end
+  def create_conditions
+    @controlled_resources = api_user.do(:update)
+    .to(resource_class, scope_context)
+    .with_ids(resource_ids)
+    .scope
+    check_controller_resources
+  end
 end
