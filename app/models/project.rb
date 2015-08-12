@@ -24,6 +24,8 @@ class Project < ActiveRecord::Base
     as: :linked
   has_one :classifications_export, -> { where(type: "project_classifications_export").order(created_at: :desc) },
     class_name: "Medium", as: :linked
+  has_one :aggregations_export, -> { where(type: "project_aggregations_export").order(created_at: :desc) },
+    class_name: "Medium", as: :linked
   has_one :subjects_export, -> { where(type: "project_subjects_export").order(created_at: :desc) },
     class_name: "Medium", as: :linked
   has_many :attached_images, -> { where(type: "project_attached_image") }, class_name: "Medium",
@@ -45,7 +47,7 @@ class Project < ActiveRecord::Base
   after_update :send_notifications
 
   can_by_role :destroy, :update, :update_links, :destroy_links, :create_classifications_export,
-    :create_subjects_export, roles: [ :owner, :collaborator ]
+    :create_subjects_export, :create_aggregations_export, roles: [ :owner, :collaborator ]
 
   can_by_role :show, :index, :versions, :version, public: true,
     roles: [ :owner, :collaborator, :tester, :translator, :scientist, :moderator ]

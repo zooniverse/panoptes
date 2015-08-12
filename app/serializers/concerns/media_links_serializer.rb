@@ -9,15 +9,17 @@ module MediaLinksSerializer
         when Symbol
           @can_includes << link
         when Hash
-          opts, _ = link.values
-          link_name, _ = link.keys
-          @can_includes << link_name if opts.fetch(:include, true)
+          opts = link.values
+          link_names = link.keys
+          link_names.each.with_index do |name, i|
+            @can_includes << name if opts[i].fetch(:include, true)
+          end
         end
       end
-      @media_links = links.map do |link|
+      @media_links = links.flat_map do |link|
         case link
         when Hash
-          link.keys.first
+          link.keys
         else
           link
         end

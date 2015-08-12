@@ -18,7 +18,7 @@ RSpec.shared_examples "export create" do |export_worker, export_type|
   it 'should update an existing export if one exists' do
     params = create_params
     params[:media].delete(:metadata)
-    export = create(:medium, linked: resource, type: "project_#{export_type}", content_type: "text/csv", metadata: {})
+    export = create(:medium, linked: resource, type: "project_#{export_type}", content_type: content_type, metadata: {})
     default_request scopes: scopes, user_id: user.id
     post create_path, params
     export.reload
@@ -28,7 +28,7 @@ RSpec.shared_examples "export create" do |export_worker, export_type|
   it 'should update the updated_at timestamp of the export' do
     params = create_params
     params[:media].delete(:metadata)
-    export = create(:medium, linked: resource, type: "project_#{export_type}", content_type: "text/csv", metadata: {recipients: [authorized_user.id]}, updated_at: 5.days.ago)
+    export = create(:medium, linked: resource, type: "project_#{export_type}", content_type: content_type, metadata: {recipients: [authorized_user.id]}, updated_at: 5.days.ago)
     default_request scopes: scopes, user_id: user.id
     post create_path, params
     export.reload

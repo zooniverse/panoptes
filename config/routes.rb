@@ -71,10 +71,13 @@ Rails.application.routes.draw do
 
       json_api_resources :projects, links: [:subject_sets, :workflows] do
         media_resources :avatar, :background, :attached_images,
-        classifications_export: { except: [:create] },
-        subjects_export: { except: [:create] }
+          classifications_export: { except: [:create] },
+          subjects_export: { except: [:create] },
+          aggregations_export: { except: [:create] }
+
         post "/classifications_export", to: "projects#create_classifications_export", format: false
         post "/subjects_export", to: "projects#create_subjects_export", format: false
+        post "/aggregations_export", to: "projects#create_aggregations_export", format: false
 
         json_api_resources :pages, controller: "project_pages"
       end
