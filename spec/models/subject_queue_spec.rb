@@ -323,12 +323,22 @@ RSpec.describe SubjectQueue, type: :model do
             end
           end
 
+          #NOTE: the spec about stripping dups should stay -> extract it to
+          # it's own test to ensure we rip out any dups on enqueues
           context "when the append queue contains a seen before" do
 
-            it "should notify HB with a custom error" do
+            before(:each) do
               create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [sms.subject_id])
+            end
+
+            it "should notify HB with a custom error" do
               expect(Honeybadger).to receive(:notify)
               SubjectQueue.enqueue_update(query, [sms.id])
+            end
+
+            it "should strip the dups before enqueueing" do
+              SubjectQueue.enqueue_update(query, [sms.id])
+              expect(ues.reload.set_member_subject_ids).to eq(smses.map(&:id))
             end
           end
 
