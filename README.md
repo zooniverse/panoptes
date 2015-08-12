@@ -35,14 +35,14 @@ Optionally you can run
 
 ## Installation
 
-We only support running Panoptes via Docker and Docker Compose. If you'd like to run it outside a container, see the above Requirements sections to get started. At the moment, Panoptes only works with Docker version 1.6.2.
+We only support running Panoptes via Docker and Docker Compose. If you'd like to run it outside a container, see the above Requirements sections to get started.
 
 It's possible to run Panoptes only having to install the `fig_rake` gem. Alternatives to various rake tasks are presented.
 
 ### Setup Docker and Docker Compose
 
 * Docker
-  * [OS X](https://docs.docker.com/installation/mac/) - Boot2Docker
+  * [OS X](https://docs.docker.com/installation/mac/) - Docker Machine
   * [Ubuntu](https://docs.docker.com/installation/ubuntulinux/) - Docker
   * [Windows](http://docs.docker.com/installation/windows/) - Boot2Docker
 
@@ -57,7 +57,7 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 0. Setup the application configuration files
   + Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
 
-0. Install [Docker and Docker Compose](https://docs.docker.com/compose/install/).
+0. Install Docker from the appropriate link above.
 
 0. Create and run the application containers by running `docker-compose up`
 
@@ -66,7 +66,7 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `frails runner db/fig_dev_seed_data/fig_dev_seed_data.rb`
 
 0. Open up the application in your browser:
-  + If on a Mac, run `boot2docker ip` to get the IP-address where the server is running.
+  + If on a Mac, run `docker-machine ip default` to get the IP-address where the server is running.
   + Visit either that address or just localhost on port 3000.
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
