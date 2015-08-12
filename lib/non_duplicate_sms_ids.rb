@@ -64,13 +64,13 @@ class NonDuplicateSmsIds
   end
 
   def user_seen_subject
-    UserSeenSubject.where(user: user, workflow: workflow).first
+    UserSeenSubject.where(user: user, workflow: workflow).first if user
   end
 
   def error_params
     error_params = {
-      user_id: queue.user.id,
-      workflow_id: queue.workflow.id,
+      user_id: user.try(:id),
+      workflow_id: workflow.id,
       curr_queue_size: curr_queue_size,
       append_ids_size: append_ids_size,
       dup_incoming_ids: dup_incoming_ids

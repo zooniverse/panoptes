@@ -318,6 +318,13 @@ RSpec.describe SubjectQueue, type: :model do
               non_dups = ues.set_member_subject_ids | [ sms.id ]
               expect(ues.reload.set_member_subject_ids).to eq(non_dups)
             end
+
+            it "should handle an empty user queue enqueue" do
+              allow_any_instance_of(NonDuplicateSmsIds).to receive(:user).and_return(nil)
+              SubjectQueue.enqueue_update(query, enq_ids_with_dups)
+              non_dups = ues.set_member_subject_ids | [ sms.id ]
+              expect(ues.reload.set_member_subject_ids).to eq(non_dups)
+            end
           end
 
           context "when the append queue grows too large" do
