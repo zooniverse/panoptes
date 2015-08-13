@@ -47,7 +47,8 @@ RSpec.describe AggregationClient do
     describe "#body" do
       subject{ described_class.new([:test, stubs]).body(project, medium) }
 
-      it { is_expected.to include(:token, url: medium.put_url, project_id: project.id) }
+      it { is_expected.to include(:token, medium_href: medium.location,
+        put_url: medium.put_url, project_id: project.id) }
     end
   end
 end

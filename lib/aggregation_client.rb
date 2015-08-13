@@ -30,7 +30,8 @@ class AggregationClient
   def body(project, medium)
     {
       project_id: project.id,
-      url: medium.put_url,
+      medium_href: medium.location,
+      put_url: medium.put_url,
       token: generate_token
     }
   end
