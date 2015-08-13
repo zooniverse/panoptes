@@ -98,7 +98,7 @@ class Api::V1::ProjectsController < Api::ApiController
       medium.touch
       medium
     else
-      controlled_resource.send("create_#{type}", media_create_params)
+      controlled_resource.send("create_#{type}!", media_create_params)
     end
   end
 
