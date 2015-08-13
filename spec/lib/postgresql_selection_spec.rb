@@ -27,7 +27,6 @@ RSpec.describe PostgresqlSelection do
       sms_scope.count - _seen_count
     end
 
-
     context "when a user has only seen a few subjects" do
       let(:seen_count) { 5 }
       let!(:uss) do
@@ -87,6 +86,14 @@ RSpec.describe PostgresqlSelection do
       subject { PostgresqlSelection.new(workflow, user) }
 
       it_behaves_like "select for incomplete_project"
+
+      it "should give up trying to construct a random list after set number of attempts" do
+        unreachable_limit = SetMemberSubject.count + 1
+        allow_any_instance_of(PostgresqlSelection).to receive(:available_count).and_return(unreachable_limit + 1)
+        allow_any_instance_of(PostgresqlSelection).to receive(:limit).and_return(unreachable_limit)
+        results = subject.select
+        expect(results).to eq(results)
+      end
     end
 
     context "grouped selection" do
