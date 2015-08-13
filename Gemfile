@@ -34,6 +34,7 @@ gem 'activerecord-import', '~> 0.8'
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'pg_search'
 gem 'ranked-model', '~> 0.4.0'
+gem 'rack-timeout', '~> 0.2.4'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
@@ -46,7 +47,7 @@ platforms :ruby do
   gem 'therubyracer', '~> 0.12'
   gem 'pg', '~> 0.18'
   gem 'poseidon', '~> 0.0.5'
-  gem 'mysql2', '~> 0.3'
+  gem 'mysql2', '0.3.18'
 end
 
 group :development do
