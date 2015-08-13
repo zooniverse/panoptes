@@ -143,6 +143,25 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       create(:medium, linked: parent, type: "#{parent_name}_#{media_type}", content_type: content_type)
     end
 
+    if actions.include? :update
+      describe "#update" do
+        let(:test_attr) { :metadata }
+        let(:test_attr_value) { { "state" => "finished" } }
+        let(:update_params) do
+          params = {
+            media: {
+              metadata: {
+                "state" => "finished"
+              }
+            }
+          }
+          params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
+        end
+
+        it_behaves_like "is updatable"
+      end
+    end
+
     if actions.include? :index
       describe "#index" do
         context "when #{media_type} exists" do
@@ -189,11 +208,11 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         let(:new_resource) { resource_class.find(created_instance_id(api_resource_name)) }
         let(:create_params) do
           params = {
-                    media: {
-                            content_type: "image/jpeg",
-                            metadata: { filename: "image.png" }
-                           }
-                   }
+            media: {
+              content_type: "image/jpeg",
+              metadata: { filename: "image.png" }
+            }
+          }
           params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
         end
 
@@ -256,6 +275,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
     it_behaves_like "has_many media", :project, :attached_images, %i(index create show destroy), 'image/jpeg'
     it_behaves_like "has_one media", :project, :classifications_export, %i(index), 'text/csv'
     it_behaves_like "has_one media", :project, :subjects_export, %i(index), 'text/csv'
+    it_behaves_like "has_one media", :project, :aggregations_export, %i(index update), 'application/x-gzip'
 
     describe "classifications_exports #index" do
       let!(:resources) do

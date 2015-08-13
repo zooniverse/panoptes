@@ -65,7 +65,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     let(:receivers) { create_list(:user, 2) }
     let(:medium) do
       create(:medium,
-             metadata: { "recipients" => receivers.map(&:id) },
+             metadata: { "recipients" => receivers.map(&:id), "state" => "creating" },
              linked: project,
              content_type: "text/csv",
              type: dump_type)
@@ -83,6 +83,12 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
       worker.perform(project.id, medium.id)
       medium.reload
       expect(medium.private).to be true
+    end
+
+    it "should set the medium state to ready" do
+      worker.perform(project.id, medium.id)
+      medium.reload
+      expect(medium.metadata).to include("state" => "ready")
     end
 
     it 'should email the users in the recipients hash' do

@@ -13,7 +13,9 @@ class ProjectSerializer
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles, :pages
   can_filter_by :display_name, :slug, :beta_requested, :beta_approved, :launch_requested, :launch_approved
-  media_include :avatar, :background, :attached_images, classifications_export: { include: false}
+  media_include :avatar, :background, :attached_images,
+    classifications_export: { include: false}, subjects_export: { include: false },
+    aggregations_export: { include: false }
 
   def self.links
     links = super

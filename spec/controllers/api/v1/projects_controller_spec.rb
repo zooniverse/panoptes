@@ -21,6 +21,8 @@ describe Api::V1::ProjectsController, type: :controller do
       "projects.avatar",
       "projects.background",
       "projects.classifications_export",
+      "projects.aggregations_export",
+      "projects.subjects_export",
       "projects.attached_images" ]
   end
 
@@ -794,11 +796,12 @@ describe Api::V1::ProjectsController, type: :controller do
     end
     let(:api_resource_links) { [] }
     let(:resource_class) { Medium }
+    let(:content_type) { "text/csv" }
 
     let(:create_params) do
       params = {
                 media: {
-                        content_type: "text/csv",
+                        content_type: content_type,
                         metadata: { recipients: create_list(:user, 1).map(&:id) }
                        }
                }
@@ -811,6 +814,15 @@ describe Api::V1::ProjectsController, type: :controller do
 
       it_behaves_like "is creatable", :create_classifications_export
       it_behaves_like "export create", ClassificationsDumpWorker, "classifications_export"
+    end
+
+    describe "#create_aggregations_export" do
+      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/aggregations_export/ }
+      let(:test_attr_value) { "project_aggregations_export" }
+      let(:content_type) { "application/x-gzip" }
+
+      it_behaves_like "is creatable", :create_aggregations_export
+      it_behaves_like "export create", AggregationsDumpWorker, "aggregations_export"
     end
 
     describe "#create_subjects_export" do

@@ -36,9 +36,11 @@ module JsonApiRoutes
     if name.to_s.pluralize == name.to_s
       # Create links for has_many media relations
       get "/:media_name/:id", to: "media#show", **opts unless exceptions.include?(:show)
+      put "/:media_name/:id", to: "media#update", **opts unless exceptions.include?(:update)
       delete "/:media_name/:id", to: "media#destroy", **opts unless exceptions.include?(:destroy)
     else
       # Create links for has_one media relations
+      put "/:media_name", to: "media#update", **opts unless exceptions.include?(:update)
       delete "/:media_name", to: "media#destroy", **opts unless exceptions.include?(:destroy)
     end
   end

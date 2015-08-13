@@ -6,7 +6,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include AdminAllowed
 
   doorkeeper_for :update, :create, :destroy, :create_classifications_export,
-    :create_subjects_export, scopes: [:project]
+    :create_subjects_export, :create_aggregations_export, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
 
@@ -28,7 +28,8 @@ class Api::V1::ProjectsController < Api::ApiController
   before_action :filter_by_tags, only: :index
   before_action :downcase_slug, only: :index
   prepend_before_action :require_login,
-    only: [:create, :update, :destroy, :create_classifications_export, :create_subjects_export]
+    only: [:create, :update, :destroy, :create_classifications_export, :create_subjects_export,
+    :create_aggregations_export]
 
   search_by do |name, query|
     query.search_display_name(name.join(" "))
@@ -65,6 +66,13 @@ class Api::V1::ProjectsController < Api::ApiController
     medium_response(medium)
   end
 
+  def create_aggregations_export
+    media_params[:metadata] ||= { recipients: [api_user.id] }
+    medium = create_or_update_medium(:aggregations_export, media_params)
+    AggregationsDumpWorker.perform_async(controlled_resource.id, medium.id)
+    medium_response(medium)
+  end
+
   def create
     super { |project| TalkAdminCreateWorker.perform_async(project.id) }
   end
@@ -84,6 +92,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_or_update_medium(type, media_create_params)
+    media_create_params['metadata']["state"] = 'creating'
     if medium = controlled_resource.send(type)
       medium.update!(media_create_params)
       medium.touch

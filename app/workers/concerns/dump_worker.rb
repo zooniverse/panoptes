@@ -34,11 +34,17 @@ module DumpWorker
     @medium ||= @medium_id ? load_medium : create_medium
   end
 
+  def set_ready_state
+    medium.metadata["state"] = 'ready'
+    medium.save!
+  end
+
   def create_medium
     Medium.create!(content_type: "text/csv",
                    type: dump_type,
                    path_opts: project_file_path,
                    linked: project,
+                   metadata: { state: 'creating' },
                    private: true)
   end
 

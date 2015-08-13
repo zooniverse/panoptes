@@ -12,6 +12,7 @@ class Medium < ActiveRecord::Base
 
   ALLOWED_UPLOAD_CONTENT_TYPES = %w(image/jpeg image/png image/gif)
   ALLOWED_EXPORT_CONTENT_TYPES  = %w(text/csv)
+  ALLOWED_AGGREGATION_EXPORT_CONTENT_TYPES = %w(application/x-gzip)
 
   validate do |medium|
     if !allow_any_content_type && !allowed_content_types.include?(medium.content_type)
@@ -87,6 +88,8 @@ class Medium < ActiveRecord::Base
     case type
     when "project_classifications_export", "project_subjects_export"
       ALLOWED_EXPORT_CONTENT_TYPES
+    when "project_aggregations_export"
+      ALLOWED_AGGREGATION_EXPORT_CONTENT_TYPES
     else
       ALLOWED_UPLOAD_CONTENT_TYPES
     end

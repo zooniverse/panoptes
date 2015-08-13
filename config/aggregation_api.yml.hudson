@@ -1,0 +1,9 @@
+development:
+  host: "http://localhost:3000"
+  user: 1
+  application: 1
+
+test:
+  host: "http://example.com"
+  user: 1
+  application: 1
