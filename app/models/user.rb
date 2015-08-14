@@ -222,7 +222,7 @@ class User < ActiveRecord::Base
       counter = 0
       sanitized_login = User.sanitize_login(display_name)
       self.login = sanitized_login
-      until User.find_by_lower_login(login).nil? || counter == DUP_LOGIN_SANITATION_ATTEMPTS
+      until no_other_logins_exist?(login) || counter == DUP_LOGIN_SANITATION_ATTEMPTS
         self.login = "#{ sanitized_login }-#{ counter += 1 }"
       end
       self.ouroboros_created = false
@@ -255,6 +255,14 @@ class User < ActiveRecord::Base
       identity_group.name = login if login_changed?
       identity_group.display_name = display_name if display_name_changed?
       identity_group.save!
+    end
+  end
+
+  def no_other_logins_exist?(login)
+    if user = User.find_by_lower_login(login)
+      user.id == id
+    else
+      true
     end
   end
 end

@@ -662,6 +662,16 @@ describe User, type: :model do
           expect(dup_user.login).to eq("#{user.login}-20")
         end
       end
+
+      context "when validating a saved ouroboros created user" do
+
+        it "should not append a suffix to the login" do
+          prev_login = user.login
+          user.update_column(:ouroboros_created, true)
+          user.valid?
+          expect(user.login).to eq(prev_login)
+        end
+      end
     end
   end
 
