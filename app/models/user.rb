@@ -171,7 +171,10 @@ class User < ActiveRecord::Base
   end
 
   def active_for_authentication?
-    !disabled? && super
+    return false if disabled?
+    update_ouroboros_created
+    ok_for_auth = changed? ? save : true
+    ok_for_auth && super
   end
 
   def email_required?
@@ -233,7 +236,9 @@ class User < ActiveRecord::Base
 
   def set_zooniverse_id
     self.zooniverse_id ||= "panoptes-#{ id }"
-    save! if zooniverse_id_changed?
+    if zooniverse_id_changed?
+      self.update_column(:zooniverse_id, self.zooniverse_id)
+    end
   end
 
   def setup_unsubscribe_token
