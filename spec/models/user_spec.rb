@@ -433,8 +433,10 @@ describe User, type: :model do
 
     context "when the user was created by ouroboros" do
       let(:user) do
+        User.skip_callback :validation, :before, :update_ouroboros_created
         u = build(:ouroboros_created_user)
         u.save(validate: false)
+        User.set_callback :validation, :before, :update_ouroboros_created
         u
       end
 
@@ -561,10 +563,10 @@ describe User, type: :model do
 
   describe "::scope_for" do
     let(:ouroboros_user) do
-      User.skip_callback :save, :before, :update_ouroboros_created
+      User.skip_callback :validation, :before, :update_ouroboros_created
       u = build(:user, activated_state: 0, ouroboros_created: true, build_group: false)
       u.save(validate: false)
-      User.set_callback :save, :before, :update_ouroboros_created
+      User.set_callback :validation, :before, :update_ouroboros_created
       u
     end
     let(:users) do
