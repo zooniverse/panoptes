@@ -416,6 +416,12 @@ describe User, type: :model do
   describe "#active_for_authentication?" do
     let(:user) { create(:user) }
 
+    it "should call update_ouroboros_created on the model" do
+      expect(user).to receive(:update_ouroboros_created)
+      expect(user).not_to receive(:save)
+      user.active_for_authentication?
+    end
+
     it "should return true for an active user" do
       expect(user.active_for_authentication?).to eq(true)
     end
@@ -423,6 +429,27 @@ describe User, type: :model do
     it "should be false for a disabled user" do
       user.disable!
       expect(user.active_for_authentication?).to eq(false)
+    end
+
+    context "when the user was created by ouroboros" do
+      let(:user) do
+        User.skip_callback :validation, :before, :update_ouroboros_created
+        u = build(:ouroboros_created_user)
+        u.save(validate: false)
+        User.set_callback :validation, :before, :update_ouroboros_created
+        u
+      end
+
+      it "should update the model and be valid for auth" do
+        aggregate_failures "active for auth" do
+          expect(user).to receive(:update_ouroboros_created).twice.and_call_original
+          expect(user).to receive(:build_identity_group).and_call_original
+          expect(user).to receive(:setup_unsubscribe_token).and_call_original
+          expect(user).to receive(:save).and_call_original
+          expect(user.active_for_authentication?).to be true
+          expect(user.reload.ouroboros_created).to be false
+        end
+      end
     end
   end
 
@@ -536,10 +563,10 @@ describe User, type: :model do
 
   describe "::scope_for" do
     let(:ouroboros_user) do
-      User.skip_callback :save, :before, :update_ouroboros_created
+      User.skip_callback :validation, :before, :update_ouroboros_created
       u = build(:user, activated_state: 0, ouroboros_created: true, build_group: false)
       u.save(validate: false)
-      User.set_callback :save, :before, :update_ouroboros_created
+      User.set_callback :validation, :before, :update_ouroboros_created
       u
     end
     let(:users) do
@@ -662,6 +689,16 @@ describe User, type: :model do
           expect(dup_user.login).to eq("#{user.login}-20")
         end
       end
+
+      context "when validating a saved ouroboros created user" do
+
+        it "should not append a suffix to the login" do
+          prev_login = user.login
+          user.update_column(:ouroboros_created, true)
+          user.valid?
+          expect(user.login).to eq(prev_login)
+        end
+      end
     end
   end
 
@@ -764,5 +801,3 @@ describe User, type: :model do
     end
   end
 end
-
-

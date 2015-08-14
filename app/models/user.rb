@@ -104,10 +104,12 @@ class User < ActiveRecord::Base
 
   def self.find_for_database_authentication(warden_conditions = { })
     warden_conditions = warden_conditions.dup
-    login = warden_conditions.delete(:login)
-
-    if login.present?
-      where(warden_conditions.to_hash).where('lower(login) = :value or email = :value or lower(display_name) = :value', value: login.downcase).first
+    if login_value = warden_conditions.delete(:login).try(:downcase)
+      arel_table = User.arel_table
+      user = arel_table[:display_name].lower.eq(login_value)
+      user = user.or(arel_table[:login].lower.eq(login_value))
+      user = user.or(arel_table[:email].eq(login_value))
+      self.where(warden_conditions.to_hash).where(user).first
     else
       where(warden_conditions.to_hash).first
     end
@@ -169,7 +171,10 @@ class User < ActiveRecord::Base
   end
 
   def active_for_authentication?
-    !disabled? && super
+    return false if disabled?
+    update_ouroboros_created
+    ok_for_auth = changed? ? save : true
+    ok_for_auth && super
   end
 
   def email_required?
@@ -220,7 +225,7 @@ class User < ActiveRecord::Base
       counter = 0
       sanitized_login = User.sanitize_login(display_name)
       self.login = sanitized_login
-      until User.find_by_lower_login(login).nil? || counter == DUP_LOGIN_SANITATION_ATTEMPTS
+      until no_other_logins_exist?(login) || counter == DUP_LOGIN_SANITATION_ATTEMPTS
         self.login = "#{ sanitized_login }-#{ counter += 1 }"
       end
       self.ouroboros_created = false
@@ -231,7 +236,9 @@ class User < ActiveRecord::Base
 
   def set_zooniverse_id
     self.zooniverse_id ||= "panoptes-#{ id }"
-    save! if zooniverse_id_changed?
+    if zooniverse_id_changed?
+      self.update_column(:zooniverse_id, self.zooniverse_id)
+    end
   end
 
   def setup_unsubscribe_token
@@ -253,6 +260,14 @@ class User < ActiveRecord::Base
       identity_group.name = login if login_changed?
       identity_group.display_name = display_name if display_name_changed?
       identity_group.save!
+    end
+  end
+
+  def no_other_logins_exist?(login)
+    if user = User.find_by_lower_login(login)
+      user.id == id
+    else
+      true
     end
   end
 end
