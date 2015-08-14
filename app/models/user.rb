@@ -104,10 +104,12 @@ class User < ActiveRecord::Base
 
   def self.find_for_database_authentication(warden_conditions = { })
     warden_conditions = warden_conditions.dup
-    login = warden_conditions.delete(:login)
-
-    if login.present?
-      where(warden_conditions.to_hash).where('lower(login) = :value or email = :value or lower(display_name) = :value', value: login.downcase).first
+    if login_value = warden_conditions.delete(:login).try(:downcase)
+      arel_table = User.arel_table
+      user = arel_table[:display_name].lower.eq(login_value)
+      user = user.or(arel_table[:login].lower.eq(login_value))
+      user = user.or(arel_table[:email].eq(login_value))
+      self.where(warden_conditions.to_hash).where(user).first
     else
       where(warden_conditions.to_hash).first
     end
