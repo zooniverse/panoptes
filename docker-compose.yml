@@ -1,9 +1,8 @@
 postgres:
-  image: zooniverse/postgresql
+  image: postgres
   environment:
-    - "PG_USER=panoptes"
-    - "DB=panoptes_development"
-    - "PASS=panoptes"
+    - "POSTGRES_USER=panoptes"
+    - "POSTGRES_PASSWORD=panoptes"
 
 zookeeper:
   image: zooniverse/zookeeper

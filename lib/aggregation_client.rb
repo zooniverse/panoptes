@@ -31,7 +31,7 @@ class AggregationClient
     {
       project_id: project.id,
       medium_href: medium.location,
-      put_url: medium.put_url,
+      metadata: medium.metadata,
       token: generate_token
     }
   end
