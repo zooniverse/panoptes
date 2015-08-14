@@ -12,14 +12,25 @@ describe SetMemberSubjectSelector do
     count.workflow.save!
   end
 
-  context 'when ther is no user' do
+  context 'when there is no user' do
     let(:workflow) { create(:workflow_with_subjects) }
     let(:selector) { SetMemberSubjectSelector.new(workflow, nil) }
 
     context 'when the workflow is not finished' do
-      it 'should select from non_retired_for_workflow subjects' do
+      it 'should select from the non retired remaining subjects' do
         expect(SetMemberSubject).to receive(:non_retired_for_workflow).with(workflow).and_call_original
         selector.set_member_subjects
+      end
+
+      context "when the workflow is finished" do
+
+        it "should select the whole set of workflow set_member_subjects" do
+          allow(workflow).to receive(:finished?).and_return(true)
+          aggregate_failures "select all" do
+            expect(selector).to receive(:select_all_workflow_set_member_subjects).and_call_original
+            expect(selector.set_member_subjects).to match_array(workflow.set_member_subjects)
+          end
+        end
       end
     end
   end
@@ -52,9 +63,9 @@ describe SetMemberSubjectSelector do
         expect(sms_to_classify).to_not be_empty
       end
 
-      it "should select from the whole set of set_member_subjects" do
-        expect_any_instance_of(SetMemberSubjectSelector).to receive(:select_all_workflow_set_member_subjects)
-        sms_to_classify
+      it 'does not include subjects the user has seen' do
+        user_seen_subject
+        expect(sms_to_classify).to eq([count.set_member_subject])
       end
     end
 
