@@ -10,7 +10,7 @@ class Medium < ActiveRecord::Base
 
   attr_writer :allow_any_content_type
 
-  ALLOWED_UPLOAD_CONTENT_TYPES = %w(image/jpeg image/png image/gif)
+  ALLOWED_UPLOAD_CONTENT_TYPES = %w(image/jpeg image/png image/gif image/svg+xml)
   ALLOWED_EXPORT_CONTENT_TYPES  = %w(text/csv)
   ALLOWED_AGGREGATION_EXPORT_CONTENT_TYPES = %w(application/x-gzip)
 
