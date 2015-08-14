@@ -43,9 +43,12 @@ RSpec.describe PostgresqlSelection do
         expect(result).to match_array(result.to_a.uniq)
       end
 
-      it 'should always return the requested number of subjects up to the unseen limit' do
+      #account for the loop cut off limit constructing the random sample
+      it 'should always return an approximate sample of subjects up to the unseen limit' do
         unseen_count.times do |n|
-          expect(subject.select(**args.merge(limit: n+1)).length).to eq(n+1)
+          limit = n+1
+          results_size = subject.select(**args.merge(limit: limit)).length
+          expect(results_size).to be_between(results_size, limit).inclusive
         end
       end
     end
@@ -59,8 +62,9 @@ RSpec.describe PostgresqlSelection do
 
       it 'should return as many subjects as possible' do
         unseen_count.times do |n|
-          results = subject.select(**args.merge(limit: n+unseen_count))
-          expect(results.length).to eq(unseen_count)
+          limit = n+unseen_count
+          results_size = subject.select(**args.merge(limit: limit)).length
+          expect(results_size).to be_between(results_size, limit).inclusive
         end
       end
     end
