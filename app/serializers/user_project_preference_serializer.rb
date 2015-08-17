@@ -8,7 +8,11 @@ class UserProjectPreferenceSerializer
   end
 
   def activity_count
-    @model.activity_count || user_project_activity
+    if !@model.legacy_count.blank?
+      @model.legacy_count.values.reduce(:+)
+    else
+      @model.activity_count || user_project_activity
+    end
   end
 
   def user_project_activity

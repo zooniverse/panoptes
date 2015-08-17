@@ -2,8 +2,6 @@ module Api
 
   class EventsController < ApplicationController
 
-    skip_before_action :verify_authenticity_token, if: :json_request?
-
     KNOWN_EVENTS = %w( activity workflow_activity )
 
     def self.resource_name
@@ -33,16 +31,16 @@ module Api
 
     def process_incoming_event
       response_status = :unprocessable_entity
-      if event_params_sanity_check
+      if event_params_check
         if upp = user_project_preference
-          upp.activity_count = create_params[:count]
+          upp.legacy_count[create_params[:workflow]] = create_params[:count]
           response_status = :ok if upp.save
         end
       end
       render status: response_status, nothing: true
     end
 
-    def event_params_sanity_check
+    def event_params_check
       required_params && known_event? && legacy_zoo_project_exists?
     end
 
@@ -85,7 +83,7 @@ module Api
     def legacy_zoo_project
       @legacy_zoo_project ||=
         Project.where(migrated: true)
-        .where("configuration ->> 'zoo_home_project_id' = ?", create_params[:project_id])
+        .where("configuration ->> 'zoo_home_project_id' = ?", create_params[:project_id].to_s)
         .first
     end
 

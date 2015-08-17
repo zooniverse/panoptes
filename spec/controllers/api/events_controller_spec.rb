@@ -26,7 +26,7 @@ describe Api::EventsController, type: :controller do
         user.update_column(:zooniverse_id, 1)
         user
       end
-      let(:event_count) { 10 }
+      let(:event_count) { {workflow.display_name => 10} }
       let(:created_at) { project.created_at.to_s }
       let(:event_kind) { "workflow_activity" }
       let(:event_params) do
@@ -34,8 +34,9 @@ describe Api::EventsController, type: :controller do
           event: {
             kind: event_kind, project_id: zoo_home_project_id, project: project.name,
             zooniverse_user_id: user.zooniverse_id, workflow: workflow.display_name,
-            count: event_count, created_at: created_at
-          }
+            count: event_count.values.first, created_at: created_at
+          },
+          format: :json
         }
       end
       let(:user_project_pref) do
@@ -205,9 +206,9 @@ describe Api::EventsController, type: :controller do
           end.to change { UserProjectPreference.count }.from(0).to(1)
         end
 
-        it "should update the upp activity_count to the correct value" do
+        it "should update the upp legacy_count to the correct value" do
           post :create, event_params
-          expect(user_project_pref.activity_count).to eq(event_count)
+          expect(user_project_pref.legacy_count).to eq(event_count)
         end
 
         context "with an panoptes-formatted user zooniverse_id" do
@@ -221,7 +222,7 @@ describe Api::EventsController, type: :controller do
 
         context "when the user project preference already exists" do
           let!(:upp) do
-            create(:user_project_preference, project: project, user: user, activity_count: 100)
+            create(:user_project_preference, project: project, user: user, legacy_count: {workflow.display_name => 100})
           end
 
           it "should update the model only" do
@@ -230,9 +231,9 @@ describe Api::EventsController, type: :controller do
             end.to_not change { UserProjectPreference.count }.from(1)
           end
 
-          it "should overwrite the upp activity_count to the correct value" do
+          it "should overwrite the upp legacy_count to the correct value" do
             post :create, event_params
-            expect(upp.reload.activity_count).to eq(event_count)
+            expect(upp.reload.legacy_count).to eq(event_count)
           end
         end
       end
