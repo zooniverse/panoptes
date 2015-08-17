@@ -98,9 +98,13 @@ class SubjectQueue < ActiveRecord::Base
   # SQL optimisations welcome here...no postgres ops preseved order
   def self.enqueue_update(query, sms_ids)
     query.find_each do |sq|
-      sms_ids = Array.wrap(sms_ids)
-      enqueue_set = NonDuplicateSmsIds.new(sq, sms_ids).enqueue_sms_ids_set
-      sq.update_column(:set_member_subject_ids, enqueue_set)
+      if sq.below_minimum?
+        sms_ids = Array.wrap(sms_ids)
+        enqueue_set = NonDuplicateSmsIds.new(sq, sms_ids).enqueue_sms_ids_set
+        if !enqueue_set.empty? && enqueue_set != sq.set_member_subject_ids
+          sq.update_column(:set_member_subject_ids, enqueue_set)
+        end
+      end
     end
   end
 

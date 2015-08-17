@@ -77,9 +77,9 @@ class SubjectSelector
 
     case
     when queue.nil?
-      queue = SubjectQueue.create_for_user(workflow, user.user, set: params[:subject_set_id])
+      queue = SubjectQueue.create_for_user(workflow, queue_user, set: params[:subject_set_id])
     when queue.below_minimum?
-      EnqueueSubjectQueueWorker.perform_async(workflow.id, user.id)
+      EnqueueSubjectQueueWorker.perform_async(workflow.id, queue_user.try(:id))
     end
     [queue, context]
   end
