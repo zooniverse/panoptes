@@ -11,7 +11,7 @@ class SetMemberSubjectSelector
 
   def set_member_subjects
     to_classify = select_set_member_subjects_to_classify
-    unless to_classify.exists?
+    if user && !to_classify.exists?
       to_classify = SetMemberSubject.unseen_for_user_by_workflow(user, workflow)
     end
     to_classify
