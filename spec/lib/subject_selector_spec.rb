@@ -62,7 +62,6 @@ RSpec.describe SubjectSelector do
                subject_set: nil,
                set_member_subjects: [])
       end
-
       let!(:subjects) { create_list(:set_member_subject, 10, subject_set: workflow.subject_sets.first) }
 
       it 'should return 5 subjects' do
@@ -103,6 +102,56 @@ RSpec.describe SubjectSelector do
           expect(SubjectQueue).to receive(:dequeue)
             .with(workflow, array_including(sms_ids), user: nil)
           subject.queued_subjects
+        end
+      end
+
+      describe "user has or workflow is finished" do
+        let(:queue_owner) { nil }
+        before(:each) do
+          subject_queue
+        end
+
+        shared_examples "enqueues for the logged out user" do
+          it 'should enqueue for logged out user' do
+            expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil)
+            subject.queued_subjects
+          end
+        end
+
+        shared_examples "creates for the logged out user" do
+          it 'should create for logged out user' do
+            expect(SubjectQueue).to receive(:create_for_user).with(workflow, nil, set: nil)
+            #non-logged in queue won't exist
+            expect { subject.queued_subjects }.to raise_error(SubjectSelector::MissingSubjectQueue)
+          end
+        end
+
+        context "when the workflow is finished" do
+          before(:each) do
+            allow_any_instance_of(Workflow).to receive(:finished?).and_return(true)
+          end
+
+          it_behaves_like "enqueues for the logged out user"
+
+          context "when the logged_out queue doesn't exist" do
+            let(:queue_owner) { user.user }
+
+            it_behaves_like "creates for the logged out user"
+          end
+        end
+
+        context "when the user has finished the workflow" do
+          before(:each) do
+            allow_any_instance_of(User).to receive(:has_finished?).and_return(true)
+          end
+
+          it_behaves_like "enqueues for the logged out user"
+
+          context "when the logged_out queue doesn't exist" do
+            let(:queue_owner) { user.user }
+
+            it_behaves_like "creates for the logged out user"
+          end
         end
       end
     end
