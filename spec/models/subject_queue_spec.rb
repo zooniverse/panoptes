@@ -223,8 +223,8 @@ RSpec.describe SubjectQueue, type: :model do
             }.to_not raise_error
           end
 
-          it 'not attempt to find or create a queue' do
-            expect(SubjectQueue).to_not receive(:find_or_create_by!)
+          it 'not attempt to find or create a queue'  do
+            expect(SubjectQueue).to_not receive(:where)
             SubjectQueue.enqueue(workflow, [], user: user)
           end
 
@@ -259,7 +259,7 @@ RSpec.describe SubjectQueue, type: :model do
         end
       end
 
-      context "list exists for user" do
+      context "subject queue exists for user" do
         let!(:smses) { create_list(:set_member_subject, 3, subject_set: sms.subject_set) }
         let!(:ues) do
           create(:subject_queue,
@@ -268,9 +268,25 @@ RSpec.describe SubjectQueue, type: :model do
                  workflow: workflow)
         end
 
-        it 'should call add_subject_id on the existing subject queue' do
-          SubjectQueue.enqueue(workflow, sms.id, user: user)
-          expect(ues.reload.set_member_subject_ids).to include(sms.id)
+        context "when the queue is above the enqueue threshold" do
+
+          it 'should add the sms id to the existing subject queue' do
+            allow_any_instance_of(SubjectQueue).to receive(:below_minimum?).and_return(true)
+            SubjectQueue.enqueue(workflow, sms.id, user: user)
+            expect(ues.reload.set_member_subject_ids).to include(sms.id)
+          end
+        end
+
+        context "when the queue is above the enqueue threshold" do
+
+          it 'should not add the sms id to the existing subject queue' do
+            allow_any_instance_of(SubjectQueue).to receive(:below_minimum?).and_return(false)
+            SubjectQueue.enqueue(workflow, sms.id, user: user)
+            aggregate_failures "don't enqueue" do
+              expect_any_instance_of(SubjectQueue).not_to receive(:enqueue_update)
+              expect(ues.reload.set_member_subject_ids).not_to include(sms.id)
+            end
+          end
         end
 
         it 'should not have a duplicate in the set' do
@@ -305,6 +321,26 @@ RSpec.describe SubjectQueue, type: :model do
             ues.set_member_subject_ids.sample(ues.set_member_subject_ids.size - 1)
           end
           let(:enq_ids_with_dups) { [ sms.id ] | q_dups }
+
+          context "when the append queue is empty" do
+
+            it "should not attempt an enqueue" do
+              allow_any_instance_of(NonDuplicateSmsIds).to receive(:enqueue_sms_ids_set)
+                .and_return([])
+              expect_any_instance_of(SubjectQueue).not_to receive(:update_column)
+              SubjectQueue.enqueue_update(query, [])
+            end
+          end
+
+          context "when the append queue has not changed" do
+
+            it "should not attempt an enqueue" do
+              allow_any_instance_of(NonDuplicateSmsIds).to receive(:enqueue_sms_ids_set)
+                .and_return(ues.set_member_subject_ids)
+              expect_any_instance_of(SubjectQueue).not_to receive(:update_column)
+              SubjectQueue.enqueue_update(query, [])
+            end
+          end
 
           context "when the append queue has dups" do
 
