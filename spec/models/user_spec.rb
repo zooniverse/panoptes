@@ -666,6 +666,21 @@ describe User, type: :model do
       expect(user).to be_valid
     end
 
+    context "when the login is all unicode" do
+
+      it "should use the zooniverse id for login field instead of leaving it blank" do
+        non_ascii = "ẉơŕƌé"
+        User.skip_callback :validation, :before, :update_ouroboros_created
+        dup_user = build(:ouroboros_created_user, display_name: non_ascii, login: non_ascii)
+        dup_user.save(validate: false)
+        User.set_callback :validation, :before, :update_ouroboros_created
+        aggregate_failures "dup user" do
+          expect(dup_user).to be_valid
+          expect(dup_user.login).to eq("panoptes-#{dup_user.id}")
+        end
+      end
+    end
+
     context "when the ouroboros created user has a clashing sanitized login" do
       let(:dup_user) do
         build(:ouroboros_created_user, display_name: "#{user.login}é")
