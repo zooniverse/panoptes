@@ -89,6 +89,11 @@ RSpec.describe Medium, :type => :model do
           .with(anything, be_a(HashWithIndifferentAccess))
         medium.put_url
       end
+
+      it 'should pass opts to MediaStorage' do
+        expect(MediaStorage).to receive(:put_path).with(anything, hash_including('foo' => 'bar'))
+        medium.put_url(foo: 'bar')
+      end
     end
 
     context "when externally linked" do
@@ -110,6 +115,11 @@ RSpec.describe Medium, :type => :model do
         expect(MediaStorage).to receive(:get_path)
           .with(anything, be_a(HashWithIndifferentAccess))
         medium.get_url
+      end
+
+      it 'should pass opts to MediaStorage' do
+        expect(MediaStorage).to receive(:get_path).with(anything, hash_including('foo' => 'bar'))
+        medium.get_url(foo: 'bar')
       end
     end
 
