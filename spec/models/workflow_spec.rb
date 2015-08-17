@@ -174,6 +174,14 @@ describe Workflow, :type => :model do
       expect(subject.retired_for_workflow?(workflow)).to be_truthy
       expect(SubjectWorkflowCount.retired.count).to eq(2)
     end
+
+    it 'does not retire subjects that do not belong to the workflow' do
+      workflow = create(:workflow_with_subject_sets)
+      subject = create(:subject)
+
+      workflow.retire_subject(subject.id)
+      expect(SubjectWorkflowCount.count).to eq(0)
+    end
   end
 
   describe "#retired_subjects_count" do
