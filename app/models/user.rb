@@ -224,6 +224,7 @@ class User < ActiveRecord::Base
     if ouroboros_created
       counter = 0
       sanitized_login = User.sanitize_login(display_name)
+      sanitized_login = panoptes_zoo_id if sanitized_login.blank?
       self.login = sanitized_login
       until no_other_logins_exist?(login) || counter == DUP_LOGIN_SANITATION_ATTEMPTS
         self.login = "#{ sanitized_login }-#{ counter += 1 }"
@@ -234,8 +235,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  def panoptes_zoo_id
+    "panoptes-#{ id }"
+  end
+
   def set_zooniverse_id
-    self.zooniverse_id ||= "panoptes-#{ id }"
+    self.zooniverse_id ||= panoptes_zoo_id
     if zooniverse_id_changed?
       self.update_column(:zooniverse_id, self.zooniverse_id)
     end
