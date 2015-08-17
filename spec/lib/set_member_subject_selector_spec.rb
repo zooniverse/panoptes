@@ -32,6 +32,17 @@ describe SetMemberSubjectSelector do
           end
         end
       end
+
+      context "when the first select returns no data" do
+
+        it "should not attempt to select the unseen for a user" do
+          allow(selector).to receive(:select_set_member_subjects_to_classify).and_return(SetMemberSubject.none)
+          aggregate_failures "select" do
+            expect(SetMemberSubject).not_to receive(:unseen_for_user_by_workflow)
+            expect(selector.set_member_subjects).to be_empty
+          end
+        end
+      end
     end
   end
 
