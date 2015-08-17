@@ -55,19 +55,19 @@ class Medium < ActiveRecord::Base
     end
   end
 
-  def put_url
+  def put_url(opts = {})
     if external_link
       src
     else
-      MediaStorage.put_path(src, indifferent_attributes)
+      MediaStorage.put_path(src, indifferent_attributes.merge(opts))
     end
   end
 
-  def get_url
+  def get_url(opts = {})
     if external_link
       src
     else
-      MediaStorage.get_path(src, indifferent_attributes)
+      MediaStorage.get_path(src, indifferent_attributes.merge(opts))
     end
   end
 
