@@ -2,13 +2,15 @@
 <html>
   <head>
     <title>Panoptes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <%= stylesheet_link_tag    'application', media: 'all' %>
     <%= javascript_include_tag 'application' %>
     <%= csrf_meta_tags %>
   </head>
   <body>
     <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
+    <%= content_tag(:p, alert, class: "#{'alert' if alert}" ) %>
 
     <%= yield %>
 

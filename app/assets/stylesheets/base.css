@@ -17,10 +17,19 @@ html, body {
 }
 
 .alert {
+  background-color: #FFD2D2;
+  border-radius: 6px;
   color:  #ff5353;
+  margin: 0 auto;
+  max-width: 510px;
+  padding: 0.75em 0;
 }
 
 /* Typography */
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1em;
+}
 
 h1 {
   font-size: 5em;
