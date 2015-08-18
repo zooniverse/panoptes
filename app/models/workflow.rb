@@ -51,7 +51,7 @@ class Workflow < ActiveRecord::Base
   end
 
   def retired_subjects
-    subject_workflow_counts.retired
+    subject_workflow_counts.retired.includes(:set_member_subject => :subject).map { |swc| swc.set_member_subject.subject }
   end
 
   def retire_subject(subject_id)

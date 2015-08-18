@@ -82,7 +82,7 @@ class Api::V1::WorkflowsController < Api::ApiController
     when :retired_subjects, 'retired_subjects'
       # TODO: scope_for
       value.flat_map {|id| resource.retire_subject(id) }
-    when :subject_set, 'subject_set'
+    when :subject_sets, 'subject_sets'
       items = construct_new_items(super(resource, relation, value), resource.project_id)
       if items.any? { |item| item.is_a?(SubjectSet) }
         items
