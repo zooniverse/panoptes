@@ -5,8 +5,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   let(:project) { create(:project) }
 
   let!(:upps) do
-    create_list :user_project_preference, 2, user: authorized_user,
-      email_communication: true
+    create_list :user_project_preference, 2, user: authorized_user
   end
 
   let(:api_resource_name) { 'project_preferences' }
@@ -44,11 +43,11 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     it_behaves_like "is showable"
 
     context "when the upp has no activity count" do
-      let!(:project) { create(:project_with_workflow) }
+      let(:project) { create(:project_with_workflow) }
       let!(:upps) do
-        [create(:user_project_preference, user: authorized_user, email_communication: true, project: project)]
+        [create(:user_project_preference, user: authorized_user, project: project)]
       end
-      let!(:user_seens) do
+      let(:user_seens) do
         create(:user_seen_subject, user: authorized_user,
           workflow: project.workflows.first, build_real_subjects: false)
       end
@@ -65,13 +64,39 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         expect(expected_count).to eq(user_seens.subject_ids.size)
       end
 
-      context "when the use has classified on more than 1 project" do
+      context "when the user has classified on more than 1 project" do
 
         it "should return the specific project activity count from user seen subjects" do
           create(:user_seen_subject, user: authorized_user, build_real_subjects: false)
           run_get
           expected_count = created_instance(api_resource_name)["activity_count"]
           expect(expected_count).to eq(user_seens.subject_ids.size)
+        end
+      end
+
+      context "when the user has legacy counts" do
+        let!(:upps) do
+          [create(:legacy_user_project_preference, user: authorized_user, project: project)]
+        end
+
+        it "should return the summated counts for each legacy workflow" do
+          run_get
+          result_count = created_instance(api_resource_name)["activity_count"]
+          expected_count = upps.map{ |upp| upp.legacy_count.values.sum }.sum
+          expect(expected_count).to eq(expected_count)
+        end
+      end
+
+      context "when the user has busted legacy counts" do
+        let!(:upps) do
+          [create(:busted_legacy_user_project_preference, user: authorized_user, project: project)]
+        end
+
+        it "should return the summated counts for each valid legacy workflow" do
+          run_get
+          result_count = created_instance(api_resource_name)["activity_count"]
+          expected_count = upps.map{ |upp| upp.send(:valid_legacy_count_values).sum }.sum
+          expect(expected_count).to eq(expected_count)
         end
       end
     end

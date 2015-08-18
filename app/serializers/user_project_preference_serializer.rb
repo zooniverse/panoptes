@@ -8,10 +8,10 @@ class UserProjectPreferenceSerializer
   end
 
   def activity_count
-    if !@model.legacy_count.blank?
-      @model.legacy_count.values.reduce(:+)
+    if count = @model.summated_activity_count
+      count
     else
-      @model.activity_count || user_project_activity
+      user_project_activity
     end
   end
 
