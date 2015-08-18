@@ -211,6 +211,15 @@ describe Api::EventsController, type: :controller do
           expect(user_project_pref.legacy_count).to eq(event_count)
         end
 
+        context "with busted per workflow count" do
+
+          it "should respond with a 422" do
+            allow(User).to receive(:find_by).and_return(user)
+            post :create, overridden_params(workflow: "", count: nil)
+            expect(response.status).to eq(422)
+          end
+        end
+
         context "with an panoptes-formatted user zooniverse_id" do
 
           it "should return success" do

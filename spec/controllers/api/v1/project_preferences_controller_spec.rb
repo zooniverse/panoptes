@@ -47,7 +47,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       let!(:upps) do
         [create(:user_project_preference, user: authorized_user, project: project)]
       end
-      let(:user_seens) do
+      let!(:user_seens) do
         create(:user_seen_subject, user: authorized_user,
           workflow: project.workflows.first, build_real_subjects: false)
       end
