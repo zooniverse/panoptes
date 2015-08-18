@@ -3,7 +3,7 @@
 
   <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: {class: "form form--new-session"}) do |f| %>
     <fieldset class="fieldset--text">
-      <%= f.label :login %><br />
+      <%= f.label :login, "Username or Email Address" %><br />
       <%= f.text_field :login, autofocus: true, required: true %>
     </fieldset>
 

@@ -26,6 +26,16 @@ html, body {
 }
 
 /* Typography */
+.logo-container {
+  font-size: 2em;
+}
+
+.logotype {
+  font-family: Montserrat;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  vertical-align: top;
+}
 
 h1, h2, h3, h4, h5, h6 {
   line-height: 1em;

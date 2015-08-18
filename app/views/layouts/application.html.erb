@@ -3,12 +3,25 @@
   <head>
     <title>Panoptes</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat&amp;text=ZOONIVERSE">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <%= stylesheet_link_tag    'application', media: 'all' %>
     <%= javascript_include_tag 'application' %>
     <%= csrf_meta_tags %>
   </head>
   <body>
+    <header>
+      <div class="logo-container">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1em" height="1em" class="logo">
+          <g stroke="transparent" stroke-width="0" transform="translate(50, 50)">
+            <path d="M 0 -45 A 45 45 0 0 1 0 45 A 45 45 0 0 1 0 -45 Z M 0 -30 A 30 30 0 0 0 0 30 A 30 30 0 0 0 0 -30 Z" />
+            <path d="M 0 -12.5 A 12.5 12.5 0 0 1 0 12.5 A 12.5 12.5 0 0 1 0 -12.5 Z" />
+            <path d="M 0 -75 L 5 0 L 0 75 L -5 0 Z" transform="rotate(50)" />
+          </g>
+        </svg>
+        <span class="logotype">Zooniverse</span>
+      </div>
+    </header>
     <p class="notice"><%= notice %></p>
     <%= content_tag(:p, alert, class: "#{'alert' if alert}" ) %>
 
