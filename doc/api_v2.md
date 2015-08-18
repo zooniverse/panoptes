@@ -62,19 +62,126 @@ The Zooniverse Classification API (version 2) is a [JSON-API]() compliant API.
 
 All requests MUST include an `Accept` header with the value `application/vnd.api+json`.
 
-All requests with a body MUST include a `Content-Type` header with either the value `application/vnd.api+json` or `application/json`. The value provided will affect how the request is processed.
+All requests with a body MUST include a `Content-Type` header with either the value `application/vnd.api+json` or `application/json`. The value provided will not affect how the request is processed.
 
 ## Authorization
 
 Zooniverse uses [OAuth2]() to allow individuals to authorize applications to access the Zooniverse Classification API on their behalf.
 
-### Authorization Code 
+The Zooniverse provides three levels of access to the Classification API:
+
++ First-Party - Skips authorization pages, allows all scopes, and the use of the Resource Owner Credential Grant.
++ Secure - An application that can keep its secret, allows use of all grants, except the Resource Owner Credential Grant.
++ Insecure - An application that cannot keep its secret (ie a Browser or Mobile Application). Can only use the Implicit Grant. Cannot use the user scope.
+
+Applications can be registered at [https://zooniverse.org/oauth/applications](https://zooniverse.org/oauth/applications).
+
+### Authorization Code
+
+Grant type used by Secure applications. It is a multi-step process:
+
+1. Direct the user to a `https://zooniverse.org/oauth/authorization?app_id=&redirect_uri=&scope=&secret=&request_type=code`
+1. The user will be asked to login, then authorize the application.
+1. The Zooniverse Classification API will redirect to `{redirect_uri}?code=`
+1. The application sends a `POST` request to `https://zooniverse.org/oauth/tokens` with a json body:
+```json
+{
+    "grant_type": "access_code",
+    "client_id": "app id",
+    "client_secret": "app secret",
+    "scopes": "user,project"
+}
+
+```
+1. The Zooniverse Classificaiton API will reply with a JSON document:
+```json
+{
+    "token_type": "bearer",
+    "access_token": "askdjfqwer234909cvjzfg8u;kjfnasd;kfkjasdf",
+    "scopes": "user,project"
+}
+```
+
+More info in the [official spec](https://tools.ietf.org/html/rfc6749#section-4.1).
+
+#### Implementations
+
++ [Omniauth Zooniverse](https://github.com/zooniverse/omniauth-zooniverse)
 
 ### Client-Credentials
 
+This grant type can be used by secure applications to exchange their credentials directly for a token belonging to the application owner.
+
+An application can make a `POST` request to `https://zooniverse.org/oauth/tokens` with a JSON body:
+
+```json
+{
+    "grant_type": "authorization_code",
+    "client_id": "app id",
+    "client_secret": "app_secret",
+    "scopes": "user,project"
+}
+```
+
+Substituting the app's id and secret, as well as the desired scopes.
+
+The response will also be a JSON document:
+
+```json
+{
+    "token_type": "bearer",
+    "access_token": "askdjfqwer234909cvjzfg8u;kjfnasd;kfkjasdf",
+    "scopes": "user,project"
+}
+```
+
+More info in the [official spec](https://tools.ietf.org/html/rfc6749#section-4.4).
+
 ### Resource Owner Credentials
 
+This grant type can only be used by First Party applications to exchange user credentials directly for a token. Non-approved applications MUST NOT ask users for their passwords. 
+
+An application can make a `POST` request to `https://zooniverse.org/oauth/tokens` with a JSON body:
+
+```json
+{
+    "grant_type": "password",
+    "client_id": "app id",
+    "client_secret": "app_secret",
+    "username": "login or email",
+    "password": "user password",
+    "scopes": "user,project"
+}
+```
+
+Substituting the app's id and secret, the username and password, and the desired scopes.
+
+The response will also be a JSON document:
+
+```json
+{
+    "token_type": "bearer",
+    "access_token": "askdjfqwer234909cvjzfg8u;kjfnasd;kfkjasdf",
+    "scopes": "user,project"
+}
+```
+
+More info in the [official spec](https://tools.ietf.org/html/rfc6749#section-4.3).
+
 ### Implicit Grant
+
+This grant type should be used by Insecure applications since it does not require an application to be able to store its application secret. It is also a multi-step process:
+
+1. Direct the user to a `https://zooniverse.org/oauth/authorization?app_id=&redirect_uri=&scope=&secret=&request_type=token`
+1. The user will be asked to login, then authorize the application.
+1. The Zooniverse Classification API will redirect to `{redirect_uri}?access_token=&scope=&token_type=bearer`
+
+More info in the [official spec](https://tools.ietf.org/html/rfc6749#section-4.2).
+
+#### Implementations
+
++ [API Access with jQuery](https://gist.github.com/edpaget/5518e717a021cbc09be9)
+
 
 ## API
 
