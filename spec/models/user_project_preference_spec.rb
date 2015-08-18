@@ -25,4 +25,24 @@ RSpec.describe UserProjectPreference, :type => :model do
       project.reload
     end.to change{project.classifiers_count}.from(0).to(1)
   end
+
+  describe "#summated_activity_count" do
+
+    it "should summate correctly for activity_count only" do
+      upp = build(:user_project_preference)
+      expect(upp.summated_activity_count).to eq(upp.activity_count)
+    end
+
+    it "should summate correctly for legacy_count only" do
+      upp = build(:legacy_user_project_preference)
+      expected_count = upp.legacy_count.values.sum
+      expect(upp.summated_activity_count).to eq(expected_count)
+    end
+
+    it "should summate correctly for busted legacy_count only" do
+      upp = build(:busted_legacy_user_project_preference)
+      expected_count = upp.send(:valid_legacy_count_values).sum
+      expect(upp.summated_activity_count).to eq(expected_count)
+    end
+  end
 end

@@ -14,8 +14,9 @@ class UserSeenSubject < ActiveRecord::Base
   end
 
   def self.count_user_activity(user_id, workflow_ids=[])
+
     workflow_ids = Array.wrap(workflow_ids)
-    scope = UserSeenSubject.where(user_id: user_id)
+    scope = self.where(user_id: user_id)
     unless workflow_ids.empty?
       scope = scope.where(workflow_id: workflow_ids)
     end
