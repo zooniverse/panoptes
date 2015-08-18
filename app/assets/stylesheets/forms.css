@@ -1,0 +1,218 @@
+/* Base Form Styles */
+
+.form-container {
+  margin: 0 auto;
+  max-width: 510px;
+  width: 100%;
+}
+
+.form-container .form {
+  width: 100%;
+}
+
+.form fieldset {
+  border: 0;
+  margin: 0 0 2em;
+  padding: 0;
+}
+
+.form label {
+  color: #646464;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.form input[type="text"], .form input[type="password"], .form input[type="email"] {
+  background-color:  #ffffff;
+  border: solid 1px #bebfc1;
+  border-radius: 2px;
+  box-sizing: border-box;
+  color: #646464;
+  font-size: 1.4em;
+  max-width: 510px;
+  padding: 0.75em;
+  width: 100%;
+}
+
+.form input[type="text"]:focus, .form input[type="password"]:focus, .form input[type="email"]:focus {
+  border-color:  #0072ff;
+  border-width: 2px;
+  outline: none;
+}
+
+.form input[type="submit"] {
+  background-color: #0072ff;
+  border: 0;
+  border-radius: 6px;
+  max-width: 160px;
+  width: 100%;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  float: right;
+  font-size: 1.4em;
+  margin: 0;
+  outline: none;
+  padding: 1em 0;
+  position: relative;
+  text-align: center;
+}
+
+.form input[type="submit"]:hover {
+  background-color: #33A5FF;
+}
+
+@media screen and (max-width: 768px) {
+  .form .submit-container {
+    width: 100%;
+  }
+
+  .form input[type="submit"] {
+    max-width: 100%;
+  }
+}
+
+/**************************/
+/* Devise specific styles */
+/**************************/
+
+/* Styles for new session form */
+
+.form--new-session > fieldset:nth-last-of-type(2) {
+  margin: 0;
+}
+
+.form--new-session > .fieldset--remember {
+  margin: 1em 0;
+}
+
+/* Styles for new user form */
+
+.form--new-user .fieldset--password {
+  display: inline-block;
+  float: left;
+}
+
+.form--new-user fieldset.fieldset--password:nth-last-of-type(2) {
+  margin-right: 1em;
+}
+
+.form--new-user .fieldset--password > input[type="password"] {
+  width: 250px;
+}
+
+@media screen and (max-width: 768px) {
+  .form--new-user .fieldset--password {
+    display: block;
+    float: none;
+  }
+
+  .form--new-user fieldset.fieldset--password:nth-last-of-type(2) {
+    margin-right: 0;
+  }
+
+  .form--new-user .fieldset--password > input[type="password"] {
+    width: 100%;
+  }
+}
+
+/* Styles for _links partial */
+
+.devise-shared-links {
+  line-height: 45px;
+  position: relative;
+}
+
+.oath-links, .action-links {
+  display: inline-block;
+}
+
+.oauth-links {
+  float: left;
+}
+
+.action-links {
+  float: right;
+  margin-right: 1.75em;
+}
+
+.devise-shared-link {
+  margin-right: 0.25em;
+}
+
+.forgot-password-link, .sign-up-link, .sign-in-link {
+  color: #989898;
+  font-size: 1.2em;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.forgot-password-link:visited, .sign-up-link:visited, .sign-in-link:visited {
+  color: #989898;
+}
+
+.forgot-password-link:hover, .sign-up-link:hover, .sign-in-link:hover {
+  color: #656565;
+}
+
+.forgot-password-link {
+  bottom: -6.5em;
+  left: 0;
+  position: absolute;
+}
+
+.facebook-link, .gplus-link {
+  font-size: 1.2em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.facebook-link {
+  background: linear-gradient(#4c69ba, #3b55a0);
+  background: -webkit-linear-gradient(#4c69ba, #3b55a0);
+  border-color: #4c69ba;
+  border-radius: 2px;
+  color: #fff;
+  font-family: "Helvetica neue";
+  padding: 0.35em 0.5em;
+  text-shadow: 0 -1px 0 #354c8c;
+}
+
+.facebook-link:hover {
+  background: linear-gradient(#6683D4, #3b55a0);
+  border-bottom-color: #3b5998;
+  border-left-color: #4961a8;
+  border-right-color: #4961a8;
+  border-top-color: #5874c3;
+  box-shadow: inset 0 1px 0 #607fd6;
+}
+
+.gplus-link {
+  background: #dd4b39;
+  border: none;
+  border-radius: 2px;
+  -webkit-box-shadow: 0 1px 0 rgba(0,0,0,.1);
+  box-shadow: 0 1px 0 rgba(0,0,0,.1);
+  color: #fff;
+  padding: 0.35em 0.5em;
+}
+
+.gplus-link:hover {
+  background-color: #e74b37;
+}
+
+@media screen and (max-width: 768px) {
+  .oauth-links, .action-links {
+    text-align: center;
+    width: 100%;
+  }
+
+  .action-links {
+    margin: 0;
+  }
+
+  .forgot-password-link {
+    bottom: 0;
+    position: relative;
+  }
+}
