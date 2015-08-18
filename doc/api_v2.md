@@ -237,8 +237,8 @@ JSON-API provides a standardized way to interact with an API over HTTP. JSON-API
         }
     ],
     "meta": {
-        filterable: ["login"],
-        sortable: ["login"]
+        "filterable": ["login"],
+        "sortable": ["login"]
     }
 }
 ```
