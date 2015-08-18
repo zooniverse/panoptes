@@ -128,7 +128,7 @@ JSON-API provides a standardized way to interact with an API over HTTP. JSON-API
                 "self": "https://www.zooniverse.org/api/projects/10"
             }
         }
-    ]
+    ],
     "meta": {
         filterable: ["login"],
         sortable: ["login"]
@@ -236,10 +236,48 @@ Projects use a natural number as their `id`.
 ##### Attributes
 | Attribute | Type | View Scope | Edit Scope | Description |
 |-----------|------|------------|------------|-------------|
+| display_name | String | Publicly Accessible / project for private Projects  | project,translation | Freeform-name for a project. Project slug is generated from it |
+| title | String | Publicly Accessible / project for private Projects | project,translation | Translated version of a project's display_name |
+| description | String | Publicly Accessible / project for private Projects | project,translation | Brief explanation of a project. Translatable. |
+| introduction | String | Publicly Accessible / project for private Projects | project,translation | Longer summary of a project's goals. Rendered as Markdown. Translatable. |
+| workflow_description | String | Publicly Accessible / project for private Projects | project,translation | Explanation of a project's workflows. Rendered as Markdown. Translatable. |
+| urls | Array[Object<url: String, label: String>] | Publicly Accessible / project for private Projects | project,translation | List of URLs with labels that a project page should link to. Labels are translatable |
+| available_languages | Array[String] | Publicly Accessible / project for private Projects | N/A | List of locale codes a project is available in |
+| primary_language | String | Publicly Accessible / project for private Projects | project | Language a project was originally created in |
+| tags | Array[String] | Publicly Accessible / project for private Projects | project | List of categories a project belongs to |
+| classifications_count | Number | Publicly Accessible / project for private Projects | N/A | Number of classifications completed for this project |
+| classifiers_count | Number | Publicly Accessible / project for private Projects | N/A | Number of logged-in users who have classified on the project |
+| subjects_count | Number | Publicly Accessible / project for private Projects | N/A | Count of the total number of subjects associated with this project |
+| retired_subjects_count | Number | Publicly Accessible / project for private Projects | N/A | Count of subjects that have been retired |
+| live | Boolean | Publicly Accessible / project for private Projects | project | Flag that controls whether classifications will count for retirement, and also locks editing of workflows |
+| private | Boolean | Publicly Accessible / project for private Projects | project | Flag that the project is only accessible to users with the correct roles |
+| launch_approved | Boolean | Publicly Accessible / project for private Projects | N/A | Flag that the project has been approved to launch |
+| launch_requested | Boolean | Publicly Accessible / project for private Projects | project | Flag that requests the project be reviewed for launch |
+| beta_approved | Boolean | Publicly Accessible / project for private Projects | N/A | Flag that the project has been approved for beta testing |
+| beta_requested | Boolean | Publicly Accessible / project for private Projects | project | Flag that requests the project be reviewed for beta testing |
+| redirect | String | Publicly Accessible / project for private Projects | N/A | URL to redirct from the zooniverse.org projects page |
+| configuration | Object<String,Any> | Publicly Accessible / project for private Projects | project | Free-form Object for project specific configuration options |
+| slug | String | Publicly Accessible / project for private Projects | N/A | URL slugs for accessing the project |
 
 ##### Links
+
 | Link | Type | Description |
 |------|------|-------------|
+| Active Workflows | workflows | Workflows that the project is allow classifications on |
+| Inactive Workflows | workflows | Workflows marked as inactive or that have finished classifying all associated subjects |
+| Subject Sets | subject_sets | All subject sets associated with the project |
+| Owner | user/user_group | The Project's Owner |
+| Editors | user/user_group | Users and user groups with the 'collaborator' or 'owner' roles |
+| Translators | user/user_group | Users and user groups with the 'collaborator', 'owner', or 'translator' roles |
+| Viewers | user/user_group | Users and user groups with any role within the project |
+| Roles | roles | All roles associated with the project |
+| Pages | pages | Markdown pages associated with the project |
+| Avatar | media | Image to represent the project |
+| Background | media | Background image for the project's page |
+| Attached Images | media | Uploaded images that can be used on the project's page |
+| Classifications Export | media | CSV export of all the classifications for a project |
+| Subjects Export | media | CSV export of all the subjects associated with a project |
+| Aggregations Export | media | Tarball of aggregated classification data |
 
 #### Workflows (/workflows)
 
