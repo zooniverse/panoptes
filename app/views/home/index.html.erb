@@ -1,5 +1,23 @@
-<h1>Home#index</h1>
-<p>Find me in app/views/home/index.html.erb</p>
-
-<%= link_to('Sign In', new_user_session_path) %>
-<%= link_to('Sign Out', destroy_user_session_path, method: :delete) %>
+<div class="home-landing">
+  <div class="row">
+    <%= link_to "Zooniverse Home", "https://www.zooniverse.org", class: "btn btn-default"%>
+  </div>
+  <div class="row">
+    <%= link_to "API Docs", "http://docs.panoptes.apiary.io/#", class: "btn btn-primary"%>
+  </div>
+  <div class="row">
+    <%= link_to "GitHub", "https://github.com/zooniverse/Panoptes", class: "btn btn-info"%>
+  </div>
+</div>
+<div class="home-landing">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-2 col-sm-offset-4">
+        <%= link_to "Sign In", new_user_session_path, class: "btn btn-success"%>
+      </div>
+      <div class="col-sm-2">
+        <%= link_to "Sign Out", destroy_user_session_path, class: "btn btn-danger"%>
+      </div>
+    </div>
+  </div>
+</div>
