@@ -182,6 +182,21 @@ More info in the [official spec](https://tools.ietf.org/html/rfc6749#section-4.2
 
 + [API Access with jQuery](https://gist.github.com/edpaget/5518e717a021cbc09be9)
 
+## Scopes
+
+The Zooniverse Classification API uses OAuth scopes to allow users to restrict the permissions they give to third-party applications accessing the API on their behalf. The available scopes are:
+
++ `user` - View private details about a user and edit their account - First Party Only
++ `user_group` - View private details about a group and edit the group - First Party Only
++ `project.view`- View private projects and their related workflows and subjects - Any App
++ `project.edit` - Edit details about projects and workflows - First Party/Secure Only
++ `translation` - Can create and edit translations of projects - Any App
++ `collection.view`- view private collections - Any App
++ `collection.edit`- Edit collections, and and remove subjects from them - Any App
++ `subject` - Create new subjects on a behalf of a user and add/remove them from collections - First Party/Secure Only
++ `media` - Upload media on behalf of a user - Any App
+
+In the API docs below `public` is used to denote that 'public' resources (projects, etc) can be accessed without needing any particular scope on the token.
 
 ## API
 
@@ -279,8 +294,8 @@ A User record can only be modified by a token belonging to the user themself.
 
 | Attribute | Type | View Scope | Edit Scope | Description |
 |-----------|------|------------|------------|-------------|
-| login     | String | Publicly Accessible | user | The user's permanent name |
-| display_name | String | Publicly Accessible | user.edit-details | A freeform name for the user |
+| login     | String | public | user | The user's permanent name |
+| display_name | String | public | user | A freeform name for the user |
 | credited_name | String | user | user | The name the user will be credited as in publications |
 | email | String | user | user | User email address |
 | global_email_communication | Boolean | user | user | Flag to indicate if a user wants to receive Zooniverse emails |
@@ -289,9 +304,9 @@ A User record can only be modified by a token belonging to the user themself.
 | max_subjects | Number |subject.create | N/A | Total number of subjects a user can upload |
 | uploaded_subject_count | Number | subject.create | N/A | Total number of a subjects a user has uploaded |
 | admin | Boolean | user | N/A | Whether the use can take administrative actions |
-| private_profile | Boolean | Publically Accessible | user | Flag to hide profile information like classification counts |
-| created_at | Time | Publicly Accessible | user | Creation Timestamp |
-| updated_at | Time  | Publicly Accessible | user | Last updated Timestamp |
+| private_profile | Boolean | publically Accessible | user | Flag to hide profile information like classification counts |
+| created_at | Time | public | user | Creation Timestamp |
+| updated_at | Time  | public | user | Last updated Timestamp |
 
 ##### Links
 
@@ -319,12 +334,12 @@ User Groups use a natural number as their `id`.
 
 | Attribute | Type | View Scope | Edit Scope | Description |
 |-----------|------|------------|------------|-------------|
-| name | String | Publicly Accessible / user_group for private groups | user_group | Permanent Name for the user group |
-| display_name | String | Publicly Accessible / user_group for private groups | user_group | Free-form name for the user group |
-| classification_count | Number | Publicly Accessible / user_group for private groups | N/A | Count of Classifications made while members were *classifying in the group* |
-| private | Boolean | user_group | user_group | Flag for whether details about the group are accessible to non-members |
-| created_at | Time | Publicly Accessible / user_group for private groups | user_group | Creation Timestamp |
-| updated_at | Time  | Publicly Accessible / user_group for private groups | user_group | Last updated Timestamp |
+| name | String | public / user_group | user_group | Permanent Name for the user group |
+| display_name | String | public / user_group | user_group | Free-form name for the user group |
+| classification_count | Number | public / user_group | N/A | Count of Classifications made while members were *classifying in the group* |
+| private | Boolean | public / user_group | user_group | Flag for whether details about the group are accessible to non-members |
+| created_at | Time | public / user_group | user_group | Creation Timestamp |
+| updated_at | Time  | public / user_group | user_group | Last updated Timestamp |
 
 ##### Links
 
@@ -349,28 +364,30 @@ Projects use a natural number as their `id`.
 ##### Attributes
 | Attribute | Type | View Scope | Edit Scope | Description |
 |-----------|------|------------|------------|-------------|
-| display_name | String | Publicly Accessible / project for private Projects  | project,translation | Freeform-name for a project. Project slug is generated from it |
-| title | String | Publicly Accessible / project for private Projects | project,translation | Translated version of a project's display_name |
-| description | String | Publicly Accessible / project for private Projects | project,translation | Brief explanation of a project. Translatable. |
-| introduction | String | Publicly Accessible / project for private Projects | project,translation | Longer summary of a project's goals. Rendered as Markdown. Translatable. |
-| workflow_description | String | Publicly Accessible / project for private Projects | project,translation | Explanation of a project's workflows. Rendered as Markdown. Translatable. |
-| urls | Array[Object<url: String, label: String>] | Publicly Accessible / project for private Projects | project,translation | List of URLs with labels that a project page should link to. Labels are translatable |
-| available_languages | Array[String] | Publicly Accessible / project for private Projects | N/A | List of locale codes a project is available in |
-| primary_language | String | Publicly Accessible / project for private Projects | project | Language a project was originally created in |
-| tags | Array[String] | Publicly Accessible / project for private Projects | project | List of categories a project belongs to |
-| classifications_count | Number | Publicly Accessible / project for private Projects | N/A | Number of classifications completed for this project |
-| classifiers_count | Number | Publicly Accessible / project for private Projects | N/A | Number of logged-in users who have classified on the project |
-| subjects_count | Number | Publicly Accessible / project for private Projects | N/A | Count of the total number of subjects associated with this project |
-| retired_subjects_count | Number | Publicly Accessible / project for private Projects | N/A | Count of subjects that have been retired |
-| live | Boolean | Publicly Accessible / project for private Projects | project | Flag that controls whether classifications will count for retirement, and also locks editing of workflows |
-| private | Boolean | Publicly Accessible / project for private Projects | project | Flag that the project is only accessible to users with the correct roles |
-| launch_approved | Boolean | Publicly Accessible / project for private Projects | N/A | Flag that the project has been approved to launch |
-| launch_requested | Boolean | Publicly Accessible / project for private Projects | project | Flag that requests the project be reviewed for launch |
-| beta_approved | Boolean | Publicly Accessible / project for private Projects | N/A | Flag that the project has been approved for beta testing |
-| beta_requested | Boolean | Publicly Accessible / project for private Projects | project | Flag that requests the project be reviewed for beta testing |
-| redirect | String | Publicly Accessible / project for private Projects | N/A | URL to redirct from the zooniverse.org projects page |
-| configuration | Object<String,Any> | Publicly Accessible / project for private Projects | project | Free-form Object for project specific configuration options |
-| slug | String | Publicly Accessible / project for private Projects | N/A | URL slugs for accessing the project |
+| display_name | String | public / project.view  | project.edit / translation | Freeform-name for a project. Project slug is generated from it |
+| title | String | public / project.view | project.edit / translation | Translated version of a project's display_name |
+| description | String | public / project.view | project.edit / translation | Brief explanation of a project. Translatable. |
+| introduction | String | public / project.view | project.edit / translation | Longer summary of a project's goals. Rendered as Markdown. Translatable. |
+| workflow_description | String | public / project.view | project.edit / translation | Explanation of a project's workflows. Rendered as Markdown. Translatable. |
+| urls | Array[Object<url: String, label: String>] | public / project.view | project.edit / translation | List of URLs with labels that a project page should link to. Labels are translatable |
+| available_languages | Array[String] | public / project.view | N/A | List of locale codes a project is available in |
+| primary_language | String | public / project.view | project.edit | Language a project was originally created in |
+| tags | Array[String] | public / project.view | project.edit | List of categories a project belongs to |
+| classifications_count | Number | public / project.view | N/A | Number of classifications completed for this project |
+| classifiers_count | Number | public / project.view | N/A | Number of logged-in users who have classified on the project |
+| subjects_count | Number | public / project.view | N/A | Count of the total number of subjects associated with this project |
+| retired_subjects_count | Number | public / project.view | N/A | Count of subjects that have been retired |
+| live | Boolean | public / project.view | project.edit | Flag that controls whether classifications will count for retirement, and also locks editing of workflows |
+| private | Boolean | public / project | project.view | Flag that the project is only accessible to users with the correct roles |
+| launch_approved | Boolean | public / project.view | N/A | Flag that the project has been approved to launch |
+| launch_requested | Boolean | public / project.view | project.edit | Flag that requests the project be reviewed for launch |
+| beta_approved | Boolean | public / project.view | N/A | Flag that the project has been approved for beta testing |
+| beta_requested | Boolean | public / project.view | project.edit | Flag that requests the project be reviewed for beta testing |
+| redirect | String | public / project.view | N/A | URL to redirct from the zooniverse.org projects page |
+| configuration | Object<String,Any> | public / project.view | project.edit | Free-form Object for project specific configuration options |
+| slug | String | public / project.view | N/A | URL slugs for accessing the project |
+| created_at | Time | public / project.view | project.edit | Creation Timestamp |
+| updated_at | Time  | public / project.view | project.edit | Last updated Timestamp |
 
 ##### Links
 
@@ -394,9 +411,25 @@ Projects use a natural number as their `id`.
 
 #### Workflows (/workflows)
 
+Projects use a natural number as their `id`.
+
 ##### Attributes
+| Attribute | Type | View Scope | Edit Scope | Description |
+|-----------|------|------------|------------|-------------|
+| display_name | String | public / project | project.edit | Name of the Workflow |
+| display_name | String | public / project | project.edit | Name of the Workflow |
+| display_name | String | public / project | project.edit | Name of the Workflow |
+| display_name | String | public / project | project.edit | Name of the Workflow |
+| display_name | String | public / project | project.edit | Name of the Workflow |
+| display_name | String | public / project | project.edit | Name of the Workflow |
+| display_name | String | public / project | project.edit | Name of the Workflow |
+| display_name | String | public / project | project.edit | Name of the Workflow |
+| display_name | String | public / project | project.edit | Name of the Workflow |
 
 ##### Links
+
+| Link | Type | Description |
+|------|------|-------------|
 
 #### Subject Sets (/subject_sets)
 
