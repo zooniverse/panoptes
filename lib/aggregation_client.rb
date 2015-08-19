@@ -32,7 +32,7 @@ class AggregationClient
       project_id: project.id,
       medium_href: medium.location,
       metadata: medium.metadata,
-      token: generate_token
+      token: generate_token.token
     }
   end
 
