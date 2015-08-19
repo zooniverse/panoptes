@@ -5,6 +5,19 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
+.home-landing {
+  text-align: center;
+  margin: 3em 0;
+}
+
+.home-landing .row {
+  margin: 1em;
+}
+
+.home-landing .row .col-sm-2 {
+  margin-top: 1em;
+}
+
 .alert, .notice {
   font-size: 1.2em;
   font-style: italic;
@@ -27,14 +40,21 @@ html, body {
 
 /* Typography */
 .logo-container {
-  font-size: 2em;
+  margin-top: 1em;
+  font-size: 3.5em;
+  display: flex;
+  display: -webkit-flex;
+  align-items: center;
+  -webkit-align-items: center;
+  justify-content: center;
+  -webkit-justify-content: center;
 }
 
 .logotype {
+  margin-left: 0.2em;
   font-family: Montserrat;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  vertical-align: top;
 }
 
 h1, h2, h3, h4, h5, h6 {
