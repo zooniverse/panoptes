@@ -80,7 +80,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   def new_items(resource, relation, value)
     case relation
     when :retired_subjects, 'retired_subjects'
-      # TODO: scope_for
       value.flat_map {|id| resource.retire_subject(id) }
     when :subject_sets, 'subject_sets'
       items = construct_new_items(super(resource, relation, value), resource.project_id)
