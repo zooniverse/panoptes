@@ -3,8 +3,11 @@ module Formatter
     class Subject
       attr_reader :sms, :project
 
+      delegate :subject_id, :subject_set_id, to: :sms
+
+
       def self.project_headers
-        %w(subject_id project_id workflow_ids subject_set_id metadata classifications_by_workflow retired_in_workflow)
+        %w(subject_id project_id workflow_ids subject_set_id metadata locations classifications_by_workflow retired_in_workflow)
       end
 
       def initialize(project)
@@ -28,12 +31,13 @@ module Formatter
         sms.subject_set.workflows.pluck(:id).to_json
       end
 
-      def subject_id
-        sms.subject_id
-      end
-
-      def subject_set_id
-        sms.subject_set_id
+      def locations
+        subject_locs = sms.subject.locations.order("\"media\".\"metadata\"->>'index' ASC")
+        {}.tap do |locs|
+          subject_locs.each_with_index.map do |loc, index|
+            locs[index] = loc.get_url
+          end
+        end.to_json
       end
 
       def retired_in_workflow
