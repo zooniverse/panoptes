@@ -16,7 +16,7 @@
         <%= link_to "Sign In", new_user_session_path, class: "btn btn-success"%>
       </div>
       <div class="col-sm-2">
-        <%= link_to "Sign Out", destroy_user_session_path, class: "btn btn-danger"%>
+        <%= link_to "Sign Out", destroy_user_session_path, method: :delete, class: "btn btn-danger"%>
       </div>
     </div>
   </div>
