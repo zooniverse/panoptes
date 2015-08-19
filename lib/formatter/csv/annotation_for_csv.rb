@@ -35,12 +35,32 @@ module Formatter
       end
 
       def translate(string)
-        @translations ||= classification.workflow.primary_content.strings
+        @translations ||= primary_content_at_version.strings
         @translations[string]
       end
 
+      def primary_content_at_version
+        model_at_version(classification.workflow.primary_content, 1)
+      end
+
+      def workflow_at_version
+        model_at_version(classification.workflow, 0)
+      end
+
+      def model_at_version(version, vers_index)
+        version_num = classification.workflow_version.split(".")[vers_index].to_i
+        if old_vers = version.versions[version_num].try(:reify)
+          version = old_vers
+        end
+        version
+      end
+
       def task
-        @task ||= classification.workflow.tasks.find {|key, task| key == annotation["task"] }.try(:last) || {}
+        return @task if @task
+        task_annotation = workflow_at_version.tasks.find do |key, task|
+          key == annotation["task"]
+        end
+        @task = task_annotation.try(:last) || {}
       end
     end
   end

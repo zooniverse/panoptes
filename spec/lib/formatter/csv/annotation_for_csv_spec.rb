@@ -42,4 +42,36 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     formatted = described_class.new(classification, annotation).to_h
     expect(formatted["value"]).to be_empty
   end
+
+  context "when the the classification refers to the workflow and contents at a prev version" do
+    with_versioning do
+      let(:workflow) { create(:workflow) }
+      let(:classification) do
+        vers = "#{workflow.versions.first.index + 1}.#{workflow.workflow_contents.first.versions.first.index + 1}"
+        create(:classification, build_real_subjects: false, workflow: workflow, workflow_version: vers)
+      end
+
+      before(:each) do
+        workflow.update(tasks: { "init" =>
+          { "T1" =>
+              { "help" => "T1.help",
+                "type" => "single",
+                "answers" => [{ "label" => "T1.answers.0.label" }],
+                "question" => "T1.question"
+              }
+          }
+        })
+        workflow.workflow_contents.first.update(strings: {
+          "T1.question"=>"Is this a cat?",
+          "T1.help"=>"",
+          "T1.answers.0.label"=>"Enter an answer"
+        })
+      end
+
+      it 'should add the correct version task label' do
+        formatted = described_class.new(classification, annotation).to_h
+        expect(formatted["task_label"]).to eq("Draw a circle")
+      end
+    end
+  end
 end
