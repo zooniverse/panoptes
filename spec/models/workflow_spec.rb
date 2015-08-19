@@ -146,41 +146,54 @@ describe Workflow, :type => :model do
   end
 
   describe '#retire_subject' do
-    it 'marks a counted subject as retired' do
-      workflow = create(:workflow_with_subject_sets)
-      subject = create(:subject, subject_sets: workflow.subject_sets)
-      count = create(:subject_workflow_count, set_member_subject: subject.set_member_subjects.first, workflow: workflow)
+    let(:workflow) { create(:workflow_with_subject_sets) }
+    let(:subject)  { create(:subject, subject_sets: workflow.subject_sets) }
 
-      workflow.retire_subject(subject.id)
-      expect(subject.retired_for_workflow?(workflow)).to be_truthy
-      expect(SubjectWorkflowCount.retired.count).to eq(2)
+    context 'when the subject has a workflow count' do
+      it 'marks as retired' do
+        create(:subject_workflow_count, set_member_subject: subject.set_member_subjects.first, workflow: workflow)
+        workflow.retire_subject(subject.id)
+
+        aggregate_failures do
+          expect(subject.retired_for_workflow?(workflow)).to be_truthy
+          expect(SubjectWorkflowCount.retired.count).to eq(2)
+        end
+      end
     end
 
-    it 'marks an uncounted subject as retired' do
-      workflow = create(:workflow_with_subject_sets)
-      subject = create(:subject, subject_sets: workflow.subject_sets)
+    context 'when the subject does not have a workflow count' do
+      it 'marks as retired' do
+        workflow.retire_subject(subject.id)
 
-      workflow.retire_subject(subject.id)
-      expect(subject.retired_for_workflow?(workflow)).to be_truthy
-      expect(SubjectWorkflowCount.retired.count).to eq(2)
+        aggregate_failures do
+          expect(subject.retired_for_workflow?(workflow)).to be_truthy
+          expect(SubjectWorkflowCount.retired.count).to eq(2)
+        end
+      end
     end
 
-    it 'leaves a retired subject retired' do
-      workflow = create(:workflow_with_subject_sets)
-      subject = create(:subject, subject_sets: workflow.subject_sets)
+    context 'when the subject is already retired' do
+      it 'leaves the retirement timestamp as it was' do
+        workflow.retire_subject(subject.id)
+        retired_ats = SubjectWorkflowCount.order(:id).pluck(:retired_at)
 
-      workflow.retire_subject(subject.id)
-      workflow.retire_subject(subject.id)
-      expect(subject.retired_for_workflow?(workflow)).to be_truthy
-      expect(SubjectWorkflowCount.retired.count).to eq(2)
+        workflow.retire_subject(subject.id)
+
+        aggregate_failures do
+          expect(subject.retired_for_workflow?(workflow)).to be_truthy
+          expect(SubjectWorkflowCount.retired.count).to eq(2)
+          expect(SubjectWorkflowCount.order(:id).pluck(:retired_at)).to eq(retired_ats)
+        end
+      end
     end
 
-    it 'does not retire subjects that do not belong to the workflow' do
-      workflow = create(:workflow_with_subject_sets)
-      subject = create(:subject)
+    context 'when the subject does not belong to the workflow' do
+      let(:subject) { create(:subject) }
 
-      workflow.retire_subject(subject.id)
-      expect(SubjectWorkflowCount.count).to eq(0)
+      it 'does not retire' do
+        workflow.retire_subject(subject.id)
+        expect(SubjectWorkflowCount.count).to eq(0)
+      end
     end
   end
 
