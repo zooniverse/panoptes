@@ -259,7 +259,13 @@ JSON API responses contain four top-level sections
 
 ### Clients
 
-Clients for JSON-API written in a variety of languages can be found [here]().
+Clients for JSON-API written in a variety of languages can be found [here](http://jsonapi.org/implementations/).
+
+#### Examples
+
++ [Using the Zooniverse Classification API with Python](python_client.md)
++ [Using the Zooniverse Classification API with Javascript](javascript_client.md)
++ [Using the Zooniverse Classification API with Ruby](ruby_client.md)
 
 ### Resources
 
