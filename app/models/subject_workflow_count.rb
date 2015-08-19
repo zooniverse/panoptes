@@ -1,6 +1,4 @@
 class SubjectWorkflowCount < ActiveRecord::Base
-  include Linkable
-
   belongs_to :set_member_subject
   belongs_to :workflow
 
