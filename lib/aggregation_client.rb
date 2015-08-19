@@ -23,7 +23,7 @@ class AggregationClient
       ac.resource_owner_id = user_id
       ac.application_id = application_id
       ac.expires_in = 1.day
-      ac.scopes = "media public"
+      ac.scopes = "medium project public"
     end
   end
 
