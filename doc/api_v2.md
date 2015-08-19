@@ -413,6 +413,44 @@ Projects use a natural number as their `id`.
 
 Projects use a natural number as their `id`.
 
+##### Tasks
+
+The `tasks` attribute of a workflow has is a JSON Object that describes the classification task for a worklow.
+
+Each task has a type string of "single" or "multiple" choice, or "drawing". (More task types to come, e.g. Serengeti-style filter and Sunspotter's comparison.)
+
+"multiple" and "drawing" tasks have a next string, linking to the next task in the workflow. If this string is empty, the workflow ends. In "single" tasks, each answer has a next string, allowing branching based on the user's decisions.
+
+"single" and "multiple" tasks have a question string, which the user must answer. Answers to the question are in an answers array. Each answer has a label string displayed to the user.
+
+"single" and "multiple" tasks may define a boolean required, which when true will force the user to provide an answer before moving on to the next task.
+
+"drawing" tasks have an instruction string telling the user how to complete the task.
+
+"drawing" tasks have a tools array.
+
+Each tool has a label shown to the user.
+
+Each tool has a string type. Options include:
+
+    point
+
+    ellipse
+
+    circle
+
+    line
+
+    rectangle
+
+    polygon
+
+Each tool has a string color, which is applied to the marks made by the tool. Any format valid as CSS can be used.
+
+##### Selection Strategy
+
+Three parameters: `grouped`, `prioritized`, and `pairwise `configure how the Zooniverse Classification API chooses subjects for classification. They are all false by default, which will give a random selection of subjects from all subject_sets that are part of a workflow. `grouped` enables selecting subjects from a specific subject set. `prioritized` ensures that users will see subjects in a predetermined order. `pairwise` will select two subjects at a time for classification.
+
 ##### Attributes
 | Attribute | Type | View Scope | Edit Scope | Description |
 |-----------|------|------------|------------|-------------|
