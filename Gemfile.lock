@@ -1,12 +1,4 @@
 GIT
-  remote: git://github.com/edpaget/active_record_union.git
-  revision: 9baa4b16bffc33f4f1e1c30047e32139d948c155
-  branch: union-all
-  specs:
-    active_record_union (1.0.1)
-      activerecord (>= 4.0)
-
-GIT
   remote: git://github.com/edpaget/restpack_serializer.git
   revision: 9a7cdb2777006c7cd05c512859f5c9451248ca8d
   branch: dev
@@ -38,6 +30,8 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    active_record_union (1.1.0)
+      activerecord (>= 4.0)
     activejob (4.2.3)
       activesupport (= 4.2.3)
       globalid (>= 0.3.0)
@@ -329,7 +323,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_record_union!
+  active_record_union (~> 1.1.0)
   activerecord-import (~> 0.8)
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter
