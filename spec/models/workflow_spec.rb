@@ -145,6 +145,58 @@ describe Workflow, :type => :model do
     end
   end
 
+  describe '#retire_subject' do
+    let(:workflow) { create(:workflow_with_subject_sets) }
+    let(:subject)  { create(:subject, subject_sets: workflow.subject_sets) }
+
+    context 'when the subject has a workflow count' do
+      it 'marks as retired' do
+        create(:subject_workflow_count, set_member_subject: subject.set_member_subjects.first, workflow: workflow)
+        workflow.retire_subject(subject.id)
+
+        aggregate_failures do
+          expect(subject.retired_for_workflow?(workflow)).to be_truthy
+          expect(SubjectWorkflowCount.retired.count).to eq(2)
+        end
+      end
+    end
+
+    context 'when the subject does not have a workflow count' do
+      it 'marks as retired' do
+        workflow.retire_subject(subject.id)
+
+        aggregate_failures do
+          expect(subject.retired_for_workflow?(workflow)).to be_truthy
+          expect(SubjectWorkflowCount.retired.count).to eq(2)
+        end
+      end
+    end
+
+    context 'when the subject is already retired' do
+      it 'leaves the retirement timestamp as it was' do
+        workflow.retire_subject(subject.id)
+        retired_ats = SubjectWorkflowCount.order(:id).pluck(:retired_at)
+
+        workflow.retire_subject(subject.id)
+
+        aggregate_failures do
+          expect(subject.retired_for_workflow?(workflow)).to be_truthy
+          expect(SubjectWorkflowCount.retired.count).to eq(2)
+          expect(SubjectWorkflowCount.order(:id).pluck(:retired_at)).to eq(retired_ats)
+        end
+      end
+    end
+
+    context 'when the subject does not belong to the workflow' do
+      let(:subject) { create(:subject) }
+
+      it 'does not retire' do
+        workflow.retire_subject(subject.id)
+        expect(SubjectWorkflowCount.count).to eq(0)
+      end
+    end
+  end
+
   describe "#retired_subjects_count" do
     it "should be an alias for retired set_member_subjects count" do
       expect(subject_relation.retired_subjects_count).to eq(subject_relation.retired_set_member_subjects_count)

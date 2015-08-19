@@ -11,6 +11,11 @@ class SubjectWorkflowCount < ActiveRecord::Base
     joins(:set_member_subject).where(set_member_subjects: {subject_set_id: subject_set_id})
   end
 
+  def self.by_subject_workflow(subject_id, workflow_id)
+    joins(:set_member_subject).where(set_member_subjects: {subject_id: subject_id},
+                                     workflow_id: workflow_id)
+  end
+
   def retire?
     workflow.retirement_scheme.retire?(self)
   end

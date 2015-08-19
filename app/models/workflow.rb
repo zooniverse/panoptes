@@ -50,6 +50,17 @@ class Workflow < ActiveRecord::Base
     read_attribute(:tasks).with_indifferent_access
   end
 
+  def retired_subjects
+    subject_workflow_counts.retired.includes(:set_member_subject => :subject).map { |swc| swc.set_member_subject.subject }
+  end
+
+  def retire_subject(subject_id)
+    set_member_subjects.where(subject_id: subject_id).each do |sms|
+      count = subject_workflow_counts.where(set_member_subject_id: sms.id, workflow_id: id).first_or_create!
+      count.retire!
+    end
+  end
+
   def retirement_scheme
     case retirement.fetch('criteria', DEFAULT_CRITERIA)
     when 'classification_count'
