@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'jbundler', platform: :jruby
 gem 'rails', '~> 4.2.3'
 gem 'postgres_ext', '~> 2.4.0'
-gem 'active_record_union', github: "edpaget/active_record_union", branch: "union-all"
+gem 'active_record_union', '~> 1.1.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'doorkeeper', '~> 1.4.1'
 gem 'devise', '~> 3.0'
