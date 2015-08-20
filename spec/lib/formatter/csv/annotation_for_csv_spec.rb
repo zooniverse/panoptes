@@ -43,34 +43,88 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     expect(formatted["value"]).to be_empty
   end
 
-  context "when the the classification refers to the workflow and contents at a prev version" do
+  context "with a versioned workflow question type task" do
+
     with_versioning do
       let(:workflow) { create(:workflow) }
       let(:classification) do
-        vers = "#{workflow.versions.first.index + 1}.#{workflow.workflow_contents.first.versions.first.index + 1}"
-        create(:classification, build_real_subjects: false, workflow: workflow, workflow_version: vers)
+        create(:classification, build_real_subjects: false, workflow: workflow)
+      end
+      let(:tasks) do
+        {
+          "init" => {
+            "help" => "init.help",
+            "type" => "single",
+            "answers" => [{ "label" => "init.answers.0.label" },
+                          { "label" => "init.answers.1.label" }],
+            "question" => "init.question",
+            "required" => true
+          }
+        }
+      end
+      let(:strings) do
+        {
+          "init.help" => "You know what a cat looks like right?",
+          "init.answers.0.label" => "Yes",
+          "init.answers.1.label" => "No",
+          "init.question" => "Is there a cat in the image"
+        }
       end
 
       before(:each) do
-        workflow.update(tasks: { "init" =>
-          { "T1" =>
-              { "help" => "T1.help",
-                "type" => "single",
-                "answers" => [{ "label" => "T1.answers.0.label" }],
-                "question" => "T1.question"
-              }
-          }
-        })
-        workflow.workflow_contents.first.update(strings: {
-          "T1.question"=>"Is this a cat?",
-          "T1.help"=>"",
-          "T1.answers.0.label"=>"Enter an answer"
-        })
+        workflow.update(tasks: tasks)
+        workflow.workflow_contents.first.update(strings: strings)
       end
 
-      it 'should add the correct version task label' do
-        formatted = described_class.new(classification, annotation).to_h
-        expect(formatted["task_label"]).to eq("Draw a circle")
+      context "with a single question workflow annotation" do
+        let(:annotation) { { task: "init", value: 1 } }
+
+        it 'should add the correct answer label' do
+          formatted = described_class.new(classification, annotation).to_h
+          expect(formatted["value"]).to eq("No")
+        end
+      end
+
+      context "with a multiple question workflow annotation" do
+        let(:tasks) do
+          {
+            "T1" => {
+              "help" => "T1.help",
+              "type" => "multiple",
+              "answers" => [{ "label" => "T1.answers.0.label" },
+                            { "label" => "T1.answers.1.label" },
+                            { "label" => "T1.answers.2.label" }],
+              "question" => "T1.question"
+            }
+          }
+        end
+        let(:strings) do
+          {
+            "T1.question"=>"How much do you love it?",
+            "T1.help"=>"It's not too hard...",
+            "T1.answers.0.label"=>"I sort of love it",
+            "T1.answers.1.label"=>"I want to take it home",
+            "T1.answers.2.label"=>"I don't love it"
+          }
+        end
+        let(:annotation) { { task: "T1", value: [0,2] } }
+
+        it 'should add the correct answer labels' do
+          formatted = described_class.new(classification, annotation).to_h
+          expect(formatted["value"]).to eq(["I sort of love it", "I don't love it"])
+        end
+      end
+
+      context "when the classification refers to the workflow and contents at a prev version" do
+        let(:classification) do
+          vers = "#{workflow.versions.first.index + 1}.#{workflow.workflow_contents.first.versions.first.index + 1}"
+          create(:classification, build_real_subjects: false, workflow: workflow, workflow_version: vers)
+        end
+
+        it 'should add the correct version task label' do
+          formatted = described_class.new(classification, annotation).to_h
+          expect(formatted["task_label"]).to eq("Draw a circle")
+        end
       end
     end
   end
