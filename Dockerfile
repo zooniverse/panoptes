@@ -18,6 +18,6 @@ RUN bundle install --without development test
 ADD supervisord.conf /etc/supervisor/conf.d/panoptes.conf
 ADD ./ /rails_app
 
-EXPOSE 80
+EXPOSE 81
 
 ENTRYPOINT /rails_app/scripts/docker/start.sh
