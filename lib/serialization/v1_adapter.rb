@@ -153,11 +153,3 @@ module Serialization
     end
   end
 end
-
-# {"classifications"=>[
-#    {"id"=>"",
-#     "annotations"=>[{"task"=>"an_annotation", "value"=>true}, {"task"=>"another_one", "value"=>[1, 2]}],
-#     "created_at"=>nil,
-#     "metadata"=>{"user_agent"=>"cURL", "started_at"=>"2015-08-18 14:15:08 UTC", "finished_at"=>"2015-08-18 14:16:08 UTC", "user_language"=>"en", "workflow_version"=>"15.15"},
-#     "href"=>"/classifications/",
-#     "links"=>{"project"=>"1", "user"=>"1", "workflow"=>"1", "subjects"=>["1", "2"]}}]}
