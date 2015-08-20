@@ -14,8 +14,4 @@ class KafkaClassificationSerializer < ActiveModel::Serializer
   def metadata
     object.metadata.merge(workflow_version: object.workflow_version)
   end
-
-  def subjects
-    Subject.where(id: object.subject_ids)
-  end
 end
