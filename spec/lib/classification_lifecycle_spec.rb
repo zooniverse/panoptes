@@ -270,7 +270,7 @@ describe ClassificationLifecycle do
     context "when classificaiton is completed" do
 
       it 'should publish to kafka' do
-        serialized = ClassificationSerializer.serialize(classification).to_json
+        serialized = KafkaClassificationSerializer.serialize(classification, include: 'subjects').to_json
         expect(MultiKafkaProducer).to receive(:publish)
           .with('classifications', [classification.project.id, serialized])
       end

@@ -1,8 +1,7 @@
 class KafkaClassificationSerializer < ActiveModel::Serializer
-  def self.serialize(classification)
+  def self.serialize(classification, options = {})
     serializer = new(classification)
-    adapter = Serialization::V1Adapter.new(serializer)
-    adapter.to_json
+    Serialization::V1Adapter.new(serializer, options)
   end
 
   attributes :id, :annotations, :created_at, :metadata

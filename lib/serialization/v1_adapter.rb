@@ -20,9 +20,12 @@ module Serialization
           result = self.class.new(s, @options.merge(fieldset: @fieldset)).serializable_hash
           @hash[serializer.type] << result[serializer.type]
 
-          if result[:included]
-            @hash[:included] ||= []
-            @hash[:included] |= result[:included]
+          if result[:linked]
+            result[:linked].each do |type, data|
+              @hash[:linked] ||= {}
+              @hash[:linked][type] ||= []
+              @hash[:linked] |= data
+            end
           end
         end
       else
@@ -60,14 +63,15 @@ module Serialization
       end
       resource_path = [parent, resource_name].compact.join('.')
       if include_assoc?(resource_path)
-        @hash[:included] ||= []
+        @hash[:linked] ||= {}
 
         serializers.each do |serializer|
           attrs = attributes_for_serializer(serializer, @options)
 
           add_resource_links(attrs, serializer, add_included: false)
 
-          @hash[:included].push(attrs) unless @hash[:included].include?(attrs)
+          @hash[:linked][serializer.type] ||= []
+          @hash[:linked][serializer.type].push(attrs) unless @hash[:linked][serializer.type].include?(attrs)
         end
       end
 
