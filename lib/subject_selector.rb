@@ -32,6 +32,7 @@ class SubjectSelector
   def selected_subjects(sms_ids, selector_context={})
     subjects = @scope.eager_load(:set_member_subjects)
       .where(set_member_subjects: {id: sms_ids})
+      .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")
     [subjects, selector_context.merge(selected: true, url_format: :get)]
   end
 
