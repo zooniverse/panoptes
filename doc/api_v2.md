@@ -455,19 +455,26 @@ Three parameters: `grouped`, `prioritized`, and `pairwise `configure how the Zoo
 | Attribute | Type | View Scope | Edit Scope | Description |
 |-----------|------|------------|------------|-------------|
 | display_name | String | public / project | project.edit | Name of the Workflow |
-| display_name | String | public / project | project.edit | Name of the Workflow |
-| display_name | String | public / project | project.edit | Name of the Workflow |
-| display_name | String | public / project | project.edit | Name of the Workflow |
-| display_name | String | public / project | project.edit | Name of the Workflow |
-| display_name | String | public / project | project.edit | Name of the Workflow |
-| display_name | String | public / project | project.edit | Name of the Workflow |
-| display_name | String | public / project | project.edit | Name of the Workflow |
-| display_name | String | public / project | project.edit | Name of the Workflow |
+| tasks | Object | public / project | project.edit | Description of the classification task for this workflow | 
+| prioritized | Boolean | public / project | project.edit | Subject Selection Flag |
+| grouped | Boolean | public / project | project.edit |Subject Selection Flag |
+| pairwise | Boolean | public / project | project.edit | Subject Selection Flag |
+| active | Boolean | public / project | project.edit | Flag indicating whether the workflow is available to classify on |
+| retirement | Object | public / project | project.edit | Object describing conditions that will cause a subject to be retired |
+| version | String | public / project | project.edit | Current version number of the workflow. | 
+| classifications_count | Number | public / project | project.edit | Total classifications completed for this workflow |
+| subjects_count | Number | public / project | project.edit | Total number of subjects associated with the workflow |
+| retired_set_member_subjects_count | Number | public / project | project.edit | count of retired subjects for this workflow |
+| primary_language | String | public / project | project.edit | Language the workflow was originally created in |
+| content_language | String | public / project | project.edit | Current language of the workflow |
+| created_at | Time | public / project | project.edit | Timestamp of creation |
+| updated_at | Time | public / project | project.edit | Timestamp of last update |
 
 ##### Links
 
 | Link | Type | Description |
 |------|------|-------------|
+| Project | projects | Parent project of the workflow
 
 #### Subject Sets (/subject_sets)
 
