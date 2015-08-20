@@ -32,6 +32,8 @@ GEM
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
     active_record_union (1.1.0)
       activerecord (>= 4.0)
+    active_model_serializers (0.10.0.rc2)
+      activemodel (>= 4.0)
     activejob (4.2.3)
       activesupport (= 4.2.3)
       globalid (>= 0.3.0)
@@ -324,6 +326,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_record_union (~> 1.1.0)
+  active_model_serializers (= 0.10.0.rc2)
   activerecord-import (~> 0.8)
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter
