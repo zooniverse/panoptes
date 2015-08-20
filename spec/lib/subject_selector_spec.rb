@@ -3,13 +3,14 @@ require 'spec_helper'
 RSpec.describe SubjectSelector do
   let(:workflow) { create(:workflow_with_subjects) }
   let(:user) { ApiUser.new(create(:user)) }
+  let(:smses) { create_list(:set_member_subject, 10).reverse }
 
   let(:subject_queue) do
     create(:subject_queue,
            workflow: workflow,
            user: nil,
            subject_set: nil,
-           set_member_subjects: create_list(:set_member_subject, 10))
+           set_member_subjects: smses)
   end
 
   subject { described_class.new(user, workflow, {}, Subject.all)}
@@ -20,6 +21,13 @@ RSpec.describe SubjectSelector do
       subject_queue
       _, ctx = subject.queued_subjects
       expect(ctx).to include(url_format: :get)
+    end
+
+    it "should respect the order of subjects in the queue" do
+      subject_queue
+      subjects, _ = subject.queued_subjects
+      expected_order = smses.map(&:subject_id)
+      expect(subjects.pluck(:id)).to eq(expected_order)
     end
 
     context "when the user doesn't have a queue" do
@@ -71,7 +79,7 @@ RSpec.describe SubjectSelector do
       end
     end
 
-    describe "#dequeue for user after selection" do
+    describe "#dequeue/enqueue after selection" do
       let(:smses) { workflow.set_member_subjects }
       let(:sms_ids) { smses.map(&:id) }
       let(:subject_queue) do
