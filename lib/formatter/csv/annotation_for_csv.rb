@@ -5,7 +5,7 @@ module Formatter
 
       def initialize(classification, annotation)
         @classification = classification
-        @annotation = annotation.dup
+        @annotation = annotation.dup.with_indifferent_access
       end
 
       def to_h
@@ -16,10 +16,12 @@ module Formatter
           value_with_tool = (annotation["value"] || []).map do |drawn_item|
             drawn_item.merge "tool_label" => tool_label(drawn_item)
           end
-
           annotation.merge!("value" => value_with_tool)
+        when /single/i
+          annotation.merge!("value" => answer_label)
+        when /multiple/i
+          annotation.merge!("value" => answer_labels)
         end
-
         annotation
       end
 
@@ -32,6 +34,17 @@ module Formatter
       def tool_label(drawn_item)
         tool = task["tools"] && task["tools"][drawn_item["tool"]]
         translate(tool["label"]) if tool
+      end
+
+      def answer_label
+        answer_labels.first
+      end
+
+      def answer_labels
+        Array.wrap(annotation["value"]).map do |answer_idx|
+          answer_string = task["answers"][answer_idx]["label"]
+          translate(answer_string)
+        end
       end
 
       def translate(string)
