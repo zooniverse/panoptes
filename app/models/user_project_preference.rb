@@ -14,6 +14,6 @@ class UserProjectPreference < ActiveRecord::Base
   private
 
   def valid_legacy_count_values
-    legacy_count.values.compact
+    legacy_count.values.compact.map(&:to_i)
   end
 end
