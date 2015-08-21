@@ -46,6 +46,10 @@ class WorkflowUpdateSchema < JsonSchema
       type "object"
     end
 
+    property "aggregation" do
+      type "object"
+    end
+
     property "links" do
       type "object"
       additional_properties false
