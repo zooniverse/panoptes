@@ -68,7 +68,7 @@ describe Api::V1::SubjectQueuesController, type: :controller do
 
     it_behaves_like "supports update_links" do
       let!(:old_ids) { resource.set_member_subject_ids }
-      let(:linked_resource) { updated_resource.set_member_subjects }
+      let(:linked_resources) { updated_resource.set_member_subjects }
 
       it "prepend the ids and remove dups" do
         expect(updated_resource.set_member_subject_ids).to eq(expected_ids)
