@@ -79,6 +79,7 @@ RSpec.shared_examples "supports update_links" do
   let!(:old_ids) { resource.send(test_relation).map(&:id) }
   let(:updated_resource) { resource.reload }
   let(:stringified_test_relation_ids) { Array.wrap(test_relation_ids).map(&:to_s) }
+  let(:linked_resource) { updated_resource.send(test_relation) }
 
   before(:each) do
     default_request scopes: scopes, user_id: authorized_user.id
@@ -91,13 +92,12 @@ RSpec.shared_examples "supports update_links" do
   end
 
   it 'should update any included links' do
-    linked_resource = updated_resource.send(test_relation)
     updated_relation_ids = UpdatableResource.extract_linked_resource_ids(linked_resource)
     expect(updated_relation_ids).to include(*stringified_test_relation_ids)
   end
 
   it 'should retain pre-existing links' do
-    expect(updated_resource.send(test_relation).map(&:id)).to include(*old_ids)
+    expect(linked_resource.map(&:id)).to include(*old_ids)
   end
 end
 
