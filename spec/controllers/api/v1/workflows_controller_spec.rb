@@ -11,7 +11,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:authorized_user) { owner }
 
   let(:api_resource_attributes) do
-    %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version grouped prioritized pairwise retirement active)
+    %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version grouped prioritized pairwise retirement aggregation active)
   end
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets workflows.tutorial_subject workflows.expert_subject_set workflows.attached_images) }
   let(:scopes) { %w(public project) }
@@ -70,9 +70,8 @@ describe Api::V1::WorkflowsController, type: :controller do
        workflows: {
                    display_name: "A Better Name",
                    active: false,
-                   retirement: {
-                                criteria: "classification_count"
-                               },
+                   retirement: { criteria: "classification_count" },
+                   aggregation: { },
                    tasks: {
                            interest: {
                                       type: "draw",
@@ -287,9 +286,8 @@ describe Api::V1::WorkflowsController, type: :controller do
                    display_name: 'Test workflow',
                    first_task: 'interest',
                    active: true,
-                   retirement: {
-                                criteria: "classification_count"
-                               },
+                   retirement: { criteria: "classification_count" },
+                   aggregation: { public: true },
                    tasks: {
                            interest: {
                                       type: "draw",
