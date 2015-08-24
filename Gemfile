@@ -9,7 +9,8 @@ gem 'doorkeeper', '~> 1.4.1'
 gem 'devise', '~> 3.0'
 gem 'versionist', '~> 1.0'
 gem 'rack-cors', '~> 0.3', require: 'rack/cors'
-gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev"
+gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev" # REST API
+gem 'active_model_serializers', '0.10.0.rc2' # Kafka
 gem 'paper_trail', '~> 3.0'
 gem 'omniauth', '~> 1.0'
 gem 'omniauth-facebook', '~> 2.0'

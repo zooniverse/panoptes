@@ -52,7 +52,7 @@ class ClassificationLifecycle
 
   def publish_to_kafka
     return unless classification.complete?
-    classification_json = ClassificationSerializer.serialize(classification).to_json
+    classification_json = KafkaClassificationSerializer.serialize(classification, include: ['subjects']).to_json
     MultiKafkaProducer.publish('classifications', [classification.project.id, classification_json])
   end
 
