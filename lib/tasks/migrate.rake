@@ -7,6 +7,17 @@ namespace :migrate do
 
   namespace :user do
 
+    desc "Migrate classifications to Cassandra"
+    task classifications: :environment do
+      cs = Classification.all
+      total = cs.count
+
+      cs.find_each.with_index do |c, i|
+        p "Importing #{i} of #{total}"
+        Cassandra::Classification.from_ar_model(cs)
+      end
+    end
+
     desc "Migrate to User login field from display_name"
     task login_field: :environment do
 
