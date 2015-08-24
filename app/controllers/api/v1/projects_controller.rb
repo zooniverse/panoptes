@@ -6,7 +6,8 @@ class Api::V1::ProjectsController < Api::ApiController
   include AdminAllowed
 
   doorkeeper_for :update, :create, :destroy, :create_classifications_export,
-    :create_subjects_export, :create_aggregations_export, scopes: [:project]
+    :create_subjects_export, :create_aggregations_export,
+    :create_workflows_export, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
 
@@ -53,24 +54,19 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_classifications_export
-    media_params[:metadata] ||= { recipients: [api_user.id] }
-    medium = create_or_update_medium(:classifications_export, media_params)
-    ClassificationsDumpWorker.perform_async(controlled_resource.id, medium.id)
-    medium_response(medium)
+    create_export(:classifications)
   end
 
   def create_subjects_export
-    media_params[:metadata] ||= { recipients: [api_user.id] }
-    medium = create_or_update_medium(:subjects_export, media_params)
-    SubjectsDumpWorker.perform_async(controlled_resource.id, medium.id)
-    medium_response(medium)
+    create_export(:subjects)
   end
 
   def create_aggregations_export
-    media_params[:metadata] ||= { recipients: [api_user.id] }
-    medium = create_or_update_medium(:aggregations_export, media_params)
-    AggregationsDumpWorker.perform_async(controlled_resource.id, medium.id)
-    medium_response(medium)
+    create_export(:aggregations)
+  end
+
+  def create_workflows_export
+    create_export(:workflows)
   end
 
   def create
@@ -91,7 +87,8 @@ class Api::V1::ProjectsController < Api::ApiController
     end
   end
 
-  def create_or_update_medium(type, media_create_params)
+  def create_or_update_medium(type, media_create_params=media_params)
+    media_create_params['metadata'] ||= { recipients: [api_user.id] }
     media_create_params['metadata']["state"] = 'creating'
     if medium = controlled_resource.send(type)
       medium.update!(media_create_params)
@@ -136,7 +133,8 @@ class Api::V1::ProjectsController < Api::ApiController
       :launched_row_order_position, :beta_row_order_position
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
     if create_params.has_key? :tags
-      create_params[:tags] = create_or_update_tags(create_params)
+      create_params[:tags
+  ] = create_or_update_tags(create_params)
     end
     add_user_as_linked_owner(create_params)
     super(create_params)
@@ -194,5 +192,12 @@ class Api::V1::ProjectsController < Api::ApiController
     visitor = TasksVisitors::ExtractStrings.new
     visitor.visit(urls)
     [urls, visitor.collector]
+  end
+
+  def create_export(export_type)
+    medium = create_or_update_medium("#{export_type}_export".to_sym)
+    dump_worker_klass = "#{export_type.to_s.camelize}DumpWorker".constantize
+    dump_worker_klass.perform_async(controlled_resource.id, medium.id)
+    medium_response(medium)
   end
 end

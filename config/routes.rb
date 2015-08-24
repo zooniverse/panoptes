@@ -78,6 +78,7 @@ Rails.application.routes.draw do
         post "/classifications_export", to: "projects#create_classifications_export", format: false
         post "/subjects_export", to: "projects#create_subjects_export", format: false
         post "/aggregations_export", to: "projects#create_aggregations_export", format: false
+        post "/workflows_export", to: "projects#create_workflows_export", format: false
 
         json_api_resources :pages, controller: "project_pages"
       end
