@@ -27,6 +27,7 @@ class ClassificationLifecycle
       create_recent
       update_seen_subjects
       publish_to_kafka
+      save_to_cassandra
     end
   end
 
@@ -54,6 +55,11 @@ class ClassificationLifecycle
     return unless classification.complete?
     classification_json = ClassificationSerializer.serialize(classification).to_json
     MultiKafkaProducer.publish('classifications', [classification.project.id, classification_json])
+  end
+
+  def save_to_cassandra
+    return unless classification.complete?
+    Cassandra::Classification.from_ar_model(classification)
   end
 
   def update_classification_data

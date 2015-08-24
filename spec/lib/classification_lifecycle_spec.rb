@@ -255,6 +255,13 @@ describe ClassificationLifecycle do
         end
       end
 
+      it 'should not call #save_to_cassandra' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:save_to_cassandra)
+          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
       it 'should not call should_count_towards_retirement?' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:should_count_towards_retirement?)
@@ -272,15 +279,34 @@ describe ClassificationLifecycle do
       it 'should publish to kafka' do
         serialized = ClassificationSerializer.serialize(classification).to_json
         expect(MultiKafkaProducer).to receive(:publish)
-          .with('classifications', [classification.project.id, serialized])
+        .with('classifications', [classification.project.id, serialized])
       end
     end
 
-    context "when classificaiton is incomplete" do
+    context "when classification is incomplete" do
       let(:classification) { build(:classification, completed: false) }
 
       it 'should do nothing' do
         expect(MultiKafkaProducer).to_not receive(:publish)
+      end
+    end
+  end
+
+  describe "#save_to_cassandra" do
+    after(:each) { subject.save_to_cassandra }
+
+    context "when classification is complete" do
+
+      it 'should create a cassandra record' do
+        expect(Cassandra::Classification).to receive(:from_ar_model).with(classification)
+      end
+    end
+
+    context "when classification is incomplete" do
+      let(:classification) { build(:classification, completed: false) }
+
+      it 'should do nothing' do
+        expect(Cassandra::Classification).to_not receive(:from_ar_model)
       end
     end
   end
@@ -298,10 +324,10 @@ describe ClassificationLifecycle do
         it "should set the communication preferences to the user's default" do
           subject.create_project_preference
           email_pref = UserProjectPreference
-            .where(user: classification.user, project: classification.project)
-            .first.email_communication
+          .where(user: classification.user, project: classification.project)
+          .first.email_communication
           expect(email_pref).to eq(classification.user
-                                   .project_email_communication)
+            .project_email_communication)
         end
 
       end
@@ -338,9 +364,9 @@ describe ClassificationLifecycle do
     context "with a user" do
       it 'should add the subject_id to the seen subjects' do
         expect(UserSeenSubject).to receive(:add_seen_subjects_for_user)
-          .with(user: classification.user,
-                workflow: classification.workflow,
-                subject_ids: classification.subject_ids)
+        .with(user: classification.user,
+          workflow: classification.workflow,
+          subject_ids: classification.subject_ids)
       end
     end
 
@@ -370,8 +396,8 @@ describe ClassificationLifecycle do
       let(:classification) { build(:classification, gold_standard: true) }
       let!(:user_role) do
         create(:access_control_list, resource: classification.project,
-               user_group: classification.user.identity_group,
-               roles: roles)
+          user_group: classification.user.identity_group,
+          roles: roles)
       end
 
       before(:each) do
