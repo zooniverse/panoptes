@@ -70,5 +70,32 @@ FactoryGirl.define do
         create_list(:subject_set_with_subjects, 2, workflows: [w], project: w.project)
       end
     end
+
+    factory :question_task_workflow do
+      tasks (
+        {
+          "init" => {
+            "help" => "init.help",
+            "type" => "single",
+            "answers" => [{ "label" => "init.answers.0.label" },
+                          { "label" => "init.answers.1.label" }],
+            "question" => "init.question",
+            "required" => true
+          }
+        }
+      )
+
+      after(:build) do |w, env|
+        if env.build_contents
+          strings = {
+            "init.help" => "You know what a cat looks like right?",
+            "init.answers.0.label" => "Yes",
+            "init.answers.1.label" => "No",
+            "init.question" => "Is there a cat in the image"
+          }
+          w.workflow_contents.first.update(strings: strings)
+        end
+      end
+    end
   end
 end
