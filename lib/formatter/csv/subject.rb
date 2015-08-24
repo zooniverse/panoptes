@@ -5,7 +5,6 @@ module Formatter
 
       delegate :subject_id, :subject_set_id, to: :sms
 
-
       def self.project_headers
         %w(subject_id project_id workflow_ids subject_set_id metadata locations classifications_by_workflow retired_in_workflow)
       end
