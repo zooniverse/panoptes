@@ -30,7 +30,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     let(:temp_file_path) { "#{Rails.root}/tmp/#{project_file_name}" }
 
     it "should create a csv file with the correct number of entries" do
-      expect_any_instance_of(CSV).to receive(:<<).exactly(6).times
+      expect_any_instance_of(CSV).to receive(:<<).exactly(num_entries).times
       worker.perform(project.id)
     end
 

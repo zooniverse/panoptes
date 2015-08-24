@@ -1,3 +1,5 @@
+require 'csv'
+
 class WorkflowsDumpWorker
   include Sidekiq::Worker
   include DumpWorker
@@ -8,13 +10,14 @@ class WorkflowsDumpWorker
     if @project = Project.find(project_id)
       @medium_id = medium_id
       begin
-        csv_formatter = Formatter::Csv::Workflow.new(project)
+        csv_formatter = Formatter::Csv::Workflow.new
         CSV.open(csv_file_path, 'wb') do |csv|
-          binding.pry
           csv << Formatter::Csv::Workflow.project_headers
           project.workflows.find_each do |workflow|
-            #what about versions here??
             csv << csv_formatter.to_array(workflow)
+            while workflow = workflow.previous_version
+              csv << csv_formatter.to_array(workflow)
+            end
           end
         end
         to_gzip
