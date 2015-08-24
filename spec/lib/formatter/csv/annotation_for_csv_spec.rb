@@ -43,7 +43,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     expect(formatted["value"]).to be_empty
   end
 
-  context "with a versioned workflow question type task", :focus do
+  context "with a versioned workflow question type task" do
 
     with_versioning do
       let(:workflow) { create(:workflow) }

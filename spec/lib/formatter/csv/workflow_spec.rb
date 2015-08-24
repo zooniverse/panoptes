@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe Formatter::Csv::Workflow, focus: true do
+RSpec.describe Formatter::Csv::Workflow do
   let(:workflow) { create(:workflow) }
   let(:project) { workflow.project }
 
@@ -36,5 +36,35 @@ RSpec.describe Formatter::Csv::Workflow, focus: true do
     subject { described_class.new.to_array(workflow) }
 
     it { is_expected.to match_array(fields) }
+  end
+
+  context "with a versioned workflow" do
+
+    with_versioning do
+      let(:q_workflow) { build(:question_task_workflow) }
+      let(:tasks) { q_workflow.tasks }
+      let(:strings) { q_workflow.workflow_contents.first.strings }
+
+      before(:each) do
+        updates = {
+          tasks: tasks, pairwise: !workflow.pairwise,
+          grouped: !workflow.grouped, prioritized: !workflow.prioritized
+        }
+        workflow.update_attributes(updates)
+        workflow.workflow_contents.first.update(strings: strings)
+      end
+
+      describe "#to_array on the latest version", :focus do
+        subject { described_class.new.to_array(workflow) }
+
+        it { is_expected.to match_array(fields) }
+      end
+
+      describe "#to_array on the previous version", :focus do
+        subject { described_class.new.to_array(workflow.previous_version) }
+
+        it { is_expected.to match_array(fields) }
+      end
+    end
   end
 end

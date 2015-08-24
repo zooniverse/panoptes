@@ -23,7 +23,12 @@ module Formatter
       end
 
       def version
-        workflow.version_string
+        binding.pry
+        #TODO: this needs to be able to find the correlated workflow contents version(s)
+        #to work...or just dump those as well.
+        #DUMP the major workflow versions
+        # and the minor workflow content version as well
+        workflow.version_string()
       end
 
       def method_missing(method, *args, &block)

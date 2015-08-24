@@ -27,7 +27,7 @@ RSpec.describe WorkflowsDumpWorker do
         workflow.workflow_contents.first.update(strings: strings)
       end
 
-      it "should append all previous versions to the csv file" do
+      it "should append all previous versions to the csv file", :focus do
         aggregate_failures "versions" do
           expect_any_instance_of(CSV).to receive(:<<).exactly(3).times.and_call_original
           [ workflow, workflow.previous_version ].each do |version|
