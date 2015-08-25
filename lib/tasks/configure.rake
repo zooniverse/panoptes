@@ -23,6 +23,17 @@ zooniverse_home_test:
 
 YAML
     File.open('config/database.yml', 'w') { |f| f.write(database_config) }
+    cequel_config = <<YAML
+test:
+  host: 127.0.0.1
+  port: 9042
+  keyspace: panoptes_test
+  max_retries: 3
+  retry_delay: 0.5
+  newrelic: false
+YAML
+
+    File.open('config/cequel.yml', 'w') { |f| f.write(cequel_config) }
   end
 end
 
