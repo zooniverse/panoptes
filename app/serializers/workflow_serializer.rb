@@ -15,8 +15,6 @@ class WorkflowSerializer
 
   media_include :attached_images
 
-  DEFAULT_WORKFLOW_VERSION_NUM = 1
-
   def self.links
     links = super
     ess = links.delete('workflows.expert_subject_sets')
@@ -52,7 +50,7 @@ class WorkflowSerializer
     if model && last_version = model.versions.last
       last_version.index + 1
     else
-      DEFAULT_WORKFLOW_VERSION_NUM
+      1
     end
   end
 end
