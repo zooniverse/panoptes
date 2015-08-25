@@ -3,23 +3,24 @@ require "spec_helper"
 RSpec.describe Formatter::Csv::Workflow do
   let(:workflow) { create(:workflow) }
   let(:project) { workflow.project }
+  let(:workflow_version) { workflow }
 
   let(:fields) do
-    [  workflow.id,
-       workflow.display_name,
-       workflow.version_string,
-       workflow.active,
-       workflow.classifications_count,
-       workflow.pairwise,
-       workflow.grouped,
-       workflow.prioritized,
-       workflow.primary_language,
-       workflow.first_task,
-       workflow.tutorial_subject_id,
-       workflow.retired_set_member_subjects_count,
-       workflow.tasks.to_json,
-       workflow.retirement.to_json,
-       workflow.aggregation.to_json ]
+    [  workflow_version.id,
+       workflow_version.display_name,
+       ModelVersion.version_number(workflow_version),
+       workflow_version.active,
+       workflow_version.classifications_count,
+       workflow_version.pairwise,
+       workflow_version.grouped,
+       workflow_version.prioritized,
+       workflow_version.primary_language,
+       workflow_version.first_task,
+       workflow_version.tutorial_subject_id,
+       workflow_version.retired_set_member_subjects_count,
+       workflow_version.tasks.to_json,
+       workflow_version.retirement.to_json,
+       workflow_version.aggregation.to_json ]
   end
 
   let(:header) do
@@ -54,14 +55,16 @@ RSpec.describe Formatter::Csv::Workflow do
         workflow.workflow_contents.first.update(strings: strings)
       end
 
-      describe "#to_array on the latest version", :focus do
+      describe "#to_array on the latest version" do
         subject { described_class.new.to_array(workflow) }
 
         it { is_expected.to match_array(fields) }
       end
 
-      describe "#to_array on the previous version", :focus do
-        subject { described_class.new.to_array(workflow.previous_version) }
+      describe "#to_array on the previous version" do
+        let(:workflow_version) { workflow.previous_version }
+
+        subject { described_class.new.to_array(workflow_version) }
 
         it { is_expected.to match_array(fields) }
       end

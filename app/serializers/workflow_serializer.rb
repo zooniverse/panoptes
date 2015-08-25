@@ -23,7 +23,7 @@ class WorkflowSerializer
   end
 
   def version
-    "#{version_index_number(@model)}.#{version_index_number(content)}"
+    "#{ModelVersion.version_number(@model)}.#{ModelVersion.version_number(content)}"
   end
 
   def content_language
@@ -42,15 +42,5 @@ class WorkflowSerializer
 
   def content
     @content ||= @model.content_for(@context[:languages])
-  end
-
-  private
-
-  def version_index_number(model)
-    if model && last_version = model.versions.last
-      last_version.index + 1
-    else
-      1
-    end
   end
 end
