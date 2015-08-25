@@ -9,7 +9,9 @@ RSpec.describe ClassificationsDumpWorker do
   end
 
   describe "#perform" do
-    it_behaves_like "dump worker", ClassificationDataMailerWorker, "project_classifications_export"
+    it_behaves_like "dump worker", ClassificationDataMailerWorker, "project_classifications_export" do
+      let(:num_entries) { classifications.size + 1 }
+    end
   end
 
   describe "#completed_project_classifications" do

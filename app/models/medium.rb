@@ -86,10 +86,10 @@ class Medium < ActiveRecord::Base
 
   def allowed_content_types
     case type
-    when "project_classifications_export", "project_subjects_export"
-      ALLOWED_EXPORT_CONTENT_TYPES
     when "project_aggregations_export"
-      ALLOWED_AGGREGATION_EXPORT_CONTENT_TYPES
+        ALLOWED_AGGREGATION_EXPORT_CONTENT_TYPES
+    when /\Aproject_[a-z_]+_export\z/i
+      ALLOWED_EXPORT_CONTENT_TYPES
     else
       ALLOWED_UPLOAD_CONTENT_TYPES
     end

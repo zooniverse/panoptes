@@ -50,26 +50,9 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       let(:classification) do
         create(:classification, build_real_subjects: false, workflow: workflow)
       end
-      let(:tasks) do
-        {
-          "init" => {
-            "help" => "init.help",
-            "type" => "single",
-            "answers" => [{ "label" => "init.answers.0.label" },
-                          { "label" => "init.answers.1.label" }],
-            "question" => "init.question",
-            "required" => true
-          }
-        }
-      end
-      let(:strings) do
-        {
-          "init.help" => "You know what a cat looks like right?",
-          "init.answers.0.label" => "Yes",
-          "init.answers.1.label" => "No",
-          "init.question" => "Is there a cat in the image"
-        }
-      end
+      let(:q_workflow) { build(:question_task_workflow) }
+      let(:tasks) { q_workflow.tasks }
+      let(:strings) { q_workflow.workflow_contents.first.strings }
 
       before(:each) do
         workflow.update(tasks: tasks)
