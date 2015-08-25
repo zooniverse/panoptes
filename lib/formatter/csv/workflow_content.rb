@@ -5,13 +5,13 @@ module Formatter
 
       delegate :language, to: :workflow_content
 
-      def self.project_headers
+      def self.workflow_content_headers
         %w(workflow_content_id workflow_id language version strings)
       end
 
       def to_array(workflow_content)
         @workflow_content = workflow_content
-        self.class.project_headers.map { |header| send(header) }
+        self.class.workflow_content_headers.map { |header| send(header) }
       end
 
       private
