@@ -5,18 +5,18 @@ require 'csv'
 
 namespace :migrate do
 
-  namespace :user do
+  desc "Migrate classifications to Cassandra"
+  task classifications: :environment do
+    cs = Classification.all
+    total = cs.count
 
-    desc "Migrate classifications to Cassandra"
-    task classifications: :environment do
-      cs = Classification.all
-      total = cs.count
-
-      cs.find_each.with_index do |c, i|
-        p "Importing #{i} of #{total}"
-        Cassandra::Classification.from_ar_model(cs)
-      end
+    cs.find_each.with_index do |c, i|
+      p "Importing #{i} of #{total}"
+      Cassandra::Classification.from_ar_model(c)
     end
+  end
+
+  namespace :user do
 
     desc "Migrate to User login field from display_name"
     task login_field: :environment do
@@ -138,8 +138,8 @@ namespace :migrate do
     desc "Create missing recents from classifications"
     task create_missing_recents: :environment do
       query = Classification
-        .joins("LEFT OUTER JOIN recents ON recents.classification_id = classifications.id")
-        .where('recents.id IS NULL')
+              .joins("LEFT OUTER JOIN recents ON recents.classification_id = classifications.id")
+              .where('recents.id IS NULL')
       total = query.count
       query.find_each.with_index do |classification, i|
         puts "#{i+1} of #{total}"
