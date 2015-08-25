@@ -74,9 +74,4 @@ class Workflow < ActiveRecord::Base
   def retired_subjects_count
     retired_set_member_subjects_count
   end
-
-  def version_string(content=nil)
-    content ||= content_for(primary_language)
-    "#{ModelVersion.index_number(self)}.#{ModelVersion.index_number(content)}"
-  end
 end

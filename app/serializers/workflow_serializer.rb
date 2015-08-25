@@ -15,6 +15,8 @@ class WorkflowSerializer
 
   media_include :attached_images
 
+  DEFAULT_WORKFLOW_VERSION_NUM = 1
+
   def self.links
     links = super
     ess = links.delete('workflows.expert_subject_sets')
@@ -23,7 +25,7 @@ class WorkflowSerializer
   end
 
   def version
-    @model.version_string(@content)
+    "#{version_index_number(@model)}.#{version_index_number(content)}"
   end
 
   def content_language
@@ -42,5 +44,15 @@ class WorkflowSerializer
 
   def content
     @content ||= @model.content_for(@context[:languages])
+  end
+
+  private
+
+  def version_index_number(model)
+    if model && last_version = model.versions.last
+      last_version.index + 1
+    else
+      DEFAULT_WORKFLOW_VERSION_NUM
+    end
   end
 end
