@@ -2,7 +2,7 @@ module DumpWorker
   extend ActiveSupport::Concern
 
   def dump_target
-    @dump_target ||= self.class.to_s.underscore.split("_")[0]
+    @dump_target ||= self.class.to_s.underscore.match(/\A(\w+)_dump_worker\z/)[1]
   end
 
   def dump_type
