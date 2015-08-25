@@ -27,14 +27,14 @@ RSpec.describe Formatter::Csv::Workflow do
     %w(workflow_id display_name version active classifications_count pairwise grouped prioritized primary_language first_task tutorial_subject_id retired_set_member_subjects_count tasks retirement aggregation)
   end
 
-  describe "::project_headers" do
+  describe "::workflow_headers" do
     it 'should contain the required headers' do
       expect(described_class.project_headers).to match_array(header)
     end
   end
 
   describe "#to_array" do
-    subject { described_class.new.to_array(workflow) }
+    subject { described_class.new.to_array(workflow_version) }
 
     it { is_expected.to match_array(fields) }
   end
@@ -44,7 +44,6 @@ RSpec.describe Formatter::Csv::Workflow do
     with_versioning do
       let(:q_workflow) { build(:question_task_workflow) }
       let(:tasks) { q_workflow.tasks }
-      let(:strings) { q_workflow.workflow_contents.first.strings }
 
       before(:each) do
         updates = {
@@ -52,7 +51,6 @@ RSpec.describe Formatter::Csv::Workflow do
           grouped: !workflow.grouped, prioritized: !workflow.prioritized
         }
         workflow.update_attributes(updates)
-        workflow.workflow_contents.first.update(strings: strings)
       end
 
       describe "#to_array on the latest version" do
