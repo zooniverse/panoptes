@@ -7,7 +7,8 @@ class Api::V1::ProjectsController < Api::ApiController
 
   doorkeeper_for :update, :create, :destroy, :create_classifications_export,
     :create_subjects_export, :create_aggregations_export,
-    :create_workflows_export, scopes: [:project]
+    :create_workflows_export, :create_workflow_contents_export,
+    scopes: [:project]
   resource_actions :default
   schema_type :json_schema
 
@@ -28,9 +29,12 @@ class Api::V1::ProjectsController < Api::ApiController
   before_action :add_owner_ids_to_filter_param!, only: :index
   before_action :filter_by_tags, only: :index
   before_action :downcase_slug, only: :index
+
   prepend_before_action :require_login,
-    only: [:create, :update, :destroy, :create_classifications_export, :create_subjects_export,
-    :create_aggregations_export]
+    only: [:create, :update, :destroy, :create_classifications_export,
+    :create_subjects_export,
+    :create_aggregations_export, :create_workflows_export,
+    :create_workflow_contents_export]
 
   search_by do |name, query|
     query.search_display_name(name.join(" "))
@@ -137,8 +141,7 @@ class Api::V1::ProjectsController < Api::ApiController
       :launched_row_order_position, :beta_row_order_position
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
     if create_params.has_key? :tags
-      create_params[:tags
-  ] = create_or_update_tags(create_params)
+      create_params[:tags] = create_or_update_tags(create_params)
     end
     add_user_as_linked_owner(create_params)
     super(create_params)

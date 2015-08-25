@@ -833,7 +833,7 @@ describe Api::V1::ProjectsController, type: :controller do
       it_behaves_like "export create", SubjectsDumpWorker, "subjects_export"
     end
 
-    describe "#create_workflows_export", :focus do
+    describe "#create_workflows_export" do
       let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/workflows_export/ }
       let(:test_attr_value) { "project_workflows_export" }
 
@@ -841,7 +841,7 @@ describe Api::V1::ProjectsController, type: :controller do
       it_behaves_like "export create", WorkflowsDumpWorker, "workflows_export"
     end
 
-    describe "#create_workflow_contents_export", :focus do
+    describe "#create_workflow_contents_export" do
       let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/workflow_contents_export/ }
       let(:test_attr_value) { "project_workflow_contents_export" }
 
