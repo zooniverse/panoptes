@@ -7,6 +7,7 @@ class Cassandra::Classification
   key :workflow_version, :int
   key :user_ip, :inet
   key :user_id, :int
+  key :classification_id, :int
   column :created_at, :timestamp
   column :updated_at, :timestamp
   column :user_group_id, :int
@@ -20,7 +21,7 @@ class Cassandra::Classification
 
   def self.from_ar_model(classification)
     attrs = classification.attributes.dup
-    attrs.delete("id")
+    attrs["classification_id"] = attrs.delete("id")
     attrs.delete("subject_ids").each do |subject_id|
       create!(attrs.merge(subject_id: subject_id))
     end
