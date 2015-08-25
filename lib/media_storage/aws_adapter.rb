@@ -25,7 +25,12 @@ module MediaStorage
     end
 
     def stored_path(content_type, medium_type, *path_prefix)
-      extension = MIME::Types[content_type].first.extensions.first
+      extension = case content_type
+                  when "application/x-gzip"
+                    "tar.gz"
+                  else
+                    MIME::Types[content_type].first.extensions.first
+                  end
       path = "#{prefix}"
       path += "/" unless path[-1] == '/'
       path += "#{medium_type}/"
