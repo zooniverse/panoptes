@@ -39,10 +39,10 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    active_record_union (1.1.0)
-      activerecord (>= 4.0)
     active_model_serializers (0.10.0.rc2)
       activemodel (>= 4.0)
+    active_record_union (1.1.0)
+      activerecord (>= 4.0)
     activejob (4.2.3)
       activesupport (= 4.2.3)
       globalid (>= 0.3.0)
@@ -213,7 +213,6 @@ GEM
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
-    rack-timeout (0.2.4)
     rails (4.2.3)
       actionmailer (= 4.2.3)
       actionpack (= 4.2.3)
@@ -337,8 +336,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_record_union (~> 1.1.0)
   active_model_serializers (= 0.10.0.rc2)
+  active_record_union (~> 1.1.0)
   activerecord-import (~> 0.8)
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter
@@ -376,7 +375,6 @@ DEPENDENCIES
   pry-rails (~> 0.3.2)
   puma (~> 2.0)
   rack-cors (~> 0.3)
-  rack-timeout (~> 0.2.4)
   rails (~> 4.2.3)
   ranked-model (~> 0.4.0)
   restpack_serializer!

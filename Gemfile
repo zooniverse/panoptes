@@ -35,7 +35,6 @@ gem 'activerecord-import', '~> 0.8'
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'pg_search'
 gem 'ranked-model', '~> 0.4.0'
-gem 'rack-timeout', '~> 0.2.4'
 gem 'cequel', github: 'edpaget/cequel', branch: 'update-cql-version'
 
 platforms :jruby do
