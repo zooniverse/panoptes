@@ -37,6 +37,12 @@ RSpec.describe MediaStorage::AwsAdapter do
 
       it { is_expected.to match(/extra\/prefixes/)}
     end
+
+    context "with an application/x-gzip content-type" do
+      subject { adapter.stored_path('application/x-gzip', 'subject_location')}
+
+      it { is_expected.to match(/\.tar\.gz/)}
+    end
   end
 
   shared_examples "signed s3 url" do
@@ -89,8 +95,8 @@ RSpec.describe MediaStorage::AwsAdapter do
     context "when opts[:private] is true" do
       it 'should call write with the content_type, file, and private acl' do
         expect(obj_double).to receive(:write).with(file: file_path,
-                                                   content_type: content_type,
-                                                   acl: 'private')
+          content_type: content_type,
+          acl: 'private')
         adapter.put_file("src", file_path, content_type: content_type, private: true)
       end
     end
@@ -98,8 +104,8 @@ RSpec.describe MediaStorage::AwsAdapter do
     context "when opts[:private] is false" do
       it 'should call write with the content_type, file, and public-read acl' do
         expect(obj_double).to receive(:write).with(file: file_path,
-                                                   content_type: content_type,
-                                                   acl: 'public-read')
+          content_type: content_type,
+          acl: 'public-read')
         adapter.put_file("src", file_path, content_type: content_type, private: false)
       end
     end
@@ -107,9 +113,9 @@ RSpec.describe MediaStorage::AwsAdapter do
     context "when opts[:compressed] is true" do
       it 'should call write wtih the content_encoding set to gzip' do
         expect(obj_double).to receive(:write).with(file: file_path,
-                                                   content_type: content_type,
-                                                   acl: 'public-read',
-                                                   content_encoding: 'gzip')
+          content_type: content_type,
+          acl: 'public-read',
+          content_encoding: 'gzip')
         adapter.put_file("src", file_path, content_type: content_type, private: false, compressed: true)
       end
     end
