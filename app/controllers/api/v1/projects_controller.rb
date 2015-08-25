@@ -69,6 +69,10 @@ class Api::V1::ProjectsController < Api::ApiController
     create_export(:workflows)
   end
 
+  def create_workflow_contents_export
+    create_export(:workflow_contents)
+  end
+
   def create
     super { |project| TalkAdminCreateWorker.perform_async(project.id) }
   end

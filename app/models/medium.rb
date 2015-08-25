@@ -88,7 +88,7 @@ class Medium < ActiveRecord::Base
     case type
     when "project_aggregations_export"
         ALLOWED_AGGREGATION_EXPORT_CONTENT_TYPES
-    when /\Aproject_[a-z]+_export\z/i
+    when /\Aproject_[a-z_]+_export\z/i
       ALLOWED_EXPORT_CONTENT_TYPES
     else
       ALLOWED_UPLOAD_CONTENT_TYPES
