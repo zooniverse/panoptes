@@ -44,7 +44,7 @@ module MediaStorage
       if opts[:private]
         object(path).url_for(:read,
                              secure: true,
-                             expires_in: expires).to_s
+                             expires: expires).to_s
       else
         "https://#{path}"
       end
@@ -56,7 +56,7 @@ module MediaStorage
       object(path).url_for(:write,
                            secure: true,
                            content_type: content_type,
-                           expires_in: expires,
+                           expires: expires,
                            response_content_type: content_type,
                            acl: opts[:private] ? 'private' : 'public-read').to_s
     end
