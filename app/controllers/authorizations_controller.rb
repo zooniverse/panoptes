@@ -7,6 +7,10 @@ class AuthorizationsController < Doorkeeper::AuthorizationsController
 
   private
 
+  def skip_authorization?
+    client.first_party? || super
+  end
+
   def allowed_response_type
     allowed = client.allowed_authorizations.include?(params[:response_type])
     head :unprocessable_entity unless allowed
