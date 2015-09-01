@@ -41,6 +41,15 @@ describe AuthorizationsController, type: :controller do
     sign_in owner
   end
 
+  context "a grant from a first party application" do
+    let!(:app) { create(:first_party_app, owner: owner) }
+
+    it 'should skip authorization and redirect' do
+      get :new, token_params
+      expect(response).to redirect_to(/\A#{params[:redirect_uri]}?access_token/)
+    end
+  end
+
   context "an implicit grant by an insecure application" do
     let!(:app) { create(:application, owner: owner) }
     let(:req) { get :new, token_params }
