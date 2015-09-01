@@ -27,7 +27,7 @@ class ClassificationLifecycle
       create_recent
       update_seen_subjects
       publish_to_kafka
-      save_to_cassandra
+      save_to_cassandra unless Rails.env == 'production'
     end
   end
 
