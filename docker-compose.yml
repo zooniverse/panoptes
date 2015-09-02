@@ -3,6 +3,8 @@ postgres:
   environment:
     - "POSTGRES_USER=panoptes"
     - "POSTGRES_PASSWORD=panoptes"
+  ports:
+    - "5432:5432"
 
 zookeeper:
   image: zooniverse/zookeeper
@@ -21,6 +23,8 @@ kafka:
 
 cassandra:
   image: cassandra
+  ports:
+    - "9042:9042"
 
 panoptes:
   dockerfile: Dockerfile.dev
