@@ -55,6 +55,12 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
     it_behaves_like 'is indexable'
     it_behaves_like 'has many filterable', :workflows
+
+    it "is filterable by metadata" do
+      subject_set = create(:subject_set, metadata: { artist: "Edvard Munch"})
+      get :index, "metadata.artist" => "Edvard Munch"
+      expect(json_response["subject_sets"][0]["id"]).to eq(subject_set.id.to_s)
+    end
   end
 
   describe '#show' do
