@@ -19,12 +19,13 @@ class SubjectSelector
 
     if queue
       set_member_subject_ids = queue.next_subjects(subjects_page_size)
-      if set_member_subject_ids.blank?
-        selected_subjects(select_from_database, context)
+      ids_for_selection = if set_member_subject_ids.blank?
+        select_from_database
       else
         dequeue_subject(set_member_subject_ids)
-        selected_subjects(set_member_subject_ids, context)
+        set_member_subject_ids
       end
+      selected_subjects(ids_for_selection, context)
     else
       raise MissingSubjectQueue.new("No queue defined for user. Building one now, please try again.")
     end
