@@ -92,35 +92,12 @@ RSpec.describe SubjectSelector do
     describe "#dequeue/enqueue after selection" do
       let(:smses) { workflow.set_member_subjects }
       let(:sms_ids) { smses.map(&:id) }
-      let(:subject_queue) do
+      let!(:subject_queue) do
         create(:subject_queue,
                workflow: workflow,
                user: queue_owner,
                subject_set: nil,
                set_member_subjects: smses)
-      end
-
-      before(:each) { subject_queue }
-
-      context "when the user has a queue" do
-        let(:queue_owner) { user.user }
-
-        it 'should call dequeue_subject for the user' do
-          expect(SubjectQueue).to receive(:dequeue)
-            .with(workflow, array_including(sms_ids), user: user.user, set: nil)
-          subject.queued_subjects
-        end
-      end
-
-      context "when the queue has no user" do
-        let(:queue_owner) { nil }
-        let(:user) { ApiUser.new(nil) }
-
-        it 'should call dequeue_subject for the user' do
-          expect(SubjectQueue).to receive(:dequeue)
-            .with(workflow, array_including(sms_ids), user: nil, set: nil)
-          subject.queued_subjects
-        end
       end
 
       describe "user has or workflow is finished" do

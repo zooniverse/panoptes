@@ -19,12 +19,12 @@ class SubjectSelector
 
     if queue
       set_member_subject_ids = queue.next_subjects(subjects_page_size)
-      if set_member_subject_ids.blank?
-        selected_subjects(select_from_database, context)
+      selection_scope = if set_member_subject_ids.blank?
+        select_from_database
       else
-        dequeue_subject(set_member_subject_ids)
-        selected_subjects(set_member_subject_ids, context)
+        set_member_subject_ids
       end
+      selected_subjects(selection_scope, context)
     else
       raise MissingSubjectQueue.new("No queue defined for user. Building one now, please try again.")
     end
@@ -91,10 +91,5 @@ class SubjectSelector
       EnqueueSubjectQueueWorker.perform_async(workflow.id, queue_user.try(:id))
     end
     [queue, context]
-  end
-
-  def dequeue_subject(set_member_subject_ids)
-    SubjectQueue.dequeue(workflow, set_member_subject_ids, user: user.user,
-      set: params[:subject_set_id])
   end
 end
