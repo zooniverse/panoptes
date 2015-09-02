@@ -2,6 +2,7 @@ class SubjectSelector
   class MissingParameter < StandardError; end
   class MissingSubjectQueue < StandardError; end
   class MissingSubjectSet < StandardError; end
+  class EmptyDatabaseSelect < StandardError; end
 
   attr_reader :user, :params, :workflow
 
@@ -39,8 +40,10 @@ class SubjectSelector
   private
 
   def select_from_database
-    PostgresqlSelection.new(workflow, user.user)
+    sms_ids = PostgresqlSelection.new(workflow, user.user)
       .select(limit: 5, subject_set_id: params[:subject_set_id])
+    empty_database_select_error if sms_ids.blank?
+    sms_ids
   end
 
   def needs_set_id?
@@ -57,6 +60,11 @@ class SubjectSelector
 
   def missing_subject_set_error
     MissingSubjectSet.new("no subject set is associated with this workflow")
+  end
+
+  def empty_database_select_error
+    message = params[:subject_set_id] ? "for subject_set_id = #{params[:subject_set_id]}" : nil
+    raise EmptyDatabaseSelect.new("No data #{message} available for selection".squish)
   end
 
   def subjects_page_size
