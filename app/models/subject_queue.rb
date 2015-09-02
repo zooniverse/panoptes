@@ -17,8 +17,8 @@ class SubjectQueue < ActiveRecord::Base
 
   alias_method :subjects=, :set_member_subjects=
 
-  def self.by_set(set)
-    set ? where(subject_set_id: set) : all
+  def self.by_set(set_id)
+    set_id ? where(subject_set_id: set_id) : all
   end
 
   def self.by_user_workflow(user, workflow)
@@ -34,8 +34,8 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
-  def self.reload(workflow, sms_ids, user: nil, set: nil)
-    queue = by_set(set).by_user_workflow(user, workflow)
+  def self.reload(workflow, sms_ids, user: nil, set_id: nil)
+    queue = by_set(set_id).by_user_workflow(user, workflow)
     if queue.exists?
       queue.update_all(set_member_subject_ids: Array.wrap(sms_ids))
     else
@@ -43,9 +43,9 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
-  def self.enqueue(workflow, sms_ids, user: nil, set: nil)
+  def self.enqueue(workflow, sms_ids, user: nil, set_id: nil)
     return if sms_ids.blank?
-    queue = by_set(set).by_user_workflow(user, workflow)
+    queue = by_set(set_id).by_user_workflow(user, workflow)
     if queue.exists?
       enqueue_update(queue, sms_ids)
     else
@@ -53,9 +53,9 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
-  def self.dequeue(workflow, sms_ids, user: nil, set: nil)
+  def self.dequeue(workflow, sms_ids, user: nil, set_id: nil)
     return if sms_ids.blank?
-    queue = by_set(set).by_user_workflow(user, workflow)
+    queue = by_set(set_id).by_user_workflow(user, workflow)
     dequeue_update(queue, sms_ids)
   end
 
@@ -70,15 +70,15 @@ class SubjectQueue < ActiveRecord::Base
     dequeue_update(where(workflow: workflow), sms_id)
   end
 
-  def self.create_for_user(workflow, user, set: nil)
-    if logged_out_queue = by_set(set).find_by(workflow: workflow, user: nil)
+  def self.create_for_user(workflow, user, set_id: nil)
+    if logged_out_queue = by_set(set_id).find_by(workflow: workflow, user: nil)
       queue = create(workflow: workflow,
                      user: user,
-                     subject_set_id: set,
+                     subject_set_id: set_id,
                      set_member_subject_ids: logged_out_queue.set_member_subject_ids)
       queue if queue.persisted?
     else
-      EnqueueSubjectQueueWorker.perform_async(workflow.id, nil)
+      EnqueueSubjectQueueWorker.perform_async(workflow.id, nil, set_id)
       nil
     end
   end
