@@ -1,5 +1,6 @@
 class SubjectWorkflowCount < ActiveRecord::Base
   belongs_to :set_member_subject
+  belongs_to :subject
   belongs_to :workflow
 
   scope :retired, -> { where.not(retired_at: nil) }
@@ -8,12 +9,11 @@ class SubjectWorkflowCount < ActiveRecord::Base
   validates_uniqueness_of :set_member_subject_id, scope: :workflow_id
 
   def self.by_set(subject_set_id)
-    joins(:set_member_subject).where(set_member_subjects: {subject_set_id: subject_set_id})
+    joins(:subject => :set_member_subject).where(set_member_subjects: {subject_set_id: subject_set_id})
   end
 
   def self.by_subject_workflow(subject_id, workflow_id)
-    joins(:set_member_subject).where(set_member_subjects: {subject_id: subject_id},
-                                     workflow_id: workflow_id)
+    where(subject_id: subject_id, workflow_id: workflow_id)
   end
 
   def retire?

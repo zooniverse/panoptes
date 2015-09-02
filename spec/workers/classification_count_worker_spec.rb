@@ -25,7 +25,7 @@ RSpec.describe ClassificationCountWorker do
 
       context "when the count does not exist" do
         subject do
-          SubjectWorkflowCount.where(set_member_subject: sms,
+          SubjectWorkflowCount.where(subject_id: sms.subject_id,
                                      workflow_id: workflow_id).first
         end
 

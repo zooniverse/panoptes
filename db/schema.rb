@@ -243,8 +243,10 @@ ActiveRecord::Schema.define(version: 20150916162320) do
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
     t.datetime "retired_at"
+    t.integer  "subject_id",            null: false, index: {name: "index_subject_workflow_counts_on_subject_id"}
   end
   add_index "subject_workflow_counts", ["set_member_subject_id", "workflow_id"], name: "index_subject_workflow_counts_on_sms_id_and_workflow_id", unique: true
+  add_index "subject_workflow_counts", ["subject_id", "workflow_id"], name: "index_subject_workflow_counts_on_subject_id_and_workflow_id", unique: true
 
   create_table "subjects", force: :cascade do |t|
     t.string   "zooniverse_id",  index: {name: "index_subjects_on_zooniverse_id", unique: true}
@@ -392,6 +394,7 @@ ActiveRecord::Schema.define(version: 20150916162320) do
   add_foreign_key "subject_sets_workflows", "subject_sets"
   add_foreign_key "subject_sets_workflows", "workflows"
   add_foreign_key "subject_workflow_counts", "set_member_subjects"
+  add_foreign_key "subject_workflow_counts", "subjects"
   add_foreign_key "subject_workflow_counts", "workflows"
   add_foreign_key "tagged_resources", "tags"
 end
