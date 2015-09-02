@@ -92,7 +92,8 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     end
 
     it 'should email the users in the recipients hash' do
-      expect(mailer_class).to receive(:perform_async).with(anything, anything, receivers.map(&:email))
+      expect(mailer_class).to receive(:perform_async)
+        .with(anything, anything, array_including(receivers.map(&:email)))
       worker.perform(project.id, medium.id)
     end
   end

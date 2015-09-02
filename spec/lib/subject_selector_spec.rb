@@ -77,6 +77,16 @@ RSpec.describe SubjectSelector do
         subjects, _ = subject.queued_subjects
         expect(subjects.length).to eq(5)
       end
+
+      context "when the database selection returns an empty set" do
+
+        it 'should raise the an error when ordering by an empty set' do
+          allow_any_instance_of(PostgresqlSelection).to receive(:select).and_return([])
+          subject_queue
+          message = "No data available for selection"
+          expect { subject.queued_subjects }.to raise_error(SubjectSelector::EmptyDatabaseSelect, message)
+        end
+      end
     end
 
     describe "#dequeue/enqueue after selection" do
