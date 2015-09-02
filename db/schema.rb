@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150817145756) do
+ActiveRecord::Schema.define(version: 20150902000226) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -203,7 +203,7 @@ ActiveRecord::Schema.define(version: 20150817145756) do
     t.integer  "subject_id",     index: {name: "index_set_member_subjects_on_subject_id"}
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.decimal  "priority"
+    t.decimal  "priority",       index: {name: "index_set_member_subjects_on_priority"}
     t.integer  "lock_version",   default: 0
     t.decimal  "random",         null: false, index: {name: "index_set_member_subjects_on_random"}
   end
