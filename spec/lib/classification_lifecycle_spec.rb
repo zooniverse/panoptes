@@ -26,11 +26,34 @@ describe ClassificationLifecycle do
   end
 
   describe "#dequeue_subjects" do
+
     it 'should dequeue the subjects' do
       subject_queue
       subject.dequeue_subjects
       subject_queue.reload
       expect(subject_queue.set_member_subject_ids).to_not include(*sms_ids)
+    end
+
+    context "complete classification" do
+      let(:classification) { create(:classification, completed: true) }
+
+      it 'should call dequeue_subject_for_user' do
+        expect(SubjectQueue).to receive(:dequeue)
+          .with(classification.workflow,
+                array_including(sms_ids),
+                user: classification.user,
+                set: nil)
+        subject.dequeue_subjects
+      end
+    end
+
+    context "incomplete classification" do
+      let(:classification) { create(:classification, completed: false) }
+
+      it 'should call dequeue when incomplete' do
+        expect(SubjectQueue).to receive(:dequeue)
+        subject.dequeue_subjects
+      end
     end
   end
 

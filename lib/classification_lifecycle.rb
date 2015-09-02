@@ -41,9 +41,9 @@ class ClassificationLifecycle
   end
 
   def dequeue_subjects
-    sms = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id).pluck(:id, :subject_set_id)
-    sms_ids = sms.map(&:first)
-    set_id = workflow.grouped ? sms.map { |s| s[1] }.first : nil
+    sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
+    sms_ids = sms_scope.pluck(:id)
+    set_id = workflow.grouped ? sms_scope.first.subject_set_id : nil
     SubjectQueue.dequeue(workflow, sms_ids, user: user, set: set_id)
   end
 
