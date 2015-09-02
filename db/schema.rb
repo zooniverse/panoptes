@@ -225,7 +225,7 @@ ActiveRecord::Schema.define(version: 20150902000226) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "set_member_subjects_count", default: 0,  null: false
-    t.jsonb    "metadata",                  default: {}
+    t.jsonb    "metadata",                  default: {}, index: {name: "index_subject_sets_on_metadata", using: :gin}
     t.integer  "lock_version",              default: 0
     t.boolean  "expert_set"
   end
