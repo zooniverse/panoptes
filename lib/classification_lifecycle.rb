@@ -44,7 +44,7 @@ class ClassificationLifecycle
     sms = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id).pluck(:id, :subject_set_id)
     sms_ids = sms.map(&:first)
     set_id = workflow.grouped ? sms.map { |s| s[1] }.first : nil
-    SubjectQueue.dequeue(workflow, sms_ids, user: user, set: set_id)
+    SubjectQueue.dequeue(workflow, sms_ids, user: user, set_id: set_id)
   end
 
   def update_seen_subjects

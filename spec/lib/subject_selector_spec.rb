@@ -35,7 +35,7 @@ RSpec.describe SubjectSelector do
       it 'should create a new queue from the logged out queue' do
         subject_queue
         expect(SubjectQueue).to receive(:create_for_user)
-          .with(workflow, user.user, set: nil).and_call_original
+          .with(workflow, user.user, set_id: nil).and_call_original
         subject.queued_subjects
       end
 
@@ -97,7 +97,7 @@ RSpec.describe SubjectSelector do
 
         it 'should call dequeue_subject for the user' do
           expect(SubjectQueue).to receive(:dequeue)
-            .with(workflow, array_including(sms_ids), user: user.user, set: nil)
+            .with(workflow, array_including(sms_ids), user: user.user, set_id: nil)
           subject.queued_subjects
         end
       end
@@ -108,7 +108,7 @@ RSpec.describe SubjectSelector do
 
         it 'should call dequeue_subject for the user' do
           expect(SubjectQueue).to receive(:dequeue)
-            .with(workflow, array_including(sms_ids), user: nil, set: nil)
+            .with(workflow, array_including(sms_ids), user: nil, set_id: nil)
           subject.queued_subjects
         end
       end
@@ -121,14 +121,14 @@ RSpec.describe SubjectSelector do
 
         shared_examples "enqueues for the logged out user" do
           it 'should enqueue for logged out user' do
-            expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil)
+            expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil, nil)
             subject.queued_subjects
           end
         end
 
         shared_examples "creates for the logged out user" do
           it 'should create for logged out user' do
-            expect(SubjectQueue).to receive(:create_for_user).with(workflow, nil, set: nil)
+            expect(SubjectQueue).to receive(:create_for_user).with(workflow, nil, set_id: nil)
             #non-logged in queue won't exist
             expect { subject.queued_subjects }.to raise_error(SubjectSelector::MissingSubjectQueue)
           end

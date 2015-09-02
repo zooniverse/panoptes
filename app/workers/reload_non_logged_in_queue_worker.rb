@@ -22,6 +22,6 @@ class ReloadNonLoggedInQueueWorker
       .select(limit: SubjectQueue::DEFAULT_LENGTH, subject_set_id: set)
       .compact
 
-    SubjectQueue.reload(workflow, subjects, set: set)
+    SubjectQueue.reload(workflow, subjects, set_id: set)
   end
 end
