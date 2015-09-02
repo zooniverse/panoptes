@@ -44,7 +44,7 @@ RSpec.describe SubjectQueue, type: :model do
     context "when no logged out queue" do
 
       it 'should attempt to build a logged out queue' do
-        expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil)
+        expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil, nil)
         SubjectQueue.create_for_user(workflow, user)
       end
 
@@ -100,7 +100,7 @@ RSpec.describe SubjectQueue, type: :model do
         end
 
         before(:each) do
-          SubjectQueue.reload(workflow, smses, set: subject_set.id)
+          SubjectQueue.reload(workflow, smses, set_id: subject_set.id)
           queue.reload
           not_updated_queue.reload
         end
@@ -116,7 +116,7 @@ RSpec.describe SubjectQueue, type: :model do
 
       context "when no queue exists" do
         before(:each) do
-          SubjectQueue.reload(workflow, smses, set: subject_set.id)
+          SubjectQueue.reload(workflow, smses, set_id: subject_set.id)
         end
 
         subject { SubjectQueue.find_by(workflow: workflow, subject_set: subject_set) }
