@@ -97,7 +97,7 @@ RSpec.describe SubjectSelector do
 
         it 'should call dequeue_subject for the user' do
           expect(SubjectQueue).to receive(:dequeue)
-            .with(workflow, array_including(sms_ids), user: user.user)
+            .with(workflow, array_including(sms_ids), user: user.user, set: nil)
           subject.queued_subjects
         end
       end
@@ -108,7 +108,7 @@ RSpec.describe SubjectSelector do
 
         it 'should call dequeue_subject for the user' do
           expect(SubjectQueue).to receive(:dequeue)
-            .with(workflow, array_including(sms_ids), user: nil)
+            .with(workflow, array_including(sms_ids), user: nil, set: nil)
           subject.queued_subjects
         end
       end

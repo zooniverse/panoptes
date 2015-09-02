@@ -86,6 +86,7 @@ class SubjectSelector
   end
 
   def dequeue_subject(set_member_subject_ids)
-    SubjectQueue.dequeue(workflow, set_member_subject_ids, user: user.user)
+    SubjectQueue.dequeue(workflow, set_member_subject_ids, user: user.user,
+      set: params[:subject_set_id])
   end
 end
