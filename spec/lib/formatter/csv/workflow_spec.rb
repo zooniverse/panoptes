@@ -29,7 +29,7 @@ RSpec.describe Formatter::Csv::Workflow do
 
   describe "::workflow_headers" do
     it 'should contain the required headers' do
-      expect(described_class.workflow_headers).to match_array(header)
+      expect(described_class.headers).to match_array(header)
     end
   end
 

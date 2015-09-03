@@ -5,7 +5,7 @@ module Formatter
 
       delegate :subject_id, :subject_set_id, to: :sms
 
-      def self.project_headers
+      def self.headers
         %w(subject_id project_id workflow_ids subject_set_id metadata locations classifications_by_workflow retired_in_workflow)
       end
 
@@ -15,7 +15,7 @@ module Formatter
 
       def to_array(sms)
         @sms = sms
-        self.class.project_headers.map do |header|
+        self.class.headers.map do |header|
           send(header)
         end
       end

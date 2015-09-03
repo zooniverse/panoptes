@@ -12,7 +12,7 @@ class ClassificationsDumpWorker
       begin
         csv_formatter = Formatter::Csv::Classification.new(project, obfuscate_private_details: obfuscate_private_details)
         CSV.open(csv_file_path, 'wb') do |csv|
-          csv << Formatter::Csv::Classification.project_headers
+          csv << csv_formatter.class.headers
           completed_project_classifications.find_each do |classification|
             csv << csv_formatter.to_array(classification)
           end

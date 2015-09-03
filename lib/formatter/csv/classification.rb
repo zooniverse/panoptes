@@ -6,7 +6,7 @@ module Formatter
       delegate :workflow, :workflow_id, :created_at, :gold_standard,
         :workflow_version, to: :classification
 
-      def self.project_headers
+      def self.headers
         %w( user_name user_ip workflow_id workflow_name workflow_version
             created_at gold_standard expert metadata annotations subject_data )
       end
@@ -19,7 +19,7 @@ module Formatter
 
       def to_array(classification)
         @classification = classification
-        self.class.project_headers.map do |attribute|
+        self.class.headers.map do |attribute|
           send(attribute)
         end
       end
