@@ -37,11 +37,12 @@ class PostgresqlSelection
   end
 
   def sample(query=available)
-    query.where('"set_member_subjects"."random" BETWEEN random() AND random()')
+    direction = [ :asc, :desc ].sample
+    query.order("RANDOM() #{direction}")
   end
 
   def limit
-    opts.fetch(:limit, 20).to_i
+    @limit ||= opts.fetch(:limit, 20).to_i
   end
 
   def selection_strategy
@@ -55,7 +56,7 @@ class PostgresqlSelection
   def select_results_randomly
     enough_available = limit < available_count
     if enough_available
-      construct_random_sample_to_limit
+      sample.limit(limit).pluck(:id)
     else
       available.pluck(:id).shuffle
     end
@@ -63,16 +64,5 @@ class PostgresqlSelection
 
   def select_results_in_order
     available.limit(limit).pluck(:id)
-  end
-
-  def construct_random_sample_to_limit
-    results = []
-    attempt = 0
-    until results.length >= limit do
-      results = results | sample.limit(limit).pluck(:id)
-      attempt += 1
-      break if attempt >= MAX_RANDOM_SAMPLE_ATTEMPTS
-    end
-    results
   end
 end
