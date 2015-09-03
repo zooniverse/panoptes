@@ -41,7 +41,7 @@ RSpec.describe Formatter::Csv::Classification do
 
   describe "::project_headers?" do
     it 'should be have the expected headers' do
-      expect(formatter.class.project_headers).to match_array(project_headers)
+      expect(formatter.class.headers).to match_array(project_headers)
     end
   end
 

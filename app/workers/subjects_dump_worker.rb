@@ -12,7 +12,7 @@ class SubjectsDumpWorker
       begin
         csv_formatter = Formatter::Csv::Subject.new(project)
         CSV.open(csv_file_path, 'wb') do |csv|
-          csv << Formatter::Csv::Subject.project_headers
+          csv << csv_formatter.class.headers
           project_subjects.find_each do |subject|
             csv << csv_formatter.to_array(subject)
           end
