@@ -89,7 +89,7 @@ RSpec.describe SubjectSelector do
       end
     end
 
-    describe "#dequeue/enqueue after selection" do
+    describe "#dequeue after selection" do
       let(:smses) { workflow.set_member_subjects }
       let(:sms_ids) { smses.map(&:id) }
       let(:subject_queue) do
@@ -129,13 +129,6 @@ RSpec.describe SubjectSelector do
           subject_queue
         end
 
-        shared_examples "enqueues for the logged out user" do
-          it 'should enqueue for logged out user' do
-            expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil, nil)
-            subject.queued_subjects
-          end
-        end
-
         shared_examples "creates for the logged out user" do
           it 'should create for logged out user' do
             expect(SubjectQueue).to receive(:create_for_user).with(workflow, nil, set_id: nil)
@@ -149,8 +142,6 @@ RSpec.describe SubjectSelector do
             allow_any_instance_of(Workflow).to receive(:finished?).and_return(true)
           end
 
-          it_behaves_like "enqueues for the logged out user"
-
           context "when the logged_out queue doesn't exist" do
             let(:queue_owner) { user.user }
 
@@ -162,8 +153,6 @@ RSpec.describe SubjectSelector do
           before(:each) do
             allow_any_instance_of(User).to receive(:has_finished?).and_return(true)
           end
-
-          it_behaves_like "enqueues for the logged out user"
 
           context "when the logged_out queue doesn't exist" do
             let(:queue_owner) { user.user }

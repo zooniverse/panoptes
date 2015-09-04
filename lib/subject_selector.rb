@@ -35,9 +35,6 @@ class SubjectSelector
       select_from_database
     else
       dequeue_subject(set_member_subject_ids)
-      if queue.below_minimum?
-        EnqueueSubjectQueueWorker.perform_async(workflow.id, queue_user.try(:id), params[:subject_set_id])
-      end
       set_member_subject_ids
     end
   end
