@@ -1,8 +1,6 @@
 class PostgresqlSelection
   attr_reader :workflow, :user, :opts
 
-  MAX_RANDOM_SAMPLE_ATTEMPTS = 100
-
   def initialize(workflow, user=nil)
     @workflow, @user = workflow, user
   end
