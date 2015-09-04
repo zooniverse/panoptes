@@ -26,6 +26,8 @@ class ClassificationLifecycle
 
       create_recent
       update_seen_subjects
+      #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
+      refresh_queue
       publish_to_kafka
       save_to_cassandra unless Rails.env == 'production'
     end
@@ -43,6 +45,14 @@ class ClassificationLifecycle
   def update_seen_subjects
     if should_update_seen? && subjects_are_unseen_by_user?
       UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
+    end
+  end
+
+  def refresh_queue
+    subjects_workflow_subject_sets.each do |set_id|
+      if below_threshold_queue?(set_id)
+        EnqueueSubjectQueueWorker.perform_async(workflow.id, user.try(:id), set_id)
+      end
     end
   end
 
@@ -141,5 +151,22 @@ class ClassificationLifecycle
   def update_classification_metadata(key, value)
     updated_metadata = classification.metadata.merge(key => value)
     classification.metadata = updated_metadata
+  end
+
+  def subjects_workflow_subject_sets
+    if workflow.grouped
+      smses = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
+      smses.map(&:subject_set_id).uniq
+    else
+      [nil]
+    end
+  end
+
+  def below_threshold_queue?(set_id)
+    if subject_queue = SubjectQueue.by_set(set_id).find_by(user: user, workflow: workflow)
+      subject_queue.below_minimum?
+    else
+      false
+    end
   end
 end
