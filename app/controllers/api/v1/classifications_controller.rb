@@ -52,9 +52,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def lifecycle(action, classification)
-    lifecycle = ClassificationLifecycle.new(classification)
-    lifecycle.dequeue_subjects
-    lifecycle.queue(action)
+    ClassificationLifecycle.new(classification).queue(action)
   end
 
   def completed_error

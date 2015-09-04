@@ -25,38 +25,6 @@ describe ClassificationLifecycle do
     allow(MultiKafkaProducer).to receive(:publish)
   end
 
-  describe "#dequeue_subjects" do
-
-    it 'should dequeue the subjects' do
-      subject_queue
-      subject.dequeue_subjects
-      subject_queue.reload
-      expect(subject_queue.set_member_subject_ids).to_not include(*sms_ids)
-    end
-
-    context "complete classification" do
-      let(:classification) { create(:classification, completed: true) }
-
-      it 'should call dequeue_subject_for_user' do
-        expect(SubjectQueue).to receive(:dequeue)
-          .with(classification.workflow,
-                array_including(sms_ids),
-                user: classification.user,
-                set_id: nil)
-        subject.dequeue_subjects
-      end
-    end
-
-    context "incomplete classification" do
-      let(:classification) { create(:classification, completed: false) }
-
-      it 'should call dequeue when incomplete' do
-        expect(SubjectQueue).to receive(:dequeue)
-        subject.dequeue_subjects
-      end
-    end
-  end
-
   describe "#queue" do
 
     context "with create action" do
@@ -161,6 +129,10 @@ describe ClassificationLifecycle do
           expect(subject).to receive(:update_seen_subjects)
         end
 
+        it "should call the #refresh_queue" do
+          expect(subject).to receive(:refresh_queue)
+        end
+
         it "should call the #publish_to_kafka" do
           expect(subject).to receive(:publish_to_kafka)
         end
@@ -208,6 +180,10 @@ describe ClassificationLifecycle do
 
         it "should call the #update_seen_subjects" do
           expect(subject).to receive(:update_seen_subjects)
+        end
+
+        it "should call the #refresh_queue" do
+          expect(subject).to receive(:refresh_queue)
         end
 
         it "should call the #publish_to_kafka method" do
@@ -267,6 +243,13 @@ describe ClassificationLifecycle do
       it 'should not call #update_seen_subjects' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:update_seen_subjects)
+          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
+      it 'should not call #refresh_queue' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:refresh_queue)
           expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
@@ -397,6 +380,69 @@ describe ClassificationLifecycle do
       let(:classification) { build(:classification, user: nil) }
       it 'should do nothing' do
         expect(UserSeenSubject).to_not receive(:add_seen_subject_for_user)
+      end
+    end
+  end
+
+  describe "#refresh_queue" do
+    let(:workflow_id) { classification.workflow_id }
+    let(:user_id) { classification.user_id }
+
+    after(:each) { subject.refresh_queue }
+
+    context "when no queue exists" do
+
+      it "should not call Enqueue worker" do
+        expect(EnqueueSubjectQueueWorker).to_not receive(:perform_async)
+      end
+    end
+
+    context "when a queue exists" do
+
+      before(:each) { subject_queue }
+
+      context "when queue is not below min" do
+
+        it "should not call Enqueue worker" do
+          allow(subject).to receive(:below_threshold_queue?).and_return(false)
+          expect(EnqueueSubjectQueueWorker).to_not receive(:perform_async)
+        end
+      end
+
+      context "when queue is below min" do
+
+        it "should call Enqueue worker" do
+          allow(subject).to receive(:below_threshold_queue?).and_return(true)
+          expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
+            .with(workflow_id, user_id, nil)
+        end
+      end
+
+      context "when workflow is grouped and the set queue is below min" do
+
+        it "should call Enqueue worker with the subject sets" do
+          smses = SetMemberSubject.where(subject_id: classification.subject_ids.first)
+          allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
+          allow(SetMemberSubject).to receive(:by_subject_workflow).and_return(smses)
+          allow(subject).to receive(:below_threshold_queue?).and_return(true)
+          smses.each do |sms|
+            expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
+              .with(workflow_id, user_id, sms.subject_set_id)
+            end
+        end
+      end
+
+      context "when subject belongs to many sets" do
+        let(:set_ids) { [1,2,3] }
+
+        it "should call Enqueue worker for each set below min" do
+          allow(subject).to receive(:subjects_workflow_subject_sets).and_return(set_ids)
+          allow(subject).to receive(:below_threshold_queue?).and_return(true)
+          set_ids.each do |set_id|
+            expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
+              .with(workflow_id, user_id, set_id)
+          end
+        end
       end
     end
   end

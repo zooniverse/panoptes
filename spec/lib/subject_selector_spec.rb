@@ -89,7 +89,7 @@ RSpec.describe SubjectSelector do
       end
     end
 
-    describe "#dequeue/enqueue after selection" do
+    describe "#dequeue after selection" do
       let(:smses) { workflow.set_member_subjects }
       let(:sms_ids) { smses.map(&:id) }
       let(:subject_queue) do
@@ -106,8 +106,8 @@ RSpec.describe SubjectSelector do
         let(:queue_owner) { user.user }
 
         it 'should call dequeue_subject for the user' do
-          expect(SubjectQueue).to receive(:dequeue)
-            .with(workflow, array_including(sms_ids), user: user.user, set_id: nil)
+          expect(DequeueSubjectQueueWorker).to receive(:perform_async)
+            .with(workflow.id, array_including(sms_ids), queue_owner.id, nil)
           subject.queued_subjects
         end
       end
@@ -117,8 +117,8 @@ RSpec.describe SubjectSelector do
         let(:user) { ApiUser.new(nil) }
 
         it 'should call dequeue_subject for the user' do
-          expect(SubjectQueue).to receive(:dequeue)
-            .with(workflow, array_including(sms_ids), user: nil, set_id: nil)
+          expect(DequeueSubjectQueueWorker).to receive(:perform_async)
+            .with(workflow.id, array_including(sms_ids), nil, nil)
           subject.queued_subjects
         end
       end
@@ -127,13 +127,6 @@ RSpec.describe SubjectSelector do
         let(:queue_owner) { nil }
         before(:each) do
           subject_queue
-        end
-
-        shared_examples "enqueues for the logged out user" do
-          it 'should enqueue for logged out user' do
-            expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil, nil)
-            subject.queued_subjects
-          end
         end
 
         shared_examples "creates for the logged out user" do
@@ -149,8 +142,6 @@ RSpec.describe SubjectSelector do
             allow_any_instance_of(Workflow).to receive(:finished?).and_return(true)
           end
 
-          it_behaves_like "enqueues for the logged out user"
-
           context "when the logged_out queue doesn't exist" do
             let(:queue_owner) { user.user }
 
@@ -162,8 +153,6 @@ RSpec.describe SubjectSelector do
           before(:each) do
             allow_any_instance_of(User).to receive(:has_finished?).and_return(true)
           end
-
-          it_behaves_like "enqueues for the logged out user"
 
           context "when the logged_out queue doesn't exist" do
             let(:queue_owner) { user.user }
