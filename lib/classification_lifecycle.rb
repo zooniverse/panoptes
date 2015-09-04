@@ -40,13 +40,6 @@ class ClassificationLifecycle
       end
   end
 
-  def dequeue_subjects
-    sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
-    sms_ids = sms_scope.pluck(:id)
-    set_id = workflow.grouped ? sms_scope.first.subject_set_id : nil
-    SubjectQueue.dequeue(workflow, sms_ids, user: user, set_id: set_id)
-  end
-
   def update_seen_subjects
     if should_update_seen? && subjects_are_unseen_by_user?
       UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
