@@ -102,21 +102,6 @@ describe Api::V1::SubjectsController, type: :controller do
               end
             end
           end
-
-          context 'when the queue is below minimum' do
-            it 'should reload the queue' do
-              expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil, nil)
-              get :index, request_params
-            end
-          end
-
-          context 'when the queue is not below minimum)' do
-            let(:sms) { create_list(:set_member_subject, 21) }
-            it 'should reload the queue' do
-              expect(EnqueueSubjectQueueWorker).to_not receive(:perform_async)
-              get :index, request_params
-            end
-          end
         end
       end
     end
@@ -177,21 +162,6 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           it_behaves_like "an api response"
-
-          context 'when the queue is below minimum' do
-            it 'should reload the queue' do
-              expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(workflow.id, user.id, nil)
-              get :index, request_params
-            end
-          end
-
-          context 'when the queue is not below minimum)' do
-            let(:sms) { create_list(:set_member_subject, 21) }
-            it 'should reload the queue' do
-              expect(EnqueueSubjectQueueWorker).to_not receive(:perform_async)
-              get :index, request_params
-            end
-          end
         end
 
         context "user has classified all subjects in the workflow" do
