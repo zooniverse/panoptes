@@ -34,7 +34,7 @@ class SubjectSelector
     if set_member_subject_ids.blank?
       select_from_database
     else
-      dequeue_subject(set_member_subject_ids)
+      DequeueSubjectQueueWorker.perform_async(workflow.id, set_member_subject_ids, queue_user.try(:id), params[:subject_set_id])
       set_member_subject_ids
     end
   end
@@ -94,10 +94,5 @@ class SubjectSelector
       .find_by(user: queue_user, workflow: workflow)
     return queue if queue
     SubjectQueue.create_for_user(workflow, queue_user, set_id: params[:subject_set_id])
-  end
-
-  def dequeue_subject(set_member_subject_ids)
-    SubjectQueue.dequeue(workflow, set_member_subject_ids, user: user.user,
-      set_id: params[:subject_set_id])
   end
 end

@@ -106,8 +106,8 @@ RSpec.describe SubjectSelector do
         let(:queue_owner) { user.user }
 
         it 'should call dequeue_subject for the user' do
-          expect(SubjectQueue).to receive(:dequeue)
-            .with(workflow, array_including(sms_ids), user: user.user, set_id: nil)
+          expect(DequeueSubjectQueueWorker).to receive(:perform_async)
+            .with(workflow.id, array_including(sms_ids), queue_owner.id, nil)
           subject.queued_subjects
         end
       end
@@ -117,8 +117,8 @@ RSpec.describe SubjectSelector do
         let(:user) { ApiUser.new(nil) }
 
         it 'should call dequeue_subject for the user' do
-          expect(SubjectQueue).to receive(:dequeue)
-            .with(workflow, array_including(sms_ids), user: nil, set_id: nil)
+          expect(DequeueSubjectQueueWorker).to receive(:perform_async)
+            .with(workflow.id, array_including(sms_ids), nil, nil)
           subject.queued_subjects
         end
       end
