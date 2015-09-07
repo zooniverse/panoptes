@@ -42,20 +42,42 @@ RSpec.describe ReloadNonLoggedInQueueWorker do
         expect(queue.set_member_subject_ids).to match_array(subject_ids)
       end
 
-      context "with a grouped queue" do
+      context "grouped / non-grouped workflows and queues" do
         let!(:queue) do
           create(:subject_queue,
                  workflow: workflow,
                  user: nil,
-                 subject_set: subject_set,
+                 subject_set: queue_subject_set,
                  set_member_subject_ids: [os])
         end
 
-        it "should update the queue's sms ids" do
-          aggregate_failures("by set lookup") do
-            expect(SubjectQueue).to receive(:by_set).with(subject_set.id).and_call_original
-            subject.perform(workflow.id, subject_set.id)
-            expect(queue.reload.set_member_subject_ids).to match_array(subject_ids)
+        before(:each) do
+          allow_any_instance_of(Workflow).to receive(:grouped).and_return(grouped)
+        end
+
+        context "when the workflow is not grouped" do
+          let(:queue_subject_set) { nil }
+          let(:grouped) { false }
+
+          it "should reload the queue without a subject set" do
+            aggregate_failures("by set lookup") do
+              expect(SubjectQueue).to receive(:by_set).with(nil).and_call_original
+              subject.perform(workflow.id, subject_set.id)
+              expect(queue.reload.set_member_subject_ids).to match_array(subject_ids)
+            end
+          end
+        end
+
+        context "when the workflow is grouped" do
+          let(:queue_subject_set) { subject_set }
+          let(:grouped) { true }
+
+          it "should reload the queue with a subject set" do
+            aggregate_failures("by set lookup") do
+              expect(SubjectQueue).to receive(:by_set).with(subject_set.id).and_call_original
+              subject.perform(workflow.id, subject_set.id)
+              expect(queue.reload.set_member_subject_ids).to match_array(subject_ids)
+            end
           end
         end
       end
