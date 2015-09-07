@@ -62,12 +62,6 @@ class SetMemberSubject < ActiveRecord::Base
     retired_workflows.pluck(:id)
   end
 
-  def retire_associated_subject_workflow_counts
-    # retired_subject_workflow_counts.each(&:retire!)
-    # subject_workflow_counts.reset
-    # workflows.reset
-  end
-
   def retired_workflows=(workflows_to_retire)
     workflows_to_retire.each do |workflow|
       workflow.retire_subject(subject)
