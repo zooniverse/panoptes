@@ -6,8 +6,8 @@ RSpec.describe SubjectWorkflowCount, type: :model do
     expect(build(:subject_workflow_count)).to be_valid
   end
 
-  it 'should not be valid without a set_member_subject' do
-    swc = build(:subject_workflow_count, set_member_subject: nil, link_subject_sets: false)
+  it 'should not be valid without a subject' do
+    swc = build(:subject_workflow_count, subject: nil, link_subject_sets: false)
     expect(swc).to_not be_valid
   end
 
@@ -33,12 +33,6 @@ RSpec.describe SubjectWorkflowCount, type: :model do
       count.retire!
       count.reload
       expect(count.retired?).to be_truthy
-    end
-
-    it 'should add the workflow the set_member_subjects retired list' do
-      count.retire!
-      count.reload
-      expect(count.set_member_subject.retired_workflows).to include(count.workflow)
     end
 
     it 'should increment the workflow retired subjects counter' do

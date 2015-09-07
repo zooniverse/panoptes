@@ -2,9 +2,9 @@ require 'spec_helper'
 
 RSpec.describe RetirementWorker do
   let(:worker) { described_class.new }
-  let(:count) { create(:subject_workflow_count) }
-  let(:sms) { count.set_member_subject }
-  let(:workflow) { count.workflow }
+  let(:sms) { create :set_member_subject }
+  let(:workflow) { create :workflow, subject_sets: [sms.subject_set] }
+  let(:count) { create(:subject_workflow_count, subject: sms.subject, workflow: workflow) }
   let!(:queue) { create(:subject_queue, workflow: workflow, set_member_subject_ids: [sms.id]) }
 
   describe "#perform" do
@@ -43,8 +43,6 @@ RSpec.describe RetirementWorker do
   end
 
   describe "#deactive_workflow!" do
-    let(:workflow) { count.workflow }
-
     context "workflow is finsihed" do
       it 'should set workflow.active to false' do
         allow(workflow).to receive(:finished?).and_return(true)

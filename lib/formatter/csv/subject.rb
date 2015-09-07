@@ -49,7 +49,7 @@ module Formatter
 
       def classifications_by_workflow
         sms.subject_set.workflows.map do |workflow|
-          count = SubjectWorkflowCount.by_subject_workflow(self.id, workflow.id)
+          count = SubjectWorkflowCount.by_subject_workflow(subject_id, workflow.id)
             .try(:classifications_count) || 0
           {workflow.id => count}
         end.reduce(&:merge).to_json

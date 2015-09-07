@@ -66,9 +66,10 @@ class SubjectQueue < ActiveRecord::Base
     enqueue_update(where(workflow: workflow), sms_ids)
   end
 
-  def self.dequeue_for_all(workflow, sms_id)
-    return if sms_id.blank?
-    dequeue_update(where(workflow: workflow), sms_id)
+  def self.dequeue_for_all(workflow, sms_ids)
+    return if sms_ids.blank?
+    sms_ids = Array.wrap(sms_ids)
+    dequeue_update(where(workflow: workflow), sms_ids)
   end
 
   def self.create_for_user(workflow, user, set_id: nil)

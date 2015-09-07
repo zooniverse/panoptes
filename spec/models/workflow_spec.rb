@@ -151,12 +151,12 @@ describe Workflow, :type => :model do
 
     context 'when the subject has a workflow count' do
       it 'marks as retired' do
-        create(:subject_workflow_count, set_member_subject: subject.set_member_subjects.first, workflow: workflow)
+        create(:subject_workflow_count, subject: subject, workflow: workflow)
         workflow.retire_subject(subject.id)
 
         aggregate_failures do
           expect(subject.retired_for_workflow?(workflow)).to be_truthy
-          expect(SubjectWorkflowCount.retired.count).to eq(2)
+          expect(SubjectWorkflowCount.retired.count).to eq(1)
         end
       end
     end
@@ -167,7 +167,7 @@ describe Workflow, :type => :model do
 
         aggregate_failures do
           expect(subject.retired_for_workflow?(workflow)).to be_truthy
-          expect(SubjectWorkflowCount.retired.count).to eq(2)
+          expect(SubjectWorkflowCount.retired.count).to eq(1)
         end
       end
     end
@@ -181,7 +181,7 @@ describe Workflow, :type => :model do
 
         aggregate_failures do
           expect(subject.retired_for_workflow?(workflow)).to be_truthy
-          expect(SubjectWorkflowCount.retired.count).to eq(2)
+          expect(SubjectWorkflowCount.retired.count).to eq(1)
           expect(SubjectWorkflowCount.order(:id).pluck(:retired_at)).to eq(retired_ats)
         end
       end

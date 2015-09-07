@@ -4,9 +4,10 @@ class SetMemberSubject < ActiveRecord::Base
 
   belongs_to :subject_set, counter_cache: true, touch: true
   belongs_to :subject
-  has_many :subject_workflow_counts, dependent: :destroy
   has_many :workflows, through: :subject_set
-  has_many :retired_subject_workflow_counts, -> { retired }, class_name: 'SubjectWorkflowCount'
+
+  has_many :subject_workflow_counts, through: :subject
+  has_many :retired_subject_workflow_counts, -> { retired }, through: :subject, class_name: 'SubjectWorkflowCount', source: 'subject_workflow_counts'
   has_many :retired_workflows, through: :retired_subject_workflow_counts, source: :workflow
 
   validates_presence_of :subject_set, :subject
@@ -42,7 +43,7 @@ class SetMemberSubject < ActiveRecord::Base
 
   def self.non_retired_for_workflow(workflow)
     by_workflow(workflow)
-    .joins("LEFT OUTER JOIN subject_workflow_counts ON subject_workflow_counts.set_member_subject_id = set_member_subjects.id")
+    .joins("LEFT OUTER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id")
     .where('subject_workflow_counts.id IS NULL OR subject_workflow_counts.retired_at IS NULL')
   end
 
@@ -53,7 +54,7 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def retire_workflow(workflow)
-    count = subject_workflow_counts.find_or_create_by!(workflow_id: workflow.id)
+    count = SubjectWorkflowCount.find_or_create_by!(workflow_id: workflow.id, subject_id: subject_id)
     count.retire!
   end
 
@@ -62,9 +63,15 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def retire_associated_subject_workflow_counts
-    retired_subject_workflow_counts.each(&:retire!)
-    subject_workflow_counts.reset
-    workflows.reset
+    # retired_subject_workflow_counts.each(&:retire!)
+    # subject_workflow_counts.reset
+    # workflows.reset
+  end
+
+  def retired_workflows=(workflows_to_retire)
+    workflows_to_retire.each do |workflow|
+      workflow.retire_subject(subject)
+    end
   end
 
   def remove_from_queues

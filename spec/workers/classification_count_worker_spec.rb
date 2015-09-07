@@ -12,7 +12,7 @@ RSpec.describe ClassificationCountWorker do
 
       context "when the count model exists" do
         let!(:count) do
-          create(:subject_workflow_count, set_member_subject: sms, workflow_id: workflow_id)
+          create(:subject_workflow_count, subject: sms.subject, workflow_id: workflow_id)
         end
 
         it 'should increment the classifications_count' do
@@ -52,7 +52,7 @@ RSpec.describe ClassificationCountWorker do
       let(:project) { create(:full_project, live: false) }
 
       let!(:count) do
-        create(:subject_workflow_count, set_member_subject: sms, workflow_id: workflow_id)
+        create(:subject_workflow_count, subject: sms.subject, workflow_id: workflow_id)
       end
 
       it 'should not increment the count' do

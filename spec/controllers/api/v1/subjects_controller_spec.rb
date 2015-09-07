@@ -186,8 +186,11 @@ describe Api::V1::SubjectsController, type: :controller do
 
           let!(:sms) do
             create_list(:set_member_subject, 2,
-                        retired_subject_workflow_counts: [build(:subject_workflow_count, retired_at: Time.now, workflow: workflow)],
                         subject_set: subject_set)
+          end
+
+          let!(:counts) do
+            sms.map {|s| create(:subject_workflow_count, subject: s.subject, workflow: workflow, retired_at: Time.now) }
           end
 
           let!(:seen_subjects) do

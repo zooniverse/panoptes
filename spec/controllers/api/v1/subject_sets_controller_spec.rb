@@ -7,14 +7,6 @@ shared_examples "cleans up the linked set member subjects" do
     expect(SetMemberSubject.where(id: linked_sms_ids)).to be_empty
   end
 
-  it 'should destroy all subject workflow counts' do
-    swc = create(:subject_workflow_count,
-                 set_member_subject: sms.first,
-                 workflow: subject_set.workflows.first)
-    delete_resources
-    expect(SubjectWorkflowCount.exists?(swc.id)).to be false
-  end
-
   it 'should queue a removal workfer' do
     expect(QueueRemovalWorker).to receive(:perform_async).with(sms.map(&:id),
                                                                subject_set.workflows.pluck(:id))

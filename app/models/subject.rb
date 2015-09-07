@@ -11,6 +11,7 @@ class Subject < ActiveRecord::Base
   has_many :collections, through: :collections_subjects
   has_many :subject_sets, through: :set_member_subjects
   has_many :set_member_subjects
+  has_many :subject_workflow_counts
   has_many :locations, -> { where(type: 'subject_location') },
     class_name: "Medium", as: :linked
   has_many :recents, dependent: :destroy
@@ -24,12 +25,13 @@ class Subject < ActiveRecord::Base
     !!migrated
   end
 
+  def retired_workflows
+    SubjectWorkflowCount.retired.where(subject: self).includes(:workflow).map(&:workflow)
+  end
+
   def retired_for_workflow?(workflow)
     if workflow && workflow.is_a?(Workflow) && workflow.persisted?
-      set_member_subjects.joins(:subject_workflow_counts).where(subject_workflow_counts: {workflow_id: workflow.id})
-                         .where(subject_set_id: workflow.subject_sets.pluck(:id))
-                         .where.not(subject_workflow_counts: {retired_at: nil})
-                         .any?
+      SubjectWorkflowCount.retired.by_subject_workflow(self.id, workflow.id).present?
     else
       false
     end
