@@ -192,40 +192,51 @@ describe Api::V1::WorkflowsController, type: :controller do
         end
       end
     end
-
-    context "with authorized user" do
-      context "when the workflow has subjects" do
-        let(:subject_set) { create(:subject_set_with_subjects, project: resource.project) }
-
-        it 'should call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async).with(resource.id)
-          default_request scopes: scopes, user_id: authorized_user.id
-          put :update, update_params.merge(id: resource.id)
-        end
-      end
-
-      context "when the workflow has no subjects" do
-        it "should not queue the worker" do
-          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async).with(resource.id)
-          default_request scopes: scopes, user_id: authorized_user.id
-          put :update, update_params.merge(id: resource.id)
-        end
-      end
-    end
-
-    context "without authorized user" do
-      it 'should not call the reload queue worker' do
-        expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async).with(resource.id)
-        default_request scopes: scopes, user_id: create(:user).id
-        put :update, update_params.merge(id: resource.id)
-      end
-    end
   end
 
   describe "#update_links" do
+    RSpec.shared_examples "reloads the non logged in queues" do
+      let(:update_link_params) do
+        {
+          link_relation: test_relation.to_s,
+          test_relation => test_relation_ids,
+          resource_id => resource.id
+        }
+      end
+
+      context "with authorized user" do
+        context "when the workflow has subjects" do
+          it 'should call the reload queue worker' do
+            expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async).with(resource.id, subject_set_id)
+            default_request scopes: scopes, user_id: authorized_user.id
+            post :update_links, update_link_params
+          end
+        end
+
+        context "when the workflow has no subjects" do
+          let(:linked_resource) { create(:subject_set, project: subject_set_project) }
+
+          it "should not queue the worker" do
+            expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
+            default_request scopes: scopes, user_id: authorized_user.id
+            post :update_links, update_link_params
+          end
+        end
+      end
+
+      context "without authorized user" do
+        it 'should not call the reload queue worker' do
+          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
+          default_request scopes: scopes, user_id: create(:user).id
+          post :update_links, update_link_params
+        end
+      end
+    end
+
     context 'linking a subject set' do
       let(:subject_set_project) { project }
       let(:linked_resource) { create(:subject_set_with_subjects, project: subject_set_project) }
+      let(:subject_set_id) { linked_resource.id.to_s }
       let(:test_attr) { :display_name }
       let(:test_relation) { :subject_sets }
       let(:test_relation_ids) { [ linked_resource.id.to_s ] }
@@ -235,6 +246,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:copied_resource) { resource.reload.send(test_relation).first }
 
       it_behaves_like "supports update_links"
+      it_behaves_like "reloads the non logged in queues"
 
       context "when the subject_set links belong to another project" do
         let!(:subject_set_project) do
@@ -261,7 +273,9 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     context 'retiring subjects via links' do
+      let(:subject_set_project) { project }
       let(:subject_set) { create(:subject_set, project: project, workflows: [project.workflows.first]) }
+      let(:subject_set_id) { subject_set.id }
       let(:linked_resource) { create(:subject, subject_sets: [subject_set]) }
       let(:test_attr) { :display_name }
       let(:test_relation) { :retired_subjects }
@@ -274,6 +288,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           expect(linked_resource.retired_for_workflow?(resource)).to be_truthy
         end
       end
+      it_behaves_like "reloads the non logged in queues"
     end
   end
 
