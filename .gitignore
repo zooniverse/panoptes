@@ -27,6 +27,7 @@ bin/**
 *~
 .jbundler/
 .DS_Store
+spec/examples.txt
 
 #ignore the api commit file
 public/commit_id.txt
