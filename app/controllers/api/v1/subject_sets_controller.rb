@@ -40,7 +40,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
   def refresh_queue(subject_set)
     if subject_set.set_member_subjects.exists?
       subject_set.workflows.each do |w|
-        ReloadNonLoggedInQueueWorker.perform_async(w.id)
+        ReloadNonLoggedInQueueWorker.perform_async(w.id, subject_set.id)
       end
     end
   end

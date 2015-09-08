@@ -7,14 +7,6 @@ class Api::V1::WorkflowsController < Api::ApiController
   resource_actions :default
   schema_type :json_schema
 
-  def create
-    super { |workflow| reload_queue(workflow) }
-  end
-
-  def update
-    super { |workflow| reload_queue(workflow) }
-  end
-
   def update_links
     super { |workflow| reload_queue(workflow) }
   end
@@ -36,7 +28,9 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def reload_queue(workflow)
     if workflow.set_member_subjects.exists?
-      ReloadNonLoggedInQueueWorker.perform_async(workflow.id)
+      reload_queue_subject_sets(workflow).each do |subject_set_id|
+        ReloadNonLoggedInQueueWorker.perform_async(workflow.id, subject_set_id)
+      end
     end
   end
 
@@ -136,6 +130,22 @@ class Api::V1::WorkflowsController < Api::ApiController
       SubjectWorkflowCount
     else
       super
+    end
+  end
+
+  def reload_queue_subject_sets(workflow)
+    case relation
+    when :subject_sets
+      Array.wrap(params[:subject_sets])
+    when :retired_subjects
+      SubjectSet.distinct
+      .joins(:workflows)
+      .where(workflows: { id: workflow.id })
+      .joins(:set_member_subjects)
+      .where(set_member_subjects: { subject_id: params[:retired_subjects] })
+      .pluck(:id)
+    else
+      []
     end
   end
 end
