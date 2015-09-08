@@ -2,30 +2,29 @@
   <h2>Sign up</h2>
 
   <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: "form form--new-user"}) do |f| %>
-    <%= devise_error_messages! %>
 
     <fieldset class="fieldset--text">
-      <%= f.label :login, "Username" %><br />
+      <%= f.label :login, "Username" %><small><%= resource.errors[:login].join(', ')%></small></br>
       <%= f.text_field :login, autofocus: true, required: true %>
     </fieldset>
 
     <fieldset class="fieldset--text">
-      <%= f.label :display_name %><br />
+      <%= f.label :display_name %><small><%= resource.errors[:display_name].join(', ')%></small></br>
       <%= f.text_field :display_name %>
     </fieldset>
 
     <fieldset class="fieldset--email">
-      <%= f.label :email %><br />
+      <%= f.label :email %><small><%= resource.errors[:email].join(', ')%></small></br>
       <%= f.email_field :email, required: true %>
     </fieldset>
 
     <fieldset class="fieldset--password">
-      <%= f.label :password %><br />
+      <%= f.label :password %><small><%= resource.errors[:password].join(', ')%></small></br>
       <%= f.password_field :password, autocomplete: "off", required: true %>
     </fieldset>
 
     <fieldset class="fieldset--password">
-      <%= f.label :password_confirmation %><br />
+      <%= f.label :password_confirmation %><small><%= resource.errors[:password_confirmation].join(', ')%></small></br>
       <%= f.password_field :password_confirmation, autocomplete: "off", required: true %>
     </fieldset>
 
