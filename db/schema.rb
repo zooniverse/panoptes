@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150902000226) do
+ActiveRecord::Schema.define(version: 20150908162042) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -310,7 +310,7 @@ ActiveRecord::Schema.define(version: 20150902000226) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                       default: "", index: {name: "index_users_on_email", unique: true}
+    t.string   "email",                       default: "", index: {name: "idx_lower_email", unique: true, case_sensitive: false}
     t.string   "encrypted_password",          default: "",       null: false
     t.string   "reset_password_token",        index: {name: "index_users_on_reset_password_token", unique: true}
     t.datetime "reset_password_sent_at"
@@ -347,6 +347,7 @@ ActiveRecord::Schema.define(version: 20150902000226) do
     t.boolean  "private_profile",             default: true, index: {name: "index_users_on_private_profile", where: "(private_profile = false)"}
     t.index name: "users_idx_trgm_login_display_name", using: :gin, expression: "((COALESCE((login)::text, ''::text) || ' '::text) || COALESCE((display_name)::text, ''::text))"
   end
+  add_index "users", ["email"], name: "index_users_on_email", unique: true
 
   create_table "versions", force: :cascade do |t|
     t.string   "item_type",      null: false, index: {name: "index_versions_on_item_type_and_item_id", with: ["item_id"]}
