@@ -7,7 +7,10 @@ class RetirementWorker
     count = SubjectWorkflowCount.find(count_id)
     if count.retire?
       count.retire! do
-        SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject.id)
+        SubjectQueue.where(workflow: count.workflow).find_each do |sq|
+          sms_ids = [ count.set_member_subject.id ]
+          DequeueSubjectQueueWorker.perform_async(sq.workflow_id, sms_ids, sq.user_id, sq.subject_set_id)
+        end
         deactivate_workflow!(count.workflow)
       end
     end
