@@ -1,6 +1,7 @@
 class SubjectQueue < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include BelongsToMany
+  include WithOptimisticRetry
 
   DEFAULT_LENGTH = 100
   MINIMUM_LENGTH = 20
@@ -87,25 +88,14 @@ class SubjectQueue < ActiveRecord::Base
   # don't use this query outside of a background Worker
   # SQL optimisations welcome here...no postgres ops preseved order
   def self.dequeue_update(query, sms_ids)
-    query.find_each do |sq|
-      dqd_non_dup_sms_ids = sq.set_member_subject_ids - Array.wrap(sms_ids)
-      sq.update_column(:set_member_subject_ids, dqd_non_dup_sms_ids)
-    end
+    query.find_each { |sq| sq.dequeue(sms_ids) }
   end
 
   # NOTE: if the query scope returns a large set then
   # don't use this query outside of a background Worker
   # SQL optimisations welcome here...no postgres ops preseved order
   def self.enqueue_update(query, sms_ids)
-    query.find_each do |sq|
-      if sq.below_minimum?
-        sms_ids = Array.wrap(sms_ids)
-        enqueue_set = NonDuplicateSmsIds.new(sq, sms_ids).enqueue_sms_ids_set
-        if !enqueue_set.empty? && enqueue_set != sq.set_member_subject_ids
-          sq.update_column(:set_member_subject_ids, enqueue_set)
-        end
-      end
-    end
+    query.find_each { |sq| sq.enqueue(sms_ids) }
   end
 
   def self.below_minimum
@@ -121,6 +111,28 @@ class SubjectQueue < ActiveRecord::Base
       set_member_subject_ids[0..limit-1]
     else
       set_member_subject_ids.sample(limit)
+    end
+  end
+
+  def dequeue(sms_ids)
+    sms_ids = Array.wrap(sms_ids)
+    with_optimistic_retry do
+      dqd_non_dup_sms_ids = self.set_member_subject_ids - sms_ids
+      self.set_member_subject_ids = dqd_non_dup_sms_ids
+      self.save!
+    end
+  end
+
+  def enqueue(sms_ids)
+    sms_ids = Array.wrap(sms_ids)
+    with_optimistic_retry do
+      if self.below_minimum?
+        enqueue_set = NonDuplicateSmsIds.new(self, sms_ids).enqueue_sms_ids_set
+        if !enqueue_set.empty? && enqueue_set != self.set_member_subject_ids
+          self.set_member_subject_ids = enqueue_set
+          self.save!
+        end
+      end
     end
   end
 end

@@ -198,6 +198,7 @@ RSpec.describe SubjectQueue, type: :model do
 
     context "with a user" do
       let(:user) { create(:user) }
+
       context "nothing for user" do
 
         shared_examples "queues something" do
@@ -274,6 +275,29 @@ RSpec.describe SubjectQueue, type: :model do
             allow_any_instance_of(SubjectQueue).to receive(:below_minimum?).and_return(true)
             SubjectQueue.enqueue(workflow, sms.id, user: user)
             expect(ues.reload.set_member_subject_ids).to include(sms.id)
+          end
+        end
+
+        context "optimisitic updates" do
+
+          context "for non-stale record" do
+            it 'should not raise an error' do
+              expect {
+                SubjectQueue.enqueue(workflow, sms.id, user: user)
+              }.to_not raise_error
+            end
+          end
+
+          context "for a persistently stale record" do
+
+            it 'should raise an error after attempting to reload 10 times' do
+              allow_any_instance_of(SubjectQueue).to receive(:lock_version).and_return(-1)
+              allow_any_instance_of(SubjectQueue).to receive(:set_member_subject_ids).and_return([])
+              expect_any_instance_of(SubjectQueue).to receive(:reload).exactly(10).times
+              expect {
+                SubjectQueue.enqueue(workflow, sms.id, user: user)
+              }.to raise_error(ActiveRecord::StaleObjectError)
+            end
           end
         end
 
@@ -451,6 +475,28 @@ RSpec.describe SubjectQueue, type: :model do
 
         it 'should return nil' do
           expect(SubjectQueue.dequeue(workflow, [], user: user)).to be_nil
+        end
+      end
+
+      context "optimisitic updates" do
+
+        context "for non-stale record" do
+          it 'should not raise an error' do
+            expect {
+              SubjectQueue.dequeue(workflow, dequeue_list, user: user)
+            }.to_not raise_error
+          end
+        end
+
+        context "for a persistently stale record" do
+
+          it 'should raise an error after attempting to reload 10 times' do
+            allow_any_instance_of(SubjectQueue).to receive(:lock_version).and_return(-1)
+            expect_any_instance_of(SubjectQueue).to receive(:reload).exactly(10).times
+            expect {
+              SubjectQueue.dequeue(workflow, dequeue_list, user: user)
+            }.to raise_error(ActiveRecord::StaleObjectError)
+          end
         end
       end
     end
