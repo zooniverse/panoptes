@@ -9,12 +9,9 @@ module WithOptimisticRetry
       yield
     rescue ActiveRecord::StaleObjectError => e
       begin
-        # Reload lock_version in particular.
         reload
         retries -= 1
-      rescue ActiveRecord::RecordNotFound
-        # If the record is gone there is nothing to do.
-      else      
+      else
         if retries > 0
           retry
         else
