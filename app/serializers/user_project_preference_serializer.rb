@@ -2,6 +2,7 @@ class UserProjectPreferenceSerializer
   include RestPack::Serializer
   attributes :id, :email_communication, :preferences, :href, :activity_count
   can_include :user, :project
+  can_sort_by :updated_at
 
   def self.key
     "project_preferences"
