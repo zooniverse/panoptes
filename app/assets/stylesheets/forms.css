@@ -86,7 +86,26 @@
   margin: 1em 0;
 }
 
+/* Styles for form errors messages */
+
+.form .field_with_errors {
+    display: inline;
+}
+
+.form .field_with_errors label {
+    color: red;
+}
+
+.form .field_with_errors input {
+    border: 1px solid red;
+}
+
 /* Styles for new user form */
+
+.form small.errored {
+    color: red;
+    padding-left: 1em;
+}
 
 .form--new-user .fieldset--password {
   display: inline-block;
@@ -98,6 +117,10 @@
 }
 
 .form--new-user .fieldset--password > input[type="password"] {
+  width: 250px;
+}
+
+.form--new-user .fieldset--password .field_with_errors > input[type="password"] {
   width: 250px;
 }
 
