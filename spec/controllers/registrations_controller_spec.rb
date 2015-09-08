@@ -97,6 +97,19 @@ describe RegistrationsController, type: :controller do
           expect{ post :create, user: user_attributes }.to change{ User.count }.from(0).to(1)
         end
 
+        it "should set the display name" do
+          user_attributes = user_attributes.delete(:display_name)
+          post :create, user: user_attributes
+          expect(User.find(created_instance_id("users")).display_name).to eq(login)
+        end
+
+        it "should set the project_email_communication" do
+          user_attributes = user_attributes.delete(:project_email_communication)
+          post :create, user: user_attributes
+          user = User.find(created_instance_id("users"))
+          expect(user.project_email_communication).to eq(user.global_email_communication)
+        end
+
         it "should persist the user account" do
           post :create, user: user_attributes
           expect(User.find(created_instance_id("users"))).to_not be_nil

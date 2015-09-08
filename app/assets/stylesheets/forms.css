@@ -100,12 +100,12 @@
     border: 1px solid red;
 }
 
-.form small {
+/* Styles for new user form */
+
+.form small.errored {
     color: red;
     padding-left: 1em;
 }
-
-/* Styles for new user form */
 
 .form--new-user .fieldset--password {
   display: inline-block;
