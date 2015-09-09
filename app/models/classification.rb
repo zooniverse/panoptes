@@ -1,9 +1,9 @@
 class Classification < ActiveRecord::Base
   include BelongsToMany
 
-  belongs_to :project
+  belongs_to :project, counter_cache: true
   belongs_to :user, counter_cache: true
-  belongs_to :workflow
+  belongs_to :workflow, counter_cache: true
   belongs_to :user_group, counter_cache: true
   belongs_to_many :subjects
 
