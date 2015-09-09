@@ -6,8 +6,7 @@ class Subject < ActiveRecord::Base
   has_paper_trail only: [:metadata, :locations]
 
   belongs_to :project
-  belongs_to :uploader, class_name: "User", foreign_key: "upload_user_id", touch: true,
-    counter_cache: :uploaded_subjects_count
+  belongs_to :uploader, class_name: "User", foreign_key: "upload_user_id"
   has_many :collections_subjects
   has_many :collections, through: :collections_subjects
   has_many :subject_sets, through: :set_member_subjects
