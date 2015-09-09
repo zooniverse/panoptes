@@ -522,6 +522,17 @@ RSpec.describe SubjectQueue, type: :model do
       it 'should return the first subjects in the queue' do
         expect(ues.next_subjects).to eq(ues.set_member_subject_ids[0..9])
       end
+
+      it 'does not return retired subjects' do
+        subject = create(:subject)
+        retired_subject = create(:subject)
+        subject_set = create(:subject_set, subjects: [subject, retired_subject])
+
+        workflow = create(:workflow, subject_sets: [subject_set])
+        workflow.retire_subject(retired_subject.id)
+        ues = build(:subject_queue, set_member_subject_ids: subject_set.set_member_subjects.pluck(:id), workflow: workflow)
+        expect(ues.next_subjects).to eq(subject.set_member_subjects.pluck(:id))
+      end
     end
 
     context "when the queue does not have a user" do
@@ -541,6 +552,17 @@ RSpec.describe SubjectQueue, type: :model do
 
       it 'should randomly sample from the subject_ids' do
         expect(ues.next_subjects).to_not match_array(ues.set_member_subject_ids[0..9])
+      end
+
+      it 'does not return retired subjects' do
+        subject = create(:subject)
+        retired_subject = create(:subject)
+        subject_set = create(:subject_set, subjects: [subject, retired_subject])
+
+        workflow = create(:workflow, subject_sets: [subject_set])
+        workflow.retire_subject(retired_subject.id)
+        ues = build(:subject_queue, set_member_subject_ids: subject_set.set_member_subjects.pluck(:id), workflow: workflow, user: nil)
+        expect(ues.next_subjects).to eq(subject.set_member_subjects.pluck(:id))
       end
     end
   end

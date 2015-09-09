@@ -24,12 +24,6 @@ RSpec.describe RetirementWorker do
           Workflow.find(workflow.id).retired_set_member_subjects_count
         }.from(0).to(1)
       end
-
-      it "should dequeue all instances of the subject" do
-        worker.perform(count.id)
-        queue.reload
-        expect(queue.set_member_subject_ids).to_not include(sms.id)
-      end
     end
 
     context "sms is not retireable" do
