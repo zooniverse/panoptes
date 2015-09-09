@@ -76,6 +76,10 @@ class Project < ActiveRecord::Base
   ranks :launched_row_order
   ranks :beta_row_order
 
+  def classification_count
+    classifications.count
+  end
+
   def expert_classifier_level(classifier)
     expert_role = project_roles.where(user_group: classifier.identity_group)
       .where.overlap(roles: EXPERT_ROLES)

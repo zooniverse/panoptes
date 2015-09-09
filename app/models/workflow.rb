@@ -74,4 +74,8 @@ class Workflow < ActiveRecord::Base
   def retired_subjects_count
     retired_set_member_subjects_count
   end
+
+  def classification_count
+    classifications.count
+  end
 end

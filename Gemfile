@@ -35,7 +35,11 @@ gem 'activerecord-import', '~> 0.8'
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'pg_search'
 gem 'ranked-model', '~> 0.4.0'
-gem 'cequel', github: 'edpaget/cequel', branch: 'update-cql-version'
+gem 'cequel', '~> 1.7.0'
+gem 'counter-cache', '0.0.2'
+gem 'redis'
+gem 'connection_pool'
+gem 'redis-namespace'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'

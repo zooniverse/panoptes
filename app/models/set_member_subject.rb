@@ -1,8 +1,9 @@
 class SetMemberSubject < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include Linkable
+  include Counter::Cache
 
-  belongs_to :subject_set, counter_cache: true, touch: true
+  belongs_to :subject_set, touch: true
   belongs_to :subject
   has_many :subject_workflow_counts, dependent: :destroy
   has_many :workflows, through: :subject_set
@@ -19,6 +20,9 @@ class SetMemberSubject < ActiveRecord::Base
   before_destroy :remove_from_queues
 
   can_be_linked :subject_queue, :in_queue_workflow, :model
+
+  counter_cache_on column: :set_member_subjects_count, relation: :subject_set,
+    method: :set_member_subject_count, relation_class_name: "SubjectSet"
 
   def self.in_queue_workflow(queue)
     query = joins(subject_set: :workflows)

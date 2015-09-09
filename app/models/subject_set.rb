@@ -25,4 +25,8 @@ class SubjectSet < ActiveRecord::Base
   def belongs_to_project?(other_project_id)
     project_id == other_project_id
   end
+
+  def set_member_subject_count
+    set_member_subjects.count
+  end
 end
