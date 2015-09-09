@@ -108,10 +108,14 @@ class SubjectQueue < ActiveRecord::Base
 
   def next_subjects(limit=10)
     if user_id
-      set_member_subject_ids[0..limit-1]
+      non_retired_set_member_subject_ids[0..limit-1]
     else
-      set_member_subject_ids.sample(limit)
+      non_retired_set_member_subject_ids.sample(limit)
     end
+  end
+
+  def non_retired_set_member_subject_ids
+    @non_retired_set_member_subject_ids ||= set_member_subject_ids - SubjectWorkflowCount.where(set_member_subject_id: set_member_subject_ids, workflow_id: workflow_id).where.not(retired_at: nil).pluck(:set_member_subject_id)
   end
 
   def dequeue(sms_ids)
