@@ -1,52 +1,23 @@
 class NonDuplicateSmsIds
 
-  attr_reader :queue, :append_ids, :curr_queue_ids
+  attr_reader :user, :workflow, :append_ids, :curr_queue_ids
 
-  def initialize(queue, append_ids)
-    @queue = queue
-    @curr_queue_ids = queue.set_member_subject_ids
+  def initialize(user, workflow, append_ids)
+    @user = user
+    @workflow = workflow
     @append_ids = append_ids
   end
 
-  def enqueue_sms_ids_set
-    check_dup_subject_enqueue_error
-    enqueue_dup_set = dup_incoming_ids | dup_seen_before_ids
-    new_append_non_dup_ids = (append_ids - enqueue_dup_set)
-    (curr_queue_ids | new_append_non_dup_ids).uniq
+  def ids_to_enqueue
+    append_ids - dup_seen_before_ids
   end
 
   private
 
-  def check_dup_subject_enqueue_error
-    notify_dup_subject_enqueue_error
-    notify_unbound_queue_growth
-  end
-
-  def dup_incoming_ids
-    @dup_incoming_ids ||= append_ids & curr_queue_ids
-  end
-
-  def unbound_queue_growth?
-    future_size = curr_queue_size + append_ids_size
-    threshold_limit = SubjectQueue::DEFAULT_LENGTH * 2
-    future_size > threshold_limit
-  end
-
   def dup_seen_before_ids
+    return @seen_before if @seen_before
     notify_dup_subject_seen_before_error
-    seen_before_set.map(&:id)
-  end
-
-  def user
-    queue.user
-  end
-
-  def workflow
-    queue.workflow
-  end
-
-  def curr_queue_size
-    curr_queue_ids.size
+    @seen_before = seen_before_set.map(&:id)
   end
 
   def append_ids_size
@@ -71,9 +42,7 @@ class NonDuplicateSmsIds
     error_params = {
       user_id: user.try(:id),
       workflow_id: workflow.id,
-      curr_queue_size: curr_queue_size,
       append_ids_size: append_ids_size,
-      dup_incoming_ids: dup_incoming_ids
     }
     if seen_before_set.exists?
       error_params.merge!({
@@ -90,18 +59,6 @@ class NonDuplicateSmsIds
       error_message: error_message,
       parameters:  error_params
     )
-  end
-
-  def notify_dup_subject_enqueue_error
-    unless dup_incoming_ids.empty?
-      notify_honey_badger("Duplicates", "Appending duplicates to subject queue")
-    end
-  end
-
-  def notify_unbound_queue_growth
-    if unbound_queue_growth?
-      notify_honey_badger("Unbound Growth", "Queue is growing too large")
-    end
   end
 
   def notify_dup_subject_seen_before_error

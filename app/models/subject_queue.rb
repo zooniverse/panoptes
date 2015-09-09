@@ -1,7 +1,6 @@
 class SubjectQueue < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include BelongsToMany
-  include WithOptimisticRetry
 
   DEFAULT_LENGTH = 100
   MINIMUM_LENGTH = 20
@@ -46,11 +45,12 @@ class SubjectQueue < ActiveRecord::Base
 
   def self.enqueue(workflow, sms_ids, user: nil, set_id: nil)
     return if sms_ids.blank?
+    unseen_ids = NonDuplicateSmsIds.new(user, workflow, Array.wrap(sms_ids)).ids_to_enqueue
     queue = by_set(set_id).by_user_workflow(user, workflow)
     if queue.exists?
-      enqueue_update(queue, sms_ids)
+      enqueue_update(queue, unseen_ids)
     else
-      queue.create!(set_member_subject_ids: Array.wrap(sms_ids))
+      queue.create!(set_member_subject_ids: unseen_ids)
     end
   end
 
@@ -84,18 +84,16 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
-  # NOTE: if the query scope returns a large set then
-  # don't use this query outside of a background Worker
-  # SQL optimisations welcome here...no postgres ops preseved order
   def self.dequeue_update(query, sms_ids)
-    query.find_each { |sq| sq.dequeue(sms_ids) }
+    return if sms_ids.blank?
+    dequeue_sql = "set_member_subject_ids = subarray(uniq(sort(set_member_subject_ids - array[?])), 0, #{DEFAULT_LENGTH})"
+    query.update_all([dequeue_sql, sms_ids])
   end
 
-  # NOTE: if the query scope returns a large set then
-  # don't use this query outside of a background Worker
-  # SQL optimisations welcome here...no postgres ops preseved order
   def self.enqueue_update(query, sms_ids)
-    query.find_each { |sq| sq.enqueue(sms_ids) }
+    return if sms_ids.blank?
+    enqueue_sql = "set_member_subject_ids = subarray(uniq(sort(set_member_subject_ids | array[?])), 0, #{DEFAULT_LENGTH})"
+    query.update_all([enqueue_sql, sms_ids])
   end
 
   def self.below_minimum
@@ -107,32 +105,6 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def next_subjects(limit=10)
-    if user_id
-      set_member_subject_ids[0..limit-1]
-    else
-      set_member_subject_ids.sample(limit)
-    end
-  end
-
-  def dequeue(sms_ids)
-    sms_ids = Array.wrap(sms_ids)
-    with_optimistic_retry do
-      dqd_non_dup_sms_ids = self.set_member_subject_ids - sms_ids
-      self.set_member_subject_ids = dqd_non_dup_sms_ids
-      self.save!
-    end
-  end
-
-  def enqueue(sms_ids)
-    sms_ids = Array.wrap(sms_ids)
-    with_optimistic_retry do
-      if self.below_minimum?
-        enqueue_set = NonDuplicateSmsIds.new(self, sms_ids).enqueue_sms_ids_set
-        if !enqueue_set.empty? && enqueue_set != self.set_member_subject_ids
-          self.set_member_subject_ids = enqueue_set
-          self.save!
-        end
-      end
-    end
+    set_member_subject_ids.sample(limit)
   end
 end
