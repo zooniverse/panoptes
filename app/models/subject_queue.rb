@@ -114,10 +114,6 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
-  def non_retired_set_member_subject_ids
-    @non_retired_set_member_subject_ids ||= set_member_subject_ids - SubjectWorkflowCount.where(set_member_subject_id: set_member_subject_ids, workflow_id: workflow_id).where.not(retired_at: nil).pluck(:set_member_subject_id)
-  end
-
   def dequeue(sms_ids)
     sms_ids = Array.wrap(sms_ids)
     with_optimistic_retry do
@@ -138,5 +134,11 @@ class SubjectQueue < ActiveRecord::Base
         end
       end
     end
+  end
+
+  private
+
+  def non_retired_set_member_subject_ids
+    @non_retired_set_member_subject_ids ||= set_member_subject_ids - SubjectWorkflowCount.where(set_member_subject_id: set_member_subject_ids, workflow_id: workflow_id).where.not(retired_at: nil).pluck(:set_member_subject_id)
   end
 end
