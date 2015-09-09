@@ -8,17 +8,10 @@ RSpec.describe CountResetWorker do
   subject(:worker) { CountResetWorker.new }
 
   describe "#perform" do
-    it 'should reset the set_member_subject_count' do
-      expect do
-        SetMemberSubject.where(id: sms[0..1].map(&:id)).delete_all
-        worker.perform(subject_set.id)
-      end.to change{SubjectSet.find(subject_set.id).set_member_subjects_count}.from(4).to(2)
-    end
-
     it 'should reset the workflow retired count' do
       workflow = workflows.first
       workflow.update! retired_set_member_subjects_count: 100
-      
+
       sms.take(2).each do |s|
         opts = { set_member_subject: s, workflow: workflow, retired_at: Time.now, link_subject_sets: false}
         create(:subject_workflow_count, opts)

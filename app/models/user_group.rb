@@ -82,6 +82,10 @@ class UserGroup < ActiveRecord::Base
     !!memberships.where(identity: true).pluck(:identity).first
   end
 
+  def classification_count
+    classifications.count
+  end
+
   private
 
   def default_display_name

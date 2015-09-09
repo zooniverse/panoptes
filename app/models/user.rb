@@ -275,4 +275,8 @@ class User < ActiveRecord::Base
       true
     end
   end
+
+  def classification_count
+    classifications.count
+  end
 end

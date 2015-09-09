@@ -1,10 +1,11 @@
 class Classification < ActiveRecord::Base
   include BelongsToMany
+  include Counter::Cache
 
   belongs_to :project
-  belongs_to :user, counter_cache: true
+  belongs_to :user
   belongs_to :workflow
-  belongs_to :user_group, counter_cache: true
+  belongs_to :user_group
   belongs_to_many :subjects
 
   has_many :recents, dependent: :destroy
@@ -21,6 +22,11 @@ class Classification < ActiveRecord::Base
   scope :incomplete, -> { where(completed: false) }
   scope :created_by, -> (user) { where(user: user) }
   scope :complete, -> { where(completed: true) }
+
+  %w(project user workflow user_group).each do |model|
+    counter_cache_on column: :classifications_count, relation: model.to_sym,
+      method: :classification_count, relation_class_name: model.capitalize
+  end
 
   def self.scope_for(action, user, opts={})
     return all if user.is_admin?

@@ -68,7 +68,6 @@ class Api::V1::SubjectSetsController < Api::ApiController
         [ resource.id, subject_id, rand ]
       end
       SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
-      SubjectSet.reset_counters(resource.id, :set_member_subjects)
     else
       super
     end

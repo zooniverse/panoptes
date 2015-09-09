@@ -1,7 +1,11 @@
 development:
   sidekiq:
     host: redis
+  counter:
+    host: redis
 
 test:
   sidekiq:
+    host: redis
+  counter:
     host: redis

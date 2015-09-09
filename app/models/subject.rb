@@ -1,13 +1,14 @@
 class Subject < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include Linkable
+  include Counter::Cache
+
   default_scope { eager_load(:locations) }
 
   has_paper_trail only: [:metadata, :locations]
 
   belongs_to :project
-  belongs_to :uploader, class_name: "User", foreign_key: "upload_user_id", touch: true,
-    counter_cache: :uploaded_subjects_count
+  belongs_to :uploader, class_name: "User", foreign_key: "upload_user_id", touch: true
   has_many :collections_subjects
   has_many :collections, through: :collections_subjects
   has_many :subject_sets, through: :set_member_subjects
@@ -19,7 +20,10 @@ class Subject < ActiveRecord::Base
   validates_presence_of :project, :uploader
 
   can_through_parent :project, :update, :index, :show, :destroy, :update_links,
-                     :destroy_links, :versions, :version
+    :destroy_links, :versions, :version
+
+  counter_cache_on column: :uploaded_subjects_count, relation: :uploader,
+    relation_class_name: "User", relation_id: "upload_user_id"
 
   def migrated_subject?
     !!migrated

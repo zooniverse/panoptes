@@ -1,13 +1,4 @@
 GIT
-  remote: git://github.com/edpaget/cequel.git
-  revision: 9f7b328d25c8437f80d9765918f125312c158d54
-  branch: update-cql-version
-  specs:
-    cequel (1.6.1)
-      activemodel (>= 3.1, < 5.0)
-      cassandra-driver (~> 2.0)
-
-GIT
   remote: git://github.com/edpaget/restpack_serializer.git
   revision: 9a7cdb2777006c7cd05c512859f5c9451248ca8d
   branch: dev
@@ -72,8 +63,13 @@ GEM
       ione (~> 1.2)
     celluloid (0.16.0)
       timers (~> 4.0.0)
+    cequel (1.7.0)
+      activemodel (~> 4.0)
+      cassandra-driver (~> 2.0)
     coderay (1.1.0)
     connection_pool (2.2.0)
+    counter-cache (0.0.2)
+      activerecord (>= 3.0)
     database_cleaner (1.2.0)
     devise (3.5.2)
       bcrypt (~> 3.0)
@@ -343,7 +339,9 @@ DEPENDENCIES
   activerecord-jdbcpostgresql-adapter
   activerecord-jdbcsqlite3-adapter
   aws-sdk-v1 (~> 1.0)
-  cequel!
+  cequel (~> 1.7.0)
+  connection_pool
+  counter-cache (= 0.0.2)
   database_cleaner (~> 1.2.0)
   devise (~> 3.0)
   doorkeeper (~> 1.4.1)
@@ -377,6 +375,8 @@ DEPENDENCIES
   rack-cors (~> 0.3)
   rails (~> 4.2.3)
   ranked-model (~> 0.4.0)
+  redis
+  redis-namespace
   restpack_serializer!
   rspec (~> 3.3.0)
   rspec-rails (~> 3.3.0)
