@@ -1,4 +1,4 @@
-class NonDuplicateSmsIds
+class SeenSubjectRemover
 
   attr_reader :user, :workflow, :append_ids, :curr_queue_ids
 
@@ -17,7 +17,7 @@ class NonDuplicateSmsIds
   def dup_seen_before_ids
     return @seen_before if @seen_before
     notify_dup_subject_seen_before_error
-    @seen_before = seen_before_set.map(&:id)
+    @seen_before = seen_before_set.pluck(&:id)
   end
 
   def append_ids_size

@@ -339,7 +339,7 @@ RSpec.describe SubjectQueue, type: :model do
           context "when the append queue is empty" do
 
             it "should not attempt an enqueue" do
-              allow_any_instance_of(NonDuplicateSmsIds).to receive(:enqueue_sms_ids_set)
+              allow_any_instance_of(SeenSubjectRemover).to receive(:enqueue_sms_ids_set)
               .and_return([])
               expect_any_instance_of(SubjectQueue).not_to receive(:update_column)
               SubjectQueue.enqueue_update(query, [])
@@ -348,7 +348,7 @@ RSpec.describe SubjectQueue, type: :model do
 
           context "when the append queue has not changed" do
             it "should not attempt an enqueue" do
-              allow_any_instance_of(NonDuplicateSmsIds).to receive(:enqueue_sms_ids_set)
+              allow_any_instance_of(SeenSubjectRemover).to receive(:enqueue_sms_ids_set)
               .and_return(ues.set_member_subject_ids)
               expect_any_instance_of(SubjectQueue).not_to receive(:update_column)
               SubjectQueue.enqueue_update(query, [])
@@ -363,7 +363,7 @@ RSpec.describe SubjectQueue, type: :model do
             end
 
             it "should handle an empty user queue enqueue" do
-              allow_any_instance_of(NonDuplicateSmsIds).to receive(:user).and_return(nil)
+              allow_any_instance_of(SeenSubjectRemover).to receive(:user).and_return(nil)
               SubjectQueue.enqueue_update(query, enq_ids_with_dups)
               non_dups = ues.set_member_subject_ids | [ sms.id ]
               expect(ues.reload.set_member_subject_ids).to match_array(non_dups)

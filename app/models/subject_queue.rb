@@ -45,7 +45,7 @@ class SubjectQueue < ActiveRecord::Base
 
   def self.enqueue(workflow, sms_ids, user: nil, set_id: nil)
     return if sms_ids.blank?
-    unseen_ids = NonDuplicateSmsIds.new(user, workflow, Array.wrap(sms_ids)).ids_to_enqueue
+    unseen_ids = SeenSubjectRemover.new(user, workflow, Array.wrap(sms_ids)).ids_to_enqueue
     queue = by_set(set_id).by_user_workflow(user, workflow)
     if queue.exists?
       enqueue_update(queue, unseen_ids)
