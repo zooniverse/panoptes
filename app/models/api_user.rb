@@ -34,6 +34,7 @@ class ApiUser
   end
 
   def subject_limits
+    user.update_uploaded_subjects_count
     [user.uploaded_subjects_count, user.subject_limit]
   end
 end

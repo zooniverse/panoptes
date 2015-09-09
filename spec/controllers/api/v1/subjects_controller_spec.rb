@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-
 describe Api::V1::SubjectsController, type: :controller do
   let!(:workflow) { create(:workflow_with_subject_sets) }
   let!(:subject_set) { workflow.subject_sets.first }
@@ -392,6 +391,7 @@ describe Api::V1::SubjectsController, type: :controller do
     context "when the user has exceeded the allowed number of subjects" do
       let(:authorised_user) { create(:user, uploaded_subjects_count: 101) }
       let(:upload_subjects) do
+        allow_any_instance_of(User).to receive(:update_uploaded_subjects_count)
         default_request scopes: scopes, user_id: authorised_user.id
         post :create, create_params
       end

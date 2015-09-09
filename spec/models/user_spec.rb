@@ -638,9 +638,25 @@ describe User, type: :model do
     end
   end
 
+  describe "update_uploaded_subjects_count" do
+    it 'should update the count of the subjects a user has uploaded' do
+      uploader = create(:user_with_uploaded_subjects)
+      uploader.update_uploaded_subjects_count
+      expect(uploader.uploaded_subjects_count).to eq(2)
+    end
+
+    context "without updating" do
+      it 'should report the previous value' do
+        uploader = create(:user_with_uploaded_subjects, uploaded_subjects_count: 4)
+        expect(uploader.uploaded_subjects_count).to eq(4)
+      end
+    end
+  end
+
   describe "#uploaded_subjects_count" do
     it 'should have a count of the subjects a user has uploaded' do
       uploader = create(:user_with_uploaded_subjects)
+      uploader.update_uploaded_subjects_count
       expect(uploader.uploaded_subjects_count).to eq(2)
     end
   end
@@ -796,6 +812,25 @@ describe User, type: :model do
       it 'should return that limit' do
         user = create(:user, subject_limit: 10)
         expect(user.subject_limit).to eq(10)
+      end
+    end
+  end
+
+  describe '#uploaded_subjects_count' do
+
+    context 'the user has no uploaded subject' do
+      it 'should return 0' do
+        user = create(:user)
+        expect(user.uploaded_subjects_count).to eq(0)
+      end
+    end
+
+    context 'the user has uploaded subject' do
+      it 'should return 1' do
+        user = create(:user)
+        create(:subject, uploader: user)
+        user.update_uploaded_subjects_count
+        expect(user.uploaded_subjects_count).to eq(1)
       end
     end
   end

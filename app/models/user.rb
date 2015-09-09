@@ -275,4 +275,9 @@ class User < ActiveRecord::Base
       true
     end
   end
+
+  def update_uploaded_subjects_count
+    uploaded_count = uploaded_subjects.count
+    self.update_column(:uploaded_subjects_count, uploaded_count)
+  end
 end
