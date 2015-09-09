@@ -23,13 +23,6 @@ RSpec.describe SubjectSelector do
       expect(ctx).to include(url_format: :get)
     end
 
-    it "should respect the order of subjects in the queue" do
-      subject_queue
-      subjects, _ = subject.queued_subjects
-      expected_order = smses.map(&:subject_id)
-      expect(subjects.pluck(:id)).to eq(expected_order)
-    end
-
     context "when the user doesn't have a queue" do
 
       it 'should create a new queue from the logged out queue' do
