@@ -25,9 +25,10 @@ RSpec.describe RetirementWorker do
         }.from(0).to(1)
       end
 
-      it "should call dequeue worker for on every queue for that workflow" do
-        expect(DequeueSubjectQueueWorker).to receive(:perform_async).with(queue.workflow_id, [sms.id], queue.user_id, queue.subject_set_id)
+      it "should dequeue all instances of the subject" do
         worker.perform(count.id)
+        queue.reload
+        expect(queue.set_member_subject_ids).to_not include(sms.id)
       end
     end
 
