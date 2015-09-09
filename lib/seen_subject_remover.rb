@@ -6,19 +6,14 @@ class SeenSubjectRemover
     @user = user
     @workflow = workflow
     @append_ids = append_ids
+    notify_dup_subject_seen_before_error
   end
 
   def ids_to_enqueue
-    append_ids - dup_seen_before_ids
+    append_ids - seen_before_set
   end
 
   private
-
-  def dup_seen_before_ids
-    return @seen_before if @seen_before
-    notify_dup_subject_seen_before_error
-    @seen_before = seen_before_set.pluck(&:id)
-  end
 
   def append_ids_size
     append_ids.length
@@ -26,12 +21,12 @@ class SeenSubjectRemover
 
   def seen_before_set
     @seen_before ||= if user_seen_subject
-      SetMemberSubject.where(id: append_ids)
-        .joins(:subject)
-        .where(subjects: { id: user_seen_subject.subject_ids })
-    else
-      SetMemberSubject.none
-    end
+                       SetMemberSubject.where(id: append_ids)
+                       .joins(:subject)
+                       .where(subjects: { id: user_seen_subject.subject_ids })
+                     else
+                       SetMemberSubject.none
+                     end.pluck(:id)
   end
 
   def user_seen_subject
@@ -44,10 +39,9 @@ class SeenSubjectRemover
       workflow_id: workflow.id,
       append_ids_size: append_ids_size,
     }
-    if seen_before_set.exists?
+    unless seen_before_set.blank?
       error_params.merge!({
-        seen_before_sms_ids: seen_before_set.map(&:id),
-        seen_before_subject_ids: seen_before_set.map(&:subject_id)
+        seen_before_sms_ids: seen_before_set
       })
     end
     error_params
@@ -62,7 +56,7 @@ class SeenSubjectRemover
   end
 
   def notify_dup_subject_seen_before_error
-    if seen_before_set.exists?
+    unless seen_before_set.blank?
       notify_honey_badger("Seen Before", "Appending seen before subject to subject queue")
     end
   end
