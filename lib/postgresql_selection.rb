@@ -35,8 +35,9 @@ class PostgresqlSelection
   end
 
   def sample(query=available)
-    direction = [ :asc, :desc ].sample
-    query.order("RANDOM() #{direction}")
+    direction = [:asc, :desc].sample
+    random_selection_limit = 1000
+    query.order(random: direction).limit(random_selection_limit)
   end
 
   def limit
@@ -54,7 +55,7 @@ class PostgresqlSelection
   def select_results_randomly
     enough_available = limit < available_count
     if enough_available
-      sample.limit(limit).pluck(:id)
+      sample.pluck(:id).sample(limit)
     else
       available.pluck(:id).shuffle
     end
