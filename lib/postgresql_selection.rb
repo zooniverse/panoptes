@@ -55,7 +55,11 @@ class PostgresqlSelection
   def select_results_randomly
     enough_available = limit < available_count
     if enough_available
-      sample.pluck(:id).sample(limit)
+      focussed_ids = sample.pluck(:id)
+      if reassign_random?
+        RandomOrderShuffleWorker.perform_async(focussed_ids)
+      end
+      focussed_ids.sample(limit)
     else
       available.pluck(:id).shuffle
     end
@@ -63,5 +67,9 @@ class PostgresqlSelection
 
   def select_results_in_order
     available.limit(limit).pluck(:id)
+  end
+
+  def reassign_random?
+    rand < 0.05
   end
 end
