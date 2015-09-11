@@ -36,8 +36,12 @@ class PostgresqlSelection
 
   def sample(query=available)
     direction = [:asc, :desc].sample
-    random_selection_limit = 1000
-    query.order(random: direction).limit(random_selection_limit)
+    query.order(random: direction).limit(focus_set_window_size)
+  end
+
+  def focus_set_window_size
+    #TODO: make the 5K a panoptes configuration directive via YAML
+    @focus_set_window_size ||= [(available_count * 0.5).ceil, 5000].min
   end
 
   def limit
