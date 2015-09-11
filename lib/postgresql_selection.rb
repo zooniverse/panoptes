@@ -31,12 +31,14 @@ class PostgresqlSelection
   end
 
   def available_count
-    available.except(:select).count
+    @available_count ||= available.except(:select).count
   end
 
   def sample(query=available)
-    direction = [ :asc, :desc ].sample
-    query.order("RANDOM() #{direction}")
+    offset_ceiling = available_count - limit
+    random_offset = offset_ceiling > 1 ? rand(1..offset_ceiling) : 1
+    selection_window = [ limit, SubjectQueue::DEFAULT_LENGTH ].max
+    query.offset(random_offset).limit(selection_window)
   end
 
   def limit
@@ -54,7 +56,7 @@ class PostgresqlSelection
   def select_results_randomly
     enough_available = limit < available_count
     if enough_available
-      sample.limit(limit).pluck(:id)
+      sample.pluck(:id).sample(limit)
     else
       available.pluck(:id).shuffle
     end
