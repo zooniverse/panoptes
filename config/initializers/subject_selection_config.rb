@@ -16,6 +16,10 @@ module Panoptes
     def self.index_rebuild_rate
       config[:index_rebuild_rate]
     end
+
+    def self.random_order_shuffle_worker_opts
+      config[:random_order_shuffle_worker_opts].symbolize_keys
+    end
   end
 end
 
