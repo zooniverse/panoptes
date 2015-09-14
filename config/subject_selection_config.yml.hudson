@@ -1,0 +1,8 @@
+development:
+  focus_set_window_size: 5000
+  index_rebuild_rate: 0.05
+
+test:
+  focus_set_window_size: 1000
+  index_rebuild_rate: 0.05
+

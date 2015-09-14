@@ -40,8 +40,11 @@ class PostgresqlSelection
   end
 
   def focus_set_window_size
-    #TODO: make the 5K a panoptes configuration directive via YAML
-    @focus_set_window_size ||= [(available_count * 0.5).ceil, 5000].min
+    @focus_set_window_size ||=
+      [
+        (available_count * 0.5).ceil,
+        Panoptes::SubjectSelection.focus_set_window_size
+      ].min
   end
 
   def limit
@@ -74,6 +77,6 @@ class PostgresqlSelection
   end
 
   def reassign_random?
-    rand < 0.05
+    rand < Panoptes::SubjectSelection.index_rebuild_rate
   end
 end
