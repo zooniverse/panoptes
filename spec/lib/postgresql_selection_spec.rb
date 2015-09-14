@@ -91,6 +91,12 @@ RSpec.describe PostgresqlSelection do
 
       it_behaves_like "select for incomplete_project"
 
+      it "should reassign the random attribute after selection" do
+        allow(subject).to receive(:reassign_random?).and_return(true)
+        expect(RandomOrderShuffleWorker).to receive(:perform_async).once
+        results = subject.select
+      end
+
       it "should give up trying to construct a random list after set number of attempts" do
         unreachable_limit = SetMemberSubject.count + 1
         allow_any_instance_of(PostgresqlSelection).to receive(:available_count).and_return(unreachable_limit + 1)

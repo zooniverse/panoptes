@@ -36,6 +36,7 @@ gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'pg_search'
 gem 'ranked-model', '~> 0.4.0'
 gem 'cequel', '~> 1.7.0'
+gem 'sidekiq-congestion', '~> 0.0.1'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
@@ -60,11 +61,14 @@ end
 
 group :development, :test do
   gem 'foreman'
+  gem 'pry-rails', '~> 0.3.2'
+end
+
+group :test do
   gem 'database_cleaner', '~> 1.2.0'
   gem 'rspec', '~> 3.3.0'
   gem 'rspec-rails', '~> 3.3.0'
   gem 'guard-rspec', '~> 4.2.9', require: false
   gem 'factory_girl_rails', '~> 4.5.0'
   gem 'spring-commands-rspec', '~> 1.0.2'
-  gem 'pry-rails', '~> 0.3.2'
 end

@@ -35,8 +35,16 @@ class PostgresqlSelection
   end
 
   def sample(query=available)
-    direction = [ :asc, :desc ].sample
-    query.order("RANDOM() #{direction}")
+    direction = [:asc, :desc].sample
+    query.order(random: direction).limit(focus_set_window_size)
+  end
+
+  def focus_set_window_size
+    @focus_set_window_size ||=
+      [
+        (available_count * 0.5).ceil,
+        Panoptes::SubjectSelection.focus_set_window_size
+      ].min
   end
 
   def limit
@@ -54,7 +62,11 @@ class PostgresqlSelection
   def select_results_randomly
     enough_available = limit < available_count
     if enough_available
-      sample.limit(limit).pluck(:id)
+      ids = sample.pluck(:id).sample(limit)
+      if reassign_random?
+        RandomOrderShuffleWorker.perform_async(ids)
+      end
+      ids
     else
       available.pluck(:id).shuffle
     end
@@ -62,5 +74,9 @@ class PostgresqlSelection
 
   def select_results_in_order
     available.limit(limit).pluck(:id)
+  end
+
+  def reassign_random?
+    rand < Panoptes::SubjectSelection.index_rebuild_rate
   end
 end

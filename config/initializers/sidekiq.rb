@@ -37,4 +37,7 @@ end
 
 Sidekiq.configure_server do |config|
   config.redis = { namespace: SidekiqConfig.namespace, url: SidekiqConfig.redis_url }
+  config.server_middleware do |chain|
+    chain.add Sidekiq::Congestion::Limiter
+  end
 end

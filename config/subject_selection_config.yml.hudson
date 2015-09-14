@@ -1,0 +1,10 @@
+development:
+  focus_set_window_size: 5000
+  index_rebuild_rate: 0.05
+  random_order_shuffle_worker_opts: { interval: 60, max_in_interval: 5, min_delay: 12, reject_with: !ruby/symbol reschedule }
+
+test:
+  focus_set_window_size: 1000
+  index_rebuild_rate: 0.05
+  random_order_shuffle_worker_opts: { interval: 60, max_in_interval: 5, min_delay: 12, reject_with: !ruby/symbol reschedule }
+
