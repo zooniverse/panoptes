@@ -10,7 +10,7 @@ module Panoptes
     end
 
     def self.congestion_opts
-      config[:congestion_opts].symbolize_keys
+      config.fetch(:congestion_opts, {}).symbolize_keys
     end
   end
 end

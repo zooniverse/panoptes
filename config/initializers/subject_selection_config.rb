@@ -18,7 +18,7 @@ module Panoptes
     end
 
     def self.random_order_shuffle_worker_opts
-      config[:random_order_shuffle_worker_opts].symbolize_keys
+      config.fetch(:random_order_shuffle_worker_opts, {}).symbolize_keys
     end
   end
 end
