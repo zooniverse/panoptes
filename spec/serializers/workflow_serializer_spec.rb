@@ -64,4 +64,29 @@ describe WorkflowSerializer do
       end
     end
   end
+
+  describe "#retirement" do
+    let(:expected) { serializer.retirement }
+
+    context "with no values set" do
+
+      it 'should return the default criteria' do
+        expect(expected).to eq({"classification_count"=>{"count"=>15}})
+      end
+    end
+
+    context "with values set" do
+      let(:custom) do
+        {
+          "criteria" => Workflow::DEFAULT_CRITERIA,
+          "options" => { count: 5 }
+        }
+      end
+
+      it 'should return the stored values' do
+        allow_any_instance_of(Workflow).to receive(:retirement).and_return(custom)
+        expect(expected).to eq(custom)
+      end
+    end
+  end
 end
