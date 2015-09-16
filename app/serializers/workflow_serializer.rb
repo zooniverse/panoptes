@@ -43,4 +43,13 @@ class WorkflowSerializer
   def content
     @content ||= @model.content_for(@context[:languages])
   end
+
+  def retirement
+    retire_criteria = @model.retirement
+    if retire_criteria.blank?
+      { Workflow::DEFAULT_CRITERIA => Workflow::DEFAULT_OPTS }
+    else
+      retire_criteria
+    end
+  end
 end
