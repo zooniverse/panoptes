@@ -31,7 +31,7 @@ class PostgresqlSelection
   end
 
   def available_count
-    available.except(:select).count
+    @available_count ||= available.except(:select).count
   end
 
   def sample(query=available)
