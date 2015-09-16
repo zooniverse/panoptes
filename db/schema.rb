@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150916161203) do
+ActiveRecord::Schema.define(version: 20150916162320) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -336,7 +336,6 @@ ActiveRecord::Schema.define(version: 20150916161203) do
     t.boolean  "banned",                      default: false,    null: false
     t.boolean  "migrated",                    default: false
     t.boolean  "valid_email",                 default: true,     null: false
-    t.integer  "uploaded_subjects_count",     default: 0
     t.integer  "project_id"
     t.boolean  "beta_email_communication",    index: {name: "index_users_on_beta_email_communication", where: "(beta_email_communication = true)"}
     t.string   "login",                       null: false, index: {name: "index_users_on_login", unique: true, case_sensitive: false}
