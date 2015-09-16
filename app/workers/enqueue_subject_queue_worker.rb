@@ -1,16 +1,11 @@
 class EnqueueSubjectQueueWorker
   include Sidekiq::Worker
 
-  sidekiq_options congestion: {
-    interval: 10,
-    max_in_interval: 1,
-    min_delay: 0,
-    reject_with: :cancel,
-    track_rejected: false,
+  sidekiq_options congestion: Panoptes::SubjectEnqueue.congestion_opts.merge({
     key: ->(workflow_id, user_id, subject_set_id) {
       "user_#{ workflow_id }_#{user_id}_#{subject_set_id}_subject_enqueue"
     }
-  }
+  })
 
   attr_reader :workflow, :user
 
