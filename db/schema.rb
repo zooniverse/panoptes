@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150908193654) do
+ActiveRecord::Schema.define(version: 20150916161203) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -254,7 +254,7 @@ ActiveRecord::Schema.define(version: 20150908193654) do
     t.integer  "project_id",     index: {name: "index_subjects_on_project_id"}
     t.boolean  "migrated"
     t.integer  "lock_version",   default: 0
-    t.string   "upload_user_id"
+    t.integer  "upload_user_id", index: {name: "index_subjects_on_upload_user_id"}
   end
 
   create_table "tagged_resources", force: :cascade do |t|
