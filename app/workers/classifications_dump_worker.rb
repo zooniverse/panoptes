@@ -1,7 +1,6 @@
 require 'csv'
 
 class ClassificationsDumpWorker
-  include Sidekiq::Worker
   include DumpWorker
 
   attr_reader :project
