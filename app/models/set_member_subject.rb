@@ -53,11 +53,6 @@ class SetMemberSubject < ActiveRecord::Base
     .where('user_seen_subjects.id IS NULL OR (NOT "set_member_subjects"."subject_id" = ANY("user_seen_subjects"."subject_ids"))')
   end
 
-  def retire_workflow(workflow)
-    count = SubjectWorkflowCount.find_or_create_by!(workflow_id: workflow.id, subject_id: subject_id)
-    count.retire!
-  end
-
   def retired_workflow_ids
     retired_workflows.pluck(:id)
   end

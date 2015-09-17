@@ -39,7 +39,7 @@ describe SetMemberSubject, :type => :model do
 
       before(:each) do
         workflow.update!(retired_set_member_subjects_count: sms.length)
-        sms.each { |i| i.retire_workflow(workflow) }
+        sms.each { |i| workflow.retire_subject(i.subject) }
       end
 
       it 'should select retired subjects' do
@@ -68,7 +68,7 @@ describe SetMemberSubject, :type => :model do
 
     context "when workflow is unfinished" do
       let!(:retired_sms) do
-        create(:set_member_subject, subject_set: subject_set).tap { |sms| sms.retire_workflow(workflow) }
+        create(:set_member_subject, subject_set: subject_set).tap { |sms| workflow.retire_subject(sms.subject) }
       end
 
       it 'should select active subjects' do
@@ -185,20 +185,6 @@ describe SetMemberSubject, :type => :model do
 
     it "should belong to a subject" do
       expect(set_member_subject.subject).to be_a(Subject)
-    end
-  end
-
-  describe "#retire_workflow" do
-    it 'should add the workflow the retired_workflows relationship' do
-      sms = set_member_subject
-      sms.save!
-      workflow1 = sms.subject_set.workflows.first
-      workflow2 = create(:workflow, subject_sets: [sms.subject_set])
-      create(:subject_workflow_count, subject: sms.subject, workflow: workflow1)
-      create(:subject_workflow_count, subject: sms.subject, workflow: workflow2)
-      sms.retire_workflow(workflow1)
-      sms.reload
-      expect(sms.retired_workflows).to eq([workflow1])
     end
   end
 
