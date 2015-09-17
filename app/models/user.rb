@@ -276,8 +276,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def update_uploaded_subjects_count
-    uploaded_count = uploaded_subjects.count
-    self.update_column(:uploaded_subjects_count, uploaded_count)
+  def uploaded_subjects_count
+    Subject.unscoped.where(upload_user_id: self.id).count
   end
 end

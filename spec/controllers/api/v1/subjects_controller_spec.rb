@@ -389,11 +389,14 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     context "when the user has exceeded the allowed number of subjects" do
-      let(:authorised_user) { create(:user, uploaded_subjects_count: 101) }
+      let(:authorised_user) { create(:user) }
       let(:upload_subjects) do
-        allow_any_instance_of(User).to receive(:update_uploaded_subjects_count)
         default_request scopes: scopes, user_id: authorised_user.id
         post :create, create_params
+      end
+
+      before(:each) do
+        allow_any_instance_of(User).to receive(:uploaded_subjects_count).and_return(101)
       end
 
       it 'should return 403' do
