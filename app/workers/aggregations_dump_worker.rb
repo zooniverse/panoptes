@@ -1,5 +1,4 @@
 class AggregationsDumpWorker
-  include Sidekiq::Worker
   include DumpWorker
 
   attr_reader :project
