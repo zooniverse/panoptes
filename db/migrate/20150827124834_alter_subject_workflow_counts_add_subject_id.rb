@@ -8,10 +8,10 @@ class AlterSubjectWorkflowCountsAddSubjectId < ActiveRecord::Migration
       INSERT INTO subject_workflow_counts (subject_id, workflow_id, classifications_count, created_at, updated_at, retired_at)
       SELECT sms.subject_id,
              workflow_id,
-             SUM(classifications_count) AS classifications_count,
+             MAX(classifications_count) AS classifications_count,
              MIN(swc.created_at) AS created_at,
              MAX(swc.updated_at) AS updated_at,
-            MIN(swc.retired_at) AS retired_at
+             MIN(swc.retired_at) AS retired_at
       FROM subject_workflow_counts swc
       INNER JOIN set_member_subjects sms ON swc.set_member_subject_id = sms.id
       GROUP BY sms.subject_id, workflow_id
