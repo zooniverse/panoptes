@@ -39,25 +39,43 @@ RSpec.describe ApiUser do
   end
 
   describe "above_subject_limit?" do
-    subject { ApiUser.new(user, admin: flag).above_subject_limit? }
+    let(:api_user) { ApiUser.new(user, admin: flag) }
     let(:flag) { false }
+    let(:user) { create(:user, subject_limit: limit) }
+
+    before(:each) do
+      allow_any_instance_of(User).to receive(:uploaded_subjects_count).and_return(10)
+    end
+
+    subject { api_user.above_subject_limit? }
+
     context "user is admin" do
-      let(:flag) { false }
+      let(:flag) { true }
       let(:user) { create(:user, admin: true) }
 
       it { is_expected.to be false }
     end
 
     context "user is above limit" do
-      let(:user) { create(:user, uploaded_subjects_count: 10, subject_limit: 9) }
+      let(:limit) { 9 }
 
       it { is_expected.to be true }
     end
 
     context "user is below limit" do
-      let(:user) { create(:user, uploaded_subjects_count: 10, subject_limit: 11) }
+      let(:limit) { 11 }
 
       it { is_expected.to be false }
+    end
+  end
+
+  describe "subject_limits" do
+    let(:api_user) { ApiUser.new(create(:user), admin: false) }
+
+    it "should call the update method and return defaults" do
+      aggregate_failures "limits" do
+        expect(api_user.subject_limits).to match_array([ 0, Panoptes.max_subjects])
+      end
     end
   end
 end

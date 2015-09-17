@@ -275,4 +275,8 @@ class User < ActiveRecord::Base
       true
     end
   end
+
+  def uploaded_subjects_count
+    Subject.unscoped.where(upload_user_id: self.id).count
+  end
 end

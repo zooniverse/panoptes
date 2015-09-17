@@ -87,13 +87,6 @@ describe Subject, :type => :model do
     end
   end
 
-  describe "#uploader" do
-    it "should have a counter cache" do
-      subject.save!
-      expect(subject.uploader.uploaded_subjects_count).to eq(1)
-    end
-  end
-
   describe "#retired_for_workflow?" do
     let(:workflow) { create(:workflow) }
     let(:project) { workflow.project }

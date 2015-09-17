@@ -800,6 +800,24 @@ describe User, type: :model do
     end
   end
 
+  describe '#uploaded_subjects_count' do
+
+    context 'the user has no uploaded subject' do
+      it 'should return 0' do
+        user = create(:user)
+        expect(user.uploaded_subjects_count).to eq(0)
+      end
+    end
+
+    context 'the user has uploaded subject' do
+      it 'should return 1' do
+        user = create(:user)
+        create(:subject, uploader: user)
+        expect(user.uploaded_subjects_count).to eq(1)
+      end
+    end
+  end
+
   describe "#sync_identity_group" do
     it 'should set the identity group login if the user login changes' do
       user.login = "test"

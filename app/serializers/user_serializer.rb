@@ -15,36 +15,12 @@ class UserSerializer
 
   media_include :avatar, :profile_header
 
-  def credited_name
-    @model.credited_name
-  end
-
-  def email
-    @model.email
-  end
-
-  def global_email_communication
-    @model.global_email_communication
-  end
-
-  def project_email_communication
-    @model.project_email_communication
-  end
-
-  def beta_email_communication
-    @model.beta_email_communication
-  end
-
   def firebase_auth_token
     FirebaseUserToken.generate(@model)
   end
 
   def max_subjects
     @model.subject_limit
-  end
-
-  def uploaded_subjects_count
-    @model.uploaded_subjects_count
   end
 
   def admin
