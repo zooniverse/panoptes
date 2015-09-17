@@ -394,7 +394,7 @@ ActiveRecord::Schema.define(version: 20150916162320) do
   add_foreign_key "subject_sets_workflows", "subject_sets"
   add_foreign_key "subject_sets_workflows", "workflows"
   add_foreign_key "subject_workflow_counts", "set_member_subjects"
-  add_foreign_key "subject_workflow_counts", "subjects"
+  add_foreign_key "subject_workflow_counts", "subjects", on_delete: :restrict
   add_foreign_key "subject_workflow_counts", "workflows"
   add_foreign_key "tagged_resources", "tags"
 end

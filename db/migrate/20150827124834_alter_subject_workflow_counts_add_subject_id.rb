@@ -1,7 +1,7 @@
 class AlterSubjectWorkflowCountsAddSubjectId < ActiveRecord::Migration
   def up
     add_column :subject_workflow_counts, :subject_id, :integer, index: true
-    add_foreign_key :subject_workflow_counts, :subjects
+    add_foreign_key :subject_workflow_counts, :subjects, on_delete: :restrict
 
     # Create new aggregated (per subject) SWC records
     execute <<-END
