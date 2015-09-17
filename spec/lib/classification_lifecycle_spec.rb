@@ -470,7 +470,7 @@ describe ClassificationLifecycle do
       let(:workflow_id) { classification.workflow_id }
 
       it "should queue a worker" do
-        expect(DequeueSubjectQueueWorker).to receive(:perform_async).with(workflow_id, sms_ids, nil, nil)
+        expect(DequeueSubjectQueueWorker).to receive(:perform_async).with(workflow_id, array_including(sms_ids), nil, nil)
         subject.dequeue_for_non_logged_in
       end
     end
