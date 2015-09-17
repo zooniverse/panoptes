@@ -106,6 +106,10 @@ describe ClassificationLifecycle do
             .and_call_original
         end
 
+        it "should call the #dequeue_for_non_logged_in" do
+          expect(subject).to receive(:dequeue_for_non_logged_in)
+        end
+
         it "should call the #update_classification_data" do
           expect(subject).to receive(:update_classification_data)
         end
@@ -157,6 +161,10 @@ describe ClassificationLifecycle do
         it "should wrap the calls in transactions" do
           expect(Classification).to receive(:transaction).twice
             .and_call_original
+        end
+
+        it "should call the #dequeue_for_non_logged_in" do
+          expect(subject).to receive(:dequeue_for_non_logged_in)
         end
 
         it "should call the #update_classification_data" do
@@ -443,6 +451,27 @@ describe ClassificationLifecycle do
               .with(workflow_id, user_id, set_id)
           end
         end
+      end
+    end
+  end
+
+  describe "dequeue_for_non_logged_in" do
+
+    context "when the user is logged in" do
+
+      it "should not queue a worker" do
+        expect(DequeueSubjectQueueWorker).to_not receive(:perform_async)
+        subject.dequeue_for_non_logged_in
+      end
+    end
+
+    context "when the no user is logged in" do
+      let(:classification) { create(:classification, user: nil) }
+      let(:workflow_id) { classification.workflow_id }
+
+      it "should queue a worker" do
+        expect(DequeueSubjectQueueWorker).to receive(:perform_async).with(workflow_id, array_including(sms_ids), nil, nil)
+        subject.dequeue_for_non_logged_in
       end
     end
   end

@@ -17,20 +17,19 @@ class ClassificationLifecycle
   end
 
   def transact!(&block)
+    dequeue_for_non_logged_in
     Classification.transaction do
       update_classification_data
-
       #NOTE: ensure the block is evaluated before updating the seen subjects
       # as the count worker won't fire if the seens are set, see #should_count_towards_retirement
       instance_eval(&block) if block_given?
-
       create_recent
       update_seen_subjects
-      #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
-      refresh_queue
       publish_to_kafka
       save_to_cassandra unless Rails.env == 'production'
     end
+    #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
+    refresh_queue
   end
 
   def create_project_preference
@@ -52,6 +51,15 @@ class ClassificationLifecycle
     subjects_workflow_subject_sets.each do |set_id|
       if below_threshold_queue?(set_id)
         EnqueueSubjectQueueWorker.perform_async(workflow.id, user.try(:id), set_id)
+      end
+    end
+  end
+
+  def dequeue_for_non_logged_in
+    unless user
+      sms_ids = set_member_subjects.pluck(:id)
+      subjects_workflow_subject_sets.each do |set_id|
+        DequeueSubjectQueueWorker.perform_async(workflow.id, sms_ids, nil, set_id)
       end
     end
   end
@@ -153,10 +161,13 @@ class ClassificationLifecycle
     classification.metadata = updated_metadata
   end
 
+  def set_member_subjects
+    SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
+  end
+
   def subjects_workflow_subject_sets
-    if workflow.grouped
-      smses = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
-      smses.map(&:subject_set_id).uniq
+    @subjects_workflow_subject_sets ||= if workflow.grouped
+      set_member_subjects.map(&:subject_set_id).uniq
     else
       [nil]
     end

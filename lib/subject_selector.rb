@@ -30,18 +30,18 @@ class SubjectSelector
   private
 
   def sms_ids_from_queue(queue)
-    set_member_subject_ids = queue.next_subjects(subjects_page_size)
-    if set_member_subject_ids.blank?
+    sms_ids = queue.next_subjects(subjects_page_size)
+    if sms_ids.blank?
       select_from_database
     else
-      DequeueSubjectQueueWorker.perform_async(workflow.id, set_member_subject_ids, queue_user.try(:id), params[:subject_set_id])
-      set_member_subject_ids
+      dequeue_for_logged_in_user(sms_ids)
+      sms_ids
     end
   end
 
   def select_from_database
     sms_ids = PostgresqlSelection.new(workflow, user.user)
-      .select(limit: 5, subject_set_id: params[:subject_set_id])
+      .select(limit: 5, subject_set_id: subject_set_id)
     empty_database_select_error if sms_ids.blank?
     sms_ids
   end
@@ -63,7 +63,7 @@ class SubjectSelector
   end
 
   def empty_database_select_error
-    message = params[:subject_set_id] ? "for subject_set_id = #{params[:subject_set_id]}" : nil
+    message = subject_set_id ? "for subject_set_id = #{subject_set_id}" : nil
     raise EmptyDatabaseSelect.new("No data #{message} available for selection".squish)
   end
 
@@ -89,10 +89,20 @@ class SubjectSelector
     end
   end
 
+  def subject_set_id
+    params[:subject_set_id]
+  end
+
   def user_subject_queue
-    queue = SubjectQueue.by_set(params[:subject_set_id])
+    queue = SubjectQueue.by_set(subject_set_id)
       .find_by(user: queue_user, workflow: workflow)
     return queue if queue
-    SubjectQueue.create_for_user(workflow, queue_user, set_id: params[:subject_set_id])
+    SubjectQueue.create_for_user(workflow, queue_user, set_id: subject_set_id)
+  end
+
+  def dequeue_for_logged_in_user(sms_ids)
+    if queue_user
+      DequeueSubjectQueueWorker.perform_async(workflow.id, sms_ids, queue_user.try(:id), subject_set_id)
+    end
   end
 end
