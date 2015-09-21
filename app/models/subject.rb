@@ -31,16 +31,7 @@ class Subject < ActiveRecord::Base
 
   def retired_for_workflow?(workflow)
     if workflow && workflow.is_a?(Workflow) && workflow.persisted?
-      if SubjectWorkflowCount::BACKWARDS_COMPAT
-        (SubjectWorkflowCount.retired.by_subject_workflow(self.id, workflow.id).present?) ||
-          (set_member_subjects.joins("INNER JOIN subject_workflow_counts ON subject_workflow_counts.set_member_subject_id = set_member_subjects.id")
-                              .where(subject_workflow_counts: {workflow_id: workflow.id})
-                              .where(subject_set_id: workflow.subject_sets.pluck(:id))
-                              .where.not(subject_workflow_counts: {retired_at: nil})
-                              .any?)
-      else
-        SubjectWorkflowCount.retired.by_subject_workflow(self.id, workflow.id).present?
-      end
+      SubjectWorkflowCount.retired.by_subject_workflow(self.id, workflow.id).present?
     else
       false
     end
