@@ -65,6 +65,15 @@ class SetMemberSubject < ActiveRecord::Base
     retired_workflows.pluck(:id)
   end
 
+  def retired_workflows
+    if SubjectWorkflowCount::BACKWARDS_COMPAT
+      workflow_ids = SubjectWorkflowCount.retired.by_subject(subject_id).pluck(:workflow_id)
+      Workflow.where(id: workflow_ids)
+    else
+      super
+    end
+  end
+
   def retired_workflows=(workflows_to_retire)
     workflows_to_retire.each do |workflow|
       workflow.retire_subject(subject)

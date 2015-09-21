@@ -11,8 +11,8 @@ class SubjectWorkflowCount < ActiveRecord::Base
 
   if BACKWARDS_COMPAT
     # Cannot validate presence in this case (while we're migrating old data columns will be nillable)
-    validates_uniqueness_of :set_member_subject_id, scope: :workflow_id
-    validates_uniqueness_of :subject_id, scope: :workflow_id
+    validates_uniqueness_of :set_member_subject_id, scope: :workflow_id, allow_nil: true
+    validates_uniqueness_of :subject_id, scope: :workflow_id, allow_nil: true
   else
     validates :subject, presence: true, uniqueness: {scope: :workflow_id}
   end
@@ -26,6 +26,15 @@ class SubjectWorkflowCount < ActiveRecord::Base
         .where("(sms1.id IS NOT NULL AND sms1.subject_set_id = ?) OR (sms2.id IS NOT NULL AND sms2.subject_set_id = ?)", subject_set_id, subject_set_id)
     else
       joins(:subject => :set_member_subjects).where(set_member_subjects: {subject_set_id: subject_set_id})
+    end
+  end
+
+  def self.by_subject(subject_id)
+    if SubjectWorkflowCount::BACKWARDS_COMPAT
+      joins("LEFT OUTER JOIN set_member_subjects sms1 ON subject_workflow_counts.set_member_subject_id = sms1.id")
+        .where("(sms1.id IS NOT NULL AND sms1.subject_id = ?) OR (subject_workflow_counts.subject_id = ?)", subject_id, subject_id)
+    else
+      where(subject_id: subject_id)
     end
   end
 
