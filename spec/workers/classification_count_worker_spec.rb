@@ -30,6 +30,7 @@ RSpec.describe ClassificationCountWorker do
         end
 
         before(:each) do
+          stub_const("SubjectWorkflowCount::BACKWARDS_COMPAT", false)
           worker.perform(sms.subject_id, workflow_id)
         end
 

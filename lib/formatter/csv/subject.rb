@@ -40,7 +40,14 @@ module Formatter
       end
 
       def retired_in_workflow
-        SubjectWorkflowCount.retired.where(subject_id: subject_id).pluck(:workflow_id).to_json
+        if SubjectWorkflowCount::BACKWARDS_COMPAT
+          workflow_ids = []
+          workflow_ids += SubjectWorkflowCount.where(set_member_subject_id: sms.id).where.not(retired_at: nil).pluck(:workflow_id)
+          workflow_ids += SubjectWorkflowCount.retired.where(subject_id: subject_id).pluck(:workflow_id)
+          workflow_ids.uniq.to_json
+        else
+          SubjectWorkflowCount.retired.where(subject_id: subject_id).pluck(:workflow_id).to_json
+        end
       end
 
       def metadata

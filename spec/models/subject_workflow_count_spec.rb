@@ -6,9 +6,11 @@ RSpec.describe SubjectWorkflowCount, type: :model do
     expect(build(:subject_workflow_count)).to be_valid
   end
 
-  it 'should not be valid without a subject' do
-    swc = build(:subject_workflow_count, subject: nil, link_subject_sets: false)
-    expect(swc).to_not be_valid
+  unless SubjectWorkflowCount::BACKWARDS_COMPAT
+    it 'should not be valid without a subject' do
+      swc = build(:subject_workflow_count, subject: nil, link_subject_sets: false)
+      expect(swc).to_not be_valid
+    end
   end
 
   it 'should not be valid without a workflow' do
@@ -16,15 +18,49 @@ RSpec.describe SubjectWorkflowCount, type: :model do
     expect(swc).to_not be_valid
   end
 
-  context "when there is a duplicate set_member_subject_id workflow_id entry" do
+  context "when there is a duplicate subject_id workflow_id entry" do
     let(:duplicate) { count.dup }
 
-    it 'should not allow duplicates' do
-      expect(duplicate).to_not be_valid
+    unless SubjectWorkflowCount::BACKWARDS_COMPAT
+      it 'should not allow duplicates' do
+        expect(duplicate).to_not be_valid
+      end
+
+      it "should raise a uniq index db error" do
+        expect{duplicate.save(validate: false)}.to raise_error(ActiveRecord::RecordNotUnique)
+      end
+    end
+  end
+
+  describe '#by_set' do
+    if SubjectWorkflowCount::BACKWARDS_COMPAT
+      it 'retrieves by sms association' do
+        sms = create(:set_member_subject)
+        swc = create(:subject_workflow_count, set_member_subject_id: sms.id)
+        expect(SubjectWorkflowCount.by_set(sms.subject_set_id)).to eq([swc])
+      end
     end
 
-    it "should raise a uniq index db error" do
-      expect{duplicate.save(validate: false)}.to raise_error(ActiveRecord::RecordNotUnique)
+    it 'retrieves by subject association' do
+      sms = create(:set_member_subject)
+      swc = create(:subject_workflow_count, subject_id: sms.subject_id)
+      expect(SubjectWorkflowCount.by_set(sms.subject_set_id)).to eq([swc])
+    end
+  end
+
+  describe '#by_subject_workflow' do
+    if SubjectWorkflowCount::BACKWARDS_COMPAT
+      it 'retrieves by sms association' do
+        sms = create(:set_member_subject)
+        swc = create(:subject_workflow_count, set_member_subject_id: sms.id)
+        expect(SubjectWorkflowCount.by_subject_workflow(sms.subject_id, swc.workflow_id)).to eq(swc)
+      end
+    end
+
+    it 'retrieves by subject association' do
+      sms = create(:set_member_subject)
+      swc = create(:subject_workflow_count, subject_id: sms.subject_id)
+      expect(SubjectWorkflowCount.by_subject_workflow(sms.subject_id, swc.workflow_id)).to eq(swc)
     end
   end
 

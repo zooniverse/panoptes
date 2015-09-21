@@ -42,9 +42,17 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def self.non_retired_for_workflow(workflow)
-    by_workflow(workflow)
-    .joins("LEFT OUTER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id")
-    .where('subject_workflow_counts.id IS NULL OR subject_workflow_counts.retired_at IS NULL')
+    if SubjectWorkflowCount::BACKWARDS_COMPAT
+      by_workflow(workflow)
+        .joins("LEFT OUTER JOIN subject_workflow_counts swc1 ON swc1.set_member_subject_id = set_member_subjects.id")
+        .joins("LEFT OUTER JOIN subject_workflow_counts swc2 ON swc2.subject_id = set_member_subjects.subject_id")
+        .where('swc1.id IS NULL OR swc1.retired_at IS NULL')
+        .where('swc2.id IS NULL OR swc2.retired_at IS NULL')
+    else
+      by_workflow(workflow)
+      .joins("LEFT OUTER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id")
+      .where('subject_workflow_counts.id IS NULL OR subject_workflow_counts.retired_at IS NULL')
+    end
   end
 
   def self.unseen_for_user_by_workflow(user, workflow)
