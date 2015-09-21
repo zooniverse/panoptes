@@ -10,7 +10,7 @@ module SubjectCounts
   end
 
   def finished?
-    if subject_sets.empty?
+    @finished ||= if subject_sets.empty?
       false
     else
       retired_subjects_count >= subjects_count
