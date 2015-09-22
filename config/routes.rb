@@ -69,7 +69,7 @@ Rails.application.routes.draw do
         get "/recents", to: "user_groups#recents", format: false
       end
 
-      json_api_resources :projects, links: [:subject_sets, :workflows] do
+      json_api_resources :projects, links: [:subject_sets, :workflows], versioned: true do
         media_resources :avatar, :background, :attached_images,
           classifications_export: { except: [:create] },
           subjects_export: { except: [:create] },

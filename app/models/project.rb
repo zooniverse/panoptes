@@ -38,6 +38,8 @@ class Project < ActiveRecord::Base
   has_many :tagged_resources, as: :resource
   has_many :tags, through: :tagged_resources
 
+  has_paper_trail only: [:private, :live, :beta_requested, :beta_approved, :launch_requested, :launch_approved]
+
   cache_by_association :project_contents, :tags
   cache_by_resource_method :subjects_count, :retired_subjects_count, :finished?
 
