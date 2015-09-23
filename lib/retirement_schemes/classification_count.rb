@@ -4,8 +4,16 @@ module RetirementSchemes
       @count = count
     end
 
-    def retire?(count)
-      count.classifications_count >= @count
+    def retire?(sw_count)
+      if disabled?
+        false
+      else
+        sw_count.classifications_count >= @count
+      end
+    end
+
+    def disabled?
+      !!@count.to_s.match(/\Adisabled\z/i)
     end
   end
 end
