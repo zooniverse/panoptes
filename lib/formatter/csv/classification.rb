@@ -3,12 +3,12 @@ module Formatter
     class Classification
       attr_reader :classification, :project, :obfuscate, :salt
 
-      delegate :workflow, :workflow_id, :created_at, :gold_standard,
+      delegate :user_id, :workflow, :workflow_id, :created_at, :gold_standard,
         :workflow_version, to: :classification
 
       def self.headers
-        %w( user_name user_ip workflow_id workflow_name workflow_version
-            created_at gold_standard expert metadata annotations subject_data )
+        %w(user_name user_id user_ip workflow_id workflow_name workflow_version
+           created_at gold_standard expert metadata annotations subject_data)
       end
 
       def initialize(project, obfuscate_private_details: true)
