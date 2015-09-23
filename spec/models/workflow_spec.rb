@@ -101,7 +101,7 @@ describe Workflow, :type => :model do
     context "empty" do
       let(:retirement) { Hash.new }
 
-      it "it should return a classification count scheme" do
+      it "should return a classification count scheme" do
         expect(subject.retirement_scheme).to be_a(RetirementSchemes::ClassificationCount)
       end
     end
@@ -109,8 +109,22 @@ describe Workflow, :type => :model do
     context "classification_count" do
       let(:retirement) { { 'criteria' => 'classification_count' } }
 
-      it "it should return a classification count scheme" do
+      it "should return a classification count scheme" do
         expect(subject.retirement_scheme).to be_a(RetirementSchemes::ClassificationCount)
+      end
+
+      context "disabling the retirement scheme" do
+        let(:retirement) do
+          { 'criteria' => 'classification_count', "options" => { "count" => "disabled" } }
+        end
+
+        it "should return a disabled classification count scheme" do
+          aggregate_failures "scheme" do
+            rs = subject.retirement_scheme
+            expect(rs).to be_a(RetirementSchemes::ClassificationCount)
+            expect(rs.disabled?).to eq(true)
+          end
+        end
       end
     end
 
