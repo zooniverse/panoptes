@@ -855,4 +855,14 @@ describe Api::V1::ProjectsController, type: :controller do
 
     it_behaves_like "is destructable"
   end
+
+  describe "versioning" do
+    let(:resource) { projects.first }
+    let!(:existing_versions) { resource.versions.length }
+    let(:num_times) { 11 }
+    let(:update_proc) { Proc.new { |resource, n| resource.update!(live: (n % 2 == 0)) } }
+    let(:resource_param) { :project_id }
+
+    it_behaves_like "a versioned resource"
+  end
 end

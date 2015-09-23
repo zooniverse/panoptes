@@ -4,6 +4,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include TranslatableResource
   include IndexSearch
   include AdminAllowed
+  include Versioned
 
   doorkeeper_for :update, :create, :destroy, :create_classifications_export,
     :create_subjects_export, :create_aggregations_export,
@@ -46,14 +47,16 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def index
     @controlled_resources = controlled_resources.eager_load(:tags)
-    @controlled_resources = case
-                            when params.has_key?(:launch_approved)
-                              controlled_resources.rank(:launched_row_order)
-                            when params.has_key?(:beta_approved)
-                              controlled_resources.rank(:beta_row_order)
-                            else
-                              controlled_resources
-                            end
+    unless params.has_key?(:sort)
+      @controlled_resources = case
+                              when params.has_key?(:launch_approved)
+                                controlled_resources.rank(:launched_row_order)
+                              when params.has_key?(:beta_approved)
+                                controlled_resources.rank(:beta_row_order)
+                              else
+                                controlled_resources
+                              end
+    end
     super
   end
 
@@ -119,8 +122,8 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def create_response(projects)
     serializer.resource({ include: 'owners' },
-                        resource_scope(projects),
-                        fields: CONTENT_FIELDS)
+      resource_scope(projects),
+      fields: CONTENT_FIELDS)
   end
 
   def content_from_params(ps)
