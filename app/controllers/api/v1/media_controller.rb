@@ -164,7 +164,7 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def send_aggregation_ready_email
-    finished = params[:media][:metadata].try(:[], "state") == "finished"
+    finished = params[:media][:metadata].try(:[], "state") == "ready"
     if params[:media_name] == "aggregations_export" && finished
       AggregationDataMailerWorker.perform_async(params[:id])
     end
