@@ -77,7 +77,11 @@ module DumpWorker
   end
 
   def send_email
-    mailer.perform_async(@project.id, medium.get_url(get_expires: 24*60), emails)
+    mailer.perform_async(@project.id, media_get_url, emails)
+  end
+
+  def media_get_url(expires=24*60)
+    medium.get_url(get_expires: expires)
   end
 
   def to_gzip
