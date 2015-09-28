@@ -146,8 +146,8 @@ RSpec.describe Api::V1::MediaController, type: :controller do
     if actions.include? :update
       describe "#update" do
         let(:test_attr) { :metadata }
-        let(:test_attr_value) { { "state" => "finished" } }
-        let(:metadata) { { metadata: { "state" => "finished" } } }
+        let(:test_attr_value) { { "state" => "ready" } }
+        let(:metadata) { { metadata: { "state" => "ready" } } }
         let(:update_params) do
           params = { media: metadata }
           params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
