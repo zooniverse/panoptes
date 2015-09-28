@@ -23,12 +23,11 @@ describe RegistrationsController, type: :controller do
     describe "#update" do
       let(:user) { create(:user) }
 
-      before(:each) do
-        sign_in user
-        put :update, user: params
-      end
-
       context "with the correct old password" do
+        let(:post_update) do
+          sign_in user
+          put :update, user: params
+        end
         let(:params) do
           {
            password: 'testpassword',
@@ -38,12 +37,19 @@ describe RegistrationsController, type: :controller do
         end
 
         it 'should set the new password' do
+          post_update
           user.reload
           expect(user.valid_password?('testpassword')).to be_truthy
         end
 
         it 'should respond 204' do
+          post_update
           expect(response).to have_http_status(:no_content)
+        end
+
+        it "should not call the subscribe worker" do
+          expect(SubscribeWorker).not_to receive(:perform_async)
+          post_update
         end
       end
 
@@ -54,6 +60,11 @@ describe RegistrationsController, type: :controller do
            password_confirmation: 'testpassword',
            current_password: 'jamesbaxter'
           }
+        end
+
+        before(:each) do
+          sign_in user
+          put :update, user: params
         end
 
         it 'should not change the password' do
@@ -74,6 +85,11 @@ describe RegistrationsController, type: :controller do
            current_password: user.password,
            email: 'ohno@example.com'
           }
+        end
+
+        before(:each) do
+          sign_in user
+          put :update, user: params
         end
 
         it 'should return 422' do
@@ -161,15 +177,25 @@ describe RegistrationsController, type: :controller do
 
       context "when email communications are true" do
         let(:extra_attributes) { { login: 'asdfasdfasdf', global_email_communication: true } }
+
         it 'should call subscribe worker' do
           expect(SubscribeWorker).to receive(:perform_async).with(user_attributes[:email])
           post :create, user: user_attributes
+        end
+
+        context "when the resource doesn't save" do
+
+          it 'should not call subscribe worker' do
+            allow_any_instance_of(User).to receive(:persisted?).and_return(false)
+            expect(SubscribeWorker).to_not receive(:perform_async)
+            post :create, user: user_attributes
+          end
         end
       end
 
       context "when email communications are false" do
         let(:extra_attributes) { { login: 'asdfasdf', global_email_communication: false } }
-        it 'should call subscribe worker' do
+        it 'should not call subscribe worker' do
           expect(SubscribeWorker).to_not receive(:perform_async)
           post :create, user: user_attributes
         end
