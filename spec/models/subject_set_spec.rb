@@ -70,7 +70,7 @@ describe SubjectSet, :type => :model do
       end
     end
 
-    describe "#set_member_subjects_count" do
+    describe "#set_member_subjects_count", :disabled do
       let!(:add_subject) {
         create(:set_member_subject, subject_set: subject_set)
         subject_set.reload
@@ -83,7 +83,6 @@ describe SubjectSet, :type => :model do
   end
 
   describe "#belongs_to_project?" do
-
     it "should be false with nil" do
       expect(subject_set.belongs_to_project?(nil)).to eq(false)
     end
