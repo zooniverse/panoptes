@@ -1,4 +1,5 @@
 class AggregationsDumpWorker
+  include Sidekiq::Worker
   include DumpWorker
   include RateLimitDumpWorker
 
