@@ -2,6 +2,7 @@ require 'csv'
 
 class SubjectsDumpWorker
   include DumpWorker
+  include RateLimitDumpWorker
 
   attr_reader :project
 

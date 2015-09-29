@@ -1,5 +1,4 @@
 class AggregationDataMailerWorker
-  include Sidekiq::Worker
   include DumpWorker
 
   attr_reader :medium

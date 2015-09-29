@@ -2,6 +2,7 @@ require 'csv'
 
 class WorkflowsDumpWorker
   include DumpWorker
+  include RateLimitDumpWorker
 
   attr_reader :project
 

@@ -1,5 +1,6 @@
 class AggregationsDumpWorker
   include DumpWorker
+  include RateLimitDumpWorker
 
   attr_reader :project
 
