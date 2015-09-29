@@ -1,7 +1,10 @@
 require 'csv'
 
 class ClassificationsDumpWorker
+  include Sidekiq::Worker
   include DumpWorker
+  include DumpMailerWorker
+  include RateLimitDumpWorker
 
   attr_reader :project
 

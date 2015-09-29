@@ -1,26 +1,12 @@
 module DumpWorker
   extend ActiveSupport::Concern
 
-  included do
-    include Sidekiq::Worker
-
-    sidekiq_options congestion: Panoptes::DumpWorker.congestion_opts.merge({
-      key: ->(project_id, medium_id) {
-        "project_#{ project_id }_#{medium_id}_data_dump_worker"
-      }
-    })
-  end
-
   def dump_target
     @dump_target ||= self.class.to_s.underscore.match(/\A(\w+)_dump_worker\z/)[1]
   end
 
   def dump_type
     "project_#{dump_target}_export"
-  end
-
-  def mailer
-    "#{dump_target.singularize}_data_mailer_worker".camelize.constantize
   end
 
   def temp_file_path
@@ -66,22 +52,6 @@ module DumpWorker
 
   def write_to_s3
     medium.put_file(gzip_file_path, compressed: true)
-  end
-
-  def emails
-    if recipients = medium.try(:metadata).try(:[], "recipients")
-      User.where(id: recipients).pluck(:email)
-    else
-      [project.owner.email]
-    end
-  end
-
-  def send_email
-    mailer.perform_async(@project.id, media_get_url, emails)
-  end
-
-  def media_get_url(expires=24*60)
-    medium.get_url(get_expires: expires)
   end
 
   def to_gzip
