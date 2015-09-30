@@ -27,13 +27,14 @@ describe Collection, :type => :model do
     end
   end
 
-  it 'should require unique displays name for an owner' do
+  it 'should require unique displays name for an owner', :aggregate_failures do
     owner = create(:user)
     expect(create(:collection, display_name: "hi fives", owner: owner)).to be_valid
     expect(build(:collection, display_name: "hi fives", owner: owner)).to_not be_valid
+    expect(build(:collection, display_name: "HI fives", owner: owner)).to_not be_valid
   end
 
-  it 'should not require display name uniquenames between owners' do
+  it 'should not require display name uniquenames between owners', :aggregate_failures do
     expect(create(:collection, display_name: "test collection", owner: create(:user))).to be_valid
     expect(create(:collection, display_name: "test collection", owner: create(:user))).to be_valid
   end
