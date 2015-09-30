@@ -22,7 +22,7 @@ class UniqueForOwnerValidator < ActiveModel::Validator
   end
 
   def record_exists?(scope, record, field)
-    query = scope.where(field => record.send(field))
+    query = scope.where("lower(#{field}) = ?", record.send(field).to_s.downcase)
     query = query.where.not(id: record.id) if record.persisted?
     query.exists?
   end

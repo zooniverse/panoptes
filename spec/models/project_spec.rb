@@ -26,13 +26,14 @@ describe Project, :type => :model do
     expect(project).to be_valid
   end
 
-  it 'should require unique displays name for an owner' do
+  it 'should require unique displays name for an owner', :aggregate_failures do
     owner = create(:user)
     expect(create(:project, display_name: "hi fives", owner: owner)).to be_valid
     expect(build(:project, display_name: "hi fives", owner: owner)).to_not be_valid
+    expect(build(:project, display_name: "HI fives", owner: owner)).to_not be_valid
   end
 
-  it 'should not require display name uniquenames between owners' do
+  it 'should not require display name uniquenames between owners', :aggregate_failures do
     expect(create(:project, display_name: "test project", owner: create(:user))).to be_valid
     expect(create(:project, display_name: "test project", owner: create(:user))).to be_valid
   end
