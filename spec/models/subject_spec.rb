@@ -108,6 +108,25 @@ describe Subject, :type => :model do
       expect(subject.retired_for_workflow?(SubjectSet.new)).to eq(false)
     end
 
+    if SubjectWorkflowCount::BACKWARDS_COMPAT
+      context "with an old SubjectWorkflowCount" do
+        let(:swc) { instance_double("SubjectWorkflowCount") }
+        before(:each) do
+          allow(SubjectWorkflowCount).to receive(:find_by).and_return(swc)
+        end
+
+        it "should be true when the swc is retired" do
+          create(:subject_workflow_count, workflow: workflow, set_member_subject_id: subject.set_member_subjects.first.id, retired_at: DateTime.now)
+          expect(subject.retired_for_workflow?(workflow)).to eq(true)
+        end
+
+        it "should be false when the sec is not retired" do
+          allow(swc).to receive(:retired?).and_return(false)
+          expect(subject.retired_for_workflow?(workflow)).to eq(false)
+        end
+      end
+    end
+
     context "with a SubjectWorkflowCount" do
       let(:swc) { instance_double("SubjectWorkflowCount") }
       before(:each) do
@@ -115,32 +134,12 @@ describe Subject, :type => :model do
       end
 
       it "should be true when the swc is retired" do
-        create(:subject_workflow_count, workflow: workflow, set_member_subject: subject.set_member_subjects.first, retired_at: DateTime.now)
+        create(:subject_workflow_count, workflow: workflow, subject: subject, retired_at: DateTime.now)
         expect(subject.retired_for_workflow?(workflow)).to eq(true)
       end
 
       it "should be false when the sec is not retired" do
         allow(swc).to receive(:retired?).and_return(false)
-        expect(subject.retired_for_workflow?(workflow)).to eq(false)
-      end
-    end
-
-    context "when the subject belongs to multiple workflows" do
-      let!(:another_workflow) { create(:workflow, project: project) }
-      let(:another_subject_set) do
-        create(:subject_set, project: project, workflows: [another_workflow])
-      end
-      let!(:another_set_member_subject) do
-        create(:set_member_subject, subject_set: another_subject_set, subject: subject)
-      end
-
-      it "should be retired when it looks up the correct set_member_subject" do
-        create(:subject_workflow_count, workflow: workflow, set_member_subject: subject.set_member_subjects.first, retired_at: DateTime.now)
-        expect(subject.retired_for_workflow?(workflow)).to eq(true)
-      end
-
-      it "should not be retired when it looks up the incorrect set_member_subject" do
-        create(:subject_workflow_count, workflow: workflow, set_member_subject: another_subject_set.set_member_subjects.last, retired_at: DateTime.now)
         expect(subject.retired_for_workflow?(workflow)).to eq(false)
       end
     end

@@ -1,14 +1,17 @@
 require 'spec_helper'
 
 describe SetMemberSubjectSelector do
-  let(:count) { create(:subject_workflow_count) }
+  let(:project) { create :project, workflows: build_list(:workflow, 1) }
+  let(:subject_set) { create :subject_set, project: project }
+  let(:subject) { create :subject, project: project, subject_sets: [subject_set]}
+  let(:seen_subject) { create(:subject, project: project, subject_sets: [subject_set]) }
+
+  let(:count) { create(:subject_workflow_count, subject: subject, workflow: project.workflows.first) }
   let(:user) { create(:user) }
-  let(:subject_set) { count.set_member_subject.subject_set }
-  let(:seen_subject) { create(:subject, subject_sets: [subject_set]) }
   let(:user_seen_subject) { create(:user_seen_subject, user: user, workflow: count.workflow, subject_ids: [seen_subject.id]) }
 
   before do
-    count.workflow.subject_sets = [count.set_member_subject.subject_set]
+    count.workflow.subject_sets = count.subject.subject_sets
     count.workflow.save!
   end
 
@@ -53,7 +56,7 @@ describe SetMemberSubjectSelector do
 
     it 'does not include subjects that have been seen' do
       user_seen_subject
-      expect(sms_to_classify).to eq([count.set_member_subject])
+      expect(sms_to_classify).to eq([count.subject.set_member_subjects.first])
     end
 
     it 'does not include subjects that are retired' do
@@ -66,7 +69,7 @@ describe SetMemberSubjectSelector do
 
       before(:each) do
         user_seen_subject
-        create(:subject_workflow_count, set_member_subject: seen_subject.set_member_subjects.first, workflow: count.workflow)
+        create(:subject_workflow_count, subject: seen_subject, workflow: count.workflow)
         count.retire!
       end
 
@@ -76,16 +79,14 @@ describe SetMemberSubjectSelector do
 
       it 'does not include subjects the user has seen' do
         user_seen_subject
-        expect(sms_to_classify).to eq([count.set_member_subject])
+        expect(sms_to_classify).to eq([count.subject.set_member_subjects.first])
       end
     end
 
     context "when there are set_member_subjects from other workfow" do
-
       it "should only return set_member_subjects from the set workflow" do
         sms = create(:set_member_subject)
-        all_sms = [count.set_member_subject, sms]
-        expect(sms_to_classify).to eq([count.set_member_subject])
+        expect(sms_to_classify).to eq([count.subject.set_member_subjects.first])
       end
     end
   end

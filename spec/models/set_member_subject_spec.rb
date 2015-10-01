@@ -39,7 +39,7 @@ describe SetMemberSubject, :type => :model do
 
       before(:each) do
         workflow.update!(retired_set_member_subjects_count: sms.length)
-        sms.each { |i| i.retire_workflow(workflow) }
+        sms.each { |i| workflow.retire_subject(i.subject) }
       end
 
       it 'should select retired subjects' do
@@ -68,7 +68,7 @@ describe SetMemberSubject, :type => :model do
 
     context "when workflow is unfinished" do
       let!(:retired_sms) do
-        create(:set_member_subject, subject_set: subject_set).tap { |sms| sms.retire_workflow(workflow) }
+        create(:set_member_subject, subject_set: subject_set).tap { |sms| workflow.retire_subject(sms.subject) }
       end
 
       it 'should select active subjects' do
@@ -124,40 +124,25 @@ describe SetMemberSubject, :type => :model do
   end
 
   describe ":non_retired_for_workflow" do
-    let(:count) { create(:subject_workflow_count) }
-    let(:workflow) { count.workflow }
+    let(:set_member_subject) { create(:set_member_subject) }
+    let(:workflow) { create(:workflow, subject_sets: [set_member_subject.subject_set]) }
+    let(:count) { create(:subject_workflow_count, subject: set_member_subject.subject, workflow: workflow) }
     let!(:another_workflow_sms) { create(:set_member_subject) }
 
-    context "when none are retired" do
+    if SubjectWorkflowCount::BACKWARDS_COMPAT
+      it 'should not return duplicate sms' do
+        count2 = create(:subject_workflow_count, set_member_subject_id: set_member_subject.id, workflow: workflow)
+        expect(SetMemberSubject.non_retired_for_workflow(workflow).size).to eq(1)
+      end
+    end
 
+    context "when none are retired" do
       it "should return the workflow's non retired sms" do
-        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(count.set_member_subject)
+        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(set_member_subject)
       end
     end
 
     context "when the workflow sms is retired" do
-
-      it "should return an empty set" do
-        count.retire!
-        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to be_empty
-      end
-    end
-  end
-
-  describe ":non_retired_for_workflow" do
-    let(:count) { create(:subject_workflow_count) }
-    let(:workflow) { count.workflow }
-    let!(:another_workflow_sms) { create(:set_member_subject) }
-
-    context "when none are retired" do
-
-      it "should return the workflow's non retired sms" do
-        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(count.set_member_subject)
-      end
-    end
-
-    context "when the workflow sms is retired" do
-
       it "should return an empty set" do
         count.retire!
         expect(SetMemberSubject.non_retired_for_workflow(workflow)).to be_empty
@@ -207,20 +192,6 @@ describe SetMemberSubject, :type => :model do
 
     it "should belong to a subject" do
       expect(set_member_subject.subject).to be_a(Subject)
-    end
-  end
-
-  describe "#retire_workflow" do
-    it 'should add the workflow the retired_workflows relationship' do
-      sms = set_member_subject
-      sms.save!
-      workflow1 = sms.subject_set.workflows.first
-      workflow2 = create(:workflow, subject_sets: [sms.subject_set])
-      create(:subject_workflow_count, set_member_subject: sms, workflow: workflow1)
-      create(:subject_workflow_count, set_member_subject: sms, workflow: workflow2)
-      sms.retire_workflow(workflow1)
-      sms.reload
-      expect(sms.retired_workflows).to eq([workflow1])
     end
   end
 

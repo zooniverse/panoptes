@@ -18,9 +18,9 @@ RSpec.describe CountResetWorker do
     it 'should reset the workflow retired count' do
       workflow = workflows.first
       workflow.update! retired_set_member_subjects_count: 100
-      
+
       sms.take(2).each do |s|
-        opts = { set_member_subject: s, workflow: workflow, retired_at: Time.now, link_subject_sets: false}
+        opts = { subject: s.subject, workflow: workflow, retired_at: Time.now, link_subject_sets: false}
         create(:subject_workflow_count, opts)
       end
 

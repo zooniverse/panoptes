@@ -40,10 +40,14 @@ module Formatter
       end
 
       def retired_in_workflow
-        SubjectWorkflowCount.where(set_member_subject: sms)
-          .where.not(retired_at: nil)
-          .pluck(:workflow_id)
-          .to_json
+        if SubjectWorkflowCount::BACKWARDS_COMPAT
+          workflow_ids = []
+          workflow_ids += SubjectWorkflowCount.where(set_member_subject_id: sms.id).where.not(retired_at: nil).pluck(:workflow_id)
+          workflow_ids += SubjectWorkflowCount.retired.where(subject_id: subject_id).pluck(:workflow_id)
+          workflow_ids.uniq.to_json
+        else
+          SubjectWorkflowCount.retired.where(subject_id: subject_id).pluck(:workflow_id).to_json
+        end
       end
 
       def metadata
@@ -52,7 +56,7 @@ module Formatter
 
       def classifications_by_workflow
         sms.subject_set.workflows.map do |workflow|
-          count = SubjectWorkflowCount.find_by(set_member_subject: sms, workflow: workflow)
+          count = SubjectWorkflowCount.by_subject_workflow(subject_id, workflow.id)
             .try(:classifications_count) || 0
           {workflow.id => count}
         end.reduce(&:merge).to_json
