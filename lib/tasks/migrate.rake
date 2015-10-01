@@ -148,7 +148,7 @@ namespace :migrate do
     end
   end
 
-  task :subject_workflow_counts do
+  task subject_workflow_counts: :environment do
     SubjectWorkflowCount.transaction do
       # Not too sure how atomic INSERT INTO ... SELECT is in Postgresql (and couldn't find anything)
       ActiveRecord::Base.connection.execute "LOCK TABLE subject_workflow_counts IN EXCLUSIVE MODE"
