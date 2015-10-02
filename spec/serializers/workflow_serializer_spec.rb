@@ -71,7 +71,11 @@ describe WorkflowSerializer do
     context "with no values set" do
 
       it 'should return the default criteria' do
-        expect(expected).to eq({"classification_count"=>{"count"=>15}})
+        defaults = {
+          criteria: "classification_count",
+          options: { "count" => 15 }
+        }
+        expect(expected).to eq(defaults)
       end
     end
 

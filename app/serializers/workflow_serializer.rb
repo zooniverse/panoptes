@@ -47,7 +47,10 @@ class WorkflowSerializer
   def retirement
     retire_criteria = @model.retirement
     if retire_criteria.blank?
-      { Workflow::DEFAULT_CRITERIA => Workflow::DEFAULT_OPTS }
+      {
+        criteria: Workflow::DEFAULT_CRITERIA,
+        options: Workflow::DEFAULT_OPTS
+      }
     else
       retire_criteria
     end
