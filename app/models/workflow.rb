@@ -51,35 +51,13 @@ class Workflow < ActiveRecord::Base
   end
 
   def retired_subjects
-    if SubjectWorkflowCount::BACKWARDS_COMPAT
-      subjects = []
-      subjects += subject_workflow_counts.retired.includes(:subject).map(&:subject)
-      subjects += SetMemberSubject.includes(:subject).where(id: subject_workflow_counts.retired.pluck(:set_member_subject_id)).map(&:subject)
-      subjects.compact
-    else
-      subject_workflow_counts.retired.includes(:subject).map(&:subject)
-    end
+    subject_workflow_counts.retired.includes(:subject).map(&:subject)
   end
 
   def retire_subject(subject_id)
-    if SubjectWorkflowCount::BACKWARDS_COMPAT
-      if set_member_subjects.where(subject_id: subject_id).any?
-        count = subject_workflow_counts.where(subject_id: subject_id, workflow_id: id).first
-
-        if count
-          count.retire!
-        else
-          set_member_subjects.where(subject_id: subject_id).each do |sms|
-            count = subject_workflow_counts.where(set_member_subject_id: sms.id, workflow_id: id).first_or_create!
-            count.retire!
-          end
-        end
-      end
-    else
-      if set_member_subjects.where(subject_id: subject_id).any?
-        count = subject_workflow_counts.where(subject_id: subject_id, workflow_id: id).first_or_create!
-        count.retire!
-      end
+    if set_member_subjects.where(subject_id: subject_id).any?
+      count = subject_workflow_counts.where(subject_id: subject_id, workflow_id: id).first_or_create!
+      count.retire!
     end
   end
 

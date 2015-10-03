@@ -163,7 +163,6 @@ describe Workflow, :type => :model do
 
     context 'when the subject does not have a workflow count' do
       it 'marks as retired' do
-        stub_const("SubjectWorkflowCount::BACKWARDS_COMPAT", false)
         workflow.retire_subject(subject.id)
 
         aggregate_failures do
@@ -175,7 +174,6 @@ describe Workflow, :type => :model do
 
     context 'when the subject is already retired' do
       it 'leaves the retirement timestamp as it was' do
-        stub_const("SubjectWorkflowCount::BACKWARDS_COMPAT", false)
         workflow.retire_subject(subject.id)
         retired_ats = SubjectWorkflowCount.order(:id).pluck(:retired_at)
         workflow.retire_subject(subject.id)
@@ -199,15 +197,6 @@ describe Workflow, :type => :model do
   end
 
   describe '#retired_subjects' do
-    if SubjectWorkflowCount::BACKWARDS_COMPAT
-      it 'returns through sms association' do
-        sms = create(:set_member_subject)
-        swc = create(:subject_workflow_count, set_member_subject_id: sms.id, subject: nil, link_subject_sets: false, retired_at: Time.now)
-
-        expect(swc.workflow.retired_subjects).to eq([sms.subject])
-      end
-    end
-
     it 'returns through subject association' do
       sms = create(:set_member_subject)
       swc = create(:subject_workflow_count, subject: sms.subject, retired_at: Time.now)

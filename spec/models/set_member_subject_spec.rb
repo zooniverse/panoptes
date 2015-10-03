@@ -129,13 +129,6 @@ describe SetMemberSubject, :type => :model do
     let(:count) { create(:subject_workflow_count, subject: set_member_subject.subject, workflow: workflow) }
     let!(:another_workflow_sms) { create(:set_member_subject) }
 
-    if SubjectWorkflowCount::BACKWARDS_COMPAT
-      it 'should not return duplicate sms' do
-        count2 = create(:subject_workflow_count, set_member_subject_id: set_member_subject.id, workflow: workflow)
-        expect(SetMemberSubject.non_retired_for_workflow(workflow).size).to eq(1)
-      end
-    end
-
     context "when none are retired" do
       it "should return the workflow's non retired sms" do
         expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(set_member_subject)
