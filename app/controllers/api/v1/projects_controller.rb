@@ -33,9 +33,8 @@ class Api::V1::ProjectsController < Api::ApiController
 
   prepend_before_action :require_login,
     only: [:create, :update, :destroy, :create_classifications_export,
-    :create_subjects_export,
-    :create_aggregations_export, :create_workflows_export,
-    :create_workflow_contents_export]
+    :create_subjects_export, :create_aggregations_export,
+    :create_workflows_export, :create_workflow_contents_export]
 
   search_by do |name, query|
     query.search_display_name(name.join(" "))
@@ -139,9 +138,14 @@ class Api::V1::ProjectsController < Api::ApiController
     content.select { |k,v| !!v }
   end
 
+  def admin_allowed_params
+    [ :beta_approved, :launch_approved, :redirect,
+      :launched_row_order_position, :beta_row_order_position,
+      :experimental_tools ]
+  end
+
   def build_resource_for_create(create_params)
-    admin_allowed create_params, :beta_approved, :launch_approved, :redirect,
-      :launched_row_order_position, :beta_row_order_position
+    admin_allowed create_params, *admin_allowed_params
     create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
     if create_params.has_key? :tags
       create_params[:tags] = create_or_update_tags(create_params)
@@ -151,8 +155,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def build_update_hash(update_params, id)
-    admin_allowed update_params, :beta_approved, :launch_approved,
-      :redirect, :launched_row_order_position, :beta_row_order_position
+    admin_allowed update_params, *admin_allowed_params
     content_update = content_from_params(update_params)
     unless content_update.blank?
       Project.find(id).primary_content.update!(content_update)
