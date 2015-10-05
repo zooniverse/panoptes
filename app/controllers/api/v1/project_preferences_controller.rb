@@ -2,12 +2,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   include PreferencesController
 
   doorkeeper_for :all, scopes: [:project]
-  schema_type :strong_params
-
-  allowed_params :create, :email_communication, preferences: [:tutorial],
-    links: [:project]
-
-  allowed_params :update, :email_communication, preferences: [:tutorial]
+  schema_type :json_schema
 
   private
 
