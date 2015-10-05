@@ -68,7 +68,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
         [ resource.id, subject_id, rand ]
       end
       SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
-      SubjectSet.reset_counters(resource.id, :set_member_subjects)
+      SubjectSetSubjectCounterWorker.perform_in(3.minutes, resource.id)
     else
       super
     end
@@ -87,6 +87,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def remove_linked_set_member_subjects(resource, set_member_subjects)
     QueueRemovalWorker.perform_async(set_member_subjects.pluck(:id), resource.workflows.pluck(:id))
+    SubjectSetSubjectCounterWorker.perform_in(3.minutes, resource.id)
     CountResetWorker.perform_async(resource.id)
     set_member_subjects.delete_all
   end

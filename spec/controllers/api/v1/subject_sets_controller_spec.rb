@@ -102,9 +102,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
         post :update_links, params
       end
 
-      it "should update the set_member_subject_count" do
+      it "should queue the counter worker" do
+        expect(SubjectSetSubjectCounterWorker).to receive(:perform_in).with(3.minutes, resource.id)
         run_update_links
-        expect(sms_count).to eq(test_relation_ids.count)
       end
 
       context "when the linking resources are not persisted" do

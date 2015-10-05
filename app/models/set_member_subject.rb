@@ -2,7 +2,7 @@ class SetMemberSubject < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include Linkable
 
-  belongs_to :subject_set, counter_cache: true, touch: true
+  belongs_to :subject_set
   belongs_to :subject
   has_many :workflows, through: :subject_set
 
@@ -20,6 +20,9 @@ class SetMemberSubject < ActiveRecord::Base
   before_destroy :remove_from_queues
 
   can_be_linked :subject_queue, :in_queue_workflow, :model
+
+  after_create :update_counter
+  before_destroy :update_counter
 
   def self.in_queue_workflow(queue)
     query = joins(subject_set: :workflows)
@@ -69,5 +72,9 @@ class SetMemberSubject < ActiveRecord::Base
 
   def set_random
     self.random = rand
+  end
+
+  def update_counter
+    SubjectSetSubjectCounterWorker.perform_in(3.minutes, subject_set_id)
   end
 end

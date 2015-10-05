@@ -1,8 +1,0 @@
-default: &default
-  congestion_opts: { interval: 86400, max_in_interval: 1, min_delay: 43200, reject_with: !ruby/symbol cancel }
-
-test:
-  <<: *default
-
-development:
-  <<: *default
