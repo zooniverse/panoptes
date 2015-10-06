@@ -16,10 +16,6 @@ module Panoptes
     def self.emails
       config.fetch(:emails, [])
     end
-
-    def self.check_interval
-      config.fetch(:check_interval, nil)
-    end
   end
 end
 
