@@ -41,3 +41,10 @@ Sidekiq.configure_server do |config|
     chain.add Sidekiq::Congestion::Limiter
   end
 end
+
+require 'sidetiq'
+Sidetiq.configure do |config|
+  config.utc = true
+end
+
+require 'sidetiq/web'

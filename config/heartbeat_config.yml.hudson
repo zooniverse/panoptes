@@ -1,0 +1,10 @@
+default: &default
+  window_period: 600
+  emails: test@test.com
+  check_interval: 300
+
+test:
+  <<: *default
+
+development:
+  <<: *default
