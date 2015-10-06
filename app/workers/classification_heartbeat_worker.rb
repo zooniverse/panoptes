@@ -4,7 +4,7 @@ class ClassificationHeartbeatWorker
 
   sidekiq_options queue: :medium
 
-  recurrence { secondly(Panoptes::ClassificationHeartbeat.check_interval) }
+  recurrence { hourly.minute_of_hour(0, 15, 30, 45) }
 
   def perform
     if missing_classifications?
