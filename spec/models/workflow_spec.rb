@@ -20,6 +20,16 @@ describe Workflow, :type => :model do
     expect(workflow).to be_valid
   end
 
+  describe "#display_name" do
+    let(:workflow) { build(:workflow, display_name: nil) }
+
+    it "should not be valid", :aggregate_failures do
+      validity = workflow.valid?
+      expect(validity).to be_falsey
+      expect(workflow.errors[:display_name]).to_not be_nil
+    end
+  end
+
   it "should be destroyable when it has subject counts" do
     workflow.save!
     create(:subject_workflow_count, workflow: workflow)

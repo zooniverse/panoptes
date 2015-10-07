@@ -26,7 +26,7 @@ class Workflow < ActiveRecord::Base
   DEFAULT_CRITERIA = 'classification_count'
   DEFAULT_OPTS = { 'count' => 15 }
 
-  validates_presence_of :project
+  validates_presence_of :project, :display_name
 
   validate do |workflow|
     criteria = %w(classification_count)
