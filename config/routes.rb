@@ -97,6 +97,10 @@ Rails.application.routes.draw do
       json_api_resources :subject_queues, links: [:subjects]
 
       json_api_resources :tags, only: [:index, :show]
+
+      json_api_resources :tutorials do
+        media_resources :attached_images
+      end
     end
   end
 
