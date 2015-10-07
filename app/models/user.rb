@@ -73,8 +73,10 @@ class User < ActiveRecord::Base
     ranked_by: ":trigram"
 
   def self.scope_for(action, user, opts={})
-    case action
-    when :show, :index
+    case
+    when user.is_admin?
+      User.all
+    when [ :show, :index ].include?(action)
       where(ouroboros_created: false).merge(active)
     else
       where(id: user.id)
