@@ -11,7 +11,7 @@ describe Api::V1::ProjectsController, type: :controller do
      "updated_at", "created_at", "available_languages", "title",
      "description", "introduction", "migrated","private", "live",
      "retired_subjects_count", "urls", "classifiers_count", "redirect",
-     "workflow_description", "tags" ]
+     "workflow_description", "tags", "experimental_tools" ]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
@@ -384,11 +384,11 @@ describe Api::V1::ProjectsController, type: :controller do
         it_behaves_like "admin only option", :redirect, "http://example.com"
       end
 
-      describe "approved option" do
+      describe "launch approved option" do
         it_behaves_like "admin only option", :launch_approved, true
       end
 
-      describe "approved option" do
+      describe "beta approved option" do
         it_behaves_like "admin only option", :beta_approved, true
       end
 
@@ -398,6 +398,10 @@ describe Api::V1::ProjectsController, type: :controller do
 
       describe "beta_row_order_position option" do
         it_behaves_like "admin only option", :beta_row_order_position, 10
+      end
+
+      describe "experiemntal_tools option" do
+        it_behaves_like "admin only option", :experimental_tools, ["survey"]
       end
 
       describe "create talk admin" do

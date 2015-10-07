@@ -90,6 +90,13 @@ class ProjectCreateSchema < JsonSchema
       type "string"
     end
 
+    property "experimental_tools" do
+      type "array"
+      items do
+        type "string"
+      end
+    end
+
     property "links" do
       type "object"
       additional_properties false
