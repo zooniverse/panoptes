@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Formatter::Csv::Classification do
 
   let(:project_headers) do
-    %w( user_name user_ip workflow_id workflow_name workflow_version
+    %w( user_name user_id user_ip workflow_id workflow_name workflow_version
         created_at gold_standard expert metadata annotations subject_data )
   end
 
@@ -21,6 +21,7 @@ RSpec.describe Formatter::Csv::Classification do
 
   let(:formatted_data) do
     [ classification.user.login,
+      classification.user_id,
       ip_hash,
       classification.workflow_id,
       classification.workflow.display_name,
@@ -70,7 +71,7 @@ RSpec.describe Formatter::Csv::Classification do
     context "when the obfuscate_private_details flag is false" do
       it 'return the real classification ip in the array' do
         allow(formatter).to receive(:obfuscate).and_return(false)
-        user_ip = formatter.to_array(classification)[1]
+        user_ip = formatter.to_array(classification)[2]
         expect(user_ip).to eq(classification.user_ip.to_s)
       end
     end
