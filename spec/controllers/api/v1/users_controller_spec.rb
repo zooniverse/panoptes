@@ -359,22 +359,35 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     describe "updated subject limit" do
+      let(:new_limit) { 10 }
+
       before(:each) do
         update_request
       end
 
       context "when user is an admin" do
-        let(:put_operations) { {admin: true, users: {subject_limit: 10}} }
+        let(:put_operations) { {admin: true, users: {subject_limit: new_limit}} }
         let(:user) { create(:user, admin: true) }
 
         it 'should update users subject_limit' do
-          user.reload
-          expect(user.subject_limit).to eq(10)
+          expect(user.reload.subject_limit).to eq(new_limit)
+        end
+
+        context "admin updating another user" do
+          let(:user_id) { users.last.id }
+
+          it "should return 200 status" do
+            expect(response).to have_http_status(:ok)
+          end
+
+          it "should have updated the other user's subject_limit" do
+            expect(users.last.reload.subject_limit).to eq(new_limit)
+          end
         end
       end
 
       context "when user is not an admin" do
-        let(:put_operations) { {users: {subject_limit: 10}} }
+        let(:put_operations) { {users: {subject_limit: new_limit}} }
 
         it 'should fail with a 422 error' do
           expect(response).to have_http_status(:unprocessable_entity)
