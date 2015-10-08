@@ -116,6 +116,10 @@ class ProjectUpdateSchema < JsonSchema
         end
       end
 
+      property "default_tutorial" do
+        type "string"
+      end
+
       property "subject_sets" do
         type "array"
         items do

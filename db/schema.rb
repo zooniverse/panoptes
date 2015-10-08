@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151005093746) do
+ActiveRecord::Schema.define(version: 20151007193849) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -190,6 +190,7 @@ ActiveRecord::Schema.define(version: 20151005093746) do
     t.integer  "launched_row_order",    index: {name: "index_projects_on_launched_row_order"}
     t.integer  "beta_row_order",        index: {name: "index_projects_on_beta_row_order"}
     t.string   "experimental_tools",    default: [],                 array: true
+    t.integer  "default_tutorial_id",   index: {name: "index_projects_on_default_tutorial_id"}
   end
 
   create_table "recents", force: :cascade do |t|
@@ -273,6 +274,14 @@ ActiveRecord::Schema.define(version: 20151005093746) do
     t.datetime "updated_at",             null: false
   end
   add_index "tags", ["name"], name: "tags_name_trgm_idx", using: :gin, operator_class: "gin_trgm_ops"
+
+  create_table "tutorials", force: :cascade do |t|
+    t.json     "steps",       default: []
+    t.text     "language",    index: {name: "index_tutorials_on_language"}
+    t.integer  "workflow_id", index: {name: "index_tutorials_on_workflow_id"}
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
 
   create_table "user_collection_preferences", force: :cascade do |t|
     t.jsonb    "preferences",   default: {}
@@ -390,6 +399,7 @@ ActiveRecord::Schema.define(version: 20151005093746) do
     t.index name: "index_workflows_on_aggregation", expression: "(aggregation ->> 'public'::text)"
   end
 
+  add_foreign_key "projects", "tutorials", column: "default_tutorial_id"
   add_foreign_key "recents", "classifications"
   add_foreign_key "recents", "subjects"
   add_foreign_key "subject_sets_workflows", "subject_sets"

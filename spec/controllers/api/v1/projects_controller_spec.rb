@@ -23,7 +23,8 @@ describe Api::V1::ProjectsController, type: :controller do
       "projects.classifications_export",
       "projects.aggregations_export",
       "projects.subjects_export",
-      "projects.attached_images" ]
+      "projects.attached_images",
+      "projects.default_tutorial" ]
   end
 
   let(:scopes) { %w(public project) }
@@ -581,27 +582,31 @@ describe Api::V1::ProjectsController, type: :controller do
   describe "#update" do
     let(:workflow) { create(:workflow) }
     let(:subject_set) { create(:subject_set) }
+    let(:tutorial) do
+      workflow = create(:workflow, project: resource)
+      create(:tutorial, workflow: workflow)
+    end
     let(:resource) { create(:project_with_contents, owner: authorized_user) }
     let(:test_attr) { :display_name }
     let(:test_attr_value) { "A Better Name" }
     let(:update_params) do
       {
-       projects: {
-                  display_name: "A Better Name",
-                  name: "something_new",
-                  workflow_description: "some more text",
-                  configuration: {
-                                  an_option: "a setting"
-                                 },
-                  beta_requested: true,
-                  live: true,
-                  tags: ["astro", "gastro"],
-                  links: {
-                          workflows: [workflow.id.to_s],
-                          subject_sets: [subject_set.id.to_s]
-                         }
-
-                 }
+        projects: {
+          display_name: "A Better Name",
+          name: "something_new",
+          workflow_description: "some more text",
+          configuration: {
+            an_option: "a setting"
+          },
+          beta_requested: true,
+          live: true,
+          tags: ["astro", "gastro"],
+          links: {
+            workflows: [workflow.id.to_s],
+            subject_sets: [subject_set.id.to_s],
+            default_tutorial: tutorial.id.to_s
+          }
+        }
       }
     end
 
@@ -804,11 +809,11 @@ describe Api::V1::ProjectsController, type: :controller do
 
     let(:create_params) do
       params = {
-                media: {
-                        content_type: content_type,
-                        metadata: { recipients: create_list(:user, 1).map(&:id) }
-                       }
-               }
+        media: {
+          content_type: content_type,
+          metadata: { recipients: create_list(:user, 1).map(&:id) }
+        }
+      }
       params.merge(project_id: resource.id)
     end
 
