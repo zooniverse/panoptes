@@ -27,8 +27,9 @@ class TutorialCreateSchema < JsonSchema
 
     property "links" do
       type "object"
+      additional_properties false
 
-      property "workflow" do
+      property "project" do
         type "string"
       end
     end

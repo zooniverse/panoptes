@@ -1,20 +1,19 @@
 require "spec_helper"
 
 describe Api::V1::TutorialsController, type: :controller do
-  let(:private_workflow) { create(:workflow, project: create(:project, private: true)) }
-  let(:workflow) { create(:workflow) }
-  let(:project) { tutorials[1].workflow.project }
+  let(:private_project) { create(:project, private: true) }
+  let(:project) { create(:project) }
   let!(:tutorials) do
-    [ create(:tutorial, workflow: workflow),
+    [ create(:tutorial, project: project),
       create(:tutorial),
-      create(:tutorial, workflow: private_workflow) ]
+      create(:tutorial, project: private_project) ]
   end
 
   let(:scopes) { %w(public project) }
   let(:api_resource_name) { "tutorials" }
   let(:api_resource_attributes) { %w(steps language) }
-  let(:api_resource_links) { %w(tutorials.workflow tutorials.attached_images) }
-  let(:authorized_user) { workflow.project.owner }
+  let(:api_resource_links) { %w(tutorials.project tutorials.attached_images) }
+  let(:authorized_user) { project.owner }
   let(:resource) { tutorials.first }
   let(:resource_class) { Tutorial }
 
@@ -30,22 +29,12 @@ describe Api::V1::TutorialsController, type: :controller do
         get :index, filter_params
       end
 
-      context "by workflow_id" do
-        let(:filter_params) { {workflow_id: workflow.id} }
-        it "should return tutorial beloning to workflow" do
-          aggregate_failures "project_id" do
-            expect(json_response["tutorials"].length).to eq(1)
-            expect(json_response["tutorials"][0]["id"]).to eq(tutorials.first.id.to_s)
-          end
-        end
-      end
-
       context "by project id" do
         let(:filter_params) { {project_id: project.id} }
         it "should return tutorial belong to project" do
           aggregate_failures "project_id" do
             expect(json_response["tutorials"].length).to eq(1)
-            expect(json_response["tutorials"][0]["id"]).to eq(tutorials[1].id.to_s)
+            expect(json_response["tutorials"][0]["id"]).to eq(tutorials[0].id.to_s)
           end
         end
       end
@@ -65,7 +54,7 @@ describe Api::V1::TutorialsController, type: :controller do
           steps: [{title: "asdfasdf", content: 'asdklfajsdf'}, {title: 'asdklfjds;kajsdf', content: 'asdfklajsdf'}],
           language: 'es-mx',
           links: {
-            workflow: workflow.id.to_s
+            project: project.id.to_s
           }
         }
       }

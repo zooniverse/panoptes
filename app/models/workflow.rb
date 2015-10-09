@@ -18,7 +18,6 @@ class Workflow < ActiveRecord::Base
   has_many :attached_images, -> { where(type: "workflow_attached_image") }, class_name: "Medium",
     as: :linked
   has_and_belongs_to_many :expert_subject_sets, -> { expert_sets }, class_name: "SubjectSet"
-  has_many :tutorials
   belongs_to :tutorial_subject, class_name: "Subject"
 
   cache_by_association :workflow_contents

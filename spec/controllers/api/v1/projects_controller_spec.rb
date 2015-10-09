@@ -23,8 +23,7 @@ describe Api::V1::ProjectsController, type: :controller do
       "projects.classifications_export",
       "projects.aggregations_export",
       "projects.subjects_export",
-      "projects.attached_images",
-      "projects.default_tutorial" ]
+      "projects.attached_images" ]
   end
 
   let(:scopes) { %w(public project) }
@@ -603,8 +602,7 @@ describe Api::V1::ProjectsController, type: :controller do
           tags: ["astro", "gastro"],
           links: {
             workflows: [workflow.id.to_s],
-            subject_sets: [subject_set.id.to_s],
-            default_tutorial: tutorial.id.to_s
+            subject_sets: [subject_set.id.to_s]
           }
         }
       }
