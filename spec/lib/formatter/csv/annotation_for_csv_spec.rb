@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe Formatter::Csv::AnnotationForCsv do
-  let(:workflow) { build_stubbed(:workflow, build_contents: false) }
-  let(:contents) { build_stubbed(:workflow_content, workflow: workflow) }
+  let(:contents) { build_stubbed(:workflow_content, workflow: nil) }
+  let(:workflow) { build_stubbed(:workflow, workflow_contents: [contents], build_contents: false) }
+  let(:cache)    { double(workflow_at_version: workflow, workflow_content_at_version: contents)}
 
   let(:classification) do
     build_stubbed(:classification, build_real_subjects: false).tap do |c|
@@ -20,12 +21,12 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
   end
 
   it 'adds the task label' do
-    formatted = described_class.new(classification, annotation).to_h
+    formatted = described_class.new(classification, annotation, cache).to_h
     expect(formatted["task_label"]).to eq("Draw a circle")
   end
 
   it 'adds the tool labels for drawing tasks', :aggregate_failures do
-    formatted = described_class.new(classification, annotation).to_h
+    formatted = described_class.new(classification, annotation, cache).to_h
     expect(formatted["value"][0]["tool_label"]).to eq("Green")
     expect(formatted["value"][1]["tool_label"]).to eq("Blue")
     expect(formatted["value"][2]["tool_label"]).to eq("Green")
@@ -33,20 +34,20 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
 
   it 'has a nil label when the tool is not found in the workflow' do
     annotation = {"task" => "interest", "value" => [{"x"=>1, "y"=>2, "tool"=>1000}]}
-    formatted = described_class.new(classification, annotation).to_h
+    formatted = described_class.new(classification, annotation, cache).to_h
     expect(formatted["value"][0]["tool_label"]).to be_nil
   end
 
   it 'returns an empty list of values when annotation itself has no value' do
     annotation = {"task" => "interest"}
-    formatted = described_class.new(classification, annotation).to_h
+    formatted = described_class.new(classification, annotation, cache).to_h
     expect(formatted["value"]).to be_empty
   end
 
   context "with a versioned workflow question type task" do
-
     with_versioning do
-      let(:workflow) { create(:workflow) }
+      let(:workflow) { create(:workflow, workflow_contents: []) }
+      let(:contents) { create(:workflow_content, workflow: workflow) }
       let(:classification) do
         create(:classification, build_real_subjects: false, workflow: workflow)
       end
@@ -55,15 +56,15 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       let(:strings) { q_workflow.workflow_contents.first.strings }
 
       before(:each) do
-        workflow.update(tasks: tasks)
-        workflow.workflow_contents.first.update(strings: strings)
+        workflow.update(workflow_contents: [contents], tasks: tasks)
+        contents.update(strings: strings)
       end
 
       context "with a single question workflow annotation" do
         let(:annotation) { { task: "init", value: 1 } }
 
         it 'should add the correct answer label' do
-          formatted = described_class.new(classification, annotation).to_h
+          formatted = described_class.new(classification, annotation, cache).to_h
           expect(formatted["value"]).to eq("No")
         end
       end
@@ -93,19 +94,21 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         let(:annotation) { { task: "T1", value: [0,2] } }
 
         it 'should add the correct answer labels' do
-          formatted = described_class.new(classification, annotation).to_h
+          formatted = described_class.new(classification, annotation, cache).to_h
           expect(formatted["value"]).to eq(["I sort of love it", "I don't love it"])
         end
       end
 
       context "when the classification refers to the workflow and contents at a prev version" do
         let(:classification) do
-          vers = "#{workflow.versions.first.index + 1}.#{workflow.workflow_contents.first.versions.first.index + 1}"
+          vers = "#{workflow.versions.first.index + 1}.#{contents.versions.first.index + 1}"
           create(:classification, build_real_subjects: false, workflow: workflow, workflow_version: vers)
         end
 
         it 'should add the correct version task label' do
-          formatted = described_class.new(classification, annotation).to_h
+          allow(cache).to receive(:workflow_at_version).with(workflow.id, 1).and_return(workflow.versions[1].reify)
+          allow(cache).to receive(:workflow_content_at_version).with(contents.id, 1).and_return(contents.versions[1].reify)
+          formatted = described_class.new(classification, annotation, cache).to_h
           expect(formatted["task_label"]).to eq("Draw a circle")
         end
       end
