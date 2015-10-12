@@ -13,7 +13,7 @@ class Project < ActiveRecord::Base
 
   EXPERT_ROLES = [:expert, :owner]
 
-  belongs_to :default_tutorial, class_name: "Tutorial"
+  has_many :tutorials
   has_many :workflows
   has_many :subject_sets, dependent: :destroy
   has_many :classifications

@@ -325,7 +325,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
   describe "parent is a tutorial" do
     let(:parent) do
-      create(:tutorial, workflow: create(:workflow, project: create(:project, owner: authorized_user)))
+      create(:tutorial, project: create(:project, owner: authorized_user))
     end
 
     it_behaves_like "has_many media", :tutorial, :attached_images, %i(index create show destroy), 'image/jpeg'
