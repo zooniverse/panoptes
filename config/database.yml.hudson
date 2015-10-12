@@ -2,6 +2,7 @@ default: &default
   adapter: postgresql
   encoding: unicode
   user: panoptes
+  username: panoptes
   password: panoptes
   host: postgres
   pool: 5

@@ -20,7 +20,7 @@ RSpec.shared_examples "filter by display_name" do
   end
 
   describe 'filter by wildcard match display_name' do
-    let(:index_options) { {search: resource.display_name.upcase[0..-3]} }
+    let(:index_options) { {search: resource.display_name.split(" ")[0..1].join(" ")} }
 
     it "should respond with the most relevant item first" do
       expect(json_response[api_resource_name].map{ |r| r['display_name']}).to include(resource.display_name)
