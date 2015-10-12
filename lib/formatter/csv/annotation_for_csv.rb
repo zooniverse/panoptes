@@ -1,11 +1,12 @@
 module Formatter
   module Csv
     class AnnotationForCsv
-      attr_reader :classification, :annotation
+      attr_reader :classification, :annotation, :cache
 
-      def initialize(classification, annotation)
+      def initialize(classification, annotation, cache)
         @classification = classification
         @annotation = annotation.dup.with_indifferent_access
+        @cache = cache
       end
 
       def to_h
@@ -53,19 +54,19 @@ module Formatter
       end
 
       def primary_content_at_version
-        model_at_version(classification.workflow.primary_content, 1)
+        cache.workflow_content_at_version(classification.workflow.primary_content.id, content_version)
       end
 
       def workflow_at_version
-        model_at_version(classification.workflow, 0)
+        cache.workflow_at_version(classification.workflow_id, workflow_version)
       end
 
-      def model_at_version(version, vers_index)
-        version_num = classification.workflow_version.split(".")[vers_index].to_i
-        if old_vers = version.versions[version_num].try(:reify)
-          version = old_vers
-        end
-        version
+      def workflow_version
+        classification.workflow_version.split(".")[0].to_i
+      end
+
+      def content_version
+        classification.workflow_version.split(".")[1].to_i
       end
 
       def task

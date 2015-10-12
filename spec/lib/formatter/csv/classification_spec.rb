@@ -10,7 +10,7 @@ RSpec.describe Formatter::Csv::Classification do
   let(:subject) { build_stubbed(:subject) }
 
   let(:subject_data) do
-    { "#{subject.id}" => subject.metadata.merge(retired: false) }
+    { "#{subject.id}" => {retired: false}.merge(subject.metadata) }
   end
 
   let(:subject_json_data) { subject_data.to_json }
@@ -18,6 +18,11 @@ RSpec.describe Formatter::Csv::Classification do
   let(:ip_hash) do
     Digest::SHA1.hexdigest("#{classification.user_ip}#{expected_time}")
   end
+
+  let(:cache) { double("Cache", subject: subject,
+                                retired?: false,
+                                workflow_at_version: workflow,
+                                workflow_content_at_version: double("WorkflowContent", strings: {})) }
 
   let(:formatted_data) do
     [ classification.user.login,
@@ -30,7 +35,7 @@ RSpec.describe Formatter::Csv::Classification do
       classification.gold_standard,
       classification.expert_classifier,
       classification.metadata.to_json,
-      classification.annotations.map {|ann| Formatter::Csv::AnnotationForCsv.new(classification, ann).to_h }.to_json,
+      classification.annotations.map {|ann| Formatter::Csv::AnnotationForCsv.new(classification, ann, cache).to_h }.to_json,
       subject_json_data
     ]
   end
@@ -38,7 +43,7 @@ RSpec.describe Formatter::Csv::Classification do
   let(:workflow) { build_stubbed(:workflow, build_contents: false) }
   let(:project) { build_stubbed(:project, workflows: [workflow]) }
   let(:classification) { build_stubbed(:classification, project: project, workflow: workflow, subject_ids: [subject.id]) }
-  let(:formatter) { described_class.new(project) }
+  let(:formatter) { described_class.new(project, cache) }
 
   describe "::project_headers?" do
     it 'should be have the expected headers' do
@@ -51,7 +56,6 @@ RSpec.describe Formatter::Csv::Classification do
 
     before(:each) do
       allow(Subject).to receive(:where).with(id: classification.subject_ids).and_return([subject])
-      allow(subject).to receive(:retired_for_workflow?).and_return(false)
       allow(workflow).to receive(:primary_content).and_return(build_stubbed(:workflow_content, workflow: workflow))
       allow(formatter).to receive(:salt).and_return(expected_time)
     end
@@ -62,7 +66,7 @@ RSpec.describe Formatter::Csv::Classification do
 
     context "when the subject has been retired for that workflow" do
       it 'return an array formatted classifcation data' do
-        allow(subject).to receive(:retired_for_workflow?).with(classification.workflow).and_return(true)
+        allow(cache).to receive(:retired?).with(subject.id, workflow.id).and_return(true)
         subject_data.deep_merge!("#{subject.id}" => { retired: true })
         expect(formatter.to_array(classification)).to match_array(formatted_data)
       end

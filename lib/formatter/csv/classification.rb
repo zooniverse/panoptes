@@ -1,7 +1,7 @@
 module Formatter
   module Csv
     class Classification
-      attr_reader :classification, :project, :obfuscate, :salt
+      attr_reader :classification, :project, :cache, :obfuscate, :salt
 
       delegate :user_id, :workflow, :workflow_id, :created_at, :gold_standard,
         :workflow_version, to: :classification
@@ -11,8 +11,9 @@ module Formatter
            created_at gold_standard expert metadata annotations subject_data)
       end
 
-      def initialize(project, obfuscate_private_details: true)
+      def initialize(project, cache, obfuscate_private_details: true)
         @project = project
+        @cache = cache
         @obfuscate = obfuscate_private_details
         @salt = Time.now.to_i
       end
@@ -40,10 +41,9 @@ module Formatter
 
       def subject_data
         {}.tap do |subjects_and_metadata|
-          subjects = ::Subject.where(id: classification.subject_ids)
-          subjects.each do |subject|
-            retired_data = { retired: subject.retired_for_workflow?(workflow) }
-            subjects_and_metadata[subject.id] = subject.metadata.merge(retired_data)
+          classification.subject_ids.map {|id| cache.subject(id) }.each do |subject|
+            retired_data = { retired: cache.retired?(subject.id, workflow.id) }
+            subjects_and_metadata[subject.id] = retired_data.reverse_merge!(subject.metadata)
           end
         end.to_json
       end
@@ -54,7 +54,7 @@ module Formatter
 
       def annotations
         classification.annotations.map do |annotation|
-          AnnotationForCsv.new(classification, annotation).to_h
+          AnnotationForCsv.new(classification, annotation, cache).to_h
         end.to_json
       end
 

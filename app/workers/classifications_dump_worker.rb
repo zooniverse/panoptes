@@ -12,11 +12,20 @@ class ClassificationsDumpWorker
     if @project = Project.find(project_id)
       @medium_id = medium_id
       begin
-        csv_formatter = Formatter::Csv::Classification.new(project, obfuscate_private_details: obfuscate_private_details)
         CSV.open(csv_file_path, 'wb') do |csv|
-          csv << csv_formatter.class.headers
-          completed_project_classifications.find_each do |classification|
-            csv << csv_formatter.to_array(classification)
+          cache = ClassificationDumpCache.new
+          formatter = Formatter::Csv::Classification.new(project, cache, obfuscate_private_details: obfuscate_private_details)
+
+          csv <<  formatter.class.headers
+
+          completed_project_classifications.find_in_batches do |group|
+            subject_ids = group.flat_map(&:subject_ids).uniq
+            workflow_ids = group.map(&:workflow_id).uniq
+
+            cache.reset_subjects(Subject.where(id: subject_ids).load)
+            cache.reset_subject_workflow_counts(SubjectWorkflowCount.retired.where(subject_id: subject_ids, workflow_id: workflow_ids).load)
+
+            group.each { |classification| csv << formatter.to_array(classification) }
           end
         end
         to_gzip
@@ -24,8 +33,8 @@ class ClassificationsDumpWorker
         set_ready_state
         send_email
       ensure
-        FileUtils.rm(csv_file_path)
-        FileUtils.rm(gzip_file_path)
+        FileUtils.rm(csv_file_path) rescue nil
+        FileUtils.rm(gzip_file_path) rescue nil
       end
     end
   end
