@@ -24,8 +24,8 @@ class ClassificationsDumpWorker
         set_ready_state
         send_email
       ensure
-        FileUtils.rm(csv_file_path)
-        FileUtils.rm(gzip_file_path)
+        FileUtils.rm(csv_file_path) rescue nil
+        FileUtils.rm(gzip_file_path) rescue nil
       end
     end
   end
