@@ -4,6 +4,7 @@ class Workflow < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include SubjectCounts
   include ExtendedCacheKey
+  include RankedModel
 
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
@@ -41,6 +42,8 @@ class Workflow < ActiveRecord::Base
   can_be_linked :subject_set, :same_project?, :model
   can_be_linked :subject_queue, :scope_for, :update, :user
   can_be_linked :aggregation, :scope_for, :update, :user
+
+  ranks :display_order, with_same: :project_id
 
   def self.same_project?(subject_set)
     where(project: subject_set.project)

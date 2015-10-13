@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151009145251) do
+ActiveRecord::Schema.define(version: 20151013181750) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -395,6 +395,7 @@ ActiveRecord::Schema.define(version: 20151009145251) do
     t.jsonb    "retirement",                        default: {}
     t.boolean  "active",                            default: true, index: {name: "index_workflows_on_active", where: "(active = true)"}
     t.jsonb    "aggregation",                       default: {},    null: false
+    t.integer  "display_order",                     index: {name: "index_workflows_on_display_order"}
     t.index name: "index_workflows_on_aggregation", expression: "(aggregation ->> 'public'::text)"
   end
 
