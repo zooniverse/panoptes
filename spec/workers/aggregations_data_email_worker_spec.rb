@@ -8,4 +8,11 @@ RSpec.describe AggregationDataMailerWorker do
   it 'should deliver the mail' do
     expect{ subject.perform(media.id) }.to change{ ActionMailer::Base.deliveries.count }.by(1)
   end
+
+  context "when the media can't be found" do
+
+    it 'should not deliver the mail' do
+      expect{ subject.perform(nil) }.not_to change{ ActionMailer::Base.deliveries.count }
+    end
+  end
 end
