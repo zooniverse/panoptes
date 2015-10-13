@@ -34,8 +34,8 @@ class Api::V1::MediaController < Api::ApiController
   def update
     error_unless_exists
     set_controlled_resources
-    send_aggregation_ready_email
     super
+    send_aggregation_ready_email
   end
 
   def destroy
@@ -147,6 +147,7 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def media_exists?
+    return false unless media
     case association_numeration
     when :single
       media.exists?
@@ -164,9 +165,10 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def send_aggregation_ready_email
-    finished = params[:media][:metadata].try(:[], "state") == "ready"
-    if params[:media_name] == "aggregations_export" && finished
-      AggregationDataMailerWorker.perform_async(params[:id])
+    return unless params[:media_name] == "aggregations_export"
+    export = media.first
+    if export.metadata.try(:[], "state") == "ready"
+      AggregationDataMailerWorker.perform_async(export.id)
     end
   end
 end
