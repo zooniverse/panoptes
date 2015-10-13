@@ -12,18 +12,6 @@ class Tutorial < ActiveRecord::Base
 
   can_through_parent :project, :update, :index, :show, :destroy
 
-  validate do |tut|
-    tut.steps.each.with_index do |step, i|
-      unless step.has_key?(:content)
-        tut.errors.add(:"steps.#{i}.content", "Tutorial step must have content")
-      end
-
-      unless step.has_key?(:title)
-        tut.errors.add(:"steps.#{i}.title", "Tutorial step must have title")
-      end
-    end
-  end
-
   def steps
     super.map(&:with_indifferent_access)
   end

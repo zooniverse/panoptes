@@ -9,9 +9,8 @@ class TutorialUpdateSchema < JsonSchema
       items do
         type "object"
         additional_properties false
-        required "title", "content"
 
-        property "title" do
+        property "media" do
           type "string"
         end
 

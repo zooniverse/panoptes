@@ -51,7 +51,7 @@ describe Api::V1::TutorialsController, type: :controller do
     let(:create_params) do
       {
         tutorials: {
-          steps: [{title: "asdfasdf", content: 'asdklfajsdf'}, {title: 'asdklfjds;kajsdf', content: 'asdfklajsdf'}],
+          steps: [{media: "asdfasdf", content: 'asdklfajsdf'}, {media: 'asdklfjds;kajsdf', content: 'asdfklajsdf'}],
           language: 'es-mx',
           links: {
             project: project.id.to_s
@@ -65,12 +65,12 @@ describe Api::V1::TutorialsController, type: :controller do
 
   describe "#update" do
     let(:test_attr) { :steps }
-    let(:test_attr_value)  { [{"title" => "asdf", "content" => "asdf"}] }
+    let(:test_attr_value)  { [{"media" => "asdf", "content" => "asdf"}] }
 
     let(:update_params) do
       {
         tutorials: {
-          steps: [{"title" => "asdf", "content" => "asdf"}]
+          steps: [{"media" => "asdf", "content" => "asdf"}]
         }
       }
     end
