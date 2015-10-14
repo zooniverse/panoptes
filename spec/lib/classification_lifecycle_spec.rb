@@ -331,19 +331,22 @@ describe ClassificationLifecycle do
 
         it 'should create a project preference' do
           expect do
-            subject.create_project_preference
+            subject.process_project_preference
           end.to change{ UserProjectPreference.count }.from(0).to(1)
         end
 
         it "should set the communication preferences to the user's default" do
-          subject.create_project_preference
+          subject.process_project_preference
           email_pref = UserProjectPreference
-          .where(user: classification.user, project: classification.project)
-          .first.email_communication
-          expect(email_pref).to eq(classification.user
-            .project_email_communication)
+            .where(user: classification.user, project: classification.project)
+            .first.email_communication
+          expect(email_pref).to eq(classification.user.project_email_communication)
         end
 
+        it "should not touch the updated_at timestamp" do
+          expect_any_instance_of(UserProjectPreference).not_to receive(:touch)
+          subject.process_project_preference
+        end
       end
     end
 
@@ -354,11 +357,19 @@ describe ClassificationLifecycle do
         build(:classification, project: project, user: user)
       end
 
-      it "should not create a project preference" do
+      before(:each) do
         create(:user_project_preference, user: user, project: project)
+      end
+
+      it "should not create a project preference" do
         expect do
-          subject.create_project_preference
+          subject.process_project_preference
         end.to_not change{ UserProjectPreference.count }
+      end
+
+      it "should touch the updated_at timestamp" do
+        expect_any_instance_of(UserProjectPreference).to receive(:touch)
+        subject.process_project_preference
       end
     end
 
@@ -366,7 +377,7 @@ describe ClassificationLifecycle do
       let(:classification) { build(:classification, user: nil) }
       it 'should not create a project preference' do
         expect do
-          subject.create_project_preference
+          subject.process_project_preference
         end.to_not change{ UserProjectPreference.count }
       end
     end
