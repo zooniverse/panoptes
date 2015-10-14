@@ -11,7 +11,7 @@ class Project < ActiveRecord::Base
   include RankedModel
   include SluggedName
 
-  EXPERT_ROLES = [:expert, :owner]
+  EXPERT_ROLES = [:owner, :expert]
 
   has_many :tutorials
   has_many :workflows
@@ -80,9 +80,12 @@ class Project < ActiveRecord::Base
   ranks :beta_row_order
 
   def expert_classifier_level(classifier)
-    expert_role = project_roles.where(user_group: classifier.identity_group)
-      .where.overlap(roles: EXPERT_ROLES)
-    expert_role.first.try(:roles).try(:first).try(:to_sym)
+    expert_roles = project_roles.where(user_group: classifier.identity_group)
+      .where
+      .overlap(roles: EXPERT_ROLES)
+    if roles = expert_roles.first.try(:roles)
+      (EXPERT_ROLES & roles.map(&:to_sym)).first
+    end
   end
 
   def expert_classifier?(classifier)

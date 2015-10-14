@@ -198,6 +198,18 @@ describe Project, :type => :model do
       end
     end
 
+    context "when they are a moderator and an expert project collaborator" do
+      let!(:roles) { ["moderator", "expert"] }
+
+      it '#expert_classifier_level should be :expert' do
+        expect(project.expert_classifier_level(project_user)).to eq(:expert)
+      end
+
+      it "#expert_classifier? should be truthy" do
+        expect(project.expert_classifier?(project_user)).to be_truthy
+      end
+    end
+
     context "when they have no role on the project" do
 
       it '#expert_classifier_level should be nil' do
