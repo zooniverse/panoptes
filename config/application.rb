@@ -21,6 +21,8 @@ module Panoptes
     config.action_controller.action_on_unpermitted_parameters = :raise
     config.middleware.insert_before ActionDispatch::ParamsParser, "CatchApiJsonParseErrors"
 
+    config.active_record.schema_format = :sql
+
     config.middleware.insert_before 0, Rack::Cors do
       Array.wrap(Panoptes.cors_config.allows).each do |allow_config|
         allow do
