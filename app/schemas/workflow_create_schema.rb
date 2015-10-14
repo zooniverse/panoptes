@@ -35,7 +35,11 @@ class WorkflowCreateSchema < JsonSchema
       end
     end
 
-   property "prioritized" do
+    property "display_order_position" do
+      type "integer"
+    end
+
+    property "prioritized" do
       type "boolean"
     end
 

@@ -9,6 +9,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:api_resource_name){ 'workflows' }
   let(:resource_class) { Workflow }
   let(:authorized_user) { owner }
+  let(:default_params) { {format: :json} }
 
   let(:api_resource_attributes) do
     %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version grouped prioritized pairwise retirement aggregation active)
@@ -84,6 +85,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                                              ]
                                      }
                           },
+                   display_order_position: 1,
                    links: {
                            subject_sets: [subject_set.id.to_s],
                           }
@@ -328,6 +330,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                    grouped: true,
                    prioritized: true,
                    primary_language: 'en',
+                   display_order_position: 1,
                    links: {
                            project: project.id.to_s
                           }

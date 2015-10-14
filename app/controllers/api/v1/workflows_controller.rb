@@ -7,6 +7,13 @@ class Api::V1::WorkflowsController < Api::ApiController
   resource_actions :default
   schema_type :json_schema
 
+  def index
+    unless params.has_key?(:sort)
+      @controlled_resources = controlled_resources.rank(:display_order)
+    end
+    super
+  end
+
   def update_links
     super { |workflow| reload_queue(workflow) }
   end
