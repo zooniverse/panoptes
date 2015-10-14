@@ -1,6 +1,6 @@
 namespace :ali do
   desc "Export of Wildcam for Ali's workshop (feel free to remove after 1 nov)"
-  task :export_wildcam do
+  task export_wildcam: :environment do
     project_id = {'development' => 593, 'staging' => 937, 'production' => 593}.fetch(Rails.env)
     user_id = {'development' => 5253, 'staging' => 115, 'production' => 5253}.fetch(Rails.env)
 
