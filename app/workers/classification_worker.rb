@@ -15,7 +15,7 @@ class ClassificationWorker
             ClassificationCountWorker.perform_async(sid, classification.workflow.id)
           end
         end
-        create_project_preference
+        process_project_preference
       end
     else
       raise "Invalid Post-Classification Action"

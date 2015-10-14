@@ -28,8 +28,8 @@ RSpec.describe ClassificationWorker do
         classification_worker.perform(classification.id, "create")
       end
 
-      it 'should call create_project_preferences' do
-        expect_any_instance_of(ClassificationLifecycle).to receive(:create_project_preference)
+      it 'should call process_project_preferences' do
+        expect_any_instance_of(ClassificationLifecycle).to receive(:process_project_preference)
       end
 
       it 'should call publish to kafka' do
