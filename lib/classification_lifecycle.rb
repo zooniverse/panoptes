@@ -32,13 +32,16 @@ class ClassificationLifecycle
     refresh_queue
   end
 
-  def create_project_preference
-    return unless should_create_project_preference?
-    UserProjectPreference.where(user: user, project: project)
-      .first_or_create do |up|
+  def process_project_preference
+    if should_create_project_preference?
+      existing_record = true
+      upp = UserProjectPreference.where(user: user, project: project).first_or_create do |up|
         up.email_communication = user.project_email_communication
         up.preferences = {}
+        existing_record = false
       end
+      upp.touch if existing_record
+    end
   end
 
   def update_seen_subjects
