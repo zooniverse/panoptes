@@ -6,6 +6,8 @@ class WorkflowsDumpWorker
   include DumpMailerWorker
   include RateLimitDumpWorker
 
+  sidekiq_options queue: :data_high
+
   attr_reader :project
 
   def perform(project_id, medium_id=nil)
