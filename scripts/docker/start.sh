@@ -26,5 +26,5 @@ else
   fi
 
   TERM=xterm git log --format="%H" -n 1 > public/commit_id.txt
-  exec /usr/bin/supervisord
+  exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
 fi
