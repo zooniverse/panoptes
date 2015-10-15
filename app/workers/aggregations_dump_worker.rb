@@ -3,6 +3,8 @@ class AggregationsDumpWorker
   include DumpWorker
   include RateLimitDumpWorker
 
+  sidekiq_options queue: :data_high
+
   attr_reader :project
 
   def perform(project_id, medium_id)
