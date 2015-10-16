@@ -3,6 +3,8 @@ require 'csv'
 class SubjectImportWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: :data_high
+
   def perform(project_id, user_id, subject_set_id, csv_url)
     project = Project.find(project_id)
     zoo_user = User.find(user_id)
