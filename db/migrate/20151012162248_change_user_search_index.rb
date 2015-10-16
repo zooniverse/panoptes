@@ -12,9 +12,6 @@ class ChangeUserSearchIndex < ActiveRecord::Migration
         tsv, 'pg_catalog.english', login, display_name
       );
     SQL
-
-    now = Time.current.to_s(:db)
-    update("UPDATE users SET updated_at = '#{now}'")
   end
 
   def down
