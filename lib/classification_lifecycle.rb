@@ -1,3 +1,5 @@
+require "kafka_classification_serializer"
+
 class ClassificationLifecycle
 
   class ClassificationNotPersisted < StandardError; end

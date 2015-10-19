@@ -1,3 +1,5 @@
+require "tasks_visitors/inject_strings"
+
 class ProjectSerializer
   include RestPack::Serializer
   include OwnerLinkSerializer

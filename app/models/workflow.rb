@@ -1,3 +1,5 @@
+require "retirement_schemes/classification_count"
+
 class Workflow < ActiveRecord::Base
   include Linkable
   include Translatable
