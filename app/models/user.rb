@@ -1,3 +1,5 @@
+require "user_unsubscribe_message_verifier"
+
 class User < ActiveRecord::Base
   include Activatable
   include Linkable

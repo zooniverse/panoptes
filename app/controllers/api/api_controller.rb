@@ -1,3 +1,5 @@
+require "accept_language_extractor"
+
 module Api
   include ApiErrors
 

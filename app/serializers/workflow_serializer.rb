@@ -1,3 +1,5 @@
+require "tasks_visitors/inject_strings"
+
 class WorkflowSerializer
   include RestPack::Serializer
   include FilterHasMany
