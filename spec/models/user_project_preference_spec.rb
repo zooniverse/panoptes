@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe UserProjectPreference, :type => :model do
+RSpec.describe UserProjectPreference, type: :model do
   let(:user_project) { build(:user_project_preference) }
   let(:factory) { :user_project_preference }
 
@@ -53,6 +53,17 @@ RSpec.describe UserProjectPreference, :type => :model do
         expected_count = upp.legacy_count.values.map(&:to_i).sum
         expect(upp.summated_activity_count).to eq(expected_count)
       end
+    end
+  end
+
+  describe "#destroy" do
+    let(:pref) { create(:user_project_preference) }
+    let(:project) { pref.project }
+
+    it "should not cascade delete the relation", :aggregate_failures do
+      expect(project).not_to be_nil
+      pref.destroy
+      expect(project.reload).not_to be_nil
     end
   end
 end
