@@ -58,7 +58,11 @@ module DumpWorker
     Zlib::GzipWriter.open(gzip_file_path) do |gz|
       gz.mtime = File.mtime(csv_file_path)
       gz.orig_name = File.basename(csv_file_path)
-      gz.write IO.binread(csv_file_path)
+      File.open(csv_file_path) do |fp|
+        while chunk = fp.read(16 * 1024) do
+          gz.write(chunk)
+        end
+      end
       gz.close
     end
   end
