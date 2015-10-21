@@ -1,8 +1,8 @@
 RSpec.shared_examples "has preferences scope" do
   let!(:user) { create(:user) }
+  let(:preferences_model) { described_class.to_s.underscore }
+  let(:preferences_for) { described_class.instance_variable_get(:@preferences_for) }
   let!(:preferences) do
-    preferences_model = described_class.to_s.underscore
-    preferences_for = described_class.instance_variable_get(:@preferences_for)
     prefs_for_actor = create(preferences_model, user: user)
     public_prefs = create(preferences_model, public: true)
     private_prefs = create(preferences_model)
@@ -42,5 +42,3 @@ RSpec.shared_examples "has preferences scope" do
     end
   end
 end
-
-
