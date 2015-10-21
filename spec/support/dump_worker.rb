@@ -43,6 +43,11 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
       expect { worker.perform(project.id) }.to_not raise_error
     end
 
+    it "should compress the csv file" do
+      expect(worker).to receive(:to_gzip).and_call_original
+      worker.perform(project.id)
+    end
+
     it "push the file to s3" do
       expect(worker).to receive(:write_to_s3).once
       worker.perform(project.id)
