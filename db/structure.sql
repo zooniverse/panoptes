@@ -213,7 +213,7 @@ CREATE TABLE collections (
     updated_at timestamp without time zone,
     activated_state integer DEFAULT 0 NOT NULL,
     display_name character varying,
-    private boolean,
+    private boolean DEFAULT true NOT NULL,
     lock_version integer DEFAULT 0,
     slug character varying DEFAULT ''::character varying,
     favorite boolean DEFAULT false NOT NULL
@@ -2685,4 +2685,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151009145251');
 INSERT INTO schema_migrations (version) VALUES ('20151012162248');
 
 INSERT INTO schema_migrations (version) VALUES ('20151013181750');
+
+INSERT INTO schema_migrations (version) VALUES ('20151023103228');
 
