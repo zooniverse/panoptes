@@ -18,6 +18,17 @@ describe Collection, :type => :model do
     expect(build(:collection)).to be_valid
   end
 
+  it "should not be valid without a private setting", :aggregate_failures do
+    c = build(:collection, private: nil)
+    expect(c).to be_invalid
+    c.valid?
+    expect(c.errors[:private]).to include("can't be blank")
+  end
+
+  it "should have a valid factory" do
+    expect(build(:collection)).to be_valid
+  end
+
   it "should not be valid without a display_name" do
     aggregate_failures "display_name validation" do
       collection = build(:collection, display_name: nil)

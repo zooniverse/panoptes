@@ -13,6 +13,7 @@ class Collection < ActiveRecord::Base
   has_many :collection_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
 
   validates :display_name, presence: true
+  validates :private, inclusion: { in: [true, false], message: "can't be blank" }
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
