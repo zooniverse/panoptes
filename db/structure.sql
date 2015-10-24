@@ -208,7 +208,6 @@ ALTER SEQUENCE classifications_id_seq OWNED BY classifications.id;
 CREATE TABLE collections (
     id integer NOT NULL,
     name character varying,
-    project_id integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     activated_state integer DEFAULT 0 NOT NULL,
@@ -216,7 +215,8 @@ CREATE TABLE collections (
     private boolean DEFAULT true NOT NULL,
     lock_version integer DEFAULT 0,
     slug character varying DEFAULT ''::character varying,
-    favorite boolean DEFAULT false NOT NULL
+    favorite boolean DEFAULT false NOT NULL,
+    project_ids integer[] DEFAULT '{}'::integer[]
 );
 
 
@@ -1838,10 +1838,10 @@ CREATE INDEX index_collections_on_favorite ON collections USING btree (favorite)
 
 
 --
--- Name: index_collections_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_collections_on_project_ids; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_collections_on_project_id ON collections USING btree (project_id);
+CREATE INDEX index_collections_on_project_ids ON collections USING gin (project_ids);
 
 
 --
@@ -2687,4 +2687,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151012162248');
 INSERT INTO schema_migrations (version) VALUES ('20151013181750');
 
 INSERT INTO schema_migrations (version) VALUES ('20151023103228');
+
+INSERT INTO schema_migrations (version) VALUES ('20151024080849');
 
