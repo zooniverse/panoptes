@@ -6,8 +6,9 @@ class Collection < ActiveRecord::Base
   include PreferencesLink
   include PgSearch
   include SluggedName
+  include BelongsToMany
 
-  belongs_to :project
+  belongs_to_many :projects
   has_many :collections_subjects, dependent: :destroy
   has_many :subjects, through: :collections_subjects
   has_many :collection_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
