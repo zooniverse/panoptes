@@ -8,7 +8,7 @@ class Api::V1::CollectionsController < Api::ApiController
   schema_type :strong_params
 
   allowed_params :create, :name, :display_name, :private, :favorite,
-    links: [ :project, subjects: [], owner: polymorphic ]
+    links: [ projects: [], subjects: [], owner: polymorphic ]
 
   allowed_params :update, :name, :display_name, :private, links: [ subjects: [] ]
 
@@ -23,4 +23,3 @@ class Api::V1::CollectionsController < Api::ApiController
     super(create_params)
   end
 end
-

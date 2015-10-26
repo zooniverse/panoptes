@@ -8,7 +8,7 @@ module BelongsToManyLinks
         name = association.klass.model_name.plural
         links.delete(nil)
         links["#{key}.#{association.name}"] = {
-                                               href: "/#{name}/{set_member_subject.retired_workflows}",
+                                               href: "/#{name}/{#{key}.#{association.name}}",
                                                type: name
                                               }
       end
