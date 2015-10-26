@@ -60,18 +60,7 @@ describe JsonApiController::UpdatableResource, type: :controller do
       end
     end
 
-    context "one-to-many" do
-      it 'should add the new relation to the resource' do
-        project = create(:project)
-        post :update_links, {id: resource.id,
-                             link_relation: :project,
-                             project: project.id}
-        resource.reload
-        expect(resource.project).to eq(project)
-      end
-    end
-
-    context "polymorphic" do
+    context "one-to-many and polymorphic" do
       it 'should add the new relation to the resource' do
         group = create(:user_group)
         create(:membership, state: :active, user: user, user_group: group, roles: ["group_admin"])
@@ -81,6 +70,17 @@ describe JsonApiController::UpdatableResource, type: :controller do
                                      type: "user_group"}}
         resource.reload
         expect(resource.owner).to eq(group)
+      end
+    end
+
+    context "belongs-to-many" do
+      it 'should add the new relation to the resource' do
+        project = create(:project)
+        post :update_links, {id: resource.id,
+                             link_relation: :projects,
+                             projects: [project.id]}
+        resource.reload
+        expect(resource.projects).to include(project)
       end
     end
   end
