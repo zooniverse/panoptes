@@ -566,7 +566,8 @@ CREATE TABLE projects (
     beta_approved boolean DEFAULT false,
     launched_row_order integer,
     beta_row_order integer,
-    experimental_tools character varying[] DEFAULT '{}'::character varying[]
+    experimental_tools character varying[] DEFAULT '{}'::character varying[],
+    launch_date timestamp without time zone
 );
 
 
@@ -2736,6 +2737,8 @@ INSERT INTO schema_migrations (version) VALUES ('20151013181750');
 INSERT INTO schema_migrations (version) VALUES ('20151023103228');
 
 INSERT INTO schema_migrations (version) VALUES ('20151024080849');
+
+INSERT INTO schema_migrations (version) VALUES ('20151026142554');
 
 INSERT INTO schema_migrations (version) VALUES ('20151027134345');
 
