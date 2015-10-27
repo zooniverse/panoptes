@@ -189,8 +189,41 @@ describe Api::V1::UsersController, type: :controller do
         end
       end
 
-    end
+      describe "search" do
 
+        context "display_name" do
+          let(:index_options) { { search: user.display_name } }
+
+          it "should respond with 1 item" do
+            expect(json_response[api_resource_name].length).to eq(1)
+          end
+
+          it "should respond with the correct item" do
+            expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+          end
+        end
+
+        context "login" do
+          let(:index_options) { { search: user.login } }
+
+          it "should respond with 1 item" do
+            expect(json_response[api_resource_name].length).to eq(1)
+          end
+
+          it "should respond with the correct item" do
+            expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+          end
+
+          context "with partial string" do
+            let(:index_options) { { search: user.login[0..1] } }
+
+            it "should respond with both users" do
+              expect(json_response[api_resource_name].length).to eq(2)
+            end
+          end
+        end
+      end
+    end
 
     describe "overridden serialiser instance assocation links" do
       let(:user){ users.sample }
