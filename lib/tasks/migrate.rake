@@ -121,7 +121,6 @@ namespace :migrate do
   end
 
   namespace :recent do
-
     desc "Create missing recents from classifications"
     task create_missing_recents: :environment do
       query = Classification
@@ -135,30 +134,20 @@ namespace :migrate do
     end
   end
 
-  task subject_workflow_counts: :environment do
-    SubjectWorkflowCount.transaction do
-      # Not too sure how atomic INSERT INTO ... SELECT is in Postgresql (and couldn't find anything)
-      ActiveRecord::Base.connection.execute "LOCK TABLE subject_workflow_counts IN EXCLUSIVE MODE"
+  desc "Converts subject_ids array into normal join table"
+  task classification_subject_ids: :environment do
+    max_length = ActiveRecord::Base.connection.execute("SELECT max(array_length(subject_ids, 1)) as max_length FROM classifications")[0]["max_length"].to_i
 
-      # Create new aggregated (per subject) SWC records
-      ActiveRecord::Base.connection.execute <<-END
-        INSERT INTO subject_workflow_counts (subject_id, workflow_id, classifications_count, created_at, updated_at, retired_at)
-        SELECT sms.subject_id,
-               workflow_id,
-               MAX(classifications_count) AS classifications_count,
-               MIN(swc.created_at) AS created_at,
-               MAX(swc.updated_at) AS updated_at,
-               MIN(swc.retired_at) AS retired_at
-        FROM subject_workflow_counts swc
-        INNER JOIN set_member_subjects sms ON swc.set_member_subject_id = sms.id
-        GROUP BY sms.subject_id, workflow_id
-        ORDER BY classifications_count DESC
-      END
-
-      # Remove old SWCs
-      ActiveRecord::Base.connection.execute <<-END
-        DELETE FROM subject_workflow_counts WHERE subject_id IS NULL AND set_member_subject_id IS NOT NULL;
-      END
+    if max_length != 1
+      raise "Does not work if any classification has more than one subject currently"
     end
+
+    ActiveRecord::Base.connection.execute <<-SQL
+      INSERT INTO classification_subjects (classification_id, subject_id)
+      SELECT id, subject_ids[1] FROM classifications
+      WHERE NOT EXISTS (
+        SELECT 1 FROM classification_subjects cs WHERE cs.classification_id = classifications.id AND cs.subject_id = classifications.subject_ids[1]
+      );
+    SQL
   end
 end

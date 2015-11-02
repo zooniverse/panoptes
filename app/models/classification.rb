@@ -5,13 +5,14 @@ class Classification < ActiveRecord::Base
   belongs_to :user, counter_cache: true
   belongs_to :workflow, counter_cache: true
   belongs_to :user_group, counter_cache: true
-  belongs_to_many :subjects
 
   has_many :recents, dependent: :destroy
 
+  has_and_belongs_to_many :subjects, join_table: :classification_subjects
+
   enum expert_classifier: [:expert, :owner]
 
-  validates_presence_of :subject_ids, :project,
+  validates_presence_of :subjects, :project,
     :workflow, :annotations, :user_ip, :workflow_version
 
   validates :user, presence: {message: "Only logged in users can store incomplete classifications"}, if: :incomplete?
