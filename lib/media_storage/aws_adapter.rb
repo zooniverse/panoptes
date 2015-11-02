@@ -9,8 +9,8 @@ module MediaStorage
     def initialize(opts={})
       @prefix = opts[:prefix] || Rails.env
       @bucket = opts[:bucket]
-      @get_expiration = opts.fetch(:expiration, {})[:get] || DEFAULT_PUT_EXPIRATION
-      @put_expiration = opts.fetch(:expiration, {})[:put] || DEFAULT_GET_EXPIRATION
+      @get_expiration = opts.fetch(:expiration, {})[:get] || DEFAULT_GET_EXPIRATION
+      @put_expiration = opts.fetch(:expiration, {})[:put] || DEFAULT_PUT_EXPIRATION
       keys = opts.slice(:access_key_id, :secret_access_key)
       aws.config(keys) unless keys.empty?
     end
@@ -40,7 +40,7 @@ module MediaStorage
     end
 
     def get_path(path, opts={})
-      expires = (opts[:get_expires] || @get_expiration).minutes.from_now
+      expires = expires_in(opts[:get_expires] || @get_expiration)
       if opts[:private]
         object(path).url_for(:read,
                              secure: true,
@@ -52,7 +52,7 @@ module MediaStorage
 
     def put_path(path, opts={})
       content_type = opts[:content_type]
-      expires = (opts[:put_expires] || @put_expiration).minutes.from_now
+      expires = expires_in(opts[:put_expires] || @put_expiration)
       object(path).url_for(:write,
                            secure: true,
                            content_type: content_type,
@@ -84,6 +84,10 @@ module MediaStorage
 
     def s3
       @s3 ||= AWS::S3.new
+    end
+
+    def expires_in(mins)
+      (mins * 60).to_i
     end
   end
 end
