@@ -71,7 +71,11 @@ class User < ActiveRecord::Base
 
   pg_search_scope :search_name,
     against: [:login, :display_name],
-    using: { tsearch: { tsvector_column: "tsv" } }
+    using: { tsearch: {
+      prefix: true,
+      tsvector_column: "tsv"
+      }
+    }
 
   def self.scope_for(action, user, opts={})
     case
