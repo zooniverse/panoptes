@@ -1,9 +1,5 @@
 FactoryGirl.define do
   factory :classification do
-    transient do
-      build_real_subjects true
-    end
-
     metadata({
               user_agent: "cURL",
               started_at: 2.minutes.ago.to_s,

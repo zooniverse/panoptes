@@ -6,7 +6,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
   let(:cache)    { double(workflow_at_version: workflow, workflow_content_at_version: contents)}
 
   let(:classification) do
-    build_stubbed(:classification, build_real_subjects: false).tap do |c|
+    build_stubbed(:classification, subjects: []).tap do |c|
       allow(c.workflow).to receive(:primary_content).and_return(contents)
     end
   end
@@ -49,7 +49,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       let(:workflow) { create(:workflow, workflow_contents: []) }
       let(:contents) { create(:workflow_content, workflow: workflow) }
       let(:classification) do
-        create(:classification, build_real_subjects: false, workflow: workflow)
+        build_stubbed(:classification, subjects: [], workflow: workflow)
       end
       let(:q_workflow) { build(:question_task_workflow) }
       let(:tasks) { q_workflow.tasks }
@@ -102,7 +102,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       context "when the classification refers to the workflow and contents at a prev version" do
         let(:classification) do
           vers = "#{workflow.versions.first.index + 1}.#{contents.versions.first.index + 1}"
-          create(:classification, build_real_subjects: false, workflow: workflow, workflow_version: vers)
+          build_stubbed(:classification, subjects: [], workflow: workflow, workflow_version: vers)
         end
 
         it 'should add the correct version task label' do
