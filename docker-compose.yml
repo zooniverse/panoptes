@@ -21,11 +21,6 @@ kafka:
   hostname: kafka
   command: -i 1 -H kafka -p 9092 -z zk:2181
 
-cassandra:
-  image: cassandra
-  ports:
-    - "9042:9042"
-
 panoptes:
   dockerfile: Dockerfile.dev
   build: ./
@@ -40,4 +35,3 @@ panoptes:
     - zookeeper:zk
     - kafka
     - redis
-    - cassandra

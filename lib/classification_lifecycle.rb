@@ -28,7 +28,6 @@ class ClassificationLifecycle
       create_recent
       update_seen_subjects
       publish_to_kafka
-      save_to_cassandra unless Rails.env == 'production'
     end
     #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
     refresh_queue
@@ -73,11 +72,6 @@ class ClassificationLifecycle
     return unless classification.complete?
     classification_json = KafkaClassificationSerializer.serialize(classification, include: ['subjects']).to_json
     MultiKafkaProducer.publish('classifications', [classification.project.id, classification_json])
-  end
-
-  def save_to_cassandra
-    return unless classification.complete?
-    Cassandra::Classification.from_ar_model(classification)
   end
 
   def update_classification_data

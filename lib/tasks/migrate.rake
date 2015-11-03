@@ -5,19 +5,7 @@ require 'csv'
 
 namespace :migrate do
 
-  desc "Migrate classifications to Cassandra"
-  task classifications: :environment do
-    cs = Classification.all
-    total = cs.count
-
-    cs.find_each.with_index do |c, i|
-      p "Importing #{i} of #{total}"
-      Cassandra::Classification.from_ar_model(c)
-    end
-  end
-
   namespace :user do
-
     desc "Migrate to User login field from display_name"
     task login_field: :environment do
 
@@ -55,7 +43,6 @@ namespace :migrate do
 
     desc "Migrate to User login field from display_name"
     task beta_email_communication: :environment do
-
       user_emails = CSV.read("#{Rails.root}/beta_users.txt").flatten!
 
       raise "Empty beta file list" if user_emails.blank?
