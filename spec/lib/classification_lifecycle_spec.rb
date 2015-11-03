@@ -269,13 +269,6 @@ describe ClassificationLifecycle do
         end
       end
 
-      it 'should not call #save_to_cassandra' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:save_to_cassandra)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
       it 'should not call should_count_towards_retirement?' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:should_count_towards_retirement?)
@@ -302,25 +295,6 @@ describe ClassificationLifecycle do
 
       it 'should do nothing' do
         expect(MultiKafkaProducer).to_not receive(:publish)
-      end
-    end
-  end
-
-  describe "#save_to_cassandra" do
-    after(:each) { subject.save_to_cassandra }
-
-    context "when classification is complete" do
-
-      it 'should create a cassandra record' do
-        expect(Cassandra::Classification).to receive(:from_ar_model).with(classification)
-      end
-    end
-
-    context "when classification is incomplete" do
-      let(:classification) { build(:classification, completed: false) }
-
-      it 'should do nothing' do
-        expect(Cassandra::Classification).to_not receive(:from_ar_model)
       end
     end
   end

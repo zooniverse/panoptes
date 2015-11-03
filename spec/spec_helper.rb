@@ -3,7 +3,6 @@ require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'sidekiq/testing'
 require 'paper_trail/frameworks/rspec'
-require 'cequel/spec_support/preparation'
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
@@ -97,5 +96,3 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = "random"
 end
-
-Cequel::SpecSupport::Preparation.setup_database

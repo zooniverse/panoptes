@@ -5,13 +5,13 @@ sudo: false
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
   - mkdir -p tmp
-  - RACK_ENV=test bundle exec rake configure:travis db:create db:migrate cequel:keyspace:create cequel:migrate
+  - RACK_ENV=test bundle exec rake configure:travis db:setup
 
 jruby_before_script: &jruby_before_script
   - bundle exec jbundle install
   - psql -c 'create database travis_ci_test;' -U postgres
   - mkdir -p tmp
-  - RACK_ENV=test bundle exec rake configure:travis db:create db:migrate cequel:keyspace:create cequel:migrate
+  - RACK_ENV=test bundle exec rake configure:travis db:setup
 
 matrix:
   fast_finish: true
@@ -21,7 +21,6 @@ matrix:
 
 services:
   - postgresql
-  - cassandra
 
 addons:
   postgresql: "9.4"
