@@ -6,6 +6,8 @@ class ConvertClassificationSubjectIdsToJoinTable < ActiveRecord::Migration
     end
 
     add_index :classification_subjects, [:classification_id, :subject_id], unique: true, name: 'classification_subjects_pk'
+    add_index :classification_subjects, :classification_id
+    add_index :classification_subjects, :subject_id
     add_foreign_key :classification_subjects, :classifications
     add_foreign_key :classification_subjects, :subjects
   end

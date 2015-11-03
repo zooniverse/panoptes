@@ -1806,6 +1806,20 @@ CREATE INDEX index_authorizations_on_user_id ON authorizations USING btree (user
 
 
 --
+-- Name: index_classification_subjects_on_classification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classification_subjects_on_classification_id ON classification_subjects USING btree (classification_id);
+
+
+--
+-- Name: index_classification_subjects_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classification_subjects_on_subject_id ON classification_subjects USING btree (subject_id);
+
+
+--
 -- Name: index_classifications_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
