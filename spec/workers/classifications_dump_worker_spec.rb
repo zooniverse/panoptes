@@ -6,7 +6,7 @@ RSpec.describe ClassificationsDumpWorker do
   let(:project) { workflow.project }
   let(:subject) { create(:subject, project: project, subject_sets: [create(:subject_set, workflows: [workflow])]) }
   let!(:classifications) do
-    create_list(:classification, 5, project: project, workflow: workflow, subject_ids: [subject.id], build_real_subjects: false)
+    create_list(:classification, 5, project: project, workflow: workflow, subjects: [subject])
   end
 
   describe "#perform" do
