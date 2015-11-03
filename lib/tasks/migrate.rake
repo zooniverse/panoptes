@@ -136,18 +136,30 @@ namespace :migrate do
 
   desc "Converts subject_ids array into normal join table"
   task classification_subject_ids: :environment do
+    puts 'check precondition'
     max_length = ActiveRecord::Base.connection.execute("SELECT max(array_length(subject_ids, 1)) as max_length FROM classifications")[0]["max_length"].to_i
 
     if max_length != 1
       raise "Does not work if any classification has more than one subject currently"
     end
 
+    puts 'create index'
+    ActiveRecord::Base.connection.execute <<-SQL
+      CREATE INDEX temporary_migration_index on classifications ((subject_ids[1]));
+    SQL
+
+    puts 'insert into'
     ActiveRecord::Base.connection.execute <<-SQL
       INSERT INTO classification_subjects (classification_id, subject_id)
       SELECT id, subject_ids[1] FROM classifications
       WHERE NOT EXISTS (
         SELECT 1 FROM classification_subjects cs WHERE cs.classification_id = classifications.id AND cs.subject_id = classifications.subject_ids[1]
       );
+    SQL
+
+    puts 'drop index'
+    ActiveRecord::Base.connection.execute <<-SQL
+      DROP INDEX temporary_migration_index;
     SQL
   end
 end
