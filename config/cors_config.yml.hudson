@@ -1,7 +1,7 @@
 default: &default
   headers: :any
   request_methods: [ delete, get, post, options, put, head ]
-  expose: [ETag]
+  expose: [ ETag, X-CSRF-Token ]
   max_age: 300
   allows:
     - {origins: '*', resource: '*'}
