@@ -160,6 +160,16 @@ ALTER SEQUENCE authorizations_id_seq OWNED BY authorizations.id;
 
 
 --
+-- Name: classification_subjects; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE classification_subjects (
+    classification_id integer NOT NULL,
+    subject_id integer NOT NULL
+);
+
+
+--
 -- Name: classifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1719,6 +1729,13 @@ ALTER TABLE ONLY workflows
 
 
 --
+-- Name: classification_subjects_pk; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX classification_subjects_pk ON classification_subjects USING btree (classification_id, subject_id);
+
+
+--
 -- Name: collections_display_name_trgm_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1786,6 +1803,20 @@ CREATE INDEX index_aggregations_on_workflow_id ON aggregations USING btree (work
 --
 
 CREATE INDEX index_authorizations_on_user_id ON authorizations USING btree (user_id);
+
+
+--
+-- Name: index_classification_subjects_on_classification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classification_subjects_on_classification_id ON classification_subjects USING btree (classification_id);
+
+
+--
+-- Name: index_classification_subjects_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classification_subjects_on_subject_id ON classification_subjects USING btree (subject_id);
 
 
 --
@@ -2459,6 +2490,14 @@ ALTER TABLE ONLY recents
 
 
 --
+-- Name: fk_rails_7c8fb1018a; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY classification_subjects
+    ADD CONSTRAINT fk_rails_7c8fb1018a FOREIGN KEY (classification_id) REFERENCES classifications(id);
+
+
+--
 -- Name: fk_rails_82e4d0479b; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2488,6 +2527,14 @@ ALTER TABLE ONLY subject_workflow_counts
 
 ALTER TABLE ONLY tagged_resources
     ADD CONSTRAINT fk_rails_d6fe15ec78 FOREIGN KEY (tag_id) REFERENCES tags(id);
+
+
+--
+-- Name: fk_rails_fc0cd14ebe; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY classification_subjects
+    ADD CONSTRAINT fk_rails_fc0cd14ebe FOREIGN KEY (subject_id) REFERENCES subjects(id);
 
 
 --
@@ -2689,4 +2736,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151013181750');
 INSERT INTO schema_migrations (version) VALUES ('20151023103228');
 
 INSERT INTO schema_migrations (version) VALUES ('20151024080849');
+
+INSERT INTO schema_migrations (version) VALUES ('20151027134345');
 

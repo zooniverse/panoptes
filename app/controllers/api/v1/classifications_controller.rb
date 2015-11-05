@@ -23,8 +23,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   def filter_by_subject_id
     subject_ids = params.delete(:subject_id).try(:split, ',')
     unless subject_ids.blank?
-      @controlled_resources = controlled_resources
-                              .where.overlap(subject_ids: subject_ids)
+      @controlled_resources = controlled_resources.joins(:subjects).where(subjects: {id: subject_ids})
     end
   end
 
