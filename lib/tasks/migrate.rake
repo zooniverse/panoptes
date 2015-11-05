@@ -152,7 +152,7 @@ namespace :migrate do
     ActiveRecord::Base.connection.execute <<-SQL
       INSERT INTO classification_subjects (classification_id, subject_id)
       SELECT id, subject_ids[1] FROM classifications
-      WHERE NOT EXISTS (
+      WHERE subject_ids[1] IS NOT NULL AND NOT EXISTS (
         SELECT 1 FROM classification_subjects cs WHERE cs.classification_id = classifications.id AND cs.subject_id = classifications.subject_ids[1]
       );
     SQL
