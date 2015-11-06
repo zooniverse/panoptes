@@ -9,7 +9,7 @@ class ProjectSerializer
     :subjects_count, :created_at, :updated_at, :available_languages,
     :title, :description, :introduction, :private, :retired_subjects_count,
     :configuration, :live, :urls, :migrated, :classifiers_count, :slug, :redirect,
-    :beta_requested, :beta_approved, :launch_requested, :launch_approved,
+    :beta_requested, :beta_approved, :launch_requested, :launch_approved, :launch_date,
     :href, :workflow_description, :primary_language, :tags, :experimental_tools
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
