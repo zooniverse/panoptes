@@ -3,7 +3,7 @@ class Classification < ActiveRecord::Base
 
   belongs_to :project
   belongs_to :user, counter_cache: true
-  belongs_to :workflow, counter_cache: true
+  belongs_to :workflow
   belongs_to :user_group, counter_cache: true
 
   has_many :recents, dependent: :destroy
@@ -25,11 +25,13 @@ class Classification < ActiveRecord::Base
 
   after_create do
     Project.update_counters project.id, classifications_count: 1
+    Workflow.update_counters workflow.id, classifications_count: 1
   end
 
   after_destroy do
     if project.launch_date.nil? || created_at >= project.launch_date
       Project.update_counters project.id, classifications_count: -1
+      Workflow.update_counters workflow.id, classifications_count: -1
     end
   end
 
