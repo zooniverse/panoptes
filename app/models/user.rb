@@ -44,12 +44,12 @@ class User < ActiveRecord::Base
   before_validation :update_ouroboros_created
 
   validates :login, presence: true, format: { with: USER_LOGIN_REGEX }
+  validates_uniqueness_of :login, case_sensitive: false
   validates :display_name, presence: true
   validates :unsubscribe_token, presence: true, uniqueness: true
   validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated
   validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
 
-  validates_with LoginUniquenessValidator
   validates_with IdentityGroupNameValidator
 
   after_create :set_zooniverse_id
@@ -113,8 +113,7 @@ class User < ActiveRecord::Base
     warden_conditions = warden_conditions.dup
     if login_value = warden_conditions.delete(:login).try(:downcase)
       arel_table = User.arel_table
-      user = arel_table[:display_name].lower.eq(login_value)
-      user = user.or(arel_table[:login].lower.eq(login_value))
+      user = arel_table[:login].lower.eq(login_value)
       user = user.or(arel_table[:email].eq(login_value))
       self.where(warden_conditions.to_hash).where(user).first
     else
