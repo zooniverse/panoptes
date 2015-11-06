@@ -12,7 +12,7 @@ describe SessionsController, type: :controller do
     end
 
     describe "#create" do
-      %w(login email display_name).each do |attr|
+      %w(login email).each do |attr|
         context "with login as #{ attr }" do
           let(:params) do
             { password: user.password, login: user.send(attr) }
