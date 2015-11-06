@@ -9,14 +9,14 @@ describe ResetProjectCountersWorker do
   let(:swc)      { create :subject_workflow_count, subject: subject, workflow: workflow, classifications_count: 3 }
 
   before do
-    project.update classifications_count: 3, classifiers_count: 2
-
     classification1 = create(:classification, user: user1, created_at: project.launch_date - 1.week, project: project, subjects: [subject])
     classification2 = create(:classification, user: user2, created_at: project.launch_date - 1.week, project: project, subjects: [subject])
     classification3 = create(:classification, user: user2, created_at: project.launch_date + 1.week, project: project, subjects: [subject])
 
     create :user_project_preference, user: user1, project: project
     create :user_project_preference, user: user2, project: project
+
+    project.reload
   end
 
   it 'resets classifications count' do

@@ -23,6 +23,16 @@ class Classification < ActiveRecord::Base
   scope :created_by, -> (user) { where(user: user) }
   scope :complete, -> { where(completed: true) }
 
+  after_create do
+    Project.update_counters project.id, classifications_count: 1
+  end
+
+  after_destroy do
+    if project.launch_date.nil? || created_at >= project.launch_date
+      Project.update_counters project.id, classifications_count: -1
+    end
+  end
+
   def self.scope_for(action, user, opts={})
     return all if user.is_admin?
     case action
