@@ -2300,7 +2300,7 @@ CREATE INDEX index_users_on_beta_email_communication ON users USING btree (beta_
 -- Name: index_users_on_display_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_users_on_display_name ON users USING btree (lower((display_name)::text));
+CREATE INDEX index_users_on_display_name ON users USING btree (lower((display_name)::text));
 
 
 --
