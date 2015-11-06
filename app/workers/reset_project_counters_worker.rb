@@ -1,6 +1,8 @@
 class ResetProjectCountersWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: :data_high
+
   def perform(project_id)
     project = Project.find(project_id)
 
