@@ -255,4 +255,24 @@ describe Workflow, :type => :model do
       end
     end
   end
+
+  describe "#config" do
+    let(:workflow) { build(:workflow, config: config ) }
+
+    context "empty" do
+      let(:config) { {} }
+
+      it "should be valid" do
+        expect(workflow).to be_valid
+      end
+    end
+
+    context "with values" do
+      let(:config) { { public_gold_standard: true } }
+
+      it "should be valid" do
+        expect(workflow).to be_valid
+      end
+    end
+  end
 end

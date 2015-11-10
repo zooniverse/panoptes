@@ -73,6 +73,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                    active: false,
                    retirement: { criteria: "classification_count" },
                    aggregation: { },
+                   config: { },
                    tasks: {
                            interest: {
                                       type: "draw",
@@ -305,6 +306,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                    active: true,
                    retirement: { criteria: "classification_count" },
                    aggregation: { public: true },
+                   config: { autoplay_subjects: true },
                    tasks: {
                            interest: {
                                       type: "draw",

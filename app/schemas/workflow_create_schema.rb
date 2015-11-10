@@ -59,6 +59,10 @@ class WorkflowCreateSchema < JsonSchema
       type "object"
     end
 
+    property "config" do
+      type "object"
+    end
+
     property "links" do
       type "object"
       required "project"
