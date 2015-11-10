@@ -1225,7 +1225,8 @@ CREATE TABLE workflows (
     retirement jsonb DEFAULT '{}'::jsonb,
     active boolean DEFAULT true,
     aggregation jsonb DEFAULT '{}'::jsonb NOT NULL,
-    display_order integer
+    display_order integer,
+    config jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 
@@ -2738,4 +2739,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151023103228');
 INSERT INTO schema_migrations (version) VALUES ('20151024080849');
 
 INSERT INTO schema_migrations (version) VALUES ('20151027134345');
+
+INSERT INTO schema_migrations (version) VALUES ('20151110135415');
 
