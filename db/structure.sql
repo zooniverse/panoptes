@@ -1828,6 +1828,13 @@ CREATE INDEX index_classifications_on_created_at ON classifications USING btree 
 
 
 --
+-- Name: index_classifications_on_gold_standard; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classifications_on_gold_standard ON classifications USING btree (gold_standard) WHERE (gold_standard IS TRUE);
+
+
+--
 -- Name: index_classifications_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2743,4 +2750,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151027134345');
 INSERT INTO schema_migrations (version) VALUES ('20151106172531');
 
 INSERT INTO schema_migrations (version) VALUES ('20151110135415');
+
+INSERT INTO schema_migrations (version) VALUES ('20151110101156');
 
