@@ -2300,7 +2300,7 @@ CREATE INDEX index_users_on_beta_email_communication ON users USING btree (beta_
 -- Name: index_users_on_display_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_users_on_display_name ON users USING btree (lower((display_name)::text));
+CREATE INDEX index_users_on_display_name ON users USING btree (lower((display_name)::text));
 
 
 --
@@ -2739,6 +2739,8 @@ INSERT INTO schema_migrations (version) VALUES ('20151023103228');
 INSERT INTO schema_migrations (version) VALUES ('20151024080849');
 
 INSERT INTO schema_migrations (version) VALUES ('20151027134345');
+
+INSERT INTO schema_migrations (version) VALUES ('20151106172531');
 
 INSERT INTO schema_migrations (version) VALUES ('20151110135415');
 

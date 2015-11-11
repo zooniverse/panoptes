@@ -174,6 +174,23 @@ describe User, type: :model do
     end
   end
 
+  describe '#display_name' do
+    let(:user) { build(:user) }
+
+    it 'should validate presence', :aggregate_failures do
+      user.display_name = ""
+      expect(user.valid?).to be_falsy
+      expect(user.errors[:display_name]).to include("can't be blank")
+    end
+
+    it 'should allow duplicate display names' do
+      user.save
+      expect {
+        create(:user, display_name: user.display_name)
+      }.not_to raise_error
+    end
+  end
+
   describe '#login' do
     let(:user) { build(:user, migrated: true) }
 

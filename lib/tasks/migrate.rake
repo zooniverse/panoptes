@@ -6,42 +6,7 @@ require 'csv'
 namespace :migrate do
 
   namespace :user do
-    desc "Migrate to User login field from display_name"
-    task login_field: :environment do
-
-      user_display_names = ENV['USERS'].try(:split, ",")
-      validator = LoginUniquenessValidator.new
-
-      null_login_users = User.where(login: nil)
-      unless user_display_names.blank?
-        display_name_scope = User.arel_table[:display_name].lower.in(user_display_names.map(&:downcase))
-        null_login_users = null_login_users.where(display_name_scope)
-      end
-
-      total = null_login_users.count
-
-      null_login_users.find_each.with_index do |user, index|
-        puts "#{ index } / #{ total }" if index % 1_000 == 0
-        sanitized_login = User.sanitize_login user.display_name
-
-        user.login = sanitized_login
-        counter = 0
-
-        validator.validate user
-        until user.errors[:login].empty?
-          if user.errors[:login]
-            user.login = "#{ sanitized_login }-#{ counter += 1 }"
-          end
-
-          user.errors[:login].clear
-          validator.validate user
-        end
-
-        user.update_attribute :login, user.login
-      end
-    end
-
-    desc "Migrate to User login field from display_name"
+    desc "Migrate beta email users from input text file"
     task beta_email_communication: :environment do
       user_emails = CSV.read("#{Rails.root}/beta_users.txt").flatten!
 
