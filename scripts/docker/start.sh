@@ -25,6 +25,10 @@ else
       bundle exec rake assets:precompile
   fi
 
-  TERM=xterm git log --format="%H" -n 1 > public/commit_id.txt
+  if [ -f "commit_id.txt" ]
+  then
+    cp commit_id.txt public/
+  fi
+
   exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
 fi
