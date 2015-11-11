@@ -30,8 +30,27 @@ describe Api::V1::CollectionsController, type: :controller do
 
     it_behaves_like "is indexable"
     it_behaves_like "it has custom owner links"
-    it_behaves_like 'has many filterable', :subjects
     it_behaves_like "it only lists active resources"
+    it_behaves_like "filter by display_name"
+    it_behaves_like 'has many filterable', :subjects
+
+    describe "filtering on project_ids" do
+      let(:project_ids){ collections.map(&:project_ids).flatten }
+      let(:expected_filtered_ids) { collections.map(&:id).map(&:to_s) }
+
+      it_behaves_like 'belongs to many filterable', :projects do
+        let(:filter_ids) { project_ids.join(",") }
+      end
+
+      context "single project_ids" do
+        let(:project_ids){ collections.first.project_ids }
+        let(:expected_filtered_ids) { [ collections.first.id.to_s ] }
+
+        it_behaves_like 'belongs to many filterable', :projects do
+          let(:filter_ids) { project_ids.join(",") }
+        end
+      end
+    end
 
     context "it is filterable by favorite" do
       let!(:favorite_col) { create(:collection, favorite: true) }
@@ -42,7 +61,14 @@ describe Api::V1::CollectionsController, type: :controller do
       end
     end
 
-    it_behaves_like "filter by display_name"
+    context "it is filterable by favorite" do
+      let!(:favorite_col) { create(:collection, favorite: true) }
+
+      it 'should only return the favorite collection' do
+        get :index, favorite: true
+        expect(json_response[api_resource_name].map{ |r| r['id'] }).to match_array([favorite_col.id.to_s])
+      end
+    end
   end
 
   describe '#show' do
