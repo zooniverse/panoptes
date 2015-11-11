@@ -44,15 +44,19 @@ def setup_create_request(project_id: project.id,
   post :create, params
 end
 
+def create_gold_standard
+  create(:gold_standard_classification, project: project, user: project.owner, workflow: workflow)
+end
+
 describe Api::V1::ClassificationsController, type: :controller do
-  let!(:user) { create(:user) }
+  let(:user) { create(:user) }
   let(:gold_standard) { nil }
   let(:invalid_property) { nil }
   let(:classification) { create(:classification, user: user) }
   let(:project) { create(:full_project) }
-  let!(:workflow) { project.workflows.first }
-  let!(:set_member_subject) { workflow.subject_sets.first.set_member_subjects.first }
-  let!(:subject) { set_member_subject.subject }
+  let(:workflow) { project.workflows.first }
+  let(:set_member_subject) { workflow.subject_sets.first.set_member_subjects.first }
+  let(:subject) { set_member_subject.subject }
   let(:created_classification_id) { created_instance_id("classifications") }
 
   let(:api_resource_name) { "classifications" }
@@ -70,51 +74,48 @@ describe Api::V1::ClassificationsController, type: :controller do
   let(:authorized_user) { user }
   let(:resource_class) { Classification }
 
-  context "logged in user" do
+  describe "#index" do
     before(:each) do
-      default_request user_id: user.id, scopes: scopes
+      default_request user_id: authorized_user.id, scopes: scopes
     end
 
-    describe "#index" do
-      context "a user retrieving their own incomplete classifications" do
-        let!(:classifications) { create_list(:classification, 2, user: user, completed: false) }
-        let!(:private_resource) { create(:classification) }
-        let(:n_visible) { 2 }
+    context "a user retrieving their own incomplete classifications" do
+      let!(:classifications) { create_list(:classification, 2, user: user, completed: false) }
+      let!(:private_resource) { create(:classification) }
+      let(:n_visible) { 2 }
 
-        it_behaves_like "is indexable"
-      end
-
-      context "a project owner retreiving classifications for the project" do
-        let!(:classifications) { create_list(:classification, 2, project: project) }
-        let(:authorized_user) { project.owner }
-
-        it 'should be filterable by subject_id' do
-          default_request scopes: scopes, user_id: authorized_user.id
-          get :index, subject_id: classifications.first.subject_ids.first
-          expect(json_response['classifications'].first['id'].to_i).to eq(classifications.first.id)
-        end
-
-        it 'should be filterable by a list of subject ids' do
-          ids = classifications.map{|c| c.subject_ids.first}.join(',')
-          default_request scopes: scopes, user_id: authorized_user.id
-          get :index, subject_id: ids
-          expect(json_response['classifications'].map{|c| c['id'].to_i}).to match_array(classifications.map(&:id))
-        end
-      end
+      it_behaves_like "is indexable"
     end
 
-    describe "#gold_standard" do
-      let(:gs) do
-        create(:gold_standard_classification, project: project, user: project.owner)
-      end
-      let!(:classifications) { [ classification, gs ] }
-      let(:another_gs) do
-        create(:gold_standard_classification, project: project, user: project.owner)
-      end
-      let(:filtered_ids) do
-        json_response['classifications'].map{|c| c['id'].to_i}
+    context "a project owner retreiving classifications for the project" do
+      let!(:classifications) { create_list(:classification, 2, project: project) }
+      let(:authorized_user) { project.owner }
+
+      it 'should be filterable by subject_id' do
+        get :index, subject_id: classifications.first.subject_ids.first
+        expect(json_response['classifications'].first['id'].to_i).to eq(classifications.first.id)
       end
 
+      it 'should be filterable by a list of subject ids' do
+        ids = classifications.map{|c| c.subject_ids.first}.join(',')
+        get :index, subject_id: ids
+        expect(json_response['classifications'].map{|c| c['id'].to_i}).to match_array(classifications.map(&:id))
+      end
+    end
+  end
+
+  describe "#gold_standard" do
+    let(:gs)  { create_gold_standard }
+    let!(:classifications) { [ classification, gs ] }
+    let(:another_gs_in_workflow) { create_gold_standard }
+    let(:another_gs) { create(:gold_standard_classification, project: project, user: project.owner) }
+    let(:public_gold_standard) { true }
+    let(:workflow) { create(:workflow, public_gold_standard: public_gold_standard) }
+    let(:filtered_ids) do
+      json_response['classifications'].map{|c| c['id'].to_i}
+    end
+
+    context "with a logged in user" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
       end
@@ -133,7 +134,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       describe "subject_ids" do
-        before(:each) { another_gs }
+        before(:each) { another_gs_in_workflow }
 
         it 'should be filterable by a subject id' do
           get :gold_standard, subject_id: gs.subject_ids.first
@@ -147,55 +148,100 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
     end
 
-    describe "#show" do
-      let(:resource) { create(:classification, user: user, completed: false) }
-      it_behaves_like "is showable"
+    context "when a user is not logged in" do
+
+      it "should return all the gold standard data for the supplied workflow" do
+        another_gs_in_workflow
+        get :gold_standard, workflow_id: workflow.id
+        expect(json_response[api_resource_name].length).to eq(2)
+      end
+
+      context "when the workflow does not have public gold_standard flag" do
+        let(:public_gold_standard) { false }
+
+        it "should return an empty resource set" do
+          get :gold_standard, workflow_id: workflow.id
+          expect(json_response[api_resource_name].length).to eq(0)
+        end
+      end
+    end
+  end
+
+  describe "#show" do
+    before(:each) do
+      default_request user_id: user.id, scopes: scopes
     end
 
-    describe "#create" do
+    let(:resource) { create(:classification, user: user, completed: false) }
+    it_behaves_like "is showable"
+  end
+
+  describe "#create" do
+
+    context "with subject_ids" do
+      before(:each) do
+        default_request user_id: authorized_user.id, scopes: scopes
+      end
+
+      let(:create_action) { setup_create_request }
+
+      it_behaves_like "a classification create"
+      it_behaves_like "a classification lifecycle event"
+      it_behaves_like "a gold standard classfication"
+
+      context "when extra invalid classification properties are added" do
+        let!(:invalid_property) { :custom_field }
+
+        it "should fail via the schema validator with the correct message" do
+          create_action
+          error = json_response["errors"].first["message"]
+          expected_error = {
+            "schema" => "contains additional properties [\"custom_field\"] outside of the schema when none are allowed"
+          }.to_s
+          expect(error).to match(expected_error)
+        end
+      end
+
+      context "when invalid link id strings are used" do
+
+        it "should fail via the schema validator with the correct message" do
+          req_params = { project_id: project.id,
+                         workflow_id: "MOCK_WORKFLOW_FOR_CLASSIFIER",
+                         subject_id: "MOCK_SUBJECT_FOR_CLASSIFIER" }
+          setup_create_request(req_params)
+          error = json_response["errors"].first["message"]
+          expected_error = { "links/workflow"   => "value \"MOCK_WORKFLOW_FOR_CLASSIFIER\" did not match the regex '^[0-9]*$'",
+                             "links/subjects/0" => "value \"MOCK_SUBJECT_FOR_CLASSIFIER\" did not match the regex '^[0-9]*$'"}.to_s
+          expect(error).to match(expected_error)
+        end
+      end
+
+      context "when a subject has been classified before" do
+        let(:create_action) { setup_create_request(metadata: metadata_values.merge(seen_before: true)) }
+        it_behaves_like "a classification create"
+
+        it "should not count towards retirement" do
+          expect(ClassificationCountWorker).to_not receive(:perform_async)
+          create_action
+        end
+      end
+    end
+
+    context "a non-logged in user" do
+      before(:each) do
+        stub_content_filter
+      end
+
+      it "should not set the user" do
+        setup_create_request
+        user = Classification.find(created_classification_id).user
+        expect(user).to be_blank
+      end
+
       context "with subject_ids" do
         let(:create_action) { setup_create_request }
 
         it_behaves_like "a classification create"
-        it_behaves_like "a classification lifecycle event"
-        it_behaves_like "a gold standard classfication"
-
-        context "when extra invalid classification properties are added" do
-          let!(:invalid_property) { :custom_field }
-
-          it "should fail via the schema validator with the correct message" do
-            create_action
-            error = json_response["errors"].first["message"]
-            expected_error = {
-              "schema" => "contains additional properties [\"custom_field\"] outside of the schema when none are allowed"
-            }.to_s
-            expect(error).to match(expected_error)
-          end
-        end
-
-        context "when invalid link id strings are used" do
-
-          it "should fail via the schema validator with the correct message" do
-            req_params = { project_id: project.id,
-                           workflow_id: "MOCK_WORKFLOW_FOR_CLASSIFIER",
-                           subject_id: "MOCK_SUBJECT_FOR_CLASSIFIER" }
-            setup_create_request(req_params)
-            error = json_response["errors"].first["message"]
-            expected_error = { "links/workflow"   => "value \"MOCK_WORKFLOW_FOR_CLASSIFIER\" did not match the regex '^[0-9]*$'",
-                               "links/subjects/0" => "value \"MOCK_SUBJECT_FOR_CLASSIFIER\" did not match the regex '^[0-9]*$'"}.to_s
-            expect(error).to match(expected_error)
-          end
-        end
-
-        context "when a subject has been classified before" do
-          let(:create_action) { setup_create_request(metadata: metadata_values.merge(seen_before: true)) }
-          it_behaves_like "a classification create"
-
-          it "should not count towards retirement" do
-            expect(ClassificationCountWorker).to_not receive(:perform_async)
-            create_action
-          end
-        end
       end
     end
   end
@@ -252,27 +298,6 @@ describe Api::V1::ClassificationsController, type: :controller do
                                 completed: true)
         delete :destroy, id: classification.id
         expect(response).to have_http_status(:forbidden)
-      end
-    end
-  end
-
-  context "a non-logged in user" do
-    before(:each) do
-      stub_content_filter
-    end
-
-    describe "#create" do
-
-      it "should not set the user" do
-        setup_create_request
-        user = Classification.find(created_classification_id).user
-        expect(user).to be_blank
-      end
-
-      context "with subject_ids" do
-        let(:create_action) { setup_create_request }
-
-        it_behaves_like "a classification create"
       end
     end
   end

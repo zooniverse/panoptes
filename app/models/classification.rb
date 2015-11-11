@@ -36,6 +36,8 @@ class Classification < ActiveRecord::Base
       incomplete_for_user(user)
     when :gold_standard
       gold_standard
+      .joins(:workflow)
+      .where("workflows.public_gold_standard = ?", true)
       .order(id: :asc)
       .distinct
     else
