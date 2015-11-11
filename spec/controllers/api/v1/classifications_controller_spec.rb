@@ -103,6 +103,50 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
     end
 
+    describe "#gold_standard" do
+      let(:gs) do
+        create(:gold_standard_classification, project: project, user: project.owner)
+      end
+      let!(:classifications) { [ classification, gs ] }
+      let(:another_gs) do
+        create(:gold_standard_classification, project: project, user: project.owner)
+      end
+      let(:filtered_ids) do
+        json_response['classifications'].map{|c| c['id'].to_i}
+      end
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'should only return the gold standard classification', :aggregate_failures do
+        get :gold_standard
+        expect(json_response['classifications'].length).to eq(1)
+        c_id = json_response['classifications'].first['id']
+        expect(c_id).to eq(gs.id.to_s)
+      end
+
+      it 'should be filterable by a workflow id' do
+        another_gs
+        get :gold_standard, workflow_id: gs.workflow_id
+        expect(filtered_ids).to match_array([gs.id])
+      end
+
+      describe "subject_ids" do
+        before(:each) { another_gs }
+
+        it 'should be filterable by a subject id' do
+          get :gold_standard, subject_id: gs.subject_ids.first
+          expect(filtered_ids).to match_array([gs.id])
+        end
+
+        it 'should be filterable by a list of subject ids' do
+          get :gold_standard, subject_ids: gs.subject_ids.join(',')
+          expect(filtered_ids).to match_array([gs.id])
+        end
+      end
+    end
+
     describe "#show" do
       let(:resource) { create(:classification, user: user, completed: false) }
       it_behaves_like "is showable"

@@ -6,7 +6,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   schema_type :json_schema
 
-  before_action :filter_by_subject_id, only: :index
+  before_action :filter_by_subject_id, only: [ :index, :gold_standard ]
 
   rescue_from RoleControl::AccessDenied, with: :access_denied
 
@@ -18,12 +18,19 @@ class Api::V1::ClassificationsController < Api::ApiController
     super { |classification| lifecycle(:update, classification) }
   end
 
+  def gold_standard
+    render json_api: serializer.page(params, controlled_resources, context),
+           generate_response_obj_etag: true
+  end
+
   private
 
   def filter_by_subject_id
-    subject_ids = params.delete(:subject_id).try(:split, ',')
+    subject_ids = params.delete(:subject_ids).try(:split, ',') || params.delete(:subject_id)
     unless subject_ids.blank?
-      @controlled_resources = controlled_resources.joins(:subjects).where(subjects: {id: subject_ids})
+      @controlled_resources = controlled_resources
+      .joins(:subjects)
+      .where(subjects: {id: subject_ids})
     end
   end
 

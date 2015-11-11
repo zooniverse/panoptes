@@ -54,7 +54,9 @@ Rails.application.routes.draw do
 
       json_api_resources :project_preferences
 
-      json_api_resources :classifications
+      json_api_resources :classifications do
+        get :gold_standard, on: :collection
+      end
 
       json_api_resources :memberships
 
