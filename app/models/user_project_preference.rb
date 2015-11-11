@@ -3,16 +3,6 @@ class UserProjectPreference < ActiveRecord::Base
 
   preferences_for :project
 
-  after_create do
-    Project.update_counters project.id, classifiers_count: 1
-  end
-
-  after_destroy do
-    if project.launch_date.nil? || project.classifications.where("user_id = ? AND created_at >= ?", user_id, project.launch_date)
-      Project.update_counters project.id, classifiers_count: -1
-    end
-  end
-
   def summated_activity_count
     if legacy_count.blank?
       activity_count
