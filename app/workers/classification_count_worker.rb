@@ -2,7 +2,9 @@ class ClassificationCountWorker
   include Sidekiq::Worker
 
   def perform(subject_id, workflow_id)
-    if Workflow.find(workflow_id).project.live
+    workflow = Workflow.find(workflow_id)
+
+    if workflow.project.live
       count = SubjectWorkflowCount.find_or_create_by!(subject_id: subject_id, workflow_id: workflow_id)
       SubjectWorkflowCount.increment_counter(:classifications_count, count.id)
       Project.increment_counter :classifications_count, workflow.project.id

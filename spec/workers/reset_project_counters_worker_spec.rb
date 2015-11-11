@@ -13,6 +13,9 @@ describe ResetProjectCountersWorker do
     classification2 = create(:classification, user: user2, created_at: project.launch_date - 1.week, project: project, workflow: workflow, subjects: [subject])
     classification3 = create(:classification, user: user2, created_at: project.launch_date + 1.week, project: project, workflow: workflow, subjects: [subject])
 
+    project.update_columns classifications_count: 3, classifiers_count: 2
+    workflow.update_columns classifications_count: 3
+
     create :user_project_preference, user: user1, project: project
     create :user_project_preference, user: user2, project: project
 

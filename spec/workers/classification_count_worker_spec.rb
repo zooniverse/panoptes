@@ -42,6 +42,16 @@ RSpec.describe ClassificationCountWorker do
         end
       end
 
+      it 'should increment the classifications counter on the project' do
+        expect(Project).to receive(:increment_counter).with(:classifications_count, project.id)
+        worker.perform(sms.subject_id, workflow_id)
+      end
+
+      it 'should increment the classifications counter on the workflow' do
+        expect(Workflow).to receive(:increment_counter).with(:classifications_count, workflow_id)
+        worker.perform(sms.subject_id, workflow_id)
+      end
+
       it 'should queue the retirement worker' do
         expect(RetirementWorker).to receive(:perform_async)
         worker.perform(sms.subject_id, workflow_id)

@@ -34,7 +34,10 @@ module Api
       if event_params_check
         if upp = user_project_preference
           upp.legacy_count[create_params[:workflow]] = create_params[:count]
-          response_status = :ok if upp.save
+          if upp.save
+            Project.increment_counter :classifiers_count, upp.project_id
+            response_status = :ok
+          end
         end
       end
       render status: response_status, nothing: true

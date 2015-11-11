@@ -301,12 +301,22 @@ describe ClassificationLifecycle do
 
   describe "#create_project_preference" do
     context "with a user" do
-      context "when no preference exists"  do
+      let(:user) { create(:user) }
+      let(:project) { create(:project) }
+      let(:classification) { build(:classification, project: project, user: user) }
 
+      context "when no preference exists"  do
         it 'should create a project preference' do
           expect do
             subject.process_project_preference
           end.to change{ UserProjectPreference.count }.from(0).to(1)
+        end
+
+        it 'should increment a count on the associated project' do
+          expect do
+            subject.process_project_preference
+            project.reload
+          end.to change{project.classifiers_count}.from(0).to(1)
         end
 
         it "should set the communication preferences to the user's default" do
@@ -322,28 +332,22 @@ describe ClassificationLifecycle do
           subject.process_project_preference
         end
       end
-    end
 
-    context "when a preference exists" do
-      let(:user) { create(:user) }
-      let(:project) { create(:project) }
-      let(:classification) do
-        build(:classification, project: project, user: user)
-      end
+      context "when a preference exists" do
+        before(:each) do
+          create(:user_project_preference, user: user, project: project)
+        end
 
-      before(:each) do
-        create(:user_project_preference, user: user, project: project)
-      end
+        it "should not create a project preference" do
+          expect do
+            subject.process_project_preference
+          end.to_not change{ UserProjectPreference.count }
+        end
 
-      it "should not create a project preference" do
-        expect do
+        it "should touch the updated_at timestamp" do
+          expect_any_instance_of(UserProjectPreference).to receive(:touch)
           subject.process_project_preference
-        end.to_not change{ UserProjectPreference.count }
-      end
-
-      it "should touch the updated_at timestamp" do
-        expect_any_instance_of(UserProjectPreference).to receive(:touch)
-        subject.process_project_preference
+        end
       end
     end
 
