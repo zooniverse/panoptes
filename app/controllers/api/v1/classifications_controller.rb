@@ -26,7 +26,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   private
 
   def filter_by_subject_id
-    subject_ids = params.delete(:subject_ids).try(:split, ',') || params.delete(:subject_id)
+    subject_ids = (params.delete(:subject_ids) || params.delete(:subject_id)).try(:split, ',')
     unless subject_ids.blank?
       @controlled_resources = controlled_resources
       .joins(:subjects)
