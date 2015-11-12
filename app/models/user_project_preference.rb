@@ -1,7 +1,7 @@
 class UserProjectPreference < ActiveRecord::Base
   include Preferences
 
-  preferences_for :project, counter_cache: :classifiers_count
+  preferences_for :project
 
   def summated_activity_count
     if legacy_count.blank?

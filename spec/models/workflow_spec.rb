@@ -81,12 +81,6 @@ describe Workflow, :type => :model do
     it_behaves_like "it has a classifications assocation"
   end
 
-  describe "#classifcations_count" do
-    let(:relation_instance) { workflow }
-
-    it_behaves_like "it has a cached counter for classifications"
-  end
-
   describe "versioning" do
     let(:workflow) { create(:workflow) }
 

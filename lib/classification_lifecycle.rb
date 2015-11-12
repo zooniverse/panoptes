@@ -37,6 +37,7 @@ class ClassificationLifecycle
     if should_create_project_preference?
       existing_record = true
       upp = UserProjectPreference.where(user: user, project: project).first_or_create do |up|
+        Project.increment_counter :classifiers_count, project.id
         up.email_communication = user.project_email_communication
         up.preferences = {}
         existing_record = false
