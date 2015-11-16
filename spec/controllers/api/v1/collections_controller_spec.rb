@@ -103,24 +103,36 @@ describe Api::V1::CollectionsController, type: :controller do
     describe "linked projects" do
       let(:updated_resource) { resource.reload }
       let(:linked_project_ids) { resource.project_ids }
-      let(:subjects) { resource.subjects }
+      let(:append_subjects) { (subjects - resource.subjects).sample(2) }
       let(:params) do
         {
           link_relation: "subjects",
-          test_relation => subjects.map(&:id).map(&:to_s),
+          test_relation => append_subjects.map(&:id).map(&:to_s),
           resource_id => resource.id
         }
       end
+      let(:track_projects) { {} }
 
       before(:each) do
         linked_project_ids
         default_request scopes: scopes, user_id: authorized_user.id
-        post :update_links, params
+        post :update_links, params.merge(track_projects)
       end
 
       it "should track the project ids of linked subjects" do
-        project_ids = subjects.map(&:project_id) | linked_project_ids
+        project_ids = append_subjects.map(&:project_id) | linked_project_ids
         expect(updated_resource.project_ids).to match_array(project_ids)
+      end
+
+      context "when project_ids are supplied" do
+        let(:another_project_id) do
+          (collections.map(&:projects).flatten - [ project ]).map(&:id)
+        end
+        let(:track_projects) { { project_ids: another_project_id.join(",") } }
+
+        it "should track the supplied project_ids and ignore the subject's projects" do
+          expect(updated_resource.project_ids).to include(another_project_id.first)
+        end
       end
     end
 

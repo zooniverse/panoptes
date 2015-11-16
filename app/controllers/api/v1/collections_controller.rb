@@ -28,8 +28,7 @@ class Api::V1::CollectionsController < Api::ApiController
 
   def add_relation(resource, relation, value)
     if relation == :subjects && value.is_a?(Array)
-      added_project_ids = Subject.unscoped.uniq.where(id: value).pluck(:project_id)
-      resource.project_ids = resource.project_ids | added_project_ids
+      resource.project_ids = update_project_ids(resource, value)
     end
     super
   end
@@ -45,9 +44,12 @@ class Api::V1::CollectionsController < Api::ApiController
 
   private
 
+  def params_project_ids
+    @params_project_ids ||= (params.delete(:project_ids) || params.delete(:project_id)).try(:split, ',')
+  end
+
   def filter_by_project_ids
-    if ids_string = (params.delete(:project_ids) || params.delete(:project_id)).try(:split, ',')
-      project_ids = ids_string.split(",")
+    if project_ids = params_project_ids
       @controlled_resources = controlled_resources.where.overlap(project_ids: project_ids)
     end
   end
@@ -59,5 +61,14 @@ class Api::V1::CollectionsController < Api::ApiController
       end
       create_params[:links].merge!(projects: [project_id])
     end
+  end
+
+  def update_project_ids(resource, value)
+    append_project_ids = if params_project_ids.blank?
+      Subject.unscoped.uniq.where(id: value).pluck(:project_id)
+    else
+      params_project_ids
+    end
+    resource.project_ids | append_project_ids
   end
 end
