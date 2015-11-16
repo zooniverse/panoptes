@@ -100,6 +100,30 @@ describe Api::V1::CollectionsController, type: :controller do
     it_behaves_like "has updatable links"
     it_behaves_like "supports update_links"
 
+    describe "linked projects" do
+      let(:updated_resource) { resource.reload }
+      let(:linked_project_ids) { resource.project_ids }
+      let(:subjects) { resource.subjects }
+      let(:params) do
+        {
+          link_relation: "subjects",
+          test_relation => subjects.map(&:id).map(&:to_s),
+          resource_id => resource.id
+        }
+      end
+
+      before(:each) do
+        linked_project_ids
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :update_links, params
+      end
+
+      it "should track the project ids of linked subjects" do
+        project_ids = subjects.map(&:project_id) | linked_project_ids
+        expect(updated_resource.project_ids).to match_array(project_ids)
+      end
+    end
+
     context "when the subject is already in a collection" do
       let!(:test_relation_ids) { Array.wrap(collection.subjects.first.id) }
       let(:params) do
@@ -177,5 +201,40 @@ describe Api::V1::CollectionsController, type: :controller do
     let(:resource) { collection }
 
     it_behaves_like "is destructable"
+
+    describe "linked projects" do
+      let(:updated_resource) { resource.reload }
+      let(:subjects) { resource.subjects }
+      let(:params) do
+        {
+          link_relation: "subjects",
+          link_ids: subjects.map(&:id).join(","),
+          collection_id: resource.id
+        }
+      end
+      let(:project_ids) { subjects.map(&:project_id).uniq }
+
+      before(:each) do
+        stub_token(scopes: scopes, user_id: authorized_user.id)
+        set_preconditions
+      end
+
+      it "should remove the project ids of unlinked subjects" do
+        delete :destroy_links, params
+        expect(updated_resource.project_ids).not_to include(*project_ids)
+      end
+
+      context "unlinking a subject with project id of another collection member" do
+        let(:project_id) { project_ids.sample }
+        let!(:another_collection_subject) do
+          create(:subject, collections: [resource], project_id: project_id)
+        end
+
+        it "should not unlink the other member project id" do
+          delete :destroy_links, params
+          expect(updated_resource.project_ids).to match_array([project_id])
+        end
+      end
+    end
   end
 end
