@@ -99,12 +99,12 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def create_or_update_medium(type, media_create_params=media_params)
     media_create_params['metadata'] ||= { recipients: [api_user.id] }
-    media_create_params['metadata']["state"] = 'creating'
     if medium = controlled_resource.send(type)
       medium.update!(media_create_params)
       medium.touch
       medium
     else
+      media_create_params['metadata']["state"] = 'creating'
       controlled_resource.send("create_#{type}!", media_create_params)
     end
   end
