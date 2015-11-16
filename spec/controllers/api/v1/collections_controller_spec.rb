@@ -50,14 +50,13 @@ describe Api::V1::CollectionsController, type: :controller do
           let(:filter_ids) { project_ids.join(",") }
         end
       end
-    end
 
-    context "it is filterable by favorite" do
-      let!(:favorite_col) { create(:collection, favorite: true) }
+      context "filtering on singular resource" do
+        let(:expected_filtered_ids) { [ collections.first.id.to_s ] }
 
-      it 'should only return the favorite collection' do
-        get :index, favorite: true
-        expect(json_response[api_resource_name].map{ |r| r['id'] }).to match_array([favorite_col.id.to_s])
+        it_behaves_like 'has many filterable', :projects do
+          let(:filter_ids) { collections.first.project_ids.first }
+        end
       end
     end
 
