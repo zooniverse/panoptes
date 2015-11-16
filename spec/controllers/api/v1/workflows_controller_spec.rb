@@ -74,6 +74,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                    retirement: { criteria: "classification_count" },
                    aggregation: { },
                    config: { },
+                   public_gold_standard: true,
                    tasks: {
                            interest: {
                                       type: "draw",
@@ -96,7 +97,6 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     it_behaves_like "is updatable"
-
     it_behaves_like "has updatable links"
 
     context "extracts strings from workflow" do
@@ -307,6 +307,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                    retirement: { criteria: "classification_count" },
                    aggregation: { public: true },
                    config: { autoplay_subjects: true },
+                   public_gold_standard: true,
                    tasks: {
                            interest: {
                                       type: "draw",

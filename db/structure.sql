@@ -1227,7 +1227,8 @@ CREATE TABLE workflows (
     active boolean DEFAULT true,
     aggregation jsonb DEFAULT '{}'::jsonb NOT NULL,
     display_order integer,
-    config jsonb DEFAULT '{}'::jsonb NOT NULL
+    config jsonb DEFAULT '{}'::jsonb NOT NULL,
+    public_gold_standard boolean DEFAULT false
 );
 
 
@@ -1829,6 +1830,13 @@ CREATE INDEX index_classifications_on_created_at ON classifications USING btree 
 
 
 --
+-- Name: index_classifications_on_gold_standard; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classifications_on_gold_standard ON classifications USING btree (gold_standard) WHERE (gold_standard IS TRUE);
+
+
+--
 -- Name: index_classifications_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2410,6 +2418,13 @@ CREATE INDEX index_workflows_on_project_id ON workflows USING btree (project_id)
 
 
 --
+-- Name: index_workflows_on_public_gold_standard; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_workflows_on_public_gold_standard ON workflows USING btree (public_gold_standard) WHERE (public_gold_standard IS TRUE);
+
+
+--
 -- Name: index_workflows_on_tutorial_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2745,5 +2760,9 @@ INSERT INTO schema_migrations (version) VALUES ('20151027134345');
 
 INSERT INTO schema_migrations (version) VALUES ('20151106172531');
 
+INSERT INTO schema_migrations (version) VALUES ('20151110101156');
+
 INSERT INTO schema_migrations (version) VALUES ('20151110135415');
+
+INSERT INTO schema_migrations (version) VALUES ('20151111154310');
 

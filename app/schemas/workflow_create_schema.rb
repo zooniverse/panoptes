@@ -22,6 +22,10 @@ class WorkflowCreateSchema < JsonSchema
       type "boolean"
     end
 
+    property "public_gold_standard" do
+      type "boolean"
+    end
+
     property "retirement" do
       type "object"
       additional_properties false

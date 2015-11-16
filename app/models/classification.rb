@@ -22,6 +22,7 @@ class Classification < ActiveRecord::Base
   scope :incomplete, -> { where(completed: false) }
   scope :created_by, -> (user) { where(user: user) }
   scope :complete, -> { where(completed: true) }
+  scope :gold_standard, -> { where(gold_standard: true) }
 
   def self.scope_for(action, user, opts={})
     return all if user.is_admin?
@@ -33,6 +34,12 @@ class Classification < ActiveRecord::Base
       query
     when :update, :destroy
       incomplete_for_user(user)
+    when :gold_standard
+      gold_standard
+      .joins(:workflow)
+      .where("workflows.public_gold_standard = ?", true)
+      .order(id: :asc)
+      .distinct
     else
       none
     end
