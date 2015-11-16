@@ -2334,6 +2334,13 @@ CREATE UNIQUE INDEX index_users_on_login ON users USING btree (lower((login)::te
 
 
 --
+-- Name: index_users_on_login_with_case; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_users_on_login_with_case ON users USING btree (login);
+
+
+--
 -- Name: index_users_on_ouroboros_created; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2765,4 +2772,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151110101156');
 INSERT INTO schema_migrations (version) VALUES ('20151110135415');
 
 INSERT INTO schema_migrations (version) VALUES ('20151111154310');
+
+INSERT INTO schema_migrations (version) VALUES ('20151116143407');
 
