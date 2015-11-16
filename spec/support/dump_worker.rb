@@ -68,9 +68,10 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
 
   context "when a medium id is also provided" do
     let(:receivers) { create_list(:user, 2) }
+    let(:metadata) { { "recipients" => receivers.map(&:id) } }
     let(:medium) do
       create(:medium,
-             metadata: { "recipients" => receivers.map(&:id), "state" => "creating" },
+             metadata: metadata,
              linked: project,
              content_type: "text/csv",
              type: dump_type)
@@ -100,6 +101,16 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
       expect(mailer_class).to receive(:perform_async)
         .with(anything, anything, array_including(receivers.map(&:email)))
       worker.perform(project.id, medium.id)
+    end
+
+    context "simulating a failed dump" do
+
+      it "should set the medium state to creating" do
+        allow(worker).to receive(:set_ready_state)
+        worker.perform(project.id, medium.id)
+        medium.reload
+        expect(medium.metadata).to include("state" => "creating")
+      end
     end
   end
 end
