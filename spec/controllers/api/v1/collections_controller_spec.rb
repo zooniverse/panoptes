@@ -137,18 +137,41 @@ describe Api::V1::CollectionsController, type: :controller do
   describe '#create' do
     let(:test_attr) { :name }
     let(:test_attr_value) { 'test__collection' }
+    let(:create_links) { { projects: [ project.id ] } }
     let(:create_params) do
       {
        collections: {
                      name: 'test__collection',
                      display_name: 'Fancy name',
                      private: false,
-                     links: { projects: [ project.id ] }
+                     links: create_links
                     }
       }
     end
 
     it_behaves_like 'is creatable'
+
+    context "with singular project link object" do
+      let(:create_links) { { project: project.id } }
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, create_params
+      end
+
+      it "should return created" do
+        expect(response).to have_http_status(:created)
+      end
+
+      context "when passing inconsistent project links" do
+        let(:create_links) { { project: project.id, projects: [1,2] } }
+
+        it "should return an error" do
+          msg = "Error: project_ids and project link keys must not be set together"
+          expect(response.body).to eq(json_error_message(msg))
+        end
+      end
+    end
   end
 
   describe '#destroy' do
