@@ -3,7 +3,7 @@ module Formatter
     class Workflow
       attr_reader :workflow
 
-      JSON_FIELDS = [:tasks, :retirement, :aggregation ].freeze
+      JSON_FIELDS = [:tasks, :aggregation ].freeze
 
       def self.headers
         %w(workflow_id display_name version active classifications_count pairwise
@@ -26,8 +26,19 @@ module Formatter
         ModelVersion.version_number(workflow)
       end
 
+      def retirement
+        retire_criteria = workflow.retirement
+        if retire_criteria.blank?
+          retire_criteria = {
+            criteria: ::Workflow::DEFAULT_CRITERIA,
+            options: ::Workflow::DEFAULT_OPTS
+          }
+        end
+        retire_criteria.to_json
+      end
+
       def method_missing(method, *args, &block)
-        value = @workflow.send(method, *args, &block)
+        value = workflow.send(method, *args, &block)
         formatted_value(method, value)
       end
 
