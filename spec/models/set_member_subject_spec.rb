@@ -151,9 +151,9 @@ describe SetMemberSubject, :type => :model do
 
     context "when the user has not seen any workflow subjects" do
 
-      it "should return the all the worflow set_member_subjects " do
+      it "should return the all the worflow set_member_subjects" do
         create(:user_seen_subject, workflow: workflow, user: user, subject_ids: [])
-        expect(SetMemberSubject.unseen_for_user_by_workflow(user, workflow)).to eq(smses)
+        expect(SetMemberSubject.unseen_for_user_by_workflow(user, workflow)).to match_array(smses)
       end
     end
 
