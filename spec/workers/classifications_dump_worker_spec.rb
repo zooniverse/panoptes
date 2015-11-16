@@ -15,22 +15,4 @@ RSpec.describe ClassificationsDumpWorker do
     end
   end
 
-  describe "#completed_project_classifications" do
-    before(:each) do
-      allow(worker).to receive(:project).and_return(project)
-    end
-
-    it "should find all the classifications" do
-      expect(worker.send(:completed_project_classifications)).to match_array(classifications)
-    end
-
-    context "when the classification has a workflow that doesn't exist" do
-
-      it "should find only the the classifications with existing workflows" do
-        classifications.last.update_column(:workflow_id, Workflow.last.id+1)
-        expected_ids = worker.send(:completed_project_classifications).map(&:id)
-        expect(expected_ids).to match_array(classifications[0..-2].map(&:id))
-      end
-    end
-  end
 end
