@@ -2467,6 +2467,13 @@ CREATE INDEX user_groups_display_name_trgm_index ON user_groups USING gist (disp
 
 
 --
+-- Name: users_idx_trgm_login_display_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX users_idx_trgm_login_display_name ON users USING gin ((((COALESCE((login)::text, ''::text) || ' '::text) || COALESCE((display_name)::text, ''::text))) gin_trgm_ops);
+
+
+--
 -- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2774,4 +2781,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151110135415');
 INSERT INTO schema_migrations (version) VALUES ('20151111154310');
 
 INSERT INTO schema_migrations (version) VALUES ('20151116143407');
+
+INSERT INTO schema_migrations (version) VALUES ('20151117154126');
 
