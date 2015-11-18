@@ -2,8 +2,9 @@ app_path = File.expand_path(File.dirname(File.dirname(__FILE__)))
 
 pidfile "#{app_path}/tmp/pids/server.pid"
 
-rails_env = ENV['RAILS_ENV'] || 'development'
-port = rails_env == "production" ? 81 : 3000
+dev_env = 'development'
+rails_env = ENV['RAILS_ENV'] || dev_env
+port = rails_env == dev_env ? 3000 : 81
 environment rails_env
 state_path "#{app_path}/tmp/pids/puma.state"
 
