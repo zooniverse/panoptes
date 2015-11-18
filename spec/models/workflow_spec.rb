@@ -149,6 +149,32 @@ describe Workflow, :type => :model do
     end
   end
 
+  describe "#retirement_with_defaults" do
+    let(:workflow) { build(:workflow, retirement: retirement) }
+    let(:defaults) do
+      {
+        criteria: Workflow::DEFAULT_CRITERIA,
+        options: Workflow::DEFAULT_OPTS
+      }
+    end
+
+    context "empty" do
+      let(:retirement) { Hash.new }
+
+      it "should return default values" do
+        expect(workflow.retirement_with_defaults).to eq(defaults)
+      end
+    end
+
+    context "with criteria" do
+      let(:retirement) { { 'criteria' => 'classification_count' } }
+
+      it "should return non-defaults" do
+        expect(workflow.retirement_with_defaults).to eq(retirement)
+      end
+    end
+  end
+
   describe '#retire_subject' do
     let(:workflow) { create(:workflow_with_subject_sets) }
     let(:subject)  { create(:subject, subject_sets: workflow.subject_sets) }

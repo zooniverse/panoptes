@@ -27,14 +27,7 @@ module Formatter
       end
 
       def retirement
-        retire_criteria = workflow.retirement
-        if retire_criteria.blank?
-          retire_criteria = {
-            criteria: ::Workflow::DEFAULT_CRITERIA,
-            options: ::Workflow::DEFAULT_OPTS
-          }
-        end
-        retire_criteria.to_json
+        workflow.retirement_with_defaults.to_json
       end
 
       def method_missing(method, *args, &block)
