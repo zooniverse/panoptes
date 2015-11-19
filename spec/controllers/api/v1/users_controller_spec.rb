@@ -194,24 +194,42 @@ describe Api::V1::UsersController, type: :controller do
         context "display_name" do
           let(:index_options) { { search: user.display_name } }
 
-          it "should respond with 1 item" do
-            expect(json_response[api_resource_name].length).to eq(1)
+          it "should respond with both items in a ranked order", :aggregate_failures do
+            expect(json_response[api_resource_name].length).to eq(2)
+            expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
           end
 
-          it "should respond with the correct item" do
-            expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+          context "with a limited page size" do
+            let(:index_options) { { search: user.display_name, page_size: 1 } }
+
+            it "should respond with 1 item" do
+              expect(json_response[api_resource_name].length).to eq(1)
+            end
+
+            it "should respond with the correct item" do
+              expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+            end
           end
         end
 
         context "login" do
           let(:index_options) { { search: user.login } }
 
-          it "should respond with 1 item" do
-            expect(json_response[api_resource_name].length).to eq(1)
+          it "should respond with both items in a ranked order", :aggregate_failures do
+            expect(json_response[api_resource_name].length).to eq(2)
+            expect(json_response[api_resource_name][0]['login']).to eq(user.login)
           end
 
-          it "should respond with the correct item" do
-            expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+          context "with a limited page size" do
+            let(:index_options) { { search: user.login, page_size: 1 } }
+
+            it "should respond with 1 item" do
+              expect(json_response[api_resource_name].length).to eq(1)
+            end
+
+            it "should respond with the correct item" do
+              expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+            end
           end
 
           context "with partial string" do
@@ -219,6 +237,16 @@ describe Api::V1::UsersController, type: :controller do
 
             it "should respond with both users" do
               expect(json_response[api_resource_name].length).to eq(2)
+            end
+          end
+
+          context "with hard to find tsvector" do
+            let(:hard_name) { "S_Powell" }
+            let(:hard_user) { create(:user, login: hard_name, display_name: hard_name )}
+            let(:index_options) { { search: hard_user.login } }
+
+            it "should respond with the hard user" do
+              expect(created_instance_id(api_resource_name)).to eq(hard_user.id.to_s)
             end
           end
         end

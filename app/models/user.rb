@@ -74,8 +74,10 @@ class User < ActiveRecord::Base
     using: { tsearch: {
       prefix: true,
       tsvector_column: "tsv"
-      }
-    }
+      },
+      trigram: {}
+    },
+    :ranked_by => ":tsearch + (0.25 * :trigram)"
 
   def self.scope_for(action, user, opts={})
     case
