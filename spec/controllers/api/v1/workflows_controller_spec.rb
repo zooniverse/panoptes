@@ -12,7 +12,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:default_params) { {format: :json} }
 
   let(:api_resource_attributes) do
-    %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version grouped prioritized pairwise retirement aggregation active)
+    %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version grouped prioritized pairwise retirement aggregation active config)
   end
   let(:api_resource_links){ %w(workflows.project workflows.subject_sets workflows.tutorial_subject workflows.expert_subject_set workflows.attached_images) }
   let(:scopes) { %w(public project) }
