@@ -79,6 +79,23 @@ describe Api::V1::ClassificationsController, type: :controller do
       default_request user_id: authorized_user.id, scopes: scopes
     end
 
+    describe "#page_size" do
+      let(:response_page_size) do
+        json_response["meta"]["classifications"]["page_size"]
+      end
+
+      it "should return the requested amount" do
+        get :index, page_size: 50
+        expect(response_page_size).to eq(50)
+      end
+
+      it "should return the max limit" do
+        limit = Panoptes.max_page_size_limit
+        get :index, page_size: limit + 1
+        expect(response_page_size).to eq(limit)
+      end
+    end
+
     context "a user retrieving their own incomplete classifications" do
       let!(:classifications) { create_list(:classification, 2, user: user, completed: false) }
       let!(:private_resource) { create(:classification) }
