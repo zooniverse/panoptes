@@ -28,10 +28,10 @@ class Classification < ActiveRecord::Base
     return all if user.is_admin?
     case action
     when :show, :index
-      query = joins(:project).merge(Project.scope_for(:update, user))
-              .merge(complete)
-              .union_all(incomplete_for_user(user))
-      query
+      joins(:project).merge(Project.scope_for(:update, user))
+      .merge(complete)
+      .union_all(incomplete_for_user(user))
+      .includes(:subjects)
     when :update, :destroy
       incomplete_for_user(user)
     when :gold_standard

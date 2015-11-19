@@ -1,6 +1,6 @@
 module Panoptes
   def self.page_size_limits
-    @user_limits ||= begin
+    @page_limits ||= begin
                        file = Rails.root.join('config/page_size_limits.yml')
                        YAML.load(File.read(file))[Rails.env].symbolize_keys
                      rescue Errno::ENOENT, NoMethodError
