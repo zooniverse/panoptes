@@ -30,8 +30,9 @@ module RoleControl
       end
 
       def owner
+        return @owner if @owner
         group = super
-        if group.try(:identity?)
+        @owner = if group.try(:identity?)
           group.users.first
         else
           group

@@ -26,7 +26,6 @@ class Api::V1::ProjectsController < Api::ApiController
                     :introduction,
                     :url_labels]
 
-
   before_action :add_owner_ids_to_filter_param!, only: :index
   before_action :filter_by_tags, only: :index
   before_action :downcase_slug, only: :index
@@ -45,7 +44,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def index
-    @controlled_resources = controlled_resources.eager_load(:tags)
+    @controlled_resources = controlled_resources.eager_load(:tags, :avatar, :background, :owner, :project_contents)
     unless params.has_key?(:sort)
       @controlled_resources = case
                               when params.has_key?(:launch_approved)
