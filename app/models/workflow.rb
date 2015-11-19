@@ -76,6 +76,18 @@ class Workflow < ActiveRecord::Base
     end
   end
 
+  def retirement_with_defaults
+    retire_criteria = self.retirement
+    if retire_criteria.blank?
+      {
+        criteria: Workflow::DEFAULT_CRITERIA,
+        options: Workflow::DEFAULT_OPTS
+      }
+    else
+      retire_criteria
+    end
+  end
+
   def retired_subjects_count
     retired_set_member_subjects_count
   end

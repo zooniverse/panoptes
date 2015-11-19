@@ -5,6 +5,13 @@ RSpec.describe Formatter::Csv::Workflow do
   let(:project) { workflow.project }
   let(:workflow_version) { workflow }
 
+  def retirement_json
+    {
+      criteria: ::Workflow::DEFAULT_CRITERIA,
+      options: ::Workflow::DEFAULT_OPTS
+    }.to_json
+  end
+
   let(:fields) do
     [  workflow_version.id,
        workflow_version.display_name,
@@ -19,7 +26,7 @@ RSpec.describe Formatter::Csv::Workflow do
        workflow_version.tutorial_subject_id,
        workflow_version.retired_set_member_subjects_count,
        workflow_version.tasks.to_json,
-       workflow_version.retirement.to_json,
+       retirement_json,
        workflow_version.aggregation.to_json ]
   end
 
