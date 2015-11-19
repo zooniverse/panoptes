@@ -21,11 +21,11 @@ gem 'honeybadger', '~> 2.0'
 gem 'jquery-rails', '~> 4.0'
 gem 'uglifier', '~> 2.0'
 gem 'sidekiq', '~> 3.0'
-gem 'sinatra', '>= 1.3.0', :require => nil
+gem 'sinatra', '>= 1.3.0', require: nil
 gem 'aws-sdk-v1', '~> 1.0'
 gem 'json-schema', '~> 2.0'
 gem 'p3p', '~> 1.0'
-gem 'newrelic_rpm', '~> 3.0'
+gem 'newrelic_rpm', '~> 3.0', require: false
 gem 'firebase_token_generator', '~> 2.0'
 gem 'stringex', '~> 2.0'
 gem 'faraday', '~> 0.9'
