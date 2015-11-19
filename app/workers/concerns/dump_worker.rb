@@ -46,7 +46,8 @@ module DumpWorker
 
   def load_medium
     m = Medium.find(@medium_id)
-    m.update!(path_opts: project_file_path, private: true, content_type: "text/csv")
+    metadata = m.metadata.merge("state" => "creating")
+    m.update!(path_opts: project_file_path, private: true, content_type: "text/csv", metadata: metadata)
     m
   end
 
