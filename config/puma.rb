@@ -33,6 +33,11 @@ workers 2
 #
 on_worker_boot do
   ActiveRecord::Base.establish_connection
+
+  # Enable New Relic RPM
+  # https://github.com/puma/puma/issues/128#issuecomment-21050609
+  require 'newrelic_rpm'
+  NewRelic::Agent.manual_start
 end
 
 before_fork do
