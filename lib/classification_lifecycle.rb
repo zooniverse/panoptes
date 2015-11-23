@@ -77,7 +77,11 @@ class ClassificationLifecycle
   end
 
   def publish_to_event_stream
-    EventStream.push('classification', classification.updated_at,
+    return unless classification.complete?
+
+    EventStream.push('classification',
+      event_id: "classification-#{classification.id}",
+      event_time: classification.updated_at,
       classification_id: classification.id,
       project_id: classification.project.id,
       user_id: Digest::SHA1.hexdigest(classification.user_id.to_s || classification.user_ip.to_s))

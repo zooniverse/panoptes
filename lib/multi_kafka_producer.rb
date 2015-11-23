@@ -27,6 +27,7 @@ module MultiKafkaProducer
   KAFKAS = { kafka: 'jruby-kafka', poseidon: 'poseidon' }
 
   def self.default_adapter
+    return :null if Rails.env.test?
     return :kafka if defined? ::Kafka
     return :poseidon if defined? ::Poseidon
 

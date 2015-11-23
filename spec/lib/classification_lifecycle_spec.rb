@@ -26,7 +26,6 @@ describe ClassificationLifecycle do
   end
 
   describe "#queue" do
-
     context "with create action" do
       let(:test_method) { :create }
 
@@ -141,6 +140,10 @@ describe ClassificationLifecycle do
           expect(subject).to receive(:publish_to_kafka)
         end
 
+        it "should call the #publish_to_event_stream" do
+          expect(subject).to receive(:publish_to_event_stream)
+        end
+
         context "when the classification has the already_seen metadata value" do
           let!(:classification) { create(:anonymous_already_seen_classification) }
 
@@ -151,7 +154,6 @@ describe ClassificationLifecycle do
       end
 
       context "when the user has not already classified the subjects" do
-
         before(:each) do
           uss = instance_double("UserSeenSubject")
           allow(uss).to receive(:subjects_seen?).and_return(false)
@@ -196,6 +198,10 @@ describe ClassificationLifecycle do
 
         it "should call the #publish_to_kafka method" do
           expect(subject).to receive(:publish_to_kafka)
+        end
+
+        it "should call the #publish_to_event_stream method" do
+          expect(subject).to receive(:publish_to_event_stream)
         end
 
         it 'should count towards retirement' do
@@ -269,6 +275,13 @@ describe ClassificationLifecycle do
         end
       end
 
+      it 'should not call #publish_to_event_stream' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:publish_to_event_stream)
+          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
       it 'should not call should_count_towards_retirement?' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:should_count_towards_retirement?)
@@ -281,8 +294,7 @@ describe ClassificationLifecycle do
   describe "#publish_to_kafka" do
     after(:each) { subject.publish_to_kafka }
 
-    context "when classificaiton is completed" do
-
+    context "when classification is completed" do
       it 'should publish to kafka' do
         serialized = KafkaClassificationSerializer.serialize(classification, include: 'subjects').to_json
         expect(MultiKafkaProducer).to receive(:publish)
@@ -295,6 +307,26 @@ describe ClassificationLifecycle do
 
       it 'should do nothing' do
         expect(MultiKafkaProducer).to_not receive(:publish)
+      end
+    end
+  end
+
+  describe "#publish_to_event_stream" do
+    after(:each) { subject.publish_to_event_stream }
+
+    context "when classification is completed" do
+      it 'should publish to event stream' do
+        expect(EventStream).to receive(:push)
+          .with('classification', a_hash_including(event_id: "classification-#{classification.id}",
+                                                   event_time: classification.updated_at))
+      end
+    end
+
+    context "when classification is incomplete" do
+      let(:classification) { build(:classification, completed: false) }
+
+      it 'should do nothing' do
+        expect(EventStream).to_not receive(:push)
       end
     end
   end

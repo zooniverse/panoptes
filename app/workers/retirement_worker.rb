@@ -9,7 +9,7 @@ class RetirementWorker
       count.retire! do
         SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject_ids)
         deactivate_workflow!(count.workflow)
-        publish_to_event_stream(count.workflow)
+        push_counters_to_event_stream(count.workflow)
       end
     end
   end
@@ -20,8 +20,8 @@ class RetirementWorker
     end
   end
 
-  def publish_to_event_stream(workflow)
-    EventStream.push('workflow_counters', Time.now,
+  def push_counters_to_event_stream(workflow)
+    EventStream.push('workflow_counters',
       project_id: workflow.project_id,
       workflow_id: workflow.id,
       subjects_count: workflow.subjects_count,

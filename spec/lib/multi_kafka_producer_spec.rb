@@ -2,6 +2,7 @@ require 'spec_helper'
 
 shared_examples "default adapter" do
   it 'should set the default adapter for the platform' do
+    allow(Rails.env).to receive(:test?).and_return(false)
     MultiKafkaProducer.adapter =  nil
     expect(adapter).to be(expected_adapter)
   end
@@ -16,13 +17,13 @@ end
 
 describe MultiKafkaProducer do
   let(:adapter) { MultiKafkaProducer.adapter }
-  
+
   if RUBY_PLATFORM == 'java'
     let(:expected_adapter) { MultiKafkaProducer::Kafka }
   else
     let(:expected_adapter) { MultiKafkaProducer::Poseidon }
   end
-  
+
   describe "::adapter=" do
     context "a string" do
       if RUBY_PLATFORM == 'java'
@@ -30,7 +31,7 @@ describe MultiKafkaProducer do
       else
         let(:adapter_name) { 'poseidon' }
       end
-      
+
       it_behaves_like "loads by name"
     end
 
@@ -40,7 +41,7 @@ describe MultiKafkaProducer do
       else
         let(:adapter_name) { :poseidon }
       end
-      
+
       it_behaves_like "loads by name"
     end
 
@@ -67,9 +68,9 @@ describe MultiKafkaProducer do
     before(:each) do
       allow(MultiKafkaProducer).to receive(:adapter).and_return(adapter)
     end
-    
+
     let(:adapter) { double({ connected?: true }) }
-    
+
     it 'should call connect on the adapter with the supplied args' do
       expect(adapter).to receive(:connect)
         .with("client-id", "broker1", "broker2")
@@ -84,7 +85,7 @@ describe MultiKafkaProducer do
 
     context "connected adapter" do
       let(:adapter) { double({ connected?: true }) }
-      
+
       it 'should call publish on the adapter with the supplied args' do
         expect(adapter).to receive(:publish).with('topic', [['key', 'msg']])
         MultiKafkaProducer.publish('topic', ['key', 'msg'])
@@ -93,7 +94,7 @@ describe MultiKafkaProducer do
 
     context "disconnected adapter" do
       let(:adapter) { double({ connected?: false, adapter_name: "blerg" }) }
-      
+
       it 'should raise an exception when the adapter is not connected' do
         expect do
           MultiKafkaProducer.publish('topic', ['key', 'msg'])
