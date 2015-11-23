@@ -1,4 +1,5 @@
 ENV["RAILS_ENV"] ||= 'test'
+require 'cellect/testing'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'sidekiq/testing'
@@ -15,6 +16,7 @@ RSpec.configure do |config|
   config.include APIResponseHelpers, type: :controller
   config.include APIResponseHelpers, type: :request
   config.include ValidUserRequestHelper, type: :request
+  config.include CellectHelpers
   config.extend RSpec::Helpers::ActiveRecordMocks
 
   config.filter_run focus: true
@@ -56,6 +58,10 @@ RSpec.configure do |config|
     else
       MultiKafkaProducer.adapter = example.metadata[:kafka]
     end
+  end
+
+  config.before(:each, type: :controller) do
+    stub_cellect_connection
   end
 
   config.before(:each) do
