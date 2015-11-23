@@ -21,6 +21,14 @@ kafka:
   hostname: kafka
   command: -i 1 -H kafka -p 9092 -z zk:2181
 
+cellect:
+  image: zooniverse/cellect-panoptes
+  #may have to update the PG env vars since we use a diff
+  # postgres image now, https://github.com/zooniverse/cellect_panoptes/blob/master/cellect_env.rb#L49
+  links:
+    - postgres
+    - zookeeper:zk
+
 panoptes:
   dockerfile: Dockerfile.dev
   build: ./
@@ -31,7 +39,8 @@ panoptes:
   environment:
     RAILS_ENV: development
   links:
-    - postgres
+    - postgres:pg #should it be pg? https://github.com/zooniverse/cellect_panoptes/blob/master/cellect_env.rb
     - zookeeper:zk
     - kafka
     - redis
+    - cellect
