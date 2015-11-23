@@ -2,7 +2,6 @@ require 'spec_helper'
 
 shared_examples "default adapter" do
   it 'should set the default adapter for the platform' do
-    allow(Rails.env).to receive(:test?).and_return(false)
     MultiKafkaProducer.adapter =  nil
     expect(adapter).to be(expected_adapter)
   end
