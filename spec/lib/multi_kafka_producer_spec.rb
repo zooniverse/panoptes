@@ -14,7 +14,7 @@ shared_examples "loads by name" do
   end
 end
 
-describe MultiKafkaProducer do
+describe MultiKafkaProducer, kafka: true do
   let(:adapter) { MultiKafkaProducer.adapter }
 
   if RUBY_PLATFORM == 'java'
