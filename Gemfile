@@ -13,7 +13,7 @@ gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev" 
 gem 'active_model_serializers', '0.10.0.rc2' # Kafka
 gem 'paper_trail', '~> 3.0'
 gem 'omniauth', '~> 1.0'
-gem 'omniauth-facebook', '~> 2.0'
+gem 'omniauth-facebook', '~> 3.0'
 gem 'omniauth-gplus', '~> 2.0'
 gem 'puma', '~> 2.0'
 gem 'logstasher', '~> 0.6'
@@ -36,6 +36,7 @@ gem 'pg_search'
 gem 'ranked-model', '~> 0.4.0'
 gem 'sidekiq-congestion', '~> 0.0.1'
 gem 'sidetiq', '~> 0.6.3'
+gem 'cellect-client', '~> 0.1.2'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
