@@ -52,7 +52,6 @@ RSpec.describe RetirementWorker do
       end
 
       context "when the workflow optimistic lock is updated" do
-
         it 'should save the changes and not raise an error' do
           allow(workflow).to receive(:finished?).and_return(true)
           Workflow.find(workflow.id).touch
@@ -68,6 +67,18 @@ RSpec.describe RetirementWorker do
           worker.deactivate_workflow!(workflow)
         end.to_not change{Workflow.find(workflow.id).active}
       end
+    end
+  end
+
+  describe "#push_counters_to_event_stream" do
+    before(:each) do
+      allow(EventStream).to receive(:push)
+    end
+
+    it 'should publish new counts to event stream upon retiring' do
+      allow_any_instance_of(SubjectWorkflowCount).to receive(:retire?).and_return(true)
+      worker.perform(count)
+      expect(EventStream).to have_received(:push).once
     end
   end
 end

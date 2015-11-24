@@ -28,6 +28,7 @@ class ClassificationLifecycle
       create_recent
       update_seen_subjects
       publish_to_kafka
+      publish_to_event_stream
     end
     #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
     refresh_queue
@@ -73,6 +74,17 @@ class ClassificationLifecycle
     return unless classification.complete?
     classification_json = KafkaClassificationSerializer.serialize(classification, include: ['subjects']).to_json
     MultiKafkaProducer.publish('classifications', [classification.project.id, classification_json])
+  end
+
+  def publish_to_event_stream
+    return unless classification.complete?
+
+    EventStream.push('classification',
+      event_id: "classification-#{classification.id}",
+      event_time: classification.updated_at,
+      classification_id: classification.id,
+      project_id: classification.project.id,
+      user_id: Digest::SHA1.hexdigest(classification.user_id.to_s || classification.user_ip.to_s))
   end
 
   def update_classification_data
