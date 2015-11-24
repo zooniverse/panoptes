@@ -12,9 +12,15 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:default_params) { {format: :json} }
 
   let(:api_resource_attributes) do
-    %w(id display_name tasks classifications_count subjects_count created_at updated_at first_task primary_language content_language version grouped prioritized pairwise retirement aggregation active config)
+    %w(id display_name tasks classifications_count subjects_count
+    created_at updated_at first_task primary_language content_language
+    version grouped prioritized pairwise retirement aggregation active
+    configuration)
   end
-  let(:api_resource_links){ %w(workflows.project workflows.subject_sets workflows.tutorial_subject workflows.expert_subject_set workflows.attached_images) }
+  let(:api_resource_links)do
+    %w(workflows.project workflows.subject_sets workflows.tutorial_subject
+    workflows.expert_subject_set workflows.attached_images)
+  end
   let(:scopes) { %w(public project) }
 
   before(:each) do
@@ -73,7 +79,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                    active: false,
                    retirement: { criteria: "classification_count" },
                    aggregation: { },
-                   config: { },
+                   configuration: { },
                    public_gold_standard: true,
                    tasks: {
                            interest: {
@@ -306,7 +312,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                    active: true,
                    retirement: { criteria: "classification_count" },
                    aggregation: { public: true },
-                   config: { autoplay_subjects: true },
+                   configuration: { autoplay_subjects: true },
                    public_gold_standard: true,
                    tasks: {
                            interest: {

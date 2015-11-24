@@ -58,7 +58,7 @@ class WorkflowUpdateSchema < JsonSchema
       type "object"
     end
 
-    property "config" do
+    property "configuration" do
       type "object"
     end
 

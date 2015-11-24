@@ -276,8 +276,8 @@ describe Workflow, :type => :model do
     end
   end
 
-  describe "#config" do
-    let(:workflow) { build(:workflow, config: config ) }
+  describe "#configuration" do
+    let(:workflow) { build(:workflow, configuration: config ) }
 
     context "empty" do
       let(:config) { {} }
