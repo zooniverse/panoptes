@@ -6,6 +6,7 @@ module Api
   class ApiController < ApplicationController
     include JsonApiController
     include RoleControl::RoledController
+    include ActionController::HttpAuthentication::Basic
 
     API_ACCEPTED_CONTENT_TYPES = ['application/json',
                                   'application/vnd.api+json']
@@ -40,27 +41,49 @@ module Api
       RestPack::Serializer::InvalidInclude,
       ActiveRecord::RecordNotUnique, with: :unprocessable_entity
 
+    prepend_before_action :authenticate!
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]
     prepend_before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
                                                 API_ALLOWED_METHOD_OVERRIDES)
 
     def self.require_authentication(*actions, scopes: [])
-      if actions == [:all]
-        before_action -> { check_authentication(scopes) }
+      @doorkeeper_scopes_per_action ||= {}
+      @doorkeeper_scopes_per_action[actions.map(&:to_s)] = scopes
+    end
+
+    def self.doorkeeper_scopes_per_action
+      @doorkeeper_scopes_per_action
+    end
+
+    def authenticate!
+      case
+      when has_basic_credentials?(request)
+        authenticate_or_request_with_http_basic do |login, password|
+          if user = User.admin_login_using_basic_auth(login, password)
+            @current_resource_owner = user
+          else
+            raise Api::NotLoggedIn
+          end
+        end
+      when doorkeeper_token
+        check_doorkeeper_authentication!
+        @current_resource_owner = User.find_by_id(doorkeeper_token.resource_owner_id)
       else
-        before_action -> { check_authentication(scopes) }, only: actions
+        check_doorkeeper_authentication!
       end
     end
 
-    def check_authentication(scopes)
-      doorkeeper_authorize!(*scopes)
+    def check_doorkeeper_authentication!
+      (self.class.doorkeeper_scopes_per_action || {}).each do |actions, scopes|
+        if actions.empty? || actions.include?("all") || actions.include?(params[:action])
+          doorkeeper_authorize!(*scopes)
+        end
+      end
     end
 
     def current_resource_owner
-      if doorkeeper_token
-        @current_resource_owner ||= User.find_by_id(doorkeeper_token.resource_owner_id)
-      end
+      @current_resource_owner
     end
 
     def api_user

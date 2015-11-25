@@ -10,7 +10,6 @@ describe Api::ApiController, type: :controller do
 
   context "without doorkeeper" do
     controller do
-
       def index
         render json_api: { tests: [{ all: "good" },
                                    { at: "least" },
@@ -26,7 +25,6 @@ describe Api::ApiController, type: :controller do
     end
 
     describe "calling paper trail whodunnit before filter" do
-
       it "should enable current user lookup" do
         expect(subject.send(:paper_trail_enabled_for_controller)).to be_truthy
       end
@@ -46,7 +44,6 @@ describe Api::ApiController, type: :controller do
                                    { at: "least" },
                                    { thats: "what I pretend" } ] }
       end
-
     end
 
     it "should return 401 without a logged in user" do
@@ -59,6 +56,29 @@ describe Api::ApiController, type: :controller do
         default_request(scopes: ["public"], user_id: user.id)
         get :index
         expect(response.status).to eq(200)
+      end
+    end
+
+    describe "when the user provides login/password over http basic" do
+      it "should return 200 with a logged in user" do
+        user.update! admin: true
+        request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(user.login, 'password')
+        get :index
+        expect(response.status).to eq(200)
+      end
+
+      it 'should return 401 without the correct password' do
+        user.update! admin: true
+        request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(user.login, 'incorrect')
+        get :index
+        expect(response.status).to eq(401)
+      end
+
+      it 'should return 401 if the user is not an admin' do
+        user.update! admin: false
+        request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(user.login, 'password')
+        get :index
+        expect(response.status).to eq(401)
       end
     end
 
@@ -87,7 +107,6 @@ describe Api::ApiController, type: :controller do
     end
 
     describe "when a user has an incorrect scope" do
-
       it "should return 403 with a logged in user" do
         allow(controller).to receive(:doorkeeper_token) {
           double( accessible?: true,
@@ -96,6 +115,62 @@ describe Api::ApiController, type: :controller do
                   resource_owner_id: user.id ) }
         get :index
         expect(response.status).to eq(403)
+      end
+    end
+  end
+
+  describe 'require_authentication' do
+    context 'when all actions are specified' do
+      controller do
+        require_authentication :all, scopes: [:public]
+        def index; render json_api: {truth: true}; end
+      end
+
+      it "should return 200 with a logged in user" do
+        default_request(scopes: ["public"], user_id: user.id)
+        get :index
+        expect(response.status).to eq(200)
+      end
+
+      it "should return 401 without a logged in user" do
+        get :index
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'when the current action is listed' do
+      controller do
+        require_authentication :index, scopes: [:public]
+        def index; render json_api: {truth: true}; end
+      end
+
+      it "should return 200 with a logged in user" do
+        default_request(scopes: ["public"], user_id: user.id)
+        get :index
+        expect(response.status).to eq(200)
+      end
+
+      it "should return 401 without a logged in user" do
+        get :index
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'when the current action is not listed' do
+      controller do
+        require_authentication :show, scopes: [:public]
+        def index; render json_api: {truth: true}; end
+      end
+
+      it "should return 200 with a logged in user" do
+        default_request(scopes: ["public"], user_id: user.id)
+        get :index
+        expect(response.status).to eq(200)
+      end
+
+      it "should return 200 without a logged in user" do
+        get :index
+        expect(response.status).to eq(200)
       end
     end
   end
