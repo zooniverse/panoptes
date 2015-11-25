@@ -18,6 +18,8 @@ Doorkeeper.configure do
 
   realm "Panoptes"
 
+  grant_flows ["authorization_code", "client_credentials", "implicit", "password"]
+
   resource_owner_authenticator do
     u = current_user || warden.authenticate!(scope: :user)
     u if !u.disabled?
@@ -42,3 +44,4 @@ Doorkeeper.configure do
     end
   end
 end
+
