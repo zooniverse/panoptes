@@ -32,15 +32,22 @@ class Medium < ActiveRecord::Base
     self.src ||= MediaStorage.stored_path(content_type, type, *path_opts)
   end
 
+  def linked_resource_details
+    details = /\A(?<resource>field_guide|[a-z]+)_(?<media_type>\w+)/i.match(type)
+    [ details[:resource], details[:media_type] ]
+  end
+
+  def pluralize_media_type?(media_type)
+    ["attached_image"].include?(media_type)
+  end
+
   # TODO: This method is a good argument for converting this into a STI model
   def location
-    case type
-    when "project_attached_image", "workflow_attached_image", "tutorial_attached_image"
-      resource, *media_type = type.split("_")
-      "/#{resource.pluralize}/#{linked_id}/#{media_type.join("_").pluralize}/#{id}"
+    resource, media_type = linked_resource_details
+    if pluralize_media_type?(media_type)
+      "/#{resource.pluralize}/#{linked_id}/#{media_type.pluralize}/#{id}"
     else
-      resource, *media_type = type.split("_")
-      "/#{resource.pluralize}/#{linked_id}/#{media_type.join("_")}"
+      "/#{resource.pluralize}/#{linked_id}/#{media_type}"
     end
   end
 

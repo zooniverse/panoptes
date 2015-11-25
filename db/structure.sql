@@ -280,6 +280,39 @@ ALTER SEQUENCE collections_subjects_id_seq OWNED BY collections_subjects.id;
 
 
 --
+-- Name: field_guides; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE field_guides (
+    id integer NOT NULL,
+    items json DEFAULT '[]'::json,
+    language text,
+    project_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: field_guides_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE field_guides_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_guides_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE field_guides_id_seq OWNED BY field_guides.id;
+
+
+--
 -- Name: media; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1297,6 +1330,13 @@ ALTER TABLE ONLY collections_subjects ALTER COLUMN id SET DEFAULT nextval('colle
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY field_guides ALTER COLUMN id SET DEFAULT nextval('field_guides_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY media ALTER COLUMN id SET DEFAULT nextval('media_id_seq'::regclass);
 
 
@@ -1521,6 +1561,14 @@ ALTER TABLE ONLY collections
 
 ALTER TABLE ONLY collections_subjects
     ADD CONSTRAINT collections_subjects_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_guides_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY field_guides
+    ADD CONSTRAINT field_guides_pkey PRIMARY KEY (id);
 
 
 --
@@ -1897,6 +1945,20 @@ CREATE INDEX index_collections_on_slug ON collections USING btree (slug);
 --
 
 CREATE UNIQUE INDEX index_collections_subjects_on_collection_id_and_subject_id ON collections_subjects USING btree (collection_id, subject_id);
+
+
+--
+-- Name: index_field_guides_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_field_guides_on_language ON field_guides USING btree (language);
+
+
+--
+-- Name: index_field_guides_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_field_guides_on_project_id ON field_guides USING btree (project_id);
 
 
 --
@@ -2783,6 +2845,8 @@ INSERT INTO schema_migrations (version) VALUES ('20151111154310');
 INSERT INTO schema_migrations (version) VALUES ('20151116143407');
 
 INSERT INTO schema_migrations (version) VALUES ('20151117154126');
+
+INSERT INTO schema_migrations (version) VALUES ('20151120104454');
 
 INSERT INTO schema_migrations (version) VALUES ('20151120161458');
 

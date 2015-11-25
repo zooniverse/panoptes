@@ -4,7 +4,7 @@ module TranslatedContent
 
   included do
     has_paper_trail skip: [:langauge]
-    validates :language, format: {with: /\A[a-z]{2}(\z|-[A-z]{2})/}
+    validates :language, format: {with: LanguageValidation.lang_regex}
     belongs_to translated_for
 
     can_through_parent translated_for, :show, :index, :versions, :version

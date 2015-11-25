@@ -113,7 +113,7 @@ class Api::V1::MediaController < Api::ApiController
 
   def controlled_scope
     case media_name
-    when "classifications_export", "subjects_export", "aggregations_export"
+    when /\A(classifications|subjects|aggregations)_export\z/
       :update
     else
       action_name.to_sym

@@ -103,6 +103,10 @@ Rails.application.routes.draw do
       json_api_resources :tutorials do
         media_resources :attached_images
       end
+
+      json_api_resources :field_guides do
+        media_resources :attached_images
+      end
     end
   end
 

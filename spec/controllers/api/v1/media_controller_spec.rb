@@ -290,53 +290,61 @@ RSpec.describe Api::V1::MediaController, type: :controller do
     end
   end
 
-  describe "parent is a workflow" do
-    let(:parent) { create(:workflow, project: create(:project, owner: authorized_user)) }
+  describe "parent resources" do
+    let(:project) { create(:project, owner: authorized_user) }
 
-    it_behaves_like "has_many media", :workflow, :attached_images, %i(index create show destroy), 'image/jpeg'
-  end
+    describe "parent is a workflow" do
+      let(:parent) { create(:workflow, project: project) }
 
-  describe "parent is a project" do
-    let(:parent) { create(:project, owner: authorized_user) }
-
-    it_behaves_like "has_one media",  :project, :avatar, %i(create index destroy), "image/jpeg"
-    it_behaves_like "has_one media",  :project, :background, %i(create index destroy), "image/jpeg"
-    it_behaves_like "has_many media", :project, :attached_images, %i(index create show destroy), 'image/jpeg'
-    it_behaves_like "has_one media", :project, :classifications_export, %i(index), 'text/csv'
-    it_behaves_like "has_one media", :project, :subjects_export, %i(index), 'text/csv'
-    it_behaves_like "has_one media", :project, :aggregations_export, %i(index update), 'application/x-gzip'
-
-    describe "classifications_exports #index" do
-      let!(:resources) do
-        create_list :medium, 2, linked: parent, content_type: "text/csv",
-          type: "project_classifications_export"
-      end
-
-      it 'should return 404 without an authorized_user' do
-        default_request user_id: create(:user).id, scopes: scopes
-        get :index, :project_id => parent.id, :media_name => "classifications_export"
-        expect(response).to have_http_status(:not_found)
-      end
-
-      it 'should return 404 without a user' do
-        get :index, :project_id => parent.id, :media_name => "classifications_export"
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-  end
-
-  describe "parent is a user" do
-    let(:parent) { authorized_user }
-
-    it_behaves_like "has_one media", :user, :avatar, %i(create index destroy), "image/jpeg"
-    it_behaves_like "has_one media", :user, :profile_header, %i(create index destroy), "image/jpeg"
-  end
-
-  describe "parent is a tutorial" do
-    let(:parent) do
-      create(:tutorial, project: create(:project, owner: authorized_user))
+      it_behaves_like "has_many media", :workflow, :attached_images, %i(index create show destroy), 'image/jpeg'
     end
 
-    it_behaves_like "has_many media", :tutorial, :attached_images, %i(index create show destroy), 'image/jpeg'
+    describe "parent is a project" do
+      let(:parent) { project }
+
+      it_behaves_like "has_one media",  :project, :avatar, %i(create index destroy), "image/jpeg"
+      it_behaves_like "has_one media",  :project, :background, %i(create index destroy), "image/jpeg"
+      it_behaves_like "has_many media", :project, :attached_images, %i(index create show destroy), 'image/jpeg'
+      it_behaves_like "has_one media", :project, :classifications_export, %i(index), 'text/csv'
+      it_behaves_like "has_one media", :project, :subjects_export, %i(index), 'text/csv'
+      it_behaves_like "has_one media", :project, :aggregations_export, %i(index update), 'application/x-gzip'
+
+      describe "classifications_exports #index" do
+        let!(:resources) do
+          create_list :medium, 2, linked: parent, content_type: "text/csv",
+            type: "project_classifications_export"
+        end
+
+        it 'should return 404 without an authorized_user' do
+          default_request user_id: create(:user).id, scopes: scopes
+          get :index, project_id: parent.id, media_name: "classifications_export"
+          expect(response).to have_http_status(:not_found)
+        end
+
+        it 'should return 404 without a user' do
+          get :index, project_id: parent.id, media_name: "classifications_export"
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+
+    describe "parent is a user" do
+      let(:parent) { authorized_user }
+
+      it_behaves_like "has_one media", :user, :avatar, %i(create index destroy), "image/jpeg"
+      it_behaves_like "has_one media", :user, :profile_header, %i(create index destroy), "image/jpeg"
+    end
+
+    describe "parent is a tutorial" do
+      let(:parent) { create(:tutorial, project: project) }
+
+      it_behaves_like "has_many media", :tutorial, :attached_images, %i(index create show destroy), 'image/jpeg'
+    end
+
+    describe "parent is a field_guide" do
+      let(:parent) { create(:field_guide, project: project) }
+
+      it_behaves_like "has_many media", :field_guide, :attached_images, %i(index create show destroy), 'image/jpeg'
+    end
   end
 end

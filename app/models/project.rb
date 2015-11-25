@@ -14,6 +14,7 @@ class Project < ActiveRecord::Base
   EXPERT_ROLES = [:owner, :expert]
 
   has_many :tutorials
+  has_many :field_guides
   has_many :workflows
   has_many :subject_sets, dependent: :destroy
   has_many :classifications
