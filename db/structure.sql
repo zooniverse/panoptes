@@ -475,7 +475,7 @@ CREATE TABLE oauth_applications (
     owner_id integer,
     owner_type character varying,
     trust_level integer DEFAULT 0 NOT NULL,
-    default_scope character varying[] DEFAULT '{}'::character varying[]
+    default_scope character varying[] DEFAULT '{}'::character varying[],
     scopes character varying DEFAULT ''::character varying NOT NULL
 );
 
