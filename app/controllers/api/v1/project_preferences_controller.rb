@@ -1,7 +1,7 @@
 class Api::V1::ProjectPreferencesController < Api::ApiController
   include PreferencesController
 
-  doorkeeper_for :all, scopes: [:project]
+  require_authentication :all, scopes: [:project]
   schema_type :json_schema
 
   private

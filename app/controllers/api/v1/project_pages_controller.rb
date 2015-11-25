@@ -1,5 +1,5 @@
 class Api::V1::ProjectPagesController < Api::ApiController
-  doorkeeper_for :update, :create, :destroy, scopes: [:project]
+  require_authentication :update, :create, :destroy, scopes: [:project]
 
   resource_actions :default
 

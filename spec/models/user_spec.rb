@@ -77,7 +77,6 @@ describe User, type: :model do
   end
 
   describe "::user_from_unsubscribe_token" do
-
     it "should find the user from the token" do
       found_user = User.user_from_unsubscribe_token(user.unsubscribe_token)
       expect(found_user.id).to eq(user.id)
@@ -145,7 +144,6 @@ describe User, type: :model do
   end
 
   describe "::find_by_lower_login" do
-
     it "should find the user by the login" do
       user = create(:user)
       expect(User.find_by_lower_login(user.login.upcase).id).to eq(user.id)
@@ -155,6 +153,32 @@ describe User, type: :model do
       it "should not find the user by the login" do
         expect(User.find_by_lower_login("missing-User")).to be_nil
       end
+    end
+  end
+
+  describe "::admin_login_using_basic_auth" do
+    it 'returns a user' do
+      user = create(:user, admin: true)
+      returned_user = User.admin_login_using_basic_auth(user.login, 'password')
+      expect(returned_user).to eq(user)
+    end
+
+    it "returns nothing if the password is incorrect" do
+      user = create(:user, admin: true)
+      returned_user = User.admin_login_using_basic_auth(user.login, 'wrong')
+      expect(returned_user).to be_nil
+    end
+
+    it "returns nothing if the user isn't an admin" do
+      user = create(:user, admin: false)
+      returned_user = User.admin_login_using_basic_auth(user.login, 'password')
+      expect(returned_user).to be_nil
+    end
+
+    it "returns nothing if the user is disabled" do
+      user = create(:user, admin: true).tap(&:disable!)
+      returned_user = User.admin_login_using_basic_auth(user.login, 'password')
+      expect(returned_user).to be_nil
     end
   end
 
@@ -255,7 +279,6 @@ describe User, type: :model do
   end
 
   describe '#email' do
-
     context "when a user is setup" do
       let(:user) { create(:user, email: 'test@example.com') }
 
@@ -351,7 +374,6 @@ describe User, type: :model do
     end
 
     context "when the identity group is missing" do
-
       it "should not be valid" do
         expect(user.valid?).to be_falsy
       end

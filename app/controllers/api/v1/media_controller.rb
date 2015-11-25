@@ -1,5 +1,5 @@
 class Api::V1::MediaController < Api::ApiController
-  doorkeeper_for :update, :create, :destroy, scopes: [:medium]
+  require_authentication :update, :create, :destroy, scopes: [:medium]
   resource_actions :default
 
   before_action :create_conditions, only: :create

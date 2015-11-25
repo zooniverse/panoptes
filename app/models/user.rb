@@ -123,6 +123,16 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.admin_login_using_basic_auth(login, password)
+    user = User.find_for_database_authentication(login: login)
+
+    if user && user.valid_password?(password) && user.admin? && !user.disabled?
+      user
+    else
+      nil
+    end
+  end
+
   def self.sanitize_login(string)
     string
       .gsub(/\s+/, '_')

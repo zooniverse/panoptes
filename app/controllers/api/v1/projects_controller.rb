@@ -6,7 +6,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include AdminAllowed
   include Versioned
 
-  doorkeeper_for :update, :create, :destroy, :create_classifications_export,
+  require_authentication :update, :create, :destroy, :create_classifications_export,
     :create_subjects_export, :create_aggregations_export,
     :create_workflows_export, :create_workflow_contents_export,
     scopes: [:project]
