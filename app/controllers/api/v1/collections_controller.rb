@@ -6,7 +6,7 @@ class Api::V1::CollectionsController < Api::ApiController
   before_action :filter_by_project_ids, only: :index
   before_action :pluralize_project_links, only: :create
 
-  doorkeeper_for :create, :update, :destroy, scopes: [:collection]
+  require_authentication :create, :update, :destroy, scopes: [:collection]
   resource_actions :default
   schema_type :strong_params
 

@@ -3,8 +3,8 @@ class Api::V1::UsersController < Api::ApiController
   include IndexSearch
   include AdminAllowed
 
-  doorkeeper_for :me, scopes: [:public]
-  doorkeeper_for :update, :destroy, scopes: [:user]
+  require_authentication :me, scopes: [:public]
+  require_authentication :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show
 
   schema_type :strong_params

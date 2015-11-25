@@ -1,4 +1,4 @@
-require 'doorkeeper/models/application'
+require 'doorkeeper/orm/active_record/application'
 
 Doorkeeper::Application.class_eval do
   enum trust_level: [:insecure, :secure, :first_party]
