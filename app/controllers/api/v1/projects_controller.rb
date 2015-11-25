@@ -174,7 +174,6 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def new_items(resource, relation, value)
-    return super if relation == :default_tutorial
     construct_new_items(super(resource, relation, value), resource.id)
   end
 

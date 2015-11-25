@@ -129,6 +129,24 @@ describe Project, :type => :model do
     end
   end
 
+  describe "#tutorials" do
+    let(:tutorial) { build(:tutorial, project: project) }
+
+    it "should have many tutorial" do
+      project.tutorials << tutorial
+      expect(project.tutorials).to match_array([tutorial])
+    end
+  end
+
+  describe "#field_guides" do
+    let(:field_guide) { build(:field_guide, project: project) }
+
+    it "should have many field_guides" do
+      project.field_guides << field_guide
+      expect(project.field_guides).to match_array([field_guide])
+    end
+  end
+
   describe "#expert_classifier_level and #expert_classifier?" do
     let(:project) { create(:project) }
     let(:project_user) { create(:user) }
