@@ -1,7 +1,7 @@
 class Api::V1::SubjectsController < Api::ApiController
   include Versioned
 
-  doorkeeper_for :update, :create, :destroy, :version, :versions,
+  require_authentication :update, :create, :destroy, :version, :versions,
     scopes: [:subject]
   resource_actions :default
   schema_type :json_schema

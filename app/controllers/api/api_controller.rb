@@ -45,6 +45,18 @@ module Api
     prepend_before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
                                                 API_ALLOWED_METHOD_OVERRIDES)
 
+    def self.require_authentication(*actions, scopes: [])
+      if actions == [:all]
+        before_action -> { check_authentication(scopes) }
+      else
+        before_action -> { check_authentication(scopes) }, only: actions
+      end
+    end
+
+    def check_authentication(scopes)
+      doorkeeper_authorize!(*scopes)
+    end
+
     def current_resource_owner
       if doorkeeper_token
         @current_resource_owner ||= User.find_by_id(doorkeeper_token.resource_owner_id)

@@ -2,7 +2,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   include Versioned
   include TranslatableResource
 
-  doorkeeper_for :update, :create, :destroy, scopes: [:project]
+  require_authentication :update, :create, :destroy, scopes: [:project]
 
   resource_actions :default
   schema_type :json_schema

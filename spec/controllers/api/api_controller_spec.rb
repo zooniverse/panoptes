@@ -40,7 +40,7 @@ describe Api::ApiController, type: :controller do
 
   context "with doorkeeper" do
     controller do
-      doorkeeper_for :index, scopes: [:public]
+      require_authentication :index, scopes: [:public]
       def index
         render json_api: { tests: [{ all: "good" },
                                    { at: "least" },
@@ -55,7 +55,6 @@ describe Api::ApiController, type: :controller do
     end
 
     describe "when a user has the correct scope" do
-
       it "should return 200 with a logged in user" do
         default_request(scopes: ["public"], user_id: user.id)
         get :index
