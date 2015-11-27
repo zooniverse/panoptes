@@ -79,6 +79,14 @@ class User < ActiveRecord::Base
     },
     :ranked_by => ":tsearch + (0.25 * :trigram)"
 
+  pg_search_scope :search_name_fast,
+    against: [:login],
+    using: { tsearch: {
+      prefix: true,
+      tsvector_column: "tsv"
+      }
+    }
+
   def self.scope_for(action, user, opts={})
     case
     when user.is_admin?
