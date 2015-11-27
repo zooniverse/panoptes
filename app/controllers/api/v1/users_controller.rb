@@ -16,7 +16,13 @@ class Api::V1::UsersController < Api::ApiController
   alias_method :user, :controlled_resource
 
   search_by do |name, query|
-    query.search_name(name.join(" "))
+    search_names = name.join(" ")
+    fast_search = query.search_name_fast(search_names)
+    if fast_search.exists?
+      fast_search
+    else
+      query.search_name(search_names)
+    end
   end
 
   def me

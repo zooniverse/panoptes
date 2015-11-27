@@ -194,8 +194,8 @@ describe Api::V1::UsersController, type: :controller do
         context "display_name" do
           let(:index_options) { { search: user.display_name } }
 
-          it "should respond with both items in a ranked order", :aggregate_failures do
-            expect(json_response[api_resource_name].length).to eq(2)
+          it "should respond with the correct user", :aggregate_failures do
+            expect(json_response[api_resource_name].length).to eq(1)
             expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
           end
 
@@ -215,8 +215,8 @@ describe Api::V1::UsersController, type: :controller do
         context "login" do
           let(:index_options) { { search: user.login } }
 
-          it "should respond with both items in a ranked order", :aggregate_failures do
-            expect(json_response[api_resource_name].length).to eq(2)
+          it "should respond with the correct user", :aggregate_failures do
+            expect(json_response[api_resource_name].length).to eq(1)
             expect(json_response[api_resource_name][0]['login']).to eq(user.login)
           end
 
