@@ -2403,13 +2403,6 @@ CREATE UNIQUE INDEX index_users_on_login_with_case ON users USING btree (login);
 
 
 --
--- Name: index_users_on_ouroboros_created; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_users_on_ouroboros_created ON users USING btree (ouroboros_created) WHERE (ouroboros_created = false);
-
-
---
 -- Name: index_users_on_private_profile; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2456,13 +2449,6 @@ CREATE INDEX index_versions_on_item_type_and_item_id ON versions USING btree (it
 --
 
 CREATE INDEX index_workflow_contents_on_workflow_id ON workflow_contents USING btree (workflow_id);
-
-
---
--- Name: index_workflows_on_active; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_workflows_on_active ON workflows USING btree (active) WHERE (active = true);
 
 
 --
@@ -2849,4 +2835,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151117154126');
 INSERT INTO schema_migrations (version) VALUES ('20151120104454');
 
 INSERT INTO schema_migrations (version) VALUES ('20151120161458');
+
+INSERT INTO schema_migrations (version) VALUES ('20151127150019');
 
