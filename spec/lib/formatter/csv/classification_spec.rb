@@ -3,8 +3,8 @@ require 'spec_helper'
 RSpec.describe Formatter::Csv::Classification do
 
   let(:project_headers) do
-    %w( user_name user_id user_ip workflow_id workflow_name workflow_version
-        created_at gold_standard expert metadata annotations subject_data )
+    %w( classification_id user_name user_id user_ip project_id workflow_id workflow_name workflow_version
+        created_at updated_at completed gold_standard expert metadata annotations subject_data )
   end
 
   let(:subject) { build_stubbed(:subject) }
@@ -25,13 +25,17 @@ RSpec.describe Formatter::Csv::Classification do
                                 workflow_content_at_version: double("WorkflowContent", strings: {})) }
 
   let(:formatted_data) do
-    [ classification.user.login,
+    [ classification.id,
+      classification.user.login,
       classification.user_id,
       ip_hash,
+      classification.project_id,
       classification.workflow_id,
       classification.workflow.display_name,
       classification.workflow_version,
       classification.created_at,
+      classification.updated_at,
+      classification.completed,
       classification.gold_standard,
       classification.expert_classifier,
       classification.metadata.to_json,
@@ -75,7 +79,7 @@ RSpec.describe Formatter::Csv::Classification do
     context "when the obfuscate_private_details flag is false" do
       it 'return the real classification ip in the array' do
         allow(formatter).to receive(:obfuscate).and_return(false)
-        user_ip = formatter.to_array(classification)[2]
+        user_ip = formatter.to_array(classification)[3]
         expect(user_ip).to eq(classification.user_ip.to_s)
       end
     end
@@ -83,7 +87,7 @@ RSpec.describe Formatter::Csv::Classification do
     context "when the classifier is logged out" do
       it 'should should return not logged in' do
         allow(classification).to receive(:user).and_return(nil)
-        user_id = formatter.to_array(classification)[0]
+        user_id = formatter.to_array(classification)[1]
         expect(user_id).to eq("not-logged-in-#{ip_hash}")
       end
     end

@@ -1,15 +1,14 @@
 class ClassificationsDump
-  attr_reader :project, :output, :cache, :formatter, :date_range
+  attr_reader :project, :cache, :formatter, :date_range
 
-  def initialize(project, output, obfuscate_private_details: true, date_range: nil)
+  def initialize(project, obfuscate_private_details: true, date_range: nil)
     @project = project
-    @output = output
     @cache = ClassificationDumpCache.new
     @formatter = Formatter::Csv::Classification.new(project, cache, obfuscate_private_details: obfuscate_private_details)
     @date_range = date_range
   end
 
-  def write
+  def write_to(output)
     output <<  formatter.class.headers
 
     completed_project_classifications.find_in_batches do |group|

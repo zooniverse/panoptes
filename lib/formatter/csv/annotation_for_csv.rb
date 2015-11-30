@@ -46,6 +46,8 @@ module Formatter
           answer_string = task["answers"][answer_idx]["label"]
           translate(answer_string)
         end
+      rescue
+        []
       end
 
       def translate(string)
