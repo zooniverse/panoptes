@@ -2,7 +2,7 @@ class Api::V1::UserGroupsController < Api::ApiController
   include Recents
   include IndexSearch
 
-  doorkeeper_for :create, :update, :destroy, scopes: [:group]
+  require_authentication :create, :update, :destroy, scopes: [:group]
   resource_actions :show, :index, :update, :deactivate, :create
   schema_type :strong_params
 

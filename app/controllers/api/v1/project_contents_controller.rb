@@ -1,7 +1,7 @@
 class Api::V1::ProjectContentsController < Api::ApiController
   include Versioned
 
-  doorkeeper_for :all, scopes: [:project]
+  require_authentication :all, scopes: [:project]
   resource_actions :default
   schema_type :strong_params
 

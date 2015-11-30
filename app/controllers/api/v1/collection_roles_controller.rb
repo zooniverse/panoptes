@@ -1,6 +1,6 @@
 class Api::V1::CollectionRolesController < Api::ApiController
   include RolesController
-  doorkeeper_for :create, :update, :destroy, scopes: [:collection]
+  require_authentication :create, :update, :destroy, scopes: [:collection]
 
   allowed_params :create, roles: [], links: [:user, :collection]
   allowed_params :update, roles: []
