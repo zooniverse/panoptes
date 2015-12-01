@@ -8,15 +8,15 @@ class RetirementWorker
     if count.retire?
       count.retire! do
         SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject_ids)
-        deactivate_workflow!(count.workflow)
+        finish_workflow!(count.workflow)
         push_counters_to_event_stream(count.workflow)
       end
     end
   end
 
-  def deactivate_workflow!(workflow)
+  def finish_workflow!(workflow, clock = Time)
     if workflow.finished?
-      Workflow.where(id: workflow.id).update_all(active: false)
+      Workflow.where(id: workflow.id).update_all(finished_at: clock.now)
     end
   end
 

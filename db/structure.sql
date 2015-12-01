@@ -1262,7 +1262,8 @@ CREATE TABLE workflows (
     aggregation jsonb DEFAULT '{}'::jsonb NOT NULL,
     display_order integer,
     configuration jsonb DEFAULT '{}'::jsonb NOT NULL,
-    public_gold_standard boolean DEFAULT false
+    public_gold_standard boolean DEFAULT false,
+    finished_at timestamp without time zone
 );
 
 
@@ -2840,4 +2841,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151120161458');
 INSERT INTO schema_migrations (version) VALUES ('20151125153712');
 
 INSERT INTO schema_migrations (version) VALUES ('20151127150019');
+
+INSERT INTO schema_migrations (version) VALUES ('20151201102135');
 
