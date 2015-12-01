@@ -42,30 +42,32 @@ RSpec.describe RetirementWorker do
     end
   end
 
-  describe "#deactive_workflow!" do
+  describe "#finish_workflow!" do
     context "workflow is finsihed" do
-      it 'should set workflow.active to false' do
+      let(:now) { Time.now.utc.change(usec: 0) }
+
+      it 'should set workflow.finished_at to the current time' do
         allow(workflow).to receive(:finished?).and_return(true)
         expect do
-          worker.deactivate_workflow!(workflow)
-        end.to change{Workflow.find(workflow.id).active}.from(true).to(false)
+          worker.finish_workflow!(workflow, double("Clock", now: now))
+        end.to change{Workflow.find(workflow.id).finished_at}.from(nil).to(now)
       end
 
       context "when the workflow optimistic lock is updated" do
         it 'should save the changes and not raise an error' do
           allow(workflow).to receive(:finished?).and_return(true)
           Workflow.find(workflow.id).touch
-          expect { worker.deactivate_workflow!(workflow) }.to_not raise_error
+          expect { worker.finish_workflow!(workflow) }.to_not raise_error
         end
       end
     end
 
     context "workflow is not finished" do
-      it 'should not set workflow.actvive to false' do
+      it 'should not set workflow.finished_at' do
         allow(workflow).to receive(:finished?).and_return(false)
         expect do
-          worker.deactivate_workflow!(workflow)
-        end.to_not change{Workflow.find(workflow.id).active}
+          worker.finish_workflow!(workflow)
+        end.to_not change{Workflow.find(workflow.id).finished_at}
       end
     end
   end
