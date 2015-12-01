@@ -958,15 +958,23 @@ classify, usually for expert classifiers.
 ### Create a Subject [POST]
 A *locations* attribute and a project link are required.
 
-The *locations* array should have the mime-types of the subject's
-associated media. If a particular piece of media has multiple
-representations (such as video encoded as WebM and MPEG-4) it's
-mimetypes should be a subarray within the *locations* array, eg, for
-subject whose media include an image and a video its *locations* array
-would look like `"locations":["image/png", ["video/webm", "video/mp4"]]`.
+To have the Zooniverse host your media resources the *locations* array
+should have the mime-types of the subject's associated media,
+e.g `"locations":["image/png", "image/jpg", "image/png"]`,
+note the locations mime types are stored in order.
 
-The response will contain signed s3 urls the client may make a PUT
+The create response will contain signed s3 urls the client may make a PUT
 request containing the media to. The signed urls will be valid for 20 minutes.
+Please take the order of the returned s3 urls into account when PUT'ing
+local media resources to the remote location.
+
+To use your own hosted media resources the *locations* array
+should be comprised of objects that represent the mime-type and the hosted URL
+of the subject's associated media,
+e.g. `"locations":[
+{"image/png": "https://your.s3_account.com/subjects/1.png"},
+{"image/jpg": "https://your.s3_account.com/subjects/1.jpg"}
+]`.
 
 The *metadata* attribute is optional.
 
