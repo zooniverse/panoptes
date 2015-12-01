@@ -1415,6 +1415,7 @@ A workflow has the following attributes
 - id
 - created_at
 - updated_at
+- finished_at
 - display_name
 - tasks
 - classifications_count
@@ -1427,6 +1428,8 @@ A workflow has the following attributes
 
 *id*, *created_at*, *updated_at*, *workflow_version*, *content_language*,
 and *classifications_count* are assigned by the API
+
+*finished_at* is set by the API to a date/time when all subjects for this workflow have been retired.
 
 Three parameters: _grouped_, _prioritized_, and _pairwise_ configure
 how [Cellect](https://github.com/zooniverse/Cellect) chooses subjects
