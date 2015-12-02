@@ -24,8 +24,10 @@ class Workflow < ActiveRecord::Base
   cache_by_association :workflow_contents
   cache_by_resource_method :subjects_count, :finished?
 
-  DEFAULT_CRITERIA = 'classification_count'
-  DEFAULT_OPTS = { 'count' => 15 }
+  DEFAULT_RETIREMENT_OPTIONS = {
+    'criteria' => 'classification_count',
+    'options' => {'count' => 15}
+  }
 
   validates_presence_of :project, :display_name
 
@@ -65,17 +67,13 @@ class Workflow < ActiveRecord::Base
   end
 
   def retirement_scheme
-    criteria = retirement.fetch('criteria', DEFAULT_CRITERIA)
-    options = retirement.fetch('options', DEFAULT_OPTS)
+    criteria = retirement_with_defaults.fetch('criteria')
+    options = retirement_with_defaults.fetch('options')
     scheme_class = RetirementSchemes.for(criteria).new(options)
   end
 
   def retirement_with_defaults
-    self.retirement.presence || default_retirement_options
-  end
-
-  def default_retirement_options
-    {criteria: Workflow::DEFAULT_CRITERIA, options: Workflow::DEFAULT_OPTS}
+    self.retirement.presence || DEFAULT_RETIREMENT_OPTIONS
   end
 
   def retired_subjects_count
