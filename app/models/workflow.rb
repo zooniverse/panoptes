@@ -30,7 +30,7 @@ class Workflow < ActiveRecord::Base
   validates_presence_of :project, :display_name
 
   validate do |workflow|
-    criteria = %w(never_retire classification_count)
+    criteria = RetirementSchemes::CRITERIA.keys
     unless workflow.retirement.empty? || criteria.include?(workflow.retirement['criteria'])
       workflow.errors.add(:"retirement.criteria", "Retirement criteria must be one of #{criteria.join(', ')}")
     end
@@ -65,15 +65,9 @@ class Workflow < ActiveRecord::Base
   end
 
   def retirement_scheme
-    case retirement.fetch('criteria', DEFAULT_CRITERIA)
-    when 'never_retire'
-      RetirementSchemes::NeverRetire.new
-    when 'classification_count'
-      params = retirement.fetch('options', DEFAULT_OPTS).values_at('count')
-      RetirementSchemes::ClassificationCount.new(*params)
-    else
-      raise StandardError, 'invalid retirement scheme'
-    end
+    criteria = retirement.fetch('criteria', DEFAULT_CRITERIA)
+    options = retirement.fetch('options', DEFAULT_OPTS)
+    scheme_class = RetirementSchemes.for(criteria).new(options)
   end
 
   def retirement_with_defaults

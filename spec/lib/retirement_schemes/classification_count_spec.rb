@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe RetirementSchemes::ClassificationCount do
-  subject { described_class.new(10) }
+  subject { described_class.new(count: 10) }
 
   describe "#retire?" do
     context "retirement count is less than sms classification count" do

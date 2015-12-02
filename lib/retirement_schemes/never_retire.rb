@@ -1,6 +1,6 @@
 module RetirementSchemes
   class NeverRetire
-    def initialize
+    def initialize(options = {})
     end
 
     def retire?(sw_count)
