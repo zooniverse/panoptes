@@ -1,5 +1,3 @@
-require "retirement_schemes/classification_count"
-
 class Workflow < ActiveRecord::Base
   include Linkable
   include Translatable
@@ -32,7 +30,7 @@ class Workflow < ActiveRecord::Base
   validates_presence_of :project, :display_name
 
   validate do |workflow|
-    criteria = %w(classification_count)
+    criteria = %w(never_retire classification_count)
     unless workflow.retirement.empty? || criteria.include?(workflow.retirement['criteria'])
       workflow.errors.add(:"retirement.criteria", "Retirement criteria must be one of #{criteria.join(', ')}")
     end
@@ -68,6 +66,8 @@ class Workflow < ActiveRecord::Base
 
   def retirement_scheme
     case retirement.fetch('criteria', DEFAULT_CRITERIA)
+    when 'never_retire'
+      RetirementSchemes::NeverRetire.new
     when 'classification_count'
       params = retirement.fetch('options', DEFAULT_OPTS).values_at('count')
       RetirementSchemes::ClassificationCount.new(*params)

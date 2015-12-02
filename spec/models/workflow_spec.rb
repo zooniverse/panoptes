@@ -110,25 +110,19 @@ describe Workflow, :type => :model do
       end
     end
 
+    context 'never_retire' do
+      let(:retirement) { { 'criteria' => 'never_retire' } }
+
+      it "should return a never retire scheme" do
+        expect(subject.retirement_scheme).to be_a(RetirementSchemes::NeverRetire)
+      end
+    end
+
     context "classification_count" do
       let(:retirement) { { 'criteria' => 'classification_count' } }
 
       it "should return a classification count scheme" do
         expect(subject.retirement_scheme).to be_a(RetirementSchemes::ClassificationCount)
-      end
-
-      context "disabling the retirement scheme" do
-        let(:retirement) do
-          { 'criteria' => 'classification_count', "options" => { "count" => "disabled" } }
-        end
-
-        it "should return a disabled classification count scheme" do
-          aggregate_failures "scheme" do
-            rs = subject.retirement_scheme
-            expect(rs).to be_a(RetirementSchemes::ClassificationCount)
-            expect(rs.disabled?).to eq(true)
-          end
-        end
       end
     end
 
