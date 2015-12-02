@@ -7,15 +7,7 @@ module RetirementSchemes
     end
 
     def retire?(sw_count)
-      if disabled?
-        false
-      else
-        sw_count.classifications_count >= @count
-      end
-    end
-
-    def disabled?
-      !!@count.to_s.match(/\Adisabled\z/i)
+      sw_count.classifications_count >= @count
     end
   end
 end
