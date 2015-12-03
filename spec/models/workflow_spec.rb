@@ -105,21 +105,29 @@ describe Workflow, :type => :model do
     context "empty" do
       let(:retirement) { Hash.new }
 
-      it "it should return a classification count scheme" do
+      it "should return a classification count scheme" do
         expect(subject.retirement_scheme).to be_a(RetirementSchemes::ClassificationCount)
       end
     end
 
-    context "classification_count" do
-      let(:retirement) { { 'criteria' => 'classification_count' } }
+    context 'never_retire' do
+      let(:retirement) { { 'criteria' => 'never_retire', 'options' => {} } }
 
-      it "it should return a classification count scheme" do
+      it "should return a never retire scheme" do
+        expect(subject.retirement_scheme).to be_a(RetirementSchemes::NeverRetire)
+      end
+    end
+
+    context "classification_count" do
+      let(:retirement) { { 'criteria' => 'classification_count', 'options' => {'count' => 1} } }
+
+      it "should return a classification count scheme" do
         expect(subject.retirement_scheme).to be_a(RetirementSchemes::ClassificationCount)
       end
     end
 
     context "anything else" do
-      let(:retirement) { { 'criteria' => 'anything else' } }
+      let(:retirement) { { 'criteria' => 'anything else', 'options': {} } }
 
       it 'should raise an error' do
         expect{subject.retirement_scheme}.to raise_error(StandardError, 'invalid retirement scheme')
@@ -151,12 +159,7 @@ describe Workflow, :type => :model do
 
   describe "#retirement_with_defaults" do
     let(:workflow) { build(:workflow, retirement: retirement) }
-    let(:defaults) do
-      {
-        criteria: Workflow::DEFAULT_CRITERIA,
-        options: Workflow::DEFAULT_OPTS
-      }
-    end
+    let(:defaults) { Workflow::DEFAULT_RETIREMENT_OPTIONS }
 
     context "empty" do
       let(:retirement) { Hash.new }

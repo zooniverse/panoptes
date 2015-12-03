@@ -1,5 +1,3 @@
-require "retirement_schemes/classification_count"
-
 class Workflow < ActiveRecord::Base
   include Linkable
   include Translatable
@@ -26,13 +24,15 @@ class Workflow < ActiveRecord::Base
   cache_by_association :workflow_contents
   cache_by_resource_method :subjects_count, :finished?
 
-  DEFAULT_CRITERIA = 'classification_count'
-  DEFAULT_OPTS = { 'count' => 15 }
+  DEFAULT_RETIREMENT_OPTIONS = {
+    'criteria' => 'classification_count',
+    'options' => {'count' => 15}
+  }
 
   validates_presence_of :project, :display_name
 
   validate do |workflow|
-    criteria = %w(classification_count)
+    criteria = RetirementSchemes::CRITERIA.keys
     unless workflow.retirement.empty? || criteria.include?(workflow.retirement['criteria'])
       workflow.errors.add(:"retirement.criteria", "Retirement criteria must be one of #{criteria.join(', ')}")
     end
@@ -67,25 +67,13 @@ class Workflow < ActiveRecord::Base
   end
 
   def retirement_scheme
-    case retirement.fetch('criteria', DEFAULT_CRITERIA)
-    when 'classification_count'
-      params = retirement.fetch('options', DEFAULT_OPTS).values_at('count')
-      RetirementSchemes::ClassificationCount.new(*params)
-    else
-      raise StandardError, 'invalid retirement scheme'
-    end
+    criteria = retirement_with_defaults.fetch('criteria')
+    options = retirement_with_defaults.fetch('options')
+    scheme_class = RetirementSchemes.for(criteria).new(options)
   end
 
   def retirement_with_defaults
-    retire_criteria = self.retirement
-    if retire_criteria.blank?
-      {
-        criteria: Workflow::DEFAULT_CRITERIA,
-        options: Workflow::DEFAULT_OPTS
-      }
-    else
-      retire_criteria
-    end
+    self.retirement.presence || DEFAULT_RETIREMENT_OPTIONS
   end
 
   def retired_subjects_count

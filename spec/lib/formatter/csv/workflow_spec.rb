@@ -6,10 +6,7 @@ RSpec.describe Formatter::Csv::Workflow do
   let(:workflow_version) { workflow }
 
   def retirement_json
-    {
-      criteria: ::Workflow::DEFAULT_CRITERIA,
-      options: ::Workflow::DEFAULT_OPTS
-    }.to_json
+    ::Workflow::DEFAULT_RETIREMENT_OPTIONS.to_json
   end
 
   let(:fields) do

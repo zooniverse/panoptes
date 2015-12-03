@@ -1,11 +1,13 @@
 module RetirementSchemes
   class ClassificationCount
-    def initialize(count)
-      @count = count
+    def initialize(options = {})
+      options = options.with_indifferent_access
+
+      @count = options.fetch(:count)
     end
 
-    def retire?(count)
-      count.classifications_count >= @count
+    def retire?(sw_count)
+      sw_count.classifications_count >= @count
     end
   end
 end

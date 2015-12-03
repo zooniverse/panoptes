@@ -69,22 +69,15 @@ describe WorkflowSerializer do
     let(:expected) { serializer.retirement }
 
     context "with no values set" do
-
       it 'should return the default criteria' do
-        defaults = {
-          criteria: "classification_count",
-          options: { "count" => 15 }
-        }
+        defaults = Workflow::DEFAULT_RETIREMENT_OPTIONS
         expect(expected).to eq(defaults)
       end
     end
 
     context "with values set" do
       let(:custom) do
-        {
-          "criteria" => Workflow::DEFAULT_CRITERIA,
-          "options" => { count: 5 }
-        }
+        Workflow::DEFAULT_RETIREMENT_OPTIONS.merge("options" => {count: 5})
       end
 
       it 'should return the stored values' do
