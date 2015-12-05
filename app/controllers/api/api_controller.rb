@@ -1,5 +1,3 @@
-require "accept_language_extractor"
-
 module Api
   include ApiErrors
 
@@ -14,9 +12,9 @@ module Api
     rescue_from ActiveRecord::RecordNotFound,
       Api::NoMediaError,
       RoleControl::AccessDenied,
-      SubjectSelector::MissingSubjectQueue,
-      SubjectSelector::MissingSubjectSet,
-      SubjectSelector::EmptyDatabaseSelect,                with: :not_found
+      Subjects::Selector::MissingSubjectQueue,
+      Subjects::Selector::MissingSubjectSet,
+      Subjects::Selector::EmptyDatabaseSelect,                with: :not_found
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
     rescue_from Api::LiveProjectChanges,                   with: :forbidden
     rescue_from Api::NotLoggedIn,
@@ -30,7 +28,7 @@ module Api
       Api::UserSeenSubjectIdError,
       ActionController::UnpermittedParameters,
       ActionController::ParameterMissing,
-      SubjectSelector::MissingParameter,
+      Subjects::Selector::MissingParameter,
       Api::RolesExist,
       JsonSchema::ValidationError,
       JsonApiController::NotLinkable,

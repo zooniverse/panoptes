@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SetMemberSubjectSelector do
+describe Subjects::SetMemberSubjectSelector do
   let(:project) { create :project, workflows: build_list(:workflow, 1) }
   let(:subject_set) { create :subject_set, project: project }
   let(:subject) { create :subject, project: project, subject_sets: [subject_set]}
@@ -9,6 +9,7 @@ describe SetMemberSubjectSelector do
   let(:count) { create(:subject_workflow_count, subject: subject, workflow: project.workflows.first) }
   let(:user) { create(:user) }
   let(:user_seen_subject) { create(:user_seen_subject, user: user, workflow: count.workflow, subject_ids: [seen_subject.id]) }
+  let(:selector_class) { Subjects::SetMemberSubjectSelector }
 
   before do
     count.workflow.subject_sets = count.subject.subject_sets
@@ -17,7 +18,7 @@ describe SetMemberSubjectSelector do
 
   context 'when there is no user' do
     let(:workflow) { create(:workflow_with_subjects) }
-    let(:selector) { SetMemberSubjectSelector.new(workflow, nil) }
+    let(:selector) { selector_class.new(workflow, nil) }
 
     context 'when the workflow is not finished' do
       it 'should select from the non retired remaining subjects' do
@@ -50,9 +51,9 @@ describe SetMemberSubjectSelector do
   end
 
   context 'when there is a user and they have participated before' do
-    before { allow_any_instance_of(SetMemberSubjectSelector).to receive(:select_from_all?).and_return(false) }
+    before { allow_any_instance_of(selector_class).to receive(:select_from_all?).and_return(false) }
 
-    let(:sms_to_classify) { SetMemberSubjectSelector.new(count.workflow, user).set_member_subjects }
+    let(:sms_to_classify) { selector_class.new(count.workflow, user).set_member_subjects }
 
     it 'does not include subjects that have been seen' do
       user_seen_subject

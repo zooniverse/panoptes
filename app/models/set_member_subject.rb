@@ -37,7 +37,7 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def self.available(workflow, user)
-    SetMemberSubjectSelector.new(workflow, user).set_member_subjects
+    Subjects::SetMemberSubjectSelector.new(workflow, user).set_member_subjects
   end
 
   def self.by_workflow(workflow)
