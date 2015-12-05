@@ -1,4 +1,6 @@
 ENV["RAILS_ENV"] ||= 'test'
+require 'celluloid/test'
+Celluloid.logger.level = Logger::WARN
 require 'cellect/testing'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
@@ -66,10 +68,12 @@ RSpec.configure do |config|
 
   config.before(:each) do
     DatabaseCleaner.start
+    Celluloid.boot
   end
 
   config.after(:each) do
     DatabaseCleaner.clean
+    Celluloid.shutdown
   end
 
   # If true, the base class of anonymous controllers will be inferred
