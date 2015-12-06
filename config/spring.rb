@@ -1,0 +1,1 @@
+require 'cellect/testing'
