@@ -14,7 +14,7 @@ module Api
       RoleControl::AccessDenied,
       Subjects::Selector::MissingSubjectQueue,
       Subjects::Selector::MissingSubjectSet,
-      Subjects::Selector::EmptyDatabaseSelect,                with: :not_found
+      Subjects::Selector::EmptyDatabaseSelect,             with: :not_found
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
     rescue_from Api::LiveProjectChanges,                   with: :forbidden
     rescue_from Api::NotLoggedIn,

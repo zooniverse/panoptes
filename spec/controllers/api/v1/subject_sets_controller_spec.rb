@@ -8,8 +8,8 @@ shared_examples "cleans up the linked set member subjects" do
   end
 
   it 'should queue a removal workfer' do
-    expect(QueueRemovalWorker).to receive(:perform_async).with(sms.map(&:id),
-                                                               subject_set.workflows.pluck(:id))
+    expect(QueueRemovalWorker).to receive(:perform_async)
+      .with(sms.map(&:id),subject_set.workflows.pluck(:id))
     delete_resources
   end
 
