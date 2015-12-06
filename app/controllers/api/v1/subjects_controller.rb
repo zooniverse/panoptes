@@ -74,7 +74,7 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def selector
-    @selector ||= SubjectSelector.new(api_user,
+    @selector ||= Subjects::Selector.new(api_user,
       workflow,
       params,
       controlled_resources)

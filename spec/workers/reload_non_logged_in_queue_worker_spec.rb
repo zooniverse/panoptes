@@ -7,7 +7,7 @@ RSpec.describe ReloadNonLoggedInQueueWorker do
   let(:subject_ids) { (1..100).to_a}
 
   before(:each) do
-    allow_any_instance_of(PostgresqlSelection).to receive(:select).and_return(subject_ids)
+    allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return(subject_ids)
   end
 
   describe "#perform" do

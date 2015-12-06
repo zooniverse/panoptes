@@ -13,7 +13,7 @@ class EnqueueSubjectQueueWorker
     @workflow = Workflow.find(workflow_id)
     @user = User.find(user_id) if user_id
 
-    subject_ids = PostgresqlSelection.new(workflow, user)
+    subject_ids = Subjects::PostgresqlSelection.new(workflow, user)
       .select(limit: limit, subject_set_id: subject_set_id)
       .compact
     unless subject_ids.empty?

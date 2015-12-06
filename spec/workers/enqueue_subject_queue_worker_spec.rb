@@ -10,7 +10,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
 
     before(:each) do
       available_smss = (1..100).to_a
-      allow_any_instance_of(PostgresqlSelection).to receive(:select).and_return(available_smss)
+      allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return(available_smss)
     end
 
     context "with no user or set" do
@@ -54,18 +54,23 @@ RSpec.describe EnqueueSubjectQueueWorker do
     end
 
     describe "#load_subjects" do
+      before do
+        allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return(result_ids)
+      end
+
       context "when there are selected subjects to queue" do
+        let(:result_ids) { [1] }
+
         it 'should attempt to queue an empty set' do
-          allow_any_instance_of(PostgresqlSelection).to receive(:select).and_return([1])
           expect(SubjectQueue).to receive(:enqueue)
           subject.perform(workflow.id)
         end
       end
 
       context "when there are no selected subjects to queue" do
+        let(:result_ids) { [] }
 
         it 'should not attempt to queue an empty set' do
-          allow_any_instance_of(PostgresqlSelection).to receive(:select).and_return([])
           expect(SubjectQueue).to_not receive(:enqueue)
           subject.perform(workflow.id)
         end
