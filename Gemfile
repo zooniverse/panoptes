@@ -59,14 +59,14 @@ end
 
 group :development, :test do
   gem 'foreman'
-  gem 'pry-rails', '~> 0.3.2'
+  gem 'pry-rails'
 end
 
 group :test do
-  gem 'database_cleaner', '~> 1.2.0'
-  gem 'rspec', '~> 3.3.0'
-  gem 'rspec-rails', '~> 3.3.0'
-  gem 'guard-rspec', '~> 4.2.9', require: false
-  gem 'factory_girl_rails', '~> 4.5.0'
-  gem 'spring-commands-rspec', '~> 1.0.2'
+  gem 'database_cleaner'
+  gem 'rspec'
+  gem 'rspec-rails'
+  gem 'guard-rspec', require: false
+  gem 'factory_girl_rails'
+  gem 'spring-commands-rspec'
 end
