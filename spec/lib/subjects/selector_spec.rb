@@ -71,13 +71,21 @@ RSpec.describe Subjects::Selector do
         expect(subjects.length).to eq(5)
       end
 
-      context "when the selection strategy returns an empty set" do
+      context "when the database selection strategy returns an empty set" do
+        let(:non_logged_in_queue) do
+          create(:subject_queue,
+                 workflow: workflow,
+                 user: nil,
+                 subject_set: nil,
+                 set_member_subjects: smses)
+        end
 
-        it 'should raise the an error when ordering by an empty set' do
+        it 'should fallback to the non-logged in queue data' do
           allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return([])
           subject_queue
-          message = "No data available for selection"
-          expect { subject.queued_subjects }.to raise_error(Subjects::Selector::EmptyDatabaseSelect, message)
+          non_logged_in_queue
+          subjects, _ = subject.queued_subjects
+          expect(smses.map(&:subject)).to include(*subjects)
         end
       end
     end

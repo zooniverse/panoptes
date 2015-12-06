@@ -33,17 +33,21 @@ module Subjects
     def sms_ids_from_queue(queue)
       sms_ids = queue.next_subjects(subjects_page_size)
       if sms_ids.blank?
-        select_from_database
+        fallback_selection
       else
         dequeue_for_logged_in_user(sms_ids)
         sms_ids
       end
     end
 
-    def select_from_database
+    def fallback_selection
+      select_limit = 5
       sms_ids = PostgresqlSelection.new(workflow, user.user)
-        .select(limit: 5, subject_set_id: subject_set_id)
-      empty_database_select_error if sms_ids.blank?
+        .select(limit: select_limit, subject_set_id: subject_set_id)
+      if sms_ids.blank?
+        non_logged_in_queue = find_subject_queue(nil)
+        sms_ids = non_logged_in_queue.next_subjects(select_limit)
+      end
       sms_ids
     end
 
@@ -61,11 +65,6 @@ module Subjects
 
     def missing_subject_set_error
       MissingSubjectSet.new("no subject set is associated with this workflow")
-    end
-
-    def empty_database_select_error
-      message = subject_set_id ? "for subject_set_id = #{subject_set_id}" : nil
-      raise EmptyDatabaseSelect.new("No data #{message} available for selection".squish)
     end
 
     def subjects_page_size
@@ -95,10 +94,16 @@ module Subjects
     end
 
     def user_subject_queue
-      queue = SubjectQueue.by_set(subject_set_id)
-        .find_by(user: queue_user, workflow: workflow)
-      return queue if queue
-      SubjectQueue.create_for_user(workflow, queue_user, set_id: subject_set_id)
+      if queue = find_subject_queue
+        queue
+      else
+        SubjectQueue.create_for_user(workflow, queue_user, set_id: subject_set_id)
+      end
+    end
+
+    def find_subject_queue(user=queue_user)
+      SubjectQueue.by_set(subject_set_id)
+        .find_by(user: user, workflow: workflow)
     end
 
     def dequeue_for_logged_in_user(sms_ids)
