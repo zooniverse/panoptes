@@ -71,7 +71,7 @@ RSpec.describe Subjects::Selector do
         expect(subjects.length).to eq(5)
       end
 
-      context "when the database selection returns an empty set" do
+      context "when the selection strategy returns an empty set" do
 
         it 'should raise the an error when ordering by an empty set' do
           allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return([])
