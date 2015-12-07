@@ -10,7 +10,8 @@ class ProjectSerializer
     :title, :description, :introduction, :private, :retired_subjects_count,
     :configuration, :live, :urls, :migrated, :classifiers_count, :slug, :redirect,
     :beta_requested, :beta_approved, :launch_requested, :launch_approved, :launch_date,
-    :href, :workflow_description, :primary_language, :tags, :experimental_tools, :completeness
+    :href, :workflow_description, :primary_language, :tags, :experimental_tools,
+    :completeness, :activity
 
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles, :pages
@@ -19,7 +20,7 @@ class ProjectSerializer
     classifications_export: { include: false}, subjects_export: { include: false },
     aggregations_export: { include: false }
 
-  can_sort_by :completeness, :classifiers_count, :updated_at
+  can_sort_by :launch_date, :activity, :completeness, :classifiers_count, :updated_at
 
   def self.links
     links = super
