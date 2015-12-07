@@ -13,7 +13,6 @@ describe CalculateProjectActivityWorker do
   end
 
   describe '#perform' do
-
     it 'should update the workflow and project activity' do
       classifications
       count = worker.workflow_activity(workflow)
@@ -24,13 +23,11 @@ describe CalculateProjectActivityWorker do
   end
 
   describe '#workflow_activity' do
-
     it 'returns 0 when no classifications have been made yet' do
       expect(worker.workflow_activity(workflow)).to eq(0)
     end
 
     context "with classifications" do
-
       it 'should only count classification in last 24 hours' do
         classifications
         expect(worker.workflow_activity(workflow)).to eq(2)
