@@ -158,8 +158,10 @@ describe Api::V1::CollectionsController, type: :controller do
         post :create, create_params
       end
 
-      it "should return created" do
+      it "should return created", :aggregate_failures do
         expect(response).to have_http_status(:created)
+        created_links = created_instance(api_resource_name)["links"]
+        expect(created_links.has_key?("projects")).to be_truthy
       end
 
       context "when passing inconsistent project links" do

@@ -36,11 +36,12 @@ class Api::V1::CollectionsController < Api::ApiController
   end
 
   def pluralize_project_links
-    if project_id = params[:collections][:links].try(:delete, :project)
-      if create_params[:links][:projects]
+    collection_params = params[:collections]
+    if project_id = collection_params[:links].try(:delete, :project)
+      if collection_params[:links][:projects]
         raise BadLinkParams.new("Error: project_ids and project link keys must not be set together")
       end
-      create_params[:links].merge!(projects: [project_id])
+      collection_params[:links].merge!(projects: [project_id])
     end
   end
 end
