@@ -13,6 +13,7 @@ class Workflow < ActiveRecord::Base
   has_many :subject_sets_workflows, dependent: :destroy
   has_many :subject_sets, through: :subject_sets_workflows
   has_many :set_member_subjects, through: :subject_sets
+  has_many :subjects, through: :set_member_subjects
   has_many :classifications
   has_many :user_seen_subjects
   has_many :subject_queues, dependent: :destroy

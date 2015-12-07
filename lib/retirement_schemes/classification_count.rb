@@ -1,5 +1,7 @@
 module RetirementSchemes
   class ClassificationCount
+    attr_reader :count
+
     def initialize(options = {})
       options = options.with_indifferent_access
 
