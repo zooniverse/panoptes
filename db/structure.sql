@@ -601,7 +601,8 @@ CREATE TABLE projects (
     launched_row_order integer,
     beta_row_order integer,
     experimental_tools character varying[] DEFAULT '{}'::character varying[],
-    launch_date timestamp without time zone
+    launch_date timestamp without time zone,
+    completeness double precision DEFAULT 0.0 NOT NULL
 );
 
 
@@ -1263,7 +1264,8 @@ CREATE TABLE workflows (
     display_order integer,
     configuration jsonb DEFAULT '{}'::jsonb NOT NULL,
     public_gold_standard boolean DEFAULT false,
-    finished_at timestamp without time zone
+    finished_at timestamp without time zone,
+    completeness double precision DEFAULT 0.0 NOT NULL
 );
 
 
@@ -2843,4 +2845,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151125153712');
 INSERT INTO schema_migrations (version) VALUES ('20151127150019');
 
 INSERT INTO schema_migrations (version) VALUES ('20151201102135');
+
+INSERT INTO schema_migrations (version) VALUES ('20151207111508');
 
