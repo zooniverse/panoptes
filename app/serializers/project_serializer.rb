@@ -19,7 +19,7 @@ class ProjectSerializer
     classifications_export: { include: false}, subjects_export: { include: false },
     aggregations_export: { include: false }
 
-  can_sort_by :updated_at
+  can_sort_by :completeness, :updated_at
 
   def self.links
     links = super
