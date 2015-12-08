@@ -33,9 +33,10 @@ module Api
       response_status = :unprocessable_entity
       if event_params_check
         if upp = user_project_preference
+          was_new = upp.new_record?
           upp.legacy_count[create_params[:workflow]] = create_params[:count]
           if upp.save
-            Project.increment_counter :classifiers_count, upp.project_id
+            Project.increment_counter :classifiers_count, upp.project_id if was_new
             response_status = :ok
           end
         end
