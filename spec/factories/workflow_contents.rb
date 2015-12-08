@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :workflow_content do
-    workflow 
+    workflow
     language "en"
     strings({
              "interest.question" => "Draw a circle",

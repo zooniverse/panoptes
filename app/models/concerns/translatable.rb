@@ -48,7 +48,7 @@ module Translatable
       content = content_association.to_a.find{ |c| c.language == lang }
       if lang.length == 2 && !content
         content = content_association.to_a.find do |c|
-          c.language =~ /^#{lang[0..1]}.*/ 
+          c.language =~ /^#{lang[0..1]}.*/
         end
       end
 

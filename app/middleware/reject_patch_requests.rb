@@ -15,7 +15,7 @@ class RejectPatchRequests
   end
 
   def api_route?(env)
-    env['PATH_INFO'] =~ /api/ 
+    env['PATH_INFO'] =~ /api/
   end
 
   def error

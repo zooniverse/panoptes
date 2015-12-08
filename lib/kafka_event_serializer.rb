@@ -1,6 +1,6 @@
 class KafkaEventSerializer
   attr_reader :attributes, :links
-  
+
   def initialize(attributes=[], links=[])
     @attributes, @links = attributes, links
   end
@@ -21,7 +21,7 @@ class KafkaEventSerializer
       { attr => model.send(attr) }
     end.reduce(&:merge)
   end
-  
+
   def serialize_links(model)
     links.map do |link|
       reflection = model.class.reflect_on_association(link)

@@ -7,7 +7,7 @@ end
 
 RSpec::Matchers.define :permit_roles do |*roles|
   include MatchForAction
-  
+
   chain :for_action do |action|
     @action = action
   end
@@ -15,7 +15,7 @@ RSpec::Matchers.define :permit_roles do |*roles|
   description do
     "permit roles #{ roles.join(", ") } for #{ @action }"
   end
-  
+
   match do |actual|
     match_for_action(actual, roles, @action)
   end
@@ -23,7 +23,7 @@ end
 
 RSpec::Matchers.define :permit_field do |field|
   include MatchForAction
-  
+
   chain :for_action do |action|
     @action = action
   end
@@ -31,7 +31,7 @@ RSpec::Matchers.define :permit_field do |field|
   description do
     "permits using field #{ field } for #{ @action }"
   end
-  
+
   match do |actual|
     match_for_action(actual, field, @action)
   end

@@ -31,7 +31,7 @@ describe ContentTypeFilter do
     it 'should allow head requests' do
       expect{ request.head '' }.to_not raise_error
     end
-    
+
     it 'should allow delete requests' do
       expect{ request.delete '' }.to_not raise_error
     end

@@ -3,7 +3,7 @@ module PreferencesController
 
   included do
     prepend_before_filter :require_login
-  
+
     resource_actions :index, :show, :create, :update
 
     include CreateOverride

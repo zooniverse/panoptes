@@ -1,9 +1,9 @@
-facebook = { 
+facebook = {
   provider: 'facebook',
   uid: '12345',
   info: {
     email: 'examplar@example.com',
-    name: 'New User' 
+    name: 'New User'
   },
   credentials: {
     token: "asd;lkfjas;dflkjasdfasdfha;vznxfhjasd;lfkhaweiuha;sdlkfjasdf",
@@ -12,12 +12,12 @@ facebook = {
   }
 }
 
-gplus = { 
+gplus = {
   provider: 'gplus',
   uid: '12345',
   info: {
     email: 'examplar@example.com',
-    name: 'New User' 
+    name: 'New User'
   },
   credentials: {
     token: "asd;lkfjas;dflkjasdfasdfha;vznxfhjasd;lfkhaweiuha;sdlkfjasdf",

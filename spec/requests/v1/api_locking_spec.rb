@@ -16,13 +16,13 @@ describe "api should allow conditional requests", type: :request do
           "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
           "If-Match" => response.etag }
   end
-  
+
   context "when a record is locked" do
     before(:each) do
       allow_any_instance_of(Project).to receive(:lock_version).and_return(-1)
       req
     end
-    
+
     it 'should return conflict' do
       expect(response).to have_http_status(:conflict)
     end
@@ -32,7 +32,7 @@ describe "api should allow conditional requests", type: :request do
     before(:each) do
       req
     end
-    
+
     it 'should return ok' do
       expect(response).to have_http_status(:ok)
     end

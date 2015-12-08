@@ -14,7 +14,7 @@ class ErrorResponse
     return @msg unless error
     "#{ @msg }: #{ error.message }"
   end
-    
+
   def json_content_header
     { "Content-Type" => "application/vnd.api+json" }
   end

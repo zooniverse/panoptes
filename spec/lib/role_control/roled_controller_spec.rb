@@ -4,7 +4,7 @@ describe RoleControl::RoledController, type: :controller do
   setup_role_control_tables
 
   let!(:enrolled_actor) { create(:user) }
-  
+
   let!(:controlled) do
     ControlledTable.create! do |c|
       c.private = true
@@ -30,8 +30,8 @@ describe RoleControl::RoledController, type: :controller do
       "controlled_table"
     end
 
-    def update 
-      render nothing: true 
+    def update
+      render nothing: true
     end
 
     def show

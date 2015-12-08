@@ -627,11 +627,6 @@ Style/TrailingUnderscoreVariable:
     - 'app/models/membership.rb'
     - 'spec/lib/subject_selector_spec.rb'
 
-# Offense count: 71
-# Cop supports --auto-correct.
-Style/TrailingWhitespace:
-  Enabled: false
-
 # Offense count: 3
 # Cop supports --auto-correct.
 # Configuration parameters: ExactNameMatch, AllowPredicates, AllowDSLWriters, IgnoreClassMethods, Whitelist.

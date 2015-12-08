@@ -8,7 +8,7 @@ describe CatchApiJsonParseErrors do
      'HTTP_ACCEPT' => 'application/vnd.api+json; version=1'
     }
   end
-  
+
   let(:bad_env) do
     {
      'CONTENT_TYPE' => 'text/plain; charset=utf-8',
@@ -17,7 +17,7 @@ describe CatchApiJsonParseErrors do
   end
 
   let(:middle) { CatchApiJsonParseErrors.new(app) }
-  
+
   context "call does not error" do
     it 'should return true' do
       expect(middle.call(good_env)).to be true
@@ -36,7 +36,7 @@ describe CatchApiJsonParseErrors do
 
   context "call errors with ParseError" do
     let(:error) { ActionDispatch::ParamsParser::ParseError.new('test', 'test') }
-    
+
     before(:each) do
       allow(app).to receive(:call).and_raise(error)
     end
@@ -46,7 +46,7 @@ describe CatchApiJsonParseErrors do
         expect{ middle.call(bad_env) }.to raise_error(ActionDispatch::ParamsParser::ParseError)
       end
     end
-    
+
     context "when the call is JSON" do
       let(:request) {  middle.call(good_env) }
       let(:status) { 400 }
@@ -55,10 +55,10 @@ describe CatchApiJsonParseErrors do
       it_behaves_like 'a json error response'
     end
   end
-  
+
   context "call errors with JSON::ParserError" do
     let(:error) { JSON::ParserError.new('test') }
-    
+
     before(:each) do
       allow(app).to receive(:call).and_raise(error)
     end

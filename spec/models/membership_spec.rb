@@ -15,14 +15,14 @@ describe Membership, :type => :model do
       expect(membership.user_group).to be_a(UserGroup)
     end
   end
-  
+
   describe "::scope_for" do
     let(:memberships) { [create(:membership, state: :active),
                          create(:membership, state: :inactive),
                          create(:membership, state: :invited)] }
-    
+
     let(:actor) { ApiUser.new(create(:user)) }
-    
+
     context ":show, :index" do
       it 'should return all a users memberships' do
         actor.user.memberships << memberships
@@ -80,7 +80,7 @@ describe Membership, :type => :model do
       expect(membership.user).to be_a(User)
     end
   end
-  
+
   describe "#state" do
     it "must have a state" do
       expect(build(:membership, state: nil)).to_not be_valid
