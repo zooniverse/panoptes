@@ -171,6 +171,11 @@ describe Api::EventsController, type: :controller do
           end.to change { UserProjectPreference.count }.from(0).to(1)
         end
 
+        it "should increment the project's classifiers count", :focus do
+          expect(Project).to receive(:increment_counter).with(:classifiers_count, project.id)
+          post :create, first_visit_event_params
+        end
+
         context "with an unknown user zooniverse_id" do
 
           it "should not create the user project preference model (upp)" do
@@ -238,6 +243,11 @@ describe Api::EventsController, type: :controller do
             expect do
               post :create, event_params
             end.to_not change { UserProjectPreference.count }.from(1)
+          end
+
+          it "should not increment the project's classifiers count", :focus do
+            expect(Project).to_not receive(:increment_counter)
+            post :create, event_params
           end
 
           it "should overwrite the upp legacy_count to the correct value" do
