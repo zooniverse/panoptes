@@ -151,7 +151,6 @@ GEM
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
-    mysql2 (0.3.18)
     nenv (0.2.0)
     newrelic_rpm (3.13.0.299)
     nokogiri (1.6.6.4)
@@ -338,7 +337,6 @@ DEPENDENCIES
   active_model_serializers (= 0.10.0.rc2)
   active_record_union (~> 1.1.0)
   activerecord-import (~> 0.8)
-  activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter
   activerecord-jdbcsqlite3-adapter
   aws-sdk-v1 (~> 1.0)
@@ -359,7 +357,6 @@ DEPENDENCIES
   jruby-kafka (= 1.0.0.beta)
   json-schema (~> 2.0)
   logstasher (~> 0.6)
-  mysql2 (= 0.3.18)
   newrelic_rpm (~> 3.0)
   omniauth (~> 1.0)
   omniauth-facebook (~> 2.0)
