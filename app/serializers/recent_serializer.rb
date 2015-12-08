@@ -13,4 +13,3 @@ class RecentSerializer
     @model.locations.map{ |loc| {loc.content_type => loc.get_url} }
   end
 end
-

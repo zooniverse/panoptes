@@ -14,4 +14,3 @@ module Panoptes
 end
 
 Panoptes.user_limits
-

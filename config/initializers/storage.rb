@@ -6,4 +6,3 @@ configuration = begin
                 end
 
 MediaStorage.adapter(configuration.delete(:adapter), **configuration)
-

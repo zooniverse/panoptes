@@ -17,4 +17,3 @@ class Recent < ActiveRecord::Base
     end
   end
 end
-
