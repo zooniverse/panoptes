@@ -171,7 +171,7 @@ describe Api::EventsController, type: :controller do
           end.to change { UserProjectPreference.count }.from(0).to(1)
         end
 
-        it "should increment the project's classifiers count", do
+        it "should increment the project's classifiers count" do
           expect(Project).to receive(:increment_counter).with(:classifiers_count, project.id)
           post :create, first_visit_event_params
         end
@@ -245,7 +245,7 @@ describe Api::EventsController, type: :controller do
             end.to_not change { UserProjectPreference.count }.from(1)
           end
 
-          it "should not increment the project's classifiers count", do
+          it "should not increment the project's classifiers count" do
             expect(Project).to_not receive(:increment_counter)
             post :create, event_params
           end
