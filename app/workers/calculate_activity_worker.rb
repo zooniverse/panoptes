@@ -7,7 +7,7 @@ class CalculateActivityWorker
   recurrence { daily }
 
   def perform
-    Project.pluck(:id).each do |project_id|
+    Project.active.pluck(:id).each do |project_id|
       CalculateProjectActivityWorker.perform_in(SPREAD*rand, project_id)
     end
   end

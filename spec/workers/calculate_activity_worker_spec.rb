@@ -14,4 +14,11 @@ describe CalculateActivityWorker do
 
     worker.perform
   end
+
+  it 'only calculates active projects' do
+    project = create :project
+    project.disable!
+    expect(CalculateProjectActivityWorker).to receive(:perform_async).with(project.id).never
+    worker.perform
+  end
 end
