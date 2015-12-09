@@ -7,7 +7,7 @@ class CalculateCompletenessWorker
   recurrence { hourly.minute_of_hour(0) }
 
   def perform
-    Project.pluck(:id).each do |project_id|
+    Project.active.pluck(:id).each do |project_id|
       CalculateProjectCompletenessWorker.perform_in(SPREAD*rand, project_id)
     end
   end
