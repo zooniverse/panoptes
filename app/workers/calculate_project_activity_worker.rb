@@ -7,10 +7,10 @@ class CalculateProjectActivityWorker
       project_activity = 0
       project.workflows.all.each do |workflow|
         activity_count = workflow_activity(workflow)
-        workflow.update! activity: activity_count
+        workflow.update_columns activity: activity_count
         project_activity += activity_count
       end
-      project.update! activity: project_activity
+      project.update_columns activity: project_activity
     end
   end
 
