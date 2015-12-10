@@ -75,8 +75,8 @@ class Project < ActiveRecord::Base
   pg_search_scope :search_display_name,
     against: :display_name,
     using: { tsearch: {
-      prefix: true,
-      tsvector_column: "tsv"
+        prefix: true,
+        tsvector_column: "tsv"
       },
       trigram: {}
     },
