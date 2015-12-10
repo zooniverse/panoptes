@@ -74,7 +74,18 @@ describe Api::V1::ProjectsController, type: :controller do
           get :index, index_options
         end
 
-        it_behaves_like "filter by display_name"
+        describe "search" do 
+          it_behaves_like "filter by display_name"
+
+          describe "filter by display_name substring" do
+
+            let(:index_options) { {search: resource.display_name[0..2]} }
+
+            it "should respond with the most relevant item first" do
+              expect(json_response[api_resource_name].length).to eq(1)
+            end
+          end
+        end
 
         describe "tag filters" do
           let!(:tags) do
