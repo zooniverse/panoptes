@@ -74,8 +74,13 @@ class Project < ActiveRecord::Base
 
   pg_search_scope :search_display_name,
     against: :display_name,
-    using: :trigram,
-    ranked_by: ":trigram"
+    using: { tsearch: {
+      prefix: true,
+      tsvector_column: "tsv"
+      },
+      trigram: {}
+    },
+    :ranked_by => ":tsearch + (0.25 * :trigram)"
 
   ranks :launched_row_order
   ranks :beta_row_order

@@ -603,7 +603,8 @@ CREATE TABLE projects (
     experimental_tools character varying[] DEFAULT '{}'::character varying[],
     launch_date timestamp without time zone,
     completeness double precision DEFAULT 0.0 NOT NULL,
-    activity integer DEFAULT 0 NOT NULL
+    activity integer DEFAULT 0 NOT NULL,
+    tsv tsvector
 );
 
 
@@ -2129,6 +2130,13 @@ CREATE INDEX index_projects_on_slug ON projects USING btree (slug);
 
 
 --
+-- Name: index_projects_on_tsv; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_projects_on_tsv ON projects USING gin (tsv);
+
+
+--
 -- Name: index_recents_on_classification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2535,6 +2543,13 @@ CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXEC
 
 
 --
+-- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON projects FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
+
+
+--
 -- Name: fk_rails_038f6f9f13; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2851,4 +2866,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151201102135');
 INSERT INTO schema_migrations (version) VALUES ('20151207111508');
 
 INSERT INTO schema_migrations (version) VALUES ('20151207145728');
+
+INSERT INTO schema_migrations (version) VALUES ('20151210134819');
 
