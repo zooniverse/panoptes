@@ -16,8 +16,8 @@ describe CalculateProjectActivityWorker do
     it 'should update the workflow and project activity' do
       classifications
       count = worker.workflow_activity(workflow)
-      expect_any_instance_of(Workflow).to receive(:update!).with(activity: count)
-      expect_any_instance_of(Project).to receive(:update!).with(activity: count)
+      expect_any_instance_of(Workflow).to receive(:update_columns).with(activity: count)
+      expect_any_instance_of(Project).to receive(:update_columns).with(activity: count)
       worker.perform(project.id)
     end
   end

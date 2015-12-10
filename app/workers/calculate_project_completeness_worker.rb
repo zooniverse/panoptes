@@ -6,10 +6,10 @@ class CalculateProjectCompletenessWorker
     Project.transaction do
       project = Project.find(project_id)
       project.workflows.all.each do |workflow|
-        workflow.update! completeness: workflow_completeness(workflow)
+        workflow.update_columns completeness: workflow_completeness(workflow)
       end
 
-      project.update! completeness: project_completeness(project)
+      project.update_columns completeness: project_completeness(project)
     end
   end
 
