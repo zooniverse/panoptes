@@ -5,7 +5,7 @@ if RUBY_PLATFORM == 'java'
     subject do
       MultiKafkaProducer::Kafka
     end
-    
+
     describe "::connected?" do
       context "a connection has been established" do
         it 'should be truthy' do

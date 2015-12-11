@@ -24,7 +24,7 @@ class CatchApiJsonParseErrors
   def error_message
     "There was a problem in the JSON you submitted"
   end
-  
+
   def json_api_call?(env)
     json_content_type = !!env['CONTENT_TYPE'].match(/application\/json/)
     json_api_request  = !!env['HTTP_ACCEPT'].match(/application\/vnd\.api\+json; version=\d/)

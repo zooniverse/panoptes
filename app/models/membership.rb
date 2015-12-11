@@ -1,6 +1,6 @@
 class Membership < ActiveRecord::Base
   include RoleControl::ParentalControlled
-  
+
   belongs_to :user_group
   belongs_to :user
   enum state: [:active, :invited, :inactive]
@@ -33,7 +33,7 @@ class Membership < ActiveRecord::Base
     accessible_groups = user.user_groups.where.overlap(memberships: {roles: roles})
     query = not_identity.where(user_group_id: accessible_groups)
             .or(not_identity.where(user_id: user.id))
-    
+
 
     case action
     when :show, :index

@@ -7,24 +7,24 @@ def setup_role_control_tables
   mock_active_record_model(:test_parent_control) do |t|
     t.integer(:controlled_table_id)
   end
-  
+
   unless const_defined?("ControlledTable")
     Object.const_set("ControlledTable",
                      Class.new(ActiveRecord::Base) do
                        include RoleControl::Controlled
 
                        has_many :access_control_lists, as: :resource
-                       
+
                        can_by_role :read, :show,
                                    public: true,
                                    roles: [:admin, :test_role]
-                       
+
                        can_by_role :update, roles: [:test_role]
-                       
+
                        can_by_role :index, roles: [:admin]
                      end)
   end
-  
+
   unless const_defined?("TestParentControlTable")
     Object.const_set("TestParentControlTable",
                      Class.new(ActiveRecord::Base) do

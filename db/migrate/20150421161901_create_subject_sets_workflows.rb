@@ -7,7 +7,7 @@ class CreateSubjectSetsWorkflows < ActiveRecord::Migration
 
     add_column :workflows, :retired_set_member_subjects_count, :integer, default: 0
 
-    SubjectSet.where.not(workflow_id: nil).find_each do |ss|	
+    SubjectSet.where.not(workflow_id: nil).find_each do |ss|
       if w = Workflow.find_by(id: ss.workflow_id)
         ActiveRecord::Base.connection.execute("INSERT INTO \"subject_sets_workflows\" (workflow_id, subject_set_id) VALUES (#{ss.workflow_id},#{ss.id})")
         w.update_attribute(:retired_set_member_subjects_count, ss.retired_set_member_subjects_count)

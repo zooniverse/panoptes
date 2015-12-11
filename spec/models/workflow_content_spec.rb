@@ -10,7 +10,7 @@ RSpec.describe WorkflowContent, :type => :model do
     subject do
       create(:workflow_content)
     end
-    
+
     it { is_expected.to be_versioned }
 
     it 'should track changes to strings', versioning: true do

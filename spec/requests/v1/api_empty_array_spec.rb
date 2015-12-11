@@ -38,4 +38,3 @@ RSpec.describe 'when an empty array is in a param', type: :request do
     end
   end
 end
-

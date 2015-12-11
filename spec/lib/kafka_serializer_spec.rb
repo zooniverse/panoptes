@@ -8,7 +8,7 @@ RSpec.describe KafkaEventSerializer do
       KafkaEventSerializer.new([:name, :display_name], [:subjects, :owner])
         .serialize(model)
     end
-    
+
     context "should produce a hash" do
       subject { serialized }
 
@@ -30,7 +30,7 @@ RSpec.describe KafkaEventSerializer do
       expect(serialized[:links][:owner]).to eq({:type => 'user',
                                                 :id => model.owner.id.to_s})
     end
-    
+
   end
 
 end

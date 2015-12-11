@@ -44,4 +44,3 @@ Doorkeeper.configure do
     end
   end
 end
-

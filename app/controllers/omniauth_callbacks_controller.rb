@@ -8,11 +8,11 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     # TODO Redirect to a page to edit user options
   end
 
-  alias_method :facebook, :callback 
+  alias_method :facebook, :callback
   alias_method :gplus, :callback
-  
+
   private
-  
+
   def sign_in_redirect
     request.env['omniauth.origin'] || 'https://zooniverse.org/'
   end

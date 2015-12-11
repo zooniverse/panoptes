@@ -606,19 +606,6 @@ Style/SymbolProc:
     - 'spec/lib/activation_spec.rb'
     - 'spec/models/user_spec.rb'
 
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/TrailingBlankLines:
-  Exclude:
-    - 'app/models/recent.rb'
-    - 'app/serializers/recent_serializer.rb'
-    - 'config/initializers/cookies_serializer.rb'
-    - 'config/initializers/doorkeeper.rb'
-    - 'config/initializers/storage.rb'
-    - 'config/initializers/user_limits.rb'
-    - 'spec/requests/v1/api_empty_array_spec.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 # Configuration parameters: AllowNamedUnderscoreVariables.
@@ -626,11 +613,6 @@ Style/TrailingUnderscoreVariable:
   Exclude:
     - 'app/models/membership.rb'
     - 'spec/lib/subject_selector_spec.rb'
-
-# Offense count: 71
-# Cop supports --auto-correct.
-Style/TrailingWhitespace:
-  Enabled: false
 
 # Offense count: 3
 # Cop supports --auto-correct.

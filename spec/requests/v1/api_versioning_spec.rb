@@ -4,7 +4,7 @@ describe "api versioning with accept headers", type: :request do
   before(:each) do
     create_list(:user, 2)
   end
-  
+
   describe "html format" do
     it "should raise a route not found error" do
       options = [ nil, { "HTTP_ACCEPT" => "text/html" } ]

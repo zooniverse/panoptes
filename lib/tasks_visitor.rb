@@ -20,7 +20,7 @@ class TasksVisitor
       n[k] = visit(v, path + [k], k)
     end
   end
-  
+
   alias :visit_ActiveSupport_HashWithIndifferentAccess :visit_Hash
   alias :visit_ActionController_Parameters :visit_Hash
 

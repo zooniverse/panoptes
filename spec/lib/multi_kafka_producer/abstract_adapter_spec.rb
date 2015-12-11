@@ -4,7 +4,7 @@ RSpec.describe MultiKafkaProducer::AbstractAdapter do
   subject do
     Class.new(MultiKafkaProducer::AbstractAdapter)
   end
-  
+
   describe "::adapter_name" do
     context "when invoked with a name" do
       it 'should set the name of the adapter' do

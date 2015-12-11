@@ -13,7 +13,7 @@ shared_examples 'is deactivatable' do
 
       it "should return no content" do
         delete :destroy, id: resource.id
-        expect(response).to have_http_status(:no_content) 
+        expect(response).to have_http_status(:no_content)
       end
 
       it "should disable the resource" do

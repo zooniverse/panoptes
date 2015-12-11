@@ -3,10 +3,10 @@ require 'spec_helper'
 describe RejectPatchRequests do
   let(:app) { double({ call: true }) }
   let(:middle) { RejectPatchRequests.new(app) }
-  
+
   context "when a request is not a PATCH" do
     let(:env) { { 'REQUEST_METHOD' => 'PUT' } }
-    
+
     it 'should allow execution to continue normally' do
       expect(app).to receive(:call)
       middle.call(env)

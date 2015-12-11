@@ -20,7 +20,7 @@ describe Linkable do
     it 'should default to default_link_to_resource_scope with the actor as an arguement' do
       expect(link_scopes[:literally_anything]).to eq([:default_link_to_scope, :user])
     end
-    
+
   end
 
   describe "::can_be_linked" do
@@ -28,7 +28,7 @@ describe Linkable do
       test_class.instance_eval do
         can_be_linked :projects, :scope_for, :destroy, :user
       end
-      
+
       expect(link_scopes[Project]).to eq([:scope_for, :destroy, :user])
     end
   end
