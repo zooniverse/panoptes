@@ -359,16 +359,14 @@ describe ClassificationLifecycle do
           expect(email_pref).to eq(classification.user.project_email_communication)
         end
 
-        it "should not touch the updated_at timestamp" do
-          expect_any_instance_of(UserProjectPreference).not_to receive(:touch)
+        it "should save the preference" do
+          expect_any_instance_of(UserProjectPreference).to receive(:save!)
           subject.process_project_preference
         end
       end
 
       context "when a preference exists" do
-        before(:each) do
-          create(:user_project_preference, user: user, project: project)
-        end
+        let!(:upp) { create(:user_project_preference, user: user, project: project) }
 
         it "should not create a project preference" do
           expect do
@@ -379,6 +377,24 @@ describe ClassificationLifecycle do
         it "should touch the updated_at timestamp" do
           expect_any_instance_of(UserProjectPreference).to receive(:touch)
           subject.process_project_preference
+        end
+
+        context "when the upp was created before the first classification was received" do
+          let!(:upp) do
+            create(:user_project_preference, email_communication: nil, user: user, project: project)
+          end
+
+          it "should update the email_communication if not set" do
+            subject.process_project_preference
+            expect(upp.reload.email_communication).to be_truthy
+          end
+
+          it 'should increment a count on the associated project' do
+            expect do
+              subject.process_project_preference
+              project.reload
+            end.to change{project.classifiers_count}.from(0).to(1)
+          end
         end
       end
     end

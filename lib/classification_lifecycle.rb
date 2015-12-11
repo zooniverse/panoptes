@@ -36,14 +36,14 @@ class ClassificationLifecycle
 
   def process_project_preference
     if should_create_project_preference?
-      existing_record = true
-      upp = UserProjectPreference.where(user: user, project: project).first_or_create do |up|
-        Project.increment_counter :classifiers_count, project.id
-        up.email_communication = user.project_email_communication
+      upp = UserProjectPreference.where(user: user, project: project).first_or_initialize do |up|
         up.preferences = {}
-        existing_record = false
       end
-      upp.touch if existing_record
+      if first_classifcation = upp.email_communication.nil?
+        Project.increment_counter :classifiers_count, project.id
+        upp.email_communication = user.project_email_communication
+      end
+      upp.changed? ? upp.save! : upp.touch
     end
   end
 
