@@ -75,11 +75,13 @@ module Subjects
       end
 
       def host
-        @host ||= if (h = @session[workflow_id]) && Cellect::Client.host_exists?(h)
-                    h
-                  else
-                    choose_host
-                  end
+        return @host  if @host
+        host = @session[workflow_id]
+        @host = if host && Cellect::Client.host_exists?(host)
+          host
+        else
+          choose_host
+        end
       end
 
       def reset_host
