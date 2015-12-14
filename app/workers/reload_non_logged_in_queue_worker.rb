@@ -5,12 +5,19 @@ class ReloadNonLoggedInQueueWorker
 
   def perform(workflow_id, subject_set_id=nil)
     @workflow = Workflow.find(workflow_id)
-    queue_subject_set = workflow.grouped ? subject_set_id : nil
-    subjects = Subjects::PostgresqlSelection.new(workflow, nil)
-      .select(limit: SubjectQueue::DEFAULT_LENGTH, subject_set_id: queue_subject_set)
-      .compact
-    SubjectQueue.reload(workflow, subjects, set_id: queue_subject_set)
+    subject_set_id = workflow.grouped ? subject_set_id : nil
+    subject_ids = selected_subject_ids(workflow, subject_set_id).compact
+    unless subject_ids.empty?
+      SubjectQueue.reload(workflow, subject_ids, set_id: subject_set_id)
+    end
   rescue ActiveRecord::RecordNotFound
     nil
+  end
+
+  private
+
+  def selected_subject_ids(workflow, subject_set_id)
+    Subjects::PostgresqlSelection.new(workflow, nil)
+    .select(limit: SubjectQueue::DEFAULT_LENGTH, subject_set_id: subject_set_id)
   end
 end
