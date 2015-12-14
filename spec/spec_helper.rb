@@ -58,34 +58,6 @@ RSpec.configure do |config|
     end
   end
 
-  config.before(:each, no_transaction: true) do
-    DatabaseCleaner.strategy = :deletion
-  end
-
-  config.before(:each, zoo_home_user: true) do
-    ZooniverseUser.delete_all
-  end
-
-  config.after(:each) do
-    ZooniverseUser.destroy_all
-  end
-
-  config.before(:all) do
-    ActiveRecord::Migration.suppress_messages do
-      ActiveRecord::Migration.run(CreateZooniverserUserDatabase, direction: :up)
-    end
-
-    ActiveRecord::Base.establish_connection(:"#{Rails.env}")
-  end
-
-  config.after(:all) do
-    ActiveRecord::Migration.suppress_messages do
-      ActiveRecord::Migration.run(CreateZooniverserUserDatabase, direction: :down)
-    end
-
-    ActiveRecord::Base.establish_connection(:"#{Rails.env}")
-  end
-
   config.before(:each) do
     DatabaseCleaner.start
   end

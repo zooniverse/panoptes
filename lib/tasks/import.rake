@@ -1,29 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-namespace :user do
-  desc 'import comma seperated list of users from Zoo Home'
-  task import: :environment do
-    users = ENV['USERS'].try(:split, ",")
-    ZooniverseUser.import_users(users)
-  end
-end
-
-namespace :user_project_preference do
-  desc 'import comma seperated list of users project preferences (subscriptions) from Zoo Home'
-  task import: :environment do
-    users = ENV['USERS'].try(:split, ",")
-    ZooniverseUserSubscription.import_zoo_user_subscriptions(users)
-  end
-end
-
 namespace :project do
-  desc 'import comma seperated list of projects from Zoo Home'
-  task import: :environment do
-    projects = ENV['PROJECTS'].try(:split, ",")
-    ZooniverseProject.import_zoo_projects(projects)
-  end
-
   namespace :json do
     desc "Import from file a json dump of a project, primary-content, workflows & primary-content, avatar and background"
     task import: :environment do

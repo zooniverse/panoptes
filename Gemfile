@@ -40,7 +40,6 @@ gem 'sidetiq', '~> 0.6.3'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
-  gem 'activerecord-jdbcmysql-adapter'
   gem 'therubyrhino'
   gem 'jruby-kafka', '1.0.0.beta'
 end
@@ -49,7 +48,6 @@ platforms :ruby do
   gem 'therubyracer', '~> 0.12'
   gem 'pg', '~> 0.18'
   gem 'poseidon', '~> 0.0.5'
-  gem 'mysql2', '0.3.18'
 end
 
 group :development do

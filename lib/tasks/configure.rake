@@ -16,11 +16,6 @@ test:
   adapter: postgresql
   database: travis_ci_test
   username: postgres
-
-zooniverse_home_test:
-  adapter: sqlite3
-  database: db/not_used.sqlite3
-
 YAML
     File.open('config/database.yml', 'w') { |f| f.write(database_config) }
   end

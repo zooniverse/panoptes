@@ -7,9 +7,9 @@ class SubjectImportWorker
 
   def perform(project_id, user_id, subject_set_id, csv_url)
     project = Project.find(project_id)
-    zoo_user = User.find(user_id)
+    user = User.find(user_id)
     subject_set = project.subject_sets.find(subject_set_id)
-    raise unless project && zoo_user && subject_set
+    raise unless project && user && subject_set
 
     rows = CSV.parse(download_csv(csv_url), headers: true).map do |row|
       header, external_src = row.delete("url")
@@ -35,7 +35,7 @@ class SubjectImportWorker
 
       urls = subject_group.map {|i| i[:external_src] }
 
-      existing_subjects = Subject.joins(:locations).where(project_id: project.id, upload_user_id: zoo_user.id,
+      existing_subjects = Subject.joins(:locations).where(project_id: project.id, upload_user_id: user.id,
                                                           media: {external_link: true, src: urls}).load
 
       subject_group.each do |item|
@@ -44,7 +44,7 @@ class SubjectImportWorker
         if subject
           subjects << subject
         else
-          subject = Subject.new(project_id: project.id, upload_user_id: zoo_user.id, metadata: item[:metadata])
+          subject = Subject.new(project_id: project.id, upload_user_id: user.id, metadata: item[:metadata])
           location_params = { content_type: item[:content_type], external_link: true, src: item[:external_src], metadata: { index: 0 }}
           subject.locations.build(location_params)
 
