@@ -35,6 +35,13 @@ RSpec.describe EnqueueSubjectQueueWorker do
       end
     end
 
+    context "when the strategy param is not set" do
+      it "should fall back to postgresql strategy" do
+        expect_any_instance_of(Subjects::PostgresqlSelection).to receive(:select)
+        subject.perform(workflow.id)
+      end
+    end
+
     context "with a user" do
 
       it 'should create a subject queue for the user' do
@@ -53,7 +60,25 @@ RSpec.describe EnqueueSubjectQueueWorker do
       end
     end
 
-    describe "#load_subjects" do
+    context "when selecting via cellect selection strategy" do
+      it 'should attempt to queue the selected set' do
+        allow_any_instance_of(Subjects::CellectClient).to receive(:get_subjects).and_return([1])
+        expect(SubjectQueue).to receive(:enqueue)
+        subject.perform(workflow.id)
+      end
+
+      context "when the cellect client can't reach a server" do
+
+        it "should fall back to postgres strategy" do
+          allow(Subjects::CellectClient).to receive(:get_subjects)
+            .and_raise(Subjects::CellectClient::ConnectionError)
+          expect_any_instance_of(Subjects::PostgresqlSelection).to receive(:select)
+          subject.perform(workflow.id, nil, nil, nil, :cellect)
+        end
+      end
+    end
+
+    context "when subjects are selected" do
       before do
         allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return(result_ids)
       end
@@ -61,7 +86,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
       context "when there are selected subjects to queue" do
         let(:result_ids) { [1] }
 
-        it 'should attempt to queue an empty set' do
+        it 'should attempt to queue the selected set' do
           expect(SubjectQueue).to receive(:enqueue)
           subject.perform(workflow.id)
         end

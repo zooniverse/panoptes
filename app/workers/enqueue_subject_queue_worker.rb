@@ -7,19 +7,41 @@ class EnqueueSubjectQueueWorker
     }
   })
 
-  attr_reader :workflow, :user
+  attr_reader :workflow, :user, :subject_set_id, :limit, :strategy
 
-  def perform(workflow_id, user_id=nil, subject_set_id=nil, limit=SubjectQueue::DEFAULT_LENGTH)
+  def perform(workflow_id, user_id=nil, subject_set_id=nil, limit=SubjectQueue::DEFAULT_LENGTH, strategy=nil)
     @workflow = Workflow.find(workflow_id)
     @user = User.find(user_id) if user_id
+    @subject_set_id = subject_set_id
+    @limit = limit
+    @strategy = strategy
 
-    subject_ids = Subjects::PostgresqlSelection.new(workflow, user)
-      .select(limit: limit, subject_set_id: subject_set_id)
-      .compact
+    begin
+      subject_ids = selected_subject_ids.compact
+    rescue Subjects::CellectClient::ConnectionError
+      subject_ids = default_strategy_ids
+    end
+
     unless subject_ids.empty?
       SubjectQueue.enqueue(workflow, subject_ids, user: user, set_id: subject_set_id)
     end
   rescue ActiveRecord::RecordNotFound
     nil
+  end
+
+  private
+
+  def selected_subject_ids
+    case strategy
+    when :cellect
+      Subjects::CellectClient.get_subjects({}, workflow.try(:id), user.try(:id), subject_set_id, limit)
+    else
+      default_strategy_ids
+    end
+  end
+
+  def default_strategy_ids
+    Subjects::PostgresqlSelection.new(workflow, user)
+    .select(limit: limit, subject_set_id: subject_set_id)
   end
 end
