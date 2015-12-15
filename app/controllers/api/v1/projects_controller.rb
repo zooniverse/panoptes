@@ -10,7 +10,7 @@ class Api::V1::ProjectsController < Api::ApiController
     :create_subjects_export, :create_aggregations_export,
     :create_workflows_export, :create_workflow_contents_export,
     scopes: [:project]
-  resource_actions :default
+  resource_actions :show, :index, :create, :update, :deactivate
   schema_type :json_schema
 
   alias_method :project, :controlled_resource
