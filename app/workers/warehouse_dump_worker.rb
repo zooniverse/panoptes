@@ -13,9 +13,9 @@ class WarehouseDumpWorker
     Project.find_each do |project|
       Tempfile.create "project-#{project.id}-nightly-export", Rails.root.join("tmp") do |tempfile|
         csv = CSV.new(tempfile)
-        dump = ClassificationsDump.new(project,
-                                       obfuscate_private_details: false,
-                                       date_range: date_range(from, till))
+        dump = Warehouse::ClassificationsDump.new(project,
+                                                  obfuscate_private_details: false,
+                                                  date_range: date_range(from, till))
         dump.write_to(csv)
         tempfile.rewind
         Warehouse.store(warehouse_path(project.id, from, till), tempfile.path)
