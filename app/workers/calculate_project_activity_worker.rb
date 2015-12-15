@@ -2,16 +2,18 @@ class CalculateProjectActivityWorker
   include Sidekiq::Worker
 
   def perform(project_id)
+    project = Project.find(project_id)
     Project.transaction do
-      project = Project.find(project_id)
       project_activity = 0
-      project.workflows.all.each do |workflow|
+      project.workflows.each do |workflow|
         activity_count = workflow_activity(workflow)
         workflow.update_columns activity: activity_count
         project_activity += activity_count
       end
       project.update_columns activity: project_activity
     end
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 
   def workflow_activity(workflow, period=24.hours.ago)
