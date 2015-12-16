@@ -26,6 +26,7 @@ class Api::V1::ProjectsController < Api::ApiController
                     :introduction,
                     :url_labels]
 
+  before_action :eager_load_includes, only: :index
   before_action :filter_by_tags, only: :index
   before_action :downcase_slug, only: :index
 
@@ -43,7 +44,6 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def index
-    @controlled_resources = controlled_resources.eager_load(*index_eager_loads)
     unless params.has_key?(:sort)
       @controlled_resources = case
                               when params.has_key?(:launch_approved)
@@ -91,7 +91,17 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def filter_by_tags
     if tags = params.delete(:tags).try(:split, ",").try(:map, &:downcase)
-      @controlled_resources = controlled_resources.joins(:tags).where(tags: {name: tags})
+      @controlled_resources = controlled_resources
+      .joins(:tags).where(tags: {name: tags})
+    end
+  end
+
+  def eager_load_includes
+    return unless params.has_key?(:include)
+    includes = params.fetch(:include, "").split(",").map(&:to_sym)
+    eager_loads = includes.select { |inc| controlled_resource.respond_to?(inc) }
+    unless eager_loads.empty?
+      @controlled_resources = controlled_resources.eager_load(*eager_loads)
     end
   end
 
@@ -210,10 +220,6 @@ class Api::V1::ProjectsController < Api::ApiController
     dump_worker_klass = "#{export_type.to_s.camelize}DumpWorker".constantize
     dump_worker_klass.perform_async(controlled_resource.id, medium.id)
     medium_response(medium)
-  end
-
-  def index_eager_loads
-    %i(owner) | params.fetch(:include, "").split(",")
   end
 
   def context
