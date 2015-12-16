@@ -26,7 +26,6 @@ class Api::V1::ProjectsController < Api::ApiController
                     :introduction,
                     :url_labels]
 
-  before_action :add_owner_ids_to_filter_param!, only: :index
   before_action :filter_by_tags, only: :index
   before_action :downcase_slug, only: :index
 
@@ -214,12 +213,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def index_eager_loads
-    card_eager_loads = %i(avatar project_contents)
-    if params.has_key?(:cards)
-      card_eager_loads
-    else
-      %i(tags background owner) | card_eager_loads
-    end
+    %i(owner) | params.fetch(:include, "").split(",")
   end
 
   def context

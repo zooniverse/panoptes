@@ -305,8 +305,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
 
           let(:index_options) do
-            {owner: project_owner.login,
-             slug: filtered_project.slug}
+            {owner: project_owner.login, slug: filtered_project.slug}
           end
 
           it "should respond with 1 item" do
