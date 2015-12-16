@@ -16,10 +16,10 @@ module Warehouse
         MultipleTaskFormatter
       when "drawing"
         DrawingTaskFormatter
-      # when "survey"
-      #   SurveyTaskFormatter
-      # when "text"
-      #   TextTaskFormatter
+      when "survey"
+        SurveyTaskFormatter
+      when "text"
+        TextTaskFormatter
       # when "crop"
       #   CropTaskFormatter
       else
