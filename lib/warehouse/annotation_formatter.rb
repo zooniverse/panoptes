@@ -20,8 +20,8 @@ module Warehouse
         SurveyTaskFormatter
       when "text"
         TextTaskFormatter
-      # when "crop"
-      #   CropTaskFormatter
+      when "crop"
+        CropTaskFormatter
       else
         BasicTaskFormatter
       end
