@@ -44,7 +44,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def index
-    @controlled_resources = controlled_resources.eager_load(:tags, :avatar, :background, :owner, :project_contents)
+    @controlled_resources = controlled_resources.eager_load(*index_eager_loads)
     unless params.has_key?(:sort)
       @controlled_resources = case
                               when params.has_key?(:launch_approved)
@@ -211,5 +211,28 @@ class Api::V1::ProjectsController < Api::ApiController
     dump_worker_klass = "#{export_type.to_s.camelize}DumpWorker".constantize
     dump_worker_klass.perform_async(controlled_resource.id, medium.id)
     medium_response(medium)
+  end
+
+  def index_eager_loads
+    card_eager_loads = %i(avatar project_contents)
+    if params.has_key?(:cards)
+      card_eager_loads
+    else
+      %i(tags background owner) | card_eager_loads
+    end
+  end
+
+  def context
+    if action_name == "index" && !!params[:cards]
+      exclude_keys = ProjectSerializer.serializable_attributes
+        .except(:id, :display_name, :description, :slug, :redirect, :avatar_src).keys
+      {cards: true, include_avatar_src?: true}.tap do |context|
+        exclude_keys.map do |k|
+          context["include_#{k}?".to_sym] = false
+        end
+      end
+    else
+      super
+    end
   end
 end

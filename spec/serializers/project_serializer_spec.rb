@@ -6,7 +6,6 @@ describe ProjectSerializer do
 
   let(:serializer) do
     s = ProjectSerializer.new
-
     s.instance_variable_set(:@model, project)
     s.instance_variable_set(:@context, context)
     s
@@ -26,6 +25,30 @@ describe ProjectSerializer do
               {"label" => "Twitter",
                "url" => "http://twitter.com/example"}]
       expect(serializer.urls).to eq(urls)
+    end
+  end
+
+  describe "#avatar_src" do
+    let(:avatar) { double("avatar", external_url: external_url, src: src) }
+    let(:src) { nil }
+    let(:external_url) { nil }
+
+    context "without external" do
+      let(:src) { "http://subject1.zooniverse.org" }
+
+      it "should return the src by default" do
+        allow(project).to receive(:avatar).and_return(avatar)
+        expect(serializer.avatar_src).to eq(src)
+      end
+    end
+
+    context "with an external url" do
+      let(:external_url) { "http://test.example.com" }
+
+      it "should return the external src if set" do
+        allow(project).to receive(:avatar).and_return(avatar)
+        expect(serializer.avatar_src).to eq(external)
+      end
     end
   end
 
