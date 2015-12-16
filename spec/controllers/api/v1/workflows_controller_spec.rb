@@ -294,11 +294,16 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:resource) { workflow }
       let(:resource_id) { :workflow_id }
 
+      before do
+        resource.update_column :display_order, nil
+      end
+
       it_behaves_like "supports update_links" do
         it 'marks the subject as retired' do
           expect(linked_resource.retired_for_workflow?(resource)).to be_truthy
         end
       end
+
       it_behaves_like "reloads the non logged in queues"
     end
   end
