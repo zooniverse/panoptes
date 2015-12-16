@@ -1,0 +1,6 @@
+development:
+  adapter: disk
+  path: ./tmp/warehouse/
+
+test:
+  adapter: test
