@@ -32,7 +32,6 @@ RSpec.describe Warehouse::SurveyTaskFormatter do
       "characteristicsOrder"=>["LK", "PTTRN", "CLR", "HRNS", "TL", "BLD"]}
   end
 
-  # {{{
   let(:translations) do
     {
       "T1.choices.RDVRK.label"=>"Aardvark",
@@ -150,7 +149,6 @@ RSpec.describe Warehouse::SurveyTaskFormatter do
       "T1.characteristics.BLD.values.SMLL.label"=>"small",
       "T1.characteristics.BLD.values.LWSLNG.label"=>"low-slung"}
   end
-  #}}}
 
   let(:formatted) do
     described_class.new(task_definition: definition, translations: translations).format(annotation)

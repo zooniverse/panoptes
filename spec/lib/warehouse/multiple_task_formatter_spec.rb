@@ -16,7 +16,7 @@ RSpec.describe Warehouse::MultipleTaskFormatter do
       "T3.question" => "Choose a colour",
       "T3.answers.0.label" => "Red",
       "T3.answers.1.label" => "Green",
-      "T3.answers.2.label" => "Blue",
+      "T3.answers.2.label" => "Blue"
     }
   end
 

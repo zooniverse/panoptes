@@ -7,32 +7,32 @@ RSpec.describe Warehouse::DrawingTaskFormatter do
       "type"=>"drawing",
       "tools"=>
         [{"type"=>"point", "color"=>"#ff0000", "label"=>"T1.tools.0.label", "details"=>[]},
-        {"type"=>"point", "color"=>"#00ffff", "label"=>"T1.tools.1.label", "details"=>[]},
-        {"type"=>"point", "color"=>"#0000ff", "label"=>"T1.tools.2.label", "details"=>[]},
-        {"type"=>"point", "color"=>"#ff00ff", "label"=>"T1.tools.3.label", "details"=>[]},
-        {"type"=>"point", "color"=>"#000000", "label"=>"T1.tools.4.label", "details"=>[
-          {"help"=>"T1.tools.4.details.0.help",
-            "type"=>"single",
-            "answers"=>
-              [{"label"=>"T1.tools.4.details.0.answers.0.label"},
-              {"label"=>"T1.tools.4.details.0.answers.1.label"},
-              {"label"=>"T1.tools.4.details.0.answers.2.label"},
-              {"label"=>"T1.tools.4.details.0.answers.3.label"}],
-            "question"=>"T1.tools.4.details.0.question",
-            "required"=>true}]},
-        {"type"=>"point", "color"=>"#00ff00", "label"=>"T1.tools.5.label", "details"=>[
-          {"help"=>"T1.tools.5.details.0.help",
-            "type"=>"multiple",
-            "answers"=>
-              [{"label"=>"T1.tools.5.details.0.answers.0.label"},
-              {"label"=>"T1.tools.5.details.0.answers.1.label"},
-              {"label"=>"T1.tools.5.details.0.answers.2.label"},
-              {"label"=>"T1.tools.5.details.0.answers.3.label"},
-              {"label"=>"T1.tools.5.details.0.answers.4.label"},
-              {"label"=>"T1.tools.5.details.0.answers.5.label"},
-              {"label"=>"T1.tools.5.details.0.answers.6.label"}],
-            "question"=>"T1.tools.5.details.0.question",
-            "required"=>true}]}],
+         {"type"=>"point", "color"=>"#00ffff", "label"=>"T1.tools.1.label", "details"=>[]},
+         {"type"=>"point", "color"=>"#0000ff", "label"=>"T1.tools.2.label", "details"=>[]},
+         {"type"=>"point", "color"=>"#ff00ff", "label"=>"T1.tools.3.label", "details"=>[]},
+         {"type"=>"point", "color"=>"#000000", "label"=>"T1.tools.4.label", "details"=>[
+           {"help"=>"T1.tools.4.details.0.help",
+             "type"=>"single",
+             "answers"=>
+               [{"label"=>"T1.tools.4.details.0.answers.0.label"},
+                {"label"=>"T1.tools.4.details.0.answers.1.label"},
+                {"label"=>"T1.tools.4.details.0.answers.2.label"},
+                {"label"=>"T1.tools.4.details.0.answers.3.label"}],
+             "question"=>"T1.tools.4.details.0.question",
+             "required"=>true}]},
+         {"type"=>"point", "color"=>"#00ff00", "label"=>"T1.tools.5.label", "details"=>[
+           {"help"=>"T1.tools.5.details.0.help",
+             "type"=>"multiple",
+             "answers"=>
+               [{"label"=>"T1.tools.5.details.0.answers.0.label"},
+                {"label"=>"T1.tools.5.details.0.answers.1.label"},
+                {"label"=>"T1.tools.5.details.0.answers.2.label"},
+                {"label"=>"T1.tools.5.details.0.answers.3.label"},
+                {"label"=>"T1.tools.5.details.0.answers.4.label"},
+                {"label"=>"T1.tools.5.details.0.answers.5.label"},
+                {"label"=>"T1.tools.5.details.0.answers.6.label"}],
+             "question"=>"T1.tools.5.details.0.question",
+             "required"=>true}]}],
       "instruction"=>"T1.instruction"}
   end
 
@@ -72,9 +72,9 @@ RSpec.describe Warehouse::DrawingTaskFormatter do
       {"task"=>"T1",
         "value"=>
           [{"x"=>506.00060605882135, "y"=>670.0977900977902, "tool"=>5, "frame"=>0, "details"=>[{"value"=>[1]}]},
-          {"x"=>277.71078251942726, "y"=>33.572033572033575, "tool"=>5, "frame"=>0, "details"=>[{"value"=>[6]}]},
-          {"x"=>742.3477174878411, "y"=>189.34626934626934, "tool"=>4, "frame"=>0, "details"=>[{"value"=>3}]},
-          {"x"=>242.79586833104935, "y"=>197.40355740355741, "tool"=>2, "frame"=>0, "details"=>[]}]}
+           {"x"=>277.71078251942726, "y"=>33.572033572033575, "tool"=>5, "frame"=>0, "details"=>[{"value"=>[6]}]},
+           {"x"=>742.3477174878411, "y"=>189.34626934626934, "tool"=>4, "frame"=>0, "details"=>[{"value"=>3}]},
+           {"x"=>242.79586833104935, "y"=>197.40355740355741, "tool"=>2, "frame"=>0, "details"=>[]}]}
     end
 
     it 'returns basic data about the annotation', :aggregate_failures do
