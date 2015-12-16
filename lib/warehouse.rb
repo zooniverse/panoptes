@@ -11,7 +11,8 @@ module Warehouse
     end
 
     def adapter
-      @adapter or raise Uninitialized
+      raise Uninitialized unless @adapter
+      @adapter
     end
 
     def store(path, file_path)

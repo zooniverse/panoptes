@@ -27,8 +27,8 @@ describe ClassificationsDump do
 
   it 'should find only the classifications within the date range' do
     dump = described_class.new(project, date_range: Date.new(2015, 1, 1)..Date.new(2015, 1, 31))
-    classifications = create_list(:classification, 5, project: project, workflow: workflow, subjects: [subject], created_at: Time.local(2015, 1, 2))
-    classifications.last.update_column(:created_at, Time.local(2015, 2, 3))
+    classifications = create_list(:classification, 5, project: project, workflow: workflow, subjects: [subject], created_at: Time.zone.local(2015, 1, 2))
+    classifications.last.update_column(:created_at, Time.zone.local(2015, 2, 3))
     dump.write_to(output)
     expect(output.map(&:first)).to match_array(["classification_id"] + classifications[0..-2].map(&:id))
   end
