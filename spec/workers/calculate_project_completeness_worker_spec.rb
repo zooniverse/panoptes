@@ -13,6 +13,13 @@ describe CalculateProjectCompletenessWorker do
 
       expect(worker.project_completeness(project)).to eq(0.5)
     end
+
+    context "when it can't find the project" do
+      it "should fail quickly" do
+        expect(Project).not_to receive(:transaction)
+        worker.perform("-1")
+      end
+    end
   end
 
   describe '#workflow_completeness' do

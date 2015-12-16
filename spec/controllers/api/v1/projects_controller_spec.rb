@@ -74,7 +74,7 @@ describe Api::V1::ProjectsController, type: :controller do
           get :index, index_options
         end
 
-        describe "search" do 
+        describe "search" do
           it_behaves_like "filter by display_name"
 
           describe "filter by display_name substring" do
@@ -871,8 +871,9 @@ describe Api::V1::ProjectsController, type: :controller do
 
   describe "#destroy" do
     let(:resource) { create(:full_project, owner: user) }
+    let(:instances_to_disable) { [resource] }
 
-    it_behaves_like "is destructable"
+    it_behaves_like "is deactivatable"
   end
 
   describe "versioning" do

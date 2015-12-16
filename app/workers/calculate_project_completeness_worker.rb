@@ -3,14 +3,15 @@ class CalculateProjectCompletenessWorker
   using Refinements::RangeClamping
 
   def perform(project_id)
+    project = Project.find(project_id)
     Project.transaction do
-      project = Project.find(project_id)
-      project.workflows.all.each do |workflow|
+      project.workflows.each do |workflow|
         workflow.update_columns completeness: workflow_completeness(workflow)
       end
-
       project.update_columns completeness: project_completeness(project)
     end
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 
   def project_completeness(project)
