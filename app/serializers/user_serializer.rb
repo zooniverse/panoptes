@@ -4,7 +4,7 @@ class UserSerializer
   include MediaLinksSerializer
 
   attributes :id, :login, :display_name, :credited_name, :email, :created_at,
-    :updated_at, :type, :firebase_auth_token, :global_email_communication,
+    :updated_at, :type, :global_email_communication,
     :project_email_communication, :beta_email_communication,
     :max_subjects, :uploaded_subjects_count, :admin, :href, :login_prompt,
     :private_profile
@@ -14,10 +14,6 @@ class UserSerializer
     collections: { param: "owner", value: "login" }
 
   media_include :avatar, :profile_header
-
-  def firebase_auth_token
-    FirebaseUserToken.generate(@model)
-  end
 
   def max_subjects
     @model.subject_limit
@@ -54,10 +50,6 @@ class UserSerializer
 
   def requester_is_user?
     @model.id == @context[:requester].id
-  end
-
-  def include_firebase_auth_token?
-    @context[:include_firebase_token] && requester_is_user?
   end
 
   def add_links(model, data)

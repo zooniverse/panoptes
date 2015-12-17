@@ -26,7 +26,6 @@ gem 'aws-sdk-v1', '~> 1.0'
 gem 'json-schema', '~> 2.0'
 gem 'p3p', '~> 1.0'
 gem 'newrelic_rpm', '~> 3.0', require: false
-gem 'firebase_token_generator', '~> 2.0'
 gem 'stringex', '~> 2.0'
 gem 'faraday', '~> 0.9'
 gem 'faraday_middleware', '~> 0.9'
