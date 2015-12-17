@@ -42,7 +42,7 @@ module Translatable
     if content_association.loaded?
       content = nil
       languages_to_sort.find do |lang|
-        content = content_association.find { |content| content.language == lang }
+        content = content_association.find { |c| c.language == lang }
       end
       content
     else
@@ -59,23 +59,21 @@ module Translatable
   end
 
   def primary_content
-    @primary_content ||=
-      if content_association.loaded?
-        content_association.to_a.find do |content|
-          content.language == primary_language
-        end
-      else
-        content_association.where(language: primary_language).first
+    @primary_content ||= if content_association.loaded?
+      content_association.to_a.find do |content|
+        content.language == primary_language
       end
+    else
+      content_association.find_by(language: primary_language)
+    end
   end
 
   def load_content_from_db(languages_to_sort)
     join_values = languages_to_sort.each_with_index.reduce([]) do |values, (lang, i)|
       values << "('#{lang}',#{i})"
     end
-
     join_clause = "JOIN (VALUES #{join_values.join(",")}) as x(lang, ordering) "\
-    "ON \"project_contents\".\"language\" = x.lang"
+    "ON \"#{self.class.content_association}\".\"language\" = x.lang"
     content_association.where(language: languages_to_sort)
     .joins(join_clause)
     .order("x.ordering")
