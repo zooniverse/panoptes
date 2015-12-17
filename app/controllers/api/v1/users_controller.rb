@@ -74,7 +74,7 @@ class Api::V1::UsersController < Api::ApiController
   private
 
   def context
-    { requester: api_user, include_firebase_token: true }
+    { requester: api_user }
   end
 
   def sign_out_current_user!
