@@ -19,7 +19,7 @@ module Translatable
     end
 
     def load_with_languages(query, languages=[])
-      query = query.joins(content_association)
+      query = query.eager_load(content_association).joins(content_association)
       where_clause = "\"#{content_association}\".\"language\" = \"#{table_name}\".\"primary_language\""
       if !languages.empty?
         where_clause = "#{where_clause} OR \"#{content_association}\".\"language\" ~ ?"
