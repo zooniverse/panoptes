@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe JsonApiController::RelationManager do
-  # let!(:resource) { create(:subject_set_with_subjects) }
   let!(:resource) { create(:collection_with_subjects) }
 
   let(:test_class) do
@@ -110,7 +109,6 @@ describe JsonApiController::RelationManager do
       end
     end
   end
-
 
   describe "#destroy_relation" do
     let(:resource_to_remove) { resource.subjects[0..2] }

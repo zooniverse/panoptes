@@ -24,8 +24,8 @@ module RoleControl
                        when UserGroup
                          o
                        end
-        build_owner_control_list(user_group: owning_group,
-                                 roles: ["owner"])
+        build_owner_control_list(user_group: owning_group, roles: ["owner"])
+        @owner = nil
         super(owning_group)
       end
 
