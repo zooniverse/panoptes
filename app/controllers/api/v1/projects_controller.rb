@@ -100,25 +100,15 @@ class Api::V1::ProjectsController < Api::ApiController
     !!params[:cards] ? [:avatar] : [:tags, :background, :avatar, :owner]
   end
 
-  def allowed_eager_loads(loads)
+  def allowed_eager_loads
     non_owner_role_params = [true, false].include?(@owner_eager_load)
     excepts = non_owner_role_params ? [:owner] : []
-    (loads - excepts).uniq
-  end
-
-  def include_eager_loads
-    [].tap do |include_loads|
-      if params.has_key?(:include)
-        includes = params.fetch(:include, "").split(",").map(&:to_sym)
-        include_loads = includes.select { |inc| controlled_resource.respond_to?(inc) }
-      end
-    end
+    (default_eager_loads - excepts).uniq
   end
 
   def eager_load_relations
-    eager_loads = allowed_eager_loads(default_eager_loads | include_eager_loads)
+    eager_loads = allowed_eager_loads
     unless eager_loads.empty?
-      controlled_resources.eager_load(*eager_loads)
       @controlled_resources = controlled_resources.eager_load(*eager_loads)
     end
   end
