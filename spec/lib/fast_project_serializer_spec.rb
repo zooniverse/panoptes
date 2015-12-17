@@ -137,8 +137,10 @@ RSpec.describe FastProjectSerializer, type: :serializer do
     it{ is_expected.to include 'id' => project.id.to_s }
     it{ is_expected.to include 'display_name' => project.display_name }
     it{ is_expected.to include 'description' => project.project_contents.first.description }
+    it{ is_expected.to include 'title' => project.project_contents.first.title }
     it{ is_expected.to include 'slug' => project.slug }
     it{ is_expected.to include 'redirect' => project.redirect }
+    it{ is_expected.to include 'available_languages' => ['en'] }
     it{ is_expected.to have_key 'avatar_src' }
   end
 
@@ -158,6 +160,43 @@ RSpec.describe FastProjectSerializer, type: :serializer do
     context 'when the avatar is an external link' do
       let(:avatar){ double external_link: true, src: 'external.jpg' }
       it{ is_expected.to eql 'external.jpg' }
+    end
+  end
+
+
+  RSpec.shared_context 'fast_serializer_project_contents' do
+    let!(:project){ create :project, primary_language: 'ab-cd' }
+    let!(:primary_content){ create :project_content, project: project, language: 'ab-cd' }
+    let!(:alt_content){ create :project_content, project: project, language: 'wx-yz' }
+    before(:each){ project.reload }
+  end
+
+  describe '#content_for' do
+    include_context 'fast_serializer_project_contents'
+    subject{ serializer.content_for project }
+
+    context 'with the primary language' do
+      it{ is_expected.to have_attributes language: 'ab-cd' }
+    end
+
+    context 'with an alternate language' do
+      let(:params){ { language: 'wx-yz' } }
+      it{ is_expected.to have_attributes language: 'wx-yz' }
+    end
+  end
+
+  describe '#find_content_for' do
+    include_context 'fast_serializer_project_contents'
+    let(:language){ }
+    subject{ serializer.find_content_for project, language }
+
+    context 'with a non-existant language' do
+      it{ is_expected.to be_nil }
+    end
+
+    context 'with a valid language' do
+      let(:language){ 'ab-cd' }
+      it{ is_expected.to have_attributes language: 'ab-cd' }
     end
   end
 end

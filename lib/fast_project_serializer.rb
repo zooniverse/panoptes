@@ -54,18 +54,35 @@ class FastProjectSerializer
   end
 
   def project_data(project)
+    contents = project.project_contents
+    content = content_for project
+
     {
       'id' => project.id.to_s,
       'display_name' => project.display_name,
-      'description' => project.project_contents.first.description,
+      'description' => content.description,
+      'title' => content.title,
       'slug' => project.slug,
       'redirect' => project.redirect,
-      'avatar_src' => avatar_src(project.avatar)
+      'avatar_src' => avatar_src(project.avatar),
+      'available_languages' => contents.map(&:language)
     }
   end
 
   def avatar_src(avatar)
     return unless avatar
     avatar.external_link ? avatar.src : "//#{ avatar.src }"
+  end
+
+  def content_for(project)
+    find_content_for(project, params[:language]) ||
+    find_content_for(project, project.primary_language) ||
+    project.project_contents.first
+  end
+
+  def find_content_for(project, language)
+    project.project_contents.find do |content|
+      content.language == language
+    end
   end
 end
