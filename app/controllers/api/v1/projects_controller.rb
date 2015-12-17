@@ -96,12 +96,15 @@ class Api::V1::ProjectsController < Api::ApiController
     end
   end
 
-  def eager_load_includes
-    return unless params.has_key?(:include)
-    includes = params.fetch(:include, "").split(",").map(&:to_sym)
-    eager_loads = includes.select { |inc| controlled_resource.respond_to?(inc) }
+  def eager_load_includes(include_loads=[])
+    default_loads = !!params[:cards] ? [:avatar] : [:tags, :background, :avatar, :owner]
+    if params.has_key?(:include)
+      includes = params.fetch(:include, "").split(",").map(&:to_sym)
+      include_loads = includes.select { |inc| controlled_resource.respond_to?(inc) }
+    end
+    eager_loads = default_loads | include_loads
     unless eager_loads.empty?
-      @controlled_resources = controlled_resources.eager_load(*eager_loads)
+      @controlled_resources = controlled_resources.eager_load(*eager_loads.uniq)
     end
   end
 
