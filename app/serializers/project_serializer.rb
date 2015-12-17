@@ -75,7 +75,7 @@ class ProjectSerializer
 
   def avatar_src
     if avatar = @model.avatar
-      avatar.external_link ? avatar.external_link : "//#{ avatar.src }"
+      avatar.external_link ? avatar.external_link : avatar.src
     else
       ""
     end

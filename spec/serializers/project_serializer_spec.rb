@@ -29,7 +29,7 @@ describe ProjectSerializer do
   end
 
   describe "#avatar_src" do
-    let(:avatar) { double("avatar", external_url: external_url, src: src) }
+    let(:avatar) { double("avatar", external_link: external_url, src: src) }
     let(:src) { nil }
     let(:external_url) { nil }
 
@@ -47,7 +47,7 @@ describe ProjectSerializer do
 
       it "should return the external src if set" do
         allow(project).to receive(:avatar).and_return(avatar)
-        expect(serializer.avatar_src).to eq(external)
+        expect(serializer.avatar_src).to eq(external_url)
       end
     end
   end
