@@ -97,7 +97,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def eager_load_includes(include_loads=[])
-    default_loads = !!params[:cards] ? [:avatar] : [:tags, :background, :avatar, :owner]
+    default_loads = !!params[:cards] ? [:avatar] : [:tags, :background, :avatar]
     if params.has_key?(:include)
       includes = params.fetch(:include, "").split(",").map(&:to_sym)
       include_loads = includes.select { |inc| controlled_resource.respond_to?(inc) }
