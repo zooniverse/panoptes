@@ -163,7 +163,6 @@ RSpec.describe FastProjectSerializer, type: :serializer do
     end
   end
 
-
   RSpec.shared_context 'fast_serializer_project_contents' do
     let!(:project){ create :project, primary_language: 'ab-cd' }
     let!(:primary_content){ create :project_content, project: project, language: 'ab-cd' }
