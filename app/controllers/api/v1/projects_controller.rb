@@ -43,7 +43,12 @@ class Api::V1::ProjectsController < Api::ApiController
     query.joins(:tags).merge(Tag.search_tags(name.first))
   end
 
+  def fast_index
+    render json_api: FastProjectSerializer.new(params).serialize
+  end
+
   def index
+    return fast_index if params[:homepage]
     unless params.has_key?(:sort)
       @controlled_resources = case
                               when params.has_key?(:launch_approved)

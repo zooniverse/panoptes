@@ -894,4 +894,36 @@ describe Api::V1::ProjectsController, type: :controller do
 
     it_behaves_like "a versioned resource"
   end
+
+  describe '#index' do
+    before(:each){ set_accept }
+
+    context 'without the homepage param' do
+      it 'should bypass the index action' do
+        expect(subject).to_not receive :fast_index
+        get :index
+      end
+    end
+
+    context 'with the homepage param' do
+      it 'should bypass the index action' do
+        expect(subject).to receive(:fast_index).and_call_original
+        get :index, homepage: true
+      end
+    end
+  end
+
+  describe '#fast_index' do
+    before(:each){ set_accept }
+
+    it 'should use the fast serializer' do
+      expect(FastProjectSerializer).to receive_message_chain 'new.serialize'
+      get :index, homepage: true
+    end
+
+    it 'should render properly' do
+      get :index, homepage: true
+      expect(response).to be_ok
+    end
+  end
 end
