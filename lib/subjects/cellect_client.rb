@@ -72,29 +72,12 @@ module Subjects
       end
 
       def request(action, params={})
-        params[:host] = host
+        params[:host] = @session.host
         params[:workflow_id] = workflow_id
         params[:user_id] = user_id
-        super(action, params) { params[:host] = reset_host }
-      end
-
-      def host
-        return @host if @host
-        host = @session.host
-        @host = if host && Cellect::Client.host_exists?(host)
-          host
-        else
-          #@session.new_host
-          choose_host
+        super(action, params) do
+          params[:host] = @session.reset_host
         end
-      end
-
-      def reset_host
-        @host = choose_host
-      end
-
-      def choose_host
-        @session.host
       end
     end
   end

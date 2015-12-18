@@ -1,6 +1,7 @@
 require "spec_helper"
 
 RSpec.describe Subjects::CellectClient do
+  let(:cellect_host) { 'example.com' }
   before(:each) do
     stub_cellect_connection
   end
@@ -15,28 +16,27 @@ RSpec.describe Subjects::CellectClient do
   describe "#add_seen" do
     it 'should call the method on the cellect client' do
       expect(Cellect::Client.connection).to receive(:add_seen)
-                                             .with(host: 'test.host',
+                                             .with(host: cellect_host,
                                                    workflow_id: 1,
                                                    user_id: 2,
                                                    subject_id: 4)
-      Subjects::CellectClient.add_seen({ 1 => 'test.host' }, 1, 2, 4)
+      Subjects::CellectClient.add_seen(1, 2, 4)
     end
 
     it 'should try a new host if the first request fails' do
       raise_error_for(:add_seen)
       expect(Cellect::Client.connection).to receive(:add_seen)
-                                             .with(host: 'example.com',
+                                             .with(host: cellect_host,
                                                    workflow_id: 1,
                                                    user_id: 2,
                                                    subject_id: 4)
-
-      Subjects::CellectClient.add_seen({ 1 => 'test.host' }, 1, 2, 4)
+      Subjects::CellectClient.add_seen(1, 2, 4)
     end
 
     it 'should only retry once' do
       raise_error_for(:add_seen, 2)
       expect do
-        Subjects::CellectClient.add_seen({ 1 => 'test.host' }, 1, 2, 4)
+        Subjects::CellectClient.add_seen(1, 2, 4)
       end.to raise_error(Subjects::CellectClient::ConnectionError)
     end
   end
@@ -44,10 +44,10 @@ RSpec.describe Subjects::CellectClient do
   describe "#load_user" do
     it 'should call the method on the cellect client' do
       expect(Cellect::Client.connection).to receive(:load_user)
-                                             .with(host: 'test.host',
+                                             .with(host: cellect_host,
                                                    workflow_id: 1,
                                                    user_id: 2)
-      Subjects::CellectClient.load_user({ 1 => 'test.host' }, 1, 2)
+      Subjects::CellectClient.load_user(1, 2)
     end
 
     it 'should try a new host if the first request fails' do
@@ -57,11 +57,10 @@ RSpec.describe Subjects::CellectClient do
       end
 
       expect(Cellect::Client.connection).to receive(:load_user)
-                                             .with(host: 'example.com',
+                                             .with(host: cellect_host,
                                                    workflow_id: 1,
                                                    user_id: 2)
-
-      Subjects::CellectClient.load_user({ 1 => 'test.host' }, 1, 2)
+      Subjects::CellectClient.load_user(1, 2)
     end
 
     it 'should retry four times' do
@@ -69,8 +68,7 @@ RSpec.describe Subjects::CellectClient do
       allow(Cellect::Client.connection).to receive(:load_user) do
         (counter += 1) < 4 ? raise(StandardError) : true
       end
-
-      Subjects::CellectClient.load_user({ 1 => 'test.host' }, 1, 2)
+      Subjects::CellectClient.load_user(1, 2)
       expect(counter).to eq(4)
     end
   end
@@ -97,10 +95,10 @@ RSpec.describe Subjects::CellectClient do
     end
   end
 
-  describe "#get_subjects", :focus do
+  describe "#get_subjects" do
     it 'should call the method on the cellect client' do
       expect(Cellect::Client.connection).to receive(:get_subjects)
-                                             .with(host: 'example.com',
+                                             .with(host: cellect_host,
                                                    workflow_id: 1,
                                                    user_id: 2,
                                                    group_id: nil,
@@ -114,7 +112,7 @@ RSpec.describe Subjects::CellectClient do
         (counter += 1) == 1 ? raise(StandardError) : true
       end
       expect(Cellect::Client.connection).to receive(:get_subjects)
-                                             .with(host: 'example.com',
+                                             .with(host: cellect_host,
                                                    workflow_id: 1,
                                                    user_id: 2,
                                                    group_id: nil,

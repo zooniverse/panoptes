@@ -10,16 +10,19 @@ module Subjects
       end
     end
 
-    def host(ttl_secs=3600)
-      Sidekiq.redis do |conn|
-        if host = conn.get(user_workflow_key)
-          host
-        else
-          host = choose_new_host
-          conn.setex(user_workflow_key, ttl_secs, host)
-          host
-        end
+    def host(ttl=ttl_secs)
+      host = Sidekiq.redis do |redis_conn|
+        redis_conn.get(user_workflow_key)
       end
+      host ? host : reset_host(ttl)
+    end
+
+    def reset_host(ttl=ttl_secs)
+      host = cellect_host
+      Sidekiq.redis do |redis_conn|
+        redis_conn.setex(user_workflow_key, ttl, host)
+      end
+      host
     end
 
     private
@@ -28,8 +31,12 @@ module Subjects
       "pcs:#{user_id}:#{workflow_id}"
     end
 
-    def choose_new_host
+    def cellect_host
       Cellect::Client.choose_host
+    end
+
+    def ttl_secs
+      3600
     end
   end
 end
