@@ -7,7 +7,7 @@ module Warehouse
 
     def self.headers
       %w(classification_id user_name user_id user_ip project_id workflow_id workflow_name workflow_version
-         created_at updated_at completed gold_standard expert metadata annotations subject_data)
+         created_at updated_at completed gold_standard expert metadata subject_data) + BasicTaskFormatter::COLUMNS.map(&:to_s)
     end
 
     def initialize(project, cache, obfuscate_private_details: true)
@@ -22,7 +22,7 @@ module Warehouse
 
       classification.annotations.flat_map do |annotation|
         Array.wrap(format_annotation(annotation)).map do |annotation_data|
-          classification_data.merge(annotation_data)
+          classification_data.merge(annotation_data).stringify_keys
         end
       end
     end
@@ -50,9 +50,21 @@ module Warehouse
     end
 
     def format_annotation(annotation)
-      task_definition = {}
-      translations = {}
+      task_definition = tasks.fetch(annotation.fetch("task"), {})
+      translations = cache.workflow_content_at_version(classification.workflow.primary_content.id, content_version).strings
       AnnotationFormatter.format(annotation, task_definition: task_definition, translations: translations)
+    end
+
+    def tasks
+      @tasks = cache.workflow_at_version(classification.workflow_id, workflow_version).tasks
+    end
+
+    def workflow_version
+      classification.workflow_version.split(".")[0].to_i
+    end
+
+    def content_version
+      classification.workflow_version.split(".")[1].to_i
     end
 
     def classification_id

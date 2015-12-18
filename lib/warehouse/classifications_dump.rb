@@ -16,7 +16,9 @@ module Warehouse
         update_cache(group)
 
         group.each do |classification|
-          output << formatter.to_array(classification)
+          formatter.to_array(classification).each do |line|
+            output << line.stringify_keys.values_at(*formatter.class.headers)
+          end
         end
       end
 
