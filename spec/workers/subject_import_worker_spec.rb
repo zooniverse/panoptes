@@ -23,13 +23,13 @@ https://placekitten.com/400/900.jpg,large,cute
 
       expect(subject_set.subjects.count).to eq(2)
       expect(subject_set.set_member_subjects_count).to eq(2)
-
-      expect(subject_set.subjects.map {|i| i.locations.first.src }).to eq([
+      expected_urls = subject_set.subjects.map {|i| i.locations.first.src }
+      expect(expected_urls).to match_array([
         "https://placekitten.com/200/300.jpg",
         "https://placekitten.com/400/900.jpg"
       ])
 
-      expect(subject_set.subjects.pluck(:metadata)).to eq([
+      expect(subject_set.subjects.pluck(:metadata)).to match_array([
         {"metadata1" => "small", "metadata2" => "cute"},
         {"metadata1" => "large", "metadata2" => "cute"}
       ])
