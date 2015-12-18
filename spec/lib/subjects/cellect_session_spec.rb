@@ -7,12 +7,12 @@ RSpec.describe Subjects::CellectSession do
   let(:session) { described_class.new(user_id, workflow_id) }
   let(:cellect_key) { "pcs:#{user_id}:#{workflow_id}" }
   let(:host) { "http://test.com" }
-  let(:redis) { double("redis", get: nil, setex: nil) }
+  let(:redis) { stubbed_redis_connection }
 
   before(:each) do
     stub_cellect_connection
+    stubbed_redis_connection
     allow(Cellect::Client).to receive(:choose_host).and_return(host)
-    allow(Sidekiq).to receive(:redis) { |&block| block.call(redis) }
   end
 
   describe "#new" do
