@@ -10,11 +10,12 @@ RSpec.describe EnqueueSubjectQueueWorker do
 
     before(:each) do
       available_smss = (1..100).to_a
-      allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return(available_smss)
+      allow_any_instance_of(Subjects::PostgresqlSelection)
+        .to receive(:select).and_return(available_smss)
     end
 
     context "with no user or set" do
-      it 'should create a subject queue with the default number of items' do
+      it "should create a subject queue with the default number of items" do
         subject.perform(workflow.id)
         queue = SubjectQueue.find_by(workflow: workflow)
         expect(queue.set_member_subject_ids.length).to eq(100)
@@ -28,7 +29,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
     end
 
     context "when the workflow does not exist" do
-      it 'should not raise an error' do
+      it "should not raise an error" do
         expect do
           subject.perform(-1)
         end.to_not raise_error
@@ -37,7 +38,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
 
     context "with a user" do
 
-      it 'should create a subject queue for the user' do
+      it "should create a subject queue for the user" do
         subject.perform(workflow.id, user.id)
         queue = SubjectQueue.by_user_workflow(user, workflow).first
         expect(queue.set_member_subject_ids.length).to eq(100)
@@ -46,9 +47,10 @@ RSpec.describe EnqueueSubjectQueueWorker do
 
     context "with user and a subject set" do
 
-      it 'should create a per user subject set queue' do
+      it "should create a per user subject set queue" do
         subject.perform(workflow.id, user.id, subject_set.id)
-        queue = SubjectQueue.by_set(subject_set.id).by_user_workflow(user, workflow).first
+        queue = SubjectQueue.by_set(subject_set.id)
+          .by_user_workflow(user, workflow).first
         expect(queue.set_member_subject_ids.length).to eq(100)
       end
     end
@@ -56,30 +58,35 @@ RSpec.describe EnqueueSubjectQueueWorker do
     context "when selecting via strategy param" do
       let(:result_ids) { [1] }
 
-      it 'should fallback from the override strategy' do
-        allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return(result_ids)
+      it "should fallback from the override strategy" do
+        allow_any_instance_of(Subjects::PostgresqlSelection)
+          .to receive(:select).and_return(result_ids)
         expect(SubjectQueue).to receive(:enqueue)
         subject.perform(workflow.id, nil, nil, nil, :unknown_strategy)
       end
 
       context "with cellect" do
-        let(:run_selection) { subject.perform(workflow.id, nil, nil, nil, :cellect) }
+        let(:run_selection) do
+          subject.perform(workflow.id, nil, nil, nil, :cellect)
+        end
         before do
           allow(Panoptes).to receive(:cellect_on).and_return(true)
         end
 
-        it 'should use the cellect client' do
-          expect(Subjects::CellectClient).to receive(:get_subjects).and_return(result_ids)
+        it "should use the cellect client" do
+          expect(Subjects::CellectClient).to receive(:get_subjects)
+            .and_return(result_ids)
           run_selection
         end
 
         it "should use a cellect session instance for session tracking" do
           expect(Subjects::CellectSession).to receive(:new).and_call_original
           run_selection
-       end
+        end
 
-        it 'should attempt to queue the selected set' do
-          allow(Subjects::CellectClient).to receive(:get_subjects).and_return(result_ids)
+        it "should attempt to queue the selected set" do
+          allow(Subjects::CellectClient).to receive(:get_subjects)
+            .and_return(result_ids)
           expect(SubjectQueue).to receive(:enqueue)
           run_selection
         end
@@ -88,7 +95,8 @@ RSpec.describe EnqueueSubjectQueueWorker do
           it "should fall back to postgres strategy" do
             allow(Subjects::CellectClient).to receive(:get_subjects)
               .and_raise(Subjects::CellectClient::ConnectionError)
-            expect_any_instance_of(Subjects::PostgresqlSelection).to receive(:select)
+            expect_any_instance_of(Subjects::PostgresqlSelection)
+              .to receive(:select)
             run_selection
           end
         end
@@ -97,13 +105,14 @@ RSpec.describe EnqueueSubjectQueueWorker do
 
     context "when subjects are selected" do
       before do
-        allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return(result_ids)
+        allow_any_instance_of(Subjects::PostgresqlSelection)
+          .to receive(:select).and_return(result_ids)
       end
 
       context "when there are selected subjects to queue" do
         let(:result_ids) { [1] }
 
-        it 'should attempt to queue the selected set' do
+        it "should attempt to queue the selected set" do
           expect(SubjectQueue).to receive(:enqueue)
           subject.perform(workflow.id)
         end
@@ -112,7 +121,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
       context "when there are no selected subjects to queue" do
         let(:result_ids) { [] }
 
-        it 'should not attempt to queue an empty set' do
+        it "should not attempt to queue an empty set" do
           expect(SubjectQueue).to_not receive(:enqueue)
           subject.perform(workflow.id)
         end
@@ -121,7 +130,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
   end
 
   describe "#strategy" do
-    let(:config) {  { selection_strategy: :cellect } }
+    let(:config) { { selection_strategy: :cellect } }
     let(:cellect_size) { Panoptes.cellect_min_pool_size }
 
     before do
@@ -150,7 +159,9 @@ RSpec.describe EnqueueSubjectQueueWorker do
 
       context "when the number of set_member_subjects is large" do
         it "should use the cellect strategy" do
-          allow(workflow).to receive_message_chain("set_member_subjects.count") { cellect_size }
+          allow(workflow).to receive_message_chain("set_member_subjects.count") do
+            cellect_size
+          end
           expect(subject.strategy(nil)).to eq(:cellect)
         end
       end
@@ -158,7 +169,9 @@ RSpec.describe EnqueueSubjectQueueWorker do
       context "with a workflow config and large subject set size" do
         it "should only use the worfklow strategy", :aggregate_failures do
           allow(workflow).to receive(:configuration).and_return(config)
-          allow(workflow).to receive_message_chain("set_member_subjects.count") { cellect_size }
+          allow(workflow).to receive_message_chain("set_member_subjects.count") do
+            cellect_size
+          end
           expect(workflow).not_to receive(:set_member_subjects)
           expect(subject.strategy(nil)).to eq(:cellect)
         end

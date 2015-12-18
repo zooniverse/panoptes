@@ -1,11 +1,11 @@
 ENV["RAILS_ENV"] ||= 'test'
-require 'celluloid/test'
+require "celluloid/test"
 Celluloid.logger.level = Logger::WARN
-require 'cellect/testing'
+require "cellect/testing"
 require File.expand_path("../../config/environment", __FILE__)
-require 'rspec/rails'
-require 'sidekiq/testing'
-require 'paper_trail/frameworks/rspec'
+require "rspec/rails"
+require "sidekiq/testing"
+require "paper_trail/frameworks/rspec"
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 

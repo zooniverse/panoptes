@@ -37,8 +37,6 @@ class EnqueueSubjectQueueWorker
       workflow_strategy
     when cellect_size_subject_space?
        :cellect
-    else
-      nil
     end
   end
 

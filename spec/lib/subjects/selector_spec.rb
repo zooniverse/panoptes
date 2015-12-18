@@ -50,7 +50,7 @@ RSpec.describe Subjects::Selector do
 
       it 'should return the page_size number of subjects' do
         subject_queue
-        subjects, _ = subject.queued_subjects
+        subjects, _context = subject.queued_subjects
         expect(subjects.length).to eq(size)
       end
     end
@@ -84,7 +84,7 @@ RSpec.describe Subjects::Selector do
           allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return([])
           subject_queue
           non_logged_in_queue
-          subjects, _ = subject.queued_subjects
+          subjects, _context = subject.queued_subjects
           expect(smses.map(&:subject)).to include(*subjects)
         end
       end

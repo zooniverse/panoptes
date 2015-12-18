@@ -11,7 +11,7 @@ RSpec.describe Subjects::CellectSession do
   before(:each) do
     stub_cellect_connection
     allow(Cellect::Client).to receive(:choose_host).and_return(host)
-    Sidekiq.redis { |conn| conn.flushdb }
+    Sidekiq.redis(&:flushdb)
   end
 
   describe "#new" do

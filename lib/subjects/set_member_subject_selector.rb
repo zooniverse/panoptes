@@ -1,8 +1,8 @@
 module Subjects
   class SetMemberSubjectSelector
     attr_reader :workflow, :user
-    SELECT_FIELDS = '"set_member_subjects"."id",' +
-    '"set_member_subjects"."random",' +
+    SELECT_FIELDS = '"set_member_subjects"."id",' \
+    '"set_member_subjects"."random",' \
     '"set_member_subjects"."priority"'
 
     def initialize(workflow, user)
