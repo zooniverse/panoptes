@@ -73,6 +73,11 @@ RSpec.describe EnqueueSubjectQueueWorker do
           run_selection
         end
 
+        it "should use a cellect session instance for session tracking" do
+          expect(Subjects::CellectSession).to receive(:new).and_call_original
+          run_selection
+       end
+
         it 'should attempt to queue the selected set' do
           allow(Subjects::CellectClient).to receive(:get_subjects).and_return(result_ids)
           expect(SubjectQueue).to receive(:enqueue)

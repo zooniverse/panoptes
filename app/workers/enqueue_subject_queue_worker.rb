@@ -47,7 +47,8 @@ class EnqueueSubjectQueueWorker
   def selected_subject_ids
     ids = case selection_strategy
     when :cellect
-      Subjects::CellectClient.get_subjects({}, workflow.try(:id), user.try(:id), subject_set_id, limit)
+      cellect_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
+      Subjects::CellectClient.get_subjects(*cellect_params)
     else
       default_strategy_ids
     end
