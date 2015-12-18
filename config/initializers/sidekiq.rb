@@ -31,8 +31,14 @@ module SidekiqConfig
   end
 end
 
+def load_fakeredis?
+  defined?(Redis::Connection::Memory) && Rails.env.test?
+end
+
 Sidekiq.configure_client do |config|
-  config.redis = { namespace: SidekiqConfig.namespace, url: SidekiqConfig.redis_url }
+  redis_opts = { namespace: SidekiqConfig.namespace, url: SidekiqConfig.redis_url }
+  redis_opts.merge!(:driver => Redis::Connection::Memory) if load_fakeredis?
+  config.redis = redis_opts
 end
 
 Sidekiq.configure_server do |config|
