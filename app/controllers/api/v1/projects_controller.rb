@@ -26,8 +26,7 @@ class Api::V1::ProjectsController < Api::ApiController
                     :introduction,
                     :url_labels]
 
-
-  before_action :add_owner_ids_to_filter_param!, only: :index
+  before_action :eager_load_relations, only: :index
   before_action :filter_by_tags, only: :index
   before_action :downcase_slug, only: :index
 
@@ -45,7 +44,6 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def index
-    @controlled_resources = controlled_resources.eager_load(:tags)
     unless params.has_key?(:sort)
       @controlled_resources = case
                               when params.has_key?(:launch_approved)
@@ -93,7 +91,25 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def filter_by_tags
     if tags = params.delete(:tags).try(:split, ",").try(:map, &:downcase)
-      @controlled_resources = controlled_resources.joins(:tags).where(tags: {name: tags})
+      @controlled_resources = controlled_resources
+      .joins(:tags).where(tags: {name: tags})
+    end
+  end
+
+  def default_eager_loads
+    !!params[:cards] ? [:avatar] : [:tags, :background, :avatar, :owner]
+  end
+
+  def allowed_eager_loads
+    non_owner_role_params = [true, false].include?(@owner_eager_load)
+    excepts = non_owner_role_params ? [:owner] : []
+    (default_eager_loads - excepts).uniq
+  end
+
+  def eager_load_relations
+    eager_loads = allowed_eager_loads
+    unless eager_loads.empty?
+      @controlled_resources = controlled_resources.eager_load(*eager_loads)
     end
   end
 
@@ -212,5 +228,19 @@ class Api::V1::ProjectsController < Api::ApiController
     dump_worker_klass = "#{export_type.to_s.camelize}DumpWorker".constantize
     dump_worker_klass.perform_async(controlled_resource.id, medium.id)
     medium_response(medium)
+  end
+
+  def context
+    if action_name == "index" && !!params[:cards]
+      exclude_keys = ProjectSerializer.serializable_attributes
+        .except(:id, :display_name, :description, :slug, :redirect, :avatar_src).keys
+      {cards: true, include_avatar_src?: true}.tap do |context|
+        exclude_keys.map do |k|
+          context["include_#{k}?".to_sym] = false
+        end
+      end
+    else
+      super
+    end
   end
 end
