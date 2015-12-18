@@ -65,16 +65,14 @@ describe Api::V1::ProjectsController, type: :controller do
         let!(:new_project) do
           create(:full_project, display_name: "Non-test project", owner: project_owner)
         end
-
         let(:resource) { new_project }
         let(:ids) { json_response["projects"].map{ |p| p["id"] } }
-
 
         before(:each) do
           get :index, index_options
         end
 
-        describe "search" do 
+        describe "search" do
           it_behaves_like "filter by display_name"
 
           describe "filter by display_name substring" do
@@ -84,6 +82,18 @@ describe Api::V1::ProjectsController, type: :controller do
             it "should respond with the most relevant item first" do
               expect(json_response[api_resource_name].length).to eq(1)
             end
+          end
+        end
+
+        describe "cards only" do
+          let(:index_options) { { cards: true } }
+          let(:card_attrs) do
+            ["id", "display_name", "description", "slug", "redirect", "avatar_src", "links"]
+          end
+
+          it "should return only serialise the card data" do
+            card_keys = json_response[api_resource_name].map(&:keys).uniq.flatten
+            expect(card_keys).to match_array(card_attrs)
           end
         end
 
@@ -295,8 +305,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
 
           let(:index_options) do
-            {owner: project_owner.login,
-             slug: filtered_project.slug}
+            {owner: project_owner.login, slug: filtered_project.slug}
           end
 
           it "should respond with 1 item" do
@@ -871,8 +880,9 @@ describe Api::V1::ProjectsController, type: :controller do
 
   describe "#destroy" do
     let(:resource) { create(:full_project, owner: user) }
+    let(:instances_to_disable) { [resource] }
 
-    it_behaves_like "is destructable"
+    it_behaves_like "is deactivatable"
   end
 
   describe "versioning" do

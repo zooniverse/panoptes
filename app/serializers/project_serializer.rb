@@ -13,13 +13,13 @@ class ProjectSerializer
     :href, :workflow_description, :primary_language, :tags, :experimental_tools,
     :completeness, :activity
 
+  optional :avatar_src
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles, :pages
-  can_filter_by :display_name, :slug, :beta_requested, :beta_approved, :launch_requested, :launch_approved, :private
   media_include :avatar, :background, :attached_images,
     classifications_export: { include: false}, subjects_export: { include: false },
     aggregations_export: { include: false }
-
+  can_filter_by :display_name, :slug, :beta_requested, :beta_approved, :launch_requested, :launch_approved, :private
   can_sort_by :launch_date, :activity, :completeness, :classifiers_count, :updated_at
 
   def self.links
@@ -29,6 +29,14 @@ class ProjectSerializer
                                type: "project_pages"
                               }
     links
+  end
+
+  def add_links(model, data)
+    if @context[:cards]
+      data.merge!(links: {})
+    else
+      super(model, data)
+    end
   end
 
   def title
@@ -63,6 +71,14 @@ class ProjectSerializer
 
   def tags
     @model.tags.map(&:name)
+  end
+
+  def avatar_src
+    if avatar = @model.avatar
+      avatar.external_link ? avatar.external_link : avatar.src
+    else
+      ""
+    end
   end
 
   def fields

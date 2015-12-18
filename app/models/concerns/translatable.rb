@@ -18,12 +18,11 @@ module Translatable
       "#{name}Content".constantize
     end
 
-    def load_with_languages(query, languages=nil)
-      where_clause = "#{content_association}.language = #{table_name}.primary_language"
-      query = query.joins(content_association).eager_load(content_association)
-
-      if languages
-        where_clause = "#{where_clause} OR #{content_association}.language ~ ?"
+    def load_with_languages(query, languages=[])
+      query = query.eager_load(content_association).joins(content_association)
+      where_clause = "\"#{content_association}\".\"language\" = \"#{table_name}\".\"primary_language\""
+      if !languages.empty?
+        where_clause = "#{where_clause} OR \"#{content_association}\".\"language\" ~ ?"
         query.where(where_clause, lang_regex(languages))
       else
         query.where(where_clause)
@@ -39,27 +38,20 @@ module Translatable
   end
 
   def content_for(languages)
-    content = nil
-    languages = Array.wrap(languages).flat_map do |lang|
-      lang.length == 2 ? lang : [lang, lang[0..1]]
-    end.uniq
-
-    languages.each do |lang|
-      content = content_association.to_a.find{ |c| c.language == lang }
-      if lang.length == 2 && !content
-        content = content_association.to_a.find do |c|
-          c.language =~ /^#{lang[0..1]}.*/
-        end
+    languages_to_sort = languages_to_sort(languages)
+    if content_association.loaded?
+      content = nil
+      languages_to_sort.find do |lang|
+        content = content_association.find { |c| c.language == lang }
       end
-
-      break if content
+      content
+    else
+      load_content_from_db(languages_to_sort)
     end
-    content = primary_content unless content
-    return content
   end
 
   def available_languages
-    content_association.select('language').map(&:language).map(&:downcase)
+    content_association.pluck(:language).map(&:downcase)
   end
 
   def content_association
@@ -68,11 +60,33 @@ module Translatable
 
   def primary_content
     @primary_content ||= if content_association.loaded?
-                           content_association.to_a.find do |content|
-                             content.language == primary_language
-                           end
-                         else
-                           content_association.where(language: primary_language).first
-                         end
+      content_association.to_a.find do |content|
+        content.language == primary_language
+      end
+    else
+      content_association.find_by(language: primary_language)
+    end
+  end
+
+  def load_content_from_db(languages_to_sort)
+    join_values = languages_to_sort.each_with_index.reduce([]) do |values, (lang, i)|
+      values << "('#{lang}',#{i})"
+    end
+    join_clause = "JOIN (VALUES #{join_values.join(",")}) as x(lang, ordering) "\
+    "ON \"#{self.class.content_association}\".\"language\" = x.lang"
+    content_association.where(language: languages_to_sort)
+    .joins(join_clause)
+    .order("x.ordering")
+    .first
+  end
+
+  def languages_to_sort(languages)
+    (Array.wrap(languages) | [primary_language]).flat_map do |lang|
+      if lang.length == 2
+        lang
+      else
+        [lang, lang[0..1]]
+      end
+    end.uniq
   end
 end

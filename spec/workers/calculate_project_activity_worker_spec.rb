@@ -20,6 +20,13 @@ describe CalculateProjectActivityWorker do
       expect_any_instance_of(Project).to receive(:update_columns).with(activity: count)
       worker.perform(project.id)
     end
+
+    context "when it can't find the project" do
+      it "should fail quickly" do
+        expect(Project).not_to receive(:transaction)
+        worker.perform("-1")
+      end
+    end
   end
 
   describe '#workflow_activity' do

@@ -2,7 +2,7 @@ module IndexSearch
   extend ActiveSupport::Concern
 
   included do
-    before_action :search, only: :index
+    before_action :search, only: :index, if: :search_query?
     @search_handlers ||= {}.with_indifferent_access
   end
 
@@ -43,5 +43,9 @@ module IndexSearch
 
   def search_handlers
     self.class.instance_variable_get(:@search_handlers)
+  end
+
+  def search_query?
+    params.has_key?(:search)
   end
 end

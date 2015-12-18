@@ -12,6 +12,16 @@ module FilterByCurrentUserRoles
         .joins(:access_control_lists)
         .where(access_control_lists: {user_group_id: api_user.user.identity_group.id})
         .where.overlap(access_control_lists: { roles: roles_filter })
+      if owner_eager_load(roles_filter)
+        @controlled_resources = @controlled_resources.eager_load(:owner)
+      end
     end
+  end
+
+  private
+
+  def owner_eager_load(roles)
+    non_owner_roles = roles - ["owner"]
+    @owner_eager_load = non_owner_roles.empty?
   end
 end

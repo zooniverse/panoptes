@@ -23,10 +23,6 @@ describe Api::V1::UsersController, type: :controller do
   end
   let(:deactivated_resource) { create(:user, activated_state: :inactive) }
 
-  let(:response_fb_token) do
-    json_response[api_resource_name][0]["firebase_auth_token"]
-  end
-
   describe "#index" do
     context "with an authenticated user" do
       before(:each) do
@@ -300,33 +296,6 @@ describe Api::V1::UsersController, type: :controller do
       it_behaves_like "an api response"
     end
 
-    describe "firebase JWT token" do
-      let(:show_id) { users.first.id }
-
-      before(:each) do
-        default_request(scopes: scopes, user_id: requesting_user_id)
-        allow_any_instance_of(UserSerializer)
-        .to receive(:include_firebase_auth_token?).and_return(false)
-        get :show, id: show_id
-      end
-
-      context "when showing the a different user to the requesting user" do
-        let(:requesting_user_id) { users.last.id }
-
-        it "should not have a firebase auth token for the user" do
-          expect(response_fb_token).to be_nil
-        end
-      end
-
-      context "when showing the requesting user" do
-        let(:requesting_user_id) { show_id }
-
-        it "should not have a firebase auth token for the user" do
-          expect(response_fb_token).to be_nil
-        end
-      end
-    end
-
     describe "admin" do
       let(:show_id) { users.first.id }
       let(:admin_response) { created_instance(api_resource_name)["admin"] }
@@ -356,12 +325,9 @@ describe Api::V1::UsersController, type: :controller do
   end
 
   describe "#me" do
-    let(:jwt_token) { "completely_fake_jwt_token" }
     let(:user) { users.first }
 
     before(:each) do
-      allow_any_instance_of(Firebase::FirebaseTokenGenerator)
-      .to receive(:create_token).and_return(jwt_token)
       default_request(scopes: scopes, user_id: user.id)
       get :me
     end
@@ -377,10 +343,6 @@ describe Api::V1::UsersController, type: :controller do
 
     it "should have a single user" do
       expect(json_response[api_resource_name].length).to eq(1)
-    end
-
-    it "should have a firebase auth token for the user" do
-      expect(response_fb_token).to eq(jwt_token)
     end
 
     it "should have the user's uploaded_subjects_count" do
