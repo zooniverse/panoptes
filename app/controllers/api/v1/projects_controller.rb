@@ -44,7 +44,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def fast_index
-    render json_api: FastProjectSerializer.new(params).serialize
+    render json_api: FastProjectSerializer.new(controlled_resources, params).serialize
   end
 
   def index

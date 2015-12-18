@@ -1,7 +1,8 @@
 class FastProjectSerializer
-  attr_accessor :params
+  attr_accessor :scope, :params
 
-  def initialize(params)
+  def initialize(scope, params)
+    @scope = scope
     @params = params
   end
 
@@ -21,7 +22,7 @@ class FastProjectSerializer
   end
 
   def query
-    @query ||= Project.where(launch_approved: true)
+    @query ||= scope.where(launch_approved: true)
       .order(:launched_row_order)
       .eager_load(:avatar, :project_contents)
   end

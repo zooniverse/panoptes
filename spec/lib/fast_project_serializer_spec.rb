@@ -2,7 +2,8 @@ require 'spec_helper'
 
 RSpec.describe FastProjectSerializer, type: :serializer do
   let(:params){ { } }
-  let(:serializer){ FastProjectSerializer.new params }
+  let(:scope){ Project } # fake the ACL'd scope
+  let(:serializer){ FastProjectSerializer.new scope, params }
 
   describe '#initialize' do
     let(:params){ { foo: 'bar' } }
