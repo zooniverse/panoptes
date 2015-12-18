@@ -89,25 +89,23 @@ RSpec.describe Subjects::CellectClient do
       allow(Cellect::Client.connection).to receive(:remove_subject) do
         (counter += 1) == 1 ? raise(StandardError) : true
       end
-
       expect(Cellect::Client.connection).to receive(:remove_subject)
                                              .with(1,
                                                    workflow_id: 2,
                                                    group_id: 4)
-
       Subjects::CellectClient.remove_subject(1, 2, 4)
     end
   end
 
-  describe "#get_subjects" do
+  describe "#get_subjects", :focus do
     it 'should call the method on the cellect client' do
       expect(Cellect::Client.connection).to receive(:get_subjects)
-                                             .with(host: 'test.host',
+                                             .with(host: 'example.com',
                                                    workflow_id: 1,
                                                    user_id: 2,
                                                    group_id: nil,
                                                    limit: 4)
-      Subjects::CellectClient.get_subjects({ 1 => 'test.host' }, 1, 2, nil, 4)
+      Subjects::CellectClient.get_subjects(1, 2, nil, 4)
     end
 
     it 'should try a new host if the first request fails' do
@@ -115,22 +113,19 @@ RSpec.describe Subjects::CellectClient do
       allow(Cellect::Client.connection).to receive(:get_subjects) do
         (counter += 1) == 1 ? raise(StandardError) : true
       end
-
       expect(Cellect::Client.connection).to receive(:get_subjects)
                                              .with(host: 'example.com',
                                                    workflow_id: 1,
                                                    user_id: 2,
                                                    group_id: nil,
                                                    limit: 4)
-
-      Subjects::CellectClient.get_subjects({ 1 => 'test.host' }, 1, 2, nil, 4)
+      Subjects::CellectClient.get_subjects(1, 2, nil, 4)
     end
   end
 
   describe "::reload_workflow" do
     it 'should call the method on the cellect client' do
-      expect(Cellect::Client.connection).to receive(:reload_workflow)
-                                             .with(1)
+      expect(Cellect::Client.connection).to receive(:reload_workflow).with(1)
       Subjects::CellectClient.reload_workflow(1)
     end
   end
