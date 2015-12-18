@@ -7,11 +7,12 @@ RSpec.describe Subjects::CellectSession do
   let(:session) { described_class.new(user_id, workflow_id) }
   let(:cellect_key) { "pcs:#{user_id}:#{workflow_id}" }
   let(:host) { "http://test.com" }
+  let(:redis) { double("redis", get: nil, setex: nil) }
 
   before(:each) do
     stub_cellect_connection
     allow(Cellect::Client).to receive(:choose_host).and_return(host)
-    Sidekiq.redis(&:flushdb)
+    allow(Sidekiq).to receive(:redis) { |&block| block.call(redis) }
   end
 
   describe "#new" do
@@ -38,8 +39,7 @@ RSpec.describe Subjects::CellectSession do
       end
 
       it "should set it in redis with a TTL for reference later" do
-        expect_any_instance_of(::Redis::Namespace).to receive(:setex)
-          .with(cellect_key, 3600, host)
+        expect(redis).to receive(:setex).with(cellect_key, 3600, host)
         session.host
       end
 
@@ -50,15 +50,13 @@ RSpec.describe Subjects::CellectSession do
 
     context "when set in redis" do
       it "should return the host from redis" do
-        expect_any_instance_of(::Redis::Namespace).to receive(:get)
-          .with(cellect_key)
+        expect(redis).to receive(:get).with(cellect_key)
         session.host
       end
 
       it "should allow the ttl to be set" do
         ttl = 60
-        expect_any_instance_of(::Redis::Namespace).to receive(:setex)
-          .with(cellect_key, ttl, host)
+        expect(redis).to receive(:setex).with(cellect_key, ttl, host)
         session.host(ttl)
       end
     end
@@ -72,15 +70,13 @@ RSpec.describe Subjects::CellectSession do
     end
 
     it "should set it in redis with a TTL for reference later" do
-      expect_any_instance_of(::Redis::Namespace).to receive(:setex)
-        .with(cellect_key, 3600, host)
+      expect(redis).to receive(:setex).with(cellect_key, 3600, host)
       session.reset_host
     end
 
     it "should allow the ttl to be set" do
       ttl = 60
-      expect_any_instance_of(::Redis::Namespace).to receive(:setex)
-        .with(cellect_key, ttl, host)
+      expect(redis).to receive(:setex).with(cellect_key, ttl, host)
       session.reset_host(ttl)
     end
   end
