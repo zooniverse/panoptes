@@ -11,7 +11,7 @@ RSpec.describe Subjects::CellectSession do
 
   before(:each) do
     stub_cellect_connection
-    stubbed_redis_connection
+    stub_redis_connection
     allow(Cellect::Client).to receive(:choose_host).and_return(host)
   end
 

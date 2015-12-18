@@ -4,6 +4,7 @@ RSpec.describe Subjects::CellectClient do
   let(:cellect_host) { 'example.com' }
   before(:each) do
     stub_cellect_connection
+    stub_redis_connection
   end
 
   def raise_error_for(method, times=1)

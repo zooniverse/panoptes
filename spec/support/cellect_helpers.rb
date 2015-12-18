@@ -16,7 +16,7 @@ module CellectHelpers
 
   def stub_redis_connection
     @redis_conn = double("redis", get: nil, setex: nil)
-    allow(Sidekiq).to receive(:redis) { |&block| block.call(redis) }
+    allow(Sidekiq).to receive(:redis) { |&block| block.call(@redis_conn) }
   end
 
   def stubbed_redis_connection
