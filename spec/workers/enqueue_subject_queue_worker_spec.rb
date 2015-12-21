@@ -80,6 +80,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
         end
 
         it "should use a cellect session instance for session tracking" do
+          stub_redis_connection
           expect(Subjects::CellectSession).to receive(:new).and_call_original
           run_selection
         end
