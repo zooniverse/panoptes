@@ -8,10 +8,11 @@ RSpec.describe Subjects::CellectSession do
   let(:cellect_key) { "pcs:#{user_id}:#{workflow_id}" }
   let(:host) { "http://test.com" }
   let(:redis) { stubbed_redis_connection }
+  let(:get_host) { nil }
 
   before(:each) do
     stub_cellect_connection
-    stub_redis_connection
+    stub_redis_connection(get_host)
     allow(Cellect::Client).to receive(:choose_host).and_return(host)
   end
 
@@ -46,18 +47,34 @@ RSpec.describe Subjects::CellectSession do
       it "should return a host" do
         expect(session.host).to eq(host)
       end
-    end
-
-    context "when set in redis" do
-      it "should return the host from redis" do
-        expect(redis).to receive(:get).with(cellect_key)
-        session.host
-      end
 
       it "should allow the ttl to be set" do
         ttl = 60
         expect(redis).to receive(:setex).with(cellect_key, ttl, host)
         session.host(ttl)
+      end
+
+    end
+
+    context "when set in redis" do
+      let(:get_host) { host }
+
+      it "should return the host from redis" do
+        expect(redis).to receive(:get).with(cellect_key)
+        session.host
+      end
+
+      it "should check the host is still alive" do
+        expect(Cellect::Client).to receive(:host_exists?).with(host)
+        session.host
+      end
+
+      context "when the host is not available anymore" do
+        it "should reset the host" do
+          allow(Cellect::Client).to receive(:host_exists?).with(host).and_return(false)
+          expect(session).to receive(:reset_host)
+          session.host
+        end
       end
     end
   end

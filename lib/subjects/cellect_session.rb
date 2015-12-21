@@ -14,8 +14,11 @@ module Subjects
       host = Sidekiq.redis do |redis_conn|
         redis_conn.get(user_workflow_key)
       end
-      #TODO: add check for host existing here.
-      host ? host : reset_host(ttl)
+      if host && Cellect::Client.host_exists?(host)
+        host
+      else
+        reset_host(ttl)
+      end
     end
 
     def reset_host(ttl=ttl_secs)
