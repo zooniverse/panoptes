@@ -36,7 +36,7 @@ gem 'pg_search'
 gem 'ranked-model', '~> 0.4.0'
 gem 'sidekiq-congestion', '~> 0.0.1'
 gem 'sidetiq', '~> 0.6.3'
-gem 'cellect-client', '~> 0.1.2'
+gem 'cellect-client', '~> 1.0.1'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
