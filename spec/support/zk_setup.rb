@@ -36,7 +36,7 @@ module ZkSetup
 
   def self.kill_old_zk_servers
     if zk_ok?
-      pid = `ps aux | grep -e 'Cellect[\/]tmp[\/]zookeeper'`.split[1]
+      pid = `ps aux | grep -e "#{PANOPTES_ROOT}[\/]tmp[\/]zookeeper"`.split[1]
       puts "Killing rogue zookeeper process: #{ pid }..."
       `kill -s TERM #{ pid }`
       sleep 1
