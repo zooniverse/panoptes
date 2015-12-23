@@ -37,7 +37,11 @@ class SubjectWorkflowCount < ActiveRecord::Base
     retired_at.present?
   end
 
+  def set_member_subjects
+    subject.set_member_subjects
+  end
+
   def set_member_subject_ids
-    subject.set_member_subjects.pluck(:id)
+    set_member_subjects.pluck(:id)
   end
 end

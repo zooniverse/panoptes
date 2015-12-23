@@ -30,6 +30,32 @@ RSpec.describe RetirementWorker do
         queue.reload
         expect(queue.set_member_subject_ids).to_not include(sms.id)
       end
+
+      context "when the workflow is not using cellect" do
+        it "should not notify cellect" do
+          expect(Subjects::CellectClient).not_to receive(:remove_subject)
+          worker.perform(count.id)
+        end
+      end
+
+      context "when the workflow is using cellect" do
+        before do
+          allow(Panoptes).to receive(:cellect_on).and_return(true)
+          allow(workflow).to receive(:using_cellect?).and_return(true)
+        end
+
+        it "should tell cellect for each subject_id" do
+          expect(Subjects::CellectClient).to receive(:remove_subject)
+            .with(sms.subject_id, workflow.id, sms.subject_set_id)
+          worker.perform(count.id)
+        end
+
+        it "should handle a dead cellect connection and move on" do
+          allow(Subjects::CellectClient).to receive(:remove_subject)
+            .and_raise(Subjects::CellectClient::ConnectionError)
+          expect{ worker.perform(count.id)}.not_to raise_error
+        end
+      end
     end
 
     context "sms is not retireable" do
