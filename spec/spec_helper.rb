@@ -7,6 +7,10 @@ require "rspec/rails"
 require "sidekiq/testing"
 require "paper_trail/frameworks/rspec"
 
+PANOPTES_ROOT = File.expand_path File.join(File.dirname(__FILE__), '../')
+SPAWN_ZK = !ENV['ZK_URL']
+require './spec/support/zk_setup.rb'
+
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActiveRecord::Migration.maintain_test_schema!
@@ -74,6 +78,10 @@ RSpec.configure do |config|
   config.after(:each) do
     DatabaseCleaner.clean
     Celluloid.shutdown
+  end
+
+  config.after(:suite) do
+    ZkSetup.stop_zk
   end
 
   # If true, the base class of anonymous controllers will be inferred

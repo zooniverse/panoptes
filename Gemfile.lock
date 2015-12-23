@@ -323,6 +323,8 @@ GEM
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
     slop (3.6.0)
+    slyphon-log4j (1.2.15)
+    slyphon-zookeeper_jar (3.3.5)
     spring (1.5.0)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
@@ -360,6 +362,11 @@ GEM
     yard (0.8.7.6)
     zk (1.9.6)
       zookeeper (~> 1.4.0)
+    zk-server (1.1.8)
+      bundler (>= 1)
+      slop (>= 3.2.0, < 4.0)
+      slyphon-log4j (= 1.2.15)
+      slyphon-zookeeper_jar (~> 3.3.5)
     zookeeper (1.4.11)
 
 PLATFORMS
@@ -420,6 +427,7 @@ DEPENDENCIES
   therubyrhino
   uglifier (~> 2.0)
   versionist (~> 1.0)
+  zk-server
 
 BUNDLED WITH
    1.10.6
