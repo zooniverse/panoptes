@@ -7,12 +7,6 @@ before_script: &before_script
   - mkdir -p tmp
   - RACK_ENV=test bundle exec rake configure:travis db:setup
 
-jruby_before_script: &jruby_before_script
-  - bundle exec jbundle install
-  - psql -c 'create database travis_ci_test;' -U postgres
-  - mkdir -p tmp
-  - RACK_ENV=test bundle exec rake configure:travis db:setup
-
 matrix:
   fast_finish: true
   allow_failures:
@@ -25,4 +19,4 @@ services:
 addons:
   postgresql: "9.4"
 
-script: RACK_ENV=test bundle exec rake spec
+script: RACK_ENV=test bundle exec rspec
