@@ -9,10 +9,14 @@ postgres:
 zookeeper:
   image: zooniverse/zookeeper
   command: /usr/share/zookeeper/bin/zkServer.sh start-foreground -c localhost:2888:3888 -i 1
+  # ports:
+  #   - "2181:2181"
 
 redis:
   image: redis
   command: redis-server --appendonly yes
+  # ports:
+  #   - "6379:6379"
 
 kafka:
   image: zooniverse/kafka
@@ -23,10 +27,17 @@ kafka:
 
 cellect:
   image: zooniverse/cellect-panoptes
-  #may have to update the PG env vars since we use a diff
-  # postgres image now, https://github.com/zooniverse/cellect_panoptes/blob/master/cellect_env.rb#L49
+  ports:
+    - "4000:80"
+  environment:
+    #cellect registers a hostname but no port, so we need prod port 80
+    - "RACK_ENV=production"
+    - "DEBUG_CELLECT_START=true"
+    - "DATABASE_URL=postgresql://panoptes:panoptes@pg:5432/panoptes_development?pool=16"
+    - "ZK_URL=zk:2181"
+    - "PUMA_MAX_THREADS=16"
   links:
-    - postgres
+    - postgres:pg
     - zookeeper:zk
 
 panoptes:
@@ -37,10 +48,12 @@ panoptes:
   ports:
     - "3000:3000"
   environment:
-    RAILS_ENV: development
+    - "RAILS_ENV=development"
+    - "CELLECT_ON=true"
+    - "CELLECT_MIN_POOL_SIZE=100"
+    - "ZK_URL=zk:2181"
   links:
-    - postgres:pg #should it be pg? https://github.com/zooniverse/cellect_panoptes/blob/master/cellect_env.rb
+    - postgres:pg
+    - redis
     - zookeeper:zk
     - kafka
-    - redis
-    - cellect
