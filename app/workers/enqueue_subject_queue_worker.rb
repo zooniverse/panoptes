@@ -19,7 +19,7 @@ class EnqueueSubjectQueueWorker
     begin
       subject_ids = selected_subject_ids.compact
     rescue Subjects::CellectClient::ConnectionError
-      subject_ids = default_strategy_ids
+      subject_ids = default_strategy_sms_ids
     end
 
     unless subject_ids.empty?
@@ -43,17 +43,19 @@ class EnqueueSubjectQueueWorker
   private
 
   def selected_subject_ids
-    ids = case selection_strategy
+    sms_ids = case selection_strategy
     when :cellect
       cellect_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
-      Subjects::CellectClient.get_subjects(*cellect_params)
+      subject_ids = Subjects::CellectClient.get_subjects(*cellect_params)
+      sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
+      sms_scope.pluck(&:id)
     else
-      default_strategy_ids
+      default_strategy_sms_ids
     end
-    Array.wrap(ids)
+    Array.wrap(sms_ids)
   end
 
-  def default_strategy_ids
+  def default_strategy_sms_ids
     Subjects::PostgresqlSelection.new(workflow, user)
     .select(limit: limit, subject_set_id: subject_set_id)
   end

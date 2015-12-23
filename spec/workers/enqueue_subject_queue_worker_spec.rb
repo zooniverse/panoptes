@@ -80,14 +80,25 @@ RSpec.describe EnqueueSubjectQueueWorker do
         end
 
         it "should use a cellect session instance for session tracking" do
+          stub_cellect_connection
           stub_redis_connection
           expect(Subjects::CellectSession).to receive(:new).and_call_original
           run_selection
         end
 
-        it "should attempt to queue the selected set" do
+        it "should convert the cellect subject_ids to panoptes sms_ids" do
           allow(Subjects::CellectClient).to receive(:get_subjects)
             .and_return(result_ids)
+          expect(SetMemberSubject).to receive(:by_subject_workflow)
+            .with(result_ids, workflow.id).and_call_original
+          run_selection
+        end
+
+        it "should attempt to queue the selected sms_id set" do
+          allow(Subjects::CellectClient).to receive(:get_subjects)
+            .and_return(result_ids)
+          allow(SetMemberSubject).to receive(:by_subject_workflow)
+            .and_return(double(pluck: result_ids))
           expect(SubjectQueue).to receive(:enqueue)
           run_selection
         end
