@@ -53,7 +53,6 @@ RSpec.describe Subjects::CellectSession do
         expect(redis).to receive(:setex).with(cellect_key, ttl, host)
         session.host(ttl)
       end
-
     end
 
     context "when set in redis" do

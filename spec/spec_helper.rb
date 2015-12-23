@@ -1,8 +1,8 @@
 ENV["RAILS_ENV"] ||= 'test'
-require "celluloid/test"
-Celluloid.logger.level = Logger::WARN
-require "cellect/testing"
 require File.expand_path("../../config/environment", __FILE__)
+require "celluloid/test"
+Celluloid.logger = nil
+require "cellect/testing"
 require "rspec/rails"
 require "sidekiq/testing"
 require "paper_trail/frameworks/rspec"
