@@ -196,8 +196,8 @@ RSpec.describe EnqueueSubjectQueueWorker do
       end
 
       context "when the number of set_member_subjects is large" do
-        it "should not query the cellect size method" do
-          expect(subject).not_to receive(:cellect_size_subject_space?)
+        it "should not query workflow about cellect" do
+          expect_any_instance_of(Workflow).not_to receive(:using_cellect?)
           expect(subject.strategy(nil)).to eq(nil)
         end
       end

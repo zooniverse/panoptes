@@ -298,4 +298,54 @@ describe Workflow, :type => :model do
       end
     end
   end
+
+  describe "#selection_strategy" do
+    it "should return the configuration directive" do
+      expect(workflow.selection_strategy).to be_nil
+    end
+
+    it "should return the configuration directive when it's set" do
+      config = { selection_strategy: :cellect }
+      allow(workflow).to receive(:configuration).and_return(config)
+      expect(workflow.selection_strategy).to eq(:cellect)
+    end
+  end
+
+  describe "#using_cellect?" do
+    it "should return false if the config set to someting not cellect" do
+      config = { selection_strategy: :database }
+      allow(workflow).to receive(:configuration).and_return(config)
+      expect(workflow.using_cellect?).to be_falsey
+    end
+
+    it "should return false if the config is missing and small subject space" do
+      expect(workflow.using_cellect?).to be_falsey
+    end
+
+    it "should return true if the config is set" do
+      config = { selection_strategy: :cellect }
+      allow(workflow).to receive(:configuration).and_return(config)
+      expect(workflow.using_cellect?).to be_truthy
+    end
+
+    it "should return true if the subjects space is large enough" do
+      allow(workflow).to receive_message_chain("set_member_subjects.count")
+        .and_return(Panoptes.cellect_min_pool_size)
+      expect(workflow.using_cellect?).to be_truthy
+    end
+  end
+
+  describe "#cellect_size_subject_space?" do
+    it "should not be true by default" do
+      expect(workflow.cellect_size_subject_space?).to be_falsey
+    end
+
+    context "when more subjects than the cellect min pool" do
+      it "should be true" do
+        allow(workflow).to receive_message_chain("set_member_subjects.count")
+          .and_return(Panoptes.cellect_min_pool_size)
+        expect(workflow.cellect_size_subject_space?).to be_truthy
+      end
+    end
+  end
 end

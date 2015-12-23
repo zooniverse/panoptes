@@ -35,7 +35,7 @@ class EnqueueSubjectQueueWorker
     case
     when workflow_strategy
       workflow_strategy
-    when cellect_size_subject_space?
+    when workflow.using_cellect?
        :cellect
     end
   end
@@ -59,10 +59,6 @@ class EnqueueSubjectQueueWorker
   end
 
   def workflow_strategy
-    @workflow_strategy ||= workflow.configuration.with_indifferent_access[:selection_strategy]
-  end
-
-  def cellect_size_subject_space?
-    workflow.set_member_subjects.count >= Panoptes.cellect_min_pool_size
+    @workflow_strategy ||= workflow.selection_strategy
   end
 end
