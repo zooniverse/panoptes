@@ -41,6 +41,9 @@ class Api::V1::SubjectSetsController < Api::ApiController
     if subject_set.set_member_subjects.exists?
       subject_set.workflows.each do |w|
         ReloadNonLoggedInQueueWorker.perform_async(w.id, subject_set.id)
+        if Panoptes.cellect_on
+          ReloadCellectWorker.perform_async(w.id)
+        end
       end
     end
   end
