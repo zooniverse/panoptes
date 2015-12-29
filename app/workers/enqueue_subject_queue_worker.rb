@@ -48,7 +48,7 @@ class EnqueueSubjectQueueWorker
       cellect_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
       subject_ids = Subjects::CellectClient.get_subjects(*cellect_params)
       sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
-      sms_scope.pluck(&:id)
+      sms_scope.pluck("set_member_subjects.id")
     else
       default_strategy_sms_ids
     end

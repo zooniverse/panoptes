@@ -37,7 +37,6 @@ RSpec.describe EnqueueSubjectQueueWorker do
     end
 
     context "with a user" do
-
       it "should create a subject queue for the user" do
         subject.perform(workflow.id, user.id)
         queue = SubjectQueue.by_user_workflow(user, workflow).first
@@ -46,7 +45,6 @@ RSpec.describe EnqueueSubjectQueueWorker do
     end
 
     context "with user and a subject set" do
-
       it "should create a per user subject set queue" do
         subject.perform(workflow.id, user.id, subject_set.id)
         queue = SubjectQueue.by_set(subject_set.id)
@@ -94,11 +92,14 @@ RSpec.describe EnqueueSubjectQueueWorker do
           run_selection
         end
 
-        it "should attempt to queue the selected sms_id set" do
+        it "should attempt to queue the selected sms_id set", :aggregate_failures do
+          selection_results = double(pluck: result_ids)
           allow(Subjects::CellectClient).to receive(:get_subjects)
             .and_return(result_ids)
           allow(SetMemberSubject).to receive(:by_subject_workflow)
-            .and_return(double(pluck: result_ids))
+            .and_return(selection_results)
+          expect(selection_results).to receive(:pluck)
+            .with("set_member_subjects.id")
           expect(SubjectQueue).to receive(:enqueue)
           run_selection
         end
