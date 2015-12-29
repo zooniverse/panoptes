@@ -1,3 +1,5 @@
+require 'cellect/client'
+
 module Subjects
   module CellectClient
     ConnectionError = Class.new(StandardError)
