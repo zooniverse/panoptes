@@ -3,7 +3,6 @@ module Subjects
     class MissingParameter < StandardError; end
     class MissingSubjectQueue < StandardError; end
     class MissingSubjectSet < StandardError; end
-    class EmptyDatabaseSelect < StandardError; end
 
     attr_reader :user, :params, :workflow
 
