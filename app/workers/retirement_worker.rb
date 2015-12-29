@@ -9,6 +9,7 @@ class RetirementWorker
       count.retire! do
         SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject_ids)
         finish_workflow!(count.workflow)
+        notify_cellect(count)
         push_counters_to_event_stream(count.workflow)
       end
     end
@@ -27,5 +28,14 @@ class RetirementWorker
       subjects_count: workflow.subjects_count,
       retired_subjects_count: workflow.retired_subjects_count,
       classifications_count: workflow.classifications_count)
+  end
+
+  def notify_cellect(count)
+    return unless Panoptes.cellect_on
+    count.set_member_subjects.each do |sms|
+      cellect_params = [ sms.subject_id, count.workflow.id, sms.subject_set_id ]
+      Subjects::CellectClient.remove_subject(*cellect_params)
+    end
+  rescue Subjects::CellectClient::ConnectionError
   end
 end

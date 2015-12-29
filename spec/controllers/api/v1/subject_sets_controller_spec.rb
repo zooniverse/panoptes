@@ -8,8 +8,8 @@ shared_examples "cleans up the linked set member subjects" do
   end
 
   it 'should queue a removal workfer' do
-    expect(QueueRemovalWorker).to receive(:perform_async).with(sms.map(&:id),
-                                                               subject_set.workflows.pluck(:id))
+    expect(QueueRemovalWorker).to receive(:perform_async)
+      .with(sms.map(&:id),subject_set.workflows.pluck(:id))
     delete_resources
   end
 
@@ -27,7 +27,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
   let(:owner) { project.owner }
   let(:api_resource_name) { 'subject_sets' }
 
-  let(:api_resource_attributes) { %w(id display_name set_member_subjects_count created_at updated_at metadata) }
+  let(:api_resource_attributes) do
+    %w(id display_name set_member_subjects_count created_at updated_at metadata)
+  end
   let(:api_resource_links) { %w(subject_sets.project subject_sets.workflows) }
 
   let(:scopes) { %w(public project) }
@@ -103,7 +105,8 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
 
       it "should queue the counter worker" do
-        expect(SubjectSetSubjectCounterWorker).to receive(:perform_in).with(3.minutes, resource.id)
+        expect(SubjectSetSubjectCounterWorker).to receive(:perform_in)
+          .with(3.minutes, resource.id)
         run_update_links
       end
 
@@ -136,52 +139,90 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
 
       context "when the subject set has a workflow" do
-        it 'should call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async).with(workflows.first.id, resource.id)
+        let(:workflow_id) { workflows.first.id }
+        after do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets][:links].delete(:workflows)
           put :update, update_params.merge(id: resource.id)
+        end
+
+        it 'should call the reload queue worker' do
+          expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async)
+          .with(workflow_id, resource.id)
+        end
+
+        it 'should not call the reload cellect worker when cellect is off' do
+          expect(ReloadCellectWorker).not_to receive(:perform_async)
+        end
+
+        it 'should call the reload cellect worker when cellect is on' do
+          allow(Panoptes).to receive(:cellect_on).and_return(true)
+          expect(ReloadCellectWorker).to receive(:perform_async)
+          .with(workflow_id)
         end
       end
 
       context "when the subject set has multiple workflows" do
         let(:workflows) { create_list(:workflow, 2, project: project) }
-        it 'should call the reload queue worker' do
-          workflows.each do |_workflow|
-            expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async).with(_workflow.id, resource.id)
-          end
+        after do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets][:links].delete(:workflows)
           put :update, update_params.merge(id: resource.id)
+        end
+
+        it 'should call the reload queue worker for each workflow' do
+          workflows.each do |_workflow|
+            expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async)
+            .with(_workflow.id, resource.id)
+          end
+        end
+
+        it 'should not call the reload cellect worker when cellect is off' do
+          expect(ReloadCellectWorker).not_to receive(:perform_async)
+        end
+
+        it 'should call the reload cellect worker when cellect is on' do
+          allow(Panoptes).to receive(:cellect_on).and_return(true)
+          workflows.each do |_workflow|
+            expect(ReloadCellectWorker).to receive(:perform_async)
+            .with(_workflow.id)
+          end
         end
       end
 
       context "when the subject set has no workflows" do
         let(:workflows) { [] }
-        it 'should not call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
+        after do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets][:links].delete(:workflows)
           put :update, update_params.merge(id: resource.id)
         end
-      end
 
-      context "when the subject set has multiple subjects" do
-        it 'should call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async).with(workflows.first.id, resource.id)
-          default_request scopes: scopes, user_id: authorized_user.id
-          update_params[:subject_sets][:links].delete(:workflows)
-          put :update, update_params.merge(id: resource.id)
+        it 'should not call the reload queue worker' do
+          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
+        end
+
+        it 'should not call the reload cellect worker when cellect is on' do
+          allow(Panoptes).to receive(:cellect_on).and_return(true)
+          expect(ReloadCellectWorker).not_to receive(:perform_async)
         end
       end
 
       context "when the subject set has no subjects" do
         let(:subjects) { [] }
-        it 'should not call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
+        after do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets].delete(:links)
           put :update, update_params.merge(id: resource.id)
+        end
+
+        it 'should not call the reload queue worker' do
+          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
+        end
+
+        it 'should not call the reload cellect worker when cellect is on' do
+          allow(Panoptes).to receive(:cellect_on).and_return(true)
+          expect(ReloadCellectWorker).not_to receive(:perform_async)
         end
       end
     end
@@ -250,7 +291,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
       delete :destroy, id: subject_set.id
     end
     let(:linked_sms_ids) { sms.map(&:id) }
-    let(:linked_subject_sets_workflows_ids) { resource.subject_sets_workflows.map(&:id) }
+    let(:linked_subject_sets_workflows_ids) do
+      resource.subject_sets_workflows.map(&:id)
+    end
 
     it_behaves_like "is destructable"
     it_behaves_like "cleans up the linked set member subjects"
@@ -259,7 +302,8 @@ describe Api::V1::SubjectSetsController, type: :controller do
       aggregate_failures "subject_sets_workflows" do
         expect(linked_subject_sets_workflows_ids.count).to be > 0
         delete_resources
-        expect(SubjectSetsWorkflow.where(id: linked_subject_sets_workflows_ids)).to be_empty
+        result = SubjectSetsWorkflow.where(id: linked_subject_sets_workflows_ids)
+        expect(result).to be_empty
       end
     end
   end
@@ -270,7 +314,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
       let(:linked_sms_ids) { sms.map(&:id) }
 
       let(:delete_resources) do
-        delete :destroy_links, subject_set_id: subject_set.id, link_relation: :subjects,
+        delete :destroy_links,
+          subject_set_id: subject_set.id,
+          link_relation: :subjects,
           link_ids: subject_set.subjects.pluck(:id).join(',')
       end
 

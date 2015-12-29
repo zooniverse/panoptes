@@ -80,4 +80,23 @@ class Workflow < ActiveRecord::Base
   def retired_subjects_count
     retired_set_member_subjects_count
   end
+
+  def selection_strategy
+    configuration.with_indifferent_access[:selection_strategy].try(:to_sym)
+  end
+
+  def cellect_size_subject_space?
+    set_member_subjects.count >= Panoptes.cellect_min_pool_size
+  end
+
+  def using_cellect?
+    case
+    when selection_strategy == :cellect
+      true
+    when selection_strategy
+      false
+    else
+      cellect_size_subject_space?
+    end
+  end
 end

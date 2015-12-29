@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe PostgresqlSelection do
+RSpec.describe Subjects::PostgresqlSelection do
 
   def update_sms_priorities
     SetMemberSubject.where(priority: nil).each_with_index do |sms, index|
@@ -87,7 +87,7 @@ RSpec.describe PostgresqlSelection do
     end
 
     describe "random selection" do
-      subject { PostgresqlSelection.new(workflow, user) }
+      subject { Subjects::PostgresqlSelection.new(workflow, user) }
 
       it_behaves_like "select for incomplete_project"
 
@@ -99,15 +99,15 @@ RSpec.describe PostgresqlSelection do
 
       it "should give up trying to construct a random list after set number of attempts" do
         unreachable_limit = SetMemberSubject.count + 1
-        allow_any_instance_of(PostgresqlSelection).to receive(:available_count).and_return(unreachable_limit + 1)
-        allow_any_instance_of(PostgresqlSelection).to receive(:limit).and_return(unreachable_limit)
+        allow_any_instance_of(subject.class).to receive(:available_count).and_return(unreachable_limit + 1)
+        allow_any_instance_of(subject.class).to receive(:limit).and_return(unreachable_limit)
         results = subject.select
         expect(results).to eq(results)
       end
     end
 
     context "grouped selection" do
-      subject { PostgresqlSelection.new(workflow, user) }
+      subject { Subjects::PostgresqlSelection.new(workflow, user) }
 
       before(:each) do
         allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
@@ -130,7 +130,7 @@ RSpec.describe PostgresqlSelection do
     end
 
     describe "priority selection" do
-      subject { PostgresqlSelection.new(workflow, user) }
+      subject { Subjects::PostgresqlSelection.new(workflow, user) }
       let(:ordered) { sms.order(priority: :asc).pluck(:id) }
 
       before(:each) do
@@ -160,7 +160,7 @@ RSpec.describe PostgresqlSelection do
     end
 
     describe "priority and grouped selection" do
-      subject { PostgresqlSelection.new(workflow, user) }
+      subject { Subjects::PostgresqlSelection.new(workflow, user) }
 
       before(:each) do
         %i( prioritized grouped ).each do |method|

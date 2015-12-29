@@ -410,14 +410,33 @@ describe ClassificationLifecycle do
   end
 
   describe "#update_seen_subjects" do
+    let(:seen_params) do
+      { user: classification.user,
+        workflow: classification.workflow,
+        subject_ids: classification.subject_ids }
+    end
     after(:each) { subject.update_seen_subjects }
 
     context "with a user" do
       it 'should add the subject_id to the seen subjects' do
         expect(UserSeenSubject).to receive(:add_seen_subjects_for_user)
-        .with(user: classification.user,
-          workflow: classification.workflow,
-          subject_ids: classification.subject_ids)
+        .with(seen_params)
+      end
+
+      it "should not tell cellect by default" do
+        expect(Subjects::CellectClient).not_to receive(:add_seen)
+      end
+
+      context "when the workflow is using cellect" do
+        it "should tell cellect for each subject_id" do
+          allow(Panoptes).to receive(:cellect_on).and_return(true)
+          allow(classification.workflow).to receive(:using_cellect?)
+          .and_return(true)
+          classification.subject_ids.each do |subject_id|
+            expect(Subjects::CellectClient).to receive(:add_seen)
+            .with(seen_params[:workflow].id, seen_params[:user].id, subject_id)
+          end
+        end
       end
     end
 

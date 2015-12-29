@@ -14,7 +14,6 @@ If you're interested in how Panoptes is implemented check out the [wiki](https:/
 
 Panoptes is primarily developed against stable MRI, currently 2.2.1. It is tested against the following versions:
 
-* JRuby 1.7.18
 * 2.2.1
 
 If you're running MRI Ruby you'll need to have the MySQL and Postgresql client libraries installed.
@@ -31,6 +30,7 @@ You'll need to have the following services running:
 Optionally you can run
 
 * [Kafka](http://kafka.apache.org) version > 0.8.1.1
+* [Cellect Server](https://github.com/zooniverse/Cellect) version > 0.1.0
 * [MySQL](http://www.mysql.com) version > 5.1
 
 ## Installation

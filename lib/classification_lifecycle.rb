@@ -50,6 +50,11 @@ class ClassificationLifecycle
   def update_seen_subjects
     if should_update_seen? && subjects_are_unseen_by_user?
       UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
+      if Panoptes.cellect_on && workflow.using_cellect?
+        subject_ids.each do |subject_id|
+          Subjects::CellectClient.add_seen(workflow.id, user.try(:id), subject_id)
+        end
+      end
     end
   end
 

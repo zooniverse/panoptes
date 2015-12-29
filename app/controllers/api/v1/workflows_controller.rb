@@ -38,6 +38,9 @@ class Api::V1::WorkflowsController < Api::ApiController
       reload_queue_subject_sets(workflow).each do |subject_set_id|
         ReloadNonLoggedInQueueWorker.perform_async(workflow.id, subject_set_id)
       end
+      if Panoptes.cellect_on
+        ReloadCellectWorker.perform_async(workflow.id)
+      end
     end
   end
 

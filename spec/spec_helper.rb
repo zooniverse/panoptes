@@ -1,8 +1,15 @@
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../../config/environment", __FILE__)
-require 'rspec/rails'
-require 'sidekiq/testing'
-require 'paper_trail/frameworks/rspec'
+require "celluloid/test"
+Celluloid.logger = nil
+require "cellect/testing"
+require "rspec/rails"
+require "sidekiq/testing"
+require "paper_trail/frameworks/rspec"
+
+PANOPTES_ROOT = File.expand_path File.join(File.dirname(__FILE__), '../')
+SPAWN_ZK = !ENV['ZK_URL']
+require './spec/support/zk_setup.rb'
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
@@ -15,6 +22,7 @@ RSpec.configure do |config|
   config.include APIResponseHelpers, type: :controller
   config.include APIResponseHelpers, type: :request
   config.include ValidUserRequestHelper, type: :request
+  config.include CellectHelpers
   config.extend RSpec::Helpers::ActiveRecordMocks
 
   config.filter_run focus: true
@@ -58,12 +66,22 @@ RSpec.configure do |config|
     end
   end
 
+  config.before(:each, type: :controller) do
+    stub_cellect_connection
+  end
+
   config.before(:each) do
     DatabaseCleaner.start
+    Celluloid.boot
   end
 
   config.after(:each) do
     DatabaseCleaner.clean
+    Celluloid.shutdown
+  end
+
+  config.after(:suite) do
+    ZkSetup.stop_zk
   end
 
   # If true, the base class of anonymous controllers will be inferred

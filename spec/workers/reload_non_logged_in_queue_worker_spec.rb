@@ -7,7 +7,8 @@ RSpec.describe ReloadNonLoggedInQueueWorker do
   let(:subject_ids) { (1..100).to_a}
 
   before(:each) do
-    allow_any_instance_of(PostgresqlSelection).to receive(:select).and_return(subject_ids)
+    allow_any_instance_of(Subjects::PostgresqlSelection)
+      .to receive(:select).and_return(subject_ids)
   end
 
   describe "#perform" do
@@ -43,6 +44,8 @@ RSpec.describe ReloadNonLoggedInQueueWorker do
       end
 
       context "grouped / non-grouped workflows and queues" do
+        let(:queue_subject_set) { nil }
+        let(:grouped) { false }
         let!(:queue) do
           create(:subject_queue,
                  workflow: workflow,
@@ -52,19 +55,25 @@ RSpec.describe ReloadNonLoggedInQueueWorker do
         end
 
         before(:each) do
-          allow_any_instance_of(Workflow).to receive(:grouped).and_return(grouped)
+          allow_any_instance_of(Workflow).to receive(:grouped)
+            .and_return(grouped)
         end
 
-        context "when the workflow is not grouped" do
-          let(:queue_subject_set) { nil }
-          let(:grouped) { false }
+        it "should reload the queue without a subject set" do
+          aggregate_failures("by set lookup") do
+            expect(SubjectQueue).to receive(:by_set)
+              .with(nil).and_call_original
+            subject.perform(workflow.id, subject_set.id)
+            expect(queue.reload.set_member_subject_ids)
+              .to match_array(subject_ids)
+          end
+        end
 
-          it "should reload the queue without a subject set" do
-            aggregate_failures("by set lookup") do
-              expect(SubjectQueue).to receive(:by_set).with(nil).and_call_original
-              subject.perform(workflow.id, subject_set.id)
-              expect(queue.reload.set_member_subject_ids).to match_array(subject_ids)
-            end
+        context "when the selector returns no subject ids" do
+          it "should not attempt to enque an empty set" do
+            allow(subject).to receive(:selected_subject_ids).and_return([])
+            expect(SubjectQueue).not_to receive(:reload)
+            subject.perform(workflow.id, subject_set.id)
           end
         end
 
@@ -74,9 +83,11 @@ RSpec.describe ReloadNonLoggedInQueueWorker do
 
           it "should reload the queue with a subject set" do
             aggregate_failures("by set lookup") do
-              expect(SubjectQueue).to receive(:by_set).with(subject_set.id).and_call_original
+              expect(SubjectQueue).to receive(:by_set).with(subject_set.id)
+                .and_call_original
               subject.perform(workflow.id, subject_set.id)
-              expect(queue.reload.set_member_subject_ids).to match_array(subject_ids)
+              expect(queue.reload.set_member_subject_ids)
+                .to match_array(subject_ids)
             end
           end
         end

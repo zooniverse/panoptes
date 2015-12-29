@@ -216,11 +216,24 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
 
       context "with authorized user" do
+        after do
+          default_request scopes: scopes, user_id: authorized_user.id
+          post :update_links, update_link_params
+        end
+
         context "when the workflow has subjects" do
           it 'should call the reload queue worker' do
             expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async).with(resource.id, subject_set_id)
-            default_request scopes: scopes, user_id: authorized_user.id
-            post :update_links, update_link_params
+          end
+
+          it 'should not call the reload cellect worker when cellect is off' do
+            expect(ReloadCellectWorker).not_to receive(:perform_async)
+          end
+
+          it 'should call the reload cellect worker when cellect is on' do
+            allow(Panoptes).to receive(:cellect_on).and_return(true)
+            expect(ReloadCellectWorker).to receive(:perform_async)
+            .with(resource.id)
           end
         end
 
@@ -232,6 +245,11 @@ describe Api::V1::WorkflowsController, type: :controller do
             default_request scopes: scopes, user_id: authorized_user.id
             post :update_links, update_link_params
           end
+
+          it 'should not call the reload cellect worker when cellect is on' do
+            allow(Panoptes).to receive(:cellect_on).and_return(true)
+            expect(ReloadCellectWorker).not_to receive(:perform_async)
+          end
         end
       end
 
@@ -240,6 +258,11 @@ describe Api::V1::WorkflowsController, type: :controller do
           expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
           default_request scopes: scopes, user_id: create(:user).id
           post :update_links, update_link_params
+        end
+
+        it 'should not call the reload cellect worker when cellect is on' do
+          allow(Panoptes).to receive(:cellect_on).and_return(true)
+          expect(ReloadCellectWorker).not_to receive(:perform_async)
         end
       end
     end

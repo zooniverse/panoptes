@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe SubjectSelector do
+RSpec.describe Subjects::Selector do
   let(:workflow) { create(:workflow_with_subjects) }
   let(:user) { ApiUser.new(create(:user)) }
   let(:smses) { create_list(:set_member_subject, 10).reverse }
@@ -36,7 +36,7 @@ RSpec.describe SubjectSelector do
 
         it 'should raise an informative error' do
           allow_any_instance_of(Workflow).to receive(:subject_sets).and_return([])
-          expect{subject.queued_subjects}.to raise_error(SubjectSelector::MissingSubjectSet,
+          expect{subject.queued_subjects}.to raise_error(Subjects::Selector::MissingSubjectSet,
             "no subject set is associated with this workflow")
         end
       end
@@ -50,7 +50,7 @@ RSpec.describe SubjectSelector do
 
       it 'should return the page_size number of subjects' do
         subject_queue
-        subjects, _ = subject.queued_subjects
+        subjects, _context = subject.queued_subjects
         expect(subjects.length).to eq(size)
       end
     end
@@ -71,13 +71,21 @@ RSpec.describe SubjectSelector do
         expect(subjects.length).to eq(5)
       end
 
-      context "when the database selection returns an empty set" do
+      context "when the database selection strategy returns an empty set" do
+        let(:non_logged_in_queue) do
+          create(:subject_queue,
+                 workflow: workflow,
+                 user: nil,
+                 subject_set: nil,
+                 set_member_subjects: smses)
+        end
 
-        it 'should raise the an error when ordering by an empty set' do
-          allow_any_instance_of(PostgresqlSelection).to receive(:select).and_return([])
+        it 'should fallback to the non-logged in queue data' do
+          allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return([])
           subject_queue
-          message = "No data available for selection"
-          expect { subject.queued_subjects }.to raise_error(SubjectSelector::EmptyDatabaseSelect, message)
+          non_logged_in_queue
+          subjects, _context = subject.queued_subjects
+          expect(smses.map(&:subject)).to include(*subjects)
         end
       end
     end
@@ -125,7 +133,7 @@ RSpec.describe SubjectSelector do
           it 'should create for logged out user' do
             expect(SubjectQueue).to receive(:create_for_user).with(workflow, nil, set_id: nil)
             #non-logged in queue won't exist
-            expect { subject.queued_subjects }.to raise_error(SubjectSelector::MissingSubjectQueue)
+            expect { subject.queued_subjects }.to raise_error(Subjects::Selector::MissingSubjectQueue)
           end
         end
 

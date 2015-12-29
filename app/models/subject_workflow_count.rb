@@ -7,6 +7,8 @@ class SubjectWorkflowCount < ActiveRecord::Base
   validates :subject, presence: true, uniqueness: {scope: :workflow_id}
   validates :workflow, presence: true
 
+  delegate :set_member_subjects, to: :subject
+
   def self.by_set(subject_set_id)
     joins(:subject => :set_member_subjects).where(set_member_subjects: {subject_set_id: subject_set_id})
   end
@@ -38,6 +40,6 @@ class SubjectWorkflowCount < ActiveRecord::Base
   end
 
   def set_member_subject_ids
-    subject.set_member_subjects.pluck(:id)
+    set_member_subjects.pluck(:id)
   end
 end
