@@ -70,22 +70,14 @@ class User < ActiveRecord::Base
   can_be_linked :collection, :scope_for, :update, :user
 
   pg_search_scope :search_name,
-    against: [:login, :display_name],
-    using: { tsearch: {
-      prefix: true,
-      tsvector_column: "tsv"
-      },
-      trigram: {}
-    },
-    :ranked_by => ":tsearch + (0.25 * :trigram)"
-
-  pg_search_scope :search_name_fast,
     against: [:login],
-    using: { tsearch: {
-      prefix: true,
-      tsvector_column: "tsv"
-      }
-    }
+    using: {
+      tsearch: {
+        tsvector_column: "tsv"
+      },
+      trigram: { threshold: 0.8 }
+    },
+    ranked_by: ":trigram + (0.25 * :tsearch)"
 
   def self.scope_for(action, user, opts={})
     case

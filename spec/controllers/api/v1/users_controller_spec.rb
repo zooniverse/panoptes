@@ -186,29 +186,28 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       describe "search" do
+        context "by display_name" do
+          context "matching login field " do
+            let(:display_name) { user.display_name }
+            let(:index_options) { { search: display_name } }
 
-        context "display_name" do
-          let(:index_options) { { search: user.display_name } }
-
-          it "should respond with the correct user", :aggregate_failures do
-            expect(json_response[api_resource_name].length).to eq(1)
-            expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+            it "should respond with the login user match", :aggregate_failures do
+              api_resources = json_response[api_resource_name]
+              expect(api_resources.length).to eq(1)
+              expect(api_resources[0]['display_name']).to eq(display_name)
+            end
           end
 
-          context "with a limited page size" do
-            let(:index_options) { { search: user.display_name, page_size: 1 } }
+          context "non-matching display_name or login" do
+            let(:index_options) { { search: "bill murray" } }
 
-            it "should respond with 1 item" do
-              expect(json_response[api_resource_name].length).to eq(1)
-            end
-
-            it "should respond with the correct item" do
-              expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+            it "should not return any data" do
+              expect(json_response[api_resource_name].length).to eq(0)
             end
           end
         end
 
-        context "login" do
+        context "by login" do
           let(:index_options) { { search: user.login } }
 
           it "should respond with the correct user", :aggregate_failures do
@@ -231,8 +230,8 @@ describe Api::V1::UsersController, type: :controller do
           context "with partial string" do
             let(:index_options) { { search: user.login[0..1] } }
 
-            it "should respond with both users" do
-              expect(json_response[api_resource_name].length).to eq(2)
+            it "should not find any users" do
+              expect(json_response[api_resource_name].length).to eq(0)
             end
           end
 
