@@ -73,11 +73,10 @@ class User < ActiveRecord::Base
     against: [:login],
     using: {
       tsearch: {
+        dictionary: "english",
         tsvector_column: "tsv"
-      },
-      trigram: { threshold: 0.8 }
-    },
-    ranked_by: ":trigram + (0.25 * :tsearch)"
+      }
+    }
 
   def self.scope_for(action, user, opts={})
     case

@@ -2513,24 +2513,17 @@ CREATE INDEX user_groups_display_name_trgm_index ON user_groups USING gist (disp
 
 
 --
--- Name: users_idx_trgm_login_display_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX users_idx_trgm_login_display_name ON users USING gin ((((COALESCE((login)::text, ''::text) || ' '::text) || COALESCE((display_name)::text, ''::text))) gin_trgm_ops);
-
-
---
--- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'login', 'display_name');
-
-
---
 -- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON projects FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
+
+
+--
+-- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'login');
 
 
 --
@@ -2844,6 +2837,8 @@ INSERT INTO schema_migrations (version) VALUES ('20151207111508');
 INSERT INTO schema_migrations (version) VALUES ('20151207145728');
 
 INSERT INTO schema_migrations (version) VALUES ('20151210134819');
+
+INSERT INTO schema_migrations (version) VALUES ('20151231123306');
 
 INSERT INTO schema_migrations (version) VALUES ('20160104131622');
 
