@@ -69,7 +69,7 @@ class User < ActiveRecord::Base
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :collection, :scope_for, :update, :user
 
-  pg_search_scope :search_login,
+  pg_search_scope :search_name,
     against: [:login],
     using: {
       tsearch: {
