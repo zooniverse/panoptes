@@ -21,7 +21,7 @@ class Api::V1::UsersController < Api::ApiController
     if login_search.exists?
       login_search
     else
-      query.search_name(search_names)
+      query.full_search_login(search_names)
     end
   end
 

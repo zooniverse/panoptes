@@ -2520,6 +2520,13 @@ CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON projects FOR EACH ROW E
 
 
 --
+-- Name: users_idx_trgm_login; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX users_idx_trgm_login ON users USING gin ((COALESCE((login)::text, ''::text)) gin_trgm_ops);
+
+
+--
 -- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
 --
 

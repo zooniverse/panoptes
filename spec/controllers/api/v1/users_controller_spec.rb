@@ -187,14 +187,12 @@ describe Api::V1::UsersController, type: :controller do
 
       describe "search" do
         context "by display_name" do
-          context "matching login field " do
+          context "fuzzy matching against the login field " do
             let(:display_name) { user.display_name }
             let(:index_options) { { search: display_name } }
 
-            it "should respond with the login user match", :aggregate_failures do
-              api_resources = json_response[api_resource_name]
-              expect(api_resources.length).to eq(1)
-              expect(api_resources[0]['display_name']).to eq(display_name)
+            it "should respond with both login matches" do
+              expect(json_response[api_resource_name].length).to eq(2)
             end
           end
 
@@ -223,25 +221,41 @@ describe Api::V1::UsersController, type: :controller do
             end
 
             it "should respond with the correct item" do
-              expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+              result = json_response[api_resource_name][0]['display_name']
+              expect(result).to eq(user.display_name)
             end
           end
 
-          context "with partial string" do
-            let(:index_options) { { search: user.login[0..1] } }
+          context "with partial strings" do
+            let(:index_options) { { search: partial } }
 
-            it "should not find any users" do
-              expect(json_response[api_resource_name].length).to eq(0)
+            context "partials that don't hit any trigrams" do
+              let(:partial) { user.login[0..1] }
+
+              it "should not find any users" do
+                expect(json_response[api_resource_name].length).to eq(0)
+              end
+            end
+
+            context "partials that match the trigrams" do
+              let(:partial) { user.login[0..2] }
+
+              it "should find both users" do
+                expect(json_response[api_resource_name].length).to eq(2)
+              end
             end
           end
 
           context "with hard to find tsvector" do
             let(:hard_name) { "S_Powell" }
-            let(:hard_user) { create(:user, login: hard_name, display_name: hard_name )}
+            let(:hard_user) do
+              create(:user, login: hard_name, display_name: hard_name)
+            end
             let(:index_options) { { search: hard_user.login } }
 
             it "should respond with the hard user" do
-              expect(created_instance_id(api_resource_name)).to eq(hard_user.id.to_s)
+              result_id = created_instance_id(api_resource_name)
+              expect(result_id).to eq(hard_user.id.to_s)
             end
           end
         end
