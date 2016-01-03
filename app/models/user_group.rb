@@ -45,7 +45,7 @@ class UserGroup < ActiveRecord::Base
               roles: [ :group_admin, :collection_editor ]
 
   pg_search_scope :search_name,
-    against: [:name, :display_name],
+    against: :display_name,
     using: :trigram,
     ranked_by: ":trigram"
 
