@@ -28,6 +28,6 @@ class Collection < ActiveRecord::Base
 
   pg_search_scope :search_display_name,
     against: :display_name,
-    using: { trigram: { threshold: 0.1 } },
+    using: :trigram,
     ranked_by: ":trigram"
 end
