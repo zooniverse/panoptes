@@ -1792,13 +1792,6 @@ CREATE UNIQUE INDEX classification_subjects_pk ON classification_subjects USING 
 
 
 --
--- Name: collections_display_name_trgm_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX collections_display_name_trgm_index ON collections USING gist (display_name gist_trgm_ops);
-
-
---
 -- Name: idx_lower_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1922,6 +1915,13 @@ CREATE INDEX index_classifications_on_workflow_id ON classifications USING btree
 --
 
 CREATE INDEX index_classifications_on_workflow_version ON classifications USING btree (workflow_version);
+
+
+--
+-- Name: index_collections_display_name_trgrm; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_collections_display_name_trgrm ON collections USING gin ((COALESCE((display_name)::text, ''::text)) gin_trgm_ops);
 
 
 --
@@ -2062,6 +2062,13 @@ CREATE INDEX index_project_pages_on_language ON project_pages USING btree (langu
 --
 
 CREATE INDEX index_project_pages_on_project_id ON project_pages USING btree (project_id);
+
+
+--
+-- Name: index_projects_display_name_trgrm; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_projects_display_name_trgrm ON projects USING gin ((COALESCE((display_name)::text, ''::text)) gin_trgm_ops);
 
 
 --
@@ -2317,6 +2324,13 @@ CREATE INDEX index_user_collection_preferences_on_user_id ON user_collection_pre
 
 
 --
+-- Name: index_user_groups_display_name_trgrm; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_user_groups_display_name_trgrm ON user_groups USING gin ((COALESCE((display_name)::text, ''::text)) gin_trgm_ops);
+
+
+--
 -- Name: index_user_groups_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2485,13 +2499,6 @@ CREATE INDEX index_workflows_on_tutorial_subject_id ON workflows USING btree (tu
 
 
 --
--- Name: projects_display_name_trgm_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX projects_display_name_trgm_index ON projects USING gist (display_name gist_trgm_ops);
-
-
---
 -- Name: tags_name_trgm_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2503,13 +2510,6 @@ CREATE INDEX tags_name_trgm_idx ON tags USING gin (name gin_trgm_ops);
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
-
-
---
--- Name: user_groups_display_name_trgm_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX user_groups_display_name_trgm_index ON user_groups USING gist (display_name gist_trgm_ops);
 
 
 --
@@ -2846,6 +2846,8 @@ INSERT INTO schema_migrations (version) VALUES ('20151207145728');
 INSERT INTO schema_migrations (version) VALUES ('20151210134819');
 
 INSERT INTO schema_migrations (version) VALUES ('20151231123306');
+
+INSERT INTO schema_migrations (version) VALUES ('20160103142817');
 
 INSERT INTO schema_migrations (version) VALUES ('20160104131622');
 
