@@ -160,7 +160,7 @@ class User < ActiveRecord::Base
   end
 
   def self.find_by_lower_login(login)
-    find_by("lower(login) = '#{login.downcase}'")
+    find_by("lower(login) = ?", login.downcase)
   end
 
   def subject_limit

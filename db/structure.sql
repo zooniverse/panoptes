@@ -2513,17 +2513,17 @@ CREATE INDEX user_groups_display_name_trgm_index ON user_groups USING gist (disp
 
 
 --
--- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON projects FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
-
-
---
 -- Name: users_idx_trgm_login; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX users_idx_trgm_login ON users USING gin ((COALESCE((login)::text, ''::text)) gin_trgm_ops);
+
+
+--
+-- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON projects FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
 
 
 --

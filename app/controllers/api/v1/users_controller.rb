@@ -17,7 +17,7 @@ class Api::V1::UsersController < Api::ApiController
 
   search_by do |name, query|
     search_names = name.join(" ")
-    login_search = query.where("lower(login) = '#{search_names.downcase}'")
+    login_search = query.where("lower(login) = ?", search_names.downcase)
     if login_search.exists?
       login_search
     else
