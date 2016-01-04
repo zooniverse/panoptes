@@ -24,6 +24,10 @@ class Classification < ActiveRecord::Base
   scope :complete, -> { where(completed: true) }
   scope :gold_standard, -> { where(gold_standard: true) }
 
+  def self.columns
+    super.reject {|c| c.name == "subject_ids" }
+  end
+
   def self.scope_for(action, user, opts={})
     return all if user.is_admin?
     case action

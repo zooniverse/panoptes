@@ -9,6 +9,10 @@ class SubjectWorkflowCount < ActiveRecord::Base
 
   delegate :set_member_subjects, to: :subject
 
+  def self.columns
+    super.reject {|c| c.name == "set_member_subject_id" }
+  end
+
   def self.by_set(subject_set_id)
     joins(:subject => :set_member_subjects).where(set_member_subjects: {subject_set_id: subject_set_id})
   end
