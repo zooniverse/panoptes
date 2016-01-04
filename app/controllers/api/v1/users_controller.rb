@@ -17,11 +17,11 @@ class Api::V1::UsersController < Api::ApiController
 
   search_by do |name, query|
     search_names = name.join(" ")
-    fast_search = query.search_name_fast(search_names)
-    if fast_search.exists?
-      fast_search
+    login_search = query.where("lower(login) = ?", search_names.downcase)
+    if login_search.exists?
+      login_search
     else
-      query.search_name(search_names)
+      query.full_search_login(search_names)
     end
   end
 

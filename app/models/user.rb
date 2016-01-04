@@ -69,23 +69,29 @@ class User < ActiveRecord::Base
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :collection, :scope_for, :update, :user
 
-  pg_search_scope :search_name,
-    against: [:login, :display_name],
-    using: { tsearch: {
-      prefix: true,
-      tsvector_column: "tsv"
+  pg_search_scope :search_login,
+    against: [:login],
+    using: {
+      tsearch: {
+        dictionary: "english",
+        tsvector_column: "tsv"
+      }
+    }
+
+  pg_search_scope :fuzzy_search_login,
+    against: [:login],
+    using: { trigram: {} }
+
+  pg_search_scope :full_search_login,
+    against: [:login],
+    using: {
+      tsearch: {
+        dictionary: "english",
+        tsvector_column: "tsv"
       },
       trigram: {}
     },
-    :ranked_by => ":tsearch + (0.25 * :trigram)"
-
-  pg_search_scope :search_name_fast,
-    against: [:login],
-    using: { tsearch: {
-      prefix: true,
-      tsvector_column: "tsv"
-      }
-    }
+    ranked_by: ":tsearch + (0.25 * :trigram)"
 
   def self.scope_for(action, user, opts={})
     case
@@ -154,7 +160,7 @@ class User < ActiveRecord::Base
   end
 
   def self.find_by_lower_login(login)
-    find_by("lower(login) = '#{login.downcase}'")
+    find_by("lower(login) = ?", login.downcase)
   end
 
   def subject_limit
