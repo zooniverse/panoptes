@@ -187,7 +187,6 @@ CREATE TABLE classifications (
     gold_standard boolean,
     expert_classifier integer,
     metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
-    subject_ids integer[] DEFAULT '{}'::integer[],
     workflow_version text
 );
 
@@ -810,7 +809,6 @@ ALTER SEQUENCE subject_sets_workflows_id_seq OWNED BY subject_sets_workflows.id;
 
 CREATE TABLE subject_workflow_counts (
     id integer NOT NULL,
-    set_member_subject_id integer,
     workflow_id integer,
     classifications_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
@@ -2228,20 +2226,6 @@ CREATE UNIQUE INDEX index_subject_sets_workflows_on_workflow_id_and_subject_set_
 
 
 --
--- Name: index_subject_workflow_counts_on_set_member_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_subject_workflow_counts_on_set_member_subject_id ON subject_workflow_counts USING btree (set_member_subject_id);
-
-
---
--- Name: index_subject_workflow_counts_on_sms_id_and_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_subject_workflow_counts_on_sms_id_and_workflow_id ON subject_workflow_counts USING btree (set_member_subject_id, workflow_id);
-
-
---
 -- Name: index_subject_workflow_counts_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2614,14 +2598,6 @@ ALTER TABLE ONLY subject_sets_workflows
 
 
 --
--- Name: fk_rails_cb0278cc1a; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY subject_workflow_counts
-    ADD CONSTRAINT fk_rails_cb0278cc1a FOREIGN KEY (set_member_subject_id) REFERENCES set_member_subjects(id);
-
-
---
 -- Name: fk_rails_d6fe15ec78; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2868,4 +2844,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151207111508');
 INSERT INTO schema_migrations (version) VALUES ('20151207145728');
 
 INSERT INTO schema_migrations (version) VALUES ('20151210134819');
+
+INSERT INTO schema_migrations (version) VALUES ('20160104131622');
 
