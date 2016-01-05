@@ -2,12 +2,12 @@ module Subjects
   class PostgresqlSelection
     attr_reader :workflow, :user, :opts
 
-    def initialize(workflow, user=nil)
-      @workflow, @user = workflow, user
+    def initialize(workflow, user=nil, options={})
+      @workflow, @user, @opts = workflow, user, options
     end
 
-    def select(options={})
-      @opts = options
+    def select(limit_override=nil)
+      @limit_override = limit_override
       results = case selection_strategy
       when :in_order
         select_results_in_order
@@ -17,8 +17,8 @@ module Subjects
       results.take(limit)
     end
 
-    def any_workflow_data(options={})
-      @opts = options
+    def any_workflow_data(limit_override=nil)
+      @limit_override = limit_override
       any_workflow_data_scope
       .order(random: [:asc, :desc].sample)
       .limit(limit)
@@ -58,7 +58,11 @@ module Subjects
     end
 
     def limit
-      @limit ||= opts.fetch(:limit, 20).to_i
+      if @limit_override
+        @limit_override
+      else
+        @limit ||= opts.fetch(:limit, 20).to_i
+      end
     end
 
     def selection_strategy

@@ -56,8 +56,8 @@ class EnqueueSubjectQueueWorker
   end
 
   def default_strategy_sms_ids
-    Subjects::PostgresqlSelection.new(workflow, user)
-    .select(limit: limit, subject_set_id: subject_set_id)
+    opts = { limit: limit, subject_set_id: subject_set_id }
+    Subjects::PostgresqlSelection.new(workflow, user, opts).select
   end
 
   def workflow_strategy

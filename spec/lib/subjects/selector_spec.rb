@@ -83,13 +83,12 @@ RSpec.describe Subjects::Selector do
         before do
           allow_any_instance_of(Subjects::PostgresqlSelection)
           .to receive(:select).and_return([])
+          expect_any_instance_of(Subjects::PostgresqlSelection)
+            .to receive(:any_workflow_data)
+            .and_call_original
         end
 
         it 'should fallback to selecting some data' do
-          expect_any_instance_of(Subjects::PostgresqlSelection)
-            .to receive(:any_workflow_data)
-            .with(limit: 5, subject_set_id: nil)
-            .and_call_original
           subjects, _context = subject.queued_subjects
         end
 
@@ -99,10 +98,6 @@ RSpec.describe Subjects::Selector do
 
           it 'should fallback to selecting some grouped data' do
             allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
-            expect_any_instance_of(Subjects::PostgresqlSelection)
-              .to receive(:any_workflow_data)
-              .with(limit: 5, subject_set_id: subject_set_id)
-              .and_call_original
             subjects, _context = subject.queued_subjects
           end
         end

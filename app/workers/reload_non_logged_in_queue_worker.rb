@@ -17,7 +17,7 @@ class ReloadNonLoggedInQueueWorker
   private
 
   def selected_subject_ids(workflow, subject_set_id)
-    Subjects::PostgresqlSelection.new(workflow, nil)
-    .select(limit: SubjectQueue::DEFAULT_LENGTH, subject_set_id: subject_set_id)
+    opts = { limit: SubjectQueue::DEFAULT_LENGTH, subject_set_id: subject_set_id }
+    Subjects::PostgresqlSelection.new(workflow, nil, opts).select
   end
 end

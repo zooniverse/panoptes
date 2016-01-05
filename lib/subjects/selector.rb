@@ -40,11 +40,11 @@ module Subjects
     end
 
     def fallback_selection(limit=5)
-      selector = PostgresqlSelection.new(workflow, user.user)
       opts = { limit: limit, subject_set_id: subject_set_id }
-      sms_ids = selector.select(opts)
+      selector = PostgresqlSelection.new(workflow, user.user, opts)
+      sms_ids = selector.select
       return sms_ids unless sms_ids.blank?
-      selector.any_workflow_data(opts)
+      selector.any_workflow_data
     end
 
     def needs_set_id?

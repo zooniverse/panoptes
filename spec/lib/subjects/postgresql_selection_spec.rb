@@ -9,7 +9,9 @@ RSpec.describe Subjects::PostgresqlSelection do
   end
 
   shared_examples "select for incomplete_project" do
-    let(:args) { {} }
+    let(:args) { opts }
+    subject { Subjects::PostgresqlSelection.new(workflow, user, args) }
+
     let(:sms_scope) do
       if ss_id = args[:subject_set_id]
         SetMemberSubject.where(subject_set_id: ss_id)
@@ -17,6 +19,7 @@ RSpec.describe Subjects::PostgresqlSelection do
         SetMemberSubject.all
       end
     end
+
     let(:unseen_count) do
       _seen_count = if ss_id = args[:subject_set_id]
         group_sms = SetMemberSubject.where(subject_set_id: ss_id)
@@ -29,25 +32,35 @@ RSpec.describe Subjects::PostgresqlSelection do
 
     context "when a user has only seen a few subjects" do
       let(:seen_count) { 5 }
+      let(:limit) { nil }
+      let(:args) { opts.merge(limit: limit) }
       let!(:uss) do
         subject_ids = sms_scope.sample(seen_count).map(&:subject_id)
         create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
       end
 
-      it 'should return an unseen subject' do
-        expect(uss.subject_ids).to_not include(subject.select(**args.merge(limit: 1)).first)
+      context "with a limit of 1" do
+        let(:limit) { 1 }
+
+        it 'should return an unseen subject' do
+          expect(uss.subject_ids).to_not include(subject.select.first)
+        end
       end
 
-      it 'should no have duplicates' do
-        result = subject.select(**args.merge(limit: 10))
-        expect(result).to match_array(result.to_a.uniq)
+      context "with a limit of 10" do
+        let(:limit) { 10 }
+
+        it 'should no have duplicates' do
+          result = subject.select
+          expect(result).to match_array(result.to_a.uniq)
+        end
       end
 
       #account for the loop cut off limit constructing the random sample
       it 'should always return an approximate sample of subjects up to the unseen limit' do
         unseen_count.times do |n|
           limit = n+1
-          results_size = subject.select(**args.merge(limit: limit)).length
+          results_size = subject.select(limit).length
           expect(results_size).to be_between(results_size, limit).inclusive
         end
       end
@@ -63,7 +76,7 @@ RSpec.describe Subjects::PostgresqlSelection do
       it 'should return as many subjects as possible' do
         unseen_count.times do |n|
           limit = n+unseen_count
-          results_size = subject.select(**args.merge(limit: limit)).length
+          results_size = subject.select(limit).length
           expect(results_size).to be_between(results_size, limit).inclusive
         end
       end
@@ -74,6 +87,8 @@ RSpec.describe Subjects::PostgresqlSelection do
     let(:user) { User.first }
     let(:workflow) { Workflow.first }
     let(:sms) { SetMemberSubject.all }
+    let(:opts) { {} }
+    subject { Subjects::PostgresqlSelection.new(workflow, user, opts) }
 
     before(:all) do
       uploader = create(:user)
@@ -88,8 +103,6 @@ RSpec.describe Subjects::PostgresqlSelection do
 
     describe "#select" do
       describe "random selection" do
-        subject { Subjects::PostgresqlSelection.new(workflow, user) }
-
         it_behaves_like "select for incomplete_project"
 
         it "should reassign the random attribute after selection" do
@@ -108,31 +121,29 @@ RSpec.describe Subjects::PostgresqlSelection do
       end
 
       context "grouped selection" do
-        subject { Subjects::PostgresqlSelection.new(workflow, user) }
-
+        let(:subject_set_id) { workflow.subject_sets.first.id }
+        let(:opts) { {subject_set_id: subject_set_id} }
         before(:each) do
           allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
         end
 
-        it_behaves_like "select for incomplete_project" do
-          let(:args) { {subject_set_id: workflow.subject_sets.first.id} }
-        end
+        it_behaves_like "select for incomplete_project"
 
         it 'should only select subjects in the specified group' do
           create(:user_seen_subject,
                  user: user,
                  subject_ids: sms.sample(5).map(&:subject_id),
                  workflow: workflow)
-          set_id = workflow.subject_sets.first.id
-          result_ids = subject.select(subject_set_id: set_id)
+          result_ids = subject.select
           sms_subject_ids = SetMemberSubject.where(id: result_ids).pluck(:subject_set_id)
-          expect(sms_subject_ids).to all( eq(set_id) )
+          expect(sms_subject_ids).to all( eq(subject_set_id) )
         end
       end
 
       describe "priority selection" do
-        subject { Subjects::PostgresqlSelection.new(workflow, user) }
         let(:ordered) { sms.order(priority: :asc).pluck(:id) }
+        let(:limit) { ordered.size }
+        let(:opts) { { limit: limit } }
 
         before(:each) do
           update_sms_priorities
@@ -142,26 +153,36 @@ RSpec.describe Subjects::PostgresqlSelection do
         it_behaves_like "select for incomplete_project"
 
         it 'should select subjects in asc order of the priority field' do
-          result = subject.select(limit: ordered.size)
+          result = subject.select
           expect(result).to eq(ordered)
         end
 
-        it 'should ignore any order param on the priority field' do
-          result = subject.select(limit: ordered.size, order: :desc)
-          expect(result).to eq(ordered)
+        context "with order by param" do
+          let(:opts) { { limit: ordered.size, order: :desc } }
+
+          it 'should ignore any order param on the priority field' do
+            result = subject.select
+            expect(result).to eq(ordered)
+          end
         end
 
-        it 'should allow negative numbers to prepend the sort list' do
-          sms_subject = create(:subject,project: workflow.project, uploader: user)
-          sms = create(:set_member_subject, subject: sms_subject,
-            subject_set: workflow.subject_sets.first, priority: -10.to_f)
-          first_id = subject.select(limit: 1).first
-          expect(first_id).to eq(sms.id)
+        context "with 1 limit for prepend test" do
+          let(:limit) { 1 }
+
+          it 'should allow negative numbers to prepend the sort list' do
+            sms_subject = create(:subject,project: workflow.project, uploader: user)
+            sms = create(:set_member_subject, subject: sms_subject,
+              subject_set: workflow.subject_sets.first, priority: -10.to_f)
+            first_id = subject.select.first
+            expect(first_id).to eq(sms.id)
+          end
         end
       end
 
       describe "priority and grouped selection" do
-        subject { Subjects::PostgresqlSelection.new(workflow, user) }
+        let(:opts) { { subject_set_id: subject_set_id } }
+        let(:subject_set_id) { SubjectSet.first.id }
+        let(:sms) { SetMemberSubject.where(subject_set_id: subject_set_id) }
 
         before(:each) do
           %i( prioritized grouped ).each do |method|
@@ -179,15 +200,10 @@ RSpec.describe Subjects::PostgresqlSelection do
           end
         end
 
-        let(:subject_set_id) { SubjectSet.first.id }
-        let(:sms) { SetMemberSubject.where(subject_set_id: subject_set_id) }
-
-        it_behaves_like "select for incomplete_project" do
-          let(:args) { {subject_set_id: subject_set_id} }
-        end
+        it_behaves_like "select for incomplete_project"
 
         it 'should only select subjects in the specified group' do
-          result = subject.select(subject_set_id: subject_set_id)
+          result = subject.select
           ordered = sms.limit(result.length).order(priority: :asc).pluck(:id)
           expect(result).to eq(ordered)
         end
@@ -195,11 +211,10 @@ RSpec.describe Subjects::PostgresqlSelection do
     end
 
     describe "#any_workflow_data" do
-      subject { Subjects::PostgresqlSelection.new(workflow, user) }
       let(:subject_set_id) { nil }
       let(:opts) { { limit: 5, subject_set_id: subject_set_id } }
       let(:expected_ids) { workflow.subjects.pluck("subjects.id") }
-      let(:subject_ids) { subject.any_workflow_data(opts) }
+      let(:subject_ids) { subject.any_workflow_data }
 
       it "should select some data from the workflow" do
         expect(expected_ids).to include(*subject_ids)
