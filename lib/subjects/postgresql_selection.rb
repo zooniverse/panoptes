@@ -17,6 +17,15 @@ module Subjects
       results.take(limit)
     end
 
+    def any_workflow_data(options={})
+      @opts = options
+      any_workflow_data_scope
+      .order(random: [:asc, :desc].sample)
+      .limit(limit)
+      .pluck("set_member_subjects.id")
+      .shuffle
+    end
+
     private
 
     def available
@@ -79,6 +88,19 @@ module Subjects
 
     def reassign_random?
       rand < Panoptes::SubjectSelection.index_rebuild_rate
+    end
+
+    def any_workflow_data_scope
+      scope = workflow.set_member_subjects
+      if workflow.grouped
+        if subject_set_id = opts[:subject_set_id]
+          scope = scope.where(subject_set_id: subject_set_id)
+        else
+          msg = "subject_set_id parameter missing for grouped workflow"
+          raise Subjects::Selector::MissingParameter.new(msg)
+        end
+      end
+      scope
     end
   end
 end

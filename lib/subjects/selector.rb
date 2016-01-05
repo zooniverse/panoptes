@@ -39,11 +39,12 @@ module Subjects
       end
     end
 
-    def fallback_selection(select_limit=5)
-      sms_ids = PostgresqlSelection.new(workflow, user.user)
-        .select(limit: select_limit, subject_set_id: subject_set_id)
+    def fallback_selection(limit=5)
+      selector = PostgresqlSelection.new(workflow, user.user)
+      opts = { limit: limit, subject_set_id: subject_set_id }
+      sms_ids = selector.select(opts)
       return sms_ids unless sms_ids.blank?
-      select_some_workflow_sms_ids(select_limit)
+      selector.any_workflow_data(opts)
     end
 
     def needs_set_id?
@@ -106,17 +107,6 @@ module Subjects
       if queue_user
         DequeueSubjectQueueWorker.perform_async(workflow.id, sms_ids, queue_user.try(:id), subject_set_id)
       end
-    end
-
-    def select_some_workflow_sms_ids(select_limit)
-      fallback_scope = workflow.set_member_subjects
-      if workflow.grouped
-        fallback_scope = fallback_scope.where(subject_set_id: subject_set_id)
-      end
-      fallback_scope
-      .order(random: [:asc, :desc].sample)
-      .limit(select_limit)
-      .pluck("set_member_subjects.id")
     end
   end
 end
