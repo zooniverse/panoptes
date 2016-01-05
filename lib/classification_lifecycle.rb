@@ -89,7 +89,9 @@ class ClassificationLifecycle
       event_time: classification.updated_at,
       classification_id: classification.id,
       project_id: classification.project.id,
-      user_id: Digest::SHA1.hexdigest(classification.user_id.to_s || classification.user_ip.to_s))
+      user_id: Digest::SHA1.hexdigest(classification.user_id.to_s || classification.user_ip.to_s),
+      _ip_address: classification.user_ip.to_s
+    )
   end
 
   def update_classification_data
