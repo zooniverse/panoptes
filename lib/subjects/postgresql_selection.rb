@@ -2,12 +2,12 @@ module Subjects
   class PostgresqlSelection
     attr_reader :workflow, :user, :opts
 
-    def initialize(workflow, user=nil)
-      @workflow, @user = workflow, user
+    def initialize(workflow, user=nil, options={})
+      @workflow, @user, @opts = workflow, user, options
     end
 
-    def select(options={})
-      @opts = options
+    def select(limit_override=nil)
+      @limit_override = limit_override
       results = case selection_strategy
       when :in_order
         select_results_in_order
@@ -15,6 +15,15 @@ module Subjects
         select_results_randomly
       end
       results.take(limit)
+    end
+
+    def any_workflow_data(limit_override=nil)
+      @limit_override = limit_override
+      any_workflow_data_scope
+      .order(random: [:asc, :desc].sample)
+      .limit(limit)
+      .pluck("set_member_subjects.id")
+      .shuffle
     end
 
     private
@@ -49,7 +58,11 @@ module Subjects
     end
 
     def limit
-      @limit ||= opts.fetch(:limit, 20).to_i
+      if @limit_override
+        @limit_override
+      else
+        @limit ||= opts.fetch(:limit, 20).to_i
+      end
     end
 
     def selection_strategy
@@ -79,6 +92,19 @@ module Subjects
 
     def reassign_random?
       rand < Panoptes::SubjectSelection.index_rebuild_rate
+    end
+
+    def any_workflow_data_scope
+      scope = workflow.set_member_subjects
+      if workflow.grouped
+        if subject_set_id = opts[:subject_set_id]
+          scope = scope.where(subject_set_id: subject_set_id)
+        else
+          msg = "subject_set_id parameter missing for grouped workflow"
+          raise Subjects::Selector::MissingParameter.new(msg)
+        end
+      end
+      scope
     end
   end
 end

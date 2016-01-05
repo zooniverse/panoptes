@@ -4,7 +4,7 @@ RSpec.describe Subjects::Selector do
   let(:workflow) { create(:workflow_with_subjects) }
   let(:user) { ApiUser.new(create(:user)) }
   let(:smses) { create_list(:set_member_subject, 10).reverse }
-
+  let(:params) { {} }
   let(:subject_queue) do
     create(:subject_queue,
            workflow: workflow,
@@ -13,7 +13,7 @@ RSpec.describe Subjects::Selector do
            set_member_subjects: smses)
   end
 
-  subject { described_class.new(user, workflow, {}, Subject.all)}
+  subject { described_class.new(user, workflow, params, Subject.all)}
 
   describe "#queued_subjects" do
 
@@ -45,7 +45,8 @@ RSpec.describe Subjects::Selector do
     context "when the params page size is set as a string" do
       let(:size) { 2 }
       subject do
-        described_class.new(user, workflow, {page_size: "#{size}"}, Subject.all)
+        params = { page_size: "#{size}" }
+        described_class.new(user, workflow, params, Subject.all)
       end
 
       it 'should return the page_size number of subjects' do
@@ -60,32 +61,45 @@ RSpec.describe Subjects::Selector do
         create(:subject_queue,
                workflow: workflow,
                user: user.user,
-               subject_set: nil,
+               subject_set: queue_subject_set,
                set_member_subjects: [])
       end
-      let!(:subjects) { create_list(:set_member_subject, 10, subject_set: workflow.subject_sets.first) }
+      let(:subject_set) { workflow.subject_sets.first }
+      let(:queue_subject_set) { nil }
+
+      before do
+        create_list(:set_member_subject, 10, subject_set: subject_set)
+        subject_queue
+      end
 
       it 'should return 5 subjects' do
-        subject_queue
         subjects, _ = subject.queued_subjects
         expect(subjects.length).to eq(5)
       end
 
       context "when the database selection strategy returns an empty set" do
-        let(:non_logged_in_queue) do
-          create(:subject_queue,
-                 workflow: workflow,
-                 user: nil,
-                 subject_set: nil,
-                 set_member_subjects: smses)
+        let(:queue_subject_set) { subject_set }
+
+        before do
+          allow_any_instance_of(Subjects::PostgresqlSelection)
+          .to receive(:select).and_return([])
+          expect_any_instance_of(Subjects::PostgresqlSelection)
+            .to receive(:any_workflow_data)
+            .and_call_original
         end
 
-        it 'should fallback to the non-logged in queue data' do
-          allow_any_instance_of(Subjects::PostgresqlSelection).to receive(:select).and_return([])
-          subject_queue
-          non_logged_in_queue
+        it 'should fallback to selecting some data' do
           subjects, _context = subject.queued_subjects
-          expect(smses.map(&:subject)).to include(*subjects)
+        end
+
+        context "and the workflow is grouped" do
+          let(:subject_set_id) { subject_set.id }
+          let(:params) { { subject_set_id: subject_set_id } }
+
+          it 'should fallback to selecting some grouped data' do
+            allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
+            subjects, _context = subject.queued_subjects
+          end
         end
       end
     end

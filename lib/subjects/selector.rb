@@ -39,15 +39,12 @@ module Subjects
       end
     end
 
-    def fallback_selection
-      select_limit = 5
-      sms_ids = PostgresqlSelection.new(workflow, user.user)
-        .select(limit: select_limit, subject_set_id: subject_set_id)
-      if sms_ids.blank?
-        non_logged_in_queue = find_subject_queue(nil)
-        sms_ids = non_logged_in_queue.next_subjects(select_limit)
-      end
-      sms_ids
+    def fallback_selection(limit=5)
+      opts = { limit: limit, subject_set_id: subject_set_id }
+      selector = PostgresqlSelection.new(workflow, user.user, opts)
+      sms_ids = selector.select
+      return sms_ids unless sms_ids.blank?
+      selector.any_workflow_data
     end
 
     def needs_set_id?
