@@ -111,7 +111,7 @@ RSpec.describe FastProjectSerializer, type: :serializer do
       expect(subject).to include 'page_count' => 3
       expect(subject).to include 'previous_page' => 1
       expect(subject).to include 'next_page' => 3
-      expect(subject).to include 'first_href' => '/projects?homepage=true'
+      expect(subject).to include 'first_href' => '/projects?simple=true'
       expect(subject.keys).to include 'previous_href', 'next_href', 'last_href'
     end
   end
@@ -127,7 +127,7 @@ RSpec.describe FastProjectSerializer, type: :serializer do
 
     context 'when the page does exist' do
       let(:page){ 123 }
-      it{ is_expected.to eql '/projects?homepage=true&page=123&page_size=2' }
+      it{ is_expected.to eql '/projects?simple=true&page=123&page_size=2' }
     end
   end
 

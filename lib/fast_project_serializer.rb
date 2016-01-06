@@ -40,7 +40,7 @@ class FastProjectSerializer
         'page_count' => paginated.total_pages,
         'previous_page' => paginated.prev_page,
         'next_page' => paginated.next_page,
-        'first_href' => '/projects?homepage=true',
+        'first_href' => '/projects?simple=true',
         'previous_href' => page_href(paginated.prev_page),
         'next_href' => page_href(paginated.next_page),
         'last_href' => page_href(paginated.total_pages)
@@ -50,7 +50,7 @@ class FastProjectSerializer
 
   def page_href(page_number)
     return unless page_number
-    "/projects?homepage=true&page=#{ page_number }&page_size=#{ page_size }"
+    "/projects?simple=true&page=#{ page_number }&page_size=#{ page_size }"
   end
 
   def project_data(project)

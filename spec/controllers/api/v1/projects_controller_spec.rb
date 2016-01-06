@@ -898,17 +898,17 @@ describe Api::V1::ProjectsController, type: :controller do
   describe '#index' do
     before(:each){ set_accept }
 
-    context 'without the homepage param' do
+    context 'without the simple param' do
       it 'should bypass the index action' do
         expect(subject).to_not receive :fast_index
         get :index
       end
     end
 
-    context 'with the homepage param' do
+    context 'with the simple param' do
       it 'should bypass the index action' do
         expect(subject).to receive(:fast_index).and_call_original
-        get :index, homepage: true
+        get :index, simple: true
       end
     end
   end
@@ -918,11 +918,11 @@ describe Api::V1::ProjectsController, type: :controller do
 
     it 'should use the fast serializer' do
       expect(FastProjectSerializer).to receive_message_chain 'new.serialize'
-      get :index, homepage: true
+      get :index, simple: true
     end
 
     it 'should render properly' do
-      get :index, homepage: true
+      get :index, simple: true
       expect(response).to be_ok
     end
   end

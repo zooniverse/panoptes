@@ -48,7 +48,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def index
-    return fast_index if params[:homepage]
+    return fast_index if params[:simple]
     unless params.has_key?(:sort)
       @controlled_resources = case
                               when params.has_key?(:launch_approved)
