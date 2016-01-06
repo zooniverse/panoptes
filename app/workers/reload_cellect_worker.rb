@@ -2,8 +2,10 @@ class ReloadCellectWorker
   include Sidekiq::Worker
 
   def perform(workflow_id)
-    return unless Panoptes.cellect_on
-    Subjects::CellectClient.reload_workflow(workflow_id)
-  rescue Subjects::CellectClient::ConnectionError
+    workflow = Workflow.find(workflow_id)
+    if Panoptes.use_cellect?(workflow)
+      Subjects::CellectClient.reload_workflow(workflow_id)
+    end
+  rescue Subjects::CellectClient::ConnectionError, ActiveRecord::RecordNotFound
   end
 end

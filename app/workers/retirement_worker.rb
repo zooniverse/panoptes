@@ -31,10 +31,11 @@ class RetirementWorker
   end
 
   def notify_cellect(count)
-    return unless Panoptes.cellect_on
-    count.set_member_subjects.each do |sms|
-      cellect_params = [ sms.subject_id, count.workflow.id, sms.subject_set_id ]
-      Subjects::CellectClient.remove_subject(*cellect_params)
+    if Panoptes.use_cellect?(count.workflow)
+      count.set_member_subjects.each do |sms|
+        cellect_params = [ sms.subject_id, count.workflow.id, sms.subject_set_id ]
+        Subjects::CellectClient.remove_subject(*cellect_params)
+      end
     end
   rescue Subjects::CellectClient::ConnectionError
   end

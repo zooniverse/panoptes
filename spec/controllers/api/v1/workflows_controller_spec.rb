@@ -230,10 +230,21 @@ describe Api::V1::WorkflowsController, type: :controller do
             expect(ReloadCellectWorker).not_to receive(:perform_async)
           end
 
-          it 'should call the reload cellect worker when cellect is on' do
-            allow(Panoptes).to receive(:cellect_on).and_return(true)
-            expect(ReloadCellectWorker).to receive(:perform_async)
-            .with(resource.id)
+          context "when cellect is on" do
+            before do
+              allow(Panoptes).to receive(:cellect_on).and_return(true)
+            end
+
+            it 'should not call reload cellect worker' do
+              expect(ReloadCellectWorker).not_to receive(:perform_async)
+            end
+
+            it 'should call reload cellect worker when workflow uses cellect' do
+              allow_any_instance_of(Workflow)
+                .to receive(:using_cellect?).and_return(true)
+              expect(ReloadCellectWorker).to receive(:perform_async)
+                .with(resource.id)
+            end
           end
         end
 
@@ -246,8 +257,8 @@ describe Api::V1::WorkflowsController, type: :controller do
             post :update_links, update_link_params
           end
 
-          it 'should not call the reload cellect worker when cellect is on' do
-            allow(Panoptes).to receive(:cellect_on).and_return(true)
+          it 'should not attempt to call cellect', :aggregate_failures do
+            expect(Panoptes).not_to receive(:use_cellect?)
             expect(ReloadCellectWorker).not_to receive(:perform_async)
           end
         end
@@ -260,8 +271,8 @@ describe Api::V1::WorkflowsController, type: :controller do
           post :update_links, update_link_params
         end
 
-        it 'should not call the reload cellect worker when cellect is on' do
-          allow(Panoptes).to receive(:cellect_on).and_return(true)
+        it 'should not attempt to call cellect', :aggregate_failures do
+          expect(Panoptes).not_to receive(:use_cellect?)
           expect(ReloadCellectWorker).not_to receive(:perform_async)
         end
       end
