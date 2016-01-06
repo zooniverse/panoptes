@@ -98,6 +98,7 @@ class ClassificationLifecycle
     mark_expert_classifier
     add_seen_before_for_user
     add_project_live_state
+    add_lifecycled_at
     classification.save!
   end
 
@@ -127,6 +128,10 @@ class ClassificationLifecycle
 
   def add_project_live_state
     update_classification_metadata(:live_project, project.live)
+  end
+
+  def add_lifecycled_at
+    classification.lifecycled_at = Time.zone.now
   end
 
   def add_seen_before_for_user
