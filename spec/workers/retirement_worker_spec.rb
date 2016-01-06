@@ -41,7 +41,8 @@ RSpec.describe RetirementWorker do
       context "when the workflow is using cellect" do
         before do
           allow(Panoptes).to receive(:cellect_on).and_return(true)
-          allow(workflow).to receive(:using_cellect?).and_return(true)
+          allow_any_instance_of(Workflow)
+          .to receive(:using_cellect?).and_return(true)
         end
 
         it "should tell cellect for each subject_id" do

@@ -423,18 +423,27 @@ describe ClassificationLifecycle do
         .with(seen_params)
       end
 
-      it "should not tell cellect by default" do
+      it "should not call cellect by default" do
         expect(Subjects::CellectClient).not_to receive(:add_seen)
       end
 
-      context "when the workflow is using cellect" do
-        it "should tell cellect for each subject_id" do
+      context "when cellect is on" do
+        before do
           allow(Panoptes).to receive(:cellect_on).and_return(true)
-          allow(classification.workflow).to receive(:using_cellect?)
-          .and_return(true)
-          classification.subject_ids.each do |subject_id|
-            expect(Subjects::CellectClient).to receive(:add_seen)
-            .with(seen_params[:workflow].id, seen_params[:user].id, subject_id)
+        end
+
+        it "should not call cellect by default" do
+          expect(Subjects::CellectClient).not_to receive(:add_seen)
+        end
+
+        context "when the workflow is using cellect" do
+          it "should tell cellect for each subject_id" do
+            allow(classification.workflow)
+              .to receive(:using_cellect?).and_return(true)
+            classification.subject_ids.each do |subject_id|
+              expect(Subjects::CellectClient).to receive(:add_seen)
+              .with(seen_params[:workflow].id, seen_params[:user].id, subject_id)
+            end
           end
         end
       end
