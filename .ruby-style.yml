@@ -93,6 +93,12 @@ Style/SingleLineMethods:
   StyleGuide: https://github.com/bbatsov/ruby-style-guide#no-single-line-methods
   Enabled: false
   AllowIfMethodIsEmpty: true
+Style/MultilineBlockLayout:
+  Enabled: false
+Style/BlockEndNewline:
+  Enabled: false
+Style/WordArray:
+  Enabled: false
 Metrics/AbcSize:
   Description: A calculated magnitude based on number of assignments, branches, and
     conditions.

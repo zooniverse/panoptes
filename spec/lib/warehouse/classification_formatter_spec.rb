@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Formatter::Csv::Classification do
+RSpec.describe Warehouse::ClassificationFormatter do
 
   let(:project_headers) do
     %w( classification_id user_name user_id user_ip project_id workflow_id workflow_name workflow_version
@@ -25,22 +25,27 @@ RSpec.describe Formatter::Csv::Classification do
                                 workflow_content_at_version: double("WorkflowContent", strings: {})) }
 
   let(:formatted_data) do
-    [ classification.id,
-      classification.user.login,
-      classification.user_id,
-      ip_hash,
-      classification.project_id,
-      classification.workflow_id,
-      classification.workflow.display_name,
-      classification.workflow_version,
-      classification.created_at,
-      classification.updated_at,
-      classification.completed,
-      classification.gold_standard,
-      classification.expert_classifier,
-      classification.metadata.to_json,
-      classification.annotations.map {|ann| Formatter::Csv::AnnotationForCsv.new(classification, ann, cache).to_h }.to_json,
-      subject_json_data
+    base_data = {
+      classification_id: classification.id,
+      user_name: classification.user.login,
+      user_id: classification.user_id,
+      user_ip: ip_hash,
+      project_id: classification.project_id,
+      workflow_id: classification.workflow_id,
+      workflow_name: classification.workflow.display_name,
+      workflow_version: classification.workflow_version,
+      created_at: classification.created_at,
+      updated_at: classification.updated_at,
+      completed: classification.completed,
+      gold_standard: classification.gold_standard,
+      expert: classification.expert_classifier,
+      metadata: classification.metadata.to_json,
+      subject_data: subject_json_data
+    }
+
+    [
+      base_data.merge(Warehouse::AnnotationFormatter.format(classification.annotations[0], task_definition: {}, translations: {})),
+      base_data.merge(Warehouse::AnnotationFormatter.format(classification.annotations[1], task_definition: {}, translations: {}))
     ]
   end
 
@@ -79,7 +84,7 @@ RSpec.describe Formatter::Csv::Classification do
     context "when the obfuscate_private_details flag is false" do
       it 'return the real classification ip in the array' do
         allow(formatter).to receive(:obfuscate).and_return(false)
-        user_ip = formatter.to_array(classification)[3]
+        user_ip = formatter.to_array(classification)[0][:user_ip]
         expect(user_ip).to eq(classification.user_ip.to_s)
       end
     end
@@ -87,7 +92,7 @@ RSpec.describe Formatter::Csv::Classification do
     context "when the classifier is logged out" do
       it 'should should return not logged in' do
         allow(classification).to receive(:user).and_return(nil)
-        user_id = formatter.to_array(classification)[1]
+        user_id = formatter.to_array(classification)[0][:user_name]
         expect(user_id).to eq("not-logged-in-#{ip_hash}")
       end
     end
