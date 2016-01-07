@@ -186,76 +186,104 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       describe "search" do
-        context "by display_name" do
-          context "fuzzy matching against the login field " do
-            let(:display_name) { user.display_name }
-            let(:index_options) { { search: display_name } }
+        let(:index_options) { { search: user.login } }
 
-            it "should respond with both login matches" do
-              expect(json_response[api_resource_name].length).to eq(2)
+        it "should respond with the correct user", :aggregate_failures do
+          expect(json_response[api_resource_name].length).to eq(1)
+          expect(json_response[api_resource_name][0]['login']).to eq(user.login)
+        end
+
+        context "fuzzy matching against the login field" do
+          let(:similar_user){ create :user, login: 'bill_murray', display_name: 'Bill Murray' }
+          let(:index_options) { { search: similar_user.display_name } }
+
+          it 'should respond with the user' do
+            result_id = created_instance_id(api_resource_name)
+            expect(result_id).to eq(similar_user.id.to_s)
+          end
+        end
+
+        context "non-matching display_name or login" do
+          let(:index_options) { { search: "bill murray" } }
+
+          it "should not return any data" do
+            expect(json_response[api_resource_name].length).to eq(0)
+          end
+        end
+
+        context "with a limited page size" do
+          let(:index_options) { { search: user.login, page_size: 1 } }
+
+          it "should respond with 1 item" do
+            expect(json_response[api_resource_name].length).to eq(1)
+          end
+
+          it "should respond with the correct item" do
+            result = json_response[api_resource_name][0]['login']
+            expect(result).to eq(user.login)
+          end
+        end
+
+        context "with partial strings" do
+          let(:index_options) { { search: partial } }
+
+          context "partials that don't hit any trigrams" do
+            let(:partial) { user.login[0..1] }
+
+            it "should not find any users" do
+              expect(json_response[api_resource_name].length).to eq(0)
             end
           end
 
-          context "non-matching display_name or login" do
-            let(:index_options) { { search: "bill murray" } }
+          context "partials that match the trigrams" do
+            let(:partial) { user.login[0..2] }
 
-            it "should not return any data" do
-              expect(json_response[api_resource_name].length).to eq(0)
+            it "should find both users" do
+              expect(json_response[api_resource_name].length).to eq(2)
             end
           end
         end
 
-        context "by login" do
-          let(:index_options) { { search: user.login } }
+        context "with hard to find tsvector" do
+          let(:hard_name) { "S_Powell" }
+          let(:hard_user) do
+            create(:user, login: hard_name)
+          end
+          let(:index_options) { { search: hard_user.login } }
 
-          it "should respond with the correct user", :aggregate_failures do
-            expect(json_response[api_resource_name].length).to eq(1)
-            expect(json_response[api_resource_name][0]['login']).to eq(user.login)
+          it "should respond with the hard user" do
+            result_id = created_instance_id(api_resource_name)
+            expect(result_id).to eq(hard_user.id.to_s)
+          end
+        end
+
+        context 'with invalid search characters' do
+          let(:index_options){ { search: '@some&@!_(   )user' } }
+
+          it 'should strip the invalid characters' do
+            expect_any_instance_of(User::ActiveRecord_Relation)
+              .to receive(:full_search_login).with('some_user').and_call_original
+            get :index, index_options
+          end
+        end
+
+        context 'with a short search string' do
+          let(:index_options){ { search: 'me' } }
+
+          it 'should abort the query', :aggregate_failures do
+            expect_any_instance_of(User::ActiveRecord_Relation)
+              .to_not receive(:full_search_login)
+            expect(User).to receive(:none).and_call_original
+            get :index, index_options
           end
 
-          context "with a limited page size" do
-            let(:index_options) { { search: user.login, page_size: 1 } }
+          context 'when a user has that login' do
+            let!(:short_user){ create :user, login: 'me' }
+            let(:index_options){ { search: short_user.login } }
 
-            it "should respond with 1 item" do
-              expect(json_response[api_resource_name].length).to eq(1)
-            end
-
-            it "should respond with the correct item" do
-              result = json_response[api_resource_name][0]['display_name']
-              expect(result).to eq(user.display_name)
-            end
-          end
-
-          context "with partial strings" do
-            let(:index_options) { { search: partial } }
-
-            context "partials that don't hit any trigrams" do
-              let(:partial) { user.login[0..1] }
-
-              it "should not find any users" do
-                expect(json_response[api_resource_name].length).to eq(0)
-              end
-            end
-
-            context "partials that match the trigrams" do
-              let(:partial) { user.login[0..2] }
-
-              it "should find both users" do
-                expect(json_response[api_resource_name].length).to eq(2)
-              end
-            end
-          end
-
-          context "with hard to find tsvector" do
-            let(:hard_name) { "S_Powell" }
-            let(:hard_user) do
-              create(:user, login: hard_name, display_name: hard_name)
-            end
-            let(:index_options) { { search: hard_user.login } }
-
-            it "should respond with the hard user" do
-              result_id = created_instance_id(api_resource_name)
-              expect(result_id).to eq(hard_user.id.to_s)
+            it 'should find the user' do
+              result_id = created_instance_id api_resource_name
+              expect(result_id).to eq(short_user.id.to_s)
             end
           end
         end

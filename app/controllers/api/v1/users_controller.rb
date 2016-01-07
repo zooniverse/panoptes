@@ -16,12 +16,18 @@ class Api::V1::UsersController < Api::ApiController
   alias_method :user, :controlled_resource
 
   search_by do |name, query|
-    search_names = name.join(" ")
-    login_search = query.where("lower(login) = ?", search_names.downcase)
+    search_names = name.join(" ").downcase
+    login_search = query.where("lower(login) = ?", search_names)
+
     if login_search.exists?
       login_search
     else
-      query.full_search_login(search_names)
+      names = search_names.gsub(/[^#{ ::User::ALLOWED_LOGIN_CHARACTERS }]/, '')
+      if names.present? && names.length >= 3
+        query.full_search_login(names)
+      else
+        User.none
+      end
     end
   end
 
