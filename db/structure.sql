@@ -1884,6 +1884,13 @@ CREATE INDEX index_classifications_on_gold_standard ON classifications USING btr
 
 
 --
+-- Name: index_classifications_on_lifecycled_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classifications_on_lifecycled_at ON classifications USING btree (lifecycled_at) WHERE (lifecycled_at IS NULL);
+
+
+--
 -- Name: index_classifications_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2853,4 +2860,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160103142817');
 INSERT INTO schema_migrations (version) VALUES ('20160104131622');
 
 INSERT INTO schema_migrations (version) VALUES ('20160106120927');
+
+INSERT INTO schema_migrations (version) VALUES ('20160107143209');
 
