@@ -609,6 +609,11 @@ describe ClassificationLifecycle do
       update_classification_data
     end
 
+    it "should call add_lifecycled_at" do
+      expect(subject).to receive(:add_lifecycled_at)
+      update_classification_data
+    end
+
     it "should call add_seen_before_for_user" do
       expect(subject).to receive(:add_seen_before_for_user)
       update_classification_data
@@ -649,6 +654,16 @@ describe ClassificationLifecycle do
         subject.add_project_live_state
         expect(classification.metadata[:live_project]).to eq(true)
       end
+    end
+  end
+
+  describe "#add_lifecycled_at" do
+
+    it "should mark the lifecycled_at timestamp" do
+      subject.add_lifecycled_at
+      prev, current = classification.changes[:lifecycled_at]
+      expect(prev).to be_nil
+      expect(current).to be_a(ActiveSupport::TimeWithZone)
     end
   end
 

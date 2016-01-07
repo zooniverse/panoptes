@@ -187,7 +187,8 @@ CREATE TABLE classifications (
     gold_standard boolean,
     expert_classifier integer,
     metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
-    workflow_version text
+    workflow_version text,
+    lifecycled_at timestamp without time zone
 );
 
 
@@ -1883,6 +1884,13 @@ CREATE INDEX index_classifications_on_gold_standard ON classifications USING btr
 
 
 --
+-- Name: index_classifications_on_lifecycled_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classifications_on_lifecycled_at ON classifications USING btree (lifecycled_at);
+
+
+--
 -- Name: index_classifications_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2850,4 +2858,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151231123306');
 INSERT INTO schema_migrations (version) VALUES ('20160103142817');
 
 INSERT INTO schema_migrations (version) VALUES ('20160104131622');
+
+INSERT INTO schema_migrations (version) VALUES ('20160106120927');
 
