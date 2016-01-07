@@ -1884,13 +1884,6 @@ CREATE INDEX index_classifications_on_gold_standard ON classifications USING btr
 
 
 --
--- Name: index_classifications_on_lifecycled_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_classifications_on_lifecycled_at ON classifications USING btree (lifecycled_at);
-
-
---
 -- Name: index_classifications_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
