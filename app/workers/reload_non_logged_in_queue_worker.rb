@@ -1,3 +1,5 @@
+require 'subjects/postgresql_selection'
+
 class ReloadNonLoggedInQueueWorker
   include Sidekiq::Worker
 
