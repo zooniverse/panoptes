@@ -39,7 +39,15 @@ class Api::V1::WorkflowsController < Api::ApiController
         ReloadNonLoggedInQueueWorker.perform_async(workflow.id, subject_set_id)
       end
       if Panoptes.use_cellect?(workflow)
-        ReloadCellectWorker.perform_async(workflow.id)
+        case relation
+        when :retired_subjects, 'retired_subjects'
+          params[:retired_subjects].each do |subject_id|
+            RetireCellectWorker.perform_async(subject_id, workflow.id)
+          end
+        when :subject_sets, 'subject_sets'
+          ReloadCellectWorker.perform_async(workflow.id)
+        end
+
       end
     end
   end
