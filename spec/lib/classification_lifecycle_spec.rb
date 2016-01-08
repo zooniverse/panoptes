@@ -415,16 +415,17 @@ describe ClassificationLifecycle do
         workflow: classification.workflow,
         subject_ids: classification.subject_ids }
     end
-    after(:each) { subject.update_seen_subjects }
 
-    context "with a user" do
+    context "with a user", :cellect do
       it 'should add the subject_id to the seen subjects' do
         expect(UserSeenSubject).to receive(:add_seen_subjects_for_user)
         .with(seen_params)
+        subject.update_seen_subjects
       end
 
       it "should not call cellect by default" do
         expect(Subjects::CellectClient).not_to receive(:add_seen)
+        subject.update_seen_subjects
       end
 
       context "when cellect is on" do
@@ -434,16 +435,29 @@ describe ClassificationLifecycle do
 
         it "should not call cellect by default" do
           expect(Subjects::CellectClient).not_to receive(:add_seen)
+          subject.update_seen_subjects
         end
 
         context "when the workflow is using cellect" do
-          it "should tell cellect for each subject_id" do
+          before do
             allow(classification.workflow)
-              .to receive(:using_cellect?).and_return(true)
+            .to receive(:using_cellect?).and_return(true)
+          end
+
+          it "should tell cellect for each subject_id" do
             classification.subject_ids.each do |subject_id|
               expect(Subjects::CellectClient).to receive(:add_seen)
               .with(seen_params[:workflow].id, seen_params[:user].id, subject_id)
             end
+            subject.update_seen_subjects
+          end
+
+          it "should ignore cellect errors" do
+            allow(Subjects::CellectClient).to receive(:add_seen)
+              .and_raise(Subjects::CellectClient::ConnectionError)
+            expect {
+              subject.update_seen_subjects
+            }.to_not raise_error
           end
         end
       end
