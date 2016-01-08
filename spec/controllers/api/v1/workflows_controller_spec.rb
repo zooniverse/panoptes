@@ -206,7 +206,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe "#update_links" do
-    RSpec.shared_examples "reloads the non logged in queues" do
+    RSpec.shared_examples "reloads the non logged in queues" do |link_to_test|
       let(:update_link_params) do
         {
           link_relation: test_relation.to_s,
@@ -230,20 +230,61 @@ describe Api::V1::WorkflowsController, type: :controller do
             expect(ReloadCellectWorker).not_to receive(:perform_async)
           end
 
-          context "when cellect is on" do
-            before do
-              allow(Panoptes).to receive(:cellect_on).and_return(true)
-            end
+          case link_to_test
+          when :subject_sets
+            context "when cellect is on" do
+              before do
+                allow(Panoptes).to receive(:cellect_on).and_return(true)
+              end
 
+              it 'should not call reload cellect worker' do
+                expect(ReloadCellectWorker).not_to receive(:perform_async)
+              end
+
+              it 'should call reload cellect worker when workflow uses cellect' do
+                allow_any_instance_of(Workflow)
+                  .to receive(:using_cellect?).and_return(true)
+                expect(ReloadCellectWorker).to receive(:perform_async)
+                  .with(resource.id)
+              end
+            end
+          when :retired_subjects
             it 'should not call reload cellect worker' do
               expect(ReloadCellectWorker).not_to receive(:perform_async)
             end
 
-            it 'should call reload cellect worker when workflow uses cellect' do
-              allow_any_instance_of(Workflow)
-                .to receive(:using_cellect?).and_return(true)
-              expect(ReloadCellectWorker).to receive(:perform_async)
-                .with(resource.id)
+            it 'should not call the retire cellect worker' do
+              expect(RetireCellectWorker).not_to receive(:perform_async)
+            end
+
+            context "when cellect is on" do
+              before do
+                allow(Panoptes).to receive(:cellect_on).and_return(true)
+              end
+
+              it 'should not call reload cellect worker' do
+                expect(ReloadCellectWorker).not_to receive(:perform_async)
+              end
+
+              it 'should not call the retire cellect worker' do
+                expect(RetireCellectWorker).not_to receive(:perform_async)
+              end
+
+              context "when the workflow is using cellect" do
+                before do
+                  allow_any_instance_of(Workflow)
+                  .to receive(:using_cellect?).and_return(true)
+                end
+
+                it 'should not call reload cellect worker' do
+                  expect(ReloadCellectWorker).not_to receive(:perform_async)
+                end
+
+                it 'should call retire cellect worker when workflow uses cellect' do
+                  expect(RetireCellectWorker).to receive(:perform_async)
+                    .with(linked_resource.id.to_s, workflow.id)
+                end
+              end
             end
           end
         end
@@ -291,7 +332,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:copied_resource) { resource.reload.send(test_relation).first }
 
       it_behaves_like "supports update_links"
-      it_behaves_like "reloads the non logged in queues"
+      it_behaves_like "reloads the non logged in queues", :subject_sets
 
       context "when the subject_set links belong to another project" do
         let!(:subject_set_project) do
@@ -338,7 +379,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         end
       end
 
-      it_behaves_like "reloads the non logged in queues"
+      it_behaves_like "reloads the non logged in queues", :retired_subjects
     end
   end
 
