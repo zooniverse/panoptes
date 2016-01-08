@@ -2,7 +2,7 @@ RSpec.shared_examples "export create" do |export_worker, export_type|
   let(:create_path) { "create_#{export_type}"}
 
   it 'should queue an export worker' do
-    expect(export_worker).to receive(:perform_async).with(resource.id, an_instance_of(Fixnum))
+    expect(export_worker).to receive(:perform_async).with(resource.id, an_instance_of(Fixnum), an_instance_of(Fixnum))
     default_request scopes: scopes, user_id: user.id
     post create_path, create_params
   end

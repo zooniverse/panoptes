@@ -5,17 +5,19 @@ class AggregationsDumpWorker
 
   sidekiq_options queue: :data_high
 
-  attr_reader :project
+  def perform_dump
+    # Set expiry time of signed_url to one day from now
+    medium.update!(put_expires: 1.day.from_now.to_i - Time.now.to_i)
 
-  def perform(project_id, medium_id)
-    if @project = Project.find(project_id)
-      @medium_id = medium_id
+    AggregationClient.new.aggregate(project, medium)
+  end
 
-      # Set expiry time of signed_url to one day from now
-      medium.update!(put_expires: 1.day.from_now.to_i - Time.now.to_i)
+  def upload_dump
+    # aggregation engine will write directly to medium when done, no need to upload
+  end
 
-      AggregationClient.new.aggregate(project, medium)
-    end
+  def cleanup_dump
+    # aggregation engine will write directly to medium when done, no need to cleanup
   end
 
   def load_medium
