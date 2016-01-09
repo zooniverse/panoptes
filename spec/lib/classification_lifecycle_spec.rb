@@ -423,8 +423,8 @@ describe ClassificationLifecycle do
         subject.update_seen_subjects
       end
 
-      it "should not call cellect by default" do
-        expect(Subjects::CellectClient).not_to receive(:add_seen)
+      it "should not call cellect seen worker" do
+        expect(SeenCellectWorker).not_to receive(:perform_async)
         subject.update_seen_subjects
       end
 
@@ -433,8 +433,8 @@ describe ClassificationLifecycle do
           allow(Panoptes).to receive(:cellect_on).and_return(true)
         end
 
-        it "should not call cellect by default" do
-          expect(Subjects::CellectClient).not_to receive(:add_seen)
+        it "should not call the worker by default" do
+          expect(SeenCellectWorker).not_to receive(:perform_async)
           subject.update_seen_subjects
         end
 
@@ -444,20 +444,13 @@ describe ClassificationLifecycle do
             .to receive(:using_cellect?).and_return(true)
           end
 
-          it "should tell cellect for each subject_id" do
+          it "should call cellect seen worker for each subject id" do
             classification.subject_ids.each do |subject_id|
-              expect(Subjects::CellectClient).to receive(:add_seen)
+              expect(SeenCellectWorker)
+              .to receive(:perform_async)
               .with(seen_params[:workflow].id, seen_params[:user].id, subject_id)
             end
             subject.update_seen_subjects
-          end
-
-          it "should ignore cellect errors" do
-            allow(Subjects::CellectClient).to receive(:add_seen)
-              .and_raise(Subjects::CellectClient::ConnectionError)
-            expect {
-              subject.update_seen_subjects
-            }.to_not raise_error
           end
         end
       end

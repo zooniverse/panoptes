@@ -4,6 +4,11 @@ RSpec.describe ReloadCellectWorker do
   let(:worker) { described_class.new }
   let(:workflow) { create(:workflow) }
 
+  it "should be retryable 3 times" do
+    retry_count = worker.class.get_sidekiq_options['retry']
+    expect(retry_count).to eq(3)
+  end
+
   describe "#perform" do
 
     it "should gracefully handle a missing workflow lookup" do
@@ -37,14 +42,6 @@ RSpec.describe ReloadCellectWorker do
           expect(Subjects::CellectClient).to receive(:reload_workflow)
             .with(workflow.id)
           worker.perform(workflow.id)
-        end
-
-        context "when cellect is unavailable" do
-          it "should handle the failure and move on" do
-            allow(Subjects::CellectClient).to receive(:reload_workflow)
-              .and_raise(Subjects::CellectClient::ConnectionError)
-            expect{worker.perform(workflow.id)}.not_to raise_error
-          end
         end
       end
     end

@@ -1,5 +1,3 @@
-require 'subjects/cellect_client'
-
 class RetirementWorker
   include Sidekiq::Worker
 
@@ -34,10 +32,7 @@ class RetirementWorker
 
   def notify_cellect(count)
     if Panoptes.use_cellect?(count.workflow)
-      count.set_member_subjects.each do |sms|
-        cellect_params = [ sms.subject_id, count.workflow.id, sms.subject_set_id ]
-        Subjects::CellectClient.remove_subject(*cellect_params)
-      end
+      RetireCellectWorker.perform_async(count.subject_id, count.workflow.id)
     end
   rescue Subjects::CellectClient::ConnectionError
   end
