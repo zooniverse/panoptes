@@ -1,3 +1,5 @@
+require 'subjects/cellect_client'
+
 class ReloadCellectWorker
   include Sidekiq::Worker
 

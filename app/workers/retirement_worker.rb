@@ -1,3 +1,5 @@
+require 'subjects/cellect_client'
+
 class RetirementWorker
   include Sidekiq::Worker
 

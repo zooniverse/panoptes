@@ -1,3 +1,5 @@
+require 'serialization/v1_adapter'
+
 class KafkaClassificationSerializer < ActiveModel::Serializer
   def self.serialize(classification, options = {})
     serializer = new(classification)

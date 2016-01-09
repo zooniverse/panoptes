@@ -1,7 +1,8 @@
 require "kafka_classification_serializer"
+require "event_stream"
+require "subjects/cellect_client"
 
 class ClassificationLifecycle
-
   class ClassificationNotPersisted < StandardError; end
 
   attr_reader :classification
