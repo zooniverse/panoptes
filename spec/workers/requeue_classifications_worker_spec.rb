@@ -23,7 +23,7 @@ describe RequeueClassificationsWorker do
     end
 
     it 'should not enqueue live data that is in the process of queueing' do
-      expect_any_instance_of(ClassificationLifecycle).not_to receive(:queue)
+      expect(ClassificationWorker).not_to receive(:perform_async)
       worker.perform
     end
 
@@ -38,8 +38,10 @@ describe RequeueClassificationsWorker do
       end
 
       it 'enqueues all the non-lifecycled classifications' do
-        expect_any_instance_of(ClassificationLifecycle)
-          .to receive(:queue).with(:create).once
+        expect(ClassificationWorker)
+          .to receive(:perform_async)
+          .with(classification.id, :create)
+          .once
         worker.perform
       end
     end

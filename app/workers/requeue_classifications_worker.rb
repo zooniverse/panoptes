@@ -7,7 +7,7 @@ class RequeueClassificationsWorker
   def perform
     non_lifecycled.find_in_batches do |classifications|
       classifications.each do |classification|
-        ClassificationLifecycle.new(classification).queue(:create)
+        ClassificationWorker.perform_async(classification.id, :create)
       end
     end
   end
