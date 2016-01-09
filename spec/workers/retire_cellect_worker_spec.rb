@@ -6,6 +6,11 @@ RSpec.describe RetireCellectWorker do
   let(:subject) { workflow.subjects.first }
   let(:subject_set) { subject.subject_sets.first }
 
+  it "should be retryable 6 times" do
+    retry_count = worker.class.get_sidekiq_options['retry']
+    expect(retry_count).to eq(6)
+  end
+
   describe "#perform" do
     it "should gracefully handle a missing workflow lookup" do
       expect{worker.perform(subject.id, -1)}.not_to raise_error
@@ -39,16 +44,6 @@ RSpec.describe RetireCellectWorker do
             .to receive(:remove_subject)
             .with(subject.id, workflow.id, subject_set.id)
           worker.perform(subject.id, workflow.id)
-        end
-
-        context "when cellect is unavailable" do
-          it "should handle the failure and move on" do
-            allow(Subjects::CellectClient).to receive(:remove_subject)
-              .and_raise(Subjects::CellectClient::ConnectionError)
-            expect{
-              worker.perform(subject.id, workflow.id)
-            }.not_to raise_error
-          end
         end
       end
     end

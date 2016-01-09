@@ -3,6 +3,8 @@ require 'subjects/cellect_client'
 class RetireCellectWorker
   include Sidekiq::Worker
 
+  sidekiq_options retry: 6
+
   def perform(subject_id, workflow_id)
     workflow = Workflow.find(workflow_id)
     if Panoptes.use_cellect?(workflow)
@@ -12,6 +14,6 @@ class RetireCellectWorker
         Subjects::CellectClient.remove_subject(*params)
       end
     end
-  rescue Subjects::CellectClient::ConnectionError, ActiveRecord::RecordNotFound
+  rescue ActiveRecord::RecordNotFound
   end
 end
