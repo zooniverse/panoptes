@@ -1,6 +1,5 @@
 require "kafka_classification_serializer"
 require "event_stream"
-require "subjects/cellect_client"
 
 class ClassificationLifecycle
   class ClassificationNotPersisted < StandardError; end
@@ -52,11 +51,8 @@ class ClassificationLifecycle
     if should_update_seen? && subjects_are_unseen_by_user?
       UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
       if Panoptes.use_cellect?(workflow)
-        begin
-          subject_ids.each do |subject_id|
-            Subjects::CellectClient.add_seen(workflow.id, user.try(:id), subject_id)
-          end
-        rescue Subjects::CellectClient::ConnectionError
+        subject_ids.each do |subject_id|
+          SeenCellectWorker.perform_async(workflow.id, user.try(:id), subject_id)
         end
       end
     end

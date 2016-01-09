@@ -1,3 +1,5 @@
+require 'subjects/cellect_client'
+
 class RetireCellectWorker
   include Sidekiq::Worker
 
@@ -6,8 +8,8 @@ class RetireCellectWorker
     if Panoptes.use_cellect?(workflow)
       smses = workflow.set_member_subjects.where(subject_id: subject_id)
       smses.each do |sms|
-          Subjects::CellectClient
-          .remove_subject(subject_id, workflow_id, sms.subject_set_id)
+        params = [ subject_id, workflow_id, sms.subject_set_id ]
+        Subjects::CellectClient.remove_subject(*params)
       end
     end
   rescue Subjects::CellectClient::ConnectionError, ActiveRecord::RecordNotFound
