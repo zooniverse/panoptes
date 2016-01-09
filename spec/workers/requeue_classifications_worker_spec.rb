@@ -16,11 +16,32 @@ describe RequeueClassificationsWorker do
     end
   end
 
-  it 'enqueues all the non-lifecycled classifications' do
-    classification
-    lifecycled_classification
-    expect_any_instance_of(ClassificationLifecycle)
-      .to receive(:queue).with(:create).once
-    worker.perform
+  describe "perform" do
+    before do
+      classification
+      lifecycled_classification
+    end
+
+    it 'should not enqueue live data that is in the process of queueing' do
+      expect_any_instance_of(ClassificationLifecycle).not_to receive(:queue)
+      worker.perform
+    end
+
+    context "with non-lifecycled classification outside the live window" do
+      let(:outside_live_window) do
+        Panoptes.lifecycled_live_window.minutes.ago
+      end
+      let(:classification) do
+        c = create(:classification)
+        c.update_column(:created_at, outside_live_window)
+        c
+      end
+
+      it 'enqueues all the non-lifecycled classifications' do
+        expect_any_instance_of(ClassificationLifecycle)
+          .to receive(:queue).with(:create).once
+        worker.perform
+      end
+    end
   end
 end

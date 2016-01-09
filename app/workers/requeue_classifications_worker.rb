@@ -1,5 +1,4 @@
 class RequeueClassificationsWorker
-
   include Sidekiq::Worker
   include Sidetiq::Schedulable
 
@@ -16,6 +15,8 @@ class RequeueClassificationsWorker
   private
 
   def non_lifecycled
-    Classification.where(lifecycled_at: nil)
+    Classification
+    .where(lifecycled_at: nil)
+    .where("created_at <= ?", Panoptes.lifecycled_live_window.minutes.ago)
   end
 end
