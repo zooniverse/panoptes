@@ -5,10 +5,14 @@ RSpec.describe ClassificationWorker do
 
   describe "perform" do
     before(:each) do
-      allow_any_instance_of(ClassificationLifecycle).to receive(:update_seen_subjects)
-      allow_any_instance_of(ClassificationLifecycle).to receive(:dequeue_subject)
-      allow_any_instance_of(ClassificationLifecycle).to receive(:publish_to_kafka)
-      allow_any_instance_of(ClassificationLifecycle).to receive(:create_project_preference)
+      allow_any_instance_of(ClassificationLifecycle)
+        .to receive(:update_seen_subjects)
+      allow_any_instance_of(ClassificationLifecycle)
+        .to receive(:dequeue_subject)
+      allow_any_instance_of(ClassificationLifecycle)
+        .to receive(:publish_to_kafka)
+      allow_any_instance_of(ClassificationLifecycle)
+        .to receive(:create_project_preference)
     end
 
     let(:classification) { create(:classification) }
@@ -19,7 +23,18 @@ RSpec.describe ClassificationWorker do
       end
 
       it 'should call publish to kafka' do
-        expect_any_instance_of(ClassificationLifecycle).to receive(:publish_to_kafka)
+        expect_any_instance_of(ClassificationLifecycle)
+        .to receive(:publish_to_kafka)
+      end
+
+      context "when the lifecycled_at field is set" do
+        let(:classification) do
+          create(:classification, lifecycled_at: Time.zone.now)
+        end
+
+        it "should not abort the worker" do
+          expect_any_instance_of(ClassificationLifecycle).to receive(:transact!)
+        end
       end
     end
 
@@ -29,19 +44,23 @@ RSpec.describe ClassificationWorker do
       end
 
       it 'should call process_project_preferences' do
-        expect_any_instance_of(ClassificationLifecycle).to receive(:process_project_preference)
+        expect_any_instance_of(ClassificationLifecycle)
+        .to receive(:process_project_preference)
       end
 
       it 'should call publish to kafka' do
-        expect_any_instance_of(ClassificationLifecycle).to receive(:publish_to_kafka)
+        expect_any_instance_of(ClassificationLifecycle)
+        .to receive(:publish_to_kafka)
       end
 
       it 'should call classification count worker' do
-        expect(ClassificationCountWorker).to receive(:perform_async).twice
+        expect(ClassificationCountWorker)
+        .to receive(:perform_async).twice
       end
 
       it 'should call update_seen_subjects' do
-        expect_any_instance_of(ClassificationLifecycle).to receive(:update_seen_subjects)
+        expect_any_instance_of(ClassificationLifecycle)
+        .to receive(:update_seen_subjects)
       end
 
       context "when the lifecycled_at field is set" do
@@ -50,7 +69,8 @@ RSpec.describe ClassificationWorker do
         end
 
         it "should abort the worker asap" do
-          expect(ClassificationLifecycle).not_to receive(:new)
+          expect_any_instance_of(ClassificationLifecycle)
+          .not_to receive(:transact!)
         end
       end
 
@@ -60,7 +80,8 @@ RSpec.describe ClassificationWorker do
                  user: classification.user,
                  workflow: classification.workflow,
                  subject_ids: classification.subject_ids)
-          expect(ClassificationCountWorker).to_not receive(:perform_async)
+          expect(ClassificationCountWorker)
+          .to_not receive(:perform_async)
         end
       end
 
@@ -68,11 +89,14 @@ RSpec.describe ClassificationWorker do
         let(:classification) { create(:classification, user: nil) }
 
         it 'should call the classification count worker' do
-          expect(ClassificationCountWorker).to receive(:perform_async).twice
+          expect(ClassificationCountWorker)
+          .to receive(:perform_async).twice
         end
 
         context "when the classification has the already_seen metadata value" do
-          let!(:classification) { create(:anonymous_already_seen_classification) }
+          let!(:classification) do
+            create(:anonymous_already_seen_classification)
+          end
 
           it 'should not call the classification count worker' do
             expect(ClassificationCountWorker).to_not receive(:perform_async)

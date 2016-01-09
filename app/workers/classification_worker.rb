@@ -9,7 +9,6 @@ class ClassificationWorker
 
   def perform(id, action)
     @classification = Classification.find(id)
-    return if classification.lifecycled_at
     @action = action
     lifecycle_classification
   end
@@ -22,14 +21,16 @@ class ClassificationWorker
     when "update"
       lifecycle.transact!
     when "create"
-      lifecycle.transact! do
-        if should_count_towards_retirement?
-          classification.subject_ids.each do |sid|
-            ClassificationCountWorker
-            .perform_async(sid, classification.workflow.id)
+      if classification.lifecycled_at.nil?
+        lifecycle.transact! do
+          if should_count_towards_retirement?
+            classification.subject_ids.each do |sid|
+              ClassificationCountWorker
+              .perform_async(sid, classification.workflow.id)
+            end
           end
+          process_project_preference
         end
-        process_project_preference
       end
     else
       raise "Invalid Post-Classification Action"
