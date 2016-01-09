@@ -6,9 +6,9 @@ RSpec.describe RetireCellectWorker do
   let(:subject) { workflow.subjects.first }
   let(:subject_set) { subject.subject_sets.first }
 
-  it "should be retryable 6 times" do
+  it "should be retryable 3 times" do
     retry_count = worker.class.get_sidekiq_options['retry']
-    expect(retry_count).to eq(6)
+    expect(retry_count).to eq(3)
   end
 
   describe "#perform" do

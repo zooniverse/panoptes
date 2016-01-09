@@ -6,9 +6,9 @@ RSpec.describe SeenCellectWorker do
   let(:subject_id) { 2 }
   let(:user_id) { 1 }
 
-  it "should be retryable 6 times" do
+  it "should be retryable 3 times" do
     retry_count = worker.class.get_sidekiq_options['retry']
-    expect(retry_count).to eq(6)
+    expect(retry_count).to eq(3)
   end
 
   describe "#perform" do
