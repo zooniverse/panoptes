@@ -5,19 +5,32 @@ class ClassificationWorker
 
   sidekiq_options queue: :high
 
+  attr_reader :classification, :action
+
   def perform(id, action)
-    classification_lifecycle = ClassificationLifecycle.new(Classification.find(id))
+    @classification = Classification.find(id)
+    @action = action
+    lifecycle_classification
+  end
+
+  private
+
+  def lifecycle_classification
+    lifecycle = ClassificationLifecycle.new(classification)
     case action
     when "update"
-      classification_lifecycle.transact!
+      lifecycle.transact!
     when "create"
-      classification_lifecycle.transact! do
-        if should_count_towards_retirement?
-          classification.subject_ids.each do |sid|
-            ClassificationCountWorker.perform_async(sid, classification.workflow.id)
+      if classification.lifecycled_at.nil?
+        lifecycle.transact! do
+          if should_count_towards_retirement?
+            classification.subject_ids.each do |sid|
+              ClassificationCountWorker
+              .perform_async(sid, classification.workflow.id)
+            end
           end
+          process_project_preference
         end
-        process_project_preference
       end
     else
       raise "Invalid Post-Classification Action"
