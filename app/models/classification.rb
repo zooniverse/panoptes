@@ -22,7 +22,7 @@ class Classification < ActiveRecord::Base
   scope :incomplete, -> { where(completed: false) }
   scope :created_by, -> (user) { where(user: user) }
   scope :complete, -> { where(completed: true) }
-  scope :gold_standard, -> { where(gold_standard: true) }
+  scope :gold_standard, -> { where("gold_standard IS TRUE") }
 
   def self.scope_for(action, user, opts={})
     return all if user.is_admin?
@@ -37,7 +37,7 @@ class Classification < ActiveRecord::Base
     when :gold_standard
       gold_standard
       .joins(:workflow)
-      .where("workflows.public_gold_standard = ?", true)
+      .where("workflows.public_gold_standard IS TRUE")
       .order(id: :asc)
       .distinct
     else
