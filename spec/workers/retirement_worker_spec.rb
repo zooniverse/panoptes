@@ -32,8 +32,8 @@ RSpec.describe RetirementWorker do
       end
 
       context "when the workflow is not using cellect" do
-        it "should not notify cellect" do
-          expect(Subjects::CellectClient).not_to receive(:remove_subject)
+        it "should not call the retire cellect worker" do
+          expect(RetireCellectWorker).not_to receive(:perform_async)
           worker.perform(count.id)
         end
       end
@@ -45,16 +45,11 @@ RSpec.describe RetirementWorker do
           .to receive(:using_cellect?).and_return(true)
         end
 
-        it "should tell cellect for each subject_id" do
-          expect(Subjects::CellectClient).to receive(:remove_subject)
-            .with(sms.subject_id, workflow.id, sms.subject_set_id)
+        it "should call the retire cellect worker" do
+          expect(RetireCellectWorker)
+            .to receive(:perform_async)
+            .with(sms.subject_id, workflow.id)
           worker.perform(count.id)
-        end
-
-        it "should handle a dead cellect connection and move on" do
-          allow(Subjects::CellectClient).to receive(:remove_subject)
-            .and_raise(Subjects::CellectClient::ConnectionError)
-          expect{ worker.perform(count.id)}.not_to raise_error
         end
       end
     end
