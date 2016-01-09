@@ -5,16 +5,28 @@ class ClassificationWorker
 
   sidekiq_options queue: :high
 
+  attr_reader :classification, :action
+
   def perform(id, action)
-    classification_lifecycle = ClassificationLifecycle.new(Classification.find(id))
+    @classification = Classification.find(id)
+    return if classification.lifecycled_at
+    @action = action
+    lifecycle_classification
+  end
+
+  private
+
+  def lifecycle_classification
+    lifecycle = ClassificationLifecycle.new(classification)
     case action
     when "update"
-      classification_lifecycle.transact!
+      lifecycle.transact!
     when "create"
-      classification_lifecycle.transact! do
+      lifecycle.transact! do
         if should_count_towards_retirement?
           classification.subject_ids.each do |sid|
-            ClassificationCountWorker.perform_async(sid, classification.workflow.id)
+            ClassificationCountWorker
+            .perform_async(sid, classification.workflow.id)
           end
         end
         process_project_preference

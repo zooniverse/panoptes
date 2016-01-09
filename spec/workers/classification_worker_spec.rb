@@ -44,8 +44,17 @@ RSpec.describe ClassificationWorker do
         expect_any_instance_of(ClassificationLifecycle).to receive(:update_seen_subjects)
       end
 
-      context "when a user has seen the subjects before" do
+      context "when the lifecycled_at field is set" do
+        let(:classification) do
+          create(:classification, lifecycled_at: Time.zone.now)
+        end
 
+        it "should abort the worker asap" do
+          expect(ClassificationLifecycle).not_to receive(:new)
+        end
+      end
+
+      context "when a user has seen the subjects before" do
         it 'should not call the classification count worker' do
           create(:user_seen_subject,
                  user: classification.user,
@@ -56,8 +65,7 @@ RSpec.describe ClassificationWorker do
       end
 
       context "when a user is anonymous" do
-
-        let!(:classification) { create(:classification, user: nil) }
+        let(:classification) { create(:classification, user: nil) }
 
         it 'should call the classification count worker' do
           expect(ClassificationCountWorker).to receive(:perform_async).twice
