@@ -25,7 +25,7 @@ class Classification < ActiveRecord::Base
   scope :gold_standard, -> { where("gold_standard IS TRUE") }
 
   def self.scope_for(action, user, opts={})
-    return all if user.is_admin?
+    return all if user.is_admin? && action != :gold_standard
     case action
     when :show, :index
       joins(:project).merge(Project.scope_for(:update, user))
@@ -35,11 +35,7 @@ class Classification < ActiveRecord::Base
     when :update, :destroy
       incomplete_for_user(user)
     when :gold_standard
-      gold_standard
-      .joins(:workflow)
-      .where("workflows.public_gold_standard IS TRUE")
-      .order(id: :asc)
-      .distinct
+      gold_standard_for_user(user)
     else
       none
     end
@@ -47,6 +43,15 @@ class Classification < ActiveRecord::Base
 
   def self.incomplete_for_user(user)
     incomplete.merge(created_by(user.user))
+  end
+
+  def self.gold_standard_for_user(user)
+    return gold_standard if user.is_admin?
+    gold_standard
+    .joins(:workflow)
+    .where("workflows.public_gold_standard IS TRUE")
+    .order(id: :asc)
+    .distinct
   end
 
   def created_and_incomplete?(actor)

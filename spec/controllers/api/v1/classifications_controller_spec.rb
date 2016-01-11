@@ -122,7 +122,7 @@ describe Api::V1::ClassificationsController, type: :controller do
   end
 
   describe "#gold_standard" do
-    let(:gs)  { create_gold_standard }
+    let(:gs) { create_gold_standard }
     let!(:classifications) { [ classification, gs ] }
     let(:another_gs_in_workflow) { create_gold_standard }
     let(:another_gs) { create(:gold_standard_classification, project: project, user: project.owner) }
@@ -130,6 +130,25 @@ describe Api::V1::ClassificationsController, type: :controller do
     let(:workflow) { create(:workflow, public_gold_standard: public_gold_standard) }
     let(:filtered_ids) do
       json_response['classifications'].map{|c| c['id'].to_i}
+    end
+
+    context "with an admin user" do
+      let(:authorized_user) { create(:user, admin: true) }
+      let(:gold_standard_ids) do
+        [gs.id, another_gs.id, another_gs_in_workflow.id].map(&:to_s)
+      end
+
+      before(:each) do
+        another_gs
+        another_gs_in_workflow
+        default_request scopes: scopes, user_id: authorized_user.id
+        get :gold_standard, admin: true
+      end
+
+      it 'should only return gold standard classifications', :aggregate_failures do
+        ids = created_instance_ids("classifications")
+        expect(ids).to match_array(gold_standard_ids)
+      end
     end
 
     context "with a logged in user" do
