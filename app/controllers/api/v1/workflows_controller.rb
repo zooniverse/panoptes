@@ -26,6 +26,11 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def retire_subject
     controlled_resource.retire_subject(params[:subject_id])
+
+    if Panoptes.use_cellect?(controlled_resource)
+      RetireCellectWorker.perform_async(params[:subject_id], controlled_resource.id)
+    end
+
     render nothing: true
   end
 

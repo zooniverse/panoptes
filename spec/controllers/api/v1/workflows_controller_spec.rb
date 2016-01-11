@@ -518,7 +518,19 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:subject_set_id) { subject_set.id }
     let(:subject) { create(:subject, subject_sets: [subject_set]) }
 
+    it 'returns a 200 status' do
+      post :retire_subject, workflow_id: workflow.id, subject_id: subject.id
+      expect(response.status).to eq(200)
+    end
+
     it 'retires the subject' do
+      post :retire_subject, workflow_id: workflow.id, subject_id: subject.id
+      expect(subject.retired_for_workflow?(workflow)).to be_truthy
+    end
+
+    it 'queues a cellect retirement if the workflow uses cellect' do
+      allow(Panoptes).to receive(:use_cellect?).and_return(true)
+      expect(RetireCellectWorker).to receive(:perform_async).with(subject.id, workflow.id)
       post :retire_subject, workflow_id: workflow.id, subject_id: subject.id
     end
   end
