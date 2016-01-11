@@ -4,7 +4,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   include Versioned
   include TranslatableResource
 
-  require_authentication :update, :create, :destroy, scopes: [:project]
+  require_authentication :update, :create, :destroy, :retire_subject, scopes: [:project]
 
   resource_actions :default
   schema_type :json_schema
@@ -22,6 +22,11 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def destroy_links
     super { |workflow| reload_queue(workflow) }
+  end
+
+  def retire_subject
+    controlled_resource.retire_subject(params[:subject_id])
+    render nothing: true
   end
 
   private

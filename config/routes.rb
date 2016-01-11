@@ -90,6 +90,8 @@ Rails.application.routes.draw do
 
       json_api_resources :workflows, links: [:subject_sets, :retired_subjects], versioned: true do
         media_resources :attached_images
+
+        post "/retired_subjects", to: "workflows#retire_subject"
       end
 
       json_api_resources :subject_sets, links: [:subjects]

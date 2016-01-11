@@ -508,6 +508,21 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
   end
 
+  describe '#retired_subjects' do
+    before do
+      default_request scopes: scopes, user_id: authorized_user.id
+    end
+
+    let(:subject_set_project) { project }
+    let(:subject_set) { create(:subject_set, project: project, workflows: [project.workflows.first]) }
+    let(:subject_set_id) { subject_set.id }
+    let(:subject) { create(:subject, subject_sets: [subject_set]) }
+
+    it 'retires the subject' do
+      post :retire_subject, workflow_id: workflow.id, subject_id: subject.id
+    end
+  end
+
   describe "versioning" do
     let(:resource) { workflow }
     let!(:existing_versions) { resource.versions.length }
