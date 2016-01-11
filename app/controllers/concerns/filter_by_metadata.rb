@@ -11,7 +11,8 @@ module FilterByMetadata
     meta_params.each do |meta_key|
       _, key = meta_key.to_s.split(".")
       value = params.delete(meta_key)
-      @controlled_resources = controlled_resources.where("\"#{resource_sym}\".\"metadata\"->>:key = :value", key: key, value: value)
+      @controlled_resources = controlled_resources
+      .where("\"#{resource_sym}\".\"metadata\" @> ? ", { key => value }.to_json)
     end
   end
 end
