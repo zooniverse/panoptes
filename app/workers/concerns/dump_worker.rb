@@ -1,6 +1,37 @@
 module DumpWorker
   extend ActiveSupport::Concern
 
+  included do
+    include ActiveSupport::Callbacks
+    define_callbacks :dump
+    attr_reader :project
+  end
+
+  def perform(project_id, medium_id=nil, requester_id=nil, *args)
+    if @project = Project.find(project_id)
+      @medium_id = medium_id
+      begin
+        run_callbacks :dump do
+          perform_dump(*args)
+          upload_dump
+        end
+      ensure
+        cleanup_dump
+      end
+    end
+  end
+
+  def upload_dump
+    to_gzip
+    write_to_s3
+    set_ready_state
+  end
+
+  def cleanup_dump
+    FileUtils.rm(csv_file_path)
+    FileUtils.rm(gzip_file_path)
+  end
+
   def dump_target
     @dump_target ||= self.class.to_s.underscore.match(/\A(\w+)_dump_worker\z/)[1]
   end

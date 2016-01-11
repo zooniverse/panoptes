@@ -231,7 +231,7 @@ class Api::V1::ProjectsController < Api::ApiController
   def create_export(export_type)
     medium = create_or_update_medium("#{export_type}_export".to_sym)
     dump_worker_klass = "#{export_type.to_s.camelize}DumpWorker".constantize
-    dump_worker_klass.perform_async(controlled_resource.id, medium.id)
+    dump_worker_klass.perform_async(controlled_resource.id, medium.id, api_user.id)
     medium_response(medium)
   end
 
