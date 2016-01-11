@@ -15,7 +15,8 @@ module Api
       Api::NoMediaError,
       RoleControl::AccessDenied,
       Subjects::Selector::MissingSubjectQueue,
-      Subjects::Selector::MissingSubjectSet,               with: :not_found
+      Subjects::Selector::MissingSubjectSet,
+      Subjects::Selector::MissingSubjects,                 with: :not_found
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
     rescue_from Api::LiveProjectChanges,                   with: :forbidden
     rescue_from Api::NotLoggedIn,

@@ -40,6 +40,18 @@ RSpec.describe Subjects::Selector do
             "no subject set is associated with this workflow")
         end
       end
+
+      context "when the subject sets have no data" do
+
+        it 'should raise the an error' do
+          allow_any_instance_of(Workflow)
+            .to receive(:set_member_subjects).and_return([])
+          message = "No data available for selection"
+          expect {
+            subject.queued_subjects
+          }.to raise_error(Subjects::Selector::MissingSubjects, message)
+        end
+      end
     end
 
     context "when the params page size is set as a string" do
