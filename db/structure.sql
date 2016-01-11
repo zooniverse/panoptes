@@ -1814,24 +1814,10 @@ CREATE INDEX index_access_control_lists_on_resource_id_and_resource_type ON acce
 
 
 --
--- Name: index_access_control_lists_on_roles; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_access_control_lists_on_roles ON access_control_lists USING gin (roles);
-
-
---
 -- Name: index_access_control_lists_on_user_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_access_control_lists_on_user_group_id ON access_control_lists USING btree (user_group_id);
-
-
---
--- Name: index_aggregations_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_aggregations_on_subject_id ON aggregations USING btree (subject_id);
 
 
 --
@@ -1898,13 +1884,6 @@ CREATE INDEX index_classifications_on_project_id ON classifications USING btree 
 
 
 --
--- Name: index_classifications_on_user_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_classifications_on_user_group_id ON classifications USING btree (user_group_id);
-
-
---
 -- Name: index_classifications_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1916,13 +1895,6 @@ CREATE INDEX index_classifications_on_user_id ON classifications USING btree (us
 --
 
 CREATE INDEX index_classifications_on_workflow_id ON classifications USING btree (workflow_id);
-
-
---
--- Name: index_classifications_on_workflow_version; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_classifications_on_workflow_version ON classifications USING btree (workflow_version);
 
 
 --
@@ -2000,13 +1972,6 @@ CREATE INDEX index_memberships_on_user_group_id ON memberships USING btree (user
 --
 
 CREATE INDEX index_memberships_on_user_id ON memberships USING btree (user_id);
-
-
---
--- Name: index_memberships_on_user_id_and_identity; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_memberships_on_user_id_and_identity ON memberships USING btree (user_id, identity) WHERE (identity = true);
 
 
 --
@@ -2276,13 +2241,6 @@ CREATE INDEX index_subjects_on_upload_user_id ON subjects USING btree (upload_us
 
 
 --
--- Name: index_subjects_on_zooniverse_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_subjects_on_zooniverse_id ON subjects USING btree (zooniverse_id);
-
-
---
 -- Name: index_tagged_resources_on_resource_type_and_resource_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2294,6 +2252,13 @@ CREATE INDEX index_tagged_resources_on_resource_type_and_resource_id ON tagged_r
 --
 
 CREATE INDEX index_tagged_resources_on_tag_id ON tagged_resources USING btree (tag_id);
+
+
+--
+-- Name: index_tags_name_trgrm; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tags_name_trgrm ON tags USING gin ((COALESCE(name, ''::text)) gin_trgm_ops);
 
 
 --
@@ -2353,13 +2318,6 @@ CREATE INDEX index_user_project_preferences_on_project_id ON user_project_prefer
 
 
 --
--- Name: index_user_project_preferences_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_user_project_preferences_on_updated_at ON user_project_preferences USING btree (updated_at);
-
-
---
 -- Name: index_user_project_preferences_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2371,13 +2329,6 @@ CREATE INDEX index_user_project_preferences_on_user_id ON user_project_preferenc
 --
 
 CREATE INDEX index_user_seen_subjects_on_user_id_and_workflow_id ON user_seen_subjects USING btree (user_id, workflow_id);
-
-
---
--- Name: index_user_seen_subjects_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_user_seen_subjects_on_workflow_id ON user_seen_subjects USING btree (workflow_id);
 
 
 --
@@ -2504,13 +2455,6 @@ CREATE INDEX index_workflows_on_public_gold_standard ON workflows USING btree (p
 --
 
 CREATE INDEX index_workflows_on_tutorial_subject_id ON workflows USING btree (tutorial_subject_id);
-
-
---
--- Name: tags_name_trgm_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX tags_name_trgm_idx ON tags USING gin (name gin_trgm_ops);
 
 
 --
@@ -2862,4 +2806,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160104131622');
 INSERT INTO schema_migrations (version) VALUES ('20160106120927');
 
 INSERT INTO schema_migrations (version) VALUES ('20160107143209');
+
+INSERT INTO schema_migrations (version) VALUES ('20160111112417');
 
