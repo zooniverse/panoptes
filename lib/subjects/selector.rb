@@ -3,6 +3,7 @@ module Subjects
     class MissingParameter < StandardError; end
     class MissingSubjectQueue < StandardError; end
     class MissingSubjectSet < StandardError; end
+    class MissingSubjects < StandardError; end
 
     attr_reader :user, :params, :workflow
 
@@ -14,14 +15,15 @@ module Subjects
       raise workflow_id_error unless workflow
       raise group_id_error if needs_set_id?
       raise missing_subject_set_error if workflow.subject_sets.empty?
+      raise missing_subjects_error if workflow.set_member_subjects.empty?
       unless queue = user_subject_queue
         raise MissingSubjectQueue.new("No queue defined for user. Building one now, please try again.")
       end
-      subjects = selected_subjects(sms_ids_from_queue(queue))
-      [ subjects, queue_context.merge(selected: true, url_format: :get) ]
+      [ selected_subjects(queue), queue_context.merge(selected: true, url_format: :get) ]
     end
 
-    def selected_subjects(sms_ids)
+    def selected_subjects(queue)
+      sms_ids = sms_ids_from_queue(queue)
       @scope.eager_load(:set_member_subjects)
         .where(set_member_subjects: {id: sms_ids})
         .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")
@@ -61,6 +63,10 @@ module Subjects
 
     def missing_subject_set_error
       MissingSubjectSet.new("no subject set is associated with this workflow")
+    end
+
+    def missing_subjects_error
+      MissingSubjects.new("No data available for selection")
     end
 
     def subjects_page_size

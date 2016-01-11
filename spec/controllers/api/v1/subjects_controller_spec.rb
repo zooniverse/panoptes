@@ -70,8 +70,8 @@ describe Api::V1::SubjectsController, type: :controller do
       context "a queued request" do
         let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
-        context "with queued subjects" do
 
+        context "with queued subjects" do
           context "when firing the request before the test" do
             before(:each) do
               get :index, request_params
@@ -99,6 +99,21 @@ describe Api::V1::SubjectsController, type: :controller do
               it 'should return a page of 2 objects' do
                 expect(json_response[api_resource_name].length).to eq(2)
               end
+            end
+          end
+
+          context "with no data to select from" do
+            before do
+              allow_any_instance_of(Workflow)
+              .to receive(:set_member_subjects)
+              .and_return([])
+            end
+
+            it 'should return an error message', :aggregate_failures do
+              get :index, request_params
+              expect(response.status).to eq(404)
+              error_body = "No data available for selection"
+              expect(response.body).to eq(json_error_message(error_body))
             end
           end
         end
