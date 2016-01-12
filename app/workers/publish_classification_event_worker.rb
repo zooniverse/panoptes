@@ -10,7 +10,7 @@ class PublishClassificationEventWorker
   def perform(classification_id)
     @classification = Classification.find(classification_id)
     if classification.complete?
-      EventStream.push("classifications",
+      EventStream.push("classification",
         event_id: "classification-#{classification.id}",
         event_time: "#{classification.updated_at}",
         classification_id: classification.id,
