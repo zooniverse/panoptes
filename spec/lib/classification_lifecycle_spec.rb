@@ -276,8 +276,14 @@ describe ClassificationLifecycle do
     after(:each) { subject.publish_data }
 
     context "when classification is complete" do
-      it 'should call the publish data worker' do
-        expect(PublishDataWorker)
+      it 'should call the publish classification worker' do
+        expect(PublishClassificationWorker)
+        .to receive(:perform_async)
+        .with(classification.id)
+      end
+
+      it 'should call the publish classification event worker' do
+        expect(PublishClassificationEventWorker)
         .to receive(:perform_async)
         .with(classification.id)
       end
@@ -286,8 +292,12 @@ describe ClassificationLifecycle do
     context "when classification is incomplete" do
       let(:classification) { build(:classification, completed: false) }
 
-      it 'should not call the publish data worker' do
-        expect(PublishDataWorker).not_to receive(:perform_async)
+      it 'should not call the publish classification worker' do
+        expect(PublishClassificationWorker).not_to receive(:perform_async)
+      end
+
+      it 'should not call the publish classification event worker' do
+        expect(PublishClassificationEventWorker).not_to receive(:perform_async)
       end
     end
   end

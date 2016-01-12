@@ -56,7 +56,8 @@ class ClassificationLifecycle
 
   def publish_data
     if classification.complete?
-      PublishDataWorker.perform_async(classification.id)
+      PublishClassificationWorker.perform_async(classification.id)
+      PublishClassificationEventWorker.perform_async(classification.id)
     end
   end
 
