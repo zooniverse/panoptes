@@ -1,6 +1,3 @@
-require "kafka_classification_serializer"
-require "event_stream"
-
 class ClassificationLifecycle
   class ClassificationNotPersisted < StandardError; end
 
@@ -27,9 +24,8 @@ class ClassificationLifecycle
       instance_eval(&block) if block_given?
       create_recent
       update_seen_subjects
-      publish_to_kafka
-      publish_to_event_stream
     end
+    publish_data
     #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
     refresh_queue
   end
@@ -58,6 +54,12 @@ class ClassificationLifecycle
     end
   end
 
+  def publish_data
+    if classification.complete?
+      PublishDataWorker.perform_async(classification.id)
+    end
+  end
+
   def refresh_queue
     subjects_workflow_subject_sets.each do |set_id|
       if below_threshold_queue?(set_id)
@@ -73,25 +75,6 @@ class ClassificationLifecycle
         DequeueSubjectQueueWorker.perform_async(workflow.id, sms_ids, nil, set_id)
       end
     end
-  end
-
-  def publish_to_kafka
-    return unless classification.complete?
-    classification_json = KafkaClassificationSerializer.serialize(classification, include: ['subjects']).to_json
-    MultiKafkaProducer.publish('classifications', [classification.project.id, classification_json])
-  end
-
-  def publish_to_event_stream
-    return unless classification.complete?
-
-    EventStream.push('classification',
-      event_id: "classification-#{classification.id}",
-      event_time: classification.updated_at,
-      classification_id: classification.id,
-      project_id: classification.project.id,
-      user_id: Digest::SHA1.hexdigest(classification.user_id.to_s || classification.user_ip.to_s),
-      _ip_address: classification.user_ip.to_s
-    )
   end
 
   def update_classification_data

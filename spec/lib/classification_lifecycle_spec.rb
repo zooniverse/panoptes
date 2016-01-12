@@ -21,10 +21,6 @@ describe ClassificationLifecycle do
     ClassificationLifecycle.new(classification)
   end
 
-  before(:each) do
-    allow(MultiKafkaProducer).to receive(:publish)
-  end
-
   describe "#queue" do
     context "with create action" do
       let(:test_method) { :create }
@@ -132,16 +128,12 @@ describe ClassificationLifecycle do
           expect(subject).to receive(:update_seen_subjects)
         end
 
+        it "should call #publish_data" do
+          expect(subject).to receive(:publish_data)
+        end
+
         it "should call the #refresh_queue" do
           expect(subject).to receive(:refresh_queue)
-        end
-
-        it "should call the #publish_to_kafka" do
-          expect(subject).to receive(:publish_to_kafka)
-        end
-
-        it "should call the #publish_to_event_stream" do
-          expect(subject).to receive(:publish_to_event_stream)
         end
 
         context "when the classification has the already_seen metadata value" do
@@ -196,12 +188,8 @@ describe ClassificationLifecycle do
           expect(subject).to receive(:refresh_queue)
         end
 
-        it "should call the #publish_to_kafka method" do
-          expect(subject).to receive(:publish_to_kafka)
-        end
-
-        it "should call the #publish_to_event_stream method" do
-          expect(subject).to receive(:publish_to_event_stream)
+        it "should call #publish_data" do
+          expect(subject).to receive(:publish_data)
         end
 
         it 'should count towards retirement' do
@@ -268,16 +256,9 @@ describe ClassificationLifecycle do
         end
       end
 
-      it 'should not call #publish_to_kafka' do
+      it 'should not call #publish_data' do
         aggregate_failures "failure point" do
-          expect(subject).to_not receive(:publish_to_kafka)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call #publish_to_event_stream' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:publish_to_event_stream)
+          expect(subject).to_not receive(:publish_data)
           expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
@@ -291,42 +272,22 @@ describe ClassificationLifecycle do
     end
   end
 
-  describe "#publish_to_kafka" do
-    after(:each) { subject.publish_to_kafka }
+  describe "#publish_data" do
+    after(:each) { subject.publish_data }
 
-    context "when classification is completed" do
-      it 'should publish to kafka' do
-        serialized = KafkaClassificationSerializer.serialize(classification, include: 'subjects').to_json
-        expect(MultiKafkaProducer).to receive(:publish)
-        .with('classifications', [classification.project.id, serialized])
+    context "when classification is complete" do
+      it 'should call the publish data worker' do
+        expect(PublishDataWorker)
+        .to receive(:perform_async)
+        .with(classification.id)
       end
     end
 
     context "when classification is incomplete" do
       let(:classification) { build(:classification, completed: false) }
 
-      it 'should do nothing' do
-        expect(MultiKafkaProducer).to_not receive(:publish)
-      end
-    end
-  end
-
-  describe "#publish_to_event_stream" do
-    after(:each) { subject.publish_to_event_stream }
-
-    context "when classification is completed" do
-      it 'should publish to event stream' do
-        expect(EventStream).to receive(:push)
-          .with('classification', a_hash_including(event_id: "classification-#{classification.id}",
-                                                   event_time: classification.updated_at))
-      end
-    end
-
-    context "when classification is incomplete" do
-      let(:classification) { build(:classification, completed: false) }
-
-      it 'should do nothing' do
-        expect(EventStream).to_not receive(:push)
+      it 'should not call the publish data worker' do
+        expect(PublishDataWorker).not_to receive(:perform_async)
       end
     end
   end
