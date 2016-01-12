@@ -37,7 +37,7 @@ RSpec.describe PublishClassificationEventWorker do
 
       it "should publish via EventStream" do
         expect(EventStream).to receive(:push)
-          .with("classifications", payload_expectation)
+          .with("classification", payload_expectation)
         worker.perform(classification.id)
       end
     end
