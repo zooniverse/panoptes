@@ -10,9 +10,9 @@ class RetirementWorker
         SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject_ids)
         finish_workflow!(count.workflow)
       end
+      PublishRetirementEventWorker.perform_async(count.workflow.id)
+      notify_cellect(count)
     end
-    PublishRetirementEventWorker.perform_async(count.workflow.id)
-    notify_cellect(count)
   end
 
   def finish_workflow!(workflow, clock = Time)
