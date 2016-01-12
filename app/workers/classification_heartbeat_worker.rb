@@ -2,7 +2,7 @@ class ClassificationHeartbeatWorker
   include Sidekiq::Worker
   include Sidetiq::Schedulable
 
-  sidekiq_options queue: :medium
+  sidekiq_options queue: :data_medium
 
   recurrence { hourly.minute_of_hour(0, 15, 30, 45) }
 

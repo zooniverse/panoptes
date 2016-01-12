@@ -1,6 +1,8 @@
 class UserWelcomeMailerWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: :data_high
+
   attr_reader :user, :project
 
   def perform(user_id, project_id=nil)

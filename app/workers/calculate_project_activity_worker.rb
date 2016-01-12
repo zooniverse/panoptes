@@ -1,6 +1,8 @@
 class CalculateProjectActivityWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: :data_medium
+
   def perform(project_id)
     project = Project.find(project_id)
     Project.transaction do

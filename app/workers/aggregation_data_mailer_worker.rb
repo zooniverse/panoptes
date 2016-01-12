@@ -3,6 +3,8 @@ class AggregationDataMailerWorker
   include DumpWorker
   include DumpMailerWorker
 
+  sidekiq_options queue: :data_high
+
   attr_reader :medium
 
   def perform(media_id)

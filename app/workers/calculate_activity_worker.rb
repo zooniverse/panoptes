@@ -4,6 +4,8 @@ class CalculateActivityWorker
   include Sidekiq::Worker
   include Sidetiq::Schedulable
 
+  sidekiq_options queue: :data_medium
+
   recurrence { daily }
 
   def perform

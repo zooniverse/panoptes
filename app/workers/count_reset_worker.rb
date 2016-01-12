@@ -1,6 +1,8 @@
 class CountResetWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: :data_high
+
   def perform(subject_set_id)
     reset_retired_subject_counter(subject_set_id)
   end

@@ -2,7 +2,7 @@ require 'subjects/cellect_client'
 
 class RetireCellectWorker
   include Sidekiq::Worker
-  sidekiq_options retry: 3
+  sidekiq_options retry: 3, queue: :data_high
 
   def perform(subject_id, workflow_id)
     workflow = Workflow.find(workflow_id)
