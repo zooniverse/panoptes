@@ -31,6 +31,13 @@ RSpec.describe RetirementWorker do
         expect(queue.set_member_subject_ids).to_not include(sms.id)
       end
 
+      it "should call the publish retire event worker" do
+        expect(PublishRetirementEventWorker)
+          .to receive(:perform_async)
+          .with(workflow.id)
+        worker.perform(count.id)
+      end
+
       context "when the workflow is not using cellect" do
         it "should not call the retire cellect worker" do
           expect(RetireCellectWorker).not_to receive(:perform_async)
@@ -91,18 +98,6 @@ RSpec.describe RetirementWorker do
           worker.finish_workflow!(workflow)
         end.to_not change{Workflow.find(workflow.id).finished_at}
       end
-    end
-  end
-
-  describe "#push_counters_to_event_stream" do
-    before(:each) do
-      allow(EventStream).to receive(:push)
-    end
-
-    it 'should publish new counts to event stream upon retiring' do
-      allow_any_instance_of(SubjectWorkflowCount).to receive(:retire?).and_return(true)
-      worker.perform(count)
-      expect(EventStream).to have_received(:push).once
     end
   end
 end

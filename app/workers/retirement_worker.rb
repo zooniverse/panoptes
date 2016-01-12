@@ -9,10 +9,10 @@ class RetirementWorker
       count.retire! do
         SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject_ids)
         finish_workflow!(count.workflow)
-        notify_cellect(count)
-        push_counters_to_event_stream(count.workflow)
       end
     end
+    PublishRetirementEventWorker.perform_async(count.workflow.id)
+    notify_cellect(count)
   end
 
   def finish_workflow!(workflow, clock = Time)
@@ -21,19 +21,9 @@ class RetirementWorker
     end
   end
 
-  def push_counters_to_event_stream(workflow)
-    EventStream.push('workflow_counters',
-      project_id: workflow.project_id,
-      workflow_id: workflow.id,
-      subjects_count: workflow.subjects_count,
-      retired_subjects_count: workflow.retired_subjects_count,
-      classifications_count: workflow.classifications_count)
-  end
-
   def notify_cellect(count)
     if Panoptes.use_cellect?(count.workflow)
       RetireCellectWorker.perform_async(count.subject_id, count.workflow.id)
     end
-  rescue Subjects::CellectClient::ConnectionError
   end
 end
