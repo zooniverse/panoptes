@@ -4,17 +4,6 @@ RSpec.describe ClassificationWorker do
   let(:classification_worker) { ClassificationWorker.new }
 
   describe "perform" do
-    before(:each) do
-      allow_any_instance_of(ClassificationLifecycle)
-        .to receive(:update_seen_subjects)
-      allow_any_instance_of(ClassificationLifecycle)
-        .to receive(:dequeue_subject)
-      allow_any_instance_of(ClassificationLifecycle)
-        .to receive(:publish_to_kafka)
-      allow_any_instance_of(ClassificationLifecycle)
-        .to receive(:create_project_preference)
-    end
-
     let(:classification) { create(:classification) }
 
     context ":update" do
@@ -22,9 +11,8 @@ RSpec.describe ClassificationWorker do
         classification_worker.perform(classification.id, "update")
       end
 
-      it 'should call publish to kafka' do
-        expect_any_instance_of(ClassificationLifecycle)
-        .to receive(:publish_to_kafka)
+      it "should call transact! on the lifecycle" do
+        expect_any_instance_of(ClassificationLifecycle).to receive(:transact!)
       end
 
       context "when the lifecycled_at field is set" do
@@ -43,24 +31,18 @@ RSpec.describe ClassificationWorker do
         classification_worker.perform(classification.id, "create")
       end
 
+      it "should call transact! on the lifecycle" do
+        expect_any_instance_of(ClassificationLifecycle).to receive(:transact!)
+      end
+
       it 'should call process_project_preferences' do
         expect_any_instance_of(ClassificationLifecycle)
         .to receive(:process_project_preference)
       end
 
-      it 'should call publish to kafka' do
-        expect_any_instance_of(ClassificationLifecycle)
-        .to receive(:publish_to_kafka)
-      end
-
       it 'should call classification count worker' do
         expect(ClassificationCountWorker)
         .to receive(:perform_async).twice
-      end
-
-      it 'should call update_seen_subjects' do
-        expect_any_instance_of(ClassificationLifecycle)
-        .to receive(:update_seen_subjects)
       end
 
       context "when the lifecycled_at field is set" do
