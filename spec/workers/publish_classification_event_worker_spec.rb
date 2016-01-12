@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe PublishEventDataWorker do
+RSpec.describe PublishClassificationEventWorker do
   let(:worker) { described_class.new }
   let(:classification) { create(:classification) }
 

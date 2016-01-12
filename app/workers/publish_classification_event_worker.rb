@@ -1,6 +1,6 @@
 require "event_stream"
 
-class PublishEventDataWorker
+class PublishClassificationEventWorker
   include Sidekiq::Worker
 
   sidekiq_options queue: :data_high
