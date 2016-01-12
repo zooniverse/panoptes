@@ -9,7 +9,7 @@ class PublishDataWorker
     @classification = Classification.find(classification_id)
     if classification.complete?
       PublishClassificationWorker.perform_async(classification_id)
-      PublishEventDataWorker.perform_async(classification_id)
+      PublishClassificationEventWorker.perform_async(classification_id)
     end
   rescue ActiveRecord::RecordNotFound
   end

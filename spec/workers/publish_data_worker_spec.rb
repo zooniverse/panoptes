@@ -6,7 +6,9 @@ RSpec.describe PublishDataWorker do
 
   describe "#perform" do
     let(:expected_topic) { "classifications" }
-    let(:workers) { [ PublishClassificationWorker, PublishEventDataWorker ] }
+    let(:workers) do
+      [ PublishClassificationWorker, PublishClassificationEventWorker ]
+    end
 
     it "should gracefully handle a missing classification lookup" do
       expect{
