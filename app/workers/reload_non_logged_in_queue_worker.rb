@@ -3,6 +3,8 @@ require 'subjects/postgresql_selection'
 class ReloadNonLoggedInQueueWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: :data_high
+
   attr_reader :workflow
 
   def perform(workflow_id, subject_set_id=nil)

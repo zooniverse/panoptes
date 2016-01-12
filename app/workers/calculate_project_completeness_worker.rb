@@ -2,6 +2,8 @@ class CalculateProjectCompletenessWorker
   include Sidekiq::Worker
   using Refinements::RangeClamping
 
+  sidekiq_options queue: :data_medium
+
   def perform(project_id)
     project = Project.find(project_id)
     Project.transaction do

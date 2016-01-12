@@ -4,6 +4,8 @@ class CalculateCompletenessWorker
   include Sidekiq::Worker
   include Sidetiq::Schedulable
 
+  sidekiq_options queue: :data_medium
+
   recurrence { hourly.minute_of_hour(0) }
 
   def perform

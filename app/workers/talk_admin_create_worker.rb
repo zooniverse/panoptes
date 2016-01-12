@@ -1,6 +1,8 @@
 class TalkAdminCreateWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: :data_high
+
   def perform(project_id)
     Project.find(project_id).create_talk_admin(client)
   rescue TalkApiClient::NoTalkHostError => e

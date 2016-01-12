@@ -2,7 +2,7 @@ require 'subjects/cellect_client'
 
 class SeenCellectWorker
   include Sidekiq::Worker
-  sidekiq_options retry: 3
+  sidekiq_options retry: 3, queue: :data_high
 
   def perform(workflow_id, user_id, subject_id)
     return if user_id.nil?

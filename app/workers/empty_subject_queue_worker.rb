@@ -1,6 +1,8 @@
 class EmptySubjectQueueWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: :data_high
+
   def perform(workflow_id=nil)
     queue_scope = SubjectQueue.all
      if workflow_id
