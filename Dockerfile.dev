@@ -20,7 +20,7 @@ ADD ./Jarfile.lock /rails_app/
 
 RUN bundle install
 
-ADD supervisord.conf /etc/supervisor/conf.d/panoptes.conf
+ADD supervisord.conf.dev /etc/supervisor/conf.d/panoptes.conf
 ADD ./ /rails_app
 
 EXPOSE 80

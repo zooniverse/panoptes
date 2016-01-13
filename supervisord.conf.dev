@@ -6,3 +6,9 @@ user=root
 command=bundle exec puma -C config/puma.rb
 directory=/rails_app
 autorestart=true
+
+[program:sidekiq]
+user=root
+command=bundle exec sidekiq
+directory=/rails_app
+autorestart=true
