@@ -3,7 +3,9 @@ require 'subjects/cellect_client'
 class EnqueueSubjectQueueWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :high
+  # SGL-PRIORITY
+  # sidekiq_options queue: :high
+  sidekiq_options queue: :really_high
 
   sidekiq_options congestion: Panoptes::SubjectEnqueue.congestion_opts.merge({
     key: ->(workflow_id, user_id, subject_set_id) {
