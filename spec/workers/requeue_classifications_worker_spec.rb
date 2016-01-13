@@ -27,6 +27,15 @@ describe RequeueClassificationsWorker do
       worker.perform
     end
 
+    context "when the worker is disabled via env variable" do
+
+      it "should not run the worker" do
+        allow(Panoptes).to receive(:disable_lifecycle_worker).and_return(true)
+        expect(worker).not_to receive(:non_lifecycled)
+        worker.perform
+      end
+    end
+
     context "with non-lifecycled classification outside the live window" do
       let(:outside_live_window) do
         Panoptes.lifecycled_live_window.minutes.ago
