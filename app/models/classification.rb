@@ -19,8 +19,10 @@ class Classification < ActiveRecord::Base
   validate :metadata, :validate_metadata
   validate :validate_gold_standard
 
+  # TODO: this scope should hti and index too
   scope :incomplete, -> { where(completed: false) }
   scope :created_by, -> (user) { where(user: user) }
+  # TODO: this scope is not hitting any index
   scope :complete, -> { where(completed: true) }
   scope :gold_standard, -> { where("gold_standard IS TRUE") }
 

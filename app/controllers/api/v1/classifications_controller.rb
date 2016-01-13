@@ -45,6 +45,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def resources_completed?
+    #TODO: turn back indexing for this created_by scope
     Classification.created_by(api_user.user)
       .merge(Classification.complete)
       .exists?(id: resource_ids)
