@@ -1,3 +1,5 @@
+require 'seen_subject_remover'
+
 class SubjectQueue < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include BelongsToMany
