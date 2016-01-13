@@ -16,8 +16,10 @@ class SubjectImportWorker
       ext = external_src.split(".").last
       metadata = row.to_hash
       content_type = case ext
-      when /jpg/i
+      when /jpe?g/i
         "image/jpeg"
+      when /png/i
+        "image/png"
       else
         nil
       end
