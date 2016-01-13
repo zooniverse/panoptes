@@ -3,7 +3,9 @@ require 'subjects/postgresql_selection'
 class ReloadNonLoggedInQueueWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :data_high
+  # SGL-PRIORITY
+  # sidekiq_options queue: :data_high
+  sidekiq_options queue: :high
 
   attr_reader :workflow
 
