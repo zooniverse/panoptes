@@ -42,12 +42,12 @@ RSpec.describe ClassificationCountWorker do
         end
       end
 
-      it 'should increment the classifications counter on the project' do
+      it 'should increment the classifications counter on the project', :disabled do
         expect(Project).to receive(:increment_counter).with(:classifications_count, project.id)
         worker.perform(sms.subject_id, workflow_id)
       end
 
-      it 'should increment the classifications counter on the workflow' do
+      it 'should increment the classifications counter on the workflow', :disabled  do
         expect(Workflow).to receive(:increment_counter).with(:classifications_count, workflow_id)
         worker.perform(sms.subject_id, workflow_id)
       end
