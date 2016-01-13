@@ -1,3 +1,5 @@
+require 'event_stream'
+
 class ClassificationLifecycle
   class ClassificationNotPersisted < StandardError; end
 

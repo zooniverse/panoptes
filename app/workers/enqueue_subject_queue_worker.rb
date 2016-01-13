@@ -1,4 +1,5 @@
 require 'subjects/cellect_client'
+require 'subjects/postgresql_selection'
 
 class EnqueueSubjectQueueWorker
   include Sidekiq::Worker

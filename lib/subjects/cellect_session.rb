@@ -1,3 +1,5 @@
+require 'cellect/client'
+
 module Subjects
   class CellectSession
     NilWorkflowError = Class.new(StandardError)

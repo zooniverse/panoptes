@@ -1,4 +1,5 @@
 require "spec_helper"
+require 'subjects/cellect_session'
 
 RSpec.describe EnqueueSubjectQueueWorker do
   subject { described_class.new }

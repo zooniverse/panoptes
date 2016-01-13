@@ -1,4 +1,5 @@
 require 'cellect/client'
+require 'subjects/cellect_session'
 
 module Subjects
   module CellectClient
