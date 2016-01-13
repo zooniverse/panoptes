@@ -1268,7 +1268,8 @@ CREATE TABLE workflows (
     public_gold_standard boolean DEFAULT false,
     finished_at timestamp without time zone,
     completeness double precision DEFAULT 0.0 NOT NULL,
-    activity integer DEFAULT 0 NOT NULL
+    activity integer DEFAULT 0 NOT NULL,
+    current_version_number character varying
 );
 
 
@@ -2284,20 +2285,6 @@ CREATE UNIQUE INDEX index_user_groups_on_name ON user_groups USING btree (lower(
 
 
 --
--- Name: index_user_project_preferences_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_user_project_preferences_on_project_id ON user_project_preferences USING btree (project_id);
-
-
---
--- Name: index_user_project_preferences_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_user_project_preferences_on_user_id ON user_project_preferences USING btree (user_id);
-
-
---
 -- Name: index_user_project_preferences_on_user_id_and_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2794,4 +2781,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160113120732');
 INSERT INTO schema_migrations (version) VALUES ('20160113132540');
 
 INSERT INTO schema_migrations (version) VALUES ('20160113133848');
+
+INSERT INTO schema_migrations (version) VALUES ('20160113143609');
 
