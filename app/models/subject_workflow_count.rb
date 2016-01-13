@@ -30,7 +30,9 @@ class SubjectWorkflowCount < ActiveRecord::Base
 
     ActiveRecord::Base.transaction(requires_new: true) do
       touch(:retired_at)
-      Workflow.increment_counter(:retired_set_member_subjects_count, workflow.id)
+      if workflow.project_id != 764
+        Workflow.increment_counter(:retired_set_member_subjects_count, workflow.id)
+      end
       yield if block_given?
     end
   end
