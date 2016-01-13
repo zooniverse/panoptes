@@ -2325,6 +2325,13 @@ CREATE INDEX index_user_project_preferences_on_user_id ON user_project_preferenc
 
 
 --
+-- Name: index_user_project_preferences_on_user_id_and_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_user_project_preferences_on_user_id_and_project_id ON user_project_preferences USING btree (user_id, project_id);
+
+
+--
 -- Name: index_user_seen_subjects_on_user_id_and_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2808,4 +2815,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160106120927');
 INSERT INTO schema_migrations (version) VALUES ('20160107143209');
 
 INSERT INTO schema_migrations (version) VALUES ('20160111112417');
+
+INSERT INTO schema_migrations (version) VALUES ('20160113120732');
 
