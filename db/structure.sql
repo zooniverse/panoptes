@@ -1216,7 +1216,8 @@ CREATE TABLE workflow_contents (
     language character varying,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    strings json DEFAULT '{}'::json NOT NULL
+    strings json DEFAULT '{}'::json NOT NULL,
+    current_version_number character varying
 );
 
 
@@ -1267,7 +1268,8 @@ CREATE TABLE workflows (
     public_gold_standard boolean DEFAULT false,
     finished_at timestamp without time zone,
     completeness double precision DEFAULT 0.0 NOT NULL,
-    activity integer DEFAULT 0 NOT NULL
+    activity integer DEFAULT 0 NOT NULL,
+    current_version_number character varying
 );
 
 
@@ -2817,4 +2819,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160107143209');
 INSERT INTO schema_migrations (version) VALUES ('20160111112417');
 
 INSERT INTO schema_migrations (version) VALUES ('20160113120732');
+
+INSERT INTO schema_migrations (version) VALUES ('20160113133848');
 

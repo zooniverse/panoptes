@@ -23,6 +23,7 @@ module Formatter
       end
 
       def version
+        # Deals with old versions of workflows, so can't use the cached current_version_number
         ModelVersion.version_number(workflow)
       end
 

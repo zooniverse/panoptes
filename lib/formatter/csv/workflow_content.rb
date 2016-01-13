@@ -25,6 +25,7 @@ module Formatter
       end
 
       def version
+        # Deals with old versions of contents, so can't use the cached current_version_number
         ModelVersion.version_number(workflow_content)
       end
 

@@ -43,7 +43,6 @@ describe WorkflowSerializer do
     end
 
     describe "#version", versioning: true do
-
       it "should use a 1 suffix for missing content versions" do
         version_num = workflow.versions.last.index + 1
         expect(serializer.version).to eq("#{version_num}.1")
