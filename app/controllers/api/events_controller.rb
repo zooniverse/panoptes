@@ -36,7 +36,9 @@ module Api
           was_new = upp.new_record?
           upp.legacy_count[create_params[:workflow]] = create_params[:count]
           if upp.save
-            Project.increment_counter :classifiers_count, upp.project_id if was_new
+            if upp.project_id != 764
+              Project.increment_counter :classifiers_count, upp.project_id if was_new
+            end
             response_status = :ok
           end
         end

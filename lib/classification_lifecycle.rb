@@ -38,7 +38,9 @@ class ClassificationLifecycle
         up.preferences = {}
       end
       if first_classifcation = upp.email_communication.nil?
-        Project.increment_counter :classifiers_count, project.id
+        if project.id != 764
+          Project.increment_counter :classifiers_count, project.id
+        end
         upp.email_communication = user.project_email_communication
       end
       upp.changed? ? upp.save! : upp.touch
