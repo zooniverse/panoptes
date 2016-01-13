@@ -1268,8 +1268,7 @@ CREATE TABLE workflows (
     public_gold_standard boolean DEFAULT false,
     finished_at timestamp without time zone,
     completeness double precision DEFAULT 0.0 NOT NULL,
-    activity integer DEFAULT 0 NOT NULL,
-    current_version_number character varying
+    activity integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1851,20 +1850,6 @@ CREATE INDEX index_classification_subjects_on_classification_id ON classificatio
 
 
 --
--- Name: index_classification_subjects_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_classification_subjects_on_subject_id ON classification_subjects USING btree (subject_id);
-
-
---
--- Name: index_classifications_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_classifications_on_created_at ON classifications USING btree (created_at);
-
-
---
 -- Name: index_classifications_on_gold_standard; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1872,24 +1857,10 @@ CREATE INDEX index_classifications_on_gold_standard ON classifications USING btr
 
 
 --
--- Name: index_classifications_on_lifecycled_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_classifications_on_lifecycled_at ON classifications USING btree (lifecycled_at) WHERE (lifecycled_at IS NULL);
-
-
---
 -- Name: index_classifications_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_classifications_on_project_id ON classifications USING btree (project_id);
-
-
---
--- Name: index_classifications_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_classifications_on_user_id ON classifications USING btree (user_id);
 
 
 --
@@ -2819,6 +2790,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160107143209');
 INSERT INTO schema_migrations (version) VALUES ('20160111112417');
 
 INSERT INTO schema_migrations (version) VALUES ('20160113120732');
+
+INSERT INTO schema_migrations (version) VALUES ('20160113132540');
 
 INSERT INTO schema_migrations (version) VALUES ('20160113133848');
 
