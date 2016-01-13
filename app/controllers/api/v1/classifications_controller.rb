@@ -52,7 +52,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def build_resource_for_create(create_params)
     super do |body_params, link_params|
-      link_params[:user] = api_user.user
+      body_params[:user_id] = api_user.id
       body_params[:user_ip] = request_ip
       body_params[:subject_ids] = link_params.delete(:subjects)
       body_params[:workflow_version] = body_params[:metadata].delete(:workflow_version)

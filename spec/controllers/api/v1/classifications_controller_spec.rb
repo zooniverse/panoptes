@@ -276,6 +276,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       context "with subject_ids" do
         let(:create_action) { setup_create_request }
+        let(:user) { nil }
 
         it_behaves_like "a classification create"
       end
