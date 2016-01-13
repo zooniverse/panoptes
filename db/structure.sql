@@ -1856,24 +1856,10 @@ CREATE INDEX index_classification_subjects_on_subject_id ON classification_subje
 
 
 --
--- Name: index_classifications_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_classifications_on_created_at ON classifications USING btree (created_at);
-
-
---
 -- Name: index_classifications_on_gold_standard; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_classifications_on_gold_standard ON classifications USING btree (gold_standard) WHERE (gold_standard IS TRUE);
-
-
---
--- Name: index_classifications_on_lifecycled_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_classifications_on_lifecycled_at ON classifications USING btree (lifecycled_at) WHERE (lifecycled_at IS NULL);
 
 
 --
@@ -2808,4 +2794,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160106120927');
 INSERT INTO schema_migrations (version) VALUES ('20160107143209');
 
 INSERT INTO schema_migrations (version) VALUES ('20160111112417');
+
+INSERT INTO schema_migrations (version) VALUES ('20160113132540');
 
