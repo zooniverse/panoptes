@@ -38,7 +38,8 @@ class ClassificationLifecycle
         up.preferences = {}
       end
       if first_classifcation = upp.email_communication.nil?
-        Project.increment_counter :classifiers_count, project.id
+        # SGL turn these off till we get a better solution
+        # Project.increment_counter :classifiers_count, project.id
         upp.email_communication = user.project_email_communication
       end
       upp.changed? ? upp.save! : upp.touch
