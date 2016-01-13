@@ -7,7 +7,9 @@ class RetirementWorker
     count = SubjectWorkflowCount.find(count_id)
     if count.retire?
       count.retire! do
-        SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject_ids)
+        if count.workflow.project_id != 764
+          SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject_ids)
+        end
         finish_workflow!(count.workflow)
       end
       PublishRetirementEventWorker.perform_async(count.workflow.id)
