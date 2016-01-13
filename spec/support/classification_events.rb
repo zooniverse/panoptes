@@ -20,6 +20,12 @@ shared_context "a classification create" do
     expect(Classification.find(created_classification_id).workflow_version).to eq("1.1")
   end
 
+  it "should set the user correctly" do
+    create_action
+    c = Classification.find(created_instance_id("classifications"))
+    expect(c.user_id).to eq(user.try(:id))
+  end
+
   it "should create the classification" do
     expect do
       create_action
@@ -41,13 +47,6 @@ shared_context "a classification lifecycle event" do
   it "should call the classification lifecycle queue method" do
     expect(lifecycle).to receive(:queue).with(:create)
     create_action
-  end
-
-  it "should set the user" do
-    create_action
-    id = created_instance_id("classifications")
-    expect(Classification.find(created_classification_id)
-            .user.id).to eq(user.id)
   end
 end
 
