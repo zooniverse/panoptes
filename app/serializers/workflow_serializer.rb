@@ -25,11 +25,15 @@ class WorkflowSerializer
   end
 
   def version
-    "#{ModelVersion.version_number(@model)}.#{ModelVersion.version_number(content)}"
+    "#{@model.current_version_number}.#{content_version}"
   end
 
   def content_language
     content.language if content
+  end
+
+  def content_version
+    content.try(:current_version_number) || ModelVersion.default_version_num
   end
 
   def tasks

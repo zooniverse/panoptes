@@ -81,21 +81,28 @@ describe Workflow, :type => :model do
     it_behaves_like "it has a classifications assocation"
   end
 
-  describe "versioning" do
+  describe "versioning", versioning: true do
     let(:workflow) { create(:workflow) }
 
     it { is_expected.to be_versioned }
 
-    it 'should track changes to tasks', versioning: true do
+    it 'should track changes to tasks' do
       new_tasks = { blha: 'asdfasd', quera: "asdfas" }
       workflow.update!(tasks: new_tasks)
       expect(workflow.previous_version.tasks).to_not eq(new_tasks)
     end
 
-    it 'should not track changes to primary_language', versioning: true do
+    it 'should not track changes to primary_language' do
       new_lang = 'en'
       workflow.update!(primary_language: new_lang)
       expect(workflow.previous_version).to be_nil
+    end
+
+    it 'caches the new version number', :aggregate_failures do
+      previous_number = workflow.current_version_number
+      workflow.update!(tasks: {blha: 'asdfasd', quera: "asdfas"})
+      expect(workflow.current_version_number).to eq(previous_number + 1)
+      expect(workflow.current_version_number).to eq(ModelVersion.version_number(workflow))
     end
   end
 

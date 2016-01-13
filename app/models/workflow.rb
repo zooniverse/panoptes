@@ -5,6 +5,7 @@ class Workflow < ActiveRecord::Base
   include SubjectCounts
   include ExtendedCacheKey
   include RankedModel
+  include CacheModelVersion
 
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
