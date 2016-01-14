@@ -1851,6 +1851,13 @@ CREATE INDEX index_classification_subjects_on_classification_id ON classificatio
 
 
 --
+-- Name: index_classifications_on_completed; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classifications_on_completed ON classifications USING btree (completed) WHERE (completed IS FALSE);
+
+
+--
 -- Name: index_classifications_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2806,4 +2813,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160113133848');
 INSERT INTO schema_migrations (version) VALUES ('20160113143609');
 
 INSERT INTO schema_migrations (version) VALUES ('20160114135531');
+
+INSERT INTO schema_migrations (version) VALUES ('20160114141909');
 
