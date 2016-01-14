@@ -141,6 +141,15 @@ describe SetMemberSubject, :type => :model do
         expect(SetMemberSubject.non_retired_for_workflow(workflow)).to be_empty
       end
     end
+
+    context 'when the workflow sms is retired for another workflow' do
+      it 'should return the sms' do
+        workflow2 = create(:workflow, subject_sets: [set_member_subject.subject_set])
+        count2 = create(:subject_workflow_count, subject: set_member_subject.subject, workflow: workflow2)
+        count2.retire!
+        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(set_member_subject)
+      end
+    end
   end
 
   describe ":unseen_for_user_by_workflow" do

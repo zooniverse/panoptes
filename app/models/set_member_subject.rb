@@ -48,7 +48,7 @@ class SetMemberSubject < ActiveRecord::Base
 
   def self.non_retired_for_workflow(workflow)
     by_workflow(workflow)
-    .joins("LEFT OUTER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id")
+    .joins(sanitize_sql_for_conditions(["LEFT OUTER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id AND subject_workflow_counts.workflow_id = ?", workflow.id]))
     .where('subject_workflow_counts.retired_at IS NULL')
   end
 
