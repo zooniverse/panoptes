@@ -16,7 +16,6 @@ RSpec.describe Subjects::Selector do
   subject { described_class.new(user, workflow, params, Subject.all)}
 
   describe "#queued_subjects" do
-
     it 'should return url_format: :get in the context object' do
       subject_queue
       _, ctx = subject.queued_subjects
