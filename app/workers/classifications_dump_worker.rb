@@ -28,7 +28,6 @@ class ClassificationsDumpWorker
   end
 
   def completed_project_classifications
-    # TODO: the completed scope here isn't hitting an index
     project.classifications
     .complete
     .joins(:workflow)
