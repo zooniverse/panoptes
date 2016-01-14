@@ -4,8 +4,8 @@ class SubjectQueue < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include BelongsToMany
 
-  DEFAULT_LENGTH = 100
-  MINIMUM_LENGTH = 20
+  DEFAULT_LENGTH = 20
+  MINIMUM_LENGTH = 10
 
   belongs_to :user
   belongs_to :workflow
