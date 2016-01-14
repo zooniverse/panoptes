@@ -1021,8 +1021,8 @@ It has the following attributes:
 
 - id
 - display_name
-- classification_count
-- subject_counts
+- classifications_count
+- subjects_count
 - created_at
 - updated_at
 - available_languages
@@ -1045,7 +1045,7 @@ It has the following attributes:
 - live
 
 *id*, *created_at*, *updated_at*, *user_count*, and
-*classification_count* are set by the API.
+*classifications_count* are set by the API.
 
 + Parameters
   + id (required, integer) ... integer id of the resource to retrieve
@@ -1084,7 +1084,7 @@ It has the following attributes:
                 "projects": [{
                     "id": "1",
                     "display_name": "Galaxy Zoo",
-                    "classification_count": "1000000",
+                    "classifications_count": "1000000",
                     "subjects_count": "10000",
                     "created_at": "2014-03-24T10:42:21Z",
                     "updated_at": "2014-03-24T10:42:21Z",
@@ -1297,7 +1297,7 @@ Projects are returned as an array under the _projects_ key.
                     "display_name": "Galaxy Zoo",
                     "primary_language": "en",
                     "user_count": "10000",
-                    "classification_count": "1000000",
+                    "classifications_count": "1000000",
                     "activated_state": 0,
                     "title": "Galaxy Zoo",
                     "description": "A Project ...",
@@ -1328,7 +1328,7 @@ Projects are returned as an array under the _projects_ key.
                     "display_name": "Galaxy Zoo 2",
                     "primary_language": "en",
                     "user_count": "10000",
-                    "classification_count": "1000000",
+                    "classifications_count": "1000000",
                     "activated_state": 0,
                     "title": "Galaxy Zoo",
                     "description": "A Project ...",
