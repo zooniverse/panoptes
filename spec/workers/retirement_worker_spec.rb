@@ -25,12 +25,6 @@ RSpec.describe RetirementWorker do
         }.from(0).to(1)
       end
 
-      it "should dequeue all instances of the subject" do
-        worker.perform(count.id)
-        queue.reload
-        expect(queue.set_member_subject_ids).to_not include(sms.id)
-      end
-
       it "should call the publish retire event worker" do
         expect(PublishRetirementEventWorker)
           .to receive(:perform_async)
