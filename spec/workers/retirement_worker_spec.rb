@@ -69,6 +69,19 @@ RSpec.describe RetirementWorker do
         expect(sms.retired_workflows).to_not include(workflow)
       end
     end
+
+    context 'when the sms is already retired' do
+      before(:each) do
+        allow(SubjectWorkflowCount).to receive(:find).with(count.id).and_return count
+        allow(count).to receive(:retire?).and_return true
+        allow(count).to receive(:retired_at).and_return 1.minute.ago.utc
+      end
+
+      it 'should not retire the subject for the workflow' do
+        expect(count).to_not receive :retire!
+        worker.perform count.id
+      end
+    end
   end
 
   describe "#finish_workflow!" do

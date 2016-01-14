@@ -5,7 +5,7 @@ class RetirementWorker
 
   def perform(count_id)
     count = SubjectWorkflowCount.find(count_id)
-    if count.retire?
+    if count.retire? && !count.retired?
       count.retire! do
         if count.workflow.project_id != 764
           SubjectQueue.dequeue_for_all(count.workflow, count.set_member_subject_ids)
