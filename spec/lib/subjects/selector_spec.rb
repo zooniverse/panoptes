@@ -16,7 +16,6 @@ RSpec.describe Subjects::Selector do
   subject { described_class.new(user, workflow, params, Subject.all)}
 
   describe "#queued_subjects" do
-
     it 'should return url_format: :get in the context object' do
       subject_queue
       _, ctx = subject.queued_subjects
@@ -187,6 +186,26 @@ RSpec.describe Subjects::Selector do
           end
         end
       end
+    end
+  end
+
+  describe '#selected_subjects' do
+    it 'should not return retired subjects' do
+      sms = smses[0]
+      swc = create(:subject_workflow_count, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
+      result = subject.selected_subjects(subject_queue).map do |subj|
+        subj.set_member_subjects.first.id
+      end.sort
+
+      expect(result).to eq(subject_queue.set_member_subject_ids[1..-1].sort)
+    end
+
+    it 'should return something when everything in the queue is retired' do
+      smses.each do |sms|
+        swc = create(:subject_workflow_count, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
+      end
+
+      expect(subject.selected_subjects(subject_queue).size).to be > 0
     end
   end
 end

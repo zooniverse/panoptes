@@ -33,12 +33,25 @@ module Subjects
 
     def sms_ids_from_queue(queue)
       sms_ids = queue.next_subjects(subjects_page_size)
-      if sms_ids.blank?
+      non_retired_ids = filter_non_retired(sms_ids)
+
+      if non_retired_ids.blank?
         fallback_selection
       else
-        dequeue_for_logged_in_user(sms_ids)
-        sms_ids
+        dequeue_for_logged_in_user(sms_ids) # dequeue all including retired ids
+        non_retired_ids
       end
+    end
+
+    def filter_non_retired(sms_ids)
+      retired_ids = SetMemberSubject
+        .joins("INNER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id")
+        .where("subject_workflow_counts.retired_at IS NOT NULL")
+        .where(set_member_subjects: {id: sms_ids})
+        .pluck(:id)
+
+      retired_ids = Set.new(retired_ids)
+      sms_ids.reject {|id| retired_ids.include?(id) }
     end
 
     def fallback_selection(limit=5)
