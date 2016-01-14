@@ -296,10 +296,10 @@ RSpec.describe SubjectQueue, type: :model do
         context "when the queue is above the enqueue threshold" do
 
           it 'should not have more than the limit in the existing subject queue' do
-            ues.set_member_subject_ids = (0..102).to_a - [sms.id]
+            ues.set_member_subject_ids = (0..22).to_a - [sms.id]
             ues.save!
             SubjectQueue.enqueue(workflow, sms.id, user: user)
-            expect(ues.reload.set_member_subject_ids.length).to eq(100)
+            expect(ues.reload.set_member_subject_ids.length).to eq(20)
           end
         end
 
@@ -371,11 +371,12 @@ RSpec.describe SubjectQueue, type: :model do
           end
 
           context "when the append queue grows too large" do
-            it "should only queue 100 ids" do
+            it "should only queue #{SubjectQueue::DEFAULT_LENGTH} ids" do
               start = smses.last.id+1
               append_ids = (start..start+SubjectQueue::DEFAULT_LENGTH*2).to_a
               SubjectQueue.enqueue_update(query, append_ids)
-              expect(query.first.set_member_subject_ids.length).to eq(100)
+              expect(query.first.set_member_subject_ids.length)
+              .to eq(SubjectQueue::DEFAULT_LENGTH)
             end
           end
 
@@ -490,7 +491,7 @@ RSpec.describe SubjectQueue, type: :model do
   describe "#below_minimum?" do
     let(:queue) { build(:subject_queue, set_member_subject_ids: subject_ids) }
 
-    context "when less than 20 items" do
+    context "when less than #{SubjectQueue::MINIMUM_LENGTH} items" do
       let(:subject_ids) { create_list(:set_member_subject, 2).map(&:id) }
 
       it 'should return true' do
@@ -498,8 +499,11 @@ RSpec.describe SubjectQueue, type: :model do
       end
     end
 
-    context "when more than 20 items" do
-      let(:subject_ids) { create_list(:set_member_subject, 21).map(&:id) }
+    context "when more than #{SubjectQueue::MINIMUM_LENGTH} items" do
+      let(:subject_ids) do
+        create_list(:set_member_subject, SubjectQueue::MINIMUM_LENGTH+1)
+        .map(&:id)
+      end
 
       it 'should return false' do
         expect(queue.below_minimum?).to be false
