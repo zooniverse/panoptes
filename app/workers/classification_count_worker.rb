@@ -7,10 +7,8 @@ class ClassificationCountWorker
     if workflow.project.live
       count = SubjectWorkflowCount.find_or_create_by!(subject_id: subject_id, workflow_id: workflow_id)
       SubjectWorkflowCount.increment_counter(:classifications_count, count.id)
-      if workflow.project_id != 764
-        Project.increment_counter :classifications_count, workflow.project.id
-        Workflow.increment_counter :classifications_count, workflow.id
-      end
+
+      ProjectClassificationsCountWorker.perform_async(workflow.project.id)
       RetirementWorker.perform_async(count.id)
     end
   rescue ActiveRecord::RecordNotFound
