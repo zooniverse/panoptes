@@ -188,4 +188,16 @@ RSpec.describe Subjects::Selector do
       end
     end
   end
+
+  describe '#selected_subjects' do
+    it 'should not return retired subjects' do
+      sms = smses[0]
+      swc = create(:subject_workflow_count, subject: sms.subject, retired_at: Time.zone.now)
+      result = subject.selected_subjects(subject_queue).map do |subj|
+        subj.set_member_subjects.first.id
+      end.sort
+
+      expect(result).to eq(subject_queue.set_member_subject_ids[1..-1].sort)
+    end
+  end
 end

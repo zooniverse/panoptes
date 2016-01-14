@@ -465,13 +465,6 @@ RSpec.describe SubjectQueue, type: :model do
       it 'should randomly sample from the subject_ids' do
         expect(ues.next_subjects).to_not match_array(ues.set_member_subject_ids[0..9])
       end
-
-      it 'should not return retired subjects' do
-        sms = create(:set_member_subject, id: ids[0])
-        swc = create(:subject_workflow_count, subject: sms.subject, retired_at: Time.zone.now)
-        ues.set_member_subject_ids = ids[0..1]
-        expect(ues.next_subjects).to eq(ues.set_member_subject_ids[1..1])
-      end
     end
 
     context "when the queue has a user" do

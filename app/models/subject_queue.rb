@@ -108,19 +108,10 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def next_subjects(limit=10)
-    retired_ids = SetMemberSubject
-      .joins("INNER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id")
-      .where("subject_workflow_counts.retired_at IS NOT NULL")
-      .where(set_member_subjects: {id: set_member_subject_ids})
-      .pluck(:id)
-
-    retired_ids = Set.new(retired_ids)
-    non_retired_ids = set_member_subject_ids.reject {|id| retired_ids.include?(id) }
-
     if workflow.prioritized
-      non_retired_ids[0..limit-1]
+      set_member_subject_ids[0..limit-1]
     else
-      non_retired_ids.sample(limit)
+      set_member_subject_ids.sample(limit)
     end
   end
 end
