@@ -84,12 +84,10 @@ module Subjects
     end
 
     def queue_context
-      @queue_context ||=
-      if finished_workflow?
-        {workflow: workflow, user_seen: UserSeenSubject.where(user: user.user, workflow: workflow)}
-      else
-        {}
-      end
+      @queue_context ||= {
+        workflow: workflow,
+        user_seen: UserSeenSubject.where(user: user.user, workflow: workflow)
+      }
     end
 
     def subject_set_id
