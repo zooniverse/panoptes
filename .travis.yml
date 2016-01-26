@@ -2,25 +2,41 @@ language: ruby
 cache: bundler
 sudo: false
 
+bundler_args: --without development production
+
+before_install:
+  - 'echo ''gem: --no-ri --no-rdoc'' > ~/.gemrc'
+
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
   - mkdir -p tmp
-  - RACK_ENV=test bundle exec rake configure:travis db:setup
+  - bundle exec rake configure:travis db:setup
+  - echo Running script - bundle exec rspec $SPECS
 
 matrix:
   fast_finish: true
-  allow_failures:
   include:
     - rvm: 2.3.0
       env:
-        - SPECFOLDER=spec/controllers
-        - SPECFOLDER=spec/lib
-        - SPECFOLDER=spec/mailers
-        - SPECFOLDER=spec/middleware
-        - SPECFOLDER=spec/models
-        - SPECFOLDER=spec/requests
-        - SPECFOLDER=spec/serializers
-        - SPECFOLDER=spec/workers
+        - SPECS=spec/controllers/api/v1/[a-m]*.rb
+    - rvm: 2.3.0
+      env:
+        - SPECS=spec/controllers/api/v1/[n-s]*.rb
+    - rvm: 2.3.0
+      env:
+        - SPECS=spec/controllers/api/v1/[t-z]*.rb
+    - rvm: 2.3.0
+      env:
+        - SPECS="spec/controllers/*.rb spec/controllers/api/*.rb"
+    - rvm: 2.3.0
+      env:
+        - SPECS=spec/models
+    - rvm: 2.3.0
+      env:
+        - SPECS=spec/workers
+    - rvm: 2.3.0
+      env:
+        - SPECS="spec/serializers spec/requests spec/middleware spec/mailers spec/lib"
 
 services:
   - postgresql
@@ -28,4 +44,4 @@ services:
 addons:
   postgresql: "9.4"
 
-script: "RACK_ENV=test bundle exec rspec $SPECFOLDER"
+script: "bundle exec rspec $SPECS"
