@@ -12,6 +12,15 @@ matrix:
   allow_failures:
   include:
     - rvm: 2.3.0
+      env:
+        - SPECFOLDER=spec/controllers
+        - SPECFOLDER=spec/lib
+        - SPECFOLDER=spec/mailers
+        - SPECFOLDER=spec/middleware
+        - SPECFOLDER=spec/models
+        - SPECFOLDER=spec/requests
+        - SPECFOLDER=spec/serializers
+        - SPECFOLDER=spec/workers
 
 services:
   - postgresql
@@ -19,4 +28,4 @@ services:
 addons:
   postgresql: "9.4"
 
-script: RACK_ENV=test bundle exec rspec
+script: "RACK_ENV=test bundle exec rspec $SPECFOLDER"
