@@ -2,8 +2,9 @@ require 'spec_helper'
 
 describe Api::V1::ProjectsController, type: :controller do
   let(:user) { create(:user) }
-  let(:projects) { create_list(:project_with_contents, 2, owner: user) }
-  let(:project) { create(:project_with_contents, owner: user) }
+  let(:projects) do
+    create_list(:project_with_contents, 2, owner: user)
+  end
   let(:authorized_user) { user }
 
   let(:api_resource_name) { "projects" }
@@ -84,7 +85,6 @@ describe Api::V1::ProjectsController, type: :controller do
           it_behaves_like "filter by display_name"
 
           describe "filter by display_name substring" do
-
             let(:index_options) { {search: resource.display_name[0..2]} }
 
             it "should respond with the most relevant item first" do
