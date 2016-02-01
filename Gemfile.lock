@@ -335,7 +335,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sqlite3 (1.3.11)
     stringex (2.5.2)
     therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
@@ -376,8 +375,6 @@ DEPENDENCIES
   active_model_serializers (= 0.10.0.rc2)
   active_record_union (~> 1.1.0)
   activerecord-import (~> 0.8)
-  activerecord-jdbcpostgresql-adapter
-  activerecord-jdbcsqlite3-adapter
   aws-sdk-v1 (~> 1.0)
   cellect-client (~> 1.2.0)
   database_cleaner (~> 1.3.0)
@@ -391,9 +388,7 @@ DEPENDENCIES
   foreman
   guard-rspec
   honeybadger (~> 2.0)
-  jbundler
   jquery-rails (~> 4.0)
-  jruby-kafka (= 1.0.0.beta)
   json-schema (~> 2.0)
   logstasher (~> 0.6)
   newrelic_rpm (~> 3.0)
@@ -422,10 +417,8 @@ DEPENDENCIES
   sinatra (>= 1.3.0)
   spring
   spring-commands-rspec
-  sqlite3
   stringex (~> 2.0)
   therubyracer (~> 0.12)
-  therubyrhino
   uglifier (~> 2.0)
   versionist (~> 1.0)
   zk-server

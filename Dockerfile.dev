@@ -15,8 +15,6 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/
 
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
-ADD ./Jarfile /rails_app/
-ADD ./Jarfile.lock /rails_app/
 
 RUN bundle install
 
