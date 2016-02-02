@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'jbundler', platform: :jruby
 gem 'rails', '~> 4.2.5'
 gem 'postgres_ext', '~> 2.4.0'
 gem 'active_record_union', '~> 1.1.0'
@@ -38,12 +37,6 @@ gem 'sidekiq-congestion', '~> 0.1.0'
 gem 'sidetiq', '~> 0.6.3'
 gem 'cellect-client', '~> 1.2.0', require: false
 
-platforms :jruby do
-  gem 'activerecord-jdbcpostgresql-adapter'
-  gem 'therubyrhino'
-  gem 'jruby-kafka', '1.0.0.beta'
-end
-
 platforms :ruby do
   gem 'therubyracer', '~> 0.12'
   gem 'pg', '~> 0.18'
@@ -52,8 +45,6 @@ end
 
 group :development do
   gem 'fig_rake', '~> 0.9.3'
-  gem 'sqlite3', platform: :ruby
-  gem 'activerecord-jdbcsqlite3-adapter', platform: :jruby
 end
 
 group :development, :test do
