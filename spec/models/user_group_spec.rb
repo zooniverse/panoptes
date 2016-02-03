@@ -143,4 +143,22 @@ describe UserGroup, :type => :model do
 
     it_behaves_like "it has a cached counter for classifications"
   end
+
+  describe '#verify_join_token' do
+    it 'returns true if the join token matches' do
+      result = user_group.verify_join_token(user_group.join_token)
+      expect(result).to be_truthy
+    end
+
+    it 'returns false if the join token does not match' do
+      result = user_group.verify_join_token('wrong')
+      expect(result).to be_falsey
+    end
+
+    it 'returns false if the group does not have a join token' do
+      user_group.join_token = nil
+      result = user_group.verify_join_token(user_group.join_token)
+      expect(result).to be_falsey
+    end
+  end
 end

@@ -83,6 +83,10 @@ class UserGroup < ActiveRecord::Base
     !!memberships.where(identity: true).pluck(:identity).first
   end
 
+  def verify_join_token(token_to_verify)
+    join_token.present? && join_token == token_to_verify
+  end
+
   private
 
   def default_display_name
