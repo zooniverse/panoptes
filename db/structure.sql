@@ -1016,7 +1016,8 @@ CREATE TABLE user_groups (
     activated_state integer DEFAULT 0 NOT NULL,
     display_name character varying,
     private boolean DEFAULT true NOT NULL,
-    lock_version integer DEFAULT 0
+    lock_version integer DEFAULT 0,
+    join_token character varying
 );
 
 
@@ -2815,4 +2816,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160113143609');
 INSERT INTO schema_migrations (version) VALUES ('20160114135531');
 
 INSERT INTO schema_migrations (version) VALUES ('20160114141909');
+
+INSERT INTO schema_migrations (version) VALUES ('20160202155708');
 
