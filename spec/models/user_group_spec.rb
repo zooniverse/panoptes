@@ -161,4 +161,26 @@ describe UserGroup, :type => :model do
       expect(result).to be_falsey
     end
   end
+
+  describe '#public?' do
+    it 'returns true for non-private groups' do
+      expect(described_class.new(private: false).public?).to be_truthy
+    end
+
+    it 'returns false for private groups' do
+      expect(described_class.new(private: true).public?).to be_falsey
+    end
+  end
+
+  describe '#member?' do
+    let(:user) { create :user }
+    it 'returns true when the user is a member of the group' do
+      expect(create(:user_group, users: [user]).member?(user)).to be_truthy
+    end
+
+    it 'returns false when the user is not a member' do
+      expect(create(:user_group, users: []).member?(user)).to be_falsey
+    end
+
+  end
 end

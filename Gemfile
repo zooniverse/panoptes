@@ -37,6 +37,7 @@ gem 'ranked-model', '~> 0.4.0'
 gem 'sidekiq-congestion', '~> 0.1.0'
 gem 'sidetiq', '~> 0.6.3'
 gem 'cellect-client', '~> 1.2.0', require: false
+gem 'active_interaction', '~> 3.0.1'
 
 platforms :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
