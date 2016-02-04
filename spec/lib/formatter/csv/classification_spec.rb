@@ -1,33 +1,29 @@
 require 'spec_helper'
 
 RSpec.describe Formatter::Csv::Classification do
-
   let(:project_headers) do
     %w( user_name user_id user_ip workflow_id workflow_name workflow_version
         created_at gold_standard expert metadata annotations subject_data )
   end
-
   let(:subject) { build_stubbed(:subject) }
-
   let(:subject_data) do
     { "#{subject.id}" => {retired: false}.merge(subject.metadata) }
   end
-
   let(:subject_json_data) { subject_data.to_json }
-
-  let(:ip_hash) do
-    Digest::SHA1.hexdigest("#{classification.user_ip}#{expected_time}")
+  let(:secure_user_ip) { SecureRandom.hex(10) }
+  let(:cache) do
+    double("Cache", subject: subject,
+      retired?: false,
+      workflow_at_version: workflow,
+      workflow_content_at_version: double("WorkflowContent", strings: {}),
+      secure_user_ip: secure_user_ip
+    )
   end
-
-  let(:cache) { double("Cache", subject: subject,
-                                retired?: false,
-                                workflow_at_version: workflow,
-                                workflow_content_at_version: double("WorkflowContent", strings: {})) }
 
   let(:formatted_data) do
     [ classification.user.login,
       classification.user_id,
-      ip_hash,
+      secure_user_ip,
       classification.workflow_id,
       classification.workflow.display_name,
       classification.workflow_version,
@@ -52,12 +48,9 @@ RSpec.describe Formatter::Csv::Classification do
   end
 
   describe "#to_array" do
-    let!(:expected_time) { Time.now.to_i }
-
     before(:each) do
       allow(Subject).to receive(:where).with(id: classification.subject_ids).and_return([subject])
       allow(workflow).to receive(:primary_content).and_return(build_stubbed(:workflow_content, workflow: workflow))
-      allow(formatter).to receive(:salt).and_return(expected_time)
     end
 
     it 'return an array formatted classifcation data' do
@@ -84,7 +77,7 @@ RSpec.describe Formatter::Csv::Classification do
       it 'should should return not logged in' do
         allow(classification).to receive(:user).and_return(nil)
         user_id = formatter.to_array(classification)[0]
-        expect(user_id).to eq("not-logged-in-#{ip_hash}")
+        expect(user_id).to eq("not-logged-in-#{secure_user_ip}")
       end
     end
   end

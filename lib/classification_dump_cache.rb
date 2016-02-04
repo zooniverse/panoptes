@@ -2,9 +2,9 @@ class ClassificationDumpCache
   def initialize
     @workflows = {}
     @workflow_contents = {}
-
     @subjects = {}
     @subject_workflow_counts = {}
+    @secure_ip_lookup = {}
   end
 
   def reset_subjects(subjects)
@@ -38,6 +38,14 @@ class ClassificationDumpCache
       workflow_content = WorkflowContent.find(workflow_content_id)
       old_version = workflow_content.versions[version].try(:reify)
       old_version || workflow_content
+    end
+  end
+
+  def secure_user_ip(ip_string)
+    if rand_hex = @secure_ip_lookup[ip_string]
+      rand_hex
+    else
+      @secure_ip_lookup[ip_string] = SecureRandom.hex(10)
     end
   end
 end
