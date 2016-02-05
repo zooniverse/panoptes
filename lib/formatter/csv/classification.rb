@@ -11,10 +11,10 @@ module Formatter
            created_at gold_standard expert metadata annotations subject_data)
       end
 
-      def initialize(project, cache, obfuscate_private_details: true)
+      def initialize(project, cache, hide_private_details: true)
         @project = project
         @cache = cache
-        @obfuscate = obfuscate_private_details
+        @obfuscate = hide_private_details
         @salt = Time.now.to_i
       end
 
@@ -31,12 +31,16 @@ module Formatter
         if user = classification.user
           user.login
         else
-          "not-logged-in-#{hash_value(classification.user_ip.to_s)}"
+          "not-logged-in-#{secure_user_ip}"
         end
       end
 
       def user_ip
-        obfuscate_value(classification.user_ip.to_s)
+        if obfuscate
+          secure_user_ip
+        else
+          classification.user_ip.to_s
+        end
       end
 
       def subject_data
@@ -66,12 +70,8 @@ module Formatter
         workflow.display_name
       end
 
-      def obfuscate_value(value)
-        obfuscate ? hash_value(value) : value
-      end
-
-      def hash_value(value)
-        Digest::SHA1.hexdigest("#{value}#{salt}")
+      def secure_user_ip
+        cache.secure_user_ip(classification.user_ip.to_s)
       end
     end
   end
