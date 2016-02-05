@@ -17,6 +17,7 @@
 
 # Ignore all config files
 /config/*.yml
+/config/aws_ips.json
 
 .vagrant/
 *.swp
