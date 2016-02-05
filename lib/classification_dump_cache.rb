@@ -42,10 +42,6 @@ class ClassificationDumpCache
   end
 
   def secure_user_ip(ip_string)
-    if rand_hex = @secure_ip_lookup[ip_string]
-      rand_hex
-    else
-      @secure_ip_lookup[ip_string] = SecureRandom.hex(10)
-    end
+    @secure_ip_lookup[ip_string] ||= SecureRandom.hex(10)
   end
 end

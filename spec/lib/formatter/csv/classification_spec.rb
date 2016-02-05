@@ -65,14 +65,6 @@ RSpec.describe Formatter::Csv::Classification do
       end
     end
 
-    context "when the obfuscate_private_details flag is false" do
-      it 'return the real classification ip in the array' do
-        allow(formatter).to receive(:obfuscate).and_return(false)
-        user_ip = formatter.to_array(classification)[2]
-        expect(user_ip).to eq(classification.user_ip.to_s)
-      end
-    end
-
     context "when the classifier is logged out" do
       it 'should should return not logged in' do
         allow(classification).to receive(:user).and_return(nil)
