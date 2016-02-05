@@ -50,6 +50,8 @@ end
 group :development, :test do
   gem 'foreman'
   gem 'pry-rails'
+  gem 'pry-byebug'
+  gem 'pry-stack_explorer'
   gem 'spring'
 end
 
