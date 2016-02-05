@@ -8,6 +8,8 @@ RUN apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y git curl supervisor libpq-dev && \
     apt-get clean
 
+RUN mkdir config && curl "https://ip-ranges.amazonaws.com/ip-ranges.json" > config/aws_ips.json
+
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
