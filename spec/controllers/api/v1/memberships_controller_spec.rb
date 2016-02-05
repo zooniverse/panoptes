@@ -39,39 +39,21 @@ describe Api::V1::MembershipsController, type: :controller do
 
   describe "#create" do
     let(:test_attr) { :state }
-    let(:test_attr_value) { "inactive" }
-
-    describe "adding a user to a group you admin" do
-      let(:create_params) do
-        {
-          memberships: {
-            links: {
-              user: create(:user).id.to_s,
-              user_group: resource.user_group.id.to_s
-            }
+    let(:test_attr_value) { "active" }
+    let(:user_group) { create :user_group }
+    let(:create_params) do
+      {
+        memberships: {
+          join_token: user_group.join_token,
+          links: {
+            user: authorized_user.id.to_s,
+            user_group: user_group.id.to_s
           }
-        }
-      end
-
-      it_behaves_like "is creatable"
+        },
+      }
     end
 
-    describe "adding yourself to a group using a join token" do
-      let(:user_group) { create :user_group }
-      let(:create_params) do
-        {
-          memberships: {
-            join_token: user_group.join_token,
-            links: {
-              user: authorized_user.id.to_s,
-              user_group: user_group.id.to_s
-            }
-          },
-        }
-      end
-
-      it_behaves_like "is creatable"
-    end
+    it_behaves_like "is creatable"
   end
 
   describe "#destroy" do
