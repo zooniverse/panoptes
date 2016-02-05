@@ -9,9 +9,8 @@ class Api::V1::MembershipsController < Api::ApiController
 
   def create
     resources = resource_class.transaction(requires_new: true) do
-
       Array.wrap(create_params).map do |membership_params|
-        Memberships::Create.run!(membership_params.merge(api_user: api_user))
+        operation.run!(membership_params)
       end
     end
 

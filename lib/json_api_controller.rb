@@ -64,6 +64,14 @@ module JsonApiController
     @resource_class ||= resource_name.camelize.constantize
   end
 
+  def operation_class(action = action_name)
+    @operation_class ||= "#{resource_name.pluralize.camelize}::#{action.camelize}".constantize
+  end
+
+  def operation
+    operation_class.with(api_user: api_user)
+  end
+
   def context
     {}
   end

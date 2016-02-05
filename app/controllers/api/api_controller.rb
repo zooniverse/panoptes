@@ -40,7 +40,8 @@ module Api
       Api::NoUserError,
       Api::UnpermittedParameter,
       RestPack::Serializer::InvalidInclude,
-      ActiveRecord::RecordNotUnique, with: :unprocessable_entity
+      ActiveRecord::RecordNotUnique,
+      Operation::Error,                                    with: :unprocessable_entity
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]
