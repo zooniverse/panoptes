@@ -33,5 +33,11 @@ describe Memberships::Create do
         operation.run links: {user: you.id, user_group: user_group.id}, join_token: 'wrong_token'
       end.to raise_error(Operation::Unauthorized)
     end
+
+    it 'does not work for missing groups' do
+      expect do
+        operation.run links: {user: you.id, user_group: 0}, join_token: 'wrong_token'
+      end.to raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 end

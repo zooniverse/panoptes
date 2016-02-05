@@ -21,9 +21,6 @@ module Memberships
 
     def user_group
       UserGroup.find(links["user_group"])
-    rescue ActiveRecord::NotFound
-      msg = "Couldn't find linked #{relation.klass.model_name.send(error_name)} for current user"
-      raise JsonApiController::NotLinkable.new(msg)
     end
   end
 end
