@@ -1,7 +1,7 @@
 module Formatter
   module Csv
     class Classification
-      attr_reader :classification, :project, :cache, :obfuscate, :salt
+      attr_reader :classification, :project, :cache, :salt
 
       delegate :user_id, :workflow, :workflow_id, :created_at, :gold_standard,
         :workflow_version, to: :classification
@@ -11,10 +11,9 @@ module Formatter
            created_at gold_standard expert metadata annotations subject_data)
       end
 
-      def initialize(project, cache, hide_private_details: true)
+      def initialize(project, cache)
         @project = project
         @cache = cache
-        @obfuscate = hide_private_details
         @salt = Time.now.to_i
       end
 
@@ -31,16 +30,12 @@ module Formatter
         if user = classification.user
           user.login
         else
-          "not-logged-in-#{secure_user_ip}"
+          "not-logged-in-#{user_ip}"
         end
       end
 
       def user_ip
-        if obfuscate
-          secure_user_ip
-        else
-          classification.user_ip.to_s
-        end
+        cache.secure_user_ip(classification.user_ip.to_s)
       end
 
       def subject_data
@@ -68,10 +63,6 @@ module Formatter
 
       def workflow_name
         workflow.display_name
-      end
-
-      def secure_user_ip
-        cache.secure_user_ip(classification.user_ip.to_s)
       end
     end
   end

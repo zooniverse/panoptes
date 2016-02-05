@@ -8,12 +8,10 @@ class ClassificationsDumpWorker
 
   sidekiq_options queue: :data_high
 
-  def perform_dump(private=true)
+  def perform_dump
     CSV.open(csv_file_path, 'wb') do |csv|
       cache = ClassificationDumpCache.new
-      formatter = Formatter::Csv::Classification.new(
-        project, cache, hide_private_details: private
-      )
+      formatter = Formatter::Csv::Classification.new(project, cache)
 
       csv <<  formatter.class.headers
 
