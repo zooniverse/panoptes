@@ -17,10 +17,13 @@ class ProjectSerializer
   can_include :workflows, :subject_sets, :owners, :project_contents,
     :project_roles, :pages
   media_include :avatar, :background, :attached_images,
-    classifications_export: { include: false}, subjects_export: { include: false },
+    classifications_export: { include: false},
+    subjects_export: { include: false },
     aggregations_export: { include: false }
-  can_filter_by :display_name, :slug, :beta_requested, :beta_approved, :launch_requested, :launch_approved, :private
-  can_sort_by :launch_date, :activity, :completeness, :classifiers_count, :updated_at
+  can_filter_by :display_name, :slug, :beta_requested, :beta_approved,
+    :launch_requested, :launch_approved, :private
+  can_sort_by :launch_date, :activity, :completeness, :classifiers_count,
+    :updated_at, :display_name
 
   def self.links
     links = super
