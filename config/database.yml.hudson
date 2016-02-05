@@ -4,7 +4,7 @@ default: &default
   user: panoptes
   username: panoptes
   password: panoptes
-  host: postgres
+  host: pg
   pool: 5
   port: 5432
 
