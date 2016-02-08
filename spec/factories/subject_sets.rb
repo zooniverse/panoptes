@@ -13,7 +13,10 @@ FactoryGirl.define do
 
     factory :subject_set_with_subjects do
       after(:create) do |sg|
-        create_list(:set_member_subject, 2, subject_set: sg)
+        2.times do |i|
+          subject = create(:subject, project: sg.project, uploader: sg.project.owner)
+          create(:set_member_subject, subject_set: sg, subject: subject)
+        end
       end
     end
   end
