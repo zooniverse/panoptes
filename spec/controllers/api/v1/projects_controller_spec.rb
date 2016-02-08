@@ -39,9 +39,10 @@ describe Api::V1::ProjectsController, type: :controller do
   describe "when not logged in" do
     describe "#index" do
       let(:authorized_user) { nil }
-      let(:n_visible) { 4 }
+      let(:n_visible) { 2 }
 
       before do
+        private_resource
         projects
       end
 
@@ -67,7 +68,7 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       describe "params" do
-        let!(:project_owner) { create(:user) }
+        let(:project_owner) { create(:user) }
         let(:new_project) do
           create(:full_project, display_name: "Non-test project", owner: project_owner)
         end
@@ -109,7 +110,6 @@ describe Api::V1::ProjectsController, type: :controller do
             [create(:tag, name: "youreit", resource: new_project),
              create(:tag, name: "youreout", resource: beta_resource)]
           end
-
           let(:tag) { tags.first }
 
           describe "fuzzy filter by tag name" do
@@ -158,7 +158,10 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "include avatar and background" do
-          let(:index_options) { {include: 'avatar,background'} }
+          let(:index_options) do
+            resource
+            {include: 'avatar,background'}
+          end
 
           it 'should include avatar' do
             expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
@@ -180,7 +183,10 @@ describe Api::V1::ProjectsController, type: :controller do
 
         describe "filter by beta" do
           context "for beta projects" do
-            let(:index_options) { { beta_approved: "true" } }
+            let(:index_options) do
+              beta_resource
+              { beta_approved: "true" }
+            end
 
             it "should respond with the beta project" do
               expect(Project.find(ids)).to include(beta_resource)
@@ -204,7 +210,10 @@ describe Api::V1::ProjectsController, type: :controller do
 
         describe "filter by approved" do
           context "for unapproved projects" do
-            let(:index_options) { { launch_approved: "false" } }
+            let(:index_options) do
+              unapproved_resource
+              { launch_approved: "false" }
+            end
 
             it "should respond with the unapproved project" do
               expect(Project.find(ids)).to include(unapproved_resource)
@@ -225,7 +234,10 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "filter by owner" do
-          let(:index_options) { { owner: project_owner.login } }
+          let(:index_options) do
+            resource
+            { owner: project_owner.login }
+          end
 
           it "should respond with 1 item" do
             expect(json_response[api_resource_name].length).to eq(1)
@@ -236,8 +248,11 @@ describe Api::V1::ProjectsController, type: :controller do
             expect(owner_id).to eq(new_project.owner.id.to_s)
           end
 
-          context "when the project owner name has a differnt case to the identity group" do
-            let!(:index_options) { { owner: [project_owner.login.upcase, 'SOMETHING'].join(',') } }
+          context "when the project owner name has a different case to the identity group" do
+            let!(:index_options) do
+              resource
+              { owner: [project_owner.login.upcase, 'SOMETHING'].join(',') }
+            end
 
             it "should respond with 1 item" do
               expect(json_response[api_resource_name].length).to eq(1)
@@ -251,7 +266,10 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "filter by current_user_roles" do
-          let(:index_options) { { current_user_roles: 'owner,collaborator' } }
+          let(:index_options) do
+            collab_acls
+            { current_user_roles: 'owner,collaborator' }
+          end
           let(:collab_acls) do
             create(:access_control_list,
                    resource: beta_resource,
@@ -263,10 +281,6 @@ describe Api::V1::ProjectsController, type: :controller do
                    roles: ["collaborator"])
           end
           let(:response_ids) { json_response[api_resource_name].map{ |p| p['id'] } }
-
-          before do
-            collab_acls
-          end
 
           it "should respond with 3 items" do
             expect(json_response[api_resource_name].length).to eq(3)
@@ -340,6 +354,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
       describe "include params" do
         before(:each) do
+          project
           get :index, { include: includes }
         end
 
