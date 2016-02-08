@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe Api::V1::ProjectsController, type: :controller do
-  let!(:user) { create(:user) }
-  let!(:projects) {create_list(:project_with_contents, 2, owner: user) }
+  let(:user) { create(:user) }
+  let(:projects) { create_list(:project_with_contents, 2, owner: user) }
+  let(:project) { create(:project_with_contents, owner: user) }
   let(:authorized_user) { user }
 
   let(:api_resource_name) { "projects" }
@@ -30,15 +31,21 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:scopes) { %w(public project) }
   let(:authorized_user) { user }
   let(:resource_class) { Project }
-  let!(:private_resource) { create(:project, private: true) }
-  let!(:beta_resource) { create(:project, beta_approved: true, launch_approved: false) }
-  let!(:unapproved_resource) { create(:project, beta_approved: false, launch_approved: false) }
-  let!(:deactivated_resource) { create(:project, activated_state: :inactive) }
+  let(:private_resource) { create(:project, private: true) }
+  let(:beta_resource) { create(:project, beta_approved: true, launch_approved: false) }
+  let(:unapproved_resource) { create(:project, beta_approved: false, launch_approved: false) }
+  let(:deactivated_resource) { create(:project, activated_state: :inactive) }
 
   describe "when not logged in" do
     describe "#index" do
       let(:authorized_user) { nil }
-      let(:n_visible) { 4 }
+      let(:n_visible) { 2 }
+
+      before do
+        private_resource
+        projects
+      end
+
       it_behaves_like "is indexable"
       it_behaves_like "it has custom owner links"
       it_behaves_like "it only lists active resources"
@@ -46,7 +53,6 @@ describe Api::V1::ProjectsController, type: :controller do
   end
 
   describe "a logged in user" do
-
     before(:each) do
       default_request(scopes: scopes, user_id: user.id)
     end
@@ -54,6 +60,7 @@ describe Api::V1::ProjectsController, type: :controller do
     describe "#index" do
       describe "custom owner links" do
         before(:each) do
+          projects
           get :index
         end
 
@@ -61,14 +68,15 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       describe "params" do
-        let!(:project_owner) { create(:user) }
-        let!(:new_project) do
+        let(:project_owner) { create(:user) }
+        let(:new_project) do
           create(:full_project, display_name: "Non-test project", owner: project_owner)
         end
         let(:resource) { new_project }
         let(:ids) { json_response["projects"].map{ |p| p["id"] } }
 
         before(:each) do
+          projects
           get :index, index_options
         end
 
@@ -102,7 +110,6 @@ describe Api::V1::ProjectsController, type: :controller do
             [create(:tag, name: "youreit", resource: new_project),
              create(:tag, name: "youreout", resource: beta_resource)]
           end
-
           let(:tag) { tags.first }
 
           describe "fuzzy filter by tag name" do
@@ -151,7 +158,10 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "include avatar and background" do
-          let(:index_options) { {include: 'avatar,background'} }
+          let(:index_options) do
+            resource
+            {include: 'avatar,background'}
+          end
 
           it 'should include avatar' do
             expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
@@ -173,7 +183,10 @@ describe Api::V1::ProjectsController, type: :controller do
 
         describe "filter by beta" do
           context "for beta projects" do
-            let(:index_options) { { beta_approved: "true" } }
+            let(:index_options) do
+              beta_resource
+              { beta_approved: "true" }
+            end
 
             it "should respond with the beta project" do
               expect(Project.find(ids)).to include(beta_resource)
@@ -197,7 +210,10 @@ describe Api::V1::ProjectsController, type: :controller do
 
         describe "filter by approved" do
           context "for unapproved projects" do
-            let(:index_options) { { launch_approved: "false" } }
+            let(:index_options) do
+              unapproved_resource
+              { launch_approved: "false" }
+            end
 
             it "should respond with the unapproved project" do
               expect(Project.find(ids)).to include(unapproved_resource)
@@ -218,7 +234,10 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "filter by owner" do
-          let(:index_options) { { owner: project_owner.login } }
+          let(:index_options) do
+            resource
+            { owner: project_owner.login }
+          end
 
           it "should respond with 1 item" do
             expect(json_response[api_resource_name].length).to eq(1)
@@ -229,8 +248,11 @@ describe Api::V1::ProjectsController, type: :controller do
             expect(owner_id).to eq(new_project.owner.id.to_s)
           end
 
-          context "when the project owner name has a differnt case to the identity group" do
-            let!(:index_options) { { owner: [project_owner.login.upcase, 'SOMETHING'].join(',') } }
+          context "when the project owner name has a different case to the identity group" do
+            let!(:index_options) do
+              resource
+              { owner: [project_owner.login.upcase, 'SOMETHING'].join(',') }
+            end
 
             it "should respond with 1 item" do
               expect(json_response[api_resource_name].length).to eq(1)
@@ -244,7 +266,10 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "filter by current_user_roles" do
-          let(:index_options) { collab_acls; { current_user_roles: 'owner,collaborator' } }
+          let(:index_options) do
+            collab_acls
+            { current_user_roles: 'owner,collaborator' }
+          end
           let(:collab_acls) do
             create(:access_control_list,
                    resource: beta_resource,
@@ -255,7 +280,6 @@ describe Api::V1::ProjectsController, type: :controller do
                    user_group: user.identity_group,
                    roles: ["collaborator"])
           end
-
           let(:response_ids) { json_response[api_resource_name].map{ |p| p['id'] } }
 
           it "should respond with 3 items" do
@@ -268,6 +292,15 @@ describe Api::V1::ProjectsController, type: :controller do
 
           it "should respond with the correct item" do
             expect(response_ids).to include(new_project.id.to_s, *projects.map(&:id).map(&:to_s))
+          end
+
+          context "with just the owner role filter" do
+            let(:index_options) { { current_user_roles: 'owner' } }
+
+            it "should respond with 2 items" do
+              expect(json_response[api_resource_name].length).to eq(2)
+            end
+
           end
         end
 
@@ -321,6 +354,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
       describe "include params" do
         before(:each) do
+          project
           get :index, { include: includes }
         end
 
@@ -355,8 +389,10 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe "#show" do
+      let(:project_id) { project.id }
+
       before(:each) do
-        get :show, id: projects.first.id
+        get :show, id: project_id
       end
 
       it "should return 200" do
@@ -365,7 +401,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
       it "should return the only requested project" do
         expect(json_response[api_resource_name].length).to eq(1)
-        expect(json_response[api_resource_name][0]['id']).to eq(projects.first.id.to_s)
+        expect(json_response[api_resource_name][0]['id']).to eq(project_id.to_s)
       end
 
       it_behaves_like "an api response"
@@ -886,7 +922,7 @@ describe Api::V1::ProjectsController, type: :controller do
   end
 
   describe "versioning" do
-    let(:resource) { projects.first }
+    let(:resource) { project }
     let!(:existing_versions) { resource.versions.length }
     let(:num_times) { 11 }
     let(:update_proc) { Proc.new { |resource, n| resource.update!(live: (n % 2 == 0)) } }
