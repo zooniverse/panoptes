@@ -87,14 +87,6 @@ class UserGroup < ActiveRecord::Base
     join_token.present? && join_token == token_to_verify
   end
 
-  def public?
-    !private?
-  end
-
-  def member?(user)
-    memberships.find_by(user_id: user.id)
-  end
-
   private
 
   def default_display_name
