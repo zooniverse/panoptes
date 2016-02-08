@@ -13,7 +13,7 @@ module FilterByCurrentUserRoles
         .where(access_control_lists: {user_group_id: api_user.user.identity_group.id})
         .where.overlap(access_control_lists: { roles: roles_filter })
       if owner_eager_load(roles_filter)
-        @controlled_resources = @controlled_resources.eager_load(:owner)
+        @controlled_resources = @controlled_resources.preload(:owner)
       end
     end
   end
