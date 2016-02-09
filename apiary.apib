@@ -2839,8 +2839,9 @@ Memberships are returned as an array under *memberships*.
 
 ### Create a Membership [POST]
 A membership creation request must include a link to a user and to a
-user_group. Optionally it may include an array of roles. It's state
-will be set to 'invited' until the linked user takes action.
+user_group, although currently the linked user must always be the current user.
+The request must also include the secret join_token of the user_group as an attribute
+of the membership (although this property is not persisted).
 
 + Request
 
@@ -2853,7 +2854,7 @@ will be set to 'invited' until the linked user takes action.
 
             {
                 "memberships": {
-                    "roles": ["group_admin"],
+                    "join_token": "decafbad",
                     "links": {
                         "user": "10",
                         "user_group": "11

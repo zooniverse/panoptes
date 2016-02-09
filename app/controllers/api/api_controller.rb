@@ -20,12 +20,14 @@ module Api
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
     rescue_from Api::LiveProjectChanges,                   with: :forbidden
     rescue_from Api::NotLoggedIn,
-      Api::UnauthorizedTokenError,                         with: :not_authenticated
+      Api::UnauthorizedTokenError,
+      Operation::Unauthenticated,                          with: :not_authenticated
     rescue_from Api::UnsupportedMediaType,                 with: :unsupported_media_type
     rescue_from JsonApiController::PreconditionNotPresent, with: :precondition_required
     rescue_from JsonApiController::PreconditionFailed,     with: :precondition_failed
     rescue_from ActiveRecord::StaleObjectError,            with: :conflict
-    rescue_from Api::LimitExceeded,                        with: :not_authorized
+    rescue_from Api::LimitExceeded,
+      Operation::Unauthorized,                             with: :not_authorized
     rescue_from Api::PatchResourceError,
       Api::UserSeenSubjectIdError,
       ActionController::UnpermittedParameters,
@@ -38,7 +40,8 @@ module Api
       Api::NoUserError,
       Api::UnpermittedParameter,
       RestPack::Serializer::InvalidInclude,
-      ActiveRecord::RecordNotUnique, with: :unprocessable_entity
+      ActiveRecord::RecordNotUnique,
+      Operation::Error,                                    with: :unprocessable_entity
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]

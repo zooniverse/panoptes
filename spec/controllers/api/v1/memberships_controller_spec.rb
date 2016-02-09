@@ -39,15 +39,17 @@ describe Api::V1::MembershipsController, type: :controller do
 
   describe "#create" do
     let(:test_attr) { :state }
-    let(:test_attr_value) { "inactive" }
+    let(:test_attr_value) { "active" }
+    let(:user_group) { create :user_group }
     let(:create_params) do
       {
         memberships: {
+          join_token: user_group.join_token,
           links: {
-            user: create(:user).id.to_s,
-            user_group: resource.user_group.id.to_s
+            user: authorized_user.id.to_s,
+            user_group: user_group.id.to_s
           }
-        }
+        },
       }
     end
 

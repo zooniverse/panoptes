@@ -25,6 +25,7 @@ class UserGroup < ActiveRecord::Base
     format: { with: User::USER_LOGIN_REGEX }
 
   before_validation :default_display_name, on: [:create, :update]
+  before_validation :default_join_token, on: [:create]
 
   scope :public_groups, -> { where(private: false) }
 
@@ -82,9 +83,17 @@ class UserGroup < ActiveRecord::Base
     !!memberships.where(identity: true).pluck(:identity).first
   end
 
+  def verify_join_token(token_to_verify)
+    join_token.present? && join_token == token_to_verify
+  end
+
   private
 
   def default_display_name
     self.display_name ||= name
+  end
+
+  def default_join_token
+    self.join_token ||= SecureRandom.hex(8)
   end
 end
