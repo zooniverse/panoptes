@@ -499,9 +499,7 @@ describe ClassificationLifecycle do
   end
 
   describe "dequeue_for_non_logged_in" do
-
     context "when the user is logged in" do
-
       it "should not queue a worker" do
         expect(DequeueSubjectQueueWorker).to_not receive(:perform_async)
         subject.dequeue_for_non_logged_in
@@ -520,7 +518,6 @@ describe ClassificationLifecycle do
   end
 
   describe "#mark_expert_classifier" do
-
     context "without a logged in user" do
       let(:classification) { create(:classification, user: nil) }
 
@@ -554,7 +551,6 @@ describe ClassificationLifecycle do
         end
 
         context "when the subject is already seen" do
-
           it "should not mark the classification as expert" do
             allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
             subject.mark_expert_classifier
@@ -609,7 +605,6 @@ describe ClassificationLifecycle do
   end
 
   describe "#add_project_live_state" do
-
     it "should leave all other metadata intact" do
       prev_metadata = classification.metadata
       subject.add_project_live_state
@@ -618,7 +613,6 @@ describe ClassificationLifecycle do
     end
 
     context "when the project is not live" do
-
       it "should return false for the project live metadata" do
         subject.add_project_live_state
         expect(classification.metadata[:live_project]).to eq(false)
@@ -626,7 +620,6 @@ describe ClassificationLifecycle do
     end
 
     context "when the project is live" do
-
       it "should return false for the project live metadata" do
         allow_any_instance_of(Project).to receive(:live).and_return(true)
         subject.add_project_live_state
@@ -635,8 +628,31 @@ describe ClassificationLifecycle do
     end
   end
 
-  describe "#add_lifecycled_at" do
+  describe "#add_user_groups" do
+    it "should leave all other metadata intact" do
+      prev_metadata = classification.metadata
+      subject.add_user_groups
+      updated_metadata = classification.metadata.except(:user_group_ids)
+      expect(updated_metadata).to eq(prev_metadata)
+    end
 
+    it "should not add identity group" do
+      subject.add_user_groups
+      expect(classification.metadata[:user_group_ids]).to eq([])
+    end
+
+    it "should add all other groups a user is currently in" do
+      group1 = create :user_group
+      group2 = create :user_group
+      classification.user.memberships.create! user_group: group1
+      classification.user.memberships.create! user_group: group2
+
+      subject.add_user_groups
+      expect(classification.metadata[:user_group_ids]).to match_array([group1.id, group2.id])
+    end
+  end
+
+  describe "#add_lifecycled_at" do
     it "should mark the lifecycled_at timestamp" do
       subject.add_lifecycled_at
       prev, current = classification.changes[:lifecycled_at]
@@ -646,7 +662,6 @@ describe ClassificationLifecycle do
   end
 
   describe "#add_seen_before_for_user" do
-
     it "should leave all other metadata intact" do
       prev_metadata = classification.metadata
       subject.add_seen_before_for_user
@@ -655,7 +670,6 @@ describe ClassificationLifecycle do
     end
 
     context "when the classification is anonymous" do
-
       it "should not add the seen_before metadata value" do
         subject.add_seen_before_for_user
         expect(classification.metadata.has_key?(:seen_before)).to eq(false)
@@ -663,9 +677,7 @@ describe ClassificationLifecycle do
     end
 
     context "when the classification is for a user" do
-
       context "when the user has not seen the subject before" do
-
         it "should not add the seen_before metadata value" do
           subject.add_seen_before_for_user
           expect(classification.metadata.has_key?(:seen_before)).to eq(false)
@@ -673,7 +685,6 @@ describe ClassificationLifecycle do
       end
 
       context "when the user has seen the subject before" do
-
         it "should add the seen_before metadata value" do
           allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
           subject.add_seen_before_for_user

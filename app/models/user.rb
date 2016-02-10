@@ -257,6 +257,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def non_identity_user_group_ids
+    memberships.where(identity: false).pluck(:user_group_id)
+  end
+
   def panoptes_zoo_id
     "panoptes-#{ id }"
   end
