@@ -23,8 +23,8 @@ describe EventStream do
         [anything, including("2015-01-02")]).once
     end
 
-    it 'ensures the event has a consistently formatted time' do
-      time = "#{Time.zone.now}"
+    it 'ensures it calls the time format method' do
+      time = Time.zone.now
       expect(EventStream).to receive(:formatted_time).with(time)
       EventStream.push(topic, event_time: time)
     end
@@ -32,7 +32,7 @@ describe EventStream do
 
   describe "::formatted_time" do
     let(:time) { Time.zone.now }
-    let(:time_str) { "#{Time.zone.now}" }
+    let(:time_str) { time.to_s }
     let(:iso_time_str) { time.iso8601 }
 
     it "should convert a string input to a standard format" do
