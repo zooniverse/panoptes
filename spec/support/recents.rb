@@ -36,7 +36,7 @@ RSpec.shared_examples "has recents" do
     let(:filter_params) { {sort: "+created_at" } }
 
     it 'should be sorted by created_at in ascending order' do
-      expect(recent_json.map{ |r| r['id'].to_i }).to eq(Recent.order(created_at: :asc).pluck(:id))
+      expect(recent_json.map{ |r| r['id'].to_i }).to match_array(Recent.order(created_at: :asc).pluck(:id))
     end
   end
 
@@ -44,7 +44,7 @@ RSpec.shared_examples "has recents" do
     let(:filter_params) { {sort: "-created_at" } }
 
     it 'should be sorted by created_at in descending order' do
-      expect(recent_json.map{ |r| r['id'].to_i }).to eq(Recent.order(created_at: :desc).pluck(:id))
+      expect(recent_json.map{ |r| r['id'].to_i }).to match_array(Recent.order(created_at: :desc).pluck(:id))
     end
   end
 
