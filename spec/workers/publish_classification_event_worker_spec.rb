@@ -27,7 +27,7 @@ RSpec.describe PublishClassificationEventWorker do
       let(:payload_expectation) do
         a_hash_including(
           event_id: "classification-#{classification.id}",
-          event_time: classification.created_at.iso8601,
+          event_time: classification.updated_at,
           classification_id: classification.id,
           project_id: classification.project.id,
           user_id: Digest::SHA1.hexdigest(classification.user_id.to_s),

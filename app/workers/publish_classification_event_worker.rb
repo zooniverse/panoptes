@@ -12,7 +12,7 @@ class PublishClassificationEventWorker
     if classification.complete?
       EventStream.push("classification",
         event_id: "classification-#{classification.id}",
-        event_time: classification.updated_at.iso8601,
+        event_time: classification.updated_at,
         classification_id: classification.id,
         project_id: classification.project.id,
         user_id: classification_user_id,
