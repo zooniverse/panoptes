@@ -61,7 +61,7 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 0. Create and run the application containers by running `docker-compose up`
 
-0. After step 5 finishes, open a new terminal and run `frake db:create db:migrate` to setup the database
+0. After step 5 finishes, open a new terminal and run `frake db:setup` to setup the database
 
 0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `frails runner db/fig_dev_seed_data/fig_dev_seed_data.rb`
 
