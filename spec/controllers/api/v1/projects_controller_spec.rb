@@ -5,6 +5,7 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:projects) do
     create_list(:project_with_contents, 2, owner: user)
   end
+  let(:project) { create(:project_with_contents, owner: user) }
   let(:authorized_user) { user }
 
   let(:api_resource_name) { "projects" }
