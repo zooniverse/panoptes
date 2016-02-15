@@ -6,7 +6,7 @@ class KafkaClassificationSerializer < ActiveModel::Serializer
     Serialization::V1Adapter.new(serializer, options)
   end
 
-  attributes :id, :annotations, :created_at, :metadata
+  attributes :id, :created_at, :updated_at, :user_ip, :annotations, :metadata
 
   belongs_to :project, serializer: KafkaProjectSerializer
   belongs_to :user, serializer: KafkaUserSerializer
