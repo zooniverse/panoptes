@@ -31,21 +31,23 @@ RSpec.describe UserWelcomeMailerWorker do
   end
 
   context "when the user has an invalid email" do
+    [ Net::SMTPSyntaxError, Net::SMTPFatalError ].each do |error_klass|
+      before(:each) do
+        allow_any_instance_of(ActionMailer::MessageDelivery)
+          .to receive(:deliver)
+          .and_raise(error_klass.new)
+        allow(user).to receive(:email).and_return("test@example.com,ox")
+      end
 
-    before(:each) do
-      allow_any_instance_of(ActionMailer::MessageDelivery).to receive(:deliver).and_raise(Net::SMTPSyntaxError.new)
-    end
+      it 'should attempt to send an email' do
+        expect_any_instance_of(ActionMailer::MessageDelivery).to receive(:deliver)
+        subject.perform(user.id)
+      end
 
-    it 'should attempt to send an email' do
-      allow(user).to receive(:email).and_return("test@example.com,ox")
-      expect_any_instance_of(ActionMailer::MessageDelivery).to receive(:deliver)
-      subject.perform(user.id)
-    end
-
-    it 'should mark the user with invalid_email' do
-      allow(user).to receive(:email).and_return("test@example.com,ox")
-      subject.perform(user.id)
-      expect(user.reload.valid_email).to eq(false)
+      it 'should mark the user with invalid_email' do
+        subject.perform(user.id)
+        expect(user.reload.valid_email).to eq(false)
+      end
     end
   end
 end

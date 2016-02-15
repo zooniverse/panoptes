@@ -15,7 +15,7 @@ class UserWelcomeMailerWorker
     end
   rescue ActiveRecord::RecordNotFound
     nil
-  rescue Net::SMTPSyntaxError => e
+  rescue Net::SMTPSyntaxError, Net::SMTPFatalError => e
     @user.update_attribute(:valid_email, false)
   end
 end
