@@ -32,7 +32,7 @@ class PublishClassificationWorker
   end
 
   def publish_to_kinesis!
-    KinesisPublisher.publish("classification", classification.project.id, kinesis_payload)
+    KinesisPublisher.publish("classification", classification.workflow_id, kinesis_payload)
   end
 
   def kinesis_payload
