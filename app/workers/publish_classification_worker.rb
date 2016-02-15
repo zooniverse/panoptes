@@ -11,16 +11,31 @@ class PublishClassificationWorker
   def perform(classification_id)
     @classification = Classification.find(classification_id)
     if classification.complete?
-      payload = [classification.project.id, classification_json]
-      MultiKafkaProducer.publish("classifications", payload)
+      publish_to_kafka!
+      publish_to_kinesis!
     end
   rescue ActiveRecord::RecordNotFound
   end
 
   private
 
-  def classification_json
-    KafkaClassificationSerializer
-    .serialize(classification, include: ['subjects']).to_json
+  def serialized_classification
+    @serialized_classification ||= KafkaClassificationSerializer.serialize(classification, include: ['subjects']).as_json
+  end
+
+  def publish_to_kafka!
+    MultiKafkaProducer.publish("classifications", kafka_payload)
+  end
+
+  def kafka_payload
+    [classification.project.id, serialized_classification.to_json]
+  end
+
+  def publish_to_kinesis!
+    KinesisPublisher.publish("classification", classification.project.id, kinesis_payload)
+  end
+
+  def kinesis_payload
+    serialized_classification["classifications"][0]
   end
 end

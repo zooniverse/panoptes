@@ -32,14 +32,19 @@ RSpec.describe PublishClassificationWorker do
         expect(KafkaClassificationSerializer)
           .to receive(:serialize)
           .with(an_instance_of(Classification), serialiser_opts)
+          .and_call_original
         worker.perform(classification.id)
       end
 
       it "should publish via kafka" do
-        expected_payload = [classification.project.id, an_instance_of(String)]
-        expect(MultiKafkaProducer)
-          .to receive(:publish)
-          .with(expected_topic, expected_payload)
+        expected_payload = [classification.project.id, instance_of(String)]
+        expect(MultiKafkaProducer).to receive(:publish).with(expected_topic, expected_payload)
+        worker.perform(classification.id)
+      end
+
+      it "should publish via kinesis" do
+        publisher = class_double("KinesisPublisher").as_stubbed_const
+        expect(publisher).to receive(:publish).with("classification", classification.project.id, duck_type(:to_json))
         worker.perform(classification.id)
       end
     end
