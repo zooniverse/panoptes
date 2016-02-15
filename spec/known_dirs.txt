@@ -1,0 +1,12 @@
+spec/support
+spec/requests
+spec/operations
+spec/middleware
+spec/factories
+spec/models
+spec/fixtures
+spec/mailers
+spec/controllers
+spec/lib
+spec/serializers
+spec/workers

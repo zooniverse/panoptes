@@ -11,6 +11,8 @@ before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
   - mkdir -p tmp
   - bundle exec rake configure:travis db:setup
+  - find spec -maxdepth 1 -type d | grep spec/ > tmp/curr_spec_dirs.txt
+  - grep -Fxv -f spec/known_dirs.txt tmp/curr_spec_dirs.txt
   - echo Running script - bundle exec rspec $SPECS
 
 matrix:
