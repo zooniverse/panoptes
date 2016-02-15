@@ -79,6 +79,10 @@ class UserGroup < ActiveRecord::Base
                             resource_type: resource.class.to_s)
   end
 
+  def has_admin?(user)
+    memberships.find_by(user_id: user.id).roles.include?("group_admin")
+  end
+
   def identity?
     !!memberships.where(identity: true).pluck(:identity).first
   end
