@@ -20,7 +20,10 @@ class PublishClassificationWorker
   private
 
   def serialized_classification
-    @serialized_classification ||= KafkaClassificationSerializer.serialize(classification, include: ['subjects']).as_json
+    @serialized_classification ||= KafkaClassificationSerializer
+      .serialize(classification, include: ['subjects'])
+      .as_json
+      .with_indifferent_access
   end
 
   def publish_to_kafka!
@@ -32,10 +35,14 @@ class PublishClassificationWorker
   end
 
   def publish_to_kinesis!
-    KinesisPublisher.publish("classification", classification.workflow_id, kinesis_payload)
+    KinesisPublisher.publish("classification", classification.workflow_id, kinesis_data, kinesis_linked)
   end
 
-  def kinesis_payload
-    serialized_classification["classifications"][0]
+  def kinesis_data
+    serialized_classification[:classifications][0]
+  end
+
+  def kinesis_linked
+    serialized_classification[:linked]
   end
 end
