@@ -30,6 +30,6 @@ class KinesisPublisher
   end
 
   def self.stream_name
-    ENV.fetch('KINESIS_STREAM')
+    ENV.fetch('KINESIS_STREAM') { "panoptes-#{Rails.env}" }
   end
 end
