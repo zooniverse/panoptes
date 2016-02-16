@@ -273,11 +273,6 @@ RSpec.describe SubjectQueue, type: :model do
             create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [sms.subject_id])
           end
 
-          it "should notify HB with a custom error" do
-            expect(Honeybadger).to receive(:notify)
-            SubjectQueue.enqueue(workflow, sms.id, user: user)
-          end
-
           it "should not enqueue dups" do
             SubjectQueue.enqueue(workflow, sms.id, user: user)
             expect(ues.reload.set_member_subject_ids).to eq(smses.map(&:id))
