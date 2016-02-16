@@ -329,7 +329,7 @@ RSpec.describe SubjectQueue, type: :model do
           end
         end
 
-        describe "duplicate id queueing" do
+        describe "duplicate id queueing", :focus do
           let(:query) { SubjectQueue.where(id: ues.id) }
           let(:q_dups) do
             ues.set_member_subject_ids.sample(ues.set_member_subject_ids.size - 1)

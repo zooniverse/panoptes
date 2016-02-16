@@ -50,7 +50,7 @@ class SubjectQueue < ActiveRecord::Base
     unseen_ids = SeenSubjectRemover.new(user, workflow, Array.wrap(sms_ids)).ids_to_enqueue
     queue = by_set(set_id).by_user_workflow(user, workflow)
     if queue.exists?
-      enqueue_update(queue, unseen_ids)
+      queue.update_attribute(:set_member_subject_ids, unseen_ids)
     else
       queue.create!(set_member_subject_ids: unseen_ids)
     end
