@@ -88,7 +88,7 @@ class UserGroup < ActiveRecord::Base
   end
 
   def identity?
-    !!memberships.where(identity: true).pluck(:identity).first
+    memberships.where(identity: true).exists?
   end
 
   def verify_join_token(token_to_verify)
