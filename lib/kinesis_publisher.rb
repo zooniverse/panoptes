@@ -17,6 +17,7 @@ class KinesisPublisher
       source: 'panoptes',
       type: event_type,
       version: '1.0.0',
+      timestamp: Time.now.utc.iso8601,
       data: data,
       linked: linked
     }.to_json
