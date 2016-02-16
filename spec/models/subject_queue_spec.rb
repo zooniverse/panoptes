@@ -28,11 +28,11 @@ RSpec.describe SubjectQueue, type: :model do
     let(:smses) { create_list(:set_member_subject, 21) }
     let!(:above_minimum) { create(:subject_queue, set_member_subjects: smses) }
     let!(:below_minimum) { create(:subject_queue, set_member_subjects: smses[0..5]) }
-    it 'should return all the queues with less than the minimum number of subjects' do
+    it 'should return all the quesq with less than the minimum number of subjects' do
       expect(SubjectQueue.below_minimum).to include(below_minimum)
     end
 
-    it 'should not return queues with more than minimum' do
+    it 'should not return quesq with more than minimum' do
       expect(SubjectQueue.below_minimum).to_not include(above_minimum)
     end
   end
@@ -44,7 +44,7 @@ RSpec.describe SubjectQueue, type: :model do
     context "when no logged out queue" do
 
       it 'should attempt to build a logged out queue' do
-        expect(EnqueueSubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil, nil)
+        expect(EnquesqubjectQueueWorker).to receive(:perform_async).with(workflow.id, nil, nil)
         SubjectQueue.create_for_user(workflow, user)
       end
 
@@ -174,7 +174,7 @@ RSpec.describe SubjectQueue, type: :model do
     let(:workflow) { create(:workflow) }
     let(:queue) { create_list(:subject_queue, 2, workflow: workflow, set_member_subject_ids: [sms.id]) }
 
-    it "should remove the subject for all queues of the workflow" do
+    it "should remove the subject for all quesq of the workflow" do
       SubjectQueue.dequeue_for_all(workflow.id, sms.id)
       expect(SubjectQueue.all.map(&:set_member_subject_ids)).to all( be_empty )
     end
@@ -185,7 +185,7 @@ RSpec.describe SubjectQueue, type: :model do
     let(:workflow) { create(:workflow) }
     let(:queue) { create_list(:subject_queue, 2, workflow: workflow) }
 
-    it "should add the subject for all queues of the workflow" do
+    it "should add the subject for all quesq of the workflow" do
       SubjectQueue.enqueue_for_all(workflow.id, sms.id)
       expect(SubjectQueue.all.map(&:set_member_subject_ids)).to all( include(sms.id) )
     end
@@ -200,7 +200,7 @@ RSpec.describe SubjectQueue, type: :model do
       let(:user) { create(:user) }
       context "nothing for user" do
 
-        shared_examples "queues something" do
+        shared_examples "quesq something" do
           it 'should create a new user_enqueue_subject' do
             expect do
               SubjectQueue.enqueue(workflow,
@@ -241,13 +241,13 @@ RSpec.describe SubjectQueue, type: :model do
         context "passing one sms_id" do
           let(:ids) { sms.id }
 
-          it_behaves_like "queues something"
+          it_behaves_like "quesq something"
         end
 
         context "passing a set of sms_ids" do
           let(:ids) { create_list(:set_member_subject, 5).map(&:id) }
 
-          it_behaves_like "queues something"
+          it_behaves_like "quesq something"
         end
 
         context "passing an empty set of sms_ids" do
@@ -260,8 +260,8 @@ RSpec.describe SubjectQueue, type: :model do
       end
 
       context "subject queue exists for user" do
-        let!(:smses) { create_list(:set_member_subject, 3, subject_set: sms.subject_set) }
-        let!(:ues) do
+        let(:smses) { create_list(:set_member_subject, 3, subject_set: sms.subject_set) }
+        let!(:sq) do
           create(:subject_queue,
             set_member_subject_ids: smses.map(&:id),
             user: user,
@@ -275,7 +275,7 @@ RSpec.describe SubjectQueue, type: :model do
 
           it "should not enqueue dups" do
             SubjectQueue.enqueue(workflow, sms.id, user: user)
-            expect(ues.reload.set_member_subject_ids).to eq(smses.map(&:id))
+            expect(sq.reload.set_member_subject_ids).to eq(smses.map(&:id))
           end
         end
 
@@ -284,31 +284,31 @@ RSpec.describe SubjectQueue, type: :model do
           it 'should add the sms id to the existing subject queue' do
             allow_any_instance_of(SubjectQueue).to receive(:below_minimum?).and_return(true)
             SubjectQueue.enqueue(workflow, sms.id, user: user)
-            expect(ues.reload.set_member_subject_ids).to include(sms.id)
+            expect(sq.reload.set_member_subject_ids).to include(sms.id)
           end
         end
 
         context "when the queue is above the enqueue threshold" do
 
           it 'should not have more than the limit in the existing subject queue' do
-            ues.set_member_subject_ids = (0..22).to_a - [sms.id]
-            ues.save!
+            sq.set_member_subject_ids = (0..22).to_a - [sms.id]
+            sq.save!
             SubjectQueue.enqueue(workflow, sms.id, user: user)
-            expect(ues.reload.set_member_subject_ids.length).to eq(20)
+            expect(sq.reload.set_member_subject_ids.length).to eq(20)
           end
         end
 
         it 'should not have a duplicate in the set' do
-          expected_ids = ues.set_member_subject_ids | [ sms.id ]
+          expected_ids = sq.set_member_subject_ids | [ sms.id ]
           SubjectQueue.enqueue(workflow, sms.id, user: user)
-          new_sms_ids = ues.reload.set_member_subject_ids
+          new_sms_ids = sq.reload.set_member_subject_ids
           expect(new_sms_ids).to match_array(expected_ids)
         end
 
         it 'should maintain the order of the set', :disabled do
-          ordered_list = ues.set_member_subject_ids | [ sms.id ]
+          ordered_list = sq.set_member_subject_ids | [ sms.id ]
           SubjectQueue.enqueue(workflow, sms.id, user: user)
-          expect(ues.reload.set_member_subject_ids).to eq(ordered_list)
+          expect(sq.reload.set_member_subject_ids).to eq(ordered_list)
         end
 
         context "when a queue's existing SMSes are deleted", sidekiq: :inline do
@@ -320,48 +320,54 @@ RSpec.describe SubjectQueue, type: :model do
           end
 
           it "should only have the enqueued subject id in the queue" do
-            expect(ues.reload.set_member_subject_ids).to eq([ sms.id ])
+            expect(sq.reload.set_member_subject_ids).to eq([ sms.id ])
           end
         end
 
-        describe "duplicate id queueing", :focus do
-          let(:query) { SubjectQueue.where(id: ues.id) }
+        describe "duplicate id queueing" do
           let(:q_dups) do
-            ues.set_member_subject_ids.sample(ues.set_member_subject_ids.size - 1)
+            sq.set_member_subject_ids.sample(sq.set_member_subject_ids.size - 1)
           end
           let(:enq_ids_with_dups) { [ sms.id ] | q_dups }
+          let(:fake_sms_ids) { double(blank?: false) }
 
-          context "when the append queue is empty" do
-
-            it "should not attempt an enqueue" do
-              allow_any_instance_of(SeenSubjectRemover).to receive(:enqueue_sms_ids_set)
-              .and_return([])
-              expect_any_instance_of(SubjectQueue).not_to receive(:update_column)
-              SubjectQueue.enqueue_update(query, [])
+          describe "non-modifying queue updates" do
+            before do
+              allow_any_instance_of(SeenSubjectRemover)
+              .to receive(:ids_to_enqueue)
+              .and_return(enqueue_set)
             end
-          end
 
-          context "when the append queue has not changed" do
-            it "should not attempt an enqueue" do
-              allow_any_instance_of(SeenSubjectRemover).to receive(:enqueue_sms_ids_set)
-              .and_return(ues.set_member_subject_ids)
-              expect_any_instance_of(SubjectQueue).not_to receive(:update_column)
-              SubjectQueue.enqueue_update(query, [])
+            context "with an empty queue" do
+              let(:enqueue_set) { [] }
+
+              it "should not modify the queue" do
+                expect{
+                  SubjectQueue.enqueue(workflow, fake_sms_ids, user: user)
+                }.not_to change{
+                  sq.set_member_subject_ids
+                }
+              end
+            end
+
+            context "with the same ids" do
+              let(:enqueue_set) { sq.set_member_subject_ids }
+
+              it "should not modify the queue" do
+                expect{
+                  SubjectQueue.enqueue(workflow, fake_sms_ids, user: user)
+                }.not_to change{
+                  sq.set_member_subject_ids
+                }
+              end
             end
           end
 
           context "when the append queue has dups" do
             it "should not enqueue dups" do
-              SubjectQueue.enqueue_update(query, enq_ids_with_dups)
-              non_dups = ues.set_member_subject_ids | [ sms.id ]
-              expect(ues.reload.set_member_subject_ids).to match_array(non_dups)
-            end
-
-            it "should handle an empty user queue enqueue" do
-              allow_any_instance_of(SeenSubjectRemover).to receive(:user).and_return(nil)
-              SubjectQueue.enqueue_update(query, enq_ids_with_dups)
-              non_dups = ues.set_member_subject_ids | [ sms.id ]
-              expect(ues.reload.set_member_subject_ids).to match_array(non_dups)
+              SubjectQueue.enqueue(workflow, enq_ids_with_dups, user: user)
+              non_dups = sq.set_member_subject_ids | [ sms.id ]
+              expect(sq.reload.set_member_subject_ids).to match_array(non_dups)
             end
           end
 
@@ -369,20 +375,9 @@ RSpec.describe SubjectQueue, type: :model do
             it "should only queue #{SubjectQueue::DEFAULT_LENGTH} ids" do
               start = smses.last.id+1
               append_ids = (start..start+SubjectQueue::DEFAULT_LENGTH*2).to_a
-              SubjectQueue.enqueue_update(query, append_ids)
-              expect(query.first.set_member_subject_ids.length)
-              .to eq(SubjectQueue::DEFAULT_LENGTH)
-            end
-          end
-
-          context "when the append queue does not contain a seen before" do
-
-            it "should not notify HB with a custom error" do
-              create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [smses.last.subject_id])
-              in_q = (smses - [ smses.last ]).map(&:id)
-              ues.update_column(:set_member_subject_ids, in_q)
-              expect(Honeybadger).to_not receive(:notify)
-              SubjectQueue.enqueue_update(query, [sms.id])
+              SubjectQueue.enqueue(workflow, append_ids, user: user)
+              expect(sq.reload.set_member_subject_ids.length)
+                .to eq(SubjectQueue::DEFAULT_LENGTH)
             end
           end
         end
@@ -398,7 +393,7 @@ RSpec.describe SubjectQueue, type: :model do
 
     context "with a user" do
       let(:user) { create(:user) }
-      let!(:ues) do
+      let!(:sq) do
         create(:subject_queue, user: user, workflow: workflow, set_member_subject_ids: smses.map(&:id))
       end
       let(:sms_id_to_dequeue) { smses.sample.id }
@@ -406,14 +401,14 @@ RSpec.describe SubjectQueue, type: :model do
 
       it 'should remove the subject given a user and workflow' do
         SubjectQueue.dequeue(workflow, dequeue_list, user: user)
-        sms_ids = ues.reload.set_member_subject_ids
+        sms_ids = sq.reload.set_member_subject_ids
         expect(sms_ids).to_not include(sms_id_to_dequeue)
       end
 
       it 'should maintain the order of the set' do
-        ordered_list = ues.set_member_subject_ids.reject { |id| id == sms_id_to_dequeue }
+        ordered_list = sq.set_member_subject_ids.reject { |id| id == sms_id_to_dequeue }
         SubjectQueue.dequeue(workflow, dequeue_list, user: user)
-        expect(ues.reload.set_member_subject_ids).to eq(ordered_list)
+        expect(sq.reload.set_member_subject_ids).to eq(ordered_list)
       end
 
       context "passing an empty set of sms_ids" do
@@ -443,23 +438,23 @@ RSpec.describe SubjectQueue, type: :model do
 
   describe "#next_subjects" do
     let(:ids) { (0..60).to_a }
-    let(:ues) { build(:subject_queue, set_member_subject_ids: ids) }
+    let(:sq) { build(:subject_queue, set_member_subject_ids: ids) }
 
     shared_examples "selects from the queue" do
       it 'should return a collection of ids' do
-        expect(ues.next_subjects).to all( be_a(Fixnum) )
+        expect(sq.next_subjects).to all( be_a(Fixnum) )
       end
 
       it 'should return 10 by default' do
-        expect(ues.next_subjects.length).to eq(10)
+        expect(sq.next_subjects.length).to eq(10)
       end
 
       it 'should accept an optional limit argument' do
-        expect(ues.next_subjects(20).length).to eq(20)
+        expect(sq.next_subjects(20).length).to eq(20)
       end
 
       it 'should randomly sample from the subject_ids' do
-        expect(ues.next_subjects).to_not match_array(ues.set_member_subject_ids[0..9])
+        expect(sq.next_subjects).to_not match_array(sq.set_member_subject_ids[0..9])
       end
     end
 
@@ -469,7 +464,7 @@ RSpec.describe SubjectQueue, type: :model do
     end
 
     context "when the queue does not have a user" do
-      let(:ues) { build(:subject_queue, set_member_subject_ids: ids, user: nil) }
+      let(:sq) { build(:subject_queue, set_member_subject_ids: ids, user: nil) }
 
       it_behaves_like "selects from the queue"
     end
@@ -478,7 +473,7 @@ RSpec.describe SubjectQueue, type: :model do
 
       it "should select in order from the head of the queue" do
         allow_any_instance_of(Workflow).to receive(:prioritized).and_return(true)
-        expect(ues.next_subjects).to match_array(ues.set_member_subject_ids[0..9])
+        expect(sq.next_subjects).to match_array(sq.set_member_subject_ids[0..9])
       end
     end
   end

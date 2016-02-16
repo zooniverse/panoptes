@@ -46,13 +46,14 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.enqueue(workflow, sms_ids, user: nil, set_id: nil)
+    sms_ids = Array.wrap(sms_ids)
     return if sms_ids.blank?
-    unseen_ids = SeenSubjectRemover.new(user, workflow, Array.wrap(sms_ids)).ids_to_enqueue
-    queue = by_set(set_id).by_user_workflow(user, workflow)
-    if queue.exists?
-      queue.update_attribute(:set_member_subject_ids, unseen_ids)
+    unseen_ids = SeenSubjectRemover.new(user, workflow, sms_ids).ids_to_enqueue
+    queue_context = by_set(set_id).by_user_workflow(user, workflow)
+    if queue = queue_context.first
+      queue.enqueue_update(unseen_ids)
     else
-      queue.create!(set_member_subject_ids: unseen_ids)
+      queue_context.create!(set_member_subject_ids: unseen_ids)
     end
   end
 
@@ -93,12 +94,6 @@ class SubjectQueue < ActiveRecord::Base
     query.update_all([dequeue_sql, sms_ids])
   end
 
-  def self.enqueue_update(query, sms_ids)
-    return if sms_ids.blank?
-    enqueue_sql = "set_member_subject_ids = subarray(uniq(sort(set_member_subject_ids | array[?])), 0, #{DEFAULT_LENGTH})"
-    query.update_all([enqueue_sql, sms_ids])
-  end
-
   def self.below_minimum
     where("cardinality(set_member_subject_ids) < ?", MINIMUM_LENGTH)
   end
@@ -113,5 +108,16 @@ class SubjectQueue < ActiveRecord::Base
     else
       set_member_subject_ids.sample(limit)
     end
+  end
+
+  def enqueue_update(sms_ids)
+    return if sms_ids.blank?
+  # enqueue_sql = "set_member_subject_ids = subarray(
+  # uniq(sort(set_member_subject_ids | array[?])),
+  # 0,
+  # #{DEFAULT_LENGTH})"
+  #   query.update_all([enqueue_sql, sms_ids])
+    enqueue_sql = "set_member_subject_ids = subarray(uniq(sort(set_member_subject_ids | array[?])), 0, #{DEFAULT_LENGTH})"
+    SubjectQueue.where(id: id).update_all([enqueue_sql, sms_ids])
   end
 end
