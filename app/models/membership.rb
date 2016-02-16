@@ -51,4 +51,8 @@ class Membership < ActiveRecord::Base
   def enable!
     active!
   end
+
+  def group_admin?
+    roles.include?("group_admin")
+  end
 end

@@ -44,4 +44,8 @@ class Api::V1::UserGroupsController < Api::ApiController
      roles: ["group_admin"]
     }
   end
+
+  def context
+    {current_user: api_user}
+  end
 end

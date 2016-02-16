@@ -12,7 +12,7 @@ FactoryGirl.define do
     end
 
     factory :identity_user_group do
-      after(:each) do |ug|
+      after(:create) do |ug|
         create_list(:membership, 1, state: Membership.states[:active],
                     roles: ["group_admin"], user_group: ug, identity: true)
       end

@@ -79,8 +79,16 @@ class UserGroup < ActiveRecord::Base
                             resource_type: resource.class.to_s)
   end
 
+  def has_admin?(user)
+    membership_for_user(user)&.group_admin?
+  end
+
+  def membership_for_user(user)
+    memberships.find_by(user_id: user.id)
+  end
+
   def identity?
-    !!memberships.where(identity: true).pluck(:identity).first
+    memberships.where(identity: true).exists?
   end
 
   def verify_join_token(token_to_verify)

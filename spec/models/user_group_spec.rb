@@ -138,7 +138,7 @@ describe UserGroup, :type => :model do
     end
   end
 
-  describe "#classifcations_count" do
+  describe "#classifications_count" do
     let(:relation_instance) { user_group }
 
     it_behaves_like "it has a cached counter for classifications"
@@ -159,6 +159,42 @@ describe UserGroup, :type => :model do
       user_group.join_token = nil
       result = user_group.verify_join_token(user_group.join_token)
       expect(result).to be_falsey
+    end
+  end
+
+  describe '#identity?' do
+    let(:user) { create :user }
+
+    it 'returns true if there is any membership marked as identity' do
+      user_group = create(:identity_user_group)
+      expect(user_group.identity?).to be_truthy
+    end
+
+    it 'returns false if there are only normal memberships' do
+      create(:membership, user: user, user_group: user_group, roles: ['group_admin'])
+      expect(user_group.identity?).to be_falsey
+    end
+
+    it 'returns false if there are no members' do
+      expect(user_group.identity?).to be_falsey
+    end
+  end
+
+  describe '#has_admin?' do
+    let(:user) { create :user }
+
+    it 'returns true if the user is a group_admin' do
+      create(:membership, user: user, user_group: user_group, roles: ['group_admin'])
+      expect(user_group.has_admin?(user)).to be_truthy
+    end
+
+    it 'returns false if the user is a normal group member' do
+      create(:membership, user: user, user_group: user_group, roles: ['group_member'])
+      expect(user_group.has_admin?(user)).to be_falsey
+    end
+
+    it 'returns false if the user is not in the group' do
+      expect(user_group.has_admin?(user)).to be_falsey
     end
   end
 end
