@@ -24,7 +24,6 @@ gem 'sinatra', '>= 1.3.0', require: nil
 gem 'aws-sdk-v1', '~> 1.0'
 gem 'json-schema', '~> 2.0'
 gem 'p3p', '~> 1.0'
-gem 'newrelic_rpm', '~> 3.0', require: false
 gem 'stringex', '~> 2.0'
 gem 'faraday', '~> 0.9'
 gem 'faraday_middleware', '~> 0.9'
@@ -37,11 +36,12 @@ gem 'sidekiq-congestion', '~> 0.1.0'
 gem 'sidetiq', '~> 0.6.3'
 gem 'cellect-client', '~> 1.2.0', require: false
 gem 'active_interaction', '~> 3.0.1'
+gem 'therubyracer', '~> 0.12'
+gem 'pg', '~> 0.18'
+gem 'poseidon', '~> 0.0.5'
 
-platforms :ruby do
-  gem 'therubyracer', '~> 0.12'
-  gem 'pg', '~> 0.18'
-  gem 'poseidon', '~> 0.0.5'
+group :production do
+  gem 'newrelic_rpm', '~> 3.0', require: false
 end
 
 group :development do

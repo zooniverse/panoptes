@@ -2,16 +2,37 @@ language: ruby
 cache: bundler
 sudo: false
 
+bundler_args: --without development production
+
+before_install:
+  - mkdir -p tmp
+  - find spec -maxdepth 1 -type d | grep spec/ > tmp/curr_spec_dirs.txt
+  - if grep -Fxvc -f spec/known_dirs.txt tmp/curr_spec_dirs.txt; then echo 'Detected unkown Spec directories, check the spec/known_dirs.txt!'; exit 1; fi
+  - 'echo ''gem: --no-ri --no-rdoc'' > ~/.gemrc'
+
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
-  - mkdir -p tmp
-  - RACK_ENV=test bundle exec rake configure:travis db:setup
+  - bundle exec rake configure:travis db:setup
+  - echo Running script - bundle exec rspec $SPECS
 
 matrix:
   fast_finish: true
-  allow_failures:
   include:
     - rvm: 2.3.0
+      env:
+        - SPECS=spec/controllers/api/v1/[a-m]*.rb
+    - rvm: 2.3.0
+      env:
+        - SPECS=spec/controllers/api/v1/[n-s]*.rb
+    - rvm: 2.3.0
+      env:
+        - SPECS=spec/controllers/api/v1/[t-z]*.rb
+    - rvm: 2.3.0
+      env:
+        - SPECS="spec/controllers/**.rb spec/controllers/api/*.rb spec/models spec/operations"
+    - rvm: 2.3.0
+      env:
+        - SPECS="spec/lib spec/workers spec/serializers spec/requests spec/middleware spec/mailers"
 
 services:
   - postgresql
@@ -19,4 +40,4 @@ services:
 addons:
   postgresql: "9.4"
 
-script: RACK_ENV=test bundle exec rspec
+script: "bundle exec rspec $SPECS"
