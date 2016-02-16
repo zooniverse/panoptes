@@ -80,7 +80,11 @@ class UserGroup < ActiveRecord::Base
   end
 
   def has_admin?(user)
-    memberships.find_by(user_id: user.id).roles.include?("group_admin")
+    membership_for_user(user).try { |m| m.roles.include?("group_admin") }
+  end
+
+  def membership_for_user(user)
+    memberships.find_by(user_id: user.id)
   end
 
   def identity?

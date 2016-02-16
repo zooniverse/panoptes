@@ -161,4 +161,22 @@ describe UserGroup, :type => :model do
       expect(result).to be_falsey
     end
   end
+
+  describe '#has_admin?' do
+    let(:user) { create :user }
+
+    it 'returns true if the user is a group_admin' do
+      create(:membership, user: user, user_group: user_group, roles: ['group_admin'])
+      expect(user_group.has_admin?(user)).to be_truthy
+    end
+
+    it 'returns false if the user is a normal group member' do
+      create(:membership, user: user, user_group: user_group, roles: ['group_member'])
+      expect(user_group.has_admin?(user)).to be_falsey
+    end
+
+    it 'returns false if the user is not in the group' do
+      expect(user_group.has_admin?(user)).to be_falsey
+    end
+  end
 end
