@@ -13,6 +13,10 @@ class KafkaClassificationSerializer < ActiveModel::Serializer
   belongs_to :workflow, serializer: KafkaWorkflowSerializer
   has_many   :subjects, serializer: KafkaSubjectSerializer
 
+  def user_ip
+    object.user_ip.to_s
+  end
+
   def metadata
     object.metadata.merge(workflow_version: object.workflow_version)
   end
