@@ -44,7 +44,7 @@ RSpec.describe PublishClassificationWorker do
 
       it "should publish via kinesis" do
         publisher = class_double("KinesisPublisher").as_stubbed_const
-        expect(publisher).to receive(:publish).with("classification", classification.project.id, duck_type(:to_json))
+        expect(publisher).to receive(:publish).with("classification", classification.workflow_id, duck_type(:to_json))
         worker.perform(classification.id)
       end
     end

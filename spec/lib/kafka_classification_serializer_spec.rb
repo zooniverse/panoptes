@@ -5,13 +5,6 @@ describe KafkaClassificationSerializer do
   let(:serializer) { KafkaClassificationSerializer.new(Classification.find(classification.id)) }
   let(:adapter) { Serialization::V1Adapter.new(serializer) }
 
-  it 'is a substitute for ClassificationSerializer' do
-    new_json = adapter.to_json
-    old_json = ClassificationSerializer.serialize(classification).to_json
-
-    expect(JSON.load(new_json)).to eq(JSON.load(old_json))
-  end
-
   it 'can process includes' do
     subject = create(:subject)
     classification.subject_ids = [subject.id]
