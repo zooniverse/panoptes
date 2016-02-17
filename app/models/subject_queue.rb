@@ -90,12 +90,6 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
-  def self.dequeue_update(query, sms_ids)
-    return if sms_ids.blank?
-    dequeue_sql = "set_member_subject_ids = subarray(uniq(sort(set_member_subject_ids - array[?])), 0, #{DEFAULT_LENGTH})"
-    query.update_all([dequeue_sql, sms_ids])
-  end
-
   def self.below_minimum
     where("cardinality(set_member_subject_ids) < ?", MINIMUM_LENGTH)
   end
@@ -114,7 +108,23 @@ class SubjectQueue < ActiveRecord::Base
 
   def enqueue_update(sms_ids)
     return if sms_ids.blank?
-    new_sms_ids = (set_member_subject_ids | sms_ids).slice(0, DEFAULT_LENGTH)
-    self.update_attribute(:set_member_subject_ids, new_sms_ids)
+    update_queue_ids(set_member_subject_ids | sms_ids)
+  end
+
+  def dequeue_update(sms_ids)
+    return if sms_ids.blank?
+    diff_ids = (set_member_subject_ids - sms_ids)
+    update_queue_ids(diff_ids)
+  end
+
+  private
+
+  def update_queue_ids(sms_ids)
+    capped_sms_ids = cap_queue_length(sms_ids)
+    self.update_attribute(:set_member_subject_ids, capped_sms_ids)
+  end
+
+  def cap_queue_length(sms_ids)
+    sms_ids.slice(0, DEFAULT_LENGTH)
   end
 end
