@@ -385,7 +385,7 @@ RSpec.describe SubjectQueue, type: :model do
     let(:workflow) { create(:workflow) }
     let(:subject_set) { create(:subject_set, workflows: [workflow], project: workflow.project) }
     let(:sms) { create(:set_member_subject, subject_set: subject_set) }
-    let!(:smses) { create_list(:set_member_subject, 3, subject_set: sms.subject_set) }
+    let(:smses) { create_list(:set_member_subject, 3, subject_set: sms.subject_set) }
 
     context "with a user" do
       let(:user) { create(:user) }

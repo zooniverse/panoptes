@@ -36,6 +36,7 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
+  #Hmm - can this reload method be wrapped into the enqueue?
   def self.reload(workflow, sms_ids, user: nil, set_id: nil)
     queue = by_set(set_id).by_user_workflow(user, workflow)
     if queue.exists?
@@ -49,9 +50,18 @@ class SubjectQueue < ActiveRecord::Base
     return if sms_ids.blank?
     sms_ids = Array.wrap(sms_ids)
     unseen_ids = SeenSubjectRemover.new(user, workflow, sms_ids).ids_to_enqueue
-    queue_context = by_set(set_id).by_user_workflow(user, workflow)
-    if queue = queue_context.first
-      queue.enqueue_update(unseen_ids)
+  #TODO: figure out how to handle nil set_id here for grouped workflows
+  # the enqueue method should probably only get specific params passed to it
+  # so it could select the correct queue context directly
+  # whereas the reload method should probably take the large scope and
+  # run the update there or force it out to the worker to loop over the known context
+    #
+    # SubjectQueue.where(user_id: nil, workflow_id: 338).count #wildcam
+    # VS
+    # SubjectQueue.where(user_id: nil, workflow_id: 121).count #annotate
+    queue_context = by_user_workflow(user, workflow).by_set(set_id)
+    if queue_context.exists?
+      queue_context.each { |queue| queue.enqueue_update(unseen_ids) }
     else
       queue_context.create!(set_member_subject_ids: unseen_ids)
     end
@@ -59,23 +69,28 @@ class SubjectQueue < ActiveRecord::Base
 
   def self.dequeue(workflow, sms_ids, user: nil, set_id: nil)
     return if sms_ids.blank?
-    queue = by_set(set_id).by_user_workflow(user, workflow)
-    dequeue_update(queue, sms_ids)
-  end
-
-  def self.enqueue_for_all(workflow, sms_ids)
-    return if sms_ids.blank?
-    sms_ids = Array.wrap(sms_ids)
-    where(workflow: workflow).each do |queue|
-      queue.enqueue_update(sms_ids)
+  #TODO: figure out how to handle nil set_id here for grouped workflows
+    queue_context = by_user_workflow(user, workflow).by_set(set_id)
+    if queue_context.exists?
+      queue_context.each { |queue| queue.dequeue_update(sms_ids) }
     end
   end
 
-  def self.dequeue_for_all(workflow, sms_ids)
-    return if sms_ids.blank?
-    sms_ids = Array.wrap(sms_ids)
-    dequeue_update(where(workflow: workflow), sms_ids)
-  end
+  # def self.enqueue_for_all(workflow, sms_ids)
+  #   return if sms_ids.blank?
+  #   sms_ids = Array.wrap(sms_ids)
+  #   where(workflow: workflow).each do |queue|
+  #     queue.enqueue_update(sms_ids)
+  #   end
+  # end
+
+  # def self.dequeue_for_all(workflow, sms_ids)
+  #   return if sms_ids.blank?
+  #   sms_ids = Array.wrap(sms_ids)
+  #   where(workflow: workflow).each do |queue|
+  #     queue.dequeue_update(sms_ids)
+  #   end
+  # end
 
   def self.create_for_user(workflow, user, set_id: nil)
     if logged_out_queue = by_set(set_id).find_by(workflow: workflow, user: nil)
