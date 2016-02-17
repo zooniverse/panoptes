@@ -279,7 +279,7 @@ RSpec.describe SubjectQueue, type: :model do
           end
         end
 
-        context "when the queue is above the enqueue threshold" do
+        context "when the queue is below the enqueue threshold" do
 
           it 'should add the sms id to the existing subject queue' do
             allow_any_instance_of(SubjectQueue).to receive(:below_minimum?).and_return(true)
@@ -305,7 +305,7 @@ RSpec.describe SubjectQueue, type: :model do
           expect(new_sms_ids).to match_array(expected_ids)
         end
 
-        it 'should maintain the order of the set', :disabled do
+        it 'should maintain the order of the set' do
           ordered_list = sq.set_member_subject_ids | [ sms.id ]
           SubjectQueue.enqueue(workflow, sms.id, user: user)
           expect(sq.reload.set_member_subject_ids).to eq(ordered_list)

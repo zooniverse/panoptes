@@ -114,12 +114,7 @@ class SubjectQueue < ActiveRecord::Base
 
   def enqueue_update(sms_ids)
     return if sms_ids.blank?
-  # enqueue_sql = "set_member_subject_ids = subarray(
-  # uniq(sort(set_member_subject_ids | array[?])),
-  # 0,
-  # #{DEFAULT_LENGTH})"
-  #   query.update_all([enqueue_sql, sms_ids])
-    enqueue_sql = "set_member_subject_ids = subarray(uniq(sort(set_member_subject_ids | array[?])), 0, #{DEFAULT_LENGTH})"
-    SubjectQueue.where(id: id).update_all([enqueue_sql, sms_ids])
+    new_sms_ids = (set_member_subject_ids | sms_ids).slice(0, DEFAULT_LENGTH)
+    self.update_attribute(:set_member_subject_ids, new_sms_ids)
   end
 end
