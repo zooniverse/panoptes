@@ -25,9 +25,9 @@ RSpec.describe SubjectQueue, type: :model do
   end
 
   describe "::below_minimum" do
-    let(:smses) { create_list(:set_member_subject, 21) }
-    let!(:above_minimum) { create(:subject_queue, set_member_subjects: smses) }
-    let!(:below_minimum) { create(:subject_queue, set_member_subjects: smses[0..5]) }
+    let(:sms_ids) { (1..11).to_a }
+    let!(:above_minimum) { create(:subject_queue, set_member_subject_ids: sms_ids) }
+    let!(:below_minimum) { create(:subject_queue, set_member_subject_ids: sms_ids[0..5]) }
     it 'should return all the queue with less than the minimum number of subjects' do
       expect(SubjectQueue.below_minimum).to include(below_minimum)
     end
@@ -73,8 +73,8 @@ RSpec.describe SubjectQueue, type: :model do
   end
 
   describe "::reload" do
-    let(:sms) { create(:set_member_subject) }
-    let(:smses) { create_list(:set_member_subject, 3).map(&:id) }
+    let(:sms_id) { [1] }
+    let(:smses) { (2..4).to_a }
     let(:workflow) { create(:workflow) }
 
     context "when passed a subject set" do
@@ -82,20 +82,18 @@ RSpec.describe SubjectQueue, type: :model do
       let(:not_updated_set) { create(:subject_set) }
 
       context "when the queue exists" do
-
         let!(:queue) do
           create(:subject_queue,
                  user: nil,
                  workflow: workflow,
-                 set_member_subject_ids: [sms.id],
+                 set_member_subject_ids: sms_id,
                  subject_set: subject_set)
         end
-
         let!(:not_updated_queue) do
           create(:subject_queue,
                  user: nil,
                  workflow: workflow,
-                 set_member_subject_ids: [sms.id],
+                 set_member_subject_ids: sms_id,
                  subject_set: not_updated_set)
         end
 
@@ -141,7 +139,7 @@ RSpec.describe SubjectQueue, type: :model do
           create(:subject_queue,
                  user: nil,
                  workflow: workflow,
-                 set_member_subject_ids: [sms.id])
+                 set_member_subject_ids: sms_id)
         end
 
         it 'should reload the workflow queue' do
@@ -170,31 +168,33 @@ RSpec.describe SubjectQueue, type: :model do
   end
 
   describe "::dequeue_for_all" do
-    let(:sms) { create(:set_member_subject) }
+    let(:sms_id) { [1] }
     let(:workflow) { create(:workflow) }
-    let(:queue) { create_list(:subject_queue, 2, workflow: workflow, set_member_subject_ids: [sms.id]) }
+    let(:queue) do
+      create_list(:subject_queue, 2, workflow: workflow, set_member_subject_ids: sms_id)
+    end
 
     it "should remove the subject for all queue of the workflow" do
-      SubjectQueue.dequeue_for_all(workflow.id, sms.id)
+      SubjectQueue.dequeue_for_all(workflow.id, sms_id)
       expect(SubjectQueue.all.map(&:set_member_subject_ids)).to all( be_empty )
     end
   end
 
   describe "::enqueue_for_all" do
-    let(:sms) { create(:set_member_subject) }
+    let(:sms_id) { [1] }
     let(:workflow) { create(:workflow) }
     let(:queue) { create_list(:subject_queue, 2, workflow: workflow) }
 
     it "should add the subject for all queue of the workflow" do
-      SubjectQueue.enqueue_for_all(workflow.id, sms.id)
-      expect(SubjectQueue.all.map(&:set_member_subject_ids)).to all( include(sms.id) )
+      SubjectQueue.enqueue_for_all(workflow.id, sms_id)
+      expect(SubjectQueue.all.map(&:set_member_subject_ids)).to all( include(sms_id) )
     end
   end
 
   describe "::enqueue" do
     let(:workflow) { create(:workflow) }
     let(:subject_set) { create(:subject_set, workflows: [workflow]) }
-    let(:sms) { create(:set_member_subject, subject_set: subject_set) }
+    let(:sms_id) { [1] }
 
     context "with a user" do
       let(:user) { create(:user) }
@@ -203,9 +203,7 @@ RSpec.describe SubjectQueue, type: :model do
         shared_examples "queue something" do
           it 'should create a new user_enqueue_subject' do
             expect do
-              SubjectQueue.enqueue(workflow,
-                ids,
-                user: user)
+              SubjectQueue.enqueue(workflow, ids, user: user)
             end.to change{ SubjectQueue.count }.from(0).to(1)
           end
 
@@ -239,13 +237,13 @@ RSpec.describe SubjectQueue, type: :model do
         end
 
         context "passing one sms_id" do
-          let(:ids) { sms.id }
+          let(:ids) { sms_id }
 
           it_behaves_like "queue something"
         end
 
         context "passing a set of sms_ids" do
-          let(:ids) { create_list(:set_member_subject, 5).map(&:id) }
+          let(:ids) { (1..5).to_a }
 
           it_behaves_like "queue something"
         end
@@ -260,10 +258,12 @@ RSpec.describe SubjectQueue, type: :model do
       end
 
       context "subject queue exists for user" do
+        let(:sms) { create(:set_member_subject) }
         let(:smses) { create_list(:set_member_subject, 3, subject_set: sms.subject_set) }
+        let(:sms_ids) { smses.map(&:id) }
         let!(:sq) do
           create(:subject_queue,
-            set_member_subject_ids: smses.map(&:id),
+            set_member_subject_ids: sms_ids,
             user: user,
             workflow: workflow)
         end
@@ -311,15 +311,11 @@ RSpec.describe SubjectQueue, type: :model do
           expect(sq.reload.set_member_subject_ids).to eq(ordered_list)
         end
 
-        context "when a queue's existing SMSes are deleted", sidekiq: :inline do
-          before(:each) do
-            smses.map(&:id).each do |sms_id|
-              QueueRemovalWorker.perform_async(sms_id, workflow.id)
-            end
-            SubjectQueue.enqueue(workflow, sms.id, user: user)
-          end
+        context "when the queue is empty" do
+          let(:sms_ids) { [] }
 
-          it "should only have the enqueued subject id in the queue" do
+          it "should only enqueue the passed ids " do
+            SubjectQueue.enqueue(workflow, sms.id, user: user)
             expect(sq.reload.set_member_subject_ids).to eq([ sms.id ])
           end
         end
@@ -482,7 +478,7 @@ RSpec.describe SubjectQueue, type: :model do
     let(:queue) { build(:subject_queue, set_member_subject_ids: subject_ids) }
 
     context "when less than #{SubjectQueue::MINIMUM_LENGTH} items" do
-      let(:subject_ids) { create_list(:set_member_subject, 2).map(&:id) }
+      let(:subject_ids) { [1, 2] }
 
       it 'should return true' do
         expect(queue.below_minimum?).to be true
@@ -490,10 +486,7 @@ RSpec.describe SubjectQueue, type: :model do
     end
 
     context "when more than #{SubjectQueue::MINIMUM_LENGTH} items" do
-      let(:subject_ids) do
-        create_list(:set_member_subject, SubjectQueue::MINIMUM_LENGTH+1)
-        .map(&:id)
-      end
+      let(:subject_ids) { (0..SubjectQueue::MINIMUM_LENGTH+1).to_a }
 
       it 'should return false' do
         expect(queue.below_minimum?).to be false
