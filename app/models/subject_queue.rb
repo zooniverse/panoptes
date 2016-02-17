@@ -46,8 +46,8 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def self.enqueue(workflow, sms_ids, user: nil, set_id: nil)
-    sms_ids = Array.wrap(sms_ids)
     return if sms_ids.blank?
+    sms_ids = Array.wrap(sms_ids)
     unseen_ids = SeenSubjectRemover.new(user, workflow, sms_ids).ids_to_enqueue
     queue_context = by_set(set_id).by_user_workflow(user, workflow)
     if queue = queue_context.first
@@ -66,7 +66,9 @@ class SubjectQueue < ActiveRecord::Base
   def self.enqueue_for_all(workflow, sms_ids)
     return if sms_ids.blank?
     sms_ids = Array.wrap(sms_ids)
-    enqueue_update(where(workflow: workflow), sms_ids)
+    where(workflow: workflow).each do |queue|
+      queue.enqueue_update(sms_ids)
+    end
   end
 
   def self.dequeue_for_all(workflow, sms_ids)
