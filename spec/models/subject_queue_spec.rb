@@ -24,6 +24,62 @@ RSpec.describe SubjectQueue, type: :model do
     expect(build(:subject_queue, workflow: q.workflow, user: q.user)).to be_valid
   end
 
+  describe "::by_set" do
+    let(:workflow) { create(:workflow_with_subject_set) }
+    let(:user) { workflow.project.owner }
+    let(:set) { workflow.subject_sets.first }
+    let(:set_id) { set.id }
+    let(:result) { SubjectQueue.by_set(set_id) }
+
+    it "should not find any queue if none exist" do
+      expect(result).to be_empty
+    end
+
+    it "should not find the queue if none exists for the subject_set" do
+      create(:subject_queue, user: user, workflow: workflow, subject_set: nil)
+      expect(result).to be_empty
+    end
+
+    context "when searching without a set id" do
+      let(:set_id) { nil }
+
+      it "should find all queues" do
+        sq = create(:subject_queue, user: user, workflow: workflow, subject_set: set)
+        expect(result).to include(sq)
+      end
+    end
+
+    it "should find the queue if it exists for the subject set" do
+      sq = create(:subject_queue, user: user, workflow: workflow, subject_set: set)
+      expect(result).to include(sq)
+    end
+  end
+
+  describe "::by_user_workflow" do
+    let(:workflow) { create(:workflow) }
+    let(:user) { workflow.project.owner }
+    let(:result) { SubjectQueue.by_user_workflow(user, workflow) }
+
+    it "should not find any queue if none exist" do
+      expect(result).to be_empty
+    end
+
+    it "should not find any queue if none exist for the user" do
+      create(:subject_queue, workflow: workflow, subject_set: nil)
+      expect(result).to be_empty
+    end
+
+    it "should not find the queue if none exists for the workflow" do
+      create(:subject_queue, user: user, subject_set: nil)
+      expect(result).to be_empty
+    end
+
+    it "should find the queue if it exists" do
+      sq = create(:subject_queue, user: user, workflow: workflow, subject_set: nil)
+      expect(result).to include(sq)
+    end
+  end
+
   describe "::below_minimum" do
     let(:sms_ids) { (1..11).to_a }
     let!(:above_minimum) { create(:subject_queue, set_member_subject_ids: sms_ids) }
