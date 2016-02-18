@@ -114,90 +114,17 @@ RSpec.describe Subjects::Selector do
         end
       end
     end
-
-    describe "#dequeue after selection" do
-      let(:smses) { workflow.set_member_subjects }
-      let(:sms_ids) { smses.map(&:id) }
-      let(:subject_queue) do
-        create(:subject_queue,
-               workflow: workflow,
-               user: queue_owner,
-               subject_set: nil,
-               set_member_subjects: smses)
-      end
-
-      before(:each) { subject_queue }
-
-      context "when the user has a queue" do
-        let(:queue_owner) { user.user }
-
-        it 'should call dequeue_subject for the user' do
-          expect(DequeueSubjectQueueWorker).to receive(:perform_async)
-            .with(workflow.id, array_including(sms_ids), queue_owner.id, nil)
-          subject.queued_subjects
-        end
-      end
-
-      context "when the queue has no user" do
-        let(:queue_owner) { nil }
-        let(:user) { ApiUser.new(nil) }
-
-        it 'should not call dequeue_subject for the user' do
-          expect(DequeueSubjectQueueWorker).to_not receive(:perform_async)
-          subject.queued_subjects
-        end
-      end
-
-      describe "user has or workflow is finished" do
-        let(:queue_owner) { nil }
-        before(:each) do
-          subject_queue
-        end
-
-        shared_examples "creates for the logged out user" do
-          it 'should create for logged out user' do
-            expect(SubjectQueue).to receive(:create_for_user).with(workflow, nil, set_id: nil)
-            #non-logged in queue won't exist
-            expect { subject.queued_subjects }.to raise_error(Subjects::Selector::MissingSubjectQueue)
-          end
-        end
-
-        context "when the workflow is finished" do
-          before(:each) do
-            allow_any_instance_of(Workflow).to receive(:finished?).and_return(true)
-          end
-
-          context "when the logged_out queue doesn't exist" do
-            let(:queue_owner) { user.user }
-
-            it_behaves_like "creates for the logged out user"
-          end
-        end
-
-        context "when the user has finished the workflow" do
-          before(:each) do
-            allow_any_instance_of(User).to receive(:has_finished?).and_return(true)
-          end
-
-          context "when the logged_out queue doesn't exist" do
-            let(:queue_owner) { user.user }
-
-            it_behaves_like "creates for the logged out user"
-          end
-        end
-      end
-    end
   end
 
   describe '#selected_subjects' do
     it 'should not return retired subjects' do
       sms = smses[0]
       swc = create(:subject_workflow_count, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
+      expected = subject_queue.set_member_subject_ids[1..-1].sort
       result = subject.selected_subjects(subject_queue).map do |subj|
         subj.set_member_subjects.first.id
       end.sort
-
-      expect(result).to eq(subject_queue.set_member_subject_ids[1..-1].sort)
+      expect(result).to eq(expected)
     end
 
     it 'should return something when everything in the queue is retired' do

@@ -18,7 +18,6 @@ class ClassificationLifecycle
   end
 
   def transact!(&block)
-    dequeue_for_non_logged_in
     Classification.transaction do
       update_classification_data
       #NOTE: ensure the block is evaluated before updating the seen subjects
@@ -67,17 +66,9 @@ class ClassificationLifecycle
 
   def refresh_queue
     subjects_workflow_subject_sets.each do |set_id|
+  #TODO: find the queue for each set_id and push that q to the enqueue worker
       if below_threshold_queue?(set_id)
         EnqueueSubjectQueueWorker.perform_async(workflow.id, user.try(:id), set_id)
-      end
-    end
-  end
-
-  def dequeue_for_non_logged_in
-    unless user
-      sms_ids = set_member_subjects.pluck(:id)
-      subjects_workflow_subject_sets.each do |set_id|
-        DequeueSubjectQueueWorker.perform_async(workflow.id, sms_ids, nil, set_id)
       end
     end
   end

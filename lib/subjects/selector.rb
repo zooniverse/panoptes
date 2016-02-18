@@ -38,7 +38,6 @@ module Subjects
       if non_retired_ids.blank?
         fallback_selection
       else
-        dequeue_for_logged_in_user(sms_ids) # dequeue all including retired ids
         non_retired_ids
       end
     end
@@ -115,15 +114,10 @@ module Subjects
       end
     end
 
-    def find_subject_queue(user=queue_user)
-      SubjectQueue.by_set(subject_set_id)
-        .find_by(user: user, workflow: workflow)
-    end
-
-    def dequeue_for_logged_in_user(sms_ids)
-      if queue_user
-        DequeueSubjectQueueWorker.perform_async(workflow.id, sms_ids, queue_user.try(:id), subject_set_id)
-      end
+    def find_subject_queue
+      SubjectQueue
+      .by_set(subject_set_id)
+      .find_by(user: queue_user, workflow: workflow)
     end
   end
 end
