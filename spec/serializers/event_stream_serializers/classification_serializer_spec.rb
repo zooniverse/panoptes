@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe EventStream::ClassificationSerializer do
+describe EventStreamSerializers::ClassificationSerializer do
   let(:classification) { create(:classification) }
   let(:serializer) { described_class.new(Classification.find(classification.id)) }
   let(:adapter) { Serialization::V1Adapter.new(serializer) }

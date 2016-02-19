@@ -18,14 +18,17 @@ class PublishClassificationWorker
   private
 
   def serialized_classification
-    @serialized_classification ||= EventStream::ClassificationSerializer
+    @serialized_classification ||= EventStreamSerializers::ClassificationSerializer
       .serialize(classification, include: ['subjects'])
       .as_json
       .with_indifferent_access
   end
 
   def publish_to_kinesis!
-    KinesisPublisher.publish("classification", classification.workflow_id, kinesis_data, kinesis_linked)
+    EventStream.publish(event: "classification",
+                        data: kinesis_data,
+                        linked: kinesis_linked,
+                        shard_by: classification.workflow_id)
   end
 
   def kinesis_data

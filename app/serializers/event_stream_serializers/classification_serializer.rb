@@ -1,6 +1,6 @@
 require 'serialization/v1_adapter'
 
-module EventStream
+module EventStreamSerializers
   class ClassificationSerializer < ActiveModel::Serializer
     def self.serialize(classification, options = {})
       serializer = new(classification)
@@ -9,10 +9,10 @@ module EventStream
 
     attributes :id, :created_at, :updated_at, :user_ip, :annotations, :metadata
 
-    belongs_to :project,  serializer: EventStream::ProjectSerializer
-    belongs_to :user,     serializer: EventStream::UserSerializer
-    belongs_to :workflow, serializer: EventStream::WorkflowSerializer
-    has_many   :subjects, serializer: EventStream::SubjectSerializer
+    belongs_to :project,  serializer: EventStreamSerializers::ProjectSerializer
+    belongs_to :user,     serializer: EventStreamSerializers::UserSerializer
+    belongs_to :workflow, serializer: EventStreamSerializers::WorkflowSerializer
+    has_many   :subjects, serializer: EventStreamSerializers::SubjectSerializer
 
     def user_ip
       object.user_ip.to_s

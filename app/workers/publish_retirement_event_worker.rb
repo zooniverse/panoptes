@@ -13,7 +13,9 @@ class PublishRetirementEventWorker
       classifications_count: workflow.classifications_count
     }
 
-    KinesisPublisher.publish('workflow_counters', workflow.id, counters)
+    EventStream.publish(event: 'workflow_counters',
+                        data: counters,
+                        shard_by: workflow.id)
   rescue ActiveRecord::RecordNotFound
   end
 end
