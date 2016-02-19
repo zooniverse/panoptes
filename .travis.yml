@@ -32,7 +32,7 @@ matrix:
         - SPECS="spec/controllers/**.rb spec/controllers/api/*.rb spec/models spec/operations"
     - rvm: 2.3.0
       env:
-        - SPECS="spec/lib spec/workers spec/serializers spec/requests spec/middleware spec/mailers"
+        - SPECS="spec/lib spec/workers spec/serializers spec/services spec/requests spec/middleware spec/mailers"
 
 services:
   - postgresql

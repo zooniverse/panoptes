@@ -9,4 +9,5 @@ spec/mailers
 spec/controllers
 spec/lib
 spec/serializers
+spec/services
 spec/workers
