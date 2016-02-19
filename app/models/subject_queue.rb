@@ -60,21 +60,21 @@ class SubjectQueue < ActiveRecord::Base
 
   def enqueue_update(sms_ids)
     return if sms_ids.blank?
-    update_queue_ids(set_member_subject_ids | Array.wrap(sms_ids))
+    update_ids(set_member_subject_ids | Array.wrap(sms_ids))
   end
 
   def dequeue_update(sms_ids)
     return if sms_ids.blank?
-    diff_ids = (set_member_subject_ids - Array.wrap(sms_ids))
-    update_queue_ids(diff_ids)
+    update_ids((set_member_subject_ids - Array.wrap(sms_ids)))
+  end
+
+  def update_ids(sms_ids)
+    return if sms_ids.blank?
+    capped_sms_ids = cap_queue_length(Array.wrap(sms_ids))
+    update_attribute(:set_member_subject_ids, capped_sms_ids)
   end
 
   private
-
-  def update_queue_ids(sms_ids)
-    capped_sms_ids = cap_queue_length(sms_ids)
-    update_attribute(:set_member_subject_ids, capped_sms_ids)
-  end
 
   def cap_queue_length(sms_ids)
     sms_ids.slice(0, DEFAULT_LENGTH)

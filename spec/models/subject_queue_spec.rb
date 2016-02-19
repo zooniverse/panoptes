@@ -96,6 +96,22 @@ RSpec.describe SubjectQueue, type: :model do
     end
   end
 
+  describe "#update_ids" do
+    let(:ids) { (5..10).to_a }
+    let(:sq) do
+      create(:subject_queue, subject_set: nil, set_member_subject_ids: ids)
+    end
+
+    it "should not modify the queue when given no ids" do
+      expect { sq.update_ids([]) }.not_to change { sq.set_member_subject_ids }
+    end
+
+    it "should replace to the queue when given ids" do
+      sq.update_ids(1)
+      expect(sq.reload.set_member_subject_ids).to eq([1])
+    end
+  end
+
   describe "#enqueue_update" do
     let(:ids) { (5..10).to_a }
     let(:sq) do
