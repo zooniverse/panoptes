@@ -50,13 +50,11 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def next_subjects(limit=10)
-    sms_ids = if workflow.prioritized
+    if workflow.prioritized
       set_member_subject_ids[0..limit-1]
     else
       set_member_subject_ids.sample(limit)
     end
-    dequeue_update(sms_ids)
-    sms_ids
   end
 
   def enqueue_update(sms_ids)

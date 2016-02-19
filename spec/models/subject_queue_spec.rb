@@ -126,7 +126,7 @@ RSpec.describe SubjectQueue, type: :model do
     end
   end
 
-  describe "#next_subjects", :focus do
+  describe "#next_subjects" do
     let(:ids) { (0..20).to_a }
     let(:sq) do
       create(:subject_queue, set_member_subject_ids: ids)
@@ -147,11 +147,6 @@ RSpec.describe SubjectQueue, type: :model do
 
       it 'should randomly sample from the subject_ids' do
         expect(sq.next_subjects).to_not match_array(sq.set_member_subject_ids[0..9])
-      end
-
-      it 'should dequeue the selected items' do
-        items = sq.next_subjects
-        expect(sq.reload.set_member_subject_ids).not_to include(*items)
       end
     end
 
