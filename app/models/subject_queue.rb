@@ -40,7 +40,8 @@ class SubjectQueue < ActiveRecord::Base
                      set_member_subject_ids: logged_out_queue.set_member_subject_ids)
       queue if queue.persisted?
     else
-      EnqueueSubjectQueueWorker.perform_async(workflow.id, nil, set_id)
+      queue = create!(workflow: workflow, user: nil, subject_set_id: set_id)
+      EnqueueSubjectQueueWorker.perform_async(queue.id)
       nil
     end
   end
