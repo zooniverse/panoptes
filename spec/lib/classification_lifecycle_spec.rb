@@ -7,7 +7,6 @@ describe ClassificationLifecycle do
       create(:set_member_subject, subject_set: subject_set, subject_id: s_id)
     end.map(&:id)
   end
-
   let(:subject_queue) do
     create(:subject_queue,
            user: classification.user,
@@ -434,56 +433,45 @@ describe ClassificationLifecycle do
     after(:each) { subject.refresh_queue }
 
     context "when no queue exists" do
-
       it "should not call Enqueue worker" do
         expect(EnqueueSubjectQueueWorker).to_not receive(:perform_async)
       end
     end
 
     context "when a queue exists" do
-
-      before(:each) { subject_queue }
+      before(:each) do
+        subject_queue
+        allow_any_instance_of(SubjectQueue)
+        .to receive(:below_minimum?)
+        .and_return(below_min)
+      end
 
       context "when queue is not below min" do
+        let(:below_min) { false }
 
         it "should not call Enqueue worker" do
-          allow(subject).to receive(:below_threshold_queue?).and_return(false)
           expect(EnqueueSubjectQueueWorker).to_not receive(:perform_async)
         end
       end
 
       context "when queue is below min" do
+        let(:below_min) { true }
 
         it "should call Enqueue worker" do
-          allow(subject).to receive(:below_threshold_queue?).and_return(true)
           expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
-            .with(workflow_id, user_id, nil)
+          .with(subject_queue.id)
         end
-      end
 
-      context "when workflow is grouped and the set queue is below min" do
+        context "when subject belongs to many sets" do
+          let(:set_ids) { [1,2,3] }
 
-        it "should call Enqueue worker with the subject sets" do
-          smses = SetMemberSubject.where(subject_id: classification.subject_ids.first)
-          allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
-          allow(SetMemberSubject).to receive(:by_subject_workflow).and_return(smses)
-          allow(subject).to receive(:below_threshold_queue?).and_return(true)
-          smses.each do |sms|
-            expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
-              .with(workflow_id, user_id, sms.subject_set_id)
+          it "should call Enqueue worker for each set" do
+            allow(subject).to receive(:subjects_workflow_subject_sets).and_return(set_ids)
+            allow(SubjectQueue).to receive(:by_set).and_return(SubjectQueue.all)
+            set_ids.each do |set_id|
+              expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
+              .with(subject_queue.id)
             end
-        end
-      end
-
-      context "when subject belongs to many sets" do
-        let(:set_ids) { [1,2,3] }
-
-        it "should call Enqueue worker for each set below min" do
-          allow(subject).to receive(:subjects_workflow_subject_sets).and_return(set_ids)
-          allow(subject).to receive(:below_threshold_queue?).and_return(true)
-          set_ids.each do |set_id|
-            expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
-              .with(workflow_id, user_id, set_id)
           end
         end
       end

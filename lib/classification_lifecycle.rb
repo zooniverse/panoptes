@@ -66,9 +66,9 @@ class ClassificationLifecycle
 
   def refresh_queue
     subjects_workflow_subject_sets.each do |set_id|
-  #TODO: find the queue for each set_id and push that q to the enqueue worker
-      if below_threshold_queue?(set_id)
-        EnqueueSubjectQueueWorker.perform_async(workflow.id, user.try(:id), set_id)
+      queue = SubjectQueue.by_set(set_id).find_by(user: user, workflow: workflow)
+      if queue && queue.below_minimum?
+        EnqueueSubjectQueueWorker.perform_async(queue.id)
       end
     end
   end
@@ -179,14 +179,6 @@ class ClassificationLifecycle
       set_member_subjects.map(&:subject_set_id).uniq
     else
       [nil]
-    end
-  end
-
-  def below_threshold_queue?(set_id)
-    if subject_queue = SubjectQueue.by_set(set_id).find_by(user: user, workflow: workflow)
-      subject_queue.below_minimum?
-    else
-      false
     end
   end
 end
