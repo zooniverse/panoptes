@@ -102,8 +102,14 @@ RSpec.describe SubjectQueue, type: :model do
       create(:subject_queue, subject_set: nil, set_member_subject_ids: ids)
     end
 
-    it "should not modify the queue when given no ids" do
-      expect { sq.update_ids([]) }.not_to change { sq.set_member_subject_ids }
+    it "should replace the queue ids when passed an empty list" do
+      sq.update_ids([])
+      expect(sq.reload.set_member_subject_ids).to be_empty
+    end
+
+    it "should replace the queue ids when passed nil" do
+      sq.update_ids(nil)
+      expect(sq.reload.set_member_subject_ids).to be_empty
     end
 
     it "should replace to the queue when given ids" do

@@ -69,7 +69,6 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def update_ids(sms_ids)
-    return if sms_ids.blank?
     capped_sms_ids = cap_queue_length(Array.wrap(sms_ids))
     update_attribute(:set_member_subject_ids, capped_sms_ids)
   end
