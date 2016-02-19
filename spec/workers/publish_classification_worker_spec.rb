@@ -20,7 +20,7 @@ RSpec.describe PublishClassificationWorker do
       end
 
       it "should not publish" do
-        expect(MultiKafkaProducer).not_to receive(:publish)
+        expect(KinesisPublisher).not_to receive(:publish)
         worker.perform(classification.id)
       end
     end
@@ -33,12 +33,6 @@ RSpec.describe PublishClassificationWorker do
           .to receive(:serialize)
           .with(an_instance_of(Classification), serialiser_opts)
           .and_call_original
-        worker.perform(classification.id)
-      end
-
-      it "should publish via kafka" do
-        expected_payload = [classification.project.id, instance_of(String)]
-        expect(MultiKafkaProducer).to receive(:publish).with(expected_topic, expected_payload)
         worker.perform(classification.id)
       end
 

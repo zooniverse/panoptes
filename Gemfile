@@ -9,7 +9,7 @@ gem 'devise', '~> 3.0'
 gem 'versionist', '~> 1.0'
 gem 'rack-cors', '~> 0.3', require: 'rack/cors'
 gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev" # REST API
-gem 'active_model_serializers', '0.10.0.rc2' # Kafka
+gem 'active_model_serializers', '0.10.0.rc2' # Event stream
 gem 'paper_trail', '~> 3.0'
 gem 'omniauth', '~> 1.0'
 gem 'omniauth-facebook', '~> 3.0'
@@ -38,7 +38,6 @@ gem 'cellect-client', '~> 1.2.0', require: false
 gem 'active_interaction', '~> 3.0.1'
 gem 'therubyracer', '~> 0.12'
 gem 'pg', '~> 0.18'
-gem 'poseidon', '~> 0.0.5'
 
 group :production do
   gem 'newrelic_rpm', '~> 3.0', require: false
