@@ -7,12 +7,6 @@ shared_examples "cleans up the linked set member subjects" do
     expect(SetMemberSubject.where(id: linked_sms_ids)).to be_empty
   end
 
-  it 'should queue a removal workfer' do
-    expect(QueueRemovalWorker).to receive(:perform_async)
-      .with(sms.map(&:id),subject_set.workflows.pluck(:id))
-    delete_resources
-  end
-
   it 'should queue a count reset worker' do
     expect(CountResetWorker).to receive(:perform_async).with(subject_set.id)
     delete_resources

@@ -1,13 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe SubjectSetsWorkflow do
-  let(:ss_w) { create(:subject_sets_workflow) }
+  it "should have a valid factory" do
+    expect(build(:subject_sets_workflow)).to be_valid
+  end
 
-  describe "#remove_from_queues" do
-    it 'should queue a removal worker' do
-      expect(QueueRemovalWorker).to receive(:perform_async)
-        .with(ss_w.subject_set.set_member_subjects.pluck(:id), ss_w.workflow_id)
-      ss_w.remove_from_queues
-    end
+  it "should validate the uniqueness of the workflow scoped to set id", :aggregate_failures do
+    ssw = create(:subject_sets_workflow)
+    dup = ssw.dup
+    expect(dup.valid?).to be_falsey
+    expect(dup.errors[:workflow_id]).to include("has already been taken")
   end
 end
