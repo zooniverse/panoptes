@@ -115,9 +115,8 @@ module Subjects
     end
 
     def find_subject_queue
-      SubjectQueue
-      .by_set(subject_set_id)
-      .find_by(user: queue_user, workflow: workflow)
+      SubjectQueue.by_set(subject_set_id)
+        .find_by(user: queue_user, workflow: workflow)
     end
   end
 end

@@ -442,8 +442,8 @@ describe ClassificationLifecycle do
       before(:each) do
         subject_queue
         allow_any_instance_of(SubjectQueue)
-        .to receive(:below_minimum?)
-        .and_return(below_min)
+          .to receive(:below_minimum?)
+          .and_return(below_min)
       end
 
       context "when queue is not below min" do

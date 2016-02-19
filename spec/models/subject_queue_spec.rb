@@ -64,8 +64,8 @@ RSpec.describe SubjectQueue, type: :model do
 
       it 'should attempt to build a logged out queue' do
         expect(EnqueueSubjectQueueWorker)
-        .to receive(:perform_async)
-        .with(workflow.id, nil, nil)
+          .to receive(:perform_async)
+          .with(workflow.id, nil, nil)
         SubjectQueue.create_for_user(workflow, user)
       end
 
@@ -89,7 +89,7 @@ RSpec.describe SubjectQueue, type: :model do
 
       it 'should add the logged out subjects to the new queue' do
         expect(new_queue.set_member_subject_ids)
-        .to match_array(logged_out_queue.set_member_subject_ids)
+          .to match_array(logged_out_queue.set_member_subject_ids)
       end
     end
   end

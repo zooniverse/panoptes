@@ -74,7 +74,7 @@ class SubjectQueue < ActiveRecord::Base
 
   def update_queue_ids(sms_ids)
     capped_sms_ids = cap_queue_length(sms_ids)
-    self.update_attribute(:set_member_subject_ids, capped_sms_ids)
+    update_attribute(:set_member_subject_ids, capped_sms_ids)
   end
 
   def cap_queue_length(sms_ids)

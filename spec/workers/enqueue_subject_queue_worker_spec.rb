@@ -10,12 +10,12 @@ RSpec.describe EnqueueSubjectQueueWorker do
     create(:subject_queue, workflow: workflow, user: user)
   end
 
-  describe "#perform", :focus do
+  describe "#perform" do
 
     before(:each) do
       allow_any_instance_of(Subjects::PostgresqlSelection)
-      .to receive(:select)
-      .and_return((1..100).to_a)
+        .to receive(:select)
+        .and_return((1..100).to_a)
     end
 
     it "should not raise an error if there is no queue" do

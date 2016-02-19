@@ -22,8 +22,8 @@ class SeenSubjectRemover
     @seen_before ||=
       if user_seen_subject
         SetMemberSubject.where(id: append_ids)
-        .joins(:subject)
-        .where(subjects: { id: user_seen_subject.subject_ids })
+          .joins(:subject)
+          .where(subjects: { id: user_seen_subject.subject_ids })
       else
         SetMemberSubject.none
       end.pluck(:id)
