@@ -20,7 +20,7 @@ RSpec.describe PublishClassificationWorker do
       end
 
       it "should not publish" do
-        expect(MultiKafkaProducer).not_to receive(:publish)
+        expect(EventStream).not_to receive(:publish)
         worker.perform(classification.id)
       end
     end
@@ -29,23 +29,20 @@ RSpec.describe PublishClassificationWorker do
       let(:serialiser_opts) { { include: ['subjects'] } }
 
       it "should format the data using the serializer" do
-        expect(KafkaClassificationSerializer)
+        expect(EventStreamSerializers::ClassificationSerializer)
           .to receive(:serialize)
           .with(an_instance_of(Classification), serialiser_opts)
           .and_call_original
         worker.perform(classification.id)
       end
 
-      it "should publish via kafka" do
-        expected_payload = [classification.project.id, instance_of(String)]
-        expect(MultiKafkaProducer).to receive(:publish).with(expected_topic, expected_payload)
-        worker.perform(classification.id)
-      end
-
       it "should publish via kinesis" do
-        publisher = class_double("KinesisPublisher").as_stubbed_const
+        publisher = class_double("EventStream").as_stubbed_const
         expect(publisher).to receive(:publish)
-          .with("classification", classification.workflow_id, duck_type(:to_json), duck_type(:to_json))
+          .with(event: "classification",
+                shard_by: classification.workflow_id,
+                data: duck_type(:to_json),
+                linked: duck_type(:to_json))
         worker.perform(classification.id)
       end
     end

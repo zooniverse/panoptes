@@ -18,13 +18,6 @@ redis:
   # ports:
   #   - "6379:6379"
 
-kafka:
-  image: zooniverse/kafka
-  links:
-    - zookeeper:zk
-  hostname: kafka
-  command: -i 1 -H kafka -p 9092 -z zk:2181
-
 cellect:
   image: zooniverse/cellect-panoptes
   ports:
@@ -56,4 +49,3 @@ panoptes:
     - postgres:pg
     - redis
     - zookeeper:zk
-    - kafka

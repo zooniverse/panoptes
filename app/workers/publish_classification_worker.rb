@@ -1,5 +1,4 @@
-require "kafka_classification_serializer"
-require "multi_kafka_producer"
+require "event_stream"
 
 class PublishClassificationWorker
   include Sidekiq::Worker
@@ -11,7 +10,6 @@ class PublishClassificationWorker
   def perform(classification_id)
     @classification = Classification.find(classification_id)
     if classification.complete?
-      publish_to_kafka!
       publish_to_kinesis!
     end
   rescue ActiveRecord::RecordNotFound
@@ -20,22 +18,17 @@ class PublishClassificationWorker
   private
 
   def serialized_classification
-    @serialized_classification ||= KafkaClassificationSerializer
+    @serialized_classification ||= EventStreamSerializers::ClassificationSerializer
       .serialize(classification, include: ['subjects'])
       .as_json
       .with_indifferent_access
   end
 
-  def publish_to_kafka!
-    MultiKafkaProducer.publish("classifications", kafka_payload)
-  end
-
-  def kafka_payload
-    [classification.project.id, serialized_classification.to_json]
-  end
-
   def publish_to_kinesis!
-    KinesisPublisher.publish("classification", classification.workflow_id, kinesis_data, kinesis_linked)
+    EventStream.publish(event: "classification",
+                        data: kinesis_data,
+                        linked: kinesis_linked,
+                        shard_by: classification.workflow_id)
   end
 
   def kinesis_data

@@ -1,5 +1,3 @@
-require "event_stream"
-
 class PublishRetirementEventWorker
   include Sidekiq::Worker
 
@@ -15,8 +13,9 @@ class PublishRetirementEventWorker
       classifications_count: workflow.classifications_count
     }
 
-    EventStream.push('workflow_counters', counters)
-    KinesisPublisher.publish('workflow_counters', workflow.id, counters)
+    EventStream.publish(event: 'workflow_counters',
+                        data: counters,
+                        shard_by: workflow.id)
   rescue ActiveRecord::RecordNotFound
   end
 end

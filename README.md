@@ -29,7 +29,6 @@ You'll need to have the following services running:
 
 Optionally you can run
 
-* [Kafka](http://kafka.apache.org) version > 0.8.1.1
 * [Cellect Server](https://github.com/zooniverse/Cellect) version > 0.1.0
 * [MySQL](http://www.mysql.com) version > 5.1
 

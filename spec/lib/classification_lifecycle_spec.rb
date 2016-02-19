@@ -281,12 +281,6 @@ describe ClassificationLifecycle do
         .to receive(:perform_async)
         .with(classification.id)
       end
-
-      it 'should call the publish classification event worker' do
-        expect(PublishClassificationEventWorker)
-        .to receive(:perform_async)
-        .with(classification.id)
-      end
     end
 
     context "when classification is incomplete" do
@@ -294,10 +288,6 @@ describe ClassificationLifecycle do
 
       it 'should not call the publish classification worker' do
         expect(PublishClassificationWorker).not_to receive(:perform_async)
-      end
-
-      it 'should not call the publish classification event worker' do
-        expect(PublishClassificationEventWorker).not_to receive(:perform_async)
       end
     end
   end

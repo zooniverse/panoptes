@@ -1,5 +1,3 @@
-require 'event_stream'
-
 class ClassificationLifecycle
   class ClassificationNotPersisted < StandardError; end
 
@@ -61,7 +59,6 @@ class ClassificationLifecycle
   def publish_data
     if classification.complete?
       PublishClassificationWorker.perform_async(classification.id)
-      PublishClassificationEventWorker.perform_async(classification.id)
     end
   end
 

@@ -1,9 +1,0 @@
-development:
-  producer_id: panoptes_development
-  brokers:
-    - kafka:9092
-
-test:
-  producer_id: panoptes_test
-  brokers:
-    - localhost:9092

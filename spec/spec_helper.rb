@@ -55,15 +55,6 @@ RSpec.configure do |config|
     else
       Sidekiq::Testing.fake!
     end
-
-    case example.metadata[:kafka]
-    when nil
-      MultiKafkaProducer.adapter = :null
-    when true
-      MultiKafkaProducer.adapter = nil
-    else
-      MultiKafkaProducer.adapter = example.metadata[:kafka]
-    end
   end
 
   config.before(:each, type: :controller) do
