@@ -29,7 +29,7 @@ RSpec.describe PublishClassificationWorker do
       let(:serialiser_opts) { { include: ['subjects'] } }
 
       it "should format the data using the serializer" do
-        expect(KafkaClassificationSerializer)
+        expect(EventStream::ClassificationSerializer)
           .to receive(:serialize)
           .with(an_instance_of(Classification), serialiser_opts)
           .and_call_original

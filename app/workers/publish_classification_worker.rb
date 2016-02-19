@@ -1,4 +1,4 @@
-require "kafka_classification_serializer"
+require "event_stream"
 
 class PublishClassificationWorker
   include Sidekiq::Worker
@@ -18,7 +18,7 @@ class PublishClassificationWorker
   private
 
   def serialized_classification
-    @serialized_classification ||= KafkaClassificationSerializer
+    @serialized_classification ||= EventStream::ClassificationSerializer
       .serialize(classification, include: ['subjects'])
       .as_json
       .with_indifferent_access

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe KafkaClassificationSerializer do
+describe EventStream::ClassificationSerializer do
   let(:classification) { create(:classification) }
-  let(:serializer) { KafkaClassificationSerializer.new(Classification.find(classification.id)) }
+  let(:serializer) { described_class.new(Classification.find(classification.id)) }
   let(:adapter) { Serialization::V1Adapter.new(serializer) }
 
   it 'can process includes' do
