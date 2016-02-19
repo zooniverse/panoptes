@@ -470,7 +470,7 @@ describe ClassificationLifecycle do
             allow(SubjectQueue).to receive(:by_set).and_return(SubjectQueue.all)
             set_ids.each do |set_id|
               expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
-              .with(subject_queue.id)
+                .with(subject_queue.id)
             end
           end
         end

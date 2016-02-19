@@ -114,6 +114,82 @@ RSpec.describe Subjects::Selector do
         end
       end
     end
+
+    describe "queue managment" do
+      let(:smses) { workflow.set_member_subjects }
+      let(:sms_ids) { smses.map(&:id) }
+      let(:subject_queue) do
+        create(:subject_queue,
+               workflow: workflow,
+               user: queue_owner,
+               subject_set: nil,
+               set_member_subjects: smses)
+      end
+
+      before(:each) { subject_queue }
+
+      context "when the user has a queue" do
+        let(:queue_owner) { user.user }
+
+        it 'should dequeue the ids from the users queue' do
+          expect{
+            subject.queued_subjects
+          }.to change {
+            subject_queue.reload.set_member_subject_ids.length
+          }.from(sms_ids.length).to(0)
+        end
+      end
+
+      context "when the queue has no user" do
+        let(:queue_owner) { nil }
+        let(:user) { ApiUser.new(nil) }
+
+        # anonymous site users can cause a lot of contention on updates
+        # to the non-logged in queues, use the rate limiter in sidekiq to
+        # control how often these happen
+        it 'should schedule a dequeue for the non-logged in queue' do
+          expect(DequeueSubjectQueueWorker).to receive(:perform_async)
+            .with(subject_queue.id, array_including(sms_ids))
+          subject.queued_subjects
+        end
+      end
+
+      describe "non-logged in queues" do
+        let(:queue_owner) { nil }
+
+        shared_examples "creates for the logged out user" do
+          it 'should create for logged out user' do
+            expect(SubjectQueue).to receive(:create_for_user).with(workflow, nil, set_id: nil)
+            #non-logged in queue won't exist
+            expect { subject.queued_subjects }.to raise_error(Subjects::Selector::MissingSubjectQueue)
+          end
+        end
+
+        context "when the workflow is finished" do
+          before(:each) do
+            allow_any_instance_of(Workflow).to receive(:finished?).and_return(true)
+          end
+
+          context "when the logged_out queue doesn't exist" do
+            let(:queue_owner) { user.user }
+
+            it_behaves_like "creates for the logged out user"
+          end
+        end
+
+        context "when the user has finished the workflow" do
+          before(:each) do
+            allow_any_instance_of(User).to receive(:has_finished?).and_return(true)
+          end
+
+          context "when the logged_out queue doesn't exist" do
+            let(:queue_owner) { user.user }
+
+            it_behaves_like "creates for the logged out user"
+          end
+        end
+      end
+    end
   end
 
   describe '#selected_subjects' do
