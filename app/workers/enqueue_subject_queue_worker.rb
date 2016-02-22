@@ -68,10 +68,8 @@ class EnqueueSubjectQueueWorker
   end
 
   def strategy_sms_ids
-    begin
-      selected_sms_ids.compact
+    selected_sms_ids.compact
     rescue Subjects::CellectClient::ConnectionError
       default_strategy_sms_ids
-    end
   end
 end
