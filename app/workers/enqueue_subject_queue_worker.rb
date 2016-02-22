@@ -1,5 +1,6 @@
 require 'subjects/cellect_client'
 require 'subjects/postgresql_selection'
+require 'subjects/seen_remover'
 
 class EnqueueSubjectQueueWorker
   include Sidekiq::Worker
@@ -22,14 +23,10 @@ class EnqueueSubjectQueueWorker
     @limit = limit
     @selection_strategy = strategy(strategy_override)
 
-    begin
-      subject_ids = selected_subject_ids.compact
-    rescue Subjects::CellectClient::ConnectionError
-      subject_ids = default_strategy_sms_ids
-    end
-
-    unless subject_ids.empty?
-      queue.enqueue_update(subject_ids)
+    sms_ids = strategy_sms_ids
+    unless sms_ids.empty?
+      unseen_ids = Subjects::SeenRemover.new(user, workflow, sms_ids).unseen_ids
+      queue.enqueue_update(unseen_ids)
     end
   rescue ActiveRecord::RecordNotFound
     nil
@@ -48,7 +45,7 @@ class EnqueueSubjectQueueWorker
 
   private
 
-  def selected_subject_ids
+  def selected_sms_ids
     sms_ids = case selection_strategy
     when :cellect
       cellect_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
@@ -68,5 +65,13 @@ class EnqueueSubjectQueueWorker
 
   def workflow_strategy
     @workflow_strategy ||= workflow.selection_strategy
+  end
+
+  def strategy_sms_ids
+    begin
+      selected_sms_ids.compact
+    rescue Subjects::CellectClient::ConnectionError
+      default_strategy_sms_ids
+    end
   end
 end

@@ -22,6 +22,13 @@ RSpec.describe EnqueueSubjectQueueWorker do
       expect { subject.perform(queue.id) }.not_to raise_error
     end
 
+    it "should call the seens remover before enqueue" do
+      seen_remover = instance_double("Subjects::SeenRemover")
+      allow(seen_remover).to receive(:unseen_ids).and_return([])
+      expect(Subjects::SeenRemover).to receive(:new).and_return(seen_remover)
+      subject.perform(queue.id)
+    end
+
     it "should enqueue new data" do
       subject.perform(queue.id)
       expect(queue.reload.set_member_subject_ids.length).to eq(20)
