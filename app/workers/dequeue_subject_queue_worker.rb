@@ -10,6 +10,8 @@ class DequeueSubjectQueueWorker
     }.merge({key: -> (queue_id, sms_ids) { "queue_#{ queue_id }_dequeue" }})
 
   def perform(queue_id, sms_ids)
+    # @note REVERT after https://github.com/zooniverse/Panoptes/pull/1676 is deployed
+    return nil if Rails.env.production?
     return if sms_ids.blank?
     queue = SubjectQueue.find(queue_id)
     queue.dequeue_update(sms_ids)
