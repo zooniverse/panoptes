@@ -27,7 +27,8 @@ class EnqueueSubjectQueueWorker
 
     sms_ids = strategy_sms_ids
     unless sms_ids.empty?
-      unseen_ids = Subjects::SeenRemover.new(user, workflow, sms_ids).unseen_ids
+      user_seens = user ? UserSeenSubject.find_by(user: user, workflow: workflow) : nil
+      unseen_ids = Subjects::SeenRemover.new(user_seens, sms_ids).unseen_ids
       queue.enqueue_update(unseen_ids)
     end
   rescue ActiveRecord::RecordNotFound

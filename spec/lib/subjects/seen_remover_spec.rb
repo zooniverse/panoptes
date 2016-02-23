@@ -7,34 +7,33 @@ RSpec.describe Subjects::SeenRemover do
   let(:uss) { instance_double("UserSeenSubject") }
   let(:sms) { create(:set_member_subject) }
   let(:subject_ids) { [ sms.subject.id ] }
-  let(:seens) do
-    build(:user_seen_subject,
-      user: nil,
-      workflow: nil,
-      subject_ids: subject_ids
-    )
-  end
-  subject { described_class.new(user, workflow, append_sms_ids) }
+  let(:user_seens) { nil }
+
+  subject { described_class.new(user_seens, append_sms_ids) }
 
   describe "#unseen_ids" do
+    let(:result) { subject.unseen_ids }
+
     it "should return the whole set if there are no seen subjects" do
-      allow(subject)
-        .to receive(:seen_before_sms_ids)
-        .and_return([])
-      expect(subject.unseen_ids).to match_array(append_sms_ids)
+      expect(result).to match_array(append_sms_ids)
     end
 
     context "with seen subjects" do
+      let(:user_seens) do
+        build(:user_seen_subject,
+          user: nil,
+          workflow: nil,
+          subject_ids: subject_ids
+        )
+      end
       it "should return the whole set if no seens match" do
-        allow(uss).to receive(:subject_ids).and_return([])
-        allow(subject).to receive(:user_seen_subject).and_return(uss)
-        expect(subject.unseen_ids).to match_array(append_sms_ids)
+        allow(user_seens).to receive(:subject_ids).and_return([])
+        expect(result).to match_array(append_sms_ids)
       end
 
       it "should return the diff set when seens match inputs" do
-        allow(subject).to receive(:user_seen_subject).and_return(seens)
         expected = append_sms_ids - subject_ids
-        expect(subject.unseen_ids).to match_array(expected)
+        expect(result).to match_array(expected)
       end
     end
   end
