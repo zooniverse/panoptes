@@ -216,4 +216,22 @@ RSpec.describe SubjectQueue, type: :model do
       end
     end
   end
+
+  describe "#stale?" do
+    let(:queue) { build(:subject_queue, set_member_subject_ids: []) }
+
+    it "should be false if the object is not persisted" do
+      expect(queue.stale?).to be false
+    end
+
+    it "should not be stale when last updated less than time threshold" do
+      allow(queue).to receive(:updated_at).and_return(Time.zone.now)
+      expect(queue.stale?).to be false
+    end
+
+    it "should be stale when last updated greater than time threshold" do
+      allow(queue).to receive(:updated_at).and_return(Time.zone.now-30.minutes)
+      expect(queue.stale?).to be true
+    end
+  end
 end

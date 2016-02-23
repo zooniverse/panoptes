@@ -4,6 +4,7 @@ class SubjectQueue < ActiveRecord::Base
 
   DEFAULT_LENGTH = 20
   MINIMUM_LENGTH = 10
+  STALE_MINS     = 30
 
   belongs_to :user
   belongs_to :workflow
@@ -69,6 +70,12 @@ class SubjectQueue < ActiveRecord::Base
   def update_ids(sms_ids)
     capped_sms_ids = cap_queue_length(Array.wrap(sms_ids))
     update_attribute(:set_member_subject_ids, capped_sms_ids)
+  end
+
+  def stale?
+    return false unless updated_at
+    last_updated_mins_ago = (Time.zone.now - updated_at).to_i / 60
+    last_updated_mins_ago >= STALE_MINS
   end
 
   private
