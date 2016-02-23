@@ -41,7 +41,7 @@ class SubjectQueue < ActiveRecord::Base
     else
       queue = create!(workflow: workflow, user: nil, subject_set_id: set_id)
       EnqueueSubjectQueueWorker.perform_async(queue.id)
-      nil
+      queue
     end
   end
 

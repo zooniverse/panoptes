@@ -71,8 +71,10 @@ RSpec.describe SubjectQueue, type: :model do
         SubjectQueue.create_for_user(workflow, user)
       end
 
-      it 'should return nil' do
-        expect(SubjectQueue.create_for_user(workflow, user)).to be_nil
+      it 'should return the persisted queue', :aggregate_failures do
+        queue = SubjectQueue.create_for_user(workflow, user)
+        expect(queue).to be_a(SubjectQueue)
+        expect(queue.persisted?).to be true
       end
     end
 
