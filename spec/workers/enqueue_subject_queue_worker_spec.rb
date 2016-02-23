@@ -6,52 +6,32 @@ RSpec.describe EnqueueSubjectQueueWorker do
   let(:workflow) { create(:workflow_with_subject_set) }
   let(:subject_set) { workflow.subject_sets.first }
   let(:user) { workflow.project.owner }
+  let(:queue) do
+    create(:subject_queue, workflow: workflow, user: user)
+  end
 
   describe "#perform" do
 
     before(:each) do
-      available_smss = (1..100).to_a
       allow_any_instance_of(Subjects::PostgresqlSelection)
-        .to receive(:select).and_return(available_smss)
+        .to receive(:select)
+        .and_return((1..100).to_a)
     end
 
-    context "with no user or set" do
-      it "should create a subject queue with the default number of items" do
-        subject.perform(workflow.id)
-        queue = SubjectQueue.find_by(workflow: workflow)
-        expect(queue.set_member_subject_ids.length).to eq(100)
-      end
+    it "should not raise an error if there is no queue" do
+      expect { subject.perform(queue.id) }.not_to raise_error
     end
 
-    context "when a workflow id string is passed in" do
-      it "should not raise an error" do
-        expect{subject.perform(workflow.id.to_s)}.to_not raise_error
-      end
+    it "should call the seens remover before enqueue" do
+      seen_remover = instance_double("Subjects::SeenRemover")
+      allow(seen_remover).to receive(:unseen_ids).and_return([])
+      expect(Subjects::SeenRemover).to receive(:new).and_return(seen_remover)
+      subject.perform(queue.id)
     end
 
-    context "when the workflow does not exist" do
-      it "should not raise an error" do
-        expect do
-          subject.perform(-1)
-        end.to_not raise_error
-      end
-    end
-
-    context "with a user" do
-      it "should create a subject queue for the user" do
-        subject.perform(workflow.id, user.id)
-        queue = SubjectQueue.by_user_workflow(user, workflow).first
-        expect(queue.set_member_subject_ids.length).to eq(100)
-      end
-    end
-
-    context "with user and a subject set" do
-      it "should create a per user subject set queue" do
-        subject.perform(workflow.id, user.id, subject_set.id)
-        queue = SubjectQueue.by_set(subject_set.id)
-          .by_user_workflow(user, workflow).first
-        expect(queue.set_member_subject_ids.length).to eq(100)
-      end
+    it "should enqueue new data" do
+      subject.perform(queue.id)
+      expect(queue.reload.set_member_subject_ids.length).to eq(20)
     end
 
     context "when selecting via strategy param" do
@@ -60,13 +40,13 @@ RSpec.describe EnqueueSubjectQueueWorker do
       it "should fallback from the override strategy" do
         allow_any_instance_of(Subjects::PostgresqlSelection)
           .to receive(:select).and_return(result_ids)
-        expect(SubjectQueue).to receive(:enqueue)
-        subject.perform(workflow.id, nil, nil, nil, :unknown_strategy)
+        expect_any_instance_of(SubjectQueue).to receive(:enqueue_update)
+        subject.perform(queue.id, nil, :unknown_strategy)
       end
 
       context "with cellect" do
         let(:run_selection) do
-          subject.perform(workflow.id, nil, nil, nil, :cellect)
+          subject.perform(queue.id, nil, :cellect)
         end
         before do
           allow(Panoptes).to receive(:cellect_on).and_return(true)
@@ -101,7 +81,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
             .and_return(selection_results)
           expect(selection_results).to receive(:pluck)
             .with("set_member_subjects.id")
-          expect(SubjectQueue).to receive(:enqueue)
+          expect_any_instance_of(SubjectQueue).to receive(:enqueue_update)
           run_selection
         end
 
@@ -127,8 +107,8 @@ RSpec.describe EnqueueSubjectQueueWorker do
         let(:result_ids) { [1] }
 
         it "should attempt to queue the selected set" do
-          expect(SubjectQueue).to receive(:enqueue)
-          subject.perform(workflow.id)
+          expect_any_instance_of(SubjectQueue).to receive(:enqueue_update)
+          subject.perform(queue.id)
         end
       end
 
@@ -136,8 +116,8 @@ RSpec.describe EnqueueSubjectQueueWorker do
         let(:result_ids) { [] }
 
         it "should not attempt to queue an empty set" do
-          expect(SubjectQueue).to_not receive(:enqueue)
-          subject.perform(workflow.id)
+          expect_any_instance_of(SubjectQueue).not_to receive(:enqueue_update)
+          subject.perform(queue.id)
         end
       end
     end

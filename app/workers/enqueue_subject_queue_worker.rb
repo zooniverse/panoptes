@@ -1,36 +1,35 @@
 require 'subjects/cellect_client'
 require 'subjects/postgresql_selection'
+require 'subjects/seen_remover'
 
 class EnqueueSubjectQueueWorker
   include Sidekiq::Worker
 
-  # SGL-PRIORITY
-  # sidekiq_options queue: :high
   sidekiq_options queue: :really_high
 
   sidekiq_options congestion: Panoptes::SubjectEnqueue.congestion_opts.merge({
-    key: ->(workflow_id, user_id, subject_set_id) {
-      "user_#{ workflow_id }_#{user_id}_#{subject_set_id}_subject_enqueue"
+    key: ->(queue_id) {
+      "queue_#{ queue_id }_enqueue"
     }
   })
 
-  attr_reader :workflow, :user, :subject_set_id, :limit, :selection_strategy
+  attr_reader :queue, :workflow, :user, :subject_set_id, :limit, :selection_strategy
 
-  def perform(workflow_id, user_id=nil, subject_set_id=nil, limit=SubjectQueue::DEFAULT_LENGTH, strategy_override=nil)
-    @workflow = Workflow.find(workflow_id)
-    @user = User.find(user_id) if user_id
-    @subject_set_id = subject_set_id
+  def perform(queue_id, limit=SubjectQueue::DEFAULT_LENGTH, strategy_override=nil)
+    # @note REVERT after https://github.com/zooniverse/Panoptes/pull/1676 is deployed
+    return nil if Rails.env.production?
+    @queue = SubjectQueue.find(queue_id)
+    @workflow = queue.workflow
+    @user = queue.user
+    @subject_set_id = queue.subject_set_id
     @limit = limit
     @selection_strategy = strategy(strategy_override)
 
-    begin
-      subject_ids = selected_subject_ids.compact
-    rescue Subjects::CellectClient::ConnectionError
-      subject_ids = default_strategy_sms_ids
-    end
-
-    unless subject_ids.empty?
-      SubjectQueue.enqueue(workflow, subject_ids, user: user, set_id: subject_set_id)
+    sms_ids = strategy_sms_ids
+    unless sms_ids.empty?
+      user_seens = user ? UserSeenSubject.find_by(user: user, workflow: workflow) : nil
+      unseen_ids = Subjects::SeenRemover.new(user_seens, sms_ids).unseen_ids
+      queue.enqueue_update(unseen_ids)
     end
   rescue ActiveRecord::RecordNotFound
     nil
@@ -49,7 +48,7 @@ class EnqueueSubjectQueueWorker
 
   private
 
-  def selected_subject_ids
+  def selected_sms_ids
     sms_ids = case selection_strategy
     when :cellect
       cellect_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
@@ -69,5 +68,11 @@ class EnqueueSubjectQueueWorker
 
   def workflow_strategy
     @workflow_strategy ||= workflow.selection_strategy
+  end
+
+  def strategy_sms_ids
+    selected_sms_ids.compact
+  rescue Subjects::CellectClient::ConnectionError
+    default_strategy_sms_ids
   end
 end

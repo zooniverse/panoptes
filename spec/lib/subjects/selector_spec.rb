@@ -115,7 +115,7 @@ RSpec.describe Subjects::Selector do
       end
     end
 
-    describe "#dequeue after selection" do
+    describe "queue managment" do
       let(:smses) { workflow.set_member_subjects }
       let(:sms_ids) { smses.map(&:id) }
       let(:subject_queue) do
@@ -131,10 +131,12 @@ RSpec.describe Subjects::Selector do
       context "when the user has a queue" do
         let(:queue_owner) { user.user }
 
-        it 'should call dequeue_subject for the user' do
-          expect(DequeueSubjectQueueWorker).to receive(:perform_async)
-            .with(workflow.id, array_including(sms_ids), queue_owner.id, nil)
-          subject.queued_subjects
+        it 'should dequeue the ids from the users queue' do
+          expect{
+            subject.queued_subjects
+          }.to change {
+            subject_queue.reload.set_member_subject_ids.length
+          }.from(sms_ids.length).to(0)
         end
       end
 
@@ -142,17 +144,18 @@ RSpec.describe Subjects::Selector do
         let(:queue_owner) { nil }
         let(:user) { ApiUser.new(nil) }
 
-        it 'should not call dequeue_subject for the user' do
-          expect(DequeueSubjectQueueWorker).to_not receive(:perform_async)
+        # anonymous site users can cause a lot of contention on updates
+        # to the non-logged in queues, use the rate limiter in sidekiq to
+        # control how often these happen
+        it 'should schedule a dequeue for the non-logged in queue' do
+          expect(DequeueSubjectQueueWorker).to receive(:perform_async)
+            .with(subject_queue.id, array_including(sms_ids))
           subject.queued_subjects
         end
       end
 
-      describe "user has or workflow is finished" do
+      describe "non-logged in queues" do
         let(:queue_owner) { nil }
-        before(:each) do
-          subject_queue
-        end
 
         shared_examples "creates for the logged out user" do
           it 'should create for logged out user' do
@@ -193,11 +196,11 @@ RSpec.describe Subjects::Selector do
     it 'should not return retired subjects' do
       sms = smses[0]
       swc = create(:subject_workflow_count, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
+      expected = subject_queue.set_member_subject_ids[1..-1].sort
       result = subject.selected_subjects(subject_queue).map do |subj|
         subj.set_member_subjects.first.id
       end.sort
-
-      expect(result).to eq(subject_queue.set_member_subject_ids[1..-1].sort)
+      expect(result).to eq(expected)
     end
 
     it 'should return something when everything in the queue is retired' do

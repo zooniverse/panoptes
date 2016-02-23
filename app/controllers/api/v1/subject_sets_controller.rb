@@ -89,7 +89,6 @@ class Api::V1::SubjectSetsController < Api::ApiController
   private
 
   def remove_linked_set_member_subjects(resource, set_member_subjects)
-    QueueRemovalWorker.perform_async(set_member_subjects.pluck(:id), resource.workflows.pluck(:id))
     SubjectSetSubjectCounterWorker.perform_in(3.minutes, resource.id)
     CountResetWorker.perform_async(resource.id)
     set_member_subjects.delete_all

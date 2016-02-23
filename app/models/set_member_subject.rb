@@ -19,7 +19,6 @@ class SetMemberSubject < ActiveRecord::Base
     :destroy_links
 
   before_create :set_random
-  before_destroy :remove_from_queues
 
   can_be_linked :subject_queue, :in_queue_workflow, :model
 
@@ -74,10 +73,6 @@ class SetMemberSubject < ActiveRecord::Base
     workflows_to_retire.each do |workflow|
       workflow.retire_subject(subject)
     end
-  end
-
-  def remove_from_queues
-    QueueRemovalWorker.perform_async(id, subject_set.workflows.pluck(:id))
   end
 
   def set_random

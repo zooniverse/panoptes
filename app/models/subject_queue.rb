@@ -1,5 +1,3 @@
-require 'seen_subject_remover'
-
 class SubjectQueue < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include BelongsToMany
@@ -19,14 +17,6 @@ class SubjectQueue < ActiveRecord::Base
 
   alias_method :subjects=, :set_member_subjects=
 
-  def self.by_set(set_id)
-    set_id ? where(subject_set_id: set_id) : all
-  end
-
-  def self.by_user_workflow(user, workflow)
-    where(user: user, workflow: workflow)
-  end
-
   def self.scope_for(action, groups, opts={})
     case action
     when :show, :index
@@ -36,42 +26,8 @@ class SubjectQueue < ActiveRecord::Base
     end
   end
 
-  def self.reload(workflow, sms_ids, user: nil, set_id: nil)
-    queue = by_set(set_id).by_user_workflow(user, workflow)
-    if queue.exists?
-      queue.update_all(set_member_subject_ids: Array.wrap(sms_ids))
-    else
-      queue.create!(set_member_subject_ids: Array.wrap(sms_ids))
-    end
-  end
-
-  def self.enqueue(workflow, sms_ids, user: nil, set_id: nil)
-    return if sms_ids.blank?
-    unseen_ids = SeenSubjectRemover.new(user, workflow, Array.wrap(sms_ids)).ids_to_enqueue
-    queue = by_set(set_id).by_user_workflow(user, workflow)
-    if queue.exists?
-      enqueue_update(queue, unseen_ids)
-    else
-      queue.create!(set_member_subject_ids: unseen_ids)
-    end
-  end
-
-  def self.dequeue(workflow, sms_ids, user: nil, set_id: nil)
-    return if sms_ids.blank?
-    queue = by_set(set_id).by_user_workflow(user, workflow)
-    dequeue_update(queue, sms_ids)
-  end
-
-  def self.enqueue_for_all(workflow, sms_ids)
-    return if sms_ids.blank?
-    sms_ids = Array.wrap(sms_ids)
-    enqueue_update(where(workflow: workflow), sms_ids)
-  end
-
-  def self.dequeue_for_all(workflow, sms_ids)
-    return if sms_ids.blank?
-    sms_ids = Array.wrap(sms_ids)
-    dequeue_update(where(workflow: workflow), sms_ids)
+  def self.by_set(set_id)
+    set_id ? where(subject_set_id: set_id) : all
   end
 
   def self.create_for_user(workflow, user, set_id: nil)
@@ -82,25 +38,10 @@ class SubjectQueue < ActiveRecord::Base
                      set_member_subject_ids: logged_out_queue.set_member_subject_ids)
       queue if queue.persisted?
     else
-      EnqueueSubjectQueueWorker.perform_async(workflow.id, nil, set_id)
+      queue = create!(workflow: workflow, user: nil, subject_set_id: set_id)
+      EnqueueSubjectQueueWorker.perform_async(queue.id)
       nil
     end
-  end
-
-  def self.dequeue_update(query, sms_ids)
-    return if sms_ids.blank?
-    dequeue_sql = "set_member_subject_ids = subarray(uniq(sort(set_member_subject_ids - array[?])), 0, #{DEFAULT_LENGTH})"
-    query.update_all([dequeue_sql, sms_ids])
-  end
-
-  def self.enqueue_update(query, sms_ids)
-    return if sms_ids.blank?
-    enqueue_sql = "set_member_subject_ids = subarray(uniq(sort(set_member_subject_ids | array[?])), 0, #{DEFAULT_LENGTH})"
-    query.update_all([enqueue_sql, sms_ids])
-  end
-
-  def self.below_minimum
-    where("cardinality(set_member_subject_ids) < ?", MINIMUM_LENGTH)
   end
 
   def below_minimum?
@@ -113,5 +54,26 @@ class SubjectQueue < ActiveRecord::Base
     else
       set_member_subject_ids.sample(limit)
     end
+  end
+
+  def enqueue_update(sms_ids)
+    return if sms_ids.blank?
+    update_ids(set_member_subject_ids | Array.wrap(sms_ids))
+  end
+
+  def dequeue_update(sms_ids)
+    return if sms_ids.blank?
+    update_ids((set_member_subject_ids - Array.wrap(sms_ids)))
+  end
+
+  def update_ids(sms_ids)
+    capped_sms_ids = cap_queue_length(Array.wrap(sms_ids))
+    update_attribute(:set_member_subject_ids, capped_sms_ids)
+  end
+
+  private
+
+  def cap_queue_length(sms_ids)
+    sms_ids.slice(0, DEFAULT_LENGTH)
   end
 end
