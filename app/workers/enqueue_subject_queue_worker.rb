@@ -16,8 +16,6 @@ class EnqueueSubjectQueueWorker
   attr_reader :queue, :workflow, :user, :subject_set_id, :limit, :selection_strategy
 
   def perform(queue_id, limit=SubjectQueue::DEFAULT_LENGTH, strategy_override=nil)
-    # @note REVERT after https://github.com/zooniverse/Panoptes/pull/1676 is deployed
-    return nil if Rails.env.production?
     @queue = SubjectQueue.find(queue_id)
     @workflow = queue.workflow
     @user = queue.user
