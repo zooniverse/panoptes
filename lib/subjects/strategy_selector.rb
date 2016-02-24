@@ -58,8 +58,8 @@ module Subjects
     def workflow_strategy
       if set_strategy = workflow.selection_strategy
         set_strategy
-      else workflow.using_cellect?
-         :cellect
+      elsif workflow.using_cellect?
+        :cellect
       end
     end
   end

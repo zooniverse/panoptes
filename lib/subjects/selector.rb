@@ -11,7 +11,7 @@ module Subjects
       @user, @workflow, @params, @scope = user, workflow, params, scope
     end
 
-    def queued_subjects
+    def get_subjects
       raise workflow_id_error unless workflow
       raise group_id_error if needs_set_id?
       raise missing_subject_set_error if workflow.subject_sets.empty?
@@ -32,8 +32,15 @@ module Subjects
     private
 
     def sms_ids_from_queue(queue)
-      sms_ids = queue.next_subjects(subjects_page_size)
-      dequeue_ids(queue, sms_ids)
+      if queue.stale?
+        queue.update_ids([])
+        sms_ids = Subjects::StrategySelector.new(
+          workflow, user, subject_set_id
+        ).select
+      else
+        sms_ids = queue.next_subjects(subjects_page_size)
+        dequeue_ids(queue, sms_ids)
+      end
 
       non_retired_ids = filter_non_retired(sms_ids)
 

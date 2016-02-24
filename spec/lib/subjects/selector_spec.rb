@@ -15,39 +15,36 @@ RSpec.describe Subjects::Selector do
 
   subject { described_class.new(user, workflow, params, Subject.all)}
 
-  describe "#queued_subjects" do
+  describe "#get_subjects" do
     it 'should return url_format: :get in the context object' do
       subject_queue
-      _, ctx = subject.queued_subjects
+      _, ctx = subject.get_subjects
       expect(ctx).to include(url_format: :get)
     end
 
     context "when the user doesn't have a queue" do
-
       it 'should create a new queue from the logged out queue' do
         subject_queue
         expect(SubjectQueue).to receive(:create_for_user)
           .with(workflow, user.user, set_id: nil).and_call_original
-        subject.queued_subjects
+        subject.get_subjects
       end
 
       context "when the workflow doesn't have any subject sets" do
-
         it 'should raise an informative error' do
           allow_any_instance_of(Workflow).to receive(:subject_sets).and_return([])
-          expect{subject.queued_subjects}.to raise_error(Subjects::Selector::MissingSubjectSet,
+          expect{subject.get_subjects}.to raise_error(Subjects::Selector::MissingSubjectSet,
             "no subject set is associated with this workflow")
         end
       end
 
       context "when the subject sets have no data" do
-
         it 'should raise the an error' do
           allow_any_instance_of(Workflow)
             .to receive(:set_member_subjects).and_return([])
           message = "No data available for selection"
           expect {
-            subject.queued_subjects
+            subject.get_subjects
           }.to raise_error(Subjects::Selector::MissingSubjects, message)
         end
       end
@@ -62,8 +59,29 @@ RSpec.describe Subjects::Selector do
 
       it 'should return the page_size number of subjects' do
         subject_queue
-        subjects, _context = subject.queued_subjects
+        subjects, _context = subject.get_subjects
         expect(subjects.length).to eq(size)
+      end
+    end
+
+    context "queue is stale" do
+      let(:subject_queue) do
+        create(:subject_queue,
+               workflow: workflow,
+               user: user.user,
+               set_member_subject_ids: (1..10).to_a)
+      end
+      before do
+        subject_queue
+        allow_any_instance_of(SubjectQueue).to receive(:stale?).and_return(true)
+      end
+
+      it 'should ignore the subject queue and request strategy selection', :aggregate_failures do
+        selector = instance_double("Subjects::StrategySelector")
+        expect(selector).to receive(:select).and_return([1])
+        expect(Subjects::StrategySelector).to receive(:new).and_return(selector)
+        expect_any_instance_of(SubjectQueue).to receive(:update_ids).with([])
+        subject.get_subjects
       end
     end
 
@@ -84,7 +102,7 @@ RSpec.describe Subjects::Selector do
       end
 
       it 'should return 5 subjects' do
-        subjects, _ = subject.queued_subjects
+        subjects, = subject.get_subjects
         expect(subjects.length).to eq(5)
       end
 
@@ -100,7 +118,7 @@ RSpec.describe Subjects::Selector do
         end
 
         it 'should fallback to selecting some data' do
-          subjects, _context = subject.queued_subjects
+          subjects, _context = subject.get_subjects
         end
 
         context "and the workflow is grouped" do
@@ -109,13 +127,13 @@ RSpec.describe Subjects::Selector do
 
           it 'should fallback to selecting some grouped data' do
             allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
-            subjects, _context = subject.queued_subjects
+            subjects, _context = subject.get_subjects
           end
         end
       end
     end
 
-    describe "queue managment" do
+    describe "queue management" do
       let(:smses) { workflow.set_member_subjects }
       let(:sms_ids) { smses.map(&:id) }
       let(:subject_queue) do
@@ -133,7 +151,7 @@ RSpec.describe Subjects::Selector do
 
         it 'should dequeue the ids from the users queue' do
           expect{
-            subject.queued_subjects
+            subject.get_subjects
           }.to change {
             subject_queue.reload.set_member_subject_ids.length
           }.from(sms_ids.length).to(0)
@@ -150,7 +168,7 @@ RSpec.describe Subjects::Selector do
         it 'should schedule a dequeue for the non-logged in queue' do
           expect(DequeueSubjectQueueWorker).to receive(:perform_async)
             .with(subject_queue.id, array_including(sms_ids))
-          subject.queued_subjects
+          subject.get_subjects
         end
       end
 
@@ -158,10 +176,21 @@ RSpec.describe Subjects::Selector do
         let(:queue_owner) { nil }
 
         shared_examples "creates for the logged out user" do
+
           it 'should create for logged out user' do
-            expect(SubjectQueue).to receive(:create_for_user).with(workflow, nil, set_id: nil)
-            #non-logged in queue won't exist
-            expect { subject.queued_subjects }.to raise_error(Subjects::Selector::MissingSubjectQueue)
+            expect(SubjectQueue)
+              .to receive(:create_for_user)
+              .with(workflow, nil, set_id: nil)
+              .and_call_original
+            subject.get_subjects
+          end
+
+          it 'should raise an error if it cannot find a queue' do
+            expect(SubjectQueue)
+              .to receive(:create_for_user)
+              .with(workflow, nil, set_id: nil)
+              .and_return(nil)
+            expect { subject.get_subjects }.to raise_error(Subjects::Selector::MissingSubjectQueue)
           end
         end
 
