@@ -66,8 +66,6 @@ module Subjects
     def user_seen_subject
       if user
         UserSeenSubject.find_by(user: user, workflow: workflow)
-      else
-        nil
       end
     end
   end
