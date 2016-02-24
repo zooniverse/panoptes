@@ -1,5 +1,3 @@
-require "event_stream"
-
 class PublishClassificationWorker
   include Sidekiq::Worker
 
