@@ -19,7 +19,7 @@ module Subjects
       if sms_ids.empty?
         []
       else
-        Subjects::SeenRemover.new(user, workflow, sms_ids).unseen_ids
+        Subjects::SeenRemover.new(user_seen_subject, sms_ids).unseen_ids
       end
     rescue Subjects::CellectClient::ConnectionError
       default_strategy_sms_ids
@@ -60,6 +60,14 @@ module Subjects
         set_strategy
       elsif workflow.using_cellect?
         :cellect
+      end
+    end
+
+    def user_seen_subject
+      if user
+        UserSeenSubject.find_by(user: user, workflow: workflow)
+      else
+        nil
       end
     end
   end

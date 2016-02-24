@@ -13,14 +13,25 @@ RSpec.describe Subjects::StrategySelector do
 
   describe "#select" do
 
-    it "should call the seens remover after selection" do
-      expect(subject).to receive(:strategy_sms_ids)
-        .and_return([1,2,3]).ordered
-      seen_remover = instance_double("Subjects::SeenRemover")
-      allow(seen_remover).to receive(:unseen_ids).and_return([])
-      expect(Subjects::SeenRemover).to receive(:new)
-        .and_return(seen_remover).ordered
-      subject.select
+    describe "remove seens after selection" do
+      let(:seen_remover) { instance_double("Subjects::SeenRemover") }
+      let(:uss) { instance_double("UserSeenSubject") }
+
+      before do
+        allow(seen_remover).to receive(:unseen_ids).and_return([])
+        allow(uss).to receive(:subject_ids).and_return([])
+        allow(UserSeenSubject).to receive(:find_by).and_return(uss)
+      end
+
+      it "should call the seens remover after selection", :aggregate_failures do
+        expect(subject).to receive(:strategy_sms_ids)
+          .and_return([1,2,3]).ordered
+        expect(Subjects::SeenRemover)
+          .to receive(:new)
+          .with(uss, an_instance_of(Array))
+          .and_return(seen_remover).ordered
+        subject.select
+      end
     end
 
     context "when selecting via strategy param" do
