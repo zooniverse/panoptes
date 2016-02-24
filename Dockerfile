@@ -1,12 +1,10 @@
-FROM zooniverse/ruby:2.3.0
+FROM zooniverse/ruby:2.3
 
 WORKDIR /rails_app
 
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN apt-get update && apt-get -y upgrade && \
+RUN apt-get update && \
     apt-get install --no-install-recommends -y git curl supervisor libpq-dev && \
-    apt-get clean
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir config && curl "https://ip-ranges.amazonaws.com/ip-ranges.json" > config/aws_ips.json
 
