@@ -73,9 +73,7 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def stale?
-    return false unless updated_at
-    last_updated_mins_ago = (Time.zone.now - updated_at).to_i / 60
-    last_updated_mins_ago >= STALE_MINS
+    !!updated_at && updated_at <= STALE_MINS.minutes.ago
   end
 
   private
