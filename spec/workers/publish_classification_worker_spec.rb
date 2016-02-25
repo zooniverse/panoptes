@@ -20,7 +20,7 @@ RSpec.describe PublishClassificationWorker do
       end
 
       it "should not publish" do
-        expect(EventStream).not_to receive(:publish)
+        expect(ZooStream).not_to receive(:publish)
         worker.perform(classification.id)
       end
     end
@@ -37,7 +37,7 @@ RSpec.describe PublishClassificationWorker do
       end
 
       it "should publish via kinesis" do
-        publisher = class_double("EventStream").as_stubbed_const
+        publisher = class_double("ZooStream").as_stubbed_const
         expect(publisher).to receive(:publish)
           .with(event: "classification",
                 shard_by: classification.workflow_id,

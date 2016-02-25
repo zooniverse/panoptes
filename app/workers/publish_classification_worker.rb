@@ -1,5 +1,3 @@
-require "event_stream"
-
 class PublishClassificationWorker
   include Sidekiq::Worker
 
@@ -25,10 +23,10 @@ class PublishClassificationWorker
   end
 
   def publish_to_kinesis!
-    EventStream.publish(event: "classification",
-                        data: kinesis_data,
-                        linked: kinesis_linked,
-                        shard_by: classification.workflow_id)
+    ZooStream.publish(event: "classification",
+                      data: kinesis_data,
+                      linked: kinesis_linked,
+                      shard_by: classification.workflow_id)
   end
 
   def kinesis_data

@@ -13,9 +13,9 @@ class PublishRetirementEventWorker
       classifications_count: workflow.classifications_count
     }
 
-    EventStream.publish(event: 'workflow_counters',
-                        data: counters,
-                        shard_by: workflow.id)
+    ZooStream.publish(event: 'workflow_counters',
+                      data: counters,
+                      shard_by: workflow.id)
   rescue ActiveRecord::RecordNotFound
   end
 end

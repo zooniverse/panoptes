@@ -21,7 +21,7 @@ RSpec.describe PublishRetirementEventWorker do
     end
 
     it "should publish via Kinesis" do
-      expect(EventStream).to receive(:publish)
+      expect(ZooStream).to receive(:publish)
         .with(event: "workflow_counters", shard_by: workflow.id, data: payload_expectation)
       worker.perform(workflow.id)
     end

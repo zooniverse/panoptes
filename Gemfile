@@ -38,6 +38,7 @@ gem 'cellect-client', '~> 1.2.0', require: false
 gem 'active_interaction', '~> 3.0.1'
 gem 'therubyracer', '~> 0.12'
 gem 'pg', '~> 0.18'
+gem 'zoo_stream', '~> 1.0.1'
 
 group :production do
   gem 'newrelic_rpm', '~> 3.0', require: false
