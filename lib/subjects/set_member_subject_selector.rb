@@ -16,29 +16,24 @@ module Subjects
                   elsif select_from_all?
                     select_all_workflow_set_member_subjects
                   else
-                    select_non_retired_unseen_for_user
+                    select_data_for_the_user
                   end
-      if all_user_unseen_data_is_retired?(selection)
-        selection = select_unseen_for_user
-      end
       selection.select(SELECT_FIELDS)
-    end
-
-    def select_from_all?
-      !user ||
-      user_has_not_seen_workflow_subjects? ||
-      workflow.finished? ||
-      user.has_finished?(workflow)
     end
 
     private
 
-    def all_user_unseen_data_is_retired?(selection)
-      user && !selection.exists?
+    def select_from_all?
+      !user || workflow.finished? || user.has_finished?(workflow)
     end
 
-    def user_has_not_seen_workflow_subjects?
-      !user.user_seen_subjects.where(workflow: workflow).exists?
+    def select_data_for_the_user
+      scope = select_non_retired_unseen_for_user
+      if scope.exists?
+        scope
+      else
+        select_unseen_for_user
+      end
     end
 
     def select_non_retired
