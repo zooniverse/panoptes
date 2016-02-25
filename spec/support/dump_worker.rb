@@ -78,9 +78,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     it 'should update the path on the object' do
       worker.perform(project.id, medium.id)
       medium.reload
-      expect(medium.path_opts).to match_array([dump_type,
-                                               project.owner.login.gsub(/\s/, "_"),
-                                               project.display_name.downcase.gsub(/\s/, "_")])
+      expect(medium.path_opts).to match_array([dump_type, project.id.to_s])
     end
 
     it 'should set the medium to private' do

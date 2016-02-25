@@ -57,8 +57,7 @@ module DumpWorker
   end
 
   def project_file_path
-    [dump_type, project.owner.login, project.display_name]
-      .map{ |name_part| name_part.downcase.gsub(/\s/, "_")}
+    [dump_type, project.id.to_s]
   end
 
   def medium
