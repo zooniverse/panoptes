@@ -252,16 +252,27 @@ describe Workflow, :type => :model do
   end
 
   describe "#finished?" do
-    it 'should be true when and retired count is equal or greater than the subject count ' do
-      subject_relation.retired_set_member_subjects_count = subject_relation.subjects_count
-      subject_relation.save!
-      expect(subject_relation).to be_finished
-    end
-
     context "when no subject_sets relation exist" do
       it 'should be false' do
-        allow(workflow).to receive(:subjects_count).and_return(0)
-        expect(workflow.finished?).to eq(false)
+        allow(subject_relation).to receive(:subject_sets).and_return([])
+        expect(subject_relation).not_to be_finished
+      end
+    end
+
+    context "when retired count is equal or greater than the subject count" do
+      before do
+        allow(subject_relation)
+          .to receive(:retired_set_member_subjects_count)
+          .and_return(subject_relation.subjects_count)
+      end
+
+      it 'should be true' do
+        expect(subject_relation).to be_finished
+      end
+
+      it 'should be false when the subject_count is 0' do
+        allow(subject_relation).to receive(:subjects_count).and_return(0)
+        expect(subject_relation).not_to be_finished
       end
     end
   end
