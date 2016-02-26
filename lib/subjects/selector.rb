@@ -129,6 +129,7 @@ module Subjects
 
     def dequeue_ids(queue, sms_ids)
       if queue_user
+        #TODO: what happens if this raises and error?
         queue.dequeue_update(sms_ids)
       else
         DequeueSubjectQueueWorker.perform_async(queue.id, sms_ids)
