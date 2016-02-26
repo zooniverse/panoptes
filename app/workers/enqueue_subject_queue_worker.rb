@@ -1,6 +1,4 @@
-require 'subjects/cellect_client'
-require 'subjects/postgresql_selection'
-require 'subjects/seen_remover'
+require 'subjects/strategy_selection'
 
 class EnqueueSubjectQueueWorker
   include Sidekiq::Worker
