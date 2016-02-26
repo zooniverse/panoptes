@@ -149,7 +149,7 @@ RSpec.describe Subjects::Selector do
       context "when the user has a queue" do
         let(:queue_owner) { user }
 
-        it 'should dequeue the ids from the users queue', :focus do
+        it 'should dequeue the ids from the users queue' do
           expect{
             subject.get_subjects
           }.to change {
@@ -157,11 +157,23 @@ RSpec.describe Subjects::Selector do
           }.from(sms_ids.length).to(0)
         end
 
+        context "when the queue object is not stale" do
+          it "should dequeue inline" do
+            expect_any_instance_of(SubjectQueue)
+              .to receive(:dequeue_update)
+              .with(array_including(sms_ids))
+            subject.get_subjects
+          end
+        end
+
         context "when the queue object is stale" do
           it "should catch the error and push into the background" do
-            allow_any_instance_of(SubjectQueue)
+            allow(subject)
+              .to receive(:find_subject_queue)
+              .and_return(subject_queue)
+            allow(subject_queue)
               .to receive(:dequeue_update)
-              .and_raise(ActiveRecord::StaleObjectError)
+              .and_raise(ActiveRecord::StaleObjectError.new(subject_queue, :update))
             expect(DequeueSubjectQueueWorker).to receive(:perform_async)
               .with(subject_queue.id, array_including(sms_ids))
             subject.get_subjects

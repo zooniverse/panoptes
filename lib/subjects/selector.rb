@@ -128,10 +128,15 @@ module Subjects
     end
 
     def dequeue_ids(queue, sms_ids)
+      background_update = !queue_user
       if queue_user
-        #TODO: what happens if this raises and error?
-        queue.dequeue_update(sms_ids)
-      else
+        begin
+          queue.dequeue_update(sms_ids)
+        rescue ActiveRecord::StaleObjectError
+          background_update = true
+        end
+      end
+      if background_update
         DequeueSubjectQueueWorker.perform_async(queue.id, sms_ids)
       end
     end
