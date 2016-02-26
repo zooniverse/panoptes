@@ -16,7 +16,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
 
   describe "#perform" do
     let(:result_ids) { [] }
-    let(:selector) { instance_double("Subjects::StrategySelector") }
+    let(:selector) { instance_double("Subjects::StrategySelection") }
     before do
       allow(selector).to receive(:select).and_return(result_ids)
     end
@@ -26,7 +26,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
     end
 
     it "should request subjects from the strategy selector" do
-      expect(Subjects::StrategySelector)
+      expect(Subjects::StrategySelection)
         .to receive(:new)
         .with(workflow, user, subject_set.id, SubjectQueue::DEFAULT_LENGTH, nil)
         .and_return(selector)
@@ -41,7 +41,7 @@ RSpec.describe EnqueueSubjectQueueWorker do
     context "when subjects are selected" do
       let(:result_ids) { (1..10).to_a }
       before do
-        expect(Subjects::StrategySelector).to receive(:new).and_return(selector)
+        expect(Subjects::StrategySelection).to receive(:new).and_return(selector)
       end
 
       it "should enqueue new data" do

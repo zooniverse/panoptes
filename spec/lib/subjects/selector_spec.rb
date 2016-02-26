@@ -77,9 +77,9 @@ RSpec.describe Subjects::Selector do
       end
 
       it 'should ignore the subject queue and request strategy selection', :aggregate_failures do
-        selector = instance_double("Subjects::StrategySelector")
+        selector = instance_double("Subjects::StrategySelection")
         expect(selector).to receive(:select).and_return([1])
-        expect(Subjects::StrategySelector).to receive(:new).and_return(selector)
+        expect(Subjects::StrategySelection).to receive(:new).and_return(selector)
         expect_any_instance_of(SubjectQueue).to receive(:update_ids).with([])
         subject.get_subjects
       end

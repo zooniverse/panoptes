@@ -42,7 +42,7 @@ module Subjects
     def sms_ids_from_queue(queue)
       if queue.stale?
         queue.update_ids([])
-        Subjects::StrategySelector.new(workflow, user, subject_set_id).select
+        Subjects::StrategySelection.new(workflow, user, subject_set_id).select
       else
         sms_ids = queue.next_subjects(subjects_page_size)
         dequeue_ids(queue, sms_ids)

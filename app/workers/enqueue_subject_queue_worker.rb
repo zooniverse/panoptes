@@ -15,7 +15,7 @@ class EnqueueSubjectQueueWorker
 
   def perform(queue_id, limit=SubjectQueue::DEFAULT_LENGTH, strategy_override=nil)
     queue = SubjectQueue.find(queue_id)
-    selector = Subjects::StrategySelector.new(
+    selector = Subjects::StrategySelection.new(
       queue.workflow,
       queue.user,
       queue.subject_set_id,
