@@ -210,8 +210,16 @@ RSpec.describe SubjectQueue, type: :model do
       end
     end
 
+    context "when equal to #{SubjectQueue::MINIMUM_LENGTH} items" do
+      let(:subject_ids) { (1..SubjectQueue::MINIMUM_LENGTH).to_a }
+
+      it 'should return true' do
+        expect(queue.below_minimum?).to be true
+      end
+    end
+
     context "when more than #{SubjectQueue::MINIMUM_LENGTH} items" do
-      let(:subject_ids) { (0..SubjectQueue::MINIMUM_LENGTH+1).to_a }
+      let(:subject_ids) { (0..SubjectQueue::MINIMUM_LENGTH).to_a }
 
       it 'should return false' do
         expect(queue.below_minimum?).to be false
