@@ -118,6 +118,12 @@ RSpec.describe SubjectQueue, type: :model do
       sq.update_ids(1)
       expect(sq.reload.set_member_subject_ids).to eq([1])
     end
+
+    it "should touch the updated_at timestamp if the attribute changes" do
+      expect {
+        sq.update_ids(1)
+      }.to change{ sq.updated_at }
+    end
   end
 
   describe "#enqueue_update" do
