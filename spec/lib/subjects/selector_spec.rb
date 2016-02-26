@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Subjects::Selector do
   let(:workflow) { create(:workflow_with_subjects) }
-  let(:user) { ApiUser.new(create(:user)) }
+  let(:user) { create(:user) }
   let(:smses) { create_list(:set_member_subject, 10).reverse }
   let(:params) { {} }
   let(:subject_queue) do
@@ -26,7 +26,7 @@ RSpec.describe Subjects::Selector do
       it 'should create a new queue from the logged out queue' do
         subject_queue
         expect(SubjectQueue).to receive(:create_for_user)
-          .with(workflow, user.user, set_id: nil).and_call_original
+          .with(workflow, user, set_id: nil).and_call_original
         subject.get_subjects
       end
 
@@ -68,7 +68,7 @@ RSpec.describe Subjects::Selector do
       let(:subject_queue) do
         create(:subject_queue,
                workflow: workflow,
-               user: user.user,
+               user: user,
                set_member_subject_ids: (1..10).to_a)
       end
       before do
@@ -89,7 +89,7 @@ RSpec.describe Subjects::Selector do
       let(:subject_queue) do
         create(:subject_queue,
                workflow: workflow,
-               user: user.user,
+               user: user,
                subject_set: queue_subject_set,
                set_member_subjects: [])
       end
@@ -147,7 +147,7 @@ RSpec.describe Subjects::Selector do
       before(:each) { subject_queue }
 
       context "when the user has a queue" do
-        let(:queue_owner) { user.user }
+        let(:queue_owner) { user }
 
         it 'should dequeue the ids from the users queue' do
           expect{
@@ -160,7 +160,7 @@ RSpec.describe Subjects::Selector do
 
       context "when the queue has no user" do
         let(:queue_owner) { nil }
-        let(:user) { ApiUser.new(nil) }
+        let(:user) { nil }
 
         # anonymous site users can cause a lot of contention on updates
         # to the non-logged in queues, use the rate limiter in sidekiq to
@@ -200,7 +200,7 @@ RSpec.describe Subjects::Selector do
           end
 
           context "when the logged_out queue doesn't exist" do
-            let(:queue_owner) { user.user }
+            let(:queue_owner) { user }
 
             it_behaves_like "creates for the logged out user"
           end
@@ -212,7 +212,7 @@ RSpec.describe Subjects::Selector do
           end
 
           context "when the logged_out queue doesn't exist" do
-            let(:queue_owner) { user.user }
+            let(:queue_owner) { user }
 
             it_behaves_like "creates for the logged out user"
           end

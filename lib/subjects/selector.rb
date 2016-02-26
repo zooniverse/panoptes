@@ -63,7 +63,7 @@ module Subjects
 
     def fallback_selection(limit=5)
       opts = { limit: limit, subject_set_id: subject_set_id }
-      selector = PostgresqlSelection.new(workflow, user.user, opts)
+      selector = PostgresqlSelection.new(workflow, user, opts)
       sms_ids = selector.select
       return sms_ids unless sms_ids.blank?
       selector.any_workflow_data
@@ -96,17 +96,17 @@ module Subjects
     end
 
     def finished_workflow?
-      @finished_workflow ||= workflow.finished? || user.has_finished?(workflow)
+      @finished_workflow ||= workflow.finished? || user && user.has_finished?(workflow)
     end
 
     def queue_user
-      @queue_user ||= finished_workflow? ? nil : user.user
+      @queue_user ||= finished_workflow? ? nil : user
     end
 
     def queue_context
       @queue_context ||= {
         workflow: workflow,
-        user_seen: UserSeenSubject.where(user: user.user, workflow: workflow)
+        user_seen: UserSeenSubject.where(user: user, workflow: workflow)
       }
     end
 
