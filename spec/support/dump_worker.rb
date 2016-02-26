@@ -27,8 +27,6 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
       "#{dump_type}_#{project.owner.login}_#{project.display_name.downcase.gsub(/\s/, "_")}.csv"
     end
 
-    let(:temp_file_path) { "#{Rails.root}/tmp/#{project_file_name}" }
-
     it "should create a csv file with the correct number of entries" do
       expect_any_instance_of(CSV).to receive(:<<).exactly(num_entries).times
       worker.perform(project.id)
@@ -54,7 +52,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     end
 
     it "should clean up the file after sending to s3" do
-      expect(FileUtils).to receive(:rm).twice.and_call_original
+      expect(worker).to receive(:remove_tempfile).twice.and_call_original
       worker.perform(project.id)
     end
 
@@ -80,9 +78,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     it 'should update the path on the object' do
       worker.perform(project.id, medium.id)
       medium.reload
-      expect(medium.path_opts).to match_array([dump_type,
-                                               project.owner.login.gsub(/\s/, "_"),
-                                               project.display_name.downcase.gsub(/\s/, "_")])
+      expect(medium.path_opts).to match_array([dump_type, project.id.to_s])
     end
 
     it 'should set the medium to private' do

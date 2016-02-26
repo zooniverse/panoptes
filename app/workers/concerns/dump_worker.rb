@@ -28,8 +28,14 @@ module DumpWorker
   end
 
   def cleanup_dump
-    FileUtils.rm(csv_file_path)
-    FileUtils.rm(gzip_file_path)
+    remove_tempfile(@csv_tempfile)
+    remove_tempfile(@gzip_tempfile)
+  end
+
+  def remove_tempfile(tempfile)
+    return unless tempfile
+    tempfile.close
+    tempfile.unlink
   end
 
   def dump_target
@@ -40,21 +46,18 @@ module DumpWorker
     "project_#{dump_target}_export"
   end
 
-  def temp_file_path
-    "#{Rails.root}/tmp/#{project_file_path.join("_")}"
-  end
-
   def csv_file_path
-    "#{Rails.root}/tmp/#{project_file_path.join("_")}.csv"
+    @csv_tempfile ||= Tempfile.new(['export', '.csv'])
+    @csv_tempfile.path
   end
 
   def gzip_file_path
-    "#{Rails.root}/tmp/#{project_file_path.join("_")}.gz"
+    @gzip_tempfile ||= Tempfile.new(['export', '.gz'])
+    @gzip_tempfile.path
   end
 
   def project_file_path
-    [dump_type, project.owner.login, project.display_name]
-      .map{ |name_part| name_part.downcase.gsub(/\s/, "_")}
+    [dump_type, project.id.to_s]
   end
 
   def medium
