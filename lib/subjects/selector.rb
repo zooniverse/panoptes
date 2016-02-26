@@ -11,7 +11,7 @@ module Subjects
       @user, @workflow, @params, @scope = user, workflow, params, scope
     end
 
-    def queued_subjects
+    def get_subjects
       raise workflow_id_error unless workflow
       raise group_id_error if needs_set_id?
       raise missing_subject_set_error if workflow.subject_sets.empty?
@@ -24,23 +24,29 @@ module Subjects
 
     def selected_subjects(queue)
       sms_ids = sms_ids_from_queue(queue)
+      sms_ids = filter_non_retired(sms_ids)
+      if sms_ids.blank?
+        sms_ids = fallback_selection
+      end
+      subjects_in_selection_order(sms_ids)
+    end
+
+    private
+
+    def subjects_in_selection_order(sms_ids)
       @scope.eager_load(:set_member_subjects)
         .where(set_member_subjects: {id: sms_ids})
         .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")
     end
 
-    private
-
     def sms_ids_from_queue(queue)
-      sms_ids = queue.next_subjects(subjects_page_size)
-      dequeue_ids(queue, sms_ids)
-
-      non_retired_ids = filter_non_retired(sms_ids)
-
-      if non_retired_ids.blank?
-        fallback_selection
+      if queue.stale?
+        queue.update_ids([])
+        Subjects::StrategySelection.new(workflow, user, subject_set_id).select
       else
-        non_retired_ids
+        sms_ids = queue.next_subjects(subjects_page_size)
+        dequeue_ids(queue, sms_ids)
+        sms_ids
       end
     end
 

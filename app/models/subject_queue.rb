@@ -4,6 +4,7 @@ class SubjectQueue < ActiveRecord::Base
 
   DEFAULT_LENGTH = 20
   MINIMUM_LENGTH = 10
+  STALE_MINS     = 30
 
   belongs_to :user
   belongs_to :workflow
@@ -40,7 +41,7 @@ class SubjectQueue < ActiveRecord::Base
     else
       queue = create!(workflow: workflow, user: nil, subject_set_id: set_id)
       EnqueueSubjectQueueWorker.perform_async(queue.id)
-      nil
+      queue
     end
   end
 
@@ -69,6 +70,10 @@ class SubjectQueue < ActiveRecord::Base
   def update_ids(sms_ids)
     capped_sms_ids = cap_queue_length(Array.wrap(sms_ids))
     update_attribute(:set_member_subject_ids, capped_sms_ids)
+  end
+
+  def stale?
+    !!updated_at && updated_at <= STALE_MINS.minutes.ago
   end
 
   private
