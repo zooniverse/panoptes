@@ -46,7 +46,7 @@ class SubjectQueue < ActiveRecord::Base
   end
 
   def below_minimum?
-    set_member_subject_ids.length < MINIMUM_LENGTH
+    set_member_subject_ids.length <= MINIMUM_LENGTH
   end
 
   def next_subjects(limit=10)
