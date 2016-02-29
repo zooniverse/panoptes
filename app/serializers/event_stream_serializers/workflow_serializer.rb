@@ -1,5 +1,5 @@
 module EventStreamSerializers
   class WorkflowSerializer < ActiveModel::Serializer
-    attributes :id, :created_at
+    attributes :id, :display_name, :tasks, :created_at
   end
 end
