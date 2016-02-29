@@ -34,7 +34,7 @@ gem 'pg_search'
 gem 'ranked-model', '~> 0.4.0'
 gem 'sidekiq-congestion', '~> 0.1.0'
 gem 'sidetiq', '~> 0.6.3'
-gem 'cellect-client', '~> 1.2.0', require: false
+gem "cellect-client", '~> 2.0.0.beta4'
 gem 'active_interaction', '~> 3.0.1'
 gem 'therubyracer', '~> 0.12'
 gem 'pg', '~> 0.18'
