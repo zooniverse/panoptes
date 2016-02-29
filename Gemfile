@@ -63,5 +63,4 @@ group :test do
   gem 'guard-rspec', require: false
   gem 'factory_girl_rails'
   gem 'spring-commands-rspec'
-  gem 'zk-server'
 end
