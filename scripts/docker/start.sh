@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/sh -ex
 
 cd /rails_app
 
@@ -30,5 +30,5 @@ else
     cp commit_id.txt public/
   fi
 
-  exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+  exec /usr/bin/supervisord -c /etc/supervisord.conf
 fi
