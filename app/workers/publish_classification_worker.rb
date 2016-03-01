@@ -17,7 +17,7 @@ class PublishClassificationWorker
 
   def serialized_classification
     @serialized_classification ||= EventStreamSerializers::ClassificationSerializer
-      .serialize(classification, include: ['subjects'])
+      .serialize(classification, include: ['project', 'workflow', 'workflow_content', 'user', 'subjects'])
       .as_json
       .with_indifferent_access
   end
