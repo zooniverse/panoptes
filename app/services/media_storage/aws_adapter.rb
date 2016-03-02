@@ -1,16 +1,13 @@
 module MediaStorage
   class AwsAdapter < AbstractAdapter
 
-    DEFAULT_PUT_EXPIRATION = 20
-    DEFAULT_GET_EXPIRATION = 60
-
     attr_accessor :prefix, :bucket
 
     def initialize(opts={})
       @prefix = opts[:prefix] || Rails.env
       @bucket = opts[:bucket]
-      @get_expiration = opts.fetch(:expiration, {})[:get] || DEFAULT_GET_EXPIRATION
-      @put_expiration = opts.fetch(:expiration, {})[:put] || DEFAULT_PUT_EXPIRATION
+      @get_expiration = opts.dig(:expiration, :get) || 60
+      @put_expiration = opts.dig(:expiration, :put) || 20
       keys = opts.slice(:access_key_id, :secret_access_key)
       aws.config(keys) unless keys.empty?
     end
