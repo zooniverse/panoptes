@@ -6,8 +6,8 @@ module MediaStorage
     def initialize(opts={})
       @prefix = opts[:prefix] || Rails.env
       @bucket = opts[:bucket]
-      @get_expiration = opts.fetch(:expiration, {})[:get] || 60
-      @put_expiration = opts.fetch(:expiration, {})[:put] || 20
+      @get_expiration = opts.dig(:expiration, :get) || 60
+      @put_expiration = opts.dig(:expiration, :put) || 20
       keys = opts.slice(:access_key_id, :secret_access_key)
       aws.config(keys) unless keys.empty?
     end
