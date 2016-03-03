@@ -4,7 +4,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   include Versioned
   include TranslatableResource
 
-  require_authentication :update, :create, :destroy, :retire_subject, scopes: [:project]
+  require_authentication :update, :create, :destroy, :retire_subjects, scopes: [:project]
 
   resource_actions :default
   schema_type :json_schema
@@ -24,13 +24,8 @@ class Api::V1::WorkflowsController < Api::ApiController
     super { |workflow| reload_queue(workflow) }
   end
 
-  def retire_subject
-    controlled_resource.retire_subject(params[:subject_id])
-
-    if Panoptes.use_cellect?(controlled_resource)
-      RetireCellectWorker.perform_async(params[:subject_id], controlled_resource.id)
-    end
-
+  def retire_subjects
+    operation.with(workflow: controlled_resource).run!(params)
     render nothing: true
   end
 

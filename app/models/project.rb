@@ -56,7 +56,7 @@ class Project < ActiveRecord::Base
 
   can_by_role :destroy, :update, :update_links, :destroy_links, :create_classifications_export,
     :create_subjects_export, :create_aggregations_export, :create_workflows_export,
-    :create_workflow_contents_export, :retire_subject, roles: [ :owner, :collaborator ]
+    :create_workflow_contents_export, :retire_subjects, roles: [ :owner, :collaborator ]
 
   can_by_role :show, :index, :versions, :version, public: true,
     roles: [ :owner, :collaborator, :tester, :translator, :scientist, :moderator ]
