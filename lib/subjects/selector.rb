@@ -133,6 +133,8 @@ module Subjects
       else
         DequeueSubjectQueueWorker.perform_async(queue.id, sms_ids)
       end
+    rescue ActiveRecord::StaleObjectError
+      DequeueSubjectQueueWorker.perform_async(queue.id, sms_ids)
     end
   end
 end

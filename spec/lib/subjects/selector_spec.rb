@@ -156,6 +156,29 @@ RSpec.describe Subjects::Selector do
             subject_queue.reload.set_member_subject_ids.length
           }.from(sms_ids.length).to(0)
         end
+
+        context "when the queue object is not stale" do
+          it "should dequeue inline" do
+            expect_any_instance_of(SubjectQueue)
+              .to receive(:dequeue_update)
+              .with(array_including(sms_ids))
+            subject.get_subjects
+          end
+        end
+
+        context "when the queue object is stale" do
+          it "should catch the error and push into the background" do
+            allow(subject)
+              .to receive(:find_subject_queue)
+              .and_return(subject_queue)
+            allow(subject_queue)
+              .to receive(:dequeue_update)
+              .and_raise(ActiveRecord::StaleObjectError.new(subject_queue, :update))
+            expect(DequeueSubjectQueueWorker).to receive(:perform_async)
+              .with(subject_queue.id, array_including(sms_ids))
+            subject.get_subjects
+          end
+        end
       end
 
       context "when the queue has no user" do
