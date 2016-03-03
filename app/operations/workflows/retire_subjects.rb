@@ -13,6 +13,8 @@ module Workflows
           workflow.retire_subject(subject_id)
         end
 
+        # This needs to be the last step in the transaction. If the transaction
+        # rolls back, we must not have enqueued these jobs yet.
         if Panoptes.use_cellect?(workflow)
           subject_ids.each do |subject_id|
             RetireCellectWorker.perform_async(subject_id, workflow.id)
