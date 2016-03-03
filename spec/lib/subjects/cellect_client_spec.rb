@@ -38,7 +38,10 @@ RSpec.describe Subjects::CellectClient do
       raise_error_for(:add_seen, 2)
       expect do
         Subjects::CellectClient.add_seen(1, 2, 4)
-      end.to raise_error(Subjects::CellectClient::ConnectionError)
+      end.to raise_error(
+        Subjects::CellectClient::ConnectionError,
+        "Cellect can't reach the server"
+      )
     end
   end
 
@@ -119,6 +122,21 @@ RSpec.describe Subjects::CellectClient do
                                                    group_id: nil,
                                                    limit: 4)
       Subjects::CellectClient.get_subjects(1, 2, nil, 4)
+    end
+
+    #applies to all RequestToHost methods
+    context "when cellect session cant choose a host due to redis error" do
+      it 'should raise a connection error' do
+        allow_any_instance_of(Subjects::CellectSession)
+          .to receive(:host)
+          .and_raise(Redis::CannotConnectError)
+        expect do
+          Subjects::CellectClient.get_subjects(1, 2, nil, 4)
+        end.to raise_error(
+          Subjects::CellectClient::ConnectionError,
+         "Cellect can't find a server host"
+        )
+      end
     end
   end
 

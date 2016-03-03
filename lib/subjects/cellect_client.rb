@@ -43,7 +43,7 @@ module Subjects
         tries ||= retries
         Cellect::Client.connection.send(action, *params)
       rescue StandardError => e
-        raise ConnectionError, "Cellect is unavailable" if tries <= 0
+        raise ConnectionError, "Cellect can't reach the server" if tries <= 0
         tries -= 1
         yield if block_given?
         retry
@@ -81,6 +81,8 @@ module Subjects
         super(action, params) do
           params[:host] = @session.reset_host
         end
+      rescue Redis::CannotConnectError => e
+        raise ConnectionError, "Cellect can't find a server host"
       end
     end
   end
