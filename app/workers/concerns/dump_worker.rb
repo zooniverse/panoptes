@@ -70,18 +70,27 @@ module DumpWorker
   end
 
   def create_medium
-    Medium.create!(content_type: "text/csv",
-                   type: dump_type,
-                   path_opts: project_file_path,
-                   linked: project,
-                   metadata: { state: 'creating' },
-                   private: true)
+    Medium.create!(
+      content_type: "text/csv",
+      type: dump_type,
+      path_opts: project_file_path,
+      linked: project,
+      metadata: { state: 'creating' },
+      private: true,
+      content_disposition: content_disposition
+    )
   end
 
   def load_medium
     m = Medium.find(@medium_id)
     metadata = m.metadata.merge("state" => "creating")
-    m.update!(path_opts: project_file_path, private: true, content_type: "text/csv", metadata: metadata)
+    m.update!(
+      path_opts: project_file_path,
+      private: true,
+      content_type: "text/csv",
+      content_disposition: content_disposition,
+      metadata: metadata
+    )
     m
   end
 
@@ -100,5 +109,10 @@ module DumpWorker
       end
       gz.close
     end
+  end
+
+  def content_disposition
+    name = project.slug.split("/")[1]
+    "attachment; filename='#{name}-#{dump_target}.csv'"
   end
 end

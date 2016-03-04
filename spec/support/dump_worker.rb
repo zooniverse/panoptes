@@ -87,6 +87,23 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
       expect(medium.private).to be true
     end
 
+    it 'should update the medium content_type to csv' do
+      medium.update_column(:content_type, "text/html")
+      worker.perform(project.id, medium.id)
+      medium.reload
+      expect(medium.content_type).to eq("text/csv")
+    end
+
+    it 'should update the medium content_disposition' do
+      worker.perform(project.id, medium.id)
+      medium.reload
+      name = project.slug.split("/")[1]
+      type = medium.type.match(/\Aproject_(\w+)_export\z/)[1]
+      ext = MIME::Types[medium.content_type].first.extensions.first
+      file_name = "#{name}-#{type}.#{ext}"
+      expect(medium.content_disposition).to eq("attachment; filename='#{file_name}'")
+    end
+
     it "should set the medium state to ready" do
       worker.perform(project.id, medium.id)
       medium.reload
