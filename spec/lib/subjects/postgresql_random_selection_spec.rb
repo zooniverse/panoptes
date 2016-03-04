@@ -2,7 +2,6 @@ require 'spec_helper'
 
 RSpec.describe Subjects::PostgresqlRandomSelection do
   let(:available) { SetMemberSubject.all }
-  let(:opts) { {} }
   subject { Subjects::PostgresqlRandomSelection.new(available, 10) }
 
   before do

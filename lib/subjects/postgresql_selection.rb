@@ -18,12 +18,7 @@ module Subjects
     end
 
     def any_workflow_data(limit_override=nil)
-      @limit_override = limit_override
-      any_workflow_data_scope
-      .order(random: [:asc, :desc].sample)
-      .limit(limit)
-      .pluck("set_member_subjects.id")
-      .shuffle
+      FallbackSelection.new(workflow, limit, opts).any_workflow_data
     end
 
     private
@@ -59,19 +54,6 @@ module Subjects
 
     def select_results_in_order
       PostgresqlInOrderSelection.new(available, limit).select
-    end
-
-    def any_workflow_data_scope
-      scope = workflow.set_member_subjects
-      if workflow.grouped
-        if subject_set_id = opts[:subject_set_id]
-          scope = scope.where(subject_set_id: subject_set_id)
-        else
-          msg = "subject_set_id parameter missing for grouped workflow"
-          raise Subjects::Selector::MissingParameter.new(msg)
-        end
-      end
-      scope
     end
   end
 end
