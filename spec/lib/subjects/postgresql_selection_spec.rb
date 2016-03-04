@@ -90,15 +90,12 @@ RSpec.describe Subjects::PostgresqlSelection do
     let(:opts) { {} }
     subject { Subjects::PostgresqlSelection.new(workflow, user, opts) }
 
-    before(:all) do
+    before do
       uploader = create(:user)
       created_workflow = create(:workflow_with_subject_sets)
       create_list(:subject, 25, project: created_workflow.project, uploader: uploader).each do |subject|
         create(:set_member_subject, subject: subject, subject_set: created_workflow.subject_sets.first)
       end
-    end
-    after(:all) do
-      DatabaseCleaner.clean_with(:deletion)
     end
 
     describe "#select" do
@@ -123,7 +120,7 @@ RSpec.describe Subjects::PostgresqlSelection do
       context "grouped selection" do
         let(:subject_set_id) { workflow.subject_sets.first.id }
         let(:opts) { {subject_set_id: subject_set_id} }
-        before(:each) do
+        before do
           allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
         end
 
@@ -145,7 +142,7 @@ RSpec.describe Subjects::PostgresqlSelection do
         let(:limit) { ordered.size }
         let(:opts) { { limit: limit } }
 
-        before(:each) do
+        before do
           update_sms_priorities
           allow_any_instance_of(Workflow).to receive(:prioritized).and_return(true)
         end
@@ -184,13 +181,13 @@ RSpec.describe Subjects::PostgresqlSelection do
         let(:subject_set_id) { SubjectSet.first.id }
         let(:sms) { SetMemberSubject.where(subject_set_id: subject_set_id) }
 
-        before(:each) do
+        before do
           %i( prioritized grouped ).each do |method|
             allow_any_instance_of(Workflow).to receive(method).and_return(true)
           end
         end
 
-        before(:all) do
+        before do
           update_sms_priorities
           created_workflow = Workflow.first
           subject_set = created_workflow.subject_sets.last
@@ -225,7 +222,7 @@ RSpec.describe Subjects::PostgresqlSelection do
       context "grouped workflow" do
         let(:subject_set_id) { SubjectSet.first.id }
 
-        before(:each) do
+        before do
           allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
         end
 
