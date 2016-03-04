@@ -73,32 +73,6 @@ RSpec.describe Subjects::PostgresqlSelection do
         end
 
         it_behaves_like "select for incomplete_project"
-
-        it 'should select subjects in asc order of the priority field' do
-          result = subject.select
-          expect(result).to eq(ordered)
-        end
-
-        context "with order by param" do
-          let(:opts) { { limit: ordered.size, order: :desc } }
-
-          it 'should ignore any order param on the priority field' do
-            result = subject.select
-            expect(result).to eq(ordered)
-          end
-        end
-
-        context "with 1 limit for prepend test" do
-          let(:limit) { 1 }
-
-          it 'should allow negative numbers to prepend the sort list' do
-            sms_subject = create(:subject,project: workflow.project, uploader: user)
-            sms = create(:set_member_subject, subject: sms_subject,
-              subject_set: workflow.subject_sets.first, priority: -10.to_f)
-            first_id = subject.select.first
-            expect(first_id).to eq(sms.id)
-          end
-        end
       end
 
       describe "priority and grouped selection" do
