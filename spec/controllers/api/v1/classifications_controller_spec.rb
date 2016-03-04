@@ -281,6 +281,19 @@ describe Api::V1::ClassificationsController, type: :controller do
         it_behaves_like "a classification create"
       end
     end
+
+    context "when redis is unavailable" do
+      it 'should not raise an error but still report it' do
+        stub_content_filter
+        allow_any_instance_of(ClassificationLifecycle)
+          .to receive(:queue)
+          .and_raise(Redis::CannotConnectError)
+        expect(Honeybadger).to receive(:notify)
+        expect do
+          setup_create_request
+        end.not_to raise_error
+      end
+    end
   end
 
   describe "#update" do
