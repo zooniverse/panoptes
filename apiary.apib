@@ -54,7 +54,7 @@ available resources.
                     "projects": "/projects",
                     "workflows": "/workflows",
                     "subject_sets": "/subject_sets",
-                    "groups": "/groups",
+                    "groups": "/user_groups",
                     "classifications": "/classifications",
                     "memberships": "/memberships",
                     "collections": "/collections",
@@ -103,7 +103,7 @@ The User resource has the following attributes:
                         "type": "projects"
                     },
                     "users.user_groups": {
-                        "href": "/groups?user_id={users.id}",
+                        "href": "/user_groups?user_id={users.id}",
                         "type": "user_groups"
                     },
                     "users.subjects": {
@@ -204,7 +204,7 @@ User resources are included a an array under the _users_ key
                         "type": "projects"
                     },
                     "users.user_groups": {
-                        "href": "/groups?user_id={users.id}",
+                        "href": "/user_groups?user_id={users.id}",
                         "type": "user_groups"
                     },
                     "users.subjects": {
@@ -2352,7 +2352,7 @@ the 'classification\_count' strategy with 15 classifications per subject.
 #Group User Group
 Resources related to _Panoptes User Groups_
 
-## UserGroup [/groups/{id}{?include}]
+## UserGroup [/user_groups/{id}{?include}]
 A user group represents a collection of users that share ownership of
 projects, collections, and classifications. Individual users within
 the group can be given different levels of permissions to act on
@@ -2482,7 +2482,7 @@ be placed in an 'inactive' state.
 
 + Response 204
 
-## Add a link [/groups/{id}/links/users]
+## Add a link [/user_groups/{id}/links/users]
 Only links to users may be added.
 
 ### Add user links [POST]
@@ -2507,7 +2507,7 @@ their membership to 'active'.
 
     [UserGroup][]
 
-## Remove a Link [/groups/{id}/links/{link_type}/{link_ids}]
+## Remove a Link [/user_groups/{id}/links/{link_type}/{link_ids}]
 Allows links to users, projects, or collections to be removed. Removed
 projects and collections are deleted. Removed users have their
 membership set to 'inactive'.
@@ -2528,7 +2528,7 @@ membership set to 'inactive'.
 
 + Response 204
 
-## UserGroup Collection [/groups{?page,page_size,sort,user_id,include}]
+## UserGroup Collection [/user_groups{?page,page_size,sort,user_id,include}]
 A collection of User Group resources.
 
 All collections add a meta attribute hash containing paging
@@ -2572,10 +2572,10 @@ User Groups are returned as an array under *user_groups*.
                         "page_count": 14,
                         "previous_page": 14,
                         "next_page": 2,
-                        "first_href": "/groups?page_size=2",
-                        "previous_href": "/groups?page=14page_size=2",
-                        "next_href": "/groups?page=2&page_size=2",
-                        "last_href": "/groups?page=14&page_size=2"
+                        "first_href": "/user_groups?page_size=2",
+                        "previous_href": "/user_groups?page=14page_size=2",
+                        "next_href": "/user_groups?page=2&page_size=2",
+                        "last_href": "/user_groups?page=14&page_size=2"
                     }
                 },
                 "user_groups": [{
@@ -2693,7 +2693,7 @@ a group has their state set to "inactive".
             {
                 "links": {
                     "memberships.user_group": {
-                        "href": "/groups/{memberships.user_group}",
+                        "href": "/user_groups/{memberships.user_group}",
                         "type": "user_groups"
                     },
                     "memberships.user": {
@@ -2772,7 +2772,7 @@ Memberships are returned as an array under *memberships*.
             {
                 "links": {
                     "memberships.user_group": {
-                        "href": "/groups/{memberships.user_group}",
+                        "href": "/user_groups/{memberships.user_group}",
                         "type": "user_groups"
                     },
                     "memberships.user": {
@@ -3066,7 +3066,7 @@ Collections are returned as an array under *collections*.
                         "owner": {
                             "id": "11",
                             "type": "user_groups",
-                            "href": "/groups/11"
+                            "href": "/user_groups/11"
                         }
                     }
                 }]
@@ -3114,7 +3114,7 @@ owner, and links to subjects.
                         "owner": {
                             "id" : "10",
                             "type": "user_groups",
-                            "href": "/groups/10"
+                            "href": "/user_groups/10"
                         }
                     }
                 }
