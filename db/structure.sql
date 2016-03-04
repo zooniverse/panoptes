@@ -330,7 +330,8 @@ CREATE TABLE media (
     updated_at timestamp without time zone NOT NULL,
     metadata jsonb,
     put_expires integer,
-    get_expires integer
+    get_expires integer,
+    content_disposition character varying
 );
 
 
@@ -2818,4 +2819,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160114135531');
 INSERT INTO schema_migrations (version) VALUES ('20160114141909');
 
 INSERT INTO schema_migrations (version) VALUES ('20160202155708');
+
+INSERT INTO schema_migrations (version) VALUES ('20160303163658');
 
