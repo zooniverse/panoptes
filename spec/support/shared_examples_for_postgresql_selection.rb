@@ -1,6 +1,6 @@
 shared_examples "select for incomplete_project" do
   let(:args) { opts }
-  subject { Subjects::PostgresqlSelection.new(workflow, user, args) }
+  let(:selector) { Subjects::PostgresqlSelection.new(workflow, user, args) }
 
   let(:sms_scope) do
     if ss_id = args[:subject_set_id]
@@ -33,7 +33,7 @@ shared_examples "select for incomplete_project" do
       let(:limit) { 1 }
 
       it 'should return an unseen subject' do
-        expect(uss.subject_ids).to_not include(subject.select.first)
+        expect(uss.subject_ids).to_not include(selector.select.first)
       end
     end
 
@@ -41,7 +41,7 @@ shared_examples "select for incomplete_project" do
       let(:limit) { 10 }
 
       it 'should no have duplicates' do
-        result = subject.select
+        result = selector.select
         expect(result).to match_array(result.to_a.uniq)
       end
     end
@@ -50,7 +50,7 @@ shared_examples "select for incomplete_project" do
     it 'should always return an approximate sample of subjects up to the unseen limit' do
       unseen_count.times do |n|
         limit = n+1
-        results_size = subject.select(limit).length
+        results_size = Subjects::PostgresqlSelection.new(workflow, user, (args || {}).merge(limit: limit)).select.length
         expect(results_size).to be_between(results_size, limit).inclusive
       end
     end
@@ -66,7 +66,7 @@ shared_examples "select for incomplete_project" do
     it 'should return as many subjects as possible' do
       unseen_count.times do |n|
         limit = n+unseen_count
-        results_size = subject.select(limit).length
+        results_size = Subjects::PostgresqlSelection.new(workflow, user, (args || {}).merge(limit: limit)).select.length
         expect(results_size).to be_between(results_size, limit).inclusive
       end
     end

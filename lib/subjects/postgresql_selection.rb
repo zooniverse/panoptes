@@ -6,22 +6,24 @@ module Subjects
       @workflow, @user, @opts = workflow, user, options
     end
 
-    def select(limit_override=nil)
-      @limit_override = limit_override
-      results = case selection_strategy
-      when :in_order
-        select_results_in_order
-      else
-        select_results_randomly
-      end
+    def select
+      results = selection_strategy.new(available, limit).select
       results.take(limit)
     end
 
-    def any_workflow_data(limit_override=nil)
+    def any_workflow_data
       FallbackSelection.new(workflow, limit, opts).any_workflow_data
     end
 
     private
+
+    def selection_strategy
+      if workflow.prioritized
+        PostgresqlInOrderSelection
+      else
+        PostgresqlRandomSelection
+      end
+    end
 
     def available
       return @available if @available
@@ -33,27 +35,7 @@ module Subjects
     end
 
     def limit
-      if @limit_override
-        @limit_override
-      else
-        @limit ||= opts.fetch(:limit, 20).to_i
-      end
-    end
-
-    def selection_strategy
-      if workflow.prioritized
-        :in_order
-      else
-        :other
-      end
-    end
-
-    def select_results_randomly
-      PostgresqlRandomSelection.new(available, limit).select
-    end
-
-    def select_results_in_order
-      PostgresqlInOrderSelection.new(available, limit).select
+      opts.fetch(:limit, 20).to_i
     end
   end
 end
