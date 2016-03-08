@@ -45,6 +45,4 @@ RSpec.describe Subjects::PostgresqlInOrderSelection do
       end
     end
   end
-
 end
-
