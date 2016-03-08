@@ -30,4 +30,3 @@ module Subjects
     end
   end
 end
-

@@ -11,13 +11,13 @@ shared_examples "select for incomplete_project" do
   end
 
   let(:unseen_count) do
-    _seen_count = if ss_id = args[:subject_set_id]
-      group_sms = SetMemberSubject.where(subject_set_id: ss_id)
-      group_sms.where(subject_id: uss.subject_ids).count
-    else
-      seen_count
-    end
-    sms_scope.count - _seen_count
+    scoped_seen_count = if ss_id = args[:subject_set_id]
+                          group_sms = SetMemberSubject.where(subject_set_id: ss_id)
+                          group_sms.where(subject_id: uss.subject_ids).count
+                        else
+                          seen_count
+                        end
+    sms_scope.count - scoped_seen_count
   end
 
   context "when a user has only seen a few subjects" do
@@ -47,7 +47,7 @@ shared_examples "select for incomplete_project" do
       end
     end
 
-    #account for the loop cut off limit constructing the random sample
+    # Account for the loop cut off limit constructing the random sample
     it 'should always return an approximate sample of subjects up to the unseen limit' do
       unseen_count.times do |n|
         limit = n+1
@@ -73,5 +73,3 @@ shared_examples "select for incomplete_project" do
     end
   end
 end
-
-
