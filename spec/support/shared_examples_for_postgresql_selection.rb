@@ -26,8 +26,6 @@ shared_examples "select for incomplete_project" do
     let(:args) { opts.merge(limit: limit) }
     let!(:uss) do
       subject_ids = sms_scope.sample(seen_count).map(&:subject_id)
-      puts "All: #{sms_scope.map(&:subject_id).inspect}"
-      puts "Seen: #{subject_ids.inspect}"
       create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
     end
 
@@ -35,8 +33,7 @@ shared_examples "select for incomplete_project" do
       let(:limit) { 1 }
 
       it 'should return an unseen subject' do
-      	selected = selector.select.first
-      	puts "Selected: #{selected.inspect}"
+        selected = selector.select.first
         expect(uss.subject_ids).to_not include(selected)
       end
     end
