@@ -65,6 +65,9 @@ module MediaStorage
                         acl: opts[:private] ? 'private' : 'public-read'
                        }
       upload_options[:content_encoding] = 'gzip' if opts[:compressed]
+      if opts[:content_disposition]
+        upload_options[:content_disposition] = opts[:content_disposition]
+      end
       object(path).write(**upload_options)
     end
 

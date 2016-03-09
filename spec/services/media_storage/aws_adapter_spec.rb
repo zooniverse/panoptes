@@ -119,6 +119,23 @@ RSpec.describe MediaStorage::AwsAdapter do
         adapter.put_file("src", file_path, content_type: content_type, private: false, compressed: true)
       end
     end
+
+    context "when opts[:content_disposition] is set" do
+      let(:disposition) { "attachment; filename='fname.ext'" }
+
+      it 'should call write with the content_disposition set' do
+        expect(obj_double)
+          .to receive(:write)
+          .with(
+            file: file_path,
+            content_type: content_type,
+            acl: 'public-read',
+            content_disposition: disposition
+          )
+        put_opts = { content_type: content_type, content_disposition: disposition }
+        adapter.put_file("src", file_path, put_opts)
+      end
+    end
   end
 
   context "when missing an s3 object path" do
