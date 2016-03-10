@@ -7,7 +7,7 @@ class UserSerializer
     :updated_at, :type, :global_email_communication,
     :project_email_communication, :beta_email_communication,
     :max_subjects, :uploaded_subjects_count, :admin, :href, :login_prompt,
-    :private_profile
+    :private_profile, :zooniverse_id
 
   can_include :classifications, :project_preferences, :collection_preferences,
     projects: { param: "owner", value: "login" },
@@ -39,7 +39,7 @@ class UserSerializer
 
   %w(credited_name email global_email_communication project_email_communication
      beta_email_communication uploaded_subjects_count max_subjects admin
-     login_prompt).each do |me_only_attribute|
+     login_prompt zooniverse_id).each do |me_only_attribute|
     alias_method :"include_#{me_only_attribute}?", :permitted_requester?
   end
 

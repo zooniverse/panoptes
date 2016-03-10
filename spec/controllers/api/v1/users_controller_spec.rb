@@ -367,6 +367,7 @@ describe Api::V1::UsersController, type: :controller do
 
   describe "#me" do
     let(:user) { users.first }
+    let(:user_response) { created_instance(api_resource_name) }
 
     before(:each) do
       default_request(scopes: scopes, user_id: user.id)
@@ -387,25 +388,30 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     it "should have the user's uploaded_subjects_count" do
-      uploaded_subjects = created_instance(api_resource_name)["uploaded_subjects_count"]
+      uploaded_subjects = user_response["uploaded_subjects_count"]
       expect(uploaded_subjects).to eq(user.uploaded_subjects_count)
     end
 
     it "should have the user's max_subjects" do
-      max_subjects = created_instance(api_resource_name)["max_subjects"]
+      max_subjects = user_response["max_subjects"]
       expect(max_subjects).to eq(Panoptes.max_subjects)
     end
 
-    it "should have a the global email communication for the user" do
-      expect(created_instance(api_resource_name)["global_email_communication"]).to eq(true)
+    it "should have the global email communication for the user" do
+      expect(user_response["global_email_communication"]).to eq(true)
     end
 
-    it "should have a the project email communication for the user" do
-      expect(created_instance(api_resource_name)["project_email_communication"]).to eq(true)
+    it "should have the project email communication for the user" do
+      expect(user_response["project_email_communication"]).to eq(true)
     end
 
-    it "should have a the beta email communication for the user" do
-      expect(created_instance(api_resource_name)["beta_email_communication"]).to eq(true)
+    it "should have the beta email communication for the user" do
+      expect(user_response["beta_email_communication"]).to eq(true)
+    end
+
+    it "should have the zooniverse_id for the user" do
+      result = user_response["zooniverse_id"]
+      expect(result).to eq(user.zooniverse_id)
     end
 
     it_behaves_like "an api response"
