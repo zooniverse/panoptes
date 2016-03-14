@@ -113,6 +113,6 @@ module DumpWorker
 
   def content_disposition
     name = project.slug.split("/")[1]
-    "attachment; filename='#{name}-#{dump_target}.csv'"
+    "attachment; filename=\"#{name}-#{dump_target}.csv\""
   end
 end
