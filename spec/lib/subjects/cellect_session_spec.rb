@@ -27,7 +27,8 @@ RSpec.describe Subjects::CellectSession do
 
     it "should raise an error on nil workflow id" do
       expect{ described_class.new(1, nil) }.to raise_error(
-        Subjects::CellectSession::NilWorkflowError
+        Subjects::CellectSession::NilWorkflowError,
+        "Nil workflow passed to cellect session"
       )
     end
   end
@@ -35,7 +36,7 @@ RSpec.describe Subjects::CellectSession do
   describe "#host" do
     context "when not set in redis" do
       it "should choose a new host" do
-        expect(session).to receive(:cellect_host)
+        expect(session).to receive(:cellect_host).and_call_original
         session.host
       end
 
@@ -81,7 +82,7 @@ RSpec.describe Subjects::CellectSession do
   describe "#reset_host" do
 
     it "should choose a new host" do
-      expect(session).to receive(:cellect_host)
+      expect(session).to receive(:cellect_host).and_call_original
       session.reset_host
     end
 
@@ -94,6 +95,19 @@ RSpec.describe Subjects::CellectSession do
       ttl = 60
       expect(redis).to receive(:setex).with(cellect_key, ttl, host)
       session.reset_host(ttl)
+    end
+
+    context "when there are no hosts to cellect from" do
+
+      it "should should raise an error" do
+        allow(Cellect::Client).to receive(:choose_host).and_return(nil)
+        expect {
+          session.reset_host
+        }.to raise_error(
+          Subjects::CellectSession::NoHostError,
+          "No cellect host available"
+        )
+      end
     end
   end
 end

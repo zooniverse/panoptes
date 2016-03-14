@@ -138,6 +138,21 @@ RSpec.describe Subjects::CellectClient do
         )
       end
     end
+
+    #applies to all RequestToHost methods
+    context "when cellect session raises no host error" do
+      it 'should raise a connection error' do
+        allow_any_instance_of(Subjects::CellectSession)
+          .to receive(:host)
+          .and_raise(Subjects::CellectSession::NoHostError)
+        expect do
+          Subjects::CellectClient.get_subjects(1, 2, nil, 4)
+        end.to raise_error(
+          Subjects::CellectClient::ConnectionError,
+         "Cellect can't find a server host"
+        )
+      end
+    end
   end
 
   describe "::reload_workflow" do
