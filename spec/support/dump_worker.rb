@@ -101,7 +101,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
       type = medium.type.match(/\Aproject_(\w+)_export\z/)[1]
       ext = MIME::Types[medium.content_type].first.extensions.first
       file_name = "#{name}-#{type}.#{ext}"
-      expect(medium.content_disposition).to eq("attachment; filename='#{file_name}'")
+      expect(medium.content_disposition).to eq("attachment; filename=\"#{file_name}\"")
     end
 
     it "should set the medium state to ready" do
