@@ -524,20 +524,20 @@ key.
             }
 
 ### List all classifications [GET]
-Only lists a classifications the active user has made,
-classifications from other members of a user_group, or projects the
-user has edit permissions for.
+Only lists classifications the active user has made or projects the user has edit permissions for.
 
-Classifications have the special *for* parameter that indicates the
-scope of classifications you'd like to retrieve. Possible options are:
+Classifications have special collection routes that indicate the scope you would like to retrieve.
 
-+ 'user' will fetch the current user's past classifications.
-+ 'user_groups' will fetch classifications from groups a user is a member of
-+ 'projects' will fetch classifications from projects a user has 'edit' permissions for
+Possible options are:
 
-Any of the for scopes may be further filtered using the *project_id*
++ '/' default, will fetch the current user's past complete classifications.
++ 'incomplete' will fetch the current user's past incomplete classifications.
++ 'project' will fetch classifications from projects a user has 'edit' permissions for
++ 'gold_standard' will fetch gold standard classifications for all marked workflows
+
+
+Any of the scopes may be further filtered using the *project_id*, *workflow_id*
 and *user_group_id* parameters.
-
 + Parameters
     + page (optional, integer) ... index of the collection page, 1 is default
     + page_size (optional, integer) ... number of items on a page. 20 is default
