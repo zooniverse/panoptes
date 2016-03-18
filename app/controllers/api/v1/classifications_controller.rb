@@ -2,13 +2,15 @@ require 'classification_lifecycle'
 
 class Api::V1::ClassificationsController < Api::ApiController
   skip_before_filter :require_login, only: :create
-  require_authentication :show, :index, :destroy, :update, scopes: [:classification]
+  require_authentication :show, :index, :destroy, :update, :incomplete, :project,
+    scopes: [:classification]
 
   resource_actions :default
 
   schema_type :json_schema
 
-  before_action :filter_by_subject_id, only: [ :index, :gold_standard ]
+  before_action :filter_by_subject_id,
+    only: [ :index, :gold_standard, :incomplete, :project ]
 
   rescue_from RoleControl::AccessDenied, with: :access_denied
 
@@ -21,8 +23,15 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def gold_standard
-    render json_api: serializer.page(params, controlled_resources, context),
-           generate_response_obj_etag: true
+    index
+  end
+
+  def incomplete
+    index
+  end
+
+  def project
+    index
   end
 
   private

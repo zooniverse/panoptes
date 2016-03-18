@@ -95,29 +95,62 @@ describe Api::V1::ClassificationsController, type: :controller do
         expect(response_page_size).to eq(limit)
       end
     end
+  end
 
-    context "a user retrieving their own incomplete classifications" do
-      let!(:classifications) { create_list(:classification, 2, user: user, completed: false) }
-      let!(:private_resource) { create(:classification) }
-      let(:n_visible) { 2 }
+  describe "#incomplete" do
+    let!(:complete) { create(:classification, user: user) }
+    let!(:incomplete) { create(:classification, user: user, completed: false) }
+    let(:n_visible) { 1 }
 
-      it_behaves_like "is indexable"
+    before(:each) do
+      default_request user_id: authorized_user.id, scopes: scopes
+      get :incomplete
     end
 
-    context "a project owner retreiving classifications for the project" do
-      let!(:classifications) { create_list(:classification, 2, project: project) }
-      let(:authorized_user) { project.owner }
+    it 'should return 200' do
+      expect(response.status).to eq 200
+    end
 
-      it 'should be filterable by subject_id' do
-        get :index, subject_id: classifications.first.subject_ids.first
-        expect(json_response['classifications'].first['id'].to_i).to eq(classifications.first.id)
-      end
+    it "should only return the incomplete one", :aggregate_failures do
+      resources = json_response[api_resource_name]
+      expect(resources.length).to eq 1
+      c = Classification.find(resources.first["id"])
+      expect(c.incomplete?).to eq(true)
+    end
+  end
 
-      it 'should be filterable by a list of subject ids' do
-        ids = classifications.map{|c| c.subject_ids.first}.join(',')
-        get :index, subject_id: ids
-        expect(json_response['classifications'].map{|c| c['id'].to_i}).to match_array(classifications.map(&:id))
-      end
+  describe "#project" do
+    let(:project) { create(:full_project) }
+    let!(:classifications) { create_list(:classification, 2, project: project) }
+    let!(:other_classification) { create(:classification) }
+    let(:authorized_user) { project.owner }
+
+    before(:each) do
+      default_request user_id: authorized_user.id, scopes: scopes
+    end
+
+    it 'should return 200' do
+      expect(response.status).to eq 200
+    end
+
+    it 'should return only the project ones' do
+      get :project
+      projects = json_response['classifications']
+        .map { |c| c["links"]["project"] }.uniq
+      expect(projects).to match_array([project.id.to_s])
+    end
+
+    it 'should be filterable by subject_id' do
+      get :project, subject_id: classifications.first.subject_ids.first
+      expect(json_response['classifications'].first['id'].to_i)
+        .to eq(classifications.first.id)
+    end
+
+    it 'should be filterable by a list of subject ids' do
+      ids = classifications.map{|c| c.subject_ids.first}.join(',')
+      get :project, subject_id: ids
+      expect(json_response['classifications'].map{|c| c['id'].to_i})
+        .to match_array(classifications.map(&:id))
     end
   end
 
@@ -208,7 +241,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       default_request user_id: user.id, scopes: scopes
     end
 
-    let(:resource) { create(:classification, user: user, completed: false) }
+    let(:resource) { create(:classification, user: user) }
     it_behaves_like "is showable"
   end
 

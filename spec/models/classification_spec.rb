@@ -130,45 +130,70 @@ describe Classification, :type => :model do
     let(:user) { ApiUser.new(create(:user)) }
     let(:project) { create(:project, owner: user.owner) }
     let(:user_group) { create(:user_group) }
-    let!(:classifications) do
+    let(:other_user_classification) { create(:classification) }
+    let(:other_user) { ApiUser.new(other_user_classification.user) }
+    let!(:membership) do
       create(:membership, roles: ['group_admin'], user: user.owner,
-             user_group: user_group, state: :active)
-      [create(:classification, user: user.owner),
-       create(:classification, user: user.owner, completed: false),
-       create(:classification, project: project),
-       create(:classification, project: project, completed: false),
-       create(:classification, user_group: user_group),
-       create(:classification)]
+        user_group: user_group, state: :active)
     end
 
-    it 'should return an ActiveRecord::Relation' do
-      expect(Classification.scope_for(:show, user)).to be_a(ActiveRecord::Relation)
+    describe "#show/index" do
+      it 'should return an ActiveRecord::Relation' do
+        expect(Classification.scope_for(:index, user)).to be_a(ActiveRecord::Relation)
+      end
+
+      it 'should return all classifications for an admin user' do
+        classifications = [
+          create(:classification, user: user.owner),
+          other_user_classification
+        ]
+        user = ApiUser.new(create(:user, admin: true), admin: true)
+        expect(Classification.scope_for(:show, user)).to match_array(classifications)
+      end
+
+      it 'should return all complete classifications the requesting user has made' do
+        expected = other_user_classification
+        expect(Classification.scope_for(:index, other_user)).to match_array(expected)
+      end
+
+      it 'should not return incomplete classifications for a project' do
+        create(:classification, user: user.owner, completed: false)
+        expect(Classification.scope_for(:show, user)).to be_empty
+      end
     end
 
-    it 'should return all classifications for a project if the user can update it' do
-      expected = classifications[2]
-      expect(Classification.scope_for(:show, user, project: true))
-        .to include(expected)
+    describe "#project" do
+      it 'should return all project classifications if the user can update it' do
+        classifications = [
+          create(:classification, project: project),
+          create(:classification, project: project, completed: false)
+        ]
+        result = Classification.scope_for(:project, user)
+        expect(result).to match_array(classifications)
+      end
+
+      it 'should not return any classifications if the user can not update it' do
+        create(:classification, user: user.owner)
+        result = Classification.scope_for(:project, other_user)
+        expect(result).to be_empty
+      end
     end
 
-    it 'should return all incomplete classifications a user has made' do
-      expected = classifications[1]
-      expect(Classification.scope_for(:show, user)).to include(expected)
+    describe "#incomplete" do
+      it 'should return all incomplete a user has made' do
+        expected = create(:classification, user: user.owner, completed: false)
+        expect(Classification.scope_for(:incomplete, user)).to match_array(expected)
+      end
     end
 
-    it 'should not return completed classifications for a user' do
-      expected = classifications[0]
-      expect(Classification.scope_for(:show, user)).to_not include(expected)
-    end
-
-    it 'should not return incomplete classifications for a project' do
-      expected = classifications[3]
-      expect(Classification.scope_for(:show, user)).to_not include(expected)
-    end
-
-    it 'should return all classifications for an admin user' do
-      user = ApiUser.new(create(:user, admin: true), admin: true)
-      expect(Classification.scope_for(:show, user)).to match_array(classifications)
+    describe "#gold_standard" do
+      it 'should return all gold_standard project data' do
+        gsc = create(:gold_standard_classification,
+          project: project, user: project.owner
+        )
+        gsc.workflow.update_column(:public_gold_standard, true)
+        expect(Classification.scope_for(:gold_standard, user)).to match_array(gsc)
+      end
     end
   end
 
