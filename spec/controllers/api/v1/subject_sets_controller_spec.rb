@@ -49,6 +49,34 @@ describe Api::V1::SubjectSetsController, type: :controller do
       get :index, "metadata.artist" => "Edvard Munch"
       expect(json_response["subject_sets"][0]["id"]).to eq(subject_set.id.to_s)
     end
+
+    describe 'sorting multiple subject sets' do
+      let(:named_subject_sets) do
+        [
+          create(:subject_set, display_name: "Ze best set"),
+          create(:subject_set, display_name: "An awesome set")
+        ]
+      end
+      let(:set_display_names) do
+        json_response["subject_sets"].map { |h| h["display_name"] }
+      end
+
+      before do
+        named_subject_sets
+      end
+
+      it "is not sorted by default" do
+        get :index, sort: "display_name"
+        names = named_subject_sets.map(&:display_name)
+        expect([set_display_names.first]).to_not include(names)
+      end
+
+      it "is sortable by display name", :aggregate_failures do
+        get :index, sort: "display_name"
+        expect(set_display_names.first).to eq("An awesome set")
+        expect(set_display_names.last).to eq("Ze best set")
+      end
+    end
   end
 
   describe '#show' do
