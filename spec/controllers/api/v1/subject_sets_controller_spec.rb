@@ -22,7 +22,8 @@ describe Api::V1::SubjectSetsController, type: :controller do
   let(:api_resource_name) { 'subject_sets' }
 
   let(:api_resource_attributes) do
-    %w(id display_name set_member_subjects_count created_at updated_at metadata)
+    %w( id display_name set_member_subjects_count created_at updated_at
+        metadata retired_set_member_subjects_count)
   end
   let(:api_resource_links) { %w(subject_sets.project subject_sets.workflows) }
 
