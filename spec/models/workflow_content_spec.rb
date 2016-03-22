@@ -6,6 +6,17 @@ RSpec.describe WorkflowContent, :type => :model do
 
   it_behaves_like "is translated content"
 
+  describe "#strings" do
+
+    it "should not be valid with a missing strings object" do
+      expect(build(:workflow_content, strings: nil)).to be_invalid
+    end
+
+    it "should allow an empty hash of strings" do
+      expect(build(:workflow_content, strings: {})).to be_valid
+    end
+  end
+
   describe "versioning", versioning: true do
     subject do
       create(:workflow_content)
