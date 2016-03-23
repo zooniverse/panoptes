@@ -428,19 +428,20 @@ describe Api::V1::UsersController, type: :controller do
       put :update, params
     end
 
-    describe "updated subject limit" do
-      let(:new_limit) { 10 }
+    shared_examples 'admin only attribute' do |attribute, value|
+      let(:attr_val_update) { { "#{attribute}" => value } }
 
       before(:each) do
         update_request
       end
 
       context "when user is an admin" do
-        let(:put_operations) { {admin: true, users: {subject_limit: new_limit}} }
+        let(:put_operations) { {admin: true, users: attr_val_update } }
         let(:user) { create(:user, admin: true) }
 
-        it 'should update users subject_limit' do
-          expect(user.reload.subject_limit).to eq(new_limit)
+        it 'should update users attribute' do
+          val = user.reload.send(attribute)
+          expect(val).to eq(value)
         end
 
         context "admin updating another user" do
@@ -451,18 +452,29 @@ describe Api::V1::UsersController, type: :controller do
           end
 
           it "should have updated the other user's subject_limit" do
-            expect(users.last.reload.subject_limit).to eq(new_limit)
+            val = users.last.reload.send(attribute)
+            expect(val).to eq(value)
           end
         end
       end
 
       context "when user is not an admin" do
-        let(:put_operations) { {users: {subject_limit: new_limit}} }
+        let(:put_operations) { { users: attr_val_update } }
 
         it 'should fail with a 422 error' do
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
+    end
+
+    describe "subject_limit" do
+
+      it_behaves_like "admin only attribute", :subject_limit, 10
+    end
+
+    describe "upload_whitelist" do
+
+      it_behaves_like "admin only attribute", :upload_whitelist, true
     end
 
     context "when changing email" do
