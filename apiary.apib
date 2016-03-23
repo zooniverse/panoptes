@@ -1430,6 +1430,12 @@ A workflow has the following attributes
 - pairwise
 - grouped
 - prioritized
+- retirement
+- retired_set_member_subjects_count
+- active
+- aggregation
+- configuration
+- completeness
 - primary_language
 - workflow_version
 - content_language
@@ -1440,13 +1446,11 @@ and *classifications_count* are assigned by the API
 *finished_at* is set by the API to a date/time when all subjects for this workflow have been retired.
 
 Three parameters: _grouped_, _prioritized_, and _pairwise_ configure
-how [Cellect](https://github.com/zooniverse/Cellect) chooses subjects
-for classification. They are all false by default, which will give a
-random selection of subjects from all subject\_sets that are part of a
-workflow. _grouped_ enables selecting subjects from a specific subject
-set. _prioritized_ ensures that users will see subjects in a
-predetermined order. _pairwise_ will select two subjects at a time
-for classification.
+how the api chooses subjects for classification. They are all false by default,
+which will give a random selection of subjects from all subject\_sets that
+are part of a workflow. _grouped_ enables selecting subjects from a specific
+subject set. _prioritized_ ensures that users will see subjects in a
+predetermined order. _pairwise_ will select two subjects at a tim for classification.
 
 A workflow's `tasks` is a hash of keys to task definitions.
 
@@ -1542,6 +1546,12 @@ Each tool has a string `color`, which is applied to the marks made by the tool. 
                              "next": null
                          }
                      },
+                     "retirement": {
+                        "criteria": "classification_count",
+                        "options": {
+                          "count": 15
+                        }
+                    },
                     "links": {
                         "project": "1",
                         "subject_sets": ["10", "11", "12"]
@@ -1959,11 +1969,21 @@ Workflows are returned as an array under the _workflows_ key.
 ### Create a Workflow [POST]
 Requires a set of *tasks*, a *primary_language*, a *display_name*, and a
 link to a *project*. Can optionally set cellect parameters *grouped*,
-*prioritized*, and *pairwise*. (false by default) and links to
+*prioritized*, and *pairwise* (all false by default) and links to
 *subject_sets*.
 
 A SubjectSet that already belongs to another workflow will be
 duplicated when it is linked.
+
+A Workflow may also include a _retirement_ object with a
+_criteria_ key and an _options_ key. _criteria_ describes the strategy
+Panoptes will use to decide when to retire subjects. Currently, this
+may only be 'classification\_count' which retires subjects after a
+target number of classifications are reached. _options_ describes the
+parameters for the strategy. The 'classification\_count' strategy
+accepts _count_ as an option with an integer number of classifications
+for each subject. If _retirement_ is left blank Panoptes defaults to
+the 'classification\_count' strategy with 15 classifications per subject.
 
 + Request
 
@@ -2010,6 +2030,12 @@ duplicated when it is linked.
                             "next": null
                         }
                     },
+                    "retirement": {
+                        "criteria": "classification_count",
+                        "options": {
+                            "count": 15
+                        }
+                    },
                     "primary_language": "en-ca",
                     "links": {
                         "project": "42",
@@ -2035,7 +2061,6 @@ A SubjectSet has the following attributes
 - id
 - display_name
 - metadata
-- retirement
 - set_member_subjects_count
 - created_at
 - updated_at
@@ -2074,12 +2099,9 @@ All attributes except display_name are set by the API
                     "metadata": {
                         "category": "things"
                     },
-                    "retirement": {
-                        "criteria": "classification_count"
-                    },
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
-                    "set_member_subject_cound": 100,
+                    "set_member_subject_count": 100,
                     "links": {
                         "project": "1",
                         "workflow": "10"
@@ -2249,9 +2271,6 @@ Subject Sets are returned as an array under *subject_sets*.
                     "metadata": {
                         "category": "things"
                     },
-                    "retirement": {
-                        "criteria": "classification_count"
-                    },
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
                     "set_member_subject_count": 100,
@@ -2264,9 +2283,6 @@ Subject Sets are returned as an array under *subject_sets*.
                     "display_name": "Boring Looking Galaxies",
                     "metadata": {
                         "category": "things"
-                    },
-                    "retirement": {
-                        "criteria": "classification_count"
                     },
                     "created_at": "2014-02-13T10:11:34Z",
                     "updated_at": "2014-02-13T10:11:34Z",
@@ -2306,16 +2322,6 @@ Instead of a list of subjects a SubjectSet may include a link to a
 Collection which will import the collection's subjects into a new
 SubjectSet.
 
-A SubjectSet may also include a _retirement_ object with a
-_criteria_ key and an _options_ key. _criteria_ describes the strategy
-Panoptes will use to decide when to retire subjects. Currently, this
-may only be 'classification\_count' which retires subjects after a
-target number of classifications are reached. _options_ describes the
-parameters for the strategy. The 'classification\_count' strategy
-accepts _count_ as an option with an integer number of classifications
-for each subject. If _retirement_ is left blank Panoptes defaults to
-the 'classification\_count' strategy with 15 classifications per subject.
-
 + Request
 
     + Headers
@@ -2330,12 +2336,6 @@ the 'classification\_count' strategy with 15 classifications per subject.
                     "display_name": "A Group of Interesting Subjects",
                     "metadata": {
                         "category": "things"
-                    },
-                    "retirement": {
-                        "criteria": "classification_count",
-                        "options": {
-                            "count": 15
-                        }
                     },
                     "links": {
                         "project": "43",
