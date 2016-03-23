@@ -69,6 +69,10 @@ describe Api::V1::UsersController, type: :controller do
         it "should have a max_subjects" do
           expect(requester).to include("max_subjects")
         end
+
+        it "should have a upload_whitelist" do
+          expect(requester).to include("upload_whitelist")
+        end
       end
 
       context "a record for a different user" do
@@ -100,6 +104,10 @@ describe Api::V1::UsersController, type: :controller do
 
         it "should not have a max_subjects" do
           expect(not_requester).to_not include("max_subjects")
+        end
+
+        it "should not have a upload_whitelist" do
+          expect(not_requester).to_not include("upload_whitelist")
         end
       end
 
@@ -139,6 +147,10 @@ describe Api::V1::UsersController, type: :controller do
 
       it "should not have a max_subjects" do
         expect(json_response[api_resource_name][0]).to_not include("max_subjects")
+      end
+
+      it "should not have a upload_whitelist" do
+        expect(json_response[api_resource_name][0]).to_not include("upload_whitelist")
       end
     end
 
@@ -412,6 +424,11 @@ describe Api::V1::UsersController, type: :controller do
     it "should have the zooniverse_id for the user" do
       result = user_response["zooniverse_id"]
       expect(result).to eq(user.zooniverse_id)
+    end
+
+    it "should have the upload_whitelist for the user" do
+      result = user_response["upload_whitelist"]
+      expect(result).to eq(user.upload_whitelist)
     end
 
     it_behaves_like "an api response"
