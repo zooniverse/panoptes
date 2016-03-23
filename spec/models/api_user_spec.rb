@@ -49,13 +49,6 @@ RSpec.describe ApiUser do
 
     subject { api_user.above_subject_limit? }
 
-    context "user is admin" do
-      let(:flag) { true }
-      let(:user) { create(:user, admin: true) }
-
-      it { is_expected.to be false }
-    end
-
     context "user is above limit" do
       let(:limit) { 9 }
 
@@ -66,6 +59,31 @@ RSpec.describe ApiUser do
       let(:limit) { 11 }
 
       it { is_expected.to be false }
+    end
+
+    context "user is admin" do
+      let(:flag) { true }
+      let(:user) { create(:user, admin: true) }
+
+      it { is_expected.to be false }
+    end
+
+    context "user is whitelisted for upload" do
+      before do
+        allow_any_instance_of(User).to receive(:upload_whitelist).and_return(true)
+      end
+
+      context "user is above limit" do
+        let(:limit) { 9 }
+
+        it { is_expected.to be false }
+      end
+
+      context "user is below limit" do
+        let(:limit) { 11 }
+
+        it { is_expected.to be false }
+      end
     end
   end
 

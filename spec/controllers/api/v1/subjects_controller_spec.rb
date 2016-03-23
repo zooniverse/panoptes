@@ -407,9 +407,8 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     context "when the user has exceeded the allowed number of subjects" do
-      let(:authorised_user) { create(:user) }
       let(:upload_subjects) do
-        default_request scopes: scopes, user_id: authorised_user.id
+        default_request scopes: scopes, user_id: authorized_user.id
         post :create, create_params
       end
 
@@ -432,6 +431,15 @@ describe Api::V1::SubjectsController, type: :controller do
 
         it 'should return the created status' do
           allow_any_instance_of(ApiUser).to receive(:is_admin?).and_return(true)
+          upload_subjects
+          expect(response).to have_http_status(:created)
+        end
+      end
+
+      context "when the user is whitelisted to upload" do
+
+        it 'should return the created status' do
+          allow_any_instance_of(User).to receive(:upload_whitelist).and_return(true)
           upload_subjects
           expect(response).to have_http_status(:created)
         end
