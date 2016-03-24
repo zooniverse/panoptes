@@ -69,6 +69,10 @@ describe Api::V1::UsersController, type: :controller do
         it "should have a max_subjects" do
           expect(requester).to include("max_subjects")
         end
+
+        it "should have a upload_whitelist" do
+          expect(requester).to include("upload_whitelist")
+        end
       end
 
       context "a record for a different user" do
@@ -100,6 +104,10 @@ describe Api::V1::UsersController, type: :controller do
 
         it "should not have a max_subjects" do
           expect(not_requester).to_not include("max_subjects")
+        end
+
+        it "should not have a upload_whitelist" do
+          expect(not_requester).to_not include("upload_whitelist")
         end
       end
 
@@ -139,6 +147,10 @@ describe Api::V1::UsersController, type: :controller do
 
       it "should not have a max_subjects" do
         expect(json_response[api_resource_name][0]).to_not include("max_subjects")
+      end
+
+      it "should not have a upload_whitelist" do
+        expect(json_response[api_resource_name][0]).to_not include("upload_whitelist")
       end
     end
 
@@ -414,6 +426,11 @@ describe Api::V1::UsersController, type: :controller do
       expect(result).to eq(user.zooniverse_id)
     end
 
+    it "should have the upload_whitelist for the user" do
+      result = user_response["upload_whitelist"]
+      expect(result).to eq(user.upload_whitelist)
+    end
+
     it_behaves_like "an api response"
   end
 
@@ -428,19 +445,20 @@ describe Api::V1::UsersController, type: :controller do
       put :update, params
     end
 
-    describe "updated subject limit" do
-      let(:new_limit) { 10 }
+    shared_examples 'admin only attribute' do |attribute, value|
+      let(:attr_val_update) { { "#{attribute}" => value } }
 
       before(:each) do
         update_request
       end
 
       context "when user is an admin" do
-        let(:put_operations) { {admin: true, users: {subject_limit: new_limit}} }
+        let(:put_operations) { {admin: true, users: attr_val_update } }
         let(:user) { create(:user, admin: true) }
 
-        it 'should update users subject_limit' do
-          expect(user.reload.subject_limit).to eq(new_limit)
+        it 'should update users attribute' do
+          val = user.reload.send(attribute)
+          expect(val).to eq(value)
         end
 
         context "admin updating another user" do
@@ -451,18 +469,29 @@ describe Api::V1::UsersController, type: :controller do
           end
 
           it "should have updated the other user's subject_limit" do
-            expect(users.last.reload.subject_limit).to eq(new_limit)
+            val = users.last.reload.send(attribute)
+            expect(val).to eq(value)
           end
         end
       end
 
       context "when user is not an admin" do
-        let(:put_operations) { {users: {subject_limit: new_limit}} }
+        let(:put_operations) { { users: attr_val_update } }
 
         it 'should fail with a 422 error' do
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
+    end
+
+    describe "subject_limit" do
+
+      it_behaves_like "admin only attribute", :subject_limit, 10
+    end
+
+    describe "upload_whitelist" do
+
+      it_behaves_like "admin only attribute", :upload_whitelist, true
     end
 
     context "when changing email" do

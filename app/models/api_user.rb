@@ -5,7 +5,8 @@ class ApiUser
 
   delegate :memberships_for, :owns?, :id, :languages, :user_groups,
     :project_preferences, :collection_preferences, :classifications,
-    :user_groups, :has_finished?, :memberships, to: :user, allow_nil: true
+    :user_groups, :has_finished?, :memberships, :upload_whitelist,
+    to: :user, allow_nil: true
 
   def initialize(user, admin: false)
     @user, @admin_flag = user, admin
@@ -28,7 +29,7 @@ class ApiUser
   end
 
   def above_subject_limit?
-    return false if is_admin?
+    return false if is_admin? || upload_whitelist
     current, max = subject_limits
     current >= max
   end

@@ -1150,7 +1150,8 @@ CREATE TABLE users (
     ouroboros_created boolean DEFAULT false,
     subject_limit integer,
     private_profile boolean DEFAULT true,
-    tsv tsvector
+    tsv tsvector,
+    upload_whitelist boolean DEFAULT false NOT NULL
 );
 
 
@@ -2821,4 +2822,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160114141909');
 INSERT INTO schema_migrations (version) VALUES ('20160202155708');
 
 INSERT INTO schema_migrations (version) VALUES ('20160303163658');
+
+INSERT INTO schema_migrations (version) VALUES ('20160323101942');
 
