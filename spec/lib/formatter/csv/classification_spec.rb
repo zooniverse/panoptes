@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Formatter::Csv::Classification do
   let(:project_headers) do
-    %w( user_name user_id user_ip workflow_id workflow_name workflow_version
+    %w( classification_id user_name user_id user_ip workflow_id workflow_name workflow_version
         created_at gold_standard expert metadata annotations subject_data )
   end
   let(:subject) { build_stubbed(:subject) }
@@ -21,7 +21,8 @@ RSpec.describe Formatter::Csv::Classification do
   end
 
   let(:formatted_data) do
-    [ classification.user.login,
+    [ classification.id,
+      classification.user.login,
       classification.user_id,
       secure_user_ip,
       classification.workflow_id,
@@ -68,7 +69,7 @@ RSpec.describe Formatter::Csv::Classification do
     context "when the classifier is logged out" do
       it 'should should return not logged in' do
         allow(classification).to receive(:user).and_return(nil)
-        user_id = formatter.to_array(classification)[0]
+        user_id = formatter.to_array(classification)[1]
         expect(user_id).to eq("not-logged-in-#{secure_user_ip}")
       end
     end
