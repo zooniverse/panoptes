@@ -10,9 +10,17 @@ RSpec.describe AggregationDataMailerWorker do
   end
 
   context "when the media can't be found" do
-
     it 'should not deliver the mail' do
       expect{ subject.perform(nil) }.not_to change{ ActionMailer::Base.deliveries.count }
+    end
+  end
+
+  context 'when there are no recipients' do
+    it 'does not call the mailer' do
+      media.metadata["recipients"] = []
+      media.save!
+      expect(AggregationDataMailer).to receive(:aggregation_data).never
+      subject.perform(media.id)
     end
   end
 end

@@ -6,6 +6,7 @@ module DumpMailerWorker
   end
 
   def send_email
+    return unless emails.present?
     mailer.perform_async(@project.id, media_get_url, emails)
   end
 
