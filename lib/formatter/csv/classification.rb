@@ -7,7 +7,7 @@ module Formatter
         :workflow_version, to: :classification
 
       def self.headers
-        %w(user_name user_id user_ip workflow_id workflow_name workflow_version
+        %w(classification_id user_name user_id user_ip workflow_id workflow_name workflow_version
            created_at gold_standard expert metadata annotations subject_data)
       end
 
@@ -25,6 +25,10 @@ module Formatter
       end
 
       private
+
+      def classification_id
+        classification.id
+      end
 
       def user_name
         if user = classification.user
