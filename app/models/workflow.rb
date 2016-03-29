@@ -18,6 +18,8 @@ class Workflow < ActiveRecord::Base
   has_many :classifications
   has_many :user_seen_subjects
   has_many :subject_queues, dependent: :destroy
+  has_many :workflow_tutorials, dependent: :destroy
+  has_many :tutorials, through: :workflow_tutorials
   has_many :attached_images, -> { where(type: "workflow_attached_image") }, class_name: "Medium",
     as: :linked
   has_and_belongs_to_many :expert_subject_sets, -> { expert_sets }, class_name: "SubjectSet"

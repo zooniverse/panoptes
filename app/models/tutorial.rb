@@ -3,6 +3,8 @@ class Tutorial < ActiveRecord::Base
   include RoleControl::ParentalControlled
 
   belongs_to :project
+  has_many :workflow_tutorials
+  has_many :workflows, through: :workflow_tutorials
   has_many :attached_images, -> { where(type: "tutorial_attached_image") }, class_name: "Medium",
     as: :linked
 

@@ -1244,6 +1244,36 @@ ALTER SEQUENCE workflow_contents_id_seq OWNED BY workflow_contents.id;
 
 
 --
+-- Name: workflow_tutorials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE workflow_tutorials (
+    id integer NOT NULL,
+    workflow_id integer,
+    tutorial_id integer
+);
+
+
+--
+-- Name: workflow_tutorials_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE workflow_tutorials_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: workflow_tutorials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE workflow_tutorials_id_seq OWNED BY workflow_tutorials.id;
+
+
+--
 -- Name: workflows; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1523,6 +1553,13 @@ ALTER TABLE ONLY workflow_contents ALTER COLUMN id SET DEFAULT nextval('workflow
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY workflow_tutorials ALTER COLUMN id SET DEFAULT nextval('workflow_tutorials_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY workflows ALTER COLUMN id SET DEFAULT nextval('workflows_id_seq'::regclass);
 
 
@@ -1780,6 +1817,14 @@ ALTER TABLE ONLY versions
 
 ALTER TABLE ONLY workflow_contents
     ADD CONSTRAINT workflow_contents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: workflow_tutorials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY workflow_tutorials
+    ADD CONSTRAINT workflow_tutorials_pkey PRIMARY KEY (id);
 
 
 --
@@ -2824,4 +2869,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160202155708');
 INSERT INTO schema_migrations (version) VALUES ('20160303163658');
 
 INSERT INTO schema_migrations (version) VALUES ('20160323101942');
+
+INSERT INTO schema_migrations (version) VALUES ('20160329144922');
 
