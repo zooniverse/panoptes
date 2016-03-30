@@ -27,15 +27,27 @@ describe Api::V1::TutorialsController, type: :controller do
     describe "filter_params" do
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
-        get :index, filter_params
       end
 
       context "by project id" do
         let(:filter_params) { {project_id: project.id} }
         it "should return tutorial belong to project" do
+          get :index, filter_params
           aggregate_failures "project_id" do
             expect(json_response["tutorials"].length).to eq(1)
             expect(json_response["tutorials"][0]["id"]).to eq(tutorials[0].id.to_s)
+          end
+        end
+      end
+
+      context "by workflow id" do
+        let(:filter_params) { {workflow_id: workflow.id} }
+        it "should return tutorial belong to workflow" do
+          workflow_tutorial = create(:tutorial, project: project, workflows: [workflow])
+          get :index, filter_params
+          aggregate_failures "workflow_id" do
+            expect(json_response["tutorials"].length).to eq(1)
+            expect(json_response["tutorials"][0]["id"]).to eq(workflow_tutorial.id.to_s)
           end
         end
       end

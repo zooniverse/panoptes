@@ -9,7 +9,6 @@ class Tutorial < ActiveRecord::Base
     as: :linked
 
   validates_presence_of :project
-  validates_uniqueness_of :language, case_sensitive: false, scope: :project_id
 
   can_through_parent :project, :update, :index, :show, :destroy
 
