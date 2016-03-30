@@ -3,6 +3,7 @@ require "spec_helper"
 describe Api::V1::TutorialsController, type: :controller do
   let(:private_project) { create(:project, private: true) }
   let(:project) { create(:project) }
+  let(:workflow) { create(:workflow, project: project) }
   let!(:tutorials) do
     [ create(:tutorial, project: project),
       create(:tutorial),
@@ -54,7 +55,8 @@ describe Api::V1::TutorialsController, type: :controller do
           steps: [{media: "asdfasdf", content: 'asdklfajsdf'}, {media: 'asdklfjds;kajsdf', content: 'asdfklajsdf'}],
           language: 'es-mx',
           links: {
-            project: project.id.to_s
+            project: project.id.to_s,
+            workflows: [workflow.id]
           }
         }
       }
