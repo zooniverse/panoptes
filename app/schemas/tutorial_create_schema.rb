@@ -24,6 +24,10 @@ class TutorialCreateSchema < JsonSchema
       type "string"
     end
 
+    property "kind" do
+      type "string"
+    end
+
     property "links" do
       type "object"
       additional_properties false

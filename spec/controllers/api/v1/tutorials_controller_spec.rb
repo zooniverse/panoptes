@@ -51,6 +51,18 @@ describe Api::V1::TutorialsController, type: :controller do
           end
         end
       end
+
+      context "by kind" do
+        let(:filter_params) { {kind: tutorials[0].kind} }
+        it "should return tutorial belong to workflow" do
+          tutorials[0].update! kind: "foo"
+          get :index, filter_params
+          aggregate_failures "workflow_id" do
+            expect(json_response["tutorials"].length).to eq(1)
+            expect(json_response["tutorials"][0]["id"]).to eq(tutorials[0].id.to_s)
+          end
+        end
+      end
     end
   end
 

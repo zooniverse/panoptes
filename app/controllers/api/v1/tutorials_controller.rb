@@ -10,11 +10,17 @@ class Api::V1::TutorialsController < Api::ApiController
   protected
 
   def controlled_resources
+    @controlled_resources ||= super
+
     if params[:workflow_id]
-      @controlled_resouces ||= super.joins(:workflow_tutorials).where(workflow_tutorials: {workflow_id: params[:workflow_id]})
-    else
-      super
+      @controlled_resources = @controlled_resources.joins(:workflow_tutorials).where(workflow_tutorials: {workflow_id: params[:workflow_id]})
     end
+
+    if params[:kind]
+      @controlled_resources = @controlled_resources.where(kind: params[:kind])
+    end
+
+    @controlled_resources
   end
 
   def set_language_from_header

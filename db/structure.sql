@@ -948,7 +948,8 @@ CREATE TABLE tutorials (
     language text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    project_id integer NOT NULL
+    project_id integer NOT NULL,
+    kind character varying
 );
 
 
@@ -2871,4 +2872,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160303163658');
 INSERT INTO schema_migrations (version) VALUES ('20160323101942');
 
 INSERT INTO schema_migrations (version) VALUES ('20160329144922');
+
+INSERT INTO schema_migrations (version) VALUES ('20160330142609');
 
