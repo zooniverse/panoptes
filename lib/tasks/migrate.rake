@@ -74,6 +74,15 @@ namespace :migrate do
         ig.save(validate: false)
       end
     end
+
+    desc "Set default value for whitelist upload count"
+    task :upload_whitelist_default => :environment do
+      User.select("id").find_in_batches do |batch|
+        User.where(id: batch.map(&:id)).update_all(upload_whitelist: false)
+        print '.'
+      end
+      puts ' done'
+    end
   end
 
   namespace :slug do
