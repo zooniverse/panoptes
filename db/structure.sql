@@ -2320,6 +2320,13 @@ CREATE UNIQUE INDEX index_tags_on_name ON tags USING btree (name);
 
 
 --
+-- Name: index_tutorials_on_kind; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tutorials_on_kind ON tutorials USING btree (kind);
+
+
+--
 -- Name: index_tutorials_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2467,6 +2474,27 @@ CREATE INDEX index_workflow_contents_on_workflow_id ON workflow_contents USING b
 
 
 --
+-- Name: index_workflow_tutorials_on_tutorial_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_workflow_tutorials_on_tutorial_id ON workflow_tutorials USING btree (tutorial_id);
+
+
+--
+-- Name: index_workflow_tutorials_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_workflow_tutorials_on_workflow_id ON workflow_tutorials USING btree (workflow_id);
+
+
+--
+-- Name: index_workflow_tutorials_on_workflow_id_and_tutorial_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_workflow_tutorials_on_workflow_id_and_tutorial_id ON workflow_tutorials USING btree (workflow_id, tutorial_id);
+
+
+--
 -- Name: index_workflows_on_aggregation; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2538,6 +2566,14 @@ ALTER TABLE ONLY subject_sets_workflows
 
 
 --
+-- Name: fk_rails_0ca158de43; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflow_tutorials
+    ADD CONSTRAINT fk_rails_0ca158de43 FOREIGN KEY (tutorial_id) REFERENCES tutorials(id) ON DELETE CASCADE;
+
+
+--
 -- Name: fk_rails_1e54468460; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2591,6 +2627,14 @@ ALTER TABLE ONLY tutorials
 
 ALTER TABLE ONLY subject_sets_workflows
     ADD CONSTRAINT fk_rails_b08d342668 FOREIGN KEY (subject_set_id) REFERENCES subject_sets(id);
+
+
+--
+-- Name: fk_rails_bcabfcd540; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflow_tutorials
+    ADD CONSTRAINT fk_rails_bcabfcd540 FOREIGN KEY (workflow_id) REFERENCES workflows(id) ON DELETE CASCADE;
 
 
 --
