@@ -109,42 +109,23 @@ namespace :migrate do
   end
 
   namespace :classification do
-
-    desc "Converts subject_ids array into normal join table"
-    task classification_subject_ids: :environment do
-      puts 'check precondition'
-      max_length = ActiveRecord::Base.connection.execute("SELECT max(array_length(subject_ids, 1)) as max_length FROM classifications")[0]["max_length"].to_i
-
-      if max_length != 1
-        raise "Does not work if any classification has more than one subject currently"
-      end
-
-      puts 'create index'
-      ActiveRecord::Base.connection.execute <<-SQL
-        CREATE INDEX temporary_migration_index on classifications ((subject_ids[1]));
-      SQL
-
-      puts 'insert into'
-      ActiveRecord::Base.connection.execute <<-SQL
-        INSERT INTO classification_subjects (classification_id, subject_id)
-        SELECT id, subject_ids[1] FROM classifications
-        WHERE subject_ids[1] IS NOT NULL AND NOT EXISTS (
-          SELECT 1 FROM classification_subjects cs WHERE cs.classification_id = classifications.id AND cs.subject_id = classifications.subject_ids[1]
-        );
-      SQL
-
-      puts 'drop index'
-      ActiveRecord::Base.connection.execute <<-SQL
-        DROP INDEX temporary_migration_index;
-      SQL
-    end
-
     desc "Add lifecycled at timestamps"
     task add_lifecycled_at: :environment do
       non_lifecycled = Classification.where(lifecycled_at: nil).select('id')
       non_lifecycled.find_in_batches do |classifications|
         Classification.where(id: classifications.map(&:id))
         .update_all(lifecycled_at: Time.current.to_s(:db))
+      end
+    end
+  end
+
+  namespace :tutorial do
+    desc "Associate all workflows with tutorials"
+    task :workflowize => :environment do
+      Tutorial.find_each do |tutorial|
+        tutorial.workflows = tutorial.project.workflows.where(active: true)
+        tutorial.save!
+        print '.'
       end
     end
   end
