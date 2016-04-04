@@ -22,7 +22,6 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
              roles: ["translator"])
     end
 
-
     let!(:private_resource) do
       project = create(:project, private: true)
       create(:workflow_with_contents, project: project)
@@ -58,7 +57,7 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
     let(:create_params) do
       {
         workflow_contents: {
-          strings: %w(a bunch of strings),
+          strings: { "label" => "stuff", "question" => "is it interesting?" },
           language: 'en-CA',
           links: {
             workflow: resource.workflow
@@ -82,16 +81,12 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
              roles: ["translator"])
     end
 
-
     let(:update_params) do
-      { workflow_contents: {
-          strings: %w(new strings)
-        }
-      }
+      { workflow_contents: { strings: test_attr_value } }
     end
 
     let(:test_attr) { :strings }
-    let(:test_attr_value) { %w(new strings) }
+    let(:test_attr_value) { { "label" => "new string" } }
 
     context "non-primary-language content" do
       it_behaves_like "is updatable"
@@ -146,10 +141,11 @@ RSpec.describe Api::V1::WorkflowContentsController, type: :controller do
              roles: ["translator"])
     end
 
-
     let(:num_times) { 11 }
     let!(:existing_versions) { resource.versions.length }
-    let(:update_proc) { Proc.new { |resource, n| resource.update!(strings: [n.to_s]) } }
+    let(:update_proc) do
+      Proc.new { |resource, n| resource.update!(strings: { n.to_s => n.to_s }) }
+    end
     let(:resource_param) { :workflow_content_id }
 
     it_behaves_like "a versioned resource"

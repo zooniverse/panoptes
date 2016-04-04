@@ -18,6 +18,7 @@ RSpec.describe WorkflowContent, :type => :model do
   end
 
   describe "versioning", versioning: true do
+    let(:new_strings) { { label: "some stuff" } }
     subject do
       create(:workflow_content)
     end
@@ -25,7 +26,6 @@ RSpec.describe WorkflowContent, :type => :model do
     it { is_expected.to be_versioned }
 
     it 'should track changes to strings' do
-      new_strings = %w(some stuff)
       subject.update!(strings: new_strings)
       expect(subject.previous_version.strings).to_not eq(new_strings)
     end
@@ -38,7 +38,7 @@ RSpec.describe WorkflowContent, :type => :model do
 
     it 'caches the new version number', :aggregate_failures do
       previous_number = subject.current_version_number
-      subject.update!(strings: %w(foo bar))
+      subject.update!(strings: new_strings)
       expect(subject.current_version_number).to eq(previous_number + 1)
       expect(subject.current_version_number).to eq(ModelVersion.version_number(subject))
     end
