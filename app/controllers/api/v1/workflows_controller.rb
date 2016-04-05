@@ -77,8 +77,10 @@ class Api::V1::WorkflowsController < Api::ApiController
     create_params[:tasks] = stripped_tasks
     create_params[:active] = false if project_live?
     workflow = super(create_params)
-    workflow.workflow_contents.build(strings: strings,
-                                     language: workflow.primary_language)
+    workflow.workflow_contents.build(
+      strings: strings,
+      language: workflow.primary_language
+    )
     workflow
   end
 

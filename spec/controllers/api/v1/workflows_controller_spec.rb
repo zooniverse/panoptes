@@ -386,46 +386,47 @@ describe Api::V1::WorkflowsController, type: :controller do
   describe '#create' do
     let(:test_attr) { :display_name }
     let(:test_attr_value) { 'Test workflow' }
+    let(:create_task_params) do
+      {
+        interest: {
+                   type: "draw",
+                   question: "Draw a Circle",
+                   next: "shape",
+                   tools: [
+                           {value: "red", label: "Red", type: 'point', color: 'red'},
+                           {value: "green", label: "Green", type: 'point', color: 'lime'},
+                           {value: "blue", label: "Blue", type: 'point', color: 'blue'},
+                          ]
+                  },
+        shape: {
+                type: 'multiple',
+                question: "What shape is this galaxy?",
+                answers: [
+                          {value: 'smooth', label: "Smooth"},
+                          {value: 'features', label: "Features"},
+                          {value: 'other', label: 'Star or artifact'}
+                         ],
+                next: nil
+               }
+       }
+    end
     let(:create_params) do
       {
-       workflows: {
-                   display_name: 'Test workflow',
-                   first_task: 'interest',
-                   active: true,
-                   retirement: { criteria: "classification_count" },
-                   aggregation: { public: true },
-                   configuration: { autoplay_subjects: true },
-                   public_gold_standard: true,
-                   tasks: {
-                           interest: {
-                                      type: "draw",
-                                      question: "Draw a Circle",
-                                      next: "shape",
-                                      tools: [
-                                              {value: "red", label: "Red", type: 'point', color: 'red'},
-                                              {value: "green", label: "Green", type: 'point', color: 'lime'},
-                                              {value: "blue", label: "Blue", type: 'point', color: 'blue'},
-                                             ]
-                                     },
-                           shape: {
-                                   type: 'multiple',
-                                   question: "What shape is this galaxy?",
-                                   answers: [
-                                             {value: 'smooth', label: "Smooth"},
-                                             {value: 'features', label: "Features"},
-                                             {value: 'other', label: 'Star or artifact'}
-                                            ],
-                                   next: nil
-                                  }
-                          },
-                   grouped: true,
-                   prioritized: true,
-                   primary_language: 'en',
-                   display_order_position: 1,
-                   links: {
-                           project: project.id.to_s
-                          }
-                  }
+         workflows: {
+                     display_name: 'Test workflow',
+                     first_task: 'interest',
+                     active: true,
+                     retirement: { criteria: "classification_count" },
+                     aggregation: { public: true },
+                     configuration: { autoplay_subjects: true },
+                     public_gold_standard: true,
+                     tasks: create_task_params,
+                     grouped: true,
+                     prioritized: true,
+                     primary_language: 'en',
+                     display_order_position: 1,
+                     links: { project: project.id.to_s }
+                    }
       }
     end
 
@@ -478,6 +479,12 @@ describe Api::V1::WorkflowsController, type: :controller do
       it 'sets the workflow active to false' do
         expect(Workflow.find(json_response["workflows"][0]["id"]).active).to be false
       end
+    end
+
+    context "with an empty task set" do
+      let(:create_task_params) { {} }
+
+      it_behaves_like "is creatable"
     end
   end
 
