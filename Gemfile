@@ -19,7 +19,7 @@ gem 'logstasher', '~> 0.6'
 gem 'honeybadger', '~> 2.0'
 gem 'jquery-rails', '~> 4.0'
 gem 'uglifier', '~> 2.0'
-gem 'sidekiq', '~> 3.0'
+gem 'sidekiq', '= 3.4.2'
 gem 'sinatra', '>= 1.3.0', require: nil
 gem 'aws-sdk-v1', '~> 1.0'
 gem 'json-schema', '~> 2.0'
