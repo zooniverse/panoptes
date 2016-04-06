@@ -77,7 +77,7 @@ namespace :migrate do
 
     desc "Set default value for whitelist upload count"
     task :upload_whitelist_default => :environment do
-      User.select("id").find_in_batches do |batch|
+      User.where(upload_whitelist: nil).select("id").find_in_batches do |batch|
         User.where(id: batch.map(&:id)).update_all(upload_whitelist: false)
         print '.'
       end
