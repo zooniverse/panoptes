@@ -1152,7 +1152,7 @@ CREATE TABLE users (
     subject_limit integer,
     private_profile boolean DEFAULT true,
     tsv tsvector,
-    upload_whitelist boolean DEFAULT false
+    upload_whitelist boolean DEFAULT false NOT NULL
 );
 
 
@@ -2920,4 +2920,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160329144922');
 INSERT INTO schema_migrations (version) VALUES ('20160330142609');
 
 INSERT INTO schema_migrations (version) VALUES ('20160406151657');
+
+INSERT INTO schema_migrations (version) VALUES ('20160408104326');
 
