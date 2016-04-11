@@ -129,4 +129,12 @@ namespace :migrate do
       end
     end
   end
+
+  namespace :project_page do
+    desc "Rename Project page result keys"
+    task :rename_result_pages => :environment do
+      result_pages = ProjectPage.where(url_key: 'result', title: 'Result')
+      result_pages.update_all(url_key: 'results', title: 'Results')
+    end
+  end
 end
