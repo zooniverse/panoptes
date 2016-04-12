@@ -2369,6 +2369,13 @@ CREATE UNIQUE INDEX index_user_groups_on_name ON user_groups USING btree (lower(
 
 
 --
+-- Name: index_user_groups_on_private; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_user_groups_on_private ON user_groups USING btree (private);
+
+
+--
 -- Name: index_user_project_preferences_on_user_id_and_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2922,4 +2929,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160330142609');
 INSERT INTO schema_migrations (version) VALUES ('20160406151657');
 
 INSERT INTO schema_migrations (version) VALUES ('20160408104326');
+
+INSERT INTO schema_migrations (version) VALUES ('20160412125332');
 
