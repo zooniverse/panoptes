@@ -189,7 +189,7 @@ RSpec.describe Subjects::Selector do
         # to the non-logged in queues, use the rate limiter in sidekiq to
         # control how often these happen
         it 'should schedule a dequeue for the non-logged in queue' do
-          expect(DequeueSubjectQueueWorker).to receive(:perform_async)
+          expect(NonLoggedInDequeueSubjectQueueWorker).to receive(:perform_async)
             .with(subject_queue.id, array_including(sms_ids))
           subject.get_subjects
         end
