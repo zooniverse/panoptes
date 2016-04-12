@@ -1140,7 +1140,7 @@ It has the following attributes:
 
 ### Edit a single Project [PUT]
 A User must be the owner of a project or have update
-permissions to edit the resource. Workflow and Subject links may be
+permissions to edit the resource. Workflow and Subject Set links may be
 edited. Removing a subject set or workflow causes the subject set or
 workflow to be destroyed. Adding a workflow or subject set causes
 the original to be copied and a new id to be returned.
@@ -1188,13 +1188,17 @@ The recommended way to edit a project's subject set and workflow
 links.
 
 ### Add a Link [POST]
-The body key must match the link_type parameter. Workflow and Subjects
+The body key must match the link_type parameter. Workflows and Subject Sets
 added in this way will be copied and their id will be returned as part
 of the complete Project representation response.
 
 + Parameters
-  + id (required, integer) ... the id of the project to add
-  + link_type (required, string) ... the name of the link to edit. May only be workflow or subject_set
+  + id (required, integer) - the id of the project to add
+  + link_type (required, string)
+    the name of the link to edit
+        + Members
+            + `workflows`
+            + `subject_sets`
 
 + Request
 
@@ -1224,7 +1228,11 @@ this action.
 
 + Parameters
   + id (required, integer) ... the id of the project to modify
-  + link_type (required, string) ... the name of the link to edit. May only be subject_set or workflow
+  + link_type (required, string)
+    the name of the link to edit
+        + Members
+            + `workflows`
+            + `subject_sets`
   + link_ids (required, string) ... comma separated list of ids to destroy
 
 + Request
