@@ -30,10 +30,9 @@ class Membership < ActiveRecord::Base
   def self.scope_for(action, user, opts={})
     return all if user.is_admin?
     roles, _ = parent_class.roles(action)
-    accessible_groups = user.user_groups.where.overlap(memberships: {roles: roles})
-    query = not_identity.where(user_group_id: accessible_groups)
+    accessible_group_ids = user.user_groups.where.overlap(memberships: {roles: roles}).pluck(:id)
+    query = not_identity.where(user_group_id: accessible_group_ids)
             .or(not_identity.where(user_id: user.id))
-
 
     case action
     when :show, :index
