@@ -33,7 +33,7 @@ module RoleControl
       end
 
       def public_query(private_query, public_flag)
-        query = where(id: private_query)
+        query = where(id: private_query.pluck(:resource_id))
         query = query.or(public_scope) if public_flag
         query
       end

@@ -4,8 +4,8 @@ module RoleControl
       attr_reader :scope, :action, :actor
 
       def initialize(actor, action)
-        @action = action
         @actor = actor
+        @action = action
       end
 
       def to(klass, context={}, add_active_scope: true)
