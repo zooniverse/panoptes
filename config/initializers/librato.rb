@@ -1,0 +1,3 @@
+if ENV["LIBRATO_API_USERNAME"] && ENV["LIBRATO_API_KEY"]
+  Librato::Metrics.authenticate ENV["LIBRATO_API_USERNAME"], ENV["LIBRATO_API_KEY"]
+end
