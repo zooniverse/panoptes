@@ -8,7 +8,7 @@ module Experiments
     attr_accessor :name
 
     def enabled?
-      super
+      (Rails.env.staging? || Rails.env.production?) && Librato::Metrics.client.email.present?
     end
 
     def publish(result)
@@ -30,7 +30,7 @@ module Experiments
     end
 
     def librato
-      @librato ||= Librato::Metrics::Queue.new
+      @librato ||= Librato::Metrics::Queue.new(source: Rails.env)
     end
   end
 end
