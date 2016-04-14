@@ -123,22 +123,6 @@ class Api::V1::ProjectsController < Api::ApiController
     end
   end
 
-  def create_or_update_medium(type, media_create_params=media_params)
-    media_create_params['metadata'] ||= { recipients: [api_user.id] }
-    if medium = controlled_resource.send(type)
-      medium.update!(media_create_params)
-      medium.touch
-      medium
-    else
-      media_create_params['metadata']["state"] = 'creating'
-      controlled_resource.send("create_#{type}!", media_create_params)
-    end
-  end
-
-  def media_params
-    @media_params ||= params.require(:media).permit(:content_type, metadata: [recipients: []])
-  end
-
   def medium_response(medium)
     headers['Location'] = "#{request.protocol}#{request.host_with_port}/api#{medium.location}"
     headers['Last-Modified'] = medium.updated_at.httpdate
@@ -231,13 +215,6 @@ class Api::V1::ProjectsController < Api::ApiController
     visitor = TasksVisitors::ExtractStrings.new
     visitor.visit(urls)
     [urls, visitor.collector]
-  end
-
-  def create_export(export_type)
-    medium = create_or_update_medium("#{export_type}_export".to_sym)
-    dump_worker_klass = "#{export_type.to_s.camelize}DumpWorker".constantize
-    dump_worker_klass.perform_async(controlled_resource.id, medium.id, api_user.id)
-    medium_response(medium)
   end
 
   def context
