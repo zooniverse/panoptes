@@ -73,15 +73,18 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_aggregations_export
-    create_export(:aggregations)
+    medium = Projects::CreateAggregationsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   def create_workflows_export
-    create_export(:workflows)
+    medium = Projects::CreateWorkflowsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   def create_workflow_contents_export
-    create_export(:workflow_contents)
+    medium = Projects::CreateWorkflowContentsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   def create
