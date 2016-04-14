@@ -28,7 +28,7 @@ class CodeExperiment < ActiveRecord::Base
 
   def enabled?
     return false unless Librato::Metrics.client.email.present?
-    enabled_rate > 0 && rand() < enabled_rate
+    enabled_rate > 0 && rand < enabled_rate
   end
 
   def publish(result)
