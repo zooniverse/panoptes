@@ -68,7 +68,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_subjects_export
-    create_export(:subjects)
+    medium = Projects::CreateSubjectsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   def create_aggregations_export
