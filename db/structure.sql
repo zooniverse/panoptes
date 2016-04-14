@@ -212,6 +212,37 @@ ALTER SEQUENCE classifications_id_seq OWNED BY classifications.id;
 
 
 --
+-- Name: code_experiments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE code_experiments (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    enabled_rate double precision DEFAULT 0.0 NOT NULL,
+    always_enabled_for_admins boolean DEFAULT true NOT NULL
+);
+
+
+--
+-- Name: code_experiments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE code_experiments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: code_experiments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE code_experiments_id_seq OWNED BY code_experiments.id;
+
+
+--
 -- Name: collections; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1358,6 +1389,13 @@ ALTER TABLE ONLY classifications ALTER COLUMN id SET DEFAULT nextval('classifica
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY code_experiments ALTER COLUMN id SET DEFAULT nextval('code_experiments_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY collections ALTER COLUMN id SET DEFAULT nextval('collections_id_seq'::regclass);
 
 
@@ -1594,6 +1632,14 @@ ALTER TABLE ONLY authorizations
 
 ALTER TABLE ONLY classifications
     ADD CONSTRAINT classifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: code_experiments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY code_experiments
+    ADD CONSTRAINT code_experiments_pkey PRIMARY KEY (id);
 
 
 --
@@ -1946,6 +1992,13 @@ CREATE INDEX index_classifications_on_user_id ON classifications USING btree (us
 --
 
 CREATE INDEX index_classifications_on_workflow_id ON classifications USING btree (workflow_id);
+
+
+--
+-- Name: index_code_experiments_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_code_experiments_on_name ON code_experiments USING btree (name);
 
 
 --
@@ -2931,4 +2984,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160406151657');
 INSERT INTO schema_migrations (version) VALUES ('20160408104326');
 
 INSERT INTO schema_migrations (version) VALUES ('20160412125332');
+
+INSERT INTO schema_migrations (version) VALUES ('20160414151041');
 
