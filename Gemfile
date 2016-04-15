@@ -39,6 +39,8 @@ gem 'active_interaction', '~> 3.0.1'
 gem 'therubyracer', '~> 0.12'
 gem 'pg', '~> 0.18'
 gem 'zoo_stream', '~> 1.0.1'
+gem 'librato-metrics', '~> 1.6.1'
+gem 'scientist', '~> 1.0.0'
 
 group :production do
   gem 'newrelic_rpm', '~> 3.0', require: false
