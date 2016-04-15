@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workflow, :type => :model do
+describe Workflow, type: :model do
   let(:workflow) { build(:workflow) }
   let(:subject_relation) { create(:workflow_with_subjects) }
   let(:translatable) { create(:workflow_with_contents, build_extra_contents: true) }
@@ -259,19 +259,18 @@ describe Workflow, :type => :model do
       end
     end
 
-    context "when retired count is equal or greater than the subject count" do
+    context "when the workflow is marked finished" do
       before do
-        allow(subject_relation)
-          .to receive(:retired_set_member_subjects_count)
-          .and_return(subject_relation.subjects_count)
+        allow(subject_relation).to receive(:finished_at).and_return(Time.zone.now)
       end
 
       it 'should be true' do
         expect(subject_relation).to be_finished
       end
+    end
 
-      it 'should be false when the subject_count is 0' do
-        allow(subject_relation).to receive(:subjects_count).and_return(0)
+    context "when the workflow is not marked finished" do
+      it 'should be false' do
         expect(subject_relation).not_to be_finished
       end
     end

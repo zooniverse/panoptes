@@ -38,7 +38,7 @@ describe SetMemberSubject, :type => :model do
       end
 
       before(:each) do
-        workflow.update!(retired_set_member_subjects_count: sms.length)
+        allow(workflow).to receive(:finished_at).and_return(Time.zone.now)
         sms.each { |i| workflow.retire_subject(i.subject) }
       end
 

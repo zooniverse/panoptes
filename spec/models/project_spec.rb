@@ -101,6 +101,17 @@ describe Project, :type => :model do
     end
   end
 
+  describe "#live_subject_sets" do
+    let(:project) { create(:full_project) }
+    let!(:unlinked_subject_set) do
+      create(:subject_set, project: project)
+    end
+
+    it "should have many subject_sets" do
+      expect(project.live_subject_sets).not_to include(unlinked_subject_set)
+    end
+  end
+
   describe "#classifications" do
     let(:relation_instance) { project }
 
@@ -244,12 +255,18 @@ describe Project, :type => :model do
   end
 
   describe "#finished?" do
-    it 'should be true when the subject count and retired count are equal' do
+    it 'should be true when all the linked workflows are marked finished' do
       subject_relation.workflows.each do |w|
-        w.update!(retired_set_member_subjects_count: w.subjects_count)
+        allow(w).to receive(:finished_at).and_return(Time.zone.now)
       end
 
       expect(subject_relation).to be_finished
+    end
+
+    it 'should be false when any of the linked workflows are not marked finished' do
+      w = subject_relation.workflows.last
+      allow(w).to receive(:finished_at).and_return(Time.zone.now)
+      expect(subject_relation).not_to be_finished
     end
   end
 

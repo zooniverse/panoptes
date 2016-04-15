@@ -2,7 +2,6 @@ class Workflow < ActiveRecord::Base
   include Linkable
   include Translatable
   include RoleControl::ParentalControlled
-  include SubjectCounts
   include ExtendedCacheKey
   include RankedModel
   include CacheModelVersion
@@ -80,10 +79,6 @@ class Workflow < ActiveRecord::Base
     self.retirement.presence || DEFAULT_RETIREMENT_OPTIONS
   end
 
-  def retired_subjects_count
-    retired_set_member_subjects_count
-  end
-
   def selection_strategy
     configuration.with_indifferent_access[:selection_strategy].try(:to_sym)
   end
@@ -100,6 +95,22 @@ class Workflow < ActiveRecord::Base
       false
     else
       cellect_size_subject_space?
+    end
+  end
+
+  def subjects_count
+    @subject_count ||= subject_sets.sum :set_member_subjects_count
+  end
+
+  def retired_subjects_count
+    retired_set_member_subjects_count
+  end
+
+  def finished?
+    @finished ||= if subject_sets.empty? || subjects_count == 0
+      false
+    else
+      finished_at.present?
     end
   end
 end
