@@ -43,7 +43,7 @@ shared_examples "has an extended cache key" do |associations, resource_methods|
       end
 
       it "should only include the resource cache key" do
-        resource_cache_key = /#{cached_resource.model_name.cache_key}\/\w+$/
+        resource_cache_key = /#{cached_resource.model_name.cache_key}\/[\w-]+$/
         expect(cache_key_result).to match(resource_cache_key)
       end
     end
@@ -70,7 +70,7 @@ shared_examples "has an extended cache key" do |associations, resource_methods|
       end
 
       it "should include all the association keys" do
-        assoc_regex = cached_resource.send(*associations).map do |relation|
+        cached_resource.send(*associations).map do |relation|
           expect(cache_key_result).to match(/#{relation.model_name.cache_key}\/\w+/)
         end
       end
