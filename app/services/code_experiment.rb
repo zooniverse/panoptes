@@ -16,7 +16,12 @@ class CodeExperiment
   end
 
   def self.reporter
-    @reporter ||= CodeExperiments::LibratoReporter.new
+    @reporter ||= case
+    when Rails.env.development? || Rails.env.test?
+      CodeExperiments::LogReporter.new
+    else
+      CodeExperiments::LibratoReporter.new
+    end
   end
 
   def self.reporter=(reporter)

@@ -158,10 +158,15 @@ describe SetMemberSubject, :type => :model do
     let(:smses){ workflow.set_member_subjects }
     let(:uss) do
       create(:user_seen_subject, workflow: workflow, user: user, subject_ids: subject_ids)
+
+      subject_ids.each do |subject_id|
+        create(:classification, subjects: Subject.where(id: subject_id), user: user, workflow: workflow)
+      end
     end
     let!(:another_workflow_sms) { create(:set_member_subject) }
 
     before do
+      allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
       uss
     end
 
