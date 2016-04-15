@@ -1,5 +1,6 @@
 class CodeExperiment < ActiveRecord::Base
   include Scientist::Experiment
+  CACHE_TIME = 5.minutes
 
   has_paper_trail
 
@@ -12,18 +13,27 @@ class CodeExperiment < ActiveRecord::Base
 
     if cache = Thread.current[:code_experiment_cache][name]
       load_time, experiment = cache
-      if load_time < 5.minutes.ago
-        experiment = find_or_create_by!(name: name)
-        Thread.current[:code_experiment_cache][name] = [Time.zone.now, experiment]
+      if load_time < CACHE_TIME.ago
+        experiment = reload_cache_for(name)
       end
     else
-      experiment = find_or_create_by!(name: name)
-      Thread.current[:code_experiment_cache][name] = [Time.zone.now, experiment]
+      experiment = reload_cache_for(name)
     end
 
     experiment
   rescue ActiveRecord::RecordNotUnique
     new(name: name, enabled_rate: 0)
+  end
+
+  def self.reset_cache!
+    Thread.current[:code_experiment_cache] = nil
+  end
+
+  def self.reload_cache_for(name)
+    experiment = find_or_create_by!(name: name)
+    experiment.readonly!
+    Thread.current[:code_experiment_cache][name] = [Time.zone.now, experiment]
+    experiment
   end
 
   def enabled?
