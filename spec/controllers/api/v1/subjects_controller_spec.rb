@@ -193,10 +193,9 @@ describe Api::V1::SubjectsController, type: :controller do
           end
         end
 
-        context "a workflow is finished" do
+        context "with a finished workflow" do
           let!(:workflow) do
-            create(:workflow_with_subject_sets,
-                   retired_set_member_subjects_count: 100)
+            create(:workflow_with_subject_sets, finished_at: Time.zone.now)
           end
 
           let!(:sms) do

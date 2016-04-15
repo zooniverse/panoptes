@@ -1,7 +1,6 @@
 class Project < ActiveRecord::Base
   include RoleControl::Owned
   include RoleControl::Controlled
-  include SubjectCounts
   include Activatable
   include Linkable
   include Translatable
@@ -17,6 +16,7 @@ class Project < ActiveRecord::Base
   has_many :field_guides
   has_many :workflows
   has_many :subject_sets, dependent: :destroy
+  has_many :live_subject_sets, through: :workflows, source: 'subject_sets'
   has_many :classifications
   has_many :subjects
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
@@ -126,5 +126,17 @@ class Project < ActiveRecord::Base
                      end
       ProjectRequestEmailWorker.perform_async(request_type, id) if request_type
     end
+  end
+
+  def subjects_count
+    @subject_count ||= live_subject_sets.sum :set_member_subjects_count
+  end
+
+  def retired_subjects_count
+    @retired_subject_count ||= workflows.sum :retired_set_member_subjects_count
+  end
+
+  def finished?
+    @finished ||= workflows.all?(&:finished?)
   end
 end
