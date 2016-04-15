@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe CodeExperiment do
+describe CodeExperimentConfig do
   include ActiveSupport::Testing::TimeHelpers
 
   before do
@@ -14,7 +14,7 @@ describe CodeExperiment do
 
     it 'fetches an existing record' do
       experiment = described_class.create! name: 'foo'
-      expect(described_class.cache_or_create('foo')).to eq(experiment)
+      expect(described_class.cache_or_create('foo')[:id]).to eq(experiment.id)
     end
 
     it 'does not fetch multiple times within a short period' do
@@ -22,7 +22,7 @@ describe CodeExperiment do
       described_class.update_all enabled_rate: 1.0 # simulate a change made by another process
 
       experiment = described_class.cache_or_create('foo')
-      expect(experiment.enabled_rate).to eq(0.0)
+      expect(experiment[:enabled_rate]).to eq(0.0)
     end
 
     it 'updates the cache after a period of time' do
@@ -31,37 +31,8 @@ describe CodeExperiment do
 
       travel_to 10.minutes.from_now do
         experiment = described_class.cache_or_create('foo')
-        expect(experiment.enabled_rate).to eq(1.0)
+        expect(experiment[:enabled_rate]).to eq(1.0)
       end
-    end
-
-    it 'returns immutable models' do
-      experiment = described_class.cache_or_create('foo')
-      expect { experiment.update! enabled_rate: 1.0 }.to raise_error(ActiveRecord::ReadOnlyRecord)
-    end
-  end
-
-  describe 'running experiments' do
-    include Scientist
-
-    it 'runs multiple times' do
-      allow(CodeExperiment.reporter).to receive(:publish)
-
-      CodeExperiment.create! name: 'test', enabled_rate: 1.0
-
-      result1 = science "test" do |e|
-        e.use { 1 }
-        e.try { 1 }
-      end
-
-      result2 = science "test" do |e|
-        e.use { 1 }
-        e.try { 2 }
-      end
-
-      expect(result1).to eq(1)
-      expect(result2).to eq(1)
-      expect(CodeExperiment.reporter).to have_received(:publish).twice
     end
   end
 end

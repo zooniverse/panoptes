@@ -1,4 +1,4 @@
-module Experiments
+module CodeExperiments
   class LibratoReporter
     def initialize
       @librato = Librato::Metrics::Queue.new(source: Rails.env)

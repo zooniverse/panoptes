@@ -212,10 +212,10 @@ ALTER SEQUENCE classifications_id_seq OWNED BY classifications.id;
 
 
 --
--- Name: code_experiments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: code_experiment_configs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE code_experiments (
+CREATE TABLE code_experiment_configs (
     id integer NOT NULL,
     name character varying NOT NULL,
     enabled_rate double precision DEFAULT 0.0 NOT NULL,
@@ -224,10 +224,10 @@ CREATE TABLE code_experiments (
 
 
 --
--- Name: code_experiments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: code_experiment_configs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE code_experiments_id_seq
+CREATE SEQUENCE code_experiment_configs_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -236,10 +236,10 @@ CREATE SEQUENCE code_experiments_id_seq
 
 
 --
--- Name: code_experiments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: code_experiment_configs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE code_experiments_id_seq OWNED BY code_experiments.id;
+ALTER SEQUENCE code_experiment_configs_id_seq OWNED BY code_experiment_configs.id;
 
 
 --
@@ -1389,7 +1389,7 @@ ALTER TABLE ONLY classifications ALTER COLUMN id SET DEFAULT nextval('classifica
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY code_experiments ALTER COLUMN id SET DEFAULT nextval('code_experiments_id_seq'::regclass);
+ALTER TABLE ONLY code_experiment_configs ALTER COLUMN id SET DEFAULT nextval('code_experiment_configs_id_seq'::regclass);
 
 
 --
@@ -1635,11 +1635,11 @@ ALTER TABLE ONLY classifications
 
 
 --
--- Name: code_experiments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: code_experiment_configs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY code_experiments
-    ADD CONSTRAINT code_experiments_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY code_experiment_configs
+    ADD CONSTRAINT code_experiment_configs_pkey PRIMARY KEY (id);
 
 
 --
@@ -1995,10 +1995,10 @@ CREATE INDEX index_classifications_on_workflow_id ON classifications USING btree
 
 
 --
--- Name: index_code_experiments_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_code_experiment_configs_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_code_experiments_on_name ON code_experiments USING btree (name);
+CREATE UNIQUE INDEX index_code_experiment_configs_on_name ON code_experiment_configs USING btree (name);
 
 
 --
