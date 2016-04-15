@@ -40,4 +40,28 @@ describe CodeExperiment do
       expect { experiment.update! enabled_rate: 1.0 }.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
   end
+
+  describe 'running experiments' do
+    include Scientist
+
+    it 'runs multiple times' do
+      allow(CodeExperiment.reporter).to receive(:publish)
+
+      CodeExperiment.create! name: 'test', enabled_rate: 1.0
+
+      result1 = science "test" do |e|
+        e.use { 1 }
+        e.try { 1 }
+      end
+
+      result2 = science "test" do |e|
+        e.use { 1 }
+        e.try { 2 }
+      end
+
+      expect(result1).to eq(1)
+      expect(result2).to eq(1)
+      expect(CodeExperiment.reporter).to have_received(:publish).twice
+    end
+  end
 end
