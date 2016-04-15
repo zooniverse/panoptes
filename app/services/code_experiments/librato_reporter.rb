@@ -1,5 +1,7 @@
 module CodeExperiments
   class LibratoReporter
+    attr_reader :librato
+
     def initialize
       @librato = Librato::Metrics::Queue.new(source: Rails.env)
     end
@@ -22,6 +24,8 @@ module CodeExperiments
       end
 
       librato.submit
+    rescue StandardError => e
+      Honeybadger.notify(e)
     end
   end
 end
