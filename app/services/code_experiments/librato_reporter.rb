@@ -24,6 +24,8 @@ module CodeExperiments
       end
 
       librato.submit
+    rescue StandardError => e
+      Honeybadger.notify(e)
     end
   end
 end
