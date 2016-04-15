@@ -1,5 +1,7 @@
 module CodeExperiments
   class LibratoReporter
+    attr_reader :librato
+
     def initialize
       @librato = Librato::Metrics::Queue.new(source: Rails.env)
     end
