@@ -21,7 +21,7 @@ class CodeExperimentConfig < ActiveRecord::Base
 
     config.with_indifferent_access
   rescue ActiveRecord::RecordNotUnique
-    new(name: name, enabled_rate: 0)
+    new(name: name, enabled_rate: 0).attributes
   end
 
   def self.reset_cache!

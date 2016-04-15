@@ -2,6 +2,7 @@ class CodeExperiment
   include ActiveModel::Model
   include Scientist::Experiment
 
+  # TODO: Implement always_enabled_for_admins
   attr_accessor :id, :name, :enabled_rate, :always_enabled_for_admins, :cached_at
 
   def self.run(name, opts={})
