@@ -878,7 +878,6 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:test_attr_value) { "project_classifications_export" }
 
       it_behaves_like "is creatable", :create_classifications_export
-      it_behaves_like "export create", ClassificationsDumpWorker, "classifications_export"
     end
 
     describe "#create_aggregations_export" do
@@ -887,7 +886,6 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:content_type) { "application/x-gzip" }
 
       it_behaves_like "is creatable", :create_aggregations_export
-      it_behaves_like "export create", AggregationsDumpWorker, "aggregations_export"
     end
 
     describe "#create_subjects_export" do
@@ -895,7 +893,6 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:test_attr_value) { "project_subjects_export" }
 
       it_behaves_like "is creatable", :create_subjects_export
-      it_behaves_like "export create", SubjectsDumpWorker, "subjects_export"
     end
 
     describe "#create_workflows_export" do
@@ -903,7 +900,6 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:test_attr_value) { "project_workflows_export" }
 
       it_behaves_like "is creatable", :create_workflows_export
-      it_behaves_like "export create", WorkflowsDumpWorker, "workflows_export"
     end
 
     describe "#create_workflow_contents_export" do
@@ -911,7 +907,6 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:test_attr_value) { "project_workflow_contents_export" }
 
       it_behaves_like "is creatable", :create_workflow_contents_export
-      it_behaves_like "export create", WorkflowContentsDumpWorker, "workflow_contents_export"
     end
   end
 

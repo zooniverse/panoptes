@@ -63,23 +63,28 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_classifications_export
-    create_export(:classifications)
+    medium = Projects::CreateClassificationsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   def create_subjects_export
-    create_export(:subjects)
+    medium = Projects::CreateSubjectsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   def create_aggregations_export
-    create_export(:aggregations)
+    medium = Projects::CreateAggregationsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   def create_workflows_export
-    create_export(:workflows)
+    medium = Projects::CreateWorkflowsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   def create_workflow_contents_export
-    create_export(:workflow_contents)
+    medium = Projects::CreateWorkflowContentsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   def create
@@ -116,22 +121,6 @@ class Api::V1::ProjectsController < Api::ApiController
     unless eager_loads.empty?
       @controlled_resources = controlled_resources.eager_load(*eager_loads)
     end
-  end
-
-  def create_or_update_medium(type, media_create_params=media_params)
-    media_create_params['metadata'] ||= { recipients: [api_user.id] }
-    if medium = controlled_resource.send(type)
-      medium.update!(media_create_params)
-      medium.touch
-      medium
-    else
-      media_create_params['metadata']["state"] = 'creating'
-      controlled_resource.send("create_#{type}!", media_create_params)
-    end
-  end
-
-  def media_params
-    @media_params ||= params.require(:media).permit(:content_type, metadata: [recipients: []])
   end
 
   def medium_response(medium)
@@ -226,13 +215,6 @@ class Api::V1::ProjectsController < Api::ApiController
     visitor = TasksVisitors::ExtractStrings.new
     visitor.visit(urls)
     [urls, visitor.collector]
-  end
-
-  def create_export(export_type)
-    medium = create_or_update_medium("#{export_type}_export".to_sym)
-    dump_worker_klass = "#{export_type.to_s.camelize}DumpWorker".constantize
-    dump_worker_klass.perform_async(controlled_resource.id, medium.id, api_user.id)
-    medium_response(medium)
   end
 
   def context
