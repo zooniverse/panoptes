@@ -137,4 +137,13 @@ namespace :migrate do
       result_pages.update_all(url_key: 'results', title: 'Results')
     end
   end
+
+  namespace :workflow do
+    desc 'Fill workflow launch dates using project launch date'
+    task :launch_date => :environment do
+      Project.where("launch_date IS NOT NULL").find_each do |project|
+        project.workflows.where(active: true).update_all(launch_date: project.launch_date)
+      end
+    end
+  end
 end

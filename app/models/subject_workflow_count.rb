@@ -21,6 +21,17 @@ class SubjectWorkflowCount < ActiveRecord::Base
     where(subject_id: subject_id, workflow_id: workflow_id).first
   end
 
+  def count_query
+    classifications.non_anonymous.count("DISTINCT(user_id)") + classifications.anonymous.count
+  end
+
+  def classifications
+    Classification
+      .joins("INNER JOIN classification_subjects ON classification_subjects.classification_id = classifications.id")
+      .where(classification_subjects: {subject_id: subject_id})
+      .where(workflow_id: workflow_id)
+  end
+
   def retire?
     workflow.retirement_scheme.retire?(self)
   end
