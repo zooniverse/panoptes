@@ -28,6 +28,37 @@ RSpec.describe SubjectWorkflowCount, type: :model do
     end
   end
 
+  describe '#count_query' do
+    let(:subject) { create :subject }
+    let(:workflow) { create :workflow }
+    let(:subject_workflow_count) { described_class.new(subject: subject, workflow: workflow) }
+
+    it 'counts classifications' do
+      create(:classification, subjects: [subject], workflow: workflow, user: create(:user))
+      create(:classification, subjects: [subject], workflow: workflow, user: create(:user))
+      create(:classification, subjects: [create(:subject)], workflow: workflow, user: create(:user))
+      create(:classification, subjects: [subject], workflow: create(:workflow), user: create(:user))
+
+      expect(subject_workflow_count.count_query).to eq(2)
+    end
+
+    it 'counts unique users only' do
+      user = create(:user)
+      create(:classification, subjects: [subject], workflow: workflow, user: user)
+      create(:classification, subjects: [subject], workflow: workflow, user: user)
+
+      expect(subject_workflow_count.count_query).to eq(1)
+    end
+
+    it 'counts all anonymous users as unique users' do
+      create(:classification, subjects: [subject], workflow: workflow, user: nil, user_ip: '1.2.3.4')
+      create(:classification, subjects: [subject], workflow: workflow, user: nil, user_ip: '1.2.3.4') # NAT means this can very well be a different person
+      create(:classification, subjects: [subject], workflow: workflow, user: nil, user_ip: '2.3.4.5')
+
+      expect(subject_workflow_count.count_query).to eq(3)
+    end
+  end
+
   describe '#by_set' do
     it 'retrieves by subject association' do
       sms = create(:set_member_subject)

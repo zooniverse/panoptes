@@ -24,6 +24,9 @@ class Classification < ActiveRecord::Base
   scope :complete, -> { where(completed: true) }
   scope :gold_standard, -> { where("gold_standard IS TRUE") }
 
+  scope :anonymous, -> { where(user_id: nil) }
+  scope :non_anonymous, -> { where.not(user_id: nil) }
+
   def self.scope_for(action, user, opts={})
     return all if user.is_admin? && action != :gold_standard
     case action
