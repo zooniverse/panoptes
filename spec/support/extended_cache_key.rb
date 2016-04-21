@@ -27,16 +27,38 @@ shared_examples "has an extended cache key" do |associations, resource_methods|
 
     it "should store the resource methods" do
       resource_class.cache_by_resource_method(*resource_methods)
-      expect(resource_class.included_resource_methods).to match_array(resource_methods)
+      expect(resource_class.included_resource_methods)
+        .to match_array(resource_methods)
     end
   end
 
   describe "#cache_key" do
+    shared_examples "it should raise an error" do |method, result|
+      it "should raise an error" do
+        allow(cached_resource.class).to receive(method).and_return([result])
+        expect {
+          cache_key_result
+        }.to raise_error(NoMethodError)
+      end
+    end
+
     let(:cache_key_result) { cached_resource.cache_key }
+
+    context "when the class method name is invalid" do
+      it_behaves_like "it should raise an error",
+        :included_associations,
+        :unknown_class_method
+    end
+
+    context "when the instance method name is invalid" do
+      it_behaves_like "it should raise an error",
+        :included_resource_methods,
+        :unknown_instance_method
+    end
 
     context "when no extra cache key directives are set" do
 
-      before(:each) do
+      before do
         %i(included_associations included_resource_methods).each do |cache_key|
           allow(cached_resource.class).to receive(cache_key).and_return([])
         end
@@ -51,15 +73,18 @@ shared_examples "has an extended cache key" do |associations, resource_methods|
     # by default or else the model spec won't need the shared helpers
     context "when extra cache key directives are set" do
 
-      before(:each) do
+      before do
         resource_association_instances.each do |instance|
           stubbed_cache_key = resource_cache_key(instance)
-          allow_any_instance_of(instance.class).to receive(:cache_key).and_return(stubbed_cache_key)
+          allow_any_instance_of(instance.class)
+            .to receive(:cache_key)
+            .and_return(stubbed_cache_key)
         end
       end
 
       it "should include the resource key" do
-        expect(cache_key_result).to match(/#{cached_resource.model_name.cache_key}\/\w+/)
+        expect(cache_key_result)
+          .to match(/#{cached_resource.model_name.cache_key}\/\w+/)
       end
 
       it "should include the resource method key" do
@@ -71,7 +96,8 @@ shared_examples "has an extended cache key" do |associations, resource_methods|
 
       it "should include all the association keys" do
         cached_resource.send(*associations).map do |relation|
-          expect(cache_key_result).to match(/#{relation.model_name.cache_key}\/\w+/)
+          expect(cache_key_result)
+            .to match(/#{relation.model_name.cache_key}\/\w+/)
         end
       end
     end

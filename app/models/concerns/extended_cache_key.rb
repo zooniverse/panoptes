@@ -2,24 +2,20 @@ module ExtendedCacheKey
   extend ActiveSupport::Concern
 
   included do
-    @included_associations = []
-    @included_resource_methods = []
+    @included_associations = Set.new
+    @included_resource_methods = Set.new
   end
 
   module ClassMethods
     def cache_by_association(*associations)
       associations.each do |association|
-        if self.reflect_on_association(association) && !@included_associations.include?(association)
-          @included_associations << association
-        end
+        @included_associations << association
       end
     end
 
     def cache_by_resource_method(*resource_methods)
       resource_methods.each do |method|
-        if self.method_defined?(method) && !@included_resource_methods.include?(method)
-          @included_resource_methods << method
-        end
+        @included_resource_methods << method
       end
     end
 
