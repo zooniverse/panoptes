@@ -70,16 +70,18 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       describe "params" do
-        let(:project_owner) { create(:user) }
+        let(:owner) { create(:user) }
         let(:new_project) do
-          create(:full_project, display_name: "Non-test project", owner: project_owner)
+          create(:full_project, display_name: "Non-test project", owner: owner)
         end
         let(:resource) { new_project }
         let(:ids) { json_response["projects"].map{ |p| p["id"] } }
+        let(:index_request) do
+          get :index, index_options
+        end
 
         before(:each) do
           projects
-          get :index, index_options
         end
 
         describe "search" do
@@ -89,6 +91,7 @@ describe Api::V1::ProjectsController, type: :controller do
             let(:index_options) { {search: resource.display_name[0..2]} }
 
             it "should respond with the most relevant item first" do
+              index_request
               expect(json_response[api_resource_name].length).to eq(1)
             end
           end
@@ -101,6 +104,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
 
           it "should return only serialise the card data" do
+            index_request
             card_keys = json_response[api_resource_name].map(&:keys).uniq.flatten
             expect(card_keys).to match_array(card_attrs)
           end
@@ -112,6 +116,10 @@ describe Api::V1::ProjectsController, type: :controller do
              create(:tag, name: "youreout", resource: beta_resource)]
           end
           let(:tag) { tags.first }
+
+          before do
+            index_request
+          end
 
           describe "fuzzy filter by tag name" do
             context "with full tag" do
@@ -158,228 +166,172 @@ describe Api::V1::ProjectsController, type: :controller do
           end
         end
 
-        describe "include avatar and background" do
-          let(:index_options) do
-            resource
-            {include: 'avatar,background'}
-          end
+        describe "filtering" do
+          let(:role_filter_resource) { beta_resource }
+          let(:role_filter_user) { user }
 
-          it 'should include avatar' do
-            expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
-            .to include(new_project.avatar.id.to_s)
-          end
+          it_behaves_like "filters by owner"
+          it_behaves_like "filters by current user roles"
 
-          it 'should include background' do
-            expect(json_response["linked"]["backgrounds"].map{ |r| r['id'] })
-            .to include(new_project.background.id.to_s)
-          end
-        end
-
-        describe "include classifications_export" do
-          let(:index_options) { {include: 'classifications_export'} }
-          it 'should not allow classifications_export to be included' do
-            expect(response).to have_http_status(:unprocessable_entity)
-          end
-        end
-
-        describe "filter by beta" do
-          context "for beta projects" do
-            let(:index_options) do
-              beta_resource
-              { beta_approved: "true" }
+          context "with the index request before" do
+            before do
+              index_request
             end
 
-            it "should respond with the beta project" do
-              expect(Project.find(ids)).to include(beta_resource)
+            describe "beta" do
+              context "for beta projects" do
+                let(:index_options) do
+                  beta_resource
+                  { beta_approved: "true" }
+                end
+
+                it "should respond with the beta project" do
+                  expect(Project.find(ids)).to include(beta_resource)
+                end
+
+                it 'should return projects in project rank order' do
+                  ranked_ids = Project.where(beta_approved: true, private: false).rank(:beta_row_order).pluck(:id).map(&:to_s)
+                  expect(ids).to match_array(ranked_ids)
+                end
+              end
+
+              context "for non-beta projects" do
+                let(:index_options) { { beta_approved: "false" } }
+
+                it "should not have beta projects" do
+                  ids = json_response["projects"].map{ |p| p["id"] }
+                  expect(Project.find(ids)).to_not include(beta_resource)
+                end
+              end
             end
 
-            it 'should return projects in project rank order' do
-              ranked_ids = Project.where(beta_approved: true, private: false).rank(:beta_row_order).pluck(:id).map(&:to_s)
-              expect(ids).to match_array(ranked_ids)
-            end
-          end
+            describe "approved" do
+              context "for unapproved projects" do
+                let(:index_options) do
+                  unapproved_resource
+                  { launch_approved: "false" }
+                end
 
-          context "for non-beta projects" do
-            let(:index_options) { { beta_approved: "false" } }
+                it "should respond with the unapproved project" do
+                  expect(Project.find(ids)).to include(unapproved_resource)
+                end
+              end
 
-            it "should not have beta projects" do
-              ids = json_response["projects"].map{ |p| p["id"] }
-              expect(Project.find(ids)).to_not include(beta_resource)
-            end
-          end
-        end
+              context "for approved projects" do
+                let(:index_options) { { launch_approved: "true" } }
+                it "should not have unapproved projects" do
+                  expect(Project.find(ids)).to_not include(unapproved_resource)
+                end
 
-        describe "filter by approved" do
-          context "for unapproved projects" do
-            let(:index_options) do
-              unapproved_resource
-              { launch_approved: "false" }
-            end
-
-            it "should respond with the unapproved project" do
-              expect(Project.find(ids)).to include(unapproved_resource)
-            end
-          end
-
-          context "for approved projects" do
-            let(:index_options) { { launch_approved: "true" } }
-            it "should not have unapproved projects" do
-              expect(Project.find(ids)).to_not include(unapproved_resource)
+                it 'should return projects in project rank order' do
+                  ranked_ids = Project.active.where(launch_approved: true, private: false).rank(:launched_row_order).pluck(:id).map(&:to_s)
+                  expect(ids).to match_array(ranked_ids)
+                end
+              end
             end
 
-            it 'should return projects in project rank order' do
-              ranked_ids = Project.active.where(launch_approved: true, private: false).rank(:launched_row_order).pluck(:id).map(&:to_s)
-              expect(ids).to match_array(ranked_ids)
-            end
-          end
-        end
+            describe "display_name" do
+              let(:index_options) { { display_name: new_project.display_name } }
 
-        describe "filter by owner" do
-          let(:index_options) do
-            resource
-            { owner: project_owner.login }
-          end
+              it "should respond with 1 item" do
+                expect(json_response[api_resource_name].length).to eq(1)
+              end
 
-          it "should respond with 1 item" do
-            expect(json_response[api_resource_name].length).to eq(1)
-          end
-
-          it "should respond with the correct item" do
-            owner_id = json_response[api_resource_name][0]['links']['owner']['id']
-            expect(owner_id).to eq(new_project.owner.id.to_s)
-          end
-
-          context "when the project owner name has a different case to the identity group" do
-            let!(:index_options) do
-              resource
-              { owner: [project_owner.login.upcase, 'SOMETHING'].join(',') }
+              it "should respond with the correct item" do
+                project_name = json_response[api_resource_name][0]['display_name']
+                expect(project_name).to eq(new_project.display_name)
+              end
             end
 
-            it "should respond with 1 item" do
-              expect(json_response[api_resource_name].length).to eq(1)
+            describe "slug" do
+              let(:index_options) { { slug: new_project.slug } }
+
+              it "should respond with 1 item" do
+                expect(json_response[api_resource_name].length).to eq(1)
+              end
+
+              it "should respond with the correct item" do
+                project_slug = json_response[api_resource_name][0]['slug']
+                expect(project_slug).to eq(new_project.slug)
+              end
             end
 
-            it "should respond with the correct item" do
-              owner_id = json_response[api_resource_name][0]['links']['owner']['id']
-              expect(owner_id).to eq(new_project.owner.id.to_s)
-            end
-          end
-        end
+            describe "slug & owner" do
+              let!(:filtered_project) do
+                projects.first.owner = owner
+                projects.first.save!
+                projects.first
+              end
 
-        describe "filter by current_user_roles" do
-          let(:index_options) do
-            collab_acls
-            { current_user_roles: 'owner,collaborator' }
-          end
-          let(:collab_acls) do
-            create(:access_control_list,
-                   resource: beta_resource,
-                   user_group: user.identity_group,
-                   roles: ["viewer"])
-            create(:access_control_list,
-                   resource: new_project,
-                   user_group: user.identity_group,
-                   roles: ["collaborator"])
-          end
-          let(:response_ids) { json_response[api_resource_name].map{ |p| p['id'] } }
+              let(:index_options) do
+                {owner: owner.login, slug: filtered_project.slug}
+              end
 
-          it "should respond with 3 items" do
-            expect(json_response[api_resource_name].length).to eq(3)
-          end
+              it "should respond with 1 item" do
+                expect(json_response[api_resource_name].length).to eq(1)
+              end
 
-          it 'should not have a project where the user has a different role' do
-            expect(response_ids).to_not include(beta_resource.id.to_s)
-          end
-
-          it "should respond with the correct item" do
-            expect(response_ids).to include(new_project.id.to_s, *projects.map(&:id).map(&:to_s))
-          end
-
-          context "with just the owner role filter" do
-            let(:index_options) { { current_user_roles: 'owner' } }
-
-            it "should respond with 2 items" do
-              expect(json_response[api_resource_name].length).to eq(2)
+              it "should respond with the correct item" do
+                project_name = json_response[api_resource_name][0]['display_name']
+                expect(project_name).to eq(filtered_project.display_name)
+              end
             end
 
-          end
-        end
+            describe "filter by state"  do
+              let(:projects) do
+                create_list(:project_with_contents, 2, owner: user).tap do |list|
+                  list[0].paused!
+                end
+              end
 
-        describe "filter by display_name" do
-          let(:index_options) { { display_name: new_project.display_name } }
+              let(:filtered_project) do
+                projects.first
+              end
 
-          it "should respond with 1 item" do
-            expect(json_response[api_resource_name].length).to eq(1)
-          end
+              let(:index_options) { { state: "paused" } }
 
-          it "should respond with the correct item" do
-            project_name = json_response[api_resource_name][0]['display_name']
-            expect(project_name).to eq(new_project.display_name)
-          end
-        end
+              it "should respond with 1 item" do
+                expect(json_response[api_resource_name].length).to eq(1)
+              end
 
-        describe "filter by slug" do
-          let(:index_options) { { slug: new_project.slug } }
-
-          it "should respond with 1 item" do
-            expect(json_response[api_resource_name].length).to eq(1)
-          end
-
-          it "should respond with the correct item" do
-            project_slug = json_response[api_resource_name][0]['slug']
-            expect(project_slug).to eq(new_project.slug)
-          end
-        end
-
-        describe "filter by state"  do
-          let(:projects) do
-            create_list(:project_with_contents, 2, owner: user).tap do |list|
-              list[0].paused!
+              it "should respond with the correct item" do
+                project_state = json_response[api_resource_name][0]['state']
+                expect(project_state).to eq(filtered_project.state)
+              end
             end
-          end
-
-          let(:filtered_project) do
-            projects.first
-          end
-
-          let(:index_options) { { state: "paused" } }
-
-          it "should respond with 1 item" do
-            expect(json_response[api_resource_name].length).to eq(1)
-          end
-
-          it "should respond with the correct item" do
-            project_state = json_response[api_resource_name][0]['state']
-            expect(project_state).to eq(filtered_project.state)
-          end
-        end
-
-        describe "filter by slug & owner" do
-          let!(:filtered_project) do
-            projects.first.owner = project_owner
-            projects.first.save!
-            projects.first
-          end
-
-          let(:index_options) do
-            {owner: project_owner.login, slug: filtered_project.slug}
-          end
-
-          it "should respond with 1 item" do
-            expect(json_response[api_resource_name].length).to eq(1)
-          end
-
-          it "should respond with the correct item" do
-            project_name = json_response[api_resource_name][0]['display_name']
-            expect(project_name).to eq(filtered_project.display_name)
           end
         end
       end
 
       describe "include params" do
-        before(:each) do
+        before do
           project
           get :index, { include: includes }
+        end
+
+        describe "include avatar and background" do
+          let(:project) do
+            create(:full_project, display_name: "Myproject")
+          end
+          let(:includes) { 'avatar,background' }
+
+          it 'should include avatar' do
+            expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
+            .to include(project.avatar.id.to_s)
+          end
+
+          it 'should include background' do
+            expect(json_response["linked"]["backgrounds"].map{ |r| r['id'] })
+            .to include(project.background.id.to_s)
+          end
+        end
+
+        describe "include classifications_export" do
+          let(:includes) { 'classifications_export' }
+
+          it 'should not allow classifications_export to be included' do
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
         end
 
         context "when the serializer models are known" do
