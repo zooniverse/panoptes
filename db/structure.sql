@@ -1334,7 +1334,8 @@ CREATE TABLE workflows (
     finished_at timestamp without time zone,
     completeness double precision DEFAULT 0.0 NOT NULL,
     activity integer DEFAULT 0 NOT NULL,
-    current_version_number character varying
+    current_version_number character varying,
+    launch_date timestamp without time zone
 );
 
 
@@ -2995,4 +2996,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160412125332');
 INSERT INTO schema_migrations (version) VALUES ('20160414151041');
 
 INSERT INTO schema_migrations (version) VALUES ('20160415163712');
+
+INSERT INTO schema_migrations (version) VALUES ('20160418161009');
 
