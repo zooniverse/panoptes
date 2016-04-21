@@ -33,7 +33,28 @@ shared_examples "has an extended cache key" do |associations, resource_methods|
   end
 
   describe "#cache_key" do
+    shared_examples "it should raise an error" do |method, result|
+      it "should raise an error" do
+        allow(cached_resource.class).to receive(method).and_return([result])
+        expect {
+          cache_key_result
+        }.to raise_error(NoMethodError)
+      end
+    end
+
     let(:cache_key_result) { cached_resource.cache_key }
+
+    context "when the class method name is invalid" do
+      it_behaves_like "it should raise an error",
+        :included_associations,
+        :unknown_class_method
+    end
+
+    context "when the instance method name is invalid" do
+      it_behaves_like "it should raise an error",
+        :included_resource_methods,
+        :unknown_instance_method
+    end
 
     context "when no extra cache key directives are set" do
 
