@@ -78,6 +78,10 @@ class SubjectImportWorker
       SetMemberSubject.import sset_import_cols, new_sms_values, validate: false
       SubjectSetSubjectCounterWorker.new.perform(subject_set.id)
     end
+
+    subject_set.workflows.each do |workflow|
+      ReloadNonLoggedInQueueWorker.perform_async(workflow.id, subject_set_id)
+    end
   end
 
   def download_csv(csv_url)
