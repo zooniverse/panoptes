@@ -74,7 +74,7 @@ Thanks a bunch for wanting to help Zooniverse. Here are few quick guidelines to 
 0. Submit a Pull Request
 0. Wait for feedback or a merge!
 
-Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.3.
+Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.3. For more information, [see the wiki](https://github.com/zooniverse/Panoptes/wiki/Contributing-to-Panoptes).
 
 ## License
 

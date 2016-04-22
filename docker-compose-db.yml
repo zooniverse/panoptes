@@ -1,0 +1,9 @@
+postgres:
+  image: postgres:9.4
+  environment:
+    - "POSTGRES_USER=panoptes"
+    - "POSTGRES_PASSWORD=panoptes"
+  ports:
+    - "5432:5432"
+
+
