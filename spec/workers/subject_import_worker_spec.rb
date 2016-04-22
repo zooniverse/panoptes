@@ -2,8 +2,9 @@ require "spec_helper"
 
 RSpec.describe SubjectImportWorker do
   let(:user) { create :user }
-  let(:project) { create :project, owner: user }
-  let(:subject_set) { create(:subject_set, project: project, workflows: []) }
+  let(:project) { create :project_with_workflow, owner: user }
+  let(:workflow) { project.workflows.first }
+  let(:subject_set) { create(:subject_set, project: project, workflows: [workflow]) }
 
   subject(:worker) { SubjectImportWorker.new }
 
@@ -33,6 +34,13 @@ https://placekitten.com/400/900.jpg,large,cute
         {"metadata1" => "small", "metadata2" => "cute"},
         {"metadata1" => "large", "metadata2" => "cute"}
       ])
+    end
+
+    it 'reloads the queue for each workflow' do
+      expect(ReloadNonLoggedInQueueWorker)
+        .to receive(:perform_async)
+        .with(workflow.id, subject_set.id)
+      worker.perform(project.id, user.id, subject_set.id, "a_csv_url")
     end
   end
 end
