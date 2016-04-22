@@ -12,12 +12,12 @@ If you're interested in how Panoptes is implemented check out the [wiki](https:/
 
 Since Panoptes uses Docker to manage its environment, the requirements listed below are also found in `docker-compose.yml`. The means by which a new Panoptes instance is created with Docker is located in the `Dockerfile`. If you plan on using Docker to manage Panoptes, skip ahead to Installation.
 
-Panoptes is primarily developed against stable MRI, currently 2.3. If you're running MRI Ruby you'll need to have the Postgresql client libraries installed.
+Panoptes is primarily developed against stable MRI, currently 2.3. If you're running MRI Ruby you'll need to have the Postgresql client libraries installed as well as have [Postgresql](http://postgresql.org) version 9.4 running.
 
 * Ubuntu/Debian: `apt-get install libpq-dev`
 * OS X (with [homebrew](http://homebrew.io)): `brew install postgresql`
 
-You'll need to have the following [Postgresql](http://postgresql.org) version > 9.4 running, and optionally:
+Optionally, you can also run the following:
 
 * [Cellect Server](https://github.com/zooniverse/Cellect) version > 0.1.0
 * [Redis](http://redis.io) version > 2.8.19
@@ -48,7 +48,7 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 0. Install Docker from the appropriate link above.
 
-0.  + **If you have an existing Panoptes Docker container**, or if your Gemfile or Ruby version has changed, run `docker-compose build`
+0.  + **If you have an existing Panoptes Docker container, or if your Gemfile or Ruby version has changed,** run `docker-compose build` to rebuild the containers.
     + Otherwise, create and run the application containers by running `docker-compose up`
 
 0. After step 5 finishes, open a new terminal and run `frake db:setup` to setup the database
@@ -60,8 +60,6 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
   + Visit either that address or just localhost on port 3000.
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
-
-If new gems have been added since your last build, you'll need to rebuild the docker image by running `docker-compose build`.
 
 ## Contributing
 
@@ -76,7 +74,7 @@ Thanks a bunch for wanting to help Zooniverse. Here are few quick guidelines to 
 0. Submit a Pull Request
 0. Wait for feedback or a merge!
 
-Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.3 and JRuby 1.7.18 before we take a look at it.
+Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.3.
 
 ## License
 
