@@ -2,6 +2,8 @@ class SubjectWorkflowCount < ActiveRecord::Base
   belongs_to :subject
   belongs_to :workflow
 
+  enum retirement_reason:  [ :classification_count, :flagged, :blank, :consensus, :other ]
+
   scope :retired, -> { where.not(retired_at: nil) }
 
   validates :subject, presence: true, uniqueness: {scope: :workflow_id}
@@ -25,11 +27,11 @@ class SubjectWorkflowCount < ActiveRecord::Base
     workflow.retirement_scheme.retire?(self)
   end
 
-  def retire!
+  def retire!(reason=nil)
     return if retired?
 
     ActiveRecord::Base.transaction(requires_new: true) do
-      touch(:retired_at)
+      update!(retirement_reason: reason, retired_at: Time.now.utc)
       Workflow.increment_counter(:retired_set_member_subjects_count, workflow.id)
       yield if block_given?
     end

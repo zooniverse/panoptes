@@ -6,11 +6,12 @@ module Workflows
     array :subject_ids, default: [] do
       integer
     end
+    string :retirement_reason, default: nil
 
     def execute
       Workflow.transaction do
         subject_ids.each do |subject_id|
-          workflow.retire_subject(subject_id)
+          workflow.retire_subject(subject_id, retirement_reason)
         end
 
         # This needs to be the last step in the transaction. If the transaction

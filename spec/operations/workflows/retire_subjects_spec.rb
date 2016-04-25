@@ -11,6 +11,12 @@ describe Workflows::RetireSubjects do
 
   let(:operation) { described_class.with(api_user: api_user) }
 
+  it 'sets the retirement reason' do
+    operation.run! workflow: workflow, subject_id: subject1.id, retirement_reason: "blank"
+    expect(SubjectWorkflowCount.by_subject_workflow(subject1.id, workflow.id).retirement_reason)
+      .to match("blank")
+  end
+
   context 'with a single subject_id' do
     it 'retires the subject' do
       operation.run! workflow: workflow, subject_id: subject1.id
