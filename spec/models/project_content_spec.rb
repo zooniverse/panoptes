@@ -27,7 +27,7 @@ RSpec.describe ProjectContent, :type => :model do
   end
 
   it 'should restrict the maximum length of introduction' do
-    expect(build(:project_content, introduction: '0' * 1501)).to_not be_valid
+    expect(build(:project_content, introduction: '0' * 5001)).to_not be_valid
   end
 
   describe "versioning" do
