@@ -62,10 +62,10 @@ class Workflow < ActiveRecord::Base
     subject_workflow_counts.retired.includes(:subject).map(&:subject)
   end
 
-  def retire_subject(subject_id)
+  def retire_subject(subject_id, reason=nil)
     if set_member_subjects.where(subject_id: subject_id).any?
       count = subject_workflow_counts.where(subject_id: subject_id, workflow_id: id).first_or_create!
-      count.retire!
+      count.retire!(reason)
     end
   end
 

@@ -847,7 +847,8 @@ CREATE TABLE subject_workflow_counts (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     retired_at timestamp without time zone,
-    subject_id integer NOT NULL
+    subject_id integer NOT NULL,
+    retirement_reason integer
 );
 
 
@@ -2986,4 +2987,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160408104326');
 INSERT INTO schema_migrations (version) VALUES ('20160412125332');
 
 INSERT INTO schema_migrations (version) VALUES ('20160414151041');
+
+INSERT INTO schema_migrations (version) VALUES ('20160425190129');
 

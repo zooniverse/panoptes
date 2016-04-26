@@ -41,7 +41,8 @@ module Api
       Api::UnpermittedParameter,
       RestPack::Serializer::InvalidInclude,
       ActiveRecord::RecordNotUnique,
-      Operation::Error,                                    with: :unprocessable_entity
+      Operation::Error,
+      ActiveInteraction::InvalidInteractionError,          with: :unprocessable_entity
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]

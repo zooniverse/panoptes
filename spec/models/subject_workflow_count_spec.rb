@@ -61,6 +61,11 @@ RSpec.describe SubjectWorkflowCount, type: :model do
       count.retired_at = 5.days.ago
       expect { count.retire! }.not_to change { count.retired_at }
     end
+
+    it 'records the retirement reason' do
+      count.retire!("blank")
+      expect(count.retirement_reason).to match("blank")
+    end
   end
 
   describe "#retire?" do
