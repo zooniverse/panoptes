@@ -535,6 +535,18 @@ describe Api::V1::WorkflowsController, type: :controller do
       expect(subject.retired_for_workflow?(workflow)).to be_truthy
     end
 
+    context "when the retirement_reason param is invalid" do
+      it 'throws an API error' do
+        post :retire_subjects, workflow_id: workflow.id, subject_id: subject.id, retirement_reason: "notreal" 
+        expect(json_response['errors'][0]['message']).to eq("Retirement reason is not included in the list")
+      end
+
+      it 'responds with a 422' do
+        post :retire_subjects, workflow_id: workflow.id, subject_id: subject.id, retirement_reason: "notreal" 
+        expect(response.status).to eq(422)
+      end
+    end
+
     it 'queues a cellect retirement if the workflow uses cellect' do
       allow(Panoptes).to receive(:use_cellect?).and_return(true)
       expect(RetireCellectWorker).to receive(:perform_async).with(subject.id, workflow.id)
