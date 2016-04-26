@@ -31,7 +31,7 @@ class SubjectWorkflowCount < ActiveRecord::Base
     return if retired?
 
     ActiveRecord::Base.transaction(requires_new: true) do
-      update!(retirement_reason: reason, retired_at: Time.now.utc)
+      update!(retirement_reason: reason, retired_at: Time.zone.now)
       Workflow.increment_counter(:retired_set_member_subjects_count, workflow.id)
       yield if block_given?
     end

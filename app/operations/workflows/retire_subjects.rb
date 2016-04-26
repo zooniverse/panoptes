@@ -1,5 +1,7 @@
 module Workflows
   class RetireSubjects < Operation
+    validates :retirement_reason, inclusion: { in: SubjectWorkflowCount.retirement_reasons.keys, allow_nil: true }
+
     object :workflow
 
     integer :subject_id, default: nil

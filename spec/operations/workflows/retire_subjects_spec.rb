@@ -11,10 +11,16 @@ describe Workflows::RetireSubjects do
 
   let(:operation) { described_class.with(api_user: api_user) }
 
-  it 'sets the retirement reason' do
+  it 'sets a valid retirement reason' do
     operation.run! workflow: workflow, subject_id: subject1.id, retirement_reason: "blank"
     expect(SubjectWorkflowCount.by_subject_workflow(subject1.id, workflow.id).retirement_reason)
       .to match("blank")
+  end
+
+  it 'is invalid with an invalid retirement reason' do
+    result = operation.run workflow: workflow, subject_id: subject1.id, retirement_reason: "nope"
+    expect(result)
+      .not_to be_valid
   end
 
   context 'with a single subject_id' do
@@ -46,8 +52,8 @@ describe Workflows::RetireSubjects do
 
     it 'does not queue workers if something went wrong' do
       allow(Panoptes).to receive(:use_cellect?).and_return(true)
-      allow(workflow).to receive(:retire_subject).with(subject1.id).and_return(true)
-      allow(workflow).to receive(:retire_subject).with(subject2.id) { raise ActiveRecord::Rollback, "some error" }
+      allow(workflow).to receive(:retire_subject).with(subject1.id, nil).and_return(true)
+      allow(workflow).to receive(:retire_subject).with(subject2.id, nil) { raise ActiveRecord::Rollback, "some error" }
       expect(RetireCellectWorker).to receive(:perform_async).with(subject1.id, workflow.id).never
       operation.run! workflow: workflow, subject_ids: [subject1.id, subject2.id]
     end

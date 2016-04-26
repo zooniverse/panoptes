@@ -66,6 +66,11 @@ RSpec.describe SubjectWorkflowCount, type: :model do
       count.retire!("blank")
       expect(count.retirement_reason).to match("blank")
     end
+
+    it 'does not record an invalid retirement reason' do
+      count.retire!("not-a-reason")
+      expect(count.retirement_reason).not_to match("not-a-reason")
+    end
   end
 
   describe "#retire?" do
