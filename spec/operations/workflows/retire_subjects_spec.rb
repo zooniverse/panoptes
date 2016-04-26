@@ -19,8 +19,12 @@ describe Workflows::RetireSubjects do
 
   it 'is invalid with an invalid retirement reason' do
     result = operation.run workflow: workflow, subject_id: subject1.id, retirement_reason: "nope"
-    expect(result)
-      .not_to be_valid
+    expect(result).not_to be_valid
+  end
+
+  it 'is valid with a missing parameter' do
+    result = operation.run workflow: workflow, subject_id: subject1.id
+    expect(result).to be_valid
   end
 
   context 'with a single subject_id' do
