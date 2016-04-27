@@ -3,8 +3,8 @@ class UserSerializer
   include RecentLinkSerializer
   include MediaLinksSerializer
 
-  attributes :id, :login, :display_name, :credited_name, :email, :created_at,
-    :updated_at, :type, :global_email_communication,
+  attributes :id, :login, :display_name, :credited_name, :email, :languages,
+    :created_at, :updated_at, :type, :global_email_communication,
     :project_email_communication, :beta_email_communication,
     :max_subjects, :uploaded_subjects_count, :admin, :href, :login_prompt,
     :private_profile, :zooniverse_id, :upload_whitelist
@@ -37,7 +37,7 @@ class UserSerializer
     @permitted ||= @context[:include_private] || requester
   end
 
-  %w(credited_name email global_email_communication project_email_communication
+  %w(credited_name email languages global_email_communication project_email_communication
      beta_email_communication uploaded_subjects_count max_subjects admin
      login_prompt zooniverse_id, upload_whitelist).each do |me_only_attribute|
     alias_method :"include_#{me_only_attribute}?", :permitted_requester?

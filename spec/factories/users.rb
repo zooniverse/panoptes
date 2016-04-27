@@ -25,10 +25,14 @@ FactoryGirl.define do
       end
     end
 
-    factory :user_with_avatar do
+    trait :avatar do
       after(:build) do |u|
         u.avatar = build(:medium, type: "user_avatar", linked: u)
       end
+    end
+
+    trait :languages do
+      languages ['en', 'es', 'fr-ca']
     end
 
     factory :insecure_user do
@@ -62,10 +66,6 @@ FactoryGirl.define do
       activated_state :inactive
       login 'deleted_user'
       email 'deleted_user@zooniverse.org'
-    end
-
-    factory :user_with_languages do
-      languages ['en', 'es', 'fr-ca']
     end
 
     factory :admin_user do

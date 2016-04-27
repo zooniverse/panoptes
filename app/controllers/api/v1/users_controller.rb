@@ -11,7 +11,7 @@ class Api::V1::UsersController < Api::ApiController
 
   allowed_params :update, :login, :display_name, :email, :credited_name,
    :global_email_communication, :project_email_communication,
-   :beta_email_communication, :subject_limit, :upload_whitelist
+   :beta_email_communication, :languages, :subject_limit, :upload_whitelist
 
   alias_method :user, :controlled_resource
 
