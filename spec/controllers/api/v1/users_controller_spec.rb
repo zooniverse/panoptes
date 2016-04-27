@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::UsersController, type: :controller do
   let!(:users) {
-    create_list(:user_with_avatar, 2)
+    create_list(:user, 2, :avatar, :languages)
   }
 
   let(:scopes) { %w(public user) }
@@ -127,6 +127,10 @@ describe Api::V1::UsersController, type: :controller do
 
       it 'should not have a credited name' do
         expect(json_response[api_resource_name][0]).to_not include("credited_name")
+      end
+
+      it 'should not have languages' do
+        expect(json_response[api_resource_name][0]).to_not include("languages")
       end
 
       it 'should not have a global email communication' do
@@ -407,6 +411,10 @@ describe Api::V1::UsersController, type: :controller do
     it "should have the user's max_subjects" do
       max_subjects = user_response["max_subjects"]
       expect(max_subjects).to eq(Panoptes.max_subjects)
+    end
+
+    it "should have the languages for the user" do
+      expect(user_response["languages"]).to eq(["en", "es", "fr-ca"])
     end
 
     it "should have the global email communication for the user" do
