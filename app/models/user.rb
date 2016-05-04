@@ -215,11 +215,10 @@ class User < ActiveRecord::Base
   end
 
   def has_finished?(workflow)
-    seen_count = user_seen_subjects.where(workflow_id: workflow.id)
-      .select('array_length("user_seen_subjects"."subject_ids", 1) as subject_count')
-      .first.try(:subject_count)
-
-    !!(seen_count && seen_count >= workflow.subjects_count)
+    current_seen_count = SetMemberSubject
+      .seen_for_user_by_workflow(self, workflow)
+      .count
+    !!(current_seen_count >= workflow.subjects_count)
   end
 
   def valid_sha1_password?(plain_password)
