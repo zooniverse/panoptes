@@ -11,7 +11,7 @@ class ProjectSerializer
     :configuration, :live, :urls, :migrated, :classifiers_count, :slug, :redirect,
     :beta_requested, :beta_approved, :launch_requested, :launch_approved, :launch_date,
     :href, :workflow_description, :primary_language, :tags, :experimental_tools,
-    :completeness, :activity
+    :completeness, :activity, :state
 
   optional :avatar_src
   can_include :workflows, :subject_sets, :owners, :project_contents,
@@ -21,9 +21,14 @@ class ProjectSerializer
     subjects_export: { include: false },
     aggregations_export: { include: false }
   can_filter_by :display_name, :slug, :beta_requested, :beta_approved,
-    :launch_requested, :launch_approved, :private
+    :launch_requested, :launch_approved, :private, :state
   can_sort_by :launch_date, :activity, :completeness, :classifiers_count,
     :updated_at, :display_name
+
+  def self.page(params = {}, scope = nil, context = {})
+    params["state"] = Project.states[params["state"]] if params.key?("state")
+    super(params, scope, context)
+  end
 
   def self.links
     links = super

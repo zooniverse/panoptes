@@ -636,7 +636,8 @@ CREATE TABLE projects (
     launch_date timestamp without time zone,
     completeness double precision DEFAULT 0.0 NOT NULL,
     activity integer DEFAULT 0 NOT NULL,
-    tsv tsvector
+    tsv tsvector,
+    state integer
 );
 
 
@@ -2213,6 +2214,13 @@ CREATE INDEX index_projects_on_slug ON projects USING btree (slug);
 
 
 --
+-- Name: index_projects_on_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_projects_on_state ON projects USING btree (state);
+
+
+--
 -- Name: index_projects_on_tsv; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2989,4 +2997,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160412125332');
 INSERT INTO schema_migrations (version) VALUES ('20160414151041');
 
 INSERT INTO schema_migrations (version) VALUES ('20160425190129');
+
+INSERT INTO schema_migrations (version) VALUES ('20160427150421');
 

@@ -5,7 +5,7 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:projects) do
     create_list(:project_with_contents, 2, owner: user)
   end
-  let(:project) { create(:project_with_contents, owner: user) }
+  let(:project) { create(:project_with_contents, owner: user, state: "paused") }
   let(:authorized_user) { user }
 
   let(:api_resource_name) { "projects" }
@@ -15,7 +15,7 @@ describe Api::V1::ProjectsController, type: :controller do
      "description", "introduction", "migrated","private", "live",
      "retired_subjects_count", "urls", "classifiers_count", "redirect",
      "workflow_description", "tags", "experimental_tools",
-     "completeness", "activity" ]
+     "completeness", "activity", "state" ]
   end
   let(:api_resource_links) do
     [ "projects.workflows",
@@ -328,6 +328,29 @@ describe Api::V1::ProjectsController, type: :controller do
           it "should respond with the correct item" do
             project_slug = json_response[api_resource_name][0]['slug']
             expect(project_slug).to eq(new_project.slug)
+          end
+        end
+
+        describe "filter by state", :focus  do
+          let(:projects) do
+            create_list(:project_with_contents, 2, owner: user).tap do |list|
+              list[0].paused!
+            end
+          end
+
+          let(:filtered_project) do
+            projects.first
+          end
+
+          let(:index_options) { { state: "paused" } }
+
+          it "should respond with 1 item" do
+            expect(json_response[api_resource_name].length).to eq(1)
+          end
+
+          it "should respond with the correct item" do
+            project_state = json_response[api_resource_name][0]['state']
+            expect(project_state).to eq(filtered_project.state)
           end
         end
 
