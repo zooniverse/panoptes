@@ -16,20 +16,21 @@ module Formatter
 
       private
 
-      def drawing
+      def drawing(task_info=task)
         {}.tap do |new_anno|
-          new_anno['task_label'] = task_label
+          new_anno['task'] = @current['task']
+          new_anno['task_label'] = task_label(task_info)
           value_with_tool = (@current["value"] || []).map do |drawn_item|
-           drawn_item.merge "tool_label" => tool_label(drawn_item)
+           drawn_item.merge "tool_label" => tool_label(task_info, drawn_item)
           end
           new_anno["value"] = value_with_tool
         end
       end
 
-      def simple
+      def simple(task_info=task)
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
-          new_anno['task_label'] = task_label
+          new_anno['task_label'] = task_label(task_info)
           new_anno['value'] = task['type'] == 'multiple' ? answer_labels : answer_label
         end
       end
@@ -37,36 +38,32 @@ module Formatter
       alias_method :single, :simple
       alias_method :multiple, :simple
 
-      def text
+      def text(task_info=task)
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
-          new_anno['task_label'] = task_label
+          new_anno['value'] = @current['value']
+          new_anno['task_label'] = task_label(task_info)
         end
       end
 
       def combo
         {}.tap do |new_anno|
+          new_anno['task'] = annotation['task']
+          new_anno['value'] ||= []
           annotation['value'].each do |subtask|
             @current = subtask
             task_info = get_task_info(subtask)
-            # tasktype = task_info['type']
-            new_anno['task'] = send(task_info['type'])
-
-            # anno = annotation_by_task(subtask).last
-            # answer_string = anno['answers'][subtask['value']]['label']
-            # new_annotation['value'] = translate(answer_string)
-            # new_annotation['task_label'] = translate(anno['question'])
-            binding.pry
+            new_anno['value'].push send(task_info['type'], task_info)
           end
         end
       end
 
-      def task_label
-        translate(task["question"] || task["instruction"])
+      def task_label(task_info)
+        translate(task_info["question"] || task_info["instruction"])
       end
 
-      def tool_label(drawn_item)
-        tool = task["tools"] && task["tools"][drawn_item["tool"]]
+      def tool_label(task_info, drawn_item)
+        tool = task_info["tools"] && task_info["tools"][drawn_item["tool"]]
         translate(tool["label"]) if tool
       end
 
