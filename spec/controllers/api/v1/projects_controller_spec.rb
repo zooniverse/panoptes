@@ -331,7 +331,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
         end
 
-        describe "filter by state", :focus  do
+        describe "filter by state"  do
           let(:projects) do
             create_list(:project_with_contents, 2, owner: user).tap do |list|
               list[0].paused!
