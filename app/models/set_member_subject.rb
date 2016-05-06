@@ -51,7 +51,17 @@ class SetMemberSubject < ActiveRecord::Base
     .where('subject_workflow_counts.retired_at IS NULL')
   end
 
+  def self.seen_for_user_by_workflow(user, workflow)
+    seen_subjects = for_user_by_workflow_scope(user, workflow)
+    by_workflow(workflow).where(seen_subjects.exists)
+  end
+
   def self.unseen_for_user_by_workflow(user, workflow)
+    seen_subjects = for_user_by_workflow_scope(user, workflow)
+    by_workflow(workflow).where(seen_subjects.exists.not)
+  end
+
+  def self.for_user_by_workflow_scope(user, workflow)
     uss = UserSeenSubject.arel_table
     sms = SetMemberSubject.arel_table
     seens = uss.project('UNNEST(subject_ids) as subject_id')
@@ -61,8 +71,7 @@ class SetMemberSubject < ActiveRecord::Base
     manager.project("null")
     manager.from(seens_subquery)
     subquery_where = sms[:subject_id].eq(Arel.sql('seen_subjects.subject_id'))
-    seen_subjects = manager.where(subquery_where)
-    by_workflow(workflow).where(seen_subjects.exists.not)
+    manager.where(subquery_where)
   end
 
   def retired_workflow_ids

@@ -629,10 +629,26 @@ describe User, type: :model do
       it { is_expected.to be true }
     end
 
-    context 'when the user not finished classifying a workflow' do
+    context 'when the user has not seen any data for a workflow' do
       let(:workflow) do
         workflow = create(:workflow_with_subjects)
         create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [])
+        workflow
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context 'when the user only classified old (unlinked) subjects in a workflow' do
+      let(:workflow) do
+        workflow = create(:workflow_with_subjects)
+        ids = workflow.subject_sets.flat_map(&:subjects).map(&:id)
+        create(:user_seen_subject, user: user, workflow: workflow, subject_ids: ids)
+        new_data_set = create(:subject_set_with_subjects,
+          workflows: [],
+          project: workflow.project
+        )
+        workflow.subject_sets = [ new_data_set ]
         workflow
       end
 
