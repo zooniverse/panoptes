@@ -167,8 +167,10 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe "filtering" do
-          let(:role_filter_resource) { beta_resource }
-          let(:role_filter_user) { user }
+          let(:owner_resources) { [ resource ] }
+          let(:collab_resource) { beta_resource }
+          let(:viewer_resource) { private_resource }
+          let(:authorized_user) { owner }
 
           it_behaves_like "filters by owner"
           it_behaves_like "filters by current user roles"
@@ -277,17 +279,13 @@ describe Api::V1::ProjectsController, type: :controller do
               end
             end
 
-            describe "filter by state"  do
+            describe "filter by state" do
               let(:projects) do
                 create_list(:project_with_contents, 2, owner: user).tap do |list|
                   list[0].paused!
                 end
               end
-
-              let(:filtered_project) do
-                projects.first
-              end
-
+              let(:filtered_project) { projects.first }
               let(:index_options) { { state: "paused" } }
 
               it "should respond with 1 item" do

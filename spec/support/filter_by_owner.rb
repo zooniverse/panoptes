@@ -2,14 +2,15 @@ RSpec.shared_examples "filters by owner" do
   let(:index_options) do
     { owner: owner.login }
   end
+  let(:expected_count) { owner_resources.count }
 
-  before(:each) do
+  before do
     resource
     get :index, index_options
   end
 
-  it "should respond with 1 item" do
-    expect(json_response[api_resource_name].length).to eq(1)
+  it "should respond with the correct number of items" do
+    expect(json_response[api_resource_name].length).to eq(expected_count)
   end
 
   it "should respond with the correct item" do
@@ -23,8 +24,8 @@ RSpec.shared_examples "filters by owner" do
       { owner: [owner.login.upcase, 'SOMETHING'].join(',') }
     end
 
-    it "should respond with 1 item" do
-      expect(json_response[api_resource_name].length).to eq(1)
+    it "should respond with the correct number of items" do
+      expect(json_response[api_resource_name].length).to eq(expected_count)
     end
 
     it "should respond with the correct item" do

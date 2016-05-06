@@ -34,9 +34,14 @@ describe Api::V1::CollectionsController, type: :controller do
     it_behaves_like "filter by display_name"
     it_behaves_like 'has many filterable', :subjects
 
-    describe "filtering", :focus do
+    describe "filtering" do
+      let(:owner_resources) { collections }
+      let(:collab_collection) { create(:collection) }
+      let(:collab_resource) { collab_collection }
+      let(:viewer_resource) { private_resource }
+
       it_behaves_like "filters by owner"
-      # it_behaves_like "filters by current user roles"
+      it_behaves_like "filters by current user roles"
 
       describe "project_ids" do
         let(:project_ids){ collections.map(&:project_ids).flatten }
