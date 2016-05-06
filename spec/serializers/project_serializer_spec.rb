@@ -28,7 +28,7 @@ describe ProjectSerializer do
     end
   end
 
-  describe "#state", :focus do
+  describe "#state" do
     it "includes the state" do
       expect(serializer.state).to eq project.state
     end

@@ -2217,7 +2217,7 @@ CREATE INDEX index_projects_on_slug ON projects USING btree (slug);
 -- Name: index_projects_on_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_projects_on_state ON projects USING btree (state);
+CREATE INDEX index_projects_on_state ON projects USING btree (state) WHERE (state IS NOT NULL);
 
 
 --
@@ -2999,4 +2999,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160414151041');
 INSERT INTO schema_migrations (version) VALUES ('20160425190129');
 
 INSERT INTO schema_migrations (version) VALUES ('20160427150421');
+
+INSERT INTO schema_migrations (version) VALUES ('20160506182308');
 
