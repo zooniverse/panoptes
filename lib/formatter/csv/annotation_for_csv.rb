@@ -6,6 +6,7 @@ module Formatter
       def initialize(classification, annotation, cache)
         @classification = classification
         @annotation = annotation.dup.with_indifferent_access
+        @current = @annotation.dup
         @cache = cache
       end
 
@@ -16,35 +17,48 @@ module Formatter
       private
 
       def drawing
-        # annotation.merge! "task_label" => task_label
-        # value_with_tool = (annotation["value"] || []).map do |drawn_item|
-        #  drawn_item.merge "tool_label" => tool_label(drawn_item)
-        # end
-        # annotation.merge!("value" => value_with_tool)
+        {}.tap do |new_anno|
+          new_anno['task_label'] = task_label
+          value_with_tool = (@current["value"] || []).map do |drawn_item|
+           drawn_item.merge "tool_label" => tool_label(drawn_item)
+          end
+          new_anno["value"] = value_with_tool
+        end
       end
 
       def simple
-        {}.tap do |new_annotation|
-          new_annotation['task'] = annotation['task']
-          new_annotation['task_label'] = task_label
-          new_annotation['value'] = task['type'] == 'multiple' ? answer_labels : answer_label
+        {}.tap do |new_anno|
+          new_anno['task'] = @current['task']
+          new_anno['task_label'] = task_label
+          new_anno['value'] = task['type'] == 'multiple' ? answer_labels : answer_label
         end
       end
 
       alias_method :single, :simple
       alias_method :multiple, :simple
 
+      def text
+        {}.tap do |new_anno|
+          new_anno['task'] = @current['task']
+          new_anno['task_label'] = task_label
+        end
+      end
+
       def combo
-        # {}.tap do |new_annotation|
-        #   annotation['value'].each do |subtask|
-        #     binding.pry
+        {}.tap do |new_anno|
+          annotation['value'].each do |subtask|
+            @current = subtask
+            task_info = get_task_info(subtask)
+            # tasktype = task_info['type']
+            new_anno['task'] = send(task_info['type'])
 
             # anno = annotation_by_task(subtask).last
             # answer_string = anno['answers'][subtask['value']]['label']
             # new_annotation['value'] = translate(answer_string)
             # new_annotation['task_label'] = translate(anno['question'])
-          # end
-        # end
+            binding.pry
+          end
+        end
       end
 
       def task_label
@@ -61,8 +75,9 @@ module Formatter
       end
 
       def answer_labels
-        Array.wrap(annotation["value"]).map do |answer_idx|
-          answer_string = task["answers"][answer_idx]["label"]
+        Array.wrap(@current["value"]).map do |answer_idx|
+          # answer_string = task["answers"][answer_idx]["label"]
+          answer_string = workflow_at_version.tasks[@current['task']]['answers'][answer_idx]['label']
           translate(answer_string)
         end
       end
@@ -92,6 +107,12 @@ module Formatter
         workflow_at_version.tasks.find do |key, task|
           key == subtask['task']
         end
+      end
+
+      def get_task_info(subtask)
+        workflow_at_version.tasks.find do |key, task|
+         key == subtask["task"]
+        end.try(:last) || {}
       end
 
       def task
