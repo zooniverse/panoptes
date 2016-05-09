@@ -97,5 +97,40 @@ FactoryGirl.define do
         end
       end
     end
+
+    factory :combo_task_workflow do
+      display_name "Combo Workflow"
+      tasks (
+        {
+          "T2"=>{
+          "help"=>"T2.help",
+          "type"=>"multiple",
+          "answers"=>[
+            {"label"=>"T2.answers.0.label"},
+            {"label"=>"T2.answers.1.label"},
+            {"label"=>"T2.answers.2.label"}
+          ],
+          "question"=>"T2.question"
+        },
+          "T3"=>{
+            "type"=>"combo",
+            "tasks"=>["init", "T2", "T6"]
+        },
+          "T6"=>{
+            "help"=>"T6.help",
+            "type"=>"text",
+            "instruction"=>"T6.instruction"
+        },
+          "init"=> {
+            "type"=>"single",
+            "answers"=>[
+              {"next"=>"T2", "label"=>"init.answers.0.label"},
+              {"label"=>"init.answers.1.label"}
+            ],
+            "question"=>"init.question"
+          }
+        }
+      )
+    end
   end
 end

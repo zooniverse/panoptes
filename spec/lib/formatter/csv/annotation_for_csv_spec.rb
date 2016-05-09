@@ -99,6 +99,51 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         end
       end
 
+      context "with a combo task" do
+        let(:combo_workflow) { build(:combo_task_workflow) }
+        let(:annotation) do
+          { "task"=>"T3", "value"=>
+            [
+              {"task"=>"init", "value"=>1},
+              {"task"=>"T2", "value"=>[1]},
+              {"task"=>"T6", "value"=>"no secrets between us, panoptes. you see all."}
+            ]
+          }
+        end
+
+        let(:new_classification) do
+          build_stubbed(:classification, subjects: [], workflow: combo_workflow, annotations: [annotation])
+        end
+        let(:combo_contents) { create(:combo_workflow_content, workflow: combo_workflow) }
+        let(:combo_cache) { double(workflow_at_version: combo_workflow, workflow_content_at_version: combo_contents)}
+
+        let(:codex) do
+          [
+            {
+              "task"=>"init",
+              "task_label"=>"Are you sure? (SINGLE)",
+              "value"=>"Positive"
+            },
+            {
+              "task"=>"T2",
+              "task_label"=>"FRUITS?!?! (MULTIPLE)",
+              "value"=>"Tomato?!"
+            },
+            {
+              "task"=>"T6",
+              "value"=>"no secrets between us, panoptes. you see all.",
+              "task_label"=>"Tell me a secret."
+            }
+          ]
+        end
+
+        it 'should add the correct answer labels' do
+          formatted = described_class.new(new_classification, new_classification.annotations[0], combo_cache).to_h
+          expect(formatted["value"]).to eq(codex)
+        end
+
+      end
+
       context "when the classification refers to the workflow and contents at a prev version" do
         let(:classification) do
           vers = "#{workflow.versions.first.index + 1}.#{contents.versions.first.index + 1}"

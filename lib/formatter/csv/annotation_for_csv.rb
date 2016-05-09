@@ -11,7 +11,7 @@ module Formatter
       end
 
       def to_h
-        send(task["type"])
+        send(task['type'])
       end
 
       private
@@ -49,6 +49,7 @@ module Formatter
       def combo
         {}.tap do |new_anno|
           new_anno['task'] = annotation['task']
+          new_anno['task_label'] = nil
           new_anno['value'] ||= []
           annotation['value'].each do |subtask|
             @current = subtask
@@ -59,11 +60,23 @@ module Formatter
       end
 
       def dropdown
-        binding.pry
         {}.tap do |new_anno|
-          new_anno['task'] = annotation['task']
-          annotationp['value'].each do
-
+          new_anno['task'] = @current['task']
+          new_anno['value'] = []
+          task['selects'].each_with_index do |sel, idx|
+            {}.tap do |tmp|
+              tmp['select_label'] = sel['title']
+              tmp['option'] = sel['allowCreate']
+              sel['options'].each do |key, arr|
+                arr.each do |ans|
+                  if ans['value'] == @current['value'][idx]['value']
+                    tmp['value'] = ans['value']
+                    tmp['label'] = translate(ans['label'])
+                  end
+                end
+              end
+              new_anno['value'].push tmp
+            end
           end
         end
       end
@@ -83,7 +96,6 @@ module Formatter
 
       def answer_labels
         Array.wrap(@current["value"]).map do |answer_idx|
-          # answer_string = task["answers"][answer_idx]["label"]
           answer_string = workflow_at_version.tasks[@current['task']]['answers'][answer_idx]['label']
           translate(answer_string)
         end
