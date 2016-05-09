@@ -58,6 +58,16 @@ module Formatter
         end
       end
 
+      def dropdown
+        binding.pry
+        {}.tap do |new_anno|
+          new_anno['task'] = annotation['task']
+          annotationp['value'].each do
+
+          end
+        end
+      end
+
       def task_label(task_info)
         translate(task_info["question"] || task_info["instruction"])
       end
