@@ -132,5 +132,86 @@ FactoryGirl.define do
         }
       )
     end
+
+    factory :dd_task_workflow do
+      display_name "Combo Workflow"
+      tasks (
+      {
+        "T7"=>
+          {"help"=>"T7.help",
+           "type"=>"dropdown",
+           "selects"=>
+            [{"id"=>"c99e5ef444475",
+              "title"=>"Country",
+              "options"=>
+               {"*"=>
+                 [{"label"=>"T7.selects.0.options.*.0.label",
+                   "value"=>"c6e0d98477ec8"},
+                  {"label"=>"T7.selects.0.options.*.1.label",
+                   "value"=>"3a9b7c7d53d6f"},
+                  {"label"=>"T7.selects.0.options.*.2.label",
+                   "value"=>"3844fc24a3df7"}]},
+              "required"=>true,
+              "allowCreate"=>false},
+             {"id"=>"e7e963e06159e",
+              "title"=>"State",
+              "options"=>
+               {"3844fc24a3df7"=>
+                 [{"label"=>"T7.selects.1.options.3844fc24a3df7.0.label",
+                   "value"=>"2619efdf9012"},
+                  {"label"=>"T7.selects.1.options.3844fc24a3df7.1.label",
+                   "value"=>"2f003e4bac96b"}],
+                "3a9b7c7d53d6f"=>
+                 [{"label"=>"T7.selects.1.options.3a9b7c7d53d6f.0.label",
+                   "value"=>"5243f2462e8b7"},
+                  {"label"=>"T7.selects.1.options.3a9b7c7d53d6f.1.label",
+                   "value"=>"ddb28c5f936ac"}],
+                "c6e0d98477ec8"=>
+                 [{"label"=>"T7.selects.1.options.c6e0d98477ec8.0.label",
+                   "value"=>"fb39ba165bfd4"},
+                  {"label"=>"T7.selects.1.options.c6e0d98477ec8.1.label",
+                   "value"=>"74ad7005baad5"}]},
+              "required"=>false,
+              "condition"=>"c99e5ef444475",
+              "allowCreate"=>true},
+             {"id"=>"2f54a93bb2804",
+              "title"=>"City",
+              "options"=>
+               {"3844fc24a3df7;2619efdf9012"=>
+                 [{"label"=>"T7.selects.2.options.3844fc24a3df7;2619efdf9012.0.label",
+                   "value"=>"24f09ef4d999c"},
+                  {"label"=>"T7.selects.2.options.3844fc24a3df7;2619efdf9012.1.label",
+                   "value"=>"515e2031a9f2"}],
+                "3844fc24a3df7;2f003e4bac96b"=>
+                 [{"label"=>"T7.selects.2.options.3844fc24a3df7;2f003e4bac96b.0.label",
+                   "value"=>"908c3c68e1f36"},
+                  {"label"=>"T7.selects.2.options.3844fc24a3df7;2f003e4bac96b.1.label",
+                   "value"=>"48b9769fe7556"}],
+                "3a9b7c7d53d6f;5243f2462e8b7"=>
+                 [{"label"=>"T7.selects.2.options.3a9b7c7d53d6f;5243f2462e8b7.0.label",
+                   "value"=>"be506b6d9e42e"},
+                  {"label"=>"T7.selects.2.options.3a9b7c7d53d6f;5243f2462e8b7.1.label",
+                   "value"=>"11a1c32d3a6ca"}],
+                "3a9b7c7d53d6f;ddb28c5f936ac"=>
+                 [{"label"=>"T7.selects.2.options.3a9b7c7d53d6f;ddb28c5f936ac.0.label",
+                   "value"=>"7c9fe6fb69c1d"},
+                  {"label"=>"T7.selects.2.options.3a9b7c7d53d6f;ddb28c5f936ac.1.label",
+                   "value"=>"d8fb8a1489c3c"}],
+                "c6e0d98477ec8;74ad7005baad5"=>
+                 [{"label"=>"T7.selects.2.options.c6e0d98477ec8;74ad7005baad5.0.label",
+                   "value"=>"3935249042d33"},
+                  {"label"=>"T7.selects.2.options.c6e0d98477ec8;74ad7005baad5.1.label",
+                   "value"=>"bf2ac1dff4aee"}],
+                "c6e0d98477ec8;fb39ba165bfd4"=>
+                 [{"label"=>"T7.selects.2.options.c6e0d98477ec8;fb39ba165bfd4.0.label",
+                   "value"=>"81a10debaa648"},
+                  {"label"=>"T7.selects.2.options.c6e0d98477ec8;fb39ba165bfd4.1.label",
+                   "value"=>"acef6073251e2"}]},
+              "required"=>false,
+              "condition"=>"e7e963e06159e",
+              "allowCreate"=>true}],
+           "instruction"=>"T7.instruction"}
+        })
+    end
   end
 end

@@ -102,8 +102,9 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       context "with a combo task" do
         let(:combo_workflow) { build(:combo_task_workflow) }
         let(:annotation) do
-          { "task"=>"T3", "value"=>
-            [
+          {
+            "task"=>"T3",
+            "value"=>[
               {"task"=>"init", "value"=>1},
               {"task"=>"T2", "value"=>[1]},
               {"task"=>"T6", "value"=>"no secrets between us, panoptes. you see all."}
@@ -118,28 +119,69 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         let(:combo_cache) { double(workflow_at_version: combo_workflow, workflow_content_at_version: combo_contents)}
 
         let(:codex) do
-          [
-            {
-              "task"=>"init",
-              "task_label"=>"Are you sure? (SINGLE)",
-              "value"=>"Positive"
-            },
-            {
-              "task"=>"T2",
-              "task_label"=>"FRUITS?!?! (MULTIPLE)",
-              "value"=>"Tomato?!"
-            },
-            {
-              "task"=>"T6",
-              "value"=>"no secrets between us, panoptes. you see all.",
-              "task_label"=>"Tell me a secret."
-            }
-          ]
+          {
+            "task"=>"T3",
+            "task_label"=>nil,
+            "value"=>[
+              {
+                "task"=>"init",
+                "task_label"=>"Are you sure? (SINGLE)",
+                "value"=>"Well now I'm second guessing myself"
+              },
+              {
+                "task"=>"T2",
+                "task_label"=>"FRUITS?!?! (MULTIPLE)",
+                "value"=>"Tomato?!"
+              },
+              {
+                "task"=>"T6",
+                "value"=>"no secrets between us, panoptes. you see all.",
+                "task_label"=>"Tell me a secret."
+              }
+            ]
+          }
         end
 
         it 'should add the correct answer labels' do
           formatted = described_class.new(new_classification, new_classification.annotations[0], combo_cache).to_h
-          expect(formatted["value"]).to eq(codex)
+          expect(formatted).to eq(codex)
+        end
+
+      end
+
+      context "with a dropdown task" do
+        let(:dd_workflow) { build(:dd_task_workflow) }
+        let(:annotation) do
+          {
+            "task"=>"T7",
+            "value"=>[
+              {"value"=>"c6e0d98477ec8", "option"=>true},
+              {"value"=>"fb39ba165bfd4", "option"=>true},
+              {"value"=>"81a10debaa648", "option"=>true}
+            ]
+           }
+        end
+
+        let(:dd_classification) do
+          build_stubbed(:classification, subjects: [], workflow: dd_workflow, annotations: [annotation])
+        end
+        let(:dd_contents) { create(:dd_workflow_content, workflow: dd_workflow) }
+        let(:dd_cache) { double(workflow_at_version: dd_workflow, workflow_content_at_version: dd_contents)}
+
+        let(:codex) do
+          {
+            "task"=>"T7",
+            "value"=> [
+              {"select_label"=>"Country", "option"=>false, "value"=>"c6e0d98477ec8", "label"=>"Oceania"},
+              {"select_label"=>"State", "option"=>true, "value"=>"fb39ba165bfd4", "label"=>"Left Oceania"},
+              {"select_label"=>"City", "option"=>true, "value"=>"81a10debaa648", "label"=>"Townsville"}
+            ]
+          }
+        end
+
+        it 'should add the correct answer labels' do
+          formatted = described_class.new(dd_classification, dd_classification.annotations[0], dd_cache).to_h
+          expect(formatted).to eq(codex)
         end
 
       end
