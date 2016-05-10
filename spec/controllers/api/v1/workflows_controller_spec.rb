@@ -358,6 +358,38 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
     end
 
+    context 'linking a tutorial' do
+
+      let(:tutorial_project) { project }
+      let(:linked_resource) { create(:tutorial, project: tutorial_project) }
+      let(:resource) { create(:workflow) }
+      let(:resource_id) { :workflow_id }
+      let(:test_relation) { :tutorials }
+      let(:test_relation_ids) { [ linked_resource.id.to_s ] }
+      # let(:update_params) { { workflow: resource.id.to_s, tutorials: test_relation_ids, link_relation: "tutorials" }}
+      # let(:params) { { link_relation: test_relation.to_s, test_relation => test_relation_ids, resource_id => resource.id } }
+
+      # let(:update_via_links) do
+      #   default_request scopes: scopes, user_id: authorized_user.id
+      #   params = {
+      #     link_relation: test_relation.to_s,
+      #     test_relation => test_relation_ids,
+      #     resource_id => resource.id
+      #   }
+      #   post :update_links, params
+      # end
+
+      it_behaves_like "has updatable links"
+
+      it_behaves_like "supports update_links" do
+
+        it 'links the tutorial to the workflow' do
+          expect(resource.tutorials).to eq(test_relation_ids.to_a)
+        end
+
+      end
+    end
+
     context 'retiring subjects via links' do
       let(:subject_set_project) { project }
       let(:subject_set) { create(:subject_set, project: project, workflows: [project.workflows.first]) }
