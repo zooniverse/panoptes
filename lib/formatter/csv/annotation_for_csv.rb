@@ -11,10 +11,18 @@ module Formatter
       end
 
       def to_h
-        send(task['type'])
+        if valid_tasks.include? task['type']
+          send(task['type'])
+        else
+         { error: "task cannot be exported" }
+        end
       end
 
       private
+
+      def valid_tasks
+        %w(single multiple text drawing combo dropdown)
+      end
 
       def drawing(task_info=task)
         {}.tap do |new_anno|
