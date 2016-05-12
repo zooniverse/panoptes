@@ -68,6 +68,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
   describe '#update' do
     let(:subject_set) { create(:subject_set, project: project) }
+    let(:tutorial) { create :tutorial, project: project }
     let(:resource) { create(:workflow_with_contents, active: false, project: project) }
     let(:test_attr) { :display_name }
     let(:test_attr_value) { "A Better Name" }
@@ -98,6 +99,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                    display_order_position: 1,
                    links: {
                            subject_sets: [subject_set.id.to_s],
+                           tutorials: [tutorial.id.to_s]
                           }
 
                   }
@@ -362,29 +364,14 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       let(:tutorial_project) { project }
       let(:linked_resource) { create(:tutorial, project: tutorial_project) }
-      let(:resource) { create(:workflow) }
+      let(:resource) { workflow }
       let(:resource_id) { :workflow_id }
       let(:test_relation) { :tutorials }
       let(:test_relation_ids) { [ linked_resource.id.to_s ] }
-      # let(:update_params) { { workflow: resource.id.to_s, tutorials: test_relation_ids, link_relation: "tutorials" }}
-      # let(:params) { { link_relation: test_relation.to_s, test_relation => test_relation_ids, resource_id => resource.id } }
-
-      # let(:update_via_links) do
-      #   default_request scopes: scopes, user_id: authorized_user.id
-      #   params = {
-      #     link_relation: test_relation.to_s,
-      #     test_relation => test_relation_ids,
-      #     resource_id => resource.id
-      #   }
-      #   post :update_links, params
-      # end
-
-      it_behaves_like "has updatable links"
 
       it_behaves_like "supports update_links" do
-
         it 'links the tutorial to the workflow' do
-          expect(resource.tutorials).to eq(test_relation_ids.to_a)
+          expect(resource.tutorials.pluck(:id).map(&:to_s)).to eq(test_relation_ids)
         end
 
       end
