@@ -29,10 +29,6 @@ module Formatter
 
       private
 
-      def valid_tasks
-        %w(single multiple text drawing combo dropdown)
-      end
-
       def drawing(task_info=task)
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']

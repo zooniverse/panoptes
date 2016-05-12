@@ -14,7 +14,7 @@ RSpec.describe WorkflowsDumpWorker do
   context "with a versioned workflow" do
 
     with_versioning do
-      let(:q_workflow) { build(:question_task_workflow) }
+      let(:q_workflow) { build(:workflow, :question_task) }
       let(:tasks) { q_workflow.tasks }
 
       before(:each) do
