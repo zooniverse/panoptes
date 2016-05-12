@@ -11,8 +11,17 @@ module Formatter
       end
 
       def to_h
-        if valid_tasks.include? task['type']
-          send(task['type'])
+        case task['type']
+        when "drawing"
+          drawing
+        when "single", "multiple"
+          simple
+        when "text"
+          text
+        when "combo"
+          combo
+        when "dropdown"
+          dropdown
         else
          { error: "task cannot be exported" }
         end

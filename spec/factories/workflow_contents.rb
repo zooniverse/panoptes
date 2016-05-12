@@ -15,7 +15,7 @@ FactoryGirl.define do
             "shape.answers.2.label" => "Star or artifact",
             })
 
-    factory :combo_workflow_content do
+    trait :combo_task do
       strings({
             "T2.help"=>"Just pick a fruit already",
             "T2.answers.0.label"=>"Pineapple",
@@ -30,7 +30,7 @@ FactoryGirl.define do
             })
     end
 
-    factory :dd_workflow_content do
+    trait :dropdown_task do
       strings({
         "T7.help"=>"it drops down",
         "T7.selects.0.options.*.0.label"=>"Oceania",

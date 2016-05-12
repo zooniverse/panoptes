@@ -71,7 +71,7 @@ FactoryGirl.define do
       end
     end
 
-    factory :question_task_workflow do
+    trait :question_task do
       tasks (
         {
           "init" => {
@@ -98,7 +98,7 @@ FactoryGirl.define do
       end
     end
 
-    factory :combo_task_workflow do
+    trait :combo_task do
       display_name "Combo Workflow"
       tasks (
         {
@@ -133,7 +133,7 @@ FactoryGirl.define do
       )
     end
 
-    factory :dd_task_workflow do
+    trait :dropdown_task do
       display_name "Combo Workflow"
       tasks (
       {

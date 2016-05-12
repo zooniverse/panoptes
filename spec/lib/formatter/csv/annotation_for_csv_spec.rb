@@ -51,7 +51,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       let(:classification) do
         build_stubbed(:classification, subjects: [], workflow: workflow)
       end
-      let(:q_workflow) { build(:question_task_workflow) }
+      let(:q_workflow) { build(:workflow, :question_task) }
       let(:tasks) { q_workflow.tasks }
       let(:strings) { q_workflow.workflow_contents.first.strings }
 
@@ -100,7 +100,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       end
 
       context "with a combo task" do
-        let(:combo_workflow) { build(:combo_task_workflow) }
+        let(:combo_workflow) { build(:workflow, :combo_task) }
         let(:annotation) do
           {
             "task"=>"T3",
@@ -115,7 +115,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         let(:new_classification) do
           build_stubbed(:classification, subjects: [], workflow: combo_workflow, annotations: [annotation])
         end
-        let(:combo_contents) { create(:combo_workflow_content, workflow: combo_workflow) }
+        let(:combo_contents) { create(:workflow_content, :combo_task, workflow: combo_workflow) }
         let(:combo_cache) { double(workflow_at_version: combo_workflow, workflow_content_at_version: combo_contents)}
 
         let(:codex) do
@@ -150,7 +150,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       end
 
       context "with a dropdown task" do
-        let(:dd_workflow) { build(:dd_task_workflow) }
+        let(:dd_workflow) { build(:workflow, :dropdown_task) }
         let(:annotation) do
           {
             "task"=>"T7",
@@ -165,7 +165,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         let(:dd_classification) do
           build_stubbed(:classification, subjects: [], workflow: dd_workflow, annotations: [annotation])
         end
-        let(:dd_contents) { create(:dd_workflow_content, workflow: dd_workflow) }
+        let(:dd_contents) { create(:workflow_content, :dropdown_task, workflow: dd_workflow) }
         let(:dd_cache) { double(workflow_at_version: dd_workflow, workflow_content_at_version: dd_contents)}
 
         let(:codex) do
