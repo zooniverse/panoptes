@@ -77,6 +77,14 @@ class WorkflowUpdateSchema < JsonSchema
           type "string", "integer"
         end
       end
+
+      property "tutorials" do
+        type "array"
+
+        items do
+          type "string", "integer"
+        end
+      end
     end
   end
 end
