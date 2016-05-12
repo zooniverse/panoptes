@@ -42,6 +42,8 @@ class Project < ActiveRecord::Base
 
   has_paper_trail only: [:private, :live, :beta_requested, :beta_approved, :launch_requested, :launch_approved]
 
+  enum state: [:paused, :finished]
+
   cache_by_association :project_contents, :tags
   cache_by_resource_method :subjects_count, :retired_subjects_count, :finished?
 
@@ -137,6 +139,14 @@ class Project < ActiveRecord::Base
   end
 
   def finished?
-    @finished ||= workflows.all?(&:finished?)
+    super ? super : workflows.all?(&:finished?)
+  end
+
+  def state
+    if self[:state]
+      super
+    else
+      live ? "live" : "development"
+    end
   end
 end

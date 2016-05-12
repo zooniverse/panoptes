@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ProjectSerializer do
-  let(:project) { create(:full_project) }
+  let(:project) { create(:full_project, state: "finished") }
   let(:context) { {languages: ['en'], fields: [:title, :url_labels]} }
 
   let(:serializer) do
@@ -25,6 +25,20 @@ describe ProjectSerializer do
               {"label" => "Twitter",
                "url" => "http://twitter.com/example"}]
       expect(serializer.urls).to eq(urls)
+    end
+  end
+
+  describe "#state" do
+    it "includes the state" do
+      expect(serializer.state).to eq project.state
+    end
+
+    let!(:paused_project) { create(:full_project, state: "paused") }
+    it 'can filter by state' do
+      project.touch
+      results = described_class.page({"state" => "finished"})
+      expect(results[:projects][0][:id]).to eq(project.id.to_s)
+      expect(results[:projects].count).to eq(1)
     end
   end
 
