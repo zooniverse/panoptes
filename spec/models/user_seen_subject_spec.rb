@@ -62,32 +62,52 @@ RSpec.describe UserSeenSubject, :type => :model do
     end
   end
 
-  describe "::count_user_activity" do
+  context "counting user activity" do
     let(:user_seen_subject) { create(:user_seen_subject, build_real_subjects: false) }
     let!(:another_uss) { create(:user_seen_subject, user: user_seen_subject.user, build_real_subjects: false) }
-    let(:workflow_ids) { [user_seen_subject, another_uss].map(&:workflow_id) }
+    let(:workflow_ids) { [user_seen_subject, another_uss].map(&:workflow_id).map(&:to_s) }
     let(:all_seen_counts) { [user_seen_subject, another_uss].map(&:subject_ids).flatten.size }
 
-    it "should sum all the seen subjects across all workflows" do
-      count = UserSeenSubject.count_user_activity(user_seen_subject.user_id)
-      expect(count).to eq(all_seen_counts)
+    describe "::count_user_activity" do
+
+      it "should sum all the seen subjects across all workflows" do
+        count = UserSeenSubject.count_user_activity(user_seen_subject.user_id)
+        expect(count).to eq(all_seen_counts)
+      end
+
+      it "should sum all the seen subjects across specific workflow ids" do
+        count = UserSeenSubject.count_user_activity(user_seen_subject.user_id, workflow_ids)
+        expect(count).to eq(all_seen_counts)
+      end
+
+      it "should sum all the seen subjects across a specific workflow" do
+        count = UserSeenSubject.count_user_activity(user_seen_subject.user_id, user_seen_subject.workflow_id)
+        expect(count).to eq(user_seen_subject.subject_ids.size)
+      end
+
+      context "when no counts exist for the user" do
+
+        it "should return 0" do
+          count = UserSeenSubject.count_user_activity(user_seen_subject.user_id+1)
+          expect(count).to eq(0)
+        end
+      end
     end
 
-    it "should sum all the seen subjects across specific workflow ids" do
-      count = UserSeenSubject.count_user_activity(user_seen_subject.user_id, workflow_ids)
-      expect(count).to eq(all_seen_counts)
-    end
+    describe '::activity_by_workflow' do
+      it 'should return number of elements equal to UserSeenSubjects for that user' do
+        expect( UserSeenSubject.activity_by_workflow(user_seen_subject.user_id).size).to eq(
+          UserSeenSubject.where(user_id: user_seen_subject.user_id).size
+        )
+      end
 
-    it "should sum all the seen subjects across a specific workflow" do
-      count = UserSeenSubject.count_user_activity(user_seen_subject.user_id, user_seen_subject.workflow_id)
-      expect(count).to eq(user_seen_subject.subject_ids.size)
-    end
+      it 'should include keys for each workflow' do
+        expect(UserSeenSubject.activity_by_workflow(user_seen_subject.user_id).keys).to match_array(workflow_ids)
+      end
 
-    context "when no counts exist for the user" do
-
-      it "should return 0" do
-        count = UserSeenSubject.count_user_activity(user_seen_subject.user_id+1)
-        expect(count).to eq(0)
+      it 'sums to the same value as ::count_user_activity' do
+        count = UserSeenSubject.count_user_activity(user_seen_subject.user_id)
+        expect(UserSeenSubject.activity_by_workflow(user_seen_subject.user_id).values.map(&:to_i).reduce(:+)).to eq(count)
       end
     end
   end

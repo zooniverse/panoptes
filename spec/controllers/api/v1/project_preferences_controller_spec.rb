@@ -9,7 +9,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   end
 
   let(:api_resource_name) { 'project_preferences' }
-  let(:api_resource_attributes) { %w(id email_communication preferences href activity_count) }
+  let(:api_resource_attributes) { %w(id email_communication preferences href activity_count activity_count_by_workflow) }
   let(:api_resource_links) { %w(project_preferences.user project_preferences.project) }
 
   let(:scopes) { %w(public project) }
@@ -47,9 +47,10 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       let!(:upps) do
         [create(:user_project_preference, user: authorized_user, project: project)]
       end
+      let(:workflow) { project.workflows.first }
       let!(:user_seens) do
         create(:user_seen_subject, user: authorized_user,
-          workflow: project.workflows.first, build_real_subjects: false)
+          workflow: workflow, build_real_subjects: false)
       end
 
       let(:run_get) do
@@ -62,6 +63,12 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         run_get
         expected_count = created_instance(api_resource_name)["activity_count"]
         expect(expected_count).to eq(user_seens.subject_ids.size)
+      end
+
+      it "returns the workflow's seen subject count" do
+        run_get
+        expected_hash = created_instance(api_resource_name)["activity_count_by_workflow"]
+        expect(expected_hash[workflow.id.to_s]).to eq(user_seens.subject_ids.size.to_s)
       end
 
       context "when the user has classified on more than 1 project" do
