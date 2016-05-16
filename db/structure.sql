@@ -2494,6 +2494,13 @@ CREATE UNIQUE INDEX index_users_on_login_with_case ON users USING btree (login);
 
 
 --
+-- Name: index_users_on_lower_names; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_users_on_lower_names ON users USING btree (lower((login)::text) text_pattern_ops, lower((display_name)::text) text_pattern_ops);
+
+
+--
 -- Name: index_users_on_private_profile; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3001,4 +3008,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160425190129');
 INSERT INTO schema_migrations (version) VALUES ('20160427150421');
 
 INSERT INTO schema_migrations (version) VALUES ('20160506182308');
+
+INSERT INTO schema_migrations (version) VALUES ('20160512181921');
 
