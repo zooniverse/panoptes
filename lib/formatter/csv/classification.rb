@@ -8,7 +8,7 @@ module Formatter
 
       def self.headers
         %w(classification_id user_name user_id user_ip workflow_id workflow_name workflow_version
-           created_at gold_standard expert metadata annotations subject_data)
+           created_at gold_standard expert metadata annotations subject_data subject_ids)
       end
 
       def initialize(project, cache)
@@ -49,6 +49,10 @@ module Formatter
             subjects_and_metadata[subject.id] = retired_data.reverse_merge!(subject.metadata)
           end
         end.to_json
+      end
+
+      def subject_ids
+          classification.subject_ids.join(";")
       end
 
       def metadata
