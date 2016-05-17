@@ -6,7 +6,7 @@ class UserSerializer
   attributes :id, :login, :display_name, :credited_name, :email, :languages,
     :created_at, :updated_at, :type, :global_email_communication,
     :project_email_communication, :beta_email_communication,
-    :max_subjects, :uploaded_subjects_count, :admin, :href, :login_prompt,
+    :subject_limit, :uploaded_subjects_count, :admin, :href, :login_prompt,
     :private_profile, :zooniverse_id, :upload_whitelist
 
   can_include :classifications, :project_preferences, :collection_preferences,
@@ -14,10 +14,6 @@ class UserSerializer
     collections: { param: "owner", value: "login" }
 
   media_include :avatar, :profile_header
-
-  def max_subjects
-    @model.subject_limit
-  end
 
   def admin
     !!@model.admin
@@ -38,7 +34,7 @@ class UserSerializer
   end
 
   %w(credited_name email languages global_email_communication project_email_communication
-     beta_email_communication uploaded_subjects_count max_subjects admin
+     beta_email_communication uploaded_subjects_count subject_limit admin
      login_prompt zooniverse_id, upload_whitelist).each do |me_only_attribute|
     alias_method :"include_#{me_only_attribute}?", :permitted_requester?
   end

@@ -66,8 +66,8 @@ describe Api::V1::UsersController, type: :controller do
           expect(requester).to include("uploaded_subjects_count")
         end
 
-        it "should have a max_subjects" do
-          expect(requester).to include("max_subjects")
+        it "should have a subject_limit" do
+          expect(requester).to include("subject_limit")
         end
 
         it "should have a upload_whitelist" do
@@ -102,8 +102,8 @@ describe Api::V1::UsersController, type: :controller do
           expect(not_requester).to_not include("uploaded_subjects_count")
         end
 
-        it "should not have a max_subjects" do
-          expect(not_requester).to_not include("max_subjects")
+        it "should not have a subject_limit" do
+          expect(not_requester).to_not include("subject_limit")
         end
 
         it "should not have a upload_whitelist" do
@@ -149,8 +149,8 @@ describe Api::V1::UsersController, type: :controller do
         expect(json_response[api_resource_name][0]).to_not include("uploaded_subjects_count")
       end
 
-      it "should not have a max_subjects" do
-        expect(json_response[api_resource_name][0]).to_not include("max_subjects")
+      it "should not have a subject_limit" do
+        expect(json_response[api_resource_name][0]).to_not include("subject_limit")
       end
 
       it "should not have a upload_whitelist" do
@@ -408,9 +408,9 @@ describe Api::V1::UsersController, type: :controller do
       expect(uploaded_subjects).to eq(user.uploaded_subjects_count)
     end
 
-    it "should have the user's max_subjects" do
-      max_subjects = user_response["max_subjects"]
-      expect(max_subjects).to eq(Panoptes.max_subjects)
+    it "should have the user's subject_limit" do
+      subject_limit = user_response["subject_limit"]
+      expect(subject_limit).to eq(Panoptes.max_subjects)
     end
 
     it "should have the languages for the user" do
