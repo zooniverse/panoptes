@@ -48,9 +48,6 @@ module Formatter
         end
       end
 
-      alias_method :single, :simple
-      alias_method :multiple, :simple
-
       def text(task_info=task)
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
@@ -76,23 +73,34 @@ module Formatter
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
           new_anno['value'] = []
-          task['selects'].each_with_index do |sel, idx|
-            {}.tap do |tmp|
-              tmp['select_label'] = sel['title']
-              tmp['option'] = sel['allowCreate']
-              sel['options'].each do |key, arr|
-                arr.each do |ans|
-                  if ans['value'] == @current['value'][idx]['value']
-                    tmp['value'] = ans['value']
-                    tmp['label'] = translate(ans['label'])
-                  end
-                end
-              end
-              new_anno['value'].push tmp
-            end
+          task['selects'].each_with_index do |selects, index|
+            new_anno['value'].push dropdown_process_selects(selects, index)
           end
         end
       end
+
+      def dropdown_process_selects(selects, index)
+        {}.tap do |drop_anno|
+          drop_anno['select_label'] = selects['title']
+          drop_anno['option'] = selects['allowCreate']
+          selects['options'].each do |key, options|
+            dropdown_process_options(options, index, drop_anno)
+          end
+        end
+      end
+
+      def dropdown_process_options(options, index, drop_anno)
+        options.each do |opt|
+          if opt['value'] == @current['value'][index]['value']
+            drop_anno['value'], drop_anno['label'] = dropdown_label(opt, index)
+          end
+        end
+      end
+
+      def dropdown_label(option, index)
+        [option['value'], translate(option['label'])]
+      end
+
 
       def task_label(task_info)
         translate(task_info["question"] || task_info["instruction"])
