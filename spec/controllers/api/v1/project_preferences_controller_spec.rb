@@ -68,7 +68,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       it "returns the workflow's seen subject count" do
         run_get
         expected_hash = created_instance(api_resource_name)["activity_count_by_workflow"]
-        expect(expected_hash[workflow.id.to_s]).to eq(user_seens.subject_ids.size.to_s)
+        expect(expected_hash[workflow.id.to_s]).to eq(user_seens.subject_ids.size)
       end
 
       context "when the user has classified on more than 1 project" do
