@@ -64,16 +64,29 @@ module Formatter
           annotation['value'].each do |subtask|
             @current = subtask
             task_info = get_task_info(subtask)
-            new_anno['value'].push send(task_info['type'], task_info)
+            new_anno['value'].push case task_info['type']
+              when "drawing"
+                drawing(task_info)
+              when "single", "multiple"
+                simple(task_info)
+              when "text"
+                text(task_info)
+              when "combo"
+                { error: "combo tasks cannot be nested" }
+              when "dropdown"
+                dropdown(task_info)
+              else
+                { error: "task cannot be exported" }
+              end
           end
         end
       end
 
-      def dropdown
+      def dropdown(task_info=task)
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
           new_anno['value'] = []
-          task['selects'].each_with_index do |selects, index|
+          task_info['selects'].each_with_index do |selects, index|
             new_anno['value'].push dropdown_process_selects(selects, index)
           end
         end

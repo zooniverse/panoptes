@@ -100,14 +100,20 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       end
 
       context "with a combo task" do
-        let(:combo_workflow) { build(:workflow, :combo_task) }
+        let(:combo_workflow) { build(:workflow, :complex_task) }
         let(:annotation) do
           {
             "task"=>"T3",
             "value"=>[
               {"task"=>"init", "value"=>1},
               {"task"=>"T2", "value"=>[1]},
-              {"task"=>"T6", "value"=>"no secrets between us, panoptes. you see all."}
+              {"task"=>"T6", "value"=>"no secrets between us, panoptes. you see all."},
+              {"task"=>"T7", "value"=>[
+                  {"value"=>"c6e0d98477ec8", "option"=>true},
+                  {"value"=>"fb39ba165bfd4", "option"=>true},
+                  {"value"=>"81a10debaa648", "option"=>true}
+                ]
+              }
             ]
           }
         end
@@ -115,7 +121,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         let(:new_classification) do
           build_stubbed(:classification, subjects: [], workflow: combo_workflow, annotations: [annotation])
         end
-        let(:combo_contents) { create(:workflow_content, :combo_task, workflow: combo_workflow) }
+        let(:combo_contents) { create(:workflow_content, :complex_task, workflow: combo_workflow) }
         let(:combo_cache) { double(workflow_at_version: combo_workflow, workflow_content_at_version: combo_contents)}
 
         let(:codex) do
@@ -137,6 +143,14 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
                 "task"=>"T6",
                 "value"=>"no secrets between us, panoptes. you see all.",
                 "task_label"=>"Tell me a secret."
+              },
+              {
+                "task"=>"T7",
+                "value"=> [
+                  {"select_label"=>"Country", "option"=>false, "value"=>"c6e0d98477ec8", "label"=>"Oceania"},
+                  {"select_label"=>"State", "option"=>true, "value"=>"fb39ba165bfd4", "label"=>"Left Oceania"},
+                  {"select_label"=>"City", "option"=>true, "value"=>"81a10debaa648", "label"=>"Townsville"}
+                ]
               }
             ]
           }
@@ -150,7 +164,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       end
 
       context "with a dropdown task" do
-        let(:dd_workflow) { build(:workflow, :dropdown_task) }
+        let(:dd_workflow) { build(:workflow, :complex_task) }
         let(:annotation) do
           {
             "task"=>"T7",
@@ -165,7 +179,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         let(:dd_classification) do
           build_stubbed(:classification, subjects: [], workflow: dd_workflow, annotations: [annotation])
         end
-        let(:dd_contents) { create(:workflow_content, :dropdown_task, workflow: dd_workflow) }
+        let(:dd_contents) { create(:workflow_content, :complex_task, workflow: dd_workflow) }
         let(:dd_cache) { double(workflow_at_version: dd_workflow, workflow_content_at_version: dd_contents)}
 
         let(:codex) do
