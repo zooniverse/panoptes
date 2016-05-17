@@ -57,7 +57,7 @@ describe Api::V1::SubjectsController, type: :controller do
             json_response[api_resource_name].map { |s| s.has_key?(optional_attr) }.uniq
           end
 
-          %w( retired already_seen ).each do |attr|
+          %w( retired already_seen seen_all_live_data ).each do |attr|
             let(:optional_attr) { attr }
 
             it "should not serialize the #{attr} attribute" do
@@ -144,6 +144,7 @@ describe Api::V1::SubjectsController, type: :controller do
       context "a queued request" do
         let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
+
         context "with queued subjects" do
           let!(:queue) do
             create(:subject_queue,
@@ -170,6 +171,11 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(already_seen).to all( be false )
           end
 
+          it 'should return seen_all_live_data as false' do
+            seen_all = json_response["subjects"].map{ |s| s['seen_all_live_data']}
+            expect(seen_all).to all( be false )
+          end
+
           it 'should return retired as false' do
             retired = json_response["subjects"].map{ |s| s['retired']}
             expect(retired).to all( be false )
@@ -190,6 +196,12 @@ describe Api::V1::SubjectsController, type: :controller do
             get :index, request_params
             already_seen = json_response["subjects"].map{ |s| s['already_seen']}
             expect(already_seen).to all( be true )
+          end
+
+          it 'should return seen_all_live_data as true' do
+            get :index, request_params
+            seen_all = json_response["subjects"].map{ |s| s['seen_all_live_data']}
+            expect(seen_all).to all( be true )
           end
         end
 
@@ -222,6 +234,11 @@ describe Api::V1::SubjectsController, type: :controller do
           it 'should return already_seen as true for seen subject' do
             already_seen = json_response["subjects"].map{ |s| s['already_seen']}
             expect(already_seen).to include(true)
+          end
+
+          it 'should return seen_all_live_data as false for each subject' do
+            seen_all = json_response["subjects"].map{ |s| s['seen_all_live_data']}
+            expect(seen_all).to include(false)
           end
 
           it 'should return all subjects as retired' do

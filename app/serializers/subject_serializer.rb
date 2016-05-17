@@ -5,7 +5,7 @@ class SubjectSerializer
   attributes :id, :metadata, :locations, :zooniverse_id,
     :created_at, :updated_at, :href
 
-  optional :retired, :already_seen
+  optional :retired, :already_seen, :seen_all_live_data
 
   can_include :project, :collections
 
@@ -25,6 +25,10 @@ class SubjectSerializer
     !!(user_seen && user_seen.subject_ids.include?(@model.id))
   end
 
+  def seen_all_live_data
+    !!(user_seen && (user_seen.workflow.subject_ids.uniq.sort == user_seen.subject_ids.uniq.sort))
+  end
+
   private
 
   def include_retired?
@@ -32,6 +36,10 @@ class SubjectSerializer
   end
 
   def include_already_seen?
+    selected?
+  end
+
+  def include_seen_all_live_data?
     selected?
   end
 
