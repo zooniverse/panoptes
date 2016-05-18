@@ -57,7 +57,7 @@ describe Api::V1::SubjectsController, type: :controller do
             json_response[api_resource_name].map { |s| s.has_key?(optional_attr) }.uniq
           end
 
-          %w( retired already_seen seen_all_live_data ).each do |attr|
+          %w( retired already_seen finished_workflow ).each do |attr|
             let(:optional_attr) { attr }
 
             it "should not serialize the #{attr} attribute" do
@@ -171,8 +171,8 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(already_seen).to all( be false )
           end
 
-          it 'should return seen_all_live_data as false' do
-            seen_all = json_response["subjects"].map{ |s| s['seen_all_live_data']}
+          it 'should return finished_workflow as false' do
+            seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all( be false )
           end
 
@@ -198,9 +198,9 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(already_seen).to all( be true )
           end
 
-          it 'should return seen_all_live_data as true' do
+          it 'should return finished_workflow as true' do
             get :index, request_params
-            seen_all = json_response["subjects"].map{ |s| s['seen_all_live_data']}
+            seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all( be true )
           end
         end
@@ -236,9 +236,9 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(already_seen).to include(true)
           end
 
-          it 'should return seen_all_live_data as false for each subject' do
-            seen_all = json_response["subjects"].map{ |s| s['seen_all_live_data']}
-            expect(seen_all).to include(false)
+          it 'should return finished_workflow as false for each subject' do
+            seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
+            expect(seen_all).to all be(false)
           end
 
           it 'should return all subjects as retired' do
