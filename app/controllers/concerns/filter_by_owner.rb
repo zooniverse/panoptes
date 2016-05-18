@@ -8,11 +8,11 @@ module FilterByOwner
   def add_owner_ids_to_filter_param!
     owner_filter = params.delete(:owner).try(:split, ',')
     unless owner_filter.blank?
-      groups = UserGroup.where(UserGroup.arel_table[:name].lower.in(owner_filter.map(&:downcase)))
-      @controlled_resources = controlled_resources
-      .eager_load(owner: [:users])
-      .joins(:owner)
-      .where(access_control_lists: { user_group: groups })
+      owner_group_scope = UserGroup.where(
+        UserGroup.arel_table[:name].lower.in(owner_filter.map(&:downcase))
+      )
+      owner_scope = resource_class.filter_by_owner(owner_group_scope)
+      @controlled_resources = controlled_resources.merge(owner_scope)
     end
   end
 end
