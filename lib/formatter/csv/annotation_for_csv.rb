@@ -6,34 +6,121 @@ module Formatter
       def initialize(classification, annotation, cache)
         @classification = classification
         @annotation = annotation.dup.with_indifferent_access
+        @current = @annotation.dup
         @cache = cache
       end
 
       def to_h
-        annotation.merge! "task_label" => task_label
-
-        case task["type"]
+        case task['type']
         when "drawing"
-          value_with_tool = (annotation["value"] || []).map do |drawn_item|
-            drawn_item.merge "tool_label" => tool_label(drawn_item)
-          end
-          annotation.merge!("value" => value_with_tool)
-        when /single/i
-          annotation.merge!("value" => answer_label)
-        when /multiple/i
-          annotation.merge!("value" => answer_labels)
+          drawing
+        when "single", "multiple"
+          simple
+        when "text"
+          text
+        when "combo"
+          combo
+        when "dropdown"
+          dropdown
+        else
+         { error: "task cannot be exported" }
         end
-        annotation
       end
 
       private
 
-      def task_label
-        translate(task["question"] || task["instruction"])
+      def drawing(task_info=task)
+        {}.tap do |new_anno|
+          new_anno['task'] = @current['task']
+          new_anno['task_label'] = task_label(task_info)
+          value_with_tool = (@current["value"] || []).map do |drawn_item|
+           drawn_item.merge "tool_label" => tool_label(task_info, drawn_item)
+          end
+          new_anno["value"] = value_with_tool
+        end
       end
 
-      def tool_label(drawn_item)
-        tool = task["tools"] && task["tools"][drawn_item["tool"]]
+      def simple(task_info=task)
+        {}.tap do |new_anno|
+          new_anno['task'] = @current['task']
+          new_anno['task_label'] = task_label(task_info)
+          new_anno['value'] = task['type'] == 'multiple' ? answer_labels : answer_label
+        end
+      end
+
+      def text(task_info=task)
+        {}.tap do |new_anno|
+          new_anno['task'] = @current['task']
+          new_anno['value'] = @current['value']
+          new_anno['task_label'] = task_label(task_info)
+        end
+      end
+
+      def combo
+        {}.tap do |new_anno|
+          new_anno['task'] = annotation['task']
+          new_anno['task_label'] = nil
+          new_anno['value'] ||= []
+          annotation['value'].each do |subtask|
+            @current = subtask
+            task_info = get_task_info(subtask)
+            new_anno['value'].push case task_info['type']
+              when "drawing"
+                drawing(task_info)
+              when "single", "multiple"
+                simple(task_info)
+              when "text"
+                text(task_info)
+              when "combo"
+                { error: "combo tasks cannot be nested" }
+              when "dropdown"
+                dropdown(task_info)
+              else
+                { error: "task cannot be exported" }
+              end
+          end
+        end
+      end
+
+      def dropdown(task_info=task)
+        {}.tap do |new_anno|
+          new_anno['task'] = @current['task']
+          new_anno['value'] = []
+          task_info['selects'].each_with_index do |selects, index|
+            new_anno['value'].push dropdown_process_selects(selects, index)
+          end
+        end
+      end
+
+      def dropdown_process_selects(selects, index)
+        {}.tap do |drop_anno|
+          drop_anno['select_label'] = selects['title']
+          drop_anno['option'] = selects['allowCreate']
+          selects['options'].each do |key, options|
+            dropdown_process_options(options, index, drop_anno)
+          end
+        end
+      end
+
+      def dropdown_process_options(options, index, drop_anno)
+        options.each do |opt|
+          if opt['value'] == @current['value'][index]['value']
+            drop_anno['value'], drop_anno['label'] = dropdown_label(opt, index)
+          end
+        end
+      end
+
+      def dropdown_label(option, index)
+        [option['value'], translate(option['label'])]
+      end
+
+
+      def task_label(task_info)
+        translate(task_info["question"] || task_info["instruction"])
+      end
+
+      def tool_label(task_info, drawn_item)
+        tool = task_info["tools"] && task_info["tools"][drawn_item["tool"]]
         translate(tool["label"]) if tool
       end
 
@@ -42,8 +129,8 @@ module Formatter
       end
 
       def answer_labels
-        Array.wrap(annotation["value"]).map do |answer_idx|
-          answer_string = task["answers"][answer_idx]["label"]
+        Array.wrap(@current["value"]).map do |answer_idx|
+          answer_string = workflow_at_version.tasks[@current['task']]['answers'][answer_idx]['label']
           translate(answer_string)
         end
       end
@@ -69,10 +156,22 @@ module Formatter
         classification.workflow_version.split(".")[1].to_i
       end
 
+      def annotation_by_task(subtask)
+        workflow_at_version.tasks.find do |key, task|
+          key == subtask['task']
+        end
+      end
+
+      def get_task_info(subtask)
+        workflow_at_version.tasks.find do |key, task|
+         key == subtask["task"]
+        end.try(:last) || {}
+      end
+
       def task
         return @task if @task
         task_annotation = workflow_at_version.tasks.find do |key, task|
-          key == annotation["task"]
+         key == annotation["task"]
         end
         @task = task_annotation.try(:last) || {}
       end

@@ -14,7 +14,7 @@ RSpec.describe WorkflowContentsDumpWorker do
   context "with a versioned workflow content" do
 
     with_versioning do
-      let(:q_workflow) { build(:question_task_workflow) }
+      let(:q_workflow) { build(:workflow, :question_task) }
       let(:strings) { q_workflow.workflow_contents.first.strings }
       let(:workflow_content) { workflow.workflow_contents.first }
 
