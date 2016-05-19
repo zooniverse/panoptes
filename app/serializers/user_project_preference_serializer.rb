@@ -25,6 +25,6 @@ class UserProjectPreferenceSerializer
   end
 
   def project_workflows_ids
-    Workflow.where(project_id: @model.project_id).pluck(:id)
+    @project_workflow_ids ||= Workflow.where(project_id: @model.project_id).pluck(:id)
   end
 end
