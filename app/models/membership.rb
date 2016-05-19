@@ -5,10 +5,8 @@ class Membership < ActiveRecord::Base
   belongs_to :user
   enum state: [:active, :invited, :inactive]
 
-  scope :identity, -> { where(identity: true,
-                              state: states[:active],
-                              roles: ["group_admin"]) }
-
+  scope :active, -> { where(state: states[:active]) }
+  scope :identity, -> { active.where(identity: true, roles: ["group_admin"]) }
   scope :not_identity, -> { where(identity: false) }
 
   validates_presence_of :user, unless: :identity
