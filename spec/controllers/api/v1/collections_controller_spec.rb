@@ -34,38 +34,48 @@ describe Api::V1::CollectionsController, type: :controller do
     it_behaves_like "filter by display_name"
     it_behaves_like 'has many filterable', :subjects
 
-    describe "filtering on project_ids" do
-      let(:project_ids){ collections.map(&:project_ids).flatten }
-      let(:expected_filtered_ids) { collections.map(&:id).map(&:to_s) }
+    describe "filtering" do
+      let(:owner_resources) { collections }
+      let(:collab_collection) { create(:collection) }
+      let(:collab_resource) { collab_collection }
+      let(:viewer_resource) { private_resource }
 
-      it_behaves_like 'belongs to many filterable', :projects do
-        let(:filter_ids) { project_ids.join(",") }
-      end
+      it_behaves_like "filters by owner"
+      it_behaves_like "filters by current user roles"
 
-      context "single project_ids" do
-        let(:project_ids){ collections.first.project_ids }
-        let(:expected_filtered_ids) { [ collections.first.id.to_s ] }
+      describe "project_ids" do
+        let(:project_ids){ collections.map(&:project_ids).flatten }
+        let(:expected_filtered_ids) { collections.map(&:id).map(&:to_s) }
 
         it_behaves_like 'belongs to many filterable', :projects do
           let(:filter_ids) { project_ids.join(",") }
         end
-      end
 
-      context "filtering on singular resource" do
-        let(:expected_filtered_ids) { [ collections.first.id.to_s ] }
+        context "single project_ids" do
+          let(:project_ids){ collections.first.project_ids }
+          let(:expected_filtered_ids) { [ collections.first.id.to_s ] }
 
-        it_behaves_like 'has many filterable', :projects do
-          let(:filter_ids) { collections.first.project_ids.first }
+          it_behaves_like 'belongs to many filterable', :projects do
+            let(:filter_ids) { project_ids.join(",") }
+          end
+        end
+
+        context "on singular resource" do
+          let(:expected_filtered_ids) { [ collections.first.id.to_s ] }
+
+          it_behaves_like 'has many filterable', :projects do
+            let(:filter_ids) { collections.first.project_ids.first }
+          end
         end
       end
-    end
 
-    context "it is filterable by favorite" do
-      let!(:favorite_col) { create(:collection, favorite: true) }
+      describe "by favorite" do
+        let!(:favorite_col) { create(:collection, favorite: true) }
 
-      it 'should only return the favorite collection' do
-        get :index, favorite: true
-        expect(json_response[api_resource_name].map{ |r| r['id'] }).to match_array([favorite_col.id.to_s])
+        it 'should only return the favorite collection' do
+          get :index, favorite: true
+          expect(json_response[api_resource_name].map{ |r| r['id'] }).to match_array([favorite_col.id.to_s])
+        end
       end
     end
   end
