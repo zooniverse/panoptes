@@ -595,11 +595,18 @@ describe ClassificationLifecycle do
     it "should add all other groups a user is currently in" do
       group1 = create :user_group
       group2 = create :user_group
-      classification.user.memberships.create! user_group: group1
-      classification.user.memberships.create! user_group: group2
+      classification.user.memberships.create! user_group: group1, state: 'active'
+      classification.user.memberships.create! user_group: group2, state: 'active'
 
       subject.add_user_groups
       expect(classification.metadata[:user_group_ids]).to match_array([group1.id, group2.id])
+    end
+
+    it 'should not add groups with inactive memberships' do
+      classification.user.memberships.create! user_group: create(:user_group), state: 'inactive'
+
+      subject.add_user_groups
+      expect(classification.metadata[:user_group_ids]).to be_empty
     end
   end
 
