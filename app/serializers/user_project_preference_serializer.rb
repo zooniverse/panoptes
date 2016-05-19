@@ -1,6 +1,6 @@
 class UserProjectPreferenceSerializer
   include RestPack::Serializer
-  attributes :id, :email_communication, :preferences, :href, :activity_count
+  attributes :id, :email_communication, :preferences, :href, :activity_count, :activity_count_by_workflow
   can_include :user, :project
   can_sort_by :updated_at
 
@@ -16,8 +16,15 @@ class UserProjectPreferenceSerializer
     end
   end
 
+  def activity_count_by_workflow
+    UserSeenSubject.activity_by_workflow(@model.user_id, project_workflows_ids)
+  end
+
   def user_project_activity
-    project_workflows_ids = Workflow.where(project_id: @model.project_id).pluck(:id)
     UserSeenSubject.count_user_activity(@model.user_id, project_workflows_ids)
+  end
+
+  def project_workflows_ids
+    @project_workflow_ids ||= Workflow.where(project_id: @model.project_id).pluck(:id)
   end
 end
