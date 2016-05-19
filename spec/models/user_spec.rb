@@ -750,6 +750,26 @@ describe User, type: :model do
     end
   end
 
+  describe '#non_identity_user_group_ids' do
+    let(:user) { create :user }
+    let(:user_group) { create :user_group }
+
+    it 'returns an empty array when not a member of any groups apart from the identity group' do
+      expect(user.identity_group).to be_present
+      expect(user.non_identity_user_group_ids).to be_empty
+    end
+
+    it 'returns user group ids for memberships' do
+      user.memberships.create! user_group: user_group, state: 'active'
+      expect(user.non_identity_user_group_ids).to match_array([user_group.id])
+    end
+
+    it 'does not return ids from inactive memberships' do
+      user.memberships.create! user_group: user_group, state: 'inactive'
+      expect(user.non_identity_user_group_ids).to be_empty
+    end
+  end
+
   describe '#set_zooniverse_id' do
     let(:user){ create :user }
     subject{ user.zooniverse_id }
