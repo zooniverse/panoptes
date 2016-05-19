@@ -5,7 +5,7 @@ class SubjectSerializer
   attributes :id, :metadata, :locations, :zooniverse_id,
     :created_at, :updated_at, :href
 
-  optional :retired, :already_seen
+  optional :retired, :already_seen, :finished_workflow
 
   can_include :project, :collections
 
@@ -35,6 +35,10 @@ class SubjectSerializer
     selected?
   end
 
+  def include_finished_workflow?
+    selected?
+  end
+
   def selected?
     @context[:selected]
   end
@@ -45,5 +49,9 @@ class SubjectSerializer
 
   def user_seen
     @context[:user_seen].try(:first)
+  end
+
+  def finished_workflow
+    @context[:finished_workflow]
   end
 end

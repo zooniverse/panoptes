@@ -106,7 +106,8 @@ module Subjects
     def queue_context
       @queue_context ||= {
         workflow: workflow,
-        user_seen: UserSeenSubject.where(user: user, workflow: workflow)
+        user_seen: UserSeenSubject.where(user: user, workflow: workflow),
+        finished_workflow: user&.has_finished?(workflow)
       }
     end
 
