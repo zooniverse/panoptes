@@ -55,6 +55,9 @@ class User < ActiveRecord::Base
   after_create :send_welcome_email, unless: :migrated
   before_create :set_ouroboros_api_key
 
+  after_update :send_email_changed_email, if: :email_changed?
+  after_update :send_password_changed_email, if: :encrypted_password_changed?
+
   delegate :projects, to: :identity_group
   delegate :collections, to: :identity_group
   delegate :subjects, to: :identity_group
@@ -306,6 +309,14 @@ class User < ActiveRecord::Base
 
   def send_welcome_email
     UserWelcomeMailerWorker.perform_async(id, project_id)
+  end
+
+  def send_password_changed_email
+    UserInfoChangedMailerWorker.perform_async(id, :password)
+  end
+
+  def send_email_changed_email
+    UserInfoChangedMailerWorker.perform_async(id, :email)
   end
 
   def set_ouroboros_api_key
