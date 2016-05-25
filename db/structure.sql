@@ -2074,6 +2074,13 @@ CREATE INDEX index_memberships_on_user_group_id ON memberships USING btree (user
 
 
 --
+-- Name: index_memberships_on_user_group_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_memberships_on_user_group_id_and_user_id ON memberships USING btree (user_group_id, user_id);
+
+
+--
 -- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3010,4 +3017,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160427150421');
 INSERT INTO schema_migrations (version) VALUES ('20160506182308');
 
 INSERT INTO schema_migrations (version) VALUES ('20160512181921');
+
+INSERT INTO schema_migrations (version) VALUES ('20160525103520');
 
