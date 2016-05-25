@@ -12,6 +12,7 @@ class Membership < ActiveRecord::Base
   validates_presence_of :user, unless: :identity
   validates_associated :user_group
   validates_presence_of :state, :user_group
+  validates_uniqueness_of :user_group, scope: :user
 
   can_through_parent :user_group, :update, :index, :show, :destroy, :update_links,
                      :destroy_links
