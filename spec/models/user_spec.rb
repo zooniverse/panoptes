@@ -811,7 +811,8 @@ describe User, type: :model do
     end
 
     context "when the user has a project id" do
-      let!(:user) { build(:user, project_id: 1) }
+      let(:project) { create :project }
+      let!(:user) { build(:user, project_id: project.id) }
 
       it "should queue the worker with the user id and project id" do
         allow(UserWelcomeMailerWorker).to receive :perform_async

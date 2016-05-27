@@ -155,8 +155,9 @@ describe RegistrationsController, type: :controller do
         end
 
         context "with a project_id param" do
+          let(:project) { create :project }
           let!(:extra_attributes) do
-            { login: login, project_id: "1" }
+            { login: login, project_id: project.id.to_s }
           end
 
           it "should return 201" do
@@ -165,7 +166,7 @@ describe RegistrationsController, type: :controller do
           end
 
           it "should increase the count of users" do
-            expect{ post :create, user: user_attributes }.to change{ User.count }.from(0).to(1)
+            expect{ post :create, user: user_attributes }.to change{ User.count }.by(1)
           end
 
           it "should persist the user account" do
