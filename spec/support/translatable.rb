@@ -8,7 +8,7 @@ shared_examples "is translatable" do
 
     it "should have the correct error message" do
       translatable_without_content.valid?
-      error_key = "#{locked_factory}_contents".to_sym
+      error_key = "#{described_class.name.underscore}_contents".to_sym
       expect(translatable_without_content.errors[error_key]).to eq(["can't be blank"])
     end
   end
