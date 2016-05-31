@@ -510,7 +510,9 @@ describe Api::V1::WorkflowsController, type: :controller do
   describe '#destroy' do
     let(:resource) { workflow }
 
-    it_behaves_like "is destructable"
+    it_behaves_like "is deactivatable" do
+      let(:instances_to_disable) { [resource] }
+    end
   end
 
   describe "#show" do

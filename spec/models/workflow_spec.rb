@@ -3,15 +3,23 @@ require 'spec_helper'
 describe Workflow, type: :model do
   let(:workflow) { build(:workflow) }
   let(:subject_relation) { create(:workflow_with_subjects) }
-  let(:translatable) { create(:workflow_with_contents, build_extra_contents: true) }
-  let(:translatable_without_content) { build(:workflow, build_contents: false) }
-  let(:primary_language_factory) { :workflow }
-  let(:locked_factory) { :workflow }
-  let(:locked_update) { {display_name: "A Different Name"} }
 
-  it_behaves_like "optimistically locked"
+  it_behaves_like "optimistically locked" do
+    let(:locked_factory) { :workflow }
+    let(:locked_update) { {display_name: "A Different Name"} }
+  end
+
   it_behaves_like "has subject_count"
-  it_behaves_like "is translatable"
+
+  it_behaves_like "is translatable" do
+    let(:translatable) { create(:workflow_with_contents, build_extra_contents: true) }
+    let(:translatable_without_content) { build(:workflow, build_contents: false) }
+    let(:primary_language_factory) { :workflow }
+  end
+
+  it_behaves_like "activatable" do
+    let(:activatable) { workflow }
+  end
 
   context "with caching resource associations" do
     let(:cached_resource) { workflow }

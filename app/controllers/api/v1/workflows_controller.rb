@@ -6,7 +6,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   require_authentication :update, :create, :destroy, :retire_subjects, scopes: [:project]
 
-  resource_actions :default
+  resource_actions :index, :show, :create, :update, :deactivate
   schema_type :json_schema
 
   def index

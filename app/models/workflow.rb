@@ -1,4 +1,5 @@
 class Workflow < ActiveRecord::Base
+  include Activatable
   include Linkable
   include Translatable
   include RoleControl::ParentalControlled
