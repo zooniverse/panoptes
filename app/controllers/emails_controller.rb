@@ -23,10 +23,10 @@ class EmailsController < ActionController::Base
 
   def unsubscribe_token
     if token = params.delete(:token)
-      user = if token
-         User.user_from_unsubscribe_token(token)
+      if user = User.user_from_unsubscribe_token(token)
+        unsubscribe_from_list(user.email)
+        revoke_email_subscriptions(user)
       end
-      revoke_email_subscriptions(user) if user
       redirect_to "#{Panoptes.unsubscribe_redirect}?processed=true"
     else
       redirect_to "#{Panoptes.unsubscribe_redirect}"
@@ -35,10 +35,10 @@ class EmailsController < ActionController::Base
 
   def unsubscribe_email
     if email = params.delete(:email)
-      user = if email
-        User.find_by(email: email)
+      unsubscribe_from_list(email)
+      if user = User.find_by(email: email)
+        revoke_email_subscriptions(user)
       end
-      revoke_email_subscriptions(user) if user
       head :ok
     else
       head :unprocessable_entity
@@ -47,9 +47,14 @@ class EmailsController < ActionController::Base
 
   def revoke_email_subscriptions(user)
     user.update!(UNSUBSCRIBE_USER_ATTRIBUTES)
-    UserProjectPreference.where(user_id: user.id).update_all(email_communication: false)
-    UnsubscribeWorker.perform_async(user.email)
+    UserProjectPreference
+      .where(user_id: user.id)
+      .update_all(email_communication: false)
   rescue ActiveRecord::RecordInvalid
     nil
+  end
+
+  def unsubscribe_from_list(email)
+    UnsubscribeWorker.perform_async(email)
   end
 end
