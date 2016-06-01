@@ -41,6 +41,7 @@ gem 'pg', '~> 0.18'
 gem 'zoo_stream', '~> 1.0.1'
 gem 'librato-metrics', '~> 1.6.1'
 gem 'scientist', '~> 1.0.0'
+gem 'flipper'
 
 group :production do
   gem 'newrelic_rpm', '~> 3.0', require: false
