@@ -85,35 +85,40 @@ module Formatter
       def dropdown(task_info=task)
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
-          new_anno['value'] = []
-          task_info['selects'].each_with_index do |selects, index|
-            new_anno['value'].push dropdown_process_selects(selects, index)
+          new_anno['value'] = task_info['selects'].map.with_index do |selects, index|
+            dropdown_process_selects(selects, index)
           end
         end
       end
 
       def dropdown_process_selects(selects, index)
+        answer = @current['value'][index]
+
         {}.tap do |drop_anno|
           drop_anno['select_label'] = selects['title']
-          drop_anno['option'] = selects['allowCreate']
-          selects['options'].each do |key, options|
-            dropdown_process_options(options, index, drop_anno)
+
+          if selects['allowCreate']
+            drop_anno['option'] = false
+            drop_anno['value'] = @current['value'][index]['value']
+          end
+
+          selected_option = dropdown_find_selected_option(selects, answer)
+          if selected_option
+            drop_anno['option'] = true
+            drop_anno['value'] = selected_option['value']
+            drop_anno['label'] = translate(selected_option['label'])
           end
         end
       end
 
-      def dropdown_process_options(options, index, drop_anno)
-        options.each do |opt|
-          if opt['value'] == @current['value'][index]['value']
-            drop_anno['value'], drop_anno['label'] = dropdown_label(opt, index)
+      def dropdown_find_selected_option(selects, answer)
+        selects['options'].each do |key, options|
+          options.each do |option|
+            return option if option['value'] == answer['value']
           end
         end
+        nil
       end
-
-      def dropdown_label(option, index)
-        [option['value'], translate(option['label'])]
-      end
-
 
       def task_label(task_info)
         translate(task_info["question"] || task_info["instruction"])

@@ -147,7 +147,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
               {
                 "task"=>"T7",
                 "value"=> [
-                  {"select_label"=>"Country", "option"=>false, "value"=>"c6e0d98477ec8", "label"=>"Oceania"},
+                  {"select_label"=>"Country", "option"=>true, "value"=>"c6e0d98477ec8", "label"=>"Oceania"},
                   {"select_label"=>"State", "option"=>true, "value"=>"fb39ba165bfd4", "label"=>"Left Oceania"},
                   {"select_label"=>"City", "option"=>true, "value"=>"81a10debaa648", "label"=>"Townsville"}
                 ]
@@ -171,7 +171,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
             "value"=>[
               {"value"=>"c6e0d98477ec8", "option"=>true},
               {"value"=>"fb39ba165bfd4", "option"=>true},
-              {"value"=>"81a10debaa648", "option"=>true}
+              {"value"=>"something unlisted", "option"=>false}
             ]
            }
         end
@@ -186,9 +186,9 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
           {
             "task"=>"T7",
             "value"=> [
-              {"select_label"=>"Country", "option"=>false, "value"=>"c6e0d98477ec8", "label"=>"Oceania"},
+              {"select_label"=>"Country", "option"=>true, "value"=>"c6e0d98477ec8", "label"=>"Oceania"},
               {"select_label"=>"State", "option"=>true, "value"=>"fb39ba165bfd4", "label"=>"Left Oceania"},
-              {"select_label"=>"City", "option"=>true, "value"=>"81a10debaa648", "label"=>"Townsville"}
+              {"select_label"=>"City", "option"=>false, "value"=>"something unlisted"}
             ]
           }
         end
@@ -197,7 +197,6 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
           formatted = described_class.new(dd_classification, dd_classification.annotations[0], dd_cache).to_h
           expect(formatted).to eq(codex)
         end
-
       end
 
       context "when the classification refers to the workflow and contents at a prev version" do
