@@ -44,7 +44,7 @@ module Formatter
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
           new_anno['task_label'] = task_label(task_info)
-          new_anno['value'] = task['type'] == 'multiple' ? answer_labels : answer_label
+          new_anno['value'] = task_info['type'] == 'multiple' ? answer_labels : answer_label
         end
       end
 

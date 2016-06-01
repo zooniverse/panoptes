@@ -137,7 +137,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
               {
                 "task"=>"T2",
                 "task_label"=>"FRUITS?!?! (MULTIPLE)",
-                "value"=>"Tomato?!"
+                "value"=>["Tomato?!"]
               },
               {
                 "task"=>"T6",
