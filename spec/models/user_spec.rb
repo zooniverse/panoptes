@@ -817,7 +817,7 @@ describe User, type: :model do
       it "should queue the worker with the user id and project id" do
         allow(UserWelcomeMailerWorker).to receive :perform_async
         user.save!
-        expect(UserWelcomeMailerWorker).to have_received(:perform_async).with(user.id, 1).ordered
+        expect(UserWelcomeMailerWorker).to have_received(:perform_async).with(user.id, project.id).ordered
       end
     end
 
