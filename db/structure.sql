@@ -344,6 +344,70 @@ ALTER SEQUENCE field_guides_id_seq OWNED BY field_guides.id;
 
 
 --
+-- Name: flipper_features; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE flipper_features (
+    id integer NOT NULL,
+    key character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: flipper_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE flipper_features_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: flipper_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE flipper_features_id_seq OWNED BY flipper_features.id;
+
+
+--
+-- Name: flipper_gates; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE flipper_gates (
+    id integer NOT NULL,
+    feature_key character varying NOT NULL,
+    key character varying NOT NULL,
+    value character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: flipper_gates_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE flipper_gates_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: flipper_gates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE flipper_gates_id_seq OWNED BY flipper_gates.id;
+
+
+--
 -- Name: media; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1420,6 +1484,20 @@ ALTER TABLE ONLY field_guides ALTER COLUMN id SET DEFAULT nextval('field_guides_
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY flipper_features ALTER COLUMN id SET DEFAULT nextval('flipper_features_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY flipper_gates ALTER COLUMN id SET DEFAULT nextval('flipper_gates_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY media ALTER COLUMN id SET DEFAULT nextval('media_id_seq'::regclass);
 
 
@@ -1667,6 +1745,22 @@ ALTER TABLE ONLY collections_subjects
 
 ALTER TABLE ONLY field_guides
     ADD CONSTRAINT field_guides_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: flipper_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY flipper_features
+    ADD CONSTRAINT flipper_features_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: flipper_gates_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY flipper_gates
+    ADD CONSTRAINT flipper_gates_pkey PRIMARY KEY (id);
 
 
 --
@@ -2051,6 +2145,20 @@ CREATE INDEX index_field_guides_on_language ON field_guides USING btree (languag
 --
 
 CREATE INDEX index_field_guides_on_project_id ON field_guides USING btree (project_id);
+
+
+--
+-- Name: index_flipper_features_on_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_flipper_features_on_key ON flipper_features USING btree (key);
+
+
+--
+-- Name: index_flipper_gates_on_feature_key_and_key_and_value; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_flipper_gates_on_feature_key_and_key_and_value ON flipper_gates USING btree (feature_key, key, value);
 
 
 --
@@ -3320,4 +3428,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160525103520');
 INSERT INTO schema_migrations (version) VALUES ('20160527140046');
 
 INSERT INTO schema_migrations (version) VALUES ('20160527162831');
+
+INSERT INTO schema_migrations (version) VALUES ('20160601162035');
 

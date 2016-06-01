@@ -35,5 +35,9 @@ module Panoptes
         end
       end
     end
+
+    config.middleware.use Flipper::Middleware::Memoizer, lambda {
+      Panoptes.flipper
+    }
   end
 end
