@@ -2966,7 +2966,7 @@ ALTER TABLE ONLY tagged_resources
 --
 
 ALTER TABLE ONLY collections_subjects
-    ADD CONSTRAINT fk_rails_dff7cd1e07 FOREIGN KEY (collection_id) REFERENCES collections(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT fk_rails_dff7cd1e07 FOREIGN KEY (collection_id) REFERENCES collections(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

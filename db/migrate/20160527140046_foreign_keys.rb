@@ -21,7 +21,7 @@ class ForeignKeys < ActiveRecord::Migration
     # add_foreign_key :classification_subjects, :subjects
 
     add_foreign_key :collections_subjects, :subjects, on_update: :cascade, on_delete: :restrict
-    add_foreign_key :collections_subjects, :collections, on_update: :cascade, on_delete: :restrict
+    add_foreign_key :collections_subjects, :collections, on_update: :cascade, on_delete: :cascade
 
     add_foreign_key :field_guides, :projects, on_update: :cascade, on_delete: :cascade
 
