@@ -63,7 +63,7 @@ class ForeignKeys < ActiveRecord::Migration
 
     Subject.joins("LEFT OUTER JOIN projects ON projects.id = subjects.project_id").where("projects.id IS NULL").update_all(project_id: nil)
     add_foreign_key :subjects, :projects, on_update: :cascade, on_delete: :restrict
-    add_foreign_key :subjects, :users, column: :upload_user_id, on_update: :cascade, on_delete: :nullify
+    add_foreign_key :subjects, :users, column: :upload_user_id, on_update: :cascade, on_delete: :restrict
 
     # add_foreign_key :tagged_resources, :tags
 
@@ -80,7 +80,7 @@ class ForeignKeys < ActiveRecord::Migration
     add_foreign_key :user_seen_subjects, :users, on_update: :cascade, on_delete: :cascade
     add_foreign_key :user_seen_subjects, :workflows, on_update: :cascade, on_delete: :cascade
 
-    add_foreign_key :users, :projects, on_update: :cascade, on_delete: :nullify
+    add_foreign_key :users, :projects, on_update: :cascade, on_delete: :restrict
 
     WorkflowContent.joins("LEFT OUTER JOIN workflows ON workflows.id = workflow_contents.workflow_id").where("workflows.id IS NULL").delete_all
     add_foreign_key :workflow_contents, :workflows, on_update: :cascade, on_delete: :cascade

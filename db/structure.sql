@@ -2998,7 +2998,7 @@ ALTER TABLE ONLY oauth_access_tokens
 --
 
 ALTER TABLE ONLY subjects
-    ADD CONSTRAINT fk_rails_f1e22b77bf FOREIGN KEY (upload_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT fk_rails_f1e22b77bf FOREIGN KEY (upload_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -3030,7 +3030,7 @@ ALTER TABLE ONLY classification_subjects
 --
 
 ALTER TABLE ONLY users
-    ADD CONSTRAINT fk_rails_fedc809cf8 FOREIGN KEY (project_id) REFERENCES projects(id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT fk_rails_fedc809cf8 FOREIGN KEY (project_id) REFERENCES projects(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
