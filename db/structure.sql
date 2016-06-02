@@ -2910,7 +2910,7 @@ ALTER TABLE ONLY classifications
 --
 
 ALTER TABLE ONLY workflows
-    ADD CONSTRAINT fk_rails_b029d72783 FOREIGN KEY (tutorial_subject_id) REFERENCES subjects(id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT fk_rails_b029d72783 FOREIGN KEY (tutorial_subject_id) REFERENCES subjects(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --

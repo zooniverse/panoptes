@@ -2,7 +2,7 @@ class ForeignKeys < ActiveRecord::Migration
   class ClassificationSubject < ActiveRecord::Base
   end
 
-  def up
+  def change
     add_foreign_key :access_control_lists, :user_groups, on_update: :cascade, on_delete: :cascade
 
     Aggregation.joins("LEFT OUTER JOIN workflows ON workflows.id = aggregations.workflow_id").where("workflows.id IS NULL").delete_all
@@ -90,7 +90,7 @@ class ForeignKeys < ActiveRecord::Migration
 
     Workflow.joins("LEFT OUTER JOIN projects ON projects.id = workflows.project_id").where("projects.id IS NULL").delete_all
     add_foreign_key :workflows, :projects, on_update: :cascade, on_delete: :restrict
-    add_foreign_key :workflows, :subjects, column: :tutorial_subject_id, on_update: :cascade, on_delete: :nullify
+    add_foreign_key :workflows, :subjects, column: :tutorial_subject_id, on_update: :cascade, on_delete: :restrict
 
     # Matches about 350 records
     classification_ids = Classification.joins("LEFT OUTER JOIN projects ON projects.id = classifications.project_id").where("projects.id IS NULL").pluck("classifications.id")
@@ -108,9 +108,5 @@ class ForeignKeys < ActiveRecord::Migration
     add_foreign_key :classifications, :users, on_update: :cascade, on_delete: :restrict
     add_foreign_key :classifications, :workflows, on_update: :cascade, on_delete: :restrict
     add_foreign_key :classifications, :user_groups, on_update: :cascade, on_delete: :restrict
-  end
-
-  def down
-    raise ActiveRecord::IrreversibleMigration
   end
 end
