@@ -3,7 +3,7 @@ module Translatable
 
   included do
     validates :primary_language, format: {with: /\A[a-z]{2}(\z|-[A-z]{2})/}
-    has_many content_association, autosave: true, inverse_of: name.downcase.to_sym
+    has_many content_association, autosave: true, inverse_of: name.downcase.to_sym, dependent: :destroy
     can_be_linked content_model.name.underscore.to_sym, :scope_for, :translate, :user
 
     validates content_association, presence: true

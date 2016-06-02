@@ -13,12 +13,12 @@ class Project < ActiveRecord::Base
   EXPERT_ROLES = [:owner, :expert]
 
   has_many :tutorials
-  has_many :field_guides
-  has_many :workflows
+  has_many :field_guides, dependent: :destroy
+  has_many :workflows, dependent: :restrict_with_exception
   has_many :subject_sets, dependent: :destroy
   has_many :live_subject_sets, through: :workflows, source: 'subject_sets'
-  has_many :classifications
-  has_many :subjects
+  has_many :classifications, dependent: :restrict_with_exception
+  has_many :subjects, dependent: :restrict_with_exception
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
   has_many :project_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
   has_one :avatar, -> { where(type: "project_avatar") }, class_name: "Medium", as: :linked
@@ -36,9 +36,10 @@ class Project < ActiveRecord::Base
     class_name: "Medium", as: :linked
   has_many :attached_images, -> { where(type: "project_attached_image") }, class_name: "Medium",
     as: :linked
-  has_many :pages, class_name: "ProjectPage"
+  has_many :pages, class_name: "ProjectPage", dependent: :destroy
   has_many :tagged_resources, as: :resource
   has_many :tags, through: :tagged_resources
+  has_many :first_time_users, class_name: "User", foreign_key: 'project_id', inverse_of: :signup_project, dependent: :restrict_with_exception
 
   has_paper_trail only: [:private, :live, :beta_requested, :beta_approved, :launch_requested, :launch_approved]
 
