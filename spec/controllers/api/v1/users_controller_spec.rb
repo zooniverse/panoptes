@@ -675,7 +675,7 @@ describe Api::V1::UsersController, type: :controller do
   describe "#destroy" do
     let(:user) { users.first}
     let(:user_id) { user.id }
-    let(:access_token) { create(:access_token) }
+    let(:access_token) { create(:access_token, resource_owner_id: user_id) }
 
     before(:each) do
       default_request(scopes: scopes, user_id: users.first.id)

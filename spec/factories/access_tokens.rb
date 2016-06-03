@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :access_token, class: Doorkeeper::AccessToken do
     sequence(:resource_owner_id) { |n| n }
-    sequence(:application_id) { |n| n }
+    application_id { nil }
     expires_in 2.hours
     revoked_at nil
 

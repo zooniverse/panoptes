@@ -4,12 +4,12 @@ class UserGroup < ActiveRecord::Base
   include Linkable
   include PgSearch
 
-  has_many :memberships
+  has_many :memberships, dependent: :destroy
   has_many :active_memberships, -> { active.where(identity: false) },
            class_name: "Membership"
   has_many :users, through: :memberships
-  has_many :classifications
-  has_many :access_control_lists
+  has_many :classifications, dependent: :restrict_with_exception
+  has_many :access_control_lists, dependent: :destroy
 
   has_many :owned_resources, -> { where(roles: ["owner"]) },
            class_name: "AccessControlList"

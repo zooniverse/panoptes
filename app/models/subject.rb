@@ -7,14 +7,16 @@ class Subject < ActiveRecord::Base
 
   belongs_to :project
   belongs_to :uploader, class_name: "User", foreign_key: "upload_user_id"
-  has_many :collections_subjects
+  has_many :collections_subjects, dependent: :restrict_with_exception
   has_many :collections, through: :collections_subjects
   has_many :subject_sets, through: :set_member_subjects
-  has_many :set_member_subjects
+  has_many :set_member_subjects, dependent: :destroy
   has_many :subject_workflow_counts, dependent: :destroy
   has_many :locations, -> { where(type: 'subject_location') },
     class_name: "Medium", as: :linked
   has_many :recents, dependent: :destroy
+  has_many :aggregations, dependent: :destroy
+  has_many :tutorial_workflows, class_name: 'Workflow', foreign_key: 'tutorial_subject_id', dependent: :restrict_with_exception
 
   validates_presence_of :project, :uploader
 

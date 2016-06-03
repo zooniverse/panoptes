@@ -15,11 +15,12 @@ class Workflow < ActiveRecord::Base
   has_many :subject_sets, through: :subject_sets_workflows
   has_many :set_member_subjects, through: :subject_sets
   has_many :subjects, through: :set_member_subjects
-  has_many :classifications
-  has_many :user_seen_subjects
+  has_many :classifications, dependent: :restrict_with_exception
+  has_many :user_seen_subjects, dependent: :destroy
   has_many :subject_queues, dependent: :destroy
   has_many :workflow_tutorials, dependent: :destroy
   has_many :tutorials, through: :workflow_tutorials
+  has_many :aggregations, dependent: :destroy
   has_many :attached_images, -> { where(type: "workflow_attached_image") }, class_name: "Medium",
     as: :linked
   has_and_belongs_to_many :expert_subject_sets, -> { expert_sets }, class_name: "SubjectSet"

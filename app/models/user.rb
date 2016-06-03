@@ -13,7 +13,7 @@ class User < ActiveRecord::Base
     :recoverable, :rememberable, :trackable, :validatable,
     :omniauthable, omniauth_providers: [:facebook, :gplus]
 
-  has_many :classifications
+  has_many :classifications, dependent: :restrict_with_exception
   has_many :authorizations, dependent: :destroy
   has_many :collection_preferences, class_name: "UserCollectionPreference", dependent: :destroy
   has_many :project_preferences, class_name: "UserProjectPreference", dependent: :destroy
@@ -32,7 +32,7 @@ class User < ActiveRecord::Base
   has_many :project_roles, through: :identity_group
   has_many :collection_roles, through: :identity_group
   has_many :user_seen_subjects, dependent: :destroy
-  has_many :uploaded_subjects, class_name: "Subject", foreign_key: "upload_user_id"
+  has_many :uploaded_subjects, class_name: "Subject", foreign_key: "upload_user_id", dependent: :restrict_with_exception
 
   has_many :subject_queues, dependent: :destroy
 
