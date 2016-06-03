@@ -52,7 +52,10 @@ RSpec.describe Subjects::StrategySelection do
         end
 
         it "should use the cellect client" do
-          expect(Subjects::CellectClient).to receive(:get_subjects)
+          cellect_params = [ workflow.id, user.id, subject_set.id, limit ]
+          expect(Subjects::CellectClient)
+            .to receive(:get_subjects)
+            .with(*cellect_params)
             .and_return(result_ids)
           run_selection
         end
