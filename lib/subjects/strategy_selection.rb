@@ -6,7 +6,7 @@ module Subjects
   class StrategySelection
     attr_reader :workflow, :user, :subject_set_id, :limit, :strategy_param
 
-    def initialize(workflow, user, set_id, limit=SubjectQueue::DEFAULT_LENGTH, strategy_param=nil)
+    def initialize(workflow, user, subject_set_id, limit=SubjectQueue::DEFAULT_LENGTH, strategy_param=nil)
       @workflow = workflow
       @user = user
       @subject_set_id = subject_set_id
