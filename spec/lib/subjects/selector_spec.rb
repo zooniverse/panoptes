@@ -13,7 +13,7 @@ RSpec.describe Subjects::Selector do
            set_member_subjects: smses)
   end
 
-  subject { described_class.new(user, workflow, params, Subject.all)}
+  subject { described_class.new(user, workflow, params, Subject.all) }
 
   describe "#get_subjects" do
     it 'should return url_format: :get in the context object' do
@@ -259,8 +259,34 @@ RSpec.describe Subjects::Selector do
       smses.each do |sms|
         swc = create(:subject_workflow_count, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
       end
-
       expect(subject.selected_subjects(subject_queue).size).to be > 0
+    end
+
+    context "testing straight selection over queues" do
+      let(:config) do
+        CodeExperimentConfig.create!(
+          name: 'skip_queue_selection',
+          enabled_rate: 0.0,
+          always_enabled_for_admins: true
+        )
+      end
+
+      before do
+        allow(CodeExperiment.reporter).to receive(:publish)
+        allow(user).to receive(:is_admin?).and_return(true)
+        config
+      end
+
+      it 'should not run the experiment' do
+        subject.selected_subjects(subject_queue)
+        expect(subject).not_to receive(:run_strategy_selection)
+      end
+
+      it 'should run the experiment when feature is on' do
+        Panoptes.flipper[:skip_queue_selection].enable
+        expect(subject).to receive(:run_strategy_selection)
+        subject.selected_subjects(subject_queue)
+      end
     end
   end
 end
