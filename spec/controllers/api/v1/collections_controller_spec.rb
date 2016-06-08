@@ -29,7 +29,7 @@ describe Api::V1::CollectionsController, type: :controller do
     let(:deactivated_resource) { create(:collection, activated_state: :inactive) }
 
     it_behaves_like "is indexable"
-    it_behaves_like "it has custom owner links"
+    it_behaves_like "it has custom owner links", "display_name"
     it_behaves_like "it only lists active resources"
     it_behaves_like "filter by display_name"
     it_behaves_like 'has many filterable', :subjects
