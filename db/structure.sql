@@ -2766,14 +2766,6 @@ ALTER TABLE ONLY subject_sets_workflows
 
 
 --
--- Name: fk_rails_0455b1dfd5; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY classifications
-    ADD CONSTRAINT fk_rails_0455b1dfd5 FOREIGN KEY (project_id) REFERENCES projects(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-
---
 -- Name: fk_rails_0be1922a0e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2902,14 +2894,6 @@ ALTER TABLE ONLY authorizations
 
 
 --
--- Name: fk_rails_501bdfd677; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY classifications
-    ADD CONSTRAINT fk_rails_501bdfd677 FOREIGN KEY (user_group_id) REFERENCES user_groups(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-
---
 -- Name: fk_rails_5244e2cc55; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3006,14 +2990,6 @@ ALTER TABLE ONLY field_guides
 
 
 --
--- Name: fk_rails_a2da3dfb8a; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY classifications
-    ADD CONSTRAINT fk_rails_a2da3dfb8a FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-
---
 -- Name: fk_rails_b029d72783; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3051,14 +3027,6 @@ ALTER TABLE ONLY set_member_subjects
 
 ALTER TABLE ONLY workflow_tutorials
     ADD CONSTRAINT fk_rails_bcabfcd540 FOREIGN KEY (workflow_id) REFERENCES workflows(id) ON DELETE CASCADE;
-
-
---
--- Name: fk_rails_c840abb688; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY classifications
-    ADD CONSTRAINT fk_rails_c840abb688 FOREIGN KEY (workflow_id) REFERENCES workflows(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -3470,6 +3438,4 @@ INSERT INTO schema_migrations (version) VALUES ('20160613074924');
 INSERT INTO schema_migrations (version) VALUES ('20160613074934');
 
 INSERT INTO schema_migrations (version) VALUES ('20160613075003');
-
-INSERT INTO schema_migrations (version) VALUES ('20160613075034');
 
