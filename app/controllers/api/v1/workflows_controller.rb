@@ -13,9 +13,18 @@ class Api::V1::WorkflowsController < Api::ApiController
     unless params.has_key?(:sort)
       @controlled_resources = controlled_resources.rank(:display_order)
     end
-    @controlled_resources = @controlled_resources
-      .eager_load(:subject_sets, :expert_subject_sets, :attached_images)
-    super
+    experiment_name = :eager_load_workflows
+    sms_ids = CodeExperiment.run "#{experiment_name}" do |e|
+      e.run_if { Panoptes.flipper[experiment_name].enabled? }
+      e.use { super }
+      e.try do
+        @controlled_resources = @controlled_resources
+          .eager_load(:subject_sets, :expert_subject_sets, :attached_images)
+        super
+      end
+      #skip the mismatch reporting...we just want perf metrics
+      e.ignore { true }
+    end
   end
 
   def update_links
