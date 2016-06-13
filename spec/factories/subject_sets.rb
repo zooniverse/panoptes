@@ -12,11 +12,12 @@ FactoryGirl.define do
     end
 
     factory :subject_set_with_subjects do
-      after(:create) do |sg|
+      after(:create) do |set|
         2.times do |i|
-          subject = create(:subject, project: sg.project, uploader: sg.project.owner)
-          create(:set_member_subject, subject_set: sg, subject: subject)
+          subject = create(:subject, project: set.project, uploader: set.project.owner)
+          create(:set_member_subject, subject_set: set, subject: subject)
         end
+        set.set_member_subjects_count = set.set_member_subjects.count
       end
     end
   end

@@ -13,6 +13,8 @@ class Api::V1::WorkflowsController < Api::ApiController
     unless params.has_key?(:sort)
       @controlled_resources = controlled_resources.rank(:display_order)
     end
+    @controlled_resources = @controlled_resources
+      .eager_load(:subject_sets, :expert_subject_sets, :attached_images)
     super
   end
 
