@@ -23,7 +23,15 @@ module Subjects
     end
 
     def selected_subjects(queue)
-      sms_ids = sms_ids_from_queue(queue)
+      sms_ids = CodeExperiment.run "skip_queue_selection" do |e|
+        # use feature flipping to turn these on / off via the web UI
+        e.run_if { Panoptes.flipper[:skip_queue_selection].enabled? }
+        e.context user: user
+        e.use { sms_ids_from_queue(queue) }
+        e.try { run_strategy_selection }
+        #skip the mismatch reporting...we just want perf metrics
+        e.ignore { true }
+      end
       sms_ids = filter_non_retired(sms_ids)
       if sms_ids.blank?
         sms_ids = fallback_selection
@@ -42,7 +50,7 @@ module Subjects
     def sms_ids_from_queue(queue)
       if queue.stale?
         queue.update_ids([])
-        Subjects::StrategySelection.new(workflow, user, subject_set_id).select
+        run_strategy_selection
       else
         sms_ids = queue.next_subjects(subjects_page_size)
         dequeue_ids(queue, sms_ids)
@@ -138,6 +146,10 @@ module Subjects
       else
         NonLoggedInDequeueSubjectQueueWorker.perform_async(queue.id, sms_ids)
       end
+    end
+
+    def run_strategy_selection
+      Subjects::StrategySelection.new(workflow, user, subject_set_id).select
     end
   end
 end
