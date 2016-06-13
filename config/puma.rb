@@ -26,6 +26,7 @@ bind "tcp://0.0.0.0:#{port}"
 # === Cluster mode ===
 unless rails_env == "development"
   workers 2
+  threads 0,8
 end
 
 # Code to run when a worker boots to setup the process before booting
