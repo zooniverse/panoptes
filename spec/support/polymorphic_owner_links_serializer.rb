@@ -1,10 +1,14 @@
-shared_examples "it has custom owner links" do
+shared_examples "it has custom owner links" do |owner_attr|
   it "should have the custom owner resource links" do
     get :index
     resource_links = json_response[api_resource_name].map do |resource|
       resource["links"]["owner"].keys
     end
-    expect(resource_links.flatten.uniq).to eq %w(id type href)
+    attrs_to_test = %w(id type href)
+    if owner_attr
+      attrs_to_test << owner_attr
+    end
+    expect(resource_links.flatten.uniq).to match_array(attrs_to_test)
   end
 
   it "should have the formatted the custom owner href link" do

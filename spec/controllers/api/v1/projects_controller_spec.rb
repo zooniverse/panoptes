@@ -49,7 +49,7 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       it_behaves_like "is indexable"
-      it_behaves_like "it has custom owner links"
+      it_behaves_like "it has custom owner links", "display_name"
       it_behaves_like "it only lists active resources"
     end
   end
@@ -66,7 +66,7 @@ describe Api::V1::ProjectsController, type: :controller do
           get :index
         end
 
-        it_behaves_like "it has custom owner links"
+        it_behaves_like "it has custom owner links", "display_name"
       end
 
       describe "params" do
