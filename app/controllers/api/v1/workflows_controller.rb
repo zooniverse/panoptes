@@ -45,9 +45,26 @@ class Api::V1::WorkflowsController < Api::ApiController
   def context
     case action_name
     when "show", "index"
-      { languages: current_languages }
+      { languages: current_languages }.merge field_context
     else
       {}
+    end
+  end
+
+  def field_context
+    if params[:fields].present?
+      included_keys = params[:fields].split ','
+      included_fields = included_keys.select{ |key| Workflow.columns_hash.has_key? key }
+      all_fields = WorkflowSerializer.serializable_attributes.keys.map &:to_s
+      excluded_fields = all_fields - included_fields - ['id'] # always include id
+
+      { }.tap do |attributes|
+        excluded_fields.each do |field|
+          attributes[:"include_#{ field }?"] = false
+        end
+      end
+    else
+      { }
     end
   end
 

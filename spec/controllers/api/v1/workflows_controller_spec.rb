@@ -64,6 +64,19 @@ describe Api::V1::WorkflowsController, type: :controller do
         end
       end
     end
+
+    describe 'limiting fields' do
+      before(:each) do
+        filterable_resources
+        default_request user_id: user.id, scopes: scopes
+      end
+
+      it 'should return only serialize the specified fields' do
+        get :index, fields: 'display_name,does_not_exist'
+        response_keys = json_response['workflows'].map(&:keys).uniq.flatten
+        expect(response_keys).to match_array ['id', 'links', 'display_name']
+      end
+    end
   end
 
   describe '#update' do
