@@ -262,29 +262,15 @@ RSpec.describe Subjects::Selector do
       expect(subject.selected_subjects(subject_queue).size).to be > 0
     end
 
-    context "testing straight selection over queues" do
-      let(:config) do
-        CodeExperimentConfig.create!(
-          name: 'skip_queue_selection',
-          enabled_rate: 0.0,
-          always_enabled_for_admins: true
-        )
-      end
-
-      before do
-        allow(CodeExperiment.reporter).to receive(:publish)
-        allow(user).to receive(:is_admin?).and_return(true)
-        config
-      end
-
-      it 'should not run the experiment' do
+    context "feature flip straight selection over queues" do
+      it 'should use queue selection when feature is off' do
+        expect(subject).to receive(:sms_ids_from_queue).and_call_original
         subject.selected_subjects(subject_queue)
-        expect(subject).not_to receive(:run_strategy_selection)
       end
 
-      it 'should run the experiment when feature is on' do
+      it 'should skip queue selection when feature is on' do
         Panoptes.flipper[:skip_queue_selection].enable
-        expect(subject).to receive(:run_strategy_selection)
+        expect(subject).to receive(:run_strategy_selection).and_call_original
         subject.selected_subjects(subject_queue)
       end
     end

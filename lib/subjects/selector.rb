@@ -23,14 +23,10 @@ module Subjects
     end
 
     def selected_subjects(queue)
-      sms_ids = CodeExperiment.run "skip_queue_selection" do |e|
-        # use feature flipping to turn these on / off via the web UI
-        e.run_if { Panoptes.flipper[:skip_queue_selection].enabled? }
-        e.context user: user
-        e.use { sms_ids_from_queue(queue) }
-        e.try { run_strategy_selection }
-        #skip the mismatch reporting...we just want perf metrics
-        e.ignore { true }
+      sms_ids = if Panoptes.flipper[:skip_queue_selection].enabled?
+        run_strategy_selection
+      else
+        sms_ids_from_queue(queue)
       end
       sms_ids = filter_non_retired(sms_ids)
       if sms_ids.blank?
