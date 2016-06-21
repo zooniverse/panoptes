@@ -53,6 +53,9 @@ class Api::V1::UsersController < Api::ApiController
           SubscribeWorker.perform_async(user.email)
           UnsubscribeWorker.perform_async(user.changes[:email].first)
         end
+        UserInfoChangedMailerWorker.perform_async(user.id, :email)
+      when user.encrypted_password_changed?
+        UserInfoChangedMailerWorker.perform_async(user.id, :password)
       end
     end
   end
