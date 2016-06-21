@@ -98,6 +98,15 @@ FactoryGirl.define do
       end
     end
 
+    trait :survey_task do
+      display_name "Survey Workflow"
+      tasks ({
+        "T1"=>{
+          "type"=>"survey"
+        }
+      })
+    end
+
     trait :complex_task do
       display_name "Complex Workflow"
       tasks (
