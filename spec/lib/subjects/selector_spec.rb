@@ -268,7 +268,7 @@ RSpec.describe Subjects::Selector do
         subject.selected_subjects(subject_queue)
       end
 
-      it 'should skip queue selection when feature is on' do
+      it 'should skip queue selection when feature is on', :feature_flip do
         Panoptes.flipper[:skip_queue_selection].enable
         expect(subject).to receive(:run_strategy_selection).and_call_original
         subject.selected_subjects(subject_queue)
