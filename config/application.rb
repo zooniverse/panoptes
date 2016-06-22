@@ -6,6 +6,7 @@ require "action_controller/railtie"
 require "action_mailer/railtie"
 require "action_view/railtie"
 require "sprockets/railtie"
+require 'flipper/middleware/memoizer'
 
 Bundler.require(*Rails.groups)
 

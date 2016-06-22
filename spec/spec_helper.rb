@@ -33,6 +33,7 @@ RSpec.configure do |config|
 
   config.before(:each) do |example|
     DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.start
     ActionMailer::Base.deliveries.clear
 
     # Clears out the jobs for tests using the fake testing
@@ -54,11 +55,7 @@ RSpec.configure do |config|
     stub_cellect_connection
   end
 
-  config.before(:each) do
-    DatabaseCleaner.start
-  end
-
-  config.after(:each) do
+  config.after(:each) do |example|
     DatabaseCleaner.clean
   end
 
