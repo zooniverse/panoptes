@@ -57,16 +57,6 @@ RSpec.configure do |config|
 
   config.after(:each) do |example|
     DatabaseCleaner.clean
-
-    #clear memoized feature state across tests
-    if example.metadata[:flipper_feat]
-      # Panoptes.flipper.remove(feature_name) once
-      # https://github.com/jnunemaker/flipper/pull/126 is released
-      Panoptes.flipper.features.map(&:name).each do |feature_name|
-        feature = Panoptes.flipper[feature_name]
-        feature.adapter.remove(feature)
-      end
-    end
   end
 
   # If true, the base class of anonymous controllers will be inferred

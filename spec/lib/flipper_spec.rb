@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Flipper do
 
-  describe 'feature flippin', :flipper_feat do
+  describe 'feature flippin' do
     let(:feature_name) { :test_feature }
 
     it "should not be enabled by default" do
