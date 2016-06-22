@@ -199,6 +199,23 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         end
       end
 
+      context "with a survey task" do
+        let(:annotation) do
+           {"task"=>"T1", "value"=>[{"choice"=>"DR", "answers"=>{"BHVR"=>["MVNG"], "DLTNTLRLSS"=>"1"}, "filters"=>{}}]}
+        end
+        let(:survey_workflow) { build(:workflow, :survey_task) }
+        let(:survey_contents) { create(:workflow_content, :survey_task, workflow: survey_workflow) }
+        let(:survey_cache) { double(workflow_at_version: survey_workflow, workflow_content_at_version: survey_contents)}
+        let(:survey_classification) do
+          build_stubbed(:classification, subjects: [], workflow: survey_workflow, annotations: [annotation])
+        end
+
+        it 'returns the unaltered annotation' do
+          formatted = described_class.new(survey_classification, survey_classification.annotations[0], survey_cache).to_h
+          expect(formatted).to eq(annotation)
+        end
+      end
+
       context "when the classification refers to the workflow and contents at a prev version" do
         let(:classification) do
           vers = "#{workflow.versions.first.index + 1}.#{contents.versions.first.index + 1}"
