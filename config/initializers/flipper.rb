@@ -1,4 +1,5 @@
 require "flipper/instrumentation/log_subscriber"
+require 'flipper/adapters/active_record'
 
 module Panoptes
   def self.flipper
