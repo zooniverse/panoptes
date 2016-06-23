@@ -22,10 +22,8 @@ module Formatter
           combo
         when "dropdown"
           dropdown
-        when "survey"
-          @annotation
         else
-         { error: "task cannot be exported" }
+          @annotation
         end
       end
 
