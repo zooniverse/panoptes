@@ -186,6 +186,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
         context "user has classified all subjects in the workflow" do
           let!(:seen_subjects) do
+            create :classification, user: user, workflow: workflow, subjects: subjects
             create(:user_seen_subject,
                    user: user,
                    workflow: workflow,
@@ -220,6 +221,7 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           let!(:seen_subjects) do
+            create :classification, user: user, workflow: workflow, subjects: [subjects.first]
             create(:user_seen_subject,
                    user: user,
                    workflow: workflow,

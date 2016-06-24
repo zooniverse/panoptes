@@ -3,7 +3,6 @@ require 'subjects/set_member_subject_selector'
 class SetMemberSubject < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include Linkable
-  extend Scientist
 
   belongs_to :subject_set
   belongs_to :subject

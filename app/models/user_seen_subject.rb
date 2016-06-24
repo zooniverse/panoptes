@@ -35,7 +35,8 @@ class UserSeenSubject < ActiveRecord::Base
         scope = Classification.joins_classification_subjects
         scope = scope.where(user_id: user_id)
         scope = scope.where(workflow_id: workflow_ids) if workflow_ids.present?
-        scope.group(:workflow_id).sum("DISTINCT subject_id")
+        scope = scope.select("workflow_id, subject_id").group(:workflow_id).count("DISTINCT subject_id")
+        scope.stringify_keys
       end
     end
   end

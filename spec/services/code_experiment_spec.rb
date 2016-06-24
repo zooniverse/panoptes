@@ -13,6 +13,9 @@ describe CodeExperiment do
     end
 
     before do
+      CodeExperiment.raise_on_mismatches = false
+      CodeExperiment.always_enabled = false
+
       allow(CodeExperiment.reporter).to receive(:publish)
       config
       CodeExperimentConfig.reset_cache!

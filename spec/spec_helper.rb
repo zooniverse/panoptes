@@ -29,7 +29,6 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
-    CodeExperiment.raise_on_mismatches = true
   end
 
   config.before(:each) do |example|
@@ -39,6 +38,10 @@ RSpec.configure do |config|
 
     # Clears out the jobs for tests using the fake testing
     Sidekiq::Worker.clear_all
+
+    # Enable all Scientist experiments
+    CodeExperiment.always_enabled = true
+    CodeExperiment.raise_on_mismatches = true
 
     case example.metadata[:sidekiq]
     when :fake

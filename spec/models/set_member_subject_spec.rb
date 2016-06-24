@@ -32,6 +32,15 @@ describe SetMemberSubject, :type => :model do
 
     subject { SetMemberSubject.available(workflow, user).pluck(:subject_id) }
 
+    before do
+      if uss
+        create :classification,
+          user: uss.user,
+          workflow: uss.workflow,
+          subjects: Subject.where(id: uss.subject_ids)
+      end
+    end
+
     context "when the workflow is finished" do
       let!(:sms) do
         create_list(:set_member_subject, 2, subject_set: subject_set)

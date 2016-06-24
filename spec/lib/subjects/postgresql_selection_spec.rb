@@ -38,9 +38,11 @@ RSpec.describe Subjects::PostgresqlSelection do
         it_behaves_like "select for incomplete_project"
 
         it 'should only select subjects in the specified group' do
+          subject_ids = sms.sample(5).map(&:subject_id)
+          create(:classification, user: user, workflow: workflow, subject_ids: subject_ids)
           create(:user_seen_subject,
                  user: user,
-                 subject_ids: sms.sample(5).map(&:subject_id),
+                 subject_ids: subject_ids,
                  workflow: workflow)
           result_ids = subject.select
           sms_subject_ids = SetMemberSubject.where(id: result_ids).pluck(:subject_set_id)

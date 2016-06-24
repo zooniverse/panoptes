@@ -49,8 +49,9 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       end
       let(:workflow) { project.workflows.first }
       let!(:user_seens) do
-        create(:user_seen_subject, user: authorized_user,
-          workflow: workflow, build_real_subjects: false)
+        create(:user_seen_subject, user: authorized_user, workflow: workflow).tap do |uss|
+          create :classification, user: authorized_user, workflow: workflow, subject_ids: uss.subject_ids
+        end
       end
 
       let(:run_get) do

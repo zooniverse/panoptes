@@ -63,13 +63,24 @@ RSpec.describe UserSeenSubject, :type => :model do
   end
 
   context "counting user activity" do
-    let(:user_seen_subject) { create(:user_seen_subject, build_real_subjects: false) }
-    let!(:another_uss) { create(:user_seen_subject, user: user_seen_subject.user, build_real_subjects: false) }
+    let(:user_seen_subject) { create(:user_seen_subject) }
+    let!(:another_uss) { create(:user_seen_subject, user: user_seen_subject.user) }
     let(:workflow_ids) { [user_seen_subject, another_uss].map(&:workflow_id).map(&:to_s) }
     let(:all_seen_counts) { [user_seen_subject, another_uss].map(&:subject_ids).flatten.size }
 
-    describe "::count_user_activity" do
+    before do
+      create :classification,
+        user: user_seen_subject.user,
+        workflow: user_seen_subject.workflow,
+        subjects: Subject.where(id: user_seen_subject.subject_ids)
 
+      create :classification,
+        user: another_uss.user,
+        workflow: another_uss.workflow,
+        subjects: Subject.where(id: another_uss.subject_ids)
+    end
+
+    describe "::count_user_activity" do
       it "should sum all the seen subjects across all workflows" do
         count = UserSeenSubject.count_user_activity(user_seen_subject.user_id)
         expect(count).to eq(all_seen_counts)
@@ -86,7 +97,6 @@ RSpec.describe UserSeenSubject, :type => :model do
       end
 
       context "when no counts exist for the user" do
-
         it "should return 0" do
           count = UserSeenSubject.count_user_activity(user_seen_subject.user_id+1)
           expect(count).to eq(0)

@@ -28,12 +28,19 @@ class CodeExperiment
     @reporter = reporter
   end
 
+  def self.always_enabled?
+    @always_enabled
+  end
+
+  def self.always_enabled=(value)
+    @always_enabled = value
+  end
+
   def enabled?
-    if always_enabled_for_admins && admin_user?
-      true
-    else
-      enabled_rate > 0 && rand < enabled_rate
-    end
+    return true if self.class.always_enabled?
+    return true if always_enabled_for_admins && admin_user?
+
+    enabled_rate > 0 && rand < enabled_rate
   end
 
   def publish(result)
