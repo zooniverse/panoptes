@@ -60,10 +60,15 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         contents.update(strings: strings)
       end
 
-      context "with a single question workflow annotation" do
-        let(:annotation) { { task: "init", value: 1 } }
+      it 'notes in the value if the annotation is invalid' do
+        annotation = {"task" => "init", "value" => "YES" }
+        formatted = described_class.new(classification, annotation, cache).to_h
+        expect(formatted["value"]).to eq("unknown answer label")
+      end
 
+      context "with a single question workflow annotation" do
         it 'should add the correct answer label' do
+          annotation = {"task" => "init", "value" => 1 }
           formatted = described_class.new(classification, annotation, cache).to_h
           expect(formatted["value"]).to eq("No")
         end
