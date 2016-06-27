@@ -623,6 +623,7 @@ describe User, type: :model do
         workflow = create(:workflow_with_subjects)
         ids = workflow.subject_sets.flat_map(&:subjects).map(&:id)
         create(:user_seen_subject, user: user, workflow: workflow, subject_ids: ids)
+        create(:classification, user: user, workflow: workflow, subjects: Subject.where(id: ids))
         workflow
       end
 

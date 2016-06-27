@@ -42,6 +42,10 @@ class Classification < ActiveRecord::Base
     end
   end
 
+  def self.joins_classification_subjects
+    joins("INNER JOIN classification_subjects ON classifications.id = classification_subjects.classification_id")
+  end
+
   def self.incomplete_for_user(user)
     incomplete.merge(created_by(user.user))
   end

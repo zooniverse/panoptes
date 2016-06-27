@@ -26,6 +26,7 @@ describe Subjects::SetMemberSubjectSelector do
   end
   let(:user) { create(:user) }
   let(:user_seen_subject) do
+    create :classification, user: user, workflow: workflow, subjects: [seen_subject]
     create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [seen_subject.id])
   end
   let(:selector_class) { Subjects::SetMemberSubjectSelector }
@@ -105,6 +106,7 @@ describe Subjects::SetMemberSubjectSelector do
             workflow: workflow,
             subject_ids: non_retired_unseen.id
           )
+          create :classification, user: user, workflow: workflow, subjects: [non_retired_unseen]
           count.touch(:retired_at)
         end
 

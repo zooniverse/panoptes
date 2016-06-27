@@ -32,6 +32,15 @@ describe SetMemberSubject, :type => :model do
 
     subject { SetMemberSubject.available(workflow, user).pluck(:subject_id) }
 
+    before do
+      if uss
+        create :classification,
+          user: uss.user,
+          workflow: uss.workflow,
+          subjects: Subject.where(id: uss.subject_ids)
+      end
+    end
+
     context "when the workflow is finished" do
       let!(:sms) do
         create_list(:set_member_subject, 2, subject_set: subject_set)
@@ -158,10 +167,15 @@ describe SetMemberSubject, :type => :model do
     let(:smses){ workflow.set_member_subjects }
     let(:uss) do
       create(:user_seen_subject, workflow: workflow, user: user, subject_ids: subject_ids)
+
+      subject_ids.each do |subject_id|
+        create(:classification, subjects: Subject.where(id: subject_id), user: user, workflow: workflow)
+      end
     end
     let!(:another_workflow_sms) { create(:set_member_subject) }
 
     before do
+      allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
       uss
     end
 

@@ -26,6 +26,7 @@ shared_examples "select for incomplete_project" do
     let(:args) { opts.merge(limit: limit) }
     let!(:uss) do
       subject_ids = sms_scope.sample(seen_count).map(&:subject_id)
+      create(:classification, user: user, workflow: workflow, subject_ids: subject_ids)
       create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
     end
 
@@ -61,6 +62,7 @@ shared_examples "select for incomplete_project" do
     let(:seen_count) { 20 }
     let!(:uss) do
       subject_ids = sms_scope.sample(seen_count).map(&:subject_id)
+      create(:classification, user: user, workflow: workflow, subject_ids: subject_ids)
       create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
     end
 
