@@ -3,6 +3,7 @@ class CodeExperiment
   include Scientist::Experiment
 
   attr_accessor :id, :name, :enabled_rate, :always_enabled_for_admins, :cached_at
+  cattr_writer :always_enabled
 
   def self.run(name, opts={})
     config = CodeExperimentConfig.cache_or_create(name)
@@ -30,10 +31,6 @@ class CodeExperiment
 
   def self.always_enabled?
     @always_enabled
-  end
-
-  def self.always_enabled=(value)
-    @always_enabled = value
   end
 
   def enabled?
