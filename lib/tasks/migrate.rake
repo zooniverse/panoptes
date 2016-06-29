@@ -117,6 +117,23 @@ namespace :migrate do
         .update_all(lifecycled_at: Time.current.to_s(:db))
       end
     end
+
+    desc "Convert non-standard Wildcam survey annotations"
+    task wildcam_annotations: :environment do
+      Classification.where(workflow_id: 338).find_each do |classification|
+        new_annotations = classification.annotations.map do |annotation|
+          if annotation["task"] == "survey"
+            {"task" => "T1", "value" => Array.wrap(annotation["value"])}
+          else
+            annotation
+          end
+        end
+
+        new_metadata = classification.metadata.merge("converted_legacy_survey_format" => true)
+
+        classification.update_columns annotations: new_annotations, metadata: new_metadata
+      end
+    end
   end
 
   namespace :tutorial do
