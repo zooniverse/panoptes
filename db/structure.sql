@@ -2930,7 +2930,7 @@ ALTER TABLE ONLY classification_subjects
 --
 
 ALTER TABLE ONLY subject_queues
-    ADD CONSTRAINT fk_rails_81596e7851 FOREIGN KEY (subject_set_id) REFERENCES subject_sets(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT fk_rails_81596e7851 FOREIGN KEY (subject_set_id) REFERENCES subject_sets(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -3438,4 +3438,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160613074924');
 INSERT INTO schema_migrations (version) VALUES ('20160613074934');
 
 INSERT INTO schema_migrations (version) VALUES ('20160613075003');
+
+INSERT INTO schema_migrations (version) VALUES ('20160628165038');
 
