@@ -52,7 +52,7 @@ Doorkeeper::JWT.configure do
     user = User.find(opts[:resource_owner_id])
 
     {
-      user: {
+      data: {
         id: user.id,
         login: user.login,
         dname: user.display_name,
