@@ -73,7 +73,7 @@ RSpec.describe Subjects::Selector do
       context "when the params page size is set as a string" do
         let(:size) { 2 }
         subject do
-          params = { page_size: "#{size}" }
+          params = { page_size: size }
           described_class.new(user, workflow, params, Subject.all)
         end
 
