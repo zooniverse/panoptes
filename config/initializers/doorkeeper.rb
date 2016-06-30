@@ -59,8 +59,13 @@ Doorkeeper::JWT.configure do
         scope: opts[:scopes].to_a,
         admin: user.is_admin?
       },
-      # allows consumers to check expiry
-      exp: Time.now.to_i + opts[:expires_in]
+      exp: Time.now.to_i + opts[:expires_in],
+
+      # RNG is not an official JWT claim.
+      # Needed so that JWT token is unique even when making multiple requests at the same time.
+      # Shorter than using the standard 'jti' claim with a UUID in it (saves about 40 chars in
+      # the resulting Base64-string).
+      rng: SecureRandom.hex(2)
     }
   end
 
