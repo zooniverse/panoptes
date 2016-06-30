@@ -496,8 +496,9 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe "#destroy" do
     let(:resource) { create(:subject, project: create(:project, owner: user)) }
+    let(:instances_to_disable) { [resource] }
 
-    it_behaves_like "is destructable"
+    it_behaves_like "is deactivatable"
   end
 
   describe "versioning" do

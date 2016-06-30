@@ -3,7 +3,7 @@ class Api::V1::SubjectsController < Api::ApiController
 
   require_authentication :update, :create, :destroy, :version, :versions,
     scopes: [:subject]
-  resource_actions :default
+  resource_actions :show, :index, :create, :update, :deactivate
   schema_type :json_schema
 
   alias_method :subject, :controlled_resource
