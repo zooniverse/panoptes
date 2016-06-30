@@ -59,6 +59,8 @@ Doorkeeper::JWT.configure do
         scope: opts[:scopes].to_a,
         admin: user.is_admin?
       },
+      # allows consumers to check expiry
+      exp: Time.now.to_i + opts[:expires_in]
     }
   end
 
