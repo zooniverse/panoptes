@@ -65,8 +65,8 @@ module Subjects
       sms_ids.reject {|id| retired_ids.include?(id) }
     end
 
-    def fallback_selection(limit=5)
-      opts = { limit: limit, subject_set_id: subject_set_id }
+    def fallback_selection
+      opts = { limit: subjects_page_size, subject_set_id: subject_set_id }
       selector = PostgresqlSelection.new(workflow, user, opts)
       sms_ids = selector.select
       return sms_ids unless sms_ids.blank?
@@ -145,7 +145,12 @@ module Subjects
     end
 
     def run_strategy_selection
-      Subjects::StrategySelection.new(workflow, user, subject_set_id).select
+      Subjects::StrategySelection.new(
+        workflow,
+        user,
+        subject_set_id,
+        subjects_page_size
+      ).select
     end
   end
 end
