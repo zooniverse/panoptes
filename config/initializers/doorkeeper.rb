@@ -55,9 +55,9 @@ Doorkeeper::JWT.configure do
       user: {
         id: user.id,
         login: user.login,
-        display_name: user.display_name,
-        is_admin: user.is_admin?
-      }
+        dname: user.display_name,
+        admin: user.is_admin?
+      },
     }
   end
 
