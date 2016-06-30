@@ -56,6 +56,7 @@ Doorkeeper::JWT.configure do
         id: user.id,
         login: user.login,
         dname: user.display_name,
+        scope: opts[:scopes].to_a,
         admin: user.is_admin?
       },
     }
