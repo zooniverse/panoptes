@@ -5,12 +5,16 @@ gem 'postgres_ext', '~> 2.4.0'
 gem 'active_record_union', '~> 1.1.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'doorkeeper', '~> 3.0'
+gem 'doorkeeper-jwt', '~> 0.1.6'
 gem 'devise', '~> 3.0'
 gem 'versionist', '~> 1.0'
 gem 'rack-cors', '~> 0.3', require: 'rack/cors'
 gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev" # REST API
 gem 'active_model_serializers', '0.10.0.rc2' # Event stream
 gem 'paper_trail', '~> 3.0'
+# Needed because version 1.1.0 locks JWT at an older version than doorkeeper-jwt requires.
+# Not a lot of commits between 1.1.0 and this ref. Remove this once the next version is released.
+gem 'oauth2', github: 'intridea/oauth2', ref: 'e0006cb5099bf392f011eb5c49cbec4f893bbdba'
 gem 'omniauth', '~> 1.0'
 gem 'omniauth-facebook', '~> 3.0'
 gem 'omniauth-gplus', '~> 2.0'

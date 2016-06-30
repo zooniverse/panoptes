@@ -20,6 +20,8 @@ Doorkeeper.configure do
 
   grant_flows ["authorization_code", "client_credentials", "implicit", "password"]
 
+  access_token_generator "Doorkeeper::JWT"
+
   resource_owner_authenticator do
     u = current_user || warden.authenticate!(scope: :user)
     u if !u.disabled?
@@ -43,4 +45,29 @@ Doorkeeper.configure do
       redirect_to(new_user_session_path)
     end
   end
+end
+
+Doorkeeper::JWT.configure do
+  token_payload do |opts|
+    user = User.find(opts[:resource_owner_id])
+
+    {
+      user: {
+        id: user.id,
+        login: user.login,
+        display_name: user.display_name,
+        is_admin: user.is_admin?
+      }
+    }
+  end
+
+  use_application_secret false
+
+  # Generate these with
+  # rsa_private = OpenSSL::PKey::RSA.generate 4096
+  # rsa_public = rsa_private.public_key
+  secret_key_path Rails.root.join("config", "doorkeeper-jwt.pem")
+
+  # Sign using RSA SHA-512
+  encryption_method :rs512
 end
