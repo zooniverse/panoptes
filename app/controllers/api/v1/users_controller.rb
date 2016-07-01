@@ -103,7 +103,6 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def user_info_changed(user_id, changed)
-    # Mailers::UserInfoChanged.run!(user_id, changed)
-    operation.run!(user_id, changed)
+    Mailers::UserInfoChanged.run!(user_id, changed)
   end
 end

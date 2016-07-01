@@ -1,8 +1,6 @@
 class UserInfoChangedMailer < ApplicationMailer
   layout false
 
-  SITE_NAME = "the Zooniverse"
-
   def user_info_changed(user, info)
     @user = user
     @email_to = user.email
