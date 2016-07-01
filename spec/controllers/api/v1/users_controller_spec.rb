@@ -442,7 +442,7 @@ describe Api::V1::UsersController, type: :controller do
     it_behaves_like "an api response"
   end
 
-  describe "#update" do
+  describe "#update", :focus do
     let(:user) { users.first }
     let(:user_id) { user.id }
 
