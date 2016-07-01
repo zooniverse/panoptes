@@ -1,5 +1,7 @@
 module Subjects
   class PostgresqlRandomSelection
+    using Refinements::RangeClamping
+
     attr_reader :available, :limit
 
     def initialize(available, limit)
@@ -41,11 +43,7 @@ module Subjects
 
     def limit_window
       half_available_count = (available_count * 0.5).ceil
-      if limit > half_available_count
-        limit
-      else
-        half_available_count
-      end
+      (half_available_count..available_count).clamp(limit)
     end
 
     def reassign_random?
