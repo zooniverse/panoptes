@@ -32,15 +32,17 @@ module Subjects
       if sms_ids.blank?
         sms_ids = fallback_selection
       end
-      subjects_in_selection_order(sms_ids)
+      active_subjects_in_selection_order(sms_ids)
     end
 
     private
 
-    def subjects_in_selection_order(sms_ids)
-      @scope.eager_load(:set_member_subjects)
-        .where(set_member_subjects: {id: sms_ids})
-        .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")
+    def active_subjects_in_selection_order(sms_ids)
+      @scope
+      .active
+      .eager_load(:set_member_subjects)
+      .where(set_member_subjects: {id: sms_ids})
+      .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")
     end
 
     def sms_ids_from_queue(queue)
