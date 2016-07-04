@@ -18,6 +18,7 @@
 # Ignore all config files
 /config/*.yml
 /config/aws_ips.json
+/config/doorkeeper-jwt.*
 
 .vagrant/
 *.swp

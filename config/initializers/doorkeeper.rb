@@ -20,6 +20,8 @@ Doorkeeper.configure do
 
   grant_flows ["authorization_code", "client_credentials", "implicit", "password"]
 
+  access_token_generator "Doorkeeper::JWT"
+
   resource_owner_authenticator do
     u = current_user || warden.authenticate!(scope: :user)
     u if !u.disabled?
@@ -43,4 +45,37 @@ Doorkeeper.configure do
       redirect_to(new_user_session_path)
     end
   end
+end
+
+Doorkeeper::JWT.configure do
+  token_payload do |opts|
+    user = User.find(opts[:resource_owner_id])
+
+    {
+      data: {
+        id: user.id,
+        login: user.login,
+        dname: user.display_name,
+        scope: opts[:scopes].to_a,
+        admin: user.is_admin?
+      },
+      exp: Time.now.to_i + opts[:expires_in],
+
+      # RNG is not an official JWT claim.
+      # Needed so that JWT token is unique even when making multiple requests at the same time.
+      # Shorter than using the standard 'jti' claim with a UUID in it (saves about 40 chars in
+      # the resulting Base64-string).
+      rng: SecureRandom.hex(2)
+    }
+  end
+
+  use_application_secret false
+
+  # Generate these with
+  # rsa_private = OpenSSL::PKey::RSA.generate 4096
+  # rsa_public = rsa_private.public_key
+  secret_key_path Rails.root.join("config", "doorkeeper-jwt.pem")
+
+  # Sign using RSA SHA-512
+  encryption_method :rs512
 end
