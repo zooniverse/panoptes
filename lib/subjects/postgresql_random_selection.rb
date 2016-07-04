@@ -1,5 +1,7 @@
 module Subjects
   class PostgresqlRandomSelection
+    using Refinements::RangeClamping
+
     attr_reader :available, :limit
 
     def initialize(available, limit)
@@ -10,7 +12,7 @@ module Subjects
     def select
       enough_available = limit < available_count
       if enough_available
-        ids = sample.pluck(:id).sample(limit)
+        ids = focus_window_random_sample.pluck(:id).sample(limit)
         if reassign_random?
           RandomOrderShuffleWorker.perform_async(ids)
         end
@@ -26,7 +28,7 @@ module Subjects
       @available_count ||= available.except(:select).count
     end
 
-    def sample(query=available)
+    def focus_window_random_sample(query=available)
       direction = [:asc, :desc].sample
       query.order(random: direction).limit(focus_set_window_size)
     end
@@ -34,9 +36,14 @@ module Subjects
     def focus_set_window_size
       @focus_set_window_size ||=
         [
-          (available_count * 0.5).ceil,
+          limit_window,
           Panoptes::SubjectSelection.focus_set_window_size
         ].min
+    end
+
+    def limit_window
+      half_available_count = (available_count * 0.5).ceil
+      (half_available_count..available_count).clamp(limit)
     end
 
     def reassign_random?

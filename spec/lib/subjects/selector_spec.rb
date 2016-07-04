@@ -50,20 +50,6 @@ RSpec.describe Subjects::Selector do
       end
     end
 
-    context "when the params page size is set as a string" do
-      let(:size) { 2 }
-      subject do
-        params = { page_size: "#{size}" }
-        described_class.new(user, workflow, params, Subject.all)
-      end
-
-      it 'should return the page_size number of subjects' do
-        subject_queue
-        subjects, _context = subject.get_subjects
-        expect(subjects.length).to eq(size)
-      end
-    end
-
     context "queue is stale" do
       let(:subject_queue) do
         create(:subject_queue,
@@ -83,6 +69,20 @@ RSpec.describe Subjects::Selector do
         expect_any_instance_of(SubjectQueue).to receive(:update_ids).with([])
         subject.get_subjects
       end
+
+      context "when the params page size is set as a string" do
+        let(:size) { 2 }
+        subject do
+          params = { page_size: size }
+          described_class.new(user, workflow, params, Subject.all)
+        end
+
+        it 'should return the page_size number of subjects' do
+          subject_queue
+          subjects, _context = subject.get_subjects
+          expect(subjects.length).to eq(size)
+        end
+      end
     end
 
     context "queue is empty" do
@@ -101,9 +101,9 @@ RSpec.describe Subjects::Selector do
         subject_queue
       end
 
-      it 'should return 5 subjects' do
+      it 'should return the default subjects set size' do
         subjects, = subject.get_subjects
-        expect(subjects.length).to eq(5)
+        expect(subjects.length).to eq(10)
       end
 
       context "when the database selection strategy returns an empty set" do

@@ -28,7 +28,7 @@ module Subjects
       else
         sms_ids_from_queue(queue)
       end
-      sms_ids = filter_non_retired(sms_ids)
+      sms_ids = filter_non_retired(sms_ids) unless sms_ids.blank?
       if sms_ids.blank?
         sms_ids = fallback_selection
       end
@@ -60,13 +60,13 @@ module Subjects
         .where("subject_workflow_counts.retired_at IS NOT NULL")
         .where(set_member_subjects: {id: sms_ids})
         .pluck(:id)
-
+      return sms_ids if retired_ids.blank?
       retired_ids = Set.new(retired_ids)
       sms_ids.reject {|id| retired_ids.include?(id) }
     end
 
-    def fallback_selection(limit=5)
-      opts = { limit: limit, subject_set_id: subject_set_id }
+    def fallback_selection
+      opts = { limit: subjects_page_size, subject_set_id: subject_set_id }
       selector = PostgresqlSelection.new(workflow, user, opts)
       sms_ids = selector.select
       return sms_ids unless sms_ids.blank?
@@ -145,7 +145,12 @@ module Subjects
     end
 
     def run_strategy_selection
-      Subjects::StrategySelection.new(workflow, user, subject_set_id).select
+      Subjects::StrategySelection.new(
+        workflow,
+        user,
+        subject_set_id,
+        subjects_page_size
+      ).select
     end
   end
 end
