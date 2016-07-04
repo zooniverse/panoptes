@@ -60,6 +60,7 @@ Doorkeeper::JWT.configure do
         admin: user.is_admin?
       },
       exp: Time.now.to_i + opts[:expires_in],
+      iss: "pan-#{Rails.env.to_s[0..3]}",
 
       # RNG is not an official JWT claim.
       # Needed so that JWT token is unique even when making multiple requests at the same time.
@@ -74,7 +75,7 @@ Doorkeeper::JWT.configure do
   # Generate these with
   # rsa_private = OpenSSL::PKey::RSA.generate 4096
   # rsa_public = rsa_private.public_key
-  secret_key_path Rails.root.join("config", "doorkeeper-jwt.pem")
+  secret_key_path Rails.root.join("config", "doorkeeper-jwt-#{Rails.env}.pem")
 
   # Sign using RSA SHA-512
   encryption_method :rs512
