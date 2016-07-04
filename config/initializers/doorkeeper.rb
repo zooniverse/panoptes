@@ -60,6 +60,7 @@ Doorkeeper::JWT.configure do
         admin: user.is_admin?
       },
       exp: Time.now.to_i + opts[:expires_in],
+      iss: "pan-#{Rails.env.to_s[0..3]}",
 
       # RNG is not an official JWT claim.
       # Needed so that JWT token is unique even when making multiple requests at the same time.
