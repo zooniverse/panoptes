@@ -42,7 +42,11 @@ module APIRequestHelpers
   end
 
   def stub_token(scopes: [], user_id: nil)
-    allow(controller).to receive(:doorkeeper_token).and_return(token(scopes, user_id))
+    if user_id
+      allow(controller).to receive(:doorkeeper_token).and_return(token(scopes, user_id))
+    else
+      allow(controller).to receive(:doorkeeper_token).and_return(nil)
+    end
   end
 
   def token(scopes, user_id)
