@@ -57,8 +57,21 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def self.unseen_for_user_by_workflow(user, workflow)
-    seen_subjects = UserSeenSubject.seen_for_user_by_workflow(user, workflow)
-    by_workflow(workflow).where.not(subject_id: seen_subjects)
+    CodeExperiment.run "unseen_by_classifications_table" do |e|
+      e.use do
+        seen_subjects = for_user_by_workflow_scope(user, workflow)
+        by_workflow(workflow).where(seen_subjects.exists.not)
+      end
+
+      e.try do
+        seen_subjects = UserSeenSubject.seen_for_user_by_workflow(user, workflow)
+        by_workflow(workflow).where.not(subject_id: seen_subjects)
+      end
+
+      e.compare do |control, candidate|
+        control.pluck(:id).sort == candidate.pluck(:id).sort
+      end
+    end
   end
 
   def self.for_user_by_workflow_scope(user, workflow)
