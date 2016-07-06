@@ -62,7 +62,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     it_behaves_like "is showable"
   end
 
-  describe "#update" do
+  describe "#update", :focus do
     let(:unauthorized_user) { create(:user) }
     let(:test_attr) { :roles }
     let(:test_attr_value) { %w(collaborator) }
@@ -71,6 +71,29 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     end
 
     it_behaves_like "is updatable"
+
+    context "mailers" do
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      # This is the one that should pass, but doesn't
+      it "calls the mailer if user added to project" do
+        params = update_params.merge(id: resource.id)
+        put :update, params
+        #expect(UserAddedToProjectMailerWorker).to receive(:perform_async)
+        expect(Mailers::UserAddedToProject).to receive(:run!)
+      end
+
+      # This is a double check and passes probably by accident
+      it "does not call the mailer not appropriate" do
+        new_roles = { project_roles: { roles: ["tester"] } }
+        params = new_roles.merge(id: resource.id)
+        put :update, params
+        # expect(UserAddedToProjectMailerWorker).to_not receive(:perform_async)
+        expect(Mailers::UserAddedToProject).to_not receive(:run!)
+      end
+    end
   end
 
   describe "#create" do
