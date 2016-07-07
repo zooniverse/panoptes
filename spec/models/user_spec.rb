@@ -832,6 +832,26 @@ describe User, type: :model do
     end
   end
 
+  describe "sends info changed emails after_update callback if info has changed" do
+    let!(:user) { create(:user) }
+
+    it "should send the info changed email if password has changed" do
+      expect(user).to receive(:send_password_changed_email)
+      user.update_attribute(:password, "totallychanged")
+    end
+
+    it "should send the info changed email if email address has changed" do
+      expect(user).to receive(:send_email_changed_email)
+      user.update_attribute(:email, "newemail@zoonverse.org")
+    end
+
+    it "should queue the worker with the user id" do
+      allow(UserInfoChangedMailerWorker).to receive :perform_async
+      user.update_attribute(:password, "totallychanged")
+      expect(UserInfoChangedMailerWorker).to have_received(:perform_async).with(user.id, :password).ordered
+    end
+  end
+
   describe "#set_ouroboros_api_key" do
     it 'should set the key on creation' do
       user = create(:user, api_key: nil)

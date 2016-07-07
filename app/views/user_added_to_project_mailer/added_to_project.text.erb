@@ -1,0 +1,13 @@
+You have been added to the Zooniverse project <%= @project.display_name %> in the following roles: <%= @roles.join(" and ") %>
+
+Visit <a href="https://zooniverse.org/projects/<%= @project.slug %>"><%= @project.display_name %></a> to get started.
+
+<% if @roles.include? "collaborator" %>
+  To edit your project, go to <a href="https://zooniverse.org/lab/<%= @project.id %>">
+<% end %>
+
+If you believe this to be in error, please contact support (contact@zooniverse.org).
+
+Thanks,
+
+The Zooniverse Team
