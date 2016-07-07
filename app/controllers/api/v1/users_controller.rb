@@ -53,9 +53,9 @@ class Api::V1::UsersController < Api::ApiController
           SubscribeWorker.perform_async(user.email)
           UnsubscribeWorker.perform_async(user.changes[:email].first)
         end
-        user_info_changed(user.id, "email")
+        user_info_changed(:email)
       when user.encrypted_password_changed?
-        user_info_changed(user.id, "password")
+        user_info_changed(:password)
       end
     end
   end
@@ -102,7 +102,7 @@ class Api::V1::UsersController < Api::ApiController
     token.revoke
   end
 
-  def user_info_changed(user_id, changed)
-    Mailers::UserInfoChanged.run!(user_id: user_id, changed: changed)
+  def user_info_changed(changed)
+    Mailers::UserInfoChanged.run!(api_user: api_user, changed: changed)
   end
 end
