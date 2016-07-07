@@ -43,7 +43,11 @@ module Subjects
 
     def limit_window
       half_available_count = (available_count * 0.5).ceil
-      (half_available_count..available_count).clamp(limit)
+      if half_available_count < limit
+        limit
+      else
+        half_available_count
+      end
     end
 
     def reassign_random?
