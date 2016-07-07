@@ -38,7 +38,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def retire_subjects
     operation.with(workflow: controlled_resource).run!(params)
-    render nothing: true
+    render nothing: true, status: 204
   end
 
   private
