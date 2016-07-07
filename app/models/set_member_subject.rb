@@ -57,20 +57,12 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def self.unseen_for_user_by_workflow(user, workflow)
-    CodeExperiment.run "unseen_by_classifications_table" do |e|
-      e.use do
-        seen_subjects = for_user_by_workflow_scope(user, workflow)
-        by_workflow(workflow).where(seen_subjects.exists.not)
-      end
-
-      e.try do
-        seen_subjects = UserSeenSubject.seen_for_user_by_workflow(user, workflow)
-        by_workflow(workflow).where.not(subject_id: seen_subjects)
-      end
-
-      e.compare do |control, candidate|
-        control.pluck(:id).sort == candidate.pluck(:id).sort
-      end
+    if Panoptes.flipper[:seens_via_classifications].enabled?
+      seen_subjects = UserSeenSubject.seen_for_user_by_workflow(user, workflow)
+      by_workflow(workflow).where.not(subject_id: seen_subjects)
+    else
+      seen_subjects = for_user_by_workflow_scope(user, workflow)
+      by_workflow(workflow).where(seen_subjects.exists.not)
     end
   end
 
