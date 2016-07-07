@@ -559,9 +559,9 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:subject_set_id) { subject_set.id }
     let(:subject) { create(:subject, subject_sets: [subject_set]) }
 
-    it 'returns a 200 status' do
+    it 'returns a 204 status' do
       post :retire_subjects, workflow_id: workflow.id, subject_id: subject.id
-      expect(response.status).to eq(200)
+      expect(response.status).to eq(204)
     end
 
     it 'retires the subject' do
