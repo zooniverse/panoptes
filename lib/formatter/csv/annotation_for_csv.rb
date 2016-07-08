@@ -52,7 +52,7 @@ module Formatter
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
           new_anno['value'] = @current['value']
-          new_anno['task_label'] = task_label(task_info)
+          new_anno['task_label'] = "text"
         end
       end
 
