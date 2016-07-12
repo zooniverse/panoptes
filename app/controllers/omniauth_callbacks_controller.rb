@@ -9,7 +9,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   alias_method :facebook, :callback
-  alias_method :gplus, :callback
+  alias_method :google_oauth2, :callback
 
   private
 

@@ -11,7 +11,7 @@ class User < ActiveRecord::Base
 
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
-    :omniauthable, omniauth_providers: [:facebook, :gplus]
+    :omniauthable, omniauth_providers: [:facebook, :google_oauth2]
 
   has_many :classifications, dependent: :restrict_with_exception
   has_many :authorizations, dependent: :destroy
