@@ -13,15 +13,15 @@
       <%- resource_class.omniauth_providers.each do |provider| %>
         <%- if provider.to_s == 'facebook' %>
           <%= link_to ("<i class='fa fa-facebook-official fa-lg'></i> Sign in").html_safe, user_omniauth_authorize_path(provider), class: "devise-shared-link #{provider.to_s}-link" %>
-        <%- elsif provider.to_s == 'gplus' %>
-          <%= link_to ("<i class='fa fa-google-plus fa-lg'></i> Sign in").html_safe, user_omniauth_authorize_path(provider), class: "devise-shared-link #{provider.to_s}-link" %>
+        <%- elsif provider.to_s == 'google_oauth2' %>
+          <%= link_to ("<i class='fa fa-google fa-lg'></i> Sign in").html_safe, user_omniauth_authorize_path(provider), class: "devise-shared-link #{provider.to_s}-link" %>
         <%- else %>
           <%= link_to "Sign in with #{provider.to_s.titleize}", user_omniauth_authorize_path(provider), class: "devise-shared-link #{provider.to_s}-link" %>
         <% end -%>
       <% end -%>
     <% end -%>
   </div>
-  
+
   <div class="action-links">
     <%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
       <%= link_to "Forgot your password?", new_password_path(resource_name), class: 'devise-shared-link forgot-password-link' %>

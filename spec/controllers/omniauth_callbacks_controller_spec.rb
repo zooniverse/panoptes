@@ -52,13 +52,13 @@ describe OmniauthCallbacksController, type: :controller do
     it_behaves_like 'an omniauth callback'
   end
 
-  describe '#gplus' do
+  describe '#google_oauth2' do
     before(:each) do
       request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:gplus]
     end
 
-    let(:provider) { 'gplus' }
-    let(:req) { get :gplus }
+    let(:provider) { 'google_oauth2' }
+    let(:req) { get :google_oauth2 }
 
     it_behaves_like 'an omniauth callback'
   end
