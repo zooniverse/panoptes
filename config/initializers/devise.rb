@@ -36,5 +36,5 @@ Devise.setup do |config|
     end
   end
 
-  omniauth_config_for(config, providers: [:facebook, :gplus])
+  omniauth_config_for(config, providers: [:facebook, :google_oauth2])
 end
