@@ -54,7 +54,7 @@ describe OmniauthCallbacksController, type: :controller do
 
   describe '#google_oauth2' do
     before(:each) do
-      request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:gplus]
+      request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:google_oauth2]
     end
 
     let(:provider) { 'google_oauth2' }

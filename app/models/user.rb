@@ -105,14 +105,16 @@ class User < ActiveRecord::Base
   end
 
   def self.from_omniauth(auth_hash)
-    auth = Authorization.from_omniauth(auth_hash)
-    auth.user ||= create! do |u|
-      u.email = auth_hash.info.email
-      u.display_name = auth_hash.info.name
-      u.login = sanitize_login u.display_name
-      u.password = Devise.friendly_token[0,20]
-      u.build_identity_group
-      u.authorizations << auth
+    transaction do
+      auth = Authorization.from_omniauth(auth_hash)
+      auth.user ||= create! do |u|
+        u.email = auth_hash.info.email
+        u.display_name = auth_hash.info.name
+        u.login = uniqueify(:login, sanitize_login(u.display_name))
+        u.password = Devise.friendly_token[0,20]
+        u.build_identity_group
+        u.authorizations << auth
+      end
     end
   end
 
@@ -140,7 +142,18 @@ class User < ActiveRecord::Base
   def self.sanitize_login(string)
     string
       .gsub(/\s+/, '_')
-      .gsub /[^#{ ALLOWED_LOGIN_CHARACTERS }]/, ''
+      .gsub(/[^#{ ALLOWED_LOGIN_CHARACTERS }]/, '')
+  end
+
+  def self.uniqueify(field, value)
+    suffix = nil
+
+    while where(field => "#{value}#{suffix}").present?
+      suffix ||= 0
+      suffix += SecureRandom.random_number(1000) # Don't want sequential numbers
+    end
+
+    "#{value}#{suffix}"
   end
 
   def self.user_from_unsubscribe_token(signature)
