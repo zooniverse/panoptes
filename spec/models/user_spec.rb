@@ -67,14 +67,6 @@ describe User, type: :model do
       end
     end
 
-    context 'an invalid user' do
-      it 'should raise an exception' do
-        create(:user, email: 'examplar@example.com')
-        auth_hash = OmniAuth.config.mock_auth[:google_oauth2]
-        expect{ User.from_omniauth(auth_hash) }.to raise_error(ActiveRecord::RecordInvalid)
-      end
-    end
-
     context 'a user who already had a normal account' do
       it 'should raise an exception when email is used' do
         user = create(:user)

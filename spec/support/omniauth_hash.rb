@@ -27,7 +27,7 @@ google_oauth2 = {
 }
 
 facebook_no_email = facebook.dup
-facebook_no_email[:info].delete(:email)
+facebook_no_email[:info] = facebook[:info].dup.delete(:email)
 
 OmniAuth.config.add_mock(:facebook, facebook)
 OmniAuth.config.add_mock(:facebook_no_email, facebook_no_email)
