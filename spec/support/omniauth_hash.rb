@@ -12,8 +12,8 @@ facebook = {
   }
 }
 
-gplus = {
-  provider: 'gplus',
+google_oauth2 = {
+  provider: 'google_oauth2',
   uid: '12345',
   info: {
     email: 'examplar@example.com',
@@ -27,8 +27,9 @@ gplus = {
 }
 
 facebook_no_email = facebook.dup
+facebook_no_email[:info] = facebook[:info].dup
 facebook_no_email[:info].delete(:email)
 
 OmniAuth.config.add_mock(:facebook, facebook)
 OmniAuth.config.add_mock(:facebook_no_email, facebook_no_email)
-OmniAuth.config.add_mock(:gplus, gplus)
+OmniAuth.config.add_mock(:google_oauth2, google_oauth2)

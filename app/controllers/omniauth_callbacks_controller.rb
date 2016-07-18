@@ -5,7 +5,8 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     sign_in @user, event: :authentication
     redirect_to sign_in_redirect
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique
-    # TODO Redirect to a page to edit user options
+    flash[:alert] = "Sorry, an account with your email address already exists. Please log in with your Zooniverse account, or attempt a password reset if you've forgotten your password."
+    redirect_to new_user_session_path
   end
 
   alias_method :facebook, :callback

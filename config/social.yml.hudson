@@ -3,7 +3,7 @@ development:
     app_id: <%= ENV['FACEBOOK_APP_ID'] %>
     app_secret: <%= ENV['FACEBOOK_APP_SECRET'] %>
     scope: email, public_profile
-  gplus:
+  google_oauth2:
     app_id: <%= ENV['GPLUS_APP_ID'] %>
     app_secret: <%= ENV['GPLUS_APP_SECRET'] %>
     scope: userinfo.email, userinfo.profile, plus.login
@@ -14,7 +14,7 @@ test:
     app_id: Not a real id
     app_secret: Not a real secret
     scope: email, public_profile
-  gplus:
+  google_oauth2:
     app_id: Not real
     app_secret: all_fake
     scope: userinfo.email, userinfo.profile, plus.login

@@ -25,7 +25,7 @@ describe User, type: :model do
 
     shared_examples 'new user from omniauth' do
       let(:user_from_auth_hash) do
-        user = User.from_omniauth(auth_hash)
+        User.from_omniauth(auth_hash)
       end
 
       it 'should create a new valid user' do
@@ -67,11 +67,22 @@ describe User, type: :model do
       end
     end
 
-    context 'an invalid user' do
-      it 'should raise an exception' do
-        create(:user, email: 'examplar@example.com')
-        auth_hash = OmniAuth.config.mock_auth[:gplus]
-        expect{ User.from_omniauth(auth_hash) }.to raise_error(ActiveRecord::RecordInvalid)
+    context 'a user who already had a normal account' do
+      it 'should raise an exception when email is used' do
+        user = create(:user)
+        auth_hash = OmniAuth.config.mock_auth[:facebook]
+        auth_hash[:info][:email] = user.email
+        expect { User.from_omniauth(auth_hash) }.to raise_error(ActiveRecord::RecordInvalid)
+        expect(Authorization.count).to eq(0)
+      end
+
+      it 'should create multiple users if email is different' do
+        user = create(:user, display_name: 'Same Thing', login: User.sanitize_login('Same Thing'))
+
+        auth_hash = OmniAuth.config.mock_auth[:facebook]
+        auth_hash[:info][:name] = user.display_name
+        auth_hash[:info][:email] = "somethingelse@example.com"
+        expect(User.from_omniauth(auth_hash)).to be_persisted
       end
     end
   end

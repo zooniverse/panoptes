@@ -31,8 +31,11 @@ shared_examples "an omniauth callback" do
     expect(response).to redirect_to 'https://zooniverse.org/'
   end
 
-  it 'should redirect to a user editor if the created user is not valid'
-  it 'should redirect to a user editor if the created user is not unique'
+  it 'should show an error when created user is invalid' do
+    user = create(:user)
+    request.env['omniauth.auth']['info']['email'] = user.email
+    req
+  end
 end
 
 describe OmniauthCallbacksController, type: :controller do
@@ -54,7 +57,7 @@ describe OmniauthCallbacksController, type: :controller do
 
   describe '#google_oauth2' do
     before(:each) do
-      request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:gplus]
+      request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:google_oauth2]
     end
 
     let(:provider) { 'google_oauth2' }
