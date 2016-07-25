@@ -98,6 +98,20 @@ describe Project, type: :model do
     end
   end
 
+  describe "#active_workflows" do
+    let(:project) do
+      create(:project) do |p|
+        create(:workflow, project: p, active: true)
+        create(:workflow, project: p, active: false)
+      end
+    end
+
+    it "should have only one active workflow" do
+      expect(project.active_workflows.size).to eq(1)
+      expect(project.active_workflows).to all( be_a(Workflow) )
+    end
+  end
+
   describe "#subject_sets" do
     let(:project) { create(:project_with_subject_sets) }
 
