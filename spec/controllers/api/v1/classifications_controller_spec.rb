@@ -243,6 +243,11 @@ describe Api::V1::ClassificationsController, type: :controller do
 
     let(:resource) { create(:classification, user: user) }
     it_behaves_like "is showable"
+
+    context "when incomplete" do
+      let(:resource) { create(:classification, user: user, completed: false) }
+      it_behaves_like "is showable"
+    end
   end
 
   describe "#create" do

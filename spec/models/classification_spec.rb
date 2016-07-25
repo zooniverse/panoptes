@@ -156,9 +156,25 @@ describe Classification, :type => :model do
         expect(Classification.scope_for(:index, other_user)).to match_array(expected)
       end
 
-      it 'should not return incomplete classifications for a project' do
-        create(:classification, user: user.owner, completed: false)
-        expect(Classification.scope_for(:show, user)).to be_empty
+      describe "#index" do
+        it 'should not return incomplete classifications for a project' do
+          create(:classification, user: user.owner, completed: false)
+          expect(Classification.scope_for(:index, user)).to be_empty
+        end
+      end
+
+      describe "#show" do
+        let(:result) { Classification.scope_for(:show, user) }
+
+        it 'should return incomplete classifications for a project' do
+          expected = create(:classification, user: user.owner, completed: false)
+          expect(result).to match_array([expected])
+        end
+
+        it 'should return complete classifications for a project' do
+          expected = create(:classification, user: user.owner)
+          expect(result).to match_array(expected)
+        end
       end
     end
 
