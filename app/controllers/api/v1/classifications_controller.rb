@@ -34,6 +34,14 @@ class Api::V1::ClassificationsController < Api::ApiController
     index
   end
 
+  def offset
+    @controlled_resources = Classification.where("project_id = ? AND id > ?", params[:project_id], params[:last_id])
+    .includes(:project)
+    .includes(:user)
+    render json_api: serializer.page(params, controlled_resources, context),
+           generate_response_obj_etag: true
+  end
+
   private
 
   def filter_by_subject_id
