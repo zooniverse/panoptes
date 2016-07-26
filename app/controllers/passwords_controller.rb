@@ -26,7 +26,12 @@ class PasswordsController < Devise::PasswordsController
     def update_from_json
       resource = resource_class.reset_password_by_token(resource_params)
       yield resource if block_given?
-      respond_to_request(resource.errors.empty?)
+      resource.valid? if resource.errors.empty?
+      response_body = {}
+      unless resource.errors.empty?
+        response_body.merge!(error_response(resource.errors.full_messages.join(", ")))
+      end
+      respond_to_request(response_body.empty?, response_body)
     end
 
     def create_from_json
@@ -36,8 +41,12 @@ class PasswordsController < Devise::PasswordsController
       respond_to_request(status)
     end
 
-    def respond_to_request(action_status)
+    def respond_to_request(action_status, body={})
       response_status = action_status ? :ok : :unprocessable_entity
-      render status: response_status, json: {}
+      render status: response_status, json: body
+    end
+
+    def error_response(msg)
+      { errors: [ message: msg ] }
     end
 end
