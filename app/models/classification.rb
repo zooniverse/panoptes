@@ -20,15 +20,17 @@ class Classification < ActiveRecord::Base
   validate :validate_gold_standard
 
   scope :incomplete, -> { where("completed IS FALSE") }
-  scope :created_by, -> (user) { where(user: user) }
+  scope :created_by, -> (user) { where(user_id: user.id) }
   scope :complete, -> { where(completed: true) }
   scope :gold_standard, -> { where("gold_standard IS TRUE") }
 
   def self.scope_for(action, user, opts={})
     return all if user.is_admin? && action != :gold_standard
     case action
-    when :show, :index
-      complete.merge(created_by(user.user)).includes(:subjects)
+    when :index
+      complete.merge(created_by(user)).includes(:subjects)
+    when :show
+      created_by(user).includes(:subjects)
     when :update, :destroy
       incomplete_for_user(user)
     when :incomplete
@@ -47,7 +49,7 @@ class Classification < ActiveRecord::Base
   end
 
   def self.incomplete_for_user(user)
-    incomplete.merge(created_by(user.user))
+    incomplete.merge(created_by(user))
   end
 
   def self.gold_standard_for_user(user)
