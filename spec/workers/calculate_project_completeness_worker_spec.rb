@@ -6,7 +6,7 @@ describe CalculateProjectCompletenessWorker do
 
   describe '#project_completeness' do
     it 'returns the average of the workflow completenesses' do
-      project = double(workflows: [
+      project = double(active_workflows: [
         double(completeness: 1),
         double(completeness: 0)
       ])

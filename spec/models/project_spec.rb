@@ -106,7 +106,7 @@ describe Project, type: :model do
       end
     end
 
-    it "should have only one active workflow" do
+    it "should only return the active workflow" do
       expect(project.active_workflows.size).to eq(1)
       expect(project.active_workflows).to all( be_a(Workflow) )
     end
