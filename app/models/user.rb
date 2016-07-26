@@ -47,7 +47,6 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :login, case_sensitive: false
   validates :display_name, presence: true
   validates :unsubscribe_token, presence: true, uniqueness: true
-  validates_length_of :password, within: 8..128, allow_blank: true, unless: :migrated
   validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
 
   validates_with IdentityGroupNameValidator
