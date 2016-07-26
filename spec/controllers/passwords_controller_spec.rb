@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe PasswordsController, type: [ :controller, :mailer ] do
-
   before(:each) do
     request.env["devise.mapping"] = Devise.mappings[:user]
   end
@@ -28,12 +27,9 @@ describe PasswordsController, type: [ :controller, :mailer ] do
       let(:email_attributes) { user.attributes.slice("email") }
       let(:user_email_attrs) { { user: email_attributes } }
 
-      context "when not supplying an email" do
-
-        it "should return 422" do
-          post :create, user: { email: nil }
-          expect(response.status).to eq(422)
-        end
+      it "should return 422 with no email" do
+        post :create, user: { email: nil }
+        expect(response.status).to eq(422)
       end
 
       context "using an email address that doesn't belong to a user" do
@@ -83,14 +79,13 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
       context "using an email address that belongs to a user" do
 
-        context "when the background mailer is used" do
-
-          it "should queue the email for delayed sending" do
-            Devise.mailer = Devise::BackgroundMailer
-            expect { post :create, user_email_attrs }
-              .to change { Sidekiq::Extensions::DelayedMailer.jobs.size }
-              .from(0).to(1)
-          end
+        it "should queue the email for delayed sending" do
+          prev_mailer = Devise.mailer
+          Devise.mailer = Devise::BackgroundMailer
+          expect { post :create, user_email_attrs }
+            .to change { Sidekiq::Extensions::DelayedMailer.jobs.size }
+            .from(0).to(1)
+          Devise.mailer = prev_mailer
         end
 
         it "should return 200" do
@@ -101,7 +96,9 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         it "should use devise to send the password reset email" do
           allow_any_instance_of(PasswordsController)
             .to receive(:successfully_sent?).and_return(true)
-          expect(User).to receive(:send_reset_password_instructions).once
+          expect(User)
+            .to receive(:send_reset_password_instructions)
+            .and_call_original
           post :create, user_email_attrs
         end
 
@@ -144,26 +141,45 @@ describe PasswordsController, type: [ :controller, :mailer ] do
       end
 
       context "when not supplying a valid reset token" do
-
-        it "should return 422" do
+        before do
           put :update, user: passwords.merge(reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        end
+
+        it "should return return 422 and a meaningful error response body" do
           expect(response.status).to eq(422)
+          error = JSON.parse(response.body)["errors"].first
+          expect(error["message"]).to eq("Reset password token is invalid")
         end
       end
 
       context "when supplying a valid reset token" do
         let(:valid_token) { user.send_reset_password_instructions }
+        let(:valid_attrs) { { user: passwords.merge(reset_password_token: valid_token) } }
 
         context "with a database user" do
           it "should return 200" do
-            put :update, user: passwords.merge(reset_password_token: valid_token)
+            put :update, valid_attrs
             expect(response.status).to eq(200)
           end
 
           it "should update the password" do
-            put :update, user: passwords.merge(reset_password_token: valid_token)
+            put :update, valid_attrs
             user.reload
             expect(user.valid_password?(new_password)).to eq(true)
+          end
+
+          context "when supplying a invalid new password" do
+            let(:passwords) do
+              short = "1234"
+              { password: short, password_confirmation: short }
+            end
+
+            it "should return a meaningful error response body" do
+              put :update, user: passwords.merge(reset_password_token: valid_token)
+              expect(response.status).to eq(422)
+              error = JSON.parse(response.body)["errors"].first
+              expect(error["message"]).to eq("Password is too short (minimum is 8 characters)")
+            end
           end
         end
       end
