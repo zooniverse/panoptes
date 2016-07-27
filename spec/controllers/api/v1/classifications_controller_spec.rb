@@ -154,24 +154,34 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
   end
 
-  describe "#offset" do
+  describe "#offset", :focus do
     let!(:first) { create(:classification, user: user, project: project) }
     let!(:second) { create(:classification, user: user, project: project) }
 
-    before(:each) do
-      default_request user_id: authorized_user.id, scopes: scopes
-      get :offset, last_id: first.id, project_id: project.id
+    context 'with an authorized user' do
+      before(:each) do
+        default_request user_id: authorized_user.id, scopes: scopes
+        get :offset, last_id: first.id, project_id: project.id
+      end
+
+      it 'should return 200' do
+        expect(response.status).to eq 200
+      end
+
+      it "should only return the second classification", :aggregate_failures do
+        resources = json_response[api_resource_name]
+        expect(resources.length).to eq 1
+        c = Classification.first
+        expect(resources).not_to include c
+      end
     end
 
-    it 'should return 200' do
-      expect(response.status).to eq 200
-    end
-
-    it "should only return the second classification", :aggregate_failures do
-      resources = json_response[api_resource_name]
-      expect(resources.length).to eq 1
-      c = Classification.first
-      expect(resources).not_to include c
+    context 'with an unauthorized user' do
+      it 'should return 401' do
+        unauthenticated_request
+        get :offset, last_id: first.id, project_id: project.id
+        expect(response.status).to eq 401
+      end
     end
   end
 

@@ -2,7 +2,7 @@ require 'classification_lifecycle'
 
 class Api::V1::ClassificationsController < Api::ApiController
   skip_before_filter :require_login, only: :create
-  require_authentication :show, :index, :destroy, :update, :incomplete, :project,
+  require_authentication :show, :index, :destroy, :update, :incomplete, :project, :offset,
     scopes: [:classification]
 
   resource_actions :default
@@ -35,9 +35,10 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def offset
-    @controlled_resources = Classification.where("project_id = ? AND id > ?", params[:project_id], params[:last_id])
-    .includes(:project)
-    .includes(:user)
+    @controlled_resources =
+      Classification.where("project_id = ? AND id > ?", params[:project_id], params[:last_id])
+                    .includes(:project)
+                    .includes(:user)
     render json_api: serializer.page(params, controlled_resources, context),
            generate_response_obj_etag: true
   end
