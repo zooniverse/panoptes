@@ -155,13 +155,16 @@ describe Api::V1::ClassificationsController, type: :controller do
   end
 
   describe "#offset", :focus do
-    let!(:first) { create(:classification, user: user, project: project) }
-    let!(:second) { create(:classification, user: user, project: project) }
+    let(:project) { create(:full_project) }
+    let(:authorized_user) { project.owner }
+    let!(:first) { create(:classification, user: authorized_user, project: project) }
+    let!(:second) { create(:classification, user: authorized_user, project: project) }
+
 
     context 'with an authorized user' do
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
-        get :offset, last_id: first.id, project_id: project.id
+        get :project_offset, last_id: first.id
       end
 
       it 'should return 200' do
@@ -177,11 +180,21 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
 
     context 'with an unauthorized user' do
-      it 'should return 401' do
+      let(:unauth_user) { create(:user) }
+
+      it 'returns 401 if the user is unauthorized' do
         unauthenticated_request
-        get :offset, last_id: first.id, project_id: project.id
+        get :project_offset, last_id: first.id
         expect(response.status).to eq 401
       end
+
+      it 'returns 0 classifications if the user does not have a valid project role' do
+        default_request scopes: scopes, user_id: unauth_user.id
+        get :project_offset, last_id: first.id
+        resources = json_response[api_resource_name]
+        expect(resources.length).to eq 0
+      end
+
     end
   end
 

@@ -2,7 +2,7 @@ require 'classification_lifecycle'
 
 class Api::V1::ClassificationsController < Api::ApiController
   skip_before_filter :require_login, only: :create
-  require_authentication :show, :index, :destroy, :update, :incomplete, :project, :offset,
+  require_authentication :show, :index, :destroy, :update, :incomplete, :project, :project_offset,
     scopes: [:classification]
 
   resource_actions :default
@@ -34,16 +34,15 @@ class Api::V1::ClassificationsController < Api::ApiController
     index
   end
 
-  def offset
-    @controlled_resources =
-      Classification.where("project_id = ? AND id > ?", params[:project_id], params[:last_id])
-                    .includes(:project)
-                    .includes(:user)
-    render json_api: serializer.page(params, controlled_resources, context),
-           generate_response_obj_etag: true
+  def project_offset
+    index
   end
 
   private
+
+  def scope_context
+    params
+  end
 
   def filter_by_subject_id
     subject_ids = (params.delete(:subject_ids) || params.delete(:subject_id)).try(:split, ',')

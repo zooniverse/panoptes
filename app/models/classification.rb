@@ -23,6 +23,7 @@ class Classification < ActiveRecord::Base
   scope :created_by, -> (user) { where(user_id: user.id) }
   scope :complete, -> { where(completed: true) }
   scope :gold_standard, -> { where("gold_standard IS TRUE") }
+  scope :after_id, -> (last_id) { where("classifications.id > ?", last_id) }
 
   def self.scope_for(action, user, opts={})
     return all if user.is_admin? && action != :gold_standard
@@ -31,12 +32,14 @@ class Classification < ActiveRecord::Base
       complete.merge(created_by(user)).includes(:subjects)
     when :show
       created_by(user).includes(:subjects)
-    when :update, :destroy
+  when :update, :destroy
       incomplete_for_user(user)
     when :incomplete
       incomplete_for_user(user).includes(:subjects)
     when :project
       joins(:project).merge(Project.scope_for(:update, user)).includes(:subjects)
+    when :project_offset
+      after_id(opts[:last_id]).joins(:project).merge(Project.scope_for(:update, user))
     when :gold_standard
       gold_standard_for_user(user).includes(:subjects)
     else
