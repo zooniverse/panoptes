@@ -54,11 +54,10 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def field_context
     if params[:fields].present?
-      included_keys = params[:fields].split ','
-      included_fields = included_keys.select{ |key| Workflow.columns_hash.has_key? key }
-      all_fields = WorkflowSerializer.serializable_attributes.keys.map &:to_s
-      excluded_fields = all_fields - included_fields - ['id'] # always include id
-
+      included_keys = params[:fields].split(',')
+      attrs = WorkflowSerializer.serializable_attributes.with_indifferent_access
+      allowed_keys = attrs.slice(*included_keys).keys | ['id']
+      excluded_fields = attrs.keys - allowed_keys
       { }.tap do |attributes|
         excluded_fields.each do |field|
           attributes[:"include_#{ field }?"] = false

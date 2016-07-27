@@ -72,9 +72,9 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
 
       it 'should return only serialize the specified fields' do
-        get :index, fields: 'display_name,does_not_exist'
+        get :index, fields: 'display_name,subjects_count,does_not_exist'
         response_keys = json_response['workflows'].map(&:keys).uniq.flatten
-        expect(response_keys).to match_array ['id', 'links', 'display_name']
+        expect(response_keys).to match_array ['id', 'links', 'display_name', 'subjects_count']
       end
     end
   end
