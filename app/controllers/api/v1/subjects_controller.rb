@@ -20,6 +20,10 @@ class Api::V1::SubjectsController < Api::ApiController
     end
   end
 
+  def destroy
+    super { |subject| SubjectRemovalWorker.perform_async(subject.id) }
+  end
+
   private
 
   def check_subject_limit

@@ -499,6 +499,13 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:instances_to_disable) { [resource] }
 
     it_behaves_like "is deactivatable"
+
+    it "should background a job to cleanup orphan subjects" do
+      stub_token(scopes: scopes, user_id: authorized_user.id)
+      set_preconditions
+      expect(SubjectRemovalWorker).to receive(:perform_async).with(resource.id)
+      delete :destroy, id: resource.id
+    end
   end
 
   describe "versioning" do
