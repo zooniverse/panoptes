@@ -81,4 +81,12 @@ class Api::V1::ClassificationsController < Api::ApiController
       "#{controller_name} with id='#{resource_ids}' is complete"
     end
   end
+
+  def update_response
+    serializer.resource(
+      {},
+      Classification.where(id: controlled_resources.first.id),
+      context
+    )
+  end
 end
