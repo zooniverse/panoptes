@@ -7,8 +7,18 @@ RSpec.describe Subjects::Remover do
   let(:subjects) { subject_set.subjects }
   let(:subject) { subjects.sample }
   let(:remover) { Subjects::Remover.new(subject.id) }
+  let(:talk_client) { instance_double(Panoptes::TalkClient) }
+  let(:discussions) { [] }
 
-  describe "::remove" do
+  describe "#cleanup" do
+
+    before do
+      allow(talk_client)
+        .to receive(:discussions)
+        .with(focus_id: subject.id, focus_type: "Subject")
+        .and_return(discussions)
+      allow(remover).to receive(:talk_client).and_return(talk_client)
+    end
 
     it "should not remove a subject that has been classified" do
       create(:classification, subjects: [subject])
@@ -20,8 +30,12 @@ RSpec.describe Subjects::Remover do
       expect { remover.cleanup }.to raise_error(Subjects::Remover::NonOrphan)
     end
 
-    it "should not remove a subject that has been in a talk discussion", :focus do
-      pending "add the talk api client discussion check here"
+    context "with a talk discussions" do
+      let(:discussions) { [{"dummy" => "discussion"}] }
+
+      it "should not remove a subject that has been in a talk discussion" do
+        expect { remover.cleanup }.to raise_error(Subjects::Remover::NonOrphan)
+      end
     end
 
     it "should remove a subject that has not been used" do

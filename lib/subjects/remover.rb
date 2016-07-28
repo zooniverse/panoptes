@@ -25,7 +25,7 @@ module Subjects
     private
 
     def can_be_removed?
-      !!orphan
+      !!orphan && no_talk_discussions?
     end
 
     def orphan
@@ -41,6 +41,21 @@ module Subjects
 
     def raise_non_orphan_error
       raise NonOrphan, "Subject with id: #{subject_id} has linked data and cannot be removed."
+    end
+
+    def no_talk_discussions?
+      talk_client.discussions(focus_id: subject_id, focus_type: 'Subject').empty?
+    end
+
+    def talk_client
+      @client ||= Panoptes::TalkClient.new(
+        url: ENV["TALK_URL"],
+        auth_url: ENV["TALK_AUTH_URL"],
+        auth: {
+          client_id: ENV["TALK_CLIENT_ID"],
+          client_secret: ENV["TALK_CLIENT_SECRET"]
+        }
+      )
     end
   end
 end
