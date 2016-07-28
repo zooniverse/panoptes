@@ -13,7 +13,7 @@ class Subject < ActiveRecord::Base
   has_many :set_member_subjects, dependent: :destroy
   has_many :subject_workflow_counts, dependent: :destroy
   has_many :locations, -> { where(type: 'subject_location') },
-    class_name: "Medium", as: :linked
+    class_name: "Medium", as: :linked, dependent: :destroy
   has_many :recents, dependent: :destroy
   has_many :aggregations, dependent: :destroy
   has_many :tutorial_workflows, class_name: 'Workflow', foreign_key: 'tutorial_subject_id', dependent: :restrict_with_exception
