@@ -48,6 +48,7 @@ gem 'scientist', '~> 1.0.0'
 gem 'flipper'
 gem 'flipper-active_record'
 gem 'flipper-ui'
+gem 'panoptes-client', github: "zooniverse/panoptes-client.rb"
 
 group :production do
   gem 'newrelic_rpm', '~> 3.0', require: false
