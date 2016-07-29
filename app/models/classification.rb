@@ -32,13 +32,21 @@ class Classification < ActiveRecord::Base
       complete.merge(created_by(user)).includes(:subjects)
     when :show
       created_by(user).includes(:subjects)
-  when :update, :destroy
+    when :update, :destroy
       incomplete_for_user(user)
     when :incomplete
       incomplete_for_user(user).includes(:subjects)
     when :project
-      project_scope = joins(:project).merge(Project.scope_for(:update, user)).includes(:subjects)
-      project_scope = project_scope.after_id(opts[:last_id]) if opts[:last_id]
+      return none if opts[:last_id] && !opts[:project_id]
+      if opts[:project_id]
+        project_scope = joins(:project)
+                        .includes(:subjects)
+                        .merge(Project.scope_for(:update, user))
+                        .where('project_id = ?', opts[:project_id])
+        project_scope = project_scope.after_id(opts[:last_id]) if opts[:last_id]
+      else
+        project_scope = joins(:project).merge(Project.scope_for(:update, user)).includes(:subjects)
+      end
       project_scope
     when :gold_standard
       gold_standard_for_user(user).includes(:subjects)

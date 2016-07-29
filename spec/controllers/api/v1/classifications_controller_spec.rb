@@ -153,15 +153,21 @@ describe Api::V1::ClassificationsController, type: :controller do
         .to match_array(classifications.map(&:id))
     end
 
-    context "includes last_id" do
+    context "filtered by last_id" do
       let!(:first) { create(:classification, user: authorized_user, project: project) }
       let!(:second) { create(:classification, user: authorized_user, project: project) }
 
       it "does not include classifications prior to given id", :aggregate_failures do
-        get :project, last_id: first.id
+        get :project, last_id: first.id, project_id: project.id
         resources = json_response[api_resource_name]
         expect(resources.length).to eq 1
         expect(resources).not_to include Classification.first
+      end
+
+      it 'returns nothing if project id' do
+        get :project, last_id: first.id
+        resources = json_response[api_resource_name]
+        expect(resources.length).to eq 0
       end
     end
   end

@@ -194,13 +194,18 @@ describe Classification, :type => :model do
         expect(result).to be_empty
       end
 
-      it 'returns only the classifications after last_id if provided' do
-        classifications = [
-          create(:classification, project: project),
-          create(:classification, project: project)
-        ]
-        result = Classification.scope_for(:project, user, {last_id: Classification.first.id})
-        expect(result).not_to include Classification.first
+      context "with last_id param provided" do
+        let!(:classifications) { create_list(:classification, 2, project: project) }
+
+        it 'returns only the classifications after last_id if provided' do
+          result = Classification.scope_for(:project, user, {last_id: Classification.first.id, project_id: project.id})
+          expect(result).not_to include Classification.first
+        end
+
+        it 'returns nothing if project_id is not also provided' do
+          result = Classification.scope_for(:project, user, {last_id: Classification.first.id})
+          expect(result.length).to eq(0)
+        end
       end
     end
 
