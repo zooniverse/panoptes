@@ -42,7 +42,6 @@ class Classification < ActiveRecord::Base
         project_scope = joins(:project)
                         .includes(:subjects)
                         .merge(Project.scope_for(:update, user))
-                        .where('project_id = ?', opts[:project_id])
         project_scope = project_scope.after_id(opts[:last_id]) if opts[:last_id]
       else
         project_scope = joins(:project).merge(Project.scope_for(:update, user)).includes(:subjects)
