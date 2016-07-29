@@ -152,49 +152,17 @@ describe Api::V1::ClassificationsController, type: :controller do
       expect(json_response['classifications'].map{|c| c['id'].to_i})
         .to match_array(classifications.map(&:id))
     end
-  end
 
-  describe "#offset", :focus do
-    let(:project) { create(:full_project) }
-    let(:authorized_user) { project.owner }
-    let!(:first) { create(:classification, user: authorized_user, project: project) }
-    let!(:second) { create(:classification, user: authorized_user, project: project) }
+    context "includes last_id" do
+      let!(:first) { create(:classification, user: authorized_user, project: project) }
+      let!(:second) { create(:classification, user: authorized_user, project: project) }
 
-
-    context 'with an authorized user' do
-      before(:each) do
-        default_request user_id: authorized_user.id, scopes: scopes
-        get :project_offset, last_id: first.id
-      end
-
-      it 'should return 200' do
-        expect(response.status).to eq 200
-      end
-
-      it "should only return the second classification", :aggregate_failures do
+      it "does not include classifications prior to given id", :aggregate_failures do
+        get :project, last_id: first.id
         resources = json_response[api_resource_name]
         expect(resources.length).to eq 1
-        c = Classification.first
-        expect(resources).not_to include c
+        expect(resources).not_to include Classification.first
       end
-    end
-
-    context 'with an unauthorized user' do
-      let(:unauth_user) { create(:user) }
-
-      it 'returns 401 if the user is unauthorized' do
-        unauthenticated_request
-        get :project_offset, last_id: first.id
-        expect(response.status).to eq 401
-      end
-
-      it 'returns 0 classifications if the user does not have a valid project role' do
-        default_request scopes: scopes, user_id: unauth_user.id
-        get :project_offset, last_id: first.id
-        resources = json_response[api_resource_name]
-        expect(resources.length).to eq 0
-      end
-
     end
   end
 

@@ -2,7 +2,7 @@ require 'classification_lifecycle'
 
 class Api::V1::ClassificationsController < Api::ApiController
   skip_before_filter :require_login, only: :create
-  require_authentication :show, :index, :destroy, :update, :incomplete, :project, :project_offset,
+  require_authentication :show, :index, :destroy, :update, :incomplete, :project,
     scopes: [:classification]
 
   resource_actions :default
@@ -31,10 +31,6 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def project
-    index
-  end
-
-  def project_offset
     index
   end
 

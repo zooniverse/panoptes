@@ -37,9 +37,9 @@ class Classification < ActiveRecord::Base
     when :incomplete
       incomplete_for_user(user).includes(:subjects)
     when :project
-      joins(:project).merge(Project.scope_for(:update, user)).includes(:subjects)
-    when :project_offset
-      after_id(opts[:last_id]).joins(:project).merge(Project.scope_for(:update, user))
+      project_scope = joins(:project).merge(Project.scope_for(:update, user)).includes(:subjects)
+      project_scope = project_scope.after_id(opts[:last_id]) if opts[:last_id]
+      project_scope
     when :gold_standard
       gold_standard_for_user(user).includes(:subjects)
     else

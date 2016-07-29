@@ -63,7 +63,6 @@ Rails.application.routes.draw do
           get :gold_standard
           get :incomplete
           get :project
-          get :project_offset
         end
       end
 
