@@ -63,10 +63,18 @@ describe Subject, :type => :model do
   end
 
   describe "#set_member_subjects" do
-    let(:set_member_subjects) { create(:subject, :with_subject_sets) }
+    let(:subject) { create(:subject, :with_subject_sets) }
 
     it "should have many set_member subjects" do
       expect(subject.set_member_subjects).to all( be_a(SetMemberSubject) )
+    end
+  end
+
+  describe "#workflows" do
+    let(:subject) { create(:subject, :with_subject_sets) }
+
+    it "should have many set_member subjects" do
+      expect(subject.workflows).to all( be_a(Workflow) )
     end
   end
 
