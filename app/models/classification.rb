@@ -1,6 +1,8 @@
 class Classification < ActiveRecord::Base
   include BelongsToMany
 
+  class MissingParameter < StandardError; end
+
   belongs_to :project
   belongs_to :user, counter_cache: true
   belongs_to :workflow
@@ -37,15 +39,11 @@ class Classification < ActiveRecord::Base
     when :incomplete
       incomplete_for_user(user).includes(:subjects)
     when :project
-      return none if opts[:last_id] && !opts[:project_id]
-      if opts[:project_id]
-        project_scope = joins(:project)
-                        .includes(:subjects)
-                        .merge(Project.scope_for(:update, user))
-        project_scope = project_scope.after_id(opts[:last_id]) if opts[:last_id]
-      else
-        project_scope = joins(:project).merge(Project.scope_for(:update, user)).includes(:subjects)
+      if opts[:last_id] && !opts[:project_id]
+        raise Classification::MissingParameter.new("Project ID required if last_id is included")
       end
+      project_scope = joins(:project).includes(:subjects).merge(Project.scope_for(:update, user))
+      project_scope = project_scope.after_id(opts[:last_id]) if opts[:last_id]
       project_scope
     when :gold_standard
       gold_standard_for_user(user).includes(:subjects)

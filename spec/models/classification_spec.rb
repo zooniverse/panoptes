@@ -178,7 +178,7 @@ describe Classification, :type => :model do
       end
     end
 
-    describe "#project" do
+    describe "#project", :focus do
       it 'should return all project classifications if the user can update it' do
         classifications = [
           create(:classification, project: project),
@@ -202,9 +202,10 @@ describe Classification, :type => :model do
           expect(result).not_to include Classification.first
         end
 
-        it 'returns nothing if project_id is not also provided' do
-          result = Classification.scope_for(:project, user, {last_id: Classification.first.id})
-          expect(result.length).to eq(0)
+        it 'raise MissingParameter if project_id is not also provided' do
+          expect {
+            Classification.scope_for(:project, user, {last_id: Classification.first.id})
+          }.to raise_error(Classification::MissingParameter)
         end
       end
     end
