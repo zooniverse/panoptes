@@ -255,6 +255,8 @@ class User < ActiveRecord::Base
         self.password = plain_password
         self.hash_func = 'bcrypt'
         setup_unsubscribe_token
+        #unset the attribute to skip devise length validation
+        self.password = nil
         self.save!
         break
       end
