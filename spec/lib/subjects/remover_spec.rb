@@ -2,8 +2,9 @@ require 'spec_helper'
 
 RSpec.describe Subjects::Remover do
   let(:workflow) { create(:workflow_with_subjects) }
-  let(:user) { create(:user) }
-  let(:subject_set) { create(:subject_set_with_subjects) }
+  let(:subject_set) do
+    create(:subject_set_with_subjects, workflows: [workflow])
+  end
   let(:subjects) { subject_set.subjects }
   let(:subject) { subjects.sample }
   let(:remover) { Subjects::Remover.new(subject.id) }
@@ -18,6 +19,14 @@ RSpec.describe Subjects::Remover do
         .with(focus_id: subject.id, focus_type: "Subject")
         .and_return(discussions)
       allow(remover).to receive(:talk_client).and_return(talk_client)
+    end
+
+    context "without a real subject" do
+      let(:subject) { double(id: 100) }
+
+      it "should ignore non existant subject ids" do
+        expect { remover.cleanup }.to raise_error(Subjects::Remover::NonOrphan)
+      end
     end
 
     it "should not remove a subject that has been classified" do
@@ -54,6 +63,13 @@ RSpec.describe Subjects::Remover do
       media_ids = subject.reload.locations.map(&:id)
       remover.cleanup
       expect { Medium.find(media_ids) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "notify cellect about the subject removal" do
+      expect(RetireCellectWorker)
+        .to receive(:perform_async)
+        .with(subject.id, workflow.id)
+      remover.cleanup
     end
   end
 end
