@@ -48,14 +48,7 @@ module Subjects
     end
 
     def talk_client
-      @client ||= Panoptes::TalkClient.new(
-        url: ENV["TALK_URL"],
-        auth_url: ENV["TALK_AUTH_URL"],
-        auth: {
-          client_id: ENV["TALK_CLIENT_ID"],
-          client_secret: ENV["TALK_CLIENT_SECRET"]
-        }
-      )
+      @client ||= Panoptes::TalkClient.new(url: ENV["TALK_URL"])
     end
   end
 end
