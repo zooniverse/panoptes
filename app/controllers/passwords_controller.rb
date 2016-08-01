@@ -29,6 +29,7 @@ class PasswordsController < Devise::PasswordsController
       resource.valid? if resource.errors.empty?
       response_body = {}
       unless resource.errors.empty?
+        report_error(resource.id, resource_params) if resource.persisted?
         response_body.merge!(error_response(resource.errors.full_messages.join(", ")))
       end
       respond_to_request(response_body.empty?, response_body)
@@ -48,5 +49,20 @@ class PasswordsController < Devise::PasswordsController
 
     def error_response(msg)
       { errors: [ message: msg ] }
+    end
+
+    def report_error(resource_id, params)
+      match = params["password"] == params["password_confirmation"]
+      length = params["password"].length
+      #token is valid if the resource is persisted
+      Honeybadger.notify(
+        error_class:   "Reset password error",
+        error_message: "Could not reset user password",
+        context: {
+          user_id: resource_id,
+          password_match: match,
+          password_length: length
+        }
+      )
     end
 end
