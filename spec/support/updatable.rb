@@ -23,8 +23,9 @@ shared_examples "is updatable" do
       end
     end
 
-    it 'should return 200' do
+    it 'should return 200 and return the updated resource', :aggregate_failures do
       expect(response).to have_http_status(:ok)
+      expect(json_response[api_resource_name].length).to eq(1)
     end
 
     it 'should include a Last-Modified header' do
