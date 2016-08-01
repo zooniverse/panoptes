@@ -36,8 +36,8 @@ FactoryGirl.define do
     end
 
     factory :insecure_user do
-      hash_func 'sha1'
-      password 'tajikistan'
+      # hash_func 'sha1' # hash func is not set via build / create
+      # password 'tajikistan' # password will set the hash_func to bcrypt
       encrypted_password 'zKUhbXyjCsgmcv6Fh5rQiHTzJWI='
       password_salt 'nK5bXjD2YS7LSYndVJNGGdY='
     end
