@@ -152,6 +152,23 @@ describe Api::V1::ClassificationsController, type: :controller do
       expect(json_response['classifications'].map{|c| c['id'].to_i})
         .to match_array(classifications.map(&:id))
     end
+
+    context "filtered by last_id" do
+      let!(:first) { create(:classification, user: authorized_user, project: project) }
+      let!(:second) { create(:classification, user: authorized_user, project: project) }
+
+      it "does not include classifications prior to given id", :aggregate_failures do
+        get :project, last_id: first.id, project_id: project.id
+        resources = json_response[api_resource_name]
+        expect(resources.length).to eq 1
+        expect(resources).not_to include Classification.first
+      end
+
+      it 'returns an error if project id is missing' do
+        get :project, last_id: first.id
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
   end
 
   describe "#gold_standard" do

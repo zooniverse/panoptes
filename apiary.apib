@@ -543,6 +543,8 @@ and *user_group_id* parameters.
     + project_id (optional, integer) ... only retrieve classifications for a specific project
     + user_group_id (optional, integer) ... only retrieve classifications for a specific user group
     + include (optional, string) ... comma separated list of linked resources to return with the collection
+    + last_id (optional, integer) ... only classifications with ids greater than `last_id` will be returned
+                                      (`/project` only, requires project_id)
 
 + Request
 

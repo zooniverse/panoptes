@@ -193,6 +193,21 @@ describe Classification, :type => :model do
         result = Classification.scope_for(:project, other_user)
         expect(result).to be_empty
       end
+
+      context "with last_id param provided" do
+        let!(:classifications) { create_list(:classification, 2, project: project) }
+
+        it 'returns only the classifications after last_id if provided' do
+          result = Classification.scope_for(:project, user, {last_id: Classification.first.id, project_id: project.id})
+          expect(result).not_to include Classification.first
+        end
+
+        it 'raise MissingParameter if project_id is not also provided' do
+          expect {
+            Classification.scope_for(:project, user, {last_id: Classification.first.id})
+          }.to raise_error(Classification::MissingParameter)
+        end
+      end
     end
 
     describe "#incomplete" do
