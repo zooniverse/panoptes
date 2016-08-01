@@ -178,7 +178,7 @@ describe Classification, :type => :model do
       end
     end
 
-    describe "#project", :focus do
+    describe "#project" do
       it 'should return all project classifications if the user can update it' do
         classifications = [
           create(:classification, project: project),

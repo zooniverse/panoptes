@@ -164,10 +164,9 @@ describe Api::V1::ClassificationsController, type: :controller do
         expect(resources).not_to include Classification.first
       end
 
-      it 'returns nothing if project id' do
+      it 'returns an error if project id is missing' do
         get :project, last_id: first.id
-        resources = json_response[api_resource_name]
-        expect(resources.length).to eq 0
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end
