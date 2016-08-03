@@ -262,6 +262,14 @@ RSpec.describe Subjects::Selector do
       expect(subject.selected_subjects(subject_queue).size).to be > 0
     end
 
+    it "should respect the order of the sms selection", :focus do
+      ordered_sms = smses.sample(5)
+      sms_ids = ordered_sms.map(&:id)
+      expect(subject).to receive(:run_strategy_selection).and_return(sms_ids)
+      subjects = subject.selected_subjects(double(stale?: true, update_ids: nil))
+      expect(ordered_sms.map(&:subject_id)).to eq(subjects.map(&:id))
+    end
+
     context "feature flip straight selection over queues" do
       it 'should use queue selection when feature is off' do
         expect(subject).to receive(:sms_ids_from_queue).and_call_original
