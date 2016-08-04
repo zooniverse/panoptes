@@ -42,25 +42,19 @@ class Api::V1::SubjectsController < Api::ApiController
     subject
   end
 
-  def build_update_hash(update_params, id)
+  def build_update_hash(update_params, resource)
     locations = update_params.delete(:locations)
-    subject = Subject.find(id)
-    subject.locations = add_locations(locations, subject)
+    new_locations = add_locations(locations, resource)
     subject.save!
-    super(update_params, id)
+    subject.locations = new_locations if new_locations
+    super(update_params, resource)
   end
 
   def add_locations(locations, subject)
-    (locations || []).map.with_index do |loc, i|
-      location_params = case loc
-                        when String
-                          { content_type: loc }
-                        when Hash
-                          { content_type: loc.keys.first, external_link: true, src: loc.values.first }
-                        end
-      location_params.merge!(metadata: { index: i })
-      location_params.merge!(allow_any_content_type: true) if api_user.is_admin?
-      subject.locations.build(location_params)
+    if locations.blank?
+      nil
+    else
+      subject.locations.build(location_params(locations))
     end
   end
 
@@ -78,5 +72,23 @@ class Api::V1::SubjectsController < Api::ApiController
       workflow,
       params,
       controlled_resources)
+  end
+
+  def location_params(locations)
+    (locations || []).map.with_index do |loc, i|
+      location_params = case loc
+                        when String
+                          { content_type: loc }
+                        when Hash
+                          {
+                            content_type: loc.keys.first,
+                            external_link: true,
+                            src: loc.values.first
+                          }
+                        end
+      location_params[:metadata] = { index: i }
+      location_params[:allow_any_content_type] = true if api_user.is_admin?
+      location_params
+    end
   end
 end

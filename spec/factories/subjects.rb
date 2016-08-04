@@ -9,8 +9,12 @@ FactoryGirl.define do
               loudness: 11})
 
     trait :with_mediums do
-      after(:create) do |s|
-        create_list(:medium, 2, linked: s)
+      ignore do
+        num_media 2
+      end
+
+      after :create do |s, evaluator|
+        create_list(:medium, evaluator.num_media, linked: s)
       end
     end
 
