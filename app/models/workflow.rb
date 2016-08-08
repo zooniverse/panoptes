@@ -85,6 +85,12 @@ class Workflow < ActiveRecord::Base
     configuration.with_indifferent_access[:selection_strategy].try(:to_sym)
   end
 
+  def set_selection_strategy(strategy)
+    new_config = configuration
+    new_config[:selection_strategy] = strategy
+    self.update_column(:configuration, new_config)
+  end
+
   def cellect_size_subject_space?
     set_member_subjects.count >= Panoptes.cellect_min_pool_size
   end
