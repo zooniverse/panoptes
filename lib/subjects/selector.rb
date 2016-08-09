@@ -58,6 +58,7 @@ module Subjects
       retired_ids = SetMemberSubject
         .joins("INNER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id")
         .where("subject_workflow_counts.retired_at IS NOT NULL")
+        .where("subject_workflow_counts.workflow_id = ?", workflow.id)
         .where(set_member_subjects: {id: sms_ids})
         .pluck(:id)
       return sms_ids if retired_ids.blank?
