@@ -939,9 +939,9 @@ classify, usually for expert classifiers.
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + page_size (optional, integer) ... number of items to include on a page default is 20
-  + sort (optional, string) ... field to sort by 'cellect' and 'queued' have special behaviour
-  + workflow_id (optional, integer) ... filter to subjects belonging to a specific workflow. Required when sort is 'random'
-  + subject_set_id (optional, integer) ... return subjects belonging to the identified subject_set
+  + sort (optional, string) ... field to sort by 'queued' have special behaviour
+  + workflow_id (optional, integer) ... filter to subjects belonging to a specific workflow, it is a required param when sort is 'queued'.
+  + subject_set_id (optional, integer) ... return subjects belonging to the identified subject_set, it is required when sort is 'queued' and the workflow is grouped.
 
 + Request
 
