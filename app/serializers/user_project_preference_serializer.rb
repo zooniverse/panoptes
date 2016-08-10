@@ -17,11 +17,15 @@ class UserProjectPreferenceSerializer
   end
 
   def activity_count_by_workflow
-    UserSeenSubject.activity_by_workflow(@model.user_id, project_workflows_ids)
+    unless project_workflows_ids.empty?
+      UserSeenSubject.activity_by_workflow(@model.user_id, project_workflows_ids)
+    end
   end
 
   def user_project_activity
-    UserSeenSubject.count_user_activity(@model.user_id, project_workflows_ids)
+    unless project_workflows_ids.empty?
+      UserSeenSubject.count_user_activity(@model.user_id, project_workflows_ids)
+    end
   end
 
   def project_workflows_ids
