@@ -7,7 +7,7 @@ class SubjectSerializer
 
   optional :retired, :already_seen, :finished_workflow
 
-  can_include :project, :collections
+  can_include :project, :collections, :subject_sets
 
   def locations
     @model.locations.order("\"media\".\"metadata\"->>'index' ASC").map do |loc|

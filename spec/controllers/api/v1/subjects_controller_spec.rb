@@ -16,7 +16,9 @@ describe Api::V1::SubjectsController, type: :controller do
   let(:api_resource_attributes) do
     [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at" ]
   end
-  let(:api_resource_links) { [ "subjects.project" ] }
+  let(:api_resource_links) do
+    [ "subjects.project","subjects.collections", "subjects.subject_sets" ]
+  end
 
   describe "#index" do
     let!(:non_user_queue) do
