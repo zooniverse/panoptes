@@ -1152,7 +1152,8 @@ CREATE TABLE user_project_preferences (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     activity_count integer,
-    legacy_count jsonb DEFAULT '{}'::jsonb
+    legacy_count jsonb DEFAULT '{}'::jsonb,
+    settings jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -3442,4 +3443,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160613075003');
 INSERT INTO schema_migrations (version) VALUES ('20160628165038');
 
 INSERT INTO schema_migrations (version) VALUES ('20160630150419');
+
+INSERT INTO schema_migrations (version) VALUES ('20160810195152');
 

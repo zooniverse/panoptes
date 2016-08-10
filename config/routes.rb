@@ -56,7 +56,9 @@ Rails.application.routes.draw do
 
       json_api_resources :project_roles
 
-      json_api_resources :project_preferences
+      json_api_resources :project_preferences do
+        post "/update_project_settings", to: "project_preferences#update_project_settings", on: :collection
+      end
 
       json_api_resources :classifications do
         collection do
