@@ -637,6 +637,10 @@ the API.
                     "subjects.project": {
                         "href": "/projects/subjects.project",
                         "type": "projects"
+                    },
+                    "subjects.subject_sets": {
+                        "href": "/subject_sets/subjects.subject_sets",
+                        "type": "subject_sets"
                     }
                 },
                 "subjects": [{
@@ -651,7 +655,8 @@ the API.
                         "lens_type": "50mm"
                     },
                     "links": {
-                        "project": "1"
+                        "project": "1",
+                        "subject_sets": ["1"]
                     }
                 }]
             }
@@ -879,6 +884,10 @@ Subjects are returned as an array under the _subject_ key.
                     "subjects.project": {
                         "href": "/projects/subjects.project",
                         "type": "projects"
+                    },
+                    "subjects.subject_sets": {
+                        "href": "/subject_sets/subjects.subject_sets",
+                        "type": "subject_sets"
                     }
                 },
                 "meta": {
@@ -909,6 +918,7 @@ Subjects are returned as an array under the _subject_ key.
                     },
                     "links": {
                         "project": "1"
+                        "subject_sets": ["1"]
                     }
                 },{
                     "id": "2",
@@ -923,6 +933,7 @@ Subjects are returned as an array under the _subject_ key.
                     },
                     "links": {
                         "project": "1"
+                        "subject_sets": ["1"]
                     }
                 }]
             }
