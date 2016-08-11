@@ -33,6 +33,10 @@ module JsonApiController
       end
     end
 
+    def extra_schema_actions(*actions)
+      @extra_schema_actions = actions
+    end
+
     def schema_type(type)
       case type
       when :json_schema

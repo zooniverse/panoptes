@@ -58,7 +58,7 @@ Rails.application.routes.draw do
 
       json_api_resources :project_preferences do
         collection do
-          post :update_project_settings
+          post :update_settings
         end
       end
 

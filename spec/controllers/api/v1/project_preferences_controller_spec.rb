@@ -139,25 +139,26 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   end
 
   describe "#update_project_settings", :focus do
-    let(:api_user) { create(:user) }
-    let(:project) { create(:project, owner: api_user) }
+    let!(:api_user) { create(:user) }
+    let!(:project) { create(:project, owner: api_user) }
+    let!(:upps) { create(:user_project_preference, user: authorized_user, project: project) }
     let(:settings_params) do
       {
-        user_id: api_user.id,
+        user_id: authorized_user.id,
         project_id: project.id,
         settings: { workflow_id: 1234 }
       }
     end
 
     it "responds with a 200" do
-      post :update_project_settings, settings_params
+      post :update_settings, settings_params
       expect(response.status).to eq(200)
     end
 
     it "updates the UPP settings attribute" do
-      post :update_project_settings, settings_params
+      post :update_settings, settings_params
       expect (
-        UserProjectPreference.where(project: project, user: authorized_user)["settings"]
+        UserProjectPreference.where(project: project, user: authorized_user).first["settings"]
       ).to eq settings_params[:settings]
     end
 
