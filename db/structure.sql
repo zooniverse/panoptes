@@ -2749,16 +2749,12 @@ CREATE INDEX users_idx_trgm_login ON users USING gin ((COALESCE((login)::text, '
 
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON projects FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
 
-ALTER TABLE projects DISABLE TRIGGER tsvectorupdate;
-
 
 --
 -- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'login');
-
-ALTER TABLE users DISABLE TRIGGER tsvectorupdate;
 
 
 --
