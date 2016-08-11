@@ -19,7 +19,7 @@ module Subjects
       if sms_ids.empty?
         []
       else
-        Subjects::SeenRemover.new(user_seen_subject, sms_ids).unseen_ids
+        strip_seen_ids(sms_ids)
       end
     rescue Subjects::CellectClient::ConnectionError
       default_strategy_sms_ids
@@ -57,10 +57,12 @@ module Subjects
       Subjects::PostgresqlSelection.new(workflow, user, opts).select
     end
 
-
-    def user_seen_subject
+    def strip_seen_ids(sms_ids)
       if user
-        UserSeenSubject.find_by(user: user, workflow: workflow)
+        uss = UserSeenSubject.find_by(user: user, workflow: workflow)
+        Subjects::SeenRemover.new(uss, sms_ids).unseen_ids
+      else
+        sms_ids
       end
     end
   end
