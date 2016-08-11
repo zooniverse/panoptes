@@ -63,20 +63,34 @@ RSpec.describe Api::V1::SetMemberSubjectsController, type: :controller do
 
     it_behaves_like "is creatable"
 
-    context "set the random value" do
-      before(:each) do
-        default_request user_id: authorized_user.id, scopes: scopes
-        post :create, create_params
-      end
-
-      it 'should set the random value for a subject' do
-        sms = SetMemberSubject.find(created_instance_id(api_resource_name))
-        expect(sms.random).to_not be_nil
-      end
+    it 'should call the set count worker after action' do
+      default_request user_id: authorized_user.id, scopes: scopes
+      expect(SubjectSetSubjectCounterWorker).to receive(:perform_async).once
+      post :create, create_params
     end
   end
 
   describe "#destroy" do
     it_behaves_like "is destructable"
+
+    describe "lifecycle callbacks" do
+      before do
+        default_request user_id: authorized_user.id, scopes: scopes
+      end
+
+      it 'should call the set count worker' do
+        expect(SubjectSetSubjectCounterWorker)
+          .to receive(:perform_async)
+          .with(resource.subject_set_id)
+        delete :destroy, id: resource.id
+      end
+
+      it 'should call the subject removal worker' do
+        expect(SubjectRemovalWorker)
+          .to receive(:perform_async)
+          .with(resource.subject_id)
+        delete :destroy, id: resource.id
+      end
+    end
   end
 end
