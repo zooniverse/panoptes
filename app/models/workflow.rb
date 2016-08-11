@@ -29,6 +29,8 @@ class Workflow < ActiveRecord::Base
   cache_by_association :workflow_contents
   cache_by_resource_method :subjects_count, :finished?
 
+  scope :using_cellect, -> { where("use_cellect IS TRUE") }
+
   DEFAULT_RETIREMENT_OPTIONS = {
     'criteria' => 'classification_count',
     'options' => {'count' => 15}

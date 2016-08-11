@@ -58,6 +58,8 @@ class Project < ActiveRecord::Base
 
   after_update :send_notifications
 
+  scope :launched, -> { where("launch_approved IS TRUE") }
+
   can_by_role :destroy, :update, :update_links, :destroy_links, :create_classifications_export,
     :create_subjects_export, :create_aggregations_export, :create_workflows_export,
     :create_workflow_contents_export, :retire_subjects, roles: [ :owner, :collaborator ]
