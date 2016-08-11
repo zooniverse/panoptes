@@ -89,7 +89,6 @@ RSpec.describe Subjects::StrategySelection do
   end
 
   describe "#strategy" do
-    let(:config) { { selection_strategy: :cellect } }
     let(:cellect_size) { Panoptes.cellect_min_pool_size }
 
     before do
@@ -113,9 +112,9 @@ RSpec.describe Subjects::StrategySelection do
         end
       end
 
-      context "when the workflow config has a selection strategy" do
+      context "when the workflow is set to use cellect" do
         it "should use the workflow config strategy" do
-          allow(workflow).to receive(:configuration).and_return(config)
+          allow(workflow).to receive(:use_cellect).and_return(true)
           expect(subject.strategy).to eq(:cellect)
         end
       end
@@ -129,12 +128,13 @@ RSpec.describe Subjects::StrategySelection do
         end
       end
 
-      context "with a workflow config and large subject set size" do
+      context "worfklow set to use_cellect and large subject set size" do
         it "should only use the worfklow strategy", :aggregate_failures do
-          allow(workflow).to receive(:configuration).and_return(config)
-          allow(workflow).to receive_message_chain("set_member_subjects.count") do
-            cellect_size
-          end
+          allow(workflow).to receive(:use_cellect).and_return(true)
+          allow(workflow)
+            .to receive(:cellect_size_subject_space?)
+            .and_return(true)
+            .and_call_original
           expect(workflow).not_to receive(:set_member_subjects)
           expect(subject.strategy).to eq(:cellect)
         end

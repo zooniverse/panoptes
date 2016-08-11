@@ -29,14 +29,16 @@ module Subjects
       @strategy ||= case
       when !Panoptes.cellect_on
         nil
-      when strategy_param == :cellect
-        strategy_param
-      else
-        workflow_strategy
+      when cellect_strategy?
+        :cellect
       end
     end
 
     private
+
+    def cellect_strategy?
+      strategy_param == :cellect || workflow.using_cellect?
+    end
 
     def strategy_sms_ids
       case strategy
@@ -55,13 +57,6 @@ module Subjects
       Subjects::PostgresqlSelection.new(workflow, user, opts).select
     end
 
-    def workflow_strategy
-      if set_strategy = workflow.selection_strategy
-        set_strategy
-      elsif workflow.using_cellect?
-        :cellect
-      end
-    end
 
     def user_seen_subject
       if user
