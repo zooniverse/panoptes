@@ -35,9 +35,9 @@ module Subjects
        Subject
        .where(id: subject_id)
        .joins("LEFT OUTER JOIN classification_subjects ON classification_subjects.subject_id = subjects.id")
-       .where("subjects.id IS NOT NULL AND classification_subjects.subject_id IS NULL")
+       .where("classification_subjects.subject_id IS NULL")
        .joins("LEFT OUTER JOIN collections_subjects ON collections_subjects.subject_id = subjects.id")
-       .where("subjects.id IS NOT NULL AND collections_subjects.subject_id IS NULL")
+       .where("collections_subjects.subject_id IS NULL")
        .first
     end
 
