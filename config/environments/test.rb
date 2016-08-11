@@ -37,6 +37,9 @@ Rails.application.configure do
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 
+  #turn off the rails cache store
+  config.cache_store = :null_store
+
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
