@@ -12,7 +12,7 @@ module Subjects
       if can_be_removed?
         locations = orphan.locations
         set_member_subjects = orphan.set_member_subjects
-        workflow_ids = orphan.workflows.map(&:id)
+        workflow_ids = orphan.workflows.pluck(:id)
         ActiveRecord::Base.transaction do
           orphan.delete
           locations.map(&:destroy)
