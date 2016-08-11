@@ -7,7 +7,7 @@ class WorkflowPromoteCellectToOwnAttribute < ActiveRecord::Migration
       strategy = config[:selection_strategy].try(:to_sym)
       if strategy == :cellect
         new_config = config.except(:selection_strategy)
-        w.update_columns(configuration: new_config, cellect: true)
+        w.update_columns(configuration: new_config, use_cellect: true)
       end
     end
   end
