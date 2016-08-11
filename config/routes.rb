@@ -121,7 +121,8 @@ Rails.application.routes.draw do
   end
 
   namespace "cellect", constraints: { format: 'json' } do
-    get  "workflows"
+    get "workflows"
+    get "subjects"
   end
 
   get "health_check", to: "home#index"

@@ -27,7 +27,8 @@ describe CellectController, type: :controller do
 
       it "should respond with only the cellect workflow" do
         run_get
-        expect(json_response).to eq({"workflow_ids"=>[cellect_workflow.id]})
+        expected = { workflow_ids: [cellect_workflow.id] }.as_json
+        expect(json_response).to eq(expected)
       end
 
       context "with a workflow that satifies the cellect subjects critera" do
@@ -39,7 +40,43 @@ describe CellectController, type: :controller do
 
         it "should respond with all the workflows" do
           run_get
-          expect(json_response).to eq({"workflow_ids"=>Workflow.all.pluck(:id)})
+          expected = { workflow_ids: Workflow.all.pluck(:id) }.as_json
+          expect(json_response).to eq(expected)
+        end
+      end
+    end
+  end
+
+  describe "GET 'subjects'" do
+    let(:cellect_workflow) do
+      create(:workflow_with_subjects, use_cellect: true)
+    end
+    let(:another_cellect_workflow) do
+      create(:workflow_with_subjects, use_cellect: true)
+    end
+    let(:run_get) do
+      get 'subjects', workflow_id: cellect_workflow.id.to_s, format: :json
+    end
+
+    context "as json" do
+      before do
+        cellect_workflow
+        another_cellect_workflow
+      end
+
+      it "should respond with only the subject ids of the params workflow" do
+        subject_ids = cellect_workflow.subjects.map(&:id)
+        expect(subject_ids.count > 0).to be_truthy
+        run_get
+        expect(json_response["subject_ids"]).to match_array(subject_ids)
+      end
+
+      context "when the worklfow is not set to use cellect" do
+        let(:cellect_workflow) { create(:workflow_with_subjects) }
+
+        it "should respond with an empty array" do
+          run_get
+          expect(json_response).to eq({ subject_ids: [] }.as_json)
         end
       end
     end
