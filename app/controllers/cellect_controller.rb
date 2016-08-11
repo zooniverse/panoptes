@@ -1,4 +1,6 @@
 class CellectController < ApplicationController
+  before_filter :html_to_json_override
+
   def workflows
     respond_to do |format|
       format.json do
@@ -24,5 +26,8 @@ class CellectController < ApplicationController
 
   def all_cellect_workflow_ids
      workflow_ids_using_cellect | Workflow.using_cellect.pluck(:id)
+
+  def html_to_json_override
+    request.format = :json if request.format == :html
   end
 end
