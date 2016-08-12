@@ -43,7 +43,7 @@ class CellectController < ApplicationController
 
   def cellect_workflow_subject_ids
     if workflow = cellect_workflow_from_param
-      workflow.set_member_subjects.pluck(:subject_id)
+      SetMemberSubject.non_retired_for_workflow(workflow).pluck(:subject_id)
     else
       []
     end

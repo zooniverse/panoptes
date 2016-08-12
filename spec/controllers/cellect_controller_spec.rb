@@ -59,16 +59,34 @@ describe CellectController, type: :controller do
     end
 
     context "as json" do
+      let(:subject_ids) { cellect_workflow.subjects.map(&:id) }
+
       before do
         cellect_workflow
         another_cellect_workflow
       end
 
       it "should respond with only the subject ids of the params workflow" do
-        subject_ids = cellect_workflow.subjects.map(&:id)
         expect(subject_ids.count > 0).to be_truthy
         run_get
         expect(json_response["subject_ids"]).to match_array(subject_ids)
+      end
+
+      context "with a retired subject" do
+        let(:retired_id) { subject_ids.sample }
+        let!(:retired_swc) do
+          create(:subject_workflow_count,
+            subject_id: retired_id,
+            workflow_id: cellect_workflow.id,
+            retired_at: DateTime.now
+          )
+        end
+
+        it "should not respond with retired_ids" do
+          non_retired_ids = subject_ids - [retired_id]
+          run_get
+          expect(json_response["subject_ids"]).to match_array(non_retired_ids)
+        end
       end
 
       context "when the worklfow is not set to use cellect" do
