@@ -60,7 +60,11 @@ describe CellectController, type: :controller do
     end
 
     context "as json" do
-      let(:subjects) { cellect_workflow.set_member_subjects.map{ |s| s.slice(:id, :priority) } }
+      let(:subjects) do
+        cellect_workflow.subjects.map do |s|
+          { 'id' => s.id, 'priority' => nil }
+        end
+      end
 
       before do
         cellect_workflow
