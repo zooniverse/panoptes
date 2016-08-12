@@ -6,7 +6,7 @@ class CellectController < ApplicationController
   def workflows
     respond_to do |format|
       format.json do
-        render json: { workflow_ids: all_cellect_workflow_ids.as_json }
+        render json: { workflows: all_cellect_workflows.as_json }
       end
     end
   end
@@ -14,7 +14,7 @@ class CellectController < ApplicationController
   def subjects
     respond_to do |format|
       format.json do
-        render json: { subject_ids: cellect_workflow_subject_ids.as_json }
+        render json: { subjects: cellect_workflow_subjects.as_json }
       end
     end
   end
@@ -25,33 +25,35 @@ class CellectController < ApplicationController
     Workflow
       .joins(:project)
       .where("projects.launch_approved IS TRUE")
-      .select(:id, :use_cellect)
+      .select(:id, :use_cellect, :pairwise, :prioritized, :grouped)
   end
 
-  def workflow_ids_using_cellect
+  def workflows_using_cellect
     launched_workflows.collect do |w|
-      w.using_cellect? ? w.id : nil
+      w.using_cellect? ? w.slice(:id, :pairwise, :prioritized, :grouped) : nil
     end.compact
   end
 
-  def all_cellect_workflow_ids
-    cache_key = "#{Rails.env}#all_cellect_workflow_ids"
+  def all_cellect_workflows
+    cache_key = "#{Rails.env}#all_cellect_workflows"
     Rails.cache.fetch(cache_key, expires_in: EXPIRY) do
-      workflow_ids_using_cellect | Workflow.using_cellect.pluck(:id)
+      workflows_using_cellect
     end
   end
 
-  def cellect_workflow_subject_ids
+  def cellect_workflow_subjects
     if workflow = cellect_workflow_from_param
-      SetMemberSubject.non_retired_for_workflow(workflow).pluck(:subject_id)
+      SetMemberSubject
+        .non_retired_for_workflow(workflow)
+        .select(:id, :priority)
     else
       []
     end
   end
 
   def cellect_workflow_from_param
-    w_id = all_cellect_workflow_ids.find { |id| id.to_s == params[:workflow_id] }
-    Workflow.where(id: w_id).select(:id).first if w_id
+    workflow = launched_workflows.find_by_id params[:workflow_id]
+    workflow if workflow&.using_cellect?
   end
 
   def html_to_json_override
