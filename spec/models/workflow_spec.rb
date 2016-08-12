@@ -329,55 +329,13 @@ describe Workflow, type: :model do
     end
   end
 
-  describe "#selection_strategy" do
-    it "should return the configuration directive" do
-      expect(workflow.selection_strategy).to be_nil
-    end
-
-    it "should return the configuration directive when it's set" do
-      config = { selection_strategy: :cellect }
-      allow(workflow).to receive(:configuration).and_return(config)
-      expect(workflow.selection_strategy).to eq(:cellect)
-    end
-  end
-
-  describe "#set_selection_strategy" do
-    let(:workflow) { create(:workflow, configuration: config) }
-    let(:config) { {} }
-    let(:strategy) { "cellect" }
-
-    it "should set the param config" do
-      expect(workflow.selection_strategy).to be_nil
-      workflow.set_selection_strategy(strategy)
-      expect(workflow.selection_strategy.to_s).to eq(strategy)
-    end
-
-    context "with existing configuration directives" do
-      let(:config) { { directive: "set this up", another_setting: true } }
-
-      it "should respect the existing directives" do
-        workflow.set_selection_strategy(strategy)
-        config = workflow.configuration.with_indifferent_access
-        expected = config.merge(selection_strategy: strategy)
-        expect(config).to eq(expected)
-      end
-    end
-  end
-
   describe "#using_cellect?" do
-    it "should return false if the config set to someting not cellect" do
-      config = { selection_strategy: :database }
-      allow(workflow).to receive(:configuration).and_return(config)
-      expect(workflow.using_cellect?).to be_falsey
-    end
-
     it "should return false if the config is missing and small subject space" do
       expect(workflow.using_cellect?).to be_falsey
     end
 
     it "should return true if the config is set" do
-      config = { selection_strategy: :cellect }
-      allow(workflow).to receive(:configuration).and_return(config)
+      allow(workflow).to receive(:use_cellect).and_return(true)
       expect(workflow.using_cellect?).to be_truthy
     end
 

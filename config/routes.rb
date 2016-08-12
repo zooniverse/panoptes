@@ -120,6 +120,11 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace "cellect", constraints: { format: 'json' } do
+    get "workflows"
+    get "subjects"
+  end
+
   get "health_check", to: "home#index"
   root to: "home#index"
   match "*path", to: "application#unknown_route", via: :all

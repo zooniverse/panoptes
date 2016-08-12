@@ -29,6 +29,8 @@ class Workflow < ActiveRecord::Base
   cache_by_association :workflow_contents
   cache_by_resource_method :subjects_count, :finished?
 
+  scope :using_cellect, -> { where("use_cellect IS TRUE") }
+
   DEFAULT_RETIREMENT_OPTIONS = {
     'criteria' => 'classification_count',
     'options' => {'count' => 15}
@@ -81,29 +83,12 @@ class Workflow < ActiveRecord::Base
     self.retirement.presence || DEFAULT_RETIREMENT_OPTIONS
   end
 
-  def selection_strategy
-    configuration.with_indifferent_access[:selection_strategy].try(:to_sym)
-  end
-
-  def set_selection_strategy(strategy)
-    new_config = configuration
-    new_config[:selection_strategy] = strategy
-    self.update_column(:configuration, new_config)
-  end
-
   def cellect_size_subject_space?
     set_member_subjects.count >= Panoptes.cellect_min_pool_size
   end
 
   def using_cellect?
-    case
-    when selection_strategy == :cellect
-      true
-    when selection_strategy
-      false
-    else
-      cellect_size_subject_space?
-    end
+    use_cellect || cellect_size_subject_space?
   end
 
   def subjects_count

@@ -1401,7 +1401,8 @@ CREATE TABLE workflows (
     completeness double precision DEFAULT 0.0 NOT NULL,
     activity integer DEFAULT 0 NOT NULL,
     current_version_number character varying,
-    activated_state integer DEFAULT 0 NOT NULL
+    activated_state integer DEFAULT 0 NOT NULL,
+    use_cellect boolean DEFAULT false NOT NULL
 );
 
 
@@ -2722,6 +2723,13 @@ CREATE INDEX index_workflows_on_tutorial_subject_id ON workflows USING btree (tu
 
 
 --
+-- Name: index_workflows_on_use_cellect; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_workflows_on_use_cellect ON workflows USING btree (use_cellect);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3442,4 +3450,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160613075003');
 INSERT INTO schema_migrations (version) VALUES ('20160628165038');
 
 INSERT INTO schema_migrations (version) VALUES ('20160630150419');
+
+INSERT INTO schema_migrations (version) VALUES ('20160810140805');
 
