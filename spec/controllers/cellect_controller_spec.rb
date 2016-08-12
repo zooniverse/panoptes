@@ -61,8 +61,8 @@ describe CellectController, type: :controller do
 
     context "as json" do
       let(:subjects) do
-        cellect_workflow.subjects.map do |s|
-          { 'id' => s.id, 'priority' => nil }
+        cellect_workflow.set_member_subjects.map do |s|
+          { 'id' => s.subject_id, 'priority' => s.priority }
         end
       end
 
@@ -78,17 +78,17 @@ describe CellectController, type: :controller do
       end
 
       context "with a retired subject" do
-        let(:retired_subject) { subjects.sample }
+        let(:retired_subject) { cellect_workflow.subjects.all.sample }
         let!(:retired_swc) do
           create(:subject_workflow_count,
-            subject_id: retired_subject['id'],
+            subject_id: retired_subject.id,
             workflow_id: cellect_workflow.id,
             retired_at: DateTime.now
           )
         end
 
         it "should not respond with retired subjects" do
-          non_retired_ids = subjects.map{ |s| s['id'] } - [retired_subject['id']]
+          non_retired_ids = subjects.map{ |s| s['id'] } - [retired_subject.id]
           run_get
           response_ids = json_response["subjects"].map{ |s| s['id'] }
           expect(response_ids).to match_array(non_retired_ids)
