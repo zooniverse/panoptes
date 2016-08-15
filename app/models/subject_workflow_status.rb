@@ -1,4 +1,6 @@
-class SubjectWorkflowCount < ActiveRecord::Base
+class SubjectWorkflowStatus < ActiveRecord::Base
+  table_name 'subject_workflow_counts'
+
   belongs_to :subject
   belongs_to :workflow
 
