@@ -19,7 +19,7 @@ module Subjects
       if sms_ids.empty?
         []
       else
-        Subjects::SeenRemover.new(user_seen_subject, sms_ids).unseen_ids
+        strip_seen_ids(sms_ids)
       end
     rescue Subjects::CellectClient::ConnectionError
       default_strategy_sms_ids
@@ -29,14 +29,16 @@ module Subjects
       @strategy ||= case
       when !Panoptes.cellect_on
         nil
-      when strategy_param == :cellect
-        strategy_param
-      else
-        workflow_strategy
+      when cellect_strategy?
+        :cellect
       end
     end
 
     private
+
+    def cellect_strategy?
+      strategy_param == :cellect || workflow.using_cellect?
+    end
 
     def strategy_sms_ids
       case strategy
@@ -55,17 +57,12 @@ module Subjects
       Subjects::PostgresqlSelection.new(workflow, user, opts).select
     end
 
-    def workflow_strategy
-      if set_strategy = workflow.selection_strategy
-        set_strategy
-      elsif workflow.using_cellect?
-        :cellect
-      end
-    end
-
-    def user_seen_subject
+    def strip_seen_ids(sms_ids)
       if user
-        UserSeenSubject.find_by(user: user, workflow: workflow)
+        uss = UserSeenSubject.find_by(user: user, workflow: workflow)
+        Subjects::SeenRemover.new(uss, sms_ids).unseen_ids
+      else
+        sms_ids
       end
     end
   end

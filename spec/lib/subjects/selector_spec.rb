@@ -245,14 +245,36 @@ RSpec.describe Subjects::Selector do
   end
 
   describe '#selected_subjects' do
-    it 'should not return retired subjects' do
-      sms = smses[0]
-      swc = create(:subject_workflow_count, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
-      expected = subject_queue.set_member_subject_ids[1..-1].sort
-      result = subject.selected_subjects(subject_queue).map do |subj|
-        subj.set_member_subjects.first.id
-      end.sort
-      expect(result).to eq(expected)
+
+    context "with retired subjects" do
+      let(:retired_workflow) { workflow }
+      let(:sms) { smses[0] }
+      let!(:swc) do
+        create(:subject_workflow_count,
+          subject: sms.subject,
+          workflow: retired_workflow,
+          retired_at: Time.zone.now
+        )
+      end
+      let(:result) do
+        subject.selected_subjects(subject_queue).map do |s|
+          s.set_member_subjects.first.id
+        end
+      end
+
+      it 'should not return retired subjects' do
+        expected = subject_queue.set_member_subject_ids[1..-1]
+        expect(result).to match_array(expected)
+      end
+
+      context "when the sms is retired for a different workflow" do
+        let(:retired_workflow) { create(:workflow, project: workflow.project) }
+
+        it 'should return all the subjects' do
+          expected = subject_queue.set_member_subject_ids
+          expect(result).to match_array(expected)
+        end
+      end
     end
 
     it 'should return something when everything in the queue is retired' do
@@ -260,6 +282,14 @@ RSpec.describe Subjects::Selector do
         swc = create(:subject_workflow_count, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
       end
       expect(subject.selected_subjects(subject_queue).size).to be > 0
+    end
+
+    it "should respect the order of the sms selection" do
+      ordered_sms = smses.sample(5)
+      sms_ids = ordered_sms.map(&:id)
+      expect(subject).to receive(:run_strategy_selection).and_return(sms_ids)
+      subjects = subject.selected_subjects(double(stale?: true, update_ids: nil))
+      expect(ordered_sms.map(&:subject_id)).to eq(subjects.map(&:id))
     end
 
     context "feature flip straight selection over queues" do

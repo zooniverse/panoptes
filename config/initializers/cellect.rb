@@ -1,6 +1,22 @@
 module Panoptes
+  def self.cellect_feature_name
+    "cellect"
+  end
+
+  def self.cellect_feature
+    @cellect_feature ||=
+      if Flipper::Adapters::ActiveRecord::Feature.where(key: cellect_feature_name).exists?
+        Panoptes.flipper[cellect_feature_name]
+      end
+  end
+
   def self.cellect_on
-    @cellect_on ||= (ENV["CELLECT_ON"] || false)
+    @cellect_on ||=
+      if cellect_feature
+        cellect_feature.try(:enabled?)
+      else
+        ENV["CELLECT_ON"] || false
+      end
   end
 
   def self.cellect_min_pool_size

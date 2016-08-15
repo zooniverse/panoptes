@@ -16,7 +16,9 @@ describe Api::V1::SubjectsController, type: :controller do
   let(:api_resource_attributes) do
     [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at" ]
   end
-  let(:api_resource_links) { [ "subjects.project" ] }
+  let(:api_resource_links) do
+    [ "subjects.project","subjects.collections", "subjects.subject_sets" ]
+  end
 
   describe "#index" do
     let!(:non_user_queue) do
@@ -29,12 +31,27 @@ describe Api::V1::SubjectsController, type: :controller do
     context "logged out user" do
 
       describe "filtering" do
-        let(:filterable_resources) do
-          create_list(:collection_with_subjects, 2).first.subjects
-        end
         let(:expected_filtered_ids) { formated_string_ids(filterable_resources) }
 
-        it_behaves_like 'has many filterable', :collections
+        context "with collection has_many" do
+          let(:filterable_resources) do
+            create_list(:collection_with_subjects, 2).first.subjects
+          end
+
+          it_behaves_like 'has many filterable', :collections
+        end
+
+        context "with subject_sets has_many" do
+          before do
+            create(:subject_set_with_subjects)
+          end
+
+          let(:filterable_resources) do
+            subject_set.subjects
+          end
+
+          it_behaves_like 'has many filterable', :subject_sets
+        end
       end
 
       context "without any sort" do

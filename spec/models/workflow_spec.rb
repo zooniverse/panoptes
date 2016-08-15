@@ -329,32 +329,13 @@ describe Workflow, type: :model do
     end
   end
 
-  describe "#selection_strategy" do
-    it "should return the configuration directive" do
-      expect(workflow.selection_strategy).to be_nil
-    end
-
-    it "should return the configuration directive when it's set" do
-      config = { selection_strategy: :cellect }
-      allow(workflow).to receive(:configuration).and_return(config)
-      expect(workflow.selection_strategy).to eq(:cellect)
-    end
-  end
-
   describe "#using_cellect?" do
-    it "should return false if the config set to someting not cellect" do
-      config = { selection_strategy: :database }
-      allow(workflow).to receive(:configuration).and_return(config)
-      expect(workflow.using_cellect?).to be_falsey
-    end
-
     it "should return false if the config is missing and small subject space" do
       expect(workflow.using_cellect?).to be_falsey
     end
 
     it "should return true if the config is set" do
-      config = { selection_strategy: :cellect }
-      allow(workflow).to receive(:configuration).and_return(config)
+      allow(workflow).to receive(:use_cellect).and_return(true)
       expect(workflow.using_cellect?).to be_truthy
     end
 
