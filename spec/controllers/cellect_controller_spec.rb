@@ -84,7 +84,7 @@ describe CellectController, type: :controller do
       context "with a retired subject" do
         let(:retired_subject) { cellect_workflow.subjects.all.sample }
         let!(:retired_swc) do
-          create(:subject_workflow_count,
+          create(:subject_workflow_status,
             subject_id: retired_subject.id,
             workflow_id: cellect_workflow.id,
             retired_at: DateTime.now
