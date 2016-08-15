@@ -41,7 +41,7 @@ module Formatter
       end
 
       def retired_in_workflow
-        SubjectWorkflowCount.retired.where(subject_id: subject_id).pluck(:workflow_id).to_json
+        SubjectWorkflowStatus.retired.where(subject_id: subject_id).pluck(:workflow_id).to_json
       end
 
       def metadata
@@ -50,7 +50,7 @@ module Formatter
 
       def classifications_by_workflow
         sms.subject_set.workflows.map do |workflow|
-          count = SubjectWorkflowCount.by_subject_workflow(subject_id, workflow.id)
+          count = SubjectWorkflowStatus.by_subject_workflow(subject_id, workflow.id)
             .try(:classifications_count) || 0
           {workflow.id => count}
         end.reduce(&:merge).to_json
