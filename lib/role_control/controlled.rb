@@ -56,14 +56,6 @@ module RoleControl
       def roles(action)
         @roles_for[action]
       end
-
-      protected
-
-      def role_test_proc(action)
-        proc do |enrolled|
-          self.class.scope_for(action, enrolled, target: self).exists?(self)
-        end
-      end
     end
   end
 end
