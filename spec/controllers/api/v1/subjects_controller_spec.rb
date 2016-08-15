@@ -234,7 +234,7 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           let!(:counts) do
-            sms.map {|s| create(:subject_workflow_count, subject: s.subject, workflow: workflow, retired_at: Time.now) }
+            sms.map {|s| create(:subject_workflow_status, subject: s.subject, workflow: workflow, retired_at: Time.now) }
           end
 
           let!(:seen_subjects) do

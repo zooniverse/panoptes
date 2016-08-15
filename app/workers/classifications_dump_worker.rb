@@ -20,11 +20,11 @@ class ClassificationsDumpWorker
         workflow_ids = group.map(&:workflow_id).uniq
 
         cache.reset_subjects(Subject.where(id: subject_ids).load)
-        retired_counts = SubjectWorkflowCount.retired.where(
+        retired_counts = SubjectWorkflowStatus.retired.where(
           subject_id: subject_ids,
           workflow_id: workflow_ids
         ).load
-        cache.reset_subject_workflow_counts(retired_counts)
+        cache.reset_subject_workflow_statuses(retired_counts)
 
         group.each { |classification| csv << formatter.to_array(classification) }
       end

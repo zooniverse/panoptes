@@ -1,10 +1,11 @@
 class SubjectWorkflowStatus < ActiveRecord::Base
-  table_name 'subject_workflow_counts'
+  self.table_name = 'subject_workflow_counts'
 
   belongs_to :subject
   belongs_to :workflow
 
-  enum retirement_reason:  [ :classification_count, :flagged, :blank, :consensus, :other ]
+  enum retirement_reason:
+    [ :classification_count, :flagged, :blank, :consensus, :other ]
 
   scope :retired, -> { where.not(retired_at: nil) }
 
@@ -14,7 +15,8 @@ class SubjectWorkflowStatus < ActiveRecord::Base
   delegate :set_member_subjects, to: :subject
 
   def self.by_set(subject_set_id)
-    joins(:subject => :set_member_subjects).where(set_member_subjects: {subject_set_id: subject_set_id})
+    joins(:subject => :set_member_subjects)
+      .where(set_member_subjects: {subject_set_id: subject_set_id})
   end
 
   def self.by_subject(subject_id)

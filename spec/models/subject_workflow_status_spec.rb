@@ -1,18 +1,18 @@
 require 'spec_helper'
 
-RSpec.describe SubjectWorkflowCount, type: :model do
-  let(:count) { create(:subject_workflow_count) }
+RSpec.describe SubjectWorkflowStatus, type: :model do
+  let(:count) { create(:subject_workflow_status) }
   it 'should have a valid factory' do
-    expect(build(:subject_workflow_count)).to be_valid
+    expect(build(:subject_workflow_status)).to be_valid
   end
 
   it 'should not be valid without a subject' do
-    swc = build(:subject_workflow_count, subject: nil, link_subject_sets: false)
+    swc = build(:subject_workflow_status, subject: nil, link_subject_sets: false)
     expect(swc).to_not be_valid
   end
 
   it 'should not be valid without a workflow' do
-    swc = build(:subject_workflow_count, workflow: nil, link_subject_sets: false)
+    swc = build(:subject_workflow_status, workflow: nil, link_subject_sets: false)
     expect(swc).to_not be_valid
   end
 
@@ -31,16 +31,16 @@ RSpec.describe SubjectWorkflowCount, type: :model do
   describe '#by_set' do
     it 'retrieves by subject association' do
       sms = create(:set_member_subject)
-      swc = create(:subject_workflow_count, subject_id: sms.subject_id)
-      expect(SubjectWorkflowCount.by_set(sms.subject_set_id)).to eq([swc])
+      swc = create(:subject_workflow_status, subject_id: sms.subject_id)
+      expect(SubjectWorkflowStatus.by_set(sms.subject_set_id)).to eq([swc])
     end
   end
 
   describe '#by_subject_workflow' do
     it 'retrieves by subject association' do
       sms = create(:set_member_subject)
-      swc = create(:subject_workflow_count, subject_id: sms.subject_id)
-      expect(SubjectWorkflowCount.by_subject_workflow(sms.subject_id, swc.workflow_id)).to eq(swc)
+      swc = create(:subject_workflow_status, subject_id: sms.subject_id)
+      expect(SubjectWorkflowStatus.by_subject_workflow(sms.subject_id, swc.workflow_id)).to eq(swc)
     end
   end
 

@@ -45,7 +45,7 @@ describe Workflow, type: :model do
 
   it "should be destroyable when it has subject counts" do
     workflow.save!
-    create(:subject_workflow_count, workflow: workflow)
+    create(:subject_workflow_status, workflow: workflow)
     expect{ workflow.destroy }.to_not raise_error
   end
 
@@ -204,12 +204,12 @@ describe Workflow, type: :model do
 
     context 'when the subject has a workflow count' do
       it 'marks as retired' do
-        create(:subject_workflow_count, subject: subject, workflow: workflow)
+        create(:subject_workflow_status, subject: subject, workflow: workflow)
         workflow.retire_subject(subject.id)
 
         aggregate_failures do
           expect(subject.retired_for_workflow?(workflow)).to be_truthy
-          expect(SubjectWorkflowCount.retired.count).to eq(1)
+          expect(SubjectWorkflowStatus.retired.count).to eq(1)
         end
       end
     end
@@ -220,7 +220,7 @@ describe Workflow, type: :model do
 
         aggregate_failures do
           expect(subject.retired_for_workflow?(workflow)).to be_truthy
-          expect(SubjectWorkflowCount.retired.count).to eq(1)
+          expect(SubjectWorkflowStatus.retired.count).to eq(1)
         end
       end
     end
@@ -228,13 +228,13 @@ describe Workflow, type: :model do
     context 'when the subject is already retired' do
       it 'leaves the retirement timestamp as it was' do
         workflow.retire_subject(subject.id)
-        retired_ats = SubjectWorkflowCount.order(:id).pluck(:retired_at)
+        retired_ats = SubjectWorkflowStatus.order(:id).pluck(:retired_at)
         workflow.retire_subject(subject.id)
 
         aggregate_failures do
           expect(subject.retired_for_workflow?(workflow)).to be_truthy
-          expect(SubjectWorkflowCount.retired.count).to eq(1)
-          expect(SubjectWorkflowCount.order(:id).pluck(:retired_at)).to eq(retired_ats)
+          expect(SubjectWorkflowStatus.retired.count).to eq(1)
+          expect(SubjectWorkflowStatus.order(:id).pluck(:retired_at)).to eq(retired_ats)
         end
       end
     end
@@ -244,7 +244,7 @@ describe Workflow, type: :model do
 
       it 'does not retire' do
         workflow.retire_subject(subject.id)
-        expect(SubjectWorkflowCount.count).to eq(0)
+        expect(SubjectWorkflowStatus.count).to eq(0)
       end
     end
   end
@@ -252,7 +252,7 @@ describe Workflow, type: :model do
   describe '#retired_subjects' do
     it 'returns through subject association' do
       sms = create(:set_member_subject)
-      swc = create(:subject_workflow_count, subject: sms.subject, retired_at: Time.now)
+      swc = create(:subject_workflow_status, subject: sms.subject, retired_at: Time.now)
 
       expect(swc.workflow.retired_subjects).to eq([sms.subject])
     end

@@ -8,9 +8,15 @@ class SetMemberSubject < ActiveRecord::Base
   belongs_to :subject
   has_many :workflows, through: :subject_set
 
-  has_many :subject_workflow_counts, through: :subject
-  has_many :retired_subject_workflow_counts, -> { retired }, through: :subject, class_name: 'SubjectWorkflowCount', source: 'subject_workflow_counts'
-  has_many :retired_workflows, through: :retired_subject_workflow_counts, source: :workflow
+  has_many :subject_workflow_statuses, through: :subject
+  has_many :retired_subject_workflow_statuses,
+    -> { retired },
+    through: :subject,
+    class_name: 'SubjectWorkflowStatus',
+    source: 'subject_workflow_counts'
+  has_many :retired_workflows,
+    through: :retired_subject_workflow_statuses,
+    source: :workflow
 
   validates_presence_of :subject_set, :subject
   validates_uniqueness_of :subject_id, scope: :subject_set_id

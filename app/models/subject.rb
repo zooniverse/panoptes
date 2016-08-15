@@ -14,12 +14,17 @@ class Subject < ActiveRecord::Base
   has_many :subject_sets, through: :set_member_subjects
   has_many :set_member_subjects, dependent: :destroy
   has_many :workflows, through: :set_member_subjects
-  has_many :subject_workflow_counts, dependent: :restrict_with_exception
-  has_many :locations, -> { where(type: 'subject_location') },
-    class_name: "Medium", as: :linked
+  has_many :subject_workflow_statuses, :restrict_with_exception
+  has_many :locations,
+    -> { where(type: 'subject_location') },
+    class_name: "Medium",
+    as: :linked
   has_many :recents, dependent: :destroy
   has_many :aggregations, dependent: :destroy
-  has_many :tutorial_workflows, class_name: 'Workflow', foreign_key: 'tutorial_subject_id', dependent: :restrict_with_exception
+  has_many :tutorial_workflows,
+    class_name: 'Workflow',
+    foreign_key: 'tutorial_subject_id',
+    dependent: :restrict_with_exception
 
   validates_presence_of :project, :uploader
 
@@ -31,12 +36,19 @@ class Subject < ActiveRecord::Base
   end
 
   def retired_workflows
-    SubjectWorkflowCount.retired.where(subject: self).includes(:workflow).map(&:workflow)
+    SubjectWorkflowStatus
+      .retired
+      .where(subject: self)
+      .includes(:workflow)
+      .map(&:workflow)
   end
 
   def retired_for_workflow?(workflow)
-    if workflow && workflow.is_a?(Workflow) && workflow.persisted?
-      SubjectWorkflowCount.retired.by_subject_workflow(self.id, workflow.id).present?
+    if workflow&.persisted?
+      SubjectWorkflowStatus
+        .retired
+        .by_subject_workflow(self.id, workflow.id)
+        .present?
     else
       false
     end

@@ -4,7 +4,7 @@ class RetirementWorker
   sidekiq_options queue: :high
 
   def perform(count_id)
-    count = SubjectWorkflowCount.find(count_id)
+    count = SubjectWorkflowStatus.find(count_id)
     if count.retire? && !count.retired?
       count.retire! do
         finish_workflow!(count.workflow)

@@ -186,7 +186,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   def assoc_class(relation)
     case relation
     when :retired_subjects, "retired_subjects"
-      SubjectWorkflowCount
+      SubjectWorkflowStatus
     else
       super
     end

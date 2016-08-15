@@ -37,7 +37,7 @@ class ResetProjectCountersWorker
   end
 
   def reset_subject_workflow_classification_counters!(workflow)
-    SubjectWorkflowCount.connection.execute <<-SQL
+    SubjectWorkflowStatus.connection.execute <<-SQL
       UPDATE subject_workflow_counts swc
       SET classifications_count = sub.actual
       FROM (

@@ -5,7 +5,7 @@ RSpec.describe RetirementSchemes::NeverRetire do
 
   describe "#retire?"  do
     it 'should be false' do
-      count = double("SubjectWorkflowCount")
+      count = double("SubjectWorkflowStatus")
       expect(subject.retire?(count)).to be(false)
     end
   end

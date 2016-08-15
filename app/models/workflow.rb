@@ -10,7 +10,7 @@ class Workflow < ActiveRecord::Base
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
   belongs_to :project
-  has_many :subject_workflow_counts, dependent: :destroy
+  has_many :subject_workflow_statuses, dependent: :destroy
   has_many :subject_sets_workflows, dependent: :destroy
   has_many :subject_sets, through: :subject_sets_workflows
   has_many :set_member_subjects, through: :subject_sets
@@ -63,12 +63,12 @@ class Workflow < ActiveRecord::Base
   end
 
   def retired_subjects
-    subject_workflow_counts.retired.includes(:subject).map(&:subject)
+    subject_workflow_statuses.retired.includes(:subject).map(&:subject)
   end
 
   def retire_subject(subject_id, reason=nil)
     if set_member_subjects.where(subject_id: subject_id).any?
-      count = subject_workflow_counts.where(subject_id: subject_id, workflow_id: id).first_or_create!
+      count = subject_workflow_statuses.where(subject_id: subject_id, workflow_id: id).first_or_create!
       count.retire!(reason)
     end
   end

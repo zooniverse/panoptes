@@ -13,7 +13,7 @@ describe Workflows::RetireSubjects do
 
   it 'sets a valid retirement reason' do
     operation.run! workflow: workflow, subject_id: subject1.id, retirement_reason: "blank"
-    expect(SubjectWorkflowCount.by_subject_workflow(subject1.id, workflow.id).retirement_reason)
+    expect(SubjectWorkflowStatus.by_subject_workflow(subject1.id, workflow.id).retirement_reason)
       .to match("blank")
   end
 
