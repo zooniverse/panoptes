@@ -7,6 +7,6 @@ class SubjectWorkflowStatusSerializer
   can_include :subject, :workflow
 
   def self.key
-    @key || self.model_class.model_name.plural.to_sym
+    @key || model_class.model_name.plural.to_sym
   end
 end
