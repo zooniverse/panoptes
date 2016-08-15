@@ -138,33 +138,75 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     it_behaves_like "is creatable"
   end
 
-  describe "#update_settings", :focus do
+  describe "#update_settings" do
     let!(:project) { create(:project, owner: authorized_user) }
     let!(:upp) { create(:user_project_preference, project: project) }
     let(:settings_params) do
       {
-        user_id: upp.user_id,
-        project_id: project.id,
-        settings: { workflow_id: 1234 }
+        project_preferences: {
+          user_id: upp.user_id,
+          project_id: project.id,
+          settings: { workflow_id: 1234 }
+        }
       }
     end
 
-    let(:scopes) { %w(project_preference) }
     before(:each) do
       default_request user_id: authorized_user.id, scopes: scopes
     end
 
     it "responds with a 200" do
-      post :update_settings, settings_params
+      put :update_settings, settings_params
       expect(response.status).to eq(200)
     end
 
-    xit "updates the UPP settings attribute" do
-      post :update_settings, settings_params
-      expect (
-        UserProjectPreference.where(project: project, user: upp.user).first["settings"]
-      ).to eq settings_params[:settings]
+    it "updates the UPP settings attribute" do
+      put :update_settings, settings_params
+      found = UserProjectPreference.where(project: project, user: upp.user).first
+      expect(found.settings["workflow_id"]).to eq settings_params[:project_preferences][:settings][:workflow_id].to_s
     end
 
+    it "cannot update preferences" do
+      sneaky_params =
+        {
+          project_preferences: {
+            user_id: upp.user_id,
+            project_id: project.id,
+            preferences: { mail_me_all_the_time: true }
+          }
+        }
+      put :update_settings, sneaky_params
+      expect(response.status).to eq (422)
+    end
+
+    it 'only updates settings of owned project' do
+      unowned_project = create(:project)
+      new_upp = create(:user_project_preference, project: unowned_project)
+
+      nefarious_params =
+        {
+          project_preferences: {
+            user_id: new_upp.user_id,
+            project_id: unowned_project.id,
+            settings: { workflow_id: 1234 }
+          }
+        }
+      put :update_settings, nefarious_params
+      expect(response.status).to eq (403)
+    end
+
+    it 'responds with a 403 if no UPP exists' do
+      unused_project = create(:project)
+      silly_params =
+        {
+          project_preferences: {
+            user_id: unused_project.owner.id,
+            project_id: unused_project.id,
+            settings: { workflow_id: 1234 }
+          }
+        }
+      put :update_settings, silly_params
+      expect(response.status).to eq (403)
+    end
   end
 end

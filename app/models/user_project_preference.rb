@@ -1,9 +1,6 @@
 class UserProjectPreference < ActiveRecord::Base
   include Preferences
 
-  class Unauthorized < StandardError; end
-  class RecordNotFound < StandardError; end
-
   preferences_for :project
 
   def summated_activity_count

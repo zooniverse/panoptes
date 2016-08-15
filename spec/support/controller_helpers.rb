@@ -81,6 +81,6 @@ module APIRequestHelpers
     set_accept_language
     set_preconditions
     stub_content_filter
-    allow(controller).to receive(:doorkeeper_token).and_return(nil)
+    stub_token
   end
 end

@@ -27,7 +27,7 @@ module Api
     rescue_from JsonApiController::PreconditionFailed,     with: :precondition_failed
     rescue_from ActiveRecord::StaleObjectError,            with: :conflict
     rescue_from Api::LimitExceeded,
-      UserProjectPreference::Unauthorized,
+      Api::Unauthorized,
       Operation::Unauthorized,                             with: :not_authorized
     rescue_from Api::PatchResourceError,
       Api::UserSeenSubjectIdError,
@@ -39,7 +39,6 @@ module Api
       JsonSchema::ValidationError,
       JsonApiController::NotLinkable,
       JsonApiController::BadLinkParams,
-      UserProjectPreference::RecordNotFound,
       Api::NoUserError,
       Api::UnpermittedParameter,
       RestPack::Serializer::InvalidInclude,
