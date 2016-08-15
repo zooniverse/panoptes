@@ -1,6 +1,8 @@
 class SubjectWorkflowStatus < ActiveRecord::Base
   self.table_name = 'subject_workflow_counts'
 
+  include RoleControl::ParentalControlled
+
   belongs_to :subject
   belongs_to :workflow
 
@@ -13,6 +15,8 @@ class SubjectWorkflowStatus < ActiveRecord::Base
   validates :workflow, presence: true
 
   delegate :set_member_subjects, to: :subject
+
+  can_through_parent :workflow, :show, :index
 
   def self.by_set(subject_set_id)
     joins(:subject => :set_member_subjects)
