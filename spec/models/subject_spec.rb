@@ -94,7 +94,7 @@ describe Subject, :type => :model do
     end
   end
 
-  describe "#retired_for_workflow?", :focus do
+  describe "#retired_for_workflow?" do
     let(:workflow) { create(:workflow) }
     let(:project) { workflow.project }
     let(:subject_set) { create(:subject_set, project: project, workflows: [workflow]) }

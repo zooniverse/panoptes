@@ -13,7 +13,7 @@ class SetMemberSubject < ActiveRecord::Base
     -> { retired },
     through: :subject,
     class_name: 'SubjectWorkflowStatus',
-    source: 'subject_workflow_counts'
+    source: 'subject_workflow_statuses'
   has_many :retired_workflows,
     through: :retired_subject_workflow_statuses,
     source: :workflow
