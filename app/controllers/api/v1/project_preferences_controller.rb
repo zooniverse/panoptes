@@ -8,20 +8,17 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   before_action :validate_records, only: [:update_settings]
 
   def update_settings
-    upp = UserProjectPreference.where(project_id: params_for[:project_id],
-                                      user_id: params_for[:user_id]).first
-    upp.settings.merge! params_for[:settings]
-    upp.save!
+    @upp.settings.merge! params_for[:settings]
+    @upp.save!
     render status: :ok, nothing: true
   end
 
   private
 
   def validate_records
-    User.find params_for[:user_id]
-    p = Project.find params_for[:project_id]
-    unless p.owner?(api_user.user)
-      raise Api::Unauthorized.new ("You must be the project owner")
+    @upp = UserProjectPreference.find_by!(user_id: params_for[:user_id], project_id: params_for[:project_id])
+    unless @upp.project.owner?(api_user.user)
+      raise Api::Unauthorized.new("You must be the project owner")
     end
   end
 

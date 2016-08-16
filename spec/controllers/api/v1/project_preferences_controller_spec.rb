@@ -138,7 +138,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     it_behaves_like "is creatable"
   end
 
-  describe "#update_settings" do
+  describe "#update_settings", :focus do
     let!(:project) { create(:project, owner: authorized_user) }
     let!(:upp) { create(:user_project_preference, project: project) }
     let(:settings_params) do
@@ -163,7 +163,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     it "updates the UPP settings attribute" do
       put :update_settings, settings_params
       found = UserProjectPreference.where(project: project, user: upp.user).first
-      expect(found.settings["workflow_id"]).to eq settings_params[:project_preferences][:settings][:workflow_id].to_s
+      expect(found.settings["workflow_id"]).to eq(settings_params[:project_preferences][:settings][:workflow_id].to_s)
     end
 
     it "cannot update preferences" do
@@ -176,10 +176,10 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
           }
         }
       put :update_settings, sneaky_params
-      expect(response.status).to eq (422)
+      expect(response.status).to eq(422)
     end
 
-    it 'only updates settings of owned project' do
+    it "only updates settings of owned project" do
       unowned_project = create(:project)
       new_upp = create(:user_project_preference, project: unowned_project)
 
@@ -192,10 +192,10 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
           }
         }
       put :update_settings, nefarious_params
-      expect(response.status).to eq (403)
+      expect(response.status).to eq(403)
     end
 
-    it 'responds with a 403 if no UPP exists' do
+    it "responds with a 404 if UPP not found" do
       unused_project = create(:project)
       silly_params =
         {
@@ -206,7 +206,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
           }
         }
       put :update_settings, silly_params
-      expect(response.status).to eq (403)
+      expect(response.status).to eq(404)
     end
   end
 end
