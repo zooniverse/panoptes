@@ -12,7 +12,6 @@ RSpec.describe Subjects::Remover do
   let(:discussions) { [] }
 
   describe "#cleanup" do
-
     before do
       allow(talk_client)
         .to receive(:discussions)
@@ -25,25 +24,25 @@ RSpec.describe Subjects::Remover do
       let(:subject) { double(id: 100) }
 
       it "should ignore non existant subject ids" do
-        expect { remover.cleanup }.to raise_error(Subjects::Remover::NonOrphan)
+        expect(remover.cleanup).to be_falsey
       end
     end
 
     it "should not remove a subject that has been classified" do
       create(:classification, subjects: [subject])
-      expect { remover.cleanup }.to raise_error(Subjects::Remover::NonOrphan)
+      expect(remover.cleanup).to be_falsey
     end
 
     it "should not remove a subject that has been collected" do
       create(:collection, subjects: [subject])
-      expect { remover.cleanup }.to raise_error(Subjects::Remover::NonOrphan)
+      expect(remover.cleanup).to be_falsey
     end
 
     context "with a talk discussions" do
       let(:discussions) { [{"dummy" => "discussion"}] }
 
       it "should not remove a subject that has been in a talk discussion" do
-        expect { remover.cleanup }.to raise_error(Subjects::Remover::NonOrphan)
+        expect(remover.cleanup).to be_falsey
       end
     end
 

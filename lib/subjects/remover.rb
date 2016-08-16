@@ -1,7 +1,5 @@
 module Subjects
   class Remover
-    class NonOrphan < StandardError; end
-
     attr_reader :subject_id
 
     def initialize(subject_id)
@@ -19,8 +17,9 @@ module Subjects
           set_member_subjects.map(&:destroy)
         end
         notify_cellect(workflow_ids)
+        true
       else
-        raise_non_orphan_error
+        false
       end
     end
 
@@ -39,10 +38,6 @@ module Subjects
        .joins("LEFT OUTER JOIN collections_subjects ON collections_subjects.subject_id = subjects.id")
        .where("collections_subjects.subject_id IS NULL")
        .first
-    end
-
-    def raise_non_orphan_error
-      raise NonOrphan, "Subject with id: #{subject_id} has linked data and cannot be removed."
     end
 
     def no_talk_discussions?

@@ -7,6 +7,5 @@ class SubjectRemovalWorker
 
   def perform(subject_id)
     Subjects::Remover.new(subject_id).cleanup
-  rescue Subjects::Remover::NonOrphan
   end
 end
