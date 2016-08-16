@@ -1,6 +1,6 @@
 class UserProjectPreferenceSerializer
   include RestPack::Serializer
-  attributes :id, :email_communication, :preferences, :href, :activity_count, :activity_count_by_workflow
+  attributes :id, :email_communication, :preferences, :href, :activity_count, :activity_count_by_workflow, :settings
   can_include :user, :project
   can_sort_by :updated_at
 
