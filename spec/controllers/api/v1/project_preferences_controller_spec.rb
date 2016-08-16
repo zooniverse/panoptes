@@ -138,7 +138,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     it_behaves_like "is creatable"
   end
 
-  describe "#update_settings", :focus do
+  describe "#update_settings" do
     let!(:project) { create(:project, owner: authorized_user) }
     let!(:upp) { create(:user_project_preference, project: project) }
     let(:settings_params) do
