@@ -9,7 +9,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   end
 
   let(:api_resource_name) { 'project_preferences' }
-  let(:api_resource_attributes) { %w(id email_communication preferences href activity_count activity_count_by_workflow) }
+  let(:api_resource_attributes) { %w(id email_communication preferences href activity_count activity_count_by_workflow settings) }
   let(:api_resource_links) { %w(project_preferences.user project_preferences.project) }
 
   let(:scopes) { %w(public project) }
