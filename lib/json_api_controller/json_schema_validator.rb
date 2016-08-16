@@ -7,7 +7,8 @@ module JsonApiController
 
     included do
       @action_params = Hash.new
-      (@actions & %i(update create)).each do |action|
+      schema_actions = %i(update create) | Array.wrap(@extra_schema_actions)
+      (@actions & schema_actions).each do |action|
         @action_params[action] = schema_class(action).try(:new)
       end
     end

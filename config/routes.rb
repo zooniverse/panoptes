@@ -56,7 +56,11 @@ Rails.application.routes.draw do
 
       json_api_resources :project_roles
 
-      json_api_resources :project_preferences
+      json_api_resources :project_preferences do
+        collection do
+          put :update_settings
+        end
+      end
 
       json_api_resources :classifications do
         collection do
