@@ -11,7 +11,7 @@ class Api::V1::ProjectRolesController < Api::ApiController
 
   def update
     super do
-      Mailers::UserAddedToProject.run!(api_user: api_user, resource_id: params[:id], roles: roles) if check_new_roles(roles).present?
+      Mailers::UserAddedToProject.run!(api_user: api_user, resource_id: params[:id], roles: roles) if new_roles_present?(roles)
     end
   end
 
@@ -21,7 +21,7 @@ class Api::V1::ProjectRolesController < Api::ApiController
     params[:project_roles][:roles]
   end
 
-  def check_new_roles(roles)
-    ["collaborator", "expert"] & roles
+  def new_roles_present?(roles)
+    (["collaborator", "expert"] & roles).present?
   end
 end

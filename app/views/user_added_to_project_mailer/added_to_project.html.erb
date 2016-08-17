@@ -3,7 +3,8 @@
 <p>Visit <a href="https://zooniverse.org/projects/<%= @project.slug %>"><%= @project.display_name %></a> to get started.</p>
 
 <% if @roles.include? "collaborator" %>
-  <p>To edit your project, go to <a href="https://zooniverse.org/lab/<%= @project.id %>">
+  <p>To edit your project, go to <a href="<%= Panoptes.frontend_url %>/<%= @project.id %>">
+  Panoptes.frontend_configuration.frontend_url
 <% end %>
 
 <p>If you believe this to be in error, please contact support (contact@zooniverse.org).</p>
