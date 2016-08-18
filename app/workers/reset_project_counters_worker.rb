@@ -1,7 +1,14 @@
 class ResetProjectCountersWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :data_high
+  sidekiq_options queue: :data_high,
+    congestion: Panoptes::CongestionControlConfig.
+      counter_worker.congestion_opts.merge({
+        reject_with: :reschedule,
+        key: ->(project_id) {
+          "project_id_#{ project_id }_count_worker"
+        }
+      })
 
   def perform(project_id)
     project = Project.find(project_id)
