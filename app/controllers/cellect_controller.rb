@@ -45,7 +45,7 @@ class CellectController < ApplicationController
     if workflow = cellect_workflow_from_param
       SetMemberSubject
         .non_retired_for_workflow(workflow)
-        .select('set_member_subjects.subject_id as id', :priority)
+        .select('set_member_subjects.subject_id as id', :priority, :subject_set_id)
     else
       []
     end
