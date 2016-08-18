@@ -18,12 +18,9 @@ class SetMemberSubject < ActiveRecord::Base
   can_through_parent :subject_set, :update, :show, :destroy, :index, :update_links,
     :destroy_links
 
-  before_create :set_random
-
   can_be_linked :subject_queue, :in_queue_workflow, :model
 
-  after_create :update_counter
-  before_destroy :update_counter
+  before_create :set_random
 
   def self.in_queue_workflow(queue)
     query = joins(subject_set: :workflows)
@@ -91,9 +88,5 @@ class SetMemberSubject < ActiveRecord::Base
 
   def set_random
     self.random = rand
-  end
-
-  def update_counter
-    SubjectSetSubjectCounterWorker.perform_in(3.minutes, subject_set_id)
   end
 end

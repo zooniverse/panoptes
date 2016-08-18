@@ -949,7 +949,8 @@ CREATE TABLE subjects (
     project_id integer,
     migrated boolean,
     lock_version integer DEFAULT 0,
-    upload_user_id integer
+    upload_user_id integer,
+    activated_state integer DEFAULT 0 NOT NULL
 );
 
 
@@ -3451,6 +3452,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160613075003');
 INSERT INTO schema_migrations (version) VALUES ('20160628165038');
 
 INSERT INTO schema_migrations (version) VALUES ('20160630150419');
+
+INSERT INTO schema_migrations (version) VALUES ('20160630170502');
 
 INSERT INTO schema_migrations (version) VALUES ('20160810140805');
 

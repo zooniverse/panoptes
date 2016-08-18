@@ -277,6 +277,13 @@ RSpec.describe Subjects::Selector do
       end
     end
 
+    it 'should not return deactivated subjects' do
+      deactivated_ids = smses[0..smses.length-2].map(&:subject_id)
+      Subject.where(id: deactivated_ids).update_all(activated_state: 1)
+      result = subject.selected_subjects(subject_queue).map(&:id)
+      expect(result).not_to include(*deactivated_ids)
+    end
+
     it 'should return something when everything in the queue is retired' do
       smses.each do |sms|
         swc = create(:subject_workflow_count, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)

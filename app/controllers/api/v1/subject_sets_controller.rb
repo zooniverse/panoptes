@@ -21,13 +21,20 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def destroy
     resource_class.transaction(requires_new: true) do
-      controlled_resources.each do |resource|
-        remove_linked_set_member_subjects(resource, resource.set_member_subjects)
-        resource.subject_sets_workflows.delete_all
-        #avoid optimisitc locking errors
-        resource.reload
-      end
+      subject_ids = controlled_resource.set_member_subjects.map(&:subject_id)
+      remove_linked_set_member_subjects(
+        controlled_resource,
+        controlled_resource.set_member_subjects
+      )
+      controlled_resource.subject_sets_workflows.delete_all
+      #avoid optimisitc locking errors
+      controlled_resource.reload
+
       super
+
+      subject_ids.each do |subject_id|
+        SubjectRemovalWorker.perform_async(subject_id)
+      end
     end
   end
 
@@ -79,7 +86,8 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def destroy_relation(resource, relation, value)
     if relation == :subjects
-      set_member_subjects = resource.set_member_subjects.where(subject_id: value.split(',').map(&:to_i))
+      linked_sms_ids = value.split(',').map(&:to_i)
+      set_member_subjects = resource.set_member_subjects.where(subject_id: linked_sms_ids)
       remove_linked_set_member_subjects(resource, set_member_subjects)
     else
       super
@@ -88,9 +96,9 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   private
 
-  def remove_linked_set_member_subjects(resource, set_member_subjects)
-    SubjectSetSubjectCounterWorker.perform_in(3.minutes, resource.id)
-    CountResetWorker.perform_async(resource.id)
+  def remove_linked_set_member_subjects(subject_set, set_member_subjects)
     set_member_subjects.delete_all
+    SubjectSetSubjectCounterWorker.perform_in(3.minutes, subject_set.id)
+    CountResetWorker.perform_async(subject_set.id)
   end
 end

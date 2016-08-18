@@ -10,6 +10,11 @@ module JsonApiController
 
     def destroy
       Activation.disable_instances!(to_disable)
+
+      to_disable.each do |resource|
+        yield resource if block_given?
+      end
+
       deleted_resource_response
     end
 

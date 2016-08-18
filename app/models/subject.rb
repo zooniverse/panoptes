@@ -1,6 +1,8 @@
 class Subject < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include Linkable
+  include Activatable
+
   default_scope { eager_load(:locations) }
 
   has_paper_trail only: [:metadata, :locations]
@@ -11,7 +13,8 @@ class Subject < ActiveRecord::Base
   has_many :collections, through: :collections_subjects
   has_many :subject_sets, through: :set_member_subjects
   has_many :set_member_subjects, dependent: :destroy
-  has_many :subject_workflow_counts, dependent: :destroy
+  has_many :workflows, through: :set_member_subjects
+  has_many :subject_workflow_counts, dependent: :restrict_with_exception
   has_many :locations, -> { where(type: 'subject_location') },
     class_name: "Medium", as: :linked
   has_many :recents, dependent: :destroy

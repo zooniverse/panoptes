@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 shared_examples "cleans up the linked set member subjects" do
-
   it 'should remove the linked set_member_subjects' do
     delete_resources
     expect(SetMemberSubject.where(id: linked_sms_ids)).to be_empty
@@ -349,6 +348,15 @@ describe Api::V1::SubjectSetsController, type: :controller do
         result = SubjectSetsWorkflow.where(id: linked_subject_sets_workflows_ids)
         expect(result).to be_empty
       end
+    end
+
+    it 'should call the subject removal worker' do
+      subject_set.subjects.each do |s|
+        expect(SubjectRemovalWorker)
+          .to receive(:perform_async)
+          .with(s.id)
+      end
+      delete_resources
     end
   end
 
