@@ -327,7 +327,9 @@ describe Api::V1::SubjectsController, type: :controller do
   end
 
   describe "#update" do
-    let(:resource) { create(:subject, project: create(:project, owner: user)) }
+    let(:resource) do
+      create(:subject, :with_mediums, num_media: 1, project: create(:project, owner: user))
+    end
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
       {
@@ -335,6 +337,7 @@ describe Api::V1::SubjectsController, type: :controller do
        "an_interesting_array" => ["1", "2", "asdf", "99.99"]
       }
     end
+    let(:locations) { [ "image/jpeg" ] }
     let(:update_params) do
       {
        subjects: {
@@ -342,24 +345,58 @@ describe Api::V1::SubjectsController, type: :controller do
                              interesting_data: "Tested Collection",
                              an_interesting_array: ["1", "2", "asdf", "99.99"]
                             },
-                  locations: [ "image/jpeg" ]
+                  locations: locations
                  }
       }
     end
 
     it_behaves_like "is updatable"
 
+    context "with an authorized user" do
+      before do
+        default_request user_id: authorized_user.id, scopes: scopes
+      end
 
-    it 'should create externally linked media resources' do
-      default_request user_id: authorized_user.id, scopes: scopes
-      external_locs = [{"image/jpeg" => "http://example.com/1.jpg"}, {"image/jpeg" => "http://example.com/2.jpg"}]
-      external_src_urls = external_locs.map { |loc| loc.to_a.flatten[1] }
-      update_params[:subjects].merge!(locations: external_locs)
-      put :update, update_params.merge(id: resource.id)
-      locations = Subject.find(created_instance_id("subjects")).locations
-      aggregate_failures "external srcs" do
-        expect(locations.map(&:external_link)).to all( be true )
-        expect(locations.map(&:src)).to match_array(external_src_urls)
+      describe "using external urls" do
+        let(:external_locs) do
+          [
+            {"image/jpeg" => "http://example.com/1.jpg"},
+            {"image/jpeg" => "http://example.com/2.jpg"}
+          ]
+        end
+        let(:external_src_urls) do
+          external_locs.map { |loc| loc.to_a.flatten[1] }
+        end
+
+        it 'should create externally linked media resources' do
+          update_params[:subjects][:locations] = external_locs
+          put :update, update_params.merge(id: resource.id)
+          locations = Subject.find(created_instance_id("subjects")).locations
+          aggregate_failures "external srcs" do
+            expect(locations.map(&:external_link)).to all( be true )
+            expect(locations.map(&:src)).to match_array(external_src_urls)
+          end
+        end
+      end
+
+      context "when the mime type is not allowed" do
+        let(:locations) { [ "text/plain" ] }
+
+        it "should not overwrite existing locations" do
+          loc_ids = resource.locations.map(&:id)
+          put :update, update_params.merge(id: resource.id)
+          expect(loc_ids).to match_array(resource.reload.locations.map(&:id))
+        end
+      end
+
+      context "when the locations array is empty" do
+        let(:locations) { [] }
+
+        it "should not overwrite existing locations" do
+          loc_ids = resource.locations.map(&:id)
+          put :update, update_params.merge(id: resource.id)
+          expect(loc_ids).to match_array(resource.reload.locations.map(&:id))
+        end
       end
     end
   end
