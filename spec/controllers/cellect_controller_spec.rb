@@ -62,7 +62,11 @@ describe CellectController, type: :controller do
     context "as json" do
       let(:subjects) do
         cellect_workflow.set_member_subjects.map do |s|
-          { 'id' => s.subject_id, 'priority' => s.priority }
+          {
+            'id' => s.subject_id,
+            'priority' => s.priority,
+            'subject_set_id' => s.subject_set_id
+          }
         end
       end
 
