@@ -3711,29 +3711,6 @@ preferences hash to be sent.
 
     [ProjectPreference][]
 
-### Edit a ProjectPreference Setting [PUT]
-Project owners may edit the settings attribute of any user's Project Preferences associated
-with that project (and only that project). "workflow_id" is the only accepted parameter.
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json; version=1
-            Content-Type: application/json
-
-    + Body
-
-            {
-                "project_preferences": {
-                    "settings": {
-                        "workflow_id": 1234,
-                    }
-                }
-            }
-
-+ Response 200
-
 ## ProjectPreference Collection [/project_preferences{?user_id,project_id,page,page_size,sort,include}]
 A Collection of ProjectPreference resources.
 
@@ -3850,6 +3827,37 @@ creation.
 + Response 201
 
     [ProjectPreference][]
+
+### Edit a ProjectPreference Setting [POST]
+Project owners may edit the settings attribute of any user's Project Preferences associated
+with that project (and only that project). You need to provide the "user_id" and the "project_id"
+to specify the resource to apply the settings update to. Note: in the settings payload the
+"workflow_id" is the only accepted parameter.
+
++ Parameters
+  + user_id (string) ... The id of the user whose preference needs updating
+  + project_id (string) ... The id of the project the preference setting should be scoped to
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "project_preferences": {
+                    "settings": {
+                        "workflow_id": 1234,
+                    }
+                }
+            }
+
++ Response 200
+
+    [ProjectPreference][]
+
 
 # Group ProjectContents
 Resources related to the translatable strings for _Panotpes Projects_.
