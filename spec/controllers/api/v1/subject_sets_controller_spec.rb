@@ -6,11 +6,12 @@ shared_examples "cleans up the linked set member subjects" do
     expect(SetMemberSubject.where(id: linked_sms_ids)).to be_empty
   end
 
-  it 'should queue a count reset worker' do
-    expect(CountResetWorker).to receive(:perform_async).with(subject_set.id)
+  it 'should queue a project count reset worker' do
+    expect(WorkflowRetiredCountWorker)
+      .to receive(:perform_async)
+      .with(subject_set.id)
     delete_resources
   end
-
 end
 
 describe Api::V1::SubjectSetsController, type: :controller do
@@ -126,8 +127,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
 
       it "should queue the counter worker" do
-        expect(SubjectSetSubjectCounterWorker).to receive(:perform_in)
-          .with(3.minutes, resource.id)
+        expect(SubjectSetSubjectCounterWorker)
+          .to receive(:perform_async)
+          .with(resource.id)
         run_update_links
       end
 
