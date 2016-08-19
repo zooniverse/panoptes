@@ -161,6 +161,14 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       expect(response.status).to eq(200)
     end
 
+    it "responds with the updated resource" do
+      run_update
+      updated_upp = json_response[api_resource_name].first
+      expect(updated_upp).not_to be_empty
+      modified = upp.updated_at.httpdate
+      expect(response.headers).to include('Last-Modified' => modified)
+    end
+
     it "updates the UPP settings attribute" do
       run_update
       found = UserProjectPreference.where(project: project, user: upp.user).first
