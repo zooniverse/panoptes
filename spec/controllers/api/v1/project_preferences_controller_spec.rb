@@ -175,7 +175,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       expect(found.settings["workflow_id"]).to eq(settings_params[:project_preferences][:settings][:workflow_id].to_s)
     end
 
-    context "with sneaky params" do
+    describe "trying to update attribute we aren't allowed to" do
       let(:settings_params) do
         {
           project_preferences: {
@@ -192,7 +192,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       end
     end
 
-    context "with nefarious params" do
+    describe "trying to update a project we don't have rights on" do
       let(:unowned_project) { create(:project) }
       let(:new_upp) do
         create(:user_project_preference, project: unowned_project)
@@ -213,7 +213,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       end
     end
 
-    context "with silly params" do
+    describe "trying to update a resource that doesn't exist" do
       let(:unused_project) { create(:project) }
       let(:settings_params) do
         {
