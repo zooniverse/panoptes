@@ -11,10 +11,7 @@ describe Subject, :type => :model do
     expect(subject).to be_valid
   end
 
-  #TODO: remove this once the activated_state defaults are in place
-  it "should set the activated_state on create" do
-    expect(subject.activated_state).to be_nil
-    subject.save
+  it "should by default be active" do
     expect(subject.active?).to be_truthy
   end
 
