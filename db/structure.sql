@@ -950,7 +950,7 @@ CREATE TABLE subjects (
     migrated boolean,
     lock_version integer DEFAULT 0,
     upload_user_id integer,
-    activated_state integer DEFAULT 0 NOT NULL
+    activated_state integer
 );
 
 
