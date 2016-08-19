@@ -160,8 +160,10 @@ namespace :migrate do
   namespace :subjects do
     desc "Set default value for subject activated_state"
     task :activated_state_default => :environment do
-      Subject.unscoped.select("id").find_in_batches do |batch|
-        Subject.unscoped.where(id: batch.map(&:id)).update_all(activated_state: 0)
+      scope = Subject.unscoped
+      subjects = scope.where(activated_state: nil).select(:id)
+      subjects.find_in_batches do |batch|
+        scope.where(id: batch.map(&:id)).update_all(activated_state: 0)
         print '.'
       end
       puts ' done'
