@@ -5,24 +5,16 @@ class RetirementWorker
 
   def perform(count_id)
     count = SubjectWorkflowStatus.find(count_id)
-    if count.retire? && !count.retired?
-      count.retire! do
-        finish_workflow!(count.workflow)
+    if count.retire?
+      count.retire!
+      workflow = count.workflow
+      PublishRetirementEventWorker.perform_async(workflow.id)
+      if workflow.finished?
+        Workflow.where(id: workflow.id).update_all(finished_at: Time.now)
       end
-      PublishRetirementEventWorker.perform_async(count.workflow.id)
-      notify_cellect(count)
-    end
-  end
-
-  def finish_workflow!(workflow, clock = Time)
-    if workflow.finished?
-      Workflow.where(id: workflow.id).update_all(finished_at: clock.now)
-    end
-  end
-
-  def notify_cellect(count)
-    if Panoptes.use_cellect?(count.workflow)
-      RetireCellectWorker.perform_async(count.subject_id, count.workflow.id)
+      if Panoptes.use_cellect?(workflow)
+        RetireCellectWorker.perform_async(count.subject_id, workflow.id)
+      end
     end
   end
 end
