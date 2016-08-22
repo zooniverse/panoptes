@@ -150,24 +150,33 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         }
       }
     end
+    let(:run_update) { post :update_settings, settings_params }
 
     before(:each) do
       default_request user_id: authorized_user.id, scopes: scopes
     end
 
     it "responds with a 200" do
-      put :update_settings, settings_params
+      run_update
       expect(response.status).to eq(200)
     end
 
+    it "responds with the updated resource" do
+      run_update
+      updated_upp = json_response[api_resource_name].first
+      expect(updated_upp).not_to be_empty
+      modified = upp.updated_at.httpdate
+      expect(response.headers).to include('Last-Modified' => modified)
+    end
+
     it "updates the UPP settings attribute" do
-      put :update_settings, settings_params
+      run_update
       found = UserProjectPreference.where(project: project, user: upp.user).first
       expect(found.settings["workflow_id"]).to eq(settings_params[:project_preferences][:settings][:workflow_id].to_s)
     end
 
-    it "cannot update preferences" do
-      sneaky_params =
+    describe "trying to update attribute we aren't allowed to" do
+      let(:settings_params) do
         {
           project_preferences: {
             user_id: upp.user_id,
@@ -175,15 +184,20 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
             preferences: { mail_me_all_the_time: true }
           }
         }
-      put :update_settings, sneaky_params
-      expect(response.status).to eq(422)
+      end
+
+      it "cannot update preferences" do
+        run_update
+        expect(response.status).to eq(422)
+      end
     end
 
-    it "only updates settings of owned project" do
-      unowned_project = create(:project)
-      new_upp = create(:user_project_preference, project: unowned_project)
-
-      nefarious_params =
+    describe "trying to update a project we don't have rights on" do
+      let(:unowned_project) { create(:project) }
+      let(:new_upp) do
+        create(:user_project_preference, project: unowned_project)
+      end
+      let(:settings_params) do
         {
           project_preferences: {
             user_id: new_upp.user_id,
@@ -191,13 +205,17 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
             settings: { workflow_id: 1234 }
           }
         }
-      put :update_settings, nefarious_params
-      expect(response.status).to eq(403)
+      end
+
+      it "only updates settings of owned project" do
+        run_update
+        expect(response.status).to eq(403)
+      end
     end
 
-    it "responds with a 404 if UPP not found" do
-      unused_project = create(:project)
-      silly_params =
+    describe "trying to update a resource that doesn't exist" do
+      let(:unused_project) { create(:project) }
+      let(:settings_params) do
         {
           project_preferences: {
             user_id: unused_project.owner.id,
@@ -205,8 +223,12 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
             settings: { workflow_id: 1234 }
           }
         }
-      put :update_settings, silly_params
-      expect(response.status).to eq(404)
+      end
+
+      it "responds with a 404 if UPP not found" do
+        run_update
+        expect(response.status).to eq(404)
+      end
     end
   end
 end
