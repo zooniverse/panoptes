@@ -7,9 +7,11 @@ shared_examples "cleans up the linked set member subjects" do
   end
 
   it 'should queue a project count reset worker' do
-    expect(WorkflowRetiredCountWorker)
-      .to receive(:perform_async)
-      .with(subject_set.id)
+    subject_set.workflows.map(&:id).each do |id|
+      expect(WorkflowRetiredCountWorker)
+        .to receive(:perform_async)
+        .with(id)
+    end
     delete_resources
   end
 end
