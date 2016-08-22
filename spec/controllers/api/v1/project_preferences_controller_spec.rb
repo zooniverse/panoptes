@@ -175,6 +175,17 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       expect(found.settings["workflow_id"]).to eq(settings_params[:project_preferences][:settings][:workflow_id].to_s)
     end
 
+    it "allows collaborators to update UPP" do
+      collab = create(:user)
+      create(:access_control_list,
+             resource: project,
+             user_group: collab.identity_group,
+             roles: ["collaborator"])
+      default_request user_id: collab.id, scopes: scopes
+      run_update
+      expect(response.status).to eq(200)
+    end
+
     describe "trying to update attribute we aren't allowed to" do
       let(:settings_params) do
         {
