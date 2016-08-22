@@ -20,7 +20,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
       user_id: params_for[:user_id],
       project_id: params_for[:project_id]
     )
-    unless @upp.project.owner?(api_user.user)
+    unless @upp.project.owners_and_collaborators.include?(api_user.user)
       raise Api::Unauthorized.new("You must be the project owner")
     end
   end
