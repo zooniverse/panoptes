@@ -29,11 +29,11 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def update_links
-    super { |workflow| reload_queue(workflow) }
+    super { |workflow| post_link_actions(workflow) }
   end
 
   def destroy_links
-    super { |workflow| reload_queue(workflow) }
+    super { |workflow| post_link_actions(workflow) }
   end
 
   def retire_subjects
@@ -68,22 +68,25 @@ class Api::V1::WorkflowsController < Api::ApiController
     end
   end
 
-  def reload_queue(workflow)
+  # This is a very good reason to move away from the api controller work we've got
+  # it's hard to hook into the right place to run actions that in theory should
+  # be easily located in specific controller actions
+  def post_link_actions(workflow)
     if workflow.set_member_subjects.exists?
-      reload_queue_subject_sets(workflow).each do |subject_set_id|
-        ReloadNonLoggedInQueueWorker.perform_async(workflow.id, subject_set_id)
-      end
-      if Panoptes.use_cellect?(workflow)
-        case relation
-        when :retired_subjects, 'retired_subjects'
+      using_cellect = Panoptes.use_cellect?(workflow)
+
+      case relation
+      when :retired_subjects, 'retired_subjects'
+        WorkflowRetiredCountWorker.perform_async(workflow.id)
+        if using_cellect
           params[:retired_subjects].each do |subject_id|
             RetireCellectWorker.perform_async(subject_id, workflow.id)
           end
-        when :subject_sets, 'subject_sets'
-          ReloadCellectWorker.perform_async(workflow.id)
         end
-
+      when :subject_sets, 'subject_sets'
+        ReloadCellectWorker.perform_async(workflow.id) if using_cellect
       end
+
     end
   end
 
@@ -189,22 +192,6 @@ class Api::V1::WorkflowsController < Api::ApiController
       SubjectWorkflowStatus
     else
       super
-    end
-  end
-
-  def reload_queue_subject_sets(workflow)
-    case relation
-    when :subject_sets
-      Array.wrap(params[:subject_sets])
-    when :retired_subjects
-      SubjectSet.distinct
-      .joins(:workflows)
-      .where(workflows: { id: workflow.id })
-      .joins(:set_member_subjects)
-      .where(set_member_subjects: { subject_id: params[:retired_subjects] })
-      .pluck(:id)
-    else
-      []
     end
   end
 end
