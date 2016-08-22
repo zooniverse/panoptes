@@ -23,14 +23,14 @@ RSpec.describe WorkflowRetiredCountWorker do
     it 'should reset the workflow retired count' do
       non_retired_swc
       expect do
-        worker.perform(subject_set.id)
+        worker.perform(workflow.id)
       end.to change{Workflow.find(workflow.id).retired_set_member_subjects_count}.from(100).to(2)
     end
 
     it 'should respect the project launch date' do
       workflow.project.update_column(:launch_date, DateTime.now)
       expect do
-        worker.perform(subject_set.id)
+        worker.perform(workflow.id)
       end.to change{Workflow.find(workflow.id).retired_set_member_subjects_count}.from(100).to(0)
     end
   end
