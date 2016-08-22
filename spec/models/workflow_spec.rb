@@ -265,26 +265,36 @@ describe Workflow, type: :model do
   end
 
   describe "#finished?" do
+    let(:workflow) { subject_relation }
+    let(:subjects_count) { workflow.subjects_count }
+
     context "when no subject_sets relation exist" do
       it 'should be false' do
-        allow(subject_relation).to receive(:subject_sets).and_return([])
-        expect(subject_relation).not_to be_finished
+        allow(workflow).to receive(:subject_sets).and_return([])
+        expect(workflow).not_to be_finished
       end
     end
 
     context "when the workflow is marked finished" do
       before do
-        allow(subject_relation).to receive(:finished_at).and_return(Time.zone.now)
+        allow(workflow).to receive(:finished_at).and_return(Time.zone.now)
       end
 
       it 'should be true' do
-        expect(subject_relation).to be_finished
+        expect(workflow).to be_finished
       end
     end
 
     context "when the workflow is not marked finished" do
-      it 'should be false' do
-        expect(subject_relation).not_to be_finished
+      it 'should be false if the retired < subjects count' do
+        expect(workflow).not_to be_finished
+      end
+
+      it 'should be true if the retired >= subjects count' do
+        allow(workflow).to receive(:retired_subjects_count).and_return(subjects_count)
+        expect(workflow).to be_finished
+        allow(workflow).to receive(:retired_subjects_count).and_return(subjects_count+1)
+        expect(workflow).to be_finished
       end
     end
   end
