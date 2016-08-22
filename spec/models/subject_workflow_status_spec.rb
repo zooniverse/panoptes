@@ -63,6 +63,12 @@ RSpec.describe SubjectWorkflowStatus, type: :model do
   end
 
   describe "#retire?" do
+    it 'should return false if it is already retired' do
+      allow(count).to receive(:retired?).and_return(true)
+      expect(count.workflow).not_to receive(:retirement_scheme)
+      expect(count.retire?).to be_falsey
+    end
+
     it 'should test against the workflow retirement scheme' do
       d = double
       allow(count.workflow).to receive(:retirement_scheme).and_return(d)

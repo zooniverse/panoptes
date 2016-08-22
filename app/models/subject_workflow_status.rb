@@ -32,7 +32,7 @@ class SubjectWorkflowStatus < ActiveRecord::Base
   end
 
   def retire?
-    workflow.retirement_scheme.retire?(self)
+    !retired? && workflow.retirement_scheme.retire?(self)
   end
 
   def retire!(reason=nil)
