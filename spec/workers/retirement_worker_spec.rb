@@ -18,10 +18,11 @@ RSpec.describe RetirementWorker do
         expect(sms.retired_workflows).to include(workflow)
       end
 
-      it "should increment the subject set's retirement count" do
-        expect{ worker.perform(count.id) }.to change{
-          Workflow.find(workflow.id).retired_set_member_subjects_count
-        }.from(0).to(1)
+      it 'should call the workflow retired counter worker' do
+        expect(WorkflowRetiredCountWorker)
+          .to receive(:perform_async)
+          .with(count.workflow.id)
+        worker.perform(count.id)
       end
 
       it "should call the publish retire event worker" do
@@ -66,7 +67,6 @@ RSpec.describe RetirementWorker do
     context 'when the sms is already retired' do
       before(:each) do
         allow(SubjectWorkflowStatus).to receive(:find).with(count.id).and_return count
-        allow(count).to receive(:retire?).and_return true
         allow(count).to receive(:retired_at).and_return 1.minute.ago.utc
       end
 
