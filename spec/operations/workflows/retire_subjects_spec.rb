@@ -33,6 +33,11 @@ describe Workflows::RetireSubjects do
       expect(subject1.retired_for_workflow?(workflow)).to be_truthy
     end
 
+    it 'queues a workflow retired counter' do
+      expect(WorkflowRetiredCountWorker).to receive(:perform_async).with(workflow.id)
+      operation.run! workflow: workflow, subject_id: subject1.id
+    end
+
     it 'queues a cellect retirement if the workflow uses cellect' do
       allow(Panoptes).to receive(:use_cellect?).and_return(true)
       expect(RetireCellectWorker).to receive(:perform_async).with(subject1.id, workflow.id)
@@ -47,17 +52,11 @@ describe Workflows::RetireSubjects do
       expect(subject2.retired_for_workflow?(workflow)).to be_truthy
     end
 
-    it 'queues a cellect retirement if the workflow uses cellect' do
-      allow(Panoptes).to receive(:use_cellect?).and_return(true)
-      expect(RetireCellectWorker).to receive(:perform_async).with(subject1.id, workflow.id)
-      expect(RetireCellectWorker).to receive(:perform_async).with(subject2.id, workflow.id)
-      operation.run! workflow: workflow, subject_ids: [subject1.id, subject2.id]
-    end
-
     it 'does not queue workers if something went wrong' do
       allow(Panoptes).to receive(:use_cellect?).and_return(true)
       allow(workflow).to receive(:retire_subject).with(subject1.id, nil).and_return(true)
       allow(workflow).to receive(:retire_subject).with(subject2.id, nil) { raise ActiveRecord::Rollback, "some error" }
+      expect(WorkflowRetiredCountWorker).to receive(:perform_async).with(workflow.id).never
       expect(RetireCellectWorker).to receive(:perform_async).with(subject1.id, workflow.id).never
       operation.run! workflow: workflow, subject_ids: [subject1.id, subject2.id]
     end
