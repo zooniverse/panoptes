@@ -26,9 +26,6 @@ class Subject < ActiveRecord::Base
   can_through_parent :project, :update, :index, :show, :destroy, :update_links,
                      :destroy_links, :versions, :version
 
-  #temp fix to ensure we're creating default values
-  before_create :set_activated_state
-
   def migrated_subject?
     !!migrated
   end
@@ -43,10 +40,5 @@ class Subject < ActiveRecord::Base
     else
       false
     end
-  end
-
-  #remove with the temp fix before_create callback
-  def set_activated_state
-    self.activated_state = 0
   end
 end

@@ -38,9 +38,7 @@ module Subjects
     private
 
     def active_subjects_in_selection_order(sms_ids)
-      #TODO: Rever to just active scope once the activated_state defaults / rake task has run
-      # @scope.active
-      @scope.where(activated_state: [nil, 0])
+      @scope.active
       .eager_load(:set_member_subjects)
       .where(set_member_subjects: {id: sms_ids})
       .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")

@@ -24,11 +24,6 @@ class Api::V1::SubjectsController < Api::ApiController
     super { |subject| SubjectRemovalWorker.perform_async(subject.id) }
   end
 
-  #REMOVE THIS AFTER THE RUNNING THE RAKE TASK TO UPDATE ALL THE ACTIVATED_STATES
-  def add_active_resources_scope
-    false
-  end
-
   private
 
   def check_subject_limit
