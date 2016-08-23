@@ -21,16 +21,13 @@ class ResetProjectCountersWorker
     )
 
     project.workflows.find_each do |workflow|
-      workflow.update_columns classifications_count: count_classifications_for_workflow(project, workflow)
+      counter = WorkflowCounter.new(workflow)
+      workflow.update_columns classifications_count: counter.classifications
       reset_subject_workflow_classification_counters!(workflow)
     end
   end
 
   private
-
-  def count_classifications_for_workflow(project, workflow)
-    workflow.classifications.where("created_at >= ?", project.launch_date).count
-  end
 
   def reset_subject_workflow_classification_counters!(workflow)
     SubjectWorkflowStatus.connection.execute <<-SQL
