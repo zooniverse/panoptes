@@ -13,7 +13,7 @@ class ProjectCounter
     if launch_date
       upps = upps.where("classifications.created_at >= ?", launch_date)
     end
-    upps.count
+    upps.distinct.count
   end
 
   def classifications
