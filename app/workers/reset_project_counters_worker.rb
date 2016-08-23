@@ -13,11 +13,12 @@ class ResetProjectCountersWorker
 
   def perform(project_id, rate_limit=true)
     project = Project.find(project_id)
+    counter = ProjectCounter.new(project)
 
-    return unless project.launch_date
-
-    project.update_columns classifications_count: count_classifications_for_project(project),
-                           classifiers_count: count_classififiers_for_project(project)
+    project.update_columns(
+      classifications_count: counter.classifications,
+      classifiers_count: counter.volunteers
+    )
 
     project.workflows.find_each do |workflow|
       workflow.update_columns classifications_count: count_classifications_for_workflow(project, workflow)
@@ -27,21 +28,8 @@ class ResetProjectCountersWorker
 
   private
 
-  def count_classifications_for_project(project)
-    project.classifications.where("created_at >= ?", project.launch_date).count
-  end
-
   def count_classifications_for_workflow(project, workflow)
     workflow.classifications.where("created_at >= ?", project.launch_date).count
-  end
-
-  def count_classififiers_for_project(project)
-    UserProjectPreference.connection.execute(<<-SQL)[0]["count"]
-      SELECT COUNT(DISTINCT(upp.user_id)) count FROM user_project_preferences upp
-      INNER JOIN classifications c ON c.user_id = upp.user_id
-      INNER JOIN projects p ON p.id = upp.project_id
-      WHERE upp.project_id = #{project.id} AND c.project_id = #{project.id} AND c.created_at >= p.launch_date;
-    SQL
   end
 
   def reset_subject_workflow_classification_counters!(workflow)
