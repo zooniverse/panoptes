@@ -11,7 +11,7 @@ class ProjectCounter
       .joins("INNER JOIN classifications ON classifications.user_id = user_project_preferences.user_id")
       .where(project_id: project.id)
     if launch_date
-      upps = upps.where("user_project_preferences.created_at >= ?", launch_date)
+      upps = upps.where("classifications.created_at >= ?", launch_date)
     end
     upps.count
   end
