@@ -3,6 +3,8 @@ class UserInfoChangedMailerWorker
 
   sidekiq_options queue: :data_high
 
+  attr_reader :user, :project
+
   def perform(user_id, info)
     @user = User.find(user_id)
     if @user && !@user.email.blank?

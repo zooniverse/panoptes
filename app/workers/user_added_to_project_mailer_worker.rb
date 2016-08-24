@@ -3,6 +3,8 @@ class UserAddedToProjectMailerWorker
 
   sidekiq_options queue: :data_high
 
+  attr_reader :user, :project
+
   def perform(user_id, project_id, roles)
     @user = User.find(user_id)
     if @user && !@user.email.blank? && roles

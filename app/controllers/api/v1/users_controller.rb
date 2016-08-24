@@ -103,6 +103,6 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def user_info_changed(changed)
-    Mailers::UserInfoChanged.run!(api_user: api_user, changed: changed)
+    UserInfoChangedMailerWorker.perform_async(api_user.id, changed)
   end
 end

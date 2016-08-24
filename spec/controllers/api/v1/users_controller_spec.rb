@@ -509,6 +509,10 @@ describe Api::V1::UsersController, type: :controller do
         update_request
       end
 
+      it "sends an email to the new address" do
+        expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, :email)
+      end
+
       context 'when email preferences are true' do
         it 'should subscribe the new email' do
           expect(SubscribeWorker).to receive(:perform_async).with("test@example.com")

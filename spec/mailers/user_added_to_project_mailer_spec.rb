@@ -25,12 +25,12 @@ RSpec.describe UserAddedToProjectMailer, :type => :mailer do
     end
 
     it 'includes the lab URL if the user is a collaborator' do
-      expect(mail.body.encoded).to match("https://zooniverse.org/lab/#{ project.id }")
+      expect(mail.body.encoded).to match("#{ Panoptes.frontend_url }/lab/#{ project.id }")
     end
 
     it 'does not include the lab URL if the user is not a collaborator' do
       newmail = UserAddedToProjectMailer.added_to_project(user, project, ['expert'])
-      expect(newmail.body.encoded).to_not match("https://zooniverse.org/lab/#{ project.id }")
+      expect(newmail.body.encoded).to_not match("#{ Panoptes.frontend_url }/lab/#{ project.id }")
     end
   end
 end

@@ -11,7 +11,7 @@ class Api::V1::ProjectRolesController < Api::ApiController
 
   def update
     super do
-      Mailers::UserAddedToProject.run!(api_user: api_user, resource_id: params[:id], roles: roles) if new_roles_present?(roles)
+      UserAddedToProjectMailerWorker.perform_async(api_user.id, params[:id], roles) if new_roles_present?(roles)
     end
   end
 

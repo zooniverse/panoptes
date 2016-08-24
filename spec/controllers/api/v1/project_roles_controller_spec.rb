@@ -79,14 +79,14 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
 
       it "calls the mailer if user added to project" do
         params = update_params.merge(id: resource.id)
-        expect(Mailers::UserAddedToProject).to receive(:run!)
+        expect(UserAddedToProjectMailerWorker).to receive(:perform_async)
         put :update, params
       end
 
       it "does not call the mailer not appropriate" do
         new_roles = { project_roles: { roles: ["tester"] } }
         params = new_roles.merge(id: resource.id)
-        expect(Mailers::UserAddedToProject).to_not receive(:run!)
+        expect(UserAddedToProjectMailerWorker).to_not receive(:perform_async)
         put :update, params
       end
     end
