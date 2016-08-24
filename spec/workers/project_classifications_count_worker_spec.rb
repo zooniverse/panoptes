@@ -3,16 +3,7 @@ require 'spec_helper'
 RSpec.describe ProjectClassificationsCountWorker do
   let(:worker) { described_class.new }
   let(:workflow) { create(:workflow) }
-  let(:project) { workflow.project }
-  let(:subject) do
-    create(:subject,
-      project: project,
-      subject_sets: [create(:subject_set, workflows: [workflow])]
-    )
-  end
-  let!(:swc) do
-    create :subject_workflow_status, subject: subject, workflow: workflow, classifications_count: 5
-  end
+  let!(:project) { workflow.project }
 
   describe "#perform" do
     it 'calls the workflow counter to update the workflow counts' do
