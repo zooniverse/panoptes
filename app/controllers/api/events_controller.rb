@@ -16,7 +16,13 @@ module Api
 
     def create
       respond_to do |format|
-        format.json { process_incoming_event }
+        format.json do
+          response_status = :unprocessable_entity
+          if event_params_check
+            response_status = process_incoming_event
+          end
+          render status: response_status, nothing: true
+        end
       end
     end
 
@@ -30,18 +36,16 @@ module Api
     end
 
     def process_incoming_event
-      response_status = :unprocessable_entity
-      if event_params_check
-        if upp = user_project_preference
-          was_new = upp.new_record?
-          upp.legacy_count[create_params[:workflow]] = create_params[:count]
-          if upp.save
-            ProjectClassifiersCountWorker.perform_async(upp.project_id) if was_new
-            response_status = :ok
-          end
+      if upp = user_project_preference
+        was_new = upp.new_record?
+        upp.legacy_count[create_params[:workflow]] = create_params[:count]
+        if upp.save
+          ProjectClassifiersCountWorker.perform_async(upp.project_id) if was_new
+          :ok
+        else
+          :unprocessable_entity
         end
       end
-      render status: response_status, nothing: true
     end
 
     def event_params_check
