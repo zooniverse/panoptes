@@ -11,7 +11,7 @@ RSpec.describe CellectExClient do
 
   context "instance methods" do
     before(:each) do
-      allow(described_class).to receive(:configuration).and_return({host: "http://test.example.com"})
+      allow(described_class).to receive(:config_from_file).and_return({host: "http://test.example.com"})
       described_class.load_configuration
     end
 

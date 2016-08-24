@@ -30,9 +30,9 @@ RSpec.describe TalkApiClient do
     end
 
     before(:each) do
-      allow(described_class).to receive(:configuration).and_return({host: "http://test.example.com",
-                                                                    user: user.id.to_s,
-                                                                    application: application.id.to_s})
+      allow(described_class).to receive(:config_from_file).and_return({host: "http://test.example.com",
+                                                                       user: user.id.to_s,
+                                                                       application: application.id.to_s})
       described_class.load_configuration
     end
 
