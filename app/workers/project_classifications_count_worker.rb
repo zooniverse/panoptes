@@ -2,10 +2,10 @@ class ProjectClassificationsCountWorker
   include Sidekiq::Worker
 
   sidekiq_options congestion: {
-    interval: 60,
+    interval: 15,
     max_in_interval: 1,
     min_delay: 0,
-    reject_with: :cancel,
+    reject_with: :reschedule,
     key: ->(project_id) {
       "project_#{project_id}_classifications_count_worker"
     }
