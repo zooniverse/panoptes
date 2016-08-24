@@ -138,12 +138,6 @@ describe UserGroup, :type => :model do
     end
   end
 
-  describe "#classifications_count" do
-    let(:relation_instance) { user_group }
-
-    it_behaves_like "it has a cached counter for classifications"
-  end
-
   describe '#verify_join_token' do
     it 'returns true if the join token matches' do
       result = user_group.verify_join_token(user_group.join_token)
