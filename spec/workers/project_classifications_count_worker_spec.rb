@@ -14,7 +14,7 @@ RSpec.describe ProjectClassificationsCountWorker do
     create :subject_workflow_status, subject: subject, workflow: workflow, classifications_count: 5
   end
 
-  describe "#perform" do
+  describe "#perform", :focus do
     it 'updates the project counter' do
       expect { worker.perform(project.id) }
         .to change { project.reload.classifications_count }
