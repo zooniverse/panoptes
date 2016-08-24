@@ -35,7 +35,7 @@ class ClassificationLifecycle
         up.preferences = {}
       end
       if first_classifcation = upp.email_communication.nil?
-        Project.increment_counter :classifiers_count, project.id
+        ProjectClassificationsCountWorker.perform_async(project.id)
         upp.email_communication = user.project_email_communication
       end
       upp.changed? ? upp.save! : upp.touch
