@@ -171,8 +171,10 @@ describe Api::EventsController, type: :controller do
           end.to change { UserProjectPreference.count }.from(0).to(1)
         end
 
-        it "should increment the project's classifiers count" do
-          expect(Project).to receive(:increment_counter).with(:classifiers_count, project.id)
+        it "should call a worker to update the project's classifiers count" do
+          expect(ProjectClassifiersCountWorker)
+            .to receive(:perform_async)
+            .with(project.id)
           post :create, first_visit_event_params
         end
 
