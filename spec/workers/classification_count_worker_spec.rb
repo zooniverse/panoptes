@@ -15,11 +15,13 @@ RSpec.describe ClassificationCountWorker do
           create(:subject_workflow_status, subject: sms.subject, workflow_id: workflow_id)
         end
 
-        it 'should increment the classifications_count' do
-          expect do
-            worker.perform(sms.subject_id, workflow_id)
-            count.reload
-          end.to change{count.classifications_count}.from(1).to(2)
+        it 'should call the counter to update the classifications_count' do
+          expect_any_instance_of(SubjectWorkflowCounter)
+            .to receive(:classifications)
+          expect_any_instance_of(SubjectWorkflowCount)
+            .to receive(:update_column)
+            .with(:classifications_count, anything)
+          worker.perform(sms.subject_id, workflow_id)
         end
       end
 
@@ -35,10 +37,6 @@ RSpec.describe ClassificationCountWorker do
 
         it 'should create a new count' do
           expect(subject).to_not be_nil
-        end
-
-        it 'should have a count of 1' do
-          expect(subject.classifications_count).to eq(1)
         end
       end
 
