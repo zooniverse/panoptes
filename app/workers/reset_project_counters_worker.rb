@@ -2,12 +2,10 @@ class ResetProjectCountersWorker
   include Sidekiq::Worker
 
   sidekiq_options queue: :data_high,
-    congestion: Panoptes::CongestionControlConfig.
-      counter_worker.congestion_opts.merge({
+    congestion:
+      Panoptes::CongestionControlConfig.counter_worker.congestion_opts.merge({
         reject_with: :reschedule,
-        key: ->(project_id) {
-          "project_id_#{ project_id }_count_worker"
-        },
+        key: ->(project_id) { "project_id_#{ project_id }_count_worker" },
         enabled: ->(project_id, rate_limit=true) { rate_limit }
       })
 

@@ -298,8 +298,8 @@ describe ClassificationLifecycle do
 
         it 'should call a worker to recount the project classifications' do
           expect(ProjectClassificationsCountWorker)
-              .to receive(:perform_async)
-              .with(classification.project_id)
+            .to receive(:perform_async)
+            .with(classification.project_id)
           subject.process_project_preference
         end
 

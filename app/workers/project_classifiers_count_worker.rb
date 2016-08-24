@@ -6,9 +6,7 @@ class ProjectClassifiersCountWorker
     max_in_interval: 1,
     min_delay: 0,
     reject_with: :reschedule,
-    key: ->(project_id) {
-      "project_#{project_id}_classifiers_count_worker"
-    }
+    key: ->(project_id) { "project_#{project_id}_classifiers_count_worker" }
   }
 
   def perform(project_id)
