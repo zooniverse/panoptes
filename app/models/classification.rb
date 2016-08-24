@@ -4,9 +4,9 @@ class Classification < ActiveRecord::Base
   class MissingParameter < StandardError; end
 
   belongs_to :project
-  belongs_to :user, counter_cache: true
+  belongs_to :user
   belongs_to :workflow
-  belongs_to :user_group, counter_cache: true
+  belongs_to :user_group
 
   has_many :recents, dependent: :destroy
 
