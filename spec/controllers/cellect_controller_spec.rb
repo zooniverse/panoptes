@@ -25,6 +25,13 @@ describe CellectController, type: :controller do
         expect(response.content_type).to eq("application/json")
       end
 
+      it "returns a public cache header" do
+        Panoptes.flipper[:cellect_controller_caching].enable
+        run_get
+        cache_control = response.headers["Cache-Control"]
+        expect(cache_control).to eq("max-age=600, public")
+      end
+
       it "should respond with only the cellect workflow" do
         run_get
         expected = [cellect_workflow.slice(:id, :pairwise, :grouped, :prioritized)].as_json
@@ -73,6 +80,13 @@ describe CellectController, type: :controller do
       before do
         cellect_workflow
         another_cellect_workflow
+      end
+
+      it "returns a public cache header" do
+        Panoptes.flipper[:cellect_controller_caching].enable
+        run_get
+        cache_control = response.headers["Cache-Control"]
+        expect(cache_control).to eq("max-age=60, public")
       end
 
       it "should respond with only the subjects of the params workflow" do
