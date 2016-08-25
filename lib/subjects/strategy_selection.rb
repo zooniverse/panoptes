@@ -27,17 +27,24 @@ module Subjects
 
     def strategy
       @strategy ||= case
-      when !Panoptes.cellect_on
-        nil
       when cellect_strategy?
         :cellect
+      when cellect_ex_strategy?
+        :cellect_ex
+      else
+        nil
       end
     end
 
     private
 
     def cellect_strategy?
+      return nil unless Panoptes.cellect_on
       strategy_param == :cellect || workflow.using_cellect?
+    end
+
+    def cellect_ex_strategy?
+      strategy_param == :cellect_ex || workflow.subject_selection_strategy == :cellect_ex
     end
 
     def strategy_sms_ids

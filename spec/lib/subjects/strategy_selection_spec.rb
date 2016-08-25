@@ -114,7 +114,7 @@ RSpec.describe Subjects::StrategySelection do
 
       context "when the workflow is set to use cellect" do
         it "should use the workflow config strategy" do
-          allow(workflow).to receive(:use_cellect).and_return(true)
+          allow(workflow).to receive(:subject_selection_strategy).and_return("cellect")
           expect(subject.strategy).to eq(:cellect)
         end
       end
@@ -128,9 +128,9 @@ RSpec.describe Subjects::StrategySelection do
         end
       end
 
-      context "worfklow set to use_cellect and large subject set size" do
-        it "should only use the worfklow strategy", :aggregate_failures do
-          allow(workflow).to receive(:use_cellect).and_return(true)
+      context "workflow is set to use cellect cellect and large subject set size" do
+        it "should only use the workflow strategy", :aggregate_failures do
+          allow(workflow).to receive(:subject_selection_strategy).and_return("cellect")
           allow(workflow)
             .to receive(:cellect_size_subject_space?)
             .and_return(true)
@@ -163,7 +163,7 @@ RSpec.describe Subjects::StrategySelection do
 
       context "when the number of set_member_subjects is large" do
         it "should not query workflow about cellect" do
-          expect_any_instance_of(Workflow).not_to receive(:using_cellect?)
+          expect_any_instance_of(Workflow).not_to receive(:using_subject_selection_strategy)
           expect(subject.strategy).to eq(nil)
         end
       end

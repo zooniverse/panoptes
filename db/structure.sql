@@ -1404,7 +1404,8 @@ CREATE TABLE workflows (
     activity integer DEFAULT 0 NOT NULL,
     current_version_number character varying,
     activated_state integer DEFAULT 0 NOT NULL,
-    use_cellect boolean DEFAULT false NOT NULL
+    use_cellect boolean DEFAULT false NOT NULL,
+    subject_selection_strategy integer DEFAULT 0
 );
 
 
@@ -3460,4 +3461,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160810140805');
 INSERT INTO schema_migrations (version) VALUES ('20160810195152');
 
 INSERT INTO schema_migrations (version) VALUES ('20160819134413');
+
+INSERT INTO schema_migrations (version) VALUES ('20160824101413');
 

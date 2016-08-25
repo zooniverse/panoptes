@@ -335,7 +335,7 @@ describe Workflow, type: :model do
     end
 
     it "should return true if the config is set" do
-      allow(workflow).to receive(:use_cellect).and_return(true)
+      allow(workflow).to receive(:subject_selection_strategy).and_return("cellect")
       expect(workflow.using_cellect?).to be_truthy
     end
 
