@@ -83,7 +83,6 @@ describe Subject, :type => :model do
   end
 
   describe "#migrated_subject?" do
-
     it "should be falsy when the flag is not set" do
       expect(subject.migrated_subject?).to be_falsey
     end
@@ -108,7 +107,7 @@ describe Subject, :type => :model do
       create(:set_member_subject, subject_set: subject_set, subject: subject)
     end
 
-    it "should be false when there is no associated SubjectWorkflowCount" do
+    it "should be false when there is no associated SubjectWorkflowStatus" do
       expect(subject.retired_for_workflow?(workflow)).to eq(false)
     end
 
@@ -120,14 +119,14 @@ describe Subject, :type => :model do
       expect(subject.retired_for_workflow?(SubjectSet.new)).to eq(false)
     end
 
-    context "with a SubjectWorkflowCount" do
-      let(:swc) { instance_double("SubjectWorkflowCount") }
+    context "with a SubjectWorkflowStatus" do
+      let(:swc) { instance_double("SubjectWorkflowStatus") }
       before(:each) do
-        allow(SubjectWorkflowCount).to receive(:find_by).and_return(swc)
+        allow(SubjectWorkflowStatus).to receive(:find_by).and_return(swc)
       end
 
       it "should be true when the swc is retired" do
-        create(:subject_workflow_count, workflow: workflow, subject: subject, retired_at: DateTime.now)
+        create(:subject_workflow_status, workflow: workflow, subject: subject, retired_at: DateTime.now)
         expect(subject.retired_for_workflow?(workflow)).to eq(true)
       end
 

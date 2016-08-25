@@ -3,7 +3,7 @@ class ClassificationDumpCache
     @workflows = {}
     @workflow_contents = {}
     @subjects = {}
-    @subject_workflow_counts = {}
+    @subject_workflow_statuses = {}
     @secure_ip_lookup = {}
   end
 
@@ -11,8 +11,8 @@ class ClassificationDumpCache
     @subjects = subjects.map {|subject| [subject.id, subject] }.to_h
   end
 
-  def reset_subject_workflow_counts(subject_workflow_counts)
-    @subject_workflow_counts = subject_workflow_counts.group_by(&:subject_id)
+  def reset_subject_workflow_statuses(subject_workflow_statuses)
+    @subject_workflow_statuses = subject_workflow_statuses.group_by(&:subject_id)
   end
 
   def subject(subject_id)
@@ -20,7 +20,7 @@ class ClassificationDumpCache
   end
 
   def retired?(subject_id, workflow_id)
-    (@subject_workflow_counts[subject_id] || []).find {|swc| swc.workflow_id == workflow_id }
+    (@subject_workflow_statuses[subject_id] || []).find {|swc| swc.workflow_id == workflow_id }
   end
 
   def workflow_at_version(workflow_id, version)

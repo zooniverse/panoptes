@@ -14,7 +14,7 @@ RSpec.describe CountResetWorker do
 
       sms.take(2).each do |s|
         opts = { subject: s.subject, workflow: workflow, retired_at: Time.now, link_subject_sets: false}
-        create(:subject_workflow_count, opts)
+        create(:subject_workflow_status, opts)
       end
 
       expect do

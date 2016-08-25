@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :subject_workflow_count do
+  factory :subject_workflow_status do
     transient do
       link_subject_sets true
     end

@@ -15,7 +15,7 @@ class ProjectClassificationsCountWorker
     project = Project.find(project_id)
 
     counts = project.workflows.map do |workflow|
-      swcs = workflow.subject_workflow_counts
+      swcs = workflow.subject_workflow_statuses
       swcs = swcs.where("created_at >= ?", project.launch_date) if project.launch_date
       count = swcs.sum(:classifications_count)
       workflow.update_column :classifications_count, count

@@ -6,7 +6,7 @@ describe ResetProjectCountersWorker do
   let(:subject)  { create :subject, project: project }
   let(:user1)    { create :user }
   let(:user2)    { create :user }
-  let(:swc)      { create :subject_workflow_count, subject: subject, workflow: workflow, classifications_count: 3 }
+  let(:swc)      { create :subject_workflow_status, subject: subject, workflow: workflow, classifications_count: 3 }
 
   before do
     classification1 = create(:classification, user: user1, created_at: project.launch_date - 1.week, project: project, workflow: workflow, subjects: [subject])

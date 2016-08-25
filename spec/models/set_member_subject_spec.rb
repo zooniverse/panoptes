@@ -135,7 +135,7 @@ describe SetMemberSubject, :type => :model do
   describe ":non_retired_for_workflow" do
     let(:set_member_subject) { create(:set_member_subject) }
     let(:workflow) { create(:workflow, subject_sets: [set_member_subject.subject_set]) }
-    let(:count) { create(:subject_workflow_count, subject: set_member_subject.subject, workflow: workflow) }
+    let(:count) { create(:subject_workflow_status, subject: set_member_subject.subject, workflow: workflow) }
     let!(:another_workflow_sms) { create(:set_member_subject) }
 
     context "when none are retired" do
@@ -154,7 +154,7 @@ describe SetMemberSubject, :type => :model do
     context 'when the workflow sms is retired for another workflow' do
       it 'should return the sms' do
         workflow2 = create(:workflow, subject_sets: [set_member_subject.subject_set])
-        count2 = create(:subject_workflow_count, subject: set_member_subject.subject, workflow: workflow2)
+        count2 = create(:subject_workflow_status, subject: set_member_subject.subject, workflow: workflow2)
         count2.retire!
         expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(set_member_subject)
       end

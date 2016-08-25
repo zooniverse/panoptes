@@ -250,7 +250,7 @@ RSpec.describe Subjects::Selector do
       let(:retired_workflow) { workflow }
       let(:sms) { smses[0] }
       let!(:swc) do
-        create(:subject_workflow_count,
+        create(:subject_workflow_status,
           subject: sms.subject,
           workflow: retired_workflow,
           retired_at: Time.zone.now
@@ -286,7 +286,7 @@ RSpec.describe Subjects::Selector do
 
     it 'should return something when everything in the queue is retired' do
       smses.each do |sms|
-        swc = create(:subject_workflow_count, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
+        swc = create(:subject_workflow_status, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
       end
       expect(subject.selected_subjects(subject_queue).size).to be > 0
     end

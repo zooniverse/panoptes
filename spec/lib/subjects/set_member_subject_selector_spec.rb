@@ -22,7 +22,7 @@ describe Subjects::SetMemberSubjectSelector do
     create(:subject, project: project, subject_sets: [subject_set])
   end
   let(:count) do
-    create(:subject_workflow_count, subject: subject, workflow: workflow)
+    create(:subject_workflow_status, subject: subject, workflow: workflow)
   end
   let(:user) { create(:user) }
   let(:user_seen_subject) do

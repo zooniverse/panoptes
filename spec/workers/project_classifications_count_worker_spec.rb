@@ -11,7 +11,7 @@ RSpec.describe ProjectClassificationsCountWorker do
     )
   end
   let!(:swc) do
-    create :subject_workflow_count, subject: subject, workflow: workflow, classifications_count: 5
+    create :subject_workflow_status, subject: subject, workflow: workflow, classifications_count: 5
   end
 
   describe "#perform" do
@@ -35,7 +35,7 @@ RSpec.describe ProjectClassificationsCountWorker do
         )
       end
       let(:another_swc) do
-        create(:subject_workflow_count,
+        create(:subject_workflow_status,
           subject: another_subject,
           workflow: workflow,
           classifications_count: 2

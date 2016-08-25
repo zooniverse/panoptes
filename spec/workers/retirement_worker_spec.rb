@@ -4,13 +4,13 @@ RSpec.describe RetirementWorker do
   let(:worker) { described_class.new }
   let(:sms) { create :set_member_subject }
   let(:workflow) { create :workflow, subject_sets: [sms.subject_set] }
-  let(:count) { create(:subject_workflow_count, subject: sms.subject, workflow: workflow) }
+  let(:count) { create(:subject_workflow_status, subject: sms.subject, workflow: workflow) }
   let!(:queue) { create(:subject_queue, workflow: workflow, set_member_subject_ids: [sms.id]) }
 
   describe "#perform" do
     context "sms is retireable" do
       before(:each) do
-        allow_any_instance_of(SubjectWorkflowCount).to receive(:retire?).and_return(true)
+        allow_any_instance_of(SubjectWorkflowStatus).to receive(:retire?).and_return(true)
       end
 
       it 'should retire the subject for the workflow' do
@@ -57,7 +57,7 @@ RSpec.describe RetirementWorker do
 
     context "sms is not retireable" do
       it 'should not retire subject for the workflow' do
-        allow_any_instance_of(SubjectWorkflowCount).to receive(:retire?).and_return(false)
+        allow_any_instance_of(SubjectWorkflowStatus).to receive(:retire?).and_return(false)
         worker.perform(count)
         sms.reload
         expect(sms.retired_workflows).to_not include(workflow)
@@ -66,7 +66,7 @@ RSpec.describe RetirementWorker do
 
     context 'when the sms is already retired' do
       before(:each) do
-        allow(SubjectWorkflowCount).to receive(:find).with(count.id).and_return count
+        allow(SubjectWorkflowStatus).to receive(:find).with(count.id).and_return count
         allow(count).to receive(:retire?).and_return true
         allow(count).to receive(:retired_at).and_return 1.minute.ago.utc
       end

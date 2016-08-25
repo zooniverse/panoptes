@@ -9,7 +9,7 @@ RSpec.describe Formatter::Csv::Subject do
   end
   let(:sms) { create(:set_member_subject, subject_set: subject_set, subject: loc_subject) }
   let!(:swc) do
-    create :subject_workflow_count, classifications_count: 10, workflow: workflow,
+    create :subject_workflow_status, classifications_count: 10, workflow: workflow,
       subject: loc_subject, retired_at: DateTime.now
   end
 
