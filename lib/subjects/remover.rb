@@ -30,8 +30,7 @@ module Subjects
     end
 
     def orphan
-     @orphan ||=
-       Subject
+      @orphan ||= Subject
        .where(id: subject_id)
        .joins("LEFT OUTER JOIN classification_subjects ON classification_subjects.subject_id = subjects.id")
        .where("classification_subjects.subject_id IS NULL")
@@ -41,11 +40,11 @@ module Subjects
     end
 
     def no_talk_discussions?
-      talk_client.discussions(focus_id: subject_id, focus_type: 'Subject').empty?
+      panoptes_client.discussions(focus_id: subject_id, focus_type: 'Subject').empty?
     end
 
-    def talk_client
-      @client ||= Panoptes::Client.new
+    def panoptes_client
+      @client ||= Panoptes::Client.new(env: Rails.env)
     end
 
     def notify_cellect(workflow_ids)
