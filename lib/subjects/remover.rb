@@ -41,10 +41,10 @@ module Subjects
     end
 
     def no_talk_discussions?
-      talk_client.discussions(focus_id: subject_id, focus_type: 'Subject').empty?
+      panoptes_client.discussions(focus_id: subject_id, focus_type: 'Subject').empty?
     end
 
-    def talk_client
+    def panoptes_client
       @client ||= Panoptes::Client.new(env: Rails.env)
     end
 
