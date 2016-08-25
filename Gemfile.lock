@@ -256,9 +256,10 @@ GEM
     orm_adapter (0.5.0)
     p3p (1.2.0)
       rack
-    panoptes-client (0.2.7)
+    panoptes-client (0.2.8)
       faraday
       faraday-panoptes (~> 0.2.0)
+      jwt (~> 1.5.0)
     paper_trail (3.0.9)
       activerecord (>= 3.0, < 5.0)
       activesupport (>= 3.0, < 5.0)

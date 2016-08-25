@@ -8,7 +8,7 @@ RSpec.describe Subjects::Remover do
   let(:subjects) { subject_set.subjects }
   let(:subject) { subjects.sample }
   let(:remover) { Subjects::Remover.new(subject.id) }
-  let(:talk_client) { instance_double(Panoptes::TalkClient) }
+  let(:talk_client) { instance_double(Panoptes::Client) }
   let(:discussions) { [] }
 
   describe "#cleanup" do
