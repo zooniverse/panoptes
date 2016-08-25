@@ -6,7 +6,7 @@ class CellectController < ApplicationController
   def workflows
     respond_to do |format|
       format.json do
-        expires_in EXPIRY, public: true
+        cache_response(EXPIRY)
         render json: { workflows: all_cellect_workflows.as_json }
       end
     end
@@ -60,5 +60,11 @@ class CellectController < ApplicationController
 
   def html_to_json_override
     request.format = :json if request.format == :html
+  end
+
+  def cache_response(expiration_time)
+    if Panoptes.flipper[:cellect_controller_caching].enabled?
+      expires_in expiration_time, public: true
+    end
   end
 end
