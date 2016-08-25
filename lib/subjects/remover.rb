@@ -45,7 +45,7 @@ module Subjects
     end
 
     def talk_client
-      @client ||= Panoptes::TalkClient.new(url: ENV["TALK_URL"])
+      @client ||= Panoptes::Client.new
     end
 
     def notify_cellect(workflow_ids)
