@@ -8,16 +8,24 @@ RSpec.describe Subjects::Remover do
   let(:subjects) { subject_set.subjects }
   let(:subject) { subjects.sample }
   let(:remover) { Subjects::Remover.new(subject.id) }
-  let(:talk_client) { instance_double(Panoptes::Client) }
+  let(:panoptes_client) { instance_double(Panoptes::Client) }
   let(:discussions) { [] }
 
   describe "#cleanup" do
     before do
-      allow(talk_client)
+      allow(panoptes_client)
         .to receive(:discussions)
         .with(focus_id: subject.id, focus_type: "Subject")
         .and_return(discussions)
-      allow(remover).to receive(:talk_client).and_return(talk_client)
+      allow(remover).to receive(:panoptes_client).and_return(panoptes_client)
+    end
+
+    it "should setup the panoptes client with the correct env" do
+      expect(Panoptes::Client)
+        .to receive(:new)
+        .with(env: Rails.env)
+        .and_call_original
+      remover.cleanup
     end
 
     context "without a real subject" do
