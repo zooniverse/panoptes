@@ -30,8 +30,7 @@ module Subjects
     end
 
     def orphan
-     @orphan ||=
-       Subject
+      @orphan ||= Subject
        .where(id: subject_id)
        .joins("LEFT OUTER JOIN classification_subjects ON classification_subjects.subject_id = subjects.id")
        .where("classification_subjects.subject_id IS NULL")
