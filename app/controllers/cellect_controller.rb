@@ -25,6 +25,7 @@ class CellectController < ApplicationController
     Workflow
       .joins(:project)
       .where("projects.launch_approved IS TRUE")
+      .order(:id)
       .select(:id, :subject_selection_strategy, :pairwise, :prioritized, :grouped)
   end
 
