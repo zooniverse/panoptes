@@ -4,7 +4,7 @@ class CellectExClient
   self.config_file = "cellect_ex_api"
   self.api_prefix = "cellect_ex_api"
 
-	configure :host
+  configure :host
 
   attr_reader :connection
 
