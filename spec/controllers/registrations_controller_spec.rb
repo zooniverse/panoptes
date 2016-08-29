@@ -51,6 +51,11 @@ describe RegistrationsController, type: :controller do
           expect(SubscribeWorker).not_to receive(:perform_async)
           post_update
         end
+
+        it "should queue a mailer worker" do
+          expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, :password)
+          post_update
+        end
       end
 
       context "without the correct old password" do

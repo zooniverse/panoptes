@@ -53,9 +53,7 @@ class Api::V1::UsersController < Api::ApiController
           SubscribeWorker.perform_async(user.email)
           UnsubscribeWorker.perform_async(user.changes[:email].first)
         end
-        user_info_changed(:email)
-      when user.encrypted_password_changed?
-        user_info_changed(:password)
+        UserInfoChangedMailerWorker.perform_async(api_user.id, :email)
       end
     end
   end
@@ -100,9 +98,5 @@ class Api::V1::UsersController < Api::ApiController
   def revoke_doorkeeper_request_token!
     token = Doorkeeper.authenticate(request)
     token.revoke
-  end
-
-  def user_info_changed(changed)
-    UserInfoChangedMailerWorker.perform_async(api_user.id, changed)
   end
 end
