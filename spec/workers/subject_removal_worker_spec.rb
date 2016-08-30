@@ -12,7 +12,7 @@ RSpec.describe SubjectRemovalWorker do
   # end
 
   # remove this when the above is fixed
-  it 'should not call the orphan remover cleanup', :focus do
+  it 'should not call the orphan remover cleanup' do
     expect(Subjects::Remover).not_to receive(:new)
     subject.perform(subject_id)
   end
