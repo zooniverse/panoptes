@@ -7,6 +7,10 @@ class Workflow < ActiveRecord::Base
   include RankedModel
   include CacheModelVersion
 
+  def self.columns
+    super.reject { |c| c.name == "use_cellect" }
+  end
+
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
   belongs_to :project
