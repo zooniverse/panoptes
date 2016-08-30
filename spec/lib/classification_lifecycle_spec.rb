@@ -315,6 +315,12 @@ describe ClassificationLifecycle do
           expect_any_instance_of(UserProjectPreference).to receive(:save!)
           subject.process_project_preference
         end
+
+        it "saves the project id" do
+          subject.process_project_preference
+          user.reload
+          expect(user.project_id).to eq(project.id)
+        end
       end
 
       context "when a preference exists" do

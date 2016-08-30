@@ -40,7 +40,10 @@ module Api
         was_new = upp.new_record?
         upp.legacy_count[create_params[:workflow]] = create_params[:count]
         if upp.save
-          ProjectClassifiersCountWorker.perform_async(upp.project_id) if was_new
+          if was_new
+            ProjectClassifiersCountWorker.perform_async(upp.project_id)
+            upp.user.update( {project_id: upp.project.id} )
+          end
           :ok
         else
           :unprocessable_entity
