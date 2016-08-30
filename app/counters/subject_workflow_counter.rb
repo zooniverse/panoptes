@@ -7,7 +7,7 @@ class SubjectWorkflowCounter
   end
 
   def classifications
-    scope = SubjectWorkflowCount
+    scope = SubjectWorkflowStatus
       .where(id: swc.id)
       .joins("INNER JOIN classification_subjects cs ON cs.subject_id = subject_workflow_counts.subject_id")
       .joins("INNER JOIN classifications ON classifications.id = cs.classification_id")

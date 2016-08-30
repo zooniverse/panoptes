@@ -18,7 +18,7 @@ RSpec.describe ClassificationCountWorker do
         it 'should call the counter to update the classifications_count' do
           expect_any_instance_of(SubjectWorkflowCounter)
             .to receive(:classifications)
-          expect_any_instance_of(SubjectWorkflowCount)
+          expect_any_instance_of(SubjectWorkflowStatus)
             .to receive(:update_column)
             .with(:classifications_count, anything)
           worker.perform(sms.subject_id, workflow_id)

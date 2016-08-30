@@ -79,7 +79,7 @@ RSpec.describe RetirementWorker do
 
   describe "finishing workflows" do
     before do
-      allow_any_instance_of(SubjectWorkflowCount)
+      allow_any_instance_of(SubjectWorkflowStatus)
         .to receive(:retire?)
         .and_return(true)
     end

@@ -16,7 +16,7 @@ class WorkflowRetiredCountWorker
   private
 
   def retired_counts_since_launch(launch_date)
-    swcs = SubjectWorkflowCount.retired.where(workflow_id: workflow.id)
+    swcs = SubjectWorkflowStatus.retired.where(workflow_id: workflow.id)
     if launch_date
       swcs = swcs.where("subject_workflow_counts.created_at >= ?", launch_date)
     end

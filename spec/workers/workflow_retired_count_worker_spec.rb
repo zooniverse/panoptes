@@ -10,13 +10,13 @@ RSpec.describe WorkflowRetiredCountWorker do
   describe "#perform" do
     let(:workflow) { workflows.first }
     let(:non_retired_swc) do
-      create(:subject_workflow_count, subject: sms.last.subject, workflow: workflow, link_subject_sets: false)
+      create(:subject_workflow_status, subject: sms.last.subject, workflow: workflow, link_subject_sets: false)
     end
     before do
       workflow.update! retired_set_member_subjects_count: 100
       sms.take(2).each do |s|
         opts = { subject: s.subject, workflow: workflow, retired_at: Time.now, link_subject_sets: false}
-        create(:subject_workflow_count, opts)
+        create(:subject_workflow_status, opts)
       end
     end
 
