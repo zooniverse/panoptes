@@ -296,11 +296,11 @@ describe ClassificationLifecycle do
           end.to change{ UserProjectPreference.count }.from(0).to(1)
         end
 
-        it 'should increment a count on the associated project' do
-          expect do
-            subject.process_project_preference
-            project.reload
-          end.to change{project.classifiers_count}.from(0).to(1)
+        it 'should call a worker to recount the project classifications' do
+          expect(ProjectClassificationsCountWorker)
+            .to receive(:perform_async)
+            .with(classification.project_id)
+          subject.process_project_preference
         end
 
         it "should set the communication preferences to the user's default" do
@@ -342,10 +342,10 @@ describe ClassificationLifecycle do
           end
 
           it 'should increment a count on the associated project' do
-            expect do
-              subject.process_project_preference
-              project.reload
-            end.to change{project.classifiers_count}.from(0).to(1)
+            expect(ProjectClassificationsCountWorker)
+              .to receive(:perform_async)
+              .with(project.id)
+            subject.process_project_preference
           end
         end
       end

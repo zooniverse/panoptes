@@ -539,12 +539,6 @@ describe User, type: :model do
     it_behaves_like "it has a classifications assocation"
   end
 
-  describe "#classifcations_count" do
-    let(:relation_instance) { user }
-
-    it_behaves_like "it has a cached counter for classifications"
-  end
-
   describe "::memberships_for" do
     let(:user) { create(:user_group_member) }
     let(:query_sql) { user.memberships_for(action, test_class).to_sql }

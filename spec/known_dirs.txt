@@ -11,3 +11,4 @@ spec/lib
 spec/serializers
 spec/services
 spec/workers
+spec/counters

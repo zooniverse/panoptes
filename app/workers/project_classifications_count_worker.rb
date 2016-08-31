@@ -2,10 +2,10 @@ class ProjectClassificationsCountWorker
   include Sidekiq::Worker
 
   sidekiq_options congestion: {
-    interval: 60,
+    interval: 15,
     max_in_interval: 1,
     min_delay: 0,
-    reject_with: :cancel,
+    reject_with: :reschedule,
     key: ->(project_id) {
       "project_#{project_id}_classifications_count_worker"
     }
@@ -13,15 +13,11 @@ class ProjectClassificationsCountWorker
 
   def perform(project_id)
     project = Project.find(project_id)
-
-    counts = project.workflows.map do |workflow|
-      swcs = workflow.subject_workflow_statuses
-      swcs = swcs.where("created_at >= ?", project.launch_date) if project.launch_date
-      count = swcs.sum(:classifications_count)
-      workflow.update_column :classifications_count, count
-      count
+    project.workflows.map do |workflow|
+      counter = WorkflowCounter.new(workflow)
+      workflow.update_column(:classifications_count, counter.classifications)
     end
-
-    project.update_column(:classifications_count, counts.sum)
+    counter = ProjectCounter.new(project)
+    project.update_column(:classifications_count, counter.classifications)
   end
 end

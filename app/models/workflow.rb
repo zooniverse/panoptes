@@ -68,7 +68,7 @@ class Workflow < ActiveRecord::Base
 
   def retire_subject(subject_id, reason=nil)
     if set_member_subjects.where(subject_id: subject_id).any?
-      count = subject_workflow_statuses.where(subject_id: subject_id, workflow_id: id).first_or_create!
+      count = subject_workflow_statuses.where(subject_id: subject_id).first_or_create!
       count.retire!(reason)
     end
   end
@@ -106,10 +106,13 @@ class Workflow < ActiveRecord::Base
   end
 
   def finished?
-    @finished ||= if subject_sets.empty? || subjects_count == 0
-      false
-    else
-      finished_at.present?
-    end
+    @finished ||= case
+      when subject_sets.empty? || subjects_count == 0
+        false
+      when finished_at.present?
+        true
+      else
+        retired_subjects_count >= subjects_count
+      end
   end
 end

@@ -23,9 +23,9 @@ class Api::V1::SubjectSetsController < Api::ApiController
     resource_class.transaction(requires_new: true) do
       subject_ids = controlled_resource.set_member_subjects.map(&:subject_id)
       remove_linked_set_member_subjects(
-        controlled_resource,
         controlled_resource.set_member_subjects
       )
+      reset_subject_set_workflow_counts(controlled_resource.id)
       controlled_resource.subject_sets_workflows.delete_all
       #avoid optimisitc locking errors
       controlled_resource.reload
@@ -78,7 +78,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
         [ resource.id, subject_id, rand ]
       end
       SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
-      SubjectSetSubjectCounterWorker.perform_in(3.minutes, resource.id)
+      reset_subject_counts(resource.id)
     else
       super
     end
@@ -88,7 +88,9 @@ class Api::V1::SubjectSetsController < Api::ApiController
     if relation == :subjects
       linked_sms_ids = value.split(',').map(&:to_i)
       set_member_subjects = resource.set_member_subjects.where(subject_id: linked_sms_ids)
-      remove_linked_set_member_subjects(resource, set_member_subjects)
+      remove_linked_set_member_subjects(set_member_subjects)
+      reset_subject_set_workflow_counts(controlled_resource.id)
+      reset_subject_counts(resource.id)
     else
       super
     end
@@ -96,9 +98,23 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   private
 
-  def remove_linked_set_member_subjects(subject_set, set_member_subjects)
+  def remove_linked_set_member_subjects(set_member_subjects)
     set_member_subjects.delete_all
-    SubjectSetSubjectCounterWorker.perform_in(3.minutes, subject_set.id)
-    CountResetWorker.perform_async(subject_set.id)
+  end
+
+  def reset_subject_set_workflow_counts(subject_set_id)
+    set_workflow_ids = Workflow
+      .joins(:subject_sets)
+      .where(subject_sets: {id: subject_set_id})
+      .select(:id)
+      .distinct
+      .pluck(:id)
+    set_workflow_ids.each do |w_id|
+      WorkflowRetiredCountWorker.perform_async(w_id)
+    end
+  end
+
+  def reset_subject_counts(set_id)
+    SubjectSetSubjectCounterWorker.perform_async(set_id)
   end
 end

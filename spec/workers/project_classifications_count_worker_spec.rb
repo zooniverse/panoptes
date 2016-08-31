@@ -3,52 +3,25 @@ require 'spec_helper'
 RSpec.describe ProjectClassificationsCountWorker do
   let(:worker) { described_class.new }
   let(:workflow) { create(:workflow) }
-  let(:project) { workflow.project }
-  let(:subject) do
-    create(:subject,
-      project: project,
-      subject_sets: [create(:subject_set, workflows: [workflow])]
-    )
-  end
-  let!(:swc) do
-    create :subject_workflow_status, subject: subject, workflow: workflow, classifications_count: 5
-  end
+  let!(:project) { workflow.project }
 
   describe "#perform" do
-    it 'updates the project counter' do
-      expect { worker.perform(project.id) }
-        .to change { project.reload.classifications_count }
-        .from(0).to(5)
+    it 'calls the workflow counter to update the workflow counts' do
+      expect_any_instance_of(WorkflowCounter)
+        .to receive(:classifications)
+      expect_any_instance_of(Workflow)
+        .to receive(:update_column)
+        .with(:classifications_count, anything)
+      worker.perform(project.id)
     end
 
-    it 'updates the workflow counter' do
-      expect { worker.perform(project.id) }
-        .to change { workflow.reload.classifications_count }
-        .from(0).to(5)
-    end
-
-    context "when the project has launch date" do
-      let(:another_subject) do
-        create(:subject,
-          project: project,
-          subject_sets: [create(:subject_set, workflows: [workflow])]
-        )
-      end
-      let(:another_swc) do
-        create(:subject_workflow_status,
-          subject: another_subject,
-          workflow: workflow,
-          classifications_count: 2
-        )
-      end
-
-      it 'should respect the launch_date in the count' do
-        project.update_column(:launch_date, DateTime.now)
-        another_swc
-        expect { worker.perform(project.id) }
-          .to change { workflow.reload.classifications_count }
-          .from(0).to(2)
-      end
+    it 'calls the project counter to update the project counts' do
+      expect_any_instance_of(ProjectCounter)
+        .to receive(:classifications)
+      expect_any_instance_of(Project)
+        .to receive(:update_column)
+        .with(:classifications_count, anything)
+      worker.perform(project.id)
     end
   end
 end

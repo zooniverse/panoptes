@@ -5,7 +5,6 @@ RSpec.describe RetirementWorker do
   let(:sms) { create :set_member_subject }
   let(:workflow) { create :workflow, subject_sets: [sms.subject_set] }
   let(:count) { create(:subject_workflow_status, subject: sms.subject, workflow: workflow) }
-  let!(:queue) { create(:subject_queue, workflow: workflow, set_member_subject_ids: [sms.id]) }
 
   describe "#perform" do
     context "sms is retireable" do
@@ -19,10 +18,11 @@ RSpec.describe RetirementWorker do
         expect(sms.retired_workflows).to include(workflow)
       end
 
-      it "should increment the subject set's retirement count" do
-        expect{ worker.perform(count.id) }.to change{
-          Workflow.find(workflow.id).retired_set_member_subjects_count
-        }.from(0).to(1)
+      it 'should call the workflow retired counter worker' do
+        expect(WorkflowRetiredCountWorker)
+          .to receive(:perform_async)
+          .with(count.workflow.id)
+        worker.perform(count.id)
       end
 
       it "should call the publish retire event worker" do
@@ -67,7 +67,6 @@ RSpec.describe RetirementWorker do
     context 'when the sms is already retired' do
       before(:each) do
         allow(SubjectWorkflowStatus).to receive(:find).with(count.id).and_return count
-        allow(count).to receive(:retire?).and_return true
         allow(count).to receive(:retired_at).and_return 1.minute.ago.utc
       end
 
@@ -78,32 +77,38 @@ RSpec.describe RetirementWorker do
     end
   end
 
-  describe "#finish_workflow!" do
-    context "workflow is finsihed" do
-      let(:now) { Time.now.utc.change(usec: 0) }
+  describe "finishing workflows" do
+    before do
+      allow_any_instance_of(SubjectWorkflowStatus)
+        .to receive(:retire?)
+        .and_return(true)
+    end
+
+    it 'should not mark the workflow as finished when it is not' do
+      allow(workflow).to receive(:finished?).and_return(false)
+      expect do
+        worker.perform(count.id)
+      end.to_not change{ Workflow.find(workflow.id).finished_at }
+    end
+
+    context "workflow is finished" do
+      before do
+        allow_any_instance_of(Workflow)
+          .to receive(:finished?)
+          .and_return(true)
+      end
 
       it 'should set workflow.finished_at to the current time' do
-        allow(workflow).to receive(:finished?).and_return(true)
         expect do
-          worker.finish_workflow!(workflow, double("Clock", now: now))
-        end.to change{Workflow.find(workflow.id).finished_at}.from(nil).to(now)
+          worker.perform(count.id)
+        end.to change{ Workflow.find(workflow.id).finished_at }.from(nil)
       end
 
       context "when the workflow optimistic lock is updated" do
         it 'should save the changes and not raise an error' do
-          allow(workflow).to receive(:finished?).and_return(true)
           Workflow.find(workflow.id).touch
-          expect { worker.finish_workflow!(workflow) }.to_not raise_error
+          expect { worker.perform(count.id) }.to_not raise_error
         end
-      end
-    end
-
-    context "workflow is not finished" do
-      it 'should not set workflow.finished_at' do
-        allow(workflow).to receive(:finished?).and_return(false)
-        expect do
-          worker.finish_workflow!(workflow)
-        end.to_not change{Workflow.find(workflow.id).finished_at}
       end
     end
   end

@@ -237,10 +237,6 @@ describe Api::V1::WorkflowsController, type: :controller do
         end
 
         context "when the workflow has subjects" do
-          it 'should call the reload queue worker' do
-            expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async).with(resource.id, subject_set_id)
-          end
-
           it 'should not call the reload cellect worker when cellect is off' do
             expect(ReloadCellectWorker).not_to receive(:perform_async)
           end
@@ -270,6 +266,12 @@ describe Api::V1::WorkflowsController, type: :controller do
 
             it 'should not call the retire cellect worker' do
               expect(RetireCellectWorker).not_to receive(:perform_async)
+            end
+
+            it 'should call the workflow retired counter worker' do
+              expect(WorkflowRetiredCountWorker)
+                .to receive(:perform_async)
+                .with(resource.id)
             end
 
             context "when cellect is on" do
@@ -307,12 +309,6 @@ describe Api::V1::WorkflowsController, type: :controller do
         context "when the workflow has no subjects" do
           let(:linked_resource) { create(:subject_set, project: subject_set_project) }
 
-          it "should not queue the worker" do
-            expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
-            default_request scopes: scopes, user_id: authorized_user.id
-            post :update_links, update_link_params
-          end
-
           it 'should not attempt to call cellect', :aggregate_failures do
             expect(Panoptes).not_to receive(:use_cellect?)
             expect(ReloadCellectWorker).not_to receive(:perform_async)
@@ -321,12 +317,6 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
 
       context "without authorized user" do
-        it 'should not call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
-          default_request scopes: scopes, user_id: create(:user).id
-          post :update_links, update_link_params
-        end
-
         it 'should not attempt to call cellect', :aggregate_failures do
           expect(Panoptes).not_to receive(:use_cellect?)
           expect(ReloadCellectWorker).not_to receive(:perform_async)

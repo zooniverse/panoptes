@@ -51,12 +51,6 @@ RSpec.describe SubjectWorkflowStatus, type: :model do
       expect(count.retired?).to be_truthy
     end
 
-    it 'should increment the workflow retired subjects counter' do
-      expect{count.retire!}.to change {
-        Workflow.find(count.workflow).retired_set_member_subjects_count
-      }.from(0).to(1)
-    end
-
     it 'does nothing when the record is already retired' do
       count.retired_at = 5.days.ago
       expect { count.retire! }.not_to change { count.retired_at }
@@ -69,6 +63,12 @@ RSpec.describe SubjectWorkflowStatus, type: :model do
   end
 
   describe "#retire?" do
+    it 'should return false if it is already retired' do
+      allow(count).to receive(:retired?).and_return(true)
+      expect(count.workflow).not_to receive(:retirement_scheme)
+      expect(count.retire?).to be_falsey
+    end
+
     it 'should test against the workflow retirement scheme' do
       d = double
       allow(count.workflow).to receive(:retirement_scheme).and_return(d)

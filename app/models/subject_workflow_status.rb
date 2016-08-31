@@ -32,16 +32,12 @@ class SubjectWorkflowStatus < ActiveRecord::Base
   end
 
   def retire?
-    workflow.retirement_scheme.retire?(self)
+    !retired? && workflow.retirement_scheme.retire?(self)
   end
 
   def retire!(reason=nil)
-    return if retired?
-
-    ActiveRecord::Base.transaction(requires_new: true) do
+    unless retired?
       update!(retirement_reason: reason, retired_at: Time.zone.now)
-      Workflow.increment_counter(:retired_set_member_subjects_count, workflow.id)
-      yield if block_given?
     end
   end
 
