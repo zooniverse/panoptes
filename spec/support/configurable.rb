@@ -1,23 +1,18 @@
 RSpec.shared_examples "is configurable" do |prefix|
   describe '::load_configuration' do
     before(:each) do
-      allow(described_class).to receive(:configuration).and_return({host: "http://test.example.com",
-        user: user.id.to_s,
-        application: application.id.to_s})
+      allow(described_class).to receive(:config_file).and_return({})
+      allow(described_class).to receive(:env_vars).and_return({})
     end
 
     context 'configuration in ENV variables' do
       before(:each) do
-        ENV["#{prefix}_API_HOST"] = 'http://example.com'
-        ENV["#{prefix}_API_USER"] = '1'
-        ENV["#{prefix}_API_APPLICATION"] = '1'
+        allow(described_class).to receive(:env_vars).and_return({
+          "#{prefix}_API_HOST" => 'http://example.com',
+          "#{prefix}_API_USER" => '1',
+          "#{prefix}_API_APPLICATION" => '1',
+        })
         described_class.load_configuration
-      end
-
-      after(:each) do
-        ENV.delete("#{prefix}_API_HOST")
-        ENV.delete("#{prefix}_API_USER")
-        ENV.delete("#{prefix}_API_APPLICATION")
       end
 
       it "should set host to #{prefix}_API_HOST var" do
@@ -35,6 +30,11 @@ RSpec.shared_examples "is configurable" do |prefix|
 
     context 'configuration in file' do
       before(:each) do
+        allow(described_class).to receive(:config_from_file).and_return({
+          host: "http://test.example.com",
+          user: user.id.to_s,
+          application: application.id.to_s
+        })
         described_class.load_configuration
       end
 
@@ -52,26 +52,26 @@ RSpec.shared_examples "is configurable" do |prefix|
     end
   end
 
-  describe "::configuration" do
+  describe "::config_from_file" do
     before(:each) do
-      described_class.instance_variable_set(:@configuration, nil)
+      described_class.instance_variable_set(:@config_from_file, nil)
     end
 
     it "should try to load the file at config/#{prefix.downcase}_api.yml" do
       expect(File).to receive(:read).with(Rails.root.join "config/#{prefix.downcase}_api.yml")
-      described_class.configuration
+      described_class.config_from_file
     end
 
-    it 'should retun the configuration for the current rails environment' do
+    it 'should retun the file section for the current rails environment' do
       expect(YAML).to receive(:load).and_return({"test" => {host: "example.coffee"},
         "development" => {host: "example.sucks"}})
-      expect(described_class.configuration).to eq({host: "example.coffee"})
+      expect(described_class.config_from_file).to eq({host: "example.coffee"})
     end
 
     it 'should memoize the results' do
-      described_class.configuration
+      described_class.config_from_file
       expect(File).to_not receive(:read)
-      described_class.configuration
+      described_class.config_from_file
     end
   end
 end

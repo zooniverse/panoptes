@@ -12,7 +12,6 @@ RSpec.describe Subjects::StrategySelection do
   end
 
   describe "#select" do
-
     describe "remove seens after selection" do
       let(:seen_remover) { instance_double("Subjects::SeenRemover") }
       let(:uss) { instance_double("UserSeenSubject") }
@@ -48,7 +47,7 @@ RSpec.describe Subjects::StrategySelection do
         let(:strategy) { :cellect }
         let(:run_selection) { subject.select }
         before do
-          allow(Panoptes).to receive(:cellect_on).and_return(true)
+          allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
         end
 
         it "should use the cellect client" do
@@ -85,6 +84,28 @@ RSpec.describe Subjects::StrategySelection do
           end
         end
       end
+
+      context "with cellect_ex" do
+        let(:strategy) { :cellect_ex }
+        let(:run_selection) { subject.select }
+
+        it "should use the cellect_ex client" do
+          params = [ workflow.id, user.id, subject_set.id, limit ]
+          expect(Subjects::CellectExSelection)
+            .to receive(:get_subjects)
+            .with(*params)
+            .and_return(result_ids)
+          run_selection
+        end
+
+        it "should convert the cellect_ex subject_ids to panoptes sms_ids" do
+          allow(Subjects::CellectExSelection).to receive(:get_subjects)
+            .and_return(result_ids)
+          expect(SetMemberSubject).to receive(:by_subject_workflow)
+            .with(result_ids, workflow.id).and_call_original
+          run_selection
+        end
+      end
     end
   end
 
@@ -101,7 +122,7 @@ RSpec.describe Subjects::StrategySelection do
 
     context "when Cellect config is on" do
       before do
-        allow(Panoptes).to receive(:cellect_on).and_return(true)
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
       end
 
       context "when providing cellect strategy param" do
@@ -114,7 +135,7 @@ RSpec.describe Subjects::StrategySelection do
 
       context "when the workflow is set to use cellect" do
         it "should use the workflow config strategy" do
-          allow(workflow).to receive(:use_cellect).and_return(true)
+          allow(workflow).to receive(:subject_selection_strategy).and_return("cellect")
           expect(subject.strategy).to eq(:cellect)
         end
       end
@@ -128,9 +149,9 @@ RSpec.describe Subjects::StrategySelection do
         end
       end
 
-      context "worfklow set to use_cellect and large subject set size" do
-        it "should only use the worfklow strategy", :aggregate_failures do
-          allow(workflow).to receive(:use_cellect).and_return(true)
+      context "workflow is set to use cellect cellect and large subject set size" do
+        it "should only use the workflow strategy", :aggregate_failures do
+          allow(workflow).to receive(:subject_selection_strategy).and_return("cellect")
           allow(workflow)
             .to receive(:cellect_size_subject_space?)
             .and_return(true)
@@ -143,7 +164,8 @@ RSpec.describe Subjects::StrategySelection do
 
     context "when Cellect Config is off" do
       before do
-        allow(Panoptes).to receive(:cellect_on).and_return(false)
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(false)
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect_ex").and_return(false)
       end
 
       context "when providing cellect strategy param" do
@@ -163,8 +185,25 @@ RSpec.describe Subjects::StrategySelection do
 
       context "when the number of set_member_subjects is large" do
         it "should not query workflow about cellect" do
-          expect_any_instance_of(Workflow).not_to receive(:using_cellect?)
+          expect_any_instance_of(Workflow).not_to receive(:using_subject_selection_strategy)
           expect(subject.strategy).to eq(nil)
+        end
+      end
+    end
+
+    describe 'cellect_ex' do
+      context "when providing cellect_ex strategy param" do
+        let(:strategy) { :cellect_ex }
+
+        it "should use the supplied strategy" do
+          expect(subject.strategy).to eq(:cellect_ex)
+        end
+      end
+
+      context "when the workflow is set to use cellect_ex" do
+        it "should use the workflow config strategy" do
+          allow(workflow).to receive(:subject_selection_strategy).and_return("cellect_ex")
+          expect(subject.strategy).to eq(:cellect_ex)
         end
       end
     end

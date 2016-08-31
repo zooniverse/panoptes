@@ -7,6 +7,10 @@ class Workflow < ActiveRecord::Base
   include RankedModel
   include CacheModelVersion
 
+  def self.columns
+    super.reject { |c| c.name == "use_cellect" }
+  end
+
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
   belongs_to :project
@@ -29,7 +33,9 @@ class Workflow < ActiveRecord::Base
   cache_by_association :workflow_contents
   cache_by_resource_method :subjects_count, :finished?
 
-  scope :using_cellect, -> { where("use_cellect IS TRUE") }
+  enum subject_selection_strategy: [:default, :cellect, :cellect_ex]
+
+  scope :using_cellect, -> { where(subject_selection_strategy: subject_selection_strategies[:cellect]) }
 
   DEFAULT_RETIREMENT_OPTIONS = {
     'criteria' => 'classification_count',
@@ -88,7 +94,7 @@ class Workflow < ActiveRecord::Base
   end
 
   def using_cellect?
-    use_cellect || cellect_size_subject_space?
+    subject_selection_strategy.to_s == "cellect" || cellect_size_subject_space?
   end
 
   def subjects_count

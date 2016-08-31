@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe CellectController, type: :controller do
   let(:cellect_workflow) do
-    create(:workflow_with_subjects, use_cellect: true)
+    create(:workflow_with_subjects, subject_selection_strategy: "cellect")
   end
   let(:non_cellect_workflow) { create(:workflow_with_subjects) }
 
@@ -57,10 +57,10 @@ describe CellectController, type: :controller do
 
   describe "GET 'subjects'" do
     let(:cellect_workflow) do
-      create(:workflow_with_subjects, use_cellect: true)
+      create(:workflow_with_subjects, subject_selection_strategy: "cellect")
     end
     let(:another_cellect_workflow) do
-      create(:workflow_with_subjects, use_cellect: true)
+      create(:workflow_with_subjects, subject_selection_strategy: "cellect")
     end
     let(:run_get) do
       get 'subjects', workflow_id: cellect_workflow.id.to_s, format: :json

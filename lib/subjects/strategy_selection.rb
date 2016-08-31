@@ -27,17 +27,25 @@ module Subjects
 
     def strategy
       @strategy ||= case
-      when !Panoptes.cellect_on
-        nil
       when cellect_strategy?
         :cellect
+      when cellect_ex_strategy?
+        :cellect_ex
+      else
+        nil
       end
     end
 
     private
 
     def cellect_strategy?
+      return nil unless Panoptes.flipper.enabled?("cellect")
       strategy_param == :cellect || workflow.using_cellect?
+    end
+
+    def cellect_ex_strategy?
+      return nil unless Panoptes.flipper.enabled?("cellect_ex")
+      strategy_param == :cellect_ex || workflow.subject_selection_strategy == 'cellect_ex'
     end
 
     def strategy_sms_ids
@@ -45,6 +53,11 @@ module Subjects
       when :cellect
         cellect_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
         subject_ids = Subjects::CellectClient.get_subjects(*cellect_params)
+        sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
+        sms_scope.pluck("set_member_subjects.id")
+      when :cellect_ex
+        cellect_ex_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
+        subject_ids = Subjects::CellectExSelection.get_subjects(*cellect_ex_params)
         sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
         sms_scope.pluck("set_member_subjects.id")
       else

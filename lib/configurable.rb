@@ -6,6 +6,12 @@ module Configurable
   end
 
   module ClassMethods
+    def configure(key, options = {})
+      @fields ||= {}
+      @fields[key] = options
+      cattr_accessor key
+    end
+
     def config_file=(file_name)
       @config_file = "config/#{file_name}.yml"
     end
@@ -15,19 +21,26 @@ module Configurable
     end
 
     def load_configuration
-      self.host = ENV["#{@api_prefix}_API_HOST"] || configuration[:host]
-      self.user_id = (ENV["#{@api_prefix}_API_USER"] || configuration[:user]).to_i
-      self.application_id = (ENV["#{@api_prefix}_API_APPLICATION"] || configuration[:application]).to_i
+      @fields.each do |key, options|
+        value = env_vars["#{@api_prefix}_#{key.upcase}"]
+        value ||= config_from_file[options[:file_field] || key]
+        value = value.to_i if options[:type] == :integer
+
+        self.public_send("#{key}=", value)
+      end
     end
 
+    def config_from_file
+      @config_from_file ||= begin
+                         config = YAML.load(ERB.new(File.read(Rails.root.join(@config_file))).result)
+                         config[Rails.env].symbolize_keys
+                       rescue Errno::ENOENT, NoMethodError
+                         {  }
+                       end
+    end
 
-    def configuration
-      @configuration ||= begin
-                           config = YAML.load(ERB.new(File.read(Rails.root.join(@config_file))).result)
-                           config[Rails.env].symbolize_keys
-                         rescue Errno::ENOENT, NoMethodError
-                           {  }
-                         end
+    def env_vars
+      ENV
     end
   end
 end

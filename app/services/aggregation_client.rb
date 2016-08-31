@@ -2,7 +2,11 @@ class AggregationClient
   include Configurable
 
   self.config_file = "aggregation_api"
-  self.api_prefix = "aggregation"
+  self.api_prefix = "aggregation_api"
+
+  configure :host
+  configure :user_id, file_field: :user, type: :integer
+  configure :application_id, file_field: :application, type: :integer
 
   attr_reader :connection
 

@@ -2,7 +2,11 @@ class TalkApiClient
   include Configurable
 
   self.config_file = "talk_api"
-  self.api_prefix = "talk"
+  self.api_prefix = "talk_api"
+
+  configure :host
+  configure :user_id, file_field: :user, type: :integer
+  configure :application_id, file_field: :application, type: :integer
 
   class NoTalkHostError < StandardError
   end

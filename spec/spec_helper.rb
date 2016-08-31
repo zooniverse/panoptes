@@ -3,6 +3,7 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "sidekiq/testing"
 require "paper_trail/frameworks/rspec"
+require 'flipper/adapters/memory'
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
@@ -42,6 +43,10 @@ RSpec.configure do |config|
     # Enable all Scientist experiments
     CodeExperiment.always_enabled = true
     CodeExperiment.raise_on_mismatches = true
+
+    allow(Panoptes).to receive(:flipper).and_return(Flipper.new(Flipper::Adapters::Memory.new))
+    Panoptes.flipper["cellect"].enable
+    Panoptes.flipper["cellect_ex"].enable
 
     case example.metadata[:sidekiq]
     when :fake
