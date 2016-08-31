@@ -13,7 +13,7 @@ class CellectExClient
   end
 
   def connect!(adapter)
-    Faraday.new host do |faraday|
+    Faraday.new(host, ssl: {verify: false}) do |faraday|
       faraday.response :json, content_type: /\bjson$/
       faraday.adapter(*adapter)
     end
