@@ -27,7 +27,7 @@ RSpec.describe SeenCellectWorker do
 
     context "when cellect is on" do
       before do
-        allow(Panoptes).to receive(:cellect_on).and_return(true)
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
       end
 
       it "should not call to cellect if the workflow is not set to use it" do

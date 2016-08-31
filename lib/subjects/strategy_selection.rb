@@ -39,11 +39,12 @@ module Subjects
     private
 
     def cellect_strategy?
-      return nil unless Panoptes.cellect_on
+      return nil unless Panoptes.flipper.enabled?("cellect")
       strategy_param == :cellect || workflow.using_cellect?
     end
 
     def cellect_ex_strategy?
+      return nil unless Panoptes.flipper.enabled?("cellect_ex")
       strategy_param == :cellect_ex || workflow.subject_selection_strategy == 'cellect_ex'
     end
 

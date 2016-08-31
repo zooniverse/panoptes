@@ -47,7 +47,7 @@ RSpec.describe Subjects::StrategySelection do
         let(:strategy) { :cellect }
         let(:run_selection) { subject.select }
         before do
-          allow(Panoptes).to receive(:cellect_on).and_return(true)
+          allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
         end
 
         it "should use the cellect client" do
@@ -122,7 +122,7 @@ RSpec.describe Subjects::StrategySelection do
 
     context "when Cellect config is on" do
       before do
-        allow(Panoptes).to receive(:cellect_on).and_return(true)
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
       end
 
       context "when providing cellect strategy param" do
@@ -164,7 +164,8 @@ RSpec.describe Subjects::StrategySelection do
 
     context "when Cellect Config is off" do
       before do
-        allow(Panoptes).to receive(:cellect_on).and_return(false)
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(false)
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect_ex").and_return(false)
       end
 
       context "when providing cellect strategy param" do

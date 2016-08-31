@@ -177,10 +177,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
         end
 
         context "when cellect is on" do
-          before do
-            allow(Panoptes).to receive(:cellect_on).and_return(true)
-          end
-
           it 'should not call reload cellect worker' do
             expect(ReloadCellectWorker).not_to receive(:perform_async)
           end
@@ -215,7 +211,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
         context "when cellect is on" do
           before do
-            allow(Panoptes).to receive(:cellect_on).and_return(true)
+            allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
           end
 
           it 'should not call reload cellect worker' do
