@@ -13,7 +13,7 @@ describe ResetProjectCountersWorker do
     classification2 = create(:classification, user: user2, created_at: project.launch_date - 1.week, project: project, workflow: workflow, subjects: [subject])
     classification3 = create(:classification, user: user2, created_at: project.launch_date + 1.week, project: project, workflow: workflow, subjects: [subject])
 
-    project.update_columns classifications_count: 3, classifiers_count: 2
+    project.update_columns classifications_count: 3, classifiers_count: 3
     workflow.update_columns classifications_count: 3
 
     create :user_project_preference, user: user1, project: project
@@ -30,7 +30,7 @@ describe ResetProjectCountersWorker do
 
   it 'resets classifiers count' do
     described_class.new.perform(project.id)
-    expect { project.reload }.to change { project.classifiers_count }.from(2).to(1)
+    expect { project.reload }.to change { project.classifiers_count }.from(3).to(2)
   end
 
   it 'resets workflow classifications count' do
