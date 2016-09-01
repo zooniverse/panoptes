@@ -4,7 +4,7 @@ class ProjectClassificationsCountWorker
   sidekiq_options queue: :data_low
 
   sidekiq_options congestion: {
-    interval: 30,
+    interval: 60,
     max_in_interval: 1,
     min_delay: 0,
     reject_with: :cancel,
