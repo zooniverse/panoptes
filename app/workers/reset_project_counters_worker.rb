@@ -11,18 +11,17 @@ class ResetProjectCountersWorker
 
   def perform(project_id, rate_limit=true)
     project = Project.find(project_id)
-    counter = ProjectCounter.new(project)
+    project.workflows.each do |workflow|
+      reset_subject_workflow_classification_counters!(workflow)
+      counter = WorkflowCounter.new(workflow)
+      workflow.update_columns classifications_count: counter.classifications
+    end
 
+    counter = ProjectCounter.new(project)
     project.update_columns(
       classifications_count: counter.classifications,
       classifiers_count: counter.volunteers
     )
-
-    project.workflows.find_each do |workflow|
-      counter = WorkflowCounter.new(workflow)
-      workflow.update_columns classifications_count: counter.classifications
-      reset_subject_workflow_classification_counters!(workflow)
-    end
   end
 
   private

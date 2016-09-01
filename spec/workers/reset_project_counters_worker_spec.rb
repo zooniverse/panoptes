@@ -6,12 +6,21 @@ describe ResetProjectCountersWorker do
   let(:subject)  { create :subject, project: project }
   let(:user1)    { create :user }
   let(:user2)    { create :user }
-  let(:swc)      { create :subject_workflow_status, subject: subject, workflow: workflow, classifications_count: 3 }
+  let(:sws)      { create :subject_workflow_status, subject: subject, workflow: workflow, classifications_count: 3 }
+  let(:classification_attrs) do
+    {
+      created_at: project.launch_date - 1.week,
+      project: project,
+      workflow: workflow,
+      subjects: [subject]
+    }
+  end
 
   before do
-    classification1 = create(:classification, user: user1, created_at: project.launch_date - 1.week, project: project, workflow: workflow, subjects: [subject])
-    classification2 = create(:classification, user: user2, created_at: project.launch_date - 1.week, project: project, workflow: workflow, subjects: [subject])
-    classification3 = create(:classification, user: user2, created_at: project.launch_date + 1.week, project: project, workflow: workflow, subjects: [subject])
+    sws
+    create(:classification, classification_attrs.merge(user: user1))
+    create(:classification, classification_attrs.merge(user: user2))
+    create(:classification, classification_attrs.merge(user: user2, created_at: project.launch_date + 1.week))
 
     project.update_columns classifications_count: 3, classifiers_count: 3
     workflow.update_columns classifications_count: 3
@@ -39,9 +48,7 @@ describe ResetProjectCountersWorker do
   end
 
   it 'resets subject workflow counters' do
-    swc.save
     described_class.new.perform(project.id)
-    expect { swc.reload }.to change { swc.classifications_count }.from(3).to(1)
+    expect { sws.reload }.to change { sws.classifications_count }.from(3).to(1)
   end
-
 end
