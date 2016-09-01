@@ -22,8 +22,9 @@ module Configurable
 
     def load_configuration
       @fields.each do |key, options|
-        value = env_vars["#{@api_prefix}_#{key.upcase}"]
-        value ||= config_from_file[options[:file_field] || key]
+        field_key = options[:key] || key
+        value = env_vars["#{@api_prefix}_#{field_key.upcase}"]
+        value ||= config_from_file[field_key]
         value = value.to_i if options[:type] == :integer
 
         self.public_send("#{key}=", value)

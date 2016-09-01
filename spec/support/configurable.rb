@@ -1,7 +1,7 @@
 RSpec.shared_examples "is configurable" do |prefix|
   describe '::load_configuration' do
     before(:each) do
-      allow(described_class).to receive(:config_file).and_return({})
+      allow(described_class).to receive(:config_from_file).and_return({})
       allow(described_class).to receive(:env_vars).and_return({})
     end
 
