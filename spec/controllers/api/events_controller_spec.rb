@@ -18,7 +18,7 @@ describe Api::EventsController, type: :controller do
       let(:workflow) { create(:workflow) }
       let(:project) do
         p = workflow.project
-        p.update_columns(migrated: true, id: zoo_home_project_id, configuration: { zoo_home_project_id: zoo_home_project_id })
+        p.update_columns(migrated: true, configuration: { zoo_home_project_id: zoo_home_project_id })
         p
       end
       let(:user) do
@@ -179,7 +179,6 @@ describe Api::EventsController, type: :controller do
         end
 
         it "sets the project_id" do
-          first_visit_event_params[:event][:project_id] = project.id
           post :create, first_visit_event_params
           user.reload
           expect(user.project_id).to eq(project.id)
