@@ -14,14 +14,6 @@ class ProjectCounter
   end
 
   def classifications
-    classifications = project.classifications
-    if launch_date
-      classifications = classifications.where("created_at >= ?", launch_date)
-    end
-    classifications.count
-  end
-
-  def launch_date
-    @launch_date ||= project.launch_date
+    project.workflows.sum(:classifications_count)
   end
 end
