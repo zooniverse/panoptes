@@ -4,10 +4,10 @@ class ProjectClassificationsCountWorker
   sidekiq_options queue: :data_low
 
   sidekiq_options congestion: {
-    interval: 15,
+    interval: 30,
     max_in_interval: 1,
     min_delay: 0,
-    reject_with: :reschedule,
+    reject_with: :cancel,
     key: ->(project_id) {
       "project_#{project_id}_classifications_count_worker"
     }
