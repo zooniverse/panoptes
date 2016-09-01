@@ -5,8 +5,8 @@ class TalkApiClient
   self.api_prefix = "talk_api"
 
   configure :host
-  configure :user_id, file_field: :user, type: :integer
-  configure :application_id, file_field: :application, type: :integer
+  configure :user_id, key: :user, type: :integer
+  configure :application_id, key: :application, type: :integer
 
   class NoTalkHostError < StandardError
   end
