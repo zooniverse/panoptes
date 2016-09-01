@@ -1,6 +1,8 @@
 class ProjectClassificationsCountWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: :data_low
+
   sidekiq_options congestion: {
     interval: 15,
     max_in_interval: 1,
