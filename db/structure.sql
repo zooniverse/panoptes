@@ -2215,6 +2215,13 @@ CREATE UNIQUE INDEX index_oauth_access_grants_on_token ON oauth_access_grants US
 
 
 --
+-- Name: index_oauth_access_tokens_on_app_id_and_owner_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_oauth_access_tokens_on_app_id_and_owner_id ON oauth_access_tokens USING btree (application_id, resource_owner_id);
+
+
+--
 -- Name: index_oauth_access_tokens_on_refresh_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3472,4 +3479,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160819134413');
 INSERT INTO schema_migrations (version) VALUES ('20160824101413');
 
 INSERT INTO schema_migrations (version) VALUES ('20160901100944');
+
+INSERT INTO schema_migrations (version) VALUES ('20160901141903');
 
