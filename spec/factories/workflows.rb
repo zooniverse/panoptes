@@ -66,8 +66,12 @@ FactoryGirl.define do
     end
 
     factory :workflow_with_subjects do
-      after(:create) do |w|
-        create_list(:subject_set_with_subjects, 2, workflows: [w], project: w.project)
+      ignore do
+        num_sets 2
+      end
+
+      after(:create) do |w, evaluator|
+        create_list(:subject_set_with_subjects, evaluator.num_sets, workflows: [w], project: w.project)
       end
     end
 
