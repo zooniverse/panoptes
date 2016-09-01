@@ -7,13 +7,10 @@ class ProjectCounter
   end
 
   def volunteers
-    upps = UserProjectPreference
-      .joins("INNER JOIN classifications ON classifications.user_id = user_project_preferences.user_id")
+    UserProjectPreference
       .where(project_id: project.id)
-    if launch_date
-      upps = upps.where("classifications.created_at >= ?", launch_date)
-    end
-    upps.distinct.count
+      .where.not(email_communication: nil)
+      .count
   end
 
   def classifications

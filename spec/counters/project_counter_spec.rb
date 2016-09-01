@@ -33,14 +33,12 @@ describe ProjectCounter do
   end
 
   describe 'volunteers' do
-    it_should_behave_like 'a project counter', :volunteers
 
-    it "should only count the disctinct joins" do
-      c1 = create(:classification, project: project)
-      c2 = create(:classification, project: project)
-      create(:user_project_preference, project: project, user: c1.user)
-      create(:user_project_preference, project: project, user: c2.user)
-      create(:classification, user: c2.user, project: project)
+    it "should return 2" do
+      2.times do
+        c = create(:classification, project: project)
+        create(:user_project_preference, project: project, user: c.user)
+      end
       expect(counter.volunteers).to eq(2)
     end
   end
