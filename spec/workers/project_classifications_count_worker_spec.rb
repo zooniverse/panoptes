@@ -5,7 +5,7 @@ RSpec.describe ProjectClassificationsCountWorker do
   let(:workflow) { create(:workflow) }
   let!(:project) { workflow.project }
 
-  describe "#perform", :focus do
+  describe "#perform" do
     # temp fix - remove this once we've cleared the jam
     # and figured out how to do the counting for certain projects
     it "should return nil" do
