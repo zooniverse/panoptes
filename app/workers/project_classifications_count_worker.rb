@@ -14,9 +14,6 @@ class ProjectClassificationsCountWorker
   }
 
   def perform(project_id)
-    #temp fix to clear the counters
-    return nil
-
     project = Project.find(project_id)
     project.workflows.map do |workflow|
       counter = WorkflowCounter.new(workflow)

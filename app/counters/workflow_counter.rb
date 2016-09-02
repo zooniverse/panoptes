@@ -7,10 +7,6 @@ class WorkflowCounter
   end
 
   def classifications
-    scope = workflow.classifications
-    if launch_date = workflow.project.launch_date
-      scope = workflow.classifications.where("created_at >= ?", launch_date)
-    end
-    scope.count
+    SubjectWorkflowStatus.where(workflow: workflow).sum(:classifications_count)
   end
 end
