@@ -25,11 +25,21 @@ describe ProjectCounter do
       expect(counter.classifications).to eq(0)
     end
 
-    it "should return 2" do
-      project.workflows.each do |w|
-        w.update_column(:classifications_count, 1)
+    context "with classifications counts" do
+      before do
+        project.workflows.each do |w|
+          w.update_column(:classifications_count, 1)
+        end
       end
-      expect(counter.classifications).to eq(2)
+
+      it "should return 2" do
+        expect(counter.classifications).to eq(2)
+      end
+
+      it "should only count the active workflows" do
+        project.workflows.last.update_column(:active, false)
+        expect(counter.classifications).to eq(1)
+      end
     end
   end
 end
