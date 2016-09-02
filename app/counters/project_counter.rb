@@ -14,6 +14,6 @@ class ProjectCounter
   end
 
   def classifications
-    project.workflows.sum(:classifications_count)
+    project.workflows.where(active: true).sum(:classifications_count)
   end
 end
