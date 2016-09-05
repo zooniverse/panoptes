@@ -139,11 +139,11 @@ class Project < ActiveRecord::Base
   end
 
   def retired_subjects_count
-    @retired_subject_count ||= workflows.sum :retired_set_member_subjects_count
+    @retired_subject_count ||= active_workflows.sum :retired_set_member_subjects_count
   end
 
   def finished?
-    super ? super : workflows.all?(&:finished?)
+    super ? super : active_workflows.all?(&:finished?)
   end
 
   def state
