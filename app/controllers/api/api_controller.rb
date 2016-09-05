@@ -14,7 +14,6 @@ module Api
     rescue_from ActiveRecord::RecordNotFound,
       Api::NoMediaError,
       RoleControl::AccessDenied,
-      Subjects::Selector::MissingSubjectQueue,
       Subjects::Selector::MissingSubjectSet,
       Subjects::Selector::MissingSubjects,                 with: :not_found
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
