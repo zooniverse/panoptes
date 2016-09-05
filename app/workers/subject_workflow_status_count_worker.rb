@@ -1,7 +1,7 @@
 class SubjectWorkflowStatusCountWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :data_low
+  sidekiq_options queue: :really_high
 
   sidekiq_options congestion: {
     interval: ENV.fetch("sws_count_worker_interval", 30),
