@@ -21,13 +21,6 @@ describe Api::V1::SubjectsController, type: :controller do
   end
 
   describe "#index" do
-    let!(:non_user_queue) do
-      create(:subject_queue,
-             user: nil,
-             workflow: workflow,
-             set_member_subject_ids: sms.map(&:id))
-    end
-
     context "logged out user" do
 
       describe "filtering" do
@@ -162,15 +155,7 @@ describe Api::V1::SubjectsController, type: :controller do
         let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
 
-        context "with queued subjects" do
-          let!(:queue) do
-            create(:subject_queue,
-                   user: user,
-                   workflow: workflow,
-                   set_member_subject_ids: sms.map(&:id))
-          end
-
-
+        context "with subjects" do
           before(:each) do
             get :index, request_params
           end
@@ -266,24 +251,6 @@ describe Api::V1::SubjectsController, type: :controller do
 
           it 'should return 422' do
             expect(response.status).to eq(422)
-          end
-        end
-
-        context "without already queued subjects" do
-          before(:each) do
-            get :index, request_params
-          end
-
-          it 'should create the queue' do
-            expect(SubjectQueue.find_by(user: user, workflow: workflow)).to_not be_nil
-          end
-
-          it 'should return 200' do
-            expect(response.status).to eq(200)
-          end
-
-          it 'should return a page of 2 objects' do
-            expect(json_response[api_resource_name].length).to eq(2)
           end
         end
       end
