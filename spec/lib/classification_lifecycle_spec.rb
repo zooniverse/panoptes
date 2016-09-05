@@ -7,13 +7,6 @@ describe ClassificationLifecycle do
       create(:set_member_subject, subject_set: subject_set, subject_id: s_id)
     end.map(&:id)
   end
-  let(:subject_queue) do
-    create(:subject_queue,
-           user: classification.user,
-           workflow: classification.workflow,
-           set_member_subject_ids: sms_ids)
-  end
-
   let(:classification) { build(:classification) }
   let(:workflow) { classification.workflow }
   let(:user) { classification.user }
@@ -143,10 +136,6 @@ describe ClassificationLifecycle do
         subject.execute
       end
 
-      it "should call the #refresh_queue" do
-        expect(subject).to receive(:refresh_queue)
-        subject.execute
-      end
 
       it "should call #publish_data" do
         expect(subject).to receive(:publish_data)
@@ -453,58 +442,6 @@ describe ClassificationLifecycle do
       let(:classification) { build(:classification, user: nil) }
       it 'should do nothing' do
         expect(UserSeenSubject).to_not receive(:add_seen_subject_for_user)
-      end
-    end
-  end
-
-  describe "#refresh_queue" do
-    let(:workflow_id) { classification.workflow_id }
-    let(:user_id) { classification.user_id }
-
-    after(:each) { subject.refresh_queue }
-
-    context "when no queue exists" do
-      it "should not call Enqueue worker" do
-        expect(EnqueueSubjectQueueWorker).to_not receive(:perform_async)
-      end
-    end
-
-    context "when a queue exists" do
-      before(:each) do
-        subject_queue
-        allow_any_instance_of(SubjectQueue)
-          .to receive(:below_minimum?)
-          .and_return(below_min)
-      end
-
-      context "when queue is not below min" do
-        let(:below_min) { false }
-
-        it "should not call Enqueue worker" do
-          expect(EnqueueSubjectQueueWorker).to_not receive(:perform_async)
-        end
-      end
-
-      context "when queue is below min" do
-        let(:below_min) { true }
-
-        it "should call Enqueue worker" do
-          expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
-          .with(subject_queue.id)
-        end
-
-        context "when subject belongs to many sets" do
-          let(:set_ids) { [1,2,3] }
-
-          it "should call Enqueue worker for each set" do
-            allow(subject).to receive(:subjects_workflow_subject_sets).and_return(set_ids)
-            allow(SubjectQueue).to receive(:by_set).and_return(SubjectQueue.all)
-            set_ids.each do |set_id|
-              expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
-                .with(subject_queue.id)
-            end
-          end
-        end
       end
     end
   end

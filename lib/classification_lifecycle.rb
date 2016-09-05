@@ -35,8 +35,6 @@ class ClassificationLifecycle
     notify_cellect
     update_counters
     publish_data
-    #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
-    refresh_queue
   end
 
   def update_classification_data
@@ -94,16 +92,6 @@ class ClassificationLifecycle
 
     subject_ids.each do |subject_id|
       SeenCellectWorker.perform_async(workflow.id, user.try(:id), subject_id)
-    end
-  end
-
-  def refresh_queue
-    subjects_workflow_subject_sets.each do |set_id|
-      queue = SubjectQueue.by_set(set_id).find_by(user: user, workflow: workflow)
-
-      if queue && queue.below_minimum?
-        EnqueueSubjectQueueWorker.perform_async(queue.id)
-      end
     end
   end
 
