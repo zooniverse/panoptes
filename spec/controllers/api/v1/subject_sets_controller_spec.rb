@@ -171,11 +171,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
           put :update, update_params.merge(id: resource.id)
         end
 
-        it 'should call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async)
-          .with(workflow_id, resource.id)
-        end
-
         it 'should not call the reload cellect worker when cellect is off' do
           expect(ReloadCellectWorker).not_to receive(:perform_async)
         end
@@ -200,13 +195,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets][:links].delete(:workflows)
           put :update, update_params.merge(id: resource.id)
-        end
-
-        it 'should call the reload queue worker for each workflow' do
-          workflows.each do |_workflow|
-            expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async)
-            .with(_workflow.id, resource.id)
-          end
         end
 
         it 'should not call the reload cellect worker when cellect is off' do
@@ -241,10 +229,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
           put :update, update_params.merge(id: resource.id)
         end
 
-        it 'should not call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
-        end
-
         it 'should not attempt to call cellect', :aggregate_failures do
           expect(Panoptes).not_to receive(:use_cellect?)
           expect(ReloadCellectWorker).not_to receive(:perform_async)
@@ -257,10 +241,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets].delete(:links)
           put :update, update_params.merge(id: resource.id)
-        end
-
-        it 'should not call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
         end
 
         it 'should not attempt to call cellect', :aggregate_failures do
