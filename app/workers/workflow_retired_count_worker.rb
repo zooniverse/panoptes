@@ -3,23 +3,20 @@ class WorkflowRetiredCountWorker
 
   sidekiq_options queue: :data_high
 
-  attr_reader :workflow
+  sidekiq_options congestion: {
+    interval: 10,
+    max_in_interval: 1,
+    min_delay: 0,
+    reject_with: :cancel,
+    key: ->(workflow_id) { "workflow_#{workflow_id}_retired_count_worker" }
+  }
 
   def perform(workflow_id)
-    @workflow = Workflow.find(workflow_id)
+    workflow = Workflow.find(workflow_id)
+    counter = WorkflowCounter.new(workflow)
     workflow.update_column(
       :retired_set_member_subjects_count,
-      retired_counts_since_launch(workflow.project.launch_date)
+      counter.retired_subjects
     )
-  end
-
-  private
-
-  def retired_counts_since_launch(launch_date)
-    swcs = SubjectWorkflowStatus.retired.where(workflow_id: workflow.id)
-    if launch_date
-      swcs = swcs.where("subject_workflow_counts.created_at >= ?", launch_date)
-    end
-    swcs.count
   end
 end

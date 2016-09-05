@@ -4,7 +4,8 @@ describe Project, type: :model do
   let(:project) { build(:project) }
   let(:owned) { project }
   let(:not_owned) { build(:project, owner: nil) }
-  let(:subject_relation) { create(:full_project) }
+  let(:full_project) { create(:full_project) }
+  let(:subject_relation) { full_project }
   let(:activatable) { project }
   let(:translatable) { create(:project_with_contents, build_extra_contents: true) }
   let(:translatable_without_content) { build(:project, build_contents: false) }
@@ -20,7 +21,7 @@ describe Project, type: :model do
   it_behaves_like "has slugged name"
 
   context "with caching resource associations" do
-    let(:cached_resource) { create(:full_project) }
+    let(:cached_resource) { full_project }
 
     it_behaves_like "has an extended cache key",
       [:project_contents, :tags],
@@ -121,7 +122,7 @@ describe Project, type: :model do
   end
 
   describe "#live_subject_sets" do
-    let(:project) { create(:full_project) }
+    let(:project) { full_project }
     let!(:unlinked_subject_set) do
       create(:subject_set, project: project)
     end
@@ -265,27 +266,43 @@ describe Project, type: :model do
   end
 
   describe "#retired_subjects_count" do
+    let(:workflows) { full_project.workflows }
+    before do
+      workflows.map { |w| w.update_column(:retired_set_member_subjects_count, 1) }
+    end
+
     it "return a count of the associated retired subjects" do
-      expect(subject_relation.retired_subjects_count).to eq(subject_relation
-                                                             .workflows
-                                                             .flat_map{ |w| w.set_member_subjects.map{ |s| s.retired_workflows.include?(w) ? 1 : 0 } }
-                                                             .reduce(&:+))
+      expect(full_project.retired_subjects_count).to eq(1)
+    end
+
+    it "should not count inactive workflows" do
+      workflows.sample.update_column(:active, false)
+      expect(full_project.retired_subjects_count).to eq(0)
     end
   end
 
   describe "#finished?" do
-    it 'should be true when all the linked workflows are marked finished' do
-      subject_relation.workflows.each do |w|
-        allow(w).to receive(:finished_at).and_return(Time.zone.now)
-      end
-
-      expect(subject_relation).to be_finished
+    it "should return true when marked as finished via the enum" do
+      full_project.finished!
+      expect(full_project).to be_finished
     end
 
-    it 'should be false when any of the linked workflows are not marked finished' do
-      w = subject_relation.workflows.last
-      allow(w).to receive(:finished_at).and_return(Time.zone.now)
-      expect(subject_relation).not_to be_finished
+    context "no enum value set" do
+      let(:workflows) { full_project.active_workflows }
+      before do
+        create(:workflow, project: full_project, active: false)
+      end
+
+      it 'should be true when all the active linked workflows are marked finished' do
+        workflows.each do |w|
+          allow(w).to receive(:finished?).and_return(true)
+        end
+        expect(full_project).to be_finished
+      end
+
+      it 'should be false when any of the active linked workflows are not marked finished' do
+        expect(full_project).not_to be_finished
+      end
     end
   end
 
