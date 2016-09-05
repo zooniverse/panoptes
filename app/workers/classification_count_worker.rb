@@ -9,8 +9,8 @@ class ClassificationCountWorker
     if workflow.project.live
       count = SubjectWorkflowStatus.find_or_create_by!(subject_id: subject_id, workflow_id: workflow_id)
 
-      counter = SubjectWorkflowCounter.new(count)
-      count.update_column(:classifications_count, counter.classifications)
+      count.class.increment_counter(:classifications_count, count.id)
+      SubjectWorkflowStatusCountWorker.perform_async(count.id)
 
       ProjectClassificationsCountWorker.perform_async(workflow.project.id)
       RetirementWorker.perform_async(count.id)
