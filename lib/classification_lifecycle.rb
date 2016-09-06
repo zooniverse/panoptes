@@ -15,6 +15,24 @@ class ClassificationLifecycle
     ClassificationWorker.perform_async(classification.id, action.to_s)
   end
 
+  def create!
+    if classification.lifecycled_at.nil?
+      transact! do
+        if should_count_towards_retirement?
+          classification.subject_ids.each do |sid|
+            ClassificationCountWorker
+            .perform_async(sid, classification.workflow.id)
+          end
+        end
+        process_project_preference
+      end
+    end
+  end
+
+  def update!
+    transact!
+  end
+
   def transact!(&block)
     Classification.transaction do
       update_classification_data

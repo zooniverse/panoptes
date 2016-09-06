@@ -18,20 +18,10 @@ class ClassificationWorker
   def lifecycle_classification
     lifecycle = ClassificationLifecycle.new(classification)
     case action
-    when "update"
-      lifecycle.transact!
     when "create"
-      if classification.lifecycled_at.nil?
-        lifecycle.transact! do
-          if should_count_towards_retirement?
-            classification.subject_ids.each do |sid|
-              ClassificationCountWorker
-              .perform_async(sid, classification.workflow.id)
-            end
-          end
-          process_project_preference
-        end
-      end
+      lifecycle.create!
+    when "update"
+      lifecycle.update!
     else
       raise "Invalid Post-Classification Action"
     end
