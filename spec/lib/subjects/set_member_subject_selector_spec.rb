@@ -49,17 +49,6 @@ describe Subjects::SetMemberSubjectSelector do
       end
     end
 
-    context "when the workflow is finished" do
-      it "should select the whole set of workflow set_member_subjects", :aggregate_failures do
-        allow(workflow).to receive(:finished?).and_return(true)
-        expect(selector)
-          .to receive(:select_all_workflow_set_member_subjects)
-          .and_call_original
-        expect(selector.set_member_subjects)
-          .to match_array(workflow.set_member_subjects)
-      end
-    end
-
     context "when there all the data is retired" do
       it "should not attempt to select the unseen for a user", :aggregate_failures do
         allow(selector).to receive(:select_non_retired)
