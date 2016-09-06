@@ -118,7 +118,11 @@ class Workflow < ActiveRecord::Base
       when finished_at.present?
         true
       else
-        retired_subjects_count >= subjects_count
+        finished_active_data?
       end
+  end
+
+  def finished_active_data?
+    @finished_active_data ||= retired_subjects_count >= subjects_count
   end
 end
