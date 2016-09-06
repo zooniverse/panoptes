@@ -1,7 +1,6 @@
 shared_examples "select for incomplete_project" do
   let(:args) { opts }
   let(:selector) { Subjects::PostgresqlSelection.new(workflow, user, args) }
-
   let(:sms_scope) do
     if ss_id = args[:subject_set_id]
       SetMemberSubject.where(subject_set_id: ss_id)
@@ -9,7 +8,6 @@ shared_examples "select for incomplete_project" do
       SetMemberSubject.all
     end
   end
-
   let(:unseen_count) do
     scoped_seen_count = if ss_id = args[:subject_set_id]
                           group_sms = SetMemberSubject.where(subject_set_id: ss_id)
@@ -18,6 +16,13 @@ shared_examples "select for incomplete_project" do
                           seen_count
                         end
     sms_scope.count - scoped_seen_count
+  end
+
+  def run_limit_selection(limit)
+    selector = Subjects::PostgresqlSelection.new(
+      workflow, user, (args || {}).merge(limit: limit)
+    )
+    selector.select
   end
 
   context "when a user has only seen a few subjects" do
@@ -51,10 +56,9 @@ shared_examples "select for incomplete_project" do
 
     # Account for the loop cut off limit constructing the random sample
     it 'should always return an approximate sample of subjects up to the unseen limit' do
-      unseen_count.times do |n|
-        limit = n+1
-        results_size = Subjects::PostgresqlSelection.new(workflow, user, (args || {}).merge(limit: limit)).select.length
-        expect(results_size).to be_between(results_size, limit).inclusive
+      (1..unseen_count).each do |limit|
+        results_size = run_limit_selection(limit).length
+        expect(results_size).to eq(limit)
       end
     end
   end
@@ -68,10 +72,9 @@ shared_examples "select for incomplete_project" do
     end
 
     it 'should return as many subjects as possible' do
-      unseen_count.times do |n|
-        limit = n+unseen_count
-        results_size = Subjects::PostgresqlSelection.new(workflow, user, (args || {}).merge(limit: limit)).select.length
-        expect(results_size).to be_between(results_size, limit).inclusive
+      (1..unseen_count).each do |limit|
+        results_size = run_limit_selection(limit).length
+        expect(results_size).to eq(limit)
       end
     end
   end
