@@ -3,10 +3,10 @@ require 'spec_helper'
 describe SubjectWorkflowCounter do
   let(:workflow) { create(:workflow) }
   let(:project) { workflow.project }
-  let(:swc) do
-    create(:subject_workflow_count, workflow: workflow, classifications_count: 0)
+  let(:sws) do
+    create(:subject_workflow_status, workflow: workflow, classifications_count: 0)
   end
-  let(:counter) { SubjectWorkflowCounter.new(swc) }
+  let(:counter) { SubjectWorkflowCounter.new(sws) }
 
   describe 'classifications' do
     let(:now) { DateTime.now.utc }
@@ -18,7 +18,7 @@ describe SubjectWorkflowCounter do
     context "with classifications" do
       before do
         2.times do
-          c = create(:classification,  subject_ids: [swc.subject_id], project: project, workflow: workflow)
+          c = create(:classification,  subject_ids: [sws.subject_id], project: project, workflow: workflow)
           create(:user_project_preference, project: project, user: c.user)
         end
       end
