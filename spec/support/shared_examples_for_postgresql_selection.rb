@@ -24,7 +24,7 @@ shared_examples "select for incomplete_project" do
     let(:seen_count) { 5 }
     let(:limit) { nil }
     let(:args) { opts.merge(limit: limit) }
-    let!(:uss) do
+    let(:uss) do
       subject_ids = sms_scope.sample(seen_count).map(&:subject_id)
       create(:classification, user: user, workflow: workflow, subject_ids: subject_ids)
       create(:user_seen_subject, user: user, subject_ids: subject_ids, workflow: workflow)
@@ -34,8 +34,9 @@ shared_examples "select for incomplete_project" do
       let(:limit) { 1 }
 
       it 'should return an unseen subject' do
+        seen_ids = uss.subject_ids
         selected = selector.select.first
-        expect(uss.subject_ids).to_not include(selected)
+        expect(seen_ids).to_not include(selected)
       end
     end
 
