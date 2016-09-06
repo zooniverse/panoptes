@@ -18,5 +18,9 @@ class WorkflowRetiredCountWorker
       :retired_set_member_subjects_count,
       counter.retired_subjects
     )
+
+    if workflow.finished?
+      Workflow.where(id: workflow.id).update_all(finished_at: Time.now)
+    end
   end
 end

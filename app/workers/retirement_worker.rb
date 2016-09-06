@@ -12,10 +12,6 @@ class RetirementWorker
       WorkflowRetiredCountWorker.perform_async(workflow.id)
       PublishRetirementEventWorker.perform_async(workflow.id)
 
-      if workflow.finished?
-        Workflow.where(id: workflow.id).update_all(finished_at: Time.now)
-      end
-
       if Panoptes.use_cellect?(workflow)
         RetireCellectWorker.perform_async(count.subject_id, workflow.id)
       end

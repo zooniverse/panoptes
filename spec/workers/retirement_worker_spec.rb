@@ -76,40 +76,4 @@ RSpec.describe RetirementWorker do
       end
     end
   end
-
-  describe "finishing workflows" do
-    before do
-      allow_any_instance_of(SubjectWorkflowStatus)
-        .to receive(:retire?)
-        .and_return(true)
-    end
-
-    it 'should not mark the workflow as finished when it is not' do
-      allow(workflow).to receive(:finished?).and_return(false)
-      expect do
-        worker.perform(count.id)
-      end.to_not change{ Workflow.find(workflow.id).finished_at }
-    end
-
-    context "workflow is finished" do
-      before do
-        allow_any_instance_of(Workflow)
-          .to receive(:finished?)
-          .and_return(true)
-      end
-
-      it 'should set workflow.finished_at to the current time' do
-        expect do
-          worker.perform(count.id)
-        end.to change{ Workflow.find(workflow.id).finished_at }.from(nil)
-      end
-
-      context "when the workflow optimistic lock is updated" do
-        it 'should save the changes and not raise an error' do
-          Workflow.find(workflow.id).touch
-          expect { worker.perform(count.id) }.to_not raise_error
-        end
-      end
-    end
-  end
 end
