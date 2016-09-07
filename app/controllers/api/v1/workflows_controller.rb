@@ -84,6 +84,7 @@ class Api::V1::WorkflowsController < Api::ApiController
           end
         end
       when :subject_sets, 'subject_sets'
+        UnfinishWorkflowWorker.perform_async(workflow.id)
         ReloadCellectWorker.perform_async(workflow.id) if using_cellect
       end
 

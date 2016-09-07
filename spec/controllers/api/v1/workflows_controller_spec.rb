@@ -243,6 +243,10 @@ describe Api::V1::WorkflowsController, type: :controller do
 
           case link_to_test
           when :subject_sets
+            it "should call unfinish_workflow_worker" do
+              expect(UnfinishWorkflowWorker).to receive(:perform_async).with(resource.id)
+            end
+
             context "when cellect is on" do
               before do
                 allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
