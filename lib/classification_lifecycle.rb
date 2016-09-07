@@ -49,8 +49,7 @@ class ClassificationLifecycle
       upp = UserProjectPreference.where(user: user, project: project).first_or_initialize do |up|
         up.preferences = {}
       end
-      if first_classifcation = upp.email_communication.nil?
-        ProjectClassificationsCountWorker.perform_async(project.id)
+      if upp.email_communication.nil?
         upp.email_communication = user.project_email_communication
         upp.user.update_column(:project_id, project.id)
       end
