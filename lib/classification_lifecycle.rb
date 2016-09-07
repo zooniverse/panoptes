@@ -20,7 +20,7 @@ class ClassificationLifecycle
 
     Classification.transaction do
       update_classification_data
-      update_counters
+      update_counters(false)
       process_project_preference
       create_recent
       update_seen_subjects
@@ -34,6 +34,7 @@ class ClassificationLifecycle
   def update!
     Classification.transaction do
       update_classification_data
+      update_counters(true)
       create_recent
       update_seen_subjects
     end
@@ -92,11 +93,10 @@ class ClassificationLifecycle
     classification.save!
   end
 
-  def update_counters
+  def update_counters(was_update)
     if should_count_towards_retirement?
       classification.subject_ids.each do |sid|
-        ClassificationCountWorker
-        .perform_async(sid, classification.workflow.id)
+        ClassificationCountWorker.perform_async(sid, classification.workflow.id, was_update)
       end
     end
   end

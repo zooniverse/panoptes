@@ -15,6 +15,7 @@ describe ClassificationLifecycle do
   end
 
   let(:classification) { build(:classification) }
+  let(:workflow) { classification.workflow }
 
   subject do
     ClassificationLifecycle.new(classification)
@@ -52,33 +53,6 @@ describe ClassificationLifecycle do
         expect do
           subject.queue(test_method)
         end.to raise_error(ClassificationLifecycle::ClassificationNotPersisted)
-      end
-    end
-
-    context 'when classification is incomplete', sidekiq: :inline do
-      before(:each) do
-        classification.completed = false
-        classification.save
-      end
-
-      it 'should not queue the count worker' do
-        expect(ClassificationCountWorker).to_not receive(:perform_async)
-        subject.queue(:create)
-      end
-    end
-
-    context 'when classification is complete', sidekiq: :inline do
-
-      it 'should queue the count worker' do
-        classification.save
-        times = case classification.subject_ids.size
-        when 1
-          :once
-        when 2
-          :twice
-        end
-        expect(ClassificationCountWorker).to receive(:perform_async).send(times)
-        subject.queue(:create)
       end
     end
   end
@@ -251,6 +225,67 @@ describe ClassificationLifecycle do
         end
       end
     end
+
+    context 'updating counters' do
+      let(:subject_ids) { classification.subject_ids }
+
+      it 'should call classification count worker' do
+        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action != :create)
+        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action != :create)
+        subject.public_send(action)
+      end
+
+      context "when a user has seen the subjects before" do
+        it 'should not call the classification count worker' do
+          create(:user_seen_subject,
+                 user: classification.user,
+                 workflow: classification.workflow,
+                 subject_ids: classification.subject_ids)
+          expect(ClassificationCountWorker).to_not receive(:perform_async)
+          subject.public_send(action)
+        end
+      end
+
+      context "when a user is anonymous" do
+        let(:classification) { create(:classification, user: nil) }
+
+        it 'should call the classification count worker' do
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action != :create)
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action != :create)
+          subject.public_send(action)
+        end
+
+        context "when the classification has the already_seen metadata value" do
+          let!(:classification) do
+            create(:anonymous_already_seen_classification)
+          end
+
+          it 'should not call the classification count worker' do
+            expect(ClassificationCountWorker).to_not receive(:perform_async)
+            subject.public_send(action)
+          end
+        end
+      end
+
+      context 'when classification is incomplete' do
+        before(:each) do
+          classification.update! completed: false
+        end
+
+        it 'should not queue the count worker' do
+          expect(ClassificationCountWorker).to_not receive(:perform_async)
+          subject.public_send(action)
+        end
+      end
+
+      context 'when classification is complete' do
+        it 'should queue the count worker' do
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action != :create)
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action != :create)
+          subject.public_send(action)
+        end
+      end
+    end
   end
 
   context "#create" do
@@ -260,11 +295,6 @@ describe ClassificationLifecycle do
 
     it 'should call process_project_preferences' do
       expect(subject).to receive(:process_project_preference)
-      subject.create!
-    end
-
-    it 'should call classification count worker' do
-      expect(ClassificationCountWorker).to receive(:perform_async).twice
       subject.create!
     end
 
@@ -279,36 +309,6 @@ describe ClassificationLifecycle do
       end
     end
 
-    context "when a user has seen the subjects before" do
-      it 'should not call the classification count worker' do
-        create(:user_seen_subject,
-               user: classification.user,
-               workflow: classification.workflow,
-               subject_ids: classification.subject_ids)
-        expect(ClassificationCountWorker).to_not receive(:perform_async)
-        subject.create!
-      end
-    end
-
-    context "when a user is anonymous" do
-      let(:classification) { create(:classification, user: nil) }
-
-      it 'should call the classification count worker' do
-        expect(ClassificationCountWorker).to receive(:perform_async).twice
-        subject.create!
-      end
-
-      context "when the classification has the already_seen metadata value" do
-        let!(:classification) do
-          create(:anonymous_already_seen_classification)
-        end
-
-        it 'should not call the classification count worker' do
-          expect(ClassificationCountWorker).to_not receive(:perform_async)
-          subject.create!
-        end
-      end
-    end
   end
 
   context "#update" do
