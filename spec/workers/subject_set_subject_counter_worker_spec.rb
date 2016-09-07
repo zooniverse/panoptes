@@ -11,12 +11,5 @@ RSpec.describe SubjectSetSubjectCounterWorker do
         .with(:set_member_subjects_count, subject_set.set_member_subjects.count)
       described_class.new.perform(subject_set.id)
     end
-
-    it "should call the unfinish workflow worker" do
-      subject_set.workflow_ids.each do |w_id|
-        expect(UnfinishWorkflowWorker).to receive(:perform_async).with(w_id)
-      end
-      described_class.new.perform(subject_set.id)
-    end
   end
 end
