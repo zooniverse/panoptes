@@ -224,21 +224,10 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         context "with a finished workflow" do
-          let!(:workflow) do
+          let(:workflow) do
             create(:workflow_with_subject_sets, finished_at: Time.zone.now)
           end
-
-          let!(:sms) do
-            create_list(:set_member_subject, 2,
-                        subject_set: subject_set)
-          end
-
-          let!(:counts) do
-            sms.map {|s| create(:subject_workflow_status, subject: s.subject, workflow: workflow, retired_at: Time.now) }
-          end
-
           let!(:seen_subjects) do
-            create :classification, user: user, workflow: workflow, subjects: [subjects.first]
             create(:user_seen_subject,
                    user: user,
                    workflow: workflow,
@@ -255,7 +244,7 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(already_seen).to include(true)
           end
 
-          it 'should return finished_workflow as false for each subject' do
+          it 'should return user finished_workflow as false for each subject' do
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all be(false)
           end
