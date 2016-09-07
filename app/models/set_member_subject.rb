@@ -40,10 +40,6 @@ class SetMemberSubject < ActiveRecord::Base
       .where(subject_id: subject_id, workflows: {id: workflow_id })
   end
 
-  def self.available(workflow, user)
-    Subjects::SetMemberSubjectSelector.new(workflow, user).set_member_subjects
-  end
-
   def self.by_workflow(workflow)
     joins(:workflows).where(workflows: {id: workflow.id})
   end
