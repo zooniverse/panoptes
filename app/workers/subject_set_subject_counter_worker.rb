@@ -12,6 +12,9 @@ class SubjectSetSubjectCounterWorker
 
   def perform(subject_set_id)
     set = SubjectSet.find(subject_set_id)
-    set.update_attribute(:set_member_subjects_count, set.set_member_subjects.count)
+    set.update_column(:set_member_subjects_count, set.set_member_subjects.count)
+    set.workflow_ids.each do |w_id|
+      UnfinishWorkflowWorker.perform_async(w_id)
+    end
   end
 end
