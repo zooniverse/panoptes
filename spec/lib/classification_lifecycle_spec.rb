@@ -230,8 +230,8 @@ describe ClassificationLifecycle do
       let(:subject_ids) { classification.subject_ids }
 
       it 'should call classification count worker' do
-        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action != :create)
-        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action != :create)
+        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == :update!)
+        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == :update!)
         subject.public_send(action)
       end
 
@@ -250,8 +250,8 @@ describe ClassificationLifecycle do
         let(:classification) { create(:classification, user: nil) }
 
         it 'should call the classification count worker' do
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action != :create)
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action != :create)
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == :update!)
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == :update!)
           subject.public_send(action)
         end
 
@@ -280,8 +280,8 @@ describe ClassificationLifecycle do
 
       context 'when classification is complete' do
         it 'should queue the count worker' do
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action != :create)
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action != :create)
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == :update!)
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == :update!)
           subject.public_send(action)
         end
       end
