@@ -264,22 +264,6 @@ describe Workflow, type: :model do
     end
   end
 
-  describe "#finished_active_data?" do
-    let(:workflow) { subject_relation }
-    let(:subjects_count) { workflow.subjects_count }
-
-    it 'should be false if the retired < subjects count' do
-      expect(workflow).not_to be_finished_active_data
-    end
-
-    it 'should be true if the retired >= subjects count' do
-      allow(workflow).to receive(:retired_subjects_count).and_return(subjects_count)
-      expect(workflow).to be_finished_active_data
-      allow(workflow).to receive(:retired_subjects_count).and_return(subjects_count+1)
-      expect(workflow).to be_finished_active_data
-    end
-  end
-
   describe "#finished?" do
     let(:workflow) { subject_relation }
     let(:subjects_count) { workflow.subjects_count }
@@ -302,13 +286,14 @@ describe Workflow, type: :model do
     end
 
     context "when the workflow is not marked finished" do
-      it 'should be false if finished_active_data? is false' do
-        allow(workflow).to receive(:finished_active_data?).and_return(false)
+      it 'should be false if the retired < subjects count' do
         expect(workflow).not_to be_finished
       end
 
-      it 'should be true if finished_active_data? is true' do
-        allow(workflow).to receive(:finished_active_data?).and_return(true)
+      it 'should be true if the retired >= subjects count' do
+        allow(workflow).to receive(:retired_subjects_count).and_return(subjects_count)
+        expect(workflow).to be_finished
+        allow(workflow).to receive(:retired_subjects_count).and_return(subjects_count+1)
         expect(workflow).to be_finished
       end
     end
