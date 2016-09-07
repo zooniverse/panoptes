@@ -16,15 +16,16 @@ module Workflows
           workflow.retire_subject(subject_id, retirement_reason)
         end
 
-        WorkflowRetiredCountWorker.perform_async(workflow.id)
+        enqueue WorkflowRetiredCountWorker, workflow.id
+        notify_cellect
+      end
+    end
 
-        # This needs to be the last step in the transaction. If the transaction
-        # rolls back, we must not have enqueued these jobs yet.
-        if Panoptes.use_cellect?(workflow)
-          subject_ids.each do |subject_id|
-            RetireCellectWorker.perform_async(subject_id, workflow.id)
-          end
-        end
+    def notify_cellect
+      return unless Panoptes.use_cellect?(workflow)
+
+      subject_ids.each do |subject_id|
+        enqueue RetireCellectWorker, subject_id, workflow.id
       end
     end
 
