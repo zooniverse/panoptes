@@ -32,13 +32,6 @@ RSpec.describe RetirementWorker do
         worker.perform(count.id)
       end
 
-      it 'should call the unfinish workflow worker' do
-        expect(UnfinishWorkflowWorker)
-          .to receive(:perform_async)
-          .with(count.workflow.id)
-        worker.perform(count.id)
-      end
-
       context "when the workflow is not using cellect" do
         it "should not call the retire cellect worker" do
           expect(RetireCellectWorker).not_to receive(:perform_async)

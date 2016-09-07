@@ -11,7 +11,6 @@ class RetirementWorker
       workflow = count.workflow
       WorkflowRetiredCountWorker.perform_async(workflow.id)
       PublishRetirementEventWorker.perform_async(workflow.id)
-      UnfinishWorkflowWorker.perform_async(workflow.id)
 
       if Panoptes.use_cellect?(workflow)
         RetireCellectWorker.perform_async(count.subject_id, workflow.id)
