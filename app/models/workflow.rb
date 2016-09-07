@@ -54,6 +54,7 @@ class Workflow < ActiveRecord::Base
   can_through_parent :project, :update, :index, :show, :destroy, :update_links,
     :destroy_links, :translate, :versions, :version, :retire_subject
 
+  can_be_linked :access_control_list, :scope_for, :update, :user
   can_be_linked :subject_set, :same_project?, :model
   can_be_linked :subject_queue, :scope_for, :update, :user
   can_be_linked :aggregation, :scope_for, :update, :user

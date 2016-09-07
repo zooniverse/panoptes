@@ -56,6 +56,8 @@ Rails.application.routes.draw do
 
       json_api_resources :project_roles
 
+      json_api_resources :workflow_roles
+
       json_api_resources :project_preferences do
         collection do
           post :update_settings
