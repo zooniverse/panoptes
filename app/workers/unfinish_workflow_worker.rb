@@ -15,7 +15,7 @@ class UnfinishWorkflowWorker
 
   def perform(workflow_id)
     workflow = Workflow.find(workflow_id)
-    if workflow.finished_at && workflow.finished_active_data?
+    if workflow.finished_at
       Workflow.where(id: workflow.id).update_all(finished_at: nil)
     end
   end
