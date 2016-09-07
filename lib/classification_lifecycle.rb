@@ -16,32 +16,28 @@ class ClassificationLifecycle
   end
 
   def create!
-    if classification.lifecycled_at.nil?
-      transact! do
-        if should_count_towards_retirement?
-          classification.subject_ids.each do |sid|
-            ClassificationCountWorker
-            .perform_async(sid, classification.workflow.id)
-          end
-        end
-        process_project_preference
-      end
-    end
-  end
+    return if classification.lifecycled_at.present?
 
-  def update!
-    transact!
-  end
-
-  def transact!(&block)
     Classification.transaction do
       update_classification_data
-      #NOTE: ensure the block is evaluated before updating the seen subjects
-      # as the count worker won't fire if the seens are set, see #should_count_towards_retirement
-      instance_eval(&block) if block_given?
+      update_counters
+      process_project_preference
       create_recent
       update_seen_subjects
     end
+
+    publish_data
+    #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
+    refresh_queue
+  end
+
+  def update!
+    Classification.transaction do
+      update_classification_data
+      create_recent
+      update_seen_subjects
+    end
+
     publish_data
     #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
     refresh_queue
@@ -94,6 +90,15 @@ class ClassificationLifecycle
     add_user_groups
     add_lifecycled_at
     classification.save!
+  end
+
+  def update_counters
+    if should_count_towards_retirement?
+      classification.subject_ids.each do |sid|
+        ClassificationCountWorker
+        .perform_async(sid, classification.workflow.id)
+      end
+    end
   end
 
   def mark_expert_classifier

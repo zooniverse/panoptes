@@ -83,21 +83,189 @@ describe ClassificationLifecycle do
     end
   end
 
-  context "#create" do
-    after(:each) do
-      subject.create!
+  shared_examples_for "create and update" do
+    let!(:classification) { create(:classification) }
+
+    context "when an anonymous user classification" do
+      let(:classification) { create(:classification, user: nil) }
+
+      it "should wrap the calls in transactions" do
+        expect(Classification).to receive(:transaction).twice.and_call_original
+        subject.public_send(action)
+      end
+
+      it "should call the #update_classification_data" do
+        expect(subject).to receive(:update_classification_data)
+        subject.public_send(action)
+      end
+
+      it "should not attempt to update the seen subjects" do
+        expect_any_instance_of(UserSeenSubject).to_not receive(:subjects_seen?)
+        subject.public_send(action)
+      end
+
+      it "should call the #create_recent" do
+        aggregate_failures "recents" do
+          expect(subject).to receive(:create_recent).and_call_original
+          expect(Recent).to_not receive(:create_from_classification)
+        end
+        subject.public_send(action)
+      end
+
+      it "should call the #update_seen_subjects" do
+        expect(subject).to receive(:update_seen_subjects)
+        subject.public_send(action)
+      end
+
+      it "should call #publish_data" do
+        expect(subject).to receive(:publish_data)
+        subject.public_send(action)
+      end
+
+      it "should call the #refresh_queue" do
+        expect(subject).to receive(:refresh_queue)
+        subject.public_send(action)
+      end
+
+      context "when the classification has the already_seen metadata value" do
+        let!(:classification) { create(:anonymous_already_seen_classification) }
+
+        it 'should not count towards retirement' do
+          expect(subject.should_count_towards_retirement?).to be false
+          subject.public_send(action)
+        end
+      end
     end
 
-    it "should call transact! on the lifecycle" do
-      expect(subject).to receive(:transact!)
+    context "when the user has not already classified the subjects" do
+      before(:each) do
+        uss = instance_double("UserSeenSubject")
+        allow(uss).to receive(:subjects_seen?).and_return(false)
+        allow(UserSeenSubject).to receive(:find_by).and_return(uss)
+      end
+
+      it "should wrap the calls in transactions" do
+        expect(Classification).to receive(:transaction).twice.and_call_original
+        subject.public_send(action)
+      end
+
+      it "should call the #update_classification_data" do
+        expect(subject).to receive(:update_classification_data)
+        subject.public_send(action)
+      end
+
+      it "should call the #create_recent" do
+        aggregate_failures "recents" do
+          expect(subject).to receive(:create_recent).and_call_original
+          expect(Recent).to receive(:create_from_classification)
+        end
+        subject.public_send(action)
+      end
+
+      it "should call the #update_seen_subjects" do
+        expect(subject).to receive(:update_seen_subjects)
+        subject.public_send(action)
+      end
+
+      it "should call the #refresh_queue" do
+        expect(subject).to receive(:refresh_queue)
+        subject.public_send(action)
+      end
+
+      it "should call #publish_data" do
+        expect(subject).to receive(:publish_data)
+        subject.public_send(action)
+      end
+
+      it 'should count towards retirement' do
+        expect(subject.should_count_towards_retirement?).to be true
+        subject.public_send(action)
+      end
+    end
+
+    context "when the user has already classified the subjects" do
+      let!(:seen) do
+        create(:user_seen_subject,
+               user: classification.user,
+               workflow: classification.workflow,
+               subject_ids: classification.subject_ids)
+      end
+
+      it "should call the #create_recent" do
+        aggregate_failures "recents" do
+          expect(subject).to receive(:create_recent).and_call_original
+          expect(Recent).to_not receive(:create_from_classification)
+        end
+        subject.public_send(action)
+      end
+
+      it 'should not count towards retirement' do
+        expect(subject.should_count_towards_retirement?).to be_falsey
+        subject.public_send(action)
+      end
+
+      it 'should not queue the count worker' do
+        expect(ClassificationCountWorker).to_not receive(:perform_async)
+        subject.public_send(action)
+      end
+    end
+
+    context "when invalid classification updates are made" do
+      before(:each) do
+        allow_any_instance_of(Classification).to receive(:save!)
+          .and_raise(ActiveRecord::RecordInvalid.new(classification))
+      end
+
+      it 'should not call #create_recent' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:create_recent)
+          expect{ subject.public_send(action) }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
+      it 'should not call #update_seen_subjects' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:update_seen_subjects)
+          expect{ subject.public_send(action) }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
+      it 'should not call #refresh_queue' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:refresh_queue)
+          expect{ subject.public_send(action) }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
+      it 'should not call #publish_data' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:publish_data)
+          expect{ subject.public_send(action) }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
+      it 'should not call should_count_towards_retirement?' do
+        aggregate_failures "failure point" do
+          expect(subject).to_not receive(:should_count_towards_retirement?)
+          expect{ subject.public_send(action) }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+    end
+  end
+
+  context "#create" do
+    it_behaves_like "create and update" do
+      let(:action) { :create! }
     end
 
     it 'should call process_project_preferences' do
       expect(subject).to receive(:process_project_preference)
+      subject.create!
     end
 
     it 'should call classification count worker' do
       expect(ClassificationCountWorker).to receive(:perform_async).twice
+      subject.create!
     end
 
     context "when the lifecycled_at field is set" do
@@ -106,7 +274,8 @@ describe ClassificationLifecycle do
       end
 
       it "should abort the worker asap" do
-        expect(subject).not_to receive(:transact!)
+        expect(subject).not_to receive(:update_classification_data)
+        subject.create!
       end
     end
 
@@ -117,6 +286,7 @@ describe ClassificationLifecycle do
                workflow: classification.workflow,
                subject_ids: classification.subject_ids)
         expect(ClassificationCountWorker).to_not receive(:perform_async)
+        subject.create!
       end
     end
 
@@ -125,6 +295,7 @@ describe ClassificationLifecycle do
 
       it 'should call the classification count worker' do
         expect(ClassificationCountWorker).to receive(:perform_async).twice
+        subject.create!
       end
 
       context "when the classification has the already_seen metadata value" do
@@ -134,207 +305,15 @@ describe ClassificationLifecycle do
 
         it 'should not call the classification count worker' do
           expect(ClassificationCountWorker).to_not receive(:perform_async)
+          subject.create!
         end
       end
     end
   end
 
   context "#update" do
-    after(:each) do
-      subject.update!
-    end
-
-    it "should call transact! on the lifecycle" do
-      expect(subject).to receive(:transact!)
-    end
-
-    context "when the lifecycled_at field is set" do
-      let(:classification) do
-        create(:classification, lifecycled_at: Time.zone.now)
-      end
-
-      it "should not abort the worker" do
-        expect(subject).to receive(:transact!)
-      end
-    end
-  end
-
-  describe "#transact!" do
-    let!(:classification) { create(:classification) }
-
-    context "transact! after each spec" do
-      after(:each) do
-        subject.transact! { true }
-      end
-
-      context "when an anonymous user classification" do
-        let(:classification) { create(:classification, user: nil) }
-
-        it "should wrap the calls in transactions" do
-          expect(Classification).to receive(:transaction).twice
-            .and_call_original
-        end
-
-        it "should call the #update_classification_data" do
-          expect(subject).to receive(:update_classification_data)
-        end
-
-        it "should not attempt to update the seen subjects" do
-          expect_any_instance_of(UserSeenSubject).to_not receive(:subjects_seen?)
-        end
-
-        it "should evaluate the block" do
-          expect(subject).to receive(:instance_eval)
-        end
-
-        it "should call the #create_recent" do
-          aggregate_failures "recents" do
-            expect(subject).to receive(:create_recent).and_call_original
-            expect(Recent).to_not receive(:create_from_classification)
-          end
-        end
-
-        it "should call the #update_seen_subjects" do
-          expect(subject).to receive(:update_seen_subjects)
-        end
-
-        it "should call #publish_data" do
-          expect(subject).to receive(:publish_data)
-        end
-
-        it "should call the #refresh_queue" do
-          expect(subject).to receive(:refresh_queue)
-        end
-
-        context "when the classification has the already_seen metadata value" do
-          let!(:classification) { create(:anonymous_already_seen_classification) }
-
-          it 'should not count towards retirement' do
-            expect(subject.should_count_towards_retirement?).to be false
-          end
-        end
-      end
-
-      context "when the user has not already classified the subjects" do
-        before(:each) do
-          uss = instance_double("UserSeenSubject")
-          allow(uss).to receive(:subjects_seen?).and_return(false)
-          allow(UserSeenSubject).to receive(:find_by).and_return(uss)
-        end
-
-        it "should wrap the calls in transactions" do
-          expect(Classification).to receive(:transaction).twice
-            .and_call_original
-        end
-
-        it "should call the #update_classification_data" do
-          expect(subject).to receive(:update_classification_data)
-        end
-
-        it "should evaluate the block" do
-          expect(subject).to receive(:instance_eval)
-        end
-
-        it "should call the #create_recent" do
-          aggregate_failures "recents" do
-            expect(subject).to receive(:create_recent).and_call_original
-            expect(Recent).to receive(:create_from_classification)
-          end
-        end
-
-        it "should call the instance_eval on the passed block" do
-          expect(subject).to receive(:instance_eval)
-        end
-
-        it "should call the #update_seen_subjects" do
-          expect(subject).to receive(:update_seen_subjects)
-        end
-
-        it "should call the #refresh_queue" do
-          expect(subject).to receive(:refresh_queue)
-        end
-
-        it "should call #publish_data" do
-          expect(subject).to receive(:publish_data)
-        end
-
-        it 'should count towards retirement' do
-          expect(subject.should_count_towards_retirement?).to be true
-        end
-      end
-
-      context "when the user has already classified the subjects" do
-        let!(:seen) do
-          create(:user_seen_subject,
-                 user: classification.user,
-                 workflow: classification.workflow,
-                 subject_ids: classification.subject_ids)
-        end
-
-        it "should call the #create_recent" do
-          aggregate_failures "recents" do
-            expect(subject).to receive(:create_recent).and_call_original
-            expect(Recent).to_not receive(:create_from_classification)
-          end
-        end
-
-        it 'should not count towards retirement' do
-          expect(subject.should_count_towards_retirement?).to be_falsey
-        end
-
-        it 'should not queue the count worker' do
-          expect(ClassificationCountWorker).to_not receive(:perform_async)
-        end
-      end
-    end
-
-    context "when invalid classification updates are made" do
-      before(:each) do
-        allow_any_instance_of(Classification).to receive(:save!)
-          .and_raise(ActiveRecord::RecordInvalid.new(classification))
-      end
-
-      it "should not call the instance_eval on the passed block" do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:instance_eval)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call #create_recent' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:create_recent)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call #update_seen_subjects' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:update_seen_subjects)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call #refresh_queue' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:refresh_queue)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call #publish_data' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:publish_data)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call should_count_towards_retirement?' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:should_count_towards_retirement?)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
+    it_behaves_like "create and update" do
+      let(:action) { :update! }
     end
   end
 
