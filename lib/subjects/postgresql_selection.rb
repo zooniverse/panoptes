@@ -26,12 +26,11 @@ module Subjects
     end
 
     def available
-      return @available if @available
       query = SetMemberSubject.available(workflow, user)
       if workflow.grouped
         query = query.where(subject_set_id: opts[:subject_set_id])
       end
-      @available = query
+      query
     end
 
     def limit
