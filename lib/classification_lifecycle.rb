@@ -1,18 +1,18 @@
 class ClassificationLifecycle
   class ClassificationNotPersisted < StandardError; end
 
-  attr_reader :classification
-
-  def initialize(classification)
-    @classification = classification
-  end
-
-  def queue(action)
+  def self.queue(classification, action)
     unless classification.persisted?
       message = "Background process called before persisting the classification."
       raise ClassificationNotPersisted.new(message)
     end
     ClassificationWorker.perform_async(classification.id, action.to_s)
+  end
+
+  attr_reader :classification
+
+  def initialize(classification)
+    @classification = classification
   end
 
   def create!

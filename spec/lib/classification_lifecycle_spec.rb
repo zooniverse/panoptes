@@ -30,12 +30,12 @@ describe ClassificationLifecycle do
         allow(classification).to receive(:persisted?).and_return(true)
         expect(ClassificationWorker).to receive(:perform_async)
           .with(classification.id, "create")
-        subject.queue(test_method)
+        described_class.queue(classification, test_method)
       end
 
       it 'should raise an error if the classification is not persisted' do
         expect do
-          subject.queue(test_method)
+          described_class.queue(classification, test_method)
         end.to raise_error(ClassificationLifecycle::ClassificationNotPersisted)
       end
     end
@@ -47,12 +47,12 @@ describe ClassificationLifecycle do
         allow(classification).to receive(:persisted?).and_return(true)
         expect(ClassificationWorker).to receive(:perform_async)
           .with(classification.id, "update")
-        subject.queue(test_method)
+        described_class.queue(classification, test_method)
       end
 
       it 'should raise en error if the classification is not persisted' do
         expect do
-          subject.queue(test_method)
+          described_class.queue(classification, test_method)
         end.to raise_error(ClassificationLifecycle::ClassificationNotPersisted)
       end
     end

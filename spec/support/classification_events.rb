@@ -34,18 +34,8 @@ shared_context "a classification create" do
 end
 
 shared_context "a classification lifecycle event" do
-
-  let(:lifecycle ) { double(dequeue_subjects: nil) }
-
-  before(:each) do
-    [ :queue ].each do |stub|
-      allow(lifecycle).to receive(stub)
-    end
-    allow(ClassificationLifecycle).to receive(:new).and_return(lifecycle)
-  end
-
   it "should call the classification lifecycle queue method" do
-    expect(lifecycle).to receive(:queue).with(:create)
+    expect(ClassificationLifecycle).to receive(:queue).with(an_instance_of(Classification), :create)
     create_action
   end
 end
