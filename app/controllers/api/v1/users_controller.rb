@@ -53,6 +53,7 @@ class Api::V1::UsersController < Api::ApiController
           SubscribeWorker.perform_async(user.email)
           UnsubscribeWorker.perform_async(user.changes[:email].first)
         end
+        UserInfoChangedMailerWorker.perform_async(api_user.id, :email)
       end
     end
   end

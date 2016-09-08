@@ -71,6 +71,25 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     end
 
     it_behaves_like "is updatable"
+
+    context "mailers" do
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it "calls the mailer if user added to project" do
+        params = update_params.merge(id: resource.id)
+        expect(UserAddedToProjectMailerWorker).to receive(:perform_async)
+        put :update, params
+      end
+
+      it "does not call the mailer not appropriate" do
+        new_roles = { project_roles: { roles: ["tester"] } }
+        params = new_roles.merge(id: resource.id)
+        expect(UserAddedToProjectMailerWorker).to_not receive(:perform_async)
+        put :update, params
+      end
+    end
   end
 
   describe "#create" do
