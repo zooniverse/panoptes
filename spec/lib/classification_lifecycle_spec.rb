@@ -107,7 +107,7 @@ describe ClassificationLifecycle do
         let!(:classification) { create(:anonymous_already_seen_classification) }
 
         it 'should not count towards retirement' do
-          expect(subject.should_count_towards_retirement?).to be false
+          expect(subject.send(:should_count_towards_retirement?)).to be false
           subject.execute
         end
       end
@@ -154,7 +154,7 @@ describe ClassificationLifecycle do
       end
 
       it 'should count towards retirement' do
-        expect(subject.should_count_towards_retirement?).to be true
+        expect(subject.send(:should_count_towards_retirement?)).to be true
         subject.execute
       end
     end
@@ -176,7 +176,7 @@ describe ClassificationLifecycle do
       end
 
       it 'should not count towards retirement' do
-        expect(subject.should_count_towards_retirement?).to be_falsey
+        expect(subject.send(:should_count_towards_retirement?)).to be_falsey
         subject.execute
       end
 
