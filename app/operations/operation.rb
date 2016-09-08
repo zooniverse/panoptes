@@ -31,19 +31,4 @@ class Operation < ActiveInteraction::Base
   end
 
   object :api_user, class: :ApiUser
-
-  set_callback :execute, :after, :enqueue_jobs
-
-  def enqueue(worker_class, *args)
-    @jobs_to_enqueue ||= []
-    @jobs_to_enqueue << [worker_class, args]
-  end
-
-  def enqueue_jobs
-    return unless @jobs_to_enqueue
-
-    @jobs_to_enqueue.each do |worker_class, args|
-      worker_class.perform_async(*args)
-    end
-  end
 end

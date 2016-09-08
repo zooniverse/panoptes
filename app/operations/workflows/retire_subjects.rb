@@ -15,17 +15,17 @@ module Workflows
         subject_ids.each do |subject_id|
           workflow.retire_subject(subject_id, retirement_reason)
         end
-
-        enqueue WorkflowRetiredCountWorker, workflow.id
-        notify_cellect
       end
+
+      WorkflowRetiredCountWorker.perform_async(workflow.id)
+      notify_cellect
     end
 
     def notify_cellect
       return unless Panoptes.use_cellect?(workflow)
 
       subject_ids.each do |subject_id|
-        enqueue RetireCellectWorker, subject_id, workflow.id
+        RetireCellectWorker.perform_async(subject_id, workflow.id)
       end
     end
 

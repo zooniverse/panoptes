@@ -14,7 +14,6 @@ class RequeueClassificationsWorker
           ClassificationWorker.perform_async(classification.id, :create)
         end
       end
-
     end
   end
 
