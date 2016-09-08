@@ -17,30 +17,24 @@ class ClassificationLifecycle
 
   def create!
     return if classification.lifecycled_at.present?
-
-    Classification.transaction do
-      update_classification_data
-      update_counters(initial: true)
-      process_project_preference
-      create_recent
-      update_seen_subjects
-    end
-
-    publish_data
-    #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
-    refresh_queue
+    execute(initial: true)
   end
 
   def update!
+    execute(initial: false)
+  end
+
+  def execute(initial:)
     Classification.transaction do
       update_classification_data
-      update_counters(initial: false)
+      update_counters(initial: initial)
       process_project_preference
       create_recent
       update_seen_subjects
     end
 
     publish_data
+    notify_cellect
     #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
     refresh_queue
   end
@@ -61,11 +55,16 @@ class ClassificationLifecycle
   def update_seen_subjects
     if should_update_seen? && subjects_are_unseen_by_user?
       UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
-      if Panoptes.use_cellect?(workflow)
-        subject_ids.each do |subject_id|
-          SeenCellectWorker.perform_async(workflow.id, user.try(:id), subject_id)
-        end
-      end
+    end
+  end
+
+  def notify_cellect
+    return unless should_update_seen?
+    return unless subjects_are_unseen_by_user?
+    return unless Panoptes.use_cellect?(workflow)
+
+    subject_ids.each do |subject_id|
+      SeenCellectWorker.perform_async(workflow.id, user.try(:id), subject_id)
     end
   end
 

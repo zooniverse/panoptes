@@ -16,6 +16,7 @@ describe ClassificationLifecycle do
 
   let(:classification) { build(:classification) }
   let(:workflow) { classification.workflow }
+  let(:user) { classification.user }
 
   subject do
     ClassificationLifecycle.new(classification)
@@ -286,6 +287,32 @@ describe ClassificationLifecycle do
         end
       end
     end
+
+    context "notifying cellect" do
+      it "should not call the worker when cellect is disabled" do
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(false)
+        expect(SeenCellectWorker).not_to receive(:perform_async)
+        subject.public_send(action)
+      end
+
+      it "should not call the worker when cellect is enabled but not active for this workflow" do
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
+        allow(classification.workflow).to receive(:using_cellect?).and_return(false)
+        expect(SeenCellectWorker).not_to receive(:perform_async)
+        subject.public_send(action)
+      end
+
+      it "should call the worker when cellect is enabled for this workflow" do
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
+        allow(classification.workflow).to receive(:using_cellect?).and_return(true)
+
+        classification.subject_ids.each do |subject_id|
+          expect(SeenCellectWorker).to receive(:perform_async).with(workflow.id, user.id, subject_id)
+        end
+
+        subject.public_send(action)
+      end
+    end
   end
 
   context "#create" do
@@ -308,7 +335,6 @@ describe ClassificationLifecycle do
         subject.create!
       end
     end
-
   end
 
   context "#update" do
@@ -419,38 +445,6 @@ describe ClassificationLifecycle do
         expect(UserSeenSubject).to receive(:add_seen_subjects_for_user)
         .with(seen_params)
         subject.update_seen_subjects
-      end
-
-      it "should not call cellect seen worker" do
-        expect(SeenCellectWorker).not_to receive(:perform_async)
-        subject.update_seen_subjects
-      end
-
-      context "when cellect is on" do
-        before do
-          allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-        end
-
-        it "should not call the worker by default" do
-          expect(SeenCellectWorker).not_to receive(:perform_async)
-          subject.update_seen_subjects
-        end
-
-        context "when the workflow is using cellect" do
-          before do
-            allow(classification.workflow)
-            .to receive(:using_cellect?).and_return(true)
-          end
-
-          it "should call cellect seen worker for each subject id" do
-            classification.subject_ids.each do |subject_id|
-              expect(SeenCellectWorker)
-              .to receive(:perform_async)
-              .with(seen_params[:workflow].id, seen_params[:user].id, subject_id)
-            end
-            subject.update_seen_subjects
-          end
-        end
       end
     end
 
