@@ -17,12 +17,13 @@ describe ClassificationLifecycle do
   let(:classification) { build(:classification) }
   let(:workflow) { classification.workflow }
   let(:user) { classification.user }
+  let(:action) { "create" }
 
   subject do
-    ClassificationLifecycle.new(classification)
+    ClassificationLifecycle.new(classification, action)
   end
 
-  describe "#queue" do
+  describe ".queue" do
     context "with create action" do
       let(:test_method) { :create }
 
@@ -66,17 +67,17 @@ describe ClassificationLifecycle do
 
       it "should wrap the calls in transactions" do
         expect(Classification).to receive(:transaction).twice.and_call_original
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call the #update_classification_data" do
         expect(subject).to receive(:update_classification_data)
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should not attempt to update the seen subjects" do
         expect_any_instance_of(UserSeenSubject).to_not receive(:subjects_seen?)
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call the #create_recent" do
@@ -84,22 +85,22 @@ describe ClassificationLifecycle do
           expect(subject).to receive(:create_recent).and_call_original
           expect(Recent).to_not receive(:create_from_classification)
         end
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call the #update_seen_subjects" do
         expect(subject).to receive(:update_seen_subjects)
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call #publish_data" do
         expect(subject).to receive(:publish_data)
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call the #refresh_queue" do
         expect(subject).to receive(:refresh_queue)
-        subject.public_send(action)
+        subject.execute
       end
 
       context "when the classification has the already_seen metadata value" do
@@ -107,7 +108,7 @@ describe ClassificationLifecycle do
 
         it 'should not count towards retirement' do
           expect(subject.should_count_towards_retirement?).to be false
-          subject.public_send(action)
+          subject.execute
         end
       end
     end
@@ -121,12 +122,12 @@ describe ClassificationLifecycle do
 
       it "should wrap the calls in transactions" do
         expect(Classification).to receive(:transaction).twice.and_call_original
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call the #update_classification_data" do
         expect(subject).to receive(:update_classification_data)
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call the #create_recent" do
@@ -134,27 +135,27 @@ describe ClassificationLifecycle do
           expect(subject).to receive(:create_recent).and_call_original
           expect(Recent).to receive(:create_from_classification)
         end
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call the #update_seen_subjects" do
         expect(subject).to receive(:update_seen_subjects)
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call the #refresh_queue" do
         expect(subject).to receive(:refresh_queue)
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call #publish_data" do
         expect(subject).to receive(:publish_data)
-        subject.public_send(action)
+        subject.execute
       end
 
       it 'should count towards retirement' do
         expect(subject.should_count_towards_retirement?).to be true
-        subject.public_send(action)
+        subject.execute
       end
     end
 
@@ -171,17 +172,17 @@ describe ClassificationLifecycle do
           expect(subject).to receive(:create_recent).and_call_original
           expect(Recent).to_not receive(:create_from_classification)
         end
-        subject.public_send(action)
+        subject.execute
       end
 
       it 'should not count towards retirement' do
         expect(subject.should_count_towards_retirement?).to be_falsey
-        subject.public_send(action)
+        subject.execute
       end
 
       it 'should not queue the count worker' do
         expect(ClassificationCountWorker).to_not receive(:perform_async)
-        subject.public_send(action)
+        subject.execute
       end
     end
 
@@ -194,35 +195,35 @@ describe ClassificationLifecycle do
       it 'should not call #create_recent' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:create_recent)
-          expect{ subject.public_send(action) }.to raise_error(ActiveRecord::RecordInvalid)
+          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
 
       it 'should not call #update_seen_subjects' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:update_seen_subjects)
-          expect{ subject.public_send(action) }.to raise_error(ActiveRecord::RecordInvalid)
+          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
 
       it 'should not call #refresh_queue' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:refresh_queue)
-          expect{ subject.public_send(action) }.to raise_error(ActiveRecord::RecordInvalid)
+          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
 
       it 'should not call #publish_data' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:publish_data)
-          expect{ subject.public_send(action) }.to raise_error(ActiveRecord::RecordInvalid)
+          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
 
       it 'should not call should_count_towards_retirement?' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:should_count_towards_retirement?)
-          expect{ subject.public_send(action) }.to raise_error(ActiveRecord::RecordInvalid)
+          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
     end
@@ -231,9 +232,9 @@ describe ClassificationLifecycle do
       let(:subject_ids) { classification.subject_ids }
 
       it 'should call classification count worker' do
-        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == :update!)
-        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == :update!)
-        subject.public_send(action)
+        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == "update")
+        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == "update")
+        subject.execute
       end
 
       context "when a user has seen the subjects before" do
@@ -243,7 +244,7 @@ describe ClassificationLifecycle do
                  workflow: classification.workflow,
                  subject_ids: classification.subject_ids)
           expect(ClassificationCountWorker).to_not receive(:perform_async)
-          subject.public_send(action)
+          subject.execute
         end
       end
 
@@ -251,9 +252,9 @@ describe ClassificationLifecycle do
         let(:classification) { create(:classification, user: nil) }
 
         it 'should call the classification count worker' do
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == :update!)
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == :update!)
-          subject.public_send(action)
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == "update")
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == "update")
+          subject.execute
         end
 
         context "when the classification has the already_seen metadata value" do
@@ -263,7 +264,7 @@ describe ClassificationLifecycle do
 
           it 'should not call the classification count worker' do
             expect(ClassificationCountWorker).to_not receive(:perform_async)
-            subject.public_send(action)
+            subject.execute
           end
         end
       end
@@ -275,15 +276,15 @@ describe ClassificationLifecycle do
 
         it 'should not queue the count worker' do
           expect(ClassificationCountWorker).to_not receive(:perform_async)
-          subject.public_send(action)
+          subject.execute
         end
       end
 
       context 'when classification is complete' do
         it 'should queue the count worker' do
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == :update!)
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == :update!)
-          subject.public_send(action)
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == "update")
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == "update")
+          subject.execute
         end
       end
     end
@@ -292,14 +293,14 @@ describe ClassificationLifecycle do
       it "should not call the worker when cellect is disabled" do
         allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(false)
         expect(SeenCellectWorker).not_to receive(:perform_async)
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should not call the worker when cellect is enabled but not active for this workflow" do
         allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
         allow(classification.workflow).to receive(:using_cellect?).and_return(false)
         expect(SeenCellectWorker).not_to receive(:perform_async)
-        subject.public_send(action)
+        subject.execute
       end
 
       it "should call the worker when cellect is enabled for this workflow" do
@@ -310,19 +311,19 @@ describe ClassificationLifecycle do
           expect(SeenCellectWorker).to receive(:perform_async).with(workflow.id, user.id, subject_id)
         end
 
-        subject.public_send(action)
+        subject.execute
       end
     end
   end
 
-  context "#create" do
-    it_behaves_like "create and update" do
-      let(:action) { :create! }
-    end
+  context "for the create action" do
+    let(:action) { "create" }
+
+    it_behaves_like "create and update"
 
     it 'should call process_project_preferences' do
       expect(subject).to receive(:process_project_preference)
-      subject.create!
+      subject.execute
     end
 
     context "when the lifecycled_at field is set" do
@@ -332,15 +333,15 @@ describe ClassificationLifecycle do
 
       it "should abort the worker asap" do
         expect(subject).not_to receive(:update_classification_data)
-        subject.create!
+        subject.execute
       end
     end
   end
 
-  context "#update" do
-    it_behaves_like "create and update" do
-      let(:action) { :update! }
-    end
+  context "for the update action" do
+    let(:action) { "update" }
+
+    it_behaves_like "create and update"
   end
 
   describe "#publish_data" do

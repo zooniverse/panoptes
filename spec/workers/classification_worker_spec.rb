@@ -6,27 +6,21 @@ RSpec.describe ClassificationWorker do
   describe "perform" do
     let(:classification) { create(:classification) }
 
-    context ":update" do
-      after(:each) do
-        classification_worker.perform(classification.id, "update")
-      end
-
-      it "should call transact! on the lifecycle" do
-        expect_any_instance_of(ClassificationLifecycle).to receive(:update!)
-      end
-    end
-
-    context ":create" do
-      after(:each) do
+    context "create action" do
+      it "should call lifecycle" do
+        expect(ClassificationLifecycle).to receive(:perform).with(classification, "create")
         classification_worker.perform(classification.id, "create")
       end
+    end
 
-      it "should call transact! on the lifecycle" do
-        expect_any_instance_of(ClassificationLifecycle).to receive(:create!)
+    context "update action" do
+      it "should call lifecycle" do
+        expect(ClassificationLifecycle).to receive(:perform).with(classification, "update")
+        classification_worker.perform(classification.id, "update")
       end
     end
 
-    context "anything else" do
+    context "other action" do
       it 'should raise an error' do
        expect do
          classification_worker.perform(classification.id, nil)

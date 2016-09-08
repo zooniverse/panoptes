@@ -9,22 +9,25 @@ class ClassificationLifecycle
     ClassificationWorker.perform_async(classification.id, action.to_s)
   end
 
+  def self.perform(classification, action)
+    raise "Invalid Post-Classification Action" unless %w(create update).include?(action)
+    ClassificationLifecycle.new(classification, action).execute
+  end
+
   attr_reader :classification
 
-  def initialize(classification)
+  def initialize(classification, action)
     @classification = classification
+    @action = action
   end
 
-  def create!
-    return if classification.lifecycled_at.present?
-    execute(initial: true)
+  def initial
+    @action == "create"
   end
 
-  def update!
-    execute(initial: false)
-  end
+  def execute
+    return if initial && classification.lifecycled_at.present?
 
-  def execute(initial:)
     Classification.transaction do
       update_classification_data
       update_counters(initial: initial)
