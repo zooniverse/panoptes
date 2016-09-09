@@ -13,19 +13,24 @@ RSpec.describe Subjects::PostgresqlSelection do
     let(:workflow) { Workflow.first }
     let(:sms) { SetMemberSubject.all }
     let(:opts) { {} }
+    let(:sms_count) { 25 }
     subject { Subjects::PostgresqlSelection.new(workflow, user, opts) }
 
     before do
       uploader = create(:user)
       created_workflow = create(:workflow_with_subject_sets)
-      create_list(:subject, 25, project: created_workflow.project, uploader: uploader).each do |subject|
+      create_list(:subject, sms_count, project: created_workflow.project, uploader: uploader).each do |subject|
         create(:set_member_subject, subject: subject, subject_set: created_workflow.subject_sets.first)
       end
     end
 
     describe "#select" do
       describe "random selection" do
-        it_behaves_like "select for incomplete_project"
+        it_behaves_like "select for incomplete_project" do
+          let(:sms_scope) do
+            SetMemberSubject.all
+          end
+        end
       end
 
       context "grouped selection" do
@@ -35,7 +40,11 @@ RSpec.describe Subjects::PostgresqlSelection do
           allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
         end
 
-        it_behaves_like "select for incomplete_project"
+        it_behaves_like "select for incomplete_project" do
+          let(:sms_scope) do
+            SetMemberSubject.where(subject_set_id: subject_set_id)
+          end
+        end
 
         it 'should only select subjects in the specified group' do
           subject_ids = sms.sample(5).map(&:subject_id)
@@ -60,21 +69,23 @@ RSpec.describe Subjects::PostgresqlSelection do
           allow_any_instance_of(Workflow).to receive(:prioritized).and_return(true)
         end
 
-        it_behaves_like "select for incomplete_project"
+        it_behaves_like "select for incomplete_project" do
+          let(:sms_scope) do
+            SetMemberSubject.all
+          end
+        end
       end
 
       describe "priority and grouped selection" do
         let(:opts) { { subject_set_id: subject_set_id } }
         let(:subject_set_id) { SubjectSet.first.id }
         let(:sms) { SetMemberSubject.where(subject_set_id: subject_set_id) }
+        let(:sms_count) { 37 }
 
         before do
           %i( prioritized grouped ).each do |method|
             allow_any_instance_of(Workflow).to receive(method).and_return(true)
           end
-        end
-
-        before do
           update_sms_priorities
           created_workflow = Workflow.first
           subject_set = created_workflow.subject_sets.last
@@ -84,7 +95,11 @@ RSpec.describe Subjects::PostgresqlSelection do
           end
         end
 
-        it_behaves_like "select for incomplete_project"
+        it_behaves_like "select for incomplete_project" do
+          let(:sms_scope) do
+            SetMemberSubject.where(subject_set_id: subject_set_id)
+          end
+        end
 
         it 'should only select subjects in the specified group' do
           result = subject.select
