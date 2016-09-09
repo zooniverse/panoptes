@@ -4,6 +4,7 @@ class ClassificationDumpCache
     @workflow_contents = {}
     @subjects = {}
     @subject_workflow_statuses = {}
+    @classification_to_subjects = {}
     @secure_ip_lookup = {}
   end
 
@@ -15,8 +16,18 @@ class ClassificationDumpCache
     @subject_workflow_statuses = subject_workflow_statuses.group_by(&:subject_id)
   end
 
+  def reset_classification_subjects(classification_subjects)
+    @classification_to_subjects = classification_subjects.map do |cs|
+      [ cs.first.to_i, [cs.last.to_i] ]
+    end.to_h
+  end
+
   def subject(subject_id)
     @subjects[subject_id]
+  end
+
+  def subject_ids_from_classification(classification_id)
+    @classification_to_subjects[classification_id]
   end
 
   def retired?(subject_id, workflow_id)
