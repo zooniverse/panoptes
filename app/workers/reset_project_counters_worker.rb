@@ -15,6 +15,7 @@ class ResetProjectCountersWorker
       reset_subject_workflow_classification_counters!(workflow)
       counter = WorkflowCounter.new(workflow)
       workflow.update_columns classifications_count: counter.classifications
+      workflow.update_columns retired_set_member_subjects_count: counter.retired_subjects
     end
 
     counter = ProjectCounter.new(project)
