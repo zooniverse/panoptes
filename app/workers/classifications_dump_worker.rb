@@ -8,33 +8,49 @@ class ClassificationsDumpWorker
 
   sidekiq_options queue: :data_high
 
+  attr_accessor :cache
+
   def perform_dump
     CSV.open(csv_file_path, 'wb') do |csv|
-      cache = ClassificationDumpCache.new
+      @cache = ClassificationDumpCache.new
       formatter = Formatter::Csv::Classification.new(project, cache)
-
-      csv <<  formatter.class.headers
-
-      completed_project_classifications.find_in_batches do |group|
-        subject_ids = group.flat_map(&:subject_ids).uniq
-        workflow_ids = group.map(&:workflow_id).uniq
-
-        cache.reset_subjects(Subject.where(id: subject_ids).load)
-        retired_counts = SubjectWorkflowStatus.retired.where(
-          subject_id: subject_ids,
-          workflow_id: workflow_ids
-        ).load
-        cache.reset_subject_workflow_statuses(retired_counts)
-
-        group.each { |classification| csv << formatter.to_array(classification) }
+      csv << formatter.class.headers
+      completed_project_classifications.find_in_batches do |batch|
+        subject_ids = setup_subjects_cache(batch)
+        setup_retirement_cache(batch, subject_ids)
+        batch.each do |classification|
+          csv << formatter.to_array(classification)
+        end
       end
     end
   end
 
   def completed_project_classifications
-    project.classifications
-    .complete
-    .joins(:workflow)
-    .includes(:user, workflow: [:workflow_contents])
+    project
+      .classifications
+      .complete
+      .joins(:workflow)
+      .includes(:user, workflow: [:workflow_contents])
+  end
+
+  private
+
+  def setup_subjects_cache(classifications)
+    classification_ids = classifications.map(&:id).join(",")
+    sql = "SELECT classification_id, subject_id FROM classification_subjects where classification_id IN (#{classification_ids})"
+    c_s_ids = ActiveRecord::Base.connection.select_rows(sql)
+    cache.reset_classification_subjects(c_s_ids)
+    subject_ids = c_s_ids.map { |cs| cs.last }
+    cache.reset_subjects(Subject.unscoped.where(id: subject_ids).load)
+    subject_ids
+  end
+
+  def setup_retirement_cache(classifications, subject_ids)
+    workflow_ids = classifications.map(&:workflow_id).uniq
+    retired_counts = SubjectWorkflowStatus.retired.where(
+      subject_id: subject_ids,
+      workflow_id: workflow_ids
+    ).load
+    cache.reset_subject_workflow_statuses(retired_counts)
   end
 end
