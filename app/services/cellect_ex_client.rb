@@ -1,6 +1,11 @@
 class CellectExClient
   include Configurable
 
+  class GenericError < StandardError; end
+  class ConnectionFailed < GenericError; end
+  class ResourceNotFound < GenericError; end
+  class ServerError < GenericError; end
+
   self.config_file = "cellect_ex_api"
   self.api_prefix = "cellect_ex_api"
 
@@ -30,23 +35,42 @@ class CellectExClient
   end
 
   def reload_workflow(workflow_id)
-    connection.post("/api/workflows/#{workflow_id}/reload") do |req|
+    response = connection.post("/api/workflows/#{workflow_id}/reload") do |req|
       req.headers["Accept"] = "application/json"
       req.headers["Content-Type"] = "application/json"
-    end.body
+    end
+
+    handle_response(response)
   end
 
   def remove_subject(subject_id, workflow_id, group_id)
-    connection.post("/api/workflows/#{workflow_id}/remove") do |req|
+    response = connection.post("/api/workflows/#{workflow_id}/remove") do |req|
       req.headers["Accept"] = "application/json"
       req.headers["Content-Type"] = "application/json"
       req.body = {subject_id: subject_id}.to_json
-    end.body
+    end
+
+    handle_response(response)
   end
 
   def get_subjects(workflow_id, user_id, _group_id, limit)
-    connection.get("/api/workflows/#{workflow_id}", strategy: :weighted, user_id: user_id, limit: limit) do |req|
+    response = connection.get("/api/workflows/#{workflow_id}", strategy: :weighted, user_id: user_id, limit: limit) do |req|
       req.headers["Accept"] = "application/json"
-    end.body
+    end
+
+    handle_response(response)
+  end
+
+  private
+
+  def handle_response(response)
+    case response.status
+    when 404
+      raise ResourceNotFound, status: response.status, body: response.body
+    when 400..600
+      raise ServerError.new(response.body)
+    else
+      response.body
+    end
   end
 end
