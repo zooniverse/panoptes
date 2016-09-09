@@ -19,9 +19,20 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
                   {"x"=>5, "y"=>6, "tool"=>1}]
     }
   end
+  let(:weird_annotation) do
+    {
+      "task" => "interest",
+      "value" => [{"x"=>1, "y"=>2}]
+    }
+  end
 
   it 'adds the task label' do
     formatted = described_class.new(classification, annotation, cache).to_h
+    expect(formatted["task_label"]).to eq("Draw a circle")
+  end
+
+  it 'adds the first task label if the tool index is missing' do
+    formatted = described_class.new(classification, weird_annotation, cache).to_h
     expect(formatted["task_label"]).to eq("Draw a circle")
   end
 

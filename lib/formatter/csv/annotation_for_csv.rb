@@ -34,7 +34,7 @@ module Formatter
           new_anno['task'] = @current['task']
           new_anno['task_label'] = task_label(task_info)
           value_with_tool = (@current["value"] || []).map do |drawn_item|
-           drawn_item.merge "tool_label" => tool_label(task_info, drawn_item)
+            drawn_item.merge "tool_label" => tool_label(task_info, drawn_item)
           end
           new_anno["value"] = value_with_tool
         end
@@ -125,7 +125,7 @@ module Formatter
       end
 
       def tool_label(task_info, drawn_item)
-        tool = task_info["tools"] && task_info["tools"][drawn_item["tool"]]
+        tool = task_info["tools"] && task_info["tools"][drawn_item.fetch("tool", 0)]
         translate(tool["label"]) if tool
       end
 
@@ -145,8 +145,8 @@ module Formatter
               error_class:   "Task export error",
               error_message: "The task cannot be exported",
               context: {
-                classification: @classification,
-                annotation: @annotation,
+                classification: @classification.inspect,
+                annotation: @annotation.inspect,
                 workflow_at_version: workflow_at_version,
                 workflow_version: workflow_version,
                 content_version: content_version,
