@@ -21,7 +21,7 @@ module Subjects
       else
         strip_seen_ids(sms_ids)
       end
-    rescue Subjects::CellectClient::ConnectionError
+    rescue Subjects::CellectClient::ConnectionError, CellectExClient::GenericError
       default_strategy_sms_ids
     end
 
