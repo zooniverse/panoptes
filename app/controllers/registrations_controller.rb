@@ -33,7 +33,7 @@ class RegistrationsController < Devise::RegistrationsController
   def update_from_json
     self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
     if resource.update_with_password(account_update_params)
-      UserInfoChangedMailerWorker.perform_async(resource.id, :password)
+      UserInfoChangedMailerWorker.perform_async(resource.id, "password")
       render json: {}, status: :no_content
     else
       render json: {errors: [{message: "Current password was incorrect, or new passwords did not match"}]}, status: :unprocessable_entity
