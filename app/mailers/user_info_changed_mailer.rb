@@ -6,10 +6,10 @@ class UserInfoChangedMailer < ApplicationMailer
     @email_to = user.email
 
     case info
-    when :email
+    when "email"
       subject = "Your Zooniverse email address has been changed"
       template = "email_changed"
-    when :password
+    when "password"
       subject = "Your Zooniverse password has been changed"
       template = "password_changed"
     end

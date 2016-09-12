@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe UserInfoChangedMailer, :type => :mailer do
   let(:user) { create(:user) }
-  let(:mail) { UserInfoChangedMailer.user_info_changed(user, :password)}
+  let(:mail) { UserInfoChangedMailer.user_info_changed(user, "password")}
 
   describe "#user_info_changed" do
 
@@ -21,7 +21,7 @@ RSpec.describe UserInfoChangedMailer, :type => :mailer do
     end
 
     context "email address was changed" do
-      let(:mail) { UserInfoChangedMailer.user_info_changed(user, :email)}
+      let(:mail) { UserInfoChangedMailer.user_info_changed(user, "email")}
       it 'should have the correct subject' do
         expect(mail.subject).to eq("Your Zooniverse email address has been changed")
       end

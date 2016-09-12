@@ -53,7 +53,7 @@ describe RegistrationsController, type: :controller do
         end
 
         it "should queue a mailer worker" do
-          expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, :password)
+          expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, "password")
           post_update
         end
       end
