@@ -121,4 +121,5 @@ class Workflow < ActiveRecord::Base
         retired_subjects_count >= subjects_count
       end
   end
+
 end
