@@ -8,7 +8,7 @@ class UnfinishWorkflowWorker
     max_in_interval: 1,
     min_delay: 0,
     reject_with: :cancel,
-    key: ->(project_id) {
+    key: ->(workflow_id) {
       "unfinish_workflow_#{workflow_id}_worker"
     }
   }
