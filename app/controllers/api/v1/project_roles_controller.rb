@@ -11,8 +11,7 @@ class Api::V1::ProjectRolesController < Api::ApiController
 
   def update
     super do
-      logger.info "Role Mailer Debug: new_roles_present(#{roles.inspect})? == #{new_roles_present?(roles)}"
-      UserAddedToProjectMailerWorker.perform_async(api_user.id, params[:id], roles) if new_roles_present?(roles)
+      UserAddedToProjectMailerWorker.perform_async(api_user.id, controlled_resource.resource.id, roles) if new_roles_present?(roles)
     end
   end
 
