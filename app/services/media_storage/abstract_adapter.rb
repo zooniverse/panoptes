@@ -1,8 +1,8 @@
 module MediaStorage
+  class EmptyPathError < StandardError; end
+  class UnknownContentType < StandardError; end
+
   class AbstractAdapter
-
-    class EmptyPathError < StandardError; end
-
     def initialize(opts={})
       @opts = opts
     end
@@ -37,6 +37,21 @@ module MediaStorage
       if path.blank?
         raise EmptyPathError.new("A storage path must be specified.")
       end
+    end
+
+    def get_extension(content_type)
+      case content_type
+      when "application/x-gzip"
+        "tar.gz"
+      else
+        get_mime_type(content_type).extensions.first
+      end
+    end
+
+    def get_mime_type(content_type)
+      known_types = MIME::Types[content_type]
+      raise UnknownContentType if known_types.blank?
+      known_types.first
     end
   end
 end

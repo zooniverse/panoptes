@@ -20,6 +20,11 @@ RSpec.describe Medium, :type => :model do
       expect(m).to_not be_valid
     end
 
+    it 'should not be valid with an empty content_type' do
+      m = build(:medium, content_type: "", src: nil)
+      expect(m).to_not be_valid
+    end
+
     it 'should be valid with a valid content_type' do
       m = build(:medium, content_type: "image/png")
       expect(m).to be_valid

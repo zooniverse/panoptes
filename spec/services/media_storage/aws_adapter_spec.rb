@@ -143,7 +143,7 @@ RSpec.describe MediaStorage::AwsAdapter do
       error_message = "A storage path must be specified."
       expect do
         adapter.send(:object, nil)
-      end.to raise_error(MediaStorage::AbstractAdapter::EmptyPathError, error_message)
+      end.to raise_error(MediaStorage::EmptyPathError, error_message)
     end
   end
 end

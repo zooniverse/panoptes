@@ -29,7 +29,10 @@ class Medium < ActiveRecord::Base
   end
 
   def create_path
+    return unless errors.empty?
     self.src ||= MediaStorage.stored_path(content_type, type, *path_opts)
+  rescue MediaStorage::UnknownContentType
+    self.src ||= nil
   end
 
   def linked_resource_details

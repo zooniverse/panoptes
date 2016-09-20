@@ -1,6 +1,5 @@
 module MediaStorage
   class AwsAdapter < AbstractAdapter
-
     attr_accessor :prefix, :bucket
 
     def initialize(opts={})
@@ -22,12 +21,7 @@ module MediaStorage
     end
 
     def stored_path(content_type, medium_type, *path_prefix)
-      extension = case content_type
-                  when "application/x-gzip"
-                    "tar.gz"
-                  else
-                    MIME::Types[content_type].first.extensions.first
-                  end
+      extension = get_extension(content_type)
       path = "#{prefix}"
       path += "/" unless path[-1] == '/'
       path += "#{medium_type}/"
