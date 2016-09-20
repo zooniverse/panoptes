@@ -151,8 +151,8 @@ module Formatter
               error_class:   "Task export error",
               error_message: "The task cannot be exported",
               context: {
-                classification: @classification.inspect,
-                annotation: @annotation.inspect,
+                classification: @classification.id,
+                annotation: @annotation.id,
                 workflow_at_version: workflow_at_version,
                 workflow_version: workflow_version,
                 content_version: content_version,
