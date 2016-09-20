@@ -26,7 +26,7 @@ module Subjects
     end
 
     def available
-      query = SetMemberSubject.available(workflow, user)
+      query =  Subjects::SetMemberSubjectSelector.new(workflow, user).set_member_subjects
       if workflow.grouped
         query = query.where(subject_set_id: opts[:subject_set_id])
       end
