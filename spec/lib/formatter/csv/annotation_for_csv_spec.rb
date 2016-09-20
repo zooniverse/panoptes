@@ -26,14 +26,14 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     }
   end
 
-  it 'adds the task label' do
+  it 'adds the task label', :focus do
     formatted = described_class.new(classification, annotation, cache).to_h
     expect(formatted["task_label"]).to eq("Draw a circle")
   end
 
-  it 'adds the first task label if the tool index is missing' do
+  it 'adds an unknown tool label if the tool index is missing' do
     formatted = described_class.new(classification, weird_annotation, cache).to_h
-    expect(formatted["task_label"]).to eq("Draw a circle")
+    expect(formatted["value"][0]["tool_label"]).to eq("unknown tool")
   end
 
   it 'adds the tool labels for drawing tasks', :aggregate_failures do

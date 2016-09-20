@@ -34,7 +34,8 @@ module Formatter
           new_anno['task'] = @current['task']
           new_anno['task_label'] = task_label(task_info)
           value_with_tool = (@current["value"] || []).map do |drawn_item|
-            drawn_item.merge "tool_label" => tool_label(task_info, drawn_item)
+            tool_label = tool_label(task_info, drawn_item["tool"])
+            drawn_item.merge("tool_label" => tool_label)
           end
           new_anno["value"] = value_with_tool
         end
@@ -124,9 +125,14 @@ module Formatter
         translate(task_info["question"] || task_info["instruction"])
       end
 
-      def tool_label(task_info, drawn_item)
-        tool = task_info["tools"] && task_info["tools"][drawn_item.fetch("tool", 0)]
-        translate(tool["label"]) if tool
+      def tool_label(task_info, tool_index)
+        have_tool_lookup_info = !!(task_info["tools"] && tool_index)
+        known_tool = have_tool_lookup_info && task_info["tools"][tool_index]
+        if known_tool
+          translate(known_tool["label"])
+        else
+          "unknown tool"
+        end
       end
 
       def answer_label
