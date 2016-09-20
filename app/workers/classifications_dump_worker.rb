@@ -8,11 +8,8 @@ class ClassificationsDumpWorker
 
   sidekiq_options queue: :data_high
 
-  attr_accessor :cache
-
   def perform_dump
     CSV.open(csv_file_path, 'wb') do |csv|
-      @cache = ClassificationDumpCache.new
       formatter = Formatter::Csv::Classification.new(project, cache)
       csv << formatter.class.headers
       completed_project_classifications.find_in_batches do |batch|
@@ -34,6 +31,10 @@ class ClassificationsDumpWorker
   end
 
   private
+
+  def cache
+    @cache ||= ClassificationDumpCache.new
+  end
 
   def setup_subjects_cache(classifications)
     classification_ids = classifications.map(&:id).join(",")
