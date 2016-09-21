@@ -17,8 +17,9 @@ class ClassificationDumpCache
   end
 
   def reset_classification_subjects(classification_subjects)
-    @classification_to_subjects = classification_subjects.map do |cs|
-      [ cs.first.to_i, [cs.last.to_i] ]
+    classification_groups = classification_subjects.group_by(&:first)
+    @classification_to_subjects = classification_groups.map do |classification_id, groups|
+      [ classification_id.to_i, groups.map { |ids| ids.last.to_i } ]
     end.to_h
   end
 
