@@ -128,11 +128,7 @@ module Formatter
       def tool_label(task_info, tool_index)
         have_tool_lookup_info = !!(task_info["tools"] && tool_index)
         known_tool = have_tool_lookup_info && task_info["tools"][tool_index]
-        if known_tool
-          translate(known_tool["label"])
-        else
-          "unknown tool"
-        end
+        translate(known_tool["label"]) if known_tool
       end
 
       def answer_label
