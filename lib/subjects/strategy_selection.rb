@@ -15,14 +15,7 @@ module Subjects
     end
 
     def select
-      sms_ids = strategy_sms_ids.compact
-      if sms_ids.empty?
-        []
-      else
-        strip_seen_ids(sms_ids)
-      end
-    rescue Subjects::CellectClient::ConnectionError, CellectExClient::GenericError
-      default_strategy_sms_ids
+      strip_seen_ids(select_sms_ids.compact)
     end
 
     def strategy
@@ -37,6 +30,12 @@ module Subjects
     end
 
     private
+
+    def select_sms_ids
+      strategy_sms_ids
+    rescue Subjects::CellectClient::ConnectionError, CellectExClient::GenericError
+      default_strategy_sms_ids
+    end
 
     def cellect_strategy?
       return nil unless Panoptes.flipper.enabled?("cellect")
@@ -71,7 +70,7 @@ module Subjects
     end
 
     def strip_seen_ids(sms_ids)
-      if user
+      if !sms_ids.empty? && user
         uss = UserSeenSubject.find_by(user: user, workflow: workflow)
         Subjects::SeenRemover.new(uss, sms_ids).unseen_ids
       else

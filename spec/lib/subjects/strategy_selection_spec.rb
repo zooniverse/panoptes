@@ -80,6 +80,7 @@ RSpec.describe Subjects::StrategySelection do
               .and_raise(Subjects::CellectClient::ConnectionError)
             expect_any_instance_of(Subjects::PostgresqlSelection)
               .to receive(:select)
+              .and_call_original
             run_selection
           end
         end
