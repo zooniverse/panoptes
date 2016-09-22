@@ -37,7 +37,7 @@ class ClassificationLifecycle
       if first_classifcation = upp.email_communication.nil?
         ProjectClassificationsCountWorker.perform_async(project.id)
         upp.email_communication = user.project_email_communication
-        upp.user.update( {project_id: project.id} )
+        upp.user.update_column(:project_id, project.id)
       end
       upp.changed? ? upp.save! : upp.touch
     end

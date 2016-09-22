@@ -42,7 +42,7 @@ module Api
         if upp.save
           if was_new
             ProjectClassifiersCountWorker.perform_async(upp.project_id)
-            upp.user.update( {project_id: upp.project.id} )
+            upp.user.update_column(:project_id, upp.project.id)
           end
           :ok
         else
