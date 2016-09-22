@@ -3,8 +3,9 @@ require 'subjects/cellect_session'
 
 RSpec.describe Subjects::StrategySelection do
   let(:strategy) { nil }
-  let(:workflow) { create(:workflow_with_subject_set) }
+  let(:workflow) { create(:workflow_with_subjects, num_sets: 1) }
   let(:subject_set) { workflow.subject_sets.first }
+  let(:smses) { subject_set.set_member_subjects }
   let(:user) { workflow.project.owner }
   let(:limit) { SubjectQueue::DEFAULT_LENGTH }
   subject do
@@ -12,6 +13,36 @@ RSpec.describe Subjects::StrategySelection do
   end
 
   describe "#select" do
+
+    describe "remove retired after selection" do
+      let(:sms) { smses[0] }
+      let!(:swc) do
+        create(:subject_workflow_status,
+          subject: sms.subject,
+          workflow: workflow,
+          retired_at: Time.zone.now
+        )
+      end
+      let(:result) { subject.select }
+
+      before do
+        allow(subject).to receive(:select).and_return(smses.map(&:id))
+      end
+
+      it 'should not return retired subjects', :focus do
+        expect(result).not_to include(sms)
+      end
+
+      context "when the sms is retired for a different workflow" do
+        let(:workflow) { create(:workflow, project: workflow.project) }
+
+        it 'should return all the subjects' do
+          expected = subject_queue.set_member_subject_ids
+          expect(result).to match_array(expected)
+        end
+      end
+    end
+
     describe "remove seens after selection" do
       let(:seen_remover) { instance_double("Subjects::SeenRemover") }
       let(:uss) { instance_double("UserSeenSubject") }
