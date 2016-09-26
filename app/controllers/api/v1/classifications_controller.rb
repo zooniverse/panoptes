@@ -73,7 +73,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def lifecycle(action, classification)
-    ClassificationLifecycle.new(classification).queue(action)
+    ClassificationLifecycle.queue(classification, action)
   rescue Redis::CannotConnectError => e
     Honeybadger.notify(e)
   end

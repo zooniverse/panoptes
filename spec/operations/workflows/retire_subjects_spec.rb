@@ -55,10 +55,12 @@ describe Workflows::RetireSubjects do
     it 'does not queue workers if something went wrong' do
       allow(Panoptes).to receive(:use_cellect?).and_return(true)
       allow(workflow).to receive(:retire_subject).with(subject1.id, nil).and_return(true)
-      allow(workflow).to receive(:retire_subject).with(subject2.id, nil) { raise ActiveRecord::Rollback, "some error" }
+      allow(workflow).to receive(:retire_subject).with(subject2.id, nil) { raise "some error" }
       expect(WorkflowRetiredCountWorker).to receive(:perform_async).with(workflow.id).never
       expect(RetireCellectWorker).to receive(:perform_async).with(subject1.id, workflow.id).never
-      operation.run! workflow: workflow, subject_ids: [subject1.id, subject2.id]
+      expect do
+        operation.run! workflow: workflow, subject_ids: [subject1.id, subject2.id]
+      end.to raise_error(RuntimeError, 'some error')
     end
   end
 end

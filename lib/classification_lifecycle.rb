@@ -1,13 +1,8 @@
 class ClassificationLifecycle
   class ClassificationNotPersisted < StandardError; end
+  class InvalidAction < StandardError; end
 
-  attr_reader :classification
-
-  def initialize(classification)
-    @classification = classification
-  end
-
-  def queue(action)
+  def self.queue(classification, action)
     unless classification.persisted?
       message = "Background process called before persisting the classification."
       raise ClassificationNotPersisted.new(message)
@@ -15,58 +10,33 @@ class ClassificationLifecycle
     ClassificationWorker.perform_async(classification.id, action.to_s)
   end
 
-  def transact!(&block)
+  def self.perform(classification, action)
+    raise InvalidAction unless %w(create update).include?(action)
+    ClassificationLifecycle.new(classification, action).execute
+  end
+
+  attr_reader :classification, :action
+
+  def initialize(classification, action)
+    @classification = classification
+    @action = action
+  end
+
+  def execute
+    return if create? && classification.lifecycled_at.present?
+
     Classification.transaction do
       update_classification_data
-      #NOTE: ensure the block is evaluated before updating the seen subjects
-      # as the count worker won't fire if the seens are set, see #should_count_towards_retirement
-      instance_eval(&block) if block_given?
+      process_project_preference
       create_recent
       update_seen_subjects
     end
+
+    notify_cellect
+    update_counters
     publish_data
     #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
     refresh_queue
-  end
-
-  def process_project_preference
-    if should_create_project_preference?
-      upp = UserProjectPreference.where(user: user, project: project).first_or_initialize do |up|
-        up.preferences = {}
-      end
-      if first_classifcation = upp.email_communication.nil?
-        ProjectClassificationsCountWorker.perform_async(project.id)
-        upp.email_communication = user.project_email_communication
-        upp.user.update_column(:project_id, project.id)
-      end
-      upp.changed? ? upp.save! : upp.touch
-    end
-  end
-
-  def update_seen_subjects
-    if should_update_seen? && subjects_are_unseen_by_user?
-      UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
-      if Panoptes.use_cellect?(workflow)
-        subject_ids.each do |subject_id|
-          SeenCellectWorker.perform_async(workflow.id, user.try(:id), subject_id)
-        end
-      end
-    end
-  end
-
-  def publish_data
-    if classification.complete?
-      PublishClassificationWorker.perform_async(classification.id)
-    end
-  end
-
-  def refresh_queue
-    subjects_workflow_subject_sets.each do |set_id|
-      queue = SubjectQueue.by_set(set_id).find_by(user: user, workflow: workflow)
-      if queue && queue.below_minimum?
-        EnqueueSubjectQueueWorker.perform_async(queue.id)
-      end
-    end
   end
 
   def update_classification_data
@@ -78,6 +48,65 @@ class ClassificationLifecycle
     classification.save!
   end
 
+  def update_counters
+    return unless should_count_towards_retirement?
+
+    classification.subject_ids.each do |sid|
+      ClassificationCountWorker.perform_async(sid, classification.workflow.id, update?)
+    end
+  end
+
+  def process_project_preference
+    return unless should_create_project_preference?
+
+    upp = UserProjectPreference.where(user: user, project: project).first_or_initialize { |up| up.preferences = {} }
+
+    if upp.email_communication.nil?
+      upp.email_communication = user.project_email_communication
+      upp.user.update_column(:project_id, project.id)
+    end
+
+    upp.changed? ? upp.save! : upp.touch
+  end
+
+  def create_recent
+    return unless should_update_seen? && subjects_are_unseen_by_user?
+
+    Recent.create_from_classification(classification)
+  end
+
+  def update_seen_subjects
+    return unless should_update_seen? && subjects_are_unseen_by_user?
+
+    UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
+  end
+
+  def publish_data
+    return unless classification.complete?
+
+    PublishClassificationWorker.perform_async(classification.id)
+  end
+
+  def notify_cellect
+    return unless should_update_seen?
+    return unless subjects_are_unseen_by_user?
+    return unless Panoptes.use_cellect?(workflow)
+
+    subject_ids.each do |subject_id|
+      SeenCellectWorker.perform_async(workflow.id, user.try(:id), subject_id)
+    end
+  end
+
+  def refresh_queue
+    subjects_workflow_subject_sets.each do |set_id|
+      queue = SubjectQueue.by_set(set_id).find_by(user: user, workflow: workflow)
+
+      if queue && queue.below_minimum?
+        EnqueueSubjectQueueWorker.perform_async(queue.id)
+      end
+    end
+  end
+
   def mark_expert_classifier
     unseen_gold_std = subjects_are_unseen_by_user? && classification.gold_standard
     expert_user = user && expert_level = project.expert_classifier_level(user)
@@ -86,19 +115,9 @@ class ClassificationLifecycle
     end
   end
 
-  def subjects_are_unseen_by_user?
-    return @unseen if @unseen
-    @unseen = !UserSeenSubject.find_by!(user: user, workflow: workflow)
-    .try(:subjects_seen?, subject_ids)
-  rescue ActiveRecord::RecordNotFound
-    @unseen = true
-  end
-
-  def should_count_towards_retirement?
-    if !classification.complete? || classification.seen_before?
-      false
-    else
-      classification.anonymous? || subjects_are_unseen_by_user?
+  def add_seen_before_for_user
+    if should_update_seen? && !subjects_are_unseen_by_user?
+      update_classification_metadata(:seen_before, true)
     end
   end
 
@@ -115,17 +134,21 @@ class ClassificationLifecycle
     classification.lifecycled_at = Time.zone.now
   end
 
-  def add_seen_before_for_user
-    if should_update_seen? && !subjects_are_unseen_by_user?
-      update_classification_metadata(:seen_before, true)
-    end
-  end
-
   private
 
-  def create_recent
-    if should_update_seen? && subjects_are_unseen_by_user?
-      Recent.create_from_classification(classification)
+  def subjects_are_unseen_by_user?
+    return @unseen if @unseen
+    @unseen = !UserSeenSubject.find_by!(user: user, workflow: workflow)
+    .try(:subjects_seen?, subject_ids)
+  rescue ActiveRecord::RecordNotFound
+    @unseen = true
+  end
+
+  def should_count_towards_retirement?
+    if !classification.complete? || classification.seen_before?
+      false
+    else
+      classification.anonymous? || subjects_are_unseen_by_user?
     end
   end
 
@@ -176,5 +199,13 @@ class ClassificationLifecycle
     else
       [nil]
     end
+  end
+
+  def create?
+    action == "create"
+  end
+
+  def update?
+    action == "update"
   end
 end

@@ -340,9 +340,7 @@ describe Api::V1::ClassificationsController, type: :controller do
     context "when redis is unavailable" do
       it 'should not raise an error but still report it' do
         stub_content_filter
-        allow_any_instance_of(ClassificationLifecycle)
-          .to receive(:queue)
-          .and_raise(Redis::CannotConnectError)
+        allow(ClassificationLifecycle).to receive(:queue).and_raise(Redis::CannotConnectError)
         expect(Honeybadger).to receive(:notify)
         expect do
           setup_create_request
