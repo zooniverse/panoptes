@@ -13,32 +13,32 @@ RSpec.describe Subjects::StrategySelection do
   end
 
   describe "#select" do
-
     describe "remove retired after selection" do
+      let(:retired_workflow) { workflow }
       let(:sms) { smses[0] }
-      let!(:swc) do
+      let(:sws) do
         create(:subject_workflow_status,
           subject: sms.subject,
-          workflow: workflow,
+          workflow: retired_workflow,
           retired_at: Time.zone.now
         )
       end
       let(:result) { subject.select }
 
       before do
-        allow(subject).to receive(:select).and_return(smses.map(&:id))
+        sws
+        allow(subject).to receive(:select_sms_ids).and_return(smses.map(&:id))
       end
 
-      it 'should not return retired subjects', :focus do
-        expect(result).not_to include(sms)
+      it 'should not return retired subjects' do
+        expect(result).not_to include(sms.id)
       end
 
       context "when the sms is retired for a different workflow" do
-        let(:workflow) { create(:workflow, project: workflow.project) }
+        let(:retired_workflow) { create(:workflow_with_subjects, num_sets: 1) }
 
         it 'should return all the subjects' do
-          expected = subject_queue.set_member_subject_ids
-          expect(result).to match_array(expected)
+          expect(result).to include(sms.id)
         end
       end
     end

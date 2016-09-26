@@ -15,7 +15,9 @@ module Subjects
     end
 
     def select
-      strip_seen_ids(select_sms_ids.compact)
+      selected_ids = select_sms_ids.compact
+      unseen_ids = strip_seen_ids(selected_ids)
+      strip_retired_ids(unseen_ids)
     end
 
     def strategy
@@ -50,15 +52,13 @@ module Subjects
     def strategy_sms_ids
       case strategy
       when :cellect
-        cellect_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
-        subject_ids = Subjects::CellectClient.get_subjects(*cellect_params)
-        sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
-        sms_scope.pluck("set_member_subjects.id")
+        run_cellection do |params|
+          Subjects::CellectClient.get_subjects(*params)
+        end
       when :cellect_ex
-        cellect_ex_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
-        subject_ids = Subjects::CellectExSelection.get_subjects(*cellect_ex_params)
-        sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
-        sms_scope.pluck("set_member_subjects.id")
+        run_cellection do |params|
+          Subjects::CellectExSelection.get_subjects(*params)
+        end
       else
         default_strategy_sms_ids
       end
@@ -76,6 +76,22 @@ module Subjects
       else
         sms_ids
       end
+    end
+
+    def strip_retired_ids(sms_ids)
+      return sms_ids if sms_ids.empty?
+      retired_ids = SetMemberSubject
+        .retired_for_workflow(workflow)
+        .where(set_member_subjects: {id: sms_ids})
+        .pluck(:id)
+      sms_ids - retired_ids
+    end
+
+    def run_cellection
+      cellect_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
+      subject_ids = yield cellect_params
+      sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
+      sms_scope.pluck("set_member_subjects.id")
     end
   end
 end
