@@ -56,6 +56,8 @@ class CellectExClient
   def get_subjects(workflow_id, user_id, _group_id, limit)
     response = connection.get("/api/workflows/#{workflow_id}", strategy: :weighted, user_id: user_id, limit: limit) do |req|
       req.headers["Accept"] = "application/json"
+      req.options.timeout = 5           # open/read timeout in seconds
+      req.options.open_timeout = 2      # connection open timeout in seconds
     end
 
     handle_response(response)
