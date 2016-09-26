@@ -33,8 +33,8 @@ class ClassificationLifecycle
       update_seen_subjects
     end
 
-    publish_data
     notify_cellect
+    publish_data
     #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
     refresh_queue
   end
