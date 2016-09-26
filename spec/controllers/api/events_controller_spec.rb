@@ -144,7 +144,7 @@ describe Api::EventsController, type: :controller do
 
       context "when the project id refers to a non-legacy migrated project" do
         let(:unknown_legacy_project) do
-          overridden_params(project_id: project.id)
+          overridden_params(project_id: 9999)
         end
 
         it "should respond with a 422" do
@@ -176,6 +176,12 @@ describe Api::EventsController, type: :controller do
             .to receive(:perform_async)
             .with(project.id)
           post :create, first_visit_event_params
+        end
+
+        it "sets the project_id" do
+          post :create, first_visit_event_params
+          user.reload
+          expect(user.project_id).to eq(project.id)
         end
 
         context "with an unknown user zooniverse_id" do
