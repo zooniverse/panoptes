@@ -1,5 +1,6 @@
 class ClassificationLifecycle
   class ClassificationNotPersisted < StandardError; end
+  class InvalidAction < StandardError; end
 
   def self.queue(classification, action)
     unless classification.persisted?
@@ -10,7 +11,7 @@ class ClassificationLifecycle
   end
 
   def self.perform(classification, action)
-    raise "Invalid Post-Classification Action" unless %w(create update).include?(action)
+    raise InvalidAction unless %w(create update).include?(action)
     ClassificationLifecycle.new(classification, action).execute
   end
 

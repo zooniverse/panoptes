@@ -21,10 +21,10 @@ RSpec.describe ClassificationWorker do
     end
 
     context "other action" do
-      it 'should raise an error' do
-       expect do
-         classification_worker.perform(classification.id, nil)
-       end.to raise_error("Invalid Post-Classification Action")
+      it 'should report to honeybadger' do
+        allow(ClassificationLifecycle).to receive(:perform).and_raise(ClassificationLifecycle::InvalidAction)
+        expect(Honeybadger).to receive(:notify)
+        classification_worker.perform(classification.id, 'other')
       end
     end
   end
