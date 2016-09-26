@@ -61,6 +61,8 @@ class CellectExClient
     end
 
     handle_response(response)
+  rescue Faraday::TimeoutError => exception
+    raise GenericError.new(exception.message)
   end
 
   private
