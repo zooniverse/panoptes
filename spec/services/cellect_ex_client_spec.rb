@@ -21,6 +21,18 @@ RSpec.describe CellectExClient do
         expect(subject_ids).to eq([1,2,3,4])
       end
 
+      it "raises if cellect_ex times out" do
+        stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+          stub.get('/api/workflows/338?limit=5&strategy=weighted&user_id=1') do |env|
+            raise Faraday::TimeoutError
+          end
+        end
+
+        expect do
+          described_class.new([:test, stubs]).get_subjects(338, 1, nil, 5)
+        end.to raise_error(CellectExClient::GenericError)
+      end
+
       it "raises if response is an HTTP 500" do
         stubs = Faraday::Adapter::Test::Stubs.new do |stub|
           stub.get('/api/workflows/338?limit=5&strategy=weighted&user_id=1') do |env|
