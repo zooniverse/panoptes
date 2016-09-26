@@ -27,13 +27,13 @@ class ClassificationLifecycle
 
     Classification.transaction do
       update_classification_data
-      update_counters
       process_project_preference
       create_recent
       update_seen_subjects
     end
 
     notify_cellect
+    update_counters
     publish_data
     #to avoid duplicates in queue, do not refresh the queue before updating seen subjects
     refresh_queue
