@@ -91,11 +91,6 @@ describe ClassificationLifecycle do
         subject.execute
       end
 
-      it "should call the #refresh_queue" do
-        expect(subject).to receive(:refresh_queue)
-        subject.execute
-      end
-
       context "when the classification has the already_seen metadata value" do
         let!(:classification) { create(:anonymous_already_seen_classification) }
 
@@ -191,13 +186,6 @@ describe ClassificationLifecycle do
       it 'should not call #update_seen_subjects' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:update_seen_subjects)
-          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call #refresh_queue' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:refresh_queue)
           expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
