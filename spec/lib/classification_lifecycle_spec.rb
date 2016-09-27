@@ -392,8 +392,14 @@ describe ClassificationLifecycle do
 
         it "saves the project id" do
           subject.process_project_preference
-          user.reload
-          expect(user.project_id).to eq(project.id)
+          expect(user.reload.project_id).to eq(project.id)
+        end
+
+        it 'does not overwrite an existing project id' do
+          other_project = create :project
+          user.update! project_id: other_project.id
+          subject.process_project_preference
+          expect(user.reload.project_id).to eq(other_project.id)
         end
       end
 
