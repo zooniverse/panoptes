@@ -34,7 +34,8 @@ module Formatter
           new_anno['task'] = @current['task']
           new_anno['task_label'] = task_label(task_info)
           value_with_tool = (@current["value"] || []).map do |drawn_item|
-           drawn_item.merge "tool_label" => tool_label(task_info, drawn_item)
+            tool_label = tool_label(task_info, drawn_item["tool"])
+            drawn_item.merge("tool_label" => tool_label)
           end
           new_anno["value"] = value_with_tool
         end
@@ -124,9 +125,10 @@ module Formatter
         translate(task_info["question"] || task_info["instruction"])
       end
 
-      def tool_label(task_info, drawn_item)
-        tool = task_info["tools"] && task_info["tools"][drawn_item["tool"]]
-        translate(tool["label"]) if tool
+      def tool_label(task_info, tool_index)
+        have_tool_lookup_info = !!(task_info["tools"] && tool_index)
+        known_tool = have_tool_lookup_info && task_info["tools"][tool_index]
+        translate(known_tool["label"]) if known_tool
       end
 
       def answer_label
@@ -141,19 +143,7 @@ module Formatter
           rescue TypeError
             "unknown answer label"
           rescue NoMethodError => e
-            Honeybadger.notify(
-              error_class:   "Task export error",
-              error_message: "The task cannot be exported",
-              context: {
-                classification: @classification,
-                annotation: @annotation,
-                workflow_at_version: workflow_at_version,
-                workflow_version: workflow_version,
-                content_version: content_version,
-                current_task: @current['task'],
-                answer_idx: answer_idx
-              }
-            )
+            report_to_honey_badger(answer_idx)
             raise e
           end
         end
@@ -198,6 +188,22 @@ module Formatter
          key == annotation["task"]
         end
         @task = task_annotation.try(:last) || {}
+      end
+
+      def report_to_honey_badger(answer_idx)
+        Honeybadger.notify(
+          error_class:   "Task export error",
+          error_message: "The task cannot be exported",
+          context: {
+            classification: @classification.id,
+            annotation: @annotation,
+            workflow_at_version: workflow_at_version.id,
+            workflow_version: workflow_version,
+            content_version: content_version,
+            current_task: @current['task'],
+            answer_idx: answer_idx
+          }
+        )
       end
     end
   end

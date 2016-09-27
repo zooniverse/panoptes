@@ -4,13 +4,11 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
   let(:contents) { build_stubbed(:workflow_content, workflow: nil) }
   let(:workflow) { build_stubbed(:workflow, workflow_contents: [contents], build_contents: false) }
   let(:cache)    { double(workflow_at_version: workflow, workflow_content_at_version: contents)}
-
   let(:classification) do
     build_stubbed(:classification, subjects: []).tap do |c|
       allow(c.workflow).to receive(:primary_content).and_return(contents)
     end
   end
-
   let(:annotation) do
     {
       "task" => "interest",
@@ -18,6 +16,20 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
                   {"x"=>3, "y"=>4, "tool"=>2},
                   {"x"=>5, "y"=>6, "tool"=>1}]
     }
+  end
+  let(:weird_annotation) do
+    {
+      "task" => "interest",
+      "value" => [{"x"=>1, "y"=>2}]
+    }
+  end
+
+  describe '#report_to_honey_badger' do
+    it 'reports the correct details' do
+      annotator = described_class.new(classification, annotation, cache)
+      expect(Honeybadger).to receive(:notify)
+      annotator.send(:report_to_honey_badger, 1)
+    end
   end
 
   it 'adds the task label' do
@@ -30,6 +42,11 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     expect(formatted["value"][0]["tool_label"]).to eq("Green")
     expect(formatted["value"][1]["tool_label"]).to eq("Blue")
     expect(formatted["value"][2]["tool_label"]).to eq("Green")
+  end
+
+  it 'adds an unknown tool label if the tool index is missing' do
+    formatted = described_class.new(classification, weird_annotation, cache).to_h
+    expect(formatted["value"][0]["tool_label"]).to be_nil
   end
 
   it 'has a nil label when the tool is not found in the workflow' do
