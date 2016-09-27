@@ -143,19 +143,7 @@ module Formatter
           rescue TypeError
             "unknown answer label"
           rescue NoMethodError => e
-            Honeybadger.notify(
-              error_class:   "Task export error",
-              error_message: "The task cannot be exported",
-              context: {
-                classification: @classification.id,
-                annotation: @annotation.id,
-                workflow_at_version: workflow_at_version,
-                workflow_version: workflow_version,
-                content_version: content_version,
-                current_task: @current['task'],
-                answer_idx: answer_idx
-              }
-            )
+            report_to_honey_badger(answer_idx)
             raise e
           end
         end
@@ -200,6 +188,22 @@ module Formatter
          key == annotation["task"]
         end
         @task = task_annotation.try(:last) || {}
+      end
+
+      def report_to_honey_badger(answer_idx)
+        Honeybadger.notify(
+          error_class:   "Task export error",
+          error_message: "The task cannot be exported",
+          context: {
+            classification: @classification.id,
+            annotation: @annotation,
+            workflow_at_version: workflow_at_version.id,
+            workflow_version: workflow_version,
+            content_version: content_version,
+            current_task: @current['task'],
+            answer_idx: answer_idx
+          }
+        )
       end
     end
   end

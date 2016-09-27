@@ -4,13 +4,11 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
   let(:contents) { build_stubbed(:workflow_content, workflow: nil) }
   let(:workflow) { build_stubbed(:workflow, workflow_contents: [contents], build_contents: false) }
   let(:cache)    { double(workflow_at_version: workflow, workflow_content_at_version: contents)}
-
   let(:classification) do
     build_stubbed(:classification, subjects: []).tap do |c|
       allow(c.workflow).to receive(:primary_content).and_return(contents)
     end
   end
-
   let(:annotation) do
     {
       "task" => "interest",
@@ -24,6 +22,14 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       "task" => "interest",
       "value" => [{"x"=>1, "y"=>2}]
     }
+  end
+
+  describe '#report_to_honey_badger' do
+    it 'reports the correct details' do
+      annotator = described_class.new(classification, annotation, cache)
+      expect(Honeybadger).to receive(:notify)
+      annotator.send(:report_to_honey_badger, 1)
+    end
   end
 
   it 'adds the task label' do
