@@ -63,7 +63,7 @@ class ClassificationLifecycle
 
     if upp.email_communication.nil?
       upp.email_communication = user.project_email_communication
-      upp.user.update_column(:project_id, project.id)
+      upp.user.update_column(:project_id, project.id) if upp.user.project_id.blank?
     end
 
     upp.changed? ? upp.save! : upp.touch

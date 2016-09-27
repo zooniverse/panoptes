@@ -184,6 +184,13 @@ describe Api::EventsController, type: :controller do
           expect(user.project_id).to eq(project.id)
         end
 
+        it 'does not overwrite an existing project id' do
+          other_project = create :project
+          user.update! project_id: other_project.id
+          post :create, first_visit_event_params
+          expect(user.reload.project_id).to eq(other_project.id)
+        end
+
         context "with an unknown user zooniverse_id" do
 
           it "should not create the user project preference model (upp)" do
