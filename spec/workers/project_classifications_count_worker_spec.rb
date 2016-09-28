@@ -4,6 +4,14 @@ RSpec.describe ProjectClassificationsCountWorker do
   let(:worker) { described_class.new }
   let!(:project) { create(:project) }
 
+  it "should be rate limited with defaults" do
+    opts = worker.class.get_sidekiq_options['congestion']
+    expect(opts[:interval]).to eq(60)
+    expect(opts[:max_in_interval]).to eq(1)
+    expect(opts[:min_delay]).to eq(10)
+    expect(opts[:reject_with]).to eq(:cancel)
+  end
+
   describe "#perform" do
 
     it 'calls the project counter to update the project counts' do

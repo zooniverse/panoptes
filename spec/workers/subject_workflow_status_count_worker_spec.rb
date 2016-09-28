@@ -8,7 +8,7 @@ RSpec.describe SubjectWorkflowStatusCountWorker do
     opts = worker.class.get_sidekiq_options['congestion']
     expect(opts[:interval]).to eq(30)
     expect(opts[:max_in_interval]).to eq(1)
-    expect(opts[:min_delay]).to eq(0)
+    expect(opts[:min_delay]).to eq(5)
     expect(opts[:reject_with]).to eq(:cancel)
   end
 
