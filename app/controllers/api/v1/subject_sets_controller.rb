@@ -5,25 +5,25 @@ class Api::V1::SubjectSetsController < Api::ApiController
   resource_actions :default
   schema_type :json_schema
 
-  IMPORT_COLUMNS = %w(subject_set_id subject_id random)
+  IMPORT_COLUMNS = %w(subject_set_id subject_id random).freeze
 
   def create
     super do |subject_set|
-      refresh_queue(subject_set)
+      notify_cellect(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
 
   def update
     super do |subject_set|
-      refresh_queue(subject_set)
+      notify_cellect(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
 
   def update_links
     super do |subject_set|
-      refresh_queue(subject_set)
+      notify_cellect(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
@@ -49,14 +49,14 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def destroy_links
     super do |subject_set|
-      refresh_queue(subject_set)
+      notify_cellect(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
 
   protected
 
-  def refresh_queue(subject_set)
+  def notify_cellect(subject_set)
     if subject_set.set_member_subjects.exists?
       subject_set.workflows.each do |w|
         if Panoptes.use_cellect?(w)
