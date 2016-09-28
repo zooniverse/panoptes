@@ -1,4 +1,4 @@
-FROM zooniverse/ruby:2.3
+FROM ruby:2.3
 
 WORKDIR /rails_app
 
