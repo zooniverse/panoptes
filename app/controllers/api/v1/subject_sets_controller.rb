@@ -8,15 +8,24 @@ class Api::V1::SubjectSetsController < Api::ApiController
   IMPORT_COLUMNS = %w(subject_set_id subject_id random)
 
   def create
-    super { |subject_set| refresh_queue(subject_set) }
+    super do |subject_set|
+      refresh_queue(subject_set)
+      reset_subject_counts(subject_set.id)
+    end
   end
 
   def update
-    super { |subject_set| refresh_queue(subject_set) }
+    super do |subject_set|
+      refresh_queue(subject_set)
+      reset_subject_counts(subject_set.id)
+    end
   end
 
   def update_links
-    super { |subject_set| refresh_queue(subject_set) }
+    super do |subject_set|
+      refresh_queue(subject_set)
+      reset_subject_counts(subject_set.id)
+    end
   end
 
   def destroy
@@ -39,7 +48,10 @@ class Api::V1::SubjectSetsController < Api::ApiController
   end
 
   def destroy_links
-    super { |subject_set| refresh_queue(subject_set) }
+    super do |subject_set|
+      refresh_queue(subject_set)
+      reset_subject_counts(subject_set.id)
+    end
   end
 
   protected
@@ -78,7 +90,6 @@ class Api::V1::SubjectSetsController < Api::ApiController
         [ resource.id, subject_id, rand ]
       end
       SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
-      reset_subject_counts(resource.id)
     else
       super
     end
@@ -90,7 +101,6 @@ class Api::V1::SubjectSetsController < Api::ApiController
       set_member_subjects = resource.set_member_subjects.where(subject_id: linked_sms_ids)
       remove_linked_set_member_subjects(set_member_subjects)
       reset_subject_set_workflow_counts(controlled_resource.id)
-      reset_subject_counts(resource.id)
     else
       super
     end
