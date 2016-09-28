@@ -46,7 +46,9 @@ RSpec.describe ClassificationCountWorker do
       end
 
       it 'queues up a count update for project and workflow' do
-        expect(ProjectClassificationsCountWorker).to receive(:perform_async).with(project.id)
+        expect(WorkflowClassificationsCountWorker)
+          .to receive(:perform_in)
+          .with(5.seconds, workflow_id)
         worker.perform(sms.subject_id, workflow_id)
       end
 
