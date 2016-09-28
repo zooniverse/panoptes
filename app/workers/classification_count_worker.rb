@@ -14,8 +14,8 @@ class ClassificationCountWorker
         count.class.increment_counter(:classifications_count, count.id) unless was_update
       end
 
-      ProjectClassificationsCountWorker.perform_async(workflow.project.id)
       SubjectWorkflowStatusCountWorker.perform_async(count.id)
+      WorkflowClassificationsCountWorker.perform_in(5.seconds, workflow.id)
       RetirementWorker.perform_async(count.id)
     end
   rescue ActiveRecord::RecordNotFound
