@@ -56,15 +56,7 @@ class ClassificationLifecycle
 
   def process_project_preference
     return unless should_create_project_preference?
-
-    upp = UserProjectPreference.where(user: user, project: project).first_or_initialize { |up| up.preferences = {} }
-
-    if upp.email_communication.nil?
-      upp.email_communication = user.project_email_communication
-      upp.user.update_column(:project_id, project.id) if upp.user.project_id.blank?
-    end
-
-    upp.changed? ? upp.save! : upp.touch
+    UserProjectPreferences::FindOrCreate.run! user: user, project: project
   end
 
   def create_recent
