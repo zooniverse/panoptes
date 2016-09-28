@@ -1,17 +1,15 @@
 require 'spec_helper'
 
 describe Api::V1::SubjectsController, type: :controller do
-  let!(:workflow) { create(:workflow_with_subject_sets) }
-  let!(:subject_set) { workflow.subject_sets.first }
-  let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+  let(:workflow) { create(:workflow_with_subject_sets) }
+  let(:subject_set) { workflow.subject_sets.first }
+  let(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
   let!(:subjects) { sms.map(&:subject) }
-  let!(:user) { create(:user) }
-
+  let(:user) { create(:user) }
   let(:scopes) { %w(subject) }
   let(:resource_class) { Subject }
   let(:authorized_user) { user }
   let(:project) { create(:project, owner: user) }
-
   let(:api_resource_name) { "subjects" }
   let(:api_resource_attributes) do
     [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at" ]
@@ -21,13 +19,6 @@ describe Api::V1::SubjectsController, type: :controller do
   end
 
   describe "#index" do
-    let!(:non_user_queue) do
-      create(:subject_queue,
-             user: nil,
-             workflow: workflow,
-             set_member_subject_ids: sms.map(&:id))
-    end
-
     context "logged out user" do
 
       describe "filtering" do
@@ -162,15 +153,7 @@ describe Api::V1::SubjectsController, type: :controller do
         let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
 
-        context "with queued subjects" do
-          let!(:queue) do
-            create(:subject_queue,
-                   user: user,
-                   workflow: workflow,
-                   set_member_subject_ids: sms.map(&:id))
-          end
-
-
+        context "with subjects" do
           before(:each) do
             get :index, request_params
           end
@@ -227,21 +210,12 @@ describe Api::V1::SubjectsController, type: :controller do
           let(:workflow) do
             create(:workflow_with_subject_sets, finished_at: Time.zone.now)
           end
-          let!(:seen_subjects) do
-            create(:user_seen_subject,
-                   user: user,
-                   workflow: workflow,
-                   subject_ids: [subjects.first.id])
-          end
 
           before(:each) do
-            allow_any_instance_of(Subject).to receive(:retired_for_workflow?).and_return(true)
+            workflow.subjects.map do |subject|
+              create(:subject_workflow_status, workflow: workflow, subject: subject, retired_at: Time.zone.now)
+            end
             get :index, request_params
-          end
-
-          it 'should return already_seen as true for seen subject' do
-            already_seen = json_response["subjects"].map{ |s| s['already_seen']}
-            expect(already_seen).to include(true)
           end
 
           it 'should return user finished_workflow as false for each subject' do
@@ -266,24 +240,6 @@ describe Api::V1::SubjectsController, type: :controller do
 
           it 'should return 422' do
             expect(response.status).to eq(422)
-          end
-        end
-
-        context "without already queued subjects" do
-          before(:each) do
-            get :index, request_params
-          end
-
-          it 'should create the queue' do
-            expect(SubjectQueue.find_by(user: user, workflow: workflow)).to_not be_nil
-          end
-
-          it 'should return 200' do
-            expect(response.status).to eq(200)
-          end
-
-          it 'should return a page of 2 objects' do
-            expect(json_response[api_resource_name].length).to eq(2)
           end
         end
       end
