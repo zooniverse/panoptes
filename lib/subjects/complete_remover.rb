@@ -17,13 +17,15 @@ module Subjects
     private
 
     def retired_seen_ids
-      retired_seen_scope = retired_scope
-      retired_seen_scope = if user_seen_ids.empty?
-        retired_seen_scope
-      else
-        retired_seen_scope.union_all(seen_scope)
-      end
       Set.new(retired_seen_scope.pluck(:id)).to_a
+    end
+
+    def retired_seen_scope
+      if user_seen_ids.empty?
+        retired_scope
+      else
+        retired_scope.union_all(seen_scope)
+      end
     end
 
     def retired_scope
