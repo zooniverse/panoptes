@@ -81,7 +81,7 @@ module Api
       user = User.find_by(zooniverse_id: user_zoo_id) if user_zoo_id
 
       if user
-        UserProjectPreferences::FindOrCreate.run! project: project, user: user
+        UserProjectPreferences::FindOrCreateUponClassification.run! project: project, user: user
       end
     end
 

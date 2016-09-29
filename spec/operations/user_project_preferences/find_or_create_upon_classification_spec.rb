@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe UserProjectPreferences::FindOrCreate do
+describe UserProjectPreferences::FindOrCreateUponClassification do
   let(:user) { create :user }
   let(:project) { create :project }
   let(:operation) { described_class.with(user: user, project: project) }

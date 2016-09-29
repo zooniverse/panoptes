@@ -56,7 +56,7 @@ class ClassificationLifecycle
 
   def process_project_preference
     return unless should_create_project_preference?
-    UserProjectPreferences::FindOrCreate.run! user: user, project: project
+    UserProjectPreferences::FindOrCreateUponClassification.run! user: user, project: project
   end
 
   def create_recent
