@@ -12,9 +12,9 @@ describe Workflows::RetireSubjects do
   let(:operation) { described_class.with(api_user: api_user) }
 
   it 'sets a valid retirement reason' do
-    operation.run! workflow: workflow, subject_id: subject1.id, retirement_reason: "blank"
+    operation.run! workflow: workflow, subject_id: subject1.id, retirement_reason: "nothing_here"
     expect(SubjectWorkflowStatus.by_subject_workflow(subject1.id, workflow.id).retirement_reason)
-      .to match("blank")
+      .to match("nothing_here")
   end
 
   it 'is invalid with an invalid retirement reason' do

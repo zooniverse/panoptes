@@ -45,10 +45,7 @@ class Subject < ActiveRecord::Base
 
   def retired_for_workflow?(workflow)
     if workflow&.persisted?
-      SubjectWorkflowStatus
-        .retired
-        .by_subject_workflow(self.id, workflow.id)
-        .present?
+      SubjectWorkflowStatus.retired.by_subject_workflow(self.id, workflow.id).present?
     else
       false
     end
