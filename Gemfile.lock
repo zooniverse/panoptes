@@ -148,15 +148,15 @@ GEM
       faraday (>= 0.7.4, < 0.10)
     ffi (1.9.10)
     fig_rake (0.9.3)
-    flipper (0.8.0)
-    flipper-active_record (0.8.0)
-      activerecord (>= 3.2, < 5)
-      flipper (~> 0.8.0)
-    flipper-ui (0.8.0)
+    flipper (0.9.2)
+    flipper-active_record (0.9.2)
+      activerecord (>= 3.2, < 6)
+      flipper (~> 0.9.2)
+    flipper-ui (0.9.2)
       erubis (~> 2.7.0)
-      flipper (~> 0.8.0)
+      flipper (~> 0.9.2)
       rack (>= 1.4, < 3)
-      rack-protection (~> 1.5.3)
+      rack-protection (>= 1.5.3, < 2.1.0)
     foreman (0.78.0)
       thor (~> 0.19.1)
     formatador (0.2.5)
@@ -489,4 +489,4 @@ DEPENDENCIES
   zoo_stream (~> 1.0.1)
 
 BUNDLED WITH
-   1.12.5
+   1.13.1
