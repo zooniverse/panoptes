@@ -1,6 +1,6 @@
 require 'subjects/cellect_client'
 require 'subjects/postgresql_selection'
-require 'subjects/seen_remover'
+require 'subjects/complete_remover'
 
 module Subjects
   class StrategySelection
@@ -16,8 +16,7 @@ module Subjects
 
     def select
       selected_ids = select_sms_ids.compact
-      unseen_ids = strip_seen_ids(selected_ids)
-      strip_retired_ids(unseen_ids)
+      Subjects::CompleteRemover.new(user, workflow, selected_ids).incomplete_ids
     end
 
     def strategy
@@ -67,24 +66,6 @@ module Subjects
     def default_strategy_sms_ids
       opts = { limit: limit, subject_set_id: subject_set_id }
       Subjects::PostgresqlSelection.new(workflow, user, opts).select
-    end
-
-    def strip_seen_ids(sms_ids)
-      if !sms_ids.empty? && user
-        uss = UserSeenSubject.find_by(user: user, workflow: workflow)
-        Subjects::SeenRemover.new(uss, sms_ids).unseen_ids
-      else
-        sms_ids
-      end
-    end
-
-    def strip_retired_ids(sms_ids)
-      return sms_ids if sms_ids.empty?
-      retired_ids = SetMemberSubject
-        .retired_for_workflow(workflow)
-        .where(set_member_subjects: {id: sms_ids})
-        .pluck(:id)
-      sms_ids - retired_ids
     end
 
     def run_cellection

@@ -13,54 +13,57 @@ RSpec.describe Subjects::StrategySelection do
   end
 
   describe "#select" do
-    describe "remove retired after selection" do
+
+    it "should call the complete remover after selection", :aggregate_failures do
+      expect(subject).to receive(:strategy_sms_ids).and_return([1,2,3]).ordered
+      expect(Subjects::CompleteRemover)
+        .to receive(:new)
+        .with(user, workflow, an_instance_of(Array))
+        .ordered
+        .and_return(instance_double(Subjects::CompleteRemover, incomplete_ids: [1]))
+      subject.select
+    end
+
+    describe "remove completed after selection" do
       let(:retired_workflow) { workflow }
       let(:sms) { smses[0] }
-      let(:sws) do
-        create(:subject_workflow_status,
-          subject: sms.subject,
-          workflow: retired_workflow,
-          retired_at: Time.zone.now
-        )
-      end
       let(:result) { subject.select }
 
       before do
-        sws
         allow(subject).to receive(:select_sms_ids).and_return(smses.map(&:id))
       end
 
-      it 'should not return retired subjects' do
-        expect(result).not_to include(sms.id)
-      end
+      context "retired subjects" do
+        let!(:sws) do
+          create(:subject_workflow_status,
+            subject: sms.subject,
+            workflow: retired_workflow,
+            retired_at: Time.zone.now
+          )
+        end
 
-      context "when the sms is retired for a different workflow" do
-        let(:retired_workflow) { create(:workflow_with_subjects, num_sets: 1) }
+        it 'should not return retired subjects' do
+          expect(result).not_to include(sms.id)
+        end
 
-        it 'should return all the subjects' do
-          expect(result).to include(sms.id)
+        context "when the sms is retired for a different workflow" do
+          let(:retired_workflow) { create(:workflow_with_subjects, num_sets: 1) }
+
+          it 'should return all the subjects' do
+            expect(result).to include(sms.id)
+          end
         end
       end
-    end
 
-    describe "remove seens after selection" do
-      let(:seen_remover) { instance_double("Subjects::SeenRemover") }
-      let(:uss) { instance_double("UserSeenSubject") }
+      context "seen subjects" do
+        let!(:seens) do
+          create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [sms.subject.id])
+        end
 
-      before do
-        allow(seen_remover).to receive(:unseen_ids).and_return([])
-        allow(uss).to receive(:subject_ids).and_return([])
-        allow(UserSeenSubject).to receive(:find_by).and_return(uss)
-      end
+        it 'should not return seen subjects' do
+          expect(result).not_to include(sms.id)
+        end
 
-      it "should call the seens remover after selection", :aggregate_failures do
-        expect(subject).to receive(:strategy_sms_ids)
-          .and_return([1,2,3]).ordered
-        expect(Subjects::SeenRemover)
-          .to receive(:new)
-          .with(uss, an_instance_of(Array))
-          .and_return(seen_remover).ordered
-        subject.select
       end
     end
 
