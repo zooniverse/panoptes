@@ -99,12 +99,8 @@ describe Subjects::SetMemberSubjectSelector do
           count.touch(:retired_at)
         end
 
-        it "should return something to classify" do
-          expect(sms_to_classify).to_not be_empty
-        end
-
-        it 'returns only the retired data the user has not seen' do
-          expect(sms_to_classify).to match_array(subject.set_member_subjects)
+        it "should not return any data" do
+          expect(sms_to_classify).to be_empty
         end
       end
 

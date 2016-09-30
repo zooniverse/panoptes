@@ -50,6 +50,12 @@ class SetMemberSubject < ActiveRecord::Base
     .where('subject_workflow_counts.retired_at IS NULL')
   end
 
+  def self.retired_for_workflow(workflow)
+    by_workflow(workflow)
+    .joins(sanitize_sql_for_conditions(["INNER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id AND subject_workflow_counts.workflow_id = ?", workflow.id]))
+    .where("subject_workflow_counts.retired_at IS NOT NULL")
+  end
+
   def self.seen_for_user_by_workflow(user, workflow)
     seen_subjects = for_user_by_workflow_scope(user, workflow)
     by_workflow(workflow).where(seen_subjects.exists)

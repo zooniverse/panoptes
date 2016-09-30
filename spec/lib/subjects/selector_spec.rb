@@ -90,31 +90,6 @@ RSpec.describe Subjects::Selector do
 
   describe '#selected_subjects' do
 
-    context "with retired subjects" do
-      let(:retired_workflow) { workflow }
-      let(:sms) { smses[0] }
-      let!(:sws) do
-        create(:subject_workflow_status,
-          subject: sms.subject,
-          workflow: retired_workflow,
-          retired_at: Time.zone.now
-        )
-      end
-      let(:result) { subject.selected_subjects.map(&:id) }
-
-      it 'should not return retired subjects' do
-        expect(result).not_to include(sws.id)
-      end
-
-      context "when the sms is retired for a different workflow" do
-        let(:retired_workflow) { create(:workflow, project: workflow.project) }
-
-        it 'should return all the subjects' do
-          expect(result).to match_array(smses.map(&:subject_id))
-        end
-      end
-    end
-
     it 'should not return deactivated subjects' do
       deactivated_ids = smses[0..smses.length-2].map(&:subject_id)
       Subject.where(id: deactivated_ids).update_all(activated_state: 1)

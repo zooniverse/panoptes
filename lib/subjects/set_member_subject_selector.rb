@@ -11,27 +11,15 @@ module Subjects
     end
 
     def set_member_subjects
-      select_data.select(SELECT_FIELDS)
-    end
-
-    private
-
-    def select_data
-      if user
-        select_data_for_the_user
+      selected = if user
+        select_non_retired_unseen_for_user
       else
         select_non_retired
       end
+      selected.select(SELECT_FIELDS)
     end
 
-    def select_data_for_the_user
-      scope = select_non_retired_unseen_for_user
-      if scope.exists?
-        scope
-      else
-        select_unseen_for_user
-      end
-    end
+    private
 
     def select_non_retired
       SetMemberSubject.non_retired_for_workflow(workflow)

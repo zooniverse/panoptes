@@ -31,7 +31,6 @@ describe SetMemberSubject, :type => :model do
   end
 
   describe ":by_workflow" do
-
     it "should retun an empty set" do
       workflow = create(:workflow)
       expect(SetMemberSubject.by_workflow(workflow)).to be_empty
@@ -59,7 +58,6 @@ describe SetMemberSubject, :type => :model do
     let(:set_member_subject) { create(:set_member_subject) }
     let(:workflow) { create(:workflow, subject_sets: [set_member_subject.subject_set]) }
     let(:count) { create(:subject_workflow_status, subject: set_member_subject.subject, workflow: workflow) }
-    let!(:another_workflow_sms) { create(:set_member_subject) }
 
     context "when none are retired" do
       it "should return the workflow's non retired sms" do
@@ -80,6 +78,35 @@ describe SetMemberSubject, :type => :model do
         count2 = create(:subject_workflow_status, subject: set_member_subject.subject, workflow: workflow2)
         count2.retire!
         expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(set_member_subject)
+      end
+    end
+  end
+
+  describe ":retired_for_workflow" do
+    let(:workflow) { create(:workflow_with_subjects, num_sets: 1) }
+    let(:sms) { workflow.set_member_subjects.first }
+    let(:count) do
+      create(:subject_workflow_status, subject: sms.subject, workflow: workflow)
+    end
+
+    context "when none are retired" do
+      it "should return an empty set" do
+        expect(SetMemberSubject.retired_for_workflow(workflow)).to be_empty
+      end
+    end
+
+    context "when the workflow sms is retired" do
+      it "should return the sms id" do
+        count.retire!
+        expect(SetMemberSubject.retired_for_workflow(workflow)).to include(sms)
+      end
+    end
+
+    context 'when the workflow sms is retired for another workflow' do
+      it 'should return the sms' do
+        workflow2 = create(:workflow, subject_sets: [sms.subject_set])
+        create(:subject_workflow_status, subject: sms.subject, workflow: workflow2, retired_at: DateTime.now)
+        expect(SetMemberSubject.retired_for_workflow(workflow2)).to include(sms)
       end
     end
   end
