@@ -63,7 +63,11 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_classifications_export
-    medium = Projects::CreateClassificationsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium = CreateClassificationsExport.with(
+      api_user: api_user,
+      resource_id: controlled_resource.id,
+      resource_type: :project
+    ).run!(params)
     medium_response(medium)
   end
 

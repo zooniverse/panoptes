@@ -101,9 +101,10 @@ Rails.application.routes.draw do
       end
 
       json_api_resources :workflows, links: [:subject_sets, :retired_subjects, :tutorials], versioned: true do
-        media_resources :attached_images
+        media_resources :attached_images, classifications_export: { except: [:create] }
 
         post "/retired_subjects", to: "workflows#retire_subjects"
+        post "/classifications_export", to: "workflows#create_classifications_export", format: false
       end
 
       json_api_resources :subject_sets, links: [:subjects]

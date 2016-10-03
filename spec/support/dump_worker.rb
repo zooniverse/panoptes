@@ -8,17 +8,17 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
 
     it "should not open a csv file" do
       expect(CSV).to_not receive(:open)
-      worker.perform(another_project.id)
+      worker.perform(another_project.id, "project")
     end
 
     it "should not push a file to s3" do
       expect(worker).to_not receive(:write_to_s3)
-      worker.perform(another_project.id)
+      worker.perform(another_project.id, "project")
     end
 
     it "should not queue a worker to send an email" do
       expect(mailer_class).to_not receive(:perform_async)
-      worker.perform(another_project.id)
+      worker.perform(another_project.id, "project")
     end
   end
 
@@ -29,38 +29,38 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
 
     it "should create a csv file with the correct number of entries" do
       expect_any_instance_of(CSV).to receive(:<<).exactly(num_entries).times
-      worker.perform(project.id)
+      worker.perform(project.id, "project")
     end
 
     it "should create a linked media resource" do
       expect(Medium).to receive(:create!).and_call_original
-      worker.perform(project.id)
+      worker.perform(project.id, "project")
     end
 
     it "should not fail to create a linked media resource" do
-      expect { worker.perform(project.id) }.to_not raise_error
+      expect { worker.perform(project.id, "project") }.to_not raise_error
     end
 
     it "should compress the csv file" do
       expect(worker).to receive(:to_gzip).and_call_original
-      worker.perform(project.id)
+      worker.perform(project.id, "project")
     end
 
     it "push the file to s3" do
       expect(worker).to receive(:write_to_s3).once
-      worker.perform(project.id)
+      worker.perform(project.id, "project")
     end
 
     it "should clean up the file after sending to s3" do
       expect(worker).to receive(:remove_tempfile).twice.and_call_original
-      worker.perform(project.id)
+      worker.perform(project.id, "project")
     end
 
     it "should queue a worker to send an email" do
       expect(mailer_class).to receive(:perform_async).with(project.id,
                                                            anything,
                                                            [project.owner.email])
-      worker.perform(project.id)
+      worker.perform(project.id, "project")
     end
   end
 
@@ -76,26 +76,26 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     end
 
     it 'should update the path on the object' do
-      worker.perform(project.id, medium.id)
+      worker.perform(project.id, "project", medium.id)
       medium.reload
       expect(medium.path_opts).to match_array([dump_type, project.id.to_s])
     end
 
     it 'should set the medium to private' do
-      worker.perform(project.id, medium.id)
+      worker.perform(project.id, "project", medium.id)
       medium.reload
       expect(medium.private).to be true
     end
 
     it 'should update the medium content_type to csv' do
       medium.update_column(:content_type, "text/html")
-      worker.perform(project.id, medium.id)
+      worker.perform(project.id, "project", medium.id)
       medium.reload
       expect(medium.content_type).to eq("text/csv")
     end
 
     it 'should update the medium content_disposition' do
-      worker.perform(project.id, medium.id)
+      worker.perform(project.id, "project", medium.id)
       medium.reload
       name = project.slug.split("/")[1]
       type = medium.type.match(/\Aproject_(\w+)_export\z/)[1]
@@ -105,7 +105,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     end
 
     it "should set the medium state to ready" do
-      worker.perform(project.id, medium.id)
+      worker.perform(project.id, "project", medium.id)
       medium.reload
       expect(medium.metadata).to include("state" => "ready")
     end
@@ -113,14 +113,14 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     it 'should email the users in the recipients hash' do
       expect(mailer_class).to receive(:perform_async)
         .with(anything, anything, array_including(receivers.map(&:email)))
-      worker.perform(project.id, medium.id)
+      worker.perform(project.id, "project", medium.id)
     end
 
     context "simulating a failed dump" do
 
       it "should set the medium state to creating" do
         allow(worker).to receive(:set_ready_state)
-        worker.perform(project.id, medium.id)
+        worker.perform(project.id, "project", medium.id)
         medium.reload
         expect(medium.metadata).to include("state" => "creating")
       end

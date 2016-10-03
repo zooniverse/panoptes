@@ -32,7 +32,7 @@ RSpec.describe WorkflowsDumpWorker do
             expect_any_instance_of(Formatter::Csv::Workflow).to receive(:to_array)
             .with(version).and_call_original
           end
-          worker.perform(project.id)
+          worker.perform(project.id, "project")
         end
       end
     end

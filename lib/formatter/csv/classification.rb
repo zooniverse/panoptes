@@ -11,8 +11,7 @@ module Formatter
            created_at gold_standard expert metadata annotations subject_data subject_ids)
       end
 
-      def initialize(project, cache)
-        @project = project
+      def initialize(cache)
         @cache = cache
         @salt = Time.now.to_i
       end

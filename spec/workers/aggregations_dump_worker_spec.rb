@@ -15,13 +15,13 @@ RSpec.describe AggregationsDumpWorker do
 
   it 'should create a medium with put_expires equal to one day in seconds' do
     expect do
-      subject.perform(project, medium)
+      subject.perform(project, "project", medium)
       medium.reload
     end.to change{medium.put_expires}.from(nil).to(86400)
   end
 
   it 'should send an aggregate message to the AggregationClient' do
     expect(agg_double).to receive(:aggregate)
-    subject.perform(project, medium)
+    subject.perform(project, "project", medium)
   end
 end

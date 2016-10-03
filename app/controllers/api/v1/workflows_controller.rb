@@ -41,6 +41,15 @@ class Api::V1::WorkflowsController < Api::ApiController
     render nothing: true, status: 204
   end
 
+  def create_classifications_export
+    medium = CreateClassificationsExport.with(
+      api_user: api_user,
+      resource_id: controlled_resource.id,
+      resource_type: :workflow
+    ).run!(params)
+    medium_response(medium)
+  end
+
   private
 
   def context

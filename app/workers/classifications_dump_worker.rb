@@ -11,11 +11,11 @@ class ClassificationsDumpWorker
   def perform_dump
     CSV.open(csv_file_path, 'wb') do |csv|
       cache = ClassificationDumpCache.new
-      formatter = Formatter::Csv::Classification.new(project, cache)
+      formatter = Formatter::Csv::Classification.new(cache)
 
       csv <<  formatter.class.headers
 
-      completed_project_classifications.find_in_batches do |group|
+      completed_resource_classifications.find_in_batches do |group|
         subject_ids = group.flat_map(&:subject_ids).uniq
         workflow_ids = group.map(&:workflow_id).uniq
 
@@ -31,8 +31,8 @@ class ClassificationsDumpWorker
     end
   end
 
-  def completed_project_classifications
-    project.classifications
+  def completed_resource_classifications
+    resource.classifications
     .complete
     .joins(:workflow)
     .includes(:user, workflow: [:workflow_contents])

@@ -4,11 +4,13 @@ module DumpWorker
   included do
     include ActiveSupport::Callbacks
     define_callbacks :dump
-    attr_reader :project
+    attr_reader :resource
   end
 
-  def perform(project_id, medium_id=nil, requester_id=nil, *args)
-    if @project = Project.find(project_id)
+  def perform(resource_id, resource_type, medium_id=nil, requester_id=nil, *args)
+    @resource_type = resource_type
+    @resource_id = resource_id
+    if @resource = get_resource
       @medium_id = medium_id
       begin
         run_callbacks :dump do
@@ -43,7 +45,7 @@ module DumpWorker
   end
 
   def dump_type
-    "project_#{dump_target}_export"
+    "#{@resource_type}_#{dump_target}_export"
   end
 
   def csv_file_path
@@ -56,8 +58,8 @@ module DumpWorker
     @gzip_tempfile.path
   end
 
-  def project_file_path
-    [dump_type, project.id.to_s]
+  def resource_file_path
+    [dump_type, @resource_id.to_s]
   end
 
   def medium
@@ -73,8 +75,8 @@ module DumpWorker
     Medium.create!(
       content_type: "text/csv",
       type: dump_type,
-      path_opts: project_file_path,
-      linked: project,
+      path_opts: resource_file_path,
+      linked: @resource,
       metadata: { state: 'creating' },
       private: true,
       content_disposition: content_disposition
@@ -85,7 +87,7 @@ module DumpWorker
     m = Medium.find(@medium_id)
     metadata = m.metadata.merge("state" => "creating")
     m.update!(
-      path_opts: project_file_path,
+      path_opts: resource_file_path,
       private: true,
       content_type: "text/csv",
       content_disposition: content_disposition,
@@ -112,7 +114,16 @@ module DumpWorker
   end
 
   def content_disposition
-    name = project.slug.split("/")[1]
+    case @resource_type
+    when "workflow"
+      name = @resource.display_name.parameterize
+    when "project"
+      name = @resource.slug.split("/")[1]
+    end
     "attachment; filename=\"#{name}-#{dump_target}.csv\""
+  end
+
+  def get_resource
+    @resource_type.capitalize.constantize.find(@resource_id)
   end
 end

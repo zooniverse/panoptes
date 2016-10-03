@@ -9,7 +9,7 @@ class SubjectsDumpWorker
   sidekiq_options queue: :data_high
 
   def perform_dump
-    csv_formatter = Formatter::Csv::Subject.new(project)
+    csv_formatter = Formatter::Csv::Subject.new(resource)
     CSV.open(csv_file_path, 'wb') do |csv|
       csv << csv_formatter.class.headers
       project_subjects.find_each do |subject|
@@ -19,6 +19,6 @@ class SubjectsDumpWorker
   end
 
   def project_subjects
-    SetMemberSubject.joins(:subject_set).merge(project.subject_sets)
+    SetMemberSubject.joins(:subject_set).merge(resource.subject_sets)
   end
 end
