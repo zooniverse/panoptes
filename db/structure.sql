@@ -2663,6 +2663,13 @@ CREATE UNIQUE INDEX index_users_on_unsubscribe_token ON users USING btree (unsub
 
 
 --
+-- Name: index_users_on_valid_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_users_on_valid_email ON users USING btree (valid_email);
+
+
+--
 -- Name: index_users_on_zooniverse_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3481,4 +3488,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160824101413');
 INSERT INTO schema_migrations (version) VALUES ('20160901100944');
 
 INSERT INTO schema_migrations (version) VALUES ('20160901141903');
+
+INSERT INTO schema_migrations (version) VALUES ('20161011134340');
 
