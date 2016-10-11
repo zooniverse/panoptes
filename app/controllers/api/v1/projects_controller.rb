@@ -63,31 +63,27 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_classifications_export
-    medium = CreateClassificationsExport.with(
-      api_user: api_user,
-      resource_id: controlled_resource.id,
-      resource_type: :project
-    ).run!(params)
+    medium = CreateClassificationsExport.with( api_user: api_user, object: controlled_resource ).run!(params)
     medium_response(medium)
   end
 
   def create_subjects_export
-    medium = Projects::CreateSubjectsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium = Projects::CreateSubjectsExport.with(api_user: api_user, object: controlled_resource).run!(params)
     medium_response(medium)
   end
 
   def create_aggregations_export
-    medium = Projects::CreateAggregationsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium = Projects::CreateAggregationsExport.with(api_user: api_user, object: controlled_resource).run!(params)
     medium_response(medium)
   end
 
   def create_workflows_export
-    medium = Projects::CreateWorkflowsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium = Projects::CreateWorkflowsExport.with(api_user: api_user, object: controlled_resource).run!(params)
     medium_response(medium)
   end
 
   def create_workflow_contents_export
-    medium = Projects::CreateWorkflowContentsExport.with(api_user: api_user, project: controlled_resource).run!(params)
+    medium = Projects::CreateWorkflowContentsExport.with(api_user: api_user, object: controlled_resource).run!(params)
     medium_response(medium)
   end
 
