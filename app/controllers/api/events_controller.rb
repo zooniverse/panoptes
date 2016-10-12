@@ -37,10 +37,9 @@ module Api
 
     def process_incoming_event
       if upp = user_project_preference
-        was_new = upp.new_record?
         upp.legacy_count[create_params[:workflow]] = create_params[:count]
+
         if upp.save
-          ProjectClassifiersCountWorker.perform_async(upp.project_id) if was_new
           :ok
         else
           :unprocessable_entity
@@ -78,9 +77,11 @@ module Api
 
     def user_project_preference
       user_zoo_id = create_params[:zooniverse_user_id]
-      if user_zoo_id && user_id = User.find_by(zooniverse_id: user_zoo_id).try(:id)
-        UserProjectPreference.find_or_initialize_by(project_id: legacy_zoo_project.id,
-                                                    user_id: user_id)
+      project = legacy_zoo_project
+      user = User.find_by(zooniverse_id: user_zoo_id) if user_zoo_id
+
+      if user
+        UserProjectPreferences::FindOrCreate.run! project: project, user: user
       end
     end
 

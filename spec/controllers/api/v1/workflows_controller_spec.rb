@@ -526,21 +526,6 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:resource) { workflows.first }
 
     it_behaves_like "is showable"
-
-    context "with a logged in user" do
-      it "should not load a user's subject queue" do
-        expect(EnqueueSubjectQueueWorker).not_to receive(:perform_async)
-        default_request scopes: scopes, user_id: authorized_user.id
-        get :show, id: resource.id
-      end
-    end
-
-    context "with a logged out user" do
-      it "should not load the general subject queue" do
-        expect(EnqueueSubjectQueueWorker).not_to receive(:perform_async)
-        get :show, id: resource.id
-      end
-    end
   end
 
   describe '#retired_subjects' do

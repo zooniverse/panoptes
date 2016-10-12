@@ -11,16 +11,8 @@ class EnqueueSubjectQueueWorker
     }
   })
 
-  def perform(queue_id, limit=SubjectQueue::DEFAULT_LENGTH, strategy_override=nil)
+  def perform(queue_id, sms_ids)
     queue = SubjectQueue.find(queue_id)
-    selector = Subjects::StrategySelection.new(
-      queue.workflow,
-      queue.user,
-      queue.subject_set_id,
-      limit,
-      strategy_override
-    )
-    sms_ids = selector.select
     queue.enqueue_update(sms_ids) unless sms_ids.empty?
   rescue ActiveRecord::RecordNotFound
     nil

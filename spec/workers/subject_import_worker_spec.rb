@@ -35,12 +35,5 @@ https://placekitten.com/400/900.jpg,large,cute
         {"metadata1" => "large", "metadata2" => "cute"}
       ])
     end
-
-    it 'reloads the queue for each workflow' do
-      expect(ReloadNonLoggedInQueueWorker)
-        .to receive(:perform_async)
-        .with(workflow.id, subject_set.id)
-      worker.perform(project.id, user.id, subject_set.id, "a_csv_url")
-    end
   end
 end

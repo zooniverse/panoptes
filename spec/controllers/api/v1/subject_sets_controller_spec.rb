@@ -116,6 +116,25 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
     it_behaves_like "supports update_links"
 
+    describe 'update' do
+      let(:workflows) { [create(:workflow, project: project)] }
+      let(:resource) do
+        create(:subject_set,project: project, subjects: []) do |sset|
+          sset.workflows = workflows
+        end
+      end
+
+      it "should queue the counter worker" do
+        expect(SubjectSetSubjectCounterWorker)
+          .to receive(:perform_async)
+          .with(resource.id)
+        default_request scopes: scopes, user_id: authorized_user.id
+        update_params[:subject_sets][:links][:subjects] = subjects.map(&:id)
+        put :update, update_params.merge(id: resource.id)
+        expect(resource.subjects.count).to eq(subjects.size)
+      end
+    end
+
     describe "update_links" do
       let(:sms_count) { resource.reload.set_member_subjects_count }
       let(:run_update_links) do
@@ -171,11 +190,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
           put :update, update_params.merge(id: resource.id)
         end
 
-        it 'should call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async)
-          .with(workflow_id, resource.id)
-        end
-
         it 'should not call the reload cellect worker when cellect is off' do
           expect(ReloadCellectWorker).not_to receive(:perform_async)
         end
@@ -200,13 +214,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets][:links].delete(:workflows)
           put :update, update_params.merge(id: resource.id)
-        end
-
-        it 'should call the reload queue worker for each workflow' do
-          workflows.each do |_workflow|
-            expect(ReloadNonLoggedInQueueWorker).to receive(:perform_async)
-            .with(_workflow.id, resource.id)
-          end
         end
 
         it 'should not call the reload cellect worker when cellect is off' do
@@ -241,10 +248,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
           put :update, update_params.merge(id: resource.id)
         end
 
-        it 'should not call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
-        end
-
         it 'should not attempt to call cellect', :aggregate_failures do
           expect(Panoptes).not_to receive(:use_cellect?)
           expect(ReloadCellectWorker).not_to receive(:perform_async)
@@ -257,10 +260,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets].delete(:links)
           put :update, update_params.merge(id: resource.id)
-        end
-
-        it 'should not call the reload queue worker' do
-          expect(ReloadNonLoggedInQueueWorker).to_not receive(:perform_async)
         end
 
         it 'should not attempt to call cellect', :aggregate_failures do
@@ -287,6 +286,20 @@ describe Api::V1::SubjectSetsController, type: :controller do
                              }
                      }
       }
+    end
+
+    describe 'after create' do
+      let(:subjects) { create_list(:subject, 4, project: project) }
+
+      it "should queue the counter worker" do
+        allow(SubjectSetSubjectCounterWorker).to receive(:perform_async)
+        default_request scopes: scopes, user_id: authorized_user.id
+        create_params[:subject_sets][:links][:subjects] = subjects.map(&:id)
+        post(:create, create_params)
+        resource = JSON.parse(response.body)["subject_sets"].first
+        expect(SubjectSetSubjectCounterWorker).to have_received(:perform_async).with(resource["id"].to_i)
+        expect(SubjectSet.last.subjects.count).to eq(subjects.size)
+      end
     end
 
     context "with illegal link properties" do

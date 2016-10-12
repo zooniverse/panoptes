@@ -67,7 +67,6 @@ RSpec.describe SubjectQueue, type: :model do
           .to receive(:create!)
           .with(workflow: workflow, user: nil, subject_set_id: nil)
           .and_call_original
-        expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
         SubjectQueue.create_for_user(workflow, user)
       end
 

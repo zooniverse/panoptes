@@ -7,20 +7,16 @@ describe ClassificationLifecycle do
       create(:set_member_subject, subject_set: subject_set, subject_id: s_id)
     end.map(&:id)
   end
-  let(:subject_queue) do
-    create(:subject_queue,
-           user: classification.user,
-           workflow: classification.workflow,
-           set_member_subject_ids: sms_ids)
-  end
-
   let(:classification) { build(:classification) }
+  let(:workflow) { classification.workflow }
+  let(:user) { classification.user }
+  let(:action) { "create" }
 
   subject do
-    ClassificationLifecycle.new(classification)
+    ClassificationLifecycle.new(classification, action)
   end
 
-  describe "#queue" do
+  describe ".queue" do
     context "with create action" do
       let(:test_method) { :create }
 
@@ -28,12 +24,12 @@ describe ClassificationLifecycle do
         allow(classification).to receive(:persisted?).and_return(true)
         expect(ClassificationWorker).to receive(:perform_async)
           .with(classification.id, "create")
-        subject.queue(test_method)
+        described_class.queue(classification, test_method)
       end
 
       it 'should raise an error if the classification is not persisted' do
         expect do
-          subject.queue(test_method)
+          described_class.queue(classification, test_method)
         end.to raise_error(ClassificationLifecycle::ClassificationNotPersisted)
       end
     end
@@ -45,171 +41,132 @@ describe ClassificationLifecycle do
         allow(classification).to receive(:persisted?).and_return(true)
         expect(ClassificationWorker).to receive(:perform_async)
           .with(classification.id, "update")
-        subject.queue(test_method)
+        described_class.queue(classification, test_method)
       end
 
       it 'should raise en error if the classification is not persisted' do
         expect do
-          subject.queue(test_method)
+          described_class.queue(classification, test_method)
         end.to raise_error(ClassificationLifecycle::ClassificationNotPersisted)
-      end
-    end
-
-    context 'when classification is incomplete', sidekiq: :inline do
-      before(:each) do
-        classification.completed = false
-        classification.save
-      end
-
-      it 'should not queue the count worker' do
-        expect(ClassificationCountWorker).to_not receive(:perform_async)
-        subject.queue(:create)
-      end
-    end
-
-    context 'when classification is complete', sidekiq: :inline do
-
-      it 'should queue the count worker' do
-        classification.save
-        times = case classification.subject_ids.size
-        when 1
-          :once
-        when 2
-          :twice
-        end
-        expect(ClassificationCountWorker).to receive(:perform_async).send(times)
-        subject.queue(:create)
       end
     end
   end
 
-  describe "#transact!" do
+  shared_examples_for "create and update" do
     let!(:classification) { create(:classification) }
 
-    context "transact! after each spec" do
+    context "when an anonymous user classification" do
+      let(:classification) { create(:classification, user: nil) }
 
-      after(:each) do
-        subject.transact! { true }
+      it "should wrap the calls in transactions" do
+        expect(Classification).to receive(:transaction).twice.and_call_original
+        subject.execute
       end
 
-      context "when an anonymous user classification" do
-        let(:classification) { create(:classification, user: nil) }
-
-        it "should wrap the calls in transactions" do
-          expect(Classification).to receive(:transaction).twice
-            .and_call_original
-        end
-
-        it "should call the #update_classification_data" do
-          expect(subject).to receive(:update_classification_data)
-        end
-
-        it "should not attempt to update the seen subjects" do
-          expect_any_instance_of(UserSeenSubject).to_not receive(:subjects_seen?)
-        end
-
-        it "should evaluate the block" do
-          expect(subject).to receive(:instance_eval)
-        end
-
-        it "should call the #create_recent" do
-          aggregate_failures "recents" do
-            expect(subject).to receive(:create_recent).and_call_original
-            expect(Recent).to_not receive(:create_from_classification)
-          end
-        end
-
-        it "should call the #update_seen_subjects" do
-          expect(subject).to receive(:update_seen_subjects)
-        end
-
-        it "should call #publish_data" do
-          expect(subject).to receive(:publish_data)
-        end
-
-        it "should call the #refresh_queue" do
-          expect(subject).to receive(:refresh_queue)
-        end
-
-        context "when the classification has the already_seen metadata value" do
-          let!(:classification) { create(:anonymous_already_seen_classification) }
-
-          it 'should not count towards retirement' do
-            expect(subject.should_count_towards_retirement?).to be false
-          end
-        end
+      it "should call the #update_classification_data" do
+        expect(subject).to receive(:update_classification_data)
+        subject.execute
       end
 
-      context "when the user has not already classified the subjects" do
-        before(:each) do
-          uss = instance_double("UserSeenSubject")
-          allow(uss).to receive(:subjects_seen?).and_return(false)
-          allow(UserSeenSubject).to receive(:find_by).and_return(uss)
-        end
-
-        it "should wrap the calls in transactions" do
-          expect(Classification).to receive(:transaction).twice
-            .and_call_original
-        end
-
-        it "should call the #update_classification_data" do
-          expect(subject).to receive(:update_classification_data)
-        end
-
-        it "should evaluate the block" do
-          expect(subject).to receive(:instance_eval)
-        end
-
-        it "should call the #create_recent" do
-          aggregate_failures "recents" do
-            expect(subject).to receive(:create_recent).and_call_original
-            expect(Recent).to receive(:create_from_classification)
-          end
-        end
-
-        it "should call the instance_eval on the passed block" do
-          expect(subject).to receive(:instance_eval)
-        end
-
-        it "should call the #update_seen_subjects" do
-          expect(subject).to receive(:update_seen_subjects)
-        end
-
-        it "should call the #refresh_queue" do
-          expect(subject).to receive(:refresh_queue)
-        end
-
-        it "should call #publish_data" do
-          expect(subject).to receive(:publish_data)
-        end
-
-        it 'should count towards retirement' do
-          expect(subject.should_count_towards_retirement?).to be true
-        end
+      it "should not attempt to update the seen subjects" do
+        expect_any_instance_of(UserSeenSubject).to_not receive(:subjects_seen?)
+        subject.execute
       end
 
-      context "when the user has already classified the subjects" do
-        let!(:seen) do
-          create(:user_seen_subject,
-                 user: classification.user,
-                 workflow: classification.workflow,
-                 subject_ids: classification.subject_ids)
+      it "should call the #create_recent" do
+        aggregate_failures "recents" do
+          expect(subject).to receive(:create_recent).and_call_original
+          expect(Recent).to_not receive(:create_from_classification)
         end
+        subject.execute
+      end
 
-        it "should call the #create_recent" do
-          aggregate_failures "recents" do
-            expect(subject).to receive(:create_recent).and_call_original
-            expect(Recent).to_not receive(:create_from_classification)
-          end
-        end
+      it "should call the #update_seen_subjects" do
+        expect(subject).to receive(:update_seen_subjects)
+        subject.execute
+      end
+
+      it "should call #publish_data" do
+        expect(subject).to receive(:publish_data)
+        subject.execute
+      end
+
+      context "when the classification has the already_seen metadata value" do
+        let!(:classification) { create(:anonymous_already_seen_classification) }
 
         it 'should not count towards retirement' do
-          expect(subject.should_count_towards_retirement?).to be_falsey
+          expect(subject.send(:should_count_towards_retirement?)).to be false
+          subject.execute
         end
+      end
+    end
 
-        it 'should not queue the count worker' do
-          expect(ClassificationCountWorker).to_not receive(:perform_async)
+    context "when the user has not already classified the subjects" do
+      before(:each) do
+        uss = instance_double("UserSeenSubject")
+        allow(uss).to receive(:subjects_seen?).and_return(false)
+        allow(UserSeenSubject).to receive(:find_by).and_return(uss)
+      end
+
+      it "should wrap the calls in transactions" do
+        expect(Classification).to receive(:transaction).twice.and_call_original
+        subject.execute
+      end
+
+      it "should call the #update_classification_data" do
+        expect(subject).to receive(:update_classification_data)
+        subject.execute
+      end
+
+      it "should call the #create_recent" do
+        aggregate_failures "recents" do
+          expect(subject).to receive(:create_recent).and_call_original
+          expect(Recent).to receive(:create_from_classification)
         end
+        subject.execute
+      end
+
+      it "should call the #update_seen_subjects" do
+        expect(subject).to receive(:update_seen_subjects)
+        subject.execute
+      end
+
+
+      it "should call #publish_data" do
+        expect(subject).to receive(:publish_data)
+        subject.execute
+      end
+
+      it 'should count towards retirement' do
+        expect(subject.send(:should_count_towards_retirement?)).to be true
+        subject.execute
+      end
+    end
+
+    context "when the user has already classified the subjects" do
+      let!(:seen) do
+        create(:user_seen_subject,
+               user: classification.user,
+               workflow: classification.workflow,
+               subject_ids: classification.subject_ids)
+      end
+
+      it "should call the #create_recent" do
+        aggregate_failures "recents" do
+          expect(subject).to receive(:create_recent).and_call_original
+          expect(Recent).to_not receive(:create_from_classification)
+        end
+        subject.execute
+      end
+
+      it 'should not count towards retirement' do
+        expect(subject.send(:should_count_towards_retirement?)).to be_falsey
+        subject.execute
+      end
+
+      it 'should not queue the count worker' do
+        expect(ClassificationCountWorker).to_not receive(:perform_async)
+        subject.execute
       end
     end
 
@@ -219,48 +176,149 @@ describe ClassificationLifecycle do
           .and_raise(ActiveRecord::RecordInvalid.new(classification))
       end
 
-      it "should not call the instance_eval on the passed block" do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:instance_eval)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
       it 'should not call #create_recent' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:create_recent)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
 
       it 'should not call #update_seen_subjects' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:update_seen_subjects)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call #refresh_queue' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:refresh_queue)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
 
       it 'should not call #publish_data' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:publish_data)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
 
       it 'should not call should_count_towards_retirement?' do
         aggregate_failures "failure point" do
           expect(subject).to_not receive(:should_count_towards_retirement?)
-          expect{ subject.transact! }.to raise_error(ActiveRecord::RecordInvalid)
+          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
     end
+
+    context 'updating counters' do
+      let(:subject_ids) { classification.subject_ids }
+
+      it 'should call classification count worker' do
+        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == "update")
+        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == "update")
+        subject.execute
+      end
+
+      context "when a user has seen the subjects before" do
+        it 'should not call the classification count worker' do
+          create(:user_seen_subject,
+                 user: classification.user,
+                 workflow: classification.workflow,
+                 subject_ids: classification.subject_ids)
+          expect(ClassificationCountWorker).to_not receive(:perform_async)
+          subject.execute
+        end
+      end
+
+      context "when a user is anonymous" do
+        let(:classification) { create(:classification, user: nil) }
+
+        it 'should call the classification count worker' do
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == "update")
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == "update")
+          subject.execute
+        end
+
+        context "when the classification has the already_seen metadata value" do
+          let!(:classification) do
+            create(:anonymous_already_seen_classification)
+          end
+
+          it 'should not call the classification count worker' do
+            expect(ClassificationCountWorker).to_not receive(:perform_async)
+            subject.execute
+          end
+        end
+      end
+
+      context 'when classification is incomplete' do
+        before(:each) do
+          classification.update! completed: false
+        end
+
+        it 'should not queue the count worker' do
+          expect(ClassificationCountWorker).to_not receive(:perform_async)
+          subject.execute
+        end
+      end
+
+      context 'when classification is complete' do
+        it 'should queue the count worker' do
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == "update")
+          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == "update")
+          subject.execute
+        end
+      end
+    end
+
+    context "notifying cellect" do
+      it "should not call the worker when cellect is disabled" do
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(false)
+        expect(SeenCellectWorker).not_to receive(:perform_async)
+        subject.execute
+      end
+
+      it "should not call the worker when cellect is enabled but not active for this workflow" do
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
+        allow(classification.workflow).to receive(:using_cellect?).and_return(false)
+        expect(SeenCellectWorker).not_to receive(:perform_async)
+        subject.execute
+      end
+
+      it "should call the worker when cellect is enabled for this workflow" do
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
+        allow(classification.workflow).to receive(:using_cellect?).and_return(true)
+
+        classification.subject_ids.each do |subject_id|
+          expect(SeenCellectWorker).to receive(:perform_async).with(workflow.id, user.id, subject_id)
+        end
+
+        subject.execute
+      end
+    end
+  end
+
+  context "for the create action" do
+    let(:action) { "create" }
+
+    it_behaves_like "create and update"
+
+    it 'should call process_project_preferences' do
+      expect(subject).to receive(:process_project_preference)
+      subject.execute
+    end
+
+    context "when the lifecycled_at field is set" do
+      let(:classification) do
+        create(:classification, lifecycled_at: Time.zone.now)
+      end
+
+      it "should abort the worker asap" do
+        expect(subject).not_to receive(:update_classification_data)
+        subject.execute
+      end
+    end
+  end
+
+  context "for the update action" do
+    let(:action) { "update" }
+
+    it_behaves_like "create and update"
   end
 
   describe "#publish_data" do
@@ -296,13 +354,6 @@ describe ClassificationLifecycle do
           end.to change{ UserProjectPreference.count }.from(0).to(1)
         end
 
-        it 'should call a worker to recount the project classifications' do
-          expect(ProjectClassificationsCountWorker)
-            .to receive(:perform_async)
-            .with(classification.project_id)
-          subject.process_project_preference
-        end
-
         it "should set the communication preferences to the user's default" do
           subject.process_project_preference
           email_pref = UserProjectPreference
@@ -314,6 +365,18 @@ describe ClassificationLifecycle do
         it "should save the preference" do
           expect_any_instance_of(UserProjectPreference).to receive(:save!)
           subject.process_project_preference
+        end
+
+        it "saves the project id" do
+          subject.process_project_preference
+          expect(user.reload.project_id).to eq(project.id)
+        end
+
+        it 'does not overwrite an existing project id' do
+          other_project = create :project
+          user.update! project_id: other_project.id
+          subject.process_project_preference
+          expect(user.reload.project_id).to eq(other_project.id)
         end
       end
 
@@ -339,13 +402,6 @@ describe ClassificationLifecycle do
           it "should update the email_communication if not set" do
             subject.process_project_preference
             expect(upp.reload.email_communication).to be_truthy
-          end
-
-          it 'should increment a count on the associated project' do
-            expect(ProjectClassificationsCountWorker)
-              .to receive(:perform_async)
-              .with(project.id)
-            subject.process_project_preference
           end
         end
       end
@@ -374,96 +430,12 @@ describe ClassificationLifecycle do
         .with(seen_params)
         subject.update_seen_subjects
       end
-
-      it "should not call cellect seen worker" do
-        expect(SeenCellectWorker).not_to receive(:perform_async)
-        subject.update_seen_subjects
-      end
-
-      context "when cellect is on" do
-        before do
-          allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-        end
-
-        it "should not call the worker by default" do
-          expect(SeenCellectWorker).not_to receive(:perform_async)
-          subject.update_seen_subjects
-        end
-
-        context "when the workflow is using cellect" do
-          before do
-            allow(classification.workflow)
-            .to receive(:using_cellect?).and_return(true)
-          end
-
-          it "should call cellect seen worker for each subject id" do
-            classification.subject_ids.each do |subject_id|
-              expect(SeenCellectWorker)
-              .to receive(:perform_async)
-              .with(seen_params[:workflow].id, seen_params[:user].id, subject_id)
-            end
-            subject.update_seen_subjects
-          end
-        end
-      end
     end
 
     context "without a user" do
       let(:classification) { build(:classification, user: nil) }
       it 'should do nothing' do
         expect(UserSeenSubject).to_not receive(:add_seen_subject_for_user)
-      end
-    end
-  end
-
-  describe "#refresh_queue" do
-    let(:workflow_id) { classification.workflow_id }
-    let(:user_id) { classification.user_id }
-
-    after(:each) { subject.refresh_queue }
-
-    context "when no queue exists" do
-      it "should not call Enqueue worker" do
-        expect(EnqueueSubjectQueueWorker).to_not receive(:perform_async)
-      end
-    end
-
-    context "when a queue exists" do
-      before(:each) do
-        subject_queue
-        allow_any_instance_of(SubjectQueue)
-          .to receive(:below_minimum?)
-          .and_return(below_min)
-      end
-
-      context "when queue is not below min" do
-        let(:below_min) { false }
-
-        it "should not call Enqueue worker" do
-          expect(EnqueueSubjectQueueWorker).to_not receive(:perform_async)
-        end
-      end
-
-      context "when queue is below min" do
-        let(:below_min) { true }
-
-        it "should call Enqueue worker" do
-          expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
-          .with(subject_queue.id)
-        end
-
-        context "when subject belongs to many sets" do
-          let(:set_ids) { [1,2,3] }
-
-          it "should call Enqueue worker for each set" do
-            allow(subject).to receive(:subjects_workflow_subject_sets).and_return(set_ids)
-            allow(SubjectQueue).to receive(:by_set).and_return(SubjectQueue.all)
-            set_ids.each do |set_id|
-              expect(EnqueueSubjectQueueWorker).to receive(:perform_async)
-                .with(subject_queue.id)
-            end
-          end
-        end
       end
     end
   end
