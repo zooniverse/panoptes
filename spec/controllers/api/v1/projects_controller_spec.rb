@@ -100,7 +100,7 @@ describe Api::V1::ProjectsController, type: :controller do
         describe "cards only" do
           let(:index_options) { { cards: true } }
           let(:card_attrs) do
-            ["id", "display_name", "description", "slug", "redirect", "avatar_src", "links"]
+            ["id", "display_name", "description", "slug", "redirect", "avatar_src", "links", "updated_at"]
           end
 
           it "should return only serialise the card data" do
