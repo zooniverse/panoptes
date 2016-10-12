@@ -589,7 +589,6 @@ describe Api::V1::WorkflowsController, type: :controller do
 
   describe "#create_classifications_export" do
     let(:test_attr) { :type }
-    let(:new_resource) { Medium.find(created_instance_id(api_resource_name)) }
     let(:api_resource_name) { "media" }
     let(:api_resource_attributes) do
       ["id", "src", "created_at", "content_type", "media_type", "href"]
@@ -597,18 +596,16 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:api_resource_links) { [] }
     let(:resource_class) { Medium }
     let(:content_type) { "text/csv" }
-    let(:authorized_user) { project.owner }
-
     let(:resource_url) { /http:\/\/test.host\/api\/workflows\/#{workflow.id}\/classifications_export/ }
     let(:test_attr_value) { "workflow_classifications_export" }
     let(:create_params) do
-      params = {
+      {
+        workflow_id: workflow.id,
         media: {
           content_type: content_type,
           metadata: { recipients: create_list(:user, 1).map(&:id) }
         }
       }
-      params.merge(workflow_id: workflow.id)
     end
 
     it_behaves_like "is creatable", :create_classifications_export
