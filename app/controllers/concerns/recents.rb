@@ -6,10 +6,14 @@ module Recents
   end
 
   def recent_scope
-    classification_query = { :"#{resource_name}_id" => resource_ids }
-    classification_query['project_id'] = params[:project_id] if params.has_key?(:project_id)
-    classification_query['workflow_id'] = params[:workflow_id] if params.has_key?(:workflow_id)
-    Recent.eager_load(:locations, :classification)
+    Recent.eager_load(:classification, :subject, :locations, :workflow, :project)
       .where(classifications: classification_query)
+  end
+
+  def classification_query
+    query = { :"#{resource_name}_id" => resource_ids }
+    query['project_id'] = params[:project_id] if params.has_key?(:project_id)
+    query['workflow_id'] = params[:workflow_id] if params.has_key?(:workflow_id)
+    query
   end
 end
