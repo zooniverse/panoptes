@@ -18,13 +18,21 @@ class Api::V1::ProjectsController < Api::ApiController
   CONTENT_PARAMS = [:description,
                     :title,
                     :workflow_description,
-                    :introduction]
+                    :introduction].freeze
 
   CONTENT_FIELDS = [:title,
                     :description,
                     :workflow_description,
                     :introduction,
-                    :url_labels]
+                    :url_labels].freeze
+
+  CARD_FIELDS = [:id,
+                 :display_name,
+                 :description,
+                 :slug,
+                 :redirect,
+                 :avatar_src,
+                 :updated_at].freeze
 
   before_action :eager_load_relations, only: :index
   before_action :filter_by_tags, only: :index
@@ -219,15 +227,17 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def context
     if action_name == "index" && !!params[:cards]
-      exclude_keys = ProjectSerializer.serializable_attributes
-        .except(:id, :display_name, :description, :slug, :redirect, :avatar_src).keys
       {cards: true, include_avatar_src?: true}.tap do |context|
-        exclude_keys.map do |k|
+        cards_exclude_keys.map do |k|
           context["include_#{k}?".to_sym] = false
         end
       end
     else
       super
     end
+  end
+
+  def cards_exclude_keys
+    ProjectSerializer.serializable_attributes.except(*CARD_FIELDS).keys
   end
 end
