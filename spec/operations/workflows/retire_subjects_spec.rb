@@ -17,6 +17,12 @@ describe Workflows::RetireSubjects do
       .to match("nothing_here")
   end
 
+  it 'rewrites the reason blank to nothing here' do
+    operation.run! workflow: workflow, subject_id: subject1.id, retirement_reason: "blank"
+    expect(SubjectWorkflowStatus.by_subject_workflow(subject1.id, workflow.id).retirement_reason)
+      .to match("nothing_here")
+  end
+
   it 'is invalid with an invalid retirement reason' do
     result = operation.run workflow: workflow, subject_id: subject1.id, retirement_reason: "nope"
     expect(result).not_to be_valid
