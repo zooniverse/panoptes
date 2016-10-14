@@ -15,7 +15,7 @@ class Api::V1::SubjectQueuesController < Api::ApiController
         .where(subject_id: value)
         .order("idx(array[#{value.join(',')}], set_member_subjects.subject_id)")
 
-      relation_or_error(relation, true)
+      relation_or_error(relation, true, false)
     else
       super
     end

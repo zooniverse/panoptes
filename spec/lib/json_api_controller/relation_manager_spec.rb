@@ -42,6 +42,13 @@ describe JsonApiController::RelationManager do
         expect(updated).to match_array(subjects)
       end
 
+      context 'empty link' do
+        it 'should set to empty collection' do
+          updated = test_instance.update_relation(resource, :subjects, [])
+          expect(updated).to be_empty
+        end
+      end
+
       context "not found" do
         it 'should raise an error' do
           expect do
@@ -80,15 +87,26 @@ describe JsonApiController::RelationManager do
         updated = test_instance.update_relation(resource, :projects, [project.id])
         expect(updated).to match_array([project])
       end
+
+      context 'empty link' do
+        it 'should set to empty collection' do
+          updated = test_instance.update_relation(resource, :projects, [])
+          expect(updated).to be_empty
+        end
+      end
     end
   end
 
   describe "#add_relation" do
     context "to-many" do
       it 'should add the new relation to the resource' do
-        test_instance.add_relation(resource,
-                                   :subjects,
-                                   subjects.map(&:id).map(&:to_s))
+        test_instance.add_relation(resource, :subjects, subjects.map(&:id).map(&:to_s))
+        expect(resource.subjects).to include(*subjects)
+      end
+
+      it 'should allow adding no items' do
+        test_instance.add_relation(resource, :subjects, subjects.map(&:id).map(&:to_s))
+        test_instance.add_relation(resource, :subjects, [])
         expect(resource.subjects).to include(*subjects)
       end
     end
@@ -105,6 +123,12 @@ describe JsonApiController::RelationManager do
     context "belongs-to-many" do
       it 'should replace the old relation' do
         test_instance.add_relation(resource, :projects, [project.id])
+        expect(resource.projects).to include(*project)
+      end
+
+      it 'should allow adding no items' do
+        test_instance.add_relation(resource, :projects, [project.id])
+        test_instance.add_relation(resource, :projects, [])
         expect(resource.projects).to include(*project)
       end
     end
