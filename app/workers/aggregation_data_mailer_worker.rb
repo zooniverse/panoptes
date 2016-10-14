@@ -10,12 +10,12 @@ class AggregationDataMailerWorker
   def perform(media_id)
     @medium = Medium.find(media_id)
     return unless emails.present?
-    AggregationDataMailer.aggregation_data(project, media_get_url, emails).deliver
+    AggregationDataMailer.aggregation_data(resource, media_get_url, emails).deliver
   rescue ActiveRecord::RecordNotFound
     nil
   end
 
-  def project
+  def resource
     medium.linked
   end
 end

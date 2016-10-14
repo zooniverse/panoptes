@@ -838,26 +838,17 @@ describe Api::V1::ProjectsController, type: :controller do
 
     let(:create_params) do
       params = {
+        project_id: project.id,
         media: {
           content_type: content_type,
           metadata: { recipients: create_list(:user, 1).map(&:id) }
         }
       }
-      params.merge(project_id: project.id)
     end
 
     describe "#create_classifications_export" do
       let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/classifications_export/ }
       let(:test_attr_value) { "project_classifications_export" }
-      let(:create_params) do
-        params = {
-          media: {
-            content_type: content_type,
-            metadata: { recipients: create_list(:user, 1).map(&:id) }
-          }
-        }
-        params.merge(project_id: project.id)
-      end
 
       it_behaves_like "is creatable", :create_classifications_export
     end
