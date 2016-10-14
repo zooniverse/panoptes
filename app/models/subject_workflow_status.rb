@@ -7,7 +7,7 @@ class SubjectWorkflowStatus < ActiveRecord::Base
   belongs_to :workflow
 
   enum retirement_reason:
-    [ :classification_count, :flagged, :blank, :consensus, :other ]
+    [ :classification_count, :flagged, :nothing_here, :consensus, :other ]
 
   scope :retired, -> { where.not(retired_at: nil) }
 

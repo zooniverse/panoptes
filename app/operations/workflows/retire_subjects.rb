@@ -1,6 +1,11 @@
 module Workflows
   class RetireSubjects < Operation
-    validates :retirement_reason, inclusion: { in: SubjectWorkflowStatus.retirement_reasons.keys, allow_nil: true }
+    set_callback :validate, :before, :rewrite_blank_reason
+
+    validates :retirement_reason, inclusion: {
+      in: SubjectWorkflowStatus.retirement_reasons.keys,
+      allow_nil: true
+    }
 
     object :workflow
 
@@ -31,6 +36,14 @@ module Workflows
 
     def subject_ids
       Array.wrap(@subject_ids) | Array.wrap(@subject_id)
+    end
+
+    private
+
+    def rewrite_blank_reason
+      if @retirement_reason == "blank"
+        @retirement_reason = "nothing_here"
+      end
     end
   end
 end
