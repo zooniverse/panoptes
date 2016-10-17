@@ -18,12 +18,7 @@ module DumpMailerWorker
     if recipients = medium.try(:metadata).try(:[], "recipients")
       User.where(id: recipients).pluck(:email)
     else
-      case @resource_type
-      when "project"
-        [resource.owner.email]
-      when "workflow"
-        [resource.project.owner.email]
-      end
+      [resource.owner.email]
     end
   end
 
