@@ -9,6 +9,8 @@ class Api::V1::WorkflowsController < Api::ApiController
   resource_actions :index, :show, :create, :update, :deactivate
   schema_type :json_schema
 
+  prepend_before_action :require_login, only: [:create, :update, :destroy, :create_classifications_export]
+
   def index
     unless params.has_key?(:sort)
       @controlled_resources = controlled_resources.rank(:display_order)
