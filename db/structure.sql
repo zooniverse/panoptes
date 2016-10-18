@@ -596,6 +596,76 @@ ALTER SEQUENCE oauth_applications_id_seq OWNED BY oauth_applications.id;
 
 
 --
+-- Name: organization_contents; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE organization_contents (
+    id integer NOT NULL,
+    title character varying NOT NULL,
+    description character varying NOT NULL,
+    introduction text DEFAULT ''::text,
+    language character varying NOT NULL,
+    organization_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_contents_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE organization_contents_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_contents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE organization_contents_id_seq OWNED BY organization_contents.id;
+
+
+--
+-- Name: organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE organizations (
+    id integer NOT NULL,
+    name character varying,
+    display_name character varying,
+    slug character varying DEFAULT ''::character varying,
+    primary_language character varying NOT NULL,
+    listed_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: organizations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE organizations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE organizations_id_seq OWNED BY organizations.id;
+
+
+--
 -- Name: project_contents; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1537,6 +1607,20 @@ ALTER TABLE ONLY oauth_applications ALTER COLUMN id SET DEFAULT nextval('oauth_a
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY organization_contents ALTER COLUMN id SET DEFAULT nextval('organization_contents_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY organizations ALTER COLUMN id SET DEFAULT nextval('organizations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY project_contents ALTER COLUMN id SET DEFAULT nextval('project_contents_id_seq'::regclass);
 
 
@@ -1805,6 +1889,22 @@ ALTER TABLE ONLY oauth_access_tokens
 
 ALTER TABLE ONLY oauth_applications
     ADD CONSTRAINT oauth_applications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_contents_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY organization_contents
+    ADD CONSTRAINT organization_contents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY organizations
+    ADD CONSTRAINT organizations_pkey PRIMARY KEY (id);
 
 
 --
@@ -3063,6 +3163,14 @@ ALTER TABLE ONLY tagged_resources
 
 
 --
+-- Name: fk_rails_d80672ecd1; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY organization_contents
+    ADD CONSTRAINT fk_rails_d80672ecd1 FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE;
+
+
+--
 -- Name: fk_rails_dff7cd1e07; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3481,4 +3589,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160824101413');
 INSERT INTO schema_migrations (version) VALUES ('20160901100944');
 
 INSERT INTO schema_migrations (version) VALUES ('20160901141903');
+
+INSERT INTO schema_migrations (version) VALUES ('20161017135917');
+
+INSERT INTO schema_migrations (version) VALUES ('20161017141439');
 
