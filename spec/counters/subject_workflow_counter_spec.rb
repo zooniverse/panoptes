@@ -37,7 +37,7 @@ describe SubjectWorkflowCounter do
         let(:another_workflow) { create(:workflow, project: project) }
 
         it "should still only count 2" do
-          create(:classification,  subject_ids: [sws.subject_id], project: project, workflow: another_workflow)
+          create(:classification, subject_ids: [sws.subject_id], project: project, workflow: another_workflow)
           expect(counter.classifications).to eq(2)
         end
       end
