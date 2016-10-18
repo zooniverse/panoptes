@@ -7,12 +7,11 @@ class SubjectWorkflowCounter
   end
 
   def classifications
-    scope = SubjectWorkflowStatus
-      .where(id: swc.id)
-      .joins("INNER JOIN classification_subjects cs ON cs.subject_id = subject_workflow_counts.subject_id")
-      .joins("INNER JOIN classifications ON classifications.id = cs.classification_id")
-      .joins("INNER JOIN workflows ON workflows.id = subject_workflow_counts.workflow_id")
-    if launch_date = swc.workflow.project.launch_date
+    scope = Classification
+      .where(workflow: swc.workflow_id)
+      .joins("INNER JOIN classification_subjects cs ON cs.classification_id = classifications.id")
+      .where("cs.subject_id = ?", swc.subject_id)
+    if launch_date = swc.project.launch_date
       scope = scope.where("classifications.created_at >= ?", launch_date)
     end
     scope.count

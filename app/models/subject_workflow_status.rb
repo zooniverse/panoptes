@@ -15,6 +15,7 @@ class SubjectWorkflowStatus < ActiveRecord::Base
   validates :workflow, presence: true
 
   delegate :set_member_subjects, to: :subject
+  delegate :project, to: :workflow
 
   can_through_parent :workflow, :show, :index
 

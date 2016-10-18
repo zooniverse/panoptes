@@ -18,8 +18,7 @@ describe SubjectWorkflowCounter do
     context "with classifications" do
       before do
         2.times do
-          c = create(:classification,  subject_ids: [sws.subject_id], project: project, workflow: workflow)
-          create(:user_project_preference, project: project, user: c.user)
+          create(:classification,  subject_ids: [sws.subject_id], project: project, workflow: workflow)
         end
       end
 
@@ -32,6 +31,15 @@ describe SubjectWorkflowCounter do
         expect(counter.classifications).to eq(0)
         allow(project).to receive(:launch_date).and_return(now-1.day)
         expect(counter.classifications).to eq(2)
+      end
+
+      context "when the subject is classified for other workflows" do
+        let(:another_workflow) { create(:workflow, project: project) }
+
+        it "should still only count 2" do
+          create(:classification, subject_ids: [sws.subject_id], project: project, workflow: another_workflow)
+          expect(counter.classifications).to eq(2)
+        end
       end
     end
   end
