@@ -1,7 +1,7 @@
 module Formatter
   module Csv
     class Classification
-      attr_reader :classification, :project, :cache, :salt
+      attr_reader :classification, :cache, :salt
 
       delegate :user_id, :workflow, :workflow_id, :created_at, :gold_standard,
         :workflow_version, to: :classification
@@ -11,8 +11,7 @@ module Formatter
            created_at gold_standard expert metadata annotations subject_data subject_ids)
       end
 
-      def initialize(project, cache)
-        @project = project
+      def initialize(cache)
         @cache = cache
         @salt = Time.now.to_i
       end

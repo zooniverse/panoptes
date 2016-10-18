@@ -10,9 +10,9 @@ class ClassificationsDumpWorker
 
   def perform_dump
     CSV.open(csv_file_path, 'wb') do |csv|
-      formatter = Formatter::Csv::Classification.new(project, cache)
+      formatter = Formatter::Csv::Classification.new(cache)
       csv << formatter.class.headers
-      completed_project_classifications.find_in_batches do |batch|
+      completed_resource_classifications.find_in_batches do |batch|
         subject_ids = setup_subjects_cache(batch)
         setup_retirement_cache(batch, subject_ids)
         batch.each do |classification|
@@ -20,14 +20,6 @@ class ClassificationsDumpWorker
         end
       end
     end
-  end
-
-  def completed_project_classifications
-    project
-      .classifications
-      .complete
-      .joins(:workflow)
-      .includes(:user, workflow: [:workflow_contents])
   end
 
   private
@@ -44,6 +36,13 @@ class ClassificationsDumpWorker
     subject_ids = c_s_ids.map { |_, subject_id| subject_id }
     cache.reset_subjects(Subject.unscoped.where(id: subject_ids).load)
     subject_ids
+  end
+
+  def completed_resource_classifications
+    resource.classifications
+    .complete
+    .joins(:workflow)
+    .includes(:user, workflow: [:workflow_contents])
   end
 
   def setup_retirement_cache(classifications, subject_ids)

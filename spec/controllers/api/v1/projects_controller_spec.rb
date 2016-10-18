@@ -825,7 +825,7 @@ describe Api::V1::ProjectsController, type: :controller do
   end
 
   context "creating exports" do
-    let(:resource) { create(:full_project, owner: user) }
+    let(:project) { create(:full_project, owner: user) }
     let(:test_attr) { :type }
     let(:new_resource) { Medium.find(created_instance_id(api_resource_name)) }
     let(:api_resource_name) { "media" }
@@ -838,23 +838,23 @@ describe Api::V1::ProjectsController, type: :controller do
 
     let(:create_params) do
       params = {
+        project_id: project.id,
         media: {
           content_type: content_type,
           metadata: { recipients: create_list(:user, 1).map(&:id) }
         }
       }
-      params.merge(project_id: resource.id)
     end
 
     describe "#create_classifications_export" do
-      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/classifications_export/ }
+      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/classifications_export/ }
       let(:test_attr_value) { "project_classifications_export" }
 
       it_behaves_like "is creatable", :create_classifications_export
     end
 
     describe "#create_aggregations_export" do
-      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/aggregations_export/ }
+      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/aggregations_export/ }
       let(:test_attr_value) { "project_aggregations_export" }
       let(:content_type) { "application/x-gzip" }
 
@@ -862,21 +862,21 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe "#create_subjects_export" do
-      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/subjects_export/ }
+      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/subjects_export/ }
       let(:test_attr_value) { "project_subjects_export" }
 
       it_behaves_like "is creatable", :create_subjects_export
     end
 
     describe "#create_workflows_export" do
-      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/workflows_export/ }
+      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/workflows_export/ }
       let(:test_attr_value) { "project_workflows_export" }
 
       it_behaves_like "is creatable", :create_workflows_export
     end
 
     describe "#create_workflow_contents_export" do
-      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{resource.id}\/workflow_contents_export/ }
+      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/workflow_contents_export/ }
       let(:test_attr_value) { "project_workflow_contents_export" }
 
       it_behaves_like "is creatable", :create_workflow_contents_export

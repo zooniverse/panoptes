@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe DumpMailerWorker do
-  let(:project) { double(id: 1) }
+  let(:resource) { double(id: 1) }
 
   let(:worker_class) do
     Class.new do
@@ -10,8 +10,8 @@ describe DumpMailerWorker do
 
       attr_reader :project, :medium
 
-      def initialize(project, medium)
-        @project = project
+      def initialize(resource, medium)
+        @resource = resource
         @medium = medium
       end
 
@@ -26,14 +26,14 @@ describe DumpMailerWorker do
       user1 = create :user
       user2 = create :user
       medium = double(get_url: nil, metadata: {"recipients" => [user1.id, user2.id]})
-      worker = worker_class.new(project, medium)
+      worker = worker_class.new(resource, medium)
       expect(ClassificationDataMailerWorker).to receive(:perform_async).once
       worker.send_email
     end
 
     it 'does not queue an email job if there are no recipients' do
       medium = double(get_url: nil, metadata: {"recipients" => []})
-      worker = worker_class.new(project, medium)
+      worker = worker_class.new(resource, medium)
       expect(ClassificationDataMailerWorker).to receive(:perform_async).never
       worker.send_email
     end

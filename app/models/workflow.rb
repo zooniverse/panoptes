@@ -27,6 +27,8 @@ class Workflow < ActiveRecord::Base
   has_many :aggregations, dependent: :destroy
   has_many :attached_images, -> { where(type: "workflow_attached_image") }, class_name: "Medium",
     as: :linked
+  has_one :classifications_export, -> { where(type: "workflow_classifications_export").order(created_at: :desc) },
+      class_name: "Medium", as: :linked
   has_and_belongs_to_many :expert_subject_sets, -> { expert_sets }, class_name: "SubjectSet"
   belongs_to :tutorial_subject, class_name: "Subject"
 
@@ -52,13 +54,15 @@ class Workflow < ActiveRecord::Base
   end
 
   can_through_parent :project, :update, :index, :show, :destroy, :update_links,
-    :destroy_links, :translate, :versions, :version, :retire_subject
+    :destroy_links, :translate, :versions, :version, :retire_subject, :create_classifications_export
 
   can_be_linked :subject_set, :same_project?, :model
   can_be_linked :subject_queue, :scope_for, :update, :user
   can_be_linked :aggregation, :scope_for, :update, :user
 
   ranks :display_order, with_same: :project_id
+
+  delegate :owner, to: :project
 
   def self.same_project?(subject_set)
     where(project: subject_set.project)

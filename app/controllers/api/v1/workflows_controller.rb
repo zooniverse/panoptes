@@ -4,10 +4,12 @@ class Api::V1::WorkflowsController < Api::ApiController
   include Versioned
   include TranslatableResource
 
-  require_authentication :update, :create, :destroy, :retire_subjects, scopes: [:project]
+  require_authentication :update, :create, :destroy, :retire_subjects, :create_classifications_export, scopes: [:project]
 
   resource_actions :index, :show, :create, :update, :deactivate
   schema_type :json_schema
+
+  prepend_before_action :require_login, only: [:create, :update, :destroy, :create_classifications_export]
 
   def index
     unless params.has_key?(:sort)
@@ -39,6 +41,11 @@ class Api::V1::WorkflowsController < Api::ApiController
   def retire_subjects
     operation.with(workflow: controlled_resource).run!(params)
     render nothing: true, status: 204
+  end
+
+  def create_classifications_export
+    medium = CreateClassificationsExport.with( api_user: api_user, object: controlled_resource ).run!(params)
+    medium_response(medium)
   end
 
   private
@@ -194,5 +201,11 @@ class Api::V1::WorkflowsController < Api::ApiController
     else
       super
     end
+  end
+
+  def medium_response(medium)
+    headers['Location'] = "#{request.protocol}#{request.host_with_port}/api#{medium.location}"
+    headers['Last-Modified'] = medium.updated_at.httpdate
+    json_api_render(:created, MediumSerializer.resource({}, Medium.where(id: medium.id)))
   end
 end

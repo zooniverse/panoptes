@@ -178,6 +178,15 @@ RSpec.describe Medium, :type => :model do
         expect(medium.location).to match(/\/projects\/[0-9]+\/attached_images\/[0-9]+/)
       end
     end
+
+   context "when type is one of workflow_classifications_export" do
+      let(:workflow) { create(:workflow) }
+      it 'should return the href the resource can be found at' do
+        medium = create(:medium, type: "workflow_classifications_export", linked: workflow, content_type: "text/csv")
+        expect(medium.location).to match(/\/workflows\/[0-9]+\/classifications_export/)
+      end
+    end
+
   end
 
   describe "before destroy callbacks" do

@@ -7,7 +7,7 @@ module DumpMailerWorker
 
   def send_email
     return unless emails.present?
-    mailer.perform_async(@project.id, media_get_url, emails)
+    mailer.perform_async(resource.id, media_get_url, emails)
   end
 
   def mailer
@@ -18,7 +18,7 @@ module DumpMailerWorker
     if recipients = medium.try(:metadata).try(:[], "recipients")
       User.where(id: recipients).pluck(:email)
     else
-      [project.owner.email]
+      [resource.owner.email]
     end
   end
 
