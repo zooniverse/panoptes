@@ -53,7 +53,7 @@ RSpec.describe Api::V1::SubjectWorkflowStatusesController, type: :controller do
 
   describe "#show" do
     let(:resource) { create(:subject_workflow_status) }
-    let(:authorized_user) { resource.workflow.project.owner }
+    let(:authorized_user) { resource.project.owner }
 
     it_behaves_like "is showable"
   end
