@@ -48,8 +48,7 @@ describe CellectController, type: :controller do
         it "should respond with all the workflows" do
           run_get
           workflows = Workflow.all.map{ |w| w.slice(:id, :pairwise, :grouped, :prioritized) }
-          expected = { workflows: workflows }.as_json
-          expect(json_response).to eq(expected)
+          expect(json_response["workflows"]).to match_array(workflows)
         end
       end
     end
