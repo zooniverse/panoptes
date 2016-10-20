@@ -509,8 +509,15 @@ describe Api::V1::UsersController, type: :controller do
         update_request
       end
 
-      it "sends an email to the new address" do
+      it "sends an email to the new address if user is valid" do
         expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, "email")
+      end
+
+      describe "with an email that already exists" do
+        let(:put_operations) { {users: {email: User.where.not(id: user.id).first.email}} }
+        it "doesn't send an email to the new address if user is not valid" do
+          expect(UserInfoChangedMailerWorker).to_not receive(:perform_async).with(user.id, "email")
+        end
       end
 
       context 'when email preferences are true' do
@@ -523,7 +530,7 @@ describe Api::V1::UsersController, type: :controller do
         end
       end
 
-      context 'when email prefences are false' do
+      context 'when email preferences are false' do
         let(:user) { create(:user, global_email_communication: false) }
         it 'should subscribe the new email' do
           expect(SubscribeWorker).to_not receive(:perform_async)
