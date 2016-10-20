@@ -26,7 +26,7 @@ RSpec.describe PublishClassificationWorker do
     end
 
     describe "internal classification event stream" do
-      let(:serialiser_opts) { { include: ['project', 'workflow', 'workflow_content', 'user', 'subjects'] } }
+      let(:serialiser_opts) { { include: ['project', 'workflow', 'user', 'subjects'] } }
 
       it "should format the data using the serializer" do
         expect(EventStreamSerializers::ClassificationSerializer)
