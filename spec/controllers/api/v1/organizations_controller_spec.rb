@@ -98,4 +98,11 @@ describe Api::V1::OrganizationsController, type: :controller do
       let(:test_attr_value) { "Def Not Illuminati" }
     end
   end
+
+  describe "#destroy" do
+    let(:resource) { create(:organization, owner: authorized_user) }
+    let(:instances_to_disable) { [resource] }
+
+    it_behaves_like "is deactivatable"
+  end
 end

@@ -1,6 +1,7 @@
 class Organization < ActiveRecord::Base
   include RoleControl::Owned
   include RoleControl::Controlled
+  include Activatable
   include Linkable
   include Translatable
 
@@ -9,7 +10,7 @@ class Organization < ActiveRecord::Base
 
   has_many :projects
   has_many :organization_contents, dependent: :destroy
-  has_many :acls, class_name: "AccesControlList", as: :resource, dependent: :destroy
+  has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
 
   accepts_nested_attributes_for :organization_contents
 

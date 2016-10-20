@@ -641,6 +641,7 @@ CREATE TABLE organizations (
     slug character varying DEFAULT ''::character varying,
     primary_language character varying NOT NULL,
     listed_at timestamp without time zone,
+    activated_state integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

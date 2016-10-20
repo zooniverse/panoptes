@@ -32,4 +32,14 @@ class Api::V1::OrganizationsController < Api::ApiController
 
     updated_resource_response
   end
+
+  def destroy
+    Organization.transaction do
+      Array.wrap(resource_ids).zip(Array.wrap(params[:organizations])).map do |organization_id, organization_params|
+        Organizations::Destroy.with(api_user: api_user, id: organization_id).run!
+      end
+    end
+
+    deleted_resource_response
+  end
 end

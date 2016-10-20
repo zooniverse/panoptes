@@ -6,6 +6,7 @@ class CreateOrganizations < ActiveRecord::Migration
       t.string :slug, default: ""
       t.string :primary_language, null: false
       t.timestamp :listed_at, default: nil
+      t.integer  :activated_state, default: 0, null: false
 
       t.timestamps null: false
     end
