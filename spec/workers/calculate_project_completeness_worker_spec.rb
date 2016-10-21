@@ -23,18 +23,12 @@ describe CalculateProjectCompletenessWorker do
   end
 
   describe '#workflow_completeness' do
-    let(:subject1) { create :subject }
-    let(:subject2) { create :subject }
-    let(:workflow) { create :workflow, subject_sets: [create(:subject_set, subjects: [subject1, subject2])], retirement: {'criteria' => 'classification_count', 'options' => {'count' => 10}} }
-
-    it 'returns 0 when no classifications have been made yet' do
-      expect(worker.workflow_completeness(workflow)).to eq(0.0)
+    let(:subject_set) { create(:subject_set_with_subjects) }
+    let(:workflow) do
+      create :workflow, subject_sets: [subject_set], retirement: {'criteria' => 'classification_count', 'options' => {'count' => 10}}
     end
 
-    context 'no panoptes retirement' do
-      before do
-        workflow.retirement = {'criteria' => 'never_retire', 'options' => {}}
-      end
+    shared_examples "it reports completeness correctly" do
 
       it 'returns 1 when all the subjects of a workflow have been retired' do
         workflow.classifications_count = 20
@@ -53,23 +47,21 @@ describe CalculateProjectCompletenessWorker do
       end
     end
 
+    it 'returns 0 when no subjects are linked' do
+      allow(workflow).to receive(:subjects_count).and_return(0)
+      expect(worker.workflow_completeness(workflow)).to eq(0.0)
+    end
+
     context 'classification count retirement' do
-      it 'returns 1 when all the subjects of a workflow have been retired' do
-        workflow.classifications_count = 20
-        workflow.retired_set_member_subjects_count = 2
-        expect(worker.workflow_completeness(workflow)).to eq(1.0)
+      it_should_behave_like "it reports completeness correctly"
+    end
+
+    context 'no panoptes retirement' do
+      before do
+        workflow.retirement = {'criteria' => 'never_retire', 'options' => {}}
       end
 
-      it 'returns 0.5 when all subjects are halfway towards their retirement limit' do
-        workflow.classifications_count = 10
-        expect(worker.workflow_completeness(workflow)).to eq(0.5)
-      end
-
-      it 'returns 1.0 when there are more classifications than needed and everything is retired' do
-        workflow.classifications_count = 9001
-        workflow.retired_set_member_subjects_count = 2
-        expect(worker.workflow_completeness(workflow)).to eq(1.0)
-      end
+      it_should_behave_like "it reports completeness correctly"
     end
   end
 end
