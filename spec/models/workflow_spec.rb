@@ -29,6 +29,17 @@ describe Workflow, type: :model do
       [:subjects_count, :finished?]
   end
 
+  describe ".scope_for" do
+    it "should eager load the linked resources used in the serializer" do
+      eager_loads = %i(subject_sets expert_subject_sets tutorial_subject attached_images)
+      expect_any_instance_of(Workflow::ActiveRecord_Relation)
+        .to receive(:eager_load)
+        .with(*eager_loads)
+        .and_call_original
+      Workflow.scope_for(:index, ApiUser.new(nil))
+    end
+  end
+
   it "should have a valid factory" do
     expect(workflow).to be_valid
   end

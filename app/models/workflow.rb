@@ -68,6 +68,15 @@ class Workflow < ActiveRecord::Base
     where(project: subject_set.project)
   end
 
+  def self.scope_for(action, user, opts={})
+    super.eager_load(
+      :subject_sets,
+      :expert_subject_sets,
+      :tutorial_subject,
+      :attached_images
+    )
+  end
+
   def tasks
     read_attribute(:tasks).with_indifferent_access
   end
