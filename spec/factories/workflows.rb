@@ -219,5 +219,27 @@ FactoryGirl.define do
           }
         })
     end
+
+    trait :persistent_task do
+      tasks (
+        {
+          "init" => {
+            "type" => "persistent",
+            "answers" => [{ "label" => "init.answers.0.label" }],
+            "question" => "init.question"
+          }
+        }
+      )
+
+      after(:build) do |w, env|
+        if env.build_contents
+          strings = {
+            "init.answers.0.label" => "yes",
+            "init.question" => "Fire present?"
+          }
+          w.workflow_contents.first.update(strings: strings)
+        end
+      end
+    end
   end
 end

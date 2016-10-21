@@ -251,6 +251,25 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
           expect(formatted["task_label"]).to eq("Draw a circle")
         end
       end
+
+      context "with a nothing_here task" do
+        let(:workflow) { build(:workflow, :persistent_task) }
+        let(:contents) { workflow.workflow_contents.first }
+        let(:tasks) { workflow.tasks }
+        let(:strings) { contents.strings }
+        let(:annotation) do
+          {
+            "task"=>"init",
+            "value"=> 0
+           }
+        end
+
+        it 'should add the correct answer labels' do
+          formatted = described_class.new(classification, annotation, cache).to_h
+          expect(formatted["task_label"]).to eq("Fire present?")
+          expect(formatted["value"]).to eq("yes")
+        end
+      end
     end
   end
 end
