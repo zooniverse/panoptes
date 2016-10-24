@@ -62,13 +62,8 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def self.unseen_for_user_by_workflow(user, workflow)
-    if Panoptes.flipper[:seens_via_classifications].enabled?
-      seen_subjects = UserSeenSubject.seen_for_user_by_workflow(user, workflow)
-      by_workflow(workflow).where.not(subject_id: seen_subjects)
-    else
-      seen_subjects = for_user_by_workflow_scope(user, workflow)
-      by_workflow(workflow).where(seen_subjects.exists.not)
-    end
+    seen_subjects = for_user_by_workflow_scope(user, workflow)
+    by_workflow(workflow).where(seen_subjects.exists.not)
   end
 
   def self.for_user_by_workflow_scope(user, workflow)

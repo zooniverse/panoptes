@@ -227,23 +227,10 @@ class User < ActiveRecord::Base
   end
 
   def has_finished?(workflow)
-    CodeExperiment.run "has_finished_by_unseen" do |e|
-      e.use do
-        current_seen_count = SetMemberSubject
-          .seen_for_user_by_workflow(self, workflow)
-          .count
-        !!(current_seen_count >= workflow.subjects_count)
-      end
-
-      e.try do
-        SetMemberSubject.unseen_for_user_by_workflow(self, workflow).empty?
-      end
-
-      e.compare do |control, candidate|
-        control == candidate
-      end
-    end
-
+    current_seen_count = SetMemberSubject
+      .seen_for_user_by_workflow(self, workflow)
+      .count
+    !!(current_seen_count >= workflow.subjects_count)
   end
 
   def valid_sha1_password?(plain_password)
