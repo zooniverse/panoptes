@@ -7,8 +7,7 @@ module Subjects
     end
 
     def select
-      results = selection_strategy.new(available, limit).select
-      results.take(limit)
+      selection_strategy.new(available, limit).select
     end
 
     def any_workflow_data
