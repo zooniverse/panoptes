@@ -42,7 +42,9 @@ class Workflow < ActiveRecord::Base
   DEFAULT_RETIREMENT_OPTIONS = {
     'criteria' => 'classification_count',
     'options' => {'count' => 15}
-  }
+  }.freeze
+
+  EAGER_LOADS = %i(subject_sets expert_subject_sets tutorial_subject attached_images).freeze
 
   validates_presence_of :project, :display_name
 
@@ -68,13 +70,12 @@ class Workflow < ActiveRecord::Base
     where(project: subject_set.project)
   end
 
-  def self.scope_for(action, user, opts={})
-    super.eager_load(
-      :subject_sets,
-      :expert_subject_sets,
-      :tutorial_subject,
-      :attached_images
-    )
+  def self.scope_for(action, user, opts={eager_loads: EAGER_LOADS})
+    workflows = super
+    if opts.has_key?(:eager_loads)
+      workflows = workflows.eager_load(*opts[:eager_loads])
+    end
+    workflows
   end
 
   def tasks

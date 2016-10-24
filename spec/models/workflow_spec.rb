@@ -38,6 +38,21 @@ describe Workflow, type: :model do
         .and_call_original
       Workflow.scope_for(:index, ApiUser.new(nil))
     end
+
+    it "eager load the supplied relations" do
+      eager_loads = %i(subject_sets)
+      expect_any_instance_of(Workflow::ActiveRecord_Relation)
+        .to receive(:eager_load)
+        .with(*eager_loads)
+        .and_call_original
+      Workflow.scope_for(:index, ApiUser.new(nil), { eager_loads: eager_loads })
+    end
+
+    it "should skip eager load if not set" do
+      expect_any_instance_of(Workflow::ActiveRecord_Relation)
+        .not_to receive(:eager_load)
+      Workflow.scope_for(:index, ApiUser.new(nil), {})
+    end
   end
 
   it "should have a valid factory" do
