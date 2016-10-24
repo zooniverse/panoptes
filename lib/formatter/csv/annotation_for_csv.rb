@@ -14,7 +14,7 @@ module Formatter
         case task['type']
         when "drawing"
           drawing
-        when /single|multiple|persistent/
+        when /single|multiple|shortcut/
           simple
         when "text"
           text

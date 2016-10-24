@@ -252,8 +252,8 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         end
       end
 
-      context "with a nothing_here task" do
-        let(:workflow) { build(:workflow, :persistent_task) }
+      context "with a shortcut task" do
+        let(:workflow) { build(:workflow, :shortcut) }
         let(:contents) { workflow.workflow_contents.first }
         let(:tasks) { workflow.tasks }
         let(:strings) { contents.strings }

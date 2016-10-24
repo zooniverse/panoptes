@@ -220,11 +220,11 @@ FactoryGirl.define do
         })
     end
 
-    trait :persistent_task do
+    trait :shortcut do
       tasks (
         {
           "init" => {
-            "type" => "persistent",
+            "type" => "shortcut",
             "answers" => [{ "label" => "init.answers.0.label" }],
             "question" => "init.question"
           }
