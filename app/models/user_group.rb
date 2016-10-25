@@ -5,13 +5,13 @@ class UserGroup < ActiveRecord::Base
   include PgSearch
 
   has_many :memberships, dependent: :destroy
-  has_many :active_memberships, -> { active.where(identity: false) },
-           class_name: "Membership"
+  has_many :active_memberships, -> { active.not_identity }, class_name: "Membership"
+  has_one  :identity_membership, -> { identity }, class_name: "Membership"
   has_many :users, through: :memberships
   has_many :classifications, dependent: :restrict_with_exception
   has_many :access_control_lists, dependent: :destroy
 
-  has_many :owned_resources, -> { where(roles: ["owner"]) },
+  has_many :owned_resources, -> { where.overlap(roles: ["owner"]) },
            class_name: "AccessControlList"
 
   has_many :projects, through: :owned_resources, source: :resource,
@@ -94,7 +94,7 @@ class UserGroup < ActiveRecord::Base
   end
 
   def identity?
-    memberships.where(identity: true).exists?
+    !!identity_membership
   end
 
   def verify_join_token(token_to_verify)
