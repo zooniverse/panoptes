@@ -20,6 +20,25 @@ describe Project, type: :model do
   it_behaves_like "is translatable"
   it_behaves_like "has slugged name"
 
+  describe ".scope_for" do
+    it "should eager load the linked resources used in the serializer" do
+      eager_loads = [
+         :workflows,
+         :subject_sets,
+         { owner: { identity_membership: :user } },
+         :project_contents,
+         :avatar,
+         :background,
+         :attached_images
+      ]
+      expect_any_instance_of(Project::ActiveRecord_Relation)
+        .to receive(:eager_load)
+        .with(*eager_loads)
+        .and_call_original
+      Project.scope_for(:index, ApiUser.new(nil))
+    end
+  end
+
   context "with caching resource associations" do
     let(:cached_resource) { full_project }
 

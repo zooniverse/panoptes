@@ -10,7 +10,15 @@ class Project < ActiveRecord::Base
   include RankedModel
   include SluggedName
 
-  EXPERT_ROLES = [:owner, :expert]
+  EXPERT_ROLES = [:owner, :expert].freeze
+  EAGER_LOADS = [
+     :workflows,
+     :subject_sets,
+     { owner: { identity_membership: :user } },
+     :project_contents,
+     :avatar,
+     :background,
+     :attached_images ].freeze
 
   has_many :tutorials
   has_many :field_guides, dependent: :destroy
@@ -91,6 +99,10 @@ class Project < ActiveRecord::Base
 
   ranks :launched_row_order
   ranks :beta_row_order
+
+  def self.scope_for(action, user, opts={})
+    super(action, user, opts).eager_load(*EAGER_LOADS)
+  end
 
   def expert_classifier_level(classifier)
     expert_roles = project_roles.where(user_group: classifier.identity_group)
