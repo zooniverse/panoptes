@@ -51,7 +51,7 @@ module Translatable
   end
 
   def available_languages
-    content_association.pluck(:language).map(&:downcase)
+    content_association.map { |ca| ca.language.downcase }
   end
 
   def content_association
