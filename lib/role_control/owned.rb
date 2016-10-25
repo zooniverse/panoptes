@@ -35,12 +35,21 @@ module RoleControl
         super(owning_group)
       end
 
-      def owner(reload=nil)
-        group = super(reload)
-        if group.try(:identity?)
-          group.users.first
+      # this method returns either the identity user or the owning group it was
+      # setup this way to allow groups and users to own resources via IdentityGroups
+      def owner
+        owner_group = super
+        if owner_group&.identity?
+          # below uses the chained call for eager loading, trying to load
+          # on other relations doesn't work through other relations but only when
+          # accessing via this relation accessor override...and that makes me sad.
+          #
+          # this owner data model adds complexity and fights the framework
+          # when trying to load data via relations...we should seriously consider
+          # how to remove this and simplify the owner relations (resource -> owner [:user]?)
+          owner_group.identity_membership.user
         else
-          group
+          owner_group
         end
       end
 
