@@ -16,6 +16,7 @@ class Project < ActiveRecord::Base
      :subject_sets,
      { owner: { identity_membership: :user } },
      :project_contents,
+     :pages,
      :avatar,
      :background,
      :attached_images ].freeze
@@ -101,7 +102,8 @@ class Project < ActiveRecord::Base
   ranks :beta_row_order
 
   def self.scope_for(action, user, opts={})
-    super(action, user, opts).eager_load(*EAGER_LOADS)
+    # eager load where we can, preload when 2 associations share the same join table
+    super.eager_load(*EAGER_LOADS).preload(:project_roles)
   end
 
   def expert_classifier_level(classifier)

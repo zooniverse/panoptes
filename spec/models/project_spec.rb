@@ -27,6 +27,7 @@ describe Project, type: :model do
          :subject_sets,
          { owner: { identity_membership: :user } },
          :project_contents,
+         :pages,
          :avatar,
          :background,
          :attached_images
