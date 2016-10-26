@@ -18,7 +18,13 @@ class Project < ActiveRecord::Base
      :pages,
      :avatar,
      :background,
-     :attached_images ].freeze
+     :attached_images
+   ].freeze
+   PRELOADS = [
+     :project_roles,
+     owner: { identity_membership: :user }
+   ].freeze
+
 
   has_many :tutorials
   has_many :field_guides, dependent: :destroy
@@ -106,9 +112,7 @@ class Project < ActiveRecord::Base
     else
       # eager load where we can, preload when 2+ eager_loads share the same source table
       # e.g. filtering on the owner relation / roles in controllers
-      super
-        .eager_load(*EAGER_LOADS)
-        .preload(:project_roles, owner: { identity_membership: :user })
+      super.eager_load(*EAGER_LOADS).preload(*PRELOADS)
     end
   end
 
