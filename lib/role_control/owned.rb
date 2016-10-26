@@ -13,7 +13,7 @@ module RoleControl
       validates_presence_of :owner
 
       def self.filter_by_owner(owner_groups)
-        eager_load(owner: [:users])
+        eager_load(owner: { identity_membership: :user })
         .joins(:owner)
         .where(access_control_lists: { user_group: owner_groups })
       end
