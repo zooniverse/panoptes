@@ -14,7 +14,6 @@ class Project < ActiveRecord::Base
   EAGER_LOADS = [
      :workflows,
      :subject_sets,
-     { owner: { identity_membership: :user } },
      :project_contents,
      :pages,
      :avatar,
@@ -102,8 +101,15 @@ class Project < ActiveRecord::Base
   ranks :beta_row_order
 
   def self.scope_for(action, user, opts={})
-    # eager load where we can, preload when 2 associations share the same join table
-    super.eager_load(*EAGER_LOADS).preload(:project_roles)
+    if opts[:skip_eager_load]
+      super
+    else
+      # eager load where we can, preload when 2+ eager_loads share the same source table
+      # e.g. filtering on the owner relation / roles in controllers
+      super
+        .eager_load(*EAGER_LOADS)
+        .preload(:project_roles, owner: { identity_membership: :user })
+    end
   end
 
   def expert_classifier_level(classifier)

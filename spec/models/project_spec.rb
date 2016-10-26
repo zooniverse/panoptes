@@ -21,20 +21,30 @@ describe Project, type: :model do
   it_behaves_like "has slugged name"
 
   describe ".scope_for" do
-    it "should eager load the linked resources used in the serializer" do
-      eager_loads = [
+    let(:eager_loads) do
+      [
          :workflows,
          :subject_sets,
-         { owner: { identity_membership: :user } },
          :project_contents,
          :pages,
          :avatar,
          :background,
          :attached_images
       ]
+    end
+
+    it "should eager load the linked resources used in the serializer" do
       expect_any_instance_of(Project::ActiveRecord_Relation)
         .to receive(:eager_load)
         .with(*eager_loads)
+        .and_call_original
+      Project.scope_for(:index, ApiUser.new(nil))
+    end
+
+    it "should prealod the linked resources used in the serializer" do
+      expect_any_instance_of(Project::ActiveRecord_Relation)
+        .to receive(:preload)
+        .with(:project_roles, owner: { identity_membership: :user })
         .and_call_original
       Project.scope_for(:index, ApiUser.new(nil))
     end
