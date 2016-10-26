@@ -29,6 +29,26 @@ describe Workflow, type: :model do
       [:subjects_count, :finished?]
   end
 
+  describe ".scope_for" do
+    let(:eager_loads) do
+      %i(project subject_sets expert_subject_sets tutorial_subject attached_images)
+    end
+
+    it "should eager load the linked resources used in the serializer" do
+      expect_any_instance_of(Workflow::ActiveRecord_Relation)
+        .to receive(:eager_load)
+        .with(*eager_loads)
+        .and_call_original
+      Workflow.scope_for(:index, ApiUser.new(nil))
+    end
+
+    it "should skip eager load if not set" do
+      expect_any_instance_of(Workflow::ActiveRecord_Relation)
+        .not_to receive(:eager_load)
+      Workflow.scope_for(:index, ApiUser.new(nil), {skip_eager_load: true})
+    end
+  end
+
   it "should have a valid factory" do
     expect(workflow).to be_valid
   end
