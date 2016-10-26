@@ -66,7 +66,7 @@ RSpec.describe Subjects::Selector do
     context "when the database selection strategy returns an empty set" do
       before do
         allow_any_instance_of(Subjects::PostgresqlSelection)
-        .to receive(:select).and_return([])
+          .to receive(:select).and_return([])
         expect_any_instance_of(Subjects::PostgresqlSelection)
           .to receive(:any_workflow_data)
           .and_call_original
@@ -82,6 +82,36 @@ RSpec.describe Subjects::Selector do
 
         it 'should fallback to selecting some grouped data' do
           allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
+          subjects, _context = subject.get_subjects
+        end
+      end
+    end
+
+    context "when the cellect selection strategy returns an empty set"do
+      before do
+        stub_cellect_connection
+        stub_redis_connection
+        allow(workflow).to receive(:using_cellect?).and_return(true)
+      end
+
+      it 'should fallback to using postgres selection' do
+        expect_any_instance_of(Subjects::PostgresqlSelection)
+          .to receive(:select)
+          .and_call_original
+        subjects, _context = subject.get_subjects
+      end
+
+      context "when the default postgres selector returns no data" do
+        before do
+          allow_any_instance_of(Subjects::PostgresqlSelection)
+            .to receive(:select)
+            .and_return([])
+        end
+
+        it "should fallback to just returning any data" do
+          expect_any_instance_of(Subjects::PostgresqlSelection)
+            .to receive(:any_workflow_data)
+            .and_call_original
           subjects, _context = subject.get_subjects
         end
       end
