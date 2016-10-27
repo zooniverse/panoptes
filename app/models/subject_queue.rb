@@ -21,7 +21,12 @@ class SubjectQueue < ActiveRecord::Base
   def self.scope_for(action, user, opts={})
     case action
     when :show, :index
-      where(workflow: Workflow.scope_for(:update, groups, opts))
+      workflows = Workflow.scope_for(
+        :update,
+        user,
+        opts.merge(skip_eager_load: true)
+      )
+      where(workflow: workflows)
     else
       super
     end
