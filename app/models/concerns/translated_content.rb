@@ -24,9 +24,12 @@ module TranslatedContent
       when :show, :index
         super
       else
+        translatable = translated_class
+          .scope_for(:translate, user, opts.merge(skip_eager_load: true))
         joins(translated_for)
-          .merge(translated_class.scope_for(:translate, user, opts))
-          .where.not("\"#{translated_class.table_name}\".\"primary_language\" = \"#{table_name}\".\"language\"")
+          .merge(translatable)
+          .where
+          .not("\"#{translated_class.table_name}\".\"primary_language\" = \"#{table_name}\".\"language\"")
       end
     end
   end
