@@ -172,23 +172,27 @@ class Api::V1::ProjectsController < Api::ApiController
     super(create_params)
   end
 
-  def build_update_hash(update_params, id)
+  def build_update_hash(update_params, resource)
     admin_allowed update_params, *admin_allowed_params
+
     content_update = content_from_params(update_params)
     unless content_update.blank?
-      Project.find(id).primary_content.update!(content_update)
+      resource.primary_content.update!(content_update)
     end
+
     tags = create_or_update_tags(update_params)
-    unless tags.nil?
-      p = Project.find(id)
-      p.tags = tags
-      p.save!
+    resource.tags = tags unless tags.nil?
+
+    if update_params[:launch_approved]
+      resource.launch_date ||= Time.zone.now
     end
+
     if update_params[:live] == false
       update_params[:launch_approved] = false
       update_params[:beta_approved] = false
     end
-    super(update_params, id)
+
+    super(update_params, resource)
   end
 
   def new_items(resource, relation, value)
