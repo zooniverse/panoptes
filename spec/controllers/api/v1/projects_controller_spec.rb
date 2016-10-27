@@ -661,25 +661,44 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
 
-    describe "approved option" do
-      before(:each) do
+    describe "launch_approved" do
+      let(:ps) do
         ps = update_params
         ps[:admin] = true
         ps[:projects][:launch_approved] = true
+        ps
+      end
+
+      before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        put :update, ps.merge(id: resource.id)
       end
 
       context "when the user is an admin" do
         let(:authorized_user) { create(:admin_user) }
+
         it "should update the project" do
+          put :update, ps.merge(id: resource.id)
           expect(response).to have_http_status(:ok)
+        end
+
+        it "should record the launch_date" do
+          expect(resource.launch_date).to be_nil
+          put :update, ps.merge(id: resource.id)
+          expect(resource.reload.launch_date).not_to be_nil
+        end
+
+        it "should not record the launch_date if it's already been set" do
+          resource.update_column(:launch_date, Time.zone.now)
+          ld = resource.reload.launch_date
+          put :update, ps.merge(id: resource.id)
+          expect(resource.reload.launch_date).to eq(ld)
         end
       end
 
       context "when the user is not an admin" do
         let(:authorized_user) { create(:user) }
         it "should not update the project" do
+          put :update, ps.merge(id: resource.id)
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
