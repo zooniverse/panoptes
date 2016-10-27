@@ -22,14 +22,6 @@ RSpec.describe Subjects::PostgresqlRandomSelection do
       subject.select
     end
 
-    it "should give up trying to construct a random list after set number of attempts" do
-      unreachable_limit = SetMemberSubject.count + 1
-      allow_any_instance_of(subject.class).to receive(:available_count).and_return(unreachable_limit + 1)
-      allow_any_instance_of(subject.class).to receive(:limit).and_return(unreachable_limit)
-      results = subject.select
-      expect(results).to eq(results)
-    end
-
     describe "selection limits" do
 
       context "larger than half available count" do
