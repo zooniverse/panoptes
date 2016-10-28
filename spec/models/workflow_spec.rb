@@ -34,18 +34,25 @@ describe Workflow, type: :model do
       %i(project subject_sets expert_subject_sets tutorial_subject attached_images)
     end
 
-    it "should eager load the linked resources used in the serializer" do
-      expect_any_instance_of(Workflow::ActiveRecord_Relation)
-        .to receive(:eager_load)
-        .with(*eager_loads)
-        .and_call_original
-      Workflow.scope_for(:index, ApiUser.new(nil))
-    end
+    context "with enabled experiment" do
+      before do
+        Panoptes.flipper["eager_load_workflows"].enable
+        allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
+      end
 
-    it "should skip eager load if not set" do
-      expect_any_instance_of(Workflow::ActiveRecord_Relation)
-        .not_to receive(:eager_load)
-      Workflow.scope_for(:index, ApiUser.new(nil), {skip_eager_load: true})
+      it "should eager load the linked resources used in the serializer" do
+        expect_any_instance_of(Workflow::ActiveRecord_Relation)
+          .to receive(:eager_load)
+          .with(*eager_loads)
+          .and_call_original
+        Workflow.scope_for(:index, ApiUser.new(nil))
+      end
+
+      it "should skip eager load if not set" do
+        expect_any_instance_of(Workflow::ActiveRecord_Relation)
+          .not_to receive(:eager_load)
+        Workflow.scope_for(:index, ApiUser.new(nil), {skip_eager_load: true})
+      end
     end
   end
 

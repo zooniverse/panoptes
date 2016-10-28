@@ -71,10 +71,17 @@ class Workflow < ActiveRecord::Base
   end
 
   def self.scope_for(action, user, opts={})
-    if opts[:skip_eager_load]
-      super
-    else
-      super.eager_load(*EAGER_LOADS)
+    experiment_name = "eager_load_workflows"
+    scope = super
+    CodeExperiment.run "#{experiment_name}" do |e|
+      e.run_if { Panoptes.flipper[experiment_name].enabled? }
+      e.context user: user
+      e.use { scope }
+      e.try do
+        opts[:skip_eager_load] ? scope : scope.eager_load(*EAGER_LOADS)
+      end
+      #skip the mismatch reporting...we just want perf metrics
+      e.ignore { true }
     end
   end
 
