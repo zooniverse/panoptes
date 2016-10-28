@@ -107,12 +107,23 @@ class Project < ActiveRecord::Base
   ranks :beta_row_order
 
   def self.scope_for(action, user, opts={})
-    if opts[:skip_eager_load]
-      super
-    else
-      # eager load where we can, preload when 2+ eager_loads share the same source table
-      # e.g. filtering on the owner relation / roles in controllers
-      super.eager_load(*EAGER_LOADS).preload(*PRELOADS)
+    experiment_name = "eager_load_projects"
+    scope = super
+    CodeExperiment.run "#{experiment_name}" do |e|
+      e.run_if { Panoptes.flipper[experiment_name].enabled? }
+      e.context user: user
+      e.use { scope }
+      e.try do
+        if opts[:skip_eager_load]
+          scope
+        else
+          # eager load where we can, preload when 2+ eager_loads share the same source table
+          # e.g. filtering on the owner relation / roles in controllers
+          scope.eager_load(*EAGER_LOADS).preload(*PRELOADS)
+        end
+      end
+      #skip the mismatch reporting...we just want perf metrics
+      e.ignore { true }
     end
   end
 
