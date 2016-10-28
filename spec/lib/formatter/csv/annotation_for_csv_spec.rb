@@ -49,6 +49,13 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     expect(formatted["value"][0]["tool_label"]).to be_nil
   end
 
+  it 'adds an unknown tool label if the tool index is missing', :focus do
+    binding.pry
+    wierd_annotation = weird_annotation.merge("value" => 0)
+    formatted = described_class.new(classification, weird_annotation, cache).to_h
+    expect(formatted["value"][0]["tool_label"]).to be_nil
+  end
+
   it 'has a nil label when the tool is not found in the workflow' do
     annotation = {"task" => "interest", "value" => [{"x"=>1, "y"=>2, "tool"=>1000}]}
     formatted = described_class.new(classification, annotation, cache).to_h
