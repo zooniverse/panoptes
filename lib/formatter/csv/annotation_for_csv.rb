@@ -134,11 +134,8 @@ module Formatter
       end
 
       def tool_label(task_info, tool)
-        begin
-          tool_index = tool["tool"]
-        rescue TypeError => e
-          raise ToolFormattingError.new(e.message)
-        end
+        raise ToolFormattingError unless tool.is_a?(Hash)
+        tool_index = tool["tool"]
         have_tool_lookup_info = !!(task_info["tools"] && tool_index)
         known_tool = have_tool_lookup_info && task_info["tools"][tool_index]
         translate(known_tool["label"]) if known_tool
