@@ -52,7 +52,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
   it 'returns the raw value if it is in an unexpected format' do
     weird_annotation["value"] = 0
     formatted = described_class.new(classification, weird_annotation, cache).to_h
-    expect(formatted["value"]).to eq(weird_annotation["value"])
+    expect(formatted["value"]).to eq(Array.wrap(weird_annotation["value"]))
   end
 
   it 'has a nil label when the tool is not found in the workflow' do

@@ -1,8 +1,6 @@
 module Formatter
   module Csv
     class AnnotationForCsv
-      class ToolFormattingError < StandardError; end
-
       attr_reader :classification, :annotation, :cache
 
       def initialize(classification, annotation, cache)
@@ -36,16 +34,16 @@ module Formatter
           new_anno['task'] = @current['task']
           new_anno['task_label'] = task_label(task_info)
 
-          value_with_tool = begin
-            Array.wrap(@current["value"]).map do |drawn_item|
+          added_tool_lables = Array.wrap(@current["value"]).map do |drawn_item|
+            if drawn_item.is_a?(Hash)
               tool_label = tool_label(task_info, drawn_item)
               drawn_item.merge("tool_label" => tool_label)
+            else
+              drawn_item
             end
-          rescue ToolFormattingError => e
-            @current["value"]
           end
 
-          new_anno["value"] = value_with_tool
+          new_anno["value"] = added_tool_lables
         end
       end
 
@@ -134,7 +132,6 @@ module Formatter
       end
 
       def tool_label(task_info, tool)
-        raise ToolFormattingError unless tool.is_a?(Hash)
         tool_index = tool["tool"]
         have_tool_lookup_info = !!(task_info["tools"] && tool_index)
         known_tool = have_tool_lookup_info && task_info["tools"][tool_index]
