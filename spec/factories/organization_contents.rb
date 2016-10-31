@@ -1,8 +1,9 @@
 FactoryGirl.define do
   factory :organization_content do
-    sequence(:description) { |n| "This is the description for Organization #{ n }" }
-    sequence(:title) { |n| "Test Organization #{ n }" }
-    sequence(:introduction) { |n| "This is the intro for Organization #{ n }" }
-    language "tw"
+    organization
+    description "This is the description for an Organization"
+    title "Test Organization"
+    introduction "This is the intro for an Organization"
+    language "en"
   end
 end
