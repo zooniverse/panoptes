@@ -24,14 +24,6 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     }
   end
 
-  describe '#report_to_honey_badger' do
-    it 'reports the correct details' do
-      annotator = described_class.new(classification, annotation, cache)
-      expect(Honeybadger).to receive(:notify)
-      annotator.send(:report_to_honey_badger, 1)
-    end
-  end
-
   it 'adds the task label' do
     formatted = described_class.new(classification, annotation, cache).to_h
     expect(formatted["task_label"]).to eq("Draw a circle")
