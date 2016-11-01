@@ -44,8 +44,6 @@ class Workflow < ActiveRecord::Base
     'options' => {'count' => 15}
   }.freeze
 
-  EAGER_LOADS = %i(subject_sets expert_subject_sets tutorial_subject attached_images).freeze
-
   validates_presence_of :project, :display_name
 
   validate do |workflow|
@@ -68,14 +66,6 @@ class Workflow < ActiveRecord::Base
 
   def self.same_project?(subject_set)
     where(project: subject_set.project)
-  end
-
-  def self.scope_for(action, user, opts={eager_loads: EAGER_LOADS})
-    workflows = super
-    if opts.has_key?(:eager_loads)
-      workflows = workflows.eager_load(*opts[:eager_loads])
-    end
-    workflows
   end
 
   def tasks
