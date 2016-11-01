@@ -4,18 +4,19 @@ describe Api::V1::OrganizationsController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:organization) { build(:organization, listed_at: Time.now, owner: authorized_user) }
   let(:unlisted_organization) { build(:organization, listed_at: nil) }
+  let(:owned_unlisted_organization) { build(:organization, listed_at: nil, owner: authorized_user) }
 
   let(:scopes) { %w(public organization) }
 
   describe "when not logged in" do
     describe "#index" do
-
       it 'returns only the listed organization' do
-        unlisted_organization.save
         organization.save
+        owned_unlisted_organization.save
         get :index
         expect(response.status).to eq(200)
         expect(json_response["organizations"].length).to eq(1)
+        expect(json_response['organizations'].map { |o| o['id'] }).not_to include(owned_unlisted_organization.id.to_s)
       end
     end
   end
@@ -44,7 +45,7 @@ describe Api::V1::OrganizationsController, type: :controller do
       end
 
       describe "with unlisted organizations" do
-        let(:owned_unlisted_organization) { build(:organization, listed_at: nil, owner: authorized_user) }
+        let(:unauthorized_user) { create(:user) }
 
         before do
           unlisted_organization.save
@@ -58,6 +59,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         end
 
         it "doesn't return unlisted organizations for unauthorized users" do
+          default_request scopes: scopes, user_id: unauthorized_user.id
           get :index
           expect(json_response["organizations"]).to be_empty
         end

@@ -3,7 +3,7 @@ module TranslatedContent
   include RoleControl::ParentalControlled
 
   included do
-    has_paper_trail skip: [:language]
+    has_paper_trail skip: [:langauge]
     validates :language, format: {with: LanguageValidation.lang_regex}
     belongs_to translated_for
 

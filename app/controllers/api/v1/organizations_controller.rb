@@ -1,7 +1,6 @@
 class Api::V1::OrganizationsController < Api::ApiController
   include FilterByOwner
   include FilterByCurrentUserRoles
-  # include TranslatableResource
   include IndexSearch
   include AdminAllowed
 
@@ -12,6 +11,10 @@ class Api::V1::OrganizationsController < Api::ApiController
 
   prepend_before_action :require_login,
     only: [:create, :update, :destroy]
+
+  CONTENT_PARAMS = [:description,
+                    :title,
+                    :introduction].freeze
 
   def create
     organizations = Organization.transaction do

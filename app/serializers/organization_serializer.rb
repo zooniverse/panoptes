@@ -1,5 +1,6 @@
 class OrganizationSerializer
   include RestPack::Serializer
+  include ContentSerializer
 
   attributes :id, :name, :display_name, :description, :introduction, :title, :href
 
@@ -21,12 +22,5 @@ class OrganizationSerializer
 
  def fields
    %i(title description introduction)
- end
-
- def _content
-   content = @model.content_for(@context[:languages])
-   content = fields.map{ |k| Hash[k, content.send(k)] }.reduce(&:merge)
-   content.default_proc = proc { |hash, key| "" }
-   content
  end
 end

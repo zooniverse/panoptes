@@ -4,6 +4,7 @@ class ProjectSerializer
   include RestPack::Serializer
   include OwnerLinkSerializer
   include MediaLinksSerializer
+  include ContentSerializer
 
   attributes :id, :display_name, :classifications_count,
     :subjects_count, :created_at, :updated_at, :available_languages,
@@ -73,10 +74,6 @@ class ProjectSerializer
     end
   end
 
-  def content
-    @content ||= _content
-  end
-
   def tags
     @model.tags.map(&:name)
   end
@@ -91,12 +88,5 @@ class ProjectSerializer
 
   def fields
     %i(title description workflow_description introduction url_labels)
-  end
-
-  def _content
-    content = @model.content_for(@context[:languages])
-    content = fields.map{ |k| Hash[k, content.send(k)] }.reduce(&:merge)
-    content.default_proc = proc { |hash, key| "" }
-    content
   end
 end
