@@ -13,7 +13,7 @@ class WorkflowCounter
   def retired_subjects
     retired = SubjectWorkflowStatus.by_set(workflow.subject_sets.pluck(:id)).retired.where(workflow_id: workflow.id)
     if launch_date
-      retired = retired.where("subject_workflow_counts.created_at >= ?", launch_date)
+      retired = retired.where("subject_workflow_counts.retired_at >= ?", launch_date)
     end
     retired.count
   end

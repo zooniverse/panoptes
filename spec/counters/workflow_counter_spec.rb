@@ -30,9 +30,13 @@ describe WorkflowCounter do
     end
 
     context "with workflow counts" do
+      let(:sws_params) do
+        { workflow: workflow, retired_at: DateTime.now, created_at: DateTime.now + 2.days }
+      end
+
       before do
         workflow.subjects.each do |subject|
-          create(:subject_workflow_status, workflow: workflow, subject: subject, retired_at: DateTime.now)
+          create(:subject_workflow_status, sws_params.merge(subject: subject))
         end
       end
 
@@ -41,7 +45,7 @@ describe WorkflowCounter do
       end
 
       it "should respect the project launch date" do
-        workflow.project.update_column(:launch_date, DateTime.now+1.day)
+        workflow.project.update_column(:launch_date, DateTime.now + 1.day)
         expect(counter.retired_subjects).to eq(0)
       end
 
