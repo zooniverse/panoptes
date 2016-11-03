@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ProjectSerializer do
-  let(:project) { create(:full_project, state: "finished") }
+  let(:project) { create(:full_project, state: "finished", live: false) }
   let(:context) { {languages: ['en'], fields: [:title, :url_labels]} }
 
   let(:serializer) do
@@ -33,12 +33,27 @@ describe ProjectSerializer do
       expect(serializer.state).to eq project.state
     end
 
-    let!(:paused_project) { create(:full_project, state: "paused") }
-    it 'can filter by state' do
-      project.touch
-      results = described_class.page({"state" => "finished"})
-      expect(results[:projects][0][:id]).to eq(project.id.to_s)
-      expect(results[:projects].count).to eq(1)
+    describe 'can filter by state' do
+      let(:paused_project) { create(:full_project, state: "paused", live: false) }
+      let(:live_project) { create(:full_project, state: nil, live: true) }
+
+      before do
+        live_project.save
+        paused_project.save
+        project.save
+      end
+
+      it 'includes filtered projects' do
+        results = described_class.page({"state" => "paused"})
+        expect(results[:projects].map { |p| p[:id] }).to include(paused_project.id.to_s)
+        expect(results[:projects].count).to eq(1)
+      end
+
+      it 'includes non-enum states' do
+        results = described_class.page({"state" => "live"})
+        expect(results[:projects].map { |p| p[:id] }).to include(live_project.id.to_s)
+        expect(results[:projects].count).to eq(1)
+      end
     end
   end
 
