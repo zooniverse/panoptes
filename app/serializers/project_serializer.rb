@@ -29,8 +29,8 @@ class ProjectSerializer
     if params.key?("state")
       if Project.states.include?(params["state"])
         params["state"] = Project.states[params["state"]]
-      else
-        params[params["state"]] = true
+      elsif params["state"] == "live"
+        params["live"] = true
         params.delete("state")
       end
     end
