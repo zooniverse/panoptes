@@ -34,7 +34,7 @@ describe ProjectSerializer do
     end
 
     describe 'can filter by state' do
-      let(:paused_project) { create(:full_project, state: "paused", live: false) }
+      let(:paused_project) { create(:full_project, state: "paused", live: true) }
       let(:live_project) { create(:full_project, state: nil, live: true) }
 
       before do
