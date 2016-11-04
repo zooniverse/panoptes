@@ -32,7 +32,7 @@ class ProjectSerializer
       elsif params["state"] == "live"
         params["live"] = true
         params.delete("state")
-        scope = Project.where(state: nil)
+        scope = scope.where(state: nil)
       end
     end
 

@@ -34,7 +34,8 @@ describe ProjectSerializer do
     end
 
     describe 'can filter by state' do
-      let(:paused_project) { create(:full_project, state: "paused", live: true) }
+      let(:paused_live_project) { create(:full_project, state: "paused", live: true) }
+      let(:paused_project) { create(:full_project, state: "paused", live: false) }
       let(:live_project) { create(:full_project, state: nil, live: true) }
 
       before do
@@ -44,15 +45,21 @@ describe ProjectSerializer do
       end
 
       it 'includes filtered projects' do
-        results = described_class.page({"state" => "paused"})
+        results = described_class.page({"state" => "paused"}, Project)
         expect(results[:projects].map { |p| p[:id] }).to include(paused_project.id.to_s)
         expect(results[:projects].count).to eq(1)
       end
 
       it 'includes non-enum states' do
-        results = described_class.page({"state" => "live"})
+        results = described_class.page({"state" => "live"}, Project)
         expect(results[:projects].map { |p| p[:id] }).to include(live_project.id.to_s)
         expect(results[:projects].count).to eq(1)
+      end
+
+      it 'does not include projects with a state, even if live' do
+        results = described_class.page({"state" => "live"}, Project)
+        expect(results[:projects].map { |p| p[:id] }).not_to include(paused_live_project.id.to_s)
+        expect(results[:projects].map { |p| p[:id] }).not_to include(paused_project.id.to_s)
       end
     end
   end
