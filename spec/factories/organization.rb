@@ -9,7 +9,7 @@ FactoryGirl.define do
 
     after(:build) do |o|
       o.organization_contents << build_list(:organization_content, 1, organization: o, language: o.primary_language)
-      o.organization_contents << build_list(:organization_content, 1, organization: o, language: 'zh-TW')
+      o.organization_contents << build_list(:organization_content, 1, organization: o, language: 'sp')
     end
   end
 end

@@ -34,7 +34,7 @@ RSpec.describe OrganizationContent, :type => :model do
     it { is_expected.to be_versioned }
 
     it 'should track changes to description', versioning: true do
-      new_desc = "a boring old project"
+      new_desc = "an exciting new organization"
       subject.update!(description: new_desc)
       expect(subject.previous_version.description).to_not eq(new_desc)
     end
