@@ -1,7 +1,5 @@
 module JsonApiController
   module CreatableResource
-    include RelationManager
-
     def create
       resources = resource_class.transaction(requires_new: true) do
         begin
@@ -37,7 +35,7 @@ module JsonApiController
       resource = resource_class.new(create_params)
 
       link_params.try(:each) do |k,v|
-        resource.send("#{k}=", update_relation(resource, k,v))
+        resource.send("#{k}=", relation_manager.update_relation(resource, k,v))
       end
 
       resource

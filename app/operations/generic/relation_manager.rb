@@ -1,5 +1,12 @@
-module JsonApiController
-  module RelationManager
+module Generic
+  class RelationManager
+    attr_reader :resource_class, :api_user
+
+    def initialize(resource_class, api_user)
+      @resource_class = resource_class
+      @api_user = api_user
+    end
+
     def update_relation(resource, relation, value)
       case value
       when Hash

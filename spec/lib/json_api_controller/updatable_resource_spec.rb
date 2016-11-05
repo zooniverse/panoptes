@@ -3,6 +3,7 @@ require 'spec_helper'
 describe JsonApiController::UpdatableResource, type: :controller do
   class JsonApiController::BadLinkParams < StandardError; end
   controller(ApplicationController) do
+    include JsonApiController
     include JsonApiController::UpdatableResource
 
     def updated_resource_response

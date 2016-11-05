@@ -129,44 +129,6 @@ class Api::V1::WorkflowsController < Api::ApiController
     [tasks, task_string_extractor.collector]
   end
 
-  def add_relation(resource, relation, value)
-    if relation == :retired_subjects && value.is_a?(Array)
-      resource.save!
-      value.each {|id| resource.retire_subject(id) }
-      resource.reload
-    else
-      super
-    end
-  end
-
-  def new_items(resource, relation, value)
-    case relation
-    when :retired_subjects, 'retired_subjects'
-      resource.save!
-      value.flat_map {|id| resource.retire_subject(id) }
-      resource.reload
-    when :subject_sets, 'subject_sets'
-      items = construct_new_items(super(resource, relation, value), resource.project_id)
-      if items.any? { |item| item.is_a?(SubjectSet) }
-        items
-      else
-        items.first
-      end
-    else
-      super
-    end
-  end
-
-  def construct_new_items(item_scope, workflow_project_id)
-    Array.wrap(item_scope).map do |item|
-      if item.is_a?(SubjectSet) && !item.belongs_to_project?(workflow_project_id)
-        SubjectSetCopier.new(item, workflow_project_id).duplicate_subject_set_and_subjects
-      else
-        item
-      end
-    end
-  end
-
   def reject_live_project_changes(workflow, update_hash)
     if workflow.active && workflow.project.live && non_permitted_changes?(workflow, update_hash)
       raise Api::LiveProjectChanges.new("Can't change an active workflow for a live project.")
@@ -194,18 +156,13 @@ class Api::V1::WorkflowsController < Api::ApiController
     end
   end
 
-  def assoc_class(relation)
-    case relation
-    when :retired_subjects, "retired_subjects"
-      SubjectWorkflowStatus
-    else
-      super
-    end
-  end
-
   def medium_response(medium)
     headers['Location'] = "#{request.protocol}#{request.host_with_port}/api#{medium.location}"
     headers['Last-Modified'] = medium.updated_at.httpdate
     json_api_render(:created, MediumSerializer.resource({}, Medium.where(id: medium.id)))
+  end
+
+  def relation_manager
+    super(Workflows::RelationManager)
   end
 end

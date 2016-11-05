@@ -136,7 +136,7 @@ describe Api::V1::CollectionsController, type: :controller do
       it "should handle duplicate index violations gracefully" do
         msg = "ERROR: duplicate key value violates unique constraint"
         error = ActiveRecord::RecordNotUnique.new(msg, PG::UniqueViolation)
-        allow(subject).to receive(:add_relation).and_raise(error)
+        allow(subject.relation_manager).to receive(:add_relation).and_raise(error)
         post :update_links, params
         expect(response).to have_http_status(:unprocessable_entity)
       end

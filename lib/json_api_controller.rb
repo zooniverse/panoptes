@@ -84,6 +84,10 @@ module JsonApiController
     @controlled_resource ||= controlled_resources.first
   end
 
+  def relation_manager(manager_class = Generic::RelationManager)
+    @relation_manager ||= manager_class.new(resource_class, api_user)
+  end
+
   private
 
   def gen_etag(query)
