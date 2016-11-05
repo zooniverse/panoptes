@@ -7,6 +7,15 @@ module Generic
       @api_user = api_user
     end
 
+    def add_relation(resource, relation, value)
+      case value
+      when Array
+        resource.send(relation).concat(new_items(resource, relation, value))
+      else
+        resource.send("#{relation}=", update_relation(resource, relation, value))
+      end
+    end
+
     def update_relation(resource, relation, value)
       case value
       when Hash
@@ -17,15 +26,6 @@ module Generic
         new_items(resource, relation, value)
       else
         value
-      end
-    end
-
-    def add_relation(resource, relation, value)
-      case value
-      when Array
-        resource.send(relation).concat(new_items(resource, relation, value))
-      else
-        resource.send("#{relation}=", update_relation(resource, relation, value))
       end
     end
 

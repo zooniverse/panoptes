@@ -1,10 +1,10 @@
 module Projects
   class RelationManager < Generic::RelationManager
+    private
+
     def new_items(resource, relation, value)
       construct_new_items(super(resource, relation, value), resource.id)
     end
-
-    private
 
     def construct_new_items(item_scope, project_id)
       Array.wrap(item_scope).map do |item|

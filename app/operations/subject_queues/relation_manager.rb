@@ -1,5 +1,19 @@
 module SubjectQueues
   class RelationManager < Generic::RelationManager
+    def add_relation(resource, relation, value)
+      if relation == :subjects && value.is_a?(Array)
+        curr_ids = resource.set_member_subject_ids
+        uniq_incoming_ids = value.uniq
+        new_ids = new_items(resource, relation, uniq_incoming_ids).map(&:id)
+        non_dup_prepend_ids = new_ids | curr_ids
+        resource.set_member_subject_ids = non_dup_prepend_ids
+      else
+        super
+      end
+    end
+
+    private
+
     def new_items(resource, relation, value, *args)
       case relation
       when "subjects", :subjects
@@ -8,18 +22,6 @@ module SubjectQueues
                      .order("idx(array[#{value.join(',')}], set_member_subjects.subject_id)")
 
         relation_or_error(relation, true, false)
-      else
-        super
-      end
-    end
-
-    def add_relation(resource, relation, value)
-      if relation == :subjects && value.is_a?(Array)
-        curr_ids = resource.set_member_subject_ids
-        uniq_incoming_ids = value.uniq
-        new_ids = new_items(resource, relation, uniq_incoming_ids).map(&:id)
-        non_dup_prepend_ids = new_ids | curr_ids
-        resource.set_member_subject_ids = non_dup_prepend_ids
       else
         super
       end
