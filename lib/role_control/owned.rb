@@ -7,7 +7,6 @@ module RoleControl
       has_one :owner_control_list, -> { where.overlap(roles: ["owner"]) }, as: :resource, class_name: "AccessControlList"
       has_one :owner, through: :owner_control_list, source: :user_group, as: :resource, class_name: "UserGroup"
 
-      scope :eager_load_owner, -> { eager_load(owner: { identity_membership: :user }) }
       scope :public_scope, -> { where(private: false) }
 
       validates_presence_of :owner
