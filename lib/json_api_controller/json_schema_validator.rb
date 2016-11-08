@@ -29,6 +29,14 @@ module JsonApiController
 
     protected
 
+    def create_params
+      params_for(:create)
+    end
+
+    def update_params
+      params_for(:update)
+    end
+
     def params_for(action=action_name.to_sym)
       ps = params.require(resource_sym).permit!
       if validator = self.class.action_params[action]
@@ -38,8 +46,5 @@ module JsonApiController
       end
       ps
     end
-
-    alias_method :create_params, :params_for
-    alias_method :update_params, :params_for
   end
 end
