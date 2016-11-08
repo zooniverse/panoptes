@@ -2,7 +2,7 @@ FactoryGirl.define do
   factory :organization do
     sequence(:name) { |n| "test_org_#{ n }" }
     sequence(:display_name) { |n| "Test Organization #{ n }" }
-    listed_at nil
+    listed_at Time.now
     primary_language "en"
 
     association :owner, factory: :user
