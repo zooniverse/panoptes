@@ -3,7 +3,7 @@ class ProjectPage < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include LanguageValidation
 
-  has_paper_trail skip: [:langauge]
+  has_paper_trail ignore: [:language]
 
   belongs_to :project
 

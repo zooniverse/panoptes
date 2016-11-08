@@ -40,7 +40,9 @@ RSpec.describe OrganizationContent, :type => :model do
     end
 
     it 'should not track changes to language', versioning: true do
-      expect{subject.update!(language: "tw")}.to change{subject.versions.count}.by(0)
+      expect {
+        subject.update!(language: 'es-mx')
+      }.not_to change { subject.previous_version }
     end
   end
 end

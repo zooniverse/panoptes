@@ -44,9 +44,9 @@ RSpec.describe ProjectContent, :type => :model do
     end
 
     it 'should not track changes to language', versioning: true do
-      new_lang = 'tw'
-      subject.update!(language: new_lang)
-      expect(subject.previous_version).to be_nil
+      expect {
+        subject.update!(language: 'es-mx')
+      }.not_to change { subject.previous_version }
     end
   end
 end
