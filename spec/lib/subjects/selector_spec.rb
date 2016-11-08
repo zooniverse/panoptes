@@ -87,7 +87,7 @@ RSpec.describe Subjects::Selector do
       end
     end
 
-    context "when the cellect selection strategy returns an empty set"do
+    context "when the cellect selection strategy returns an empty set" do
       before do
         stub_cellect_connection
         stub_redis_connection
@@ -98,7 +98,17 @@ RSpec.describe Subjects::Selector do
         expect_any_instance_of(Subjects::PostgresqlSelection)
           .to receive(:select)
           .and_call_original
-        subjects, _context = subject.get_subjects
+        subject.get_subjects
+      end
+
+      it "should notify cellect to reload" do
+        expect(ReloadCellectWorker).to receive(:perform_async).with(workflow.id)
+        subject.get_subjects
+      end
+
+      it "should notify us this sync error occurred" do
+        expect(Honeybadger).to receive(:notify)
+        subject.get_subjects
       end
 
       context "when the default postgres selector returns no data" do
@@ -112,7 +122,7 @@ RSpec.describe Subjects::Selector do
           expect_any_instance_of(Subjects::PostgresqlSelection)
             .to receive(:any_workflow_data)
             .and_call_original
-          subjects, _context = subject.get_subjects
+          subject.get_subjects
         end
       end
     end

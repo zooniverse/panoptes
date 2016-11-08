@@ -38,7 +38,19 @@ module Subjects
       fallback_selector = PostgresqlSelection.new(workflow, user, opts)
 
       sms_ids = []
-      sms_ids = fallback_selector.select if workflow.using_cellect?
+      if workflow.using_cellect?
+        sms_ids = fallback_selector.select
+        if data_available = !sms_ids.empty?
+          ReloadCellectWorker.perform_async(workflow.id)
+          Honeybadger.notify(
+            error_class:   "Cellect data sync error",
+            error_message: "Cellect returns no data but PG selector does",
+            context: {
+              workflow: workflow.id
+            }
+          )
+        end
+      end
 
       if sms_ids.blank?
         fallback_selector.any_workflow_data
