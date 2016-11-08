@@ -41,7 +41,9 @@ module Subjects
       if workflow.using_cellect?
         sms_ids = fallback_selector.select
         if data_available = !sms_ids.empty?
-          ReloadCellectWorker.perform_async(workflow.id)
+          if Panoptes.flipper[:cellect_sync_error_reload].enabled?
+            ReloadCellectWorker.perform_async(workflow.id)
+          end
           Honeybadger.notify(
             error_class:   "Cellect data sync error",
             error_message: "Cellect returns no data but PG selector does",
