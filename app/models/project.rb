@@ -109,7 +109,7 @@ class Project < ActiveRecord::Base
   def self.scope_for(action, user, opts={})
     experiment_name = "eager_load_projects"
     scope = super
-    CodeExperiment.run "#{experiment_name}" do |e|
+    CodeExperiment.run(experiment_name) do |e|
       e.run_if { Panoptes.flipper[experiment_name].enabled? }
       e.context user: user
       e.use { scope }
