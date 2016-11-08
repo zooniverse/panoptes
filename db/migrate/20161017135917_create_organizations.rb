@@ -11,6 +11,6 @@ class CreateOrganizations < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    add_index :organizations, :listed_at, where: "(listed_at IS NOT NULL)"
+    add_index :organizations, :listed_at
   end
 end

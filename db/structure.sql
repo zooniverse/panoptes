@@ -2361,7 +2361,7 @@ CREATE UNIQUE INDEX index_oauth_applications_on_uid ON oauth_applications USING 
 -- Name: index_organizations_on_listed_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_organizations_on_listed_at ON organizations USING btree (listed_at) WHERE (listed_at IS NOT NULL);
+CREATE INDEX index_organizations_on_listed_at ON organizations USING btree (listed_at);
 
 
 --
@@ -3601,6 +3601,4 @@ INSERT INTO schema_migrations (version) VALUES ('20160901141903');
 INSERT INTO schema_migrations (version) VALUES ('20161017135917');
 
 INSERT INTO schema_migrations (version) VALUES ('20161017141439');
-
-INSERT INTO schema_migrations (version) VALUES ('20161101175911');
 
