@@ -114,11 +114,53 @@ describe UserGroup, :type => :model do
     end
   end
 
-  describe "#user_group_memberships" do
+  describe "#memberships" do
     let(:user_group) { create(:user_group_with_users) }
 
-    it "should have many user group memberships" do
+    it "should have many memberships" do
       expect(user_group.memberships).to all( be_a(Membership) )
+    end
+  end
+
+  describe "#active_memberships" do
+    let(:user_group) { create(:user_group_with_users) }
+
+    it "should have many active memberships" do
+      memberships = user_group.active_memberships
+      expect(memberships).to all( be_a(Membership) )
+      expect(memberships.map(&:identity)).to all( be(false) )
+    end
+  end
+
+  describe "#identity_membership" do
+    let(:user_group) { create(:identity_user_group) }
+
+    it "should have one identity membership" do
+      membership = user_group.identity_membership
+      expect(membership).to be_a(Membership)
+      expect(membership.identity).to be(true)
+    end
+  end
+
+  describe "#owned_resources" do
+    let(:user_group) { create(:user_group_with_projects) }
+    let(:owned_projects) { user_group.owned_resources.map(&:resource) }
+    let(:projects) do
+      acls = AccessControlList.where(user_group_id: user_group.id, resource_type: "Project")
+      acls.map(&:resource)
+    end
+
+    it "should link to the owned_resources" do
+      expect(owned_projects).to eq(projects)
+    end
+
+    context "when the owned resource has other roles" do
+
+      it "should still link to the owned_resources" do
+        acl = user_group.owned_resources.first
+        acl.update_column(:roles, ["owner", "tester"])
+        expect(owned_projects).to eq(projects)
+      end
     end
   end
 

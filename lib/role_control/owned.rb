@@ -12,7 +12,7 @@ module RoleControl
       validates_presence_of :owner
 
       def self.filter_by_owner(owner_groups)
-        eager_load(owner: [:users])
+        eager_load(owner: { identity_membership: :user })
         .joins(:owner)
         .where(access_control_lists: { user_group: owner_groups })
       end
@@ -34,12 +34,23 @@ module RoleControl
         super(owning_group)
       end
 
-      def owner(reload=nil)
-        group = super(reload)
-        if group.try(:identity?)
-          group.users.first
+      # NOTE: this owner data model adds complexity and fights the framework
+      # when trying to load data via relations...we should seriously consider
+      # how to remove this and simplify the owner relations (resource -> owner [:user]?)
+      #
+      # this method returns either the identity user or the owning group.
+      # It was setup this way to allow groups and users to own resources via IdentityGroups
+      def owner
+        owner_group = super
+        # trying to pre/eager load on relations other than owner does not work
+        # when using this relation accessor override
+        # ...and that makes me sad, it does work if you remove this owner override
+        # but you lose the ability to return the correct owner resource...
+        if owner_group&.identity?
+          # ensure that this chained call matches the pre/eager loading setup
+          owner_group.identity_membership.user
         else
-          group
+          owner_group
         end
       end
 

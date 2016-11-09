@@ -42,9 +42,8 @@ class Classification < ActiveRecord::Base
       if opts[:last_id] && !opts[:project_id]
         raise Classification::MissingParameter.new("Project ID required if last_id is included")
       end
-      project_scope = joins(:project).includes(:subjects).merge(Project.scope_for(:update, user))
-      project_scope = project_scope.after_id(opts[:last_id]) if opts[:last_id]
-      project_scope
+      updatable_projects = Project.scope_for(:update, user, skip_eager_load: true)
+      classifications_for_project(updatable_projects, opts[:last_id])
     when :gold_standard
       gold_standard_for_user(user).includes(:subjects)
     else
@@ -67,6 +66,12 @@ class Classification < ActiveRecord::Base
     .where("workflows.public_gold_standard IS TRUE")
     .order(id: :asc)
     .distinct
+  end
+
+  def self.classifications_for_project(updatable_projects, last_id)
+    project_scope = joins(:project).includes(:subjects).merge(updatable_projects)
+    project_scope = project_scope.after_id(last_id) if last_id
+    project_scope
   end
 
   def created_and_incomplete?(actor)
