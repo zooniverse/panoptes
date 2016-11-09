@@ -1,5 +1,21 @@
-module JsonApiController
-  module RelationManager
+module Generic
+  class RelationManager
+    attr_reader :resource_class, :api_user
+
+    def initialize(resource_class, api_user)
+      @resource_class = resource_class
+      @api_user = api_user
+    end
+
+    def add_relation(resource, relation, value)
+      case value
+      when Array
+        resource.send(relation).concat(new_items(resource, relation, value))
+      else
+        resource.send("#{relation}=", update_relation(resource, relation, value))
+      end
+    end
+
     def update_relation(resource, relation, value)
       case value
       when Hash
@@ -10,15 +26,6 @@ module JsonApiController
         new_items(resource, relation, value)
       else
         value
-      end
-    end
-
-    def add_relation(resource, relation, value)
-      case value
-      when Array
-        resource.send(relation).concat(new_items(resource, relation, value))
-      else
-        resource.send("#{relation}=", update_relation(resource, relation, value))
       end
     end
 

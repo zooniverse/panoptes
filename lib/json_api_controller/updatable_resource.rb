@@ -1,7 +1,6 @@
 module JsonApiController
   module UpdatableResource
     extend ActiveSupport::Concern
-    include RelationManager
     include PreconditionCheck
 
     included do
@@ -29,7 +28,7 @@ module JsonApiController
       check_relation
       resource = controlled_resources.first
       resource_class.transaction(requires_new: true) do
-        add_relation(resource, relation, params[relation])
+        relation_manager.add_relation(resource, relation, params[relation])
         resource.save!
       end
 
@@ -41,7 +40,7 @@ module JsonApiController
     def destroy_links
       resource = controlled_resources.first
       resource_class.transaction do
-        destroy_relation(resource, relation, params[:link_ids])
+        relation_manager.destroy_relation(resource, relation, params[:link_ids])
       end
 
       yield resource if block_given?
@@ -54,7 +53,7 @@ module JsonApiController
     def build_update_hash(update_params, resource)
       return update_params unless links = update_params.delete(:links)
       links.try(:reduce, update_params) do |params, (k, v)|
-        params[k] = update_relation(resource, k.to_sym, v)
+        params[k] = relation_manager.update_relation(resource, k.to_sym, v)
         params
       end
     end
