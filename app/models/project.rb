@@ -18,7 +18,8 @@ class Project < ActiveRecord::Base
      :pages,
      :avatar,
      :background,
-     :attached_images
+     :attached_images,
+     :tags
    ].freeze
    PRELOADS = [
      :project_roles,
