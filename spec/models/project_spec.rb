@@ -29,7 +29,8 @@ describe Project, type: :model do
          :pages,
          :avatar,
          :background,
-         :attached_images
+         :attached_images,
+         :tags
       ]
     end
 
