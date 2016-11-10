@@ -16,47 +16,41 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
   let(:resource_class) { OrganizationContent }
   let(:primary_content) { organization.primary_content }
 
+  let(:acl_roles) { %w(translator) }
+  let(:acl) do
+    create(:access_control_list,
+           user_group: authorized_user.identity_group,
+           resource: organization,
+           roles: acl_roles)
+  end
+
   describe "#index" do
-    let!(:acl) do
-      create(:access_control_list,
-             user_group: authorized_user.identity_group,
-             resource: organization,
-             roles: ["collaborator"])
-    end
+    let(:acl_roles) { %w(collaborator) }
 
     let!(:private_resource) do
-      create(:organization, listed_at: nil)
-        .organization_contents.first
+      create(:organization, listed_at: nil).organization_contents.first
     end
 
-    let(:n_visible) { 2 }
+    before { acl }
+
+    let(:n_visible) { 3 }
 
     it_behaves_like "is indexable"
   end
 
   describe "#show" do
-    let!(:acl) do
-      create(:access_control_list,
-             user_group: authorized_user.identity_group,
-             resource: organization,
-             roles: ["translator"])
-    end
+    before { acl }
 
     it_behaves_like "is showable"
   end
 
   describe "#create" do
-    let!(:acl) do
-      create(:access_control_list,
-             user_group: authorized_user.identity_group,
-             resource: organization,
-             roles: ["collaborator"])
-    end
-
+    let(:test_attr) { :title }
+    let(:test_attr_value) { "A Bad Title" }
 
     let(:create_params) do
       { organization_contents: {
-          title: "A Bad Title",
+          title: test_attr_value,
           description: "Worse Content",
           introduction: "Useless Science",
           language: "en-CA",
@@ -65,30 +59,23 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
       }
     end
 
-    let(:test_attr) { :title }
-    let(:test_attr_value) { "A Bad Title" }
+    before { acl }
 
     it_behaves_like "is creatable"
   end
 
   describe "#update" do
-    let!(:acl) do
-      create(:access_control_list,
-             user_group: authorized_user.identity_group,
-             resource: organization,
-             roles: ["collaborator"])
-    end
-
+    let(:test_attr) { :title }
+    let(:test_attr_value) { "a bad title" }
 
     let(:update_params) do
       { organization_contents: {
-          title: "a bad title"
+          title: test_attr_value
         }
       }
     end
 
-    let(:test_attr) { :title }
-    let(:test_attr_value) { "a bad title" }
+    before { acl }
 
     context "non-primary-language content" do
       it_behaves_like "is updatable"
@@ -138,18 +125,12 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
   end
 
   describe "versioning" do
-    let!(:acl) do
-      create(:access_control_list,
-             user_group: authorized_user.identity_group,
-             resource: organization,
-             roles: ["collaborator"])
-    end
-
-
     let!(:existing_versions) { resource.versions.length }
     let(:num_times) { 11 }
     let(:update_proc) { Proc.new { |resource, n| resource.update!(title: n.to_s) } }
     let(:resource_param) { :organization_content_id }
+
+    before { acl }
 
     it_behaves_like "a versioned resource"
   end
