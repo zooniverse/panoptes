@@ -24,14 +24,6 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     }
   end
 
-  describe '#report_to_honey_badger' do
-    it 'reports the correct details' do
-      annotator = described_class.new(classification, annotation, cache)
-      expect(Honeybadger).to receive(:notify)
-      annotator.send(:report_to_honey_badger, 1)
-    end
-  end
-
   it 'adds the task label' do
     formatted = described_class.new(classification, annotation, cache).to_h
     expect(formatted["task_label"]).to eq("Draw a circle")
@@ -49,10 +41,26 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     expect(formatted["value"][0]["tool_label"]).to be_nil
   end
 
+  it 'returns the raw value if it is in an unexpected format' do
+    weird_annotation["value"] = 0
+    formatted = described_class.new(classification, weird_annotation, cache).to_h
+    expect(formatted["value"]).to eq(Array.wrap(weird_annotation["value"]))
+  end
+
   it 'has a nil label when the tool is not found in the workflow' do
     annotation = {"task" => "interest", "value" => [{"x"=>1, "y"=>2, "tool"=>1000}]}
     formatted = described_class.new(classification, annotation, cache).to_h
     expect(formatted["value"][0]["tool_label"]).to be_nil
+  end
+
+  it 'just records the tool index if the tool label cannot be translated' do
+    annotation = {"task" => "interest", "value" => [{"x"=>1, "y"=>2, "tool"=>0}]}
+    formatter = described_class.new(classification, annotation, cache)
+    content = double(strings: {})
+    allow(formatter).to receive(:primary_content_at_version).and_return(content)
+    formatted = formatter.to_h
+    expect(formatted["value"][0]["tool_label"]).to be_nil
+    expect(formatted["value"][0]["tool"]).to eq(0)
   end
 
   it 'returns an empty list of values when annotation itself has no value' do
@@ -245,8 +253,8 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         end
 
         it 'should add the correct version task label' do
-          allow(cache).to receive(:workflow_at_version).with(workflow.id, 1).and_return(workflow.versions[1].reify)
-          allow(cache).to receive(:workflow_content_at_version).with(contents.id, 1).and_return(contents.versions[1].reify)
+          allow(cache).to receive(:workflow_at_version).with(workflow, 1).and_return(workflow.versions[1].reify)
+          allow(cache).to receive(:workflow_content_at_version).with(contents, 1).and_return(contents.versions[1].reify)
           formatted = described_class.new(classification, annotation, cache).to_h
           expect(formatted["task_label"]).to eq("Draw a circle")
         end

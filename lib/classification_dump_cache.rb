@@ -35,19 +35,17 @@ class ClassificationDumpCache
     (@subject_workflow_statuses[subject_id] || []).find {|swc| swc.workflow_id == workflow_id }
   end
 
-  def workflow_at_version(workflow_id, version)
-    @workflows[workflow_id] ||= {}
-    @workflows[workflow_id][version] ||= begin
-      workflow = Workflow.find(workflow_id)
+  def workflow_at_version(workflow, version)
+    @workflows[workflow.id] ||= {}
+    @workflows[workflow.id][version] ||= begin
       old_version = workflow.versions[version].try(:reify)
       old_version || workflow
     end
   end
 
-  def workflow_content_at_version(workflow_content_id, version)
-    @workflow_contents[workflow_content_id] ||= {}
-    @workflow_contents[workflow_content_id][version] ||= begin
-      workflow_content = WorkflowContent.find(workflow_content_id)
+  def workflow_content_at_version(workflow_content, version)
+    @workflow_contents[workflow_content.id] ||= {}
+    @workflow_contents[workflow_content.id][version] ||= begin
       old_version = workflow_content.versions[version].try(:reify)
       old_version || workflow_content
     end

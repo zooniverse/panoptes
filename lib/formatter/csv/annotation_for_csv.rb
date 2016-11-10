@@ -33,11 +33,17 @@ module Formatter
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
           new_anno['task_label'] = task_label(task_info)
-          value_with_tool = (@current["value"] || []).map do |drawn_item|
-            tool_label = tool_label(task_info, drawn_item["tool"])
-            drawn_item.merge("tool_label" => tool_label)
+
+          added_tool_lables = Array.wrap(@current["value"]).map do |drawn_item|
+            if drawn_item.is_a?(Hash)
+              tool_label = tool_label(task_info, drawn_item)
+              drawn_item.merge("tool_label" => tool_label)
+            else
+              drawn_item
+            end
           end
-          new_anno["value"] = value_with_tool
+
+          new_anno["value"] = added_tool_lables
         end
       end
 
@@ -125,7 +131,8 @@ module Formatter
         translate(task_info["question"] || task_info["instruction"])
       end
 
-      def tool_label(task_info, tool_index)
+      def tool_label(task_info, tool)
+        tool_index = tool["tool"]
         have_tool_lookup_info = !!(task_info["tools"] && tool_index)
         known_tool = have_tool_lookup_info && task_info["tools"][tool_index]
         translate(known_tool["label"]) if known_tool
@@ -142,9 +149,6 @@ module Formatter
             translate(answer_string)
           rescue TypeError
             "unknown answer label"
-          rescue NoMethodError => e
-            report_to_honey_badger(answer_idx)
-            raise e
           end
         end
       end
@@ -155,11 +159,11 @@ module Formatter
       end
 
       def primary_content_at_version
-        cache.workflow_content_at_version(classification.workflow.primary_content.id, content_version)
+        cache.workflow_content_at_version(classification.workflow.primary_content, content_version)
       end
 
       def workflow_at_version
-        cache.workflow_at_version(classification.workflow_id, workflow_version)
+        cache.workflow_at_version(classification.workflow, workflow_version)
       end
 
       def workflow_version
@@ -188,22 +192,6 @@ module Formatter
          key == annotation["task"]
         end
         @task = task_annotation.try(:last) || {}
-      end
-
-      def report_to_honey_badger(answer_idx)
-        Honeybadger.notify(
-          error_class:   "Task export error",
-          error_message: "The task cannot be exported",
-          context: {
-            classification: @classification.id,
-            annotation: @annotation,
-            workflow_at_version: workflow_at_version.id,
-            workflow_version: workflow_version,
-            content_version: content_version,
-            current_task: @current['task'],
-            answer_idx: answer_idx
-          }
-        )
       end
     end
   end
