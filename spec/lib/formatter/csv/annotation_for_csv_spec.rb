@@ -53,6 +53,16 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
     expect(formatted["value"][0]["tool_label"]).to be_nil
   end
 
+  it 'just records the tool index if the tool label cannot be translated' do
+    annotation = {"task" => "interest", "value" => [{"x"=>1, "y"=>2, "tool"=>0}]}
+    formatter = described_class.new(classification, annotation, cache)
+    content = double(strings: {})
+    allow(formatter).to receive(:primary_content_at_version).and_return(content)
+    formatted = formatter.to_h
+    expect(formatted["value"][0]["tool_label"]).to be_nil
+    expect(formatted["value"][0]["tool"]).to eq(0)
+  end
+
   it 'returns an empty list of values when annotation itself has no value' do
     annotation = {"task" => "interest"}
     formatted = described_class.new(classification, annotation, cache).to_h
