@@ -518,7 +518,7 @@ Style/Semicolon:
 
 # Offense count: 161
 # Cop supports --auto-correct.
-Style/SingleSpaceBeforeFirstArg:
+Style/SpaceBeforeFirstArg:
   Exclude:
     - 'app/schemas/subject_create_schema.rb'
     - 'config/initializers/doorkeeper.rb'
