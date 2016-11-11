@@ -5,35 +5,34 @@ class Api::V1::SubjectSetsController < Api::ApiController
   resource_actions :default
   schema_type :json_schema
 
-  IMPORT_COLUMNS = %w(subject_set_id subject_id random)
+  IMPORT_COLUMNS = %w(subject_set_id subject_id random).freeze
 
   def create
     super do |subject_set|
-      refresh_queue(subject_set)
+      notify_cellect(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
 
   def update
     super do |subject_set|
-      refresh_queue(subject_set)
+      notify_cellect(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
 
   def update_links
     super do |subject_set|
-      refresh_queue(subject_set)
+      notify_cellect(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
 
   def destroy
     resource_class.transaction(requires_new: true) do
-      subject_ids = controlled_resource.set_member_subjects.map(&:subject_id)
-      remove_linked_set_member_subjects(
-        controlled_resource.set_member_subjects
-      )
+      smses = controlled_resource.set_member_subjects
+      subject_ids = smses.map(&:subject_id)
+      remove_linked_set_member_subjects(smses)
       reset_subject_set_workflow_counts(controlled_resource.id)
       controlled_resource.subject_sets_workflows.delete_all
       #avoid optimisitc locking errors
@@ -41,22 +40,22 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
       super
 
-      subject_ids.each do |subject_id|
-        SubjectRemovalWorker.perform_async(subject_id)
+      subject_ids.each_with_index do |subject_id, index|
+        SubjectRemovalWorker.perform_in(index.minute, subject_id)
       end
     end
   end
 
   def destroy_links
     super do |subject_set|
-      refresh_queue(subject_set)
+      notify_cellect(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
 
   protected
 
-  def refresh_queue(subject_set)
+  def notify_cellect(subject_set)
     if subject_set.set_member_subjects.exists?
       subject_set.workflows.each do |w|
         if Panoptes.use_cellect?(w)

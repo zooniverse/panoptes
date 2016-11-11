@@ -2,18 +2,19 @@ require 'spec_helper'
 
 RSpec.describe SubjectRemovalWorker do
   let(:subject_id) { 1 }
+  let(:feature_name) { "remove_orphan_subjects" }
+  let(:remover) { instance_double(Subjects::Remover) }
 
-  # TODO: reinstate this when the cleanup code is not killing the db
-  # it 'should call the orphan remover cleanup' do
-  #   remover = instance_double(Subjects::Remover)
-  #   expect(Subjects::Remover).to receive(:new).with(subject_id).and_return(remover)
-  #   expect(remover).to receive(:cleanup)
-  #   subject.perform(subject_id)
-  # end
+  it 'should call the orphan remover cleanup when enabled' do
+    Panoptes.flipper[feature_name].enable
+    expect(Subjects::Remover).to receive(:new).with(subject_id).and_return(remover)
+    expect(remover).to receive(:cleanup)
+    subject.perform(subject_id)
+  end
 
-  # remove this when the above is fixed
-  it 'should not call the orphan remover cleanup' do
+  it 'should not call the orphan remover cleanup when disabled' do
     expect(Subjects::Remover).not_to receive(:new)
+    expect(remover).not_to receive(:cleanup)
     subject.perform(subject_id)
   end
 end
