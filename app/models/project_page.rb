@@ -16,7 +16,7 @@ class ProjectPage < ActiveRecord::Base
     when :show, :index
       super
     else
-      translatable = Project.scope_for(:translate, user, opts.merge(skip_eager_load: true))
+      translatable = Project.scope_for(:translate, user, opts)
       joins(:project).merge(translatable)
     end
   end

@@ -27,10 +27,8 @@ describe RoleControl::ParentalControlled do
         .and_call_original
     end
 
-    it "should call scope_for on the parent and skip eager loads" do
-      expect(parent.class)
-        .to receive(:scope_for)
-        .with(:update, enrolled_actor, {skip_eager_load: true})
+    it "should call scope_for on the parent" do
+      expect(parent.class).to receive(:scope_for).with(:update, enrolled_actor, {})
     end
   end
 end

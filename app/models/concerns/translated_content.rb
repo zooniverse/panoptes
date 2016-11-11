@@ -25,7 +25,7 @@ module TranslatedContent
         super
       else
         translatable = translated_class
-          .scope_for(:translate, user, opts.merge(skip_eager_load: true))
+          .scope_for(:translate, user, opts)
         joins(translated_for)
           .merge(translatable)
           .where
