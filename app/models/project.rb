@@ -11,21 +11,6 @@ class Project < ActiveRecord::Base
   include SluggedName
 
   EXPERT_ROLES = [:owner, :expert].freeze
-  EAGER_LOADS = [
-     :workflows,
-     :subject_sets,
-     :project_contents,
-     :pages,
-     :avatar,
-     :background,
-     :attached_images,
-     :tags
-   ].freeze
-   PRELOADS = [
-     :project_roles,
-     owner: { identity_membership: :user }
-   ].freeze
-
 
   has_many :tutorials
   has_many :field_guides, dependent: :destroy
@@ -109,27 +94,6 @@ class Project < ActiveRecord::Base
 
   ranks :launched_row_order
   ranks :beta_row_order
-
-  def self.scope_for(action, user, opts={})
-    experiment_name = "eager_load_projects"
-    scope = super
-    CodeExperiment.run(experiment_name) do |e|
-      e.run_if { Panoptes.flipper[experiment_name].enabled? }
-      e.context user: user
-      e.use { scope }
-      e.try do
-        if opts[:skip_eager_load]
-          scope
-        else
-          # eager load where we can, preload when 2+ eager_loads share the same source table
-          # e.g. filtering on the owner relation / roles in controllers
-          scope.eager_load(*EAGER_LOADS).preload(*PRELOADS)
-        end
-      end
-      #skip the mismatch reporting...we just want perf metrics
-      e.ignore { true }
-    end
-  end
 
   def expert_classifier_level(classifier)
     expert_roles = project_roles.where(user_group: classifier.identity_group)
