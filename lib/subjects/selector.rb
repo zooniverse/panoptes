@@ -26,14 +26,20 @@ module Subjects
 
     private
 
-    def active_subjects_in_selection_order(sms_ids)
-      @scope.active
-      .eager_load(:set_member_subjects)
-      .where(set_member_subjects: {id: sms_ids})
-      .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")
+    def run_strategy_selection
+      Rails.logger.info "Selecting subjects based on workflow config", workflow_id: workflow.id, user_id: user&.id
+
+      Subjects::StrategySelection.new(
+        workflow,
+        user,
+        subject_set_id,
+        subjects_page_size
+      ).select
     end
 
     def fallback_selection
+      Rails.logger.info "Preferred strategy returned no results, trying fallback", workflow_id: workflow.id, user_id: user&.id
+
       opts = { limit: subjects_page_size, subject_set_id: subject_set_id }
       fallback_selector = PostgresqlSelection.new(workflow, user, opts)
 
@@ -55,10 +61,18 @@ module Subjects
       end
 
       if sms_ids.blank?
+        Rails.logger.info "Fallback failed to return unseen unretired data, falling back to selecting anything", workflow_id: workflow.id, user_id: user.id
         fallback_selector.any_workflow_data
       else
         sms_ids
       end
+    end
+
+    def active_subjects_in_selection_order(sms_ids)
+      @scope.active
+        .eager_load(:set_member_subjects)
+        .where(set_member_subjects: {id: sms_ids})
+        .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")
     end
 
     def needs_set_id?
@@ -97,15 +111,6 @@ module Subjects
 
     def subject_set_id
       params[:subject_set_id]
-    end
-
-    def run_strategy_selection
-      Subjects::StrategySelection.new(
-        workflow,
-        user,
-        subject_set_id,
-        subjects_page_size
-      ).select
     end
   end
 end
