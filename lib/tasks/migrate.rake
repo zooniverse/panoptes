@@ -174,7 +174,13 @@ namespace :migrate do
     desc "Set pan_and_zoom on linked workflows if in experimental_tools array"
     task :set_pan_and_zoom => :environment do
       workflows = Workflow.joins(:project).where("projects.experimental_tools @> ?", '{pan and zoom}')
-      workflows.map { |w| w.update_column(:configuration, w.configuration.merge({'pan_and_zoom': true})) unless w.configuration.has_key?(:pan_and_zoom) }
+      workflows.map do |w|
+        unless w.configuration.key?(:pan_and_zoom)
+          new_config = w.configuration.merge({'pan_and_zoom': true})
+          w.update_column(:configuration, new_config)
+        end
+      end
+
     end
   end
 
