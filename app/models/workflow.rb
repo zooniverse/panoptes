@@ -44,8 +44,6 @@ class Workflow < ActiveRecord::Base
     'options' => {'count' => 15}
   }.freeze
 
-  EAGER_LOADS = %i(project subject_sets expert_subject_sets tutorial_subject attached_images).freeze
-
   validates_presence_of :project, :display_name
 
   validate do |workflow|
@@ -68,21 +66,6 @@ class Workflow < ActiveRecord::Base
 
   def self.same_project?(subject_set)
     where(project: subject_set.project)
-  end
-
-  def self.scope_for(action, user, opts={})
-    experiment_name = "eager_load_workflows"
-    scope = super
-    CodeExperiment.run(experiment_name) do |e|
-      e.run_if { Panoptes.flipper[experiment_name].enabled? }
-      e.context user: user
-      e.use { scope }
-      e.try do
-        opts[:skip_eager_load] ? scope : scope.eager_load(*EAGER_LOADS)
-      end
-      #skip the mismatch reporting...we just want perf metrics
-      e.ignore { true }
-    end
   end
 
   def tasks
