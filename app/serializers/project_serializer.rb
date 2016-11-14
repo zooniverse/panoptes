@@ -6,9 +6,32 @@ class ProjectSerializer
   include MediaLinksSerializer
   include ContentSerializer
 
+  EAGER_LOADS = [
+    #  :project_contents,
+    #  :workflows,
+    #  :subject_sets,
+     :pages,
+     :attached_images,
+     :avatar,
+     :background,
+     :tags
+   ].freeze
   PRELOADS = [
     :project_roles,
-    owner: { identity_membership: :user }
+    [ owner: { identity_membership: :user } ],
+    :workflows,
+    :subject_sets
+  ].freeze
+  ONLY_PRELOADS = [
+    :project_roles,
+    [ owner: { identity_membership: :user } ],
+    :workflows,
+    :subject_sets,
+    :pages,
+    :attached_images,
+    :avatar,
+    :background,
+    :tags
   ].freeze
 
   attributes :id, :display_name, :classifications_count,
@@ -44,10 +67,13 @@ class ProjectSerializer
 
     experiment_name = "eager_load_projects"
     CodeExperiment.run(experiment_name) do |e|
-      e.run_if { Panoptes.flipper[experiment_name].enabled? }
-      e.use { super(params, scope, context) }
-      e.try { super(params, scope.preload(*PRELOADS), context) }
-      #skip the mismatch reporting...we just want perf metrics
+      # e.run_if { Panoptes.flipper[experiment_name].enabled? }
+    # e.use { super(params, scope, context) }
+# #TODO: make this eager load work as it speeds up the app
+    e.use { super(params, scope.eager_load(*EAGER_LOADS).preload(*PRELOADS), context) }
+    e.try { super(params, scope.preload(*ONLY_PRELOADS), context) }
+      # e.try { super(params, scope.preload(*PRELOADS), context) }
+      # skip the mismatch reporting...we just want perf metrics
       e.ignore { true }
     end
   end
