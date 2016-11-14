@@ -26,7 +26,7 @@ class WorkflowSerializer
       # e.run_if { Panoptes.flipper[experiment_name].enabled? }
       e.use { super(params, scope, context) }
       e.try { super(params, scope.eager_load(*EAGER_LOADS), context) }
-      #skip the mismatch reporting...we just want perf metrics
+      # skip the mismatch reporting...we just want perf metrics
       e.ignore { true }
     end
   end
