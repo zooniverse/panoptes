@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Workflows::RetireSubjects do
   let(:api_user) { ApiUser.new(build_stubbed(:user)) }
-  let(:workflow) { create :workflow }
+  let(:workflow) { create(:workflow) }
 
   let(:subject_set) { create(:subject_set, project: workflow.project, workflows: [workflow]) }
   let(:subject_set_id) { subject_set.id }
@@ -49,6 +49,14 @@ describe Workflows::RetireSubjects do
       expect(RetireCellectWorker).to receive(:perform_async).with(subject1.id, workflow.id)
       operation.run! workflow: workflow, subject_id: subject1.id
     end
+
+    it 'does not do any work when missing the subject_id' do
+      operation_params = { workflow: workflow, subject_id: nil }
+      expect(Workflow).not_to receive(:transaction).and_call_original
+      expect(WorkflowRetiredCountWorker).not_to receive(:perform_async)
+      expect(operation).not_to receive(:notify_cellect)
+      operation.run!(operation_params)
+    end
   end
 
   context 'with a list of subject_ids' do
@@ -67,6 +75,14 @@ describe Workflows::RetireSubjects do
       expect do
         operation.run! workflow: workflow, subject_ids: [subject1.id, subject2.id]
       end.to raise_error(RuntimeError, 'some error')
+    end
+
+    it 'does not do any work when the subject_ids are empty' do
+      operation_params = { workflow: workflow, subject_ids: [] }
+      expect(Workflow).not_to receive(:transaction).and_call_original
+      expect(WorkflowRetiredCountWorker).not_to receive(:perform_async)
+      expect(operation).not_to receive(:notify_cellect)
+      operation.run!(operation_params)
     end
   end
 end
