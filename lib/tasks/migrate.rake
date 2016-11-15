@@ -175,7 +175,7 @@ namespace :migrate do
     task :set_pan_and_zoom => :environment do
       workflows = Workflow.joins(:project).where("projects.experimental_tools @> ?", '{pan and zoom}')
       workflows.map do |w|
-        unless w.configuration.key?(:pan_and_zoom)
+        unless w.configuration.key?("pan_and_zoom")
           new_config = w.configuration.merge({'pan_and_zoom': true})
           w.update_column(:configuration, new_config)
         end
