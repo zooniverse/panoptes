@@ -15,8 +15,13 @@ module Subjects
     end
 
     def select
-      selected_ids = select_sms_ids.compact
-      Subjects::CompleteRemover.new(user, workflow, selected_ids).incomplete_ids
+      used_strategy, selected_ids = select_sms_ids
+      Rails.logger.info("Selected subjects", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: selected_ids)
+
+      selected_ids = selected_ids.compact
+      incomplete_ids = Subjects::CompleteRemover.new(user, workflow, selected_ids).incomplete_ids
+      Rails.logger.info("Selected subjects after cleanup", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: incomplete_ids)
+      incomplete_ids
     end
 
     def strategy
@@ -33,9 +38,9 @@ module Subjects
     private
 
     def select_sms_ids
-      strategy_sms_ids
+      [strategy, strategy_sms_ids]
     rescue Subjects::CellectClient::ConnectionError, CellectExClient::GenericError
-      default_strategy_sms_ids
+      [:default, default_strategy_sms_ids]
     end
 
     def cellect_strategy?

@@ -30,7 +30,7 @@ RSpec.describe Subjects::StrategySelection do
       let(:result) { subject.select }
 
       before do
-        allow(subject).to receive(:select_sms_ids).and_return(smses.map(&:id))
+        allow(subject).to receive(:select_sms_ids).and_return([:default, smses.map(&:id)])
       end
 
       context "retired subjects" do
