@@ -16,6 +16,8 @@ module Workflows
     string :retirement_reason, default: nil
 
     def execute
+      return if subject_ids.empty?
+
       Workflow.transaction do
         subject_ids.each do |subject_id|
           workflow.retire_subject(subject_id, retirement_reason)
@@ -35,7 +37,7 @@ module Workflows
     end
 
     def subject_ids
-      Array.wrap(@subject_ids) | Array.wrap(@subject_id)
+      @cached_subject_ids ||= Array.wrap(@subject_ids) | Array.wrap(@subject_id)
     end
 
     private
