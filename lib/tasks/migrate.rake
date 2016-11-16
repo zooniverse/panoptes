@@ -169,4 +169,22 @@ namespace :migrate do
       puts ' done'
     end
   end
+
+  namespace :workflows do
+    desc "Set the workflows version cache key attribute"
+    task :update_version_cache_key => :environment do
+      Workflow.where(current_version_number: nil).find_each do |w|
+        w.send(:update_workflow_version_cache)
+      end
+    end
+  end
+
+  namespace :workflow_contents do
+    desc "Set the workflow_contents version cache key attribute"
+    task :update_version_cache_key => :environment do
+      WorkflowContent.where(current_version_number: nil).find_each do |wc|
+        wc.send(:update_workflow_version_cache)
+      end
+    end
+  end
 end
