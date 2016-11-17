@@ -6,6 +6,12 @@ if ENV["GRAYLOG_URL"].present?
     # If we want to switch from Logstasher to use SemanticLogger for
     # request logs too, remove this filter. Until then this prevents
     # duplicate logging.
-    filter: ->(log) { !(log.name =~ /Controller$/ && log.message =~ /^Completed/) }
+    #
+    # Filter proc defines a *whitelist*.
+    filter: ->(log) {
+      !(log.name =~ /Controller$/ && log.message =~ /^Completed/) ||
+      !(log.name =~ /Mailer/) ||
+      !(log.name == "Sidekiq" || log.name == "Sidetiq")
+    }
   )
 end
