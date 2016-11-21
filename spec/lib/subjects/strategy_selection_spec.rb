@@ -158,6 +158,7 @@ RSpec.describe Subjects::StrategySelection do
     context "when Cellect config is on" do
       before do
         allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
+        allow(Panoptes.flipper).to receive(:enabled?).with("cellect_ex").and_return(true)
       end
 
       context "when providing cellect strategy param" do
@@ -238,6 +239,16 @@ RSpec.describe Subjects::StrategySelection do
       context "when the workflow is set to use cellect_ex" do
         it "should use the workflow config strategy" do
           allow(workflow).to receive(:subject_selection_strategy).and_return("cellect_ex")
+          expect(subject.strategy).to eq(:cellect_ex)
+        end
+      end
+
+      context 'when the workflow has a lot of subjects' do
+        it 'should still use cellect_ex' do
+          allow(workflow).to receive(:subject_selection_strategy).and_return("cellect_ex")
+          allow(workflow).to receive_message_chain("set_member_subjects.count") do
+            cellect_size
+          end
           expect(subject.strategy).to eq(:cellect_ex)
         end
       end

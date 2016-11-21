@@ -26,10 +26,12 @@ module Subjects
 
     def strategy
       @strategy ||= case
-      when cellect_strategy?
+      when configured_to_use_cellect?
         :cellect
-      when cellect_ex_strategy?
+      when configured_to_use_cellect_ex?
         :cellect_ex
+      when automatically_use_cellect?
+        :cellect
       else
         nil
       end
@@ -43,14 +45,19 @@ module Subjects
       [:default, default_strategy_sms_ids]
     end
 
-    def cellect_strategy?
+    def configured_to_use_cellect?
       return nil unless Panoptes.flipper.enabled?("cellect")
-      strategy_param == :cellect || workflow.using_cellect?
+      strategy_param == :cellect || workflow.subject_selection_strategy.to_s == 'cellect'
     end
 
-    def cellect_ex_strategy?
+    def configured_to_use_cellect_ex?
       return nil unless Panoptes.flipper.enabled?("cellect_ex")
-      strategy_param == :cellect_ex || workflow.subject_selection_strategy == 'cellect_ex'
+      strategy_param == :cellect_ex || workflow.subject_selection_strategy.to_s == 'cellect_ex'
+    end
+
+    def automatically_use_cellect?
+      return nil unless Panoptes.flipper.enabled?("cellect")
+      workflow.using_cellect?
     end
 
     def strategy_sms_ids
