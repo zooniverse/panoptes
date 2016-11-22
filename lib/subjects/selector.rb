@@ -61,7 +61,7 @@ module Subjects
       end
 
       if sms_ids.blank?
-        Rails.logger.info "Fallback failed to return unseen unretired data, falling back to selecting anything", workflow_id: workflow.id, user_id: user.id
+        Rails.logger.info "Fallback failed to return unseen unretired data, falling back to selecting anything", workflow_id: workflow.id, user_id: user&.id
         fallback_selector.any_workflow_data
       else
         sms_ids
