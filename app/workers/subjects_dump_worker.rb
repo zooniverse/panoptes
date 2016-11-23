@@ -19,6 +19,9 @@ class SubjectsDumpWorker
   end
 
   def project_subjects
-    SetMemberSubject.joins(:subject_set).merge(resource.subject_sets)
+    Subject
+      .joins(:subject_sets)
+      .eager_load(:subject_sets, :locations)
+      .merge(resource.subject_sets)
   end
 end

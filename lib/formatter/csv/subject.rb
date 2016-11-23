@@ -1,21 +1,20 @@
 module Formatter
   module Csv
     class Subject
-      attr_reader :sms, :project
-
-      delegate :subject_id, :subject_set_id, to: :sms
+      attr_reader :subject, :project, :project_workflow_ids
 
       def self.headers
-        %w(subject_id project_id workflow_ids subject_set_id metadata locations
+        %w(subject_id project_id workflow_ids subject_set_ids metadata locations
            classifications_by_workflow retired_in_workflow)
       end
 
       def initialize(project)
         @project = project
+        @project_workflow_ids = project.workflows.pluck(&:id)
       end
 
-      def to_array(sms)
-        @sms = sms
+      def to_array(subject)
+        @subject = subject
         self.class.headers.map do |header|
           send(header)
         end
@@ -23,16 +22,24 @@ module Formatter
 
       private
 
+      def subject_id
+        subject.id
+      end
+
+      def subject_set_ids
+        subject.subject_set_ids.to_json
+      end
+
       def project_id
         project.id
       end
 
       def workflow_ids
-        sms.subject_set.workflows.pluck(:id).to_json
+        subject_workflow_statuses.map(&:workflow_id).to_json
       end
 
       def locations
-        subject_locs = sms.subject.locations.order("\"media\".\"metadata\"->>'index' ASC")
+        subject_locs = subject.locations.order("\"media\".\"metadata\"->>'index' ASC")
         {}.tap do |locs|
           subject_locs.each_with_index.map do |loc, index|
             locs[index] = loc.get_url
@@ -41,19 +48,29 @@ module Formatter
       end
 
       def retired_in_workflow
-        SubjectWorkflowStatus.retired.where(subject_id: subject_id).pluck(:workflow_id).to_json
+        retired = subject_workflow_statuses.select do |sws|
+          sws.retired?
+        end
+        retired.map(&:workflow_id).to_json
       end
 
       def metadata
-        sms.subject.metadata.to_json
+        subject.metadata.to_json
       end
 
       def classifications_by_workflow
-        sms.subject_set.workflows.map do |workflow|
-          count = SubjectWorkflowStatus.by_subject_workflow(subject_id, workflow.id)
-            .try(:classifications_count) || 0
-          {workflow.id => count}
-        end.reduce(&:merge).to_json
+        workflow_counts = subject_workflow_statuses.map do |sws|
+          count = (sws.classifications_count || 0)
+          {sws.workflow_id => count}
+        end
+        workflow_counts.reduce(&:merge).to_json
+      end
+
+      def subject_workflow_statuses
+        @swses ||= SubjectWorkflowStatus
+          .by_subject(subject.id)
+          .where(workflow_id: project_workflow_ids)
+          .to_a
       end
     end
   end
