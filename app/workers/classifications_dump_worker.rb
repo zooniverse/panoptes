@@ -34,7 +34,7 @@ class ClassificationsDumpWorker
     c_s_ids = ActiveRecord::Base.connection.select_rows(sql)
     cache.reset_classification_subjects(c_s_ids)
     subject_ids = c_s_ids.map { |_, subject_id| subject_id }
-    cache.reset_subjects(Subject.unscoped.where(id: subject_ids).load)
+    cache.reset_subjects(Subject.where(id: subject_ids).load)
     subject_ids
   end
 
