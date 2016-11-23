@@ -1,5 +1,7 @@
 module Subjects
   class Selector
+    include Logging
+
     class MissingParameter < StandardError; end
     class MissingSubjectSet < StandardError; end
     class MissingSubjects < StandardError; end
@@ -27,7 +29,7 @@ module Subjects
     private
 
     def run_strategy_selection
-      Rails.logger.info "Selecting subjects based on workflow config", workflow_id: workflow.id, user_id: user&.id
+      eventlog.info "Selecting subjects based on workflow config", workflow_id: workflow.id, user_id: user&.id
 
       Subjects::StrategySelection.new(
         workflow,
@@ -38,7 +40,7 @@ module Subjects
     end
 
     def fallback_selection
-      Rails.logger.info "Preferred strategy returned no results, trying fallback", workflow_id: workflow.id, user_id: user&.id
+      eventlog.info "Preferred strategy returned no results, trying fallback", workflow_id: workflow.id, user_id: user&.id
 
       opts = { limit: subjects_page_size, subject_set_id: subject_set_id }
       fallback_selector = PostgresqlSelection.new(workflow, user, opts)
@@ -61,7 +63,7 @@ module Subjects
       end
 
       if sms_ids.blank?
-        Rails.logger.info "Fallback failed to return unseen unretired data, falling back to selecting anything", workflow_id: workflow.id, user_id: user&.id
+        eventlog.info "Fallback failed to return unseen unretired data, falling back to selecting anything", workflow_id: workflow.id, user_id: user&.id
         fallback_selector.any_workflow_data
       else
         sms_ids

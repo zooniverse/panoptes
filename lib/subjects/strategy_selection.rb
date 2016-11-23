@@ -4,6 +4,8 @@ require 'subjects/complete_remover'
 
 module Subjects
   class StrategySelection
+    include Logging
+
     attr_reader :workflow, :user, :subject_set_id, :limit, :strategy_param
 
     def initialize(workflow, user, subject_set_id, limit=SubjectQueue::DEFAULT_LENGTH, strategy_param=nil)
@@ -16,11 +18,11 @@ module Subjects
 
     def select
       used_strategy, selected_ids = select_sms_ids
-      Rails.logger.info("Selected subjects", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: selected_ids)
+      eventlog.info("Selected subjects", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: selected_ids)
 
       selected_ids = selected_ids.compact
       incomplete_ids = Subjects::CompleteRemover.new(user, workflow, selected_ids).incomplete_ids
-      Rails.logger.info("Selected subjects after cleanup", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: incomplete_ids)
+      eventlog.info("Selected subjects after cleanup", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: incomplete_ids)
       incomplete_ids
     end
 
