@@ -35,37 +35,35 @@ class CellectExClient
   end
 
   def reload_workflow(workflow_id)
-    response = connection.post("/api/workflows/#{workflow_id}/reload") do |req|
-      req.headers["Accept"] = "application/json"
-      req.headers["Content-Type"] = "application/json"
-    end
-
-    handle_response(response)
+    request(:post, "/api/workflows/#{workflow_id}/reload")
   end
 
   def remove_subject(subject_id, workflow_id, group_id)
-    response = connection.post("/api/workflows/#{workflow_id}/remove") do |req|
-      req.headers["Accept"] = "application/json"
-      req.headers["Content-Type"] = "application/json"
+    request(:post, "/api/workflows/#{workflow_id}/remove") do |req|
       req.body = {subject_id: subject_id}.to_json
     end
-
-    handle_response(response)
   end
 
   def get_subjects(workflow_id, user_id, _group_id, limit)
-    response = connection.get("/api/workflows/#{workflow_id}", strategy: :weighted, user_id: user_id, limit: limit) do |req|
-      req.headers["Accept"] = "application/json"
-      req.options.timeout = 5           # open/read timeout in seconds
-      req.options.open_timeout = 2      # connection open timeout in seconds
-    end
-
-    handle_response(response)
-  rescue Faraday::TimeoutError => exception
-    raise GenericError.new(exception.message)
+    url = "/api/workflows/#{workflow_id}"
+    params = { strategy: :weighted, user_id: user_id, limit: limit }
+    request(:get, [ url, params ])
   end
 
   private
+
+  def request(http_method, params)
+    response = connection.send(http_method, *params) do |req|
+      req.headers["Accept"] = "application/json"
+      req.options.timeout = 5           # open/read timeout in seconds
+      req.options.open_timeout = 2      # connection open timeout in seconds
+      yield req if block_given?
+    end
+
+    handle_response(response)
+  rescue Faraday::TimeoutError, Faraday::ConnectionFailed => exception
+    raise GenericError.new(exception.message)
+  end
 
   def handle_response(response)
     case response.status
