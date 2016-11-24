@@ -1,3 +1,5 @@
+require 'semantic_logger'
+
 if ENV["GRAYLOG_URL"].present?
   SemanticLogger.add_appender(
     appender: :graylog,
