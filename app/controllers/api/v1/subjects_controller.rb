@@ -75,7 +75,7 @@ class Api::V1::SubjectsController < Api::ApiController
     @selector ||= Subjects::Selector.new(api_user.user,
       workflow,
       params,
-      controlled_resources)
+      Subject.all)
   end
 
   def location_params(locations)
