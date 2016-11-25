@@ -59,8 +59,6 @@ class SubjectSerializer
   def user_seen
     @user_seen ||= if user
       UserSeenSubject.where(user: user, workflow: workflow).first
-    else
-      nil
     end
   end
 
