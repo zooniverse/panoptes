@@ -17,7 +17,10 @@ module Subjects
       raise group_id_error if needs_set_id?
       raise missing_subject_set_error if workflow.subject_sets.empty?
       raise missing_subjects_error if workflow.set_member_subjects.empty?
-      [ selected_subjects, context.merge(selected: true, url_format: :get) ]
+      selected_context = context.merge(
+        url_format: :get, select_context: subject_selection_context
+      ).compact
+      [ selected_subjects, selected_context ]
     end
 
     def selected_subjects
@@ -109,6 +112,14 @@ module Subjects
 
     def subject_set_id
       params[:subject_set_id]
+    end
+
+    def subject_selection_context
+      if Panoptes.flipper[:skip_subject_selection_context].enabled?
+        nil
+      else
+        true
+      end
     end
   end
 end

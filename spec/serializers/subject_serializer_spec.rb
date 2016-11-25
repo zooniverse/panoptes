@@ -14,12 +14,13 @@ describe OrganizationSerializer do
     SubjectSerializer.page({}, Subject.all, {})
   end
 
-  context "subject selection", :focus do
+  context "subject selection" do
+    let(:selection_context) { { select_context: true } }
     let(:run_serializer) do
-      SubjectSerializer.single({}, Subject.all, {selected: true})
+      SubjectSerializer.single({}, Subject.all, selection_context)
     end
 
-    describe "seen and retired" do
+    describe "seen, retired, finished selection contexts" do
       it "should run the lookups if the feature flag is off" do
         expect_any_instance_of(SubjectSerializer).to receive(:retired)
         expect_any_instance_of(SubjectSerializer).to receive(:already_seen)
@@ -27,12 +28,15 @@ describe OrganizationSerializer do
         run_serializer
       end
 
-      it "should not run the lookups if the feature flag is on" do
-        Panoptes.flipper[:skip_subject_selection_context].enable
-        expect_any_instance_of(SubjectSerializer).not_to receive(:retired)
-        expect_any_instance_of(SubjectSerializer).not_to receive(:already_seen)
-        expect_any_instance_of(SubjectSerializer).not_to receive(:finished_workflow)
-        run_serializer
+      context "when skip select context lookup feature flag is on" do
+        let(:selection_context) { { select_context: false } }
+
+        it "should not run the lookups if the feature flag is on" do
+          expect_any_instance_of(SubjectSerializer).not_to receive(:retired)
+          expect_any_instance_of(SubjectSerializer).not_to receive(:already_seen)
+          expect_any_instance_of(SubjectSerializer).not_to receive(:finished_workflow)
+          run_serializer
+        end
       end
     end
   end

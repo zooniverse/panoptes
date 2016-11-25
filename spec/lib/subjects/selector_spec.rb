@@ -10,9 +10,21 @@ RSpec.describe Subjects::Selector do
   subject { described_class.new(user, workflow, params, Subject.all) }
 
   describe "#get_subjects" do
-    it 'should return url_format: :get in the context object' do
-      _, ctx = subject.get_subjects
-      expect(ctx).to include(url_format: :get)
+    describe "context object" do
+      let(:ctx) { subject.get_subjects.last }
+
+      it 'should return url_format: :get' do
+        expect(ctx).to include(url_format: :get)
+      end
+
+      it 'should return select_context' do
+        expect(ctx).to include(select_context: true)
+      end
+
+      it 'should not return select_context in the context object' do
+        Panoptes.flipper[:skip_subject_selection_context].enable
+        expect(ctx).not_to include(:select_context)
+      end
     end
 
     context "when the workflow doesn't have any subject sets" do

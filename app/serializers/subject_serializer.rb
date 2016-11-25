@@ -27,29 +27,25 @@ class SubjectSerializer
   end
 
   def already_seen
-    !!(user_seen&.subject_ids.include?(@model.id))
+    !!(user_seen && user_seen.subject_ids.include?(@model.id))
   end
 
   private
 
   def include_retired?
-    enabled_selection_context
+    select_context?
   end
 
   def include_already_seen?
-    enabled_selection_context
+    select_context?
   end
 
   def include_finished_workflow?
-    enabled_selection_context
+    select_context?
   end
 
-  def enabled_selection_context
-    selected? && !Panoptes.flipper[:skip_subject_selection_context].enabled?
-  end
-
-  def selected?
-    @context[:selected]
+  def select_context?
+    @context[:select_context]
   end
 
   def workflow
