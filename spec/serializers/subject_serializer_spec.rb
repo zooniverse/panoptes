@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe OrganizationSerializer do
+describe SubjectSerializer do
   let(:subject) { create(:subject, :with_subject_sets, num_sets: 1) }
   let!(:collection) do
     create(:collection, build_projects: false, owner: subject.project.owner, subjects: [subject])
