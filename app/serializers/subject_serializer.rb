@@ -9,6 +9,11 @@ class SubjectSerializer
 
   can_include :project, :collections, :subject_sets
 
+  def self.page(params = {}, scope = nil, context = {})
+    scope = scope.preload(:locations, :project, :collections, :subject_sets)
+    super(params, scope, context)
+  end
+
   def locations
     @model.locations.order("\"media\".\"metadata\"->>'index' ASC").map do |loc|
       {
@@ -22,21 +27,25 @@ class SubjectSerializer
   end
 
   def already_seen
-    !!(user_seen && user_seen.subject_ids.include?(@model.id))
+    !!(user_seen&.subject_ids.include?(@model.id))
   end
 
   private
 
   def include_retired?
-    selected?
+    enabled_selection_context
   end
 
   def include_already_seen?
-    selected?
+    enabled_selection_context
   end
 
   def include_finished_workflow?
-    selected?
+    enabled_selection_context
+  end
+
+  def enabled_selection_context
+    selected? && !Panoptes.flipper[:skip_subject_selection_context].enabled?
   end
 
   def selected?
@@ -47,11 +56,15 @@ class SubjectSerializer
     @context[:workflow]
   end
 
+  def user
+    @context[:user]
+  end
+
   def user_seen
-    @context[:user_seen].try(:first)
+    @user_seen ||= UserSeenSubject.where(user: user, workflow: workflow).first
   end
 
   def finished_workflow
-    @context[:finished_workflow]
+    user&.has_finished?(workflow)
   end
 end

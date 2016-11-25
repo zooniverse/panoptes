@@ -104,11 +104,7 @@ module Subjects
     end
 
     def context
-      @context ||= {
-        workflow: workflow,
-        user_seen: UserSeenSubject.where(user: user, workflow: workflow),
-        finished_workflow: user&.has_finished?(workflow)
-      }
+      @context ||= { workflow: workflow, user: user }
     end
 
     def subject_set_id
