@@ -14,9 +14,9 @@ class WorkflowSerializer
 
   can_include :project, :subject_sets, :tutorial_subject, :expert_subject_sets
 
-  can_filter_by :active
+  media_include :attached_images, classifications_export: { include: false }
 
-  media_include :attached_images
+  can_filter_by :active
 
   def self.links
     links = super
