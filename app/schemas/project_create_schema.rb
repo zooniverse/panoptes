@@ -90,6 +90,10 @@ class ProjectCreateSchema < JsonSchema
       type "string"
     end
 
+    property "researcher_quote" do
+      type "string"
+    end
+
     property "experimental_tools" do
       type "array"
       items do
