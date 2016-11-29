@@ -6,9 +6,9 @@ module Subjects
     class MissingSubjectSet < StandardError; end
     class MissingSubjects < StandardError; end
 
-    attr_reader :user, :params, :workflow
+    attr_reader :user, :params, :workflow, :scope
 
-    def initialize(user, workflow, params, scope)
+    def initialize(user, workflow, params, scope=Subject.all)
       @user, @workflow, @params, @scope = user, workflow, params, scope
     end
 
@@ -74,7 +74,7 @@ module Subjects
     end
 
     def active_subjects_in_selection_order(sms_ids)
-      @scope.active
+      scope.active
         .eager_load(:set_member_subjects)
         .where(set_member_subjects: {id: sms_ids})
         .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")

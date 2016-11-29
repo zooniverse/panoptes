@@ -7,7 +7,7 @@ RSpec.describe Subjects::Selector do
   let!(:smses) { create_list(:set_member_subject, 10, subject_set: subject_set).reverse }
   let(:params) { {} }
 
-  subject { described_class.new(user, workflow, params, Subject.all) }
+  subject { described_class.new(user, workflow, params) }
 
   describe "#get_subjects" do
     describe "context object" do
