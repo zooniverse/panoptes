@@ -301,8 +301,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
       describe "classifications_exports #index" do
         let!(:resources) do
-          create_list :medium, 2, linked: parent, content_type: "text/csv",
-            type: "workflow_classifications_export"
+          create(:medium, linked: parent, type: "workflow_classifications_export", content_type: "text/csv")
         end
 
         it 'should return 404 without an authorized_user' do
@@ -330,8 +329,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
       describe "classifications_exports #index" do
         let!(:resources) do
-          create_list :medium, 2, linked: parent, content_type: "text/csv",
-            type: "project_classifications_export"
+          create(:medium, linked: parent, type: "project_classifications_export", content_type: "text/csv")
         end
 
         it 'should return 404 without an authorized_user' do
