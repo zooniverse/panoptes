@@ -15,7 +15,7 @@ class SubjectSerializer
   end
 
   def locations
-    @model.locations.order("\"media\".\"metadata\"->>'index' ASC").map do |loc|
+    index_ordered_locations.map do |loc|
       {
        loc.content_type => loc.url_for_format(@context[:url_format] || :get)
       }
@@ -62,5 +62,13 @@ class SubjectSerializer
 
   def finished_workflow
     user&.has_finished?(workflow)
+  end
+
+  def index_ordered_locations
+    if @model.locations.loaded?
+      @model.locations.sort_by { |loc| loc.metadata["index"] }
+    else
+      @model.locations.order("\"media\".\"metadata\"->>'index' ASC")
+    end
   end
 end

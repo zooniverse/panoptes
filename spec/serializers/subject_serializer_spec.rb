@@ -14,6 +14,24 @@ describe SubjectSerializer do
     SubjectSerializer.page({}, Subject.all, {})
   end
 
+  describe "locations" do
+    let(:subject) do
+      create(:subject, :with_mediums, :with_subject_sets, num_sets: 1)
+    end
+    let(:subject_locs) do
+      subject.locations.sort_by { |loc| loc.metadata["index"] }
+    end
+    let(:result_locs) do
+      SubjectSerializer.single({}, Subject.all, {})[:locations]
+    end
+
+    it "should sort the related locations index" do
+      expected = subject_locs.map { |loc| loc.src.split("/").last }
+      results = result_locs.map { |loc| loc[:"image/jpeg"].split("/").last }
+      expect(expected).to eq(results)
+    end
+  end
+
   context "subject selection" do
     let(:selection_context) { { select_context: true } }
     let(:run_serializer) do
