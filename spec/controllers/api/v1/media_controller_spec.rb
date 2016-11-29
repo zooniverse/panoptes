@@ -297,6 +297,24 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       let(:parent) { create(:workflow, project: project) }
 
       it_behaves_like "has_many media", :workflow, :attached_images, %i(index create show destroy), 'image/jpeg'
+      it_behaves_like "has_one media", :workflow, :classifications_export, %i(index), 'text/csv'
+
+      describe "classifications_exports #index" do
+        let!(:resources) do
+          create(:medium, linked: parent, type: "workflow_classifications_export", content_type: "text/csv")
+        end
+
+        it 'should return 404 without an authorized_user' do
+          default_request user_id: create(:user).id, scopes: scopes
+          get :index, project_id: parent.id, media_name: "classifications_export"
+          expect(response).to have_http_status(:not_found)
+        end
+
+        it 'should return 404 without a user' do
+          get :index, project_id: parent.id, media_name: "classifications_export"
+          expect(response).to have_http_status(:not_found)
+        end
+      end
     end
 
     describe "parent is a project" do
@@ -311,8 +329,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
       describe "classifications_exports #index" do
         let!(:resources) do
-          create_list :medium, 2, linked: parent, content_type: "text/csv",
-            type: "project_classifications_export"
+          create(:medium, linked: parent, type: "project_classifications_export", content_type: "text/csv")
         end
 
         it 'should return 404 without an authorized_user' do
