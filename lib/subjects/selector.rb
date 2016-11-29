@@ -17,9 +17,6 @@ module Subjects
       raise group_id_error if needs_set_id?
       raise missing_subject_set_error if workflow.subject_sets.empty?
       raise missing_subjects_error if workflow.set_member_subjects.empty?
-      selected_context = context.merge(
-        url_format: :get, select_context: subject_selection_context
-      ).compact
       [ selected_subjects, selected_context ]
     end
 
@@ -106,19 +103,31 @@ module Subjects
       page_size
     end
 
-    def context
-      @context ||= { workflow: workflow, user: user }
+    def selected_context
+      {
+        workflow: workflow,
+        user: user,
+        user_seen: user_seen,
+        url_format: :get,
+        select_context: selection_context_on
+      }.compact
     end
 
     def subject_set_id
       params[:subject_set_id]
     end
 
-    def subject_selection_context
+    def selection_context_on
       if Panoptes.flipper[:skip_subject_selection_context].enabled?
         nil
       else
         true
+      end
+    end
+
+    def user_seen
+      if user
+        UserSeenSubject.where(user: user, workflow: workflow).first
       end
     end
   end

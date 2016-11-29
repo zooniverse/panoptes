@@ -27,7 +27,7 @@ class SubjectSerializer
   end
 
   def already_seen
-    !!(user_seen && user_seen.subject_ids.include?(@model.id))
+    !!(user_seen&.subjects_seen?(@model.id))
   end
 
   private
@@ -57,9 +57,7 @@ class SubjectSerializer
   end
 
   def user_seen
-    @user_seen ||= if user
-      UserSeenSubject.where(user: user, workflow: workflow).first
-    end
+    @context[:user_seen]
   end
 
   def finished_workflow
