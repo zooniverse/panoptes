@@ -681,7 +681,7 @@ CREATE TABLE project_contents (
     introduction text DEFAULT ''::text,
     url_labels jsonb DEFAULT '{}'::jsonb,
     workflow_description text DEFAULT ''::text,
-    researcher_quote text
+    researcher_quote text DEFAULT ''::text
 );
 
 
@@ -2370,13 +2370,6 @@ CREATE INDEX index_organizations_on_listed_at ON organizations USING btree (list
 --
 
 CREATE INDEX index_project_contents_on_project_id ON project_contents USING btree (project_id);
-
-
---
--- Name: index_project_contents_on_researcher_quote; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_project_contents_on_researcher_quote ON project_contents USING btree (researcher_quote);
 
 
 --
