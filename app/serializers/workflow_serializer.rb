@@ -6,7 +6,8 @@ class WorkflowSerializer
   include FilterHasMany
   include MediaLinksSerializer
 
-  EAGER_LOADS = %i(project subject_sets expert_subject_sets tutorial_subject attached_images).freeze
+  # :workflow_contents, Note: re-add when the eager_load from translatable_resources is removed
+  PRELOADS = %i(project subject_sets tutorial_subject attached_images).freeze
 
   attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
              :created_at, :updated_at, :finished_at, :first_task, :primary_language,
@@ -25,7 +26,7 @@ class WorkflowSerializer
     CodeExperiment.run(experiment_name) do |e|
       # e.run_if { Panoptes.flipper[experiment_name].enabled? }
       e.use { super(params, scope, context) }
-      e.try { super(params, scope.eager_load(*EAGER_LOADS), context) }
+      e.try { super(params, scope.preload(*PRELOADS), context) }
       # skip the mismatch reporting...we just want perf metrics
       e.ignore { true }
     end
