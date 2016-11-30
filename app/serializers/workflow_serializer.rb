@@ -14,7 +14,7 @@ class WorkflowSerializer
              :retirement, :retired_set_member_subjects_count, :href, :active,
              :aggregation, :configuration, :public_gold_standard, :completeness
 
-  can_include :project, :subject_sets, :tutorial_subject, :expert_subject_sets
+  can_include :project, :subject_sets, :tutorial_subject
 
   media_include :attached_images, classifications_export: { include: false }
 
@@ -29,13 +29,6 @@ class WorkflowSerializer
       # skip the mismatch reporting...we just want perf metrics
       e.ignore { true }
     end
-  end
-
-  def self.links
-    links = super
-    ess = links.delete('workflows.expert_subject_sets')
-    links['workflows.expert_subject_set'] = ess
-    links
   end
 
   def version
