@@ -11,6 +11,21 @@ describe ProjectSerializer do
     s
   end
 
+  it "should not preload the serialized associations by default" do
+    expect_any_instance_of(Project::ActiveRecord_Relation).not_to receive(:preload)
+    ProjectSerializer.page({}, Project.all, {})
+  end
+
+  it "should preload the serialized associations if enabled" do
+    allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
+    Panoptes.flipper["eager_load_projects"].enable
+    expect_any_instance_of(Project::ActiveRecord_Relation)
+      .to receive(:preload)
+      .with(*ProjectSerializer::PRELOADS)
+      .and_call_original
+    ProjectSerializer.page({}, Project.all, {})
+  end
+
   describe "#content" do
     it "should return project content for the preferred language" do
       expect(serializer.content).to be_a( Hash )

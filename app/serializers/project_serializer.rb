@@ -6,23 +6,10 @@ class ProjectSerializer
   include MediaLinksSerializer
   include ContentSerializer
 
-  EAGER_LOADS = [
-    #  :project_contents,
-    #  :workflows,
-    #  :subject_sets,
-     :pages,
-     :attached_images,
-     :avatar,
-     :background,
-     :tags
-   ].freeze
   PRELOADS = [
-    :project_roles,
-    [ owner: { identity_membership: :user } ],
+    # :project_contents, Note: re-add when the eager_load from translatable_resources is removed
     :workflows,
-    :subject_sets
-  ].freeze
-  ONLY_PRELOADS = [
+    :subject_sets,
     :project_roles,
     [ owner: { identity_membership: :user } ],
     :workflows,
@@ -67,12 +54,9 @@ class ProjectSerializer
 
     experiment_name = "eager_load_projects"
     CodeExperiment.run(experiment_name) do |e|
-      # e.run_if { Panoptes.flipper[experiment_name].enabled? }
-    # e.use { super(params, scope, context) }
-# #TODO: make this eager load work as it speeds up the app
-    e.use { super(params, scope.eager_load(*EAGER_LOADS).preload(*PRELOADS), context) }
-    e.try { super(params, scope.preload(*ONLY_PRELOADS), context) }
-      # e.try { super(params, scope.preload(*PRELOADS), context) }
+      e.run_if { Panoptes.flipper[experiment_name].enabled? }
+      e.use { super(params, scope, context) }
+      e.try { super(params, scope.preload(*PRELOADS), context) }
       # skip the mismatch reporting...we just want perf metrics
       e.ignore { true }
     end
@@ -126,7 +110,7 @@ class ProjectSerializer
   end
 
   def tags
-    @model.tags.map(&:name)
+    @model.tags.pluck(&:name)
   end
 
   def avatar_src
