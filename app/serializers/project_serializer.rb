@@ -110,7 +110,11 @@ class ProjectSerializer
   end
 
   def tags
-    @model.tags.pluck(&:name)
+    if @model.tags.loaded?
+      @model.tags.map(&:name)
+    else
+      @model.tags.pluck(&:name)
+    end
   end
 
   def avatar_src
