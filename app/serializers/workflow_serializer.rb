@@ -24,7 +24,7 @@ class WorkflowSerializer
   def self.page(params = {}, scope = nil, context = {})
     experiment_name = "eager_load_workflows"
     CodeExperiment.run(experiment_name) do |e|
-      # e.run_if { Panoptes.flipper[experiment_name].enabled? }
+      e.run_if { Panoptes.flipper[experiment_name].enabled? }
       e.use { super(params, scope, context) }
       e.try { super(params, scope.preload(*PRELOADS), context) }
       # skip the mismatch reporting...we just want perf metrics
