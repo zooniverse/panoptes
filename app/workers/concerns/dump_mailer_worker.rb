@@ -7,7 +7,7 @@ module DumpMailerWorker
 
   def send_email
     return unless emails.present?
-    mailer.perform_async(resource.id, media_get_url, emails)
+    mailer.perform_async(resource.id, resource.class.to_s.downcase, media_get_url, emails)
   end
 
   def mailer
