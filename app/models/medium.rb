@@ -6,7 +6,7 @@ class Medium < ActiveRecord::Base
   before_validation :create_path, unless: :external_link
   validates :src, presence: true, unless: :external_link
 
-  before_destroy :queue_medium_removal
+  before_destroy :queue_medium_removal, unless: :external_link
 
   attr_writer :allow_any_content_type
 
