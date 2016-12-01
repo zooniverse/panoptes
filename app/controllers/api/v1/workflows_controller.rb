@@ -19,7 +19,10 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def update_links
-    super { |workflow| post_link_actions(workflow) }
+    super do |workflow|
+      UnfinishWorkflowWorker.perform_async(workflow.id)
+      post_link_actions(workflow)
+    end
   end
 
   def destroy_links
@@ -79,7 +82,6 @@ class Api::V1::WorkflowsController < Api::ApiController
           end
         end
       when :subject_sets, 'subject_sets'
-        UnfinishWorkflowWorker.perform_async(workflow.id)
         ReloadCellectWorker.perform_async(workflow.id) if using_cellect
       end
 
