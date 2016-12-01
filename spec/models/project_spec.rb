@@ -141,6 +141,11 @@ describe Project, type: :model do
     it "should have many workflows" do
       expect(project.workflows).to all( be_a(Workflow) )
     end
+
+    it "should not have any deactivated workflows" do
+      Activation.disable_instances!(project.workflows)
+      expect(project.workflows.reload).to be_empty
+    end
   end
 
   describe "#active_workflows" do
