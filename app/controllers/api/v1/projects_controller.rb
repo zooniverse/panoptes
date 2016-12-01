@@ -18,12 +18,14 @@ class Api::V1::ProjectsController < Api::ApiController
   CONTENT_PARAMS = [:description,
                     :title,
                     :workflow_description,
+                    :researcher_quote,
                     :introduction].freeze
 
   CONTENT_FIELDS = [:title,
                     :description,
                     :workflow_description,
                     :introduction,
+                    :researcher_quote,
                     :url_labels].freeze
 
   CARD_FIELDS = [:id,

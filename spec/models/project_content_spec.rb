@@ -30,6 +30,10 @@ RSpec.describe ProjectContent, :type => :model do
     expect(build(:project_content, introduction: '0' * 5001)).to_not be_valid
   end
 
+  it 'should restrict the maximum length of researcher quote' do
+    expect(build(:project_content, researcher_quote: '0' * 256)).to_not be_valid
+  end
+
   describe "versioning" do
     subject do
       create(:project_content)

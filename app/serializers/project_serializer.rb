@@ -12,7 +12,7 @@ class ProjectSerializer
     :configuration, :live, :urls, :migrated, :classifiers_count, :slug, :redirect,
     :beta_requested, :beta_approved, :launch_requested, :launch_approved, :launch_date,
     :href, :workflow_description, :primary_language, :tags, :experimental_tools,
-    :completeness, :activity, :state
+    :completeness, :activity, :state, :researcher_quote
 
   optional :avatar_src
   can_include :workflows, :subject_sets, :owners, :project_contents,
@@ -71,6 +71,10 @@ class ProjectSerializer
 
   def introduction
     content[:introduction]
+  end
+
+  def researcher_quote
+    content[:researcher_quote]
   end
 
   def urls

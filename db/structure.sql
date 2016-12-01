@@ -680,7 +680,8 @@ CREATE TABLE project_contents (
     updated_at timestamp without time zone,
     introduction text DEFAULT ''::text,
     url_labels jsonb DEFAULT '{}'::jsonb,
-    workflow_description text DEFAULT ''::text
+    workflow_description text DEFAULT ''::text,
+    researcher_quote text DEFAULT ''::text
 );
 
 
@@ -3601,4 +3602,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160901141903');
 INSERT INTO schema_migrations (version) VALUES ('20161017135917');
 
 INSERT INTO schema_migrations (version) VALUES ('20161017141439');
+
+INSERT INTO schema_migrations (version) VALUES ('20161128193435');
 
