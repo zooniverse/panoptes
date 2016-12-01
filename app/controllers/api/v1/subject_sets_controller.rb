@@ -25,8 +25,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
     super do |subject_set|
       notify_cellect(subject_set)
       reset_subject_counts(subject_set.id)
-      workflow_ids = subject_set.workflows.pluck(:id)
-      reset_workflow_finished_at(workflow_ids)
+      reset_workflow_finished_at(subject_set.workflows.pluck(:id))
     end
   end
 
@@ -123,6 +122,6 @@ class Api::V1::SubjectSetsController < Api::ApiController
   end
 
   def reset_workflow_finished_at(workflow_ids)
-    Workflow.where(id: workflow_ids).update_all(finished_at: nil)
+    workflow_ids.map { |id| UnfinishWorkflowWorker.perform_async(id) }
   end
 end

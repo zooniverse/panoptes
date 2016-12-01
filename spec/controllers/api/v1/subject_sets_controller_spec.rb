@@ -154,12 +154,11 @@ describe Api::V1::SubjectSetsController, type: :controller do
         run_update_links
       end
 
-      it "should reset the workflow finished_at state" do
-        linked_workflows = resource.workflows
-        linked_workflows.map { |w| w.update_column(:finished_at, Time.zone.now) }
+      it "should call the unfinish workflow worker" do
+        resource.workflows.each do |workflow|
+          expect(UnfinishWorkflowWorker).to receive(:perform_async).with(workflow.id)
+        end
         run_update_links
-        finished_ats = linked_workflows.map { |w| w.reload.finished_at }.compact
-        expect(finished_ats).to be_empty
       end
 
       context "when the linking resources are not persisted" do
