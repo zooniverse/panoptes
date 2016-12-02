@@ -543,9 +543,9 @@ describe Api::V1::WorkflowsController, type: :controller do
       expect(response.status).to eq(204)
     end
 
-    it 'retires the subject' do
+    it 'queues a retire subject worker' do
+      expect(RetireSubjectWorker).to receive(:perform_async).with(workflow.id, [subject.id], nil)
       post :retire_subjects, workflow_id: workflow.id, subject_id: subject.id
-      expect(subject.retired_for_workflow?(workflow)).to be_truthy
     end
 
     it 'throws an unpermitted params error when retired_reason is invalid', :aggregate_failures do
@@ -553,12 +553,6 @@ describe Api::V1::WorkflowsController, type: :controller do
       expect(json_response['errors'][0]['message'])
         .to eq("Retirement reason is not included in the list")
       expect(response.status).to eq(422)
-    end
-
-    it 'queues a cellect retirement if the workflow uses cellect' do
-      allow(Panoptes).to receive(:use_cellect?).and_return(true)
-      expect(RetireCellectWorker).to receive(:perform_async).with(subject.id, workflow.id)
-      post :retire_subjects, workflow_id: workflow.id, subject_id: subject.id
     end
   end
 
