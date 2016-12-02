@@ -970,7 +970,7 @@ A *locations* attribute and a project link are required.
 
 To have the Zooniverse host your media resources the *locations* array
 should have the mime-types of the subject's associated media,
-e.g `"locations":["image/png", "image/jpg", "image/png"]`,
+e.g `"locations":["image/png", "image/jpeg", "image/png"]`,
 note the locations mime types are stored in order.
 
 The create response will contain signed s3 urls the client may make a PUT
@@ -983,7 +983,7 @@ should be comprised of objects that represent the mime-type and the hosted URL
 of the subject's associated media,
 e.g. `"locations":[
 {"image/png": "https://your.s3_account.com/subjects/1.png"},
-{"image/jpg": "https://your.s3_account.com/subjects/1.jpg"}
+{"image/jpeg": "https://your.s3_account.com/subjects/1.jpg"}
 ]`.
 
 The *metadata* attribute is optional.
