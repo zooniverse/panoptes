@@ -10,13 +10,13 @@ class Api::V1::ProjectRolesController < Api::ApiController
   end
 
   def update
-    UserAddedToProjectMailerWorker.perform_async(acl_user_id, controlled_resource.resource.id, roles) if new_roles_present?(roles)
     super
+    UserAddedToProjectMailerWorker.perform_async(acl_user_id, controlled_resource.resource.id, roles) if new_roles_present?(roles)
   end
 
   def create
-    UserAddedToProjectMailerWorker.perform_async(new_user_id, project_id, roles) if new_roles_present?(roles)
     super
+    UserAddedToProjectMailerWorker.perform_async(new_user_id, project_id, roles) if new_roles_present?(roles)
   end
 
   private

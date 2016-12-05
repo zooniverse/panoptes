@@ -74,7 +74,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
 
     context "mailers" do
       let(:user) do
-        create(:user).tap do |user|
+        create(:user) do |user|
           create :access_control_list, user_group: user.identity_group, resource: project
         end
       end
@@ -175,11 +175,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     end
 
     context "mailers" do
-      let(:user) do
-        create(:user).tap do |user|
-          create :access_control_list, user_group: user.identity_group, resource: project
-        end
-      end
+      let(:user) { create(:user) }
 
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
