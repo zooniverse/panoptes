@@ -8,6 +8,7 @@ class ClassificationDataMailerWorker
     ClassificationDataMailer.classification_data(
       resource_type.camelize.constantize.find(resource_id),
       s3_url.to_s,
-      emails).deliver
+      emails
+    ).deliver
   end
 end
