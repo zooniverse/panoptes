@@ -667,6 +667,16 @@ ALTER SEQUENCE organizations_id_seq OWNED BY organizations.id;
 
 
 --
+-- Name: organizations_projects; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE organizations_projects (
+    organization_id integer NOT NULL,
+    project_id integer NOT NULL
+);
+
+
+--
 -- Name: project_contents; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2366,6 +2376,20 @@ CREATE INDEX index_organizations_on_listed_at ON organizations USING btree (list
 
 
 --
+-- Name: index_organizations_projects_on_organization_id_and_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organizations_projects_on_organization_id_and_project_id ON organizations_projects USING btree (organization_id, project_id);
+
+
+--
+-- Name: index_organizations_projects_on_project_id_and_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organizations_projects_on_project_id_and_organization_id ON organizations_projects USING btree (project_id, organization_id);
+
+
+--
 -- Name: index_project_contents_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3604,4 +3628,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161017135917');
 INSERT INTO schema_migrations (version) VALUES ('20161017141439');
 
 INSERT INTO schema_migrations (version) VALUES ('20161128193435');
+
+INSERT INTO schema_migrations (version) VALUES ('20161205203956');
 

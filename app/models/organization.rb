@@ -8,7 +8,8 @@ class Organization < ActiveRecord::Base
   scope :public_scope, -> { where.not(listed_at: nil) }
   scope :private_scope, -> { where(listed_at: nil) }
 
-  has_many :projects
+  has_many :organizations_projects
+  has_many :projects, through: :organizations_projects
   has_many :organization_contents, dependent: :destroy
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
 
