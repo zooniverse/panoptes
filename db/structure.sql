@@ -188,7 +188,8 @@ CREATE TABLE classifications (
     expert_classifier integer,
     metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
     workflow_version text,
-    lifecycled_at timestamp without time zone
+    lifecycled_at timestamp without time zone,
+    duration integer
 );
 
 
@@ -3604,4 +3605,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161017135917');
 INSERT INTO schema_migrations (version) VALUES ('20161017141439');
 
 INSERT INTO schema_migrations (version) VALUES ('20161128193435');
+
+INSERT INTO schema_migrations (version) VALUES ('20161206233551');
 
