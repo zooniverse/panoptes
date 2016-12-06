@@ -521,6 +521,11 @@ describe ClassificationLifecycle do
       update_classification_data
     end
 
+    it "should call store_duration" do
+      expect(subject).to receive(:add_duration)
+      update_classification_data
+    end
+
     it "should call classification save!" do
       expect(classification).to receive(:save!)
       update_classification_data
@@ -548,6 +553,49 @@ describe ClassificationLifecycle do
         subject.add_project_live_state
         expect(classification.metadata[:live_project]).to eq(true)
       end
+    end
+  end
+
+  describe "#add_duration" do
+    def update_metadata(new_values)
+      classification.metadata = classification.metadata.merge(new_values)
+    end
+
+    before do
+      now = Time.zone.now
+      time_updates = {
+        "started_at" => (now - 10.seconds).to_s,
+        "finished_at" => now.to_s
+      }
+      update_metadata(time_updates)
+    end
+
+    it "should leave all other metadata intact" do
+      prev_metadata = classification.metadata
+      subject.add_duration
+      updated_metadata = classification.metadata.except(:duration)
+      expect(updated_metadata).to eq(prev_metadata)
+    end
+
+    it "should add a duration metadata value" do
+      expect{ subject.add_duration }.to change{
+        classification.metadata["duration"]
+      }.from(nil).to(10)
+    end
+
+    it "should handle malformed values" do
+      update_metadata({ "finished_at" => "boosh" })
+      expect{ subject.add_duration }.not_to change{
+        classification.metadata["duration"]
+      }
+    end
+
+    it "should handle missing values" do
+      update_metadata({ "finished_at" => nil })
+      classification.metadata.delete("finished_at")
+      expect{ subject.add_duration }.not_to change{
+        classification.metadata["duration"]
+      }
     end
   end
 
