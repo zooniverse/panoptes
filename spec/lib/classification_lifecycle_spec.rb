@@ -570,31 +570,23 @@ describe ClassificationLifecycle do
       update_metadata(time_updates)
     end
 
-    it "should leave all other metadata intact" do
-      prev_metadata = classification.metadata
-      subject.add_duration
-      updated_metadata = classification.metadata.except(:duration)
-      expect(updated_metadata).to eq(prev_metadata)
-    end
-
     it "should add a duration metadata value" do
       expect{ subject.add_duration }.to change{
-        classification.metadata["duration"]
+        classification.duration
       }.from(nil).to(10)
     end
 
     it "should handle malformed values" do
       update_metadata({ "finished_at" => "boosh" })
       expect{ subject.add_duration }.not_to change{
-        classification.metadata["duration"]
+        classification.duration
       }
     end
 
     it "should handle missing values" do
       update_metadata({ "finished_at" => nil })
-      classification.metadata.delete("finished_at")
       expect{ subject.add_duration }.not_to change{
-        classification.metadata["duration"]
+        classification.duration
       }
     end
   end

@@ -112,9 +112,7 @@ class ClassificationLifecycle
   end
 
   def add_duration
-    if seconds = duration_seconds
-      update_classification_metadata(:duration, seconds)
-    end
+    classification.duration = duration_seconds
   end
 
   def add_lifecycled_at
