@@ -667,16 +667,6 @@ ALTER SEQUENCE organizations_id_seq OWNED BY organizations.id;
 
 
 --
--- Name: organizations_projects; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE organizations_projects (
-    organization_id integer NOT NULL,
-    project_id integer NOT NULL
-);
-
-
---
 -- Name: project_contents; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -783,7 +773,8 @@ CREATE TABLE projects (
     completeness double precision DEFAULT 0.0 NOT NULL,
     activity integer DEFAULT 0 NOT NULL,
     tsv tsvector,
-    state integer
+    state integer,
+    organization_id integer
 );
 
 
@@ -2376,20 +2367,6 @@ CREATE INDEX index_organizations_on_listed_at ON organizations USING btree (list
 
 
 --
--- Name: index_organizations_projects_on_organization_id_and_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_organizations_projects_on_organization_id_and_project_id ON organizations_projects USING btree (organization_id, project_id);
-
-
---
--- Name: index_organizations_projects_on_project_id_and_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_organizations_projects_on_project_id_and_organization_id ON organizations_projects USING btree (project_id, organization_id);
-
-
---
 -- Name: index_project_contents_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2471,6 +2448,13 @@ CREATE INDEX index_projects_on_live ON projects USING btree (live);
 --
 
 CREATE INDEX index_projects_on_migrated ON projects USING btree (migrated) WHERE (migrated = true);
+
+
+--
+-- Name: index_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_projects_on_organization_id ON projects USING btree (organization_id);
 
 
 --
@@ -3121,6 +3105,14 @@ ALTER TABLE ONLY subject_sets
 
 ALTER TABLE ONLY memberships
     ADD CONSTRAINT fk_rails_99326fb65d FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_9aee26923d; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY projects
+    ADD CONSTRAINT fk_rails_9aee26923d FOREIGN KEY (organization_id) REFERENCES organizations(id);
 
 
 --
