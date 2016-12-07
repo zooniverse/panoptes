@@ -78,6 +78,22 @@ describe Api::V1::CollectionsController, type: :controller do
         end
       end
     end
+
+    describe "sorting" do
+
+      describe "by display_name" do
+        let!(:first_by_name) do
+          create(:collection, build_projects: false, display_name: "Aardvarks")
+        end
+
+        it 'should respect the sort order query param' do
+          get :index, sort: "display_name"
+          results = json_response[api_resource_name].map{ |r| r['display_name'] }
+          expected = Collection.public_scope.order(:display_name).map(&:display_name)
+          expect(results).to eq(expected)
+        end
+      end
+    end
   end
 
   describe '#show' do

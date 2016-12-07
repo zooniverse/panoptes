@@ -19,6 +19,7 @@ class CollectionSerializer
   can_include :owner, :collection_roles, :subjects
 
   can_filter_by :display_name, :slug, :favorite
+  can_sort_by :display_name
 
   # overridden belongs_to_many association to serialize the :projects links
   def self.btm_associations
