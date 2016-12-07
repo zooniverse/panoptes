@@ -186,17 +186,22 @@ RSpec.describe Medium, :type => :model do
         expect(medium.location).to match(/\/workflows\/[0-9]+\/classifications_export/)
       end
     end
-
   end
 
   describe "before destroy callbacks" do
-
     it 'should queue a worker to remove the attached files' do
       medium = create(:medium)
       aggregate_failures do
         expect(medium).to receive(:queue_medium_removal).and_call_original
         expect(MediumRemovalWorker).to receive(:perform_async).with(medium.src)
       end
+      medium.destroy
+    end
+
+    it 'should not queue a worker if the src is external' do
+      medium.external_link = true
+      expect(medium).not_to receive(:queue_medium_removal)
+      expect(MediumRemovalWorker).not_to receive(:perform_async)
       medium.destroy
     end
   end
