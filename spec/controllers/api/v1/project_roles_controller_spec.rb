@@ -5,7 +5,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
   let(:project) { create(:project, owner: authorized_user) }
 
   let!(:acls) do
-    create_list :access_control_list, 2, resource: project,
+    create_list :access_control_list_with_user_group, 2, resource: project,
                 roles: ["tester"]
   end
 
