@@ -2220,6 +2220,13 @@ CREATE INDEX index_collections_display_name_trgrm ON collections USING gin ((COA
 
 
 --
+-- Name: index_collections_on_display_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_collections_on_display_name ON collections USING btree (display_name);
+
+
+--
 -- Name: index_collections_on_favorite; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2448,13 +2455,6 @@ CREATE INDEX index_projects_on_live ON projects USING btree (live);
 --
 
 CREATE INDEX index_projects_on_migrated ON projects USING btree (migrated) WHERE (migrated = true);
-
-
---
--- Name: index_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_projects_on_organization_id ON projects USING btree (organization_id);
 
 
 --
@@ -3108,14 +3108,6 @@ ALTER TABLE ONLY memberships
 
 
 --
--- Name: fk_rails_9aee26923d; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY projects
-    ADD CONSTRAINT fk_rails_9aee26923d FOREIGN KEY (organization_id) REFERENCES organizations(id);
-
-
---
 -- Name: fk_rails_9c86377aa8; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3622,4 +3614,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161017141439');
 INSERT INTO schema_migrations (version) VALUES ('20161128193435');
 
 INSERT INTO schema_migrations (version) VALUES ('20161205203956');
+
+INSERT INTO schema_migrations (version) VALUES ('20161207111319');
 
