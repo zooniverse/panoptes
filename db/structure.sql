@@ -773,7 +773,8 @@ CREATE TABLE projects (
     completeness double precision DEFAULT 0.0 NOT NULL,
     activity integer DEFAULT 0 NOT NULL,
     tsv tsvector,
-    state integer
+    state integer,
+    organization_id integer
 );
 
 
@@ -2450,6 +2451,13 @@ CREATE INDEX index_projects_on_migrated ON projects USING btree (migrated) WHERE
 
 
 --
+-- Name: index_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_projects_on_organization_id ON projects USING btree (organization_id);
+
+
+--
 -- Name: index_projects_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3610,8 +3618,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160901141903');
 INSERT INTO schema_migrations (version) VALUES ('20161017135917');
 
 INSERT INTO schema_migrations (version) VALUES ('20161017141439');
-
-INSERT INTO schema_migrations (version) VALUES ('20161111173051');
 
 INSERT INTO schema_migrations (version) VALUES ('20161128193435');
 
