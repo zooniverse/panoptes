@@ -2,10 +2,25 @@ class UserProjectPreferenceSerializer
   include RestPack::Serializer
   attributes :id, :email_communication, :preferences, :href, :activity_count, :activity_count_by_workflow, :settings
   can_include :user, :project
-  can_sort_by :updated_at
+  can_sort_by :updated_at, :display_name
 
   def self.key
     "project_preferences"
+  end
+
+  def self.page_with_options(options)
+    if options.sorting.key?(:display_name)
+      display_sort, other_sorts = options.sorting.partition do |field, direction|
+        field.match(/display_name/)
+      end.map(&:to_h)
+      options.sorting = {}
+      options.scope = options
+        .scope
+        .joins(:project)
+        .order("projects.display_name #{display_sort[:display_name]}")
+        .order(other_sorts)
+    end
+    super(options)
   end
 
   def activity_count
