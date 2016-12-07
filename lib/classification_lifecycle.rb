@@ -42,6 +42,7 @@ class ClassificationLifecycle
     add_seen_before_for_user
     add_project_live_state
     add_user_groups
+    add_duration
     add_lifecycled_at
     classification.save!
   end
@@ -108,6 +109,10 @@ class ClassificationLifecycle
   def add_user_groups
     return if classification.anonymous?
     update_classification_metadata(:user_group_ids, user.non_identity_user_group_ids)
+  end
+
+  def add_duration
+    classification.duration = duration_seconds
   end
 
   def add_lifecycled_at
@@ -187,5 +192,13 @@ class ClassificationLifecycle
 
   def update?
     action == "update"
+  end
+
+  def duration_seconds
+    started_at, finished_at = %w(started_at finished_at).map do |attribute|
+      Time.zone.parse(classification.metadata[attribute])&.utc
+    end
+    (finished_at - started_at).to_i
+  rescue TypeError, NoMethodError
   end
 end
