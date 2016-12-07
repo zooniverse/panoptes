@@ -21,8 +21,8 @@ RSpec.shared_examples "has preferences scope" do
       expect(subject).to include(preferences[0])
     end
 
-    it 'should return public preferences' do
-      expect(subject).to include(preferences[1])
+    it 'should not include public preferences' do
+      expect(subject).to_not include(preferences[1])
     end
 
     it 'should not include private preference' do
