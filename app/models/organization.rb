@@ -9,7 +9,6 @@ class Organization < ActiveRecord::Base
   scope :private_scope, -> { where(listed_at: nil) }
 
   has_many :projects
-  has_many :organization_contents, dependent: :destroy
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
 
   accepts_nested_attributes_for :organization_contents

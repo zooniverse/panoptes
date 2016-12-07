@@ -773,7 +773,8 @@ CREATE TABLE projects (
     completeness double precision DEFAULT 0.0 NOT NULL,
     activity integer DEFAULT 0 NOT NULL,
     tsv tsvector,
-    state integer
+    state integer,
+    organization_id integer
 );
 
 
@@ -2450,6 +2451,13 @@ CREATE INDEX index_projects_on_migrated ON projects USING btree (migrated) WHERE
 
 
 --
+-- Name: index_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_projects_on_organization_id ON projects USING btree (organization_id);
+
+
+--
 -- Name: index_projects_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3100,6 +3108,14 @@ ALTER TABLE ONLY memberships
 
 
 --
+-- Name: fk_rails_9aee26923d; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY projects
+    ADD CONSTRAINT fk_rails_9aee26923d FOREIGN KEY (organization_id) REFERENCES organizations(id);
+
+
+--
 -- Name: fk_rails_9c86377aa8; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3604,4 +3620,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161017135917');
 INSERT INTO schema_migrations (version) VALUES ('20161017141439');
 
 INSERT INTO schema_migrations (version) VALUES ('20161128193435');
+
+INSERT INTO schema_migrations (version) VALUES ('20161205203956');
 

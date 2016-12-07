@@ -29,6 +29,7 @@ class Project < ActiveRecord::Base
 
   has_many :tutorials
   has_many :field_guides, dependent: :destroy
+  belongs_to :organization
   # uses the activated_state enum on the workflow
   has_many :workflows, -> { active }, dependent: :restrict_with_exception
   # uses the active attribute on the workflow

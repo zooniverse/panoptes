@@ -16,7 +16,7 @@ class ProjectSerializer
 
   optional :avatar_src
   can_include :workflows, :subject_sets, :owners, :project_contents,
-    :project_roles, :pages
+    :project_roles, :pages, :organization
   media_include :avatar, :background, :attached_images,
     classifications_export: { include: false},
     subjects_export: { include: false },
