@@ -704,34 +704,6 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
 
-    context "live option" do
-      context "when set false" do
-        let!(:resource) {create(:project_with_contents, owner: user, beta_approved: true, launch_approved: true) }
-
-        before(:each) do
-          default_request scopes: scopes, user_id: authorized_user.id
-        end
-
-        it 'should set beta approved to false' do
-          expect do
-            ps = update_params
-            ps[:admin] = true
-            ps[:projects][:live] = false
-            put :update, ps.merge(id: resource.id)
-          end.to change{ Project.find(resource).beta_approved}.from(true).to(false)
-        end
-
-        it 'should set launch approved to false' do
-          expect do
-            ps = update_params
-            ps[:admin] = true
-            ps[:projects][:live] = false
-            put :update, ps.merge(id: resource.id)
-          end.to change{ Project.find(resource).launch_approved}.from(true).to(false)
-        end
-      end
-    end
-
     context "project_contents" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id

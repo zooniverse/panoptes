@@ -171,11 +171,6 @@ class Api::V1::ProjectsController < Api::ApiController
       resource.launch_date ||= Time.zone.now
     end
 
-    if update_params[:live] == false
-      update_params[:launch_approved] = false
-      update_params[:beta_approved] = false
-    end
-
     super(update_params, resource)
   end
 
