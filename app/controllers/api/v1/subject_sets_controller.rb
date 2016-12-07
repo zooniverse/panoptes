@@ -25,6 +25,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
     super do |subject_set|
       notify_cellect(subject_set)
       reset_subject_counts(subject_set.id)
+      reset_workflow_finished_at(subject_set.workflows.pluck(:id))
     end
   end
 
@@ -33,7 +34,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
       smses = controlled_resource.set_member_subjects
       subject_ids = smses.map(&:subject_id)
       remove_linked_set_member_subjects(smses)
-      reset_subject_set_workflow_counts(controlled_resource.id)
+      reset_subject_set_workflow_counts(controlled_resource)
       controlled_resource.subject_sets_workflows.delete_all
       #avoid optimisitc locking errors
       controlled_resource.reload
@@ -98,7 +99,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
       linked_sms_ids = value.split(',').map(&:to_i)
       set_member_subjects = resource.set_member_subjects.where(subject_id: linked_sms_ids)
       remove_linked_set_member_subjects(set_member_subjects)
-      reset_subject_set_workflow_counts(controlled_resource.id)
+      reset_subject_set_workflow_counts(controlled_resource)
     else
       super
     end
@@ -110,19 +111,17 @@ class Api::V1::SubjectSetsController < Api::ApiController
     set_member_subjects.delete_all
   end
 
-  def reset_subject_set_workflow_counts(subject_set_id)
-    set_workflow_ids = Workflow
-      .joins(:subject_sets)
-      .where(subject_sets: {id: subject_set_id})
-      .select(:id)
-      .distinct
-      .pluck(:id)
-    set_workflow_ids.each do |w_id|
+  def reset_subject_set_workflow_counts(subject_set)
+    subject_set.workflows.pluck(:id).each do |w_id|
       WorkflowRetiredCountWorker.perform_async(w_id)
     end
   end
 
   def reset_subject_counts(set_id)
     SubjectSetSubjectCounterWorker.perform_async(set_id)
+  end
+
+  def reset_workflow_finished_at(workflow_ids)
+    workflow_ids.map { |id| UnfinishWorkflowWorker.perform_async(id) }
   end
 end
