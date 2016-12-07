@@ -58,6 +58,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
 
     it "should queue a worker to send an email" do
       expect(mailer_class).to receive(:perform_async).with(project.id,
+                                                           "project",
                                                            anything,
                                                            [project.owner.email])
       worker.perform(project.id, "project")
@@ -112,7 +113,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
 
     it 'should email the users in the recipients hash' do
       expect(mailer_class).to receive(:perform_async)
-        .with(anything, anything, array_including(receivers.map(&:email)))
+        .with(anything, "project", anything, array_including(receivers.map(&:email)))
       worker.perform(project.id, "project", medium.id)
     end
 
