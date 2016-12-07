@@ -206,3 +206,5 @@ Lint/LiteralInInterpolation:
   Enabled: false
 Style/MultilineMethodCallIndentation:
   Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
