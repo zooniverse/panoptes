@@ -2458,6 +2458,13 @@ CREATE INDEX index_projects_on_migrated ON projects USING btree (migrated) WHERE
 
 
 --
+-- Name: index_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_projects_on_organization_id ON projects USING btree (organization_id);
+
+
+--
 -- Name: index_projects_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3105,6 +3112,14 @@ ALTER TABLE ONLY subject_sets
 
 ALTER TABLE ONLY memberships
     ADD CONSTRAINT fk_rails_99326fb65d FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_9aee26923d; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY projects
+    ADD CONSTRAINT fk_rails_9aee26923d FOREIGN KEY (organization_id) REFERENCES organizations(id);
 
 
 --
