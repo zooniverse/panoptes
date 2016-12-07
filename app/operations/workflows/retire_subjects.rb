@@ -17,23 +17,7 @@ module Workflows
 
     def execute
       return if subject_ids.empty?
-
-      Workflow.transaction do
-        subject_ids.each do |subject_id|
-          workflow.retire_subject(subject_id, retirement_reason)
-        end
-      end
-
-      WorkflowRetiredCountWorker.perform_async(workflow.id)
-      notify_cellect
-    end
-
-    def notify_cellect
-      return unless Panoptes.use_cellect?(workflow)
-
-      subject_ids.each do |subject_id|
-        RetireCellectWorker.perform_async(subject_id, workflow.id)
-      end
+      RetireSubjectWorker.perform_async(workflow.id, subject_ids, retirement_reason)
     end
 
     def subject_ids
