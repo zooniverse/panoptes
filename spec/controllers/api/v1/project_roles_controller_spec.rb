@@ -5,7 +5,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
   let(:project) { create(:project, owner: authorized_user) }
 
   let!(:acls) do
-    create_list :access_control_list, 2, resource: project,
+    create_list :access_control_list_with_user_group, 2, resource: project,
                 roles: ["tester"]
   end
 
@@ -73,19 +73,25 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     it_behaves_like "is updatable"
 
     context "mailers" do
+      let(:user) do
+        create(:user) do |user|
+          create :access_control_list, user_group: user.identity_group, resource: project
+        end
+      end
+
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
       it "calls the mailer if user added to project" do
-        params = update_params.merge(id: resource.id)
-        expect(UserAddedToProjectMailerWorker).to receive(:perform_async).with(authorized_user.id, project.id, ["collaborator"]).once
+        params = update_params.merge(id: user.user_groups.first.access_control_lists.first)
+        expect(UserAddedToProjectMailerWorker).to receive(:perform_async).with(user.id, project.id, ["collaborator"]).once
         put :update, params
       end
 
       it "does not call the mailer not appropriate" do
         new_roles = { project_roles: { roles: ["tester"] } }
-        params = new_roles.merge(id: resource.id)
+        params = new_roles.merge(id: user.user_groups.first.access_control_lists.first)
         expect(UserAddedToProjectMailerWorker).to_not receive(:perform_async)
         put :update, params
       end
@@ -167,6 +173,26 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
 
       it_behaves_like "no user"
     end
+
+    context "mailers" do
+      let(:user) { create(:user) }
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it "calls the mailer if user added to project" do
+        expect(UserAddedToProjectMailerWorker).to receive(:perform_async).with(user.id.to_i, project.id.to_i, ["collaborator"]).once
+        post :create, create_params
+      end
+
+      it "does not call the mailer not appropriate" do
+        create_params[:project_roles][:roles] = ["tester"]
+        expect(UserAddedToProjectMailerWorker).to_not receive(:perform_async)
+        post :create, create_params
+      end
+    end
+
   end
 
   describe "#destroy" do
