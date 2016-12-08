@@ -1,8 +1,10 @@
 require 'spec_helper'
 
 describe DumpMailerWorker do
-  let(:resource) { double(id: 1) }
-
+  let(:resource) { double(id: 1, class: Workflow) }
+  let(:users) { create_list(:user, 2) }
+  let(:metadata) { {"recipients" => users.map(&:id) } }
+  let(:medium) {double(id: 2, get_url: nil, metadata: metadata) }
   let(:worker_class) do
     Class.new do
       include DumpWorker
@@ -22,20 +24,24 @@ describe DumpMailerWorker do
   end
 
   describe 'queueing notification emails' do
+    let(:worker) { worker_class.new(resource, medium) }
+
     it 'queues up an email job' do
-      user1 = create :user
-      user2 = create :user
-      medium = double(get_url: nil, metadata: {"recipients" => [user1.id, user2.id]})
-      worker = worker_class.new(resource, medium)
-      expect(ClassificationDataMailerWorker).to receive(:perform_async).once
+      expect(worker.mailer)
+        .to receive(:perform_async)
+        .with(resource.id, "workflow", nil, users.map(&:email))
+        .once
+        .and_call_original
       worker.send_email
     end
 
-    it 'does not queue an email job if there are no recipients' do
-      medium = double(get_url: nil, metadata: {"recipients" => []})
-      worker = worker_class.new(resource, medium)
-      expect(ClassificationDataMailerWorker).to receive(:perform_async).never
-      worker.send_email
+    context "with no recipients" do
+      let(:users) { [] }
+
+      it 'does not queue an email job' do
+        expect(worker.mailer).to receive(:perform_async).never
+        worker.send_email
+      end
     end
   end
 end
