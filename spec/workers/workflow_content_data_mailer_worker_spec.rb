@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SubjectDataMailerWorker do
+RSpec.describe WorkflowContentDataMailerWorker do
   let(:project) { create(:project) }
   let(:s3_url) { "https://fake.s3.url.example.com" }
 
@@ -10,7 +10,7 @@ RSpec.describe SubjectDataMailerWorker do
 
   context 'when there are no recipients' do
     it 'does not call the mailer' do
-      expect(SubjectDataMailer).to receive(:subject_data).never
+      expect(WorkflowContentDataMailer).to receive(:subject_data).never
       subject.perform(project.id, "project", s3_url, [])
     end
   end
