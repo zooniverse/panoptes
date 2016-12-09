@@ -6,6 +6,21 @@ class ProjectSerializer
   include MediaLinksSerializer
   include ContentSerializer
 
+  PRELOADS = [
+    # :project_contents, Note: re-add when the eager_load from translatable_resources is removed
+    :workflows,
+    :subject_sets,
+    :project_roles,
+    [ owner: { identity_membership: :user } ],
+    :workflows,
+    :subject_sets,
+    :pages,
+    :attached_images,
+    :avatar,
+    :background,
+    :tags
+  ].freeze
+
   attributes :id, :display_name, :classifications_count,
     :subjects_count, :created_at, :updated_at, :available_languages,
     :title, :description, :introduction, :private, :retired_subjects_count,
@@ -37,7 +52,14 @@ class ProjectSerializer
       end
     end
 
-    super(params, scope, context)
+    experiment_name = "eager_load_projects"
+    CodeExperiment.run(experiment_name) do |e|
+      e.run_if { Panoptes.flipper[experiment_name].enabled? }
+      e.use { super(params, scope, context) }
+      e.try { super(params, scope.preload(*PRELOADS), context) }
+      # skip the mismatch reporting...we just want perf metrics
+      e.ignore { true }
+    end
   end
 
   def self.links
@@ -88,7 +110,11 @@ class ProjectSerializer
   end
 
   def tags
-    @model.tags.map(&:name)
+    if @model.tags.loaded?
+      @model.tags.map(&:name)
+    else
+      @model.tags.pluck(&:name)
+    end
   end
 
   def avatar_src

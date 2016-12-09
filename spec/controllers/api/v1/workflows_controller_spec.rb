@@ -19,7 +19,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
   let(:api_resource_links)do
     %w(workflows.project workflows.subject_sets workflows.tutorial_subject
-    workflows.expert_subject_set workflows.attached_images)
+    workflows.attached_images)
   end
   let(:scopes) { %w(public project) }
 

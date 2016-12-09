@@ -42,7 +42,7 @@ class Classification < ActiveRecord::Base
       if opts[:last_id] && !opts[:project_id]
         raise Classification::MissingParameter.new("Project ID required if last_id is included")
       end
-      updatable_projects = Project.scope_for(:update, user, skip_eager_load: true)
+      updatable_projects = Project.scope_for(:update, user)
       classifications_for_project(updatable_projects, opts[:last_id])
     when :gold_standard
       gold_standard_for_user(user).includes(:subjects)

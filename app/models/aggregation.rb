@@ -15,7 +15,7 @@ class Aggregation < ActiveRecord::Base
 
   def self.scope_for(action, user, opts={})
     if (action == :show || action == :index) && !user.is_admin?
-      updatable = Workflow.scope_for(:update, user, opts.merge(skip_eager_load: true))
+      updatable = Workflow.scope_for(:update, user, opts)
       controlled_scope = joins(:workflow).merge(updatable)
       joins(:workflow)
         .where("workflows.aggregation ->> 'public' = 'true'")
