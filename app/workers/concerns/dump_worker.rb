@@ -3,6 +3,7 @@ module DumpWorker
 
   included do
     include ActiveSupport::Callbacks
+    include DumpCommons
     define_callbacks :dump
     attr_reader :resource
   end
@@ -16,29 +17,12 @@ module DumpWorker
       begin
         run_callbacks :dump do
           perform_dump(*args)
-          upload_dump
+          upload_dump { set_ready_state }
         end
       ensure
         cleanup_dump
       end
     end
-  end
-
-  def upload_dump
-    to_gzip
-    write_to_s3
-    set_ready_state
-  end
-
-  def cleanup_dump
-    remove_tempfile(@csv_tempfile)
-    remove_tempfile(@gzip_tempfile)
-  end
-
-  def remove_tempfile(tempfile)
-    return unless tempfile
-    tempfile.close
-    tempfile.unlink
   end
 
   def dump_target
@@ -47,16 +31,6 @@ module DumpWorker
 
   def dump_type
     "#{@resource_type}_#{dump_target}_export"
-  end
-
-  def csv_file_path
-    @csv_tempfile ||= Tempfile.new(['export', '.csv'])
-    @csv_tempfile.path
-  end
-
-  def gzip_file_path
-    @gzip_tempfile ||= Tempfile.new(['export', '.gz'])
-    @gzip_tempfile.path
   end
 
   def resource_file_path
@@ -70,6 +44,10 @@ module DumpWorker
   def set_ready_state
     medium.metadata["state"] = 'ready'
     medium.save!
+  end
+
+  def write_to_s3
+    medium.put_file(gzip_file_path, compressed: true)
   end
 
   def create_medium
@@ -95,23 +73,6 @@ module DumpWorker
       metadata: metadata
     )
     m
-  end
-
-  def write_to_s3
-    medium.put_file(gzip_file_path, compressed: true)
-  end
-
-  def to_gzip
-    Zlib::GzipWriter.open(gzip_file_path) do |gz|
-      gz.mtime = File.mtime(csv_file_path)
-      gz.orig_name = File.basename(csv_file_path)
-      File.open(csv_file_path) do |fp|
-        while chunk = fp.read(16 * 1024) do
-          gz.write(chunk)
-        end
-      end
-      gz.close
-    end
   end
 
   def content_disposition
