@@ -6,9 +6,9 @@ module Subjects
     class MissingSubjectSet < StandardError; end
     class MissingSubjects < StandardError; end
 
-    attr_reader :user, :params, :workflow
+    attr_reader :user, :params, :workflow, :scope
 
-    def initialize(user, workflow, params, scope)
+    def initialize(user, workflow, params, scope=Subject.all)
       @user, @workflow, @params, @scope = user, workflow, params, scope
     end
 
@@ -17,7 +17,7 @@ module Subjects
       raise group_id_error if needs_set_id?
       raise missing_subject_set_error if workflow.subject_sets.empty?
       raise missing_subjects_error if workflow.set_member_subjects.empty?
-      [ selected_subjects, context.merge(selected: true, url_format: :get) ]
+      [ selected_subjects, selected_context ]
     end
 
     def selected_subjects
@@ -71,7 +71,7 @@ module Subjects
     end
 
     def active_subjects_in_selection_order(sms_ids)
-      @scope.active
+      scope.active
         .eager_load(:set_member_subjects)
         .where(set_member_subjects: {id: sms_ids})
         .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")
@@ -103,16 +103,32 @@ module Subjects
       page_size
     end
 
-    def context
-      @context ||= {
+    def selected_context
+      {
         workflow: workflow,
-        user_seen: UserSeenSubject.where(user: user, workflow: workflow),
-        finished_workflow: user&.has_finished?(workflow)
-      }
+        user: user,
+        user_seen: user_seen,
+        url_format: :get,
+        select_context: selection_context_on
+      }.compact
     end
 
     def subject_set_id
       params[:subject_set_id]
+    end
+
+    def selection_context_on
+      if Panoptes.flipper[:skip_subject_selection_context].enabled?
+        nil
+      else
+        true
+      end
+    end
+
+    def user_seen
+      if user
+        UserSeenSubject.where(user: user, workflow: workflow).first
+      end
     end
   end
 end

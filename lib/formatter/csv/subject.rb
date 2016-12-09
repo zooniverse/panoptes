@@ -39,7 +39,7 @@ module Formatter
       end
 
       def locations
-        subject_locs = subject.locations.order("\"media\".\"metadata\"->>'index' ASC")
+        subject_locs = subject.locations.sort_by { |loc| loc.metadata["index"] }
         {}.tap do |locs|
           subject_locs.each_with_index.map do |loc, index|
             locs[index] = loc.get_url

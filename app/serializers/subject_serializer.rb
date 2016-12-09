@@ -9,8 +9,13 @@ class SubjectSerializer
 
   can_include :project, :collections, :subject_sets
 
+  def self.page(params = {}, scope = nil, context = {})
+    scope = scope.preload(:locations, :project, :collections, :subject_sets)
+    super(params, scope, context)
+  end
+
   def locations
-    @model.locations.order("\"media\".\"metadata\"->>'index' ASC").map do |loc|
+    index_ordered_locations.map do |loc|
       {
        loc.content_type => loc.url_for_format(@context[:url_format] || :get)
       }
@@ -22,36 +27,48 @@ class SubjectSerializer
   end
 
   def already_seen
-    !!(user_seen && user_seen.subject_ids.include?(@model.id))
+    !!(user_seen&.subjects_seen?(@model.id))
   end
 
   private
 
   def include_retired?
-    selected?
+    select_context?
   end
 
   def include_already_seen?
-    selected?
+    select_context?
   end
 
   def include_finished_workflow?
-    selected?
+    select_context?
   end
 
-  def selected?
-    @context[:selected]
+  def select_context?
+    @context[:select_context]
   end
 
   def workflow
     @context[:workflow]
   end
 
+  def user
+    @context[:user]
+  end
+
   def user_seen
-    @context[:user_seen].try(:first)
+    @context[:user_seen]
   end
 
   def finished_workflow
-    @context[:finished_workflow]
+    user&.has_finished?(workflow)
+  end
+
+  def index_ordered_locations
+    if @model.locations.loaded?
+      @model.locations.sort_by { |loc| loc.metadata["index"] }
+    else
+      @model.locations.order("\"media\".\"metadata\"->>'index' ASC")
+    end
   end
 end

@@ -2220,10 +2220,24 @@ CREATE INDEX index_collections_display_name_trgrm ON collections USING gin ((COA
 
 
 --
+-- Name: index_collections_on_activated_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_collections_on_activated_state ON collections USING btree (activated_state);
+
+
+--
 -- Name: index_collections_on_favorite; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_collections_on_favorite ON collections USING btree (favorite);
+
+
+--
+-- Name: index_collections_on_private; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_collections_on_private ON collections USING btree (private);
 
 
 --
@@ -2360,6 +2374,13 @@ CREATE UNIQUE INDEX index_oauth_applications_on_uid ON oauth_applications USING 
 
 
 --
+-- Name: index_organizations_on_activated_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organizations_on_activated_state ON organizations USING btree (activated_state);
+
+
+--
 -- Name: index_organizations_on_listed_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2392,6 +2413,13 @@ CREATE INDEX index_project_pages_on_project_id ON project_pages USING btree (pro
 --
 
 CREATE INDEX index_projects_display_name_trgrm ON projects USING gin ((COALESCE((display_name)::text, ''::text)) gin_trgm_ops);
+
+
+--
+-- Name: index_projects_on_activated_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_projects_on_activated_state ON projects USING btree (activated_state);
 
 
 --
@@ -2455,6 +2483,13 @@ CREATE INDEX index_projects_on_migrated ON projects USING btree (migrated) WHERE
 --
 
 CREATE INDEX index_projects_on_organization_id ON projects USING btree (organization_id);
+
+
+--
+-- Name: index_projects_on_private; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_projects_on_private ON projects USING btree (private);
 
 
 --
@@ -2591,6 +2626,13 @@ CREATE INDEX index_subject_workflow_counts_on_workflow_id ON subject_workflow_co
 
 
 --
+-- Name: index_subjects_on_activated_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_subjects_on_activated_state ON subjects USING btree (activated_state);
+
+
+--
 -- Name: index_subjects_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2675,6 +2717,13 @@ CREATE INDEX index_user_groups_display_name_trgrm ON user_groups USING gin ((COA
 
 
 --
+-- Name: index_user_groups_on_activated_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_user_groups_on_activated_state ON user_groups USING btree (activated_state);
+
+
+--
 -- Name: index_user_groups_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2700,6 +2749,13 @@ CREATE UNIQUE INDEX index_user_project_preferences_on_user_id_and_project_id ON 
 --
 
 CREATE INDEX index_user_seen_subjects_on_user_id_and_workflow_id ON user_seen_subjects USING btree (user_id, workflow_id);
+
+
+--
+-- Name: index_users_on_activated_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_users_on_activated_state ON users USING btree (activated_state);
 
 
 --
@@ -2819,6 +2875,13 @@ CREATE INDEX index_workflow_tutorials_on_workflow_id ON workflow_tutorials USING
 --
 
 CREATE UNIQUE INDEX index_workflow_tutorials_on_workflow_id_and_tutorial_id ON workflow_tutorials USING btree (workflow_id, tutorial_id);
+
+
+--
+-- Name: index_workflows_on_activated_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_workflows_on_activated_state ON workflows USING btree (activated_state);
 
 
 --
@@ -3618,6 +3681,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160901141903');
 INSERT INTO schema_migrations (version) VALUES ('20161017135917');
 
 INSERT INTO schema_migrations (version) VALUES ('20161017141439');
+
+INSERT INTO schema_migrations (version) VALUES ('20161125123824');
 
 INSERT INTO schema_migrations (version) VALUES ('20161128193435');
 

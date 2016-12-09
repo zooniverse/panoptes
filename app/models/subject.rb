@@ -3,8 +3,6 @@ class Subject < ActiveRecord::Base
   include Linkable
   include Activatable
 
-  default_scope { eager_load(:locations) }
-
   has_paper_trail only: [:metadata, :locations]
 
   belongs_to :project
