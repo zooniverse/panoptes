@@ -631,6 +631,7 @@ describe Api::V1::ProjectsController, type: :controller do
           beta_requested: true,
           live: true,
           tags: ["astro", "gastro"],
+          researcher_quote: "this is such a great project",
           links: {
             workflows: [workflow.id.to_s],
             subject_sets: [subject_set.id.to_s]
