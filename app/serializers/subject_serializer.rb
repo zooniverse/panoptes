@@ -66,7 +66,7 @@ class SubjectSerializer
 
   def index_ordered_locations
     if @model.locations.loaded?
-      @model.locations.sort_by { |loc| loc.metadata["index"] }
+      @model.locations.sort_by { |loc| loc.metadata&.dig("index") || loc.id }
     else
       @model.locations.order("\"media\".\"metadata\"->>'index' ASC")
     end
