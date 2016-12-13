@@ -1120,7 +1120,8 @@ CREATE TABLE tutorials (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     project_id integer NOT NULL,
-    kind character varying
+    kind character varying,
+    display_name text DEFAULT ''::text
 );
 
 
@@ -3687,4 +3688,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161125123824');
 INSERT INTO schema_migrations (version) VALUES ('20161128193435');
 
 INSERT INTO schema_migrations (version) VALUES ('20161205203956');
+
+INSERT INTO schema_migrations (version) VALUES ('20161212205412');
 

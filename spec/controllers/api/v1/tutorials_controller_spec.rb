@@ -78,6 +78,7 @@ describe Api::V1::TutorialsController, type: :controller do
         tutorials: {
           steps: [{media: "asdfasdf", content: 'asdklfajsdf'}, {media: 'asdklfjds;kajsdf', content: 'asdfklajsdf'}],
           language: 'es-mx',
+          display_name: "Asdf Asdf",
           links: {
             project: project.id.to_s,
             workflows: [workflow.id]

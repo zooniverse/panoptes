@@ -4,6 +4,10 @@ class TutorialUpdateSchema < JsonSchema
     description "A Tutorial Resource"
     additional_properties false
 
+    property "display_name" do
+      type "string"
+    end
+
     property "steps" do
       type "array"
       items do

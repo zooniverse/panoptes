@@ -28,6 +28,10 @@ class TutorialCreateSchema < JsonSchema
       type "string"
     end
 
+    property "display_name" do
+      type "string"
+    end
+
     property "links" do
       type "object"
       additional_properties false
