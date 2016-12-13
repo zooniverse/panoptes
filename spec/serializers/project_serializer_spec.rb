@@ -16,14 +16,24 @@ describe ProjectSerializer do
     ProjectSerializer.page({}, Project.all, {})
   end
 
-  it "should preload the serialized associations if enabled" do
-    allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
-    Panoptes.flipper["eager_load_projects"].enable
-    expect_any_instance_of(Project::ActiveRecord_Relation)
-      .to receive(:preload)
-      .with(*ProjectSerializer::PRELOADS)
-      .and_call_original
-    ProjectSerializer.page({}, Project.all, {})
+  context "with enabled experiment" do
+    before do
+      allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
+      Panoptes.flipper["eager_load_projects"].enable
+    end
+
+    it "should not preload with cards context" do
+      expect_any_instance_of(Project::ActiveRecord_Relation).not_to receive(:preload)
+      ProjectSerializer.page({}, Project.all, {cards: true})
+    end
+
+    it "should preload the serialized associations without cards context" do
+      expect_any_instance_of(Project::ActiveRecord_Relation)
+        .to receive(:preload)
+        .with(*ProjectSerializer::PRELOADS)
+        .and_call_original
+      ProjectSerializer.page({}, Project.all, {})
+    end
   end
 
   describe "#content" do
