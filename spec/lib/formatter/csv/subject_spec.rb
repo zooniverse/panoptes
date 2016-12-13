@@ -62,5 +62,13 @@ RSpec.describe Formatter::Csv::Subject do
         expect(result).to match_array(fields)
       end
     end
+
+    context "with a subject that has no location metadata" do
+
+      it "should match the expected output" do
+        allow_any_instance_of(Medium).to receive(:metadata).and_return(nil)
+        expect(result).to match_array(fields)
+      end
+    end
   end
 end
