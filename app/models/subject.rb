@@ -48,4 +48,12 @@ class Subject < ActiveRecord::Base
       false
     end
   end
+
+  def ordered_locations
+    if locations.loaded?
+      locations.sort_by { |loc| loc.metadata&.dig("index") || loc.id }
+    else
+      locations.order("\"media\".\"metadata\"->>'index' ASC")
+    end
+  end
 end

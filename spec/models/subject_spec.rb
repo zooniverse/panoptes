@@ -82,6 +82,26 @@ describe Subject, :type => :model do
     end
   end
 
+  describe "#ordered_locations" do
+    let(:subject) do
+      create(:subject, :with_mediums, :with_subject_sets, num_sets: 1)
+    end
+
+    it "should sort the related locations index" do
+      expected = subject.locations.sort_by { |loc| loc.metadata["index"] }
+      expect(expected.map(&:id)).to eq(subject.ordered_locations.map(&:id))
+    end
+
+    context "subject without location metadata" do
+
+      it "should fall back to the relation ordering" do
+        allow_any_instance_of(Medium).to receive(:metadata).and_return(nil)
+        expected = subject.locations.sort_by(&:id)
+        expect(expected.map(&:id)).to eq(subject.ordered_locations.map(&:id))
+      end
+    end
+  end
+
   describe "#migrated_subject?" do
     it "should be falsy when the flag is not set" do
       expect(subject.migrated_subject?).to be_falsey

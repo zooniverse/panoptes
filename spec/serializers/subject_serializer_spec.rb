@@ -23,22 +23,18 @@ describe SubjectSerializer do
       SubjectSerializer.single({}, scope, {})[:locations]
     end
 
-    it "should sort the related locations index" do
-      subject_locs = subject.locations.sort_by { |loc| loc.metadata["index"] }
-      expected = subject_locs.map { |loc| loc.src.split("/").last }
-      results = result_locs.map { |loc| loc[:"image/jpeg"].split("/").last }
-      expect(expected).to eq(results)
+    it "should use the model ordered locations sort order" do
+      expect_any_instance_of(Subject)
+        .to receive(:ordered_locations)
+        .and_call_original
+      result_locs
     end
 
-    context "subject without location metadata" do
-
-      it "should fall back to the relation ordering" do
-        allow_any_instance_of(Medium).to receive(:metadata).and_return(nil)
-        subject_locs = subject.locations.sort_by(&:id)
-        expected = subject_locs.map { |loc| loc.src.split("/").last }
-        results = result_locs.map { |loc| loc[:"image/jpeg"].split("/").last }
-        expect(expected).to eq(results)
+    it "should serialize the locations into a mime : url hash" do
+      expected = subject.ordered_locations.map do |loc|
+        { :"#{loc.content_type}" => loc.url_for_format(:get) }
       end
+      expect(expected).to eq(result_locs)
     end
   end
 
