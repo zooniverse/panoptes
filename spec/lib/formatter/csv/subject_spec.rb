@@ -43,8 +43,8 @@ RSpec.describe Formatter::Csv::Subject do
        project.id,
        [workflow.id, workflow_two.id].to_json,
        subject_set_ids.to_json,
-       ordered_subject_locations.to_json,
        subject.metadata.to_json,
+       ordered_subject_locations.to_json,
        {workflow.id => 10, workflow_two.id => 5}.to_json,
        [workflow.id].to_json]
     end
