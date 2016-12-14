@@ -82,6 +82,39 @@ describe Subject, :type => :model do
     end
   end
 
+  describe "#ordered_locations" do
+    let(:subject) do
+      create(:subject, :with_mediums, :with_subject_sets, num_sets: 1)
+    end
+
+    it "should sort the loaded locations by index" do
+      expected = subject.locations.sort_by { |loc| loc.metadata["index"] }
+      expect(expected.map(&:id)).to eq(subject.ordered_locations.map(&:id))
+    end
+
+    it "should sort the non-loaded locations by db index" do
+      lone_subject = Subject.find(subject.id)
+      expect_any_instance_of(Medium::ActiveRecord_Associations_CollectionProxy)
+        .to receive(:order)
+        .with("\"media\".\"metadata\"->>'index' ASC")
+        .and_call_original
+      expected = subject.locations.sort_by { |loc| loc.metadata["index"] }
+      expect(expected.map(&:id)).to eq(lone_subject.ordered_locations.map(&:id))
+    end
+
+    context "subject without location metadata", :focus do
+
+      it "should mimic the database order by using the relation ordering" do
+        Medium.update_all(metadata: nil)
+        allow_any_instance_of(Medium::ActiveRecord_Associations_CollectionProxy)
+          .to receive(:loaded?)
+          .and_return(true)
+        expected = subject.locations.order("\"media\".\"metadata\"->>'index' ASC")
+        expect(expected.map(&:id)).to eq(subject.ordered_locations.map(&:id))
+      end
+    end
+  end
+
   describe "#migrated_subject?" do
     it "should be falsy when the flag is not set" do
       expect(subject.migrated_subject?).to be_falsey
