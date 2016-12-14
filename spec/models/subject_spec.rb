@@ -102,7 +102,7 @@ describe Subject, :type => :model do
       expect(expected.map(&:id)).to eq(lone_subject.ordered_locations.map(&:id))
     end
 
-    context "subject without location metadata", :focus do
+    context "subject without location metadata" do
 
       it "should mimic the database order by using the relation ordering" do
         Medium.update_all(metadata: nil)
