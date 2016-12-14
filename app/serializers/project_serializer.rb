@@ -126,6 +126,6 @@ class ProjectSerializer
   end
 
   def fields
-    %i(title description workflow_description introduction url_labels)
+    %i(title description workflow_description introduction url_labels researcher_quote)
   end
 end

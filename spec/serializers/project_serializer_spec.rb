@@ -31,6 +31,10 @@ describe ProjectSerializer do
       expect(serializer.content).to be_a( Hash )
       expect(serializer.content).to include(:title)
     end
+
+    it "includes the defined content fields" do
+      expect(serializer.content.keys).to contain_exactly(*Api::V1::ProjectsController::CONTENT_FIELDS)
+    end
   end
 
   describe "#urls" do
