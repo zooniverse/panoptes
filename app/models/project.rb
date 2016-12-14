@@ -20,7 +20,7 @@ class Project < ActiveRecord::Base
   # uses the active attribute on the workflow
   has_many :active_workflows, -> { where(active: true) }, class_name: "Workflow"
   has_many :subject_sets, dependent: :destroy
-  has_many :live_subject_sets, through: :workflows, source: 'subject_sets'
+  has_many :live_subject_sets, through: :active_workflows, source: 'subject_sets'
   has_many :classifications, dependent: :restrict_with_exception
   has_many :subjects, dependent: :restrict_with_exception
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
