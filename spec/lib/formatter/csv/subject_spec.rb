@@ -9,10 +9,9 @@ RSpec.describe Formatter::Csv::Subject do
     create(:subject, :with_mediums, project: project, uploader: project.owner)
   end
   let(:subject_set_ids) { [ subject_set.id ] }
-
-  def ordered_subject_locations
+  let(:ordered_subject_locations) do
     {}.tap do |locs|
-      Medium.all.order(:id).each_with_index.map do |m, index|
+      subject.ordered_locations.each_with_index.map do |m, index|
         locs[index] = m.get_url
       end
     end
@@ -65,7 +64,10 @@ RSpec.describe Formatter::Csv::Subject do
 
     context "with a subject that has no location metadata" do
 
-      it "should match the expected output" do
+      it "should match the db ordered subject_locations array" do
+        allow_any_instance_of(Medium::ActiveRecord_Associations_CollectionProxy)
+          .to receive(:loaded?)
+          .and_return(true)
         allow_any_instance_of(Medium).to receive(:metadata).and_return(nil)
         expect(result).to match_array(fields)
       end
