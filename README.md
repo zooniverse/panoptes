@@ -68,21 +68,20 @@ This will get you a working copy of the checked out code base. Keep your code up
 
 ## Testing
 
-There are two options for setting up a testing environment:
+There are multiple options for setting up a testing environment:
 
 0. Run it entirely from within docker-compose:
 
-  0. To create the testing database, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint=rake panoptes db:setup`.
-  0. Run the full spec suite `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint=rspec panoptes`. Note: this will be slow. Use rspec focus set or specify the spec you want to run, e.g. ``docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="rspec path/to/spec/file.rb" panoptes`
+    0. To create the testing database, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint=rake panoptes db:setup`.
+    0. Run the full spec suite `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint=rspec panoptes`. Note: this will be slow. Use rspec focus set or specify the spec you want to run, e.g. ``docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="rspec path/to/spec/file.rb" panoptes`
 
+0. Use parts of docker-compose manually and wire them up manually to create a testing environment.
 
-0. Set up a custom environment and configure 
+    ```
+    docker-compose run -d --name postgres --service-ports postgres
+    docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes
+    ```
 
-Then
-
-`docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes`
-
-`docker-compose run -d --name postgres --service-ports postgres`
 
 
 ## Contributing
