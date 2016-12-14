@@ -41,7 +41,7 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 0. Clone the repository `git clone https://github.com/zooniverse/Panoptes`.
 
-0. `cd` into the cloned folder. Run either `bundle install` or `gem install fig_rake`. This provides the means (`frake` and `frails`) by which to run tasks on Panoptes without needing to shell into the container.
+0. `cd` into the cloned folder. 
 
 0. Copy the example configuration files.
   + Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
@@ -51,13 +51,18 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 0.  + **If you have an existing Panoptes Docker container, or if your Gemfile or Ruby version has changed,** run `docker-compose build` to rebuild the containers.
     + Otherwise, create and run the application containers by running `docker-compose up`
 
-0. After step 5 finishes, open a new terminal and run `frake db:setup` to setup the database
+0. After step 5 finishes, open a new terminal and run `docker-compose run --rm --entrypoint=rake panoptes db:setup` to setup the database. This will launch a new Docker container, run the rake DB setup task, and then clean up the container.
 
-0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `frails runner db/fig_dev_seed_data/fig_dev_seed_data.rb`
+0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `docker-compose run --rm --entrypoint=rails panoptes runner db/fig_dev_seed_data/fig_dev_seed_data.rb`
 
 0. Open up the application in your browser:
-  + If on a Mac, run `docker-machine ip default` to get the IP-address where the server is running.
-  + Visit either that address or just localhost on port 3000.
+  + It should be running on localhost:3000
+  + If it's not and you're on a Mac, run `docker ps`, and find the IP address where the `panoptes_panoptes` image is running. E.g.: 0.0.0.0:3000->3000/tcp means running on localhost at port 3000.
+
+     ```
+CONTAINER ID        IMAGE                         COMMAND                  CREATED             STATUS              PORTS                            NAMES
+1f98164914be        panoptes_panoptes             "/bin/sh -c /rails_ap"   16 minutes ago      Up 16 minutes       80/tcp, **0.0.0.0:3000->3000/tcp**   panoptes_panoptes_1
+     ```
 
 This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
 
