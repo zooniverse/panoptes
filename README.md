@@ -56,7 +56,7 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `docker-compose run --rm --entrypoint=rails panoptes runner db/fig_dev_seed_data/fig_dev_seed_data.rb`
 
 0. Open up the application in your browser:
-  + It should be running on localhost:3000
+  + It should be running on http://localhost:3000
   + If it's not and you're on a Mac, run `docker ps`, and find the IP address where the `panoptes_panoptes` image is running. E.g.: 0.0.0.0:3000->3000/tcp means running on localhost at port 3000.
 
      ```
