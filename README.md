@@ -82,7 +82,13 @@ There are multiple options for setting up a testing environment:
     docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes
     ```
 
-
+0. Assuming you have a Ruby environment already setup: 
+    
+    0. Run `bundle install`
+    0. Start the docker Postgres container by running `docker-compose run -d --name postgres --service-ports postgres`
+    0. Modify your `config/database.yml` test env to point to the running Postgres container, e.g. `host: localhost`
+    0. Setup the testing database if you haven't already, by running `RAILS_ENV=test rake db:setup`
+    0. Finally, run rspec with `RAILS_ENV=test rspec`
 
 ## Contributing
 
