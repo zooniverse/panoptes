@@ -51,7 +51,11 @@ class Subject < ActiveRecord::Base
 
   def ordered_locations
     if locations.loaded?
-      locations.sort_by { |loc| loc.metadata&.dig("index") || loc.id }
+      if locations.all? { |loc| loc.metadata&.key?("index") }
+        locations.sort_by { |loc| loc.metadata["index"] }
+      else
+        locations
+      end
     else
       locations.order("\"media\".\"metadata\"->>'index' ASC")
     end
