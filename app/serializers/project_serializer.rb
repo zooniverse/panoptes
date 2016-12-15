@@ -56,7 +56,10 @@ class ProjectSerializer
     CodeExperiment.run(experiment_name) do |e|
       e.run_if { Panoptes.flipper[experiment_name].enabled? }
       e.use { super(params, scope, context) }
-      e.try { super(params, scope.preload(*PRELOADS), context) }
+      e.try do
+        scope = scope.preload(*PRELOADS) unless context[:cards]
+        super(params, scope, context)
+      end
       # skip the mismatch reporting...we just want perf metrics
       e.ignore { true }
     end
