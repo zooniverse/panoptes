@@ -5,6 +5,7 @@ class WorkflowSerializer
   include RestPack::Serializer
   include FilterHasMany
   include MediaLinksSerializer
+  include CachedSerializer
 
   # :workflow_contents, Note: re-add when the eager_load from translatable_resources is removed
   PRELOADS = %i(project subject_sets tutorial_subject attached_images).freeze
