@@ -5,6 +5,7 @@ class WorkflowSerializer
   include RestPack::Serializer
   include FilterHasMany
   include MediaLinksSerializer
+  include CachedSerializer
 
   attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
              :created_at, :updated_at, :finished_at, :first_task, :primary_language,
