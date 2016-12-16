@@ -2,22 +2,32 @@ require 'spec_helper'
 
 describe Project, type: :model do
   let(:project) { build(:project) }
-  let(:owned) { project }
-  let(:not_owned) { build(:project, owner: nil) }
   let(:full_project) { create(:full_project) }
   let(:subject_relation) { full_project }
-  let(:activatable) { project }
-  let(:translatable) { create(:project_with_contents, build_extra_contents: true) }
-  let(:translatable_without_content) { build(:project, build_contents: false) }
-  let(:primary_language_factory) { :project }
-  let(:locked_factory) { :project }
-  let(:locked_update) { {display_name: "A Different Name"} }
 
-  it_behaves_like "optimistically locked"
-  it_behaves_like "is ownable"
+  it_behaves_like "optimistically locked" do
+    let(:locked_factory) { :project }
+    let(:locked_update) { {display_name: "A Different Name"} }
+  end
+
+  it_behaves_like "is ownable" do
+    let(:owned) { project }
+    let(:not_owned) { build(:project, owner: nil) }
+  end
+
   it_behaves_like "has subject_count"
-  it_behaves_like "activatable"
-  it_behaves_like "is translatable"
+
+  it_behaves_like "activatable" do
+    let(:activatable) { project }
+  end
+
+  it_behaves_like "is translatable" do
+    let(:translatable) { create(:project_with_contents, build_extra_contents: true) }
+    let(:translatable_without_content) { build(:project, build_contents: false) }
+    let(:primary_language_factory) { :project }
+    let(:private_model) { create(:project, private: true) }
+  end
+
   it_behaves_like "has slugged name"
 
   context "with caching resource associations" do

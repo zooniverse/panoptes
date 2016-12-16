@@ -87,17 +87,11 @@ shared_examples "is translatable" do
 
   describe "::scope_for" do
     let(:users) { create_list(:user, 2) }
-    let!(:private_model) do
-      project = create(:project, private: true)
-      return project if :project == primary_language_factory
-      create(primary_language_factory, project: project)
-    end
-
     let!(:acl) do
-      project = translatable.try(:project) || translatable
+      resource = translatable.try(:project) || translatable
       create(:access_control_list,
              user_group: users.first.identity_group,
-             resource: project,
+             resource: resource,
              roles: ["translator"])
     end
 

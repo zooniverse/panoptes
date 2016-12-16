@@ -1,7 +1,23 @@
 require 'spec_helper'
 
-RSpec.describe Organization, type: :model do
+describe Organization, type: :model do
   let(:organization) { build(:organization) }
+
+  it_behaves_like "is ownable"do
+    let(:owned) { organization }
+    let(:not_owned) { build(:organization, owner: nil) }
+  end
+
+  it_behaves_like "activatable" do
+    let(:activatable) { organization }
+  end
+
+  it_behaves_like "is translatable" do
+    let(:translatable) { create(:organization) }
+    let(:translatable_without_content) { build(:organization, build_contents: false) }
+    let(:primary_language_factory) { :organization }
+    let(:private_model) { create(:organization, listed_at: nil) }
+  end
 
   it "should have a valid factory" do
     expect(organization).to be_valid
