@@ -68,7 +68,7 @@ describe UserProjectPreferenceSerializer do
       described_class.single({}, UserProjectPreference.all, {})[:activity_count]
     end
 
-    describe "activity count caching" do
+    describe "count caching" do
       let!(:upp) { create(:user_project_preference) }
 
       it "should not use the result cache" do
@@ -77,13 +77,15 @@ describe UserProjectPreferenceSerializer do
       end
 
       it "should use the result cache if enabled" do
-        Panoptes.flipper["upp_activity_count_cache"].enable
-        expect_any_instance_of(ActiveSupport::Cache::NullStore)
-          .to receive(:fetch)
-          .with(
-            "#{upp.class}/#{upp.id}/activity_count",
-            {expires_in: UserProjectPreferenceSerializer::ACTIVITY_COUNT_CACHE_MINS.minutes}
-          )
+        Panoptes.flipper[UserProjectPreferenceSerializer::FLIPPER_KEY].enable
+        %w(count_activity count_activity_by_workflow).each do |method|
+          expect_any_instance_of(ActiveSupport::Cache::NullStore)
+            .to receive(:fetch)
+            .with(
+              "#{upp.class}/#{upp.id}/#{method}",
+              {expires_in: UserProjectPreferenceSerializer::CACHE_MINS.minutes}
+            )
+        end
         result
       end
     end

@@ -5,7 +5,8 @@ class UserProjectPreferenceSerializer
   can_include :user, :project
   can_sort_by :updated_at, :display_name
 
-  ACTIVITY_COUNT_CACHE_MINS = (ENV["UPP_ACTIVITY_COUNT_CACHE_MINS"] || 5).freeze
+  CACHE_MINS = (ENV["UPP_ACTIVITY_COUNT_CACHE_MINS"] || 5).freeze
+  FLIPPER_KEY = "upp_activity_count_cache".freeze
 
   def self.key
     "project_preferences"
@@ -27,25 +28,26 @@ class UserProjectPreferenceSerializer
   end
 
   def activity_count
-    if Panoptes.flipper["upp_activity_count_cache"].enabled?
-      cache_key = "#{@model.class}/#{@model.id}/activity_count"
-      Rails.cache.fetch(cache_key, expires_in: ACTIVITY_COUNT_CACHE_MINS.minutes) do
-        _activity_count
-      end
-    else
-      _activity_count
-    end
+    perform_cached_lookup(:count_activity)
   end
 
   def activity_count_by_workflow
-    unless project_workflows_ids.empty?
-      UserSeenSubject.activity_by_workflow(@model.user_id, project_workflows_ids)
+    perform_cached_lookup(:count_activity_by_workflow)
+  end
+
+  private
+
+  def count_activity
+    if count = @model.summated_activity_count
+      count
+    elsif !project_workflows_ids.empty?
+      UserSeenSubject.count_user_activity(@model.user_id, project_workflows_ids)
     end
   end
 
-  def user_project_activity
+  def count_activity_by_workflow
     unless project_workflows_ids.empty?
-      UserSeenSubject.count_user_activity(@model.user_id, project_workflows_ids)
+      UserSeenSubject.activity_by_workflow(@model.user_id, project_workflows_ids)
     end
   end
 
@@ -53,13 +55,14 @@ class UserProjectPreferenceSerializer
     @project_workflow_ids ||= Workflow.where(project_id: @model.project_id).pluck(:id)
   end
 
-  private
-
-  def _activity_count
-    if count = @model.summated_activity_count
-      count
+  def perform_cached_lookup(method_to_send)
+    if Panoptes.flipper[FLIPPER_KEY].enabled?
+      cache_key = "#{@model.class}/#{@model.id}/#{method_to_send}"
+      Rails.cache.fetch(cache_key, expires_in: CACHE_MINS.minutes) do
+        send method_to_send
+      end
     else
-      user_project_activity
+      send method_to_send
     end
   end
 end
