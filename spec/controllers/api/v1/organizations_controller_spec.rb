@@ -159,7 +159,6 @@ describe Api::V1::OrganizationsController, type: :controller do
       end
 
       it 'should include avatar' do
-        binding.pry
         expect(json_response["avatar_src"].map{ |r| r['id'] })
         .to include(organization.avatar.id.to_s)
       end

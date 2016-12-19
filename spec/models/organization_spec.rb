@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Organization, type: :model do
   let(:organization) { build(:organization) }
 
-  it_behaves_like "is ownable"do
+  it_behaves_like "is ownable" do
     let(:owned) { organization }
     let(:not_owned) { build(:organization, owner: nil) }
   end

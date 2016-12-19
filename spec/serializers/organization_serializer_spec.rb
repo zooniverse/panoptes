@@ -23,8 +23,9 @@ describe OrganizationSerializer do
   end
 
   describe "media links" do
+    let(:organization_with_media) { create(:organization, build_media: true) }
     let(:links) { [:avatar, :background] }
-    let(:serialized) { OrganizationSerializer.resource({}, Organization.where(id: organization.id), context) }
+    let(:serialized) { OrganizationSerializer.resource({}, Organization.where(id: organization_with_media.id), context) }
 
     it 'should include top level links for media' do
       expect(serialized[:links]).to include(*links.map{ |l| "organizations.#{l}" })
