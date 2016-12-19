@@ -27,22 +27,46 @@ describe OrganizationSerializer do
     let(:serialized) { OrganizationSerializer.resource({}, Organization.where(id: organization.id), context) }
 
     it 'should include top level links for media' do
-      expect(serialized[:links]).to include(*links.map{ |l| "projects.#{l}" })
+      expect(serialized[:links]).to include(*links.map{ |l| "organizations.#{l}" })
     end
 
     it 'should include resource level links for media' do
-      expect(serialized[:projects][0][:links]).to include(*links)
+      expect(serialized[:organizations][0][:links]).to include(*links)
     end
 
     it 'should include hrefs for links' do
-      serialized[:projects][0][:links].slice(*links).each do |_, linked|
+      serialized[:organizations][0][:links].slice(*links).each do |_, linked|
         expect(linked).to include(:href)
       end
     end
 
     it 'should include the id for single links' do
-      serialized[:projects][0][:links].slice(:avatar, :background).each do |_, linked|
+      serialized[:organizations][0][:links].slice(:avatar, :background).each do |_, linked|
         expect(linked).to include(:id)
+      end
+    end
+  end
+
+  describe "#avatar_src" do
+    let(:avatar) { double("avatar", external_link: external_url, src: src) }
+    let(:src) { nil }
+    let(:external_url) { nil }
+
+    context "without external" do
+      let(:src) { "http://subject1.zooniverse.org" }
+
+      it "should return the src by default" do
+        allow(organization).to receive(:avatar).and_return(avatar)
+        expect(serializer.avatar_src).to eq(src)
+      end
+    end
+
+    context "with an external url" do
+      let(:external_url) { "http://test.example.com" }
+
+      it "should return the external src if set" do
+        allow(organization).to receive(:avatar).and_return(avatar)
+        expect(serializer.avatar_src).to eq(external_url)
       end
     end
   end

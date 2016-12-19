@@ -2,6 +2,7 @@ FactoryGirl.define do
   factory :organization do
     transient do
       build_contents true
+      build_media false
     end
 
     sequence(:name) { |n| "test_org_#{ n }" }
@@ -15,6 +16,11 @@ FactoryGirl.define do
       if env.build_contents
         o.organization_contents << build_list(:organization_content, 1, organization: o, language: o.primary_language)
         o.organization_contents << build_list(:organization_content, 1, organization: o, language: 'en-US')
+      end
+
+      if env.build_media
+        o.avatar = create(:medium, type: "organization_avatar", linked: o)
+        o.background = create(:medium, type: "organization_background", linked: o)
       end
     end
   end

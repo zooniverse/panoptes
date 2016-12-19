@@ -48,6 +48,7 @@ module Serialization
     end
 
     def add_link(resource, name, serializer, val=nil)
+      binding.pry
       resource[:links] ||= {}
       resource[:links][name] = nil
 
