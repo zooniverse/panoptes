@@ -155,11 +155,11 @@ describe Api::V1::OrganizationsController, type: :controller do
 
       before do
         organization
-        get :index
+        get :index, { include: includes }
       end
 
       it 'should include avatar' do
-        expect(json_response["avatar_src"].map{ |r| r['id'] })
+        expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
         .to include(organization.avatar.id.to_s)
       end
 
