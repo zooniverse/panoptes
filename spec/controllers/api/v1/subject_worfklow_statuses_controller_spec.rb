@@ -13,8 +13,12 @@ RSpec.describe Api::V1::SubjectWorkflowStatusesController, type: :controller do
   let(:resource_class) { SubjectWorkflowStatus }
 
   describe "#index" do
-    let(:workflow) { create(:workflow) }
-    let!(:swcs) { create_list(:subject_workflow_status, 2, workflow: workflow) }
+    let(:workflow) { create(:workflow_with_subjects, num_sets: 1) }
+    let!(:swcs) do
+      workflow.subjects.map do |subject|
+        create(:subject_workflow_status, subject: subject, workflow: workflow)
+      end
+    end
     let(:private_project) { create(:project_with_workflow, private: true) }
     let(:private_workflow) { private_project.workflows.first }
     let!(:private_resource) do
