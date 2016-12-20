@@ -54,10 +54,11 @@ RSpec.describe Formatter::Csv::Subject do
     end
 
     context "with an old unlinked subject" do
-      let(:sms) { nil }
       let(:subject_set_ids) { [ ] }
 
       it "should match the expected output" do
+        sms.destroy
+        subject.reload
         expect(result).to match_array(fields)
       end
     end

@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe ResetProjectCountersWorker do
   let(:project)  { create :project, launch_date: Date.new(2015, 1, 1) }
-  let(:workflow) { create :workflow, project: project }
-  let(:subject)  { create :subject, project: project }
+  let(:workflow) { create :workflow_with_subjects, num_sets: 1, project: project }
+  let(:subject)  { workflow.subjects.first }
   let(:user1)    { create :user }
   let(:user2)    { create :user }
   let(:sws)      { create :subject_workflow_status, subject: subject, workflow: workflow, classifications_count: 3 }
