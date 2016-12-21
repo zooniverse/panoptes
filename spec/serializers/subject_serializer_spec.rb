@@ -31,6 +31,8 @@ describe SubjectSerializer do
     end
 
     it "should serialize the locations into a mime : url hash" do
+      # load the association to match the preload in the serializer scope
+      subject.locations
       expected = subject.ordered_locations.map do |loc|
         { :"#{loc.content_type}" => loc.url_for_format(:get) }
       end

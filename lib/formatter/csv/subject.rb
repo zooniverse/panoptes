@@ -10,7 +10,7 @@ module Formatter
 
       def initialize(project)
         @project = project
-        @project_workflow_ids = project.workflows.pluck(&:id)
+        @project_workflow_ids = project.workflows.pluck(:id)
       end
 
       def to_array(subject)
