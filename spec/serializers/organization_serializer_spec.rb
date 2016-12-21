@@ -12,6 +12,10 @@ describe OrganizationSerializer do
   end
 
   describe "#content" do
+    let(:organization_with_media) { create(:organization, build_media: true) }
+    let(:links) { [:avatar, :background] }
+    let(:serialized) { OrganizationSerializer.resource({include: 'avatar,background'}, Organization.where(id: organization_with_media.id), context) }
+
     it "should return organization content for the preferred language" do
       expect(serializer.content).to be_a( Hash )
       expect(serializer.content).to include(:title)
@@ -20,30 +24,38 @@ describe OrganizationSerializer do
     it "includes the defined content fields" do
       expect(serializer.content.keys).to contain_exactly(*Api::V1::OrganizationsController::CONTENT_PARAMS)
     end
-  end
 
-  describe "media links" do
-    let(:organization_with_media) { create(:organization, build_media: true) }
-    let(:links) { [:avatar, :background] }
-    let(:serialized) { OrganizationSerializer.resource({}, Organization.where(id: organization_with_media.id), context) }
+    describe "includes avatar and background" do
+      it 'should include avatar' do
+        expect(serialized[:linked][:avatars].map{ |r| r[:id] })
+        .to include(organization_with_media.avatar.id.to_s)
+      end
 
-    it 'should include top level links for media' do
-      expect(serialized[:links]).to include(*links.map{ |l| "organizations.#{l}" })
-    end
-
-    it 'should include resource level links for media' do
-      expect(serialized[:organizations][0][:links]).to include(*links)
-    end
-
-    it 'should include hrefs for links' do
-      serialized[:organizations][0][:links].slice(*links).each do |_, linked|
-        expect(linked).to include(:href)
+      it 'should include background' do
+        expect(serialized[:linked][:backgrounds].map{ |r| r[:id] })
+        .to include(organization_with_media.background.id.to_s)
       end
     end
 
-    it 'should include the id for single links' do
-      serialized[:organizations][0][:links].slice(:avatar, :background).each do |_, linked|
-        expect(linked).to include(:id)
+    describe "media links" do
+      it 'should include top level links for media' do
+        expect(serialized[:links]).to include(*links.map{ |l| "organizations.#{l}" })
+      end
+
+      it 'should include resource level links for media' do
+        expect(serialized[:organizations][0][:links]).to include(*links)
+      end
+
+      it 'should include hrefs for links' do
+        serialized[:organizations][0][:links].slice(*links).each do |_, linked|
+          expect(linked).to include(:href)
+        end
+      end
+
+      it 'should include the id for single links' do
+        serialized[:organizations][0][:links].slice(:avatar, :background).each do |_, linked|
+          expect(linked).to include(:id)
+        end
       end
     end
   end

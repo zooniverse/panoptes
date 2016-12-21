@@ -146,27 +146,5 @@ describe Api::V1::OrganizationsController, type: :controller do
         it_behaves_like "supports update_links"
       end
     end
-
-    describe "include avatar and background" do
-      let(:organization) do
-        create(:organization, build_media: true)
-      end
-      let!(:includes) { 'avatar,background' }
-
-      before do
-        organization
-        get :index, { include: includes }
-      end
-
-      it 'should include avatar' do
-        expect(json_response["linked"]["avatars"].map{ |r| r['id'] })
-        .to include(organization.avatar.id.to_s)
-      end
-
-      it 'should include background' do
-        expect(json_response["linked"]["backgrounds"].map{ |r| r['id'] })
-        .to include(organization.background.id.to_s)
-      end
-    end
   end
 end
