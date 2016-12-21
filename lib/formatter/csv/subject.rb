@@ -15,6 +15,7 @@ module Formatter
 
       def to_array(subject)
         @subject = subject
+        @swses = nil
         self.class.headers.map do |header|
           send(header)
         end
@@ -66,8 +67,7 @@ module Formatter
       end
 
       def subject_workflow_statuses
-        @swses ||= SubjectWorkflowStatus
-          .by_subject(subject.id)
+        @swses ||= SubjectWorkflowStatus.by_subject(subject.id)
           .where(workflow_id: project_workflow_ids)
           .to_a
       end

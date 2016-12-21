@@ -47,10 +47,18 @@ RSpec.describe Formatter::Csv::Subject do
        {workflow.id => 10, workflow_two.id => 5}.to_json,
        [workflow.id].to_json]
     end
-    let(:result) { described_class.new(project).to_array(subject) }
+    let(:formatter) { described_class.new(project) }
+    let(:result) { formatter.to_array(subject) }
 
     it "should match the expected output" do
       expect(result).to match_array(fields)
+    end
+
+    it "should not cache between subjects" do
+      expect(result).to match_array(fields)
+      new_subject = create(:subject, :with_mediums, project: project, uploader: project.owner)
+      new_result = formatter.to_array(new_subject)
+      expect(new_result[-2..-1]).not_to match_array(fields[-2..-1])
     end
 
     context "with an old unlinked subject" do
