@@ -10,6 +10,7 @@ class Organization < ActiveRecord::Base
 
   has_many :projects
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
+  has_many :organization_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
 
   accepts_nested_attributes_for :organization_contents
 
