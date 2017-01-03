@@ -16,9 +16,8 @@ describe ProjectSerializer do
     ProjectSerializer.page({}, Project.all, {})
   end
 
-  context "with enabled experiment" do
+  context "with enabled preload feature" do
     before do
-      allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
       Panoptes.flipper["eager_load_projects"].enable
     end
 
