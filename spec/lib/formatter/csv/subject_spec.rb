@@ -47,7 +47,7 @@ RSpec.describe Formatter::Csv::Subject do
        {workflow.id => 10, workflow_two.id => 5}.to_json,
        [workflow.id].to_json]
     end
-    let(:result) { described_class.new(project).to_array(subject) }
+    let(:result) { described_class.new(project, subject).to_array }
 
     it "should match the expected output" do
       expect(result).to match_array(fields)

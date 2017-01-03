@@ -9,11 +9,10 @@ class SubjectsDumpWorker
   sidekiq_options queue: :data_high
 
   def perform_dump
-    csv_formatter = Formatter::Csv::Subject.new(resource)
     CSV.open(csv_file_path, 'wb') do |csv|
-      csv << csv_formatter.class.headers
+      csv << Formatter::Csv::Subject.headers
       project_subjects.find_each do |subject|
-        csv << csv_formatter.to_array(subject)
+        csv << Formatter::Csv::Subject.new(resource, subject).to_array
       end
     end
   end
