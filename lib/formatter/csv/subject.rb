@@ -8,14 +8,13 @@ module Formatter
            classifications_by_workflow retired_in_workflow)
       end
 
-      def initialize(project)
+      def initialize(project, subject)
         @project = project
         @project_workflow_ids = project.workflows.pluck(:id)
+        @subject = subject
       end
 
-      def to_array(subject)
-        @subject = subject
-        @swses = nil
+      def to_array
         self.class.headers.map do |header|
           send(header)
         end
