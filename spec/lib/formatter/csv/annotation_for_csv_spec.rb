@@ -85,10 +85,18 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         contents.update(strings: strings)
       end
 
-      it 'notes in the value if the annotation is invalid' do
-        annotation = {"task" => "init", "value" => "YES" }
-        formatted = described_class.new(classification, annotation, cache).to_h
-        expect(formatted["value"]).to eq("unknown answer label")
+      context "invalid annotation values" do
+        it 'records an invalid answer label lookup for invalid indexes' do
+          annotation = {"task" => "init", "value" => "YES" }
+          formatted = described_class.new(classification, annotation, cache).to_h
+          expect(formatted["value"]).to eq("unknown answer label")
+        end
+
+        it 'records an invalid answer lookup for valid indexes' do
+          annotation = {"task" => "init", "value" => 2 }
+          formatted = described_class.new(classification, annotation, cache).to_h
+          expect(formatted["value"]).to eq("unknown answer label")
+        end
       end
 
       context "with a single question workflow annotation" do
