@@ -11,10 +11,39 @@ describe ProjectSerializer do
     s
   end
 
+  it "should not preload the serialized associations by default" do
+    expect_any_instance_of(Project::ActiveRecord_Relation).not_to receive(:preload)
+    ProjectSerializer.page({}, Project.all, {})
+  end
+
+  context "with enabled experiment" do
+    before do
+      allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
+      Panoptes.flipper["eager_load_projects"].enable
+    end
+
+    it "should not preload with cards context" do
+      expect_any_instance_of(Project::ActiveRecord_Relation).not_to receive(:preload)
+      ProjectSerializer.page({}, Project.all, {cards: true})
+    end
+
+    it "should preload the serialized associations without cards context" do
+      expect_any_instance_of(Project::ActiveRecord_Relation)
+        .to receive(:preload)
+        .with(*ProjectSerializer::PRELOADS)
+        .and_call_original
+      ProjectSerializer.page({}, Project.all, {})
+    end
+  end
+
   describe "#content" do
     it "should return project content for the preferred language" do
       expect(serializer.content).to be_a( Hash )
       expect(serializer.content).to include(:title)
+    end
+
+    it "includes the defined content fields" do
+      expect(serializer.content.keys).to contain_exactly(*Api::V1::ProjectsController::CONTENT_FIELDS)
     end
   end
 

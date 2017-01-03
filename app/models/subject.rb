@@ -3,8 +3,6 @@ class Subject < ActiveRecord::Base
   include Linkable
   include Activatable
 
-  default_scope { eager_load(:locations) }
-
   has_paper_trail only: [:metadata, :locations]
 
   belongs_to :project
@@ -48,6 +46,18 @@ class Subject < ActiveRecord::Base
       SubjectWorkflowStatus.retired.by_subject_workflow(self.id, workflow.id).present?
     else
       false
+    end
+  end
+
+  def ordered_locations
+    if locations.loaded?
+      if locations.all? { |loc| loc.metadata&.key?("index") }
+        locations.sort_by { |loc| loc.metadata["index"] }
+      else
+        locations
+      end
+    else
+      locations.order("\"media\".\"metadata\"->>'index' ASC")
     end
   end
 end

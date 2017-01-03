@@ -631,6 +631,7 @@ describe Api::V1::ProjectsController, type: :controller do
           beta_requested: true,
           live: true,
           tags: ["astro", "gastro"],
+          researcher_quote: "this is such a great project",
           links: {
             workflows: [workflow.id.to_s],
             subject_sets: [subject_set.id.to_s]
@@ -700,34 +701,6 @@ describe Api::V1::ProjectsController, type: :controller do
         it "should not update the project" do
           put :update, ps.merge(id: resource.id)
           expect(response).to have_http_status(:unprocessable_entity)
-        end
-      end
-    end
-
-    context "live option" do
-      context "when set false" do
-        let!(:resource) {create(:project_with_contents, owner: user, beta_approved: true, launch_approved: true) }
-
-        before(:each) do
-          default_request scopes: scopes, user_id: authorized_user.id
-        end
-
-        it 'should set beta approved to false' do
-          expect do
-            ps = update_params
-            ps[:admin] = true
-            ps[:projects][:live] = false
-            put :update, ps.merge(id: resource.id)
-          end.to change{ Project.find(resource).beta_approved}.from(true).to(false)
-        end
-
-        it 'should set launch approved to false' do
-          expect do
-            ps = update_params
-            ps[:admin] = true
-            ps[:projects][:live] = false
-            put :update, ps.merge(id: resource.id)
-          end.to change{ Project.find(resource).launch_approved}.from(true).to(false)
         end
       end
     end
@@ -917,37 +890,5 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:resource_param) { :project_id }
 
     it_behaves_like "a versioned resource"
-  end
-
-  describe '#index' do
-    before(:each){ set_accept }
-
-    context 'without the simple param' do
-      it 'should bypass the index action' do
-        expect(subject).to_not receive :fast_index
-        get :index
-      end
-    end
-
-    context 'with the simple param' do
-      it 'should bypass the index action' do
-        expect(subject).to receive(:fast_index).and_call_original
-        get :index, simple: true
-      end
-    end
-  end
-
-  describe '#fast_index' do
-    before(:each){ set_accept }
-
-    it 'should use the fast serializer' do
-      expect(FastProjectSerializer).to receive_message_chain 'new.serialize'
-      get :index, simple: true
-    end
-
-    it 'should render properly' do
-      get :index, simple: true
-      expect(response).to be_ok
-    end
   end
 end

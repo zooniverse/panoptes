@@ -47,7 +47,9 @@ RSpec.describe Subjects::StrategySelection do
         end
 
         context "when the sms is retired for a different workflow" do
-          let(:retired_workflow) { create(:workflow_with_subjects, num_sets: 1) }
+          let(:retired_workflow) do
+            create(:workflow, subject_sets: workflow.subject_sets)
+          end
 
           it 'should return all the subjects' do
             expect(result).to include(sms.id)

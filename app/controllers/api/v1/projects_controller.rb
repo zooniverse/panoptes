@@ -52,12 +52,7 @@ class Api::V1::ProjectsController < Api::ApiController
     query.joins(:tags).merge(Tag.search_tags(name.first))
   end
 
-  def fast_index
-    render json_api: FastProjectSerializer.new(params).serialize
-  end
-
   def index
-    return fast_index if params[:simple]
     unless params.has_key?(:sort)
       @controlled_resources = case
                               when params.has_key?(:launch_approved)
@@ -169,11 +164,6 @@ class Api::V1::ProjectsController < Api::ApiController
 
     if update_params[:launch_approved]
       resource.launch_date ||= Time.zone.now
-    end
-
-    if update_params[:live] == false
-      update_params[:launch_approved] = false
-      update_params[:beta_approved] = false
     end
 
     super(update_params, resource)

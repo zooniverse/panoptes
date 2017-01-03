@@ -21,11 +21,7 @@ module RoleControl
       end
 
       def scope_for(action, user, opts={})
-        parent_scope = parent_class.scope_for(
-          action,
-          user,
-          opts.merge(skip_eager_load: true)
-        )
+        parent_scope = parent_class.scope_for(action, user, opts)
         joins(@parent).merge(parent_scope)
       end
     end

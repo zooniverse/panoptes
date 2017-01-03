@@ -12,6 +12,21 @@ describe WorkflowSerializer do
     serializer
   end
 
+  it "should not preload the serialized associations by default" do
+    expect_any_instance_of(Workflow::ActiveRecord_Relation).not_to receive(:preload)
+    WorkflowSerializer.page({}, Workflow.all, {})
+  end
+
+  it "should preload the serialized associations if enabled" do
+    allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
+    Panoptes.flipper["eager_load_workflows"].enable
+    expect_any_instance_of(Workflow::ActiveRecord_Relation)
+      .to receive(:preload)
+      .with(*WorkflowSerializer::PRELOADS)
+      .and_call_original
+    WorkflowSerializer.page({}, Workflow.all, {})
+  end
+
   describe "#tasks" do
     it 'should return the translated tasks' do
       expect(serializer.tasks['interest']['question']).to eq('Draw a circle')

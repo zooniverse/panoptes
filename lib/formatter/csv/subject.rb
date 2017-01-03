@@ -10,7 +10,7 @@ module Formatter
 
       def initialize(project)
         @project = project
-        @project_workflow_ids = project.workflows.pluck(&:id)
+        @project_workflow_ids = project.workflows.pluck(:id)
       end
 
       def to_array(subject)
@@ -39,9 +39,8 @@ module Formatter
       end
 
       def locations
-        subject_locs = subject.locations.order("\"media\".\"metadata\"->>'index' ASC")
         {}.tap do |locs|
-          subject_locs.each_with_index.map do |loc, index|
+          subject.ordered_locations.each_with_index.map do |loc, index|
             locs[index] = loc.get_url
           end
         end.to_json

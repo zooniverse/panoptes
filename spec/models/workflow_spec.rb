@@ -29,33 +29,6 @@ describe Workflow, type: :model do
       [:subjects_count, :finished?]
   end
 
-  describe ".scope_for" do
-    let(:eager_loads) do
-      %i(project subject_sets expert_subject_sets tutorial_subject attached_images)
-    end
-
-    context "with enabled experiment" do
-      before do
-        Panoptes.flipper["eager_load_workflows"].enable
-        allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
-      end
-
-      it "should eager load the linked resources used in the serializer" do
-        expect_any_instance_of(Workflow::ActiveRecord_Relation)
-          .to receive(:eager_load)
-          .with(*eager_loads)
-          .and_call_original
-        Workflow.scope_for(:index, ApiUser.new(nil))
-      end
-
-      it "should skip eager load if not set" do
-        expect_any_instance_of(Workflow::ActiveRecord_Relation)
-          .not_to receive(:eager_load)
-        Workflow.scope_for(:index, ApiUser.new(nil), {skip_eager_load: true})
-      end
-    end
-  end
-
   it "should have a valid factory" do
     expect(workflow).to be_valid
   end
@@ -269,9 +242,8 @@ describe Workflow, type: :model do
     context 'when the subject does not belong to the workflow' do
       let(:subject) { create(:subject) }
 
-      it 'does not retire' do
-        workflow.retire_subject(subject.id)
-        expect(SubjectWorkflowStatus.count).to eq(0)
+      it 'should raise an error' do
+        expect { workflow.retire_subject(subject.id) }.to raise_error
       end
     end
   end

@@ -19,4 +19,20 @@ RSpec.describe Organization, type: :model do
                           .with_scope(:scope_for, :update, user)
     end
   end
+
+  describe "#organization_roles" do
+    let!(:preferences) do
+      [create(:access_control_list, resource: organization, roles: []),
+       create(:access_control_list, resource: organization, roles: ["tester"]),
+       create(:access_control_list, resource: organization, roles: ["collaborator"])]
+    end
+
+    it 'should include models with assigned roles' do
+      expect(organization.organization_roles).to include(*preferences[1..-1])
+    end
+
+    it 'should not include models without assigned roles' do
+      expect(organization.organization_roles).to_not include(preferences[0])
+    end
+  end
 end

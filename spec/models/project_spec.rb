@@ -20,50 +20,6 @@ describe Project, type: :model do
   it_behaves_like "is translatable"
   it_behaves_like "has slugged name"
 
-  describe ".scope_for" do
-    let(:eager_loads) do
-      [
-         :workflows,
-         :subject_sets,
-         :project_contents,
-         :pages,
-         :avatar,
-         :background,
-         :attached_images,
-         :tags
-      ]
-    end
-
-    context "with enabled experiment" do
-      before do
-        Panoptes.flipper["eager_load_projects"].enable
-        allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
-      end
-
-      it "should eager load the linked resources used in the serializer" do
-        expect_any_instance_of(Project::ActiveRecord_Relation)
-          .to receive(:eager_load)
-          .with(*eager_loads)
-          .and_call_original
-        Project.scope_for(:index, ApiUser.new(nil))
-      end
-
-      it "should prealod the linked resources used in the serializer" do
-        expect_any_instance_of(Project::ActiveRecord_Relation)
-          .to receive(:preload)
-          .with(:project_roles, owner: { identity_membership: :user })
-          .and_call_original
-        Project.scope_for(:index, ApiUser.new(nil))
-      end
-
-      it "should skip eager load if not set" do
-        expect_any_instance_of(Project::ActiveRecord_Relation)
-          .not_to receive(:eager_load)
-        Project.scope_for(:index, ApiUser.new(nil), {skip_eager_load: true})
-      end
-    end
-  end
-
   context "with caching resource associations" do
     let(:cached_resource) { full_project }
 
@@ -178,6 +134,11 @@ describe Project, type: :model do
 
     it "should have many subject_sets" do
       expect(project.live_subject_sets).not_to include(unlinked_subject_set)
+    end
+
+    it "should only get subject_sets from active workflows" do
+      inactive_workflow = create(:workflow_with_subjects, num_sets: 1, active: false, project: project)
+      expect(project.live_subject_sets).not_to include(inactive_workflow.subject_sets.first)
     end
   end
 

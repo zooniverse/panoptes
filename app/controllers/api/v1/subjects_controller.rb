@@ -72,10 +72,7 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def selector
-    @selector ||= Subjects::Selector.new(api_user.user,
-      workflow,
-      params,
-      controlled_resources)
+    @selector ||= Subjects::Selector.new(api_user.user, workflow, params)
   end
 
   def location_params(locations)

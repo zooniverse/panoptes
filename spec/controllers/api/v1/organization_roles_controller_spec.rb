@@ -1,30 +1,30 @@
 require 'spec_helper'
 
-RSpec.describe Api::V1::ProjectRolesController, type: :controller do
+RSpec.describe Api::V1::OrganizationRolesController, type: :controller do
   let(:authorized_user) { create(:user) }
-  let(:project) { create(:project, owner: authorized_user) }
+  let(:organization) { create(:organization, owner: authorized_user) }
 
   let!(:acls) do
-    create_list :access_control_list_with_user_group, 2, resource: project,
+    create_list :access_control_list_with_user_group, 2, resource: organization,
                 roles: ["tester"]
   end
 
-  let(:api_resource_name) { 'project_roles' }
+  let(:api_resource_name) { 'organization_roles' }
   let(:api_resource_attributes) { %w(id roles) }
-  let(:api_resource_links) { %w(project_roles.project) }
+  let(:api_resource_links) { %w(organization_roles.organization) }
 
-  let(:scopes) { %w(public project) }
+  let(:scopes) { %w(public organization) }
   let(:resource) { acls.first }
   let(:resource_class) { AccessControlList }
 
   describe "#index" do
-    let!(:private_resource) { create(:access_control_list, resource: create(:project, private: true)) }
+    let!(:private_resource) { create(:access_control_list, resource: create(:organization, listed_at: nil)) }
     let(:n_visible) { 3 }
 
     it_behaves_like "it has custom owner links"
 
     context "when not logged in" do
-      let(:project) { create(:project) }
+      let(:organization) { create(:organization) }
       let(:authorized_user) { nil }
 
       it_behaves_like "is indexable"
@@ -35,23 +35,23 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
       it_behaves_like "is indexable"
 
       describe "filter params" do
-        let!(:new_project) { create(:project) }
+        let!(:new_organization) { create(:organization) }
 
         before(:each) do
           default_request scopes: scopes, user_id: authorized_user.id if authorized_user
           get :index, index_options
         end
 
-        describe "filter by project_id" do
-          let(:index_options) { { project_id: new_project.id } }
+        describe "filter by organization_id" do
+          let(:index_options) { { organization_id: new_organization.id } }
 
           it "should respond with 1 item" do
             expect(json_response[api_resource_name].length).to eq(1)
           end
 
           it "should respond with the correct item" do
-            project_id = json_response[api_resource_name][0]['links']['project']
-            expect(project_id).to eq(new_project.id.to_s)
+            organization_id = json_response[api_resource_name][0]['links']['organization']
+            expect(organization_id).to eq(new_organization.id.to_s)
           end
         end
       end
@@ -67,35 +67,10 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     let(:test_attr) { :roles }
     let(:test_attr_value) { %w(collaborator) }
     let(:update_params) do
-      { project_roles: { roles: ["collaborator"] } }
+      { organization_roles: { roles: ["collaborator"] } }
     end
 
     it_behaves_like "is updatable"
-
-    context "mailers" do
-      let(:user) do
-        create(:user) do |user|
-          create :access_control_list, user_group: user.identity_group, resource: project
-        end
-      end
-
-      before(:each) do
-        default_request scopes: scopes, user_id: authorized_user.id
-      end
-
-      it "calls the mailer if user added to project" do
-        params = update_params.merge(id: user.user_groups.first.access_control_lists.first)
-        expect(UserAddedToProjectMailerWorker).to receive(:perform_async).with(user.id, project.id, ["collaborator"]).once
-        put :update, params
-      end
-
-      it "does not call the mailer not appropriate" do
-        new_roles = { project_roles: { roles: ["tester"] } }
-        params = new_roles.merge(id: user.user_groups.first.access_control_lists.first)
-        expect(UserAddedToProjectMailerWorker).to_not receive(:perform_async)
-        put :update, params
-      end
-    end
   end
 
   describe "#create" do
@@ -104,11 +79,11 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
 
     let(:create_params) do
       {
-        project_roles: {
+        organization_roles: {
           roles: ["collaborator"],
           links: {
             user: user,
-            project: project.id.to_s
+            organization: organization.id.to_s
           }
         }
       }
@@ -122,7 +97,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     context "when the user has an acl" do
       let(:user) do
         u = create(:user)
-        create(:access_control_list, user_group: u.identity_group, resource: project)
+        create(:access_control_list, user_group: u.identity_group, resource: organization)
         u.id.to_s
       end
 
@@ -173,26 +148,6 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
 
       it_behaves_like "no user"
     end
-
-    context "mailers" do
-      let(:user) { create(:user) }
-
-      before(:each) do
-        default_request scopes: scopes, user_id: authorized_user.id
-      end
-
-      it "calls the mailer if user added to project" do
-        expect(UserAddedToProjectMailerWorker).to receive(:perform_async).with(user.id.to_i, project.id.to_i, ["collaborator"]).once
-        post :create, create_params
-      end
-
-      it "does not call the mailer not appropriate" do
-        create_params[:project_roles][:roles] = ["tester"]
-        expect(UserAddedToProjectMailerWorker).to_not receive(:perform_async)
-        post :create, create_params
-      end
-    end
-
   end
 
   describe "#destroy" do

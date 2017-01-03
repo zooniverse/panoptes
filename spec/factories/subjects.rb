@@ -25,8 +25,12 @@ FactoryGirl.define do
     end
 
     trait :with_subject_sets do
-      after(:create) do |s|
-        2.times do |i|
+      ignore do
+        num_sets 2
+      end
+
+      after(:create) do |s, evaluator|
+        evaluator.num_sets.times do |i|
           create(:set_member_subject, subject: s, subject_set: create(:subject_set, project: s.project))
         end
       end
