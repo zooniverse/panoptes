@@ -29,6 +29,9 @@ RSpec.configure do |config|
 
   Devise.mailer = Devise::Mailer
 
+  # work around https://github.com/celluloid/celluloid/issues/696
+  Celluloid.shutdown_timeout = 1
+
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
   end
