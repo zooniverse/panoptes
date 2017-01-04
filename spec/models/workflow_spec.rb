@@ -243,7 +243,9 @@ describe Workflow, type: :model do
       let(:subject) { create(:subject) }
 
       it 'should raise an error' do
-        expect { workflow.retire_subject(subject.id) }.to raise_error
+        expect {
+          workflow.retire_subject(subject.id)
+        }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end
