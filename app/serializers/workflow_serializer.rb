@@ -23,14 +23,11 @@ class WorkflowSerializer
   can_filter_by :active
 
   def self.page(params = {}, scope = nil, context = {})
-    experiment_name = "eager_load_workflows"
-    CodeExperiment.run(experiment_name) do |e|
-      e.run_if { Panoptes.flipper[experiment_name].enabled? }
-      e.use { super(params, scope, context) }
-      e.try { super(params, scope.preload(*PRELOADS), context) }
-      # skip the mismatch reporting...we just want perf metrics
-      e.ignore { true }
+    if Panoptes.flipper["eager_load_workflows"].enabled?
+      scope = scope.preload(*PRELOADS)
     end
+
+    super(params, scope, context)
   end
 
   def version
