@@ -7,12 +7,25 @@ module Panoptes
       extend ClassMethodOverrides
     end
 
+    module ClassMethods
+      def preload(*preloads)
+        @preloads ||= []
+        @preloads += preloads
+      end
+
+      def preloads
+        @preloads || []
+      end
+    end
+
     module ClassMethodOverrides
       def page(params = {}, scope = nil, context = {})
         if params[:include]
-          param_preloads = params[:include].split(',').map(&:to_sym)
-          preloads = param_preloads & self.can_include
-          scope = scope.preload(*preloads)
+          param_preloads = params[:include].split(',').map(&:to_sym) & self.can_include
+        end
+        preload_relations = self.preloads | Array.wrap(param_preloads)
+        unless preload_relations.empty?
+          scope = scope.preload(*preload_relations)
         end
 
         super(params, scope, context)
