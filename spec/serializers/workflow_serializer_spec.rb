@@ -3,13 +3,18 @@ require 'spec_helper'
 describe WorkflowSerializer do
   let(:workflow) { create(:workflow_with_contents) }
   let(:content) { workflow.workflow_contents.first }
-
   let(:serializer) do
     serializer = WorkflowSerializer.new
     serializer.instance_variable_set(:@model, workflow)
     serializer.instance_variable_set(:@context,
                                      {languages: ['en']})
     serializer
+  end
+
+  it_should_behave_like "a panoptes restpack serializer" do
+    let(:resource) { workflow }
+    let(:includes) { "project,tutorial_subject" }
+    let(:preloads) { [ :project, :tutorial_subject ] }
   end
 
   it "should not preload the serialized associations by default" do
