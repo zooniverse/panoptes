@@ -7,9 +7,6 @@ class WorkflowSerializer
   include MediaLinksSerializer
   include CachedSerializer
 
-  # :workflow_contents, Note: re-add when the eager_load from translatable_resources is removed
-  PRELOADS = %i(subject_sets attached_images).freeze
-
   attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
              :created_at, :updated_at, :finished_at, :first_task, :primary_language,
              :version, :content_language, :prioritized, :grouped, :pairwise,
@@ -22,13 +19,8 @@ class WorkflowSerializer
 
   can_filter_by :active
 
-  def self.page(params = {}, scope = nil, context = {})
-    if Panoptes.flipper["eager_load_workflows"].enabled?
-      scope = scope.preload(*PRELOADS)
-    end
-
-    super(params, scope, context)
-  end
+  # :workflow_contents, Note: re-add when the eager_load from translatable_resources is removed
+  preload :subject_sets, :attached_images
 
   def version
     "#{@model.current_version_number}.#{content_version}"
