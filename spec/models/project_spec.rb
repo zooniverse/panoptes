@@ -275,6 +275,35 @@ describe Project, type: :model do
     end
   end
 
+  describe "#subjects_count" do
+    before do
+      subject_sets.map { |set| set.update_column(:set_member_subjects_count, 1) }
+    end
+
+    context "without a loaded association" do
+      let(:subject_sets) { SubjectSet.where(project_id: full_project.id) }
+
+      it "should hit the db with a sum query when the association is not loaded" do
+        expect(full_project.live_subject_sets)
+          .to receive(:sum)
+          .with(:set_member_subjects_count)
+          .and_call_original
+        expect(full_project.subjects_count).to eq(2)
+      end
+    end
+
+    context "with a loaded assocation" do
+      let(:subject_sets) { full_project.live_subject_sets }
+
+      it "should use the association values when loaded" do
+        expect(full_project.live_subject_sets)
+          .to receive(:inject)
+          .and_call_original
+        expect(full_project.subjects_count).to eq(2)
+      end
+    end
+  end
+
   describe "#retired_subjects_count" do
     let(:workflows) { full_project.workflows }
     before do
