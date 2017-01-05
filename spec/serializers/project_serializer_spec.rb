@@ -21,8 +21,11 @@ describe ProjectSerializer do
       Panoptes.flipper["eager_load_projects"].enable
     end
 
-    it "should not preload with cards context" do
-      expect_any_instance_of(Project::ActiveRecord_Relation).not_to receive(:preload)
+    it "should preload avatars with cards context" do
+      expect_any_instance_of(Project::ActiveRecord_Relation)
+        .to receive(:preload)
+        .with(:avatar)
+        .and_call_original
       ProjectSerializer.page({}, Project.all, {cards: true})
     end
 

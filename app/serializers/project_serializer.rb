@@ -53,7 +53,12 @@ class ProjectSerializer
     end
 
     if Panoptes.flipper["eager_load_projects"].enabled?
-      scope = scope.preload(*PRELOADS) unless context[:cards]
+      preloads = if context[:cards]
+        :avatar
+      else
+        PRELOADS
+      end
+      scope = scope.preload(*preloads)
     end
 
     super(params, scope, context)
