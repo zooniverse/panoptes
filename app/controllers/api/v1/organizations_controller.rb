@@ -16,6 +16,11 @@ class Api::V1::OrganizationsController < Api::ApiController
                     :title,
                     :introduction].freeze
 
+  CONTENT_FIELDS = [:description,
+                    :title,
+                    :introduction,
+                    :url_labels].freeze
+
   def create
     organizations = Organization.transaction do
       Array.wrap(params[:organizations]).map do |organization_params|

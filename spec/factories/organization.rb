@@ -4,6 +4,7 @@ FactoryGirl.define do
     sequence(:display_name) { |n| "Test Organization #{ n }" }
     listed_at Time.now
     primary_language "en"
+    urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
 
     association :owner, factory: :user
 

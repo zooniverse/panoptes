@@ -607,7 +607,8 @@ CREATE TABLE organization_contents (
     language character varying NOT NULL,
     organization_id integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    url_labels jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -643,7 +644,8 @@ CREATE TABLE organizations (
     listed_at timestamp without time zone,
     activated_state integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    urls jsonb DEFAULT '[]'::jsonb
 );
 
 
@@ -3690,4 +3692,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161128193435');
 INSERT INTO schema_migrations (version) VALUES ('20161205203956');
 
 INSERT INTO schema_migrations (version) VALUES ('20161212205412');
+
+INSERT INTO schema_migrations (version) VALUES ('20161221203241');
 
