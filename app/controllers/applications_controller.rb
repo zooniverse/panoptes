@@ -6,11 +6,7 @@ class ApplicationsController < Doorkeeper::ApplicationsController
   respond_to :html
 
   def index
-    if current_user.is_admin?
-      @applications = Doorkeeper::Application.all
-    else
-      @applications = current_user.oauth_applications
-    end
+    @applications = scope_for_current_user
   end
 
   def create
@@ -40,5 +36,19 @@ class ApplicationsController < Doorkeeper::ApplicationsController
 
   def application_params
     @application_params ||= params.require(:application).permit(:name, :redirect_uri, default_scope: [])
+  end
+
+  def set_application
+    @application = scope_for_current_user.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    head 404
+  end
+
+  def scope_for_current_user
+    if current_user.is_admin?
+      Doorkeeper::Application.all
+    else
+      current_user.oauth_applications
+    end
   end
 end

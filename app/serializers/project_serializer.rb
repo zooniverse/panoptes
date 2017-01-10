@@ -52,17 +52,11 @@ class ProjectSerializer
       end
     end
 
-    experiment_name = "eager_load_projects"
-    CodeExperiment.run(experiment_name) do |e|
-      e.run_if { Panoptes.flipper[experiment_name].enabled? }
-      e.use { super(params, scope, context) }
-      e.try do
-        scope = scope.preload(*PRELOADS) unless context[:cards]
-        super(params, scope, context)
-      end
-      # skip the mismatch reporting...we just want perf metrics
-      e.ignore { true }
+    if Panoptes.flipper["eager_load_projects"].enabled?
+      scope = scope.preload(*PRELOADS) unless context[:cards]
     end
+
+    super(params, scope, context)
   end
 
   def self.links

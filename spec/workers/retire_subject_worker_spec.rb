@@ -2,11 +2,12 @@ require 'spec_helper'
 
 RSpec.describe RetireSubjectWorker do
   let(:worker) { described_class.new }
-  let(:sms) { create(:set_member_subject) }
+  let(:workflow) { create(:workflow_with_subjects, num_sets: 1) }
+  let(:subject) { workflow.subjects.first }
+  let(:sms) { subject.set_member_subjects.first }
   let(:set) { sms.subject_set }
   let(:sms2) { create(:set_member_subject, subject_set: set) }
-  let(:workflow) { create :workflow, subject_sets: [set] }
-  let!(:count) { create(:subject_workflow_status, subject: sms.subject, workflow: workflow) }
+  let!(:count) { create(:subject_workflow_status, subject: subject, workflow: workflow) }
   let(:subject_ids) { [sms.subject_id, sms2.subject_id] }
 
   describe "#perform" do

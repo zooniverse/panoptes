@@ -19,8 +19,7 @@ describe SubjectSerializer do
       create(:subject, :with_mediums, :with_subject_sets, num_sets: 1)
     end
     let(:result_locs) do
-      scope = Subject.preload(:locations).all
-      SubjectSerializer.single({}, scope, {})[:locations]
+      SubjectSerializer.single({}, Subject.all, {})[:locations]
     end
 
     it "should use the model ordered locations sort order" do
@@ -34,7 +33,7 @@ describe SubjectSerializer do
       expected = subject.ordered_locations.map do |loc|
         { :"#{loc.content_type}" => loc.url_for_format(:get) }
       end
-      expect(expected).to eq(result_locs)
+      expect(expected).to match_array(result_locs)
     end
   end
 

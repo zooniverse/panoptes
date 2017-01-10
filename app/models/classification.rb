@@ -31,21 +31,17 @@ class Classification < ActiveRecord::Base
     return all if user.is_admin? && action != :gold_standard
     case action
     when :index
-      complete.merge(created_by(user)).includes(:subjects)
+      complete.merge(created_by(user))
     when :show
-      created_by(user).includes(:subjects)
+      created_by(user)
     when :update, :destroy
       incomplete_for_user(user)
     when :incomplete
-      incomplete_for_user(user).includes(:subjects)
+      incomplete_for_user(user)
     when :project
-      if opts[:last_id] && !opts[:project_id]
-        raise Classification::MissingParameter.new("Project ID required if last_id is included")
-      end
-      updatable_projects = Project.scope_for(:update, user)
-      classifications_for_project(updatable_projects, opts[:last_id])
+      classifications_for_project(user, opts)
     when :gold_standard
-      gold_standard_for_user(user).includes(:subjects)
+      gold_standard_for_user(user)
     else
       none
     end
@@ -68,10 +64,15 @@ class Classification < ActiveRecord::Base
     .distinct
   end
 
-  def self.classifications_for_project(updatable_projects, last_id)
-    project_scope = joins(:project).includes(:subjects).merge(updatable_projects)
-    project_scope = project_scope.after_id(last_id) if last_id
-    project_scope
+  def self.classifications_for_project(user, opts)
+    if opts[:last_id] && !opts[:project_id]
+      raise Classification::MissingParameter.new("Project ID required if last_id is included")
+    end
+    updatable = Project.scope_for(:update, user)
+    updatable = updatable.where(id: opts[:project_id]) if opts[:last_id]
+    scope = joins(:project).merge(updatable)
+    scope = scope.after_id(opts[:last_id]) if opts[:last_id]
+    scope
   end
 
   def created_and_incomplete?(actor)

@@ -244,9 +244,10 @@ describe Workflow, type: :model do
     context 'when the subject does not belong to the workflow' do
       let(:subject) { create(:subject) }
 
-      it 'does not retire' do
-        workflow.retire_subject(subject.id)
-        expect(SubjectWorkflowStatus.count).to eq(0)
+      it 'should raise an error' do
+        expect {
+          workflow.retire_subject(subject.id)
+        }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end

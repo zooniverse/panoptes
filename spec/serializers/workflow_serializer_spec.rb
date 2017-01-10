@@ -18,7 +18,6 @@ describe WorkflowSerializer do
   end
 
   it "should preload the serialized associations if enabled" do
-    allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
     Panoptes.flipper["eager_load_workflows"].enable
     expect_any_instance_of(Workflow::ActiveRecord_Relation)
       .to receive(:preload)
