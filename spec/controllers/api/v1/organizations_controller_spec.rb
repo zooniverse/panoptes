@@ -10,22 +10,22 @@ describe Api::V1::OrganizationsController, type: :controller do
 
   describe "when not logged in" do
     describe "#index" do
-      it 'returns only the listed organization' do
+      it "returns only the listed organization" do
         organization.save
         owned_unlisted_organization.save
         get :index
         expect(response.status).to eq(200)
-        expect(json_response["organizations"].length).to eq(1)
+        expect(json_response['organizations'].length).to eq(1)
         expect(json_response['organizations'].map { |o| o['id'] }).not_to include(owned_unlisted_organization.id.to_s)
       end
     end
   end
 
   describe "when a logged in user" do
-    describe '#index' do
+    describe "#index" do
       it_behaves_like "is indexable" do
         let(:private_resource) { unlisted_organization }
-        let(:api_resource_name) { 'organizations' }
+        let(:api_resource_name) { "organizations" }
         let(:api_resource_attributes) { %w(id name display_name) }
         let(:api_resource_links) { %w() }
 
@@ -37,7 +37,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         end
       end
 
-      it 'returns listed organizations' do
+      it "returns listed organizations" do
         organization.save
         get :index
         expect(response.status).to eq(200)
@@ -52,7 +52,7 @@ describe Api::V1::OrganizationsController, type: :controller do
           owned_unlisted_organization.save
         end
 
-        it 'returns unlisted organizations that I own' do
+        it "returns unlisted organizations that I own" do
           default_request scopes: scopes, user_id: authorized_user.id
           get :index
           expect(json_response['organizations'].map { |o| o['id'] }).to include(owned_unlisted_organization.id.to_s)
@@ -61,7 +61,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         it "doesn't return unlisted organizations for unauthorized users" do
           default_request scopes: scopes, user_id: unauthorized_user.id
           get :index
-          expect(json_response["organizations"]).to be_empty
+          expect(json_response['organizations']).to be_empty
         end
       end
     end
@@ -71,7 +71,7 @@ describe Api::V1::OrganizationsController, type: :controller do
 
       it_behaves_like "is showable" do
         let(:resource) { organization }
-        let(:api_resource_name) { 'organizations' }
+        let(:api_resource_name) { "organizations" }
         let(:api_resource_attributes) { %w(id name display_name) }
         let(:api_resource_links) { %w() }
       end
