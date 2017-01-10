@@ -26,33 +26,33 @@ describe OrganizationSerializer do
     end
 
     describe "includes avatar and background" do
-      it 'should include avatar' do
+      it "should include avatar" do
         expect(serialized[:linked][:avatars].map{ |r| r[:id] })
         .to include(organization_with_media.avatar.id.to_s)
       end
 
-      it 'should include background' do
+      it "should include background" do
         expect(serialized[:linked][:backgrounds].map{ |r| r[:id] })
         .to include(organization_with_media.background.id.to_s)
       end
     end
 
     describe "media links" do
-      it 'should include top level links for media' do
+      it "should include top level links for media" do
         expect(serialized[:links]).to include(*links.map{ |l| "organizations.#{l}" })
       end
 
-      it 'should include resource level links for media' do
+      it "should include resource level links for media" do
         expect(serialized[:organizations][0][:links]).to include(*links)
       end
 
-      it 'should include hrefs for links' do
+      it "should include hrefs for links" do
         serialized[:organizations][0][:links].slice(*links).each do |_, linked|
           expect(linked).to include(:href)
         end
       end
 
-      it 'should include the id for single links' do
+      it "should include the id for single links" do
         serialized[:organizations][0][:links].slice(:avatar, :background).each do |_, linked|
           expect(linked).to include(:id)
         end

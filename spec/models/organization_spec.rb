@@ -23,7 +23,7 @@ describe Organization, type: :model do
     expect(organization).to be_valid
   end
 
-  it 'should require a primary language field to be set' do
+  it "should require a primary language field to be set" do
     expect(build(:organization, primary_language: nil)).to_not be_valid
   end
 
