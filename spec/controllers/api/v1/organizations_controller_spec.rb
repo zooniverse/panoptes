@@ -41,7 +41,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         organization.save
         get :index
         expect(response.status).to eq(200)
-        expect(json_response['organizations'].map { |o| o['id'] }).to include(organization.id.to_s)
+        expect(json_response["organizations"].map { |o| o['id'] }).to include(organization.id.to_s)
       end
 
       describe "with unlisted organizations" do
@@ -55,7 +55,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         it "returns unlisted organizations that I own" do
           default_request scopes: scopes, user_id: authorized_user.id
           get :index
-          expect(json_response['organizations'].map { |o| o['id'] }).to include(owned_unlisted_organization.id.to_s)
+          expect(json_response["organizations"].map { |o| o['id'] }).to include(owned_unlisted_organization.id.to_s)
         end
 
         it "doesn't return unlisted organizations for unauthorized users" do
@@ -83,7 +83,7 @@ describe Api::V1::OrganizationsController, type: :controller do
           organizations: {
             name: "The Illuminati",
             display_name: "The Illuminati",
-            title: 'Come join us',
+            title: "Come join us",
             description: "This organization is the most organized organization to ever organize",
             primary_language: "zh-tw"
           }
@@ -94,7 +94,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:test_attr) { :display_name }
         let(:test_attr_value) { "The Illuminati" }
         let(:resource_class) { Organization }
-        let(:api_resource_name) { 'organizations' }
+        let(:api_resource_name) { "organizations" }
         let(:api_resource_attributes) { %w(id name display_name) }
         let(:api_resource_links) { %w() }
       end
