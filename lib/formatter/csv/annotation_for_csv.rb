@@ -145,9 +145,10 @@ module Formatter
       def answer_labels
         Array.wrap(@current["value"]).map do |answer_idx|
           begin
-            answer_string = workflow_at_version.tasks[@current['task']]['answers'][answer_idx]['label']
+            task_answer = workflow_at_version.tasks[@current['task']]['answers'][answer_idx]
+            answer_string = task_answer['label']
             translate(answer_string)
-          rescue TypeError
+          rescue TypeError, NoMethodError
             "unknown answer label"
           end
         end

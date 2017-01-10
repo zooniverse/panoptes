@@ -47,17 +47,18 @@ RSpec.describe Formatter::Csv::Subject do
        {workflow.id => 10, workflow_two.id => 5}.to_json,
        [workflow.id].to_json]
     end
-    let(:result) { described_class.new(project).to_array(subject) }
+    let(:result) { described_class.new(project, subject).to_array }
 
     it "should match the expected output" do
       expect(result).to match_array(fields)
     end
 
     context "with an old unlinked subject" do
-      let(:sms) { nil }
       let(:subject_set_ids) { [ ] }
 
       it "should match the expected output" do
+        sms.destroy
+        subject.reload
         expect(result).to match_array(fields)
       end
     end

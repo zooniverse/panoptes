@@ -89,6 +89,8 @@ Rails.application.routes.draw do
         media_resources :avatar, :background
       end
 
+      json_api_resources :organization_roles
+
       json_api_resources :projects, links: [:subject_sets, :workflows], versioned: true do
         media_resources :avatar, :background, :attached_images,
           classifications_export: { except: [:create] },

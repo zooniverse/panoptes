@@ -77,10 +77,8 @@ class Workflow < ActiveRecord::Base
   end
 
   def retire_subject(subject_id, reason=nil)
-    if set_member_subjects.where(subject_id: subject_id).any?
-      count = subject_workflow_statuses.where(subject_id: subject_id).first_or_create!
-      count.retire!(reason)
-    end
+    count = subject_workflow_statuses.where(subject_id: subject_id).first_or_create!
+    count.retire!(reason)
   end
 
   def retirement_scheme

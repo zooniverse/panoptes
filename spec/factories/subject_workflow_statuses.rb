@@ -3,13 +3,13 @@ FactoryGirl.define do
     transient do
       link_subject_sets true
     end
-    subject
+    association :subject, :with_subject_sets, num_sets: 1
     workflow
     classifications_count 1
 
-    after(:build) do |swc, env|
-      if env.link_subject_sets && swc.workflow && swc.workflow.subject_sets.empty?
-        swc.workflow.subject_sets += swc.subject.subject_sets
+    after(:build) do |sws, env|
+      if env.link_subject_sets && sws.workflow && sws.workflow.subject_sets.empty?
+        sws.workflow.subject_sets += sws.subject.subject_sets
       end
     end
   end

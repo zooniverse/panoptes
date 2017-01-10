@@ -103,12 +103,12 @@ describe Subject, :type => :model do
     end
 
     context "subject without location metadata" do
+      before do
+        subject.locations.update_all(metadata: nil)
+        subject.locations(true)
+      end
 
       it "should mimic the database order by using the relation ordering" do
-        Medium.update_all(metadata: nil)
-        allow_any_instance_of(Medium::ActiveRecord_Associations_CollectionProxy)
-          .to receive(:loaded?)
-          .and_return(true)
         expected = subject.locations.order("\"media\".\"metadata\"->>'index' ASC")
         expect(expected.map(&:id)).to eq(subject.ordered_locations.map(&:id))
       end

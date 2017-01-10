@@ -1,23 +1,39 @@
 require 'spec_helper'
 
 RSpec.describe SubjectWorkflowStatus, type: :model do
-  let(:count) { create(:subject_workflow_status) }
+  let(:sws) { create(:subject_workflow_status) }
   it 'should have a valid factory' do
     expect(build(:subject_workflow_status)).to be_valid
   end
 
-  it 'should not be valid without a subject' do
-    swc = build(:subject_workflow_status, subject: nil, link_subject_sets: false)
-    expect(swc).to_not be_valid
+  it 'should not be valid without a subject'  do
+    built_sws = build(:subject_workflow_status, subject: nil, link_subject_sets: false)
+    expect(built_sws).to_not be_valid
   end
 
   it 'should not be valid without a workflow' do
-    swc = build(:subject_workflow_status, workflow: nil, link_subject_sets: false)
-    expect(swc).to_not be_valid
+    built_sws = build(:subject_workflow_status, workflow: nil, link_subject_sets: false)
+    expect(built_sws).to_not be_valid
+  end
+
+  it 'should not be valid with a subject not in the workflow' do
+    built_sws = build(:subject_workflow_status)
+    subject = create(:subject, :with_subject_sets, num_sets: 1)
+    built_sws.subject = subject
+    expect(built_sws).to_not be_valid
+    expect(built_sws.errors[:subject]).to eq(["must be linked to the workflow"])
+  end
+
+  context "when re-saving the sws after subject has been unlinked for the workflow" do
+    it 'should be valid' do
+      subject = create(:subject)
+      sws.subject = subject
+      expect(sws).to be_valid
+    end
   end
 
   context "when there is a duplicate subject_id workflow_id entry" do
-    let(:duplicate) { count.dup }
+    let(:duplicate) { sws.dup }
 
     it 'should not allow duplicates' do
       expect(duplicate).to_not be_valid
@@ -31,49 +47,49 @@ RSpec.describe SubjectWorkflowStatus, type: :model do
   describe '#by_set' do
     it 'retrieves by subject association' do
       sms = create(:set_member_subject)
-      swc = create(:subject_workflow_status, subject_id: sms.subject_id)
-      expect(SubjectWorkflowStatus.by_set(sms.subject_set_id)).to eq([swc])
+      sws = create(:subject_workflow_status, subject_id: sms.subject_id)
+      expect(SubjectWorkflowStatus.by_set(sms.subject_set_id)).to eq([sws])
     end
   end
 
   describe '#by_subject_workflow' do
     it 'retrieves by subject association' do
       sms = create(:set_member_subject)
-      swc = create(:subject_workflow_status, subject_id: sms.subject_id)
-      expect(SubjectWorkflowStatus.by_subject_workflow(sms.subject_id, swc.workflow_id)).to eq(swc)
+      sws = create(:subject_workflow_status, subject_id: sms.subject_id)
+      expect(SubjectWorkflowStatus.by_subject_workflow(sms.subject_id, sws.workflow_id)).to eq(sws)
     end
   end
 
   describe "#retire!" do
     it 'marks the record as retired' do
-      count.retire!
-      count.reload
-      expect(count.retired?).to be_truthy
+      sws.retire!
+      sws.reload
+      expect(sws.retired?).to be_truthy
     end
 
     it 'does nothing when the record is already retired' do
-      count.retired_at = 5.days.ago
-      expect { count.retire! }.not_to change { count.retired_at }
+      sws.retired_at = 5.days.ago
+      expect { sws.retire! }.not_to change { sws.retired_at }
     end
 
     it 'records the retirement reason' do
-      count.retire!("nothing_here")
-      expect(count.retirement_reason).to match("nothing_here")
+      sws.retire!("nothing_here")
+      expect(sws.retirement_reason).to match("nothing_here")
     end
   end
 
   describe "#retire?" do
     it 'should return false if it is already retired' do
-      allow(count).to receive(:retired?).and_return(true)
-      expect(count.workflow).not_to receive(:retirement_scheme)
-      expect(count.retire?).to be_falsey
+      allow(sws).to receive(:retired?).and_return(true)
+      expect(sws.workflow).not_to receive(:retirement_scheme)
+      expect(sws.retire?).to be_falsey
     end
 
     it 'should test against the workflow retirement scheme' do
       d = double
-      allow(count.workflow).to receive(:retirement_scheme).and_return(d)
-      expect(d).to receive(:retire?).with(count)
-      count.retire?
+      allow(sws.workflow).to receive(:retirement_scheme).and_return(d)
+      expect(d).to receive(:retire?).with(sws)
+      sws.retire?
     end
   end
 end

@@ -7,7 +7,10 @@ class RetireSubjectWorker
     workflow = Workflow.find(workflow_id)
     Workflow.transaction do
       subject_ids.each do |subject_id|
-        workflow.retire_subject(subject_id, reason)
+        begin
+          workflow.retire_subject(subject_id, reason)
+        rescue ActiveRecord::RecordInvalid
+        end
       end
     end
 

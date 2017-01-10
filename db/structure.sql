@@ -2228,6 +2228,13 @@ CREATE INDEX index_collections_on_activated_state ON collections USING btree (ac
 
 
 --
+-- Name: index_collections_on_display_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_collections_on_display_name ON collections USING btree (display_name);
+
+
+--
 -- Name: index_collections_on_favorite; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3688,6 +3695,8 @@ INSERT INTO schema_migrations (version) VALUES ('20161125123824');
 INSERT INTO schema_migrations (version) VALUES ('20161128193435');
 
 INSERT INTO schema_migrations (version) VALUES ('20161205203956');
+
+INSERT INTO schema_migrations (version) VALUES ('20161207111319');
 
 INSERT INTO schema_migrations (version) VALUES ('20161212205412');
 
