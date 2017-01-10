@@ -1,5 +1,5 @@
 module Organizations
-  class Update < Operation
+  class Update < Organization
     integer :id
     string :name
     string :display_name
