@@ -15,8 +15,8 @@ describe Api::V1::OrganizationsController, type: :controller do
         owned_unlisted_organization.save
         get :index
         expect(response.status).to eq(200)
-        expect(json_response['organizations'].length).to eq(1)
-        expect(json_response['organizations'].map { |o| o['id'] }).not_to include(owned_unlisted_organization.id.to_s)
+        expect(json_response["organizations"].length).to eq(1)
+        expect(json_response["organizations"].map { |o| o['id'] }).not_to include(owned_unlisted_organization.id.to_s)
       end
     end
   end
@@ -61,7 +61,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         it "doesn't return unlisted organizations for unauthorized users" do
           default_request scopes: scopes, user_id: unauthorized_user.id
           get :index
-          expect(json_response['organizations']).to be_empty
+          expect(json_response["organizations"]).to be_empty
         end
       end
     end
