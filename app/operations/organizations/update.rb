@@ -1,5 +1,7 @@
+include UrlLabels
+
 module Organizations
-  class Update < Organization
+  class Update < Operation
     integer :id
     string :name
     string :display_name
@@ -17,30 +19,11 @@ module Organizations
         organization.update!(name: name, display_name: display_name, primary_language: primary_language)
         organization.organization_contents.find_or_initialize_by(language: primary_language) do |content|
           param_hash = { title: title, description: description, introduction: introduction }
-          param_hash.merge! content_from_params(inputs)
+          param_hash.merge! content_from_params(inputs, Api::V1::OrganizationsController::CONTENT_FIELDS)
           content.update! param_hash
-          # content.update! title: title, description: description, introduction: introduction, url_labels: url_labels
         end
         organization.save!
       end
-    end
-
-    def content_from_params(ps)
-      content = ps.slice(Api::V1::OrganizationsController::CONTENT_FIELDS)
-      content[:language] = ps[:primary_language]
-      if ps.has_key? :urls
-        urls, labels = extract_url_labels(ps[:urls])
-        content[:url_labels] = labels
-        ps[:urls] = urls
-      end
-      ps.except!(Api::V1::OrganizationsController::CONTENT_FIELDS)
-      content.select { |k,v| !!v }
-    end
-
-    def extract_url_labels(urls)
-      visitor = TasksVisitors::ExtractStrings.new
-      visitor.visit(urls)
-      [urls, visitor.collector]
     end
   end
 end

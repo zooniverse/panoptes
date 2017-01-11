@@ -1,3 +1,5 @@
+include UrlLabels
+
 module Organizations
   class Create < Operation
     string :name
@@ -14,14 +16,11 @@ module Organizations
       Organization.transaction do
         organization = Organization.new owner: api_user.user, name: name, display_name: display_name, primary_language: primary_language
         param_hash = { title: title, description: description, introduction: introduction }
-        param_hash.merge! content_from_params(inputs)
-        # organization.organization_contents.build title: title, description: description, introduction: introduction, language: primary_language, urls: contenturls
+        param_hash.merge! content_from_params(inputs, Api::V1::OrganizationsController::CONTENT_FIELDS)
         organization.organization_contents.build param_hash
         organization.save!
         organization
       end
     end
-
-
   end
 end
