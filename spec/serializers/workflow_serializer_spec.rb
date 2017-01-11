@@ -13,7 +13,7 @@ describe WorkflowSerializer do
 
   it "should have the set of preloads wired up" do
     preloads = %i(subject_sets attached_images)
-    expect(WorkflowSerializer.preloads).to match_array(preloads)
+    expect(WorkflowSerializer::PRELOADS).to match_array(preloads)
   end
 
   it "should not preload the serialized associations by default" do
