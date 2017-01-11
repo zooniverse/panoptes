@@ -31,7 +31,7 @@ class WorkflowPrpSerializer
   end
 
   def content_language
-    content.language if content
+    content&.language
   end
 
   def content_version
