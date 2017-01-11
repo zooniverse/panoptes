@@ -12,8 +12,6 @@ class ProjectSerializer
     :subject_sets,
     :project_roles,
     [ owner: { identity_membership: :user } ],
-    :workflows,
-    :subject_sets,
     :pages,
     :attached_images,
     :avatar,
