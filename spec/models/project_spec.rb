@@ -275,19 +275,66 @@ describe Project, type: :model do
     end
   end
 
-  describe "#retired_subjects_count" do
-    let(:workflows) { full_project.workflows }
+  describe "#subjects_count" do
     before do
-      workflows.map { |w| w.update_column(:retired_set_member_subjects_count, 1) }
+      subject_sets.map { |set| set.update_column(:set_member_subjects_count, 1) }
     end
 
-    it "return a count of the associated retired subjects" do
+    context "without a loaded association" do
+      let(:subject_sets) { SubjectSet.where(project_id: full_project.id) }
+
+      it "should hit the db with a sum query" do
+        expect(full_project.live_subject_sets)
+          .to receive(:sum)
+          .with(:set_member_subjects_count)
+          .and_call_original
+        expect(full_project.subjects_count).to eq(2)
+      end
+    end
+
+    context "with a loaded assocation" do
+      let(:subject_sets) { full_project.live_subject_sets }
+
+      it "should use the association values" do
+        expect(full_project.live_subject_sets)
+          .to receive(:inject)
+          .and_call_original
+        expect(full_project.subjects_count).to eq(2)
+      end
+    end
+  end
+
+  describe "#retired_subjects_count" do
+    it "should use the association values when loaded" do
+      full_project.active_workflows.update_all(retired_set_member_subjects_count: 1)
+      # i had to call inspect to actually get the association to stay loaded..wtf?!
+      full_project.active_workflows.inspect
+      expect(full_project.active_workflows)
+        .to receive(:inject)
+        .and_call_original
+
       expect(full_project.retired_subjects_count).to eq(1)
     end
 
-    it "should not count inactive workflows" do
-      workflows.sample.update_column(:active, false)
-      expect(full_project.retired_subjects_count).to eq(0)
+    context "without a loaded association" do
+      let(:workflows) { Workflow.where(project_id: full_project.id, active: true) }
+
+      before do
+        workflows.update_all(retired_set_member_subjects_count: 1)
+      end
+
+      it "should not count inactive workflows" do
+        workflows.sample.update_column(:active, false)
+        expect(full_project.retired_subjects_count).to eq(0)
+      end
+
+      it "should hit the db with a sum query" do
+        expect(full_project.active_workflows)
+          .to receive(:sum)
+          .with(:retired_set_member_subjects_count)
+          .and_call_original
+        expect(full_project.retired_subjects_count).to eq(1)
+      end
     end
   end
 

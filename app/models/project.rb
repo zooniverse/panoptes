@@ -138,11 +138,23 @@ class Project < ActiveRecord::Base
   end
 
   def subjects_count
-    @subject_count ||= live_subject_sets.sum :set_member_subjects_count
+    @subject_count ||= if live_subject_sets.loaded?
+      live_subject_sets.inject(0) do |sum,set|
+        sum + set.set_member_subjects_count
+      end
+    else
+      live_subject_sets.sum :set_member_subjects_count
+    end
   end
 
   def retired_subjects_count
-    @retired_subject_count ||= active_workflows.sum :retired_set_member_subjects_count
+    @retired_subject_count ||= if active_workflows.loaded?
+      active_workflows.inject(0) do |sum,w|
+        sum + w.retired_set_member_subjects_count
+      end
+    else
+      active_workflows.sum :retired_set_member_subjects_count
+    end
   end
 
   def finished?
