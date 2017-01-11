@@ -92,7 +92,7 @@ class Workflow < ActiveRecord::Base
   end
 
   def cellect_size_subject_space?
-    set_member_subjects.count >= Panoptes.cellect_min_pool_size
+    subjects_count >= Panoptes.cellect_min_pool_size
   end
 
   def using_cellect?
