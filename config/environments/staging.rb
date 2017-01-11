@@ -19,7 +19,13 @@ Rails.application.configure do
   # For large-scale production use, consider using a caching reverse proxy like nginx, varnish or squid.
   # config.action_dispatch.rack_cache = true
 
-  config.cache_store = :memory_store, { size: 64.megabytes, expires_in: 5.minutes }
+  if cluster_name = ENV["ELASTIC_CACHE"]
+    endpoint    = "#{cluster_name}:11211"
+    elasticache = Dalli::ElastiCache.new(endpoint)
+    config.cache_store = :dalli_store, elasticache.servers, { expires_in: 5.minutes, compress: true }
+  else
+    config.cache_store = :memory_store, { size: 64.megabytes, expires_in: 5.minutes }
+  end
 
   # Disable Rails's static asset server (Apache or nginx will already do this).
   config.serve_static_files = false
