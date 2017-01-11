@@ -208,3 +208,6 @@ Style/MultilineMethodCallIndentation:
   Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: false
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+  Enabled: false
