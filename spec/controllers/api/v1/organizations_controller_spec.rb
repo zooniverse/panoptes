@@ -85,6 +85,7 @@ describe Api::V1::OrganizationsController, type: :controller do
             display_name: "The Illuminati",
             title: "Come join us",
             description: "This organization is the most organized organization to ever organize",
+            urls: [{label: "Blog", url: "http://blogo.com/example"}],
             primary_language: "zh-tw"
           }
         }
@@ -116,6 +117,7 @@ describe Api::V1::OrganizationsController, type: :controller do
               display_name: "Def Not Illuminati",
               title: "Totally Harmless",
               description: "This Organization is not affiliated with the Illuminati, absolutely not no way",
+              urls: [{label: "Blog", url: "http://blogo.com/example"}],
               introduction: "Hello and welcome to Illuminati Headquarters oh wait damn"
             }
           }
