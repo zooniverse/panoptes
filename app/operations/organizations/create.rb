@@ -1,7 +1,7 @@
-include UrlLabels
-
 module Organizations
   class Create < Operation
+    include UrlLabels
+
     string :name
     string :display_name
     string :primary_language

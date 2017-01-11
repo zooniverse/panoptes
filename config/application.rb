@@ -15,6 +15,7 @@ module Panoptes
     config.autoload_paths += Dir[Rails.root.join('app', 'models', '**/')]
     config.autoload_paths += Dir[Rails.root.join('app', 'serializers', '**/')]
     config.autoload_paths += Dir[Rails.root.join('app', 'workers', '**/')]
+    config.autoload_paths += Dir[Rails.root.join('app', 'operations', '**/')]
     config.autoload_paths += Dir[Rails.root.join('lib', '**/')]
 
     config.action_dispatch.perform_deep_munge = false

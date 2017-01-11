@@ -1,7 +1,7 @@
-include UrlLabels
-
 module Organizations
   class Update < Operation
+    include UrlLabels
+
     integer :id
     string :name
     string :display_name
