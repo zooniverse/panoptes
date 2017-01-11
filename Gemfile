@@ -51,6 +51,7 @@ gem 'flipper'
 gem 'flipper-active_record'
 gem 'flipper-ui'
 gem 'panoptes-client'
+gem 'dalli-elasticache'
 
 group :production do
   gem 'newrelic_rpm', '~> 3.0', require: false
