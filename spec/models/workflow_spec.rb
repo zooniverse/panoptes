@@ -15,6 +15,8 @@ describe Workflow, type: :model do
     let(:translatable) { create(:workflow_with_contents, build_extra_contents: true) }
     let(:translatable_without_content) { build(:workflow, build_contents: false) }
     let(:primary_language_factory) { :workflow }
+    let(:private_project) { create(:project, private: true) }
+    let(:private_model) { create(:workflow, project: private_project) }
   end
 
   it_behaves_like "activatable" do
