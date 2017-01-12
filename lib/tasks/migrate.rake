@@ -109,7 +109,8 @@ namespace :migrate do
 
     desc "Backfill belongs_to relations from classifications"
     task backfill_belongs_to_relations: :environment do
-      scope = Recent.all.preload(:classification)
+      scope = Recent.where(project_id: nil, user_id: nil, workflow_id: nil)
+      scope = scope.preload(:classification)
       total = scope.count
       scope.find_each.with_index do |recent, i|
         puts "#{i+1} of #{total}"
