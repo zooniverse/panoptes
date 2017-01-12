@@ -106,6 +106,17 @@ namespace :migrate do
         Recent.create_from_classification(classification)
       end
     end
+
+    desc "Backfill belongs_to relations from classifications"
+    task backfill_belongs_to_relations: :environment do
+      scope = Recent.all.preload(:classification)
+      total = scope.count
+      scope.find_each.with_index do |recent, i|
+        puts "#{i+1} of #{total}"
+        recent.send(:copy_classification_fkeys)
+        recent.save!(validate: false, touch: false) if recent.changed
+      end
+    end
   end
 
   namespace :classification do
