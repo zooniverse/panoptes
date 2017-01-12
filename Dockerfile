@@ -11,6 +11,7 @@ RUN mkdir config && curl "https://ip-ranges.amazonaws.com/ip-ranges.json" > conf
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
+RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
 RUN bundle install --without development test
 
 ADD supervisord.conf /etc/supervisor/conf.d/panoptes.conf
