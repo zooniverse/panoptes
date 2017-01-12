@@ -16,9 +16,25 @@ class Recent < ActiveRecord::Base
 
   validates_presence_of :classification, :subject
 
+  # TODO: modify the following validation to run all the time
+  # once the recents schema has been migrated from has_one through associations
+  validates_presence_of :project_id, :workflow_id, :user_id, only: :create
+
+  before_validation :copy_classification_fkeys
+
   def self.create_from_classification(classification)
-    classification.subject_ids.each do |sid|
-      create!(subject_id: sid, classification: classification)
+    classification.subject_ids.map do |sid|
+      create!({ subject_id: sid, classification: classification })
+    end
+  end
+
+  private
+
+  def copy_classification_fkeys
+    if classification
+      %W(project_id workflow_id user_id user_group_id).each do |key|
+        self.send("#{key}=", classification.send(key))
+      end
     end
   end
 end
