@@ -353,7 +353,7 @@ describe Workflow, type: :model do
     end
 
     it "should return true if the subjects space is large enough" do
-      allow(workflow).to receive_message_chain("set_member_subjects.count")
+      allow(workflow).to receive(:subjects_count)
         .and_return(Panoptes.cellect_min_pool_size)
       expect(workflow.using_cellect?).to be_truthy
     end
@@ -366,7 +366,7 @@ describe Workflow, type: :model do
 
     context "when more subjects than the cellect min pool" do
       it "should be true" do
-        allow(workflow).to receive_message_chain("set_member_subjects.count")
+        allow(workflow).to receive(:subjects_count)
           .and_return(Panoptes.cellect_min_pool_size)
         expect(workflow.cellect_size_subject_space?).to be_truthy
       end

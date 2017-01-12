@@ -180,9 +180,7 @@ RSpec.describe Subjects::StrategySelection do
 
       context "when the number of set_member_subjects is large" do
         it "should use the cellect strategy" do
-          allow(workflow).to receive_message_chain("set_member_subjects.count") do
-            cellect_size
-          end
+          allow(workflow).to receive(:subjects_count).and_return(cellect_size)
           expect(subject.strategy).to eq(:cellect)
         end
       end
@@ -248,9 +246,7 @@ RSpec.describe Subjects::StrategySelection do
       context 'when the workflow has a lot of subjects' do
         it 'should still use cellect_ex' do
           allow(workflow).to receive(:subject_selection_strategy).and_return("cellect_ex")
-          allow(workflow).to receive_message_chain("set_member_subjects.count") do
-            cellect_size
-          end
+          allow(workflow).to receive(:subjects_count).and_return(cellect_size)
           expect(subject.strategy).to eq(:cellect_ex)
         end
       end
