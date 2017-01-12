@@ -9,6 +9,11 @@ class Recent < ActiveRecord::Base
   has_one :user, through: :classification
   has_one :user_group, through: :classification
 
+  belongs_to :project
+  belongs_to :workflow
+  belongs_to :user
+  belongs_to :user_group
+
   validates_presence_of :classification, :subject
 
   def self.create_from_classification(classification)
