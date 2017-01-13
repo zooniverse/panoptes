@@ -9,8 +9,8 @@ describe EmailsExportWorker do
   end
 
   it 'should not do any work if disabled' do
-    expect(UsersEmailExportWorker).not_to receive(:perform_async)
-    expect(ProjectEmailExportWorker).not_to receive(:perform_in)
+    expect(EmailsUsersExportWorker).not_to receive(:perform_async)
+    expect(EmailsProjectsExportWorker).not_to receive(:perform_in)
     worker.perform
   end
 
@@ -20,17 +20,24 @@ describe EmailsExportWorker do
     end
 
     it 'enqueues an all users email export worker' do
-      expect(EmailsUsersExportWorker).to receive(:perform_async)
+      expect(EmailsUsersExportWorker).to receive(:perform_async).with(:global)
       worker.perform
     end
 
-    it 'enqueues a email export worker for each launch_approved project' do
+    it 'enqueues an beta users email export worker' do
+      expect(EmailsUsersExportWorker)
+        .to receive(:perform_in)
+        .with(EmailsExportWorker::SPREAD, :beta)
+      worker.perform
+    end
+
+    it 'enqueues a email export worker for each launch_approved project', :focus do
       projects = create_list(:project, 2)
       not_launched = create(:project, launch_approved: false)
-      projects.each do |p|
-        expect(ProjectEmailExportWorker)
+      projects.each_with_index do |p, i|
+        expect(EmailsProjectsExportWorker)
           .to receive(:perform_in)
-          .with(an_instance_of(Float), p.id)
+          .with((EmailsExportWorker::SPREAD * 2 + 1), p.id)
       end
       worker.perform
     end
