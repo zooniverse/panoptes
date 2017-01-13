@@ -33,7 +33,7 @@ class Recent < ActiveRecord::Base
   def copy_classification_fkeys
     if classification
       %W(project_id workflow_id user_id user_group_id).each do |key|
-        self.send("#{key}=", classification.send(key))
+        send("#{key}=", classification.send(key))
       end
     end
   end
