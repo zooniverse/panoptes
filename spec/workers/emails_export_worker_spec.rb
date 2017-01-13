@@ -27,17 +27,17 @@ describe EmailsExportWorker do
     it 'enqueues an beta users email export worker' do
       expect(EmailsUsersExportWorker)
         .to receive(:perform_in)
-        .with(EmailsExportWorker::SPREAD, :beta)
+        .with(EmailsExportWorker::BETA_DELAY, :beta)
       worker.perform
     end
 
-    it 'enqueues a email export worker for each launch_approved project', :focus do
+    it 'enqueues a email export worker for each launch_approved project' do
       projects = create_list(:project, 2)
       not_launched = create(:project, launch_approved: false)
       projects.each_with_index do |p, i|
         expect(EmailsProjectsExportWorker)
           .to receive(:perform_in)
-          .with((EmailsExportWorker::SPREAD * 2 + 1), p.id)
+          .with(an_instance_of(Float), p.id)
       end
       worker.perform
     end
