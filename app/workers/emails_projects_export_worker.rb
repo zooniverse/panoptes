@@ -25,7 +25,7 @@ class EmailsProjectsExportWorker
   def user_emails
     User
       .joins(:project_preferences)
-      .where(user_project_preferences: { project_id: project.id })
+      .where(user_project_preferences: { project_id: project.id, email_communication: true })
       .active
       .where(valid_email: true)
       .select(:id, :email)
