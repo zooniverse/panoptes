@@ -20,6 +20,10 @@ class Api::V1::SubjectsController < Api::ApiController
     end
   end
 
+  def create
+    super { |subject| subject.uploader.increment_subjects_count_cache }
+  end
+
   def destroy
     super { |subject| SubjectRemovalWorker.perform_async(subject.id) }
   end
