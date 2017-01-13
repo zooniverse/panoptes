@@ -11,12 +11,6 @@ RSpec.shared_examples "has recents" do
     default_request(scopes: scopes, user_id: authorized_user.id)
   end
 
-  it "should call the correct eager_loads join queries" do
-    eager_loads = %i(classification subject locations workflow project)
-    expect(Recent).to receive(:eager_load).with(*eager_loads).and_call_original
-    get :recents, { resource_key_id => resource.id }
-  end
-
   context "with the controller action run" do
     before do
       get :recents, filter_params.merge(resource_key_id => resource.id)
