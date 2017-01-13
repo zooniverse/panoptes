@@ -46,7 +46,6 @@ class EmailsUsersExportWorker
   end
 
   def write_to_s3
-    binding.pry
     storage_path = MediaStorage.stored_path("application/x-gzip", "email_exports")
     prefix = File.dirname(storage_path)
     file_paths = File.basename(storage_path).split(".")

@@ -41,23 +41,26 @@ describe EmailsUsersExportWorker do
       expect(worker).to receive(:to_gzip).and_call_original
     end
 
-    it "push the file to s3" do
-      expect(MediaStorage)
-        .to receive(:stored_path)
+    it "push the file to s3 at the correct bucket location" do
+      adapter = MediaStorage::TestAdapter.new
+      allow(MediaStorage).to receive(:adapter).and_return(adapter)
+      expect(MediaStorage).to receive(:stored_path)
         .with("application/x-gzip", "email_exports")
-      expect(MediaStorage)
+        .and_call_original
+      expect(adapter)
         .to receive(:put_file)
-        .with(an_instance_of(String), an_instance_of(String), s3_opts)
-      expect(worker).to receive(:write_to_s3)
+        .with(s3_path, an_instance_of(String), s3_opts)
+      expect(worker).to receive(:write_to_s3).and_call_original
     end
-    #
-    # it "should clean up the file after sending to s3" do
-    #   expect(worker).to receive(:remove_tempfile).once.and_call_original
-    # end
+
+    it "should clean up the csv and compressed files after sending to s3" do
+      expect(worker).to receive(:remove_tempfile).twice
+    end
   end
 
-  it_behaves_like "an email dump exporter", :focus  do
+  it_behaves_like "an email dump exporter" do
     let!(:non_global_user) { create(:user, global_email_communication: false) }
+    let(:s3_path) { "email_exports/global_email_list.tar.gz" }
     let(:s3_opts) do
       {
         private: true,
@@ -68,8 +71,9 @@ describe EmailsUsersExportWorker do
     let(:export_type) { :global }
   end
 
-  it_behaves_like "an email dump exporter", :focus do
+  it_behaves_like "an email dump exporter" do
     let!(:non_beta_user) { create(:user, beta_email_communication: false) }
+    let(:s3_path) { "email_exports/beta_email_list.tar.gz" }
     let(:s3_opts) do
       {
         private: true,
