@@ -7,7 +7,6 @@ shared_examples "an email dump exporter" do
     end
   end
 
-  let(:users) { create_list(:user, 2) }
   let(:inactive_user) { create(:user, activated_state: :inactive) }
   let(:invalid_email_user) { create(:user, valid_email: false) }
 

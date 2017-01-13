@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe EmailsUsersExportWorker do
   let(:worker) { described_class.new }
+  let(:users) { create_list(:user, 2) }
 
   it { is_expected.to be_a Sidekiq::Worker }
 
