@@ -34,8 +34,7 @@ shared_examples "an email dump exporter" do
   end
 
   it "push the file to s3 at the correct bucket location" do
-    adapter = MediaStorage::TestAdapter.new
-    allow(MediaStorage).to receive(:adapter).and_return(adapter)
+    adapter = MediaStorage.adapter
     expect(MediaStorage).to receive(:stored_path)
       .with("application/x-gzip", "email_exports")
       .and_call_original
