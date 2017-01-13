@@ -24,5 +24,5 @@ end
 if cache_client = Panoptes::ElastiCache.client
   Rails.application.config.cache_store = :dalli_store,
     cache_client.servers,
-    Panotes::ElastiCache.options
+    Panoptes::ElastiCache.options
 end
