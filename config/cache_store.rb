@@ -7,7 +7,7 @@ module Panoptes
     end
 
     def self.options
-      { expires_in: expires_in, compress: compress }
+      { expires_in: expires_in, compress: compress, pool_size: pool_size }
     end
 
     def self.expires_in
@@ -17,12 +17,9 @@ module Panoptes
     def self.compress
       ENV.fetch("CACHE_COMPRESS", true)
     end
-  end
-end
 
-# change the ENV cache store config to use AWS Elastic Cache
-if cache_client = Panoptes::ElastiCache.client
-  Rails.application.config.cache_store = :dalli_store,
-    cache_client.servers,
-    Panoptes::ElastiCache.options
+    def self.pool_size
+      ENV.fetch("CACHE_POOL_SIZE", 16)
+    end
+  end
 end

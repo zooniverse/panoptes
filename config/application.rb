@@ -7,6 +7,7 @@ require "action_mailer/railtie"
 require "action_view/railtie"
 require "sprockets/railtie"
 require 'flipper/middleware/memoizer'
+require_relative 'cache_store'
 
 Bundler.require(*Rails.groups)
 
@@ -41,5 +42,9 @@ module Panoptes
     config.middleware.use Flipper::Middleware::Memoizer, lambda {
       Panoptes.flipper
     }
+
+    if cache_client = Panoptes::ElastiCache.client
+      config.cache_store = :dalli_store, cache_client.servers, Panoptes::ElastiCache.options
+    end
   end
 end
