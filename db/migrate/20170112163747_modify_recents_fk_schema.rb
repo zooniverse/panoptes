@@ -1,8 +1,8 @@
 class ModifyRecentsFkSchema < ActiveRecord::Migration
+
   def change
-    add_column :recents, :project_id, :integer, index: true
-    add_column :recents, :workflow_id, :integer, index: true
-    add_column :recents, :user_id, :integer, index: true
-    add_column :recents, :user_group_id, :integer
+    %i(project_id workflow_id user_id user_group_id).each do |col|
+      add_column :recents, col, :integer
+    end
   end
 end
