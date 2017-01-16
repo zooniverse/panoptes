@@ -2,6 +2,9 @@ class CellectController < ApplicationController
   before_filter :html_to_json_override
 
   EXPIRY = 10.minutes.freeze
+  SELECT_COLS = %i(
+    id subject_selection_strategy pairwise prioritized grouped updated_at
+  ).freeze
 
   def workflows
     respond_to do |format|
@@ -28,7 +31,7 @@ class CellectController < ApplicationController
       .joins(:project)
       .where("projects.launch_approved IS TRUE")
       .order(:id)
-      .select(:id, :subject_selection_strategy, :pairwise, :prioritized, :grouped)
+      .select(SELECT_COLS)
   end
 
   def workflows_using_cellect
