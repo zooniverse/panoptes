@@ -23,8 +23,8 @@ class Recent < ActiveRecord::Base
   before_validation :copy_classification_fkeys
 
   def self.create_from_classification(classification)
-    classification.subject_ids.map do |sid|
-      create!({ subject_id: sid, classification: classification })
+    classification.subject_ids.map do |subject_id|
+      create!(subject_id: subject_id, classification: classification)
     end
   end
 
