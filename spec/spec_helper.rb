@@ -64,6 +64,11 @@ RSpec.configure do |config|
     end
   end
 
+  config.before(:example, with_cache_store: true) do
+    cache_store = ActiveSupport::Cache::MemoryStore.new(size: 2.megabytes)
+    allow(Rails).to receive(:cache).and_return(cache_store)
+  end
+
   config.before(:each, type: :controller) do
     stub_cellect_connection
   end

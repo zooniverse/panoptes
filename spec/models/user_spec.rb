@@ -694,6 +694,19 @@ describe User, type: :model do
     end
   end
 
+  describe "#increment_subjects_count_cache", :with_cache_store do
+    it 'should return nil if no cache entry' do
+      uploader = create(:user_with_uploaded_subjects)
+      expect(uploader.increment_subjects_count_cache).to eq(nil)
+    end
+
+    it 'should inc the cache entry value if exists' do
+      uploader = create(:user_with_uploaded_subjects)
+      count = uploader.uploaded_subjects_count
+      expect(uploader.increment_subjects_count_cache).to eq(count+1)
+    end
+  end
+
   describe "#update_ouroboros_created" do
     let(:user) do
       build(:ouroboros_created_user, login: "NOT ALLOWED")

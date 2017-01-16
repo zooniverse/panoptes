@@ -364,6 +364,12 @@ describe Api::V1::SubjectsController, type: :controller do
       }
     end
 
+    it "should incremement the user's subjects_count cache" do
+      expect_any_instance_of(User).to receive(:increment_subjects_count_cache)
+      default_request user_id: authorized_user.id, scopes: scopes
+      post :create, create_params
+    end
+
     it "should return locations in the order they were submitted" do
       default_request user_id: authorized_user.id, scopes: scopes
       post :create, create_params

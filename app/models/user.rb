@@ -316,6 +316,18 @@ class User < ActiveRecord::Base
   end
 
   def uploaded_subjects_count
-    Subject.where(upload_user_id: self.id).count
+    Rails.cache.fetch(subjects_count_cache_key) do
+      Subject.where(upload_user_id: id).count
+    end
+  end
+
+  def increment_subjects_count_cache
+    Rails.cache.increment(subjects_count_cache_key)
+  end
+
+  private
+
+  def subjects_count_cache_key
+    @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count"
   end
 end
