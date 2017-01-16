@@ -694,7 +694,7 @@ describe User, type: :model do
     end
   end
 
-  describe "#increment_subjects_count_cache", :with_cache_store, :focus do
+  describe "#increment_subjects_count_cache", :with_cache_store do
     it 'should return nil if no cache entry' do
       uploader = create(:user_with_uploaded_subjects)
       expect(uploader.increment_subjects_count_cache).to eq(nil)
