@@ -194,6 +194,22 @@ describe Classification, :type => :model do
         expect(result).to be_empty
       end
 
+      context "using project_id param" do
+        it 'should not return any classifications for a non-existant project id' do
+          create(:classification, project: project, user: user.owner)
+          result = Classification.scope_for(:project, user, {project_id: -1})
+          expect(result).to be_empty
+        end
+
+        it 'should not return any classifications for another project' do
+          create(:classification, user: user.owner, project: project)
+          another_project = create(:project)
+          create(:classification, user: user.owner, project: another_project)
+          result = Classification.scope_for(:project, user, {project_id: another_project.id})
+          expect(result).to be_empty
+        end
+      end
+
       context "with last_id param provided" do
         let!(:classifications) { create_list(:classification, 2, project: project) }
 

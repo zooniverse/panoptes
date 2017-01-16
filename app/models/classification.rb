@@ -68,9 +68,9 @@ class Classification < ActiveRecord::Base
     if opts[:last_id] && !opts[:project_id]
       raise Classification::MissingParameter.new("Project ID required if last_id is included")
     end
-    updatable = Project.scope_for(:update, user)
-    updatable = updatable.where(id: opts[:project_id]) if opts[:last_id]
-    scope = joins(:project).merge(updatable)
+    projects = Project.scope_for(:update, user)
+    projects = projects.where(id: opts[:project_id]) if opts[:project_id]
+    scope = where(project_id: projects.pluck(:id))
     scope = scope.after_id(opts[:last_id]) if opts[:last_id]
     scope
   end
