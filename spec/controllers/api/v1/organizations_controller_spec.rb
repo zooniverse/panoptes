@@ -111,7 +111,6 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:update_params) do
           {
             organizations: {
-              id: resource.id,
               primary_language: "tw",
               name: "A Different Name",
               display_name: "Def Not Illuminati",

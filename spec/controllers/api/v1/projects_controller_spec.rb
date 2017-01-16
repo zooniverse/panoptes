@@ -633,8 +633,8 @@ describe Api::V1::ProjectsController, type: :controller do
           tags: ["astro", "gastro"],
           researcher_quote: "this is such a great project",
           links: {
-            workflows: [workflow.id.to_s],
-            subject_sets: [subject_set.id.to_s]
+            workflows: ["1"],
+            subject_sets: ["1"]
           }
         }
       }
