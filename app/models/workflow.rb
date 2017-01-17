@@ -6,10 +6,7 @@ class Workflow < ActiveRecord::Base
   include ExtendedCacheKey
   include RankedModel
   include CacheModelVersion
-
-  def self.columns
-    super.reject { |c| c.name == "use_cellect" }
-  end
+  include ModelCacheKey
 
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
@@ -96,7 +93,9 @@ class Workflow < ActiveRecord::Base
   end
 
   def using_cellect?
-    subject_selection_strategy.to_s == "cellect" || cellect_size_subject_space?
+    Rails.cache.fetch(model_cache_key(:using_cellect?), expires_in: 1.hour) do
+      subject_selection_strategy.to_s == "cellect" || cellect_size_subject_space?
+    end
   end
 
   def subjects_count
@@ -123,5 +122,4 @@ class Workflow < ActiveRecord::Base
         retired_subjects_count >= subjects_count
       end
   end
-
 end
