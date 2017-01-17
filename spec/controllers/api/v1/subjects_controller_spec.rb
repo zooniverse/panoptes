@@ -494,6 +494,13 @@ describe Api::V1::SubjectsController, type: :controller do
       expect(SubjectRemovalWorker).to receive(:perform_async).with(resource.id)
       delete :destroy, id: resource.id
     end
+
+    it "should handle redis timeout error" do
+      stub_token(scopes: scopes, user_id: authorized_user.id)
+      set_preconditions
+      expect(SubjectRemovalWorker).to receive(:perform_async).and_raise(Timeout::Error)
+      delete :destroy, id: resource.id
+    end
   end
 
   describe "versioning" do

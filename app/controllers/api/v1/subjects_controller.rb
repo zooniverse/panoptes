@@ -25,7 +25,13 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def destroy
-    super { |subject| SubjectRemovalWorker.perform_async(subject.id) }
+    super do |subject|
+      begin
+        SubjectRemovalWorker.perform_async(subject.id)
+      rescue Timeout::Error => e
+        Honeybadger.notify(e)
+      end
+    end
   end
 
   private
