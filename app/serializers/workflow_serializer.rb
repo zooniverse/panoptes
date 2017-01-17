@@ -8,7 +8,7 @@ class WorkflowSerializer
   include CachedSerializer
 
   # :workflow_contents, Note: re-add when the eager_load from translatable_resources is removed
-  PRELOADS = %i(project subject_sets tutorial_subject attached_images).freeze
+  PRELOADS = %i(subject_sets attached_images).freeze
 
   attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
              :created_at, :updated_at, :finished_at, :first_task, :primary_language,
