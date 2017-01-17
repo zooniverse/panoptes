@@ -81,7 +81,7 @@ module Subjects
         super(action, params) do
           params[:host] = @session.reset_host
         end
-      rescue Redis::CannotConnectError, Subjects::CellectSession::NoHostError
+      rescue Redis::CannotConnectError, Subjects::CellectSession::NoHostError, Timeout::Error
         raise ConnectionError, "Cellect can't find a server host"
       end
     end
