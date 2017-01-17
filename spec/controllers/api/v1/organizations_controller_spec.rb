@@ -124,6 +124,26 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:test_attr) { :display_name }
         let(:test_attr_value) { "Def Not Illuminati" }
       end
+
+      context "includes incomplete parameters" do
+        let(:incomplete_params) do
+          {
+            organizations: {
+              name: "Just a name",
+              display_name: "Just a name"
+            }
+          }
+        end
+
+        it "succesfully updates included attributes and returns resource", :aggregate_failures do
+          default_request scopes: scopes, user_id: authorized_user.id
+          organization.save!
+          params = incomplete_params.merge(id: organization.id)
+          put :update, params
+          expect(response).to have_http_status(:ok)
+          expect(json_response["organizations"].length).to eq(1)
+        end
+      end
     end
 
     describe "#destroy" do

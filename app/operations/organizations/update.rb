@@ -8,7 +8,6 @@ module Organizations
 
     def execute
       Organization.transaction do
-        organization = Organization.find(id)
         content_update = {}
         org_update = organization_params.dup
         Api::V1::OrganizationsController::CONTENT_FIELDS.each do |field|
@@ -18,12 +17,22 @@ module Organizations
           end
         end
         organization.update!(org_update.symbolize_keys)
-        organization.organization_contents.find_or_initialize_by(language: organization_params[:primary_language]) do |content|
+        organization.organization_contents.find_or_initialize_by(language: language) do |content|
           content_update.merge! content_from_params(inputs, Api::V1::OrganizationsController::CONTENT_FIELDS)
           content.update! content_update.symbolize_keys
         end
         organization.save!
       end
+    end
+
+    private
+
+    def organization
+      @organization ||= Organization.find(id)
+    end
+
+    def language
+      @language ||= organization_params[:primary_language] ? organization_params[:primary_language] : @organization.primary_language
     end
   end
 end
