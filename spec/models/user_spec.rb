@@ -688,9 +688,18 @@ describe User, type: :model do
   end
 
   describe "#uploaded_subjects_count" do
+    let(:uploader) { create(:user_with_uploaded_subjects) }
+
     it 'should have a count of the subjects a user has uploaded' do
-      uploader = create(:user_with_uploaded_subjects)
       expect(uploader.uploaded_subjects_count).to eq(2)
+    end
+
+    it "should ensure the it casts invalid values" do
+      ["", nil].each do |cast_val|
+        cache_store = Rails.cache
+        allow(cache_store).to receive(:fetch).and_return(cast_val)
+        expect(uploader.uploaded_subjects_count).to eq(0)
+      end
     end
   end
 
