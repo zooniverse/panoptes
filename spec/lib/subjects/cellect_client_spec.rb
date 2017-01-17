@@ -126,7 +126,7 @@ RSpec.describe Subjects::CellectClient do
 
     #applies to all RequestToHost methods
     context "when cellect session cant choose a host due to redis error" do
-      [Redis::CannotConnectError, Timeout::Error].each do |error|
+      [Redis::CannotConnectError, Timeout::Error, Redis::TimeoutError].each do |error|
         it 'should raise a connection error' do
           allow_any_instance_of(Subjects::CellectSession)
             .to receive(:host)
