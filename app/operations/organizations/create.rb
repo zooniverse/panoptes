@@ -10,7 +10,7 @@ module Organizations
     string :title
     string :description
     string :introduction, default: ''
-    array :urls, default: ''
+    array :urls, default: []
 
     def execute
       Organization.transaction do
