@@ -29,10 +29,9 @@ RSpec.describe WorkflowRetiredCountWorker do
     end
 
     it 'should not mark the workflow as finished when it is not' do
-      allow(workflow).to receive(:finished?).and_return(false)
-      expect do
-        worker.perform(workflow.id)
-      end.to_not change{ Workflow.find(workflow.id).finished_at }
+      allow_any_instance_of(Workflow).to receive(:finished?).and_return(false)
+      worker.perform(workflow.id)
+      expect(workflow.reload.finished_at).to be_nil
     end
 
     context "workflow is finished" do
@@ -40,6 +39,13 @@ RSpec.describe WorkflowRetiredCountWorker do
         allow_any_instance_of(Workflow)
           .to receive(:finished?)
           .and_return(true)
+      end
+
+      it 'should not update the finished_at timestamp if already set' do
+        workflow.update_column(:finished_at, Time.zone.now)
+        expect do
+          worker.perform(workflow.id)
+        end.to_not change{ workflow.reload.finished_at }
       end
 
       it 'should set workflow.finished_at to the current time' do

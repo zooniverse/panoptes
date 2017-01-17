@@ -19,7 +19,7 @@ class WorkflowRetiredCountWorker
       counter.retired_subjects
     )
 
-    if workflow.finished?
+    if workflow.finished_at.nil? && workflow.finished?
       Workflow.where(id: workflow.id).update_all(finished_at: Time.now)
     end
   end
