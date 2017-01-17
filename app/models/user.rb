@@ -293,6 +293,8 @@ class User < ActiveRecord::Base
 
   def send_welcome_email
     UserWelcomeMailerWorker.perform_async(id, project_id)
+  rescue Timeout::Error => e
+    Honeybadger.notify(e)
   end
 
   def set_ouroboros_api_key
