@@ -32,9 +32,9 @@ shared_examples "an email dump exporter" do
     expect(worker).to receive(:to_gzip).and_call_original
   end
 
-  it "push the file to s3 at the correct bucket location" do
-    adapter = MediaStorage.adapter
-    expect(MediaStorage).to receive(:stored_path)
+  it "push the file to s3 the correct bucket location via a custom storage adapter" do
+    adapter = worker.send(:storage_adapter)
+    expect(adapter).to receive(:stored_path)
       .with("application/x-gzip", "email_exports")
       .and_call_original
     expect(adapter)
