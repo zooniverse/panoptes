@@ -848,6 +848,12 @@ describe User, type: :model do
       expect(UserWelcomeMailerWorker).to have_received(:perform_async).with(user.id, nil).ordered
     end
 
+    it "should handle redis being down" do
+      allow(UserWelcomeMailerWorker).to receive(:perform_async).and_raise(Timeout::Error)
+      user.save!
+      expect(UserWelcomeMailerWorker).to have_received(:perform_async).with(user.id, nil).ordered
+    end
+
     context "when the user has a project id" do
       let(:project) { create :project }
       let!(:user) { build(:user, project_id: project.id) }
