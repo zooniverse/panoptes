@@ -109,7 +109,10 @@ namespace :migrate do
 
     desc "Backfill belongs_to relations from classifications"
     task backfill_belongs_to_relations: :environment do
-      scope = Recent.preload(:classification, :subject)
+      scope = Recent.where(user_id: nil)
+        .includes(:classification)
+        .where.not(classifications: { user_id: nil })
+        .preload(:subject)
       total = scope.count
       scope.find_each.with_index do |recent, i|
         # some recents are for non-logged in classifications
