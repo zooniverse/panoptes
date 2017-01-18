@@ -58,7 +58,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: access_control_lists; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: access_control_lists; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE access_control_lists (
@@ -408,7 +408,7 @@ ALTER SEQUENCE flipper_gates_id_seq OWNED BY flipper_gates.id;
 
 
 --
--- Name: media; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: media; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE media (
@@ -1483,8 +1483,7 @@ CREATE TABLE workflows (
     activity integer DEFAULT 0 NOT NULL,
     current_version_number character varying,
     activated_state integer DEFAULT 0 NOT NULL,
-    subject_selection_strategy integer DEFAULT 0,
-    nero_config jsonb DEFAULT '{}'::jsonb
+    subject_selection_strategy integer DEFAULT 0
 );
 
 
@@ -2394,28 +2393,28 @@ CREATE INDEX index_organizations_on_activated_state ON organizations USING btree
 
 
 --
--- Name: index_organizations_on_display_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_organizations_on_display_name; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_organizations_on_display_name ON organizations USING btree (display_name);
 
 
 --
--- Name: index_organizations_on_listed_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_organizations_on_listed_at; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_organizations_on_listed_at ON organizations USING btree (listed_at);
 
 
 --
--- Name: index_organizations_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_organizations_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_organizations_on_updated_at ON organizations USING btree (updated_at);
 
 
 --
--- Name: index_project_contents_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_project_contents_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_project_contents_on_project_id ON project_contents USING btree (project_id);
@@ -2548,35 +2547,35 @@ CREATE INDEX index_recents_on_classification_id ON recents USING btree (classifi
 
 
 --
--- Name: index_recents_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
+-- Name: index_recents_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
+tru-
 
 CREATE INDEX index_recents_on_project_id ON recents USING btree (project_id);
 
 
 --
--- Name: index_recents_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_recents_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_recents_on_subject_id ON recents USING btree (subject_id);
 
 
 --
--- Name: index_recents_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_recents_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_recents_on_user_id ON recents USING btree (user_id);
 
 
 --
--- Name: index_recents_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_recents_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_recents_on_workflow_id ON recents USING btree (workflow_id);
 
 
 --
--- Name: index_set_member_subjects_on_priority; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_set_member_subjects_on_priority; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_set_member_subjects_on_priority ON set_member_subjects USING btree (priority);
@@ -3156,11 +3155,27 @@ ALTER TABLE ONLY user_collection_preferences
 
 
 --
+-- Name: fk_rails_6c609bbfd1; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recents
+    ADD CONSTRAINT fk_rails_6c609bbfd1 FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
 -- Name: fk_rails_732cb83ab7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY oauth_access_tokens
     ADD CONSTRAINT fk_rails_732cb83ab7 FOREIGN KEY (application_id) REFERENCES oauth_applications(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_7504acfc82; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recents
+    ADD CONSTRAINT fk_rails_7504acfc82 FOREIGN KEY (workflow_id) REFERENCES workflows(id);
 
 
 --
@@ -3241,6 +3256,14 @@ ALTER TABLE ONLY memberships
 
 ALTER TABLE ONLY field_guides
     ADD CONSTRAINT fk_rails_a1b35288b8 FOREIGN KEY (project_id) REFERENCES projects(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_ae363bfedc; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recents
+    ADD CONSTRAINT fk_rails_ae363bfedc FOREIGN KEY (project_id) REFERENCES projects(id);
 
 
 --
@@ -3741,9 +3764,10 @@ INSERT INTO schema_migrations (version) VALUES ('20170113113532');
 
 INSERT INTO schema_migrations (version) VALUES ('20170116134142');
 
+INSERT INTO schema_migrations (version) VALUES ('20170118141452');
+
 INSERT INTO schema_migrations (version) VALUES ('20170202200131');
 
 INSERT INTO schema_migrations (version) VALUES ('20170202202724');
 
 INSERT INTO schema_migrations (version) VALUES ('20170206161946');
-
