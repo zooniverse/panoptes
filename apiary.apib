@@ -417,8 +417,11 @@ A User may delete an incomplete classification.
 ## Classification Collection [/classifications{?page,page_size,sort,project_id,user_group_id,include,for}]
 A representation of all the Classifications in a collection
 
-All collections add a *meta* attribute hash containing
-paging information.
+All collections add a *meta* attribute hash containing paging information.
+
+Please note that due to the cost of the page count queries on the
+classifications table we are not returning the page counts for
+this end point, please use the previous and next hrefs to page into the data.
 
 Classifications are returned as an array under the _classifications_
 key.
