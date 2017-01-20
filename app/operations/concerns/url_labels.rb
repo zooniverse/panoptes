@@ -2,7 +2,7 @@ module UrlLabels
   extend ActiveSupport::Concern
 
   def content_from_params(ps, content_fields)
-    content = ps.slice(content_fields)
+    yield ps if block_given?
     content[:language] = ps[:primary_language]
     if ps.has_key? :urls
       urls, labels = extract_url_labels(ps[:urls])
