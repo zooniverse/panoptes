@@ -1,6 +1,7 @@
 module Organizations
   class Update < Operation
     include UrlLabels
+    include ContentFromParams
 
     integer :id
     string :name
