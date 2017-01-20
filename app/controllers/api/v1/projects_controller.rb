@@ -15,12 +15,6 @@ class Api::V1::ProjectsController < Api::ApiController
 
   alias_method :project, :controlled_resource
 
-  CONTENT_PARAMS = [:description,
-                    :title,
-                    :workflow_description,
-                    :researcher_quote,
-                    :introduction].freeze
-
   CONTENT_FIELDS = [:title,
                     :description,
                     :workflow_description,
