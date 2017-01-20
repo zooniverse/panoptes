@@ -706,22 +706,31 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     context "project_contents" do
+      let(:params) do
+        { projects: { description: 'SC' }, id: resource.id }
+      end
+
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        params = update_params
-        params[:projects][:description] = 'SC'
-        params = params.merge(id: resource.id)
-        put :update, params
       end
 
       it 'should update the default contents when the display_name is updated' do
+        params[:projects][test_attr] = test_attr_value
+        put :update, params
         contents_title = resource.primary_content.reload
         contents_title = resource.primary_content.title
         expect(contents_title).to eq(test_attr_value)
       end
 
       it 'should update the default contents when the description changes' do
+        put :update, params
         expect(json_response['projects'][0]['description']).to eq('SC')
+      end
+
+      it "should touch the project resource to modify the cache_key / etag" do
+        expect {
+          put :update, params
+        }.to change { resource.reload.updated_at }
       end
     end
 
