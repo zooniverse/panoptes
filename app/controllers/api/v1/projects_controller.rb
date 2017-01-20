@@ -5,6 +5,8 @@ class Api::V1::ProjectsController < Api::ApiController
   include IndexSearch
   include AdminAllowed
   include Versioned
+  include UrlLabels
+  include ContentFromParams
 
   require_authentication :update, :create, :destroy, :create_classifications_export,
     :create_subjects_export, :create_aggregations_export,
@@ -111,22 +113,11 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_response(projects)
-    serializer.resource({ include: 'owners' },
+    serializer.resource(
+      { include: 'owners' },
       resource_scope(projects),
-      fields: CONTENT_FIELDS)
-  end
-
-  def content_from_params(ps)
-    ps[:title] = ps[:display_name]
-    content = ps.slice(*CONTENT_FIELDS)
-    content[:language] = ps[:primary_language]
-    if ps.has_key? :urls
-      urls, labels = extract_url_labels(ps[:urls])
-      content[:url_labels] = labels
-      ps[:urls] = urls
-    end
-    ps.except!(*CONTENT_FIELDS)
-    content.select { |k,v| !!v }
+      fields: CONTENT_FIELDS
+    )
   end
 
   def admin_allowed_params
@@ -189,12 +180,6 @@ class Api::V1::ProjectsController < Api::ApiController
       name = tag.downcase
       Tag.find_or_initialize_by(name: name)
     end
-  end
-
-  def extract_url_labels(urls)
-    visitor = TasksVisitors::ExtractStrings.new
-    visitor.visit(urls)
-    [urls, visitor.collector]
   end
 
   def context
