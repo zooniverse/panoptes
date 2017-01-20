@@ -149,12 +149,15 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def build_resource_for_create(create_params)
     admin_allowed create_params, *admin_allowed_params
-    create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
+
+    content_attributes = primary_content_attributes(create_params)
+    create_params[:project_contents] = [ ProjectContent.new(content_attributes) ]
     if create_params.has_key? :tags
       create_params[:tags] = create_or_update_tags(create_params)
     end
     add_user_as_linked_owner(create_params)
-    super(create_params)
+
+    super(create_params.except(*CONTENT_FIELDS))
   end
 
   def build_update_hash(update_params, resource)
