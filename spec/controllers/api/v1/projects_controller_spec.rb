@@ -630,7 +630,6 @@ describe Api::V1::ProjectsController, type: :controller do
           },
           beta_requested: true,
           live: true,
-          tags: ["astro", "gastro"],
           researcher_quote: "this is such a great project",
           links: {
             workflows: [workflow.id.to_s],
@@ -643,9 +642,14 @@ describe Api::V1::ProjectsController, type: :controller do
     it_behaves_like "is updatable"
 
     describe "update tags" do
+      let(:tags) { ["astro", "gastro"] }
+      let(:tag_params) do
+        { projects: { tags: tags }, id: resource.id }
+      end
+
       def tag_update
         default_request scopes: scopes, user_id: authorized_user.id
-        put :update, update_params.merge(id: resource.id)
+        put :update, tag_params
       end
 
       it 'should remove all previous tags' do
@@ -658,7 +662,13 @@ describe Api::V1::ProjectsController, type: :controller do
       it 'should update with new tags' do
         tag_update
         resource.reload
-        expect(resource.tags.pluck(:name)).to include("astro", "gastro")
+        expect(resource.tags.pluck(:name)).to match_array(tags)
+      end
+
+      it "should touch the project resource to modify the cache_key / etag" do
+        expect {
+          tag_update
+        }.to change { resource.reload.updated_at }
       end
     end
 
