@@ -62,6 +62,27 @@ class Api::V1::ProjectsController < Api::ApiController
     super
   end
 
+  def update
+    super do |resource|
+      # TODO: extract this primary project content update
+      # to a service object that sits in the project
+      # transaction.
+      content_attributes = primary_content_attributes(update_params)
+      unless content_attributes.blank?
+        resource.primary_content.update!(content_attributes)
+      end
+
+      # TODO: move this to a service object to create/update
+      # tags for the project
+      tags = create_or_update_tags(update_params.dup)
+      resource.tags = tags unless tags.nil?
+
+      if !content_attributes.blank? || !tags.nil?
+        resource.updated_at = Time.zone.now
+      end
+    end
+  end
+
   def create_classifications_export
     medium = CreateClassificationsExport.with( api_user: api_user, object: controlled_resource ).run!(params)
     medium_response(medium)
@@ -139,19 +160,12 @@ class Api::V1::ProjectsController < Api::ApiController
   def build_update_hash(update_params, resource)
     admin_allowed update_params, *admin_allowed_params
 
-    content_update = content_from_params(update_params)
-    unless content_update.blank?
-      resource.primary_content.update!(content_update)
-    end
-
-    tags = create_or_update_tags(update_params)
-    resource.tags = tags unless tags.nil?
-
     if update_params[:launch_approved]
       resource.launch_date ||= Time.zone.now
     end
 
-    super(update_params, resource)
+    update_attributes = super(update_params, resource)
+    update_attributes.except(:tags, *CONTENT_FIELDS)
   end
 
   def new_items(resource, relation, value)
@@ -196,5 +210,11 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def cards_exclude_keys
     ProjectSerializer.serializable_attributes.except(*CARD_FIELDS).keys
+  end
+
+  def primary_content_attributes(content_attributes)
+    content_from_params(content_attributes.dup, CONTENT_FIELDS) do |ps|
+      ps[:title] = ps[:display_name]
+    end
   end
 end
