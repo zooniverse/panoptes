@@ -52,10 +52,13 @@ module JsonApiController
     protected
 
     def build_update_hash(update_params, resource)
-      return update_params unless links = update_params.delete(:links)
-      links.try(:reduce, update_params) do |params, (k, v)|
-        params[k] = update_relation(resource, k.to_sym, v)
-        params
+      if links = update_params.delete(:links)
+        links.try(:reduce, update_params) do |params, (k, v)|
+          params[k] = update_relation(resource, k.to_sym, v)
+          params
+        end
+      else
+        update_params
       end
     end
 
