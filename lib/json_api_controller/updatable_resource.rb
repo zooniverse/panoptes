@@ -12,7 +12,8 @@ module JsonApiController
 
     def update
       controlled_resources.zip(Array.wrap(update_params)).each do |resource, update_hash|
-        resource.assign_attributes(build_update_hash(update_hash,resource))
+        update_attributes = build_update_hash(update_hash, resource)
+        resource.assign_attributes(update_attributes)
       end
 
       resource_class.transaction(requires_new: true) do
