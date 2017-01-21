@@ -27,9 +27,6 @@ describe Workflow, type: :model do
     let(:cached_resource) { workflow }
 
     it_behaves_like "has an extended cache key" do
-      let(:associations) do
-        %i(workflow_contents)
-      end
       let(:methods) do
         %i(subjects_count finished?)
       end
