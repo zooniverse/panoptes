@@ -13,7 +13,7 @@ module ActiveInteraction
     end
 
     def valid?(value)
-      OrganizationUpdateSchema.new.validate!(value) == nil
+      OrganizationUpdateSchema.new.validate!(value).nil?
     end
   end
 end
