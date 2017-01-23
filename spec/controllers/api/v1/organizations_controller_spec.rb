@@ -125,7 +125,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:test_attr_value) { "Def Not Illuminati" }
       end
 
-      context "includes incomplete parameters" do
+      context "includes exceptional parameters" do
         let(:incomplete_params) do
           {
             organizations: {
@@ -135,13 +135,29 @@ describe Api::V1::OrganizationsController, type: :controller do
           }
         end
 
-        it "succesfully updates included attributes and returns resource", :aggregate_failures do
+        before do
           default_request scopes: scopes, user_id: authorized_user.id
           organization.save!
-          params = incomplete_params.merge(id: organization.id)
-          put :update, params
+        end
+
+        after do
           expect(response).to have_http_status(:ok)
           expect(json_response["organizations"].length).to eq(1)
+        end
+
+        it "successfully updates with incomplete params", :aggregate_failures do
+          params = incomplete_params.merge(id: organization.id)
+          put :update, params
+        end
+
+        it "successfully updates with nested params", :aggregate_failures do
+          params = incomplete_params.merge(id: organization.id)
+          params[:organizations][:urls] = [
+            {label: "Blog", url: "http://blogo.com/example"},
+            {label: "Slog", url: "http://whattasite.net"},
+            {label: "Krog", url: "http://potatosalad.yum"}
+          ]
+          put :update, params
         end
       end
     end
