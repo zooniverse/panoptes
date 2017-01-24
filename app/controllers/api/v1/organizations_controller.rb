@@ -7,7 +7,6 @@ class Api::V1::OrganizationsController < Api::ApiController
   require_authentication :update, :create, :destroy, scopes: [:organization]
 
   resource_actions :show, :index, :create, :update, :deactivate
-  schema_type :json_schema
 
   prepend_before_action :require_login,
     only: [:create, :update, :destroy]
@@ -34,7 +33,8 @@ class Api::V1::OrganizationsController < Api::ApiController
   def update
     Organization.transaction do
       Array.wrap(resource_ids).zip(Array.wrap(params[:organizations])).map do |organization_id, organization_params|
-        Organizations::Update.with(api_user: api_user, id: organization_id).run!(organization_params)
+        wrapper = { organization_params: organization_params }
+        Organizations::Update.with(api_user: api_user, id: organization_id).run!(wrapper)
       end
     end
 
