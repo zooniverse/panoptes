@@ -6,7 +6,7 @@ class OrganizationSerializer
   attributes :id, :name, :display_name, :description, :introduction, :title, :href, :primary_language
   optional :avatar_src
   media_include :avatar, :background
-  can_include :organization_contents, :projects
+  can_include :organization_contents, :organization_roles, :projects
 
   def title
     content[:title]
