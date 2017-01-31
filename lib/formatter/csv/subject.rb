@@ -17,8 +17,8 @@ module Formatter
       def to_rows
         rows = []
 
-        workflow_ids = @project_workflow_ids.present? ? @project_workflow_ids : [nil]
-        subject_set_ids = subject.subject_set_ids.present? ? subject.subject_set_ids : [nil]
+        workflow_ids = @project_workflow_ids.present? ? @project_workflow_ids.sort : [nil]
+        subject_set_ids = subject.subject_set_ids.present? ? subject.subject_set_ids.sort : [nil]
 
         workflow_ids.each do |workflow_id|
           subject_set_ids.each do |subject_set_id|
