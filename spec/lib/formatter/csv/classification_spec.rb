@@ -3,13 +3,12 @@ require 'spec_helper'
 RSpec.describe Formatter::Csv::Classification do
   let(:project_headers) do
     %w( classification_id user_name user_id user_ip workflow_id workflow_name workflow_version
-        created_at gold_standard expert metadata annotations subject_data subject_ids )
+        created_at gold_standard expert metadata annotations subject_ids )
   end
   let(:subject) { build_stubbed(:subject) }
   let(:subject_data) do
     { "#{subject.id}" => {retired: false}.merge(subject.metadata) }
   end
-  let(:subject_json_data) { subject_data.to_json }
   let(:subject_ids) { subject.id.to_s }
   let(:secure_user_ip) { SecureRandom.hex(10) }
   let(:cache) do
@@ -35,7 +34,6 @@ RSpec.describe Formatter::Csv::Classification do
       classification.expert_classifier,
       classification.metadata.to_json,
       classification.annotations.map {|ann| Formatter::Csv::AnnotationForCsv.new(classification, ann, cache).to_h }.to_json,
-      subject_json_data,
       subject_ids
     ]
   end
@@ -59,14 +57,6 @@ RSpec.describe Formatter::Csv::Classification do
 
     it 'return an array formatted classifcation data' do
       expect(formatter.to_array(classification)).to match_array(formatted_data)
-    end
-
-    context "when the subject has been retired for that workflow" do
-      it 'return an array formatted classifcation data' do
-        allow(cache).to receive(:retired?).with(subject.id, workflow.id).and_return(true)
-        subject_data.deep_merge!("#{subject.id}" => { retired: true })
-        expect(formatter.to_array(classification)).to match_array(formatted_data)
-      end
     end
 
     context "when the classifier is logged out" do

@@ -8,7 +8,7 @@ module Formatter
 
       def self.headers
         %w(classification_id user_name user_id user_ip workflow_id workflow_name workflow_version
-           created_at gold_standard expert metadata annotations subject_data subject_ids)
+           created_at gold_standard expert metadata annotations subject_ids)
       end
 
       def initialize(cache)
@@ -39,15 +39,6 @@ module Formatter
 
       def user_ip
         cache.secure_user_ip(classification.user_ip.to_s)
-      end
-
-      def subject_data
-        {}.tap do |subjects_and_metadata|
-          classification_subject_ids.map {|id| cache.subject(id) }.each do |subject|
-            retired_data = { retired: cache.retired?(subject.id, workflow.id) }
-            subjects_and_metadata[subject.id] = retired_data.reverse_merge!(subject.metadata)
-          end
-        end.to_json
       end
 
       def subject_ids
