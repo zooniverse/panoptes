@@ -17,40 +17,49 @@ RSpec.describe Formatter::Csv::Subject do
     end
   end
 
-  let(:header) do
-    %w(subject_id project_id workflow_ids subject_set_ids metadata locations classifications_by_workflow retired_in_workflow)
-  end
-
-  describe "::project_headers" do
-    it 'should contain the required headers' do
-      expect(described_class.headers).to match_array(header)
-    end
-  end
-
-  describe "#to_array" do
+  describe "#to_rows" do
     let(:sms) { create(:set_member_subject, subject_set: subject_set, subject: subject) }
+    let(:retirement_date) { DateTime.now }
+
     before do
       sms
       create(:subject_workflow_status, classifications_count: 10, workflow: workflow,
-        subject: subject, retired_at: DateTime.now)
+        subject: subject, retired_at: retirement_date)
       create(:subject_workflow_status, classifications_count: 5, workflow: workflow_two,
         subject: subject)
     end
 
-    let(:fields) do
-      [subject.id,
-       project.id,
-       [workflow.id, workflow_two.id].to_json,
-       subject_set_ids.to_json,
-       subject.metadata.to_json,
-       ordered_subject_locations.to_json,
-       {workflow.id => 10, workflow_two.id => 5}.to_json,
-       [workflow.id].to_json]
+    let(:expected) do
+      [
+        {
+          subject_id: subject.id,
+          project_id: project.id,
+          workflow_id: workflow.id,
+          subject_set_id: subject_set.id,
+          metadata: subject.metadata.to_json,
+          locations: ordered_subject_locations.to_json,
+          classifications_count: 10,
+          retired_at: retirement_date,
+          retirement_reason: nil
+        }.with_indifferent_access,
+        {
+          subject_id: subject.id,
+          project_id: project.id,
+          workflow_id: workflow_two.id,
+          subject_set_id: subject_set.id,
+          metadata: subject.metadata.to_json,
+          locations: ordered_subject_locations.to_json,
+          classifications_count: 5,
+          retired_at: nil,
+          retirement_reason: nil
+        }.with_indifferent_access
+      ]
     end
-    let(:result) { described_class.new(project, subject).to_array }
+
+    let(:result) { described_class.new(project, subject).to_rows }
 
     it "should match the expected output" do
-      expect(result).to match_array(fields)
+      expect(result).to match_array(expected)
     end
 
     context "with an old unlinked subject" do
@@ -59,18 +68,17 @@ RSpec.describe Formatter::Csv::Subject do
       it "should match the expected output" do
         sms.destroy
         subject.reload
-        expect(result).to match_array(fields)
+        expect(result).to match_array(expected.map { |row| row.merge(subject_set_id: nil) })
       end
     end
 
     context "with a subject that has no location metadata" do
-
       it "should match the db ordered subject_locations array" do
         allow_any_instance_of(Medium::ActiveRecord_Associations_CollectionProxy)
           .to receive(:loaded?)
           .and_return(true)
         allow_any_instance_of(Medium).to receive(:metadata).and_return(nil)
-        expect(result).to match_array(fields)
+        expect(result).to match_array(expected)
       end
     end
   end
