@@ -958,7 +958,7 @@ describe User, type: :model do
   end
 
   describe '#anonymize' do
-    let(:user) { create(:user, current_sign_in_ip: '1.2.3.4', last_sign_in_ip: '1.2.3.5', tsv: 'foo') }
+    let(:user) { create(:user, current_sign_in_ip: '1.2.3.4', last_sign_in_ip: '1.2.3.5', tsv: 'foo', private_profile: false) }
     subject(:changes) { user.anonymize.changes }
 
     it { is_expected.to include(:email) }
@@ -971,6 +971,8 @@ describe User, type: :model do
     it { is_expected.to include(:global_email_communication) }
     it { is_expected.to include(:project_email_communication) }
     it { is_expected.to include(:beta_email_communication) }
+    it { is_expected.to include(:valid_email) }
+    it { is_expected.to include(:private_profile) }
     it { is_expected.to include(:api_key) }
     it { is_expected.to include(:tsv) }
   end
