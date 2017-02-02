@@ -1,5 +1,6 @@
 class OrganizationRoleSerializer
   include ACLSerializer
+  include OwnerLinkSerializer
 
   attributes :id, :roles, :href
   can_include :user_group, :resource

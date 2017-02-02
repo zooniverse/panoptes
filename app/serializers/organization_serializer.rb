@@ -1,5 +1,6 @@
 class OrganizationSerializer
   include RestPack::Serializer
+  include OwnerLinkSerializer
   include ContentSerializer
   include MediaLinksSerializer
 
