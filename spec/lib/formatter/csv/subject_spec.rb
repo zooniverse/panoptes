@@ -19,7 +19,7 @@ RSpec.describe Formatter::Csv::Subject do
 
   describe "#to_rows" do
     let(:sms) { create(:set_member_subject, subject_set: subject_set, subject: subject) }
-    let(:retirement_date) { DateTime.now }
+    let(:retirement_date) { Time.zone.now.change(usec: 0) }
 
     before do
       sms
