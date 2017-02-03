@@ -10,8 +10,6 @@ class ResetProjectCountersWorker
       }),
     unique: :until_executing
 
-
-
   def perform(project_id, rate_limit=true)
     project = Project.find(project_id)
     project.workflows.each do |workflow|
