@@ -7,7 +7,10 @@ class ResetProjectCountersWorker
         reject_with: :reschedule,
         key: ->(project_id) { "project_id_#{ project_id }_count_worker" },
         enabled: ->(project_id, rate_limit=true) { rate_limit }
-      })
+      }),
+    unique: :until_executing
+
+
 
   def perform(project_id, rate_limit=true)
     project = Project.find(project_id)
