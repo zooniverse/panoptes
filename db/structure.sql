@@ -637,7 +637,6 @@ ALTER SEQUENCE organization_contents_id_seq OWNED BY organization_contents.id;
 
 CREATE TABLE organizations (
     id integer NOT NULL,
-    name character varying,
     display_name character varying,
     slug character varying DEFAULT ''::character varying,
     primary_language character varying NOT NULL,
@@ -2534,10 +2533,31 @@ CREATE INDEX index_recents_on_classification_id ON recents USING btree (classifi
 
 
 --
+-- Name: index_recents_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recents_on_project_id ON recents USING btree (project_id);
+
+
+--
 -- Name: index_recents_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_recents_on_subject_id ON recents USING btree (subject_id);
+
+
+--
+-- Name: index_recents_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recents_on_user_id ON recents USING btree (user_id);
+
+
+--
+-- Name: index_recents_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recents_on_workflow_id ON recents USING btree (workflow_id);
 
 
 --
@@ -3705,4 +3725,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170112163747');
 INSERT INTO schema_migrations (version) VALUES ('20170113113532');
 
 INSERT INTO schema_migrations (version) VALUES ('20170116134142');
+
+INSERT INTO schema_migrations (version) VALUES ('20170202200131');
 
