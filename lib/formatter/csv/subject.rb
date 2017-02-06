@@ -4,8 +4,8 @@ module Formatter
       attr_reader :subject, :project, :project_workflow_ids
 
       def self.headers
-        %w(subject_id project_id workflow_ids subject_set_ids metadata locations
-           classifications_by_workflow retired_in_workflow)
+        %w(subject_id project_id workflow_id subject_set_id metadata locations
+           classifications_count retired_at retirement_reason)
       end
 
       def initialize(project, subject)
@@ -14,10 +14,29 @@ module Formatter
         @subject = subject
       end
 
-      def to_array
-        self.class.headers.map do |header|
-          send(header)
+      def to_rows
+        rows = []
+
+        workflow_ids = @project_workflow_ids.present? ? @project_workflow_ids.sort : [nil]
+        subject_set_ids = subject.subject_set_ids.present? ? subject.subject_set_ids.sort : [nil]
+
+        workflow_ids.each do |workflow_id|
+          subject_set_ids.each do |subject_set_id|
+            rows << HashWithIndifferentAccess.new(
+              subject_id: subject_id,
+              project_id: project_id,
+              workflow_id: workflow_id,
+              subject_set_id: subject_set_id,
+              metadata: metadata,
+              locations: locations,
+              classifications_count: classifications_count(workflow_id),
+              retired_at: retired_at(workflow_id),
+              retirement_reason: retirement_reason(workflow_id)
+            )
+          end
         end
+
+        rows
       end
 
       private
@@ -46,29 +65,30 @@ module Formatter
         end.to_json
       end
 
-      def retired_in_workflow
-        retired = subject_workflow_statuses.select do |sws|
-          sws.retired?
-        end
-        retired.map(&:workflow_id).to_json
+      def retired_at(workflow_id)
+        subject_workflow_status = subject_workflow_statuses[workflow_id]
+        subject_workflow_status&.retired_at
+      end
+
+      def retirement_reason(workflow_id)
+        subject_workflow_status = subject_workflow_statuses[workflow_id]
+        subject_workflow_status&.retirement_reason
       end
 
       def metadata
         subject.metadata.to_json
       end
 
-      def classifications_by_workflow
-        workflow_counts = subject_workflow_statuses.map do |sws|
-          count = (sws.classifications_count || 0)
-          {sws.workflow_id => count}
-        end
-        workflow_counts.reduce(&:merge).to_json
+      def classifications_count(workflow_id)
+        subject_workflow_status = subject_workflow_statuses[workflow_id]
+        subject_workflow_status&.classifications_count || 0
       end
 
       def subject_workflow_statuses
         @swses ||= SubjectWorkflowStatus.by_subject(subject.id)
           .where(workflow_id: project_workflow_ids)
           .to_a
+          .index_by(&:workflow_id)
       end
     end
   end

@@ -9,11 +9,6 @@ class OrganizationUpdateSchema < JsonSchema
       description "Human readable name for a project ie Galaxy Zoo"
     end
 
-    property "name" do
-      type "string"
-      description "URL string for a project downcased and underscored ie galaxy_zoo"
-    end
-
     property "primary_language" do
       type "string"
       description "Two character ISO 639 language code, optionally include two character ISO 3166-1 alpha-2 country code seperated by a hyphen for specific locale. ie 'en', 'zh-tw', 'es_MX'"

@@ -3,7 +3,7 @@ class OrganizationSerializer
   include ContentSerializer
   include MediaLinksSerializer
 
-  attributes :id, :name, :display_name, :description, :introduction, :title, :href, :primary_language
+  attributes :id, :display_name, :description, :introduction, :title, :href, :primary_language
   optional :avatar_src
   media_include :avatar, :background
   can_include :organization_contents, :organization_roles, :projects

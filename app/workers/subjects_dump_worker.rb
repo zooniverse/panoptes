@@ -10,9 +10,14 @@ class SubjectsDumpWorker
 
   def perform_dump
     CSV.open(csv_file_path, 'wb') do |csv|
-      csv << Formatter::Csv::Subject.headers
+      headers = Formatter::Csv::Subject.headers
+
+      csv << headers
+
       project_subjects.find_each do |subject|
-        csv << Formatter::Csv::Subject.new(resource, subject).to_array
+        Formatter::Csv::Subject.new(resource, subject).to_rows.each do |hash|
+          csv << hash.values_at(*headers)
+        end
       end
     end
   end
