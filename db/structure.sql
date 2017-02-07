@@ -2549,7 +2549,7 @@ CREATE INDEX index_recents_on_classification_id ON recents USING btree (classifi
 
 --
 -- Name: index_recents_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
-tru-
+--
 
 CREATE INDEX index_recents_on_project_id ON recents USING btree (project_id);
 
