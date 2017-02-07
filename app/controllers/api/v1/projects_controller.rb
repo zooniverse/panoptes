@@ -1,5 +1,6 @@
 class Api::V1::ProjectsController < Api::ApiController
   include FilterByOwner
+  include FilterByEditor
   include FilterByCurrentUserRoles
   include TranslatableResource
   include IndexSearch

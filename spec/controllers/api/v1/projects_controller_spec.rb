@@ -173,6 +173,7 @@ describe Api::V1::ProjectsController, type: :controller do
           let(:authorized_user) { owner }
 
           it_behaves_like "filters by owner"
+          it_behaves_like "filters by editor"
           it_behaves_like "filters by current user roles"
 
           context "with the index request before" do

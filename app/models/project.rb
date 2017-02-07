@@ -1,6 +1,7 @@
 class Project < ActiveRecord::Base
   include RoleControl::Owned
   include RoleControl::Controlled
+  include RoleControl::Editors
   include Activatable
   include Linkable
   include Translatable
