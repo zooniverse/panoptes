@@ -1484,7 +1484,7 @@ CREATE TABLE workflows (
     current_version_number character varying,
     activated_state integer DEFAULT 0 NOT NULL,
     subject_selection_strategy integer DEFAULT 0,
-    nero_config jsonb
+    nero_config jsonb DEFAULT '{}'::jsonb
 );
 
 
