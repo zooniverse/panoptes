@@ -14,8 +14,8 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:api_resource_attributes) do
     %w(id display_name tasks classifications_count subjects_count
     created_at updated_at first_task primary_language content_language
-    version grouped prioritized pairwise retirement aggregation active
-    configuration finished_at public_gold_standard)
+    version grouped prioritized pairwise retirement aggregation nero_config
+    active configuration finished_at public_gold_standard)
   end
   let(:api_resource_links)do
     %w(workflows.project workflows.subject_sets workflows.tutorial_subject
@@ -90,32 +90,37 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:resource_id) { :workflow_id }
     let(:update_params) do
       {
-       workflows: {
-                   display_name: "A Better Name",
-                   active: false,
-                   retirement: { criteria: "classification_count" },
-                   aggregation: { },
-                   configuration: { },
-                   public_gold_standard: true,
-                   tasks: {
-                           interest: {
-                                      type: "draw",
-                                      question: "Draw a Circle",
-                                      next: "shape",
-                                      tools: [
-                                              {value: "red", label: "Red", type: 'point', color: 'red'},
-                                              {value: "green", label: "Green", type: 'point', color: 'lime'},
-                                              {value: "blue", label: "Blue", type: 'point', color: 'blue'},
-                                             ]
-                                     }
-                          },
-                   display_order_position: 1,
-                   links: {
-                           subject_sets: [subject_set.id.to_s],
-                           tutorials: [tutorial.id.to_s]
-                          }
+        workflows: {
+          display_name: "A Better Name",
+          active: false,
+          retirement: {criteria: "classification_count"},
+          aggregation: {},
+          nero_config: {
+            extractors: {surv: {type: 'survey'}},
+            reducers: {custom: {type: 'external', url: 'https://example.org/reduce'}},
+            rules: [{if: ["const", true], then: [{action: 'retire_subject'}]}]
+          },
+          configuration: {},
+          public_gold_standard: true,
+          tasks: {
+            interest: {
+             type: "draw",
+             question: "Draw a Circle",
+             next: "shape",
+             tools: [
+               {value: "red", label: "Red", type: 'point', color: 'red'},
+               {value: "green", label: "Green", type: 'point', color: 'lime'},
+               {value: "blue", label: "Blue", type: 'point', color: 'blue'}
+             ]
+           }
+           },
+           display_order_position: 1,
+           links: {
+            subject_sets: [subject_set.id.to_s],
+            tutorials: [tutorial.id.to_s]
+          }
 
-                  }
+        }
       }
     end
 
@@ -145,17 +150,17 @@ describe Api::V1::WorkflowsController, type: :controller do
       context "when the update requests tasks to change" do
         let(:update_params) do
           {
-           tasks: {
-                   wintrest: {
-                              type: "draw",
-                              question: "Draw a Circle",
-                              next: "shape",
-                              tools: [
-                                      {value: "red", label: "Red", type: 'point', color: 'red'},
-                                      {value: "green", label: "Green", type: 'point', color: 'lime'},
-                                     ]
-                             }
-                  }
+            tasks: {
+              wintrest: {
+                type: "draw",
+                question: "Draw a Circle",
+                next: "shape",
+                tools: [
+                  {value: "red", label: "Red", type: 'point', color: 'red'},
+                  {value: "green", label: "Green", type: 'point', color: 'lime'}
+                ]
+              }
+            }
           }
         end
 
@@ -415,44 +420,50 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:create_task_params) do
       {
         interest: {
-                   type: "draw",
-                   question: "Draw a Circle",
-                   next: "shape",
-                   tools: [
-                           {value: "red", label: "Red", type: 'point', color: 'red'},
-                           {value: "green", label: "Green", type: 'point', color: 'lime'},
-                           {value: "blue", label: "Blue", type: 'point', color: 'blue'},
-                          ]
-                  },
+          type: "draw",
+          question: "Draw a Circle",
+          next: "shape",
+          tools: [
+            {value: "red", label: "Red", type: 'point', color: 'red'},
+            {value: "green", label: "Green", type: 'point', color: 'lime'},
+            {value: "blue", label: "Blue", type: 'point', color: 'blue'}
+          ]
+        },
         shape: {
-                type: 'multiple',
-                question: "What shape is this galaxy?",
-                answers: [
-                          {value: 'smooth', label: "Smooth"},
-                          {value: 'features', label: "Features"},
-                          {value: 'other', label: 'Star or artifact'}
-                         ],
-                next: nil
-               }
-       }
+          type: 'multiple',
+          question: "What shape is this galaxy?",
+          answers: [
+            {value: 'smooth', label: "Smooth"},
+            {value: 'features', label: "Features"},
+            {value: 'other', label: 'Star or artifact'}
+          ],
+          next: nil
+        }
+      }
     end
+
     let(:create_params) do
       {
-         workflows: {
-                     display_name: 'Test workflow',
-                     first_task: 'interest',
-                     active: true,
-                     retirement: { criteria: "classification_count" },
-                     aggregation: { public: true },
-                     configuration: { autoplay_subjects: true },
-                     public_gold_standard: true,
-                     tasks: create_task_params,
-                     grouped: true,
-                     prioritized: true,
-                     primary_language: 'en',
-                     display_order_position: 1,
-                     links: { project: project.id.to_s }
-                    }
+        workflows: {
+          display_name: 'Test workflow',
+          first_task: 'interest',
+          active: true,
+          retirement: {criteria: "classification_count"},
+          aggregation: {public: true},
+          nero_config: {
+            extractors: {surv: {type: 'survey'}},
+            reducers: {custom: {type: 'external', url: 'https://example.org/reduce'}},
+            rules: [{if: ["const", true], then: [{action: 'retire_subject'}]}]
+          },
+          configuration: {autoplay_subjects: true},
+          public_gold_standard: true,
+          tasks: create_task_params,
+          grouped: true,
+          prioritized: true,
+          primary_language: 'en',
+          display_order_position: 1,
+          links: {project: project.id.to_s}
+        }
       }
     end
 
