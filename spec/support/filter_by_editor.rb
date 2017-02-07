@@ -7,6 +7,13 @@ RSpec.shared_examples "filters by editor" do
       roles: ["collaborator"])
   end
 
+  let(:private_acl) do
+    create(:access_control_list,
+      resource: private_resource,
+      user_group: collaborator.identity_group,
+      roles: ["collaborator"])
+  end
+
   let(:index_options) do
     { editor: collaborator.login }
   end
@@ -23,6 +30,11 @@ RSpec.shared_examples "filters by editor" do
 
   it "should respond with the correct item" do
     expect(collab_resource.editors).to include collaborator.identity_group
+  end
+
+  it "should not include private collections" do
+    expect(json_response[api_resource_name].map { |c| c["id"] })
+      .to_not include private_resource.id.to_s
   end
 
   context "when the editor name has a different case to the identity group" do
