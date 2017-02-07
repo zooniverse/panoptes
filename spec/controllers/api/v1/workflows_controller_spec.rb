@@ -110,7 +110,7 @@ describe Api::V1::WorkflowsController, type: :controller do
              tools: [
                {value: "red", label: "Red", type: 'point', color: 'red'},
                {value: "green", label: "Green", type: 'point', color: 'lime'},
-               {value: "blue", label: "Blue", type: 'point', color: 'blue'},
+               {value: "blue", label: "Blue", type: 'point', color: 'blue'}
              ]
            }
            },
@@ -157,7 +157,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                 next: "shape",
                 tools: [
                   {value: "red", label: "Red", type: 'point', color: 'red'},
-                  {value: "green", label: "Green", type: 'point', color: 'lime'},
+                  {value: "green", label: "Green", type: 'point', color: 'lime'}
                 ]
               }
             }
@@ -426,7 +426,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           tools: [
             {value: "red", label: "Red", type: 'point', color: 'red'},
             {value: "green", label: "Green", type: 'point', color: 'lime'},
-            {value: "blue", label: "Blue", type: 'point', color: 'blue'},
+            {value: "blue", label: "Blue", type: 'point', color: 'blue'}
           ]
         },
         shape: {
