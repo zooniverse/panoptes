@@ -22,8 +22,6 @@ RSpec.shared_examples "filters by editor" do
   end
 
   it "should respond with the correct item" do
-    # owner_id = json_response[api_resource_name][0]['links']['owner']['id']
-    # expect(owner_id).to eq(resource.owner.id.to_s)
     expect(collab_resource.editors).to include collaborator.identity_group
   end
 
@@ -38,8 +36,6 @@ RSpec.shared_examples "filters by editor" do
     end
 
     it "should respond with the correct item" do
-      # owner_id = json_response[api_resource_name][0]['links']['owner']['id']
-      # expect(owner_id).to eq(resource.owner.id.to_s)
       expect(collab_resource.editors).to include collaborator.identity_group
     end
   end
