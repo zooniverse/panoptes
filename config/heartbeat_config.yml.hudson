@@ -1,9 +1,0 @@
-default: &default
-  window_period: 600
-  emails: test@test.com
-
-test:
-  <<: *default
-
-development:
-  <<: *default
