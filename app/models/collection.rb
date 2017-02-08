@@ -19,8 +19,8 @@ class Collection < ActiveRecord::Base
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
-  can_by_role :destroy, :update, :update_links, :destroy_links,
-              roles: [ :owner, :collaborator ]
+  can_by_role :destroy, :update, :destroy_links, roles: [ :owner, :collaborator ]
+  can_by_role :update_links, roles: [ :owner, :collaborator, :contributor ]
   can_by_role :index, :show, public: true, roles: [ :owner, :collaborator, :viewer ]
 
   can_be_linked :access_control_list, :scope_for, :update, :user

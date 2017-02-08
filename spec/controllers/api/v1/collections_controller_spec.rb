@@ -190,4 +190,43 @@ describe Api::V1::CollectionsController, type: :controller do
 
     it_behaves_like "is destructable"
   end
+
+  describe "user role permissions" do
+    let(:empty_collection) { create(:collection) }
+    let(:contributor) { create(:user) }
+    let(:subjects) { create_list(:subject, 4) }
+    let(:subjects_list) { subjects.map { |s| s.id.to_s } }
+    let(:params) do
+      {
+        link_relation: "subjects",
+        "subjects" => subjects_list,
+        "collection_id" => empty_collection.id
+
+      }
+    end
+    before(:each) do
+      default_request scopes: scopes, user_id: contributor.id
+    end
+
+    context "user is a contributor" do
+      let!(:acl) do
+        create(:access_control_list,
+               user_group: contributor.identity_group,
+               resource: empty_collection,
+               roles: ["contributor"])
+      end
+
+      it "successfully updates links" do
+        post :update_links, params
+        expect(json_response["collections"][0]["links"]["subjects"]).to match_array(subjects_list)
+      end
+    end
+
+    context "user is unauthorized" do
+      it "does not update links" do
+        post :update_links, params
+        expect(response.status).to be(404)
+      end
+    end
+  end
 end
