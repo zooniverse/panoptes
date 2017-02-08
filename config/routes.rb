@@ -40,7 +40,7 @@ Rails.application.routes.draw do
   end
 
   namespace :api do
-    api_version(module: "V1", header: {name: "Accept", value: "application/vnd.api+json; version=1"}) do
+    api_version(module: "v1", header: {name: "Accept", value: "application/vnd.api+json; version=1"}) do
       get "/me", to: 'users#me', format: false
       json_api_resources :aggregations
 

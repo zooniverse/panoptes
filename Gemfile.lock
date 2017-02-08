@@ -184,7 +184,7 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     hashie (3.4.3)
     hitimes (1.2.4)
-    honeybadger (2.5.1)
+    honeybadger (2.7.2)
     http (0.9.8)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
@@ -280,7 +280,7 @@ GEM
       activerecord (>= 3.1)
       activesupport (>= 3.1)
       arel
-    postgres_ext (2.4.1)
+    postgres_ext (3.0.0)
       activerecord (>= 4.0.0)
       arel (>= 4.0.1)
       pg_array_parser (~> 0.0.9)
@@ -490,7 +490,7 @@ DEPENDENCIES
   paper_trail (~> 5.2)
   pg (~> 0.18)
   pg_search
-  postgres_ext (~> 2.4.0)
+  postgres_ext (~> 3.0.0)
   pry-byebug
   pry-rails
   pry-stack_explorer
