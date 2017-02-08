@@ -1,5 +1,6 @@
 require "tasks_visitors/inject_strings"
 require 'model_version'
+require 'panoptes/restpack_serializer'
 
 class WorkflowPrpSerializer
   include Panoptes::RestpackSerializer
