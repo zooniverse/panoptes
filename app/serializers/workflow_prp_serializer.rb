@@ -1,20 +1,17 @@
 require "tasks_visitors/inject_strings"
 require 'model_version'
 
-class WorkflowSerializer
-  include RestPack::Serializer
+class WorkflowPrpSerializer
+  include Panoptes::RestpackSerializer
   include FilterHasMany
   include MediaLinksSerializer
   include CachedSerializer
-
-  # :workflow_contents, Note: re-add when the eager_load from translatable_resources is removed
-  PRELOADS = %i(subject_sets attached_images).freeze
 
   attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
              :created_at, :updated_at, :finished_at, :first_task, :primary_language,
              :version, :content_language, :prioritized, :grouped, :pairwise,
              :retirement, :retired_set_member_subjects_count, :href, :active,
-             :aggregation, :nero_config, :configuration, :public_gold_standard, :completeness
+             :aggregation, :configuration, :public_gold_standard, :completeness
 
   can_include :project, :subject_sets, :tutorial_subject
 
@@ -22,12 +19,11 @@ class WorkflowSerializer
 
   can_filter_by :active
 
-  def self.page(params = {}, scope = nil, context = {})
-    if Panoptes.flipper["eager_load_workflows"].enabled?
-      scope = scope.preload(*PRELOADS)
-    end
+  # :workflow_contents, Note: re-add when the eager_load from translatable_resources is removed
+  preload :subject_sets, :attached_images
 
-    super(params, scope, context)
+  def self.model_class
+    Workflow
   end
 
   def version

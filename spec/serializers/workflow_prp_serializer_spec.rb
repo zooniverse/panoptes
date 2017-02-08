@@ -1,33 +1,25 @@
 require 'spec_helper'
 
-describe WorkflowSerializer do
+describe WorkflowPrpSerializer do
   let(:workflow) { create(:workflow_with_contents) }
   let(:content) { workflow.workflow_contents.first }
   let(:serializer) do
-    serializer = WorkflowSerializer.new
+    serializer = WorkflowPrpSerializer.new
     serializer.instance_variable_set(:@model, workflow)
     serializer.instance_variable_set(:@context,
                                      {languages: ['en']})
     serializer
   end
 
+  it_should_behave_like "a panoptes restpack serializer" do
+    let(:resource) { workflow }
+    let(:includes) { "project,tutorial_subject" }
+    let(:preloads) { [ :project, :tutorial_subject ] }
+  end
+
   it "should have the set of preloads wired up" do
     preloads = %i(subject_sets attached_images)
-    expect(WorkflowSerializer::PRELOADS).to match_array(preloads)
-  end
-
-  it "should not preload the serialized associations by default" do
-    expect_any_instance_of(Workflow::ActiveRecord_Relation).not_to receive(:preload)
-    WorkflowSerializer.page({}, Workflow.all, {})
-  end
-
-  it "should preload the serialized associations if enabled" do
-    Panoptes.flipper["eager_load_workflows"].enable
-    expect_any_instance_of(Workflow::ActiveRecord_Relation)
-      .to receive(:preload)
-      .with(*WorkflowSerializer::PRELOADS)
-      .and_call_original
-    WorkflowSerializer.page({}, Workflow.all, {})
+    expect(WorkflowPrpSerializer.preloads).to match_array(preloads)
   end
 
   describe "#tasks" do
