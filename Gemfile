@@ -1,17 +1,17 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.5'
+gem 'rails', '~> 5.0.1'
 gem 'postgres_ext', '~> 2.4.0'
 gem 'active_record_union', '~> 1.1.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'doorkeeper', '~> 3.0'
 gem 'doorkeeper-jwt', '~> 0.1.6'
-gem 'devise', '~> 3.0'
+gem 'devise', '~> 4.0'
 gem 'versionist', '~> 1.0'
 gem 'rack-cors', '~> 0.3', require: 'rack/cors'
-gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev" # REST API
+gem 'restpack_serializer', github: "zooniverse/restpack_serializer", branch: "rails5" # REST API
 gem 'active_model_serializers', '0.10.0.rc2' # Event stream
-gem 'paper_trail', '~> 3.0'
+gem 'paper_trail', '~> 5.2'
 # Needed because version 1.1.0 locks JWT at an older version than doorkeeper-jwt requires.
 # Not a lot of commits between 1.1.0 and this ref. Remove this once the next version is released.
 gem 'oauth2', github: 'intridea/oauth2', ref: 'e0006cb5099bf392f011eb5c49cbec4f893bbdba'
@@ -26,7 +26,7 @@ gem 'honeybadger', '~> 2.0'
 gem 'jquery-rails', '~> 4.0'
 gem 'uglifier', '~> 2.0'
 gem 'sidekiq', '~> 4.0'
-gem 'sinatra', '>= 1.3.0', require: nil
+gem 'sinatra', '2.0.0.beta2', require: nil
 gem 'aws-sdk-v1', '~> 1.0'
 gem 'json-schema', '~> 2.0'
 gem 'p3p', '~> 1.0'
@@ -35,7 +35,7 @@ gem 'faraday', '~> 0.9'
 gem 'faraday_middleware', '~> 0.9'
 gem 'faraday-http-cache', '~> 1.0'
 gem 'activerecord-import', '~> 0.8'
-gem 'schema_plus_pg_indexes', '~> 0.1'
+gem 'schema_plus_pg_indexes', '~> 0.2.1'
 gem 'pg_search'
 gem 'ranked-model', '~> 0.4.0'
 gem 'sidekiq-congestion', '~> 0.1.0'
