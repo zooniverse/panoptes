@@ -13,6 +13,10 @@ RSpec.describe ProjectRequestMailer, type: :mailer do
     expect(mail.to).to include(*emails)
   end
 
+  it 'should send a bcc emails to the designated recipients' do
+    expect(mail.bcc).to include(*Panoptes.project_request.bcc)
+  end
+
   it 'should come from no-reply@zooniverse.org' do
     expect(mail.from).to include('no-reply@zooniverse.org')
   end
