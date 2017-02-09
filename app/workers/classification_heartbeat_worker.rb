@@ -7,7 +7,7 @@ class ClassificationHeartbeatWorker
   recurrence { hourly.minute_of_hour(0, 15, 30, 45) }
 
   def perform
-    if missing_classifications?
+    if heartbeat_check? && missing_classifications?
       ClassificationHeartbeatMailer.missing_classifications(emails, window_period).deliver
       Honeybadger.notify(
         error_class:   "Classification data error",
@@ -29,5 +29,9 @@ class ClassificationHeartbeatWorker
 
   def emails
     Panoptes::ClassificationHeartbeat.emails
+  end
+
+  def heartbeat_check?
+    Rails.env.production?
   end
 end
