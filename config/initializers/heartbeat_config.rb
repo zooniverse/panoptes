@@ -1,7 +1,7 @@
 module Panoptes
   module ClassificationHeartbeat
     def self.window_period
-      @lifecycled_live_window ||= ENV.fetch("HEARTBEAT_WINDOW_PERIOD", 15).to_i
+      @lifecycled_live_window ||= ENV.fetch("HEARTBEAT_WINDOW_PERIOD", 600).to_i
     end
 
     def self.emails
