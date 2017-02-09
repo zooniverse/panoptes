@@ -107,9 +107,25 @@ namespace :migrate do
       end
     end
 
+    desc "Remove all recents that have no traceable user in the classification"
+    task remove_no_user_recents: :environment do
+      no_user_recents = Recent.where(user_id: nil)
+        .joins(:classification)
+        .where(classifications: { user_id: nil })
+        .select(:id)
+
+      no_user_recents.find_in_batches.with_index do |batch, batch_index|
+        puts "Processing relation ##{batch_index}"
+        Recent.where(id: batch.map(&:id)).delete_all
+      end
+    end
+
     desc "Backfill belongs_to relations from classifications"
     task backfill_belongs_to_relations: :environment do
-      scope = Recent.preload(:classification, :subject)
+      scope = Recent.where(user_id: nil)
+        .includes(:classification)
+        .where.not(classifications: { user_id: nil })
+        .preload(:subject)
       total = scope.count
       scope.find_each.with_index do |recent, i|
         # some recents are for non-logged in classifications

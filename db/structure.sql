@@ -3156,11 +3156,27 @@ ALTER TABLE ONLY user_collection_preferences
 
 
 --
+-- Name: fk_rails_6c609bbfd1; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recents
+    ADD CONSTRAINT fk_rails_6c609bbfd1 FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
 -- Name: fk_rails_732cb83ab7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY oauth_access_tokens
     ADD CONSTRAINT fk_rails_732cb83ab7 FOREIGN KEY (application_id) REFERENCES oauth_applications(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_7504acfc82; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recents
+    ADD CONSTRAINT fk_rails_7504acfc82 FOREIGN KEY (workflow_id) REFERENCES workflows(id);
 
 
 --
@@ -3241,6 +3257,14 @@ ALTER TABLE ONLY memberships
 
 ALTER TABLE ONLY field_guides
     ADD CONSTRAINT fk_rails_a1b35288b8 FOREIGN KEY (project_id) REFERENCES projects(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_ae363bfedc; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recents
+    ADD CONSTRAINT fk_rails_ae363bfedc FOREIGN KEY (project_id) REFERENCES projects(id);
 
 
 --
@@ -3740,6 +3764,8 @@ INSERT INTO schema_migrations (version) VALUES ('20170112163747');
 INSERT INTO schema_migrations (version) VALUES ('20170113113532');
 
 INSERT INTO schema_migrations (version) VALUES ('20170116134142');
+
+INSERT INTO schema_migrations (version) VALUES ('20170118141452');
 
 INSERT INTO schema_migrations (version) VALUES ('20170202200131');
 
