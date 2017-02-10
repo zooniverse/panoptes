@@ -13,7 +13,6 @@ class SubjectWorkflowStatus < ActiveRecord::Base
 
   validates :subject, presence: true, uniqueness: {scope: :workflow_id}
   validates :workflow, presence: true
-  validate :subject_belongs_to_workflow, on: :create
 
   delegate :set_member_subjects, to: :subject
   delegate :project, to: :workflow
@@ -49,15 +48,5 @@ class SubjectWorkflowStatus < ActiveRecord::Base
 
   def set_member_subject_ids
     set_member_subjects.pluck(:id)
-  end
-
-  private
-
-  def subject_belongs_to_workflow
-    return unless subject_id && workflow_id
-
-    unless SetMemberSubject.by_subject_workflow(subject_id, workflow_id).exists?
-      errors.add(:subject, "must be linked to the workflow")
-    end
   end
 end

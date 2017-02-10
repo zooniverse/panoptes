@@ -16,12 +16,11 @@ RSpec.describe SubjectWorkflowStatus, type: :model do
     expect(built_sws).to_not be_valid
   end
 
-  it 'should not be valid with a subject not in the workflow' do
+  it 'should be valid with a subject not linked to the workflow' do
     built_sws = build(:subject_workflow_status)
     subject = create(:subject, :with_subject_sets, num_sets: 1)
     built_sws.subject = subject
-    expect(built_sws).to_not be_valid
-    expect(built_sws.errors[:subject]).to eq(["must be linked to the workflow"])
+    expect(built_sws).to be_valid
   end
 
   context "when re-saving the sws after subject has been unlinked for the workflow" do
