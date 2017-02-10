@@ -2,6 +2,7 @@ class Subject < ActiveRecord::Base
   include RoleControl::ParentalControlled
   include Linkable
   include Activatable
+  include OrderedLocations
 
   has_paper_trail only: [:metadata, :locations]
 
@@ -46,18 +47,6 @@ class Subject < ActiveRecord::Base
       SubjectWorkflowStatus.retired.by_subject_workflow(self.id, workflow.id).present?
     else
       false
-    end
-  end
-
-  def ordered_locations
-    if locations.loaded?
-      if locations.all? { |loc| loc.metadata&.key?("index") }
-        locations.sort_by { |loc| loc.metadata["index"] }
-      else
-        locations
-      end
-    else
-      locations.order("\"media\".\"metadata\"->>'index' ASC")
     end
   end
 end

@@ -1,4 +1,6 @@
 class Recent < ActiveRecord::Base
+  include OrderedLocations
+
   belongs_to :classification
   belongs_to :subject
 

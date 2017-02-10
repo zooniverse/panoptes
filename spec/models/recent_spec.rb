@@ -52,4 +52,11 @@ RSpec.describe Recent, :type => :model do
       }.by (subjects.length)
     end
   end
+
+  describe "ordered_locations" do
+    it_behaves_like "it has ordered locations" do
+      let(:resource) { create(:recent) }
+      let(:klass) { Recent }
+    end
+  end
 end
