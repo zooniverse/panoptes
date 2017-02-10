@@ -6,7 +6,7 @@ class RecentSerializer
   can_sort_by :created_at
 
   def self.page(params = {}, scope = nil, context = {})
-    scope = scope.preload(subject: :locations)
+    scope = scope.preload(:locations)
     super(params, scope, context)
   end
 
@@ -15,7 +15,7 @@ class RecentSerializer
   end
 
   def locations
-    @model.subject.ordered_locations.map do |loc|
+    @model.ordered_locations.map do |loc|
       { loc.content_type => loc.get_url }
     end
   end

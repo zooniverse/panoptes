@@ -8,7 +8,7 @@ describe RecentSerializer do
   it "should preload the serialized associations" do
     expect_any_instance_of(Recent::ActiveRecord_Relation)
       .to receive(:preload)
-      .with(subject: :locations)
+      .with(:locations)
       .and_call_original
     RecentSerializer.page({}, Recent.all, context)
   end
@@ -20,7 +20,7 @@ describe RecentSerializer do
     end
 
     it "should use the subject ordered locations method" do
-      expect_any_instance_of(Subject)
+      expect_any_instance_of(Recent)
         .to receive(:ordered_locations)
         .and_call_original
       result_locs
