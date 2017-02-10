@@ -6,7 +6,8 @@ RSpec.describe Recent, :type => :model do
     let(:recent) { build(:recent, classification: classification) }
 
     it 'should not be valid without a classification' do
-      expect(build(:recent, classification: nil)).to_not be_valid
+      recent.classification = nil
+      expect(recent).to_not be_valid
     end
 
     it 'should not be valid without a subject' do
