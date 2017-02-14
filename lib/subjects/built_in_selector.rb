@@ -20,8 +20,8 @@ module Subjects
       true
     end
 
-    def get_subjects(user_id, group_id, limit)
-      []
+    def get_subjects(user, subject_set_id, limit)
+      Subjects::PostgresqlSelection.new(@workflow, user, {limit: limit, subject_set_id: subject_set_id}).select
     end
 
     def workflow_id

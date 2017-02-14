@@ -129,7 +129,7 @@ RSpec.describe Subjects::StrategySelection do
         it "should use the cellect_ex client" do
           expect_any_instance_of(Subjects::CellectExSelector)
             .to receive(:get_subjects)
-            .with(user.id, subject_set.id, limit)
+            .with(user, subject_set.id, limit)
             .and_return(result_ids)
           run_selection
         end

@@ -82,7 +82,7 @@ module Subjects
     end
 
     def run_cellection
-      cellect_params = [ user.try(:id), subject_set_id, limit ]
+      cellect_params = [user, subject_set_id, limit]
       subject_ids = yield cellect_params
       sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
       sms_scope.pluck("set_member_subjects.id")
