@@ -1,5 +1,3 @@
-require 'subjects/cellect_client'
-
 class SeenCellectWorker
   include Sidekiq::Worker
 
@@ -11,7 +9,7 @@ class SeenCellectWorker
     return if user_id.nil?
     workflow = Workflow.find(workflow_id)
     if Panoptes.use_cellect?(workflow)
-      Subjects::CellectClient.add_seen(workflow.id, user_id, subject_id)
+      CellectClient.add_seen(workflow.id, user_id, subject_id)
     end
   rescue ActiveRecord::RecordNotFound
   end

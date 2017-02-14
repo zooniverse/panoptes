@@ -1,5 +1,3 @@
-require 'subjects/cellect_client'
-
 class RetireCellectWorker
   include Sidekiq::Worker
 
@@ -13,7 +11,7 @@ class RetireCellectWorker
       smses = workflow.set_member_subjects.where(subject_id: subject_id)
       smses.each do |sms|
         params = [ subject_id, workflow_id, sms.subject_set_id ]
-        Subjects::CellectClient.remove_subject(*params)
+        CellectClient.remove_subject(*params)
       end
     end
   rescue ActiveRecord::RecordNotFound

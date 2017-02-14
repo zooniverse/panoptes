@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe Subjects::CellectClient do
+RSpec.describe CellectClient do
   let(:cellect_host) { 'example.com' }
   before(:each) do
     stub_cellect_connection
@@ -21,7 +21,7 @@ RSpec.describe Subjects::CellectClient do
                                                    workflow_id: 1,
                                                    user_id: 2,
                                                    subject_id: 4)
-      Subjects::CellectClient.add_seen(1, 2, 4)
+      CellectClient.add_seen(1, 2, 4)
     end
 
     it 'should try a new host if the first request fails' do
@@ -31,15 +31,15 @@ RSpec.describe Subjects::CellectClient do
                                                    workflow_id: 1,
                                                    user_id: 2,
                                                    subject_id: 4)
-      Subjects::CellectClient.add_seen(1, 2, 4)
+      CellectClient.add_seen(1, 2, 4)
     end
 
     it 'should only retry once' do
       raise_error_for(:add_seen, 2)
       expect do
-        Subjects::CellectClient.add_seen(1, 2, 4)
+        CellectClient.add_seen(1, 2, 4)
       end.to raise_error(
-        Subjects::CellectClient::ConnectionError,
+        CellectClient::ConnectionError,
         "Cellect can't reach the server"
       )
     end
@@ -51,7 +51,7 @@ RSpec.describe Subjects::CellectClient do
                                              .with(host: cellect_host,
                                                    workflow_id: 1,
                                                    user_id: 2)
-      Subjects::CellectClient.load_user(1, 2)
+      CellectClient.load_user(1, 2)
     end
 
     it 'should try a new host if the first request fails' do
@@ -64,7 +64,7 @@ RSpec.describe Subjects::CellectClient do
                                              .with(host: cellect_host,
                                                    workflow_id: 1,
                                                    user_id: 2)
-      Subjects::CellectClient.load_user(1, 2)
+      CellectClient.load_user(1, 2)
     end
 
     it 'should retry four times' do
@@ -72,7 +72,7 @@ RSpec.describe Subjects::CellectClient do
       allow(Cellect::Client.connection).to receive(:load_user) do
         (counter += 1) < 4 ? raise(StandardError) : true
       end
-      Subjects::CellectClient.load_user(1, 2)
+      CellectClient.load_user(1, 2)
       expect(counter).to eq(4)
     end
   end
@@ -83,7 +83,7 @@ RSpec.describe Subjects::CellectClient do
                                              .with(1,
                                                    workflow_id: 2,
                                                    group_id: 4)
-      Subjects::CellectClient.remove_subject(1, 2, 4)
+      CellectClient.remove_subject(1, 2, 4)
     end
 
     it 'should try a new host if the first request fails' do
@@ -95,7 +95,7 @@ RSpec.describe Subjects::CellectClient do
                                              .with(1,
                                                    workflow_id: 2,
                                                    group_id: 4)
-      Subjects::CellectClient.remove_subject(1, 2, 4)
+      CellectClient.remove_subject(1, 2, 4)
     end
   end
 
@@ -107,7 +107,7 @@ RSpec.describe Subjects::CellectClient do
                                                    user_id: 2,
                                                    group_id: nil,
                                                    limit: 4)
-      Subjects::CellectClient.get_subjects(1, 2, nil, 4)
+      CellectClient.get_subjects(1, 2, nil, 4)
     end
 
     it 'should try a new host if the first request fails' do
@@ -121,7 +121,7 @@ RSpec.describe Subjects::CellectClient do
                                                    user_id: 2,
                                                    group_id: nil,
                                                    limit: 4)
-      Subjects::CellectClient.get_subjects(1, 2, nil, 4)
+      CellectClient.get_subjects(1, 2, nil, 4)
     end
 
     #applies to all RequestToHost methods
@@ -132,9 +132,9 @@ RSpec.describe Subjects::CellectClient do
             .to receive(:host)
             .and_raise(error)
           expect do
-            Subjects::CellectClient.get_subjects(1, 2, nil, 4)
+            CellectClient.get_subjects(1, 2, nil, 4)
           end.to raise_error(
-            Subjects::CellectClient::ConnectionError,
+            CellectClient::ConnectionError,
            "Cellect can't find a server host"
           )
         end
@@ -148,9 +148,9 @@ RSpec.describe Subjects::CellectClient do
           .to receive(:host)
           .and_raise(Subjects::CellectSession::NoHostError)
         expect do
-          Subjects::CellectClient.get_subjects(1, 2, nil, 4)
+          CellectClient.get_subjects(1, 2, nil, 4)
         end.to raise_error(
-          Subjects::CellectClient::ConnectionError,
+          CellectClient::ConnectionError,
          "Cellect can't find a server host"
         )
       end
@@ -160,7 +160,7 @@ RSpec.describe Subjects::CellectClient do
   describe "::reload_workflow" do
     it 'should call the method on the cellect client' do
       expect(Cellect::Client.connection).to receive(:reload_workflow).with(1)
-      Subjects::CellectClient.reload_workflow(1)
+      CellectClient.reload_workflow(1)
     end
   end
 end

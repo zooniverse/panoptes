@@ -1,5 +1,3 @@
-require 'subjects/cellect_client'
-
 class ReloadSubjectSelectorWorker
   include Sidekiq::Worker
 
@@ -9,10 +7,7 @@ class ReloadSubjectSelectorWorker
 
   def perform(workflow_id)
     workflow = Workflow.find(workflow_id)
-
-    if Panoptes.use_cellect?(workflow)
-      Subjects::CellectClient.reload_workflow(workflow_id)
-    end
+    workflow.subject_selector.reload_workflow
   rescue ActiveRecord::RecordNotFound
   end
 end

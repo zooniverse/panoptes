@@ -1,4 +1,3 @@
-require 'subjects/cellect_client'
 require 'subjects/postgresql_selection'
 require 'subjects/complete_remover'
 
@@ -43,7 +42,7 @@ module Subjects
 
     def select_sms_ids
       [strategy, strategy_sms_ids]
-    rescue Subjects::CellectClient::ConnectionError, CellectExClient::GenericError
+    rescue CellectClient::ConnectionError, CellectExClient::GenericError
       [:default, default_strategy_sms_ids]
     end
 
@@ -66,11 +65,11 @@ module Subjects
       case strategy
       when :cellect
         run_cellection do |params|
-          Subjects::CellectClient.get_subjects(*params)
+          Subjects::CellectSelector.new(workflow).get_subjects(*params)
         end
       when :cellect_ex
         run_cellection do |params|
-          Subjects::CellectExSelection.get_subjects(*params)
+          Subjects::CellectExSelector.new(workflow).get_subjects(*params)
         end
       else
         default_strategy_sms_ids
@@ -83,7 +82,7 @@ module Subjects
     end
 
     def run_cellection
-      cellect_params = [ workflow.id, user.try(:id), subject_set_id, limit ]
+      cellect_params = [ user.try(:id), subject_set_id, limit ]
       subject_ids = yield cellect_params
       sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
       sms_scope.pluck("set_member_subjects.id")

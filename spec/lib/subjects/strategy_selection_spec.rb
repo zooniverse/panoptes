@@ -88,7 +88,7 @@ RSpec.describe Subjects::StrategySelection do
 
         it "should use the cellect client" do
           cellect_params = [ workflow.id, user.id, subject_set.id, limit ]
-          expect(Subjects::CellectClient)
+          expect(CellectClient)
             .to receive(:get_subjects)
             .with(*cellect_params)
             .and_return(result_ids)
@@ -103,7 +103,7 @@ RSpec.describe Subjects::StrategySelection do
         end
 
         it "should convert the cellect subject_ids to panoptes sms_ids" do
-          allow(Subjects::CellectClient).to receive(:get_subjects)
+          allow(CellectClient).to receive(:get_subjects)
             .and_return(result_ids)
           expect(SetMemberSubject).to receive(:by_subject_workflow)
             .with(result_ids, workflow.id).and_call_original
@@ -112,8 +112,8 @@ RSpec.describe Subjects::StrategySelection do
 
         context "when the cellect client can't reach a server" do
           it "should fall back to postgres strategy" do
-            allow(Subjects::CellectClient).to receive(:get_subjects)
-              .and_raise(Subjects::CellectClient::ConnectionError)
+            allow(CellectClient).to receive(:get_subjects)
+              .and_raise(CellectClient::ConnectionError)
             expect_any_instance_of(Subjects::PostgresqlSelection)
               .to receive(:select)
               .and_call_original
@@ -127,16 +127,15 @@ RSpec.describe Subjects::StrategySelection do
         let(:run_selection) { subject.select }
 
         it "should use the cellect_ex client" do
-          params = [ workflow.id, user.id, subject_set.id, limit ]
-          expect(Subjects::CellectExSelection)
+          expect_any_instance_of(Subjects::CellectExSelector)
             .to receive(:get_subjects)
-            .with(*params)
+            .with(user.id, subject_set.id, limit)
             .and_return(result_ids)
           run_selection
         end
 
         it "should convert the cellect_ex subject_ids to panoptes sms_ids" do
-          allow(Subjects::CellectExSelection).to receive(:get_subjects)
+          allow_any_instance_of(Subjects::CellectExSelector).to receive(:get_subjects)
             .and_return(result_ids)
           expect(SetMemberSubject).to receive(:by_subject_workflow)
             .with(result_ids, workflow.id).and_call_original

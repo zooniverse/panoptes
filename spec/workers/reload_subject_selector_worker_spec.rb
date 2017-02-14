@@ -16,7 +16,7 @@ RSpec.describe ReloadSubjectSelectorWorker do
 
     context "when cellect is off" do
       it "should not call cellect" do
-        expect(Subjects::CellectClient).not_to receive(:reload_workflow)
+        expect(CellectClient).not_to receive(:reload_workflow)
         worker.perform(workflow.id)
       end
     end
@@ -27,7 +27,7 @@ RSpec.describe ReloadSubjectSelectorWorker do
       end
 
       it "should not call to cellect if the workflow is not set to use it" do
-        expect(Subjects::CellectClient).not_to receive(:reload_workflow)
+        expect(CellectClient).not_to receive(:reload_workflow)
         worker.perform(workflow.id)
       end
 
@@ -38,7 +38,7 @@ RSpec.describe ReloadSubjectSelectorWorker do
         end
 
         it "should request that cellect reload it's workflow" do
-          expect(Subjects::CellectClient).to receive(:reload_workflow)
+          expect(CellectClient).to receive(:reload_workflow)
             .with(workflow.id)
           worker.perform(workflow.id)
         end

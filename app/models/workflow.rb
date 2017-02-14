@@ -88,6 +88,10 @@ class Workflow < ActiveRecord::Base
     self.retirement.presence || DEFAULT_RETIREMENT_OPTIONS
   end
 
+  def subject_selector
+    @subject_selector ||= SubjectSelector.for(self)
+  end
+
   def cellect_size_subject_space?
     subjects_count >= Panoptes.cellect_min_pool_size
   end
