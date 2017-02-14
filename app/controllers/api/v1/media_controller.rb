@@ -82,8 +82,10 @@ class Api::V1::MediaController < Api::ApiController
     end
   end
 
-  def link_header(resource)
-    "#{request.protocol}#{request.host_with_port}/api#{resource.location}"
+  def link_header(resources)
+    binding.pry
+    loc_paths = resources.map(&:location)
+    "#{request.protocol}#{request.host_with_port}/api#{resources.location}"
   end
 
   def context
