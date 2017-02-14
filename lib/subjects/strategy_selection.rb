@@ -5,14 +5,13 @@ module Subjects
   class StrategySelection
     include Logging
 
-    attr_reader :workflow, :user, :subject_set_id, :limit, :strategy_param
+    attr_reader :workflow, :user, :subject_set_id, :limit
 
-    def initialize(workflow, user, subject_set_id, limit=SubjectQueue::DEFAULT_LENGTH, strategy_param=nil)
+    def initialize(workflow, user, subject_set_id, limit=SubjectQueue::DEFAULT_LENGTH)
       @workflow = workflow
       @user = user
       @subject_set_id = subject_set_id
       @limit = limit
-      @strategy_param = strategy_param
     end
 
     def select
@@ -41,19 +40,19 @@ module Subjects
     private
 
     def select_sms_ids
-      [strategy, strategy_sms_ids]
+      select_with(desired_selector)
     rescue CellectClient::ConnectionError, CellectExClient::GenericError
-      [:default, default_strategy_sms_ids]
+      select_with(default_selector)
     end
 
     def configured_to_use_cellect?
       return nil unless Panoptes.flipper.enabled?("cellect")
-      strategy_param == :cellect || workflow.subject_selection_strategy.to_s == 'cellect'
+      workflow.subject_selection_strategy.to_s == 'cellect'
     end
 
     def configured_to_use_cellect_ex?
       return nil unless Panoptes.flipper.enabled?("cellect_ex")
-      strategy_param == :cellect_ex || workflow.subject_selection_strategy.to_s == 'cellect_ex'
+      workflow.subject_selection_strategy.to_s == 'cellect_ex'
     end
 
     def automatically_use_cellect?
@@ -61,31 +60,20 @@ module Subjects
       workflow.using_cellect?
     end
 
-    def strategy_sms_ids
-      case strategy
-      when :cellect
-        run_cellection do |params|
-          Subjects::CellectSelector.new(workflow).get_subjects(*params)
-        end
-      when :cellect_ex
-        run_cellection do |params|
-          Subjects::CellectExSelector.new(workflow).get_subjects(*params)
-        end
+    def select_with(selector)
+      [selector.id, selector.get_subjects(user, subject_set_id, limit)]
+    end
+
+    def desired_selector
+      if workflow.subject_selector.enabled?
+        workflow.subject_selector
       else
-        default_strategy_sms_ids
+        default_selector
       end
     end
 
-    def default_strategy_sms_ids
-      opts = { limit: limit, subject_set_id: subject_set_id }
-      Subjects::PostgresqlSelection.new(workflow, user, opts).select
-    end
-
-    def run_cellection
-      cellect_params = [user, subject_set_id, limit]
-      subject_ids = yield cellect_params
-      sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
-      sms_scope.pluck("set_member_subjects.id")
+    def default_selector
+      BuiltInSelector.new(workflow)
     end
   end
 end
