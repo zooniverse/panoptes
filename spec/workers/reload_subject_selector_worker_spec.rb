@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe ReloadCellectWorker do
+RSpec.describe ReloadSubjectSelectorWorker do
   let(:worker) { described_class.new }
   let(:workflow) { create(:workflow) }
 
@@ -10,7 +10,6 @@ RSpec.describe ReloadCellectWorker do
   end
 
   describe "#perform" do
-
     it "should gracefully handle a missing workflow lookup" do
       expect{worker.perform(-1)}.not_to raise_error
     end

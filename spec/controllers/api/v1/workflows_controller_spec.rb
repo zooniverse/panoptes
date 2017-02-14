@@ -257,7 +257,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
         context "when the workflow has subjects" do
           it 'should not call the reload cellect worker when cellect is off' do
-            expect(ReloadCellectWorker).not_to receive(:perform_async)
+            expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
           end
 
           case link_to_test
@@ -272,19 +272,19 @@ describe Api::V1::WorkflowsController, type: :controller do
               end
 
               it 'should not call reload cellect worker' do
-                expect(ReloadCellectWorker).not_to receive(:perform_async)
+                expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
               end
 
               it 'should call reload cellect worker when workflow uses cellect' do
                 allow_any_instance_of(Workflow)
                   .to receive(:using_cellect?).and_return(true)
-                expect(ReloadCellectWorker).to receive(:perform_async)
+                expect(ReloadSubjectSelectorWorker).to receive(:perform_async)
                   .with(resource.id)
               end
             end
           when :retired_subjects
             it 'should not call reload cellect worker' do
-              expect(ReloadCellectWorker).not_to receive(:perform_async)
+              expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
             end
 
             it 'should not call the retire cellect worker' do
@@ -303,7 +303,7 @@ describe Api::V1::WorkflowsController, type: :controller do
               end
 
               it 'should not call reload cellect worker' do
-                expect(ReloadCellectWorker).not_to receive(:perform_async)
+                expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
               end
 
               it 'should not call the retire cellect worker' do
@@ -317,7 +317,7 @@ describe Api::V1::WorkflowsController, type: :controller do
                 end
 
                 it 'should not call reload cellect worker' do
-                  expect(ReloadCellectWorker).not_to receive(:perform_async)
+                  expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
                 end
 
                 it 'should call retire cellect worker when workflow uses cellect' do
@@ -334,7 +334,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
           it 'should not attempt to call cellect', :aggregate_failures do
             expect(Panoptes).not_to receive(:use_cellect?)
-            expect(ReloadCellectWorker).not_to receive(:perform_async)
+            expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
           end
         end
       end
@@ -342,7 +342,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       context "without authorized user" do
         it 'should not attempt to call cellect', :aggregate_failures do
           expect(Panoptes).not_to receive(:use_cellect?)
-          expect(ReloadCellectWorker).not_to receive(:perform_async)
+          expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
         end
       end
     end

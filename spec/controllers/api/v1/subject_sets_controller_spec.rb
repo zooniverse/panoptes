@@ -198,18 +198,18 @@ describe Api::V1::SubjectSetsController, type: :controller do
         end
 
         it 'should not call the reload cellect worker when cellect is off' do
-          expect(ReloadCellectWorker).not_to receive(:perform_async)
+          expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
         end
 
         context "when cellect is on" do
           it 'should not call reload cellect worker' do
-            expect(ReloadCellectWorker).not_to receive(:perform_async)
+            expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
           end
 
           it 'should call reload cellect worker when workflow uses cellect' do
             allow_any_instance_of(Workflow)
               .to receive(:using_cellect?).and_return(true)
-            expect(ReloadCellectWorker)
+            expect(ReloadSubjectSelectorWorker)
               .to receive(:perform_async).with(workflow_id)
           end
         end
@@ -224,7 +224,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
         end
 
         it 'should not call the reload cellect worker when cellect is off' do
-          expect(ReloadCellectWorker).not_to receive(:perform_async)
+          expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
         end
 
         context "when cellect is on" do
@@ -233,14 +233,14 @@ describe Api::V1::SubjectSetsController, type: :controller do
           end
 
           it 'should not call reload cellect worker' do
-            expect(ReloadCellectWorker).not_to receive(:perform_async)
+            expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
           end
 
           it 'should call reload cellect worker when workflow uses cellect' do
             allow_any_instance_of(Workflow)
               .to receive(:using_cellect?).and_return(true)
             workflows.each do |_workflow|
-              expect(ReloadCellectWorker).to receive(:perform_async)
+              expect(ReloadSubjectSelectorWorker).to receive(:perform_async)
               .with(_workflow.id)
             end
           end
@@ -257,7 +257,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
         it 'should not attempt to call cellect', :aggregate_failures do
           expect(Panoptes).not_to receive(:use_cellect?)
-          expect(ReloadCellectWorker).not_to receive(:perform_async)
+          expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
         end
       end
 
@@ -271,7 +271,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
         it 'should not attempt to call cellect', :aggregate_failures do
           expect(Panoptes).not_to receive(:use_cellect?)
-          expect(ReloadCellectWorker).not_to receive(:perform_async)
+          expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
         end
       end
     end
