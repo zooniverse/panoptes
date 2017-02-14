@@ -115,12 +115,12 @@ RSpec.describe Subjects::Selector do
 
       it "should notify cellect to reload" do
         Panoptes.flipper[:cellect_sync_error_reload].enable
-        expect(ReloadSubjectSelectorWorker).to receive(:perform_async).with(workflow.id)
+        expect(NotifySubjectSelectorOfSubjectsChangeWorker).to receive(:perform_async).with(workflow.id)
         subject.get_subjects
       end
 
       it "should not notify cellect to reload if the feature is disabled" do
-        expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
+        expect(NotifySubjectSelectorOfSubjectsChangeWorker).not_to receive(:perform_async)
         subject.get_subjects
       end
 

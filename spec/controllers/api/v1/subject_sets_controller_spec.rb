@@ -197,21 +197,11 @@ describe Api::V1::SubjectSetsController, type: :controller do
           put :update, update_params.merge(id: resource.id)
         end
 
-        it 'should not call the reload cellect worker when cellect is off' do
-          expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
-        end
-
-        context "when cellect is on" do
-          it 'should not call reload cellect worker' do
-            expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
-          end
-
-          it 'should call reload cellect worker when workflow uses cellect' do
-            allow_any_instance_of(Workflow)
-              .to receive(:using_cellect?).and_return(true)
-            expect(ReloadSubjectSelectorWorker)
-              .to receive(:perform_async).with(workflow_id)
-          end
+        it 'should notify the subject selector' do
+          allow_any_instance_of(Workflow)
+            .to receive(:using_cellect?).and_return(true)
+          expect(NotifySubjectSelectorOfSubjectsChangeWorker)
+            .to receive(:perform_async).with(workflow_id)
         end
       end
 
@@ -223,26 +213,12 @@ describe Api::V1::SubjectSetsController, type: :controller do
           put :update, update_params.merge(id: resource.id)
         end
 
-        it 'should not call the reload cellect worker when cellect is off' do
-          expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
-        end
-
-        context "when cellect is on" do
-          before do
-            allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-          end
-
-          it 'should not call reload cellect worker' do
-            expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
-          end
-
-          it 'should call reload cellect worker when workflow uses cellect' do
-            allow_any_instance_of(Workflow)
-              .to receive(:using_cellect?).and_return(true)
-            workflows.each do |_workflow|
-              expect(ReloadSubjectSelectorWorker).to receive(:perform_async)
-              .with(_workflow.id)
-            end
+        it 'should notify subject selector' do
+          allow_any_instance_of(Workflow)
+            .to receive(:using_cellect?).and_return(true)
+          workflows.each do |_workflow|
+            expect(NotifySubjectSelectorOfSubjectsChangeWorker).to receive(:perform_async)
+            .with(_workflow.id)
           end
         end
       end
@@ -257,7 +233,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
         it 'should not attempt to call cellect', :aggregate_failures do
           expect(Panoptes).not_to receive(:use_cellect?)
-          expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
+          expect(NotifySubjectSelectorOfSubjectsChangeWorker).not_to receive(:perform_async)
         end
       end
 
@@ -271,7 +247,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
         it 'should not attempt to call cellect', :aggregate_failures do
           expect(Panoptes).not_to receive(:use_cellect?)
-          expect(ReloadSubjectSelectorWorker).not_to receive(:perform_async)
+          expect(NotifySubjectSelectorOfSubjectsChangeWorker).not_to receive(:perform_async)
         end
       end
     end

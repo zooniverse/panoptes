@@ -9,21 +9,21 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def create
     super do |subject_set|
-      notify_cellect(subject_set)
+      notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
 
   def update
     super do |subject_set|
-      notify_cellect(subject_set)
+      notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
 
   def update_links
     super do |subject_set|
-      notify_cellect(subject_set)
+      notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
       reset_workflow_finished_at(subject_set.workflows.pluck(:id))
     end
@@ -49,19 +49,17 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def destroy_links
     super do |subject_set|
-      notify_cellect(subject_set)
+      notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
     end
   end
 
   protected
 
-  def notify_cellect(subject_set)
+  def notify_subject_selector(subject_set)
     if subject_set.set_member_subjects.exists?
       subject_set.workflows.each do |w|
-        if Panoptes.use_cellect?(w)
-          ReloadSubjectSelectorWorker.perform_async(w.id)
-        end
+        NotifySubjectSelectorOfSubjectsChangeWorker.perform_async(w.id)
       end
     end
   end

@@ -1,8 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe ReloadSubjectSelectorWorker do
+RSpec.describe NotifySubjectSelectorOfSeenSubjectWorker do
   let(:worker) { described_class.new }
   let(:workflow) { create(:workflow) }
+  let(:subject_id) { 2 }
+  let(:user_id) { 1 }
 
   it "should be retryable 3 times" do
     retry_count = worker.class.get_sidekiq_options['retry']
@@ -11,13 +13,15 @@ RSpec.describe ReloadSubjectSelectorWorker do
 
   describe "#perform" do
     it "should gracefully handle a missing workflow lookup" do
-      expect{worker.perform(-1)}.not_to raise_error
+      expect{
+        worker.perform(-1, user_id, subject_id)
+      }.not_to raise_error
     end
 
     context "when cellect is off" do
       it "should not call cellect" do
-        expect(CellectClient).not_to receive(:reload_workflow)
-        worker.perform(workflow.id)
+        expect(CellectClient).not_to receive(:add_seen)
+        worker.perform(workflow.id, user_id, subject_id)
       end
     end
 
@@ -27,8 +31,8 @@ RSpec.describe ReloadSubjectSelectorWorker do
       end
 
       it "should not call to cellect if the workflow is not set to use it" do
-        expect(CellectClient).not_to receive(:reload_workflow)
-        worker.perform(workflow.id)
+        expect(CellectClient).not_to receive(:add_seen)
+        worker.perform(workflow.id, user_id, subject_id)
       end
 
       context "when the workflow is using cellect" do
@@ -37,10 +41,16 @@ RSpec.describe ReloadSubjectSelectorWorker do
           .to receive(:using_cellect?).and_return(true)
         end
 
-        it "should request that cellect reload it's workflow" do
-          expect(CellectClient).to receive(:reload_workflow)
-            .with(workflow.id)
-          worker.perform(workflow.id)
+        it "should not call to cellect if the user is nil" do
+          expect(CellectClient).not_to receive(:add_seen)
+          worker.perform(workflow.id, nil, subject_id)
+        end
+
+        it "should request that cellect add the seen for the subject" do
+          expect(CellectClient)
+            .to receive(:add_seen)
+            .with(workflow.id, user_id, subject_id)
+          worker.perform(workflow.id, user_id, subject_id)
         end
       end
     end

@@ -1,4 +1,4 @@
-class ReloadSubjectSelectorWorker
+class NotifySubjectSelectorOfSubjectsChangeWorker
   include Sidekiq::Worker
 
   # SGL-PRIORITY

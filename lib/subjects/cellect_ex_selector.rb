@@ -25,7 +25,7 @@ module Subjects
       self.class.client.reload_workflow(workflow.id)
     end
 
-    def remove_subject(subject_id, group_id)
+    def remove_subject(subject_id)
       return unless enabled?
       self.class.client.remove_subject(subject_id, workflow.id, group_id)
     end

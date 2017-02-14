@@ -22,7 +22,7 @@ module Subjects
       true
     end
 
-    def remove_subject(subject_id, group_id)
+    def remove_subject(subject_id)
       true
     end
 

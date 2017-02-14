@@ -25,9 +25,13 @@ module Subjects
       self.class.client.reload_workflow(workflow.id)
     end
 
-    def remove_subject(subject_id, group_id)
+    def remove_subject(subject_id)
       return unless enabled?
-      self.class.client.remove_subject(subject_id, workflow.id, group_id)
+
+      smses = workflow.set_member_subjects.where(subject_id: subject_id)
+      smses.each do |sms|
+        self.class.client.remove_subject(subject_id, workflow.id, sms.subject_set_id)
+      end
     end
 
     def get_subjects(user, group_id, limit)

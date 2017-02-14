@@ -16,9 +16,8 @@ class RetireSubjectWorker
 
     WorkflowRetiredCountWorker.perform_async(workflow.id)
 
-    return unless Panoptes.use_cellect?(workflow)
     subject_ids.each do |subject_id|
-      RetireCellectWorker.perform_async(subject_id, workflow.id)
+      NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
     end
   rescue ActiveRecord::RecordNotFound
   end
