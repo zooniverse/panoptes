@@ -1,4 +1,6 @@
 class Recent < ActiveRecord::Base
+  include OrderedLocations
+
   belongs_to :classification
   belongs_to :subject
 
@@ -9,11 +11,7 @@ class Recent < ActiveRecord::Base
   belongs_to :user
   belongs_to :user_group
 
-  validates_presence_of :classification, :subject
-
-  # TODO: modify the following validation to run all the time
-  # once the recents schema has been migrated from has_one through associations
-  validates_presence_of :project_id, :workflow_id, :user_id, only: :create
+  validates_presence_of :classification, :subject, :project_id, :workflow_id, :user_id
 
   before_validation :copy_classification_fkeys
 

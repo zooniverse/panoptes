@@ -2548,6 +2548,13 @@ CREATE INDEX index_recents_on_classification_id ON recents USING btree (classifi
 
 
 --
+-- Name: index_recents_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recents_on_created_at ON recents USING btree (created_at);
+
+
+--
 -- Name: index_recents_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3772,4 +3779,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170202200131');
 INSERT INTO schema_migrations (version) VALUES ('20170202202724');
 
 INSERT INTO schema_migrations (version) VALUES ('20170206161946');
+
+INSERT INTO schema_migrations (version) VALUES ('20170210163241');
 
