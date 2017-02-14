@@ -23,7 +23,9 @@ module JsonApiController
     protected
 
     def params_for(action=action_name.to_sym)
-      params.require(resource_sym).permit(*self.class.action_params[action])
+      Array.wrap(params.require(resource_sym)).map do |ps|
+        ps.permit(*self.class.action_params[action])
+      end
     end
 
     alias_method :create_params, :params_for
