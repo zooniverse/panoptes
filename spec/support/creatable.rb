@@ -47,4 +47,28 @@ shared_examples "is creatable" do |action=:create|
       expect(response).to have_http_status(:unauthorized)
     end
   end
+
+  context "array of resources to create" do
+    let(:resource_name) { controller.controller_name.to_sym }
+
+    before(:each) do
+      default_request scopes: scopes, user_id: authorized_user.id
+      create_params[resource_name] = Array.wrap(create_params[resource_name])
+      post action, create_params
+    end
+
+    it "should return created" do
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'should create the new resource' do
+      field = resource_class.find(created_id).send(test_attr)
+
+      if field.is_a?(Array)
+        expect(field).to match_array(test_attr_value)
+      else
+        expect(field).to eq(test_attr_value)
+      end
+    end
+  end
 end
