@@ -58,6 +58,12 @@ describe RoleControl::Controlled do
       visible_records = subject.scope_for(:update, ApiUser.new(admin_actor, admin: true))
       expect(visible_records).to match_array(group_tables)
     end
+
+    it 'should fetch all publicly visible records for non-logged in user' do
+      visible_records = subject.scope_for(:read, ApiUser.new(nil))
+      expected_records = group_tables.values_at(0)
+      expect(visible_records).to match_array(expected_records)
+    end
   end
 
   describe "::can_by_role" do
