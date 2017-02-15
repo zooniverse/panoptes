@@ -59,7 +59,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
   def notify_subject_selector(subject_set)
     if subject_set.set_member_subjects.exists?
       subject_set.workflows.each do |w|
-        NotifySubjectSelectorOfSubjectsChangeWorker.perform_async(w.id)
+        NotifySubjectSelectorOfChangeWorker.perform_async(w.id)
       end
     end
   end

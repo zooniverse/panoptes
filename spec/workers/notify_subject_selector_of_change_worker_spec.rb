@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe NotifySubjectSelectorOfSubjectsChangeWorker do
+RSpec.describe NotifySubjectSelectorOfChangeWorker do
   let(:worker) { described_class.new }
   let(:workflow) { create(:workflow) }
 

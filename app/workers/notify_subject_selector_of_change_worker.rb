@@ -1,4 +1,4 @@
-class NotifySubjectSelectorOfSubjectsChangeWorker
+class NotifySubjectSelectorOfChangeWorker
   include Sidekiq::Worker
 
   # SGL-PRIORITY

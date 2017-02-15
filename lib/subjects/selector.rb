@@ -50,7 +50,7 @@ module Subjects
         sms_ids = fallback_selector.select
         if data_available = !sms_ids.empty?
           if Panoptes.flipper[:cellect_sync_error_reload].enabled?
-            NotifySubjectSelectorOfSubjectsChangeWorker.perform_async(workflow.id)
+            NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
           end
           Honeybadger.notify(
             error_class:   "Cellect data sync error",
