@@ -42,7 +42,7 @@ RSpec.describe RetireSubjectWorker do
 
     it 'queues a cellect retirement if the workflow uses cellect' do
       allow(Panoptes).to receive(:use_cellect?).and_return(true)
-      expect(RetireCellectWorker).to receive(:perform_async).with(sms.subject_id, workflow.id)
+      expect(NotifySubjectSelectorOfRetirementWorker).to receive(:perform_async).with(sms.subject_id, workflow.id)
       worker.perform(workflow.id, [sms.subject_id])
     end
 
@@ -51,7 +51,7 @@ RSpec.describe RetireSubjectWorker do
       allow(Workflow).to receive(:find).and_return(workflow)
       allow(workflow).to receive(:retire_subject).with(sms.subject_id, nil) { raise "some error" }
       expect(WorkflowRetiredCountWorker).not_to receive(:perform_async)
-      expect(RetireCellectWorker).not_to receive(:perform_async)
+      expect(NotifySubjectSelectorOfRetirementWorker).not_to receive(:perform_async)
       expect {
         worker.perform(workflow.id, [sms.subject_id])
       }.to raise_error(RuntimeError, 'some error')

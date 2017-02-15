@@ -256,39 +256,21 @@ describe Api::V1::WorkflowsController, type: :controller do
         end
 
         context "when the workflow has subjects" do
-          it 'should not call the reload cellect worker when cellect is off' do
-            expect(ReloadCellectWorker).not_to receive(:perform_async)
-          end
-
           case link_to_test
           when :subject_sets
             it "should call unfinish_workflow_worker" do
               expect(UnfinishWorkflowWorker).to receive(:perform_async).with(resource.id)
             end
 
-            context "when cellect is on" do
-              before do
-                allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-              end
-
-              it 'should not call reload cellect worker' do
-                expect(ReloadCellectWorker).not_to receive(:perform_async)
-              end
-
-              it 'should call reload cellect worker when workflow uses cellect' do
-                allow_any_instance_of(Workflow)
-                  .to receive(:using_cellect?).and_return(true)
-                expect(ReloadCellectWorker).to receive(:perform_async)
-                  .with(resource.id)
-              end
+            it 'should notify the subject selector that the available subjects changed' do
+              allow_any_instance_of(Workflow)
+                .to receive(:using_cellect?).and_return(true)
+              expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async)
+                .with(resource.id)
             end
           when :retired_subjects
             it 'should not call reload cellect worker' do
-              expect(ReloadCellectWorker).not_to receive(:perform_async)
-            end
-
-            it 'should not call the retire cellect worker' do
-              expect(RetireCellectWorker).not_to receive(:perform_async)
+              expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
             end
 
             it 'should call the workflow retired counter worker' do
@@ -297,34 +279,9 @@ describe Api::V1::WorkflowsController, type: :controller do
                 .with(resource.id)
             end
 
-            context "when cellect is on" do
-              before do
-                allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-              end
-
-              it 'should not call reload cellect worker' do
-                expect(ReloadCellectWorker).not_to receive(:perform_async)
-              end
-
-              it 'should not call the retire cellect worker' do
-                expect(RetireCellectWorker).not_to receive(:perform_async)
-              end
-
-              context "when the workflow is using cellect" do
-                before do
-                  allow_any_instance_of(Workflow)
-                  .to receive(:using_cellect?).and_return(true)
-                end
-
-                it 'should not call reload cellect worker' do
-                  expect(ReloadCellectWorker).not_to receive(:perform_async)
-                end
-
-                it 'should call retire cellect worker when workflow uses cellect' do
-                  expect(RetireCellectWorker).to receive(:perform_async)
-                    .with(linked_resource.id.to_s, workflow.id)
-                end
-              end
+            it 'should notify the subject selector that subjects were retired' do
+              expect(NotifySubjectSelectorOfRetirementWorker).to receive(:perform_async)
+                .with(linked_resource.id.to_s, workflow.id)
             end
           end
         end
@@ -334,7 +291,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
           it 'should not attempt to call cellect', :aggregate_failures do
             expect(Panoptes).not_to receive(:use_cellect?)
-            expect(ReloadCellectWorker).not_to receive(:perform_async)
+            expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
           end
         end
       end
@@ -342,7 +299,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       context "without authorized user" do
         it 'should not attempt to call cellect', :aggregate_failures do
           expect(Panoptes).not_to receive(:use_cellect?)
-          expect(ReloadCellectWorker).not_to receive(:perform_async)
+          expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
         end
       end
     end

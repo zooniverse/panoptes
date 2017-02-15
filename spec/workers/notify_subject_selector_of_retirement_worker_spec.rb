@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe RetireCellectWorker do
+RSpec.describe NotifySubjectSelectorOfRetirementWorker do
   let(:worker) { described_class.new }
   let(:workflow) { create(:workflow_with_subjects) }
   let(:subject) { workflow.subjects.first }
@@ -18,7 +18,7 @@ RSpec.describe RetireCellectWorker do
 
     context "when cellect is off" do
       it "should not call cellect" do
-        expect(Subjects::CellectClient).not_to receive(:remove_subject)
+        expect(CellectClient).not_to receive(:remove_subject)
         worker.perform(subject.id, workflow.id)
       end
     end
@@ -29,7 +29,7 @@ RSpec.describe RetireCellectWorker do
       end
 
       it "should not call to cellect if the workflow is not set to use it" do
-        expect(Subjects::CellectClient).not_to receive(:remove_subject)
+        expect(CellectClient).not_to receive(:remove_subject)
         worker.perform(subject.id, workflow.id)
       end
 
@@ -40,7 +40,7 @@ RSpec.describe RetireCellectWorker do
         end
 
         it "should request that cellect retire for the workflow and set" do
-          expect(Subjects::CellectClient)
+          expect(CellectClient)
             .to receive(:remove_subject)
             .with(subject.id, workflow.id, subject_set.id)
           worker.perform(subject.id, workflow.id)

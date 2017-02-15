@@ -89,18 +89,15 @@ class Api::V1::WorkflowsController < Api::ApiController
   # be easily located in specific controller actions
   def post_link_actions(workflow)
     if workflow.set_member_subjects.exists?
-      using_cellect = Panoptes.use_cellect?(workflow)
-
       case relation
       when :retired_subjects, 'retired_subjects'
         WorkflowRetiredCountWorker.perform_async(workflow.id)
-        if using_cellect
-          params[:retired_subjects].each do |subject_id|
-            RetireCellectWorker.perform_async(subject_id, workflow.id)
-          end
+
+        params[:retired_subjects].each do |subject_id|
+          NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
         end
       when :subject_sets, 'subject_sets'
-        ReloadCellectWorker.perform_async(workflow.id) if using_cellect
+        NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
       end
 
     end

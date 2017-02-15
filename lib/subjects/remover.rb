@@ -16,7 +16,7 @@ module Subjects
           locations.map(&:destroy)
           set_member_subjects.map(&:destroy)
         end
-        notify_cellect(workflow_ids)
+        notify_subject_selector(workflow_ids)
         true
       else
         false
@@ -47,9 +47,9 @@ module Subjects
       @client ||= Panoptes::Client.new(env: Rails.env)
     end
 
-    def notify_cellect(workflow_ids)
+    def notify_subject_selector(workflow_ids)
       workflow_ids.each do |workflow_id|
-        RetireCellectWorker.perform_async(orphan.id, workflow_id)
+        NotifySubjectSelectorOfRetirementWorker.perform_async(orphan.id, workflow_id)
       end
     end
   end
