@@ -271,7 +271,7 @@ describe ClassificationLifecycle do
       allow(classification.workflow).to receive(:using_cellect?).and_return(true)
 
       classification.subject_ids.each do |subject_id|
-        expect(NotifySubjectSelectorOfSeenSubjectWorker).to receive(:perform_async).with(workflow.id, user.id, subject_id)
+        expect(NotifySubjectSelectorOfSeenWorker).to receive(:perform_async).with(workflow.id, user.id, subject_id)
       end
 
       subject.execute

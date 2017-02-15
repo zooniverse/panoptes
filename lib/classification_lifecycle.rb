@@ -82,7 +82,7 @@ class ClassificationLifecycle
     return unless subjects_are_unseen_by_user?
 
     subject_ids.each do |subject_id|
-      NotifySubjectSelectorOfSeenSubjectWorker.perform_async(workflow.id, user.try(:id), subject_id)
+      NotifySubjectSelectorOfSeenWorker.perform_async(workflow.id, user.try(:id), subject_id)
     end
   end
 
