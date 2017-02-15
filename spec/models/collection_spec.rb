@@ -64,28 +64,21 @@ describe Collection, type: :model do
     end
   end
 
-  context "collaboration" do
+  context "contribution" do
     let(:contributor) { ApiUser.new(create(:user)) }
     let(:collab_collection) { create(:collection) }
-    let(:subjects) { create_list(:subject, 4) }
 
-    describe "user is a collaborator" do
-      let!(:acl) do
-        create(:access_control_list,
-               user_group: contributor.user.identity_group,
-               resource: collab_collection,
-               roles: ["contributor"])
-      end
-
-      it "allows contributor to update links" do
-        expect(Collection.scope_for(:update_links, contributor)).to include(collab_collection)
-      end
+    it "allows contributor to update links" do
+      AccessControlList.new(
+        user_group: contributor.user.identity_group,
+        resource: collab_collection,
+        roles: ["contributor"]
+        ).save!
+      expect(Collection.scope_for(:update_links, contributor)).to include(collab_collection)
     end
 
-    describe "user is unauthorized" do
-      it "does not allow non-contributor to update links" do
-        expect(Collection.scope_for(:update_links, contributor)).to_not include(collab_collection)
-      end
+    it "does not allow non-contributor to update links" do
+      expect(Collection.scope_for(:update_links, contributor)).to_not include(collab_collection)
     end
   end
 end
