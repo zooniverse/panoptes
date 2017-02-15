@@ -73,7 +73,7 @@ describe Collection, type: :model do
         user_group: contributor.user.identity_group,
         resource: collab_collection,
         roles: ["contributor"]
-        ).save!
+      ).save!
       expect(Collection.scope_for(:update_links, contributor)).to include(collab_collection)
     end
 
