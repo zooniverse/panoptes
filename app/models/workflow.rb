@@ -89,7 +89,17 @@ class Workflow < ActiveRecord::Base
   end
 
   def subject_selector
-    @subject_selector ||= SubjectSelector.for(self)
+    @subject_selector ||=
+      case
+      when subject_selection_strategy == "cellect"
+        Subjects::CellectSelector.new(self)
+      when subject_selection_strategy == "cellect_ex"
+        Subjects::CellectExSelector.new(self)
+      when using_cellect?
+        Subjects::CellectSelector.new(self)
+      else
+        Subjects::BuiltInSelector.new(self)
+      end
   end
 
   def cellect_size_subject_space?
