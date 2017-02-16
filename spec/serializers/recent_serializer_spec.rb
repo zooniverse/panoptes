@@ -33,4 +33,15 @@ describe RecentSerializer do
       expect(expected).to match_array(result_locs)
     end
   end
+
+  describe "nested member routes" do
+    it "should return the correct href urls" do
+      prefix = "users/1"
+      context = { url_prefix: prefix }
+      result = RecentSerializer.page({}, Recent.all, context)
+      meta = result[:meta][:recents]
+      expect(meta[:first_href]).to eq("/#{prefix}/recents")
+      expect(meta[:last_href]).to eq("/#{prefix}/recents?page=0")
+    end
+  end
 end
