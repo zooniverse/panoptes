@@ -30,6 +30,34 @@ module Panoptes
 
         super(params, scope, context)
       end
+
+      private
+
+      def page_href(page, options)
+        return nil unless page
+
+        params = []
+        params << "page=#{page}" unless page == 1
+        params << "page_size=#{options.page_size}" unless options.default_page_size?
+        params << "include=#{options.include.join(',')}" if options.include.any?
+        params << options.sorting_as_url_params if options.sorting.any?
+        params << options.filters_as_url_params if options.filters.any?
+
+        url = page_url(options.context)
+        url += '?' + params.join('&') if params.any?
+        url
+      end
+
+      def page_url(context)
+        case
+        when context[:url_prefix]
+          "#{href_prefix}/#{context[:url_prefix]}/#{key}"
+        when context[:url_suffix]
+          "#{href_prefix}/#{key}/#{context[:url_suffix]}"
+        else
+          "#{href_prefix}/#{key}"
+        end
+      end
     end
   end
 end
