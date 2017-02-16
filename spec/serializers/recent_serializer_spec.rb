@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe RecentSerializer do
+  let(:prefix) { "users/1" }
   let(:context) do
-    { type: "user", owner_id: "1" }
+    { url_prefix: prefix }
   end
 
   it "should preload the serialized associations" do
@@ -13,7 +14,7 @@ describe RecentSerializer do
     RecentSerializer.page({}, Recent.all, context)
   end
 
-  describe "locations" do
+  describe "#locations" do
     let!(:recent) { create(:recent) }
     let(:result_locs) do
       RecentSerializer.single({}, Recent.all, context)[:locations]
@@ -34,10 +35,16 @@ describe RecentSerializer do
     end
   end
 
-  describe "nested member routes" do
+  describe "#href" do
+    it "should include the url_prefix for the resource route" do
+      recent = create(:recent)
+      result = RecentSerializer.single({}, Recent.all, context)
+      expect(result[:href]).to eq("/#{prefix}/recents/#{recent.id}")
+    end
+  end
+
+  describe "meta paging urls" do
     it "should return the correct href urls" do
-      prefix = "users/1"
-      context = { url_prefix: prefix }
       result = RecentSerializer.page({}, Recent.all, context)
       meta = result[:meta][:recents]
       expect(meta[:first_href]).to eq("/#{prefix}/recents")
