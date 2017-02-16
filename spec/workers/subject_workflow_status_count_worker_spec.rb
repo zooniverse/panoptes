@@ -9,7 +9,7 @@ RSpec.describe SubjectWorkflowStatusCountWorker do
     expect(opts[:interval]).to eq(30)
     expect(opts[:max_in_interval]).to eq(1)
     expect(opts[:min_delay]).to eq(5)
-    expect(opts[:reject_with]).to eq(:cancel)
+    expect(opts[:reject_with]).to eq(:reschedule)
   end
 
   describe "#perform" do

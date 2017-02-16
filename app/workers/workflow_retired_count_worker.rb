@@ -7,9 +7,11 @@ class WorkflowRetiredCountWorker
     interval: 10,
     max_in_interval: 1,
     min_delay: 0,
-    reject_with: :cancel,
+    reject_with: :reschedule,
     key: ->(workflow_id) { "workflow_#{workflow_id}_retired_count_worker" }
   }
+
+  sidekiq_options unique: :until_executing
 
   def perform(workflow_id)
     workflow = Workflow.find(workflow_id)

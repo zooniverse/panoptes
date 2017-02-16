@@ -2,6 +2,7 @@ ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "sidekiq/testing"
+require 'sidekiq_unique_jobs/testing'
 require "paper_trail/frameworks/rspec"
 require 'flipper/adapters/memory'
 

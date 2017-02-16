@@ -26,13 +26,18 @@ namespace :configure do
   end
 
   task travis: :local do
-    database_config = <<YAML
+    File.open('config/database.yml', 'w') { |f| f.write(<<YAML) }
 test:
   adapter: postgresql
   database: travis_ci_test
   username: postgres
 YAML
-    File.open('config/database.yml', 'w') { |f| f.write(database_config) }
+
+    File.open('config/redis.yml', 'w') { |f| f.write(<<YAML) }
+test:
+  sidekiq:
+    host: localhost
+YAML
   end
 end
 
