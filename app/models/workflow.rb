@@ -50,7 +50,7 @@ class Workflow < ActiveRecord::Base
     end
   end
 
-  can_through_parent :project, :update, :index, :show, :destroy, :update_links,
+  can_through_parent :project, :update, :index, :show, :destroy, :update_links, :serializer_test,
     :destroy_links, :translate, :versions, :version, :retire_subject, :create_classifications_export
 
   can_be_linked :subject_set, :same_project?, :model

@@ -67,7 +67,7 @@ class Project < ActiveRecord::Base
     :create_subjects_export, :create_aggregations_export, :create_workflows_export,
     :create_workflow_contents_export, :retire_subjects, roles: [ :owner, :collaborator ]
 
-  can_by_role :show, :index, :versions, :version, public: true,
+  can_by_role :show, :index, :serializer_test, :versions, :version, public: true,
     roles: [ :owner, :collaborator, :tester, :translator, :scientist, :moderator ]
 
   can_by_role :translate, roles: [ :owner, :translator, :collaborator ]
