@@ -849,9 +849,11 @@ describe User, type: :model do
     end
 
     it "should handle redis being down" do
-      allow(UserWelcomeMailerWorker).to receive(:perform_async).and_raise(Timeout::Error)
-      user.save!
-      expect(UserWelcomeMailerWorker).to have_received(:perform_async).with(user.id, nil).ordered
+      [ Timeout::Error, Redis::TimeoutError, Redis::CannotConnectError ].each do |redis_error|
+        allow(UserWelcomeMailerWorker).to receive(:perform_async).and_raise(redis_error)
+        user.save!
+        expect(UserWelcomeMailerWorker).to have_received(:perform_async).with(user.id, nil).ordered
+      end
     end
 
     context "when the user has a project id" do
