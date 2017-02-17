@@ -33,8 +33,14 @@ RSpec.configure do |config|
   # work around https://github.com/celluloid/celluloid/issues/696
   Celluloid.shutdown_timeout = 1
 
+  MOCK_REDIS ||= MockRedis.new
+
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
+
+    SidekiqUniqueJobs.configure do |suj_config|
+      suj_config.redis_test_mode = :mock
+    end
   end
 
   config.before(:each) do |example|
@@ -42,16 +48,11 @@ RSpec.configure do |config|
     DatabaseCleaner.start
     ActionMailer::Base.deliveries.clear
 
-    SidekiqUniqueJobs.configure do |suj_config|
-      suj_config.redis_test_mode = :mock
-    end
+    allow(Redis).to receive(:new).and_return(MOCK_REDIS)
 
-    MOCK_REDIS ||= MockRedis.new
     MOCK_REDIS.keys.each do |key|
       MOCK_REDIS.del(key)
     end
-
-    allow(Redis).to receive(:new).and_return(MOCK_REDIS)
 
     # Clears out the jobs for tests using the fake testing
     Sidekiq::Worker.clear_all
