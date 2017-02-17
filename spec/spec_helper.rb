@@ -46,6 +46,13 @@ RSpec.configure do |config|
       suj_config.redis_test_mode = :mock
     end
 
+    MOCK_REDIS ||= MockRedis.new
+    MOCK_REDIS.keys.each do |key|
+      MOCK_REDIS.del(key)
+    end
+
+    allow(Redis).to receive(:new).and_return(MOCK_REDIS)
+
     # Clears out the jobs for tests using the fake testing
     Sidekiq::Worker.clear_all
 

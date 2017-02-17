@@ -232,6 +232,7 @@ GEM
     mime-types (2.99.1)
     mini_portile2 (2.0.0)
     minitest (5.8.4)
+    mock_redis (0.17.2)
     modware (0.1.2)
       its-it
       key_struct (~> 0.4)
@@ -464,6 +465,7 @@ DEPENDENCIES
   json-schema (~> 2.0)
   librato-metrics (~> 1.6.1)
   logstasher (~> 0.6)
+  mock_redis
   newrelic_rpm (~> 3.0)
   oauth2!
   omniauth (~> 1.0)
