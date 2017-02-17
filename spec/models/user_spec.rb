@@ -848,11 +848,18 @@ describe User, type: :model do
       expect(UserWelcomeMailerWorker).to have_received(:perform_async).with(user.id, nil).ordered
     end
 
-    it "should handle redis being down" do
-      [ Timeout::Error, Redis::TimeoutError, Redis::CannotConnectError ].each do |redis_error|
-        allow(UserWelcomeMailerWorker).to receive(:perform_async).and_raise(redis_error)
+    context "when redis is unreachable" do
+      it "should not raise an error on save" do
+        [ Timeout::Error, Redis::TimeoutError, Redis::CannotConnectError ].each do |redis_error|
+          allow(UserWelcomeMailerWorker).to receive(:perform_async).and_raise(redis_error)
+          expect { user.save! }.not_to raise_error
+        end
+      end
+
+      it "should send the welcome email in band" do
+        allow(UserWelcomeMailerWorker).to receive(:perform_async).and_raise(Redis::CannotConnectError)
+        expect_any_instance_of(UserWelcomeMailerWorker).to receive(:perform).with(Integer, nil)
         user.save!
-        expect(UserWelcomeMailerWorker).to have_received(:perform_async).with(user.id, nil).ordered
       end
     end
 
