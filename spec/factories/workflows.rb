@@ -47,8 +47,8 @@ FactoryGirl.define do
       if env.build_contents
         w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: w.primary_language)
         if env.build_extra_contents
-        w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: 'en-US')
-        w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: 'zh-TW')
+          w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: 'en-US')
+          w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: 'zh-TW')
         end
       end
     end

@@ -93,13 +93,13 @@ RSpec.describe CellectExClient do
           end
         end
 
-        response = described_class.new([:test, stubs]).remove_subject(1, 338, nil)
+        response = described_class.new([:test, stubs]).remove_subject(1, 338)
         expect(response).to eq(nil)
       end
 
       it_behaves_like "handles server errors" do
         let(:method) { :remove_subject }
-        let(:params) { [ 1, 338, nil ] }
+        let(:params) { [ 1, 338 ] }
         let(:url) { '/api/workflows/338/remove' }
         let(:http_method) { :post }
       end

@@ -27,11 +27,11 @@ module Subjects
 
     def remove_subject(subject_id)
       return unless enabled?
-      self.class.client.remove_subject(subject_id, workflow.id, group_id)
+      self.class.client.remove_subject(subject_id, workflow.id)
     end
 
     def get_subjects(user, group_id, limit)
-      return unless enabled?
+      return [] unless enabled?
 
       subject_ids = self.class.client.get_subjects(workflow.id, user.try(&:id), group_id, limit)
       sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
