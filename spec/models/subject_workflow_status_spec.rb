@@ -71,6 +71,11 @@ RSpec.describe SubjectWorkflowStatus, type: :model do
       expect { sws.retire! }.not_to change { sws.retired_at }
     end
 
+    it 'records a default retirement reason' do
+      sws.retire!
+      expect(sws.retirement_reason).to match("classification_count")
+    end
+
     it 'records the retirement reason' do
       sws.retire!("nothing_here")
       expect(sws.retirement_reason).to match("nothing_here")
