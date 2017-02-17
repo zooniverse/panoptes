@@ -42,6 +42,10 @@ RSpec.configure do |config|
     DatabaseCleaner.start
     ActionMailer::Base.deliveries.clear
 
+    SidekiqUniqueJobs.configure do |config|
+      config.redis_test_mode = :mock
+    end
+
     # Clears out the jobs for tests using the fake testing
     Sidekiq::Worker.clear_all
 
