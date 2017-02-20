@@ -265,6 +265,163 @@ describe Api::V1::SubjectsController, type: :controller do
     end
   end
 
+  describe "#queued" do
+    context "logged out user" do
+      context "a queued request" do
+        let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+        let(:request_params) { { workflow_id: workflow.id.to_s } }
+
+        context "with queued subjects" do
+          context "when firing the request before the test" do
+            before(:each) do
+              get :queued, request_params
+            end
+
+            it "should return 200" do
+              expect(response.status).to eq(200)
+            end
+
+            it 'should return a page of 2 objects' do
+              expect(json_response[api_resource_name].length).to eq(2)
+            end
+
+            it_behaves_like "an api response"
+
+            context "with extraneous filtering params" do
+              let!(:request_params) do
+                { sort: 'queued', workflow_id: workflow.id.to_s, project_id: "1", collection_id: "1" }
+              end
+
+              it "should return 200" do
+                expect(response.status).to eq(200)
+              end
+
+              it 'should return a page of 2 objects' do
+                expect(json_response[api_resource_name].length).to eq(2)
+              end
+            end
+          end
+
+          context "with no data to select from" do
+            before do
+              allow_any_instance_of(Workflow)
+              .to receive(:set_member_subjects)
+              .and_return([])
+            end
+
+            it 'should return an error message', :aggregate_failures do
+              get :queued, request_params
+              expect(response.status).to eq(404)
+              error_body = "No data available for selection"
+              expect(response.body).to eq(json_error_message(error_body))
+            end
+          end
+        end
+      end
+    end
+
+    context "logged in user" do
+      before(:each) do
+        default_request user_id: user.id, scopes: scopes
+      end
+
+      context "a queued request" do
+        let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+        let(:request_params) { { workflow_id: workflow.id.to_s } }
+
+        context "with subjects" do
+          before(:each) do
+            get :queued, request_params
+          end
+
+          it "should return 200" do
+            expect(response.status).to eq(200)
+          end
+
+          it 'should return a page of 2 objects' do
+            expect(json_response[api_resource_name].length).to eq(2)
+          end
+
+          it 'should return already_seen as false' do
+            already_seen = json_response["subjects"].map{ |s| s['already_seen']}
+            expect(already_seen).to all( be false )
+          end
+
+          it 'should return finished_workflow as false' do
+            seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
+            expect(seen_all).to all( be false )
+          end
+
+          it 'should return retired as false' do
+            retired = json_response["subjects"].map{ |s| s['retired']}
+            expect(retired).to all( be false )
+          end
+
+          it_behaves_like "an api response"
+        end
+
+        context "user has classified all subjects in the workflow" do
+          let!(:seen_subjects) do
+            create :classification, user: user, workflow: workflow, subjects: subjects
+            create(:user_seen_subject,
+                   user: user,
+                   workflow: workflow,
+                   subject_ids: subjects.map(&:id))
+          end
+
+          it 'should return already_seen true for each subject' do
+            get :queued, request_params
+            already_seen = json_response["subjects"].map{ |s| s['already_seen']}
+            expect(already_seen).to all( be true )
+          end
+
+          it 'should return finished_workflow as true' do
+            get :queued, request_params
+            seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
+            expect(seen_all).to all( be true )
+          end
+        end
+
+        context "with a finished workflow" do
+          let(:workflow) do
+            create(:workflow_with_subject_sets, finished_at: Time.zone.now)
+          end
+
+          before(:each) do
+            workflow.subjects.map do |subject|
+              create(:subject_workflow_status, workflow: workflow, subject: subject, retired_at: Time.zone.now)
+            end
+            get :queued, request_params
+          end
+
+          it 'should return user finished_workflow as false for each subject' do
+            seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
+            expect(seen_all).to all be(false)
+          end
+
+          it 'should return all subjects as retired' do
+            retired = json_response["subjects"].map{ |s| s['retired']}
+            expect(retired).to all( be true )
+          end
+        end
+
+        context "without a workflow id" do
+          before(:each) do
+            get :queued, request_params
+          end
+
+          let(:request_params) do
+            { }
+          end
+
+          it 'should return 422' do
+            expect(response.status).to eq(422)
+          end
+        end
+      end
+    end
+  end
+
   describe "#show" do
     let(:resource) { create(:subject) }
 
