@@ -79,7 +79,7 @@ RSpec.describe Subjects::Remover do
       end
 
       it "notify cellect about the subject removal" do
-        expect(RetireCellectWorker)
+        expect(NotifySubjectSelectorOfRetirementWorker)
           .to receive(:perform_async)
           .with(subject.id, workflow.id)
         remover.cleanup

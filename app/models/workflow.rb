@@ -50,7 +50,7 @@ class Workflow < ActiveRecord::Base
     end
   end
 
-  can_through_parent :project, :update, :index, :show, :destroy, :update_links,
+  can_through_parent :project, :update, :index, :show, :destroy, :update_links, :serializer_test,
     :destroy_links, :translate, :versions, :version, :retire_subject, :create_classifications_export
 
   can_be_linked :subject_set, :same_project?, :model
@@ -86,6 +86,20 @@ class Workflow < ActiveRecord::Base
 
   def retirement_with_defaults
     self.retirement.presence || DEFAULT_RETIREMENT_OPTIONS
+  end
+
+  def subject_selector
+    @subject_selector ||=
+      case
+      when subject_selection_strategy == "cellect"
+        Subjects::CellectSelector.new(self)
+      when subject_selection_strategy == "cellect_ex"
+        Subjects::CellectExSelector.new(self)
+      when using_cellect?
+        Subjects::CellectSelector.new(self)
+      else
+        Subjects::BuiltInSelector.new(self)
+      end
   end
 
   def cellect_size_subject_space?

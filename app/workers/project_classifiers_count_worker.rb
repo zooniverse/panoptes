@@ -7,9 +7,11 @@ class ProjectClassifiersCountWorker
     interval: 60,
     max_in_interval: 1,
     min_delay: 0,
-    reject_with: :cancel,
+    reject_with: :reschedule,
     key: ->(project_id) { "project_#{project_id}_classifiers_count_worker" }
   }
+
+  sidekiq_options unique: :until_executing
 
   def perform(project_id)
     project = Project.find(project_id)

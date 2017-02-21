@@ -6,7 +6,10 @@ class ProjectRequestMailer < ApplicationMailer
     @owner = project.owner.display_name
     @name = project.primary_content.title
     @url = "#{Panoptes.project_request.base_url}/projects/#{project.slug}"
-    emails = [project.owner.email].concat(Panoptes.project_request.recipients)
-    mail(to: emails, subject: "Project #{@type} update")
+    mail(
+      to: [project.owner.email].concat(Panoptes.project_request.recipients),
+      bcc: Panoptes.project_request.bcc,
+      subject: "Project #{@type} update"
+    )
   end
 end

@@ -46,8 +46,8 @@ module RoleControl
           all
         when user.logged_in?
           public_query(private_query(action, user, roles), public_flag)
-        when public_scope
-          public_flag ? public_scope : none
+        when public_flag
+          public_scope
         else
           none
         end

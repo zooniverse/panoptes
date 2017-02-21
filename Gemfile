@@ -39,6 +39,7 @@ gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'pg_search'
 gem 'ranked-model', '~> 0.4.0'
 gem 'sidekiq-congestion', '~> 0.1.0'
+gem 'sidekiq-unique-jobs'
 gem 'sidetiq', '~> 0.7'
 gem "cellect-client", '~> 2.0.1'
 gem 'active_interaction', '~> 3.0.1'
@@ -76,4 +77,5 @@ group :test do
   gem 'guard-rspec', require: false
   gem 'factory_girl_rails'
   gem 'spring-commands-rspec'
+  gem 'mock_redis'
 end

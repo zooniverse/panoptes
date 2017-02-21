@@ -637,7 +637,6 @@ ALTER SEQUENCE organization_contents_id_seq OWNED BY organization_contents.id;
 
 CREATE TABLE organizations (
     id integer NOT NULL,
-    name character varying,
     display_name character varying,
     slug character varying DEFAULT ''::character varying,
     primary_language character varying NOT NULL,
@@ -1484,7 +1483,8 @@ CREATE TABLE workflows (
     activity integer DEFAULT 0 NOT NULL,
     current_version_number character varying,
     activated_state integer DEFAULT 0 NOT NULL,
-    subject_selection_strategy integer DEFAULT 0
+    subject_selection_strategy integer DEFAULT 0,
+    nero_config jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -2394,10 +2394,24 @@ CREATE INDEX index_organizations_on_activated_state ON organizations USING btree
 
 
 --
+-- Name: index_organizations_on_display_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organizations_on_display_name ON organizations USING btree (display_name);
+
+
+--
 -- Name: index_organizations_on_listed_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_organizations_on_listed_at ON organizations USING btree (listed_at);
+
+
+--
+-- Name: index_organizations_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organizations_on_updated_at ON organizations USING btree (updated_at);
 
 
 --
@@ -2534,10 +2548,38 @@ CREATE INDEX index_recents_on_classification_id ON recents USING btree (classifi
 
 
 --
+-- Name: index_recents_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recents_on_created_at ON recents USING btree (created_at);
+
+
+--
+-- Name: index_recents_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recents_on_project_id ON recents USING btree (project_id);
+
+
+--
 -- Name: index_recents_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_recents_on_subject_id ON recents USING btree (subject_id);
+
+
+--
+-- Name: index_recents_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recents_on_user_id ON recents USING btree (user_id);
+
+
+--
+-- Name: index_recents_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recents_on_workflow_id ON recents USING btree (workflow_id);
 
 
 --
@@ -3705,4 +3747,16 @@ INSERT INTO schema_migrations (version) VALUES ('20170112163747');
 INSERT INTO schema_migrations (version) VALUES ('20170113113532');
 
 INSERT INTO schema_migrations (version) VALUES ('20170116134142');
+
+INSERT INTO schema_migrations (version) VALUES ('20170118141452');
+
+INSERT INTO schema_migrations (version) VALUES ('20170202200131');
+
+INSERT INTO schema_migrations (version) VALUES ('20170202202724');
+
+INSERT INTO schema_migrations (version) VALUES ('20170206161946');
+
+INSERT INTO schema_migrations (version) VALUES ('20170210163241');
+
+INSERT INTO schema_migrations (version) VALUES ('20170215105309');
 

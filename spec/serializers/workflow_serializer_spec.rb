@@ -3,13 +3,17 @@ require 'spec_helper'
 describe WorkflowSerializer do
   let(:workflow) { create(:workflow_with_contents) }
   let(:content) { workflow.workflow_contents.first }
-
   let(:serializer) do
     serializer = WorkflowSerializer.new
     serializer.instance_variable_set(:@model, workflow)
     serializer.instance_variable_set(:@context,
                                      {languages: ['en']})
     serializer
+  end
+
+  it "should have the set of preloads wired up" do
+    preloads = %i(subject_sets attached_images)
+    expect(WorkflowSerializer::PRELOADS).to match_array(preloads)
   end
 
   it "should not preload the serialized associations by default" do

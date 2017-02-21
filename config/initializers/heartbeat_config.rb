@@ -1,22 +1,11 @@
 module Panoptes
   module ClassificationHeartbeat
-    def self.config
-      @config ||= begin
-                    file = Rails.root.join('config/heartbeat_config.yml')
-                    YAML.load(File.read(file))[Rails.env].symbolize_keys
-                  rescue Errno::ENOENT, NoMethodError
-                    {  }
-                  end
-    end
-
     def self.window_period
-      config.fetch(:window_period, nil)
+      @lifecycled_live_window ||= ENV.fetch("HEARTBEAT_WINDOW_PERIOD", 600).to_i
     end
 
     def self.emails
-      config.fetch(:emails, [])
+      @emails ||= ENV.fetch("HEARTBEAT_EMAILS", "no-reply@zooniverse.org")
     end
   end
 end
-
-Panoptes::ClassificationHeartbeat.config

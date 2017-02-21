@@ -6,7 +6,8 @@ RSpec.describe Recent, :type => :model do
     let(:recent) { build(:recent, classification: classification) }
 
     it 'should not be valid without a classification' do
-      expect(build(:recent, classification: nil)).to_not be_valid
+      recent.classification = nil
+      expect(recent).to_not be_valid
     end
 
     it 'should not be valid without a subject' do
@@ -49,6 +50,13 @@ RSpec.describe Recent, :type => :model do
       }.to change {
         Recent.where(subject_id: subjects).count
       }.by (subjects.length)
+    end
+  end
+
+  describe "ordered_locations" do
+    it_behaves_like "it has ordered locations" do
+      let(:resource) { create(:recent) }
+      let(:klass) { Recent }
     end
   end
 end

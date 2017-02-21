@@ -32,26 +32,11 @@ RSpec.describe RetirementWorker do
         worker.perform(count.id)
       end
 
-      context "when the workflow is not using cellect" do
-        it "should not call the retire cellect worker" do
-          expect(RetireCellectWorker).not_to receive(:perform_async)
-          worker.perform(count.id)
-        end
-      end
-
-      context "when the workflow is using cellect" do
-        before do
-          allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-          allow_any_instance_of(Workflow)
-          .to receive(:using_cellect?).and_return(true)
-        end
-
-        it "should call the retire cellect worker" do
-          expect(RetireCellectWorker)
-            .to receive(:perform_async)
-            .with(sms.subject_id, workflow.id)
-          worker.perform(count.id)
-        end
+      it "should notify the subject selector" do
+        expect(NotifySubjectSelectorOfRetirementWorker)
+          .to receive(:perform_async)
+          .with(sms.subject_id, workflow.id)
+        worker.perform(count.id)
       end
     end
 

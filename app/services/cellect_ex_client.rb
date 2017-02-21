@@ -38,7 +38,7 @@ class CellectExClient
     request(:post, "/api/workflows/#{workflow_id}/reload")
   end
 
-  def remove_subject(subject_id, workflow_id, group_id)
+  def remove_subject(subject_id, workflow_id)
     request(:post, "/api/workflows/#{workflow_id}/remove") do |req|
       req.body = {subject_id: subject_id}.to_json
     end

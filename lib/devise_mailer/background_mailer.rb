@@ -21,6 +21,8 @@ module Devise
 
     def deliver
       Devise::Mailer.delay.send(@method, @record, @token, @opts)
+    rescue Redis::CannotConnectError, Redis::TimeoutError, Timeout::Error
+      Devise::Mailer.send(@method, @record, @token, @opts).deliver
     end
   end
 end

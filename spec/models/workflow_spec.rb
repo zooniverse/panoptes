@@ -244,10 +244,10 @@ describe Workflow, type: :model do
     context 'when the subject does not belong to the workflow' do
       let(:subject) { create(:subject) }
 
-      it 'should raise an error' do
+      it 'should retire the subject' do
         expect {
           workflow.retire_subject(subject.id)
-        }.to raise_error(ActiveRecord::RecordInvalid)
+        }.to change { SubjectWorkflowStatus.retired.count }.by(1)
       end
     end
   end

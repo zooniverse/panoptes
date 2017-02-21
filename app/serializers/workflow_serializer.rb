@@ -14,7 +14,7 @@ class WorkflowSerializer
              :created_at, :updated_at, :finished_at, :first_task, :primary_language,
              :version, :content_language, :prioritized, :grouped, :pairwise,
              :retirement, :retired_set_member_subjects_count, :href, :active,
-             :aggregation, :configuration, :public_gold_standard, :completeness
+             :aggregation, :nero_config, :configuration, :public_gold_standard, :completeness
 
   can_include :project, :subject_sets, :tutorial_subject
 
@@ -35,7 +35,7 @@ class WorkflowSerializer
   end
 
   def content_language
-    content.language if content
+    content&.language
   end
 
   def content_version

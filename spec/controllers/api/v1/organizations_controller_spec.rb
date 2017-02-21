@@ -26,7 +26,7 @@ describe Api::V1::OrganizationsController, type: :controller do
       it_behaves_like "is indexable" do
         let(:private_resource) { unlisted_organization }
         let(:api_resource_name) { "organizations" }
-        let(:api_resource_attributes) { %w(id name display_name) }
+        let(:api_resource_attributes) { %w(id display_name) }
         let(:api_resource_links) { %w() }
 
         let(:n_visible) { 1 }
@@ -72,7 +72,7 @@ describe Api::V1::OrganizationsController, type: :controller do
       it_behaves_like "is showable" do
         let(:resource) { organization }
         let(:api_resource_name) { "organizations" }
-        let(:api_resource_attributes) { %w(id name display_name) }
+        let(:api_resource_attributes) { %w(id display_name) }
         let(:api_resource_links) { %w() }
       end
     end
@@ -81,7 +81,6 @@ describe Api::V1::OrganizationsController, type: :controller do
       let(:create_params) do
         {
           organizations: {
-            name: "The Illuminati",
             display_name: "The Illuminati",
             title: "Come join us",
             description: "This organization is the most organized organization to ever organize",
@@ -96,7 +95,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:test_attr_value) { "The Illuminati" }
         let(:resource_class) { Organization }
         let(:api_resource_name) { "organizations" }
-        let(:api_resource_attributes) { %w(id name display_name) }
+        let(:api_resource_attributes) { %w(id display_name) }
         let(:api_resource_links) { %w() }
       end
     end
@@ -106,13 +105,12 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:resource) { create(:organization, owner: authorized_user) }
         let(:resource_class) { Organization }
         let(:api_resource_name) { "organizations" }
-        let(:api_resource_attributes) { ["name", "display_name", "title", "description"] }
+        let(:api_resource_attributes) { ["display_name", "title", "description"] }
         let(:api_resource_links) { [] }
         let(:update_params) do
           {
             organizations: {
               primary_language: "tw",
-              name: "A Different Name",
               display_name: "Def Not Illuminati",
               title: "Totally Harmless",
               description: "This Organization is not affiliated with the Illuminati, absolutely not no way",
@@ -129,7 +127,6 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:incomplete_params) do
           {
             organizations: {
-              name: "Just a name",
               display_name: "Just a name"
             }
           }

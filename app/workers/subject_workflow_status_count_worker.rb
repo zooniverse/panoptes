@@ -7,11 +7,13 @@ class SubjectWorkflowStatusCountWorker
     interval: 30,
     max_in_interval: 1,
     min_delay: 5,
-    reject_with: :cancel,
+    reject_with: :reschedule,
     key: ->(count_id) {
       "sws_#{count_id}_count_worker"
     }
   }
+
+  sidekiq_options unique: :until_executing
 
   def perform(count_id)
     sws = SubjectWorkflowStatus.find(count_id)

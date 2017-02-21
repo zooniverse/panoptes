@@ -14,8 +14,8 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:api_resource_attributes) do
     %w(id display_name tasks classifications_count subjects_count
     created_at updated_at first_task primary_language content_language
-    version grouped prioritized pairwise retirement aggregation active
-    configuration finished_at public_gold_standard)
+    version grouped prioritized pairwise retirement aggregation nero_config
+    active configuration finished_at public_gold_standard)
   end
   let(:api_resource_links)do
     %w(workflows.project workflows.subject_sets workflows.tutorial_subject
@@ -31,6 +31,20 @@ describe Api::V1::WorkflowsController, type: :controller do
   after(:each) do
     PaperTrail.enabled = false
     PaperTrail.enabled_for_controller = false
+  end
+
+  describe "serializer_test" do
+    it "should use the old serializer by default" do
+      expect(WorkflowSerializer).to receive(:page)
+      get :serializer_test
+    end
+
+    it "should use the new serializer if setup" do
+      allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
+      Panoptes.flipper["workflow_prp_serializer"].enable
+      expect(WorkflowPrpSerializer).to receive(:page)
+      get :serializer_test
+    end
   end
 
   describe '#index' do
@@ -90,32 +104,37 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:resource_id) { :workflow_id }
     let(:update_params) do
       {
-       workflows: {
-                   display_name: "A Better Name",
-                   active: false,
-                   retirement: { criteria: "classification_count" },
-                   aggregation: { },
-                   configuration: { },
-                   public_gold_standard: true,
-                   tasks: {
-                           interest: {
-                                      type: "draw",
-                                      question: "Draw a Circle",
-                                      next: "shape",
-                                      tools: [
-                                              {value: "red", label: "Red", type: 'point', color: 'red'},
-                                              {value: "green", label: "Green", type: 'point', color: 'lime'},
-                                              {value: "blue", label: "Blue", type: 'point', color: 'blue'},
-                                             ]
-                                     }
-                          },
-                   display_order_position: 1,
-                   links: {
-                           subject_sets: [subject_set.id.to_s],
-                           tutorials: [tutorial.id.to_s]
-                          }
+        workflows: {
+          display_name: "A Better Name",
+          active: false,
+          retirement: {criteria: "classification_count"},
+          aggregation: {},
+          nero_config: {
+            extractors: {surv: {type: 'survey'}},
+            reducers: {custom: {type: 'external', url: 'https://example.org/reduce'}},
+            rules: [{if: ["const", true], then: [{action: 'retire_subject'}]}]
+          },
+          configuration: {},
+          public_gold_standard: true,
+          tasks: {
+            interest: {
+             type: "draw",
+             question: "Draw a Circle",
+             next: "shape",
+             tools: [
+               {value: "red", label: "Red", type: 'point', color: 'red'},
+               {value: "green", label: "Green", type: 'point', color: 'lime'},
+               {value: "blue", label: "Blue", type: 'point', color: 'blue'}
+             ]
+           }
+           },
+           display_order_position: 1,
+           links: {
+            subject_sets: [subject_set.id.to_s],
+            tutorials: [tutorial.id.to_s]
+          }
 
-                  }
+        }
       }
     end
 
@@ -145,17 +164,17 @@ describe Api::V1::WorkflowsController, type: :controller do
       context "when the update requests tasks to change" do
         let(:update_params) do
           {
-           tasks: {
-                   wintrest: {
-                              type: "draw",
-                              question: "Draw a Circle",
-                              next: "shape",
-                              tools: [
-                                      {value: "red", label: "Red", type: 'point', color: 'red'},
-                                      {value: "green", label: "Green", type: 'point', color: 'lime'},
-                                     ]
-                             }
-                  }
+            tasks: {
+              wintrest: {
+                type: "draw",
+                question: "Draw a Circle",
+                next: "shape",
+                tools: [
+                  {value: "red", label: "Red", type: 'point', color: 'red'},
+                  {value: "green", label: "Green", type: 'point', color: 'lime'}
+                ]
+              }
+            }
           }
         end
 
@@ -237,39 +256,21 @@ describe Api::V1::WorkflowsController, type: :controller do
         end
 
         context "when the workflow has subjects" do
-          it 'should not call the reload cellect worker when cellect is off' do
-            expect(ReloadCellectWorker).not_to receive(:perform_async)
-          end
-
           case link_to_test
           when :subject_sets
             it "should call unfinish_workflow_worker" do
               expect(UnfinishWorkflowWorker).to receive(:perform_async).with(resource.id)
             end
 
-            context "when cellect is on" do
-              before do
-                allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-              end
-
-              it 'should not call reload cellect worker' do
-                expect(ReloadCellectWorker).not_to receive(:perform_async)
-              end
-
-              it 'should call reload cellect worker when workflow uses cellect' do
-                allow_any_instance_of(Workflow)
-                  .to receive(:using_cellect?).and_return(true)
-                expect(ReloadCellectWorker).to receive(:perform_async)
-                  .with(resource.id)
-              end
+            it 'should notify the subject selector that the available subjects changed' do
+              allow_any_instance_of(Workflow)
+                .to receive(:using_cellect?).and_return(true)
+              expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async)
+                .with(resource.id)
             end
           when :retired_subjects
             it 'should not call reload cellect worker' do
-              expect(ReloadCellectWorker).not_to receive(:perform_async)
-            end
-
-            it 'should not call the retire cellect worker' do
-              expect(RetireCellectWorker).not_to receive(:perform_async)
+              expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
             end
 
             it 'should call the workflow retired counter worker' do
@@ -278,34 +279,9 @@ describe Api::V1::WorkflowsController, type: :controller do
                 .with(resource.id)
             end
 
-            context "when cellect is on" do
-              before do
-                allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-              end
-
-              it 'should not call reload cellect worker' do
-                expect(ReloadCellectWorker).not_to receive(:perform_async)
-              end
-
-              it 'should not call the retire cellect worker' do
-                expect(RetireCellectWorker).not_to receive(:perform_async)
-              end
-
-              context "when the workflow is using cellect" do
-                before do
-                  allow_any_instance_of(Workflow)
-                  .to receive(:using_cellect?).and_return(true)
-                end
-
-                it 'should not call reload cellect worker' do
-                  expect(ReloadCellectWorker).not_to receive(:perform_async)
-                end
-
-                it 'should call retire cellect worker when workflow uses cellect' do
-                  expect(RetireCellectWorker).to receive(:perform_async)
-                    .with(linked_resource.id.to_s, workflow.id)
-                end
-              end
+            it 'should notify the subject selector that subjects were retired' do
+              expect(NotifySubjectSelectorOfRetirementWorker).to receive(:perform_async)
+                .with(linked_resource.id.to_s, workflow.id)
             end
           end
         end
@@ -315,7 +291,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
           it 'should not attempt to call cellect', :aggregate_failures do
             expect(Panoptes).not_to receive(:use_cellect?)
-            expect(ReloadCellectWorker).not_to receive(:perform_async)
+            expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
           end
         end
       end
@@ -323,7 +299,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       context "without authorized user" do
         it 'should not attempt to call cellect', :aggregate_failures do
           expect(Panoptes).not_to receive(:use_cellect?)
-          expect(ReloadCellectWorker).not_to receive(:perform_async)
+          expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
         end
       end
     end
@@ -415,44 +391,50 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:create_task_params) do
       {
         interest: {
-                   type: "draw",
-                   question: "Draw a Circle",
-                   next: "shape",
-                   tools: [
-                           {value: "red", label: "Red", type: 'point', color: 'red'},
-                           {value: "green", label: "Green", type: 'point', color: 'lime'},
-                           {value: "blue", label: "Blue", type: 'point', color: 'blue'},
-                          ]
-                  },
+          type: "draw",
+          question: "Draw a Circle",
+          next: "shape",
+          tools: [
+            {value: "red", label: "Red", type: 'point', color: 'red'},
+            {value: "green", label: "Green", type: 'point', color: 'lime'},
+            {value: "blue", label: "Blue", type: 'point', color: 'blue'}
+          ]
+        },
         shape: {
-                type: 'multiple',
-                question: "What shape is this galaxy?",
-                answers: [
-                          {value: 'smooth', label: "Smooth"},
-                          {value: 'features', label: "Features"},
-                          {value: 'other', label: 'Star or artifact'}
-                         ],
-                next: nil
-               }
-       }
+          type: 'multiple',
+          question: "What shape is this galaxy?",
+          answers: [
+            {value: 'smooth', label: "Smooth"},
+            {value: 'features', label: "Features"},
+            {value: 'other', label: 'Star or artifact'}
+          ],
+          next: nil
+        }
+      }
     end
+
     let(:create_params) do
       {
-         workflows: {
-                     display_name: 'Test workflow',
-                     first_task: 'interest',
-                     active: true,
-                     retirement: { criteria: "classification_count" },
-                     aggregation: { public: true },
-                     configuration: { autoplay_subjects: true },
-                     public_gold_standard: true,
-                     tasks: create_task_params,
-                     grouped: true,
-                     prioritized: true,
-                     primary_language: 'en',
-                     display_order_position: 1,
-                     links: { project: project.id.to_s }
-                    }
+        workflows: {
+          display_name: 'Test workflow',
+          first_task: 'interest',
+          active: true,
+          retirement: {criteria: "classification_count"},
+          aggregation: {public: true},
+          nero_config: {
+            extractors: {surv: {type: 'survey'}},
+            reducers: {custom: {type: 'external', url: 'https://example.org/reduce'}},
+            rules: [{if: ["const", true], then: [{action: 'retire_subject'}]}]
+          },
+          configuration: {autoplay_subjects: true},
+          public_gold_standard: true,
+          tasks: create_task_params,
+          grouped: true,
+          prioritized: true,
+          primary_language: 'en',
+          display_order_position: 1,
+          links: {project: project.id.to_s}
+        }
       }
     end
 

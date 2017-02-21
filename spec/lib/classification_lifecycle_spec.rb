@@ -266,30 +266,15 @@ describe ClassificationLifecycle do
       end
     end
 
-    context "notifying cellect" do
-      it "should not call the worker when cellect is disabled" do
-        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(false)
-        expect(SeenCellectWorker).not_to receive(:perform_async)
-        subject.execute
+    it "should notify the subject selector" do
+      allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
+      allow(classification.workflow).to receive(:using_cellect?).and_return(true)
+
+      classification.subject_ids.each do |subject_id|
+        expect(NotifySubjectSelectorOfSeenWorker).to receive(:perform_async).with(workflow.id, user.id, subject_id)
       end
 
-      it "should not call the worker when cellect is enabled but not active for this workflow" do
-        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-        allow(classification.workflow).to receive(:using_cellect?).and_return(false)
-        expect(SeenCellectWorker).not_to receive(:perform_async)
-        subject.execute
-      end
-
-      it "should call the worker when cellect is enabled for this workflow" do
-        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-        allow(classification.workflow).to receive(:using_cellect?).and_return(true)
-
-        classification.subject_ids.each do |subject_id|
-          expect(SeenCellectWorker).to receive(:perform_async).with(workflow.id, user.id, subject_id)
-        end
-
-        subject.execute
-      end
+      subject.execute
     end
   end
 

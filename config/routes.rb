@@ -74,7 +74,11 @@ Rails.application.routes.draw do
 
       json_api_resources :memberships
 
-      json_api_resources :subjects, versioned: true
+      json_api_resources :subjects, versioned: true do
+        collection do
+          get :queued
+        end
+      end
 
       json_api_resources :users, except: [:new, :edit, :create], links: [:user_groups] do
         get "/recents", to: "users#recents", format: false
@@ -113,6 +117,11 @@ Rails.application.routes.draw do
 
         post "/retired_subjects", to: "workflows#retire_subjects"
         post "/classifications_export", to: "workflows#create_classifications_export", format: false
+
+        # temp route to test Panoptes::RestpackSerializer
+        collection do
+          get "/serializer_test", to: "workflows#serializer_test"
+        end
       end
 
       json_api_resources :subject_sets, links: [:subjects]

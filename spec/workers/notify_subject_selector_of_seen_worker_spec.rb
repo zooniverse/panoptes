@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe SeenCellectWorker do
+RSpec.describe NotifySubjectSelectorOfSeenWorker do
   let(:worker) { described_class.new }
   let(:workflow) { create(:workflow) }
   let(:subject_id) { 2 }
@@ -20,7 +20,7 @@ RSpec.describe SeenCellectWorker do
 
     context "when cellect is off" do
       it "should not call cellect" do
-        expect(Subjects::CellectClient).not_to receive(:add_seen)
+        expect(CellectClient).not_to receive(:add_seen)
         worker.perform(workflow.id, user_id, subject_id)
       end
     end
@@ -31,7 +31,7 @@ RSpec.describe SeenCellectWorker do
       end
 
       it "should not call to cellect if the workflow is not set to use it" do
-        expect(Subjects::CellectClient).not_to receive(:add_seen)
+        expect(CellectClient).not_to receive(:add_seen)
         worker.perform(workflow.id, user_id, subject_id)
       end
 
@@ -42,12 +42,12 @@ RSpec.describe SeenCellectWorker do
         end
 
         it "should not call to cellect if the user is nil" do
-          expect(Subjects::CellectClient).not_to receive(:add_seen)
+          expect(CellectClient).not_to receive(:add_seen)
           worker.perform(workflow.id, nil, subject_id)
         end
 
         it "should request that cellect add the seen for the subject" do
-          expect(Subjects::CellectClient)
+          expect(CellectClient)
             .to receive(:add_seen)
             .with(workflow.id, user_id, subject_id)
           worker.perform(workflow.id, user_id, subject_id)
