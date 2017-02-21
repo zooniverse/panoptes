@@ -13,11 +13,15 @@ class Api::V1::SubjectsController < Api::ApiController
   def index
     case params[:sort]
     when 'queued'
-      non_filterable_params = params.except(:project_id, :collection_id)
-      render json_api: SubjectSerializer.page(non_filterable_params, *selector.get_subjects)
+      queued
     else
       super
     end
+  end
+
+  def queued
+    non_filterable_params = params.except(:project_id, :collection_id)
+    render json_api: SubjectSerializer.page(non_filterable_params, *selector.get_subjects)
   end
 
   def create

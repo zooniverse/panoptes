@@ -74,7 +74,11 @@ Rails.application.routes.draw do
 
       json_api_resources :memberships
 
-      json_api_resources :subjects, versioned: true
+      json_api_resources :subjects, versioned: true do
+        collection do
+          get :queued
+        end
+      end
 
       json_api_resources :users, except: [:new, :edit, :create], links: [:user_groups] do
         get "/recents", to: "users#recents", format: false
