@@ -8,6 +8,7 @@ describe SubjectSelectorSerializer do
 
   it_should_behave_like "a panoptes restpack serializer" do
     let(:resource) { subject }
+    let(:includes) { [] }
     let(:preloads) { [ :locations ] }
   end
 
@@ -34,7 +35,7 @@ describe SubjectSelectorSerializer do
     end
   end
 
-  context "subject selection", :focus do
+  context "subject selection" do
     let(:selection_context) { { select_context: true } }
     let(:run_serializer) do
       SubjectSelectorSerializer.single({}, Subject.all, selection_context)
