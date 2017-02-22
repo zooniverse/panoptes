@@ -37,8 +37,8 @@ shared_examples "a panoptes restpack serializer" do
     it "should preload included relations" do
       expect_any_instance_of(resource.class::ActiveRecord_Relation)
         .to receive(:preload)
-        .with(*preloads)
-      described_class.page({include: includes}, scope, {})
+        .with(*includes)
+      described_class.page({include: includes.join(',')}, scope, {})
     end
   end
 end
