@@ -5,6 +5,7 @@ class ClassificationSerializer
   include NoCountSerializer
 
   attributes :id, :annotations, :created_at, :metadata, :href
+
   can_include :project, :user, :user_group, :workflow
 
   preload :subjects
