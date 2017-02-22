@@ -10,6 +10,10 @@ class SubjectSelectorSerializer
 
   preload :locations
 
+  def self.model_class
+    Subject
+  end
+
   def locations
     @model.ordered_locations.map do |loc|
       {
