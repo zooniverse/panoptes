@@ -12,6 +12,10 @@ describe SubjectSelectorSerializer do
     let(:preloads) { [ :locations ] }
   end
 
+  it_should_behave_like "a no count serializer" do
+    let(:resource) { subject }
+  end
+
   describe "locations" do
     let(:subject) do
       create(:subject, :with_mediums, :with_subject_sets, num_sets: 1)

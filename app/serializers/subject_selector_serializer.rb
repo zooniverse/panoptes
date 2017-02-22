@@ -2,6 +2,7 @@ require 'panoptes/restpack_serializer'
 
 class SubjectSelectorSerializer
   include Panoptes::RestpackSerializer
+  include NoCountSerializer
 
   attributes :id, :metadata, :locations, :zooniverse_id,
     :created_at, :updated_at, :href
