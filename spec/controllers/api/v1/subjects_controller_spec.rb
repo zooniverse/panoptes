@@ -78,6 +78,7 @@ describe Api::V1::SubjectsController, type: :controller do
       context "a queued request" do
         let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
+        let(:api_resource_links) { [] }
 
         context "with queued subjects" do
           context "when firing the request before the test" do
@@ -152,6 +153,7 @@ describe Api::V1::SubjectsController, type: :controller do
       context "a queued request" do
         let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
+        let(:api_resource_links) { [] }
 
         context "with subjects" do
           before(:each) do
@@ -266,6 +268,8 @@ describe Api::V1::SubjectsController, type: :controller do
   end
 
   describe "#queued" do
+    let(:api_resource_links) { [] }
+
     context "logged out user" do
       context "a queued request" do
         let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }

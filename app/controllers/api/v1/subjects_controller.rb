@@ -20,8 +20,9 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def queued
+    selector = Subjects::Selector.new(api_user.user, workflow, params)
     non_filterable_params = params.except(:project_id, :collection_id)
-    render json_api: SubjectSerializer.page(non_filterable_params, *selector.get_subjects)
+    render json_api: SubjectSelectorSerializer.page(non_filterable_params, *selector.get_subjects)
   end
 
   def create
@@ -83,10 +84,6 @@ class Api::V1::SubjectsController < Api::ApiController
     else
       { url_format: :get }
     end
-  end
-
-  def selector
-    @selector ||= Subjects::Selector.new(api_user.user, workflow, params)
   end
 
   def location_params(locations)
