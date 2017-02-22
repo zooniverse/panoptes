@@ -14,7 +14,7 @@ describe OrganizationSerializer do
   describe "#content" do
     let(:organization_with_media) { create(:organization, build_media: true) }
     let(:links) { [:avatar, :background] }
-    let(:serialized) { OrganizationSerializer.resource({include: 'avatar,background'}, Organization.where(id: organization_with_media.id), context) }
+    let(:serialized) { OrganizationSerializer.resource({include: 'avatar,background,owners'}, Organization.where(id: organization_with_media.id), context) }
 
     it "should return organization content for the preferred language" do
       expect(serializer.content).to be_a( Hash )
@@ -34,6 +34,11 @@ describe OrganizationSerializer do
       it "should include background" do
         expect(serialized[:linked][:backgrounds].map{ |r| r[:id] })
         .to include(organization_with_media.background.id.to_s)
+      end
+
+      it "should include owners" do
+        expect(serialized[:linked][:owners].map{ |r| r[:id] })
+        .to include(organization_with_media.owner.id.to_s)
       end
     end
 
