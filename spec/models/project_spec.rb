@@ -114,7 +114,7 @@ describe Project, type: :model do
     end
   end
 
-  describe "#active_workflows" do
+  describe "#active_workflows", :focus do
     let(:project) do
       create(:project) do |p|
         create(:workflow, project: p, active: true)
@@ -125,6 +125,11 @@ describe Project, type: :model do
     it "should only return the active workflow" do
       expect(project.active_workflows.size).to eq(1)
       expect(project.active_workflows).to all( be_a(Workflow) )
+    end
+
+    it "should not include inactive workflows" do
+      project.active_workflows.first.inactive!
+      expect(project.active_workflows.size).to eq(0)
     end
   end
 
