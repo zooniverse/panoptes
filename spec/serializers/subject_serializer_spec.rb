@@ -6,12 +6,10 @@ describe SubjectSerializer do
     create(:collection, build_projects: false, owner: subject.project.owner, subjects: [subject])
   end
 
-  it "should preload the serialized associations" do
-    expect_any_instance_of(Subject::ActiveRecord_Relation)
-      .to receive(:preload)
-      .with(:locations, :project, :collections, :subject_sets)
-      .and_call_original
-    SubjectSerializer.page({}, Subject.all, {})
+  it_should_behave_like "a panoptes restpack serializer" do
+    let(:resource) { subject }
+    let(:includes) { %i(project collections subject_sets) }
+    let(:preloads) { %i(locations project collections subject_sets) }
   end
 
   describe "locations" do
