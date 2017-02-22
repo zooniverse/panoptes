@@ -34,9 +34,10 @@ shared_examples "a panoptes restpack serializer" do
       described_class.page({}, scope, {})
     end
 
-    it "should preload included relations" do
+    it "should handle preloading included relations" do
+      expectation = includes.empty? ? :not_to : :to
       expect_any_instance_of(resource.class::ActiveRecord_Relation)
-        .to receive(:preload)
+        .send(expectation, receive(:preload))
         .with(*includes)
       described_class.page({include: includes.join(',')}, scope, {})
     end
