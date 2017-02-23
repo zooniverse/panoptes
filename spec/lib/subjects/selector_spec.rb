@@ -10,39 +10,6 @@ RSpec.describe Subjects::Selector do
   subject { described_class.new(user, workflow, params) }
 
   describe "#get_subjects" do
-    describe "context object" do
-      let(:ctx) { subject.get_subjects.last }
-
-      it 'should return url_format: :get' do
-        expect(ctx).to include(url_format: :get)
-      end
-
-      it 'should return select_context' do
-        expect(ctx).to include(select_context: true)
-      end
-
-      it 'should not return select_context in the context object' do
-        Panoptes.flipper[:skip_subject_selection_context].enable
-        expect(ctx).not_to include(:select_context)
-      end
-    end
-
-    context "when the workflow is finished_at" do
-      before do
-        allow(workflow).to receive(:finished_at).and_return(Time.zone.now)
-      end
-
-      it "should not run the strategy selector" do
-        expect(subject).not_to receive(:run_strategy_selection)
-        subject.get_subjects
-      end
-
-      it "should run the fallback selector only" do
-        expect(subject).to receive(:fallback_selection).and_call_original
-        subject.get_subjects
-      end
-    end
-
     context "when the workflow doesn't have any subject sets" do
       it 'should raise an informative error' do
         allow_any_instance_of(Workflow).to receive(:subject_sets).and_return([])
@@ -73,7 +40,7 @@ RSpec.describe Subjects::Selector do
       end
 
       it 'should return the default subjects set size' do
-        subjects, = subject.get_subjects
+        subjects = subject.get_subjects
         expect(subjects.length).to eq(10)
       end
 
@@ -85,7 +52,7 @@ RSpec.describe Subjects::Selector do
         end
 
         it 'should return the page_size number of subjects' do
-          subjects, _context = subject.get_subjects
+          subjects = subject.get_subjects
           expect(subjects.length).to eq(size)
         end
       end
@@ -101,7 +68,7 @@ RSpec.describe Subjects::Selector do
       end
 
       it 'should fallback to selecting some data' do
-        subjects, _context = subject.get_subjects
+        subjects = subject.get_subjects
       end
 
       context "and the workflow is grouped" do
@@ -110,7 +77,7 @@ RSpec.describe Subjects::Selector do
 
         it 'should fallback to selecting some grouped data' do
           allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
-          subjects, _context = subject.get_subjects
+          subjects = subject.get_subjects
         end
       end
     end
