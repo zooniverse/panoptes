@@ -11,24 +11,6 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   prepend_before_action :require_login, only: [:create, :update, :destroy, :create_classifications_export]
 
-  # temp action to test perf of Panoptes::RestpackSerializer
-  def serializer_test
-    experiment_name = "workflow_prp_serializer"
-    CodeExperiment.run(experiment_name) do |e|
-      e.run_if { Panoptes.flipper[experiment_name].enabled? }
-      e.use do
-        serializer.page(params, controlled_resources, context)
-      end
-      e.try do
-         WorkflowPrpSerializer.page(params, controlled_resources, context)
-      end
-      # skip the mismatch reporting...we just want perf metrics
-      e.ignore { true }
-
-      render nothing: true, status: 204
-    end
-  end
-
   def index
     unless params.has_key?(:sort)
       @controlled_resources = controlled_resources.rank(:display_order)

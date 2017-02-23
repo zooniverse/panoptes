@@ -33,20 +33,6 @@ describe Api::V1::WorkflowsController, type: :controller do
     PaperTrail.enabled_for_controller = false
   end
 
-  describe "serializer_test" do
-    it "should use the old serializer by default" do
-      expect(WorkflowSerializer).to receive(:page)
-      get :serializer_test
-    end
-
-    it "should use the new serializer if setup" do
-      allow_any_instance_of(CodeExperiment).to receive(:enabled?).and_return(true)
-      Panoptes.flipper["workflow_prp_serializer"].enable
-      expect(WorkflowPrpSerializer).to receive(:page)
-      get :serializer_test
-    end
-  end
-
   describe '#index' do
     let(:filterable_resources) { create_list(:workflow_with_subjects, 2) }
     let(:expected_filtered_ids) { [ filterable_resources.first.id.to_s ] }
