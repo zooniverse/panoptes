@@ -348,14 +348,30 @@ describe Workflow, type: :model do
     end
 
     it "should return true if the config is set" do
-      allow(workflow).to receive(:subject_selection_strategy).and_return("cellect")
+      allow(workflow).to receive(:cellect?).and_return(true)
       expect(workflow.using_cellect?).to be_truthy
     end
 
-    it "should return true if the subjects space is large enough" do
-      allow(workflow).to receive(:subjects_count)
-        .and_return(Panoptes.cellect_min_pool_size)
-      expect(workflow.using_cellect?).to be_truthy
+    context "when the subject space is large enough" do
+      before do
+        allow(workflow)
+          .to receive(:subjects_count)
+          .and_return(Panoptes.cellect_min_pool_size)
+      end
+
+      it "should return true if no selection strategy" do
+        expect(workflow.using_cellect?).to be_truthy
+      end
+
+      it "should return true if cellect strategy" do
+        workflow.cellect!
+        expect(workflow.using_cellect?).to be_truthy
+      end
+
+      it "should return false if cellect_ex is set" do
+        workflow.cellect_ex!
+        expect(workflow.using_cellect?).to be_falsey
+      end
     end
   end
 

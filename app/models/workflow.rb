@@ -108,7 +108,13 @@ class Workflow < ActiveRecord::Base
 
   def using_cellect?
     Rails.cache.fetch(model_cache_key(:using_cellect?), expires_in: 1.hour) do
-      subject_selection_strategy.to_s == "cellect" || cellect_size_subject_space?
+      if cellect?
+        true
+      elsif cellect_ex?
+        false
+      else
+        cellect_size_subject_space?
+      end
     end
   end
 
