@@ -54,7 +54,7 @@ describe SubjectSelectorSerializer do
       end
 
       context "when skip select context lookup feature flag is on" do
-        let(:selection_context) { { select_context: false } }
+        let(:selection_context) { {} }
 
         it "should not run the lookups if the feature flag is on" do
           expect_any_instance_of(SubjectSelectorSerializer).not_to receive(:retired)
