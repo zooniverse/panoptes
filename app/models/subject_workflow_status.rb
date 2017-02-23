@@ -36,7 +36,7 @@ class SubjectWorkflowStatus < ActiveRecord::Base
     !retired? && workflow.retirement_scheme.retire?(self)
   end
 
-  def retire!(reason=:classification_count)
+  def retire!(reason=nil)
     unless retired?
       update!(retirement_reason: reason, retired_at: Time.zone.now)
     end
