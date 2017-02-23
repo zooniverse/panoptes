@@ -155,6 +155,32 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
         let(:api_resource_links) { [] }
 
+        describe "selection context" do
+          let(:selector_context) do
+            {
+              workflow: workflow,
+              user: user,
+              url_format: :get,
+              select_context: true
+            }
+          end
+
+          it 'should pass the selection context to the serializer' do
+            expect(SubjectSelectorSerializer)
+              .to receive(:page)
+              .with(anything, anything, selector_context)
+            get :index, request_params
+          end
+
+          it 'should pass empty selection context if feature flag is enabled' do
+            Panoptes.flipper[:skip_subject_selection_context].enable
+            expect(SubjectSelectorSerializer)
+              .to receive(:page)
+              .with(anything, anything, {})
+            get :index, request_params
+          end
+        end
+
         context "with subjects" do
           before(:each) do
             get :index, request_params
