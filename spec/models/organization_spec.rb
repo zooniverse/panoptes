@@ -27,15 +27,6 @@ describe Organization, type: :model do
     expect(build(:organization, primary_language: nil)).to_not be_valid
   end
 
-  describe "links" do
-    let(:user) { ApiUser.new(create(:user)) }
-
-    it "should allow projects to link when user has update permissions" do
-      expect(Organization).to link_to(Project).given_args(user)
-                          .with_scope(:scope_for, :update, user)
-    end
-  end
-
   describe "#organization_roles" do
     let!(:preferences) do
       [create(:access_control_list, resource: organization, roles: []),
