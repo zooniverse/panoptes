@@ -21,7 +21,7 @@ module Subjects
     end
 
     def selected_subjects
-      sms_ids = run_strategy_selection
+      sms_ids = run_strategy_selection unless workflow.finished_at
       sms_ids = fallback_selection if sms_ids.blank?
       active_subjects_in_selection_order(sms_ids)
     end
@@ -40,7 +40,12 @@ module Subjects
     end
 
     def fallback_selection
-      eventlog.info "Preferred strategy returned no results, trying fallback", workflow_id: workflow.id, user_id: user&.id
+      msg = if workflow.finished_at
+        "Skipped selection for the finished workflow"
+      else
+        "Preferred strategy returned no results, trying fallback"
+      end
+      eventlog.info msg, workflow_id: workflow.id, user_id: user&.id
 
       opts = { limit: subjects_page_size, subject_set_id: subject_set_id }
       fallback_selector = PostgresqlSelection.new(workflow, user, opts)
