@@ -6,7 +6,7 @@ class RetirementWorker
   def perform(count_id)
     count = SubjectWorkflowStatus.find(count_id)
     if count.retire?
-      count.retire!
+      count.retire!("classification_count")
 
       workflow = count.workflow
       WorkflowRetiredCountWorker.perform_async(workflow.id)
