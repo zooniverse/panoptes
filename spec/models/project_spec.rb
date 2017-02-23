@@ -114,7 +114,7 @@ describe Project, type: :model do
     end
   end
 
-  describe "#active_workflows", :focus do
+  describe "#active_workflows" do
     let(:project) do
       create(:project) do |p|
         create(:workflow, project: p, active: true)
