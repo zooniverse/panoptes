@@ -109,6 +109,11 @@ class ProjectUpdateSchema < JsonSchema
       end
     end
 
+    property "organization_id" do
+      type "string", "integer", nil
+      pattern "^[0-9]*$"
+    end
+
     property "links" do
       type "object"
       additional_properties false

@@ -640,6 +640,31 @@ describe Api::V1::ProjectsController, type: :controller do
       }
     end
 
+    describe "update organization" do
+      let(:organization) { create(:organization) }
+      let!(:project_with_org) { create(:project, owner: authorized_user, organization: organization)}
+      let(:update_org_params) do
+        {
+          projects: {
+            organization_id: organization.id.to_s
+          }
+        }
+      end
+
+      it "updates the project's organization association" do
+        default_request scopes: scopes, user_id: authorized_user.id
+        put :update, update_org_params.merge(id: resource.id)
+        expect(resource.reload.organization).to eq(organization)
+      end
+
+      it "removes the project's organization association" do
+        default_request scopes: scopes, user_id: authorized_user.id
+        update_org_params[:projects][:organization_id] = nil
+        put :update, update_org_params.merge(id: project_with_org.id)
+        expect(project_with_org.reload.organization).to be nil
+      end
+    end
+
     it_behaves_like "is updatable"
 
     describe "update tags" do
