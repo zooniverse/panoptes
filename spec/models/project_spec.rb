@@ -126,6 +126,11 @@ describe Project, type: :model do
       expect(project.active_workflows.size).to eq(1)
       expect(project.active_workflows).to all( be_a(Workflow) )
     end
+
+    it "should not include inactive workflows" do
+      project.active_workflows.first.inactive!
+      expect(project.active_workflows.size).to eq(0)
+    end
   end
 
   describe "#subject_sets" do
