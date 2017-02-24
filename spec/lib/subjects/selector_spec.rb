@@ -27,6 +27,22 @@ RSpec.describe Subjects::Selector do
       end
     end
 
+    context "when the workflow is finished_at" do
+      before do
+        allow(workflow).to receive(:finished_at).and_return(Time.zone.now)
+      end
+
+      it "should not run the strategy selector" do
+        expect(subject).not_to receive(:run_strategy_selection)
+        subject.get_subjects
+      end
+
+      it "should run the fallback selector only" do
+        expect(subject).to receive(:fallback_selection).and_call_original
+        subject.get_subjects
+      end
+    end
+
     context "when the workflow doesn't have any subject sets" do
       it 'should raise an informative error' do
         allow_any_instance_of(Workflow).to receive(:subject_sets).and_return([])
