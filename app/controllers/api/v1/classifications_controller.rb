@@ -93,4 +93,12 @@ class Api::V1::ClassificationsController < Api::ApiController
       context
     )
   end
+
+  def context
+    if %w(gold_standard incomplete project).include?(action_name)
+      super.merge(url_suffix: action_name)
+    else
+      super
+    end
+  end
 end

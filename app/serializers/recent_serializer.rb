@@ -1,17 +1,16 @@
+require 'panoptes/restpack_serializer'
+
 class RecentSerializer
-  include RestPack::Serializer
+  include Panoptes::RestpackSerializer
 
   attributes :id, :created_at, :locations, :href
   can_include :project, :workflow, :subject
   can_sort_by :created_at
 
-  def self.page(params = {}, scope = nil, context = {})
-    scope = scope.preload(:locations)
-    super(params, scope, context)
-  end
+  preload :locations
 
   def href
-    "/#{@context[:type].pluralize}/#{@context[:owner_id]}/recents/#{@model.id}"
+    "/#{@context[:url_prefix]}/recents/#{@model.id}"
   end
 
   def locations
