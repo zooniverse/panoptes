@@ -18,6 +18,12 @@ RSpec.describe RetirementWorker do
         expect(sms.retired_workflows).to include(workflow)
       end
 
+      it 'should record a reason for retirement' do
+        expect { worker.perform(count) }.to change {
+          count.reload.retirement_reason
+        }.to("classification_count")
+      end
+
       it 'should call the workflow retired counter worker' do
         expect(WorkflowRetiredCountWorker)
           .to receive(:perform_async)
