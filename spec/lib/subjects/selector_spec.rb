@@ -25,6 +25,16 @@ RSpec.describe Subjects::Selector do
         Panoptes.flipper[:skip_subject_selection_context].enable
         expect(ctx).not_to include(:select_context)
       end
+
+      it "includes the favorite when enabled" do
+        Panoptes.flipper[:subject_include_favorite].enable
+        expect(ctx[:include_favorite?]).to be(true)
+      end
+
+      it "does not include the favorite when disabled" do
+        Panoptes.flipper[:subject_include_favorite].disable
+        expect(ctx[:include_favorite?]).to be(false)
+      end
     end
 
     context "when the workflow is finished_at" do

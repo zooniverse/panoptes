@@ -329,6 +329,23 @@ describe Api::V1::SubjectsController, type: :controller do
         let!(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
         let(:request_params) { { workflow_id: workflow.id.to_s } }
 
+        describe "subject favorite flag" do
+          let!(:collection) do
+            create(:collection, build_projects: false, owner: user, subjects: subjects, favorite: true)
+          end
+          it "does not include subject favorites when the flag is disabled" do
+            Panoptes.flipper[:subject_include_favorite].disable
+            get :queued, request_params
+            expect(json_response["subjects"].first.has_key?("favorite")).to be_falsey
+          end
+
+          it "includes subject favorite when the flag is enabled" do
+            Panoptes.flipper[:subject_include_favorite].enable
+            get :queued, request_params
+            expect(json_response["subjects"].map{ |s| s['favorite']}).to include(true)
+          end
+        end
+
         context "with subjects" do
           before(:each) do
             get :queued, request_params

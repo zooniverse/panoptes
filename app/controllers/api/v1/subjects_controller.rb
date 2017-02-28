@@ -21,7 +21,9 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def queued
     non_filterable_params = params.except(:project_id, :collection_id)
-    render json_api: SubjectSerializer.page(non_filterable_params, *selector.get_subjects)
+    scope, context = selector.get_subjects
+    context[:include_favorite?] = false unless Panoptes.flipper[:subject_include_favorite].enabled?
+    render json_api: SubjectSerializer.page(non_filterable_params, scope, context)
   end
 
   def create
