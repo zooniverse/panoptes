@@ -55,6 +55,7 @@ class CellectExClient
   def request(http_method, params)
     response = connection.send(http_method, *params) do |req|
       req.headers["Accept"] = "application/json"
+      req.headers["Content-Type"] = "application/json"
       req.options.timeout = 5           # open/read timeout in seconds
       req.options.open_timeout = 2      # connection open timeout in seconds
       yield req if block_given?

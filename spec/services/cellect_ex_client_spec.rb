@@ -39,6 +39,8 @@ RSpec.describe CellectExClient do
     end
   end
 
+  let(:headers) { {"Content-Type" => "application/json", "Accept" => "application/json"} }
+
   context "instance methods" do
     before(:each) do
       allow(described_class).to receive(:config_from_file).and_return({host: "http://test.example.com"})
@@ -48,7 +50,7 @@ RSpec.describe CellectExClient do
     describe "#get_subjects" do
       it 'returns subject ids' do
         stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-          stub.get('/api/workflows/338?limit=5&strategy=weighted&user_id=1') do |env|
+          stub.get('/api/workflows/338?limit=5&strategy=weighted&user_id=1', headers) do |env|
             [200, {'Content-Type' => 'application/json'}, [1,2,3,4].to_json]
           end
         end
@@ -68,7 +70,7 @@ RSpec.describe CellectExClient do
     describe "#reload_workflow" do
       it 'returns a no-content response' do
         stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-          stub.post('/api/workflows/338/reload') do |env|
+          stub.post('/api/workflows/338/reload', '', headers) do |env|
             [204, {'Content-Type' => 'application/json'}, nil]
           end
         end
@@ -88,7 +90,7 @@ RSpec.describe CellectExClient do
     describe "#remove_subject" do
       it 'returns a no-content response' do
         stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-          stub.post('/api/workflows/338/remove', {subject_id: 1}.to_json) do |env|
+          stub.post('/api/workflows/338/remove', {subject_id: 1}.to_json, headers) do |env|
             [204, {'Content-Type' => 'application/json'}, nil]
           end
         end
