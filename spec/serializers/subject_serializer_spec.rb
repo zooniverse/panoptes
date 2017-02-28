@@ -6,6 +6,40 @@ describe SubjectSerializer do
     create(:collection, build_projects: false, owner: subject.project.owner, subjects: [subject])
   end
 
+  describe "favorite" do
+    let(:fav_collection) do
+      create(:collection, build_projects: false, subjects: [subject], favorite: true)
+    end
+
+    let(:context) { {languages: ['en'], user: fav_collection.owner} }
+    let(:serializer) do
+      s = SubjectSerializer.new
+      s.instance_variable_set(:@model, subject)
+      s.instance_variable_set(:@context, context)
+      s
+    end
+
+    before do
+      Panoptes.flipper[:subject_include_favorite].enable
+    end
+
+    it "is true if the subject is included in the current user's favorites" do
+      expect(serializer.favorite).to be true
+    end
+
+    it "is false if the subject is not included in the current user's favorites" do
+      fav_collection.subjects.clear
+      expect(serializer.favorite).to be false
+    end
+
+    it "does not include a user" do
+      s = SubjectSerializer.new
+      s.instance_variable_set(:@model, subject)
+      s.instance_variable_set(:@context, {})
+      expect(s.favorite).to be_nil
+    end
+  end
+
   it "should preload the serialized associations" do
     expect_any_instance_of(Subject::ActiveRecord_Relation)
       .to receive(:preload)

@@ -3,7 +3,7 @@ class SubjectSerializer
   include FilterHasMany
 
   attributes :id, :metadata, :locations, :zooniverse_id,
-    :created_at, :updated_at, :href
+    :created_at, :updated_at, :href, :favorite
 
   optional :retired, :already_seen, :finished_workflow
 
@@ -28,6 +28,10 @@ class SubjectSerializer
 
   def already_seen
     !!(user_seen&.subjects_seen?(@model.id))
+  end
+
+  def favorite
+    !!user ? user.collections.where(favorite: true).first.subjects.include?(@model) : nil
   end
 
   private
