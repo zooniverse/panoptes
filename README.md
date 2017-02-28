@@ -41,10 +41,14 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 0. Clone the repository `git clone https://github.com/zooniverse/Panoptes`.
 
-0. `cd` into the cloned folder. 
+0. `cd` into the cloned folder.
 
-0. Copy the example configuration files.
+0. Setup the configuration files via a rake task
+  + Run: `rake configure:local`
+
+  Or manually copy the example configuration files and setup the doorkeeper keys.
   + Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
+  + Run: `rake configure:doorkeeper_keys`
 
 0. Install Docker from the appropriate link above.
 
@@ -82,8 +86,8 @@ There are multiple options for setting up a testing environment:
     docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes
     ```
 
-0. Assuming you have a Ruby environment already setup: 
-    
+0. Assuming you have a Ruby environment already setup:
+
     0. Run `bundle install`
     0. Start the docker Postgres container by running `docker-compose run -d --name postgres --service-ports postgres`
     0. Modify your `config/database.yml` test env to point to the running Postgres container, e.g. `host: localhost`
