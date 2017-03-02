@@ -20,8 +20,13 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def queued
+    selector = Subjects::Selector.new(api_user.user, workflow, params)
     non_filterable_params = params.except(:project_id, :collection_id)
-    render json_api: SubjectSerializer.page(non_filterable_params, *selector.get_subjects)
+    render json_api: SubjectSelectorSerializer.page(
+      non_filterable_params,
+      selector.get_subjects,
+      selector_context
+    )
   end
 
   def create
@@ -85,10 +90,6 @@ class Api::V1::SubjectsController < Api::ApiController
     end
   end
 
-  def selector
-    @selector ||= Subjects::Selector.new(api_user.user, workflow, params)
-  end
-
   def location_params(locations)
     (locations || []).map.with_index do |loc, i|
       location_params = case loc
@@ -104,6 +105,26 @@ class Api::V1::SubjectsController < Api::ApiController
       location_params[:metadata] = { index: i }
       location_params[:allow_any_content_type] = true if api_user.is_admin?
       location_params
+    end
+  end
+
+  def selector_context
+    if Panoptes.flipper[:skip_subject_selection_context].enabled?
+      {}
+    else
+      {
+        workflow: workflow,
+        user: api_user.user,
+        user_seen: user_seen,
+        url_format: :get,
+        select_context: true
+      }.compact
+    end
+  end
+
+  def user_seen
+    if api_user.user
+      UserSeenSubject.where(user: api_user.user, workflow: workflow).first
     end
   end
 end

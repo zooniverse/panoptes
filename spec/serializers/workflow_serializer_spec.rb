@@ -13,13 +13,8 @@ describe WorkflowSerializer do
 
   it_should_behave_like "a panoptes restpack serializer" do
     let(:resource) { workflow }
-    let(:includes) { "project,tutorial_subject" }
-    let(:preloads) { [ :project, :tutorial_subject ] }
-  end
-
-  it "should have the set of preloads wired up" do
-    preloads = %i(subject_sets attached_images)
-    expect(WorkflowSerializer.preloads).to match_array(preloads)
+    let(:includes) { [ :project, :tutorial_subject ] }
+    let(:preloads) { includes }
   end
 
   describe "#tasks" do
