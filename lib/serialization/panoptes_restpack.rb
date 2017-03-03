@@ -1,5 +1,5 @@
-module Panoptes
-  module RestpackSerializer
+module Serialization
+  module PanoptesRestpack
     extend ActiveSupport::Concern
 
     included do
