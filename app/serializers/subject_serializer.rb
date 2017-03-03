@@ -1,5 +1,3 @@
-require 'panoptes/restpack_serializer'
-
 class SubjectSerializer
   include Panoptes::RestpackSerializer
   include FilterHasMany

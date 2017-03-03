@@ -1,5 +1,3 @@
-require 'panoptes/restpack_serializer'
-
 class SubjectSelectorSerializer
   include Panoptes::RestpackSerializer
   include NoCountSerializer

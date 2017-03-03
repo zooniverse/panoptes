@@ -1,5 +1,3 @@
-require 'panoptes/restpack_serializer'
-
 class ClassificationSerializer
   include Panoptes::RestpackSerializer
   include NoCountSerializer

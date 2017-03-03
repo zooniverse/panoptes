@@ -1,5 +1,3 @@
-require 'panoptes/restpack_serializer'
-
 class RecentSerializer
   include Panoptes::RestpackSerializer
 
