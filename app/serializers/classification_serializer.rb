@@ -1,5 +1,5 @@
 class ClassificationSerializer
-  include Panoptes::RestpackSerializer
+  include Serialization::PanoptesRestpack
   include NoCountSerializer
 
   attributes :id, :annotations, :created_at, :metadata, :href

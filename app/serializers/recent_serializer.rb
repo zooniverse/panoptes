@@ -1,5 +1,5 @@
 class RecentSerializer
-  include Panoptes::RestpackSerializer
+  include Serialization::PanoptesRestpack
 
   attributes :id, :created_at, :locations, :href
   can_include :project, :workflow, :subject

@@ -2,7 +2,7 @@ require "tasks_visitors/inject_strings"
 require 'model_version'
 
 class WorkflowSerializer
-  include Panoptes::RestpackSerializer
+  include Serialization::PanoptesRestpack
   include FilterHasMany
   include MediaLinksSerializer
   include CachedSerializer

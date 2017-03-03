@@ -1,5 +1,5 @@
 class SubjectSerializer
-  include Panoptes::RestpackSerializer
+  include Serialization::PanoptesRestpack
   include FilterHasMany
 
   attributes :id, :metadata, :locations, :zooniverse_id,
