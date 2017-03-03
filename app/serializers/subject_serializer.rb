@@ -7,7 +7,7 @@ class SubjectSerializer
   attributes :id, :metadata, :locations, :zooniverse_id,
     :created_at, :updated_at, :href
 
-  optional :retired, :already_seen, :finished_workflow
+  optional :retired, :already_seen, :finished_workflow, :favorite
 
   can_include :project, :collections, :subject_sets
 

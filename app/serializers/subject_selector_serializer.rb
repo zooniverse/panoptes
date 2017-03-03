@@ -7,7 +7,7 @@ class SubjectSelectorSerializer
   attributes :id, :metadata, :locations, :zooniverse_id,
     :created_at, :updated_at, :href
 
-  optional :retired, :already_seen, :finished_workflow
+  optional :retired, :already_seen, :finished_workflow, :favorite
 
   preload :locations
 
@@ -31,6 +31,10 @@ class SubjectSelectorSerializer
     !!(user_seen&.subjects_seen?(@model.id))
   end
 
+  def favorite
+    user&.collections&.where(favorite: true)&.first&.subjects&.include? @model
+  end
+
   private
 
   def include_retired?
@@ -42,6 +46,10 @@ class SubjectSelectorSerializer
   end
 
   def include_finished_workflow?
+    select_context?
+  end
+
+  def include_favorite?
     select_context?
   end
 

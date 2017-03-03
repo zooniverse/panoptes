@@ -50,6 +50,7 @@ describe SubjectSelectorSerializer do
         expect_any_instance_of(SubjectSelectorSerializer).to receive(:retired)
         expect_any_instance_of(SubjectSelectorSerializer).to receive(:already_seen)
         expect_any_instance_of(SubjectSelectorSerializer).to receive(:finished_workflow)
+        expect_any_instance_of(SubjectSelectorSerializer).to receive(:favorite)
         run_serializer
       end
 
@@ -60,6 +61,7 @@ describe SubjectSelectorSerializer do
           expect_any_instance_of(SubjectSelectorSerializer).not_to receive(:retired)
           expect_any_instance_of(SubjectSelectorSerializer).not_to receive(:already_seen)
           expect_any_instance_of(SubjectSelectorSerializer).not_to receive(:finished_workflow)
+          expect_any_instance_of(SubjectSelectorSerializer).not_to receive(:favorite)
           run_serializer
         end
       end

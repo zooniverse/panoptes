@@ -5,6 +5,10 @@ describe Api::V1::SubjectsController, type: :controller do
   let(:subject_set) { workflow.subject_sets.first }
   let(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
   let!(:subjects) { sms.map(&:subject) }
+  let(:fav_subject) { subjects.first }
+  let!(:collection) do
+    create(:collection, owner: user, subjects: [fav_subject], favorite: true)
+  end
   let(:user) { create(:user) }
   let(:scopes) { %w(subject) }
   let(:resource_class) { Subject }
@@ -65,7 +69,7 @@ describe Api::V1::SubjectsController, type: :controller do
             json_response[api_resource_name].map { |s| s.has_key?(optional_attr) }.uniq
           end
 
-          %w( retired already_seen finished_workflow ).each do |attr|
+          %w( retired already_seen finished_workflow favorite ).each do |attr|
             let(:optional_attr) { attr }
 
             it "should not serialize the #{attr} attribute" do
@@ -207,6 +211,32 @@ describe Api::V1::SubjectsController, type: :controller do
           it 'should return retired as false' do
             retired = json_response["subjects"].map{ |s| s['retired']}
             expect(retired).to all( be false )
+          end
+
+          describe "favorited subjects" do
+            context "user has no favorites collection" do
+              it 'should return favorite as false' do
+                user.collections.destroy_all
+                get :index, request_params
+                favorites = json_response["subjects"].map{ |s| s['favorite']}
+                expect(favorites).to all( be nil )
+              end
+            end
+
+            context "user has a favorites collection" do
+              before(:each) { get :index, request_params }
+
+              it "favorite returns true for favorited subjects" do
+                fav = json_response["subjects"].find{ |s| s["id"] == fav_subject.id.to_s }
+                expect(fav["favorite"]).to be true
+              end
+
+              it "favorite returns false for non-favorited subjects" do
+                fav = json_response["subjects"].find{ |s| s["id"] != fav_subject.id.to_s }
+                expect(fav["favorite"]).to be false
+              end
+            end
+
           end
 
           it_behaves_like "an api response"
@@ -387,6 +417,30 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(retired).to all( be false )
           end
 
+          describe "favorited subjects" do
+            context "user has no favorites collection" do
+              it 'should return favorite as false' do
+                user.collections.destroy_all
+                get :queued, request_params
+                favorites = json_response["subjects"].map{ |s| s['favorite']}
+                expect(favorites).to all( be nil )
+              end
+            end
+
+            context "user has a favorites collection" do
+              before(:each) { get :queued, request_params }
+
+              it "favorite returns true for favorited subjects" do
+                fav = json_response["subjects"].find{ |s| s["id"] == fav_subject.id.to_s }
+                expect(fav["favorite"]).to be true
+              end
+
+              it "favorite returns false for non-favorited subjects" do
+                fav = json_response["subjects"].find{ |s| s["id"] != fav_subject.id.to_s }
+                expect(fav["favorite"]).to be false
+              end
+            end
+          end
           it_behaves_like "an api response"
         end
 
