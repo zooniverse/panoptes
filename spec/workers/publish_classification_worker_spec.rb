@@ -40,7 +40,7 @@ RSpec.describe PublishClassificationWorker do
         publisher = class_double("ZooStream").as_stubbed_const
         expect(publisher).to receive(:publish)
           .with(event: "classification",
-                shard_by: classification.workflow_id,
+                shard_by: "#{classification.workflow_id}-#{classification.subjects[0].id}-#{classification.subjects[1].id}",
                 data: duck_type(:to_json),
                 linked: duck_type(:to_json))
         worker.perform(classification.id)
