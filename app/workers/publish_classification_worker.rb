@@ -26,7 +26,7 @@ class PublishClassificationWorker
     ZooStream.publish(event: "classification",
                       data: kinesis_data,
                       linked: kinesis_linked,
-                      shard_by: classification.workflow_id)
+                      shard_by: [classification.workflow_id, classification.subject_ids].flatten.join("-"))
   end
 
   def kinesis_data
