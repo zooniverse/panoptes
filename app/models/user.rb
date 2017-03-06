@@ -328,6 +328,10 @@ class User < ActiveRecord::Base
     Rails.cache.increment(subjects_count_cache_key)
   end
 
+  def favorite_collections_for_project(project)
+    collections.where(favorite: true, projects: [project])
+  end
+
   private
 
   def subjects_count_cache_key

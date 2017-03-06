@@ -22,10 +22,11 @@ class Api::V1::SubjectsController < Api::ApiController
   def queued
     selector = Subjects::Selector.new(api_user.user, workflow, params)
     non_filterable_params = params.except(:project_id, :collection_id)
+    selected_subjects = selector.get_subjects
     render json_api: SubjectSelectorSerializer.page(
       non_filterable_params,
-      selector.get_subjects,
-      selector_context
+      selected_subjects,
+      selector_context(selected_subjects.map(&:id))
     )
   end
 
@@ -108,15 +109,22 @@ class Api::V1::SubjectsController < Api::ApiController
     end
   end
 
-  def selector_context
+  def selector_context(selected_subject_ids)
     if Panoptes.flipper[:skip_subject_selection_context].enabled?
       {}
     else
+      if api_user.logged_in?
+        fav_collections = api_user.user.favorite_collections_for_project(workflow.project)
+        fav_subjects = fav_collections.joins(:subjects).where(subjects: {id: selected_subject_ids}).pluck("subjects.id")
+      else
+        fav_subjects = []
+      end
       {
         workflow: workflow,
         user: api_user.user,
         user_seen: user_seen,
         url_format: :get,
+        favorite_subject_ids: fav_subjects,
         select_context: true
       }.compact
     end

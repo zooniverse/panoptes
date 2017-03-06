@@ -32,7 +32,7 @@ class SubjectSelectorSerializer
   end
 
   def favorite
-    user&.collections&.where(favorite: true)&.first&.subjects&.include? @model
+    @context[:favorite_subject_ids].include? @model.id
   end
 
   private

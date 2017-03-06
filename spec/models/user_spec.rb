@@ -940,4 +940,12 @@ describe User, type: :model do
       expect(user.identity_group.display_name).to eq("test")
     end
   end
+
+  describe "#favorite_collections_for_project" do
+    let!(:fav_collection) { create(:collection, projects: [owned], owner: user, favorite: true) }
+
+    it "returns the favorite collections for the project" do
+      expect(user.favorite_collections_for_project(owned)).to eq([fav_collection])
+    end
+  end
 end

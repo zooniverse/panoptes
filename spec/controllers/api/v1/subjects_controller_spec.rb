@@ -5,10 +5,6 @@ describe Api::V1::SubjectsController, type: :controller do
   let(:subject_set) { workflow.subject_sets.first }
   let(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
   let!(:subjects) { sms.map(&:subject) }
-  let(:fav_subject) { subjects.first }
-  let!(:collection) do
-    create(:collection, owner: user, subjects: [fav_subject], favorite: true)
-  end
   let(:user) { create(:user) }
   let(:scopes) { %w(subject) }
   let(:resource_class) { Subject }
@@ -164,6 +160,7 @@ describe Api::V1::SubjectsController, type: :controller do
             {
               workflow: workflow,
               user: user,
+              favorite_subject_ids: [],
               url_format: :get,
               select_context: true
             }
@@ -186,60 +183,38 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         context "with subjects" do
-          before(:each) do
-            get :index, request_params
-          end
-
           it "should return 200" do
+            get :index, request_params
             expect(response.status).to eq(200)
           end
 
           it 'should return a page of 2 objects' do
+            get :index, request_params
             expect(json_response[api_resource_name].length).to eq(2)
           end
 
           it 'should return already_seen as false' do
+            get :index, request_params
             already_seen = json_response["subjects"].map{ |s| s['already_seen']}
             expect(already_seen).to all( be false )
           end
 
           it 'should return finished_workflow as false' do
+            get :index, request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all( be false )
           end
 
           it 'should return retired as false' do
+            get :index, request_params
             retired = json_response["subjects"].map{ |s| s['retired']}
             expect(retired).to all( be false )
           end
 
-          describe "favorited subjects" do
-            context "user has no favorites collection" do
-              it 'should return favorite as false' do
-                user.collections.destroy_all
-                get :index, request_params
-                favorites = json_response["subjects"].map{ |s| s['favorite']}
-                expect(favorites).to all( be nil )
-              end
-            end
-
-            context "user has a favorites collection" do
-              before(:each) { get :index, request_params }
-
-              it "favorite returns true for favorited subjects" do
-                fav = json_response["subjects"].find{ |s| s["id"] == fav_subject.id.to_s }
-                expect(fav["favorite"]).to be true
-              end
-
-              it "favorite returns false for non-favorited subjects" do
-                fav = json_response["subjects"].find{ |s| s["id"] != fav_subject.id.to_s }
-                expect(fav["favorite"]).to be false
-              end
-            end
-
+          it_behaves_like "favorited subjects"
+          it_behaves_like "an api response" do
+            before { get :index, request_params }
           end
-
-          it_behaves_like "an api response"
         end
 
         context "user has classified all subjects in the workflow" do
@@ -390,58 +365,38 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:request_params) { { workflow_id: workflow.id.to_s } }
 
         context "with subjects" do
-          before(:each) do
-            get :queued, request_params
-          end
-
           it "should return 200" do
+            get :queued, request_params
             expect(response.status).to eq(200)
           end
 
           it 'should return a page of 2 objects' do
+            get :queued, request_params
             expect(json_response[api_resource_name].length).to eq(2)
           end
 
           it 'should return already_seen as false' do
+            get :queued, request_params
             already_seen = json_response["subjects"].map{ |s| s['already_seen']}
             expect(already_seen).to all( be false )
           end
 
           it 'should return finished_workflow as false' do
+            get :queued, request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all( be false )
           end
 
           it 'should return retired as false' do
+            get :queued, request_params
             retired = json_response["subjects"].map{ |s| s['retired']}
             expect(retired).to all( be false )
           end
 
-          describe "favorited subjects" do
-            context "user has no favorites collection" do
-              it 'should return favorite as false' do
-                user.collections.destroy_all
-                get :queued, request_params
-                favorites = json_response["subjects"].map{ |s| s['favorite']}
-                expect(favorites).to all( be nil )
-              end
-            end
-
-            context "user has a favorites collection" do
-              before(:each) { get :queued, request_params }
-
-              it "favorite returns true for favorited subjects" do
-                fav = json_response["subjects"].find{ |s| s["id"] == fav_subject.id.to_s }
-                expect(fav["favorite"]).to be true
-              end
-
-              it "favorite returns false for non-favorited subjects" do
-                fav = json_response["subjects"].find{ |s| s["id"] != fav_subject.id.to_s }
-                expect(fav["favorite"]).to be false
-              end
-            end
+          it_behaves_like "favorited subjects"
+          it_behaves_like "an api response" do
+            before { get :queued, request_params }
           end
-          it_behaves_like "an api response"
         end
 
         context "user has classified all subjects in the workflow" do
