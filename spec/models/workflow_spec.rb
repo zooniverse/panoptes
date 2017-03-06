@@ -368,8 +368,8 @@ describe Workflow, type: :model do
         expect(workflow.using_cellect?).to be_truthy
       end
 
-      it "should return false if cellect_ex is set" do
-        workflow.cellect_ex!
+      it "should return false if designator is set" do
+        workflow.designator!
         expect(workflow.using_cellect?).to be_falsey
       end
     end

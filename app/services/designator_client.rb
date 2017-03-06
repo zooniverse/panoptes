@@ -1,4 +1,4 @@
-class CellectExClient
+class DesignatorClient
   include Configurable
 
   class GenericError < StandardError; end
@@ -6,7 +6,7 @@ class CellectExClient
   class ResourceNotFound < GenericError; end
   class ServerError < GenericError; end
 
-  self.config_file = "cellect_ex_api"
+  self.config_file = "designator_api"
   self.api_prefix = "designator_api"
 
   configure :host

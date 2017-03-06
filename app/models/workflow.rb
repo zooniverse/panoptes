@@ -32,7 +32,7 @@ class Workflow < ActiveRecord::Base
   cache_by_association :workflow_contents
   cache_by_resource_method :subjects_count, :finished?
 
-  enum subject_selection_strategy: [:default, :cellect, :cellect_ex]
+  enum subject_selection_strategy: [:default, :cellect, :designator]
 
   scope :using_cellect, -> { where(subject_selection_strategy: subject_selection_strategies[:cellect]) }
 
@@ -93,8 +93,8 @@ class Workflow < ActiveRecord::Base
       case
       when subject_selection_strategy == "cellect"
         Subjects::CellectSelector.new(self)
-      when subject_selection_strategy == "cellect_ex"
-        Subjects::CellectExSelector.new(self)
+      when subject_selection_strategy == "designator"
+        Subjects::DesignatorSelector.new(self)
       when using_cellect?
         Subjects::CellectSelector.new(self)
       else
@@ -110,7 +110,7 @@ class Workflow < ActiveRecord::Base
     Rails.cache.fetch(model_cache_key(:using_cellect?), expires_in: 1.hour) do
       if cellect?
         true
-      elsif cellect_ex?
+      elsif designator?
         false
       else
         cellect_size_subject_space?

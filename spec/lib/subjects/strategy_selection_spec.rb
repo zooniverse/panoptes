@@ -120,23 +120,23 @@ RSpec.describe Subjects::StrategySelection do
         end
       end
 
-      context "with cellect_ex" do
+      context "with designator" do
         let(:run_selection) { subject.select }
 
         before do
-          workflow.subject_selection_strategy = "cellect_ex"
+          workflow.subject_selection_strategy = "designator"
         end
 
-        it "should use the cellect_ex client" do
-          expect_any_instance_of(Subjects::CellectExSelector)
+        it "should use the designator client" do
+          expect_any_instance_of(Subjects::DesignatorSelector)
             .to receive(:get_subjects)
             .with(user, subject_set.id, limit)
             .and_return(result_ids)
           run_selection
         end
 
-        it "should convert the cellect_ex subject_ids to panoptes sms_ids" do
-          allow_any_instance_of(CellectExClient).to receive(:get_subjects)
+        it "should convert the designator subject_ids to panoptes sms_ids" do
+          allow_any_instance_of(DesignatorClient).to receive(:get_subjects)
             .and_return(result_ids)
           expect(SetMemberSubject).to receive(:by_subject_workflow)
             .with(result_ids, workflow.id).and_call_original
@@ -160,7 +160,7 @@ RSpec.describe Subjects::StrategySelection do
     context "when Cellect config is on" do
       before do
         allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-        allow(Panoptes.flipper).to receive(:enabled?).with("cellect_ex").and_return(true)
+        allow(Panoptes.flipper).to receive(:enabled?).with("designator").and_return(true)
       end
 
       context "when the workflow is set to use cellect" do
@@ -193,7 +193,7 @@ RSpec.describe Subjects::StrategySelection do
     context "when Cellect Config is off" do
       before do
         allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(false)
-        allow(Panoptes.flipper).to receive(:enabled?).with("cellect_ex").and_return(false)
+        allow(Panoptes.flipper).to receive(:enabled?).with("designator").and_return(false)
       end
 
       context "when the workflow config has a selection strategy" do
@@ -211,19 +211,19 @@ RSpec.describe Subjects::StrategySelection do
       end
     end
 
-    describe 'cellect_ex' do
-      context "when the workflow is set to use cellect_ex" do
+    describe 'designator' do
+      context "when the workflow is set to use designator" do
         it "should use the workflow config strategy" do
-          allow(workflow).to receive(:subject_selection_strategy).and_return("cellect_ex")
-          expect(subject.strategy).to eq(:cellect_ex)
+          allow(workflow).to receive(:subject_selection_strategy).and_return("designator")
+          expect(subject.strategy).to eq(:designator)
         end
       end
 
       context 'when the workflow has a lot of subjects' do
-        it 'should still use cellect_ex' do
-          allow(workflow).to receive(:subject_selection_strategy).and_return("cellect_ex")
+        it 'should still use designator' do
+          allow(workflow).to receive(:subject_selection_strategy).and_return("designator")
           allow(workflow).to receive(:subjects_count).and_return(cellect_size)
-          expect(subject.strategy).to eq(:cellect_ex)
+          expect(subject.strategy).to eq(:designator)
         end
       end
     end
