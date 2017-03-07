@@ -113,18 +113,12 @@ class Api::V1::SubjectsController < Api::ApiController
     if Panoptes.flipper[:skip_subject_selection_context].enabled?
       {}
     else
-      if api_user.logged_in?
-        fav_collections = api_user.user.favorite_collections_for_project(workflow.project)
-        fav_subjects = fav_collections.joins(:subjects).where(subjects: {id: selected_subject_ids}).pluck("subjects.id")
-      else
-        fav_subjects = []
-      end
       {
         workflow: workflow,
         user: api_user.user,
         user_seen: user_seen,
         url_format: :get,
-        favorite_subject_ids: fav_subjects,
+        favorite_subject_ids: FavoritesFinder.new(api_user.user, workflow.project, selected_subject_ids).find_favorites,
         select_context: true
       }.compact
     end
