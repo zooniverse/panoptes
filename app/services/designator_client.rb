@@ -1,4 +1,4 @@
-class CellectExClient
+class DesignatorClient
   include Configurable
 
   class GenericError < StandardError; end
@@ -6,10 +6,12 @@ class CellectExClient
   class ResourceNotFound < GenericError; end
   class ServerError < GenericError; end
 
-  self.config_file = "cellect_ex_api"
-  self.api_prefix = "cellect_ex_api"
+  self.config_file = "designator_api"
+  self.api_prefix = "designator_api"
 
   configure :host
+  configure :username
+  configure :password
 
   attr_reader :connection
 
@@ -19,6 +21,7 @@ class CellectExClient
 
   def connect!(adapter)
     Faraday.new(host, ssl: {verify: false}) do |faraday|
+      faraday.request  :basic_auth, username, password
       faraday.response :json, content_type: /\bjson$/
       faraday.adapter(*adapter)
     end

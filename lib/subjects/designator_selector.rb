@@ -1,5 +1,5 @@
 module Subjects
-  class CellectExSelector
+  class DesignatorSelector
     attr_reader :workflow
 
     def initialize(workflow)
@@ -7,7 +7,7 @@ module Subjects
     end
 
     def id
-      :cellect_ex
+      :designator
     end
 
     def add_seen(user_id, subject_id)
@@ -39,11 +39,11 @@ module Subjects
     end
 
     def enabled?
-      Panoptes.flipper["cellect_ex"].enabled?
+      Panoptes.flipper["designator"].enabled?
     end
 
     def self.client
-      @client ||= CellectExClient.new
+      @client ||= DesignatorClient.new
     end
   end
 end

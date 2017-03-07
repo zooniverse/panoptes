@@ -28,8 +28,8 @@ module Subjects
       @strategy ||= case
       when configured_to_use_cellect?
         :cellect
-      when configured_to_use_cellect_ex?
-        :cellect_ex
+      when configured_to_use_designator?
+        :designator
       when automatically_use_cellect?
         :cellect
       else
@@ -41,7 +41,7 @@ module Subjects
 
     def select_sms_ids
       select_with(desired_selector)
-    rescue CellectClient::ConnectionError, CellectExClient::GenericError
+    rescue CellectClient::ConnectionError, DesignatorClient::GenericError
       select_with(default_selector)
     end
 
@@ -50,9 +50,9 @@ module Subjects
       workflow.subject_selection_strategy.to_s == 'cellect'
     end
 
-    def configured_to_use_cellect_ex?
-      return nil unless Panoptes.flipper.enabled?("cellect_ex")
-      workflow.subject_selection_strategy.to_s == 'cellect_ex'
+    def configured_to_use_designator?
+      return nil unless Panoptes.flipper.enabled?("designator")
+      workflow.subject_selection_strategy.to_s == 'designator'
     end
 
     def automatically_use_cellect?

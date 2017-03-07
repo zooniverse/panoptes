@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Subjects::CellectExSelector do
-  let(:client) { instance_double(CellectExClient) }
+describe Subjects::DesignatorSelector do
+  let(:client) { instance_double(DesignatorClient) }
   let(:workflow) { instance_double(Workflow, id: 1) }
   let(:selector) { described_class.new(workflow)}
   
@@ -16,7 +16,7 @@ describe Subjects::CellectExSelector do
     end
 
     it 'does nothing unless enabled' do
-      Panoptes.flipper["cellect_ex"].disable
+      Panoptes.flipper["designator"].disable
       expect(client).not_to receive(:add_seen)
       selector.add_seen(2, 3)
     end
@@ -29,7 +29,7 @@ describe Subjects::CellectExSelector do
     end
 
     it 'does nothing unless enabled' do
-      Panoptes.flipper["cellect_ex"].disable
+      Panoptes.flipper["designator"].disable
       expect(client).not_to receive(:load_user)
       selector.load_user(2)
     end
@@ -42,7 +42,7 @@ describe Subjects::CellectExSelector do
     end
 
     it 'does nothing unless enabled' do
-      Panoptes.flipper["cellect_ex"].disable
+      Panoptes.flipper["designator"].disable
       expect(client).not_to receive(:reload_workflow)
       selector.reload_workflow
     end
@@ -55,7 +55,7 @@ describe Subjects::CellectExSelector do
     end
 
     it 'does nothing unless enabled' do
-      Panoptes.flipper["cellect_ex"].disable
+      Panoptes.flipper["designator"].disable
       expect(client).not_to receive(:remove_subject)
       selector.remove_subject(3)
     end
@@ -81,7 +81,7 @@ describe Subjects::CellectExSelector do
     end
 
     it 'returns an empty array unless enabled', :aggregate_failures do
-      Panoptes.flipper["cellect_ex"].disable
+      Panoptes.flipper["designator"].disable
       expect(client).not_to receive(:get_subjects)
 
       subject_ids = selector.get_subjects(user, nil, 10)

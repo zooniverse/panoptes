@@ -1,8 +1,8 @@
 require "spec_helper"
 
-RSpec.describe CellectExClient do
+RSpec.describe DesignatorClient do
   shared_examples "handles server errors" do
-    it "raises if cellect_ex can't connect" do
+    it "raises if designator can't connect" do
       stubs = Faraday::Adapter::Test::Stubs.new do |stub|
         stub.send(http_method, url) do |env|
           raise Faraday::ConnectionFailed.new("execution expired")
@@ -11,10 +11,10 @@ RSpec.describe CellectExClient do
 
       expect do
         described_class.new([:test, stubs]).send(method, *params)
-      end.to raise_error(CellectExClient::GenericError)
+      end.to raise_error(DesignatorClient::GenericError)
     end
 
-    it "raises if cellect_ex times out" do
+    it "raises if designator times out" do
       stubs = Faraday::Adapter::Test::Stubs.new do |stub|
         stub.send(http_method, url) do |env|
           raise Faraday::TimeoutError
@@ -23,7 +23,7 @@ RSpec.describe CellectExClient do
 
       expect do
         described_class.new([:test, stubs]).send(method, *params)
-      end.to raise_error(CellectExClient::GenericError)
+      end.to raise_error(DesignatorClient::GenericError)
     end
 
     it "raises if response is an HTTP 500" do
@@ -35,7 +35,7 @@ RSpec.describe CellectExClient do
 
       expect do
         described_class.new([:test, stubs]).send(method, *params)
-      end.to raise_error(CellectExClient::ServerError)
+      end.to raise_error(DesignatorClient::ServerError)
     end
   end
 

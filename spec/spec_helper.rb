@@ -63,7 +63,7 @@ RSpec.configure do |config|
 
     allow(Panoptes).to receive(:flipper).and_return(Flipper.new(Flipper::Adapters::Memory.new))
     Panoptes.flipper["cellect"].enable
-    Panoptes.flipper["cellect_ex"].enable
+    Panoptes.flipper["designator"].enable
 
     case example.metadata[:sidekiq]
     when :fake
