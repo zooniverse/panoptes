@@ -32,4 +32,12 @@ RSpec.describe FavoritesFinder do
       expect(FavoritesFinder.new(nil, project, subject_ids).find_favorites).to eq([])
     end
   end
+
+  context "feature flag enabled" do
+    it "returns an empty array" do
+      collection
+      Panoptes.flipper[:skip_favorites_finder].enable
+      expect(FavoritesFinder.new(user, project, subject_ids).find_favorites).to eq([])
+    end
+  end
 end
