@@ -65,7 +65,7 @@ describe Api::V1::SubjectsController, type: :controller do
             json_response[api_resource_name].map { |s| s.has_key?(optional_attr) }.uniq
           end
 
-          %w( retired already_seen finished_workflow ).each do |attr|
+          %w( retired already_seen finished_workflow favorite ).each do |attr|
             let(:optional_attr) { attr }
 
             it "should not serialize the #{attr} attribute" do
@@ -160,6 +160,7 @@ describe Api::V1::SubjectsController, type: :controller do
             {
               workflow: workflow,
               user: user,
+              favorite_subject_ids: [],
               url_format: :get,
               select_context: true
             }
@@ -182,34 +183,38 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         context "with subjects" do
-          before(:each) do
-            get :index, request_params
-          end
-
           it "should return 200" do
+            get :index, request_params
             expect(response.status).to eq(200)
           end
 
           it 'should return a page of 2 objects' do
+            get :index, request_params
             expect(json_response[api_resource_name].length).to eq(2)
           end
 
           it 'should return already_seen as false' do
+            get :index, request_params
             already_seen = json_response["subjects"].map{ |s| s['already_seen']}
             expect(already_seen).to all( be false )
           end
 
           it 'should return finished_workflow as false' do
+            get :index, request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all( be false )
           end
 
           it 'should return retired as false' do
+            get :index, request_params
             retired = json_response["subjects"].map{ |s| s['retired']}
             expect(retired).to all( be false )
           end
 
-          it_behaves_like "an api response"
+          it_behaves_like "favorited subjects"
+          it_behaves_like "an api response" do
+            before { get :index, request_params }
+          end
         end
 
         context "user has classified all subjects in the workflow" do
@@ -360,34 +365,38 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:request_params) { { workflow_id: workflow.id.to_s } }
 
         context "with subjects" do
-          before(:each) do
-            get :queued, request_params
-          end
-
           it "should return 200" do
+            get :queued, request_params
             expect(response.status).to eq(200)
           end
 
           it 'should return a page of 2 objects' do
+            get :queued, request_params
             expect(json_response[api_resource_name].length).to eq(2)
           end
 
           it 'should return already_seen as false' do
+            get :queued, request_params
             already_seen = json_response["subjects"].map{ |s| s['already_seen']}
             expect(already_seen).to all( be false )
           end
 
           it 'should return finished_workflow as false' do
+            get :queued, request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all( be false )
           end
 
           it 'should return retired as false' do
+            get :queued, request_params
             retired = json_response["subjects"].map{ |s| s['retired']}
             expect(retired).to all( be false )
           end
 
-          it_behaves_like "an api response"
+          it_behaves_like "favorited subjects"
+          it_behaves_like "an api response" do
+            before { get :queued, request_params }
+          end
         end
 
         context "user has classified all subjects in the workflow" do
