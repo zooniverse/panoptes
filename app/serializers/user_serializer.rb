@@ -1,5 +1,5 @@
 class UserSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include RecentLinkSerializer
   include MediaLinksSerializer
 
@@ -15,6 +15,8 @@ class UserSerializer
 
   media_include :avatar, :profile_header
 
+  preload :avatar
+
   def admin
     !!@model.admin
   end
@@ -28,11 +30,7 @@ class UserSerializer
   end
 
   def avatar_src
-    if @model.association(:avatar).loaded?
-      @model.avatar&.url_for_format(:get)
-    else
-      nil
-    end
+    @model.avatar&.url_for_format(:get)
   end
 
   private

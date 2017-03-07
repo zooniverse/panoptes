@@ -44,20 +44,21 @@ RSpec.describe UserSerializer do
   end
 
   describe '#avatar_src' do
-    it 'returns nil if avatar is not loaded' do
-      expect(serializer.avatar_src).to eq(nil)
+    let(:result) do
+      described_class.page({}, User.where(id: user.id), context)
     end
 
     it 'returns nil if user does not have an avatar' do
       user.avatar = nil
-      expect(serializer.avatar_src).to eq(nil)
+      user.save!
+      expect(result[:users][0][:avatar_src]).to eq(nil)
     end
 
-    it 'returns a src if user has an avatar and loaded' do
+    it 'returns a src if user has an avatar' do
       avatar = build(:medium, type: "user_avatar", linked: user)
       user.avatar = avatar
       user.save!
-      expect(serializer.avatar_src).to eq(avatar.url_for_format(:get))
+      expect(result[:users][0][:avatar_src]).to eq(avatar.url_for_format(:get))
     end
   end
 end
