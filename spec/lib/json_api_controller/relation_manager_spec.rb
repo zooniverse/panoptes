@@ -154,11 +154,11 @@ describe JsonApiController::RelationManager do
     context "has_many" do
       let!(:resource) { create(:project_with_workflows) }
 
-      it 'should destroy the unlinked items' do
+      it 'should not destroy the unlinked items' do
         expect do
           del_string = resource.workflows.map(&:id).join(",")
           test_instance.destroy_relation(resource, :workflows, del_string)
-        end.to change{ Workflow.count }.from(2).to(0)
+        end.to_not change{ Workflow.count }
       end
     end
   end
