@@ -7,7 +7,7 @@ class UserSerializer
     :created_at, :updated_at, :type, :global_email_communication,
     :project_email_communication, :beta_email_communication,
     :subject_limit, :uploaded_subjects_count, :admin, :href, :login_prompt,
-    :private_profile, :zooniverse_id, :upload_whitelist
+    :private_profile, :zooniverse_id, :upload_whitelist, :avatar_src
 
   can_include :classifications, :project_preferences, :collection_preferences,
     projects: { param: "owner", value: "login" },
@@ -25,6 +25,14 @@ class UserSerializer
 
   def login_prompt
     @model.migrated && @model.sign_in_count <= 1
+  end
+
+  def avatar_src
+    if @model.association(:avatar).loaded?
+      @model.avatar&.url_for_format(:get)
+    else
+      nil
+    end
   end
 
   private
