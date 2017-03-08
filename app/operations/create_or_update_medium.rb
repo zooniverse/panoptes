@@ -13,6 +13,7 @@ class CreateOrUpdateMedium < Operation
 
   def execute
     if medium = object.public_send(type)
+      media['metadata']["state"] = 'creating'
       medium.update!(media)
       medium.touch
       medium

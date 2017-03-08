@@ -38,4 +38,13 @@ shared_examples_for "creates an export" do
     export.reload
     expect(export.updated_at).to be_within(5.seconds).of(Time.zone.now)
   end
+
+  it "includes the state in the metadata" do
+    params = create_params
+    params[:media].delete(:metadata)
+    export = create(:medium, linked: resource, type: medium_type, content_type: content_type, metadata: {recipients: [user.id]}, updated_at: 5.days.ago)
+    operation.with(object: resource).run!(create_params)
+    export.reload
+    expect(export.metadata).to include("state" => "creating")
+  end
 end
