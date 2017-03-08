@@ -21,7 +21,7 @@ module Serialization
     module ClassMethodOverrides
       def page(params = {}, scope = nil, context = {})
         if params[:include]
-          param_preloads = params[:include].split(',').map(&:to_sym) & self.can_include
+          param_preloads = params[:include].split(',').map(&:to_sym) & self.can_includes
         end
         preload_relations = self.preloads | Array.wrap(param_preloads)
         unless preload_relations.empty?

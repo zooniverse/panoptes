@@ -1,5 +1,5 @@
 class UserSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include RecentLinkSerializer
   include MediaLinksSerializer
 
@@ -7,13 +7,15 @@ class UserSerializer
     :created_at, :updated_at, :type, :global_email_communication,
     :project_email_communication, :beta_email_communication,
     :subject_limit, :uploaded_subjects_count, :admin, :href, :login_prompt,
-    :private_profile, :zooniverse_id, :upload_whitelist
+    :private_profile, :zooniverse_id, :upload_whitelist, :avatar_src
 
   can_include :classifications, :project_preferences, :collection_preferences,
     projects: { param: "owner", value: "login" },
     collections: { param: "owner", value: "login" }
 
   media_include :avatar, :profile_header
+
+  preload :avatar
 
   def admin
     !!@model.admin
@@ -25,6 +27,10 @@ class UserSerializer
 
   def login_prompt
     @model.migrated && @model.sign_in_count <= 1
+  end
+
+  def avatar_src
+    @model.avatar&.url_for_format(:get)
   end
 
   private
