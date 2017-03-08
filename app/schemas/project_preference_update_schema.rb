@@ -12,6 +12,16 @@ class ProjectPreferenceUpdateSchema < JsonSchema
       type "object"
     end
 
+    property "settings" do
+      type "object"
+      additional_properties false
+
+      property "workflow_id" do
+        type "string", "integer"
+        pattern "^[0-9]*$"
+      end
+    end
+
     property "links" do
       type "object"
       additional_properties false
