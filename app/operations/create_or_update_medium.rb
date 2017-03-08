@@ -12,12 +12,12 @@ class CreateOrUpdateMedium < Operation
   end
 
   def execute
+    media['metadata']["state"] = 'creating'
     if medium = object.public_send(type)
       medium.update!(media)
       medium.touch
       medium
     else
-      media['metadata']["state"] = 'creating'
       object.send("create_#{type}!", media)
     end
   end
