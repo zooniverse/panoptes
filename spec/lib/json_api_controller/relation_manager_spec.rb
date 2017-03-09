@@ -139,7 +139,7 @@ describe JsonApiController::RelationManager do
       test_instance.destroy_relation(resource, relation, del_string)
     end
 
-    context "habtm" do
+    context "has_many through" do
       let(:resource_to_remove) { resource.subjects[0..2] }
       let(:relation) { :subjects }
       let(:del_string) { resource_to_remove.map(&:id).join(",") }
@@ -148,9 +148,13 @@ describe JsonApiController::RelationManager do
         expect{ destroy_helper }.to_not change{Subject.count}
       end
 
-      it "deletes the linked relations" do
+      it "removes the linked relations" do
         destroy_helper
         expect(resource.subjects).to_not include(*resource_to_remove)
+      end
+
+      it "deletes the join table record" do
+        expect{ destroy_helper }.to change{ CollectionsSubject.count }.by(-2)
       end
     end
 
@@ -164,9 +168,31 @@ describe JsonApiController::RelationManager do
         expect{ destroy_helper }.to change{ Workflow.count }.by(0)
       end
 
-      it "deletes the linked resource" do
+      it "removes the linked relation" do
         destroy_helper
         expect(resource.workflows).to_not include(*resource_to_remove)
+      end
+    end
+
+    context "has_and_belongs_to_many" do
+      let(:resource) { create(:classification}
+      let(:resource_to_remove) { resource.subjects[0] }
+      let(:resource_to_remain) { resource.subjects[1] }
+      let(:relation) { :subjects }
+      let(:del_string) { resource_to_remove.id.to_s }
+
+      it "does not destroy the unlinked items" do
+        expect{ destroy_helper }.to_not change{Subject.count}
+      end
+
+      it "removes the linked relation" do
+        destroy_helper
+        expect(resource.subjects).to_not include(*resource_to_remove)
+      end
+
+      it "removes ONLY the specified linked relation" do
+        destroy_helper
+        expect(resource.subjects).to include(*resource_to_remain)
       end
     end
 
@@ -180,7 +206,7 @@ describe JsonApiController::RelationManager do
         expect{ destroy_helper }.to change{ Project.count }.by(0)
       end
 
-      it "deletes the linked resource" do
+      it "removes the linked relation" do
         destroy_helper
         expect(resource.projects).to_not include(*resource_to_remove)
       end
@@ -196,7 +222,7 @@ describe JsonApiController::RelationManager do
         expect{ destroy_helper }.to change{ Project.count }.by(0)
       end
 
-      it "deletes the linked resource" do
+      it "removes the linked relation" do
         destroy_helper
         expect(resource.projects).to_not include(*resource_to_remove)
       end
