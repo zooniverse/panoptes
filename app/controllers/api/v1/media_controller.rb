@@ -128,7 +128,7 @@ class Api::V1::MediaController < Api::ApiController
             else
               Medium.where(id: params[:id])
             end
-    !(gen_etag(query) == precondition)
+    run_etag_validation(query)
   end
 
   def resource_scope(resources)

@@ -56,6 +56,12 @@ describe "api should allow conditional requests", type: :request do
       send method, url, body.to_json, request_params
       expect(response).to have_http_status(ok_status)
     end
+
+    it "should succeed if correct weak etag precondition is met" do
+      weak_etag = "W/#{etag}"
+      send method, url, body.to_json, request_params.merge("If-Match" => weak_etag)
+      expect(response).to have_http_status(ok_status)
+    end
   end
 
   shared_examples "returns etag" do
@@ -78,7 +84,7 @@ describe "api should allow conditional requests", type: :request do
     end
   end
 
-  context "PUT requests"  do
+  context "PUT requests" do
     let(:method) { :put }
     let(:body) do
       { "projects" => { "name" => "dave" } }

@@ -1,6 +1,6 @@
 module JsonApiController
   module PreconditionCheck
-    HEADER_NAME = "If-Match"
+    HEADER_NAME = "If-Match".freeze
 
     def precondition_check
       if !precondition
@@ -21,11 +21,21 @@ module JsonApiController
 
     def precondition_fails?
       query = resource_class.where(id: resource_ids)
-      !(gen_etag(query) == precondition)
+      run_etag_validation(query)
     end
 
     def precondition_error_msg
       "Request requires #{HEADER_NAME} header to be present"
+    end
+
+    def run_etag_validation(query)
+      current_etag = gen_etag(query)
+      current_etag = "W/#{current_etag}" if weak_etag?(precondition)
+      !(current_etag == precondition)
+    end
+
+    def weak_etag?(etag)
+      !!etag.match(%r{^\AW/})
     end
   end
 end
