@@ -135,30 +135,70 @@ describe JsonApiController::RelationManager do
   end
 
   describe "#destroy_relation" do
-    let(:resource_to_remove) { resource.subjects[0..2] }
-    let(:del_string) { resource_to_remove.map(&:id).join(",") }
-
-    it 'should remove the linked relations' do
-      test_instance.destroy_relation(resource, :subjects, del_string)
-      expect(resource.subjects).to_not include(*resource_to_remove)
+    def destroy_helper
+      test_instance.destroy_relation(resource, relation, del_string)
     end
 
     context "habtm" do
-      it 'should not destroy the unlinked items' do
-        expect do
-          test_instance.destroy_relation(resource, :subjects, del_string)
-        end.to_not change{ Subject.count }
+      let(:resource_to_remove) { resource.subjects[0..2] }
+      let(:relation) { :subjects }
+      let(:del_string) { resource_to_remove.map(&:id).join(",") }
+
+      it "does not destroy the unlinked items" do
+        expect{ destroy_helper }.to_not change{Subject.count}
+      end
+
+      it "deletes the linked relations" do
+        destroy_helper
+        expect(resource.subjects).to_not include(*resource_to_remove)
       end
     end
 
     context "has_many" do
-      let!(:resource) { create(:project_with_workflows) }
+      let(:resource) { create(:project_with_workflows) }
+      let(:resource_to_remove) { resource.workflows[0..2] }
+      let(:relation) { :workflows }
+      let(:del_string) { resource.workflows.map(&:id).join(",") }
 
-      it 'should not destroy the unlinked items' do
-        expect do
-          del_string = resource.workflows.map(&:id).join(",")
-          test_instance.destroy_relation(resource, :workflows, del_string)
-        end.to_not change{ Workflow.count }
+      it "does not destroy the unlinked items" do
+        expect{ destroy_helper }.to change{ Workflow.count }.by(0)
+      end
+
+      it "deletes the linked resource" do
+        destroy_helper
+        expect(resource.workflows).to_not include(*resource_to_remove)
+      end
+    end
+
+    context "belongs_to" do
+      let(:resource) { create(:organization, projects: [project]) }
+      let(:resource_to_remove) { resource.projects[0] }
+      let(:relation) { :projects }
+      let(:del_string) { resource.projects.map(&:id).join(",") }
+
+      it "does not destroy the unlinked item" do
+        expect{ destroy_helper }.to change{ Project.count }.by(0)
+      end
+
+      it "deletes the linked resource" do
+        destroy_helper
+        expect(resource.projects).to_not include(*resource_to_remove)
+      end
+    end
+
+    context "belongs_to_many" do
+      let!(:resource) { create(:collection, projects: [project]) }
+      let(:resource_to_remove) { resource.projects[0] }
+      let(:relation) { :projects }
+      let(:del_string) { resource.projects.map(&:id).join(",") }
+
+      it "does not destroy the unlinked item" do
+        expect{ destroy_helper }.to change{ Project.count }.by(0)
+      end
+
+      it "deletes the linked resource" do
+        destroy_helper
+        expect(resource.projects).to_not include(*resource_to_remove)
       end
     end
   end
