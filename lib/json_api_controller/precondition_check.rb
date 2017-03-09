@@ -35,7 +35,7 @@ module JsonApiController
     end
 
     def weak_etag?(etag)
-      !!etag.match(/^\AW\//)
+      !!etag.match(%r{^\AW/})
     end
   end
 end
