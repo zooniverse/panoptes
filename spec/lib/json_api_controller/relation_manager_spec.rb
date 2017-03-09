@@ -175,7 +175,7 @@ describe JsonApiController::RelationManager do
     end
 
     context "has_and_belongs_to_many" do
-      let(:resource) { create(:classification}
+      let(:resource) { create(:classification) }
       let(:resource_to_remove) { resource.subjects[0] }
       let(:resource_to_remain) { resource.subjects[1] }
       let(:relation) { :subjects }
