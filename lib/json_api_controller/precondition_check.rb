@@ -21,13 +21,17 @@ module JsonApiController
 
     def precondition_fails?
       query = resource_class.where(id: resource_ids)
-      current_etag = gen_etag(query)
-      current_etag = "W/#{current_etag}" if weak_etag?(precondition)
-      !(current_etag == precondition)
+      run_etag_validation(query)
     end
 
     def precondition_error_msg
       "Request requires #{HEADER_NAME} header to be present"
+    end
+
+    def run_etag_validation(query)
+      current_etag = gen_etag(query)
+      current_etag = "W/#{current_etag}" if weak_etag?(precondition)
+      !(current_etag == precondition)
     end
 
     def weak_etag?(etag)
