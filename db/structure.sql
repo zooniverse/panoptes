@@ -2303,6 +2303,13 @@ CREATE UNIQUE INDEX index_flipper_gates_on_feature_key_and_key_and_value ON flip
 
 
 --
+-- Name: index_media_on_linked_id_and_linked_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_media_on_linked_id_and_linked_type ON media USING btree (linked_id, linked_type);
+
+
+--
 -- Name: index_media_on_linked_type_and_linked_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2699,6 +2706,13 @@ CREATE INDEX index_subjects_on_project_id ON subjects USING btree (project_id);
 --
 
 CREATE INDEX index_subjects_on_upload_user_id ON subjects USING btree (upload_user_id);
+
+
+--
+-- Name: index_tagged_resources_on_resource_id_and_resource_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tagged_resources_on_resource_id_and_resource_type ON tagged_resources USING btree (resource_id, resource_type);
 
 
 --
@@ -3759,4 +3773,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170206161946');
 INSERT INTO schema_migrations (version) VALUES ('20170210163241');
 
 INSERT INTO schema_migrations (version) VALUES ('20170215105309');
+
+INSERT INTO schema_migrations (version) VALUES ('20170310131642');
 
