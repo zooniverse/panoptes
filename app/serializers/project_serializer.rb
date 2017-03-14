@@ -5,6 +5,7 @@ class ProjectSerializer
   include OwnerLinkSerializer
   include MediaLinksSerializer
   include ContentSerializer
+  include CachedSerializer
 
   PRELOADS = [
     # :project_contents, Note: re-add when the eager_load from translatable_resources is removed
