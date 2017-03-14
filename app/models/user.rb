@@ -318,7 +318,7 @@ class User < ActiveRecord::Base
   end
 
   def uploaded_subjects_count
-    count = Rails.cache.fetch(subjects_count_cache_key) do
+    count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry) do
       Subject.where(upload_user_id: id).count
     end
     count.to_i
@@ -336,5 +336,9 @@ class User < ActiveRecord::Base
 
   def subjects_count_cache_key
     @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count"
+  end
+
+  def subject_count_cache_expiry
+    ENV.fetch("UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY", 1.hour)
   end
 end
