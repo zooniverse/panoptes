@@ -51,7 +51,7 @@ module Formatter
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
           new_anno['task_label'] = task_label(task_info)
-          new_anno['value'] = task_info['type'] == 'multiple' ? answer_labels : answer_label
+          new_anno['value'] = ['multiple', 'shortcut'].include?(task_info['type']) ? answer_labels : answer_labels.first
         end
       end
 
@@ -136,10 +136,6 @@ module Formatter
         have_tool_lookup_info = !!(task_info["tools"] && tool_index)
         known_tool = have_tool_lookup_info && task_info["tools"][tool_index]
         translate(known_tool["label"]) if known_tool
-      end
-
-      def answer_label
-        answer_labels.first
       end
 
       def answer_labels

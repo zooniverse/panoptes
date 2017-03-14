@@ -283,7 +283,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         it 'should add the correct answer labels' do
           formatted = described_class.new(classification, annotation, cache).to_h
           expect(formatted["task_label"]).to eq("Fire present?")
-          expect(formatted["value"]).to eq("yes")
+          expect(formatted["value"]).to eq(["yes"])
         end
       end
     end
