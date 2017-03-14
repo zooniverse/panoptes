@@ -12,13 +12,13 @@ shared_examples "a no count serializer" do
       expect(meta[:next_page]).to eq(2)
     end
 
-    it "should handle the the previous page information" do
+    it "should handle the the previous & next page information" do
       result = described_class.page({page: 2}, scope, {})
       meta = result[:meta][lookup]
       expect(meta[:count]).to eq(0)
       expect(meta[:page_count]).to eq(0)
       expect(meta[:previous_page]).to eq(1)
-      expect(meta[:next_page]).to eq(3)
+      expect(meta[:next_page]).to be_nil
     end
   end
 end

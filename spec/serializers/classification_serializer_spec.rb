@@ -14,6 +14,10 @@ describe ClassificationSerializer do
   end
 
   describe "nested collection routes" do
+    before do
+      classification
+    end
+
     it "should return the correct href urls" do
       %w(gold_standard incomplete project).each do |collection_route|
         context = {url_suffix: collection_route}
