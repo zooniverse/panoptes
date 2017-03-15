@@ -1,3 +1,5 @@
+require 'serialization/has_many_filtering/options'
+
 module FilterHasMany
   extend ActiveSupport::Concern
 
@@ -13,7 +15,8 @@ module FilterHasMany
         query.joins(filter[0]).where(filter[0] => {id: filter[2]})
       end
 
-      super params, scope, context
+      context[:has_many_filters] = has_many_filters(filters)
+      page_with_options Serialization::HasManyFiltering::Options.new(self, params, scope, context)
     end
 
     def has_many_filterable_by
@@ -26,6 +29,13 @@ module FilterHasMany
 
     def reflection_to_filter(reflection)
       [reflection.name, :"#{reflection.name.to_s.singularize}_id"]
+    end
+
+    def has_many_filters(scope_filters)
+      filters_hash = scope_filters.map do |filter|
+        [ filter[1], Array.wrap(filter[2]) ]
+      end
+      Hash[ filters_hash ]
     end
   end
 end
