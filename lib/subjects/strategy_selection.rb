@@ -19,9 +19,13 @@ module Subjects
       eventlog.info("Selected subjects", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: selected_ids)
 
       selected_ids = selected_ids.compact
-      incomplete_ids = Subjects::CompleteRemover.new(user, workflow, selected_ids).incomplete_ids
-      eventlog.info("Selected subjects after cleanup", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: incomplete_ids)
-      incomplete_ids
+      if Panoptes.flipper[:remove_complete_subjects].enabled?
+        incomplete_ids = Subjects::CompleteRemover.new(user, workflow, selected_ids).incomplete_ids
+        eventlog.info("Selected subjects after cleanup", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: incomplete_ids)
+        incomplete_ids
+      else
+        selected_ids
+      end
     end
 
     def strategy
