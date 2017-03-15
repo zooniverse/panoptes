@@ -24,7 +24,7 @@ module JsonApiController
 
     def destroy_relation(resource, relation, value)
       ids = value.split(',').map(&:to_i)
-      resource.send(relation).destroy(*ids)
+      resource.send(relation).delete(*ids)
     end
 
     protected
