@@ -6,7 +6,6 @@ module Serialization
       end
 
       def filters_as_url_params
-
         has_many_scope_filters.sort.map { |k,v| map_filter_ids(k,v) }.join('&')
       end
 
