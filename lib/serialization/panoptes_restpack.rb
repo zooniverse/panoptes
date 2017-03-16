@@ -20,15 +20,20 @@ module Serialization
 
     module ClassMethodOverrides
       def page(params = {}, scope = nil, context = {})
+        super(params, paging_scope(params, scope), context)
+      end
+
+      def paging_scope(params, scope)
         if params[:include]
           param_preloads = params[:include].split(',').map(&:to_sym) & self.can_includes
         end
+
         preload_relations = self.preloads | Array.wrap(param_preloads)
         unless preload_relations.empty?
           scope = scope.preload(*preload_relations)
         end
 
-        super(params, scope, context)
+        scope
       end
 
       private
