@@ -17,6 +17,14 @@ describe WorkflowSerializer do
     let(:preloads) { includes }
   end
 
+  it_should_behave_like "a filter has many serializer" do
+    let(:resource) { create(:workflow_with_subject_set) }
+    let(:relation) { :subject_sets }
+    let(:next_page_resource) do
+      create(:workflow, subject_sets: resource.subject_sets)
+    end
+  end
+
   describe "#tasks" do
     it 'should return the translated tasks' do
       expect(serializer.tasks['interest']['question']).to eq('Draw a circle')
