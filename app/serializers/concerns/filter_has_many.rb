@@ -15,8 +15,15 @@ module FilterHasMany
         query.joins(filter[0]).where(filter[0] => {id: filter[2]})
       end
 
-      context[:has_many_filters] = has_many_filters(filters)
-      page_with_options Serialization::HasManyFiltering::Options.new(self, params, scope, context)
+      serializer_options = Serialization::HasManyFiltering::Options.new(
+        has_many_filters(filters),
+        self,
+        params,
+        scope,
+        context
+      )
+
+      page_with_options serializer_options
     end
 
     def has_many_filterable_by

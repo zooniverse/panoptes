@@ -1,6 +1,13 @@
 module Serialization
   module HasManyFiltering
     class Options < RestPack::Serializer::Options
+      attr_reader :has_many_filters
+
+      def initialize(has_many_filters, serializer, params, scope, context)
+        @has_many_filters = has_many_filters
+        super(serializer, params, scope, context)
+      end
+
       def filters
         has_many_scope_filters
       end
@@ -12,7 +19,7 @@ module Serialization
       private
 
       def has_many_scope_filters
-        @filters.merge(context.fetch(:has_many_filters, []))
+        @has_many_scope_filters ||= @filters.merge(has_many_filters)
       end
     end
   end
