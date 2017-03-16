@@ -15,7 +15,10 @@ module FilterHasMany
         query.joins(filter[0]).where(filter[0] => {id: filter[2]})
       end
 
-
+      # As our RestPack doesn't' handle the join filtering natively, we need to
+      # use this custom options class to percolate the has_many filters
+      # into the response meta paging urls and still use the has_many
+      # join scopes built above.
       serializer_options = Serialization::HasManyFiltering::Options.new(
         has_many_filters(filters),
         self,
@@ -24,6 +27,7 @@ module FilterHasMany
         context
       )
 
+      # Use the custom paging instance to create a paged response
       page_with_options serializer_options
     end
 
