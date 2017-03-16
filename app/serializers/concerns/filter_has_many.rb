@@ -15,11 +15,12 @@ module FilterHasMany
         query.joins(filter[0]).where(filter[0] => {id: filter[2]})
       end
 
+
       serializer_options = Serialization::HasManyFiltering::Options.new(
         has_many_filters(filters),
         self,
         params,
-        scope,
+        paging_scope(params, scope),
         context
       )
 
