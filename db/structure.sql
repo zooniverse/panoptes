@@ -2310,13 +2310,6 @@ CREATE INDEX index_media_on_linked_id_and_linked_type ON media USING btree (link
 
 
 --
--- Name: index_media_on_linked_type_and_linked_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_media_on_linked_type_and_linked_id ON media USING btree (linked_type, linked_id);
-
-
---
 -- Name: index_media_on_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2713,13 +2706,6 @@ CREATE INDEX index_subjects_on_upload_user_id ON subjects USING btree (upload_us
 --
 
 CREATE INDEX index_tagged_resources_on_resource_id_and_resource_type ON tagged_resources USING btree (resource_id, resource_type);
-
-
---
--- Name: index_tagged_resources_on_resource_type_and_resource_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_tagged_resources_on_resource_type_and_resource_id ON tagged_resources USING btree (resource_type, resource_id);
 
 
 --
@@ -3775,4 +3761,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170210163241');
 INSERT INTO schema_migrations (version) VALUES ('20170215105309');
 
 INSERT INTO schema_migrations (version) VALUES ('20170310131642');
+
+INSERT INTO schema_migrations (version) VALUES ('20170316170501');
 
