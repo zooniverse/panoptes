@@ -10,16 +10,20 @@ describe CollectionSerializer do
     end
   end
 
-  it "should not have the :projects side load include setup" do
-    expect(CollectionSerializer.can_includes).not_to include(:projects)
+  it_should_behave_like "a panoptes restpack serializer" do
+    let(:resource) { collection }
+    let(:includes) { [ :owner, :collection_roles, :subjects ] }
+    let(:preloads) do
+      [ [ owner: { identity_membership: :user } ], :collection_roles, :subjects ]
+    end
   end
 
-  it "should preload the serialized associations" do
-    expect_any_instance_of(Collection::ActiveRecord_Relation)
-      .to receive(:preload)
-      .with(*CollectionSerializer::PRELOADS)
-      .and_call_original
-    CollectionSerializer.page({}, Collection.all, {})
+  it_should_behave_like "a filter has many serializer" do
+    let(:resource) { create(:collection_with_subjects) }
+    let(:relation) { :subjects }
+    let(:next_page_resource) do
+      create(:collection, subjects: resource.subjects)
+    end
   end
 
   describe "sorting" do
