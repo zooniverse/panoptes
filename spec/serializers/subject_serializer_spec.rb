@@ -10,14 +10,13 @@ describe SubjectSerializer do
     let(:resource) { subject }
     let(:includes) { %i(project collections subject_sets) }
     let(:preloads) { %i(locations project collections subject_sets) }
+  end
 
-    it "handles paging query params for has_many_filtering" do
-      set_id = subject.subject_sets.first.id
+  it_should_behave_like "a filter has many serializer" do
+    let(:resource) { subject }
+    let(:relation) { :subject_sets }
+    let(:next_page_resource) do
       create(:subject, subject_sets: subject.subject_sets)
-      params = {page_size: 1, subject_set_id: set_id}
-      result = SubjectSerializer.page(params, Subject.all, {})
-      next_href = result.dig(:meta, :subjects, :next_href)
-      expect(next_href).to eq("/subjects?page=2&page_size=1&subject_set_id=1")
     end
   end
 
