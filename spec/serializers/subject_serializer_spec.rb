@@ -12,6 +12,14 @@ describe SubjectSerializer do
     let(:preloads) { %i(locations project collections subject_sets) }
   end
 
+  it_should_behave_like "a filter has many serializer" do
+    let(:resource) { subject }
+    let(:relation) { :subject_sets }
+    let(:next_page_resource) do
+      create(:subject, subject_sets: subject.subject_sets)
+    end
+  end
+
   describe "locations" do
     let(:subject) do
       create(:subject, :with_mediums, :with_subject_sets, num_sets: 1)

@@ -1,15 +1,9 @@
 class CollectionSerializer
-  include RestPack::Serializer
-  include OwnerLinkSerializer
+  include Serialization::PanoptesRestpack
   include FilterHasMany
+  include OwnerLinkSerializer
   include BelongsToManyLinks
   include CachedSerializer
-
-  PRELOADS = [
-    [ owner: { identity_membership: :user } ],
-    :collection_roles,
-    :subjects
-  ].freeze
 
   attributes :id, :name, :display_name, :created_at, :updated_at,
     :slug, :href, :favorite, :private
@@ -22,13 +16,10 @@ class CollectionSerializer
   can_filter_by :display_name, :slug, :favorite
   can_sort_by :display_name
 
+  preload [ owner: { identity_membership: :user } ], :collection_roles, :subjects
+
   # overridden belongs_to_many association to serialize the :projects links
   def self.btm_associations
     [ model_class.reflect_on_association(:projects) ]
-  end
-
-  def self.page(params = {}, scope = nil, context = {})
-    scope = scope.preload(*PRELOADS)
-    super(params, scope, context)
   end
 end

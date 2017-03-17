@@ -2,6 +2,12 @@ shared_examples "a panoptes restpack serializer" do
   let(:scope) { resource.class.all }
 
   describe "preload associations" do
+    around do |example|
+      orig_values = described_class.instance_variable_get(:@preloads)
+      example.run
+      described_class.instance_variable_set(:@preloads, orig_values)
+    end
+
     it "should not preload when none set" do
       expect_any_instance_of(resource.class::ActiveRecord_Relation).not_to receive(:preload)
       described_class.instance_variable_set(:@preloads, [])
