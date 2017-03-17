@@ -30,7 +30,7 @@ module FilterHasMany
     def scope_filters_from_params(params)
       has_many_filterable_by.map do |filter|
         filter_ids = params.delete(filter[1])
-        filter << "#{filter_ids}".split(",")
+        filter << filter_ids.to_s.split(",")
       end.delete_if do |filter|
         filter[2].blank?
       end
