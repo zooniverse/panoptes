@@ -5,12 +5,7 @@ module FilterHasMany
 
   module ClassMethods
     def page(params = {}, scope = nil, context = {})
-      filters = has_many_filterable_by.map do |filter|
-        filter_ids = params.delete(filter[1])
-        filter << filter_ids&.split(",")
-      end.delete_if do |filter|
-        filter[2].nil?
-      end
+      filters = scope_filters_from_params(params)
 
       scope = filters.reduce(scope || self.model_class.all) do |query, filter|
         query.joins(filter[0]).where(filter[0] => {id: filter[2]})
@@ -30,6 +25,15 @@ module FilterHasMany
 
       # Use the custom paging instance to create a paged response
       page_with_options serializer_options
+    end
+
+    def scope_filters_from_params(params)
+      has_many_filterable_by.map do |filter|
+        filter_ids = params.delete(filter[1])
+        filter << "#{filter_ids}".split(",")
+      end.delete_if do |filter|
+        filter[2].blank?
+      end
     end
 
     def has_many_filterable_by
