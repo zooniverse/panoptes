@@ -6,7 +6,8 @@ module FilterHasMany
   module ClassMethods
     def page(params = {}, scope = nil, context = {})
       filters = has_many_filterable_by.map do |filter|
-        filter << params.delete(filter[1])
+        filter_ids = params.delete(filter[1])
+        filter << filter_ids&.split(",")
       end.delete_if do |filter|
         filter[2].nil?
       end
