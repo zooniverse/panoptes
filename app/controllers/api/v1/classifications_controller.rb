@@ -9,9 +9,6 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   schema_type :json_schema
 
-  before_action :filter_by_subject_id,
-    only: [ :index, :gold_standard, :incomplete, :project ]
-
   rescue_from RoleControl::AccessDenied, with: :access_denied
 
   def create
@@ -38,15 +35,6 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def scope_context
     params
-  end
-
-  def filter_by_subject_id
-    subject_ids = (params.delete(:subject_ids) || params.delete(:subject_id)).try(:split, ',')
-    unless subject_ids.blank?
-      @controlled_resources = controlled_resources
-      .joins(:subjects)
-      .where(subjects: {id: subject_ids})
-    end
   end
 
   def access_denied(exception)
