@@ -3,6 +3,7 @@ class CollectionSerializer
   include OwnerLinkSerializer
   include FilterHasMany
   include BelongsToManyLinks
+  include CachedSerializer
 
   PRELOADS = [
     [ owner: { identity_membership: :user } ],
