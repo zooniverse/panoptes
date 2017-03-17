@@ -29,6 +29,18 @@ describe EmailsController, type: :controller do
         expect(upp_emails).to match_array([false])
       end
     end
+
+    context "with a different case variant of the email" do
+      before do
+        upcase_email = user.email.upcase
+        allow(user).to receive(:email).and_return(upcase_email)
+      end
+
+      it "should find the user and revoke their prefs" do
+        expect_any_instance_of(described_class).to receive(:revoke_email_subscriptions)
+        unsubscribe_user
+      end
+    end
   end
 
   let(:user) { create(:user, email_attrs) }

@@ -36,7 +36,7 @@ class EmailsController < ActionController::Base
   def unsubscribe_email
     if email = params.delete(:email)
       unsubscribe_from_list(email)
-      if user = User.find_by(email: email)
+      if user = User.find_for_authentication(email: email)
         revoke_email_subscriptions(user)
       end
       head :ok
