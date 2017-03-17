@@ -57,11 +57,8 @@ class Classification < ActiveRecord::Base
 
   def self.gold_standard_for_user(user)
     return gold_standard if user.is_admin?
-    gold_standard
-    .joins(:workflow)
-    .where("workflows.public_gold_standard IS TRUE")
-    .order(id: :asc)
-    .distinct
+    public_workflow_ids = Workflow.where("public_gold_standard IS TRUE").pluck(:id)
+    where(workflow_id: public_workflow_ids).gold_standard.order(id: :asc)
   end
 
   def self.classifications_for_project(user, opts)
