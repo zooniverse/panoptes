@@ -41,7 +41,7 @@ class Classification < ActiveRecord::Base
     when :project
       classifications_for_project(user, opts)
     when :gold_standard
-      gold_standard_for_user(user)
+      gold_standard_for_user(user, opts)
     else
       none
     end
@@ -55,13 +55,16 @@ class Classification < ActiveRecord::Base
     incomplete.merge(created_by(user))
   end
 
-  def self.gold_standard_for_user(user)
+  def self.gold_standard_for_user(user, opts)
     return gold_standard if user.is_admin?
-    gold_standard
-    .joins(:workflow)
-    .where("workflows.public_gold_standard IS TRUE")
-    .order(id: :asc)
-    .distinct
+
+    public_workflows = Workflow.where("public_gold_standard IS TRUE")
+    if opts[:workflow_id]
+      public_workflows = public_workflows.where(id: opts[:workflow_id])
+    end
+    public_workflow_ids = public_workflows.pluck(:id)
+
+    where(workflow_id: public_workflow_ids).gold_standard.order(id: :asc)
   end
 
   def self.classifications_for_project(user, opts)

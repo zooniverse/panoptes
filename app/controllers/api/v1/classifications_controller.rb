@@ -9,10 +9,10 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   schema_type :json_schema
 
-  before_action :filter_by_subject_id,
-    only: [ :index, :gold_standard, :incomplete, :project ]
-
   rescue_from RoleControl::AccessDenied, with: :access_denied
+
+  before_action :filter_plural_subject_ids,
+    only: [ :index, :gold_standard, :incomplete, :project ]
 
   def create
     super { |classification| lifecycle(:create, classification) }
@@ -38,15 +38,6 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def scope_context
     params
-  end
-
-  def filter_by_subject_id
-    subject_ids = (params.delete(:subject_ids) || params.delete(:subject_id)).try(:split, ',')
-    unless subject_ids.blank?
-      @controlled_resources = controlled_resources
-      .joins(:subjects)
-      .where(subjects: {id: subject_ids})
-    end
   end
 
   def access_denied(exception)
@@ -99,6 +90,13 @@ class Api::V1::ClassificationsController < Api::ApiController
       super.merge(url_suffix: action_name)
     else
       super
+    end
+  end
+
+  # backwards compat for api subject filtering before moving to FilterHasMany
+  def filter_plural_subject_ids
+    if subject_ids = params.delete(:subject_ids)
+      params[:subject_id] = subject_ids
     end
   end
 end

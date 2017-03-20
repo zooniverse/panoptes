@@ -214,7 +214,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it 'should be filterable by a workflow id' do
-        another_gs
+        another_gs.workflow.update_column(:public_gold_standard, true)
         get :gold_standard, workflow_id: gs.workflow_id
         expect(filtered_ids).to match_array([gs.id])
       end
