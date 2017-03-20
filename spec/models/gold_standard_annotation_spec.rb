@@ -27,6 +27,11 @@ describe GoldStandardAnnotation, type: :model do
     expect(gsa).to_not be_valid
   end
 
+  it "must have a classification" do
+    gsa.classification = nil
+    expect(gsa).to_not be_valid
+  end
+
   it "must have annotations" do
     gsa.annotations = nil
     expect(gsa).to_not be_valid

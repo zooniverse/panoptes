@@ -5,8 +5,7 @@ class GoldStandardAnnotation < ActiveRecord::Base
   belongs_to :user
   belongs_to :classification
 
-  validates_presence_of
-    :workflow,
+  validates_presence_of :workflow,
     :subject,
     :project,
     :user,
