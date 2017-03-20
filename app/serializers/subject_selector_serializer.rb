@@ -22,7 +22,7 @@ class SubjectSelectorSerializer
   end
 
   def retired
-    @model.retired_for_workflow?(workflow)
+    @context[:retired_for_workflow].include? @model.id
   end
 
   def already_seen
