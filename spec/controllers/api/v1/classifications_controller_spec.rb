@@ -228,7 +228,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         end
 
         it 'should be filterable by a list of subject ids' do
-          get :gold_standard, subject_id: gs.subject_ids.join(',')
+          get :gold_standard, subject_ids: gs.subject_ids.join(',')
           expect(filtered_ids).to match_array([gs.id])
         end
       end

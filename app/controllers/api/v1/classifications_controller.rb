@@ -11,6 +11,9 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   rescue_from RoleControl::AccessDenied, with: :access_denied
 
+  before_action :filter_plural_subject_ids,
+    only: [ :index, :gold_standard, :incomplete, :project ]
+
   def create
     super { |classification| lifecycle(:create, classification) }
   end
@@ -87,6 +90,13 @@ class Api::V1::ClassificationsController < Api::ApiController
       super.merge(url_suffix: action_name)
     else
       super
+    end
+  end
+
+  # backwards compat for api subject filtering before moving to FilterHasMany
+  def filter_plural_subject_ids
+    if subject_ids = params.delete(:subject_ids)
+      params[:subject_id] = subject_ids
     end
   end
 end
