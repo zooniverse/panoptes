@@ -28,6 +28,10 @@ class SubjectWorkflowStatus < ActiveRecord::Base
     where(subject_id: subject_id)
   end
 
+  def self.by_workflow(workflow_id)
+    where(workflow_id: workflow_id)
+  end
+
   def self.by_subject_workflow(subject_id, workflow_id)
     where(subject_id: subject_id, workflow_id: workflow_id).first
   end
