@@ -22,7 +22,13 @@ module RoleControl
 
       def scope_for(action, user, opts={})
         parent_scope = parent_class.scope_for(action, user, opts)
-        joins(@parent).merge(parent_scope)
+
+        if Panoptes.flipper["no_join_parental_scope"].enabled?
+          parent_fk = reflect_on_association(@parent).foreign_key
+          where(parent_fk => parent_scope.pluck(:id))
+        else
+          joins(@parent).merge(parent_scope)
+        end
       end
     end
   end
