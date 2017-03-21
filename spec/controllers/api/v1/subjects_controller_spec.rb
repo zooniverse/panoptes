@@ -138,6 +138,7 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:query_params) { { } }
 
         before(:each) do
+          binding.pry
           get :index, query_params
         end
 
@@ -146,14 +147,15 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         it "should default to private cache-control value" do
+          binding.pry
           expect(response.headers["Cache-Control"]).to eq("none")
         end
 
         context "with the http cache query param setup" do
-          let(:query_params) { http_cache: true }
+          let(:query_params) { { http_cache: true } }
 
           it "should set the cache-control value" do
-            expect(response.headers["Cache-Control"]).to eq("public max-age: 30)
+            expect(response.headers["Cache-Control"]).to eq("public max-age: 30")
           end
         end
       end

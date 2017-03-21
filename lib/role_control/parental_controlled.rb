@@ -38,6 +38,9 @@ module RoleControl
 
       def parent_foreign_key
         reflect_on_association(@parent).foreign_key
+
+      def parent_relation
+        @parent
       end
 
       def scope_for(action, user, opts={})
