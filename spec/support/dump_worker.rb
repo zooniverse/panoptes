@@ -1,5 +1,6 @@
 RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
   let(:another_project) { create(:project) }
+  before { Panoptes.flipper[:dump_worker_exports].enable }
 
   context "when the project id doesn't correspond to a project" do
     before(:each) do
@@ -124,6 +125,14 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
         worker.perform(project.id, "project", medium.id)
         medium.reload
         expect(medium.metadata).to include("state" => "creating")
+      end
+    end
+
+    context "Dump workers are disabled" do
+      before { Panoptes.flipper[:dump_worker_exports].disable }
+
+      it "raises an exception" do
+        expect { worker.perform(project.id, "project", medium.id) }.to raise_error(ApiErrors::ExportDisabled)
       end
     end
   end

@@ -6,6 +6,7 @@ class AggregationsDumpWorker
   sidekiq_options queue: :data_high
 
   def perform_dump
+    raise ApiErrors::ExportDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
     # Set expiry time of signed_url to one day from now
     medium.update!(put_expires: 1.day.from_now.to_i - Time.now.to_i)
 

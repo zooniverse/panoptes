@@ -5,6 +5,7 @@ RSpec.describe AggregationsDumpWorker do
   let(:agg_double) {double(aggregate: nil)}
 
   before(:each) do
+    Panoptes.flipper[:dump_worker_exports].enable
     allow(AggregationClient).to receive(:new).and_return(agg_double)
   end
 
@@ -23,5 +24,13 @@ RSpec.describe AggregationsDumpWorker do
   it 'should send an aggregate message to the AggregationClient' do
     expect(agg_double).to receive(:aggregate)
     subject.perform(project, "project", medium)
+  end
+
+  context "Dump workers are disabled" do
+    before { Panoptes.flipper[:dump_worker_exports].disable }
+
+    it "raises an exception" do
+      expect { subject.perform(project, "project", medium) }.to raise_error(ApiErrors::ExportDisabled)
+    end
   end
 end

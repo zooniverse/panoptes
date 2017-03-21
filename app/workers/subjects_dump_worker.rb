@@ -9,6 +9,7 @@ class SubjectsDumpWorker
   sidekiq_options queue: :data_high
 
   def perform_dump
+    raise ApiErrors::ExportDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
     CSV.open(csv_file_path, 'wb') do |csv|
       headers = Formatter::Csv::Subject.headers
 
