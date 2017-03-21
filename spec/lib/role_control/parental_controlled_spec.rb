@@ -41,7 +41,6 @@ describe RoleControl::ParentalControlled do
       end
     end
 
-
     it "should call scope_for on the parent" do
       expect(parent.class).to receive(:scope_for).with(:update, enrolled_actor, {})
     end
