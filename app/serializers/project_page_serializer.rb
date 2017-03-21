@@ -1,5 +1,6 @@
 class ProjectPageSerializer
   include RestPack::Serializer
+  include CachedSerializer
 
   attributes :id, :href, :created_at, :updated_at, :url_key, :title,
     :language, :content, :type
