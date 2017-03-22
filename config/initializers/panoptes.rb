@@ -6,6 +6,6 @@ module Panoptes
   end
 
   def self.disable_lifecycle_worker
-    ENV["DISABLE_LIVE_WINDOW"] || false
+    Panoptes.flipper[:disable_lifecycle_worker].enabled?
   end
 end
