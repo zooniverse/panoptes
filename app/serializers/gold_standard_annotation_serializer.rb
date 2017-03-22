@@ -10,6 +10,10 @@ class GoldStandardAnnotationSerializer
     :classifications
   end
 
+  def id
+    @model.classification_id.to_s
+  end
+
   def add_links(model, data)
     data = super(model, data)
     data[:links][:subjects] = model.subject_id.to_s

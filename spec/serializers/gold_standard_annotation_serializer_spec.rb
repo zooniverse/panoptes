@@ -13,6 +13,13 @@ describe GoldStandardAnnotationSerializer do
     let(:resource) { gsa }
   end
 
+  it "should have the classification id as the id" do
+    create(:classification)
+    gsa
+    result = described_class.single({}, GoldStandardAnnotation.all, {})
+    expect(result[:id]).to eq(gsa.classification_id.to_s)
+  end
+
   describe "nested collection routes" do
     before do
       gsa
