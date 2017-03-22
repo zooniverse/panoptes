@@ -18,6 +18,14 @@ FactoryGirl.define do
     workflow
     subject
     user
-    classification
+
+    after(:build) do |gsa, evaluator|
+      gsa.classification = create(:classification,
+        project: gsa.project,
+        workflow: gsa.workflow,
+        user: gsa.user,
+        subjects: [gsa.subject]
+      )
+    end
   end
 end
