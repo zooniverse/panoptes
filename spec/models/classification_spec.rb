@@ -235,11 +235,11 @@ describe Classification, :type => :model do
 
     describe "#gold_standard" do
       it 'should return all gold_standard project data' do
-        gsc = create(:gold_standard_classification,
+        gsa = create(:gold_standard_annotation,
           project: project, user: project.owner
         )
-        gsc.workflow.update_column(:public_gold_standard, true)
-        expect(Classification.scope_for(:gold_standard, user)).to match_array(gsc)
+        gsa.workflow.update_column(:public_gold_standard, true)
+        expect(Classification.scope_for(:gold_standard, user)).to match_array(gsa)
       end
     end
   end
