@@ -45,7 +45,10 @@ def setup_create_request(project_id: project.id,
 end
 
 def create_gold_standard
-  create(:gold_standard_classification, project: project, user: project.owner, workflow: workflow)
+  c_attrs = { project: project, user: project.owner, workflow: workflow }
+  c = create(:gold_standard_classification, c_attrs)
+  gs_attrs = c_attrs.merge(classification: c, subject_id: c.subject_ids.first)
+  create(:gold_standard_annotation, gs_attrs)
 end
 
 describe Api::V1::ClassificationsController, type: :controller do
@@ -172,10 +175,13 @@ describe Api::V1::ClassificationsController, type: :controller do
   end
 
   describe "#gold_standard" do
-    let(:gs) { create_gold_standard }
+    let(:gsa) { create_gold_standard }
+    let(:gs) { gsa.classification }
     let!(:classifications) { [ classification, gs ] }
-    let(:another_gs_in_workflow) { create_gold_standard }
-    let(:another_gs) { create(:gold_standard_classification, project: project, user: project.owner) }
+    let(:another_gsa_in_workflow) { create_gold_standard }
+    let(:another_gs_in_workflow) { another_gsa_in_workflow.classification }
+    let(:another_gsa) { create(:gold_standard_annotation, project: project, user: project.owner) }
+    let(:another_gs) { another_gsa.classification }
     let(:public_gold_standard) { true }
     let(:workflow) { create(:workflow, public_gold_standard: public_gold_standard) }
     let(:filtered_ids) do
