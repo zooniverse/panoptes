@@ -316,6 +316,20 @@ describe Api::V1::ClassificationsController, type: :controller do
           create_action
         end
       end
+
+      context "when the lifecycle should be processed immediately" do
+        before { Panoptes.flipper[:cls_lifecycle_queue].disable }
+
+        it "does not queue the job" do
+          expect(ClassificationLifecycle).to_not receive(:perform_async)
+          create_action
+        end
+
+        it "executes the job" do
+          expect_any_instance_of(ClassificationLifecycle).to receive(:execute)
+          create_action
+        end
+      end
     end
 
     context "a non-logged in user" do

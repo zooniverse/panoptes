@@ -7,6 +7,7 @@ module Flipper
       Panoptes.flipper[:remove_complete_subjects].enable
       Panoptes.flipper[:dump_worker_exports].enable
       Panoptes.flipper[:subject_uploading].enable
+      Panoptes.flipper[:cls_lifecycle_queue].enable
     end
   end
 end

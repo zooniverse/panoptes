@@ -64,9 +64,15 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def lifecycle(action, classification)
-    ClassificationLifecycle.queue(classification, action)
-  rescue Redis::CannotConnectError, Redis::TimeoutError, Timeout::Error => e
-    Honeybadger.notify(e)
+    begin
+      if Panoptes.flipper[:cls_lifecycle_queue].enabled?
+        ClassificationLifecycle.queue(classification, action)
+      else
+        ClassificationLifecycle.perform(classification, action.to_s)
+      end
+    rescue Redis::CannotConnectError, Redis::TimeoutError, Timeout::Error => e
+      Honeybadger.notify(e)
+    end
   end
 
   def completed_error
