@@ -4,7 +4,7 @@ module RoleControl
     include RoleControl::Controlled
 
     included do
-      scope :private_scope, ->  {
+      scope :private_scope, lambda {
         private_scope = parent_class.private_scope
 
         if Panoptes.flipper["test_no_join_parental_scope"].enabled?
@@ -13,7 +13,7 @@ module RoleControl
           joins(@parent).merge(private_scope)
         end
       }
-      scope :public_scope, -> {
+      scope :public_scope, lambda {
         public_scope = parent_class.public_scope
 
         if Panoptes.flipper["test_no_join_parental_scope"].enabled?
