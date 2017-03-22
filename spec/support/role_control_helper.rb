@@ -30,6 +30,8 @@ def setup_role_control_tables
                      Class.new(ActiveRecord::Base) do
                        include RoleControl::ParentalControlled
 
+                       belongs_to :controlled_table
+
                        can_through_parent :controlled_table, :index, :read, :show, :update
                      end)
   end
