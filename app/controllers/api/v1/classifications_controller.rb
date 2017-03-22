@@ -69,7 +69,7 @@ class Api::V1::ClassificationsController < Api::ApiController
     else
       ClassificationLifecycle.perform(classification, action.to_s)
     end
-    rescue Redis::CannotConnectError, Redis::TimeoutError, Timeout::Error => e
+  rescue Redis::CannotConnectError, Redis::TimeoutError, Timeout::Error => e
       Honeybadger.notify(e)
   end
 
