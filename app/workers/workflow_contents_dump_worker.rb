@@ -9,7 +9,7 @@ class WorkflowContentsDumpWorker
   sidekiq_options queue: :data_high
 
   def perform_dump
-    raise ApiErrors::ExportDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
+    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
     csv_formatter = Formatter::Csv::WorkflowContent.new
     CSV.open(csv_file_path, 'wb') do |csv|
       csv << csv_formatter.class.headers

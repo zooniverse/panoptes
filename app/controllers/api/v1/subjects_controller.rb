@@ -31,6 +31,7 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def create
+    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_uploading].enabled?
     super { |subject| subject.uploader.increment_subjects_count_cache }
   end
 

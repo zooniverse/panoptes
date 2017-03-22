@@ -25,9 +25,9 @@ module ApiErrors
       super("Cannot create roles resource when one exists for the user and project")
     end
   end
-  class ExportDisabled < PanoptesApiError
+  class FeatureDisabled < PanoptesApiError
     def initialize
-      super("Exports are temporarily disabled")
+      super("Feature has been temporarily disabled")
     end
   end
 end
