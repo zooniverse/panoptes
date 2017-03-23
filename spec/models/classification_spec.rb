@@ -239,7 +239,7 @@ describe Classification, :type => :model do
           project: project, user: project.owner
         )
         gsa.workflow.update_column(:public_gold_standard, true)
-        expect(Classification.scope_for(:gold_standard, user)).to match_array(gsa)
+        expect(Classification.scope_for(:gold_standard, user)).to match_array([gsa])
       end
     end
   end
