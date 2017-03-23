@@ -38,6 +38,7 @@ module RoleControl
 
       def parent_foreign_key
         reflect_on_association(@parent).foreign_key
+      end
 
       def parent_relation
         @parent
