@@ -318,7 +318,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       context "when the lifecycle should be processed immediately" do
-        before { Panoptes.flipper[:cls_lifecycle_queue].disable }
+        before { Panoptes.flipper[:classification_lifecycle_in_background].disable }
 
         it "does not queue the job" do
           expect(ClassificationLifecycle).to_not receive(:perform_async)

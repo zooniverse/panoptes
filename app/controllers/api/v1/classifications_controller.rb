@@ -64,7 +64,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def lifecycle(action, classification)
-    if Panoptes.flipper[:cls_lifecycle_queue].enabled?
+    if Panoptes.flipper[:classification_lifecycle_in_background].enabled?
       ClassificationLifecycle.queue(classification, action)
     else
       ClassificationLifecycle.perform(classification, action.to_s)
