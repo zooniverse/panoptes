@@ -134,28 +134,29 @@ describe Api::V1::SubjectsController, type: :controller do
         default_request user_id: user.id, scopes: scopes
       end
 
-      context "for a public project", :focus do
+      describe "http caching" do
         let(:query_params) { { } }
 
         before(:each) do
-          binding.pry
           get :index, query_params
         end
 
-        it "should return 200" do
-          expect(response.status).to eq(200)
-        end
+        context "for a public project", :focus do
+          it "should return 200" do
+            binding.pry
+            expect(response.status).to eq(200)
+          end
 
-        it "should default to private cache-control value" do
-          binding.pry
-          expect(response.headers["Cache-Control"]).to eq("none")
-        end
+          it "should not have a default value" do
+            expect(response.headers.key?("Cache-Control")).to be_falsey
+          end
 
-        context "with the http cache query param setup" do
-          let(:query_params) { { http_cache: true } }
+          context "with the http cache query param setup" do
+            let(:query_params) { { http_cache: "true" } }
 
-          it "should set the cache-control value" do
-            expect(response.headers["Cache-Control"]).to eq("public max-age: 30")
+            it "should set the cache-control value" do
+              expect(response.headers["Cache-Control"]).to eq("public max-age: 60")
+            end
           end
         end
       end

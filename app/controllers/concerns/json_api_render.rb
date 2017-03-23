@@ -1,32 +1,30 @@
 module JSONApiRender
   extend ActiveSupport::Concern
 
+  CACHEABLE_RESOURCES = { subjects: "public max-age: 60" }.freeze
+
   included do
     ActionController.add_renderer :json_api do |obj, options|
       response_body = JSONApiResponse.format_response_body(obj)
       if options[:generate_response_obj_etag]
         self.headers["ETag"] = JSONApiResponse.response_etag_header(response_body)
       end
-      if options[:add_http_cache] == "true"
-        if all_public_resources?
+      resource_cache_directive = CACHEABLE_RESOURCES[resource_sym]
+      if resource_cache_directive && options[:add_http_cache] == "true"
 
-          # def public_resources?
-          #   binding.pry
-          #   controlled_class, controlled_attribute = if resource_class.respond_to?(:parent_class)
-          #     parent_relation = resource_class.reflect_on_association(resource_class.parent_relation)
-          #     [ resource_class.parent_class, parent_relation.foreign_key ]
-          #   else
-          #     [ resource_class, :id ]
-          #   end
-          #   # MOVE THIS TO SOME SET EQUALITY OPERATOR INSTEAD OF COMPARING request_params
-          #   # OF ID's before a limit is applied
-          #   # this may not even be feasible
-          #   # if not then we'll have to cache public routes only
-          #   controlled_resource_ids = controlled_resources.pluck(controlled_attribute)
-          #   controlled_class.public_scope.where(id: controlled_resource_ids).pluck(:id)
-          # end
+        #TODO: move this to some infelctor or render options
+        parent_class = resource_class.parent_class
+        parent_resource_ids = controlled_resources.map do |cr|
+          cr.send resource_class.parent_foreign_key
+        end
 
-          self.headers["Cache-Control"] = ""
+        contains_private_data = parent_class
+          .private_scope
+          .where(id: parent_resource_ids)
+          .exists?
+
+        if !contains_private_data
+          self.headers["Cache-Control"] = resource_cache_directive
         end
       end
       self.content_type ||= Mime::Type.lookup("application/vnd.api+json; version=1")
