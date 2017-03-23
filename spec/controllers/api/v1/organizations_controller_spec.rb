@@ -165,20 +165,5 @@ describe Api::V1::OrganizationsController, type: :controller do
 
       it_behaves_like "is deactivatable"
     end
-
-    describe "#update_links" do
-      let(:resource) { create(:organization, owner: authorized_user) }
-      let(:resource_id) { :organization_id }
-      let(:test_attr) { :display_name }
-      let(:test_relation_ids) { [ linked_resource.id.to_s ] }
-
-      describe "linking a project" do
-        let!(:linked_resource) { create(:project) }
-        let(:test_relation) { :projects }
-        let(:expected_copies_count) { 1 }
-
-        it_behaves_like "supports update_links"
-      end
-    end
   end
 end
