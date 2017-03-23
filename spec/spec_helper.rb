@@ -19,6 +19,7 @@ RSpec.configure do |config|
   config.include APIResponseHelpers, type: :request
   config.include ValidUserRequestHelper, type: :request
   config.include CellectHelpers
+  config.include Flipper
   config.extend RSpec::Helpers::ActiveRecordMocks
 
   config.filter_run focus: true
@@ -60,10 +61,6 @@ RSpec.configure do |config|
     # Enable all Scientist experiments
     CodeExperiment.always_enabled = true
     CodeExperiment.raise_on_mismatches = true
-
-    allow(Panoptes).to receive(:flipper).and_return(Flipper.new(Flipper::Adapters::Memory.new))
-    Panoptes.flipper["cellect"].enable
-    Panoptes.flipper["designator"].enable
 
     case example.metadata[:sidekiq]
     when :fake

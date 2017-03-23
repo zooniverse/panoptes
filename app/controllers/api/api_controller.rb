@@ -44,6 +44,7 @@ module Api
       ActiveRecord::RecordNotUnique,
       Operation::Error,
       ActiveInteraction::InvalidInteractionError,          with: :unprocessable_entity
+    rescue_from Api::FeatureDisabled,                      with: :service_unavailable
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]

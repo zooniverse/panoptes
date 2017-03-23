@@ -12,8 +12,6 @@ RSpec.describe WorkflowsDumpWorker do
   end
 
   context "with a versioned workflow" do
-    before { Panoptes.flipper[:dump_worker_exports].enable }
-
     with_versioning do
       let(:q_workflow) { build(:workflow, :question_task) }
       let(:tasks) { q_workflow.tasks }

@@ -19,8 +19,6 @@ RSpec.describe Subjects::StrategySelection do
     end
 
     context "removing completes is enabled" do
-      before { Panoptes.flipper[:remove_complete_subjects].enable }
-
       it "should call the complete remover after selection", :aggregate_failures do
         expect(subject).to receive(:select_sms_ids).and_return([:default, [1,2,3]]).ordered
         expect(Subjects::CompleteRemover)

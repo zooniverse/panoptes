@@ -561,6 +561,16 @@ describe Api::V1::SubjectsController, type: :controller do
       }
     end
 
+    context "Uploading is disabled" do
+      before { Panoptes.flipper[:subject_uploading].disable }
+
+      it "raises an error when uploading is disabled" do
+        default_request user_id: authorized_user.id, scopes: scopes
+        post :create, create_params
+        expect(response.status).to be(503)
+      end
+    end
+
     it "should incremement the user's subjects_count cache" do
       expect_any_instance_of(User).to receive(:increment_subjects_count_cache)
       default_request user_id: authorized_user.id, scopes: scopes

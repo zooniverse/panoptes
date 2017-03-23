@@ -30,7 +30,7 @@ RSpec.describe AggregationsDumpWorker do
     before { Panoptes.flipper[:dump_worker_exports].disable }
 
     it "raises an exception" do
-      expect { subject.perform(project, "project", medium) }.to raise_error(ApiErrors::ExportDisabled)
+      expect { subject.perform(project, "project", medium) }.to raise_error(ApiErrors::FeatureDisabled)
     end
   end
 end
