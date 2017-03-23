@@ -7,6 +7,7 @@ module Flipper
       Panoptes.flipper[:remove_complete_subjects].enable
       Panoptes.flipper[:dump_worker_exports].enable
       Panoptes.flipper[:subject_uploading].enable
+      Panoptes.flipper[:classification_lifecycle_in_background].enable
     end
   end
 end
