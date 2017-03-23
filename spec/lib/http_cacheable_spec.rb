@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe HttpCacheable do
+  let(:resource_name) { controlled_resources.klass.model_name }
   let(:resource) do
-    factory_name = controlled_resources.klass.model_name.singular.to_sym
+    factory_name = resource_name.singular.to_sym
     create(factory_name)
   end
   let(:http_cache) do
@@ -57,6 +58,26 @@ describe HttpCacheable do
       it "should return false with a private resource" do
         make_private(resource)
         expect(http_cache.public_resources?).to be false
+      end
+    end
+
+    describe "#resource_cache_directive" do
+      context "with a non-cacheable resource" do
+        let(:controlled_resources) { Collection.all }
+
+        it "should response with nil if not cacheable" do
+          expect(http_cache.resource_cache_directive).to be_nil
+        end
+      end
+
+      context "with a cacheable resource" do
+        let(:controlled_resources) { Project.all }
+
+        it "should response with the correct cache directive" do
+          resource_key = resource_name.plural.to_sym
+          cache_directive = HttpCacheable::CACHEABLE_RESOURCES[resource_key]
+          expect(http_cache.resource_cache_directive).to eq(cache_directive)
+        end
       end
     end
   end

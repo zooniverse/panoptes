@@ -24,11 +24,11 @@ class HttpCacheable
     !private_resources
   end
 
-  private
-
   def resource_cache_directive
-    CACHEABLE_RESOURCES[resource_symbol]
+    @resource_cache_directive ||= CACHEABLE_RESOURCES[resource_symbol]
   end
+
+  private
 
   def any_private_parent_resources?
     parent_fk_scope = controlled_resources.select(
