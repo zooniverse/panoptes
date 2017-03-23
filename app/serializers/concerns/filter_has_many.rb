@@ -1,5 +1,3 @@
-require 'serialization/has_many_filtering/options'
-
 module FilterHasMany
   extend ActiveSupport::Concern
 
