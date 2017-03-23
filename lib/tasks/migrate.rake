@@ -179,7 +179,7 @@ namespace :migrate do
 
       non_migrated_gs_scope.find_each.with_index do |classification, index|
         curr_index = index + 1
-        if curr_index % 10 == 0 || curr_index == to_migrate_count
+        if (curr_index % 10).zero? || curr_index == to_migrate_count
           puts "Migrating classification to gold standard: #{curr_index} / #{to_migrate_count}"
         end
 
