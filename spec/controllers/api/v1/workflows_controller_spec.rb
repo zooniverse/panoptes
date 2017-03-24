@@ -223,6 +223,29 @@ describe Api::V1::WorkflowsController, type: :controller do
         end
       end
     end
+
+    context "workflow_contents task strings" do
+      let(:tasks) { update_params.dig(:workflows, :tasks) }
+      let(:params) do
+        { workflows: { tasks: tasks }, id: resource.id }
+      end
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it "should update the primary content task strings" do
+        put :update, params
+        response_tasks = json_response['workflows'][0]['tasks']
+        expect(response_tasks).to eq(tasks.deep_stringify_keys)
+      end
+
+      it "should touch the workflow resource to modify the cache_key / etag" do
+        expect {
+          put :update, params
+        }.to change { resource.reload.updated_at }
+      end
+    end
   end
 
   describe "#update_links" do

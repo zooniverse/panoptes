@@ -18,6 +18,15 @@ class Api::V1::WorkflowsController < Api::ApiController
     super
   end
 
+  def update
+    super do |resource|
+      _, strings = extract_strings(update_params[:tasks])
+      if strings
+        resource.primary_content.update(strings: strings)
+      end
+    end
+  end
+
   def update_links
     super do |workflow|
       UnfinishWorkflowWorker.perform_async(workflow.id)
@@ -85,17 +94,14 @@ class Api::V1::WorkflowsController < Api::ApiController
     end
   end
 
-  def build_update_hash(update_params, id)
-    workflow = Workflow.find(id)
-    WorkflowContent.transaction(requires_new: true) do
-      if update_params.has_key? :tasks
-        stripped_tasks, strings = extract_strings(update_params[:tasks])
-        update_params[:tasks] = stripped_tasks
-        workflow.primary_content.update(strings: strings)
-      end
-      reject_live_project_changes(workflow, update_params)
+  def build_update_hash(update_params, resource)
+    if update_params.has_key? :tasks
+      stripped_tasks, strings = extract_strings(update_params[:tasks])
+      update_params[:tasks] = stripped_tasks
     end
-    super(update_params, id)
+
+    reject_live_project_changes(resource, update_params)
+    super(update_params, resource)
   end
 
   def build_resource_for_create(create_params)
@@ -111,9 +117,10 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def extract_strings(tasks)
+    return @task_strings if @task_strings
     task_string_extractor = TasksVisitors::ExtractStrings.new
     task_string_extractor.visit(tasks)
-    [tasks, task_string_extractor.collector]
+    @task_strings = [tasks, task_string_extractor.collector]
   end
 
   def add_relation(resource, relation, value)
