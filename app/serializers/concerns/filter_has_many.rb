@@ -15,7 +15,7 @@ module FilterHasMany
       # use this custom options class to percolate the has_many filters
       # into the response meta paging urls and still use the has_many
       # join scopes built above.
-      serializer_options = Serialization::HasManyFiltering::Options.new(
+      serializer_options = ::Serialization::HasManyFiltering::Options.new(
         has_many_filters(filters),
         self,
         params,

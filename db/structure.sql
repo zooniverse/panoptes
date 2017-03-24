@@ -408,6 +408,43 @@ ALTER SEQUENCE flipper_gates_id_seq OWNED BY flipper_gates.id;
 
 
 --
+-- Name: gold_standard_annotations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE gold_standard_annotations (
+    id integer NOT NULL,
+    project_id integer,
+    workflow_id integer,
+    subject_id integer,
+    user_id integer,
+    classification_id integer,
+    annotations json NOT NULL,
+    metadata json NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: gold_standard_annotations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE gold_standard_annotations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: gold_standard_annotations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE gold_standard_annotations_id_seq OWNED BY gold_standard_annotations.id;
+
+
+--
 -- Name: media; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1581,6 +1618,13 @@ ALTER TABLE ONLY flipper_gates ALTER COLUMN id SET DEFAULT nextval('flipper_gate
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY gold_standard_annotations ALTER COLUMN id SET DEFAULT nextval('gold_standard_annotations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY media ALTER COLUMN id SET DEFAULT nextval('media_id_seq'::regclass);
 
 
@@ -1858,6 +1902,14 @@ ALTER TABLE ONLY flipper_features
 
 ALTER TABLE ONLY flipper_gates
     ADD CONSTRAINT flipper_gates_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: gold_standard_annotations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY gold_standard_annotations
+    ADD CONSTRAINT gold_standard_annotations_pkey PRIMARY KEY (id);
 
 
 --
@@ -2300,6 +2352,20 @@ CREATE UNIQUE INDEX index_flipper_features_on_key ON flipper_features USING btre
 --
 
 CREATE UNIQUE INDEX index_flipper_gates_on_feature_key_and_key_and_value ON flipper_gates USING btree (feature_key, key, value);
+
+
+--
+-- Name: index_gold_standard_annotations_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_gold_standard_annotations_on_subject_id ON gold_standard_annotations USING btree (subject_id);
+
+
+--
+-- Name: index_gold_standard_annotations_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_gold_standard_annotations_on_workflow_id ON gold_standard_annotations USING btree (workflow_id);
 
 
 --
@@ -3019,6 +3085,22 @@ ALTER TABLE ONLY subject_sets_workflows
 
 
 --
+-- Name: fk_rails_06fc22e4c3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY gold_standard_annotations
+    ADD CONSTRAINT fk_rails_06fc22e4c3 FOREIGN KEY (classification_id) REFERENCES classifications(id);
+
+
+--
+-- Name: fk_rails_082b4f1af7; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY gold_standard_annotations
+    ADD CONSTRAINT fk_rails_082b4f1af7 FOREIGN KEY (project_id) REFERENCES projects(id);
+
+
+--
 -- Name: fk_rails_0be1922a0e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3035,11 +3117,27 @@ ALTER TABLE ONLY workflow_tutorials
 
 
 --
+-- Name: fk_rails_0e782fcb3c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY gold_standard_annotations
+    ADD CONSTRAINT fk_rails_0e782fcb3c FOREIGN KEY (subject_id) REFERENCES subjects(id);
+
+
+--
 -- Name: fk_rails_107209726e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY workflow_contents
     ADD CONSTRAINT fk_rails_107209726e FOREIGN KEY (workflow_id) REFERENCES workflows(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_1d218ca624; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY gold_standard_annotations
+    ADD CONSTRAINT fk_rails_1d218ca624 FOREIGN KEY (workflow_id) REFERENCES workflows(id);
 
 
 --
@@ -3200,6 +3298,14 @@ ALTER TABLE ONLY tutorials
 
 ALTER TABLE ONLY set_member_subjects
     ADD CONSTRAINT fk_rails_93073bf3b1 FOREIGN KEY (subject_id) REFERENCES subjects(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_937b47dc37; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY gold_standard_annotations
+    ADD CONSTRAINT fk_rails_937b47dc37 FOREIGN KEY (user_id) REFERENCES users(id);
 
 
 --
@@ -3763,4 +3869,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170215105309');
 INSERT INTO schema_migrations (version) VALUES ('20170310131642');
 
 INSERT INTO schema_migrations (version) VALUES ('20170316170501');
+
+INSERT INTO schema_migrations (version) VALUES ('20170320203350');
 

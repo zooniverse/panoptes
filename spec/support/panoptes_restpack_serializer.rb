@@ -22,8 +22,9 @@ shared_examples "a panoptes restpack serializer" do
     end
 
     it "should preload valid preloads" do
+      expectation = preloads.empty? ? :not_to : :to
       expect_any_instance_of(resource.class::ActiveRecord_Relation)
-        .to receive(:preload)
+        .send(expectation, receive(:preload))
         .with(*preloads)
       described_class.instance_variable_set(:@preloads, preloads)
       described_class.page({}, scope, {})

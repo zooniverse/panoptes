@@ -165,6 +165,42 @@ namespace :migrate do
         classification.update_columns annotations: new_annotations, metadata: new_metadata
       end
     end
+
+    desc "Migrate gold standard classifiations to their own model"
+    task migrate_gold_standard_to_own_model: :environment do
+      non_migrated_gs_scope = Classification
+        .gold_standard
+        .joins("LEFT OUTER JOIN gold_standard_annotations ON gold_standard_annotations.classification_id = classifications.id")
+        .where('gold_standard_annotations.id IS NULL')
+
+      to_migrate_count = non_migrated_gs_scope.count
+      failed_ids = []
+      migrated_ids = []
+
+      non_migrated_gs_scope.find_each.with_index do |classification, index|
+        curr_index = index + 1
+        if (curr_index % 10).zero? || curr_index == to_migrate_count
+          puts "Migrating classification to gold standard: #{curr_index} / #{to_migrate_count}"
+        end
+
+        begin
+          GoldStandardAnnotation.create!(classification: classification) do |gsa|
+            gsa.project_id = classification.project_id
+            gsa.workflow_id = classification.workflow_id
+            gsa.subject_id = classification.subjects.first.id
+            gsa.user_id = classification.user_id
+            gsa.annotations = classification.annotations
+            gsa.metadata = classification.metadata
+          end
+          migrated_ids << classification.id
+        rescue ActiveRecord::RecordInvalid => e
+          failed_ids << classification.id
+        end
+      end
+      puts "Successfully migrated #{migrated_ids.count}"
+      puts "Failed to migrate #{failed_ids.count}"
+      puts "Failed classification ids #{failed_ids.join(",")}"
+    end
   end
 
   namespace :tutorial do

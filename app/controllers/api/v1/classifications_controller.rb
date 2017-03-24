@@ -23,7 +23,12 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def gold_standard
-    index
+    gold_standard_page = GoldStandardAnnotationSerializer.page(
+      params,
+      controlled_resources,
+      context
+    )
+    render json_api: gold_standard_page, generate_response_obj_etag: true
   end
 
   def incomplete

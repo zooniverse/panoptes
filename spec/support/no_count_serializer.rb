@@ -1,6 +1,6 @@
 shared_examples "a no count serializer" do
   let(:scope) { resource.class.all }
-  let(:lookup) { resource.model_name.plural.to_sym }
+  let(:lookup) { described_class.key.to_sym }
 
   describe "avoid heavy count queries on paging" do
     it "should manually deal with the paging information" do
