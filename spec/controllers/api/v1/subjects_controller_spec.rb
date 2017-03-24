@@ -492,6 +492,23 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:resource) { create(:subject) }
 
     it_behaves_like "is showable"
+
+    describe "http caching", :focus do
+      let(:action) { :show }
+      let(:private_resource) do
+        project = create(:project, private: true) do |p|
+          p.owner = user
+        end
+        create(:subject, project: project)
+      end
+
+      it_behaves_like "an showable unauthenticated http cacheable response" do
+        let(:query_params) { { id: resource.id } }
+      end
+      it_behaves_like "an showable authenticated http cacheable response" do
+        let(:query_params) { { id: private_resource.id } }
+      end
+    end
   end
 
   describe "#update" do
