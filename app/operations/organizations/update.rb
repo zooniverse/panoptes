@@ -3,7 +3,6 @@ require_relative '../../../lib/filters/organization_filter.rb'
 module Organizations
   class Update < Operation
     include UrlLabels
-    include ContentFromParams
 
     organization :organization_params
     string :id
