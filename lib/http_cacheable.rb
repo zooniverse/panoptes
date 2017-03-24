@@ -10,7 +10,7 @@ class HttpCacheable
   end
 
   def public_resources?
-    return false if resource_cache_directive.blank?
+    return false unless cacheable_resource?
 
     private_resources = if resource_class.respond_to?(:parent_class)
       any_private_parent_resources?
@@ -56,5 +56,9 @@ class HttpCacheable
 
   def max_age_directive
     @max_age_directive ||= ENV.fetch("HTTP_#{resource_symbol.to_s.upcase}_MAX_AGE", 60)
+  end
+
+  def cacheable_resource?
+    Panoptes.flipper[:http_caching].enabled? && !!resource_cache_directive
   end
 end

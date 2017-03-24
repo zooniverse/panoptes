@@ -15,10 +15,19 @@ describe HttpCacheable do
   end
 
   before do
+    Panoptes.flipper["http_caching"].enable
     resource
   end
 
   describe '#public_resources?' do
+    context "when http caching is disabled" do
+      let(:controlled_resources) { Project.all }
+
+      it "should return false for a public resource" do
+        Panoptes.flipper["http_caching"].disable
+        expect(http_cache.public_resources?).to be false
+      end
+    end
     describe "a non-cacheable resource" do
       let(:controlled_resources) { Collection.all }
 
