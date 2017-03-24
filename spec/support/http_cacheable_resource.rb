@@ -35,7 +35,7 @@ shared_examples "private resources http cache" do
   end
 end
 
-shared_examples "an authenticated http cacheable response" do
+shared_examples "an indexable authenticated http cacheable response" do
   let(:query_params) { { } }
 
   before do
@@ -55,7 +55,7 @@ shared_examples "an authenticated http cacheable response" do
   it_behaves_like "public resources http cache"
 end
 
-shared_examples "an unauthenticated http cacheable response" do
+shared_examples "an indexable unauthenticated http cacheable response" do
   let(:query_params) { { } }
 
   before do
