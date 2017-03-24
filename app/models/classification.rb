@@ -62,7 +62,7 @@ class Classification < ActiveRecord::Base
     if opts[:workflow_id]
       public_workflows = public_workflows.where(id: opts[:workflow_id])
     end
-    public_workflow_ids = public_workflows.pluck(:id)
+    public_workflow_ids = public_workflows.select(:id)
     GoldStandardAnnotation
       .where(workflow_id: public_workflow_ids)
       .order(id: :asc)
@@ -74,7 +74,7 @@ class Classification < ActiveRecord::Base
     end
     projects = Project.scope_for(:update, user)
     projects = projects.where(id: opts[:project_id]) if opts[:project_id]
-    scope = where(project_id: projects.pluck(:id))
+    scope = where(project_id: projects.select(:id))
     scope = scope.after_id(opts[:last_id]) if opts[:last_id]
     scope
   end

@@ -64,7 +64,7 @@ class UserGroup < ActiveRecord::Base
   end
 
   def self.public_query(private_query, public_flag)
-    query = where(id: private_query.pluck(:id))
+    query = where(id: private_query.select(:id))
     query = query.or(public_scope) if public_flag
     query
   end

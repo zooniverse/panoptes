@@ -24,14 +24,16 @@ describe RoleControl::ParentalControlled do
       end
     end
 
-    context "with test no join parent scope feature flag" do
+    context "with test no join scope feature flag" do
+      let(:parent_fk) do
+        klass.reflect_on_association(parent.model_name.singular).foreign_key
+      end
+
       it "should call filter on belongs_to parent fk" do
         Panoptes.flipper[:test_no_join_parental_scope].enable
-        parent_scope_for = parent.class.scope_for(:update, enrolled_actor, {})
-        parent_fk = klass.reflect_on_association(parent.model_name.singular).foreign_key
         expect(klass)
           .to receive(:where)
-          .with(parent_fk => parent_scope_for.pluck(:id))
+          .with(parent_fk => sub_select_scope.select(:id))
           .and_call_original
       end
     end
@@ -41,6 +43,7 @@ describe RoleControl::ParentalControlled do
     let(:parent) { ControlledTable.create!(private: false) }
 
     it_behaves_like "a parental controlled" do
+      let(:sub_select_scope) { parent.class.public_scope }
       after do
         klass.public_scope
       end
@@ -49,6 +52,7 @@ describe RoleControl::ParentalControlled do
 
   describe "::private_scope" do
     it_behaves_like "a parental controlled" do
+      let(:sub_select_scope) { parent.class.private_scope }
       after do
         klass.private_scope
       end
@@ -56,8 +60,9 @@ describe RoleControl::ParentalControlled do
   end
 
   describe "::scope_for" do
+    let(:sub_select_scope) { parent.class.scope_for(:update, enrolled_actor, {}) }
     after do
-      klass.scope_for(:update, enrolled_actor)
+      klass.scope_for(:update, enrolled_actor, {})
     end
 
     it_behaves_like "a parental controlled"

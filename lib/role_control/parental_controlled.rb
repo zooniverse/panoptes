@@ -8,7 +8,7 @@ module RoleControl
         private_scope = parent_class.private_scope
 
         if Panoptes.flipper["test_no_join_parental_scope"].enabled?
-          where(parent_foreign_key => private_scope.pluck(:id))
+          where(parent_foreign_key => private_scope.select(:id))
         else
           joins(@parent).merge(private_scope)
         end
@@ -17,7 +17,7 @@ module RoleControl
         public_scope = parent_class.public_scope
 
         if Panoptes.flipper["test_no_join_parental_scope"].enabled?
-          where(parent_foreign_key => public_scope.pluck(:id))
+          where(parent_foreign_key => public_scope.select(:id))
         else
           joins(@parent).merge(public_scope)
         end
@@ -44,7 +44,7 @@ module RoleControl
         parent_scope = parent_class.scope_for(action, user, opts)
 
         if Panoptes.flipper["test_no_join_parental_scope"].enabled?
-          where(parent_foreign_key => parent_scope.pluck(:id))
+          where(parent_foreign_key => parent_scope.select(:id))
         else
           joins(@parent).merge(parent_scope)
         end
