@@ -38,14 +38,13 @@ module JsonApiController
     end
 
     def params_for(action=action_name.to_sym)
-      return @ps if @ps
-      @ps = params.require(resource_sym).permit!
+      ps = params.require(resource_sym).permit!
       if validator = self.class.action_params[action]
-        validator.validate!(@ps)
+        validator.validate!(ps)
       else
         raise NoValidatorForActionError
       end
-      @ps
+      ps
     end
   end
 end

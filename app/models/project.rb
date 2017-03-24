@@ -49,6 +49,7 @@ class Project < ActiveRecord::Base
 
   enum state: [:paused, :finished]
 
+  cache_by_association :project_contents, :tags
   cache_by_resource_method :subjects_count, :retired_subjects_count, :finished?
 
   accepts_nested_attributes_for :project_contents

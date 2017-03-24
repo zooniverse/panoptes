@@ -12,8 +12,7 @@ module JsonApiController
 
     def update
       controlled_resources.zip(Array.wrap(update_params)).each do |resource, update_hash|
-        update_attributes = build_update_hash(update_hash, resource)
-        resource.assign_attributes(update_attributes)
+        resource.assign_attributes(build_update_hash(update_hash,resource))
       end
 
       resource_class.transaction(requires_new: true) do
@@ -53,13 +52,10 @@ module JsonApiController
     protected
 
     def build_update_hash(update_params, resource)
-      if links = update_params.delete(:links)
-        links.try(:reduce, update_params) do |params, (k, v)|
-          params[k] = update_relation(resource, k.to_sym, v)
-          params
-        end
-      else
-        update_params
+      return update_params unless links = update_params.delete(:links)
+      links.try(:reduce, update_params) do |params, (k, v)|
+        params[k] = update_relation(resource, k.to_sym, v)
+        params
       end
     end
 

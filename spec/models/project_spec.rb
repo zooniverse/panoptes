@@ -33,11 +33,9 @@ describe Project, type: :model do
   context "with caching resource associations" do
     let(:cached_resource) { full_project }
 
-    it_behaves_like "has an extended cache key" do
-      let(:methods) do
-        %i(subjects_count retired_subjects_count finished?)
-      end
-    end
+    it_behaves_like "has an extended cache key",
+      [:project_contents, :tags],
+      [:subjects_count, :retired_subjects_count, :finished?]
   end
 
   it "should have a valid factory" do
