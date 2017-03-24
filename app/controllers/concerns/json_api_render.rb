@@ -18,7 +18,6 @@ module JSONApiRender
       self.content_type ||= Mime::Type.lookup("application/vnd.api+json; version=1")
       self.response_body = response_body
     end
-
   end
 
   def json_api_render(status, content, location=nil)

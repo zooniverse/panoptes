@@ -1,8 +1,5 @@
 class HttpCacheable
-  CACHEABLE_RESOURCES = {
-    subjects: "public max-age: 60",
-    projects: "public max-age: 60"
-  }.freeze
+  CACHEABLE_RESOURCES = %i(subjects projects workflows).freeze
 
   attr_reader :controlled_resources, :resource_class, :resource_symbol
 
@@ -13,7 +10,7 @@ class HttpCacheable
   end
 
   def public_resources?
-    return false unless resource_cache_directive
+    return false if resource_cache_directive.blank?
 
     private_resources = if resource_class.respond_to?(:parent_class)
       any_private_parent_resources?
@@ -25,7 +22,10 @@ class HttpCacheable
   end
 
   def resource_cache_directive
-    @resource_cache_directive ||= CACHEABLE_RESOURCES[resource_symbol]
+    @resource_cache_directive ||=
+      if CACHEABLE_RESOURCES.include?(resource_symbol)
+        "#{public_private_directive} max-age: #{max_age_directive}"
+      end
   end
 
   private
@@ -44,5 +44,17 @@ class HttpCacheable
 
   def any_private_resources?
     controlled_resources.private_scope.exists?
+  end
+
+  def public_private_directive
+    @public_private_directive ||= if Panoptes.flipper[:private_http_caching].enabled?
+      "private"
+    else
+      "public"
+    end
+  end
+
+  def max_age_directive
+    @max_age_directive ||= ENV.fetch("HTTP_#{resource_symbol.to_s.upcase}_MAX_AGE", 60)
   end
 end

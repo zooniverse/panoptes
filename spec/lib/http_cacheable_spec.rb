@@ -19,7 +19,6 @@ describe HttpCacheable do
   end
 
   describe '#public_resources?' do
-
     describe "a non-cacheable resource" do
       let(:controlled_resources) { Collection.all }
 
@@ -34,17 +33,19 @@ describe HttpCacheable do
     end
 
     describe "parental controlled resources" do
-      let(:controlled_resources) { Subject.all }
+      [ Subject, Workflow ].each do |resource_klass|
+        let(:controlled_resources) { resource_klass.all }
 
-      it "should return true with a public resource" do
-        expect(http_cache.public_resources?).to be true
-      end
+        it "should return true with a public resource" do
+          expect(http_cache.public_resources?).to be true
+        end
 
-      it "should return false with a private resource" do
-        parent_relation = resource.class.parent_relation
-        parent_resource = resource.send(parent_relation)
-        make_private(parent_resource)
-        expect(http_cache.public_resources?).to be false
+        it "should return false with a private resource" do
+          parent_relation = resource_klass.parent_relation
+          parent_resource = resource.send(parent_relation)
+          make_private(parent_resource)
+          expect(http_cache.public_resources?).to be false
+        end
       end
     end
 
@@ -71,12 +72,22 @@ describe HttpCacheable do
       end
 
       context "with a cacheable resource" do
-        let(:controlled_resources) { Project.all }
+        [ Project, Subject, Workflow ].each do |resource_klass|
+          let(:controlled_resources) { resource_klass.all }
+          let(:cache_directive) { "public max-age: 60" }
 
-        it "should response with the correct cache directive" do
-          resource_key = resource_name.plural.to_sym
-          cache_directive = HttpCacheable::CACHEABLE_RESOURCES[resource_key]
-          expect(http_cache.resource_cache_directive).to eq(cache_directive)
+          it "should response with the correct cache directive" do
+            expect(http_cache.resource_cache_directive).to eq(cache_directive)
+          end
+
+          context "with feature flag to ensure private browser caching" do
+            let(:cache_directive) { "private max-age: 60" }
+
+            it "should not allow public caching" do
+              Panoptes.flipper[:private_http_caching].enable
+              expect(http_cache.resource_cache_directive).to eq(cache_directive)
+            end
+          end
         end
       end
     end
