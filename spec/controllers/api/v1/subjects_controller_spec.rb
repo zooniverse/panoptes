@@ -136,8 +136,8 @@ describe Api::V1::SubjectsController, type: :controller do
 
       it_behaves_like "http cacheable response" do
         let(:private_resource) do
-          project = create(:project, private: true) do |project|
-            project.owner = user
+          project = create(:project, private: true) do |p|
+            p.owner = user
           end
           create(:subject, project: project)
         end
