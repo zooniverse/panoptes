@@ -493,7 +493,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
     it_behaves_like "is showable"
 
-    describe "http caching", :focus do
+    describe "http caching" do
       let(:action) { :show }
       let(:private_resource) do
         project = create(:project, private: true) do |p|

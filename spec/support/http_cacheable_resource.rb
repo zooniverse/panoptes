@@ -39,38 +39,53 @@ shared_examples "private resources http cache" do
 end
 
 shared_examples "an indexable authenticated http cacheable response" do
+  let(:cache_params) { { } }
   let(:query_params) { { } }
 
-  before do
+  def index_request
     default_request user_id: user.id, scopes: scopes
-    get action, query_params
+    get action, query_params.merge(cache_params)
   end
 
-  it "should return 200" do
-    expect(response.status).to eq(200)
-  end
-
-  it "should not have a default value" do
-    expect(response.headers["Cache-Control"]).to be_nil
-  end
-
-  context "with the http cache query param setup" do
-    let(:query_params) { { http_cache: "true" } }
-
-    it "should not have a cache directive value" do
-      expect(response.headers["Cache-Control"]).to be_nil
+  it_behaves_like "private resources http cache" do
+    before do
+      private_resource
+      index_request
     end
   end
 
-  it_behaves_like "public resources http cache"
+  it_behaves_like "public resources http cache" do
+    before do
+      index_request
+    end
+  end
 end
 
 shared_examples "an indexable unauthenticated http cacheable response" do
+  let(:cache_params) { { } }
   let(:query_params) { { } }
 
-  it_behaves_like "private resources http cache" do
+  before do
+    private_resource
+    get action, query_params.merge(cache_params)
+  end
+
+  describe "private resources http cache" do
+
+    it "should return 200" do
+      expect(response.status).to eq(200)
+    end
+
+    it "should not have a default value" do
+      expect(response.headers["Cache-Control"]).to be_nil
+    end
+
     context "with the http cache query param setup" do
-      let(:query_params) { { http_cache: "true" } }
+      let(:cache_params) { { http_cache: "true" } }
+
+      it "should return 200" do
+        expect(response.status).to eq(200)
+      end
 
       it "should not return the private resource in the response" do
         response_ids = created_instance_ids(api_resource_name)
