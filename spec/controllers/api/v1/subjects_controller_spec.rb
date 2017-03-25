@@ -504,8 +504,8 @@ describe Api::V1::SubjectsController, type: :controller do
       let(:private_resource_id) { private_resource.id }
       let(:public_resource_id) { resource.id }
 
-      it_behaves_like "an showable unauthenticated http cacheable response"
-      it_behaves_like "an showable authenticated http cacheable response"
+      it_behaves_like "a showable unauthenticated http cacheable response"
+      it_behaves_like "a showable authenticated http cacheable response"
     end
   end
 

@@ -101,7 +101,7 @@ shared_examples "an indexable unauthenticated http cacheable response" do
   it_behaves_like "public resources http cache"
 end
 
-shared_examples "an showable authenticated http cacheable response" do
+shared_examples "a showable authenticated http cacheable response" do
   let(:cache_params) { { } }
 
   before do
@@ -118,7 +118,7 @@ shared_examples "an showable authenticated http cacheable response" do
   end
 end
 
-shared_examples "an showable unauthenticated http cacheable response" do
+shared_examples "a showable unauthenticated http cacheable response" do
   let(:cache_params) { { } }
 
   before do
