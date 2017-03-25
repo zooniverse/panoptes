@@ -1,10 +1,4 @@
 shared_examples "public resources http cache" do
-  let(:cache_params) { { } }
-
-  before(:each) do
-    get action, query_params.merge(cache_params)
-  end
-
   it "should return 200" do
     expect(response.status).to eq(200)
   end
@@ -23,12 +17,6 @@ shared_examples "public resources http cache" do
 end
 
 shared_examples "private resources http cache" do
-  let(:cache_params) { { } }
-
-  before do
-    get action, query_params.merge(cache_params)
-  end
-
   it "should return 200" do
     expect(response.status).to eq(200)
   end
@@ -99,9 +87,11 @@ shared_examples "an indexable unauthenticated http cacheable response" do
 end
 
 shared_examples "an showable authenticated http cacheable response" do
+  let(:cache_params) { { } }
+
   before do
     default_request user_id: user.id, scopes: scopes
-    get action, query_params
+    get action, query_params.merge(cache_params)
   end
 
   it_behaves_like "private resources http cache" do
@@ -114,8 +104,10 @@ shared_examples "an showable authenticated http cacheable response" do
 end
 
 shared_examples "an showable unauthenticated http cacheable response" do
+  let(:cache_params) { { } }
+
   before do
-    get action, query_params
+    get action, query_params.merge(cache_params)
   end
 
   context "when trying to access a private resource" do
