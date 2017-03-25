@@ -454,7 +454,7 @@ describe Api::V1::ProjectsController, type: :controller do
       it 'should queue a talk admin create worker' do
         expect(TalkAdminCreateWorker)
           .to receive(:perform_async)
-          .with(instance_of(Fixnum))
+          .with(be_kind_of(Integer))
         default_request scopes: scopes, user_id: authorized_user.id
         post :create, create_params
       end
