@@ -8,6 +8,7 @@ module Flipper
       Panoptes.flipper[:dump_worker_exports].enable
       Panoptes.flipper[:subject_uploading].enable
       Panoptes.flipper[:classification_lifecycle_in_background].enable
+      Panoptes.flipper["http_caching"].enable
     end
   end
 end

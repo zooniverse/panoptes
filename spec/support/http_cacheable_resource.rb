@@ -54,10 +54,6 @@ shared_examples "an indexable authenticated http cacheable response" do
   let(:query_params) { { } }
 
   before do
-    Panoptes.flipper["http_caching"].enable
-  end
-
-  before do
     default_request user_id: user.id, scopes: scopes
     get action, query_params
   end
@@ -84,10 +80,6 @@ end
 shared_examples "an indexable unauthenticated http cacheable response" do
   let(:query_params) { { } }
 
-  before do
-    Panoptes.flipper["http_caching"].enable
-  end
-
   it_behaves_like "private resources http cache" do
     context "with the http cache query param setup" do
       let(:query_params) { { http_cache: "true" } }
@@ -108,10 +100,6 @@ end
 
 shared_examples "an showable authenticated http cacheable response" do
   before do
-    Panoptes.flipper["http_caching"].enable
-  end
-
-  before do
     default_request user_id: user.id, scopes: scopes
     get action, query_params
   end
@@ -126,10 +114,6 @@ shared_examples "an showable authenticated http cacheable response" do
 end
 
 shared_examples "an showable unauthenticated http cacheable response" do
-  before do
-    Panoptes.flipper["http_caching"].enable
-  end
-
   before do
     get action, query_params
   end
@@ -152,9 +136,6 @@ shared_examples "an showable unauthenticated http cacheable response" do
 end
 
 shared_examples "is not a http cacheable response" do
-  before do
-    Panoptes.flipper["http_caching"].enable
-  end
 
   context "for a public resource" do
     before(:each) do
