@@ -11,14 +11,7 @@ class HttpCacheable
 
   def public_resources?
     return false unless cacheable_resource?
-
-    private_resources = if resource_class.respond_to?(:parent_class)
-      any_private_parent_resources?
-    else
-      any_private_resources?
-    end
-
-    !private_resources
+    !controlled_resources_any_private?
   end
 
   def resource_cache_directive
@@ -47,11 +40,12 @@ class HttpCacheable
   end
 
   def public_private_directive
-    @public_private_directive ||= if Panoptes.flipper[:private_http_caching].enabled?
-      "private"
-    else
-      "public"
-    end
+    @public_private_directive ||=
+      if Panoptes.flipper[:private_http_caching].enabled?
+        "private"
+      else
+        "public"
+      end
   end
 
   def max_age_directive
@@ -60,5 +54,13 @@ class HttpCacheable
 
   def cacheable_resource?
     Panoptes.flipper[:http_caching].enabled? && !!resource_cache_directive
+  end
+
+  def controlled_resources_any_private?
+    if resource_class.respond_to?(:parent_class)
+      any_private_parent_resources?
+    else
+      any_private_resources?
+    end
   end
 end
