@@ -5,6 +5,7 @@ AllCops:
     - "vendor/**/*"
     - "db/schema.rb"
   UseCache: false
+  TargetRubyVersion: 2.3
 
 Style/DotPosition:
   Description: Checks the position of the dot in multi-line method calls.
