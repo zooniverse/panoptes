@@ -14,6 +14,7 @@ RSpec.shared_examples "is showable" do
 
   it 'should return the requested resource' do
     expect(json_response[api_resource_name].length).to eq 1
+    expect(json_response[api_resource_name][0]['id']).to eq(resource.id.to_s)
   end
 
   it_behaves_like 'an api response'
