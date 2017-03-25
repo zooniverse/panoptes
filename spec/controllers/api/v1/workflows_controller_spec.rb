@@ -37,10 +37,15 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:filterable_resources) { create_list(:workflow_with_subjects, 2) }
     let(:expected_filtered_ids) { [ filterable_resources.first.id.to_s ] }
     let(:private_project) { create(:private_project) }
-    let!(:private_resource) { create(:workflow, project: private_project) }
+    let(:private_resource) { create(:workflow, project: private_project) }
     let(:n_visible) { 2 }
 
-    it_behaves_like 'is indexable'
+    it_behaves_like 'is indexable' do
+      before do
+        private_resource
+      end
+    end
+
     it_behaves_like 'has many filterable', :subject_sets
 
     describe "filter by" do
