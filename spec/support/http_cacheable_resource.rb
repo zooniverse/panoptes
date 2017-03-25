@@ -43,7 +43,7 @@ shared_examples "an indexable authenticated http cacheable response" do
   let(:query_params) { { } }
 
   def index_request
-    default_request user_id: user.id, scopes: scopes
+    default_request user_id: authorized_user.id, scopes: scopes
     get action, query_params.merge(cache_params)
   end
 
@@ -105,7 +105,7 @@ shared_examples "a showable authenticated http cacheable response" do
   let(:cache_params) { { } }
 
   before do
-    default_request user_id: user.id, scopes: scopes
+    default_request user_id: authorized_user.id, scopes: scopes
     get action, query_params.merge(cache_params)
   end
 
