@@ -375,20 +375,16 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe "#show" do
-      let(:project_id) { project.id }
+      let(:resource) { project }
 
-      before(:each) do
-        get :show, id: project_id
+      it_behaves_like "is showable"
+
+      it_behaves_like "an api response" do
+        before do
+          get :show, id: resource.id
+        end
       end
 
-      it "should return 200" do
-        expect(response.status).to eq(200)
-      end
-
-      it "should return the only requested project" do
-        expect(json_response[api_resource_name].length).to eq(1)
-        expect(json_response[api_resource_name][0]['id']).to eq(project_id.to_s)
-      end
 
       it_behaves_like "an api response"
     end
