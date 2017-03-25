@@ -48,6 +48,10 @@ describe Api::V1::ProjectsController, type: :controller do
         projects
       end
 
+      it_behaves_like "an indexable unauthenticated http cacheable response" do
+        let(:action) { :index }
+      end
+
       it_behaves_like "is indexable"
       it_behaves_like "it has custom owner links", "display_name"
       it_behaves_like "it only lists active resources"
@@ -60,6 +64,14 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe "#index" do
+
+      it_behaves_like "an indexable authenticated http cacheable response" do
+        let(:action) { :index }
+        let(:private_resource) do
+          create(:project, owner: user, private: true)
+        end
+      end
+
       describe "custom owner links" do
         before(:each) do
           projects
