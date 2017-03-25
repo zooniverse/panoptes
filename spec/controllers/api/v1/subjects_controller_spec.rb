@@ -21,7 +21,7 @@ describe Api::V1::SubjectsController, type: :controller do
   describe "#index" do
     context "logged out user" do
 
-      it_behaves_like "an unauthenticated http cacheable response" do
+      it_behaves_like "an indexable unauthenticated http cacheable response" do
         let(:action) { :index }
         let(:private_resource) do
           project = create(:project, private: true) do |p|
@@ -150,7 +150,7 @@ describe Api::V1::SubjectsController, type: :controller do
         default_request user_id: user.id, scopes: scopes
       end
 
-      it_behaves_like "an authenticated http cacheable response" do
+      it_behaves_like "an indexable authenticated http cacheable response" do
         let(:action) { :index }
         let(:private_resource) do
           project = create(:project, private: true) do |p|
@@ -501,13 +501,11 @@ describe Api::V1::SubjectsController, type: :controller do
         end
         create(:subject, project: project)
       end
+      let(:private_resource_id) { private_resource.id }
+      let(:public_resource_id) { resource.id }
 
-      it_behaves_like "an showable unauthenticated http cacheable response" do
-        let(:query_params) { { id: resource.id } }
-      end
-      it_behaves_like "an showable authenticated http cacheable response" do
-        let(:query_params) { { id: private_resource.id } }
-      end
+      it_behaves_like "an showable unauthenticated http cacheable response"
+      it_behaves_like "an showable authenticated http cacheable response"
     end
   end
 
