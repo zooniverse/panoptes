@@ -514,6 +514,19 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:resource) { workflows.first }
 
     it_behaves_like "is showable"
+
+    describe "http caching" do
+      let(:action) { :show }
+      let(:private_resource) do
+        project = create(:private_project, owner: authorized_user)
+        create(:workflow, project: project)
+      end
+      let(:private_resource_id) { private_resource.id }
+      let(:public_resource_id) { resource.id }
+
+      it_behaves_like "a showable unauthenticated http cacheable response"
+      it_behaves_like "a showable authenticated http cacheable response"
+    end
   end
 
   describe '#retired_subjects' do
