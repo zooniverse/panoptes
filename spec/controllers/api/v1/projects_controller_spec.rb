@@ -50,6 +50,9 @@ describe Api::V1::ProjectsController, type: :controller do
 
       it_behaves_like "an indexable unauthenticated http cacheable response" do
         let(:action) { :index }
+        let(:private_resource) do
+          create(:project, owner: user, private: true)
+        end
       end
 
       it_behaves_like "is indexable"
