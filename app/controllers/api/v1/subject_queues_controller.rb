@@ -14,8 +14,7 @@ class Api::V1::SubjectQueuesController < Api::ApiController
       relation = SetMemberSubject.link_to_resource(resource, api_user, *args)
         .where(subject_id: value)
         .order("idx(array[#{value.join(',')}], set_member_subjects.subject_id)")
-
-      relation_or_error(relation, true, false)
+      relations_or_error(relation, value)
     else
       super
     end
