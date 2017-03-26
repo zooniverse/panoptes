@@ -5,6 +5,8 @@ class Api::V1::ProjectsController < Api::ApiController
   include IndexSearch
   include AdminAllowed
   include Versioned
+  include UrlLabels
+  include ContentFromParams
 
   require_authentication :update, :create, :destroy, :create_classifications_export,
     :create_subjects_export, :create_aggregations_export,
@@ -14,12 +16,6 @@ class Api::V1::ProjectsController < Api::ApiController
   schema_type :json_schema
 
   alias_method :project, :controlled_resource
-
-  CONTENT_PARAMS = [:description,
-                    :title,
-                    :workflow_description,
-                    :researcher_quote,
-                    :introduction].freeze
 
   CONTENT_FIELDS = [:title,
                     :description,
@@ -64,6 +60,27 @@ class Api::V1::ProjectsController < Api::ApiController
                               end
     end
     super
+  end
+
+  def update
+    super do |resource|
+      # TODO: extract this primary project content update
+      # to a service object that sits in the project
+      # transaction.
+      content_attributes = primary_content_attributes(update_params)
+      unless content_attributes.blank?
+        resource.primary_content.update!(content_attributes)
+      end
+
+      # TODO: move this to a service object to create/update
+      # tags for the project
+      tags = create_or_update_tags(update_params.dup)
+      resource.tags = tags unless tags.nil?
+
+      if !content_attributes.blank? || !tags.nil?
+        resource.updated_at = Time.zone.now
+      end
+    end
   end
 
   def create_classifications_export
@@ -117,22 +134,11 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_response(projects)
-    serializer.resource({ include: 'owners' },
+    serializer.resource(
+      { include: 'owners' },
       resource_scope(projects),
-      fields: CONTENT_FIELDS)
-  end
-
-  def content_from_params(ps)
-    ps[:title] = ps[:display_name]
-    content = ps.slice(*CONTENT_FIELDS)
-    content[:language] = ps[:primary_language]
-    if ps.has_key? :urls
-      urls, labels = extract_url_labels(ps[:urls])
-      content[:url_labels] = labels
-      ps[:urls] = urls
-    end
-    ps.except!(*CONTENT_FIELDS)
-    content.select { |k,v| !!v }
+      fields: CONTENT_FIELDS
+    )
   end
 
   def admin_allowed_params
@@ -143,30 +149,26 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def build_resource_for_create(create_params)
     admin_allowed create_params, *admin_allowed_params
-    create_params[:project_contents] = [ProjectContent.new(content_from_params(create_params))]
+
+    content_attributes = primary_content_attributes(create_params)
+    create_params[:project_contents] = [ ProjectContent.new(content_attributes) ]
     if create_params.has_key? :tags
       create_params[:tags] = create_or_update_tags(create_params)
     end
     add_user_as_linked_owner(create_params)
-    super(create_params)
+
+    super(create_params.except(*CONTENT_FIELDS))
   end
 
   def build_update_hash(update_params, resource)
     admin_allowed update_params, *admin_allowed_params
 
-    content_update = content_from_params(update_params)
-    unless content_update.blank?
-      resource.primary_content.update!(content_update)
-    end
-
-    tags = create_or_update_tags(update_params)
-    resource.tags = tags unless tags.nil?
-
     if update_params[:launch_approved]
       resource.launch_date ||= Time.zone.now
     end
 
-    super(update_params, resource)
+    update_attributes = super(update_params, resource)
+    update_attributes.except(:tags, *CONTENT_FIELDS)
   end
 
   def new_items(resource, relation, value)
@@ -197,12 +199,6 @@ class Api::V1::ProjectsController < Api::ApiController
     end
   end
 
-  def extract_url_labels(urls)
-    visitor = TasksVisitors::ExtractStrings.new
-    visitor.visit(urls)
-    [urls, visitor.collector]
-  end
-
   def context
     if action_name == "index" && !!params[:cards]
       {cards: true, include_avatar_src?: true}.tap do |context|
@@ -217,5 +213,11 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def cards_exclude_keys
     ProjectSerializer.serializable_attributes.except(*CARD_FIELDS).keys
+  end
+
+  def primary_content_attributes(content_attributes)
+    content_from_params(content_attributes.dup, CONTENT_FIELDS) do |ps|
+      ps[:title] = ps[:display_name]
+    end
   end
 end
