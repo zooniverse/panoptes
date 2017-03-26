@@ -63,10 +63,10 @@ class UserGroup < ActiveRecord::Base
       .where(memberships: { identity: false })
   end
 
-  def self.public_query(private_query, public_flag)
-    query = where(id: private_query.select(:id))
-    query = query.or(public_scope) if public_flag
-    query
+  def self.user_can_access_scope(private_query, public_flag)
+    scope = where(id: private_query.select(:id))
+    scope = scope.or(public_scope) if public_flag
+    scope
   end
 
   def self.roles_allowed_to_access(action, klass=nil)
