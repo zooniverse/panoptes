@@ -8,7 +8,9 @@ class Classification < ActiveRecord::Base
 
   has_many :recents, dependent: :destroy
 
-  has_and_belongs_to_many :subjects, join_table: :classification_subjects
+  has_and_belongs_to_many :subjects,
+    join_table: :classification_subjects,
+    validate: false
 
   enum expert_classifier: [:expert, :owner]
 
