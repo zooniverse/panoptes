@@ -25,10 +25,11 @@ module RoleControl
       end
 
       def private_query(action, target, roles)
-        AccessControlList.joins(user_group: :memberships)
+        user_group_memberships = memberships_query(action, target)
+          .select(:user_group_id)
+        AccessControlList
+          .where(user_group_id: user_group_memberships)
           .select(:resource_id)
-          .merge(memberships_query(action, target))
-          .where(resource_type: name)
           .where.overlap(roles: roles)
       end
 
