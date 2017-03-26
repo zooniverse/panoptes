@@ -29,7 +29,7 @@ class ProjectSerializer
     :completeness, :activity, :state, :researcher_quote
 
   optional :avatar_src
-  can_include :workflows, :subject_sets, :owners, :project_contents,
+  can_include :workflows, :active_workflows, :subject_sets, :owners, :project_contents,
     :project_roles, :pages, :organization
   media_include :avatar, :background, :attached_images,
     classifications_export: { include: false},
@@ -124,6 +124,10 @@ class ProjectSerializer
     else
       ""
     end
+  end
+
+  def active_workflows
+    @model.workflows.where(active: true)
   end
 
   def fields

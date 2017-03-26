@@ -143,4 +143,14 @@ describe ProjectSerializer do
       end
     end
   end
+
+  describe "active workflows" do
+    let(:active_workflow) { project.workflows.first }
+    let!(:inactive_workflow) { create(:workflow, project: project, active: false) }
+    let(:serialized) { ProjectSerializer.resource({}, Project.where(id: project.id), context) }
+
+    it "includes a list of only active workflows in the links" do
+      expect(serialized[:projects][0][:links][:active_workflows]).to contain_exactly(active_workflow.id.to_s)
+    end
+  end
 end
