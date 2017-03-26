@@ -34,12 +34,11 @@ module JsonApiController
       if block_given?
         yield create_params, link_params
       end
+
       resource = resource_class.new(create_params)
-
-      link_params.try(:each) do |k,v|
-        resource.send("#{k}=", update_relation(resource, k,v))
+      link_params.try(:each) do |relation,relation_id|
+        add_relation_link(resource, relation, relation_id)
       end
-
       resource
     end
 
@@ -49,6 +48,17 @@ module JsonApiController
 
     def link_header(resource)
       send(:"api_#{ resource_name }_url", resource)
+    end
+
+    def add_relation_link(resource, relation, relation_id)
+      resource_class.reflect_on_association(relation)
+      link_reflection = resource_class.reflect_on_association(relation)
+      relation_to_link = update_relation(resource, relation, relation_id)
+      if link_reflection.macro == :belongs_to
+        resource.send("#{link_reflection.foreign_key}=", "#{relation_to_link.id}")
+      else
+        resource.send("#{relation}=", relation_to_link)
+      end
     end
   end
 end
