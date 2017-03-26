@@ -1,6 +1,4 @@
 class Classification < ActiveRecord::Base
-  include BelongsToMany
-
   class MissingParameter < StandardError; end
 
   belongs_to :project
