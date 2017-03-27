@@ -10,6 +10,7 @@ class ProjectSerializer
   PRELOADS = [
     # :project_contents, Note: re-add when the eager_load from translatable_resources is removed
     :workflows,
+    :active_workflows,
     :subject_sets,
     :project_roles,
     [ owner: { identity_membership: :user } ],
@@ -124,10 +125,6 @@ class ProjectSerializer
     else
       ""
     end
-  end
-
-  def active_workflows
-    @model.workflows.where(active: true)
   end
 
   def fields
