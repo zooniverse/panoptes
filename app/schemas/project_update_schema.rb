@@ -109,6 +109,10 @@ class ProjectUpdateSchema < JsonSchema
       end
     end
 
+    property "state" do
+      type "string"
+    end
+
     property "links" do
       type "object"
       additional_properties false
