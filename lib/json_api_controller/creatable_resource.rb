@@ -34,12 +34,12 @@ module JsonApiController
       if block_given?
         yield create_params, link_params
       end
+
       resource = resource_class.new(create_params)
-
-      link_params.try(:each) do |k,v|
-        resource.send("#{k}=", update_relation(resource, k,v))
+      link_params.try(:each) do |relation,relation_id|
+        relation_to_link = update_relation(resource, relation, relation_id)
+        resource.send("#{relation}=", relation_to_link)
       end
-
       resource
     end
 

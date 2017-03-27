@@ -25,17 +25,18 @@ module RoleControl
       end
 
       def private_query(action, target, roles)
-        AccessControlList.joins(user_group: :memberships)
+        user_group_memberships = memberships_query(action, target)
+          .select(:user_group_id)
+        AccessControlList
+          .where(user_group_id: user_group_memberships)
           .select(:resource_id)
-          .merge(memberships_query(action, target))
-          .where(resource_type: name)
           .where.overlap(roles: roles)
       end
 
-      def public_query(private_query, public_flag)
-        query = where(id: private_query.select(:resource_id))
-        query = query.or(public_scope) if public_flag
-        query
+      def user_can_access_scope(private_query, public_flag)
+        scope = where(id: private_query.select(:resource_id))
+        scope = scope.or(public_scope) if public_flag
+        scope
       end
 
       def scope_for(action, user, opts={})
@@ -45,7 +46,10 @@ module RoleControl
         when user.is_admin?
           all
         when user.logged_in?
-          public_query(private_query(action, user, roles), public_flag)
+          user_can_access_scope(
+            private_query(action, user, roles),
+            public_flag
+          )
         when public_flag
           public_scope
         else
