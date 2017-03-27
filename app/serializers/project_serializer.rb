@@ -10,6 +10,7 @@ class ProjectSerializer
   PRELOADS = [
     # :project_contents, Note: re-add when the eager_load from translatable_resources is removed
     :workflows,
+    :active_workflows,
     :subject_sets,
     :project_roles,
     [ owner: { identity_membership: :user } ],
@@ -29,7 +30,7 @@ class ProjectSerializer
     :completeness, :activity, :state, :researcher_quote
 
   optional :avatar_src
-  can_include :workflows, :subject_sets, :owners, :project_contents,
+  can_include :workflows, :active_workflows, :subject_sets, :owners, :project_contents,
     :project_roles, :pages, :organization
   media_include :avatar, :background, :attached_images,
     classifications_export: { include: false},
