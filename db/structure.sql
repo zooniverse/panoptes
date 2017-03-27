@@ -2439,13 +2439,6 @@ CREATE UNIQUE INDEX index_oauth_access_tokens_on_token ON oauth_access_tokens US
 
 
 --
--- Name: index_oauth_applications_on_owner_id_and_owner_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_oauth_applications_on_owner_id_and_owner_type ON oauth_applications USING btree (owner_id, owner_type);
-
-
---
 -- Name: index_oauth_applications_on_uid; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2607,13 +2600,6 @@ CREATE INDEX index_projects_on_tsv ON projects USING gin (tsv);
 
 
 --
--- Name: index_recents_on_classification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_recents_on_classification_id ON recents USING btree (classification_id);
-
-
---
 -- Name: index_recents_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2649,13 +2635,6 @@ CREATE INDEX index_recents_on_workflow_id ON recents USING btree (workflow_id);
 
 
 --
--- Name: index_set_member_subjects_on_priority; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_set_member_subjects_on_priority ON set_member_subjects USING btree (priority);
-
-
---
 -- Name: index_set_member_subjects_on_random; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2681,13 +2660,6 @@ CREATE UNIQUE INDEX index_set_member_subjects_on_subject_id_and_subject_set_id O
 --
 
 CREATE INDEX index_set_member_subjects_on_subject_set_id ON set_member_subjects USING btree (subject_set_id);
-
-
---
--- Name: index_subject_queues_on_workflow_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_subject_queues_on_workflow_id_and_user_id ON subject_queues USING btree (workflow_id, user_id);
 
 
 --
@@ -2744,13 +2716,6 @@ CREATE UNIQUE INDEX index_subject_workflow_counts_on_subject_id_and_workflow_id 
 --
 
 CREATE INDEX index_subject_workflow_counts_on_workflow_id ON subject_workflow_counts USING btree (workflow_id);
-
-
---
--- Name: index_subjects_on_activated_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_subjects_on_activated_state ON subjects USING btree (activated_state);
 
 
 --
@@ -3871,4 +3836,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170310131642');
 INSERT INTO schema_migrations (version) VALUES ('20170316170501');
 
 INSERT INTO schema_migrations (version) VALUES ('20170320203350');
+
+INSERT INTO schema_migrations (version) VALUES ('20170325135953');
 
