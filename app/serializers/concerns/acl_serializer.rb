@@ -2,6 +2,7 @@ module ACLSerializer
   extend ActiveSupport::Concern
 
   include RestPack::Serializer
+  include CachedSerializer
 
   module ClassMethods
     def key

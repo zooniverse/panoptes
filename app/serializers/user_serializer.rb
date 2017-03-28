@@ -2,6 +2,7 @@ class UserSerializer
   include Serialization::PanoptesRestpack
   include RecentLinkSerializer
   include MediaLinksSerializer
+  include CachedSerializer
 
   attributes :id, :login, :display_name, :credited_name, :email, :languages,
     :created_at, :updated_at, :type, :global_email_communication,
