@@ -16,10 +16,9 @@ describe RoleControl::ParentalControlled do
 
   shared_examples_for "a parental controlled" do
     it "should call filter on belongs_to parent fk" do
-      parent_scope_for = parent.class.scope_for(:update, enrolled_actor, {})
       expect(klass)
         .to receive(:where)
-        .with(klass.parent_foreign_key => parent_scope_for.pluck(:id))
+        .with(klass.parent_foreign_key => parent_select_scope.select(:id))
         .and_call_original
     end
   end
@@ -28,7 +27,7 @@ describe RoleControl::ParentalControlled do
     let(:parent) { ControlledTable.create!(private: false) }
 
     it_behaves_like "a parental controlled" do
-      let(:sub_select_scope) { parent.class.public_scope }
+      let(:parent_select_scope) { parent.class.public_scope }
       after do
         klass.public_scope
       end
@@ -37,7 +36,7 @@ describe RoleControl::ParentalControlled do
 
   describe "::private_scope" do
     it_behaves_like "a parental controlled" do
-      let(:sub_select_scope) { parent.class.private_scope }
+      let(:parent_select_scope) { parent.class.private_scope }
       after do
         klass.private_scope
       end
@@ -45,7 +44,9 @@ describe RoleControl::ParentalControlled do
   end
 
   describe "::scope_for" do
-    let(:sub_select_scope) { parent.class.scope_for(:update, enrolled_actor, {}) }
+    let(:parent_select_scope) do
+      parent.class.scope_for(:update, enrolled_actor, {})
+    end
     after do
       klass.scope_for(:update, enrolled_actor, {})
     end

@@ -25,7 +25,7 @@ module RoleControl
       end
 
       def parent_scope(scope)
-        where(parent_foreign_key => scope.pluck(:id))
+        where(parent_foreign_key => scope.select(:id))
       end
 
       def scope_for(action, user, opts={})
