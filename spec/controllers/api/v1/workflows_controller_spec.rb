@@ -37,11 +37,31 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:filterable_resources) { create_list(:workflow_with_subjects, 2) }
     let(:expected_filtered_ids) { [ filterable_resources.first.id.to_s ] }
     let(:private_project) { create(:private_project) }
-    let!(:private_resource) { create(:workflow, project: private_project) }
+    let(:private_resource) { create(:workflow, project: private_project) }
     let(:n_visible) { 2 }
 
-    it_behaves_like 'is indexable'
+    it_behaves_like 'is indexable' do
+      before do
+        private_resource
+      end
+    end
+
     it_behaves_like 'has many filterable', :subject_sets
+
+    it_behaves_like "an indexable unauthenticated http cacheable response" do
+      let(:action) { :index }
+      let(:private_resource) do
+        create(:workflow, project: private_project)
+      end
+    end
+
+    it_behaves_like "an indexable authenticated http cacheable response" do
+      let(:action) { :index }
+      let(:private_resource) do
+        create(:workflow, project: private_project)
+      end
+      let(:authorized_user) { private_project.owner }
+    end
 
     describe "filter by" do
       before(:each) do
@@ -494,6 +514,19 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:resource) { workflows.first }
 
     it_behaves_like "is showable"
+
+    describe "http caching" do
+      let(:action) { :show }
+      let(:private_resource) do
+        project = create(:private_project, owner: authorized_user)
+        create(:workflow, project: project)
+      end
+      let(:private_resource_id) { private_resource.id }
+      let(:public_resource_id) { resource.id }
+
+      it_behaves_like "a showable unauthenticated http cacheable response"
+      it_behaves_like "a showable authenticated http cacheable response"
+    end
   end
 
   describe '#retired_subjects' do

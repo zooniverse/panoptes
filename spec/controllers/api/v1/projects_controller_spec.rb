@@ -38,8 +38,8 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:unapproved_resource) { create(:project, beta_approved: false, launch_approved: false) }
   let(:deactivated_resource) { create(:project, activated_state: :inactive) }
 
-  describe "when not logged in" do
-    describe "#index" do
+  describe "#index" do
+    context "not logged in" do
       let(:authorized_user) { nil }
       let(:n_visible) { 2 }
 
@@ -48,18 +48,27 @@ describe Api::V1::ProjectsController, type: :controller do
         projects
       end
 
+      it_behaves_like "an indexable unauthenticated http cacheable response" do
+        let(:action) { :index }
+        let(:private_resource) do
+          create(:project, owner: user, private: true)
+        end
+      end
+
       it_behaves_like "is indexable"
       it_behaves_like "it has custom owner links", "display_name"
       it_behaves_like "it only lists active resources"
     end
-  end
 
-  describe "a logged in user" do
-    before(:each) do
-      default_request(scopes: scopes, user_id: user.id)
-    end
+    context "logged in " do
 
-    describe "#index" do
+      it_behaves_like "an indexable authenticated http cacheable response" do
+        let(:action) { :index }
+        let(:private_resource) do
+          create(:project, owner: user, private: true)
+        end
+      end
+
       describe "custom owner links" do
         before(:each) do
           projects
@@ -361,251 +370,258 @@ describe Api::V1::ProjectsController, type: :controller do
         end
       end
     end
+  end
 
-    describe "#show" do
-      let(:project_id) { project.id }
+  describe "#show" do
+    let(:resource) { project }
 
-      before(:each) do
-        get :show, id: project_id
+    it_behaves_like "is showable"
+
+    it_behaves_like "an api response" do
+      before do
+        get :show, id: resource.id
       end
-
-      it "should return 200" do
-        expect(response.status).to eq(200)
-      end
-
-      it "should return the only requested project" do
-        expect(json_response[api_resource_name].length).to eq(1)
-        expect(json_response[api_resource_name][0]['id']).to eq(project_id.to_s)
-      end
-
-      it_behaves_like "an api response"
     end
 
-    describe "#create" do
-      let(:created_project_id) { created_instance_id("projects") }
-      let(:test_attr) { :display_name }
-      let(:test_attr_value) { "New Zoo" }
-      let(:display_name) { test_attr_value }
-      let(:owner_params) { nil }
+    describe "http caching" do
+      let(:action) { :show }
+      let(:private_resource) do
+        create(:project, owner: user, private: true)
+      end
+      let(:private_resource_id) { private_resource.id }
+      let(:public_resource_id) { resource.id }
 
-      let(:default_create_params) do
-        { projects: { display_name: display_name,
-                     description: "A new Zoo for you!",
-                     primary_language: 'en',
-                     workflow_description: "some more text",
-                     urls: [{label: "Twitter", url: "http://twitter.com/example"}],
-                     tags: ["astro", "gastro"],
-                     configuration: {
-                                     an_option: "a setting"
-                                    },
-                     beta_requested: true,
-                     private: true } }
+      it_behaves_like "a showable unauthenticated http cacheable response"
+      it_behaves_like "a showable authenticated http cacheable response"
+    end
+  end
+
+  describe "#create" do
+    let(:created_project_id) { created_instance_id("projects") }
+    let(:test_attr) { :display_name }
+    let(:test_attr_value) { "New Zoo" }
+    let(:display_name) { test_attr_value }
+    let(:owner_params) { nil }
+
+    let(:default_create_params) do
+      { projects: { display_name: display_name,
+                   description: "A new Zoo for you!",
+                   primary_language: 'en',
+                   workflow_description: "some more text",
+                   urls: [{label: "Twitter", url: "http://twitter.com/example"}],
+                   tags: ["astro", "gastro"],
+                   configuration: {
+                                   an_option: "a setting"
+                                  },
+                   beta_requested: true,
+                   private: true } }
+    end
+
+    let (:create_params) do
+      ps = default_create_params
+      if owner_params
+        ps[:projects][:links] ||= Hash.new
+        ps[:projects][:links][:owner] = owner_params
+      end
+      ps
+    end
+
+    describe "redirect option" do
+      it_behaves_like "admin only option", :redirect, "http://example.com"
+    end
+
+    describe "launch approved option" do
+      it_behaves_like "admin only option", :launch_approved, true
+    end
+
+    describe "beta approved option" do
+      it_behaves_like "admin only option", :beta_approved, true
+    end
+
+    describe "launched_row_order_position option" do
+      it_behaves_like "admin only option", :launched_row_order_position, 10
+    end
+
+    describe "beta_row_order_position option" do
+      it_behaves_like "admin only option", :beta_row_order_position, 10
+    end
+
+    describe "experiemntal_tools option" do
+      it_behaves_like "admin only option", :experimental_tools, ["survey"]
+    end
+
+    describe "create talk admin" do
+      it 'should queue a talk admin create worker' do
+        expect(TalkAdminCreateWorker)
+          .to receive(:perform_async)
+          .with(be_kind_of(Integer))
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, create_params
+      end
+    end
+
+    describe "correct serializer configuration" do
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, create_params
       end
 
-      let (:create_params) do
-        ps = default_create_params
-        if owner_params
-          ps[:projects][:links] ||= Hash.new
-          ps[:projects][:links][:owner] = owner_params
-        end
-        ps
-      end
+      context "without commas in the display name" do
 
-      describe "redirect option" do
-        it_behaves_like "admin only option", :redirect, "http://example.com"
-      end
-
-      describe "launch approved option" do
-        it_behaves_like "admin only option", :launch_approved, true
-      end
-
-      describe "beta approved option" do
-        it_behaves_like "admin only option", :beta_approved, true
-      end
-
-      describe "launched_row_order_position option" do
-        it_behaves_like "admin only option", :launched_row_order_position, 10
-      end
-
-      describe "beta_row_order_position option" do
-        it_behaves_like "admin only option", :beta_row_order_position, 10
-      end
-
-      describe "experiemntal_tools option" do
-        it_behaves_like "admin only option", :experimental_tools, ["survey"]
-      end
-
-      describe "create talk admin" do
-        it 'should queue a talk admin create worker' do
-          expect(TalkAdminCreateWorker).to receive(:perform_async).with(instance_of Fixnum)
-          default_request scopes: scopes, user_id: authorized_user.id
-          post :create, create_params
-        end
-      end
-
-      describe "correct serializer configuration" do
-        before(:each) do
-          default_request scopes: scopes, user_id: authorized_user.id
-          post :create, create_params
-        end
-
-        context "without commas in the display name" do
-
-          it "should return the correct resource in the response" do
-            expect(json_response["projects"]).to_not be_empty
-          end
-        end
-
-        context "when the display name has commas in it" do
-          let!(:display_name) { "My parents, Steve McQueen, and God" }
-
-          it "should return a created response" do
-            expect(json_response["projects"]).to_not be_empty
-          end
-        end
-
-        describe "owner links" do
-          it "should include the link" do
-            expect(json_response['linked']['owners']).to_not be_nil
-          end
-        end
-
-        describe "project contents" do
-          let(:contents) { Project.find(created_project_id).project_contents.first }
-
-          it "should create an associated project_content model" do
-            expect(contents).to_not be_nil
-          end
-
-          it 'should extract labels from the urls' do
-            expect(Project.find(created_project_id).urls).to eq([{"label" => "0.label", "url" => "http://twitter.com/example"}])
-          end
-
-
-          it 'should save labels to contents' do
-            expect(contents.url_labels).to eq({"0.label" => "Twitter"})
-          end
-
-          it 'should set the contents title do' do
-            expect(contents.title).to eq('New Zoo')
-          end
-
-          it 'should set the description' do
-            expect(contents.description).to eq('A new Zoo for you!')
-          end
-
-          it 'should set the language' do
-            expect(contents.language).to eq('en')
-          end
+        it "should return the correct resource in the response" do
+          expect(json_response["projects"]).to_not be_empty
         end
       end
 
-      describe "tags" do
-        let(:tags) { Tag.where(name: ["astro", "gastro"]) }
+      context "when the display name has commas in it" do
+        let!(:display_name) { "My parents, Steve McQueen, and God" }
 
-        def tag_request
-          default_request scopes: scopes, user_id: authorized_user.id
-          post :create, create_params
+        it "should return a created response" do
+          expect(json_response["projects"]).to_not be_empty
+        end
+      end
+
+      describe "owner links" do
+        it "should include the link" do
+          expect(json_response['linked']['owners']).to_not be_nil
+        end
+      end
+
+      describe "project contents" do
+        let(:contents) { Project.find(created_project_id).project_contents.first }
+
+        it "should create an associated project_content model" do
+          expect(contents).to_not be_nil
         end
 
-        context "when the tags did not exist" do
-          it 'should create tag models for the project tags' do
-            tag_request
-            expect(tags.pluck(:tagged_resources_count)).to all( eq(1) )
-          end
+        it 'should extract labels from the urls' do
+          expect(Project.find(created_project_id).urls).to eq([{"label" => "0.label", "url" => "http://twitter.com/example"}])
         end
 
-        context "when the tags did exist" do
-          it 'should reuse existing tags' do
-            create(:tag, name: "astro")
-            create(:tag, name: "gastro")
-            tag_request
-            expect(tags.pluck(:tagged_resources_count)).to all( eq(2) )
-          end
+
+        it 'should save labels to contents' do
+          expect(contents.url_labels).to eq({"0.label" => "Twitter"})
         end
 
-        it 'should associate the tags with the project' do
+        it 'should set the contents title do' do
+          expect(contents.title).to eq('New Zoo')
+        end
+
+        it 'should set the description' do
+          expect(contents.description).to eq('A new Zoo for you!')
+        end
+
+        it 'should set the language' do
+          expect(contents.language).to eq('en')
+        end
+      end
+    end
+
+    describe "tags" do
+      let(:tags) { Tag.where(name: ["astro", "gastro"]) }
+
+      def tag_request
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, create_params
+      end
+
+      context "when the tags did not exist" do
+        it 'should create tag models for the project tags' do
           tag_request
-          resource_id = json_response[api_resource_name][0]["id"].to_i
-          expect(tags.flat_map{ |t| t.projects.pluck(:id) }).to all( eq(resource_id) )
+          expect(tags.pluck(:tagged_resources_count)).to all( eq(1) )
         end
       end
 
-      context "created with user as owner" do
-        it_behaves_like "is creatable"
-
-        context "with invalid create params" do
-
-          it "should not orphan an ACL instance when the model is invalid" do
-            default_request scopes: scopes, user_id: authorized_user.id
-            create_params[:projects] = create_params[:projects].except(:primary_language)
-            expect{ post :create, create_params }.not_to change{ AccessControlList.count }
-          end
+      context "when the tags did exist" do
+        it 'should reuse existing tags' do
+          create(:tag, name: "astro")
+          create(:tag, name: "gastro")
+          tag_request
+          expect(tags.pluck(:tagged_resources_count)).to all( eq(2) )
         end
       end
 
-      context "created with specified user as owner" do
-        context "user is the current user" do
-          let(:owner_params) do
-            {
-             id: authorized_user.id.to_s,
-             type: "users"
-            }
-          end
+      it 'should associate the tags with the project' do
+        tag_request
+        resource_id = json_response[api_resource_name][0]["id"].to_i
+        expect(tags.flat_map{ |t| t.projects.pluck(:id) }).to all( eq(resource_id) )
+      end
+    end
 
-          it_behaves_like "is creatable"
-        end
+    context "created with user as owner" do
+      it_behaves_like "is creatable"
 
-        context "user is not the current user" do
-          let(:req) do
-            default_request scopes: scopes, user_id: authorized_user.id
-            post :create, create_params
-          end
+      context "with invalid create params" do
 
-
-          let(:owner_params) do
-            user = create(:user)
-            {
-              id: user.id.to_s,
-                type: "users"
-            }
-          end
-
-          it "should not create a new project" do
-            expect{ req }.to_not change{Project.count}
-          end
-
-          it "should return 422" do
-            req
-            expect(response).to have_http_status(:unprocessable_entity)
-          end
+        it "should not orphan an ACL instance when the model is invalid" do
+          default_request scopes: scopes, user_id: authorized_user.id
+          create_params[:projects] = create_params[:projects].except(:primary_language)
+          expect{ post :create, create_params }.not_to change{ AccessControlList.count }
         end
       end
+    end
 
-      context "create with user_group as owner" do
-        let(:owner) { create(:user_group) }
-        let!(:membership) { create(:membership,
-                                   state: :active,
-                                   user: user,
-                                   user_group: owner,
-                                   roles: ["group_admin"]) }
-
+    context "created with specified user as owner" do
+      context "user is the current user" do
         let(:owner_params) do
           {
-           id: owner.id.to_s,
-           type: "user_groups"
+           id: authorized_user.id.to_s,
+           type: "users"
           }
         end
 
-        it 'should have the user group as its owner' do
-          default_request scopes: scopes, user_id: authorized_user.id
-          post :create, create_params
-          project = Project.find(json_response['projects'][0]['id'])
-          expect(project.owner).to eq(owner)
-        end
-
         it_behaves_like "is creatable"
       end
+
+      context "user is not the current user" do
+        let(:req) do
+          default_request scopes: scopes, user_id: authorized_user.id
+          post :create, create_params
+        end
+
+
+        let(:owner_params) do
+          user = create(:user)
+          {
+            id: user.id.to_s,
+              type: "users"
+          }
+        end
+
+        it "should not create a new project" do
+          expect{ req }.to_not change{Project.count}
+        end
+
+        it "should return 422" do
+          req
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+    end
+
+    context "create with user_group as owner" do
+      let(:owner) { create(:user_group) }
+      let!(:membership) { create(:membership,
+                                 state: :active,
+                                 user: user,
+                                 user_group: owner,
+                                 roles: ["group_admin"]) }
+
+      let(:owner_params) do
+        {
+         id: owner.id.to_s,
+         type: "user_groups"
+        }
+      end
+
+      it 'should have the user group as its owner' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, create_params
+        project = Project.find(json_response['projects'][0]['id'])
+        expect(project.owner).to eq(owner)
+      end
+
+      it_behaves_like "is creatable"
     end
   end
 
