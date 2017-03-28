@@ -8,7 +8,7 @@ module JSONApiRender
         self.headers["ETag"] = JSONApiResponse.response_etag_header(response_body)
       end
 
-      if options[:add_http_cache] == "true"
+      if !Rails.env.production? && options[:add_http_cache] == "true"
         http_cacheable = HttpCacheable.new(controlled_resources)
         if http_cacheable.public_resources?
           self.headers["Cache-Control"] = http_cacheable.resource_cache_directive
