@@ -2,7 +2,6 @@ class ClassificationSerializer
   include Serialization::PanoptesRestpack
   include NoCountSerializer
   include FilterHasMany
-  include CachedSerializer
 
   attributes :id, :annotations, :created_at, :metadata, :href
 
