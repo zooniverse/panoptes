@@ -1,5 +1,7 @@
 class VersionSerializer
   include RestPack::Serializer
+  include CachedSerializer
+
   attributes :id, :changeset, :whodunnit, :created_at, :type, :href
 
   can_include :item

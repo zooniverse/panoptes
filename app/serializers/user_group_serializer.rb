@@ -1,6 +1,8 @@
 class UserGroupSerializer
   include RestPack::Serializer
   include RecentLinkSerializer
+  include CachedSerializer
+
   attributes :id, :name, :display_name, :classifications_count, :created_at, :updated_at, :type, :href, :join_token
   can_include :memberships, :users,
               projects: { param: "owner", value: "name" },

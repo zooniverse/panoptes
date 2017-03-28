@@ -32,7 +32,11 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def create
     raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_uploading].enabled?
-    super { |subject| subject.uploader.increment_subjects_count_cache }
+    super do |subject|
+      user = subject.uploader
+      user.increment_subjects_count_cache
+      user.touch
+    end
   end
 
   def destroy

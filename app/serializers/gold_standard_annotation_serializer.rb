@@ -1,6 +1,7 @@
 class GoldStandardAnnotationSerializer
   include Serialization::PanoptesRestpack
   include NoCountSerializer
+  include CachedSerializer
 
   attributes :id, :annotations, :created_at, :metadata
 

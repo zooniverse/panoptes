@@ -3,6 +3,7 @@ class OrganizationSerializer
   include OwnerLinkSerializer
   include ContentSerializer
   include MediaLinksSerializer
+  include CachedSerializer
 
   attributes :id, :display_name, :description, :introduction, :title, :href, :primary_language
   optional :avatar_src

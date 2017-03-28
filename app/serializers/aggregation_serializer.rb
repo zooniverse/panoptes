@@ -1,5 +1,6 @@
 class AggregationSerializer
   include RestPack::Serializer
+  include CachedSerializer
 
   attributes :id, :created_at, :updated_at, :aggregation, :href
   can_include :workflow, :subject

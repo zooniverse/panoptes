@@ -1,5 +1,7 @@
 class UserProjectPreferenceSerializer
   include RestPack::Serializer
+  include CachedSerializer
+
   attributes :id, :email_communication, :preferences, :href,
     :activity_count, :activity_count_by_workflow, :settings
   can_include :user, :project
