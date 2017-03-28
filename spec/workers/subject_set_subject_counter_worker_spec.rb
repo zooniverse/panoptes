@@ -9,8 +9,8 @@ RSpec.describe SubjectSetSubjectCounterWorker do
       expect_any_instance_of(SubjectSet)
         .to receive(:update_column)
         .with(:set_member_subjects_count, subject_set.set_member_subjects.count)
-        expect_any_instance_of(SubjectSet)
-          .to receive(:touch)
+      expect_any_instance_of(SubjectSet)
+        .to receive(:touch)
       described_class.new.perform(subject_set.id)
     end
   end
