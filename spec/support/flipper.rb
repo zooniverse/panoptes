@@ -9,6 +9,7 @@ module Flipper
       Panoptes.flipper[:subject_uploading].enable
       Panoptes.flipper[:classification_lifecycle_in_background].enable
       Panoptes.flipper["http_caching"].enable
+      Panoptes.flipper["classification_counters"].enable
     end
   end
 end
