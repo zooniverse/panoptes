@@ -4,7 +4,7 @@ class SubjectSetSubjectCounterWorker
   sidekiq_options queue: :data_high,
     congestion: Panoptes::CongestionControlConfig.
       counter_worker.congestion_opts.merge({
-        reject_with: :reschedule,
+        reject_with: :cancel, # SGL 2017 was :reschedule
         key: ->(subject_set_id) {
           "subject_set_#{ subject_set_id }_counter_worker"
         }

@@ -7,7 +7,7 @@ class WorkflowClassificationsCountWorker
     interval: 60,
     max_in_interval: 1,
     min_delay: 10,
-    reject_with: :reschedule,
+    reject_with: :cancel, # SGL 2017 was :reschedule
     key: ->(workflow_id) {
       "workflow_#{workflow_id}_classifications_count_worker"
     }

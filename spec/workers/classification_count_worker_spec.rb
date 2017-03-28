@@ -10,6 +10,14 @@ RSpec.describe ClassificationCountWorker do
     context "when the workflow project is live" do
       let(:project) { create(:full_project, live: true) }
 
+      context "when the flipper flag is disabled" do
+        it "should not run the counters" do
+          Panoptes.flipper["classification_counters"].disable
+          expect(SubjectWorkflowStatus).not_to receive(:increment_counter)
+          worker.perform(sms.subject_id, workflow_id)
+        end
+      end
+
       context "when the count model exists" do
         let!(:count) do
           create(:subject_workflow_status, subject: sms.subject, workflow_id: workflow_id)

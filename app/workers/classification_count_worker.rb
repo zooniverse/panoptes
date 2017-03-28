@@ -6,7 +6,7 @@ class ClassificationCountWorker
   def perform(subject_id, workflow_id, was_update=false)
     workflow = Workflow.find(workflow_id)
 
-    if workflow.project.live
+    if workflow.project.live && Panoptes.flipper["classification_counters"].enabled?
       count = nil
 
       Workflow.transaction do
