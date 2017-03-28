@@ -20,6 +20,10 @@ module RoleControl
         @parent_class ||= @parent.to_s.camelize.constantize
       end
 
+      def parent_relation
+       @parent
+     end
+
       def parent_foreign_key
         reflect_on_association(@parent).foreign_key
       end
