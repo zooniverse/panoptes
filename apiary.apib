@@ -942,20 +942,32 @@ Subjects are returned as an array under the _subject_ key.
             }
 
 ### Retrieve a List of Subjects [GET]
-Subjects allow a special sort option called 'cellect' that produces a
-list of subjects that have not been seen by the active user.
-When the cellect sort is used, *workflow_id* is a required parameter.
-
-Subjects also allow an 'queued' sort, which will return a random
-subset of subjects have a been queued for a particular user to
-classify, usually for expert classifiers.
 
 + Parameters
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + page_size (optional, integer) ... number of items to include on a page default is 20
-  + sort (optional, string) ... field to sort by 'queued' have special behaviour
-  + workflow_id (optional, integer) ... filter to subjects belonging to a specific workflow, it is a required param when sort is 'queued'.
-  + subject_set_id (optional, integer) ... return subjects belonging to the identified subject_set, it is required when sort is 'queued' and the workflow is grouped.
+  + sort (optional, string) ... field to sort by
+  + workflow_id (optional, integer) ... filter to subjects belonging to a specific workflow
+  + subject_set_id (optional, integer) ... return subjects belonging to the identified subject_set
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
++ Response 200
+
+    [Subject Collection][]
+
+### Retrieve subjects to classify [GET /api/v1/subjects/queued]
+
+While the normal GET on the subjects resource will return a list of subjects in a project, there is a special API for getting some subjects that need classifications: `GET /api/v1/subjects/queued`. This special API is optimized specifically for serving a selection of subjects that should be shown to the user in the classify interface.
+
++ Parameters
+  + workflow_id (required, integer) ... filter to subjects belonging to a specific workflow
+  + subject_set_id (optional, integer) ... return subjects belonging to the identified subject_set, it is required when the workflow is grouped.
 
 + Request
 
@@ -3159,7 +3171,7 @@ Resources related to _Panotpes SubjectQueues_
 ## SubjectQueue [/subject_queues/{id}{?include}]
 A subject queue is a list of subjects for classification by a
 user that is created by a project owner or editor. When a user
-requests subjects to classify using the `?sort=queued` param they we
+requests subjects to classify using the `/subjects/queued` API they we
 be given a randomly selection from their queue if it exists.
 
 + id
