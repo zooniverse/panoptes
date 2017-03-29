@@ -29,6 +29,7 @@ module RoleControl
           .select(:user_group_id)
         AccessControlList
           .where(user_group_id: user_group_memberships)
+          .where(resource_type: model_name.name)
           .select(:resource_id)
           .where.overlap(roles: roles)
       end
