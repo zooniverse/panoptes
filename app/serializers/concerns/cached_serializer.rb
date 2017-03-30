@@ -15,7 +15,7 @@ module CachedSerializer
     end
 
     def serializer_cache_key(model, context_hash)
-      "#{model.class.to_s}/#{model.id}/#{model.updated_at.to_i}/context-#{context_hash}"
+      "#{model.class}/#{model.id}/#{model.updated_at.to_i}/context-#{context_hash}"
     end
   end
 end
