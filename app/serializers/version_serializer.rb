@@ -2,11 +2,13 @@ class VersionSerializer
   include RestPack::Serializer
   include CachedSerializer
 
-  using VirtualUpdatedAt
-
   attributes :id, :changeset, :whodunnit, :created_at, :type, :href
 
   can_include :item
+
+  def self.serializer_cache_key(model, context_hash)
+    "#{model.class.to_s}/#{model.id}/#{model.created_at.to_i}/context-#{context_hash}"
+  end
 
   def type
     "versions"
