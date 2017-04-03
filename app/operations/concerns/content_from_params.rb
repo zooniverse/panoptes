@@ -3,7 +3,7 @@ module ContentFromParams
     yield ps if block_given?
     content = ps.slice(*content_fields)
     content[:language] = ps[:primary_language]
-    if ps.has_key? :urls
+    if ps.key? :urls
       urls, labels = extract_url_labels(ps[:urls])
       content[:url_labels] = labels
       ps[:urls] = urls

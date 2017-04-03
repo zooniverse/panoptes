@@ -95,7 +95,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def build_update_hash(update_params, resource)
-    if update_params.has_key? :tasks
+    if update_params.key? :tasks
       stripped_tasks, strings = extract_strings(update_params[:tasks])
       update_params[:tasks] = stripped_tasks
     end
