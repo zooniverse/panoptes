@@ -172,7 +172,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           }
         end
 
-        it "should touch the worklfow resource" do
+        it "should touch the workflow resource" do
           expect {
             put :update, task_only_update_params
           }.to change {
@@ -185,6 +185,39 @@ describe Api::V1::WorkflowsController, type: :controller do
           instance = Workflow.find(created_instance_id(api_resource_name))
           updated_string = instance.primary_content.strings["interest.question"]
           expect(updated_string).to eq(new_question)
+        end
+      end
+
+      context "when updating without tasks" do
+        let(:no_task_update_params) do
+          {
+            workflows: { active: true },
+            id: resource.id
+          }
+        end
+
+        it "should update the workflow active state" do
+          expect {
+            put :update, no_task_update_params
+          }.to change {
+            resource.reload.active
+          }.to(true)
+        end
+
+        it "should not update the workflow tasks" do
+          expect {
+            put :update, no_task_update_params
+          }.not_to change {
+            resource.reload.tasks
+          }
+        end
+
+        it "should not update the workflow content strings" do
+          expect {
+            put :update, no_task_update_params
+          }.not_to change {
+            resource.primary_content.reload.strings
+          }
         end
       end
     end
