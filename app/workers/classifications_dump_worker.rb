@@ -9,7 +9,6 @@ class ClassificationsDumpWorker
   sidekiq_options queue: :data_high
 
   def perform_dump
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
     CSV.open(csv_file_path, 'wb') do |csv|
       formatter = Formatter::Csv::Classification.new(cache)
       csv << formatter.class.headers
