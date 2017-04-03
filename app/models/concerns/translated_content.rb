@@ -5,7 +5,7 @@ module TranslatedContent
   included do
     has_paper_trail ignore: [:language]
     validates :language, format: {with: LanguageValidation.lang_regex}
-    belongs_to translated_for
+    belongs_to translated_for, touch: true
 
     can_through_parent translated_for, :show, :index, :versions, :version
   end
