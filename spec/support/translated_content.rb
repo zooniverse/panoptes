@@ -5,6 +5,10 @@ shared_examples "is translated content" do
     expect(content).to be_valid
   end
 
+  it "should touch it's parent on save" do
+    expect { content.save }.to change { content.send(:parent).updated_at }
+  end
+
   describe "#language" do
     let(:factory) { content_factory }
     let(:locale_field) { :language }
