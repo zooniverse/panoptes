@@ -20,8 +20,8 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def update
     super do |resource|
-      _, strings = extract_strings(update_params[:tasks])
-      if strings
+      if update_params.key? :tasks
+        _, strings = extract_strings(update_params[:tasks])
         resource.primary_content.update(strings: strings)
       end
     end
