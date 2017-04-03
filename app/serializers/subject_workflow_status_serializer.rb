@@ -1,5 +1,6 @@
 class SubjectWorkflowStatusSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
+  include NoCountSerializer
 
   attributes :id, :classifications_count, :retired_at,
     :retirement_reason, :updated_at, :created_at, :href
