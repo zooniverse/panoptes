@@ -1,6 +1,7 @@
 module Organizations
   class Create < Operation
     include UrlLabels
+    include ContentFromParams
 
     string :display_name
     string :primary_language

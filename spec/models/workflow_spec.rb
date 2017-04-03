@@ -26,9 +26,11 @@ describe Workflow, type: :model do
   context "with caching resource associations" do
     let(:cached_resource) { workflow }
 
-    it_behaves_like "has an extended cache key",
-      [:workflow_contents],
-      [:subjects_count, :finished?]
+    it_behaves_like "has an extended cache key" do
+      let(:methods) do
+        %i(subjects_count finished?)
+      end
+    end
   end
 
   it "should have a valid factory" do

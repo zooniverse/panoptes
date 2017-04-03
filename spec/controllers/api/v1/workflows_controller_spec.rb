@@ -148,11 +148,44 @@ describe Api::V1::WorkflowsController, type: :controller do
     it_behaves_like "has updatable links"
 
     context "extracts strings from workflow" do
-      it 'should replace "Draw a circle" with 0' do
+      let(:new_question) { "Contemplate" }
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
-        put :update, update_params.merge(id: resource.id)
+        update_params[:workflows][:tasks][:interest][:question] = new_question
+        update_params[:id] = resource.id
+      end
+
+      it 'should replace "Draw a circle" with Contemplate', :aggregate_failures do
+        put :update, update_params
         instance = Workflow.find(created_instance_id(api_resource_name))
         expect(instance.tasks["interest"]["question"]).to eq("interest.question")
+        updated_string = instance.primary_content.strings["interest.question"]
+        expect(updated_string).to eq(new_question)
+      end
+
+      context "when only updating the task content strings" do
+        let(:new_question) { "Can you mark the penguins." }
+        let(:task_only_update_params) do
+          {
+            workflows: { tasks: update_params[:workflows][:tasks] },
+            id: resource.id
+          }
+        end
+
+        it "should touch the worklfow resource" do
+          expect {
+            put :update, task_only_update_params
+          }.to change {
+            resource.reload.updated_at
+          }
+        end
+
+        it 'should update the associated contents' do
+          put :update, task_only_update_params
+          instance = Workflow.find(created_instance_id(api_resource_name))
+          updated_string = instance.primary_content.strings["interest.question"]
+          expect(updated_string).to eq(new_question)
+        end
       end
     end
 
@@ -241,6 +274,29 @@ describe Api::V1::WorkflowsController, type: :controller do
           content = resource.primary_content
           expect{ content.reload }.to change{ content.strings }
         end
+      end
+    end
+
+    context "workflow_contents task strings" do
+      let(:tasks) { update_params.dig(:workflows, :tasks) }
+      let(:params) do
+        { workflows: { tasks: tasks }, id: resource.id }
+      end
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it "should update the primary content task strings" do
+        put :update, params
+        response_tasks = json_response['workflows'][0]['tasks']
+        expect(response_tasks).to eq(tasks.deep_stringify_keys)
+      end
+
+      it "should touch the workflow resource to modify the cache_key / etag" do
+        expect {
+          put :update, params
+        }.to change { resource.reload.updated_at }
       end
     end
   end

@@ -1,7 +1,7 @@
-shared_examples "has an extended cache key" do |associations, resource_methods|
-
+shared_examples "has an extended cache key" do
   let(:stubbed_timestamp) { "20150511125031990014934" }
   let(:stubbed_resource_id) { 2 }
+  let(:resource_class) { cached_resource.class }
 
   def resource_cache_key(resource)
     "#{resource.model_name.cache_key}/#{stubbed_resource_id}-#{stubbed_timestamp}"
@@ -13,18 +13,27 @@ shared_examples "has an extended cache key" do |associations, resource_methods|
     end.flatten
   end
 
-  let(:resource_class) { cached_resource.class }
+  def resource_associations
+    associations
+  rescue NameError
+    []
+  end
+
+  def resource_methods
+    methods
+  rescue NameError
+    []
+  end
 
   describe "::cache_by_association" do
-
     it "should store the association key" do
-      resource_class.cache_by_association(*associations)
-      expect(resource_class.included_associations).to match_array(associations)
+      resource_class.cache_by_association(*resource_associations)
+      expect(resource_class.included_associations)
+        .to match_array(resource_associations)
     end
   end
 
   describe "::cache_by_resource_method" do
-
     it "should store the resource methods" do
       resource_class.cache_by_resource_method(*resource_methods)
       expect(resource_class.included_resource_methods)
@@ -95,9 +104,10 @@ shared_examples "has an extended cache key" do |associations, resource_methods|
       end
 
       it "should include all the association keys" do
-        cached_resource.send(*associations).map do |relation|
-          expect(cache_key_result)
-            .to match(/#{relation.model_name.cache_key}\/\w+/)
+        resource_associations.map do |assocation|
+          relation = cached_resource.send(assocation)
+          relation_regex = /#{relation.model_name.cache_key}\/\w+/
+          expect(cache_key_result).to match(relation_regex)
         end
       end
     end
