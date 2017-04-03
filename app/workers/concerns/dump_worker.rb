@@ -8,6 +8,7 @@ module DumpWorker
   end
 
   def perform(resource_id, resource_type, medium_id=nil, requester_id=nil, *args)
+    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
     @resource_type = resource_type
     @resource_id = resource_id
     if @resource = get_resource
