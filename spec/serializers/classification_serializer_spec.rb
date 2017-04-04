@@ -29,5 +29,19 @@ describe ClassificationSerializer do
         expect(meta[:last_href]).to eq("/classifications/#{collection_route}?page=0")
       end
     end
+
+    context "project context with last_id param present" do
+      let(:project) { classification.project }
+
+      it "should insert the next hightest last_id into the next_href" do
+        second = create(:classification, project: project)
+        last_id = classification.id
+        params = {project_id: project.id, last_id: last_id, page_size: 1}
+        result = ClassificationSerializer.page(params, Classification.all, {})
+        meta = result[:meta][:classifications]
+        expect(meta[:previous_href]).to eq("/classifications?last_id=#{last_id}&page_size=1&project_id=#{project.id}")
+        expect(meta[:next_href]).to eq("/classifications?last_id=#{second.id}&page_size=1&project_id=#{project.id}")
+      end
+    end
   end
 end

@@ -15,7 +15,26 @@ class ClassificationSerializer
       scope = scope.distinct
     end
 
-    super(params, scope, context)
+    page = super(params, scope, context)
+
+    add_last_id_paging_hrefs(params, page)
+  end
+
+  # last_id is an mechanism to avoid offset paging
+  # ensure we update the next/prev hrefs in the meta paging info for clients to use.
+  # Do not let them keep the same last_id param and just page into that scope with offsets
+  def self.add_last_id_paging_hrefs(params, page)
+    if params.key?(:last_id)
+      sorted_ids = page[:classifications].map { |c| c[:id] }.sort
+      next_last_id = sorted_ids.last
+      href_key_ids = { next_href: next_last_id, previous_href: params[:last_id] }
+      href_key_ids.map do |href_key, next_id|
+        href = page[:meta][:classifications][href_key]
+        updated_last_id_href = href.gsub(/page=\d+/, "last_id=#{next_id}")
+        page[:meta][:classifications][href_key] = updated_last_id_href
+      end
+    end
+    page
   end
 
   def metadata
