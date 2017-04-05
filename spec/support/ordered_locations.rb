@@ -9,7 +9,7 @@ RSpec.shared_examples 'it has ordered locations' do
     lone_resource = klass.find(resource.id)
     expect_any_instance_of(Medium::ActiveRecord_Associations_CollectionProxy)
       .to receive(:order)
-      .with("\"media\".\"metadata\"->>'index' ASC")
+      .with("\"media\".\"metadata\"->'index' ASC")
       .and_call_original
     expected = resource.locations.sort_by { |loc| loc.metadata["index"] }
     expect(expected.map(&:id)).to eq(lone_resource.ordered_locations.map(&:id))
@@ -22,7 +22,7 @@ RSpec.shared_examples 'it has ordered locations' do
     end
 
     it "should mimic the database order by using the relation ordering" do
-      expected = resource.locations.order("\"media\".\"metadata\"->>'index' ASC")
+      expected = resource.locations.order("\"media\".\"metadata\"->'index' ASC")
       expect(expected.map(&:id)).to eq(resource.ordered_locations.map(&:id))
     end
   end
