@@ -7,11 +7,11 @@ class WorkflowCounter
   end
 
   def classifications
-    SubjectWorkflowStatus.where(workflow: workflow).sum(:classifications_count)
+    linked_subject_workflow_status.sum(:classifications_count)
   end
 
   def retired_subjects
-    retired = SubjectWorkflowStatus.by_set(workflow.subject_sets.pluck(:id)).retired.where(workflow_id: workflow.id)
+    retired = linked_subject_workflow_status.retired
     if launch_date
       retired = retired.where("subject_workflow_counts.retired_at >= ?", launch_date)
     end
@@ -22,5 +22,11 @@ class WorkflowCounter
 
   def launch_date
     workflow.project.launch_date
+  end
+
+  def linked_subject_workflow_status
+    SubjectWorkflowStatus
+      .by_set(workflow.subject_sets.pluck(:id))
+      .where(workflow_id: workflow.id)
   end
 end
