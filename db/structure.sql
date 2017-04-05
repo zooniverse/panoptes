@@ -257,7 +257,8 @@ CREATE TABLE collections (
     lock_version integer DEFAULT 0,
     slug character varying DEFAULT ''::character varying,
     favorite boolean DEFAULT false NOT NULL,
-    project_ids integer[] DEFAULT '{}'::integer[]
+    project_ids integer[] DEFAULT '{}'::integer[],
+    default_subject_id integer
 );
 
 
@@ -3838,4 +3839,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170316170501');
 INSERT INTO schema_migrations (version) VALUES ('20170320203350');
 
 INSERT INTO schema_migrations (version) VALUES ('20170325135953');
+
+INSERT INTO schema_migrations (version) VALUES ('20170403194826');
 
