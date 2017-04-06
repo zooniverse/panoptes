@@ -41,6 +41,8 @@ describe Api::V1::CollectionsController, type: :controller do
       let(:viewer_resource) { private_resource }
 
       it_behaves_like "filters by owner"
+      it_behaves_like "filters by editor"
+
       it_behaves_like "filters by current user roles"
 
       describe "project_ids" do

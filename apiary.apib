@@ -1271,7 +1271,7 @@ this action.
 
 + Response 204
 
-## Project Collection [/projects{?page,page_size,sort,owner,include}]
+## Project Collection [/projects{?page,page_size,sort,owner,editor,include}]
 A collection of _Panotpes Project_ resources.
 
 All collections add a *meta* attribute hash containing
@@ -1395,7 +1395,8 @@ Projects are returned as an array under the _projects_ key.
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
-  + owner (optional, string) ... string owner name of either a user or a user group to filter by.
+  + owner (optional, string) ... string owner name of either a user or a user group to filter by owner
+  + editor (optional, string) ... string name of either a user or user group to filter by owner and collaborator
   + include (optional, string) ... comma separated list of linked resources to include in the response
 
 + Request
@@ -3047,7 +3048,7 @@ owner or have edit permissions.
 
 + Response 204
 
-## Collection Collection [/collections{?page,page_size,sort,owner}]
+## Collection Collection [/collections{?page,page_size,sort,owner, editor}]
 A collection of Collection resources.
 
 All collections add a meta attribute hash containing paging
@@ -3117,7 +3118,8 @@ Collections are returned as an array under *collections*.
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
-  + owner (optional, string) ... string name of either a user or user group to filter by
+  + owner (optional, string) ... string name of either a user or user group to filter by owner
+  + editor (optional, string) ... string name of either a user or user group to filter by owner and collaborator
 
 + Request
 

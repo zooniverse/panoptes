@@ -1,6 +1,7 @@
 class Project < ActiveRecord::Base
   include RoleControl::Owned
   include RoleControl::Controlled
+  include RoleControl::Editors
   include Activatable
   include Linkable
   include Translatable
@@ -9,6 +10,7 @@ class Project < ActiveRecord::Base
   include PgSearch
   include RankedModel
   include SluggedName
+  include OwnersAndCollaborators
 
   EXPERT_ROLES = [:owner, :expert].freeze
 
@@ -105,12 +107,6 @@ class Project < ActiveRecord::Base
 
   def expert_classifier?(classifier)
     !!expert_classifier_level(classifier)
-  end
-
-  def owners_and_collaborators
-    User.joins(user_groups: :access_control_lists)
-      .merge(acls.where.overlap(roles: %w(owner collaborator)))
-      .select(:id)
   end
 
   def create_talk_admin(client)

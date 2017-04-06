@@ -1,17 +1,20 @@
 class Collection < ActiveRecord::Base
   include RoleControl::Controlled
   include RoleControl::Owned
+  include RoleControl::Editors
   include Activatable
   include Linkable
   include PreferencesLink
   include PgSearch
   include SluggedName
   include BelongsToMany
+  include OwnersAndCollaborators
 
   belongs_to_many :projects
   has_many :collections_subjects, dependent: :destroy
   has_many :subjects, through: :collections_subjects
   has_many :collection_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
+  has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
   has_many :user_collection_preferences, dependent: :destroy
 
   validates :display_name, presence: true
