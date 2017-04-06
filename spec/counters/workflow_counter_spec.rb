@@ -20,6 +20,16 @@ describe WorkflowCounter do
       it "should return 2" do
         expect(counter.classifications).to eq(2)
       end
+
+      context "when unlinking subject_sets" do
+        let(:workflow) { create(:workflow_with_subjects, num_sets: 2) }
+
+        it "should only return the count for the linked sets" do
+          set_to_keep = workflow.subject_sets.sample
+          workflow.subject_sets = [ set_to_keep ]
+          expect(counter.classifications).to eq(2)
+        end
+      end
     end
   end
 
