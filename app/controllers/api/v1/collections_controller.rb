@@ -11,9 +11,9 @@ class Api::V1::CollectionsController < Api::ApiController
   schema_type :strong_params
 
   allowed_params :create, :name, :display_name, :private, :favorite,
-    links: [ :project, projects: [], subjects: [], owner: polymorphic ]
+    links: [ :default_subject, :project, projects: [], subjects: [], owner: polymorphic ]
 
-  allowed_params :update, :name, :display_name, :private, links: [ subjects: [] ]
+  allowed_params :update, :name, :display_name, :private, links: [ :default_subject, subjects: [] ]
 
   search_by do |name, query|
     query.search_display_name(name.join(" "))

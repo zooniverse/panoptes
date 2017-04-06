@@ -121,7 +121,7 @@ Rails.application.routes.draw do
 
       json_api_resources :subject_sets, links: [:subjects]
 
-      json_api_resources :collections, links: [:subjects]
+      json_api_resources :collections, links: [:subjects, :default_subject]
 
       json_api_resources :subject_queues, links: [:subjects]
 

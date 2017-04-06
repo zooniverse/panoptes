@@ -24,6 +24,10 @@ class CollectionSerializer
   end
 
   def default_subject_src
-    @model.default_subject&.locations&.first&.src
+    if @model.default_subject
+      @model.default_subject&.locations&.first&.src
+    else
+      @model.subjects.first&.locations&.first&.src
+    end
   end
 end
