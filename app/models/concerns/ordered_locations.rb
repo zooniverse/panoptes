@@ -8,7 +8,7 @@ module OrderedLocations
         locations
       end
     else
-      locations.order("\"media\".\"metadata\"->>'index' ASC")
+      locations.order("\"media\".\"metadata\"->'index' ASC")
     end
   end
 end
