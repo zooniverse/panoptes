@@ -7,7 +7,7 @@ class ProjectClassificationsCountWorker
     interval: 60,
     max_in_interval: 1,
     min_delay: 10,
-    reject_with: :cancel, # SGL 2017 was :reschedule
+    reject_with: :reschedule,
     key: ->(project_id) {
       "project_#{project_id}_classifications_count_worker"
     }
