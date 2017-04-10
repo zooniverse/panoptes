@@ -7,7 +7,7 @@ class SubjectWorkflowStatusCountWorker
     interval: 30,
     max_in_interval: 1,
     min_delay: 5,
-    reject_with: :cancel, # SGL 2017 was :reschedule
+    reject_with: :reschedule,
     key: ->(count_id) {
       "sws_#{count_id}_count_worker"
     }
