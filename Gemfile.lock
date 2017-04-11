@@ -11,6 +11,16 @@ GIT
       rack (>= 1.2, < 3)
 
 GIT
+  remote: git://github.com/shaneog/postgres_ext.git
+  revision: 88d46f6c145ef573e055e4d860ba2dea3264d11c
+  branch: rails-5
+  specs:
+    postgres_ext (3.0.0)
+      activerecord (>= 4.0.0)
+      arel (>= 4.0.1)
+      pg_array_parser (~> 0.0.9)
+
+GIT
   remote: git://github.com/zooniverse/restpack_serializer.git
   revision: a0c2bc4725dbdd86783f09c88054280e110da752
   branch: rails5
@@ -50,7 +60,7 @@ GEM
       activemodel (>= 4, < 6)
     active_model_serializers (0.10.0.rc2)
       activemodel (>= 4.0)
-    active_record_union (1.1.0)
+    active_record_union (1.2.0)
       activerecord (>= 4.0)
     activejob (5.0.2)
       activesupport (= 5.0.2)
@@ -280,10 +290,6 @@ GEM
       activerecord (>= 3.1)
       activesupport (>= 3.1)
       arel
-    postgres_ext (3.0.0)
-      activerecord (>= 4.0.0)
-      arel (>= 4.0.1)
-      pg_array_parser (~> 0.0.9)
     pry (0.10.4)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -454,7 +460,7 @@ PLATFORMS
 DEPENDENCIES
   active_interaction (~> 3.0.1)
   active_model_serializers (= 0.10.0.rc2)
-  active_record_union (~> 1.1.0)
+  active_record_union (~> 1.2.0)
   activerecord-import (~> 0.8)
   aws-sdk-v1 (~> 1.0)
   cellect-client (~> 2.0.1)
@@ -490,7 +496,7 @@ DEPENDENCIES
   paper_trail (~> 5.2)
   pg (~> 0.18)
   pg_search
-  postgres_ext (~> 3.0.0)
+  postgres_ext!
   pry-byebug
   pry-rails
   pry-stack_explorer
