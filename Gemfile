@@ -4,7 +4,7 @@ gem 'rails', '~> 5.0.1'
 gem 'postgres_ext', github: 'shaneog/postgres_ext', branch: 'rails-5'
 gem 'active_record_union', '~> 1.2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
-gem 'doorkeeper', '~> 3.0'
+gem 'doorkeeper', '~> 4.0'
 gem 'doorkeeper-jwt', '~> 0.1.6'
 gem 'devise', '~> 4.0'
 gem 'versionist', '~> 1.0'
