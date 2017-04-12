@@ -50,6 +50,7 @@ module Api
     prepend_before_action :ban_user, only: [:create, :update, :destroy]
     prepend_before_action ContentTypeFilter.new(*API_ACCEPTED_CONTENT_TYPES,
                                                 API_ALLOWED_METHOD_OVERRIDES)
+    before_action :set_paper_trail_whodunnit
 
     def self.require_authentication(*actions, scopes: [])
       if actions == [:all]
