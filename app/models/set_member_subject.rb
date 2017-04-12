@@ -57,26 +57,19 @@ class SetMemberSubject < ActiveRecord::Base
   end
 
   def self.seen_for_user_by_workflow(user, workflow)
-    seen_subjects = for_user_by_workflow_scope(user, workflow)
-    by_workflow(workflow).where(seen_subjects.exists)
+    with_seens(user, workflow).by_workflow(workflow).where("seens.subject_id IS NOT NULL")
   end
 
   def self.unseen_for_user_by_workflow(user, workflow)
-    seen_subjects = for_user_by_workflow_scope(user, workflow)
-    by_workflow(workflow).where(seen_subjects.exists.not)
+    with_seens(user, workflow).by_workflow(workflow).where("seens.subject_id IS NULL")
   end
 
-  def self.for_user_by_workflow_scope(user, workflow)
+  def self.with_seens(user, workflow)
     uss = UserSeenSubject.arel_table
-    sms = SetMemberSubject.arel_table
     seens = uss.project('UNNEST(subject_ids) as subject_id')
-    seens.where(uss[:user_id].eq(user.id).and(uss[:workflow_id].eq(workflow.id)))
-    seens_subquery = seens.as(Arel.sql('as seen_subjects'))
-    manager = Arel::SelectManager.new(uss.engine)
-    manager.project("null")
-    manager.from(seens_subquery)
-    subquery_where = sms[:subject_id].eq(Arel.sql('seen_subjects.subject_id'))
-    manager.where(subquery_where)
+              .where(uss[:user_id].eq(user.id).and(uss[:workflow_id].eq(workflow.id)))
+
+    with(seens: seens).joins("LEFT OUTER JOIN seens ON seens.subject_id = set_member_subjects.subject_id")
   end
 
   def retired_workflow_ids

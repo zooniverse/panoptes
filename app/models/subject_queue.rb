@@ -9,7 +9,12 @@ class SubjectQueue < ActiveRecord::Base
   belongs_to :user
   belongs_to :workflow
   belongs_to :subject_set
-  belongs_to_many :set_member_subjects
+
+  # TODO: RAILS 5 UPGRADE
+  # belongs_to_many :set_member_subjects
+  def set_member_subjects
+    SetMemberSubject.where(id: set_member_subject_ids)
+  end
 
   validates_presence_of :workflow
   validates_uniqueness_of :user_id, scope: [:subject_set_id, :workflow_id]

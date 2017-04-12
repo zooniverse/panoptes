@@ -37,10 +37,10 @@ RSpec.describe WorkflowContent, :type => :model do
     end
 
     it 'caches the new version number', :aggregate_failures do
-      previous_number = subject.current_version_number
+      previous_number = subject.current_version_number.to_i
       subject.update!(strings: new_strings)
-      expect(subject.current_version_number).to eq(previous_number + 1)
-      expect(subject.current_version_number).to eq(ModelVersion.version_number(subject))
+      expect(subject.current_version_number.to_i).to eq(previous_number + 1)
+      expect(subject.current_version_number.to_i).to eq(ModelVersion.version_number(subject))
     end
   end
 end

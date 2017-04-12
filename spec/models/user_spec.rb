@@ -942,7 +942,7 @@ describe User, type: :model do
   end
 
   describe "#favorite_collections_for_project" do
-    let!(:fav_collection) { create(:collection, projects: [owned], owner: user, favorite: true) }
+    let!(:fav_collection) { create(:collection, project_ids: [owned.id], owner: user, favorite: true) }
 
     it "returns the favorite collections for the project" do
       expect(user.favorite_collections_for_project(owned)).to eq([fav_collection])

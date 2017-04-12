@@ -8,7 +8,12 @@ class Collection < ActiveRecord::Base
   include SluggedName
   include BelongsToMany
 
-  belongs_to_many :projects
+  # TODO: RAILS 5 UPGRADE
+  # belongs_to_many :projects
+  def projects
+    Project.where(id: project_ids)
+  end
+
   has_many :collections_subjects, dependent: :destroy
   has_many :subjects, through: :collections_subjects
   has_many :collection_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource

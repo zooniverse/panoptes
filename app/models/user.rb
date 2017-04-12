@@ -329,7 +329,7 @@ class User < ActiveRecord::Base
   end
 
   def favorite_collections_for_project(project)
-    collections.where(favorite: true, projects: [project])
+    collections.where(favorite: true).where.overlap(project_ids: [project.id])
   end
 
   private
