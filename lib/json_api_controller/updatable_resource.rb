@@ -41,8 +41,9 @@ module JsonApiController
 
     def destroy_links
       resource = controlled_resources.first
-      resource_class.transaction do
+      resource_class.transaction(requires_new: true) do
         destroy_relation(resource, relation, params[:link_ids])
+        resource.save!
       end
 
       yield resource if block_given?
