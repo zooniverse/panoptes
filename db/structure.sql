@@ -3283,6 +3283,14 @@ ALTER TABLE ONLY subject_sets
 
 
 --
+-- Name: fk_rails_991d5ad7ab; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY collections
+    ADD CONSTRAINT fk_rails_991d5ad7ab FOREIGN KEY (default_subject_id) REFERENCES subjects(id);
+
+
+--
 -- Name: fk_rails_99326fb65d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
