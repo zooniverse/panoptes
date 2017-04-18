@@ -257,7 +257,8 @@ CREATE TABLE collections (
     lock_version integer DEFAULT 0,
     slug character varying DEFAULT ''::character varying,
     favorite boolean DEFAULT false NOT NULL,
-    project_ids integer[] DEFAULT '{}'::integer[]
+    project_ids integer[] DEFAULT '{}'::integer[],
+    default_subject_id integer
 );
 
 
@@ -3282,6 +3283,14 @@ ALTER TABLE ONLY subject_sets
 
 
 --
+-- Name: fk_rails_991d5ad7ab; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY collections
+    ADD CONSTRAINT fk_rails_991d5ad7ab FOREIGN KEY (default_subject_id) REFERENCES subjects(id);
+
+
+--
 -- Name: fk_rails_99326fb65d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3838,4 +3847,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170316170501');
 INSERT INTO schema_migrations (version) VALUES ('20170320203350');
 
 INSERT INTO schema_migrations (version) VALUES ('20170325135953');
+
+INSERT INTO schema_migrations (version) VALUES ('20170403194826');
 

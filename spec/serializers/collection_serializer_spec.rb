@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe CollectionSerializer do
   let(:collection) { create(:collection_with_subjects) }
+  let(:subject_with_media) { create(:subject, :with_mediums, num_media: 1, collections: [collection]) }
 
   describe "::btm_associations" do
     it "should be overriden" do
@@ -45,6 +46,20 @@ describe CollectionSerializer do
         expected = [ first_by_name.display_name, collection.display_name ]
         expect(results).to eq(expected)
       end
+    end
+  end
+
+  describe "default subject location" do
+    before { collection.default_subject = subject_with_media }
+    let(:serializer) do
+      s = CollectionSerializer.new
+      s.instance_variable_set(:@model, collection)
+      s.instance_variable_set(:@context, {})
+      s
+    end
+
+    it "includes the default subject's url" do
+      expect(serializer.default_subject_src).to eq(subject_with_media.locations.first.src)
     end
   end
 end

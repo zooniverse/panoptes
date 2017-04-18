@@ -6,7 +6,7 @@ class CollectionSerializer
   include CachedSerializer
 
   attributes :id, :name, :display_name, :created_at, :updated_at,
-    :slug, :href, :favorite, :private
+    :slug, :href, :favorite, :private, :default_subject_src
 
   # Do not include the BelongsToMany :projects relation
   # as this can't be preloaded (custom AR relation)
@@ -21,5 +21,13 @@ class CollectionSerializer
   # overridden belongs_to_many association to serialize the :projects links
   def self.btm_associations
     [ model_class.reflect_on_association(:projects) ]
+  end
+
+  def default_subject_src
+    if @model.default_subject
+      @model.default_subject&.locations&.first&.src
+    else
+      @model.subjects.first&.locations&.first&.src
+    end
   end
 end

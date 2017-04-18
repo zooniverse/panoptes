@@ -2917,6 +2917,7 @@ It has the following attributes:
 - updated_at
 - name
 - display_name
+- default_subject
 
 *id*, *created_at*, and *updated_at* are set by the API.
 
@@ -2937,6 +2938,7 @@ It has the following attributes:
                     "updated_at": "2014-04-20T06:23:12Z",
                     "name" : "flowers",
                     "display_name": "Lots of Pretty flowers",
+                    "default_subject_src": "panoptes-uploads.zooniverse.org/production/subject_location/hash.jpeg",
                     "links": {
                         "owner": {
                             "id": "10",
@@ -2964,7 +2966,8 @@ It has the following attributes:
 ### Edit a collection [PUT]
 A user may edit a collection they are the owner of or have edit
 permissions for. A user may edit a collection's name, or display_name,
-and may also send a full representation of a collections subject links.
+and may also send a full representation of a collections subject links
+or a single subject id to set the default subject.
 
 Sending subject links through a put is not recommend, especially if a
 collection has many subjects.
@@ -3046,6 +3049,33 @@ owner or have edit permissions.
             Content-Type: application/json
 
 + Response 204
+
+## Add default subject link [/collections/{id}/links/default_subject]
+Links a default subject to a collection. This subject's first media
+location URL will be included in the serialized collection and used
+as the thumbnail. Update this attribute with `null` to use the first
+subject in the linked list instead.
+
+### Add links [POST]
+A user is permitted to add a default subject if they are the collection
+owner or have edit permissions.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json; version=1
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "default_subject": "1"
+            }
+
++ Response 200
+
+    [Collection][]
 
 ## Collection Collection [/collections{?page,page_size,sort,owner}]
 A collection of Collection resources.
