@@ -4,7 +4,7 @@ class UserProjectPreferenceSerializer
 
   attributes :id, :email_communication, :preferences, :href,
     :activity_count, :activity_count_by_workflow, :settings,
-    :created_at
+    :created_at, :updated_at
   can_include :user, :project
   can_sort_by :updated_at, :display_name
 
