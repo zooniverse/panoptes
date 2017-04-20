@@ -15,7 +15,7 @@ describe Api::V1::ProjectsController, type: :controller do
      "description", "introduction", "migrated","private", "live",
      "retired_subjects_count", "urls", "classifiers_count", "redirect",
      "workflow_description", "tags", "experimental_tools",
-     "completeness", "activity", "state" ]
+     "completeness", "activity", "state", "mobile_friendly" ]
   end
   let(:api_resource_links) do
     [ "projects.workflows",

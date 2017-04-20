@@ -50,6 +50,10 @@ class ProjectUpdateSchema < JsonSchema
       type "boolean"
     end
 
+    property "mobile_friendly" do
+      type "boolean"
+    end
+
     property "live" do
       type "boolean"
     end

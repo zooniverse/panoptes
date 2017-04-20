@@ -813,7 +813,8 @@ CREATE TABLE projects (
     activity integer DEFAULT 0 NOT NULL,
     tsv tsvector,
     state integer,
-    organization_id integer
+    organization_id integer,
+    mobile_friendly boolean DEFAULT false NOT NULL
 );
 
 
@@ -2566,7 +2567,14 @@ CREATE INDEX index_projects_on_migrated ON projects USING btree (migrated) WHERE
 
 
 --
--- Name: index_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_projects_on_mobile_friendly; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_projects_on_mobile_friendly ON projects USING btree (mobile_friendly);
+
+
+--
+-- Name: index_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_projects_on_organization_id ON projects USING btree (organization_id);
@@ -3849,4 +3857,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170320203350');
 INSERT INTO schema_migrations (version) VALUES ('20170325135953');
 
 INSERT INTO schema_migrations (version) VALUES ('20170403194826');
+
+INSERT INTO schema_migrations (version) VALUES ('20170420095703');
 
