@@ -59,7 +59,7 @@ describe CollectionSerializer do
     end
 
     it "includes the default subject's url" do
-      expect(serializer.default_subject_src).to eq(subject_with_media.locations.first.src)
+      expect(serializer.default_subject_src).to eq(subject_with_media.locations.first.url_for_format(:get))
     end
   end
 end
