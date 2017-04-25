@@ -190,4 +190,34 @@ describe Api::V1::CollectionsController, type: :controller do
 
     it_behaves_like "is destructable"
   end
+
+  describe '#destroy_links' do
+    context "removing the default subject from the collection" do
+      let(:default_subject) { collection.subjects.first }
+
+      def delete_default(ids)
+        delete :destroy_links,
+          collection_id: collection.id,
+          link_relation: :subjects,
+          link_ids: ids
+      end
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        collection.update({default_subject: default_subject})
+      end
+
+      context "nulls the default subject relation" do
+        it "when there is a single subject given" do
+          delete_default(default_subject.id.to_s)
+          expect(collection.reload.default_subject).to be_nil
+        end
+
+        it "when there is an array of subjects given" do
+          delete_default(collection.subjects.pluck(:id).join(','))
+          expect(collection.reload.default_subject).to be_nil
+        end
+      end
+    end
+  end
 end

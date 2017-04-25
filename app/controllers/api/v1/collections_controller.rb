@@ -33,7 +33,7 @@ class Api::V1::CollectionsController < Api::ApiController
   private
 
   def check_default_subject(collection)
-    collection.update({ default_subject: nil }) if collection.default_subject&.id.to_s == params["link_ids"]
+    collection.update({ default_subject: nil }) if params["link_ids"].split(",").include? collection.default_subject&.id.to_s
   end
 
   def filter_by_project_ids
