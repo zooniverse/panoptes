@@ -22,6 +22,10 @@ class WorkflowCreateSchema < JsonSchema
       type "boolean"
     end
 
+    property "mobile_friendly" do
+      type "boolean"
+    end
+
     property "public_gold_standard" do
       type "boolean"
     end
