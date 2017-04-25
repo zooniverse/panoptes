@@ -25,9 +25,9 @@ class CollectionSerializer
 
   def default_subject_src
     if @model.default_subject
-      @model.default_subject&.locations&.first&.src
+      @model.default_subject&.locations&.first&.url_for_format(:get)
     else
-      @model.subjects.first&.locations&.first&.src
+      @model.subjects.first&.locations&.first&.url_for_format(:get)
     end
   end
 end

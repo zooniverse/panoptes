@@ -19,6 +19,10 @@ class Api::V1::CollectionsController < Api::ApiController
     query.search_display_name(name.join(" "))
   end
 
+  def destroy_links
+    super { |collection| check_default_subject(collection) }
+  end
+
   protected
 
   def build_resource_for_create(create_params)
@@ -27,6 +31,10 @@ class Api::V1::CollectionsController < Api::ApiController
   end
 
   private
+
+  def check_default_subject(collection)
+    collection.update({ default_subject: nil }) if params["link_ids"].split(",").include? collection.default_subject&.id.to_s
+  end
 
   def filter_by_project_ids
     if ids_string = (params.delete(:project_ids) || params.delete(:project_id)).try(:split, ',')
