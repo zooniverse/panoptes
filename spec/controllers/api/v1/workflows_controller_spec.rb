@@ -15,7 +15,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     %w(id display_name tasks classifications_count subjects_count
     created_at updated_at first_task primary_language content_language
     version grouped prioritized pairwise retirement aggregation nero_config
-    active configuration finished_at public_gold_standard)
+    active mobile_friendly configuration finished_at public_gold_standard)
   end
   let(:api_resource_links)do
     %w(workflows.project workflows.subject_sets workflows.tutorial_subject

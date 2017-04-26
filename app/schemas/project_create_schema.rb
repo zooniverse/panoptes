@@ -38,6 +38,10 @@ class ProjectCreateSchema < JsonSchema
       type "boolean"
     end
 
+    property "mobile_friendly" do
+      type "boolean"
+    end
+
     property "launched_row_order_position" do
       type "integer"
     end

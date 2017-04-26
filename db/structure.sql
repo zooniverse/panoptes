@@ -813,7 +813,8 @@ CREATE TABLE projects (
     activity integer DEFAULT 0 NOT NULL,
     tsv tsvector,
     state integer,
-    organization_id integer
+    organization_id integer,
+    mobile_friendly boolean DEFAULT false NOT NULL
 );
 
 
@@ -1522,7 +1523,8 @@ CREATE TABLE workflows (
     current_version_number character varying,
     activated_state integer DEFAULT 0 NOT NULL,
     subject_selection_strategy integer DEFAULT 0,
-    nero_config jsonb DEFAULT '{}'::jsonb
+    nero_config jsonb DEFAULT '{}'::jsonb,
+    mobile_friendly boolean DEFAULT false NOT NULL
 );
 
 
@@ -2566,7 +2568,14 @@ CREATE INDEX index_projects_on_migrated ON projects USING btree (migrated) WHERE
 
 
 --
--- Name: index_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_projects_on_mobile_friendly; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_projects_on_mobile_friendly ON projects USING btree (mobile_friendly);
+
+
+--
+-- Name: index_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_projects_on_organization_id ON projects USING btree (organization_id);
@@ -2986,7 +2995,14 @@ CREATE INDEX index_workflows_on_display_order ON workflows USING btree (display_
 
 
 --
--- Name: index_workflows_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_workflows_on_mobile_friendly; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_workflows_on_mobile_friendly ON workflows USING btree (mobile_friendly);
+
+
+--
+-- Name: index_workflows_on_project_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_workflows_on_project_id ON workflows USING btree (project_id);
@@ -3849,4 +3865,8 @@ INSERT INTO schema_migrations (version) VALUES ('20170320203350');
 INSERT INTO schema_migrations (version) VALUES ('20170325135953');
 
 INSERT INTO schema_migrations (version) VALUES ('20170403194826');
+
+INSERT INTO schema_migrations (version) VALUES ('20170420095703');
+
+INSERT INTO schema_migrations (version) VALUES ('20170425110939');
 
