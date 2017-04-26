@@ -90,6 +90,7 @@ Rails.application.routes.draw do
       end
 
       json_api_resources :organizations, links: [:projects] do
+        json_api_resources :pages, controller: "organization_pages"
         media_resources :avatar, :background
       end
 

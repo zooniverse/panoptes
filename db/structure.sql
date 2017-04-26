@@ -670,6 +670,41 @@ ALTER SEQUENCE organization_contents_id_seq OWNED BY organization_contents.id;
 
 
 --
+-- Name: organization_pages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE organization_pages (
+    id integer NOT NULL,
+    url_key character varying,
+    title text,
+    language character varying,
+    content text,
+    organization_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_pages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE organization_pages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_pages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE organization_pages_id_seq OWNED BY organization_pages.id;
+
+
+--
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1668,6 +1703,13 @@ ALTER TABLE ONLY organization_contents ALTER COLUMN id SET DEFAULT nextval('orga
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY organization_pages ALTER COLUMN id SET DEFAULT nextval('organization_pages_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY organizations ALTER COLUMN id SET DEFAULT nextval('organizations_id_seq'::regclass);
 
 
@@ -1959,6 +2001,14 @@ ALTER TABLE ONLY oauth_applications
 
 ALTER TABLE ONLY organization_contents
     ADD CONSTRAINT organization_contents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY organization_pages
+    ADD CONSTRAINT organization_pages_pkey PRIMARY KEY (id);
 
 
 --
@@ -2444,6 +2494,20 @@ CREATE UNIQUE INDEX index_oauth_access_tokens_on_token ON oauth_access_tokens US
 --
 
 CREATE UNIQUE INDEX index_oauth_applications_on_uid ON oauth_applications USING btree (uid);
+
+
+--
+-- Name: index_organization_pages_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organization_pages_on_language ON organization_pages USING btree (language);
+
+
+--
+-- Name: index_organization_pages_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organization_pages_on_organization_id ON organization_pages USING btree (organization_id);
 
 
 --
@@ -3849,4 +3913,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170320203350');
 INSERT INTO schema_migrations (version) VALUES ('20170325135953');
 
 INSERT INTO schema_migrations (version) VALUES ('20170403194826');
+
+INSERT INTO schema_migrations (version) VALUES ('20170426162708');
 
