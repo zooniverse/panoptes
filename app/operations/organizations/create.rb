@@ -7,7 +7,6 @@ module Organizations
     string :primary_language
 
     # Organization Contents Fields
-    string :title
     string :description
     string :introduction, default: ''
     array :urls, default: []
@@ -15,7 +14,7 @@ module Organizations
     def execute
       Organization.transaction do
         organization = Organization.new owner: api_user.user, display_name: display_name, primary_language: primary_language
-        param_hash = { title: title, description: description, introduction: introduction }
+        param_hash = { title: display_name, description: description, introduction: introduction }
         param_hash.merge! content_from_params(inputs, Api::V1::OrganizationsController::CONTENT_FIELDS)
         organization.organization_contents.build param_hash
         organization.save!
