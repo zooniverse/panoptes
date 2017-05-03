@@ -13,7 +13,7 @@ class OrganizationPageSerializer
 
     organization_id = options.filters.delete :organization_id
 
-    url = "#{self.href_prefix}/organizations/#{organization_id.try(:first)}/pages"
+    url = "#{href_prefix}/organizations/#{organization_id.try(:first)}/pages"
 
     params = []
     params << "page=#{page}" unless page == 1

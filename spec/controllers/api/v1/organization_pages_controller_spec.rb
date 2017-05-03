@@ -81,7 +81,7 @@ describe Api::V1::OrganizationPagesController, type: :controller do
       end
 
       it 'should use correct paging links' do
-        expect(json_response["meta"][api_resource_name]["first_href"]).to match(/organizations\/[0-9]+\/pages/)
+        expect(json_response["meta"][api_resource_name]["first_href"]).to match(%r{organizations/[0-9]+/pages})
       end
     end
   end
@@ -124,7 +124,7 @@ describe Api::V1::OrganizationPagesController, type: :controller do
       {
        organization_id: organization.id,
        organization_pages: {
-                       content: "dancer",
+                       content: "dancer"
                       }
       }
     end

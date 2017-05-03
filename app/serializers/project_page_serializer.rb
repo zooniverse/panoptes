@@ -13,7 +13,7 @@ class ProjectPageSerializer
 
     project_id = options.filters.delete :project_id
 
-    url = "#{self.href_prefix}/projects/#{project_id.try(:first)}/pages"
+    url = "#{href_prefix}/projects/#{project_id.try(:first)}/pages"
 
     params = []
     params << "page=#{page}" unless page == 1
