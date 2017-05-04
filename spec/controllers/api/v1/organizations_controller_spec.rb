@@ -82,7 +82,6 @@ describe Api::V1::OrganizationsController, type: :controller do
         {
           organizations: {
             display_name: "The Illuminati",
-            title: "Come join us",
             description: "This organization is the most organized organization to ever organize",
             urls: [{label: "Blog", url: "http://blogo.com/example"}],
             primary_language: "zh-tw"
@@ -105,14 +104,13 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:resource) { create(:organization, owner: authorized_user) }
         let(:resource_class) { Organization }
         let(:api_resource_name) { "organizations" }
-        let(:api_resource_attributes) { ["display_name", "title", "description"] }
+        let(:api_resource_attributes) { ["display_name", "description"] }
         let(:api_resource_links) { [] }
         let(:update_params) do
           {
             organizations: {
               primary_language: "tw",
               display_name: "Def Not Illuminati",
-              title: "Totally Harmless",
               description: "This Organization is not affiliated with the Illuminati, absolutely not no way",
               urls: [{label: "Blog", url: "http://blogo.com/example"}],
               introduction: "Hello and welcome to Illuminati Headquarters oh wait damn"
@@ -156,6 +154,14 @@ describe Api::V1::OrganizationsController, type: :controller do
           ]
           put :update, params
         end
+      end
+
+      it "updates the title to match the display name" do
+        default_request scopes: scopes, user_id: authorized_user.id
+        organization.save!
+        params = { organizations: { display_name: "Also a title"}, id: organization.id }
+        put :update, params
+        expect(json_response["organizations"].first['title']).to eq("Also a title")
       end
     end
 

@@ -5,7 +5,7 @@ class OrganizationSerializer
   include MediaLinksSerializer
   include CachedSerializer
 
-  attributes :id, :display_name, :description, :introduction, :title, :href, :primary_language
+  attributes :id, :display_name, :description, :introduction, :title, :href, :primary_language, :listed_at
   optional :avatar_src
   media_include :avatar, :background
   can_include :organization_contents, :organization_roles, :projects, :owners
