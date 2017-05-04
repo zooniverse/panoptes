@@ -1,57 +1,33 @@
 require "spec_helper"
 
-describe Api::V1::ProjectPagesController, type: :controller do
-  let(:project) { create(:project) }
+describe Api::V1::OrganizationPagesController, type: :controller do
+  let(:organization) { create(:organization) }
   let!(:pages) do
-    [create(:project_page, project: project),
-     create(:project_page, project: project, url_key: "faq"),
-     create(:project_page, project: project, language: 'zh-tw'),
-     create(:project_page)]
+    [create(:organization_page, organization: organization),
+     create(:organization_page, organization: organization, url_key: "faq"),
+     create(:organization_page, organization: organization, language: 'zh-tw'),
+     create(:organization_page)]
   end
 
-  let(:scopes) { %w(public project) }
+  let(:scopes) { %w(public organization) }
 
-  let(:api_resource_name) { "project_pages" }
+  let(:api_resource_name) { "organization_pages" }
   let(:api_resource_attributes) do
     ["title", "created_at", "updated_at", "type", "content", "language", "url_key"]
   end
 
-  let(:api_resource_links) { ["project_pages.project"] }
+  let(:api_resource_links) { ["organization_pages.organization"] }
 
-  let(:authorized_user) { project.owner }
+  let(:authorized_user) { organization.owner }
 
   let(:resource) { pages.first }
-  let(:resource_class) { ProjectPage }
+  let(:resource_class) { OrganizationPage }
 
   describe "#index" do
-    let(:index_params) { {project_id: project.id} }
+    let(:index_params) { {organization_id: organization.id} }
     let(:n_visible) { 2 }
 
     it_behaves_like "is indexable", false
-
-    describe "for a private project" do
-      let(:private_project) { create(:project, private: true) }
-      let!(:private_page) { create(:project_page, project: private_project) }
-
-      before(:each) do
-        default_request scopes: scopes, user_id: authorized_user.id
-        get :index, project_id: private_project.id
-      end
-
-      context "authorized user" do
-        let(:authorized_user) { private_project.owner }
-
-        it 'should return the page' do
-          expect(json_response[api_resource_name][0]['id']).to eq(private_page.id.to_s)
-        end
-      end
-
-      context "unauthorized user" do
-        it 'should not return a page' do
-          expect(json_response[api_resource_name]).to be_empty
-        end
-      end
-    end
 
     describe "filter options" do
       let(:filter_opts) { {} }
@@ -105,13 +81,13 @@ describe Api::V1::ProjectPagesController, type: :controller do
       end
 
       it 'should use correct paging links' do
-        expect(json_response["meta"][api_resource_name]["first_href"]).to match(%r{projects/[0-9]+/pages})
+        expect(json_response["meta"][api_resource_name]["first_href"]).to match(%r{organizations/[0-9]+/pages})
       end
     end
   end
 
   describe "#show" do
-    let(:show_params) { {project_id: project.id} }
+    let(:show_params) { {organization_id: organization.id} }
 
     it_behaves_like "is showable"
   end
@@ -119,11 +95,11 @@ describe Api::V1::ProjectPagesController, type: :controller do
   describe "#create" do
     let(:test_attr) { :content }
     let(:test_attr_value) { "dancer" }
-    let(:resource_url) { "http://test.host/api/projects/#{project.id}/pages/#{created_id}"}
+    let(:resource_url) { "http://test.host/api/organizations/#{organization.id}/pages/#{created_id}"}
     let(:create_params) do
       {
-       project_id: project.id,
-       project_pages: {
+       organization_id: organization.id,
+       organization_pages: {
                        content: "dancer",
                        url_key: "whatevs",
                        language: "en-CA",
@@ -134,10 +110,10 @@ describe Api::V1::ProjectPagesController, type: :controller do
 
     it_behaves_like "is creatable"
 
-    it 'should set project from the project_id param' do
+    it 'should set organization from the organization_id param' do
       default_request scopes: scopes, user_id: authorized_user.id
       post :create, create_params
-      expect(json_response[api_resource_name][0]["links"]["project"]).to eq(project.id.to_s)
+      expect(json_response[api_resource_name][0]["links"]["organization"]).to eq(organization.id.to_s)
     end
   end
 
@@ -146,8 +122,8 @@ describe Api::V1::ProjectPagesController, type: :controller do
     let(:test_attr_value) { "dancer" }
     let(:update_params) do
       {
-       project_id: project.id,
-       project_pages: {
+       organization_id: organization.id,
+       organization_pages: {
                        content: "dancer"
                       }
       }
@@ -157,7 +133,7 @@ describe Api::V1::ProjectPagesController, type: :controller do
   end
 
   describe "#destroy" do
-    let(:delete_params) { {project_id: project.id} }
+    let(:delete_params) { {organization_id: organization.id} }
 
     it_behaves_like "is destructable"
   end
