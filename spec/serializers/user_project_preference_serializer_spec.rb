@@ -70,14 +70,21 @@ describe UserProjectPreferenceSerializer do
 
     describe "count caching" do
       let!(:upp) { create(:user_project_preference) }
-
-      it "should not use the result cache" do
-        expect(Rails).not_to receive(:cache)
-        result
+      let(:serializer_cache_key) do
+        UserProjectPreferenceSerializer.serializer_cache_key(
+          upp,
+          Digest::MD5.hexdigest({}.to_json)
+        )
       end
 
-      it "should use the result cache if enabled" do
-        Panoptes.flipper[UserProjectPreferenceSerializer::FLIPPER_KEY].enable
+      before do
+        allow_any_instance_of(ActiveSupport::Cache::NullStore)
+          .to receive(:fetch)
+          .with(serializer_cache_key)
+          .and_call_original
+      end
+
+      it "should cache the results" do
         %w(count_activity count_activity_by_workflow).each do |method|
           expect_any_instance_of(ActiveSupport::Cache::NullStore)
             .to receive(:fetch)

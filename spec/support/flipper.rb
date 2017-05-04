@@ -10,6 +10,7 @@ module Flipper
       Panoptes.flipper[:classification_lifecycle_in_background].enable
       Panoptes.flipper["http_caching"].enable
       Panoptes.flipper["classification_counters"].enable
+      Panoptes.flipper["cached_serializer"].enable
     end
   end
 end

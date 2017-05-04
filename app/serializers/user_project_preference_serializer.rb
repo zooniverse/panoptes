@@ -9,7 +9,6 @@ class UserProjectPreferenceSerializer
   can_sort_by :updated_at, :display_name
 
   CACHE_MINS = (ENV["UPP_ACTIVITY_COUNT_CACHE_MINS"] || 5).freeze
-  FLIPPER_KEY = "upp_activity_count_cache".freeze
 
   def self.key
     "project_preferences"
@@ -59,12 +58,8 @@ class UserProjectPreferenceSerializer
   end
 
   def perform_cached_lookup(method_to_send)
-    if Panoptes.flipper[FLIPPER_KEY].enabled?
-      cache_key = "#{@model.class}/#{@model.id}/#{method_to_send}"
-      Rails.cache.fetch(cache_key, expires_in: CACHE_MINS.minutes) do
-        send method_to_send
-      end
-    else
+    cache_key = "#{@model.class}/#{@model.id}/#{method_to_send}"
+    Rails.cache.fetch(cache_key, expires_in: CACHE_MINS.minutes) do
       send method_to_send
     end
   end
