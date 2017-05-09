@@ -1,5 +1,6 @@
 require 'media_storage/test_adapter'
 require 'media_storage/aws_adapter'
+require 'media_storage/disk_adapter'
 
 module MediaStorage
   class NoMediaStorage < StandardError
@@ -48,6 +49,8 @@ module MediaStorage
         AwsAdapter
       when "test"
         TestAdapter
+      when "disk"
+        DiskAdapter
       else
         default_adapter
       end
