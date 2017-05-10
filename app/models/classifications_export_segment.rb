@@ -5,6 +5,9 @@ class ClassificationsExportSegment < ActiveRecord::Base
   belongs_to :last_classification,  class_name: 'Classification', foreign_key: 'last_classification_id'
   belongs_to :requester, class_name: 'User', foreign_key: 'requester_id'
 
+  validates :first_classification_id, presence: true
+  validates :last_classification_id, presence: true
+
   has_one :medium, as: :linked
 
   def classifications_in_segment
@@ -15,22 +18,19 @@ class ClassificationsExportSegment < ActiveRecord::Base
   end
 
   def next_segment
-    res = complete_classifications
-            .where("id > ?", last_classification_id)
-            .select("min(id), max(id)")
-            .limit(1)
-            .load[0]
+    segment = self.class.new(project_id: project_id, workflow_id: workflow_id, requester: requester)
+    segment.set_first_last_classifications(last_classification_id)
+    segment
+  end
 
-    next_first_id = res.min
-    next_last_id  = res.max
+  def set_first_last_classifications(after)
+    scope = complete_classifications
+    scope = scope.where("id > ?", after) if after.present?
 
-    self.class.new(
-      project_id: project_id,
-      workflow_id: workflow_id,
-      requester: requester,
-      first_classification_id: next_first_id,
-      last_classification_id: next_last_id
-    )
+    res = scope.select("min(id), max(id)").limit(1).load[0]
+
+    self.first_classification_id = res.min
+    self.last_classification_id = res.max
   end
 
   private

@@ -145,6 +145,6 @@ class Workflow < ActiveRecord::Base
   end
 
   def latest_classifications_export_segment
-    workflow.classification_export_segments.order("last_classification_id DESC").first
+    classifications_export_segments.order("last_classification_id DESC").first
   end
 end
