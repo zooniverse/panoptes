@@ -390,4 +390,27 @@ describe Workflow, type: :model do
       end
     end
   end
+
+  describe '#latest_classifications_export_segment' do
+    it 'returns the latest export segment by classification id' do
+      workflow.save!
+      subject = create :subject
+      classifications = create_list :classification, 3, workflow: workflow, subject_ids: [subject.id], user: nil
+
+      segment1 = workflow.classifications_export_segments.create! project: workflow.project,
+                                                                  requester: workflow.project.owner,
+                                                                  first_classification: classifications[0],
+                                                                  last_classification: classifications[0]
+      segment2 = workflow.classifications_export_segments.create! project: workflow.project,
+                                                                  requester: workflow.project.owner,
+                                                                  first_classification: classifications[2],
+                                                                  last_classification: classifications[2]
+      segment3 = workflow.classifications_export_segments.create! project: workflow.project,
+                                                                  requester: workflow.project.owner,
+                                                                  first_classification: classifications[1],
+                                                                  last_classification: classifications[1]
+
+      expect(workflow.latest_classifications_export_segment).to eq(segment2)
+    end
+  end
 end
