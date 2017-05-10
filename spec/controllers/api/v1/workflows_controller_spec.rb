@@ -363,6 +363,12 @@ describe Api::V1::WorkflowsController, type: :controller do
                 .with(resource.id)
             end
 
+            it 'should call the project completeness worker' do
+              expect(CalculateProjectCompletenessWorker)
+                .to receive(:perform_async)
+                .with(resource.project_id)
+            end
+
             it 'should notify the subject selector that the available subjects changed' do
               allow_any_instance_of(Workflow)
                 .to receive(:using_cellect?).and_return(true)

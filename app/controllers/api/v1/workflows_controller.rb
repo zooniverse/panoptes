@@ -87,6 +87,7 @@ class Api::V1::WorkflowsController < Api::ApiController
           NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
         end
       when :subject_sets, 'subject_sets'
+        CalculateProjectCompletenessWorker.perform_async(workflow.project_id)
         NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
       end
     end
