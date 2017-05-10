@@ -357,6 +357,12 @@ describe Api::V1::WorkflowsController, type: :controller do
               expect(UnfinishWorkflowWorker).to receive(:perform_async).with(resource.id)
             end
 
+            it 'should call the workflow retired counter worker' do
+              expect(WorkflowRetiredCountWorker)
+                .to receive(:perform_async)
+                .with(resource.id)
+            end
+
             it 'should notify the subject selector that the available subjects changed' do
               allow_any_instance_of(Workflow)
                 .to receive(:using_cellect?).and_return(true)
