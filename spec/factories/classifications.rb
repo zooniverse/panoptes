@@ -14,8 +14,9 @@ FactoryGirl.define do
     workflow_version "15.15"
     completed true
     user
-    project
     workflow
+    project { workflow&.project || build(:project) }
+
     subject_ids do
       create_list(:set_member_subject, 2).map(&:subject).map(&:id)
     end
