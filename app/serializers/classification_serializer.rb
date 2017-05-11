@@ -57,7 +57,7 @@ class ClassificationSerializer
   end
 
   def self.updated_last_id_href(href, next_id)
-    parsed_uri = URI::parse(href)
+    parsed_uri = URI.parse(href)
     path = parsed_uri.path
     uri_params = Rack::Utils.parse_nested_query(parsed_uri.query)
     no_page_href = uri_params.except("page").merge("last_id" => next_id)
