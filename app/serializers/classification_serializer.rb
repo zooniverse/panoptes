@@ -30,8 +30,8 @@ class ClassificationSerializer
       href_key_ids = { next_href: next_last_id, previous_href: params[:last_id] }
       href_key_ids.map do |href_key, next_id|
         href = page[:meta][:classifications][href_key]
-        updated_last_id_href = href.gsub(/page=\d+/, "last_id=#{next_id}")
-        page[:meta][:classifications][href_key] = updated_last_id_href
+        next unless href
+        page[:meta][:classifications][href_key] = updated_last_id_href(href, next_id)
       end
     end
     page
@@ -54,5 +54,13 @@ class ClassificationSerializer
       href: "/subjects/{#{key}.subjects}"
     }
     links
+  end
+
+  def self.updated_last_id_href(href, next_id)
+    parsed_uri = URI::parse(href)
+    path = parsed_uri.path
+    uri_params = Rack::Utils.parse_nested_query(parsed_uri.query)
+    no_page_href = uri_params.except("page").merge("last_id" => next_id)
+    "#{path}?#{no_page_href.to_query}"
   end
 end
