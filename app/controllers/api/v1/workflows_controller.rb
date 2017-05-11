@@ -30,6 +30,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   def update_links
     super do |workflow|
       UnfinishWorkflowWorker.perform_async(workflow.id)
+      WorkflowRetiredCountWorker.perform_async(workflow.id)
       post_link_actions(workflow)
     end
   end
@@ -82,15 +83,13 @@ class Api::V1::WorkflowsController < Api::ApiController
     if workflow.set_member_subjects.exists?
       case relation
       when :retired_subjects, 'retired_subjects'
-        WorkflowRetiredCountWorker.perform_async(workflow.id)
-
         params[:retired_subjects].each do |subject_id|
           NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
         end
       when :subject_sets, 'subject_sets'
+        CalculateProjectCompletenessWorker.perform_async(workflow.project_id)
         NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
       end
-
     end
   end
 
