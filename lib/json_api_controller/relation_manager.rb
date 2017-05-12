@@ -2,7 +2,7 @@ module JsonApiController
   module RelationManager
     def update_relation(resource, relation, value)
       case value
-      when Hash
+      when Hash, ActionController::Parameters
         id, type = value.values_at(:id, :type)
         item = find_for_string_type(resource, type, id)
         item

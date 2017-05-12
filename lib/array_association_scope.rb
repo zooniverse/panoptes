@@ -32,11 +32,11 @@ class ArrayAssociationScope < ActiveRecord::Associations::AssociationScope
 
   INSTANCE = create
 
-  def last_chain_scope(scope, table, reflection, owner, tracker, assoc_klass)
+  def last_chain_scope(scope, table, reflection, owner, assoc_klass)
     join_keys = reflection.join_keys(assoc_klass)
     key = join_keys.key
     foreign_key = join_keys.foreign_key
-    bind_val = bind scope, table.table_name, key.to_s, owner[foreign_key], tracker
+    bind_val = bind scope, table.table_name, key.to_s, owner[foreign_key]
     value = Arel::Nodes::NamedFunction.new('ANY', [bind_val])
     scope = scope.where(table[key].eq(value))
   end

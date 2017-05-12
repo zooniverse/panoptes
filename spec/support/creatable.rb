@@ -23,7 +23,7 @@ shared_examples "is creatable" do |action=:create|
 
     it 'should include a Last-Modified header' do
       updated_at = resource_class.find(created_id).updated_at.httpdate
-      expect(response.headers).to include('Last-Modified' => updated_at)
+      expect(response.headers['Last-Modified']).to eq(updated_at)
     end
 
     it "should set the Location header as per JSON-API specs" do

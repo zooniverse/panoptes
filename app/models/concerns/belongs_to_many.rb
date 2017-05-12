@@ -2,7 +2,7 @@ module BelongsToMany
   extend ActiveSupport::Concern
 
   class BelongsToManyBuilder < ActiveRecord::Associations::Builder::CollectionAssociation
-    def macro; :belongs_to_many; end
+    def self.macro; :belongs_to_many; end
   end
 
   module ClassMethods

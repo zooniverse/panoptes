@@ -30,7 +30,7 @@ shared_examples "is updatable" do
 
     it 'should include a Last-Modified header' do
       modified = updated_resource.updated_at.httpdate
-      expect(response.headers).to include('Last-Modified' => modified)
+      expect(response.headers["Last-Modified"]).to eq(modified)
     end
 
     it_behaves_like 'an api response'

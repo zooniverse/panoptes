@@ -6,13 +6,16 @@ module DefaultParams
   included do
     let(:default_params) { {locale: I18n.locale} }
 
-    def process_with_default_params(action, http_method = 'GET', *args)
-      parameters = args.shift
+    def process_with_default_params(action, *args)
+      if kwarg_request?(args)
+        parameters = args[0][:params]
+        args[0][:params] = default_params.merge(parameters || {})
+      else
+        parameters = args[1]
+        args[1] = default_params.merge(parameters || {})
+      end
 
-      parameters = default_params.merge(parameters || {})
-      args.unshift(parameters)
-
-      process_without_default_params(action, http_method, *args)
+      process_without_default_params(action, *args)
     end
 
     alias_method_chain :process, :default_params

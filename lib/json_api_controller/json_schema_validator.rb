@@ -39,7 +39,7 @@ module JsonApiController
 
     def params_for(action=action_name.to_sym)
       return @ps if @ps
-      @ps = params.require(resource_sym).permit!
+      @ps = params.require(resource_sym).permit!.to_h
       if validator = self.class.action_params[action]
         validator.validate!(@ps)
       else

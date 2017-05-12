@@ -29,7 +29,9 @@ class Membership < ActiveRecord::Base
   def self.scope_for(action, user, opts={})
     return all if user.is_admin?
     roles, _ = parent_class.roles(action)
-    accessible_group_ids = user.user_groups.where.overlap(memberships: {roles: roles}).select(:id)
+
+    # TODO RAILS 5 UPGRADE: SQL INJECTION HERE
+    accessible_group_ids = user.user_groups.where("memberships.roles && '{#{roles.join(',')}}'").select(:id)
     query = not_identity.where(user_group_id: accessible_group_ids)
             .or(not_identity.where(user_id: user.id))
 

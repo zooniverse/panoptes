@@ -38,7 +38,7 @@ RSpec.describe UserProjectPreference, type: :model do
     end
 
     context "when the count is a string" do
-      let(:legacy_count) { '{"bars": 19, "candels": "10"}' }
+      let(:legacy_count) { {"bars" => 19, "candels" => "10"} }
 
       it "should summate correctly for legacy counts" do
         upp = build(:legacy_user_project_preference, legacy_count: legacy_count)
