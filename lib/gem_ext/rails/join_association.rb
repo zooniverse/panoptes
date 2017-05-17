@@ -1,5 +1,3 @@
-require 'active_record/associations/join_dependency/join_association'
-
 ActiveRecord::Associations::JoinDependency::JoinAssociation.class_eval do
   def build_constraint(klass, table, key, foreign_table, foreign_key)
     constraint = case reflection.macro
