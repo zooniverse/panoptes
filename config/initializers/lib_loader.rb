@@ -1,6 +1,1 @@
-require_dependency 'gem_ext/doorkeeper/application'
-require_dependency 'gem_ext/doorkeeper/server'
-require_dependency 'gem_ext/doorkeeper/client_credentials_creator'
-require_dependency 'gem_ext/rails/query_methods.rb'
-require_dependency 'gem_ext/rails/reflection.rb'
-require_dependency 'gem_ext/rails/join_association.rb'
+require 'gem_ext'

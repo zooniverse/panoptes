@@ -1,0 +1,10 @@
+require_dependency 'gem_ext/doorkeeper/application'
+require 'gem_ext/doorkeeper/server'
+require 'gem_ext/doorkeeper/client_credentials_creator'
+
+require 'gem_ext/rails/query_methods.rb'
+require 'gem_ext/rails/reflection.rb'
+require 'gem_ext/rails/join_association.rb'
+require 'gem_ext/rails/belongs_to_many.rb'
+require 'gem_ext/rails/belongs_to_many_builder.rb'
+require 'gem_ext/rails/belongs_to_many_association.rb'
