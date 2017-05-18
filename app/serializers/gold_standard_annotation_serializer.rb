@@ -3,7 +3,7 @@ class GoldStandardAnnotationSerializer
   include NoCountSerializer
   include CachedSerializer
 
-  attributes :id, :annotations, :created_at, :metadata
+  attributes :id, :annotations, :created_at, :updated_at, :metadata
 
   can_include :project, :user, :workflow
 

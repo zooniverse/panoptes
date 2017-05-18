@@ -3,7 +3,7 @@ class ClassificationSerializer
   include NoCountSerializer
   include FilterHasMany
 
-  attributes :id, :annotations, :created_at, :metadata, :href
+  attributes :id, :annotations, :created_at, :updated_at, :metadata, :href
 
   can_include :project, :user, :user_group, :workflow
 
