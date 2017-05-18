@@ -1,6 +1,3 @@
-require_dependency 'retirement_schemes/never_retire'
-require_dependency 'retirement_schemes/classification_count'
-
 module RetirementSchemes
   CRITERIA = {
     "never_retire" => NeverRetire,

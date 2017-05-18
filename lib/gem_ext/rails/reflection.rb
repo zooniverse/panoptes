@@ -1,6 +1,3 @@
-require 'active_record/reflection'
-require 'belongs_to_many_association'
-
 ActiveRecord::Reflection.module_eval do
   def self.create(macro, name, scope, options, ar)
     klass = case macro

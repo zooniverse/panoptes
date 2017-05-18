@@ -1,6 +1,3 @@
-require 'active_record/querying'
-require 'active_record/relation/query_methods'
-
 # Backported .or query methods from Rails 5.0
 # https://github.com/rails/rails/pull/16052/files
 

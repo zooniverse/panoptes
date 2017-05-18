@@ -1,5 +1,3 @@
-require 'array_association_scope'
-
 class BelongsToManyAssociation < ActiveRecord::Associations::CollectionAssociation
 
   def association_scope
