@@ -1,14 +1,23 @@
 class ClassificationsExportSegment < ActiveRecord::Base
+  include Linkable
+  include RoleControl::ParentalControlled
+
   belongs_to :project
   belongs_to :workflow
   belongs_to :first_classification, class_name: 'Classification', foreign_key: 'first_classification_id'
   belongs_to :last_classification,  class_name: 'Classification', foreign_key: 'last_classification_id'
   belongs_to :requester, class_name: 'User', foreign_key: 'requester_id'
 
+  can_through_parent :project, :index, :show
+
   validates :first_classification_id, presence: true
   validates :last_classification_id, presence: true
 
   has_one :medium, as: :linked
+
+  def self.scope_for(action, user, opts={})
+    super(:create_classifications_export, user, opts)
+  end
 
   def classifications_in_segment
     complete_classifications
