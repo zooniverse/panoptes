@@ -12,6 +12,10 @@ RSpec.shared_examples "is showable" do
     expect(response.status).to eq 200
   end
 
+  it 'should have an ETag header' do
+    expect(response.headers.key?('ETag')).to eq(true)
+  end
+
   it 'should return the requested resource' do
     expect(json_response[api_resource_name].length).to eq 1
     expect(json_response[api_resource_name][0]['id']).to eq(resource.id.to_s)
