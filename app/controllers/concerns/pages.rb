@@ -23,10 +23,6 @@ module Pages
     end
   end
 
-  def serializer
-    @serializer ||= "#{resource_name.camelize}Serializer".constantize
-  end
-
   def controlled_resources
     @controlled_resouces ||= super.where("#{parent_resource}": resource_id)
   end
