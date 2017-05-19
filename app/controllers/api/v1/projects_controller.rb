@@ -7,6 +7,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include Versioned
   include UrlLabels
   include ContentFromParams
+  include MediumResponse
 
   require_authentication :update, :create, :destroy, :create_classifications_export,
     :create_subjects_export, :create_aggregations_export,
@@ -125,12 +126,6 @@ class Api::V1::ProjectsController < Api::ApiController
       @controlled_resources = controlled_resources
       .joins(:tags).where(tags: {name: tags})
     end
-  end
-
-  def medium_response(medium)
-    headers['Location'] = "#{request.protocol}#{request.host_with_port}/api#{medium.location}"
-    headers['Last-Modified'] = medium.updated_at.httpdate
-    json_api_render(:created, MediumSerializer.resource({}, Medium.where(id: medium.id)))
   end
 
   def create_response(projects)
