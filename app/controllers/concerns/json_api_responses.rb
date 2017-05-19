@@ -3,6 +3,7 @@ module JSONApiResponses
 
   def created_resource_response(resources)
     scope = resource_scope(resources)
+    response.headers['ETag'] = gen_etag(scope)
     response.headers['Last-Modified'] = scope.maximum(:updated_at).httpdate
     json_api_render(:created,
                     create_response(scope),
