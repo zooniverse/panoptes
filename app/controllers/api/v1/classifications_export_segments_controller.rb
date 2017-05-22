@@ -5,10 +5,20 @@ class Api::V1::ClassificationsExportSegmentsController < Api::ApiController
 
   schema_type :strong_params
 
-  allowed_params :create, :url_key, :title, :content, :language
-  allowed_params :update, :url_key, :title, :content, :language
+  allowed_params :create, links: [:project, :workflow, :first_classification, :last_classification]
+  allowed_params :update, links: [:project, :workflow, :first_classification, :last_classification]
 
-  before_filter :set_language_from_header, only: [:index]
+  def create
+    classifications_export_segments = ClassificationsExportSegment.transaction do
+      Array.wrap(params[:classifications_export_segments]).map do |segment_params|
+        segment_params[:links] ||= {}
+        segment_params[:links][:project] = params[:project_id]
+        ClassificationsExportSegments::Create.with(api_user: api_user).run!(segment_params)
+      end
+    end
+
+    created_resource_response(classifications_export_segments)
+  end
 
   def controlled_resources
     @controlled_resouces ||= super.where(project: params[:project_id])
@@ -24,10 +34,6 @@ class Api::V1::ClassificationsExportSegmentsController < Api::ApiController
 
   def link_header(resource)
     resource = resource.first
-    send(:"api_#{ resource_name }_url", id: resource.id, project_id: resource.project_id)
-  end
-
-  def set_language_from_header
-    params[:language] = "en"
+    send(:"api_project_#{ resource_name }_url", id: resource.id, project_id: resource.project_id)
   end
 end

@@ -1,9 +1,10 @@
 module ClassificationsExportSegments
   class Create < Operation
-    integer :workflow_id
+    hash :links do
+      integer :workflow
+    end
 
     def execute
-      workflow = Workflow.find(workflow_id)
       previous_segment = workflow.latest_classifications_export_segment
 
       segment = if previous_segment
@@ -24,6 +25,10 @@ module ClassificationsExportSegments
 
     private
 
+    def workflow
+      @workflow ||= Workflow.find(links[:workflow])
+
+    end
     def initial_segment(workflow)
       segment = workflow.classifications_export_segments.build(project_id: workflow.project_id)
       segment.set_first_last_classifications(nil)

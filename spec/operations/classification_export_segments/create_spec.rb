@@ -4,42 +4,45 @@ describe ClassificationsExportSegments::Create do
   let(:workflow) { create :workflow }
   let(:user) { create :user }
   let(:subject) { create :subject }
+  let(:operation) do
+    described_class.with(links: {workflow: workflow.id}, api_user: ApiUser.new(user))
+  end
 
   it 'creates a segment when there is no segment yet' do
     create :classification, workflow: workflow, subject_ids: [subject.id], user: nil
-    segment = described_class.run!(workflow_id: workflow.id, api_user: ApiUser.new(user))
+    segment = operation.run!
     expect(segment).to be_present
     expect(segment.classifications_in_segment.count).to eq(1)
   end
 
   it 'creates the next segment' do
     create :classification, workflow: workflow, subject_ids: [subject.id], user: nil
-    first_segment = described_class.run!(workflow_id: workflow.id, api_user: ApiUser.new(user))
+    first_segment = operation.run!
 
     classifications = create_list :classification, 3, workflow: workflow, subject_ids: [subject.id], user: nil
-    next_segment = described_class.run!(workflow_id: workflow.id, api_user: ApiUser.new(user))
+    next_segment = operation.run!
 
     expect(next_segment.first_classification_id).to eq(classifications[0].id)
     expect(next_segment.last_classification_id).to eq(classifications[-1].id)
   end
 
   it 'does not create a segment if there are no classifications' do
-    first_segment = described_class.run!(workflow_id: workflow.id, api_user: ApiUser.new(user))
+    first_segment = operation.run!
     expect(first_segment).to be_nil
   end
 
   it 'does not create a segment if the current segment contains all classifications' do
     classifications = create_list :classification, 3, workflow: workflow, subject_ids: [subject.id], user: nil
-    described_class.run!(workflow_id: workflow.id, api_user: ApiUser.new(user))
+    operation.run!
 
-    segment = described_class.run!(workflow_id: workflow.id, api_user: ApiUser.new(user))
+    segment = operation.run!
     expect(segment).to be_nil
 
   end
 
   it 'queues the export segment worker' do
     classifications = create_list :classification, 3, workflow: workflow, subject_ids: [subject.id], user: nil
-    described_class.run!(workflow_id: workflow.id, api_user: ApiUser.new(user))
+    operation.run!
     expect(ClassificationsExportSegmentWorker.jobs.size).to eq(1)
   end
 end
