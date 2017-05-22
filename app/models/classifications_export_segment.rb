@@ -42,6 +42,12 @@ class ClassificationsExportSegment < ActiveRecord::Base
     self.last_classification_id = res.max
   end
 
+  def state
+    return :unstarted unless started_at.present?
+    return :in_progress unless finished_at.present?
+    :finished
+  end
+
   private
 
   def complete_classifications

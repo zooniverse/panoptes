@@ -24,7 +24,7 @@ describe Api::V1::ClassificationsExportSegmentsController, type: :controller do
 
     it 'should not allow access to projects the user is not a collaborator on' do
       project2 = create :project
-      segmnet2 = create :classifications_export_segment, project: project
+      segment2 = create :classifications_export_segment, project: project
       get :index, project_id: project2.id
       expect(response.status).to eq(401)
     end
@@ -62,50 +62,37 @@ describe Api::V1::ClassificationsExportSegmentsController, type: :controller do
     end
   end
 
-  # describe "#show" do
-  #   it_behaves_like "is showable"
-  # end
+  describe "#show" do
+    let(:show_params) { {project_id: project.id} }
 
-  # describe "#create" do
-  #   let(:test_attr) { :language }
-  #   let(:lang) { "en-au" }
-  #   let(:test_attr_value)  { lang }
-  #   let(:create_params) do
-  #     {
-  #       field_guides: {
-  #         items: [
-  #           {icon: "789", title: "Stuff", content: 'things'},
-  #           {icon: "897", title: "More things", content: 'other stuff'}
-  #         ],
-  #         language: lang,
-  #         links: {
-  #           project: project.id.to_s
-  #         }
-  #       }
-  #     }
-  #   end
+    it_behaves_like "is showable"
+  end
 
-  #   it_behaves_like "is creatable"
-  # end
+  describe "#create" do
+    let(:workflow) { create :workflow, project: project }
+    let(:test_attr) { :state }
+    let(:test_attr_value) { :unstarted }
+    let(:resource_url) { "http://test.host/api/projects/#{project.id}/classifications_export_segments/#{created_id}"}
+    let(:classification) { create :classification, project: project, workflow: workflow, user: nil }
+    let(:create_params) do
+      {
+        project_id: project.id,
+        classifications_export_segments: {
+          links: {
+            workflow: workflow.id,
+            first_classification: classification.id,
+            last_classification: classification.id
+          }
+        }
+      }
+    end
 
-  # describe "#update" do
-  #   let(:test_attr) { :items }
-  #   let(:test_attr_value) do
-  #     [{"icon" => "789", "title" => "Stuff", "content" => 'things'}]
-  #   end
+    it_behaves_like "is creatable"
 
-  #   let(:update_params) do
-  #     {
-  #       field_guides: {
-  #         items: test_attr_value
-  #       }
-  #     }
-  #   end
-
-  #   it_behaves_like "is updatable"
-  # end
-
-  # describe "#destroy" do
-  #   it_behaves_like "is destructable"
-  # end
+    it 'should set project from the project_id param' do
+      default_request scopes: scopes, user_id: authorized_user.id
+      post :create, create_params
+      expect(json_response[api_resource_name][0]["links"]["project"]).to eq(project.id.to_s)
+    end
+  end
 end

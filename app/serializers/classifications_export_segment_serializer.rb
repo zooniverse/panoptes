@@ -1,7 +1,7 @@
 class ClassificationsExportSegmentSerializer
   include RestPack::Serializer
 
-  attributes :id, :href, :started_at, :finished_at, :first_classification_id, :last_classification_id
+  attributes :id, :href, :state, :started_at, :finished_at, :first_classification_id, :last_classification_id
   can_include :project, :workflow, :requester
 
   can_filter_by :workflow
