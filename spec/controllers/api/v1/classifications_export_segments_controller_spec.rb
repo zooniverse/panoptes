@@ -15,13 +15,19 @@ describe Api::V1::ClassificationsExportSegmentsController, type: :controller do
   let(:authorized_user) { project.owner }
   let(:resource) { export_segments.first }
   let(:resource_class) { ClassificationsExportSegment }
-  let(:private_resource) { create :classifications_export_segment }
 
   describe "#index" do
     let(:index_params) { {project_id: project.id} }
     let(:n_visible) { 1 }
 
-    it_behaves_like "is indexable"
+    it_behaves_like "is indexable", false
+
+    it 'should not allow access to projects the user is not a collaborator on' do
+      project2 = create :project
+      segmnet2 = create :classifications_export_segment, project: project
+      get :index, project_id: project2.id
+      expect(response.status).to eq(401)
+    end
 
     describe "filter options" do
       let(:filter_opts) { {} }
