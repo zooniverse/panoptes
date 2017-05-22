@@ -111,7 +111,7 @@ Rails.application.routes.draw do
         post "/workflow_contents_export", to: "projects#create_workflow_contents_export", format: false
 
         json_api_resources :pages, controller: "project_pages"
-        json_api_resources :classifications_export_segments
+        json_api_resources :classifications_export_segments, only: [:index, :show, :create]
       end
 
       json_api_resources :workflows, links: [:subject_sets, :retired_subjects, :tutorials], versioned: true do
