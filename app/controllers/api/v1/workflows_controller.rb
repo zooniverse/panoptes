@@ -3,6 +3,7 @@ require 'model_version'
 class Api::V1::WorkflowsController < Api::ApiController
   include Versioned
   include TranslatableResource
+  include MediumResponse
 
   require_authentication :update, :create, :destroy, :retire_subjects, :create_classifications_export, scopes: [:project]
 
@@ -194,11 +195,5 @@ class Api::V1::WorkflowsController < Api::ApiController
     else
       super
     end
-  end
-
-  def medium_response(medium)
-    headers['Location'] = "#{request.protocol}#{request.host_with_port}/api#{medium.location}"
-    headers['Last-Modified'] = medium.updated_at.httpdate
-    json_api_render(:created, MediumSerializer.resource({}, Medium.where(id: medium.id)))
   end
 end
