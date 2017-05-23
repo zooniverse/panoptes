@@ -24,6 +24,7 @@ class Workflow < ActiveRecord::Base
   has_many :aggregations, dependent: :destroy
   has_many :attached_images, -> { where(type: "workflow_attached_image") }, class_name: "Medium",
     as: :linked
+  has_many :classifications_export_segments
   has_one :classifications_export, -> { where(type: "workflow_classifications_export").order(created_at: :desc) },
       class_name: "Medium", as: :linked
   has_and_belongs_to_many :expert_subject_sets, -> { expert_sets }, class_name: "SubjectSet"
@@ -141,5 +142,9 @@ class Workflow < ActiveRecord::Base
       else
         retired_subjects_count >= subjects_count
       end
+  end
+
+  def latest_classifications_export_segment
+    classifications_export_segments.order("last_classification_id DESC").first
   end
 end

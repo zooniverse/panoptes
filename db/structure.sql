@@ -193,6 +193,43 @@ CREATE TABLE classifications (
 
 
 --
+-- Name: classifications_export_segments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE classifications_export_segments (
+    id integer NOT NULL,
+    project_id integer NOT NULL,
+    workflow_id integer NOT NULL,
+    first_classification_id integer NOT NULL,
+    last_classification_id integer NOT NULL,
+    requester_id integer NOT NULL,
+    started_at timestamp without time zone,
+    finished_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: classifications_export_segments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE classifications_export_segments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: classifications_export_segments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE classifications_export_segments_id_seq OWNED BY classifications_export_segments.id;
+
+
+--
 -- Name: classifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -279,6 +316,16 @@ CREATE SEQUENCE collections_id_seq
 --
 
 ALTER SEQUENCE collections_id_seq OWNED BY collections.id;
+
+
+--
+-- Name: collections_projects; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE collections_projects (
+    collection_id integer NOT NULL,
+    project_id integer NOT NULL
+);
 
 
 --
@@ -1614,6 +1661,13 @@ ALTER TABLE ONLY classifications ALTER COLUMN id SET DEFAULT nextval('classifica
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY classifications_export_segments ALTER COLUMN id SET DEFAULT nextval('classifications_export_segments_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY code_experiment_configs ALTER COLUMN id SET DEFAULT nextval('code_experiment_configs_id_seq'::regclass);
 
 
@@ -1891,6 +1945,14 @@ ALTER TABLE ONLY aggregations
 
 ALTER TABLE ONLY authorizations
     ADD CONSTRAINT authorizations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: classifications_export_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY classifications_export_segments
+    ADD CONSTRAINT classifications_export_segments_pkey PRIMARY KEY (id);
 
 
 --
@@ -2268,6 +2330,20 @@ CREATE INDEX index_classification_subjects_on_subject_id ON classification_subje
 
 
 --
+-- Name: index_classifications_export_segments_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classifications_export_segments_on_project_id ON classifications_export_segments USING btree (project_id);
+
+
+--
+-- Name: index_classifications_export_segments_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classifications_export_segments_on_workflow_id ON classifications_export_segments USING btree (workflow_id);
+
+
+--
 -- Name: index_classifications_on_completed; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2370,6 +2446,27 @@ CREATE INDEX index_collections_on_project_ids ON collections USING gin (project_
 --
 
 CREATE INDEX index_collections_on_slug ON collections USING btree (slug);
+
+
+--
+-- Name: index_collections_projects_on_collection_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_collections_projects_on_collection_id ON collections_projects USING btree (collection_id);
+
+
+--
+-- Name: index_collections_projects_on_collection_id_and_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_collections_projects_on_collection_id_and_project_id ON collections_projects USING btree (collection_id, project_id);
+
+
+--
+-- Name: index_collections_projects_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_collections_projects_on_project_id ON collections_projects USING btree (project_id);
 
 
 --
@@ -3179,6 +3276,14 @@ ALTER TABLE ONLY workflow_contents
 
 
 --
+-- Name: fk_rails_1be0872ee9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY collections_projects
+    ADD CONSTRAINT fk_rails_1be0872ee9 FOREIGN KEY (collection_id) REFERENCES collections(id);
+
+
+--
 -- Name: fk_rails_1d218ca624; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3192,6 +3297,14 @@ ALTER TABLE ONLY gold_standard_annotations
 
 ALTER TABLE ONLY recents
     ADD CONSTRAINT fk_rails_1e54468460 FOREIGN KEY (classification_id) REFERENCES classifications(id);
+
+
+--
+-- Name: fk_rails_1eb1aee2f6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY classifications_export_segments
+    ADD CONSTRAINT fk_rails_1eb1aee2f6 FOREIGN KEY (workflow_id) REFERENCES workflows(id);
 
 
 --
@@ -3216,6 +3329,14 @@ ALTER TABLE ONLY aggregations
 
 ALTER TABLE ONLY aggregations
     ADD CONSTRAINT fk_rails_28a7ada458 FOREIGN KEY (subject_id) REFERENCES subjects(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_2cc7401a1f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY classifications_export_segments
+    ADD CONSTRAINT fk_rails_2cc7401a1f FOREIGN KEY (requester_id) REFERENCES users(id);
 
 
 --
@@ -3307,11 +3428,27 @@ ALTER TABLE ONLY user_collection_preferences
 
 
 --
+-- Name: fk_rails_678647f3b6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY classifications_export_segments
+    ADD CONSTRAINT fk_rails_678647f3b6 FOREIGN KEY (project_id) REFERENCES projects(id);
+
+
+--
 -- Name: fk_rails_732cb83ab7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY oauth_access_tokens
     ADD CONSTRAINT fk_rails_732cb83ab7 FOREIGN KEY (application_id) REFERENCES oauth_applications(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_75356fc305; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY classifications_export_segments
+    ADD CONSTRAINT fk_rails_75356fc305 FOREIGN KEY (first_classification_id) REFERENCES classifications(id);
 
 
 --
@@ -3336,6 +3473,14 @@ ALTER TABLE ONLY subject_queues
 
 ALTER TABLE ONLY tutorials
     ADD CONSTRAINT fk_rails_82e4d0479b FOREIGN KEY (project_id) REFERENCES projects(id);
+
+
+--
+-- Name: fk_rails_895b025564; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY collections_projects
+    ADD CONSTRAINT fk_rails_895b025564 FOREIGN KEY (project_id) REFERENCES projects(id);
 
 
 --
@@ -3464,6 +3609,14 @@ ALTER TABLE ONLY tagged_resources
 
 ALTER TABLE ONLY organization_contents
     ADD CONSTRAINT fk_rails_d80672ecd1 FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_d88309a3be; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY classifications_export_segments
+    ADD CONSTRAINT fk_rails_d88309a3be FOREIGN KEY (last_classification_id) REFERENCES classifications(id);
 
 
 --
@@ -3935,4 +4088,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170420095703');
 INSERT INTO schema_migrations (version) VALUES ('20170425110939');
 
 INSERT INTO schema_migrations (version) VALUES ('20170426162708');
+
+INSERT INTO schema_migrations (version) VALUES ('20170509105754');
 
