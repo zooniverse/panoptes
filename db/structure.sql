@@ -3336,7 +3336,7 @@ ALTER TABLE ONLY aggregations
 --
 
 ALTER TABLE ONLY classifications_export_segments
-    ADD CONSTRAINT fk_rails_2cc7401a1f FOREIGN KEY (requester_id) REFERENCES users(id);
+    ADD CONSTRAINT fk_rails_2cc7401a1f FOREIGN KEY (requester_id) REFERENCES users(id) NOT VALID;
 
 
 --
@@ -3448,7 +3448,7 @@ ALTER TABLE ONLY oauth_access_tokens
 --
 
 ALTER TABLE ONLY classifications_export_segments
-    ADD CONSTRAINT fk_rails_75356fc305 FOREIGN KEY (first_classification_id) REFERENCES classifications(id);
+    ADD CONSTRAINT fk_rails_75356fc305 FOREIGN KEY (first_classification_id) REFERENCES classifications(id) NOT VALID;
 
 
 --
@@ -3616,7 +3616,7 @@ ALTER TABLE ONLY organization_contents
 --
 
 ALTER TABLE ONLY classifications_export_segments
-    ADD CONSTRAINT fk_rails_d88309a3be FOREIGN KEY (last_classification_id) REFERENCES classifications(id);
+    ADD CONSTRAINT fk_rails_d88309a3be FOREIGN KEY (last_classification_id) REFERENCES classifications(id) NOT VALID;
 
 
 --
@@ -4082,6 +4082,8 @@ INSERT INTO schema_migrations (version) VALUES ('20170320203350');
 INSERT INTO schema_migrations (version) VALUES ('20170325135953');
 
 INSERT INTO schema_migrations (version) VALUES ('20170403194826');
+
+INSERT INTO schema_migrations (version) VALUES ('20170413092013');
 
 INSERT INTO schema_migrations (version) VALUES ('20170420095703');
 
