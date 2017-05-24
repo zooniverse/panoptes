@@ -26,7 +26,7 @@ module Organizations
           content_update.merge! results
           content.update! content_update.symbolize_keys
         end
-        organization.listed ? organization.touch(:listed_at) : organization[:listed_at] = nil
+        org_update[:listed] == true ? organization.touch(:listed_at) : organization[:listed_at] = nil
         organization.save!
       end
     end
