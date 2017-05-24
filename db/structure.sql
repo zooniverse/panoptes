@@ -2255,13 +2255,6 @@ CREATE INDEX index_authorizations_on_user_id ON authorizations USING btree (user
 
 
 --
--- Name: index_classification_subjects_on_classification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_classification_subjects_on_classification_id ON classification_subjects USING btree (classification_id);
-
-
---
 -- Name: index_classification_subjects_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2434,13 +2427,6 @@ CREATE INDEX index_media_on_linked_id_and_linked_type ON media USING btree (link
 --
 
 CREATE INDEX index_media_on_type ON media USING btree (type);
-
-
---
--- Name: index_memberships_on_user_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_memberships_on_user_group_id ON memberships USING btree (user_group_id);
 
 
 --
@@ -2717,13 +2703,6 @@ CREATE INDEX index_set_member_subjects_on_random ON set_member_subjects USING bt
 
 
 --
--- Name: index_set_member_subjects_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_set_member_subjects_on_subject_id ON set_member_subjects USING btree (subject_id);
-
-
---
 -- Name: index_set_member_subjects_on_subject_id_and_subject_set_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2759,24 +2738,10 @@ CREATE INDEX index_subject_sets_workflows_on_subject_set_id ON subject_sets_work
 
 
 --
--- Name: index_subject_sets_workflows_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_subject_sets_workflows_on_workflow_id ON subject_sets_workflows USING btree (workflow_id);
-
-
---
 -- Name: index_subject_sets_workflows_on_workflow_id_and_subject_set_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX index_subject_sets_workflows_on_workflow_id_and_subject_set_id ON subject_sets_workflows USING btree (workflow_id, subject_set_id);
-
-
---
--- Name: index_subject_workflow_counts_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_subject_workflow_counts_on_subject_id ON subject_workflow_counts USING btree (subject_id);
 
 
 --
@@ -3022,13 +2987,6 @@ CREATE INDEX index_workflow_contents_on_workflow_id ON workflow_contents USING b
 --
 
 CREATE INDEX index_workflow_tutorials_on_tutorial_id ON workflow_tutorials USING btree (tutorial_id);
-
-
---
--- Name: index_workflow_tutorials_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_workflow_tutorials_on_workflow_id ON workflow_tutorials USING btree (workflow_id);
 
 
 --
@@ -3939,3 +3897,4 @@ INSERT INTO schema_migrations (version) VALUES ('20170426162708');
 
 INSERT INTO schema_migrations (version) VALUES ('20170519181110');
 
+INSERT INTO schema_migrations (version) VALUES ('20170523135118');

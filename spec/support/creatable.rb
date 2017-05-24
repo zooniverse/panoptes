@@ -11,6 +11,10 @@ shared_examples "is creatable" do |action=:create|
       expect(response).to have_http_status(:created)
     end
 
+    it 'should have an ETag header' do
+      expect(response.headers.key?('ETag')).to eq(true)
+    end
+
     it 'should create the new resource' do
       field = resource_class.find(created_id).send(test_attr)
 
