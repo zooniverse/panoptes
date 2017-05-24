@@ -7,6 +7,7 @@ FactoryGirl.define do
 
     sequence(:display_name) { |n| "Test Organization #{ n }" }
     listed_at Time.now
+    listed true
     primary_language "en"
     urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
 
@@ -22,6 +23,11 @@ FactoryGirl.define do
         o.avatar = create(:medium, type: "organization_avatar", linked: o)
         o.background = create(:medium, type: "organization_background", linked: o)
       end
+    end
+
+    factory :unlisted_organization do
+      listed_at nil
+      listed false
     end
   end
 end

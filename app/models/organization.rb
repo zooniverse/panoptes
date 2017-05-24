@@ -5,8 +5,8 @@ class Organization < ActiveRecord::Base
   include Linkable
   include Translatable
 
-  scope :public_scope, -> { where.not(listed_at: nil) }
-  scope :private_scope, -> { where(listed_at: nil) }
+  scope :public_scope, -> { where(listed: true) }
+  scope :private_scope, -> { where(listed: false) }
 
   has_many :projects
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy

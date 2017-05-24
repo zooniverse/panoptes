@@ -717,7 +717,8 @@ CREATE TABLE organizations (
     activated_state integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    urls jsonb DEFAULT '[]'::jsonb
+    urls jsonb DEFAULT '[]'::jsonb,
+    listed boolean DEFAULT false NOT NULL
 );
 
 
@@ -2513,6 +2514,13 @@ CREATE INDEX index_organizations_on_display_name ON organizations USING btree (d
 
 
 --
+-- Name: index_organizations_on_listed; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organizations_on_listed ON organizations USING btree (listed);
+
+
+--
 -- Name: index_organizations_on_listed_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3895,4 +3903,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170425110939');
 INSERT INTO schema_migrations (version) VALUES ('20170426162708');
 
 INSERT INTO schema_migrations (version) VALUES ('20170523135118');
+
+INSERT INTO schema_migrations (version) VALUES ('20170524210302');
 
