@@ -34,7 +34,6 @@ class ClassificationsExportSegmentWorker
     [resource.requester.email]
   end
 
-
   private
 
   def cache

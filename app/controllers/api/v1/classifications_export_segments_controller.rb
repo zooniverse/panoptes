@@ -3,11 +3,6 @@ class Api::V1::ClassificationsExportSegmentsController < Api::ApiController
 
   resource_actions :default
 
-  schema_type :strong_params
-
-  allowed_params :create, links: [:project, :workflow, :first_classification, :last_classification]
-  allowed_params :update, links: [:project, :workflow, :first_classification, :last_classification]
-
   def create
     classifications_export_segments = ClassificationsExportSegment.transaction do
       Array.wrap(params[:classifications_export_segments]).map do |segment_params|

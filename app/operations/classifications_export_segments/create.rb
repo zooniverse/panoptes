@@ -27,8 +27,8 @@ module ClassificationsExportSegments
 
     def workflow
       @workflow ||= Workflow.find(links[:workflow])
-
     end
+
     def initial_segment(workflow)
       segment = workflow.classifications_export_segments.build(project_id: workflow.project_id)
       segment.set_first_last_classifications(nil)
