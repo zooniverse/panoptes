@@ -6,7 +6,7 @@ module Slug
   end
 
   def downcase_slug
-    if params.has_key? "slug"
+    if params.key? "slug"
       params[:slug] = params[:slug].downcase
     end
   end
