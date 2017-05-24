@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe CleanupExpiredAccessTokensWorker do
+describe DoorkeeperAccessCleanerWorker do
   let(:worker) { described_class.new }
 
   it{ is_expected.to be_a Sidekiq::Worker }

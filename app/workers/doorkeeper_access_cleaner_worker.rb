@@ -1,4 +1,4 @@
-class CleanupExpiredAccessTokensWorker
+class DoorkeeperAccessCleanerWorker
   include Sidekiq::Worker
   include Sidetiq::Schedulable
 
