@@ -11,6 +11,7 @@ module Pages
 
     before_filter :set_language_from_header, only: [:index]
 
+    # Methods defined here in order to avoid being overridden by resource modules
     define_method(:link_header) do |resource|
       resource = resource.first
       send(:"api_#{ resource_name }_url", id: resource.id, "#{parent_resource}_id": resource_id)
@@ -21,10 +22,24 @@ module Pages
       create_params[:links][parent_resource] = resource_id
       super create_params
     end
+
+    require_authentication :update, :create, :destroy, scopes: [:"#{self::PARENT_RESOURCE}"]
   end
 
   def controlled_resources
     @controlled_resouces ||= super.where("#{parent_resource}": resource_id)
+  end
+
+  def parent_resource
+    self.class::PARENT_RESOURCE
+  end
+
+  def resource_name
+    @resource_name ||= controller_name.singularize
+  end
+
+  def resource_id
+    params[:"#{parent_resource}_id"]
   end
 
   protected
