@@ -3,6 +3,7 @@ class Api::V1::OrganizationsController < Api::ApiController
   include FilterByCurrentUserRoles
   include IndexSearch
   include AdminAllowed
+  include Slug
 
   require_authentication :update, :create, :destroy, scopes: [:organization]
 
