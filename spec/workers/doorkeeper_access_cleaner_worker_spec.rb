@@ -14,7 +14,7 @@ describe DoorkeeperAccessCleanerWorker do
   describe "perform" do
     let(:cleaner) { instance_double(Doorkeeper::AccessCleanup) }
 
-    it 'should tell doorkeeper to cleanup', :focus do
+    it 'should tell doorkeeper to cleanup' do
       allow(Doorkeeper::AccessCleanup).to receive(:new).and_return(cleaner)
       expect(cleaner).to receive(:cleanup!)
       worker.perform
