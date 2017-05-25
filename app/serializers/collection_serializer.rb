@@ -6,7 +6,7 @@ class CollectionSerializer
   include CachedSerializer
 
   attributes :id, :name, :display_name, :created_at, :updated_at,
-    :slug, :href, :favorite, :private, :default_subject_src
+    :slug, :href, :favorite, :private, :default_subject_src, :description
 
   # Do not include the BelongsToMany :projects relation
   # as this can't be preloaded (custom AR relation)
