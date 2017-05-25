@@ -5,6 +5,7 @@ FactoryGirl.define do
     end
     sequence(:name) { |n| "collection_name_#{ n }" }
     sequence(:display_name) { |n| "another name #{ n }" }
+    sequence(:description) { |n| "This collection is SO GOOD, it is #{ n } times better than any other" }
     activated_state :active
     private false
 

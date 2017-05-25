@@ -7,7 +7,7 @@ describe Api::V1::CollectionsController, type: :controller do
   let(:project) { collection.projects.sample }
   let(:api_resource_name) { 'collections' }
 
-  let(:api_resource_attributes) { %w(id name display_name created_at updated_at favorite private) }
+  let(:api_resource_attributes) { %w(id name display_name created_at updated_at favorite private description) }
   let(:api_resource_links) { %w(collections.projects collections.owner collections.collection_roles collections.subjects) }
 
   let(:scopes) { %w(public collection) }
@@ -153,6 +153,7 @@ describe Api::V1::CollectionsController, type: :controller do
                      name: 'test__collection',
                      display_name: 'Fancy name',
                      private: false,
+                     description: "Such a good collection, the best, amazing",
                      links: create_links
                     }
       }
