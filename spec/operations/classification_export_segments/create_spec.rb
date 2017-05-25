@@ -1,11 +1,12 @@
 require 'spec_helper'
 
 describe ClassificationsExportSegments::Create do
-  let(:workflow) { create :workflow }
-  let(:user) { create :user }
-  let(:subject) { create :subject }
+  let(:project) { create :project}
+  let(:workflow) { create :workflow, project: project }
+  let(:user) { project.owner }
+  let(:subject) { create :subject, project: project }
   let(:operation) do
-    described_class.with(links: {workflow: workflow.id}, api_user: ApiUser.new(user))
+    described_class.with(project: project, links: {workflow: workflow.id}, api_user: ApiUser.new(user))
   end
 
   it 'creates a segment when there is no segment yet' do

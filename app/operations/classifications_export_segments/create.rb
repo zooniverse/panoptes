@@ -1,5 +1,7 @@
 module ClassificationsExportSegments
   class Create < Operation
+    object :project
+
     hash :links do
       integer :workflow
     end
@@ -26,7 +28,7 @@ module ClassificationsExportSegments
     private
 
     def workflow
-      @workflow ||= Workflow.find(links[:workflow])
+      @workflow ||= project.workflows.find(links[:workflow])
     end
 
     def initial_segment(workflow)

@@ -94,5 +94,15 @@ describe Api::V1::ClassificationsExportSegmentsController, type: :controller do
       post :create, create_params
       expect(json_response[api_resource_name][0]["links"]["project"]).to eq(project.id.to_s)
     end
+
+    it 'should not allow access to projects the user is not a collaborator on' do
+      project2 = create :project
+      workflow2 = create :workflow, project: project
+      default_request scopes: scopes, user_id: authorized_user.id
+      create_params[:project_id] = project2.id
+      create_params[:links][:workflow] = workflow2.id
+      post :create, create_params
+      expect(response.status).to eq(403)
+    end
   end
 end

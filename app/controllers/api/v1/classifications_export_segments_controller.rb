@@ -1,14 +1,14 @@
 class Api::V1::ClassificationsExportSegmentsController < Api::ApiController
   require_authentication :all, scopes: [:project]
 
+  before_action :require_access_to_project, only: [:create]
+
   resource_actions :default
 
   def create
     classifications_export_segments = ClassificationsExportSegment.transaction do
       Array.wrap(params[:classifications_export_segments]).map do |segment_params|
-        segment_params[:links] ||= {}
-        segment_params[:links][:project] = params[:project_id]
-        ClassificationsExportSegments::Create.with(api_user: api_user).run!(segment_params)
+        ClassificationsExportSegments::Create.with(api_user: api_user, project: @project).run!(segment_params)
       end
     end
 
@@ -21,10 +21,12 @@ class Api::V1::ClassificationsExportSegmentsController < Api::ApiController
 
   protected
 
-  def build_resource_for_create(create_params)
-    create_params[:links] ||= {}
-    create_params[:links][:project] = params[:project_id]
-    super create_params
+  def require_access_to_project
+    @project = Project.scope_for(:update, api_user, {}).where(id: params[:project_id]).first
+
+    unless @project
+      raise Api::Unauthorized
+    end
   end
 
   def link_header(resource)
