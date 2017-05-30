@@ -8,8 +8,8 @@ class OrganizationSerializer
   attributes :id, :display_name, :description, :introduction, :title, :href, :primary_language, :listed_at, :listed
   optional :avatar_src
   media_include :avatar, :background
-  can_include :organization_contents, :organization_roles, :projects, :owners
   can_sort_by :display_name, :updated_at, :listed
+  can_include :organization_contents, :organization_roles, :projects, :owners, :pages
 
   def title
     content[:title]
@@ -37,5 +37,14 @@ class OrganizationSerializer
 
   def fields
     %i(title description introduction)
+  end
+
+  def self.links
+    links = super
+    links["organizations.pages"] = {
+                               href: "/organizations/{organizations.id}/pages",
+                               type: "organization_pages"
+                              }
+    links
   end
 end
