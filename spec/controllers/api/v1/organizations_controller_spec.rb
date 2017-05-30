@@ -64,6 +64,18 @@ describe Api::V1::OrganizationsController, type: :controller do
           expect(json_response["organizations"]).to be_empty
         end
       end
+
+      describe "filtering by slug" do
+        let(:index_options) { { slug: organization.slug } }
+        it "filters by slug" do
+          organization.save
+          owned_unlisted_organization.save
+
+          default_request scopes: scopes, user_id: authorized_user.id
+          get :index, index_options
+          expect(json_response["organizations"].length).to eq(1)
+        end
+      end
     end
 
     describe "#show" do

@@ -121,10 +121,6 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def slugged_name
-    "#{ owner.try(:login) || owner.try(:name) }/#{ display_name.gsub('/', '-') }"
-  end
-
   def send_notifications
     if Panoptes.project_request.recipients
       request_type = if beta_requested_changed? && beta_requested

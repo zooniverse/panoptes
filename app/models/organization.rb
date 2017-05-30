@@ -3,6 +3,7 @@ class Organization < ActiveRecord::Base
   include RoleControl::Controlled
   include Activatable
   include Linkable
+  include SluggedName
   include Translatable
 
   scope :public_scope, -> { where(listed: true) }

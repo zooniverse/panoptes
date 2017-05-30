@@ -7,6 +7,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include Versioned
   include UrlLabels
   include ContentFromParams
+  include Slug
   include MediumResponse
 
   require_authentication :update, :create, :destroy, :create_classifications_export,
@@ -34,7 +35,6 @@ class Api::V1::ProjectsController < Api::ApiController
                  :updated_at].freeze
 
   before_action :filter_by_tags, only: :index
-  before_action :downcase_slug, only: :index
 
   prepend_before_action :require_login,
     only: [:create, :update, :destroy, :create_classifications_export,
@@ -114,12 +114,6 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   private
-
-  def downcase_slug
-    if params.has_key? "slug"
-      params[:slug] = params[:slug].downcase
-    end
-  end
 
   def filter_by_tags
     if tags = params.delete(:tags).try(:split, ",").try(:map, &:downcase)

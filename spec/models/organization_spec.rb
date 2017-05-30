@@ -27,6 +27,8 @@ describe Organization, type: :model do
     expect(build(:organization, primary_language: nil)).to_not be_valid
   end
 
+  it_behaves_like "has slugged name"
+
   describe "links" do
     let(:user) { ApiUser.new(create(:user)) }
 
