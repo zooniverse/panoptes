@@ -28,7 +28,7 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
     let(:acl_roles) { %w(collaborator) }
 
     let!(:private_resource) do
-      create(:organization, listed_at: nil).organization_contents.first
+      create(:unlisted_organization).organization_contents.first
     end
 
     before { acl }

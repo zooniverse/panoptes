@@ -3,8 +3,8 @@ require 'spec_helper'
 describe Api::V1::OrganizationsController, type: :controller do
   let(:authorized_user) { create(:user) }
   let(:organization) { build(:organization, listed_at: Time.now, owner: authorized_user) }
-  let(:unlisted_organization) { build(:organization, listed_at: nil) }
-  let(:owned_unlisted_organization) { build(:organization, listed_at: nil, owner: authorized_user) }
+  let(:unlisted_organization) { build(:unlisted_organization) }
+  let(:owned_unlisted_organization) { build(:unlisted_organization, owner: authorized_user) }
 
   let(:scopes) { %w(public organization) }
 
@@ -174,6 +174,22 @@ describe Api::V1::OrganizationsController, type: :controller do
         params = { organizations: { display_name: "Also a title"}, id: organization.id }
         put :update, params
         expect(json_response["organizations"].first['title']).to eq("Also a title")
+      end
+
+      it "touches listed_at if listed is true" do
+        default_request scopes: scopes, user_id: authorized_user.id
+        organization.update_attributes({listed: false, listed_at: nil})
+        params = { organizations: { listed: true }, id: organization.id }
+        put :update, params
+        expect(json_response["organizations"].first['listed_at']).to be_truthy
+      end
+
+      it "nulls listed_at if listed is false" do
+        default_request scopes: scopes, user_id: authorized_user.id
+        organization.update_attributes({listed: true, listed_at: Time.now })
+        params = { organizations: { listed: false }, id: organization.id }
+        put :update, params
+        expect(json_response["organizations"].first['listed_at']).to be_nil
       end
     end
 

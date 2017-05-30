@@ -26,6 +26,10 @@ class OrganizationUpdateSchema < JsonSchema
        type "string"
     end
 
+    property "listed" do
+      type "boolean"
+    end
+
     property "urls" do
       type "array"
       items do
