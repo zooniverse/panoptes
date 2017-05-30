@@ -2521,6 +2521,13 @@ CREATE INDEX index_organizations_on_listed_at ON organizations USING btree (list
 
 
 --
+-- Name: index_organizations_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_organizations_on_slug ON organizations USING btree (slug);
+
+
+--
 -- Name: index_organizations_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3894,6 +3901,8 @@ INSERT INTO schema_migrations (version) VALUES ('20170420095703');
 INSERT INTO schema_migrations (version) VALUES ('20170425110939');
 
 INSERT INTO schema_migrations (version) VALUES ('20170426162708');
+
+INSERT INTO schema_migrations (version) VALUES ('20170524205300');
 
 INSERT INTO schema_migrations (version) VALUES ('20170519181110');
 
