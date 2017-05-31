@@ -5,7 +5,7 @@ class User < ActiveRecord::Base
   include Linkable
   include PgSearch
 
-  ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
+  ALLOWED_LOGIN_CHARACTERS = '[[:word:]\-\.]'
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
   DUP_LOGIN_SANITATION_ATTEMPTS = 20
 

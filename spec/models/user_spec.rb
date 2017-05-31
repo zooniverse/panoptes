@@ -10,6 +10,10 @@ describe User, type: :model do
   it_behaves_like "activatable"
   it_behaves_like "is an owner"
 
+  def build_test_user(attribute, value)
+    build(:user, attribute => value)
+  end
+
   describe "links" do
     it "should allow membership links to any user" do
       expect(User).to link_to(Membership).with_scope(:all)
@@ -203,34 +207,38 @@ describe User, type: :model do
   end
 
   describe '#login' do
-    let(:user) { build(:user, migrated: true) }
 
     it 'should validate presence' do
-      user.login = ""
+      user = build_test_user(:login, "")
       expect(user).to_not be_valid
     end
 
     it 'should not have whitespace' do
-      user.login = " asdf asdf"
+      user = build_test_user(:login, " asdf asdf")
       expect(user).to_not be_valid
     end
 
     it 'should not have non alpha characters' do
-      user.login = "asdf!fdsa"
+      user = build_test_user(:login, "asdf!fdsa")
       expect(user).to_not be_valid
     end
 
     it 'should allow dashes and underscores' do
-      user.login = "abc-def_123"
+      user = build_test_user(:login, "abc-def_123")
+      expect(user).to be_valid
+    end
+
+    it 'should allow unicode chars' do
+      user = build_test_user(:login, "Lrëa")
       expect(user).to be_valid
     end
 
     it 'should not enfore a minimum length' do
-      expect(build(:user, login: "1")).to be_valid
+      expect(build_test_user(:login, "1")).to be_valid
     end
 
     it 'should have non-blank error' do
-      user = build(:user, login: "")
+      user = build_test_user(:login, "")
       user.valid?
       expect(user.errors[:login]).to include("can't be blank")
     end
@@ -250,7 +258,7 @@ describe User, type: :model do
 
     it "should have the correct case-insensitive uniqueness error" do
       user = create(:user)
-      dup_user = build(:user, login: user.login.upcase)
+      dup_user = build_test_user(:login, user.login.upcase)
       dup_user.valid?
       expect(dup_user.errors[:login]).to include("has already been taken")
     end
