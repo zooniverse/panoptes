@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'rails', '~> 4.2.5'
 gem 'postgres_ext', '~> 2.4.0'
 gem 'active_record_union', '~> 1.1.0'
-gem 'sdoc', '~> 0.4.0', group: :doc
+gem 'sdoc', '~> 0.4.2', group: :doc
 gem 'doorkeeper', '~> 3.0'
 gem 'doorkeeper-jwt', '~> 0.1.6'
 gem 'devise', '~> 3.0'
