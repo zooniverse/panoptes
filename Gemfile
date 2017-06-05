@@ -5,7 +5,7 @@ gem 'postgres_ext', '~> 2.4.0'
 gem 'active_record_union', '~> 1.1.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'doorkeeper', '~> 3.0'
-gem 'doorkeeper-jwt', '~> 0.1.6'
+gem 'doorkeeper-jwt', '~> 0.2.0'
 gem 'devise', '~> 3.0'
 gem 'versionist', '~> 1.0'
 gem 'rack-cors', '~> 0.3', require: 'rack/cors'
