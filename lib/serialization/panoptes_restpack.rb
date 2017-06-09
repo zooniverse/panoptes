@@ -28,7 +28,7 @@ module Serialization
           param_preloads = params[:include].split(',').map(&:to_sym) & self.can_includes
         end
 
-        preload_relations = self.preloads | Array.wrap(param_preloads)
+        preload_relations = preloads | Array.wrap(param_preloads)
         unless preload_relations.empty?
           scope = scope.preload(*preload_relations)
         end
