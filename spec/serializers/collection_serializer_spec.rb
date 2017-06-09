@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe CollectionSerializer do
   let(:collection) { create(:collection_with_subjects) }
-  let(:subject_with_media) { create(:subject, :with_mediums, num_media: 1, collections: [collection]) }
 
   describe "::btm_associations" do
     it "should be overriden" do
@@ -15,7 +14,12 @@ describe CollectionSerializer do
     let(:resource) { collection }
     let(:includes) { [ :owner, :collection_roles, :subjects ] }
     let(:preloads) do
-      [ [ owner: { identity_membership: :user } ], :collection_roles, :subjects ]
+      [
+        [ owner: { identity_membership: :user } ],
+        :collection_roles,
+        :subjects,
+        default_subject: :locations
+      ]
     end
   end
 
@@ -50,16 +54,21 @@ describe CollectionSerializer do
   end
 
   describe "default subject location" do
-    before { collection.default_subject = subject_with_media }
-    let(:serializer) do
-      s = CollectionSerializer.new
-      s.instance_variable_set(:@model, collection)
-      s.instance_variable_set(:@context, {})
-      s
+    let(:subject_with_media) { create(:subject, :with_mediums, num_media: 1) }
+    let(:collection) do
+      create(:collection) do |col|
+        col.subjects = [ subject_with_media ]
+        col.default_subject_id = col.subjects.first.id
+      end
     end
+    let(:serializer_result) do
+      CollectionSerializer.single({}, Collection.where(id: collection.id), {})
+    end
+    let(:media_location) { subject_with_media.ordered_locations.first }
 
     it "includes the default subject's url" do
-      expect(serializer.default_subject_src).to eq(subject_with_media.locations.first.url_for_format(:get))
+      default_subject_src = serializer_result[:default_subject_src]
+      expect(default_subject_src).to eq(media_location.get_url)
     end
   end
 end

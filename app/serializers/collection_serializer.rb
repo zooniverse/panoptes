@@ -27,10 +27,15 @@ class CollectionSerializer
   end
 
   def default_subject_src
-    if @model.default_subject
-      @model.default_subject&.locations&.first&.url_for_format(:get)
+    media_locations = case
+    when default_subject = @model.default_subject
+      default_subject.ordered_locations
+    when first_subject = @model.subjects.first
+      first_subject.ordered_locations
     else
-      @model.subjects.first&.locations&.first&.url_for_format(:get)
+      []
     end
+
+    media_locations.first&.get_url
   end
 end
