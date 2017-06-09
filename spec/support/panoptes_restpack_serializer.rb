@@ -32,8 +32,11 @@ shared_examples "a panoptes restpack serializer" do
   end
 
   describe "auto preload includes" do
-    before do
+    around do |example|
+      orig_values = described_class.instance_variable_get(:@preloads)
       described_class.instance_variable_set(:@preloads, [])
+      example.run
+      described_class.instance_variable_set(:@preloads, orig_values)
     end
 
     it "should not preload when no included relations" do
