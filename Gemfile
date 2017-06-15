@@ -7,7 +7,7 @@ gem 'sdoc', '~> 0.4.2', group: :doc
 gem 'doorkeeper', '~> 3.0'
 gem 'doorkeeper-jwt', '~> 0.1.6'
 gem 'devise', '~> 3.0'
-gem 'versionist', '~> 1.0'
+gem 'versionist', '~> 1.5'
 gem 'rack-cors', '~> 0.3', require: 'rack/cors'
 gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev" # REST API
 gem 'active_model_serializers', '0.10.0.rc2' # Event stream
