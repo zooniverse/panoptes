@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '~> 4.2.8'
 gem 'postgres_ext', '~> 3.0.0'
-gem 'active_record_union', '~> 1.1.0'
+gem 'active_record_union', '~> 1.2.0'
 gem 'sdoc', '~> 0.4.2', group: :doc
 gem 'doorkeeper', '~> 3.0'
 gem 'doorkeeper-jwt', '~> 0.1.6'
