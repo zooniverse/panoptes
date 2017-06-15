@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.5'
+gem 'rails', '~> 4.2.8'
 gem 'postgres_ext', '~> 2.4.0'
 gem 'active_record_union', '~> 1.1.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
