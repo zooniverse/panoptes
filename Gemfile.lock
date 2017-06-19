@@ -182,7 +182,7 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     hashie (3.4.3)
     hitimes (1.2.4)
-    honeybadger (2.5.1)
+    honeybadger (3.1.2)
     http (0.9.8)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
@@ -464,7 +464,7 @@ DEPENDENCIES
   foreman
   gelf
   guard-rspec
-  honeybadger (~> 2.0)
+  honeybadger (~> 3.1)
   jquery-rails (~> 4.0)
   json-schema (~> 2.0)
   librato-metrics (~> 1.6.1)
