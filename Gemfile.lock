@@ -293,7 +293,7 @@ GEM
     pry-stack_explorer (0.4.9.2)
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
-    puma (3.1.0)
+    puma (3.9.1)
     rack (1.6.8)
     rack-cors (0.4.1)
     rack-protection (1.5.3)
@@ -484,7 +484,7 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   pry-stack_explorer
-  puma (~> 3.1.0)
+  puma (~> 3.9.1)
   rack-cors (~> 0.4)
   rails (~> 4.2.8)
   ranked-model (~> 0.4.0)
