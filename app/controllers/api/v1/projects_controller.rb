@@ -195,6 +195,8 @@ class Api::V1::ProjectsController < Api::ApiController
           context["include_#{k}?".to_sym] = false
         end
       end
+    elsif params[:avatar_src]
+      {include_avatar_src?: true}
     else
       super
     end
