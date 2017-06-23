@@ -165,7 +165,7 @@ RSpec.describe SubjectQueue, type: :model do
 
     shared_examples "selects from the queue" do
       it 'should return a collection of ids' do
-        expect(sq.next_subjects).to all( be_a(Fixnum) )
+        expect(sq.next_subjects).to all( be_a(Integer) )
       end
 
       it 'should return 10 by default' do

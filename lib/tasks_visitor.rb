@@ -28,6 +28,6 @@ class TasksVisitor
   alias :visit_TrueClass :noop
   alias :visit_FalseClass :noop
   alias :visit_NilClass :noop
-  alias :visit_Fixnum :noop
+  alias :visit_Integer :noop
   alias :visit_Float :noop
 end

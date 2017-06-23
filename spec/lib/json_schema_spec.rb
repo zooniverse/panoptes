@@ -63,7 +63,7 @@ RSpec.describe JsonSchema do
       end
 
       it 'should format the error message for use in the API response' do
-        message = { "name" => "of type Fixnum did not match the following type: string",
+        message = { "name" => "of type Integer did not match the following type: string",
                     "metadata" => "did not contain a required property of 'start'" }.to_s
         expect do
           subject.validate!(invalid_json)
