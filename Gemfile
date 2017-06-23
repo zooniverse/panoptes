@@ -55,7 +55,7 @@ gem 'panoptes-client'
 gem 'dalli-elasticache'
 
 group :production do
-  gem 'newrelic_rpm', '~> 3.0', require: false
+  gem 'newrelic_rpm'
 end
 
 group :development do

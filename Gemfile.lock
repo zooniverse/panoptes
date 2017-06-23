@@ -470,7 +470,7 @@ DEPENDENCIES
   librato-metrics (~> 1.6.1)
   logstasher (~> 0.6)
   mock_redis
-  newrelic_rpm (~> 3.0)
+  newrelic_rpm
   oauth2!
   omniauth (~> 1.0)
   omniauth-facebook (~> 3.0)
@@ -509,4 +509,4 @@ DEPENDENCIES
   zoo_stream (~> 1.0.1)
 
 BUNDLED WITH
-   1.13.6
+   1.14.6
