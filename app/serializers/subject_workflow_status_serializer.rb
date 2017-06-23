@@ -3,7 +3,7 @@ class SubjectWorkflowStatusSerializer
   include NoCountSerializer
 
   attributes :id, :classifications_count, :retired_at,
-    :retirement_reason, :updated_at, :created_at, :href
+    :retirement_reason, :created_at, :updated_at, :href
 
   can_include :subject, :workflow
 
