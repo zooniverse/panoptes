@@ -39,12 +39,9 @@ end
 # This can be called multiple times to add hooks.
 #
 on_worker_boot do
-  ActiveRecord::Base.establish_connection
-
-  # Enable New Relic RPM
-  # https://github.com/puma/puma/issues/128#issuecomment-21050609
-  require 'newrelic_rpm'
-  NewRelic::Agent.manual_start
+  ActiveSupport.on_load(:active_record) do
+    ActiveRecord::Base.establish_connection
+  end
 end
 
 before_fork do
