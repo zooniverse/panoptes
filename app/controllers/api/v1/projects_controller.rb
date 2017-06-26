@@ -32,6 +32,7 @@ class Api::V1::ProjectsController < Api::ApiController
                  :slug,
                  :redirect,
                  :avatar_src,
+                 :classifications_count,
                  :updated_at].freeze
 
   before_action :filter_by_tags, only: :index
@@ -195,8 +196,6 @@ class Api::V1::ProjectsController < Api::ApiController
           context["include_#{k}?".to_sym] = false
         end
       end
-    elsif params[:avatar_src]
-      {include_avatar_src?: true}
     else
       super
     end
