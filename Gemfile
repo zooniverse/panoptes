@@ -16,7 +16,7 @@ gem 'paper_trail', '~> 3.0'
 # Not a lot of commits between 1.1.0 and this ref. Remove this once the next version is released.
 gem 'oauth2', github: 'intridea/oauth2', ref: 'e0006cb5099bf392f011eb5c49cbec4f893bbdba'
 gem 'omniauth', '~> 1.0'
-gem 'omniauth-facebook', '~> 3.0'
+gem 'omniauth-facebook', '~> 4.0'
 gem 'omniauth-google-oauth2'
 gem 'puma', '~> 3.1.0'
 gem 'logstasher', '~> 1.2'
