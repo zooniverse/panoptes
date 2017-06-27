@@ -292,7 +292,7 @@ GEM
     pry-stack_explorer (0.4.9.2)
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
-    puma (3.1.0)
+    puma (3.9.1)
     rack (1.6.8)
     rack-cors (0.4.1)
     rack-protection (1.5.3)
@@ -468,7 +468,7 @@ DEPENDENCIES
   librato-metrics (~> 1.6.1)
   logstasher (~> 1.2)
   mock_redis
-  newrelic_rpm (~> 3.0)
+  newrelic_rpm
   oauth2!
   omniauth (~> 1.0)
   omniauth-facebook (~> 3.0)
@@ -482,7 +482,7 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   pry-stack_explorer
-  puma (~> 3.1.0)
+  puma (~> 3.9.1)
   rack-cors (~> 0.4)
   rails (~> 4.2.8)
   ranked-model (~> 0.4.0)
@@ -507,4 +507,4 @@ DEPENDENCIES
   zoo_stream (~> 1.0.1)
 
 BUNDLED WITH
-   1.13.6
+   1.14.6

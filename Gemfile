@@ -18,7 +18,7 @@ gem 'oauth2', github: 'intridea/oauth2', ref: 'e0006cb5099bf392f011eb5c49cbec4f8
 gem 'omniauth', '~> 1.0'
 gem 'omniauth-facebook', '~> 3.0'
 gem 'omniauth-google-oauth2'
-gem 'puma', '~> 3.1.0'
+gem 'puma', '~> 3.9.1'
 gem 'logstasher', '~> 1.2'
 gem 'semantic_logger', '~> 4.1.1'
 gem 'gelf'
@@ -55,7 +55,7 @@ gem 'panoptes-client'
 gem 'dalli-elasticache'
 
 group :production do
-  gem 'newrelic_rpm', '~> 3.0', require: false
+  gem 'newrelic_rpm'
 end
 
 group :development do
