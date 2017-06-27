@@ -1104,7 +1104,7 @@ CREATE TABLE subjects (
     migrated boolean,
     lock_version integer DEFAULT 0,
     upload_user_id integer,
-    activated_state integer DEFAULT 0
+    activated_state integer DEFAULT 0 NOT NULL
 );
 
 
@@ -3910,13 +3910,13 @@ INSERT INTO schema_migrations (version) VALUES ('20170425110939');
 
 INSERT INTO schema_migrations (version) VALUES ('20170426162708');
 
-INSERT INTO schema_migrations (version) VALUES ('20170519181110');
-
-INSERT INTO schema_migrations (version) VALUES ('20170523135118');
-
 INSERT INTO schema_migrations (version) VALUES ('20170524205300');
 
+INSERT INTO schema_migrations (version) VALUES ('20170519181110');
+
 INSERT INTO schema_migrations (version) VALUES ('20170524210302');
+
+INSERT INTO schema_migrations (version) VALUES ('20170523135118');
 
 INSERT INTO schema_migrations (version) VALUES ('20170525151142');
 
