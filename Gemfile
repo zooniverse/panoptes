@@ -25,7 +25,7 @@ gem 'gelf'
 gem 'honeybadger', '~> 3.1'
 gem 'jquery-rails', '~> 4.0'
 gem 'uglifier', '~> 3.2'
-gem 'sidekiq', '~> 4.0'
+gem 'sidekiq', '~> 5.0'
 gem 'sinatra', '>= 1.4.8', require: nil
 gem 'aws-sdk-v1', '~> 1.67'
 gem 'json-schema', '~> 2.0'
