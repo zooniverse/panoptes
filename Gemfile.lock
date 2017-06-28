@@ -465,7 +465,7 @@ DEPENDENCIES
   mock_redis
   newrelic_rpm
   oauth2!
-  omniauth (~> 1.0)
+  omniauth (~> 1.6)
   omniauth-facebook (~> 3.0)
   omniauth-google-oauth2
   p3p (~> 1.0)
