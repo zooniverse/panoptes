@@ -42,6 +42,8 @@ Sidekiq.configure_server do |config|
   end
 end
 
+Sidekiq::Extensions.enable_delay!
+
 require 'sidetiq'
 Sidetiq.configure do |config|
   config.utc = true
