@@ -15,9 +15,13 @@ RSpec.describe Medium, :type => :model do
 
   describe "#content_type" do
 
-    it 'should not be valid without a valid content_type' do
-      m = build(:medium, content_type: "video/mp4")
-      expect(m).to_not be_valid
+    it 'should not be valid without an invalid content_type' do
+      aggregate_failures "content types" do
+        %w(text/plain video/mp4).each do |content_type|
+          m = build(:medium, content_type: content_type)
+          expect(m).to_not be_valid
+        end
+      end
     end
 
     it 'should not be valid with an empty content_type' do
@@ -36,7 +40,7 @@ RSpec.describe Medium, :type => :model do
 
       it 'should be valid with both content_types' do
         aggregate_failures "content types" do
-          %w(image/png video/mp4).each do |content_type|
+          %w(text/plain video/mp4).each do |content_type|
             m = build(:medium, allow_any_content_type: true, content_type: content_type)
             expect(m).to be_valid
           end
