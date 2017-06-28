@@ -26,8 +26,10 @@ RSpec.describe Medium, :type => :model do
     end
 
     it 'should be valid with a valid content_type' do
-      m = build(:medium, content_type: "image/png")
-      expect(m).to be_valid
+      Medium::ALLOWED_UPLOAD_CONTENT_TYPES.each do |content_type|
+        m = build(:medium, content_type: content_type)
+        expect(m).to be_valid
+      end
     end
 
     context "with the allow_any_content_type flag set" do
