@@ -10,7 +10,7 @@ shared_examples_for "creates an export" do
   end
 
   it 'should queue an export worker' do
-    expect(export_worker).to receive(:perform_async).with(resource.id, resource.class.to_s.downcase, an_instance_of(Fixnum), an_instance_of(Fixnum))
+    expect(export_worker).to receive(:perform_async).with(resource.id, resource.class.to_s.downcase, an_instance_of(Integer), an_instance_of(Integer))
     operation.with(object: resource).run!(create_params)
   end
 

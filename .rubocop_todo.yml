@@ -94,7 +94,7 @@ Performance/StringReplacement:
 
 # Offense count: 14
 # Cop supports --auto-correct.
-Style/AlignArray:
+Layout/AlignArray:
   Exclude:
     - 'app/controllers/api/events_controller.rb'
     - 'app/controllers/api/v1/projects_controller.rb'
@@ -107,13 +107,13 @@ Style/AlignArray:
 # Offense count: 74
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle, SupportedLastArgumentHashStyles.
-Style/AlignHash:
+Layout/AlignHash:
   Enabled: false
 
 # Offense count: 98
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AlignParameters:
+Layout/AlignParameters:
   Enabled: false
 
 # Offense count: 25
@@ -124,7 +124,7 @@ Style/BlockDelimiters:
 
 # Offense count: 11
 # Cop supports --auto-correct.
-Style/BlockEndNewline:
+Layout/BlockEndNewline:
   Exclude:
     - 'app/models/membership.rb'
     - 'spec/controllers/api/api_controller_spec.rb'
@@ -151,7 +151,7 @@ Style/CaseEquality:
 # Offense count: 4
 # Cop supports --auto-correct.
 # Configuration parameters: IndentWhenRelativeTo, SupportedStyles, IndentOneStep.
-Style/CaseIndentation:
+Layout/CaseIndentation:
   Enabled: false
 
 # Offense count: 24
@@ -186,18 +186,18 @@ Style/ConstantName:
 
 # Offense count: 29
 # Cop supports --auto-correct.
-Style/DeprecatedHashMethods:
+Style/PreferredHashMethods:
   Enabled: false
 
 # Offense count: 182
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/DotPosition:
+Layout/DotPosition:
   Enabled: false
 
 # Offense count: 4
 # Cop supports --auto-correct.
-Style/ElseAlignment:
+Layout/ElseAlignment:
   Exclude:
     - 'app/models/concerns/subject_counts.rb'
     - 'lib/classification_lifecycle.rb'
@@ -214,7 +214,7 @@ Style/EmptyElse:
 # Offense count: 5
 # Cop supports --auto-correct.
 # Configuration parameters: AllowAdjacentOneLineDefs.
-Style/EmptyLineBetweenDefs:
+Layout/EmptyLineBetweenDefs:
   Exclude:
     - 'db/fig_dev_seed_data/fig_dev_seed_data.rb'
     - 'db/migrate/20150318132024_project_contents_text.rb'
@@ -222,7 +222,7 @@ Style/EmptyLineBetweenDefs:
 
 # Offense count: 26
 # Cop supports --auto-correct.
-Style/EmptyLines:
+Layout/EmptyLines:
   Exclude:
     - 'app/controllers/api/v1/projects_controller.rb'
     - 'app/controllers/emails_controller.rb'
@@ -243,18 +243,18 @@ Style/EmptyLines:
 # Offense count: 237
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundBlockBody:
+Layout/EmptyLinesAroundBlockBody:
   Enabled: false
 
 # Offense count: 32
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundClassBody:
+Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
 # Offense count: 3
 # Cop supports --auto-correct.
-Style/EmptyLinesAroundMethodBody:
+Layout/EmptyLinesAroundMethodBody:
   Exclude:
     - 'app/controllers/api/v1/media_controller.rb'
     - 'app/models/user_seen_subject.rb'
@@ -263,7 +263,7 @@ Style/EmptyLinesAroundMethodBody:
 # Offense count: 6
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundModuleBody:
+Layout/EmptyLinesAroundModuleBody:
   Exclude:
     - 'app/controllers/api/events_controller.rb'
     - 'app/serializers/concerns/owner_link_serializer.rb'
@@ -283,13 +283,13 @@ Style/EvenOdd:
 # Offense count: 60
 # Cop supports --auto-correct.
 # Configuration parameters: AllowForAlignment.
-Style/ExtraSpacing:
+Layout/ExtraSpacing:
   Enabled: false
 
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/FirstParameterIndentation:
+Layout/FirstParameterIndentation:
   Exclude:
     - 'lib/gem_ext/doorkeeper/client_credentials_creator.rb'
 
@@ -301,7 +301,7 @@ Style/HashSyntax:
 
 # Offense count: 20
 # Cop supports --auto-correct.
-Style/IndentArray:
+Layout/IndentArray:
   Exclude:
     - 'lib/gem_ext/rails/join_association.rb'
     - 'spec/controllers/api/v1/workflows_controller_spec.rb'
@@ -311,13 +311,13 @@ Style/IndentArray:
 # Offense count: 129
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/IndentHash:
+Layout/IndentHash:
   Enabled: false
 
 # Offense count: 16
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/IndentationConsistency:
+Layout/IndentationConsistency:
   Exclude:
     - 'app/controllers/passwords_controller.rb'
     - 'app/schemas/project_update_schema.rb'
@@ -331,7 +331,7 @@ Style/IndentationConsistency:
 # Offense count: 19
 # Cop supports --auto-correct.
 # Configuration parameters: Width.
-Style/IndentationWidth:
+Layout/IndentationWidth:
   Enabled: false
 
 # Offense count: 7
@@ -347,7 +347,7 @@ Style/Lambda:
 
 # Offense count: 18
 # Cop supports --auto-correct.
-Style/LeadingCommentSpace:
+Layout/LeadingCommentSpace:
   Exclude:
     - 'app/controllers/api/v1/media_controller.rb'
     - 'app/controllers/api/v1/subject_sets_controller.rb'
@@ -371,7 +371,7 @@ Style/LineEndConcatenation:
 
 # Offense count: 1
 # Cop supports --auto-correct.
-Style/MethodCallParentheses:
+Style/MethodCallWithoutArgsParentheses:
   Exclude:
     - 'lib/serialization/v1_adapter.rb'
 
@@ -388,7 +388,7 @@ Style/MultilineBlockChain:
 
 # Offense count: 11
 # Cop supports --auto-correct.
-Style/MultilineBlockLayout:
+Layout/MultilineBlockLayout:
   Exclude:
     - 'app/models/membership.rb'
     - 'spec/controllers/api/v1/aggregations_controller_spec.rb'
@@ -404,7 +404,7 @@ Style/MultilineBlockLayout:
 # Offense count: 99
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MultilineOperationIndentation:
+Layout/MultilineOperationIndentation:
   Enabled: false
 
 # Offense count: 1
@@ -518,7 +518,7 @@ Style/Semicolon:
 
 # Offense count: 161
 # Cop supports --auto-correct.
-Style/SpaceBeforeFirstArg:
+Layout/SpaceBeforeFirstArg:
   Exclude:
     - 'app/schemas/subject_create_schema.rb'
     - 'config/initializers/doorkeeper.rb'
@@ -532,53 +532,53 @@ Style/SpaceBeforeFirstArg:
 
 # Offense count: 35
 # Cop supports --auto-correct.
-Style/SpaceAfterComma:
+Layout/SpaceAfterComma:
   Enabled: false
 
 # Offense count: 87
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/SpaceAroundEqualsInParameterDefault:
+Layout/SpaceAroundEqualsInParameterDefault:
   Enabled: false
 
 # Offense count: 47
 # Cop supports --auto-correct.
 # Configuration parameters: MultiSpaceAllowedForOperators.
-Style/SpaceAroundOperators:
+Layout/SpaceAroundOperators:
   Enabled: false
 
 # Offense count: 213
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/SpaceBeforeBlockBraces:
+Layout/SpaceBeforeBlockBraces:
   Enabled: false
 
 # Offense count: 122
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
-Style/SpaceInsideBlockBraces:
+Layout/SpaceInsideBlockBraces:
   Enabled: false
 
 # Offense count: 218
 # Cop supports --auto-correct.
-Style/SpaceInsideBrackets:
+Layout/SpaceInsideBrackets:
   Enabled: false
 
 # Offense count: 427
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SupportedStyles.
-Style/SpaceInsideHashLiteralBraces:
+Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 
 # Offense count: 123
 # Cop supports --auto-correct.
-Style/SpaceInsideParens:
+Layout/SpaceInsideParens:
   Enabled: false
 
 # Offense count: 66
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/SpaceInsideStringInterpolation:
+Layout/SpaceInsideStringInterpolation:
   Enabled: false
 
 # Offense count: 2209
