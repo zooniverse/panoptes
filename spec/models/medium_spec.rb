@@ -15,8 +15,8 @@ RSpec.describe Medium, :type => :model do
 
   describe "#content_type" do
 
-    it 'should not be valid without an invalid content_type' do
-      aggregate_failures "content types" do
+    it 'should be invalid with an disallowed content_types' do
+      aggregate_failures "disallowed content types" do
         %w(text/plain video/mp4).each do |content_type|
           m = build(:medium, content_type: content_type)
           expect(m).to_not be_valid
