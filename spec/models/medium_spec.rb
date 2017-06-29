@@ -29,10 +29,12 @@ RSpec.describe Medium, :type => :model do
       expect(m).to_not be_valid
     end
 
-    it 'should be valid with a valid content_type' do
-      Medium::ALLOWED_UPLOAD_CONTENT_TYPES.each do |content_type|
-        m = build(:medium, content_type: content_type)
-        expect(m).to be_valid
+    it 'should be valid with allowed content_types' do
+      aggregate_failures "allowed content types" do
+        Medium::ALLOWED_UPLOAD_CONTENT_TYPES.each do |content_type|
+          m = build(:medium, content_type: content_type)
+          expect(m).to be_valid
+        end
       end
     end
 
