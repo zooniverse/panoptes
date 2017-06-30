@@ -10,10 +10,12 @@ describe Project, type: :model do
     let(:locked_update) { {display_name: "A Different Name"} }
   end
 
+context "test owner updates", :focus do
   it_behaves_like "is ownable" do
     let(:owned) { project }
     let(:not_owned) { build(:project, owner: nil) }
   end
+end
 
   it_behaves_like "has subject_count"
 
