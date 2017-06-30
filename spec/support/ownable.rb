@@ -45,12 +45,18 @@ shared_examples "is ownable" do
     # end
 
     context "changing owner to an existing collaborator" do
-      it "should not fail to assign the new owner" do
+      before do
         owned.save
         create(:access_control_list, resource: owned, user_group: new_owner.identity_group)
         owned.owner = new_owner
-        binding.pry
+      end
+
+      it "should assign the new owner" do
         expect(owned.reload.owner?(new_owner)).to be_truthy
+      end
+
+      it "should change the exising ACL from collab to owner" do
+        pending
       end
     end
   end
