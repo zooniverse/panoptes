@@ -406,7 +406,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    stringex (2.6.0)
+    stringex (2.7.1)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -494,7 +494,7 @@ DEPENDENCIES
   sidetiq (~> 0.7)
   spring
   spring-commands-rspec
-  stringex (~> 2.0)
+  stringex (~> 2.7)
   therubyracer (~> 0.12)
   uglifier (~> 3.2)
   versionist (~> 1.5)
