@@ -153,4 +153,19 @@ describe ProjectSerializer do
       expect(serialized[:projects][0][:links][:active_workflows]).to contain_exactly(active_workflow.id.to_s)
     end
   end
+
+  describe "tags" do
+    let(:tag) { create(:tag) }
+    let(:project) { tag.tagged_resources.first.resource }
+    let(:tag_names){ [ tag.name ]}
+
+    it "should only return the tag strings array" do
+      expect(serializer.tags).to eq(tag_names)
+    end
+
+    it "should only return the tag strings array when preloaded" do
+      project.tags
+      expect(serializer.tags).to eq(tag_names)
+    end
+  end
 end

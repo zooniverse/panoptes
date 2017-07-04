@@ -115,7 +115,7 @@ class ProjectSerializer
     if @model.tags.loaded?
       @model.tags.map(&:name)
     else
-      @model.tags.pluck(&:name)
+      @model.tags.pluck(:name)
     end
   end
 
