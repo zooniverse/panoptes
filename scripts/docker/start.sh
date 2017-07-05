@@ -7,6 +7,8 @@ then
     ln -sf /rails_conf/* ./config/
 fi
 
+tmpreaper 7d /tmp/
+
 mkdir -p tmp/pids/
 rm -f tmp/pids/*.pid
 
