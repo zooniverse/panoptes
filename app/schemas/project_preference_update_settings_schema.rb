@@ -22,6 +22,11 @@ class ProjectPreferenceUpdateSettingsSchema < JsonSchema
         type "string", "integer"
         pattern "^[0-9]*$"
       end
+
+      property "designator" do
+        type "object"
+        additional_properties true
+      end
     end
   end
 end
