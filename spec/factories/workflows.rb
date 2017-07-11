@@ -220,6 +220,32 @@ FactoryGirl.define do
         })
     end
 
+    trait :combo_task do
+      display_name "Combo Task Workflow"
+      first_task "T3"
+      tasks ({
+        "T1"=>{
+          "help"=>"T1.help",
+          "type"=>"text",
+          "instruction"=>"T1.instruction"
+        },
+        "T2"=>{
+          "help"=>"T2.help",
+          "type"=>"multiple",
+          "answers"=>[
+            {"label"=>"T2.answers.0.label"},
+            {"label"=>"T2.answers.1.label"},
+            {"label"=>"T2.answers.2.label"}
+          ],
+          "question"=>"T2.question"
+        },
+        "T3"=>{
+          "type"=>"combo",
+          "tasks"=>["T1", "T2"]
+        }
+      })
+    end
+
     trait :shortcut do
       tasks (
         {

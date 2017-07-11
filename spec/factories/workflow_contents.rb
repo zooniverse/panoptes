@@ -58,5 +58,17 @@ FactoryGirl.define do
         "T1.help"=>"this is a survey",
       })
     end
+
+    trait :combo_task do
+      strings({
+        "T1.help"=>"Just pick a fruit already",
+        "T1.instruction"=>"Tell me a secret.",
+        "T2.help"=>"Help is needed here I see",
+        "T2.question"=>"Choose one of the labels",
+        "T2.answers.0.label"=>"I'm positive.",
+        "T2.answers.1.label"=>"Well now I'm second guessing myself",
+        "T2.answers.2.label"=>"Has to be the correct one, for sure...right"
+      })
+    end
   end
 end

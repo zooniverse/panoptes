@@ -138,67 +138,95 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       end
 
       context "with a combo task" do
-        let(:combo_workflow) { build(:workflow, :complex_task) }
-        let(:annotation) do
-          {
-            "task"=>"T3",
-            "value"=>[
-              {"task"=>"init", "value"=>1},
-              {"task"=>"T2", "value"=>[1]},
-              {"task"=>"T6", "value"=>"no secrets between us, panoptes. you see all."},
-              {"task"=>"T7", "value"=>[
-                  {"value"=>"c6e0d98477ec8", "option"=>true},
-                  {"value"=>"fb39ba165bfd4", "option"=>true},
-                  {"value"=>"81a10debaa648", "option"=>true}
-                ]
-              }
-            ]
-          }
-        end
-
         let(:new_classification) do
-          build_stubbed(:classification, subjects: [], workflow: combo_workflow, annotations: [annotation])
+          build_stubbed(:classification, subjects: [], workflow: combo_workflow, annotations: annotations)
         end
-        let(:combo_contents) { create(:workflow_content, :complex_task, workflow: combo_workflow) }
         let(:combo_cache) { double(workflow_at_version: combo_workflow, workflow_content_at_version: combo_contents)}
+        let(:combo_annotation) { new_classification.annotations.first }
 
-        let(:codex) do
-          {
-            "task"=>"T3",
-            "task_label"=>nil,
-            "value"=>[
-              {
-                "task"=>"init",
-                "task_label"=>"Are you sure? (SINGLE)",
-                "value"=>"Well now I'm second guessing myself"
-              },
-              {
-                "task"=>"T2",
-                "task_label"=>"FRUITS?!?! (MULTIPLE)",
-                "value"=>["Tomato?!"]
-              },
-              {
-                "task"=>"T6",
-                "value"=>"no secrets between us, panoptes. you see all.",
-                "task_label"=>"Tell me a secret."
-              },
-              {
-                "task"=>"T7",
-                "value"=> [
-                  {"select_label"=>"Country", "option"=>true, "value"=>"c6e0d98477ec8", "label"=>"Oceania"},
-                  {"select_label"=>"State", "option"=>true, "value"=>"fb39ba165bfd4", "label"=>"Left Oceania"},
-                  {"select_label"=>"City", "option"=>true, "value"=>"81a10debaa648", "label"=>"Townsville"}
-                ]
-              }
+        context "with a valid annotation" do
+          let(:combo_workflow) { build(:workflow, :complex_task) }
+          let(:combo_contents) { create(:workflow_content, :complex_task, workflow: combo_workflow) }
+          let(:annotations) do
+            [{
+              "task"=>"T3",
+              "value"=>[
+                {"task"=>"init", "value"=>1},
+                {"task"=>"T2", "value"=>[1]},
+                {"task"=>"T6", "value"=>"no secrets between us, panoptes. you see all."},
+                {"task"=>"T7", "value"=>[
+                    {"value"=>"c6e0d98477ec8", "option"=>true},
+                    {"value"=>"fb39ba165bfd4", "option"=>true},
+                    {"value"=>"81a10debaa648", "option"=>true}
+                  ]
+                }
+              ]
+            }]
+          end
+          let(:codex) do
+            {
+              "task"=>"T3",
+              "task_label"=>nil,
+              "value"=>[
+                {
+                  "task"=>"init",
+                  "task_label"=>"Are you sure? (SINGLE)",
+                  "value"=>"Well now I'm second guessing myself"
+                },
+                {
+                  "task"=>"T2",
+                  "task_label"=>"FRUITS?!?! (MULTIPLE)",
+                  "value"=>["Tomato?!"]
+                },
+                {
+                  "task"=>"T6",
+                  "value"=>"no secrets between us, panoptes. you see all.",
+                  "task_label"=>"Tell me a secret."
+                },
+                {
+                  "task"=>"T7",
+                  "value"=> [
+                    {"select_label"=>"Country", "option"=>true, "value"=>"c6e0d98477ec8", "label"=>"Oceania"},
+                    {"select_label"=>"State", "option"=>true, "value"=>"fb39ba165bfd4", "label"=>"Left Oceania"},
+                    {"select_label"=>"City", "option"=>true, "value"=>"81a10debaa648", "label"=>"Townsville"}
+                  ]
+                }
+              ]
+            }
+          end
+
+          it 'should add the correct answer labels' do
+            formatted = described_class.new(new_classification, combo_annotation, combo_cache).to_h
+            expect(formatted).to eq(codex)
+          end
+        end
+
+        context "with an malformed annotation" do
+          let(:combo_workflow) { build(:workflow, :combo_task) }
+          let(:combo_contents) { create(:workflow_content, :combo_task, workflow: combo_workflow) }
+          let(:annotations) do
+            # A valid annotation for the combo task
+            # [{ "task"=>"T3", "value"=>[
+            #   {"task"=>"T1", "value"=>"Reginald P. Herring the third"},
+            #   {"task"=>"T2", "value"=>[2]}
+            # ]}]
+            # An example annotation from tropical sweden project
+            [
+              { "task"=>"T3", "value"=>0 },
+              {"task"=>"T1", "value"=>"Reginald P. Herring the third"},
+              {"task"=>"T2", "value"=>[2]}
             ]
-          }
-        end
+          end
+          let(:codex) do
+            { "task"=>"T3", "task_label"=>nil, "value"=>[{:error=>"task cannot be exported"}] }
+          end
 
-        it 'should add the correct answer labels' do
-          formatted = described_class.new(new_classification, new_classification.annotations[0], combo_cache).to_h
-          expect(formatted).to eq(codex)
-        end
+          it 'should add the error value' do
+            formatted = described_class.new(new_classification, combo_annotation, combo_cache).to_h
+            expect(formatted).to eq(codex)
+          end
 
+        end
       end
 
       context "with a dropdown task" do
