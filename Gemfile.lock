@@ -260,8 +260,8 @@ GEM
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
     orm_adapter (0.5.0)
-    p3p (1.2.0)
-      rack
+    p3p (2.0.0)
+      rack (>= 1.6.2)
     panoptes-client (0.2.8)
       faraday
       faraday-panoptes (~> 0.2.0)
@@ -470,7 +470,7 @@ DEPENDENCIES
   omniauth (~> 1.0)
   omniauth-facebook (~> 4.0)
   omniauth-google-oauth2
-  p3p (~> 1.0)
+  p3p (~> 2.0)
   panoptes-client
   paper_trail (~> 3.0)
   pg (~> 0.18)
