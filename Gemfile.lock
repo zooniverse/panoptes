@@ -269,7 +269,7 @@ GEM
     paper_trail (3.0.9)
       activerecord (>= 3.0, < 5.0)
       activesupport (>= 3.0, < 5.0)
-    pg (0.18.4)
+    pg (0.21.0)
     pg_array_parser (0.0.9)
     pg_search (1.0.5)
       activerecord (>= 3.1)
@@ -473,7 +473,7 @@ DEPENDENCIES
   p3p (~> 1.0)
   panoptes-client
   paper_trail (~> 3.0)
-  pg (~> 0.18)
+  pg (~> 0.21)
   pg_search
   postgres_ext (~> 3.0.0)
   pry-byebug
