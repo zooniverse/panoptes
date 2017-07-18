@@ -146,6 +146,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
 
         context "with a valid annotation" do
           let(:complex_with_combo_workflow) { build(:workflow, :complex_task) }
+          let(:combo_workflow) { complex_with_combo_workflow }
           let(:combo_contents) do
             create(:workflow_content, :complex_task, workflow: complex_with_combo_workflow)
           end
