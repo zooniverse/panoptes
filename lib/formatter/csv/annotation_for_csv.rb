@@ -68,7 +68,7 @@ module Formatter
           new_anno['task'] = annotation['task']
           new_anno['task_label'] = nil
           new_anno['value'] ||= []
-          annotation['value'].each do |subtask|
+          Array.wrap(annotation['value']).each do |subtask|
             @current = subtask
             task_info = get_task_info(subtask)
             new_anno['value'].push case task_info['type']
@@ -181,6 +181,8 @@ module Formatter
         workflow_at_version.tasks.find do |key, task|
          key == subtask["task"]
         end.try(:last) || {}
+      rescue
+        {}
       end
 
       def task
