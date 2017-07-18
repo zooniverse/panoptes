@@ -157,11 +157,10 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
                 {"task"=>"T2", "value"=>[1]},
                 {"task"=>"T6", "value"=>"no secrets between us, panoptes. you see all."},
                 {"task"=>"T7", "value"=>[
-                    {"value"=>"c6e0d98477ec8", "option"=>true},
-                    {"value"=>"fb39ba165bfd4", "option"=>true},
-                    {"value"=>"81a10debaa648", "option"=>true}
-                  ]
-                }
+                  {"value"=>"c6e0d98477ec8", "option"=>true},
+                  {"value"=>"fb39ba165bfd4", "option"=>true},
+                  {"value"=>"81a10debaa648", "option"=>true}
+                ]}
               ]
             }]
           end
