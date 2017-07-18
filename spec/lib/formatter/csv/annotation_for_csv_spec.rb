@@ -145,8 +145,10 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         let(:combo_annotation) { new_classification.annotations.first }
 
         context "with a valid annotation" do
-          let(:combo_workflow) { build(:workflow, :complex_task) }
-          let(:combo_contents) { create(:workflow_content, :complex_task, workflow: combo_workflow) }
+          let(:complex_with_combo_workflow) { build(:workflow, :complex_task) }
+          let(:combo_contents) do
+            create(:workflow_content, :complex_task, workflow: complex_with_combo_workflow)
+          end
           let(:annotations) do
             [{
               "task"=>"T3",
