@@ -10,6 +10,14 @@ describe User, type: :model do
   it_behaves_like "activatable"
   it_behaves_like "is an owner"
 
+  context "with caching resource associations" do
+    let(:cached_resource) { user }
+
+    it_behaves_like "has an extended cache key" do
+      let(:methods) { %i(uploaded_subjects_count) }
+    end
+  end
+
   describe "links" do
     it "should allow membership links to any user" do
       expect(User).to link_to(Membership).with_scope(:all)

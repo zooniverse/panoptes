@@ -35,7 +35,6 @@ class Api::V1::SubjectsController < Api::ApiController
     super do |subject|
       user = subject.uploader
       user.increment_subjects_count_cache
-      user.touch
     end
   end
 
