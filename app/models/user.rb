@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   include Activatable
   include Linkable
   include PgSearch
+  include ExtendedCacheKey
 
   ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
@@ -37,6 +38,8 @@ class User < ActiveRecord::Base
   has_many :subject_queues, dependent: :destroy
 
   belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
+
+  cache_by_resource_method :uploaded_subjects_count
 
   before_validation :default_display_name, on: [:create, :update]
   before_validation :sync_identity_group, on: [:update]

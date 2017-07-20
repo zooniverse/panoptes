@@ -614,7 +614,6 @@ describe Api::V1::SubjectsController, type: :controller do
 
     it "should incremement the user's subjects_count cache and touch the user" do
       expect_any_instance_of(User).to receive(:increment_subjects_count_cache)
-      expect_any_instance_of(User).to receive(:touch)
       default_request user_id: authorized_user.id, scopes: scopes
       post :create, create_params
     end
