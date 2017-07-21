@@ -27,14 +27,14 @@ class CollectionSerializer
   end
 
   def default_subject_src
-    media_locations = case
-    when default_subject = @model.default_subject
-      default_subject.ordered_locations
-    when first_subject = @model.subjects.first
-      first_subject.ordered_locations
-    else
-      []
-    end
+    media_locations =
+      if default_subject = @model.default_subject
+        default_subject.ordered_locations
+      elsif first_subject = @model.subjects.first
+        first_subject.ordered_locations
+      else
+        []
+      end
 
     media_locations.first&.get_url
   end
