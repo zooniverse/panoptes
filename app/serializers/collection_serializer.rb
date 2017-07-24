@@ -16,7 +16,10 @@ class CollectionSerializer
   can_filter_by :display_name, :slug, :favorite
   can_sort_by :display_name
 
-  preload [ owner: { identity_membership: :user } ], :collection_roles, :subjects
+  preload [ owner: { identity_membership: :user } ],
+    :collection_roles,
+    :subjects,
+    default_subject: :locations
 
   # overridden belongs_to_many association to serialize the :projects links
   def self.btm_associations
@@ -24,10 +27,15 @@ class CollectionSerializer
   end
 
   def default_subject_src
-    if @model.default_subject
-      @model.default_subject&.locations&.first&.url_for_format(:get)
-    else
-      @model.subjects.first&.locations&.first&.url_for_format(:get)
-    end
+    media_locations =
+      if default_subject = @model.default_subject
+        default_subject.ordered_locations
+      elsif first_subject = @model.subjects.first
+        first_subject.ordered_locations
+      else
+        []
+      end
+
+    media_locations.first&.get_url
   end
 end

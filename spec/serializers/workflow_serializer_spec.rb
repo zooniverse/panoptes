@@ -13,8 +13,8 @@ describe WorkflowSerializer do
 
   it_should_behave_like "a panoptes restpack serializer" do
     let(:resource) { workflow }
-    let(:includes) { [ :project, :tutorial_subject ] }
-    let(:preloads) { includes }
+    let(:includes) { %i(project subject_sets tutorial_subject) }
+    let(:preloads) { %i(subject_sets attached_images) }
   end
 
   it_should_behave_like "a filter has many serializer" do
