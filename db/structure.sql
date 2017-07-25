@@ -609,7 +609,7 @@ CREATE TABLE oauth_applications (
     updated_at timestamp without time zone,
     owner_id integer,
     owner_type character varying,
-    trust_level integer DEFAULT 0 NOT NULL,
+    trust_level integer DEFAULT 1 NOT NULL,
     default_scope character varying[] DEFAULT '{}'::character varying[],
     scopes character varying DEFAULT ''::character varying NOT NULL
 );
@@ -3894,6 +3894,8 @@ INSERT INTO schema_migrations (version) VALUES ('20170210163241');
 
 INSERT INTO schema_migrations (version) VALUES ('20170215105309');
 
+INSERT INTO schema_migrations (version) VALUES ('20170215151802');
+
 INSERT INTO schema_migrations (version) VALUES ('20170310131642');
 
 INSERT INTO schema_migrations (version) VALUES ('20170316170501');
@@ -3910,13 +3912,13 @@ INSERT INTO schema_migrations (version) VALUES ('20170425110939');
 
 INSERT INTO schema_migrations (version) VALUES ('20170426162708');
 
-INSERT INTO schema_migrations (version) VALUES ('20170524205300');
-
 INSERT INTO schema_migrations (version) VALUES ('20170519181110');
 
-INSERT INTO schema_migrations (version) VALUES ('20170524210302');
-
 INSERT INTO schema_migrations (version) VALUES ('20170523135118');
+
+INSERT INTO schema_migrations (version) VALUES ('20170524205300');
+
+INSERT INTO schema_migrations (version) VALUES ('20170524210302');
 
 INSERT INTO schema_migrations (version) VALUES ('20170525151142');
 
