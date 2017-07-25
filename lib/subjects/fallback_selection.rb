@@ -7,8 +7,7 @@ module Subjects
     end
 
     def any_workflow_data
-      any_workflow_data_scope \
-        .order(random: [:asc, :desc].sample)
+      any_workflow_data_scope
         .limit(limit)
         .pluck("set_member_subjects.id")
         .shuffle
