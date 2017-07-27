@@ -2375,6 +2375,13 @@ CREATE UNIQUE INDEX index_collections_subjects_on_collection_id_and_subject_id O
 
 
 --
+-- Name: index_collections_subjects_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_collections_subjects_on_subject_id ON collections_subjects USING btree (subject_id);
+
+
+--
 -- Name: index_field_guides_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3921,4 +3928,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170524205300');
 INSERT INTO schema_migrations (version) VALUES ('20170524210302');
 
 INSERT INTO schema_migrations (version) VALUES ('20170525151142');
+
+INSERT INTO schema_migrations (version) VALUES ('20170727142122');
 
