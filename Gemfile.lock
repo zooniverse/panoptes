@@ -243,7 +243,7 @@ GEM
     multi_xml (0.6.0)
     multipart-post (2.0.0)
     nenv (0.3.0)
-    newrelic_rpm (3.15.0.314)
+    newrelic_rpm (4.3.0.335)
     nokogiri (1.8.0)
       mini_portile2 (~> 2.2.0)
     notiffany (0.1.1)
