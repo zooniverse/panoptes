@@ -150,7 +150,7 @@ GEM
     faraday-panoptes (0.3.0)
       faraday (~> 0.9)
       faraday_middleware (~> 0.10)
-    faraday_middleware (0.11.0.1)
+    faraday_middleware (0.12.0)
       faraday (>= 0.7.4, < 1.0)
     ffi (1.9.18)
     fig_rake (0.9.3)
@@ -454,7 +454,7 @@ DEPENDENCIES
   factory_girl_rails
   faraday (~> 0.9)
   faraday-http-cache (~> 2.0)
-  faraday_middleware (~> 0.11)
+  faraday_middleware (~> 0.12)
   fig_rake (~> 0.9.3)
   flipper
   flipper-active_record
