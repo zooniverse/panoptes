@@ -42,6 +42,12 @@ on_worker_boot do
   ActiveSupport.on_load(:active_record) do
     ActiveRecord::Base.establish_connection
   end
+
+  # manually start new relic agent in staging
+  # https://github.com/puma/puma/issues/614#issuecomment-117712457
+  if rails_env == "staging"
+    NewRelic::Agent.manual_start
+  end
 end
 
 before_fork do
