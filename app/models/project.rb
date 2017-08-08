@@ -45,6 +45,8 @@ class Project < ActiveRecord::Base
   has_many :tags, through: :tagged_resources
   has_many :first_time_users, class_name: "User", foreign_key: 'project_id', inverse_of: :signup_project, dependent: :restrict_with_exception
 
+  has_many :translations, as: :translated, dependent: :destroy
+
   has_paper_trail only: [:private, :live, :beta_requested, :beta_approved, :launch_requested, :launch_approved]
 
   enum state: [:paused, :finished]
