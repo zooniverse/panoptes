@@ -2872,6 +2872,13 @@ CREATE UNIQUE INDEX index_tags_on_name ON tags USING btree (name);
 
 
 --
+-- Name: index_translations_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_translations_on_language ON translations USING btree (language);
+
+
+--
 -- Name: index_translations_on_translated_type_and_translated_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
