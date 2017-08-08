@@ -53,7 +53,7 @@ gem 'flipper-ui'
 gem 'panoptes-client'
 gem 'dalli-elasticache'
 
-group :production do
+group :production, :staging do
   gem 'newrelic_rpm'
 end
 
