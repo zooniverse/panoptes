@@ -5,7 +5,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
 
   # TODO: expand to worklows, tutorials, field guides, etc
   %i(project).each do |resource_type|
-    let(:resource) { create(resource_type) }
+    let(:resource) { create(:translation) }
     let(:api_resource_name) { "#{resource_type}" }
     let(:api_resource_attributes) { %w(id strings language) }
     let(:api_resource_links) { %w(workflow_contents.workflow) }
@@ -16,9 +16,9 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
         create(resource_type, private: true)
       end
 
-      let(:n_visible) { 2 }
-
-      it_behaves_like "is indexable"
+      it_behaves_like "is indexable" do
+        let(:n_visible) { 2 }
+      end
     end
   end
 end

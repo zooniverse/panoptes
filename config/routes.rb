@@ -137,6 +137,8 @@ Rails.application.routes.draw do
       end
 
       json_api_resources :subject_workflow_statuses, only: [:index, :show]
+
+      json_api_resources :translations, only: [:index, :show]
     end
   end
 
