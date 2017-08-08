@@ -1191,6 +1191,40 @@ ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
 
 
 --
+-- Name: translations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE translations (
+    id integer NOT NULL,
+    translated_id integer,
+    translated_type character varying,
+    language character varying NOT NULL,
+    strings jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: translations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE translations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: translations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE translations_id_seq OWNED BY translations.id;
+
+
+--
 -- Name: tutorials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1805,6 +1839,13 @@ ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclas
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY translations ALTER COLUMN id SET DEFAULT nextval('translations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY tutorials ALTER COLUMN id SET DEFAULT nextval('tutorials_id_seq'::regclass);
 
 
@@ -2117,6 +2158,14 @@ ALTER TABLE ONLY tagged_resources
 
 ALTER TABLE ONLY tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: translations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY translations
+    ADD CONSTRAINT translations_pkey PRIMARY KEY (id);
 
 
 --
@@ -2820,6 +2869,13 @@ CREATE INDEX index_tags_name_trgrm ON tags USING gin ((COALESCE(name, ''::text))
 --
 
 CREATE UNIQUE INDEX index_tags_on_name ON tags USING btree (name);
+
+
+--
+-- Name: index_translations_on_translated_type_and_translated_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_translations_on_translated_type_and_translated_id ON translations USING btree (translated_type, translated_id);
 
 
 --
@@ -3930,4 +3986,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170524210302');
 INSERT INTO schema_migrations (version) VALUES ('20170525151142');
 
 INSERT INTO schema_migrations (version) VALUES ('20170727142122');
+
+INSERT INTO schema_migrations (version) VALUES ('20170808130619');
 
