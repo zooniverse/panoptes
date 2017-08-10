@@ -138,7 +138,45 @@ Rails.application.routes.draw do
 
       json_api_resources :subject_workflow_statuses, only: [:index, :show]
 
-      json_api_resources :translations, only: [:index, :show]
+      class ProjectTranslationsContraint
+        PROJECT_REGEX = /project/i
+
+        attr_reader :ids_regex
+
+        def initialize(ids_regex=nil)
+          @ids_regex = ids_regex
+        end
+
+        def matches?(request)
+          projects_resource = PROJECT_REGEX.match(request.params[:translated_type])
+
+          if ids_regex
+             ids_regex.match(request.params[:id]) & projects_resource
+          else
+            projects_resource
+          end
+        end
+      end
+
+      namespace :translations do
+        get '/',
+          to: 'projects#index',
+          constraints: ProjectTranslationsContraint.new,
+          format: false
+        get '/:id',
+          to: 'projects#show',
+          constraints: ProjectTranslationsContraint.new(JsonApiRoutes::VALID_IDS),
+          format: false
+      end
+
+      # namespace :translations do
+      #   resources :projects, :organizations, only: [:index, :show]
+      # end
+
+      # json_api_resources :translations, only: [:index, :show] do
+      #   # resources :projects, controller: :translations
+      #   # resources :organizations, controller: :translations
+      # end
     end
   end
 
