@@ -1,26 +1,31 @@
 module Routes
   module Constraints
     class ProjectTranslations
-      include Translations
-
       PROJECT_REGEX = /project/i
+      attr_reader :request
 
       def matches?(request)
-        project_resource = project_translations_request?(
-          request.params[:translated_type]
-        )
+        @request = request
 
-        if ids_regex
-           ids_regex.match(request.params[:id]) && project_resource
+        if show_route?
+           valid_show_id? && project_translations_request?
         else
-          project_resource
+          project_translations_request?
         end
       end
 
       private
 
-      def project_translations_request?(translated_resource_type)
-        !!PROJECT_REGEX.match(translated_resource_type)
+      def project_translations_request?
+        !!PROJECT_REGEX.match(request.params[:translated_type])
+      end
+
+      def show_route?
+        request.params.key?(:id)
+      end
+
+      def valid_show_id?
+        !!Routes::JsonApiRoutes::VALID_IDS.match(request.params[:id].to_s)
       end
     end
   end

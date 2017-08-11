@@ -145,7 +145,7 @@ Rails.application.routes.draw do
           format: false
         get '/:id',
           to: 'projects#show',
-          constraints: Routes::Constraints::ProjectTranslations.new(Routes::JsonApiRoutes::VALID_IDS),
+          constraints: Routes::Constraints::ProjectTranslations.new,
           format: false
       end
     end
