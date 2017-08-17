@@ -2,7 +2,8 @@ class Api::V1::MediaController < Api::ApiController
   require_authentication :update, :create, :destroy, scopes: [:medium]
   resource_actions :default
 
-  before_action :create_conditions, only: :create
+  before_action :set_media_controlled_resources, only: %i(index show)
+  before_action :error_unless_exists, only: %i(index show)
 
   schema_type :json_schema
 
@@ -11,69 +12,44 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def index
-    unless media.blank?
-      @controlled_resources = media
-      if association_numeration == :single
-        #generate the etag here as we use the index route for linked media has_one relations
-        headers['ETag'] = gen_etag(controlled_resources)
-        render json_api: serializer.page(params, controlled_resources, context)
-      else
-        super
-      end
+    if association_numeration == :single
+      #generate the etag here as we use the index route for linked media has_one relations
+      headers['ETag'] = gen_etag(controlled_resources)
+      render json_api: serializer.page(params, controlled_resources, context)
     else
-      raise Api::NoMediaError.new(media_name, resource_name, resource_ids)
+      super
     end
   end
 
-  def show
-    error_unless_exists
-    set_controlled_resources
-    super
-  end
-
   def update
-    error_unless_exists
-    set_controlled_resources
+    binding.pry
     super
     send_aggregation_ready_email
   end
 
-  def destroy
-    error_unless_exists
-    set_controlled_resources
-    super
-  end
-
   def create
-    created = if association_numeration == :collection
-                controlled_resource.send(media_name).create!(create_params)
-              else
-                if old_resource = controlled_resource.send(media_name)
-                  old_resource.destroy
-                end
-                controlled_resource.send("create_#{media_name}!", create_params)
-              end
-    created_resource_response(created)
-  end
-
-  def set_controlled_resources
-    if association_numeration == :collection
-      @controlled_resources = media.where(id: params[:id])
-    else
-      @controlled_resources = media
+    media_linked_to_resource_scope do
+      check_controller_resources
     end
-
+    created_resource_response(created_media_resource)
   end
 
-  def media
-    return @media if @media
-    linked_media = controlled_resource.send(media_name)
-    @media = if linked_media && association_numeration == :single
-               id = params[:id] ? params[:id] : linked_media.id
-               linked_media.class.where(id: id)
-             else
-               linked_media
-             end
+  # override the controlled resources to handle the polymorphic media lookup
+  # from the different routes paths, e.g. /api/workflows/:id/attached_images
+  # will lookup the linked attached_images media for the workflow :id
+  def set_media_controlled_resources
+    binding.pry if action_name == "update"
+    # ensure this scope setup only runs once
+    return if @media_controlled_resources
+    linked_media_scope = association_reflection.klass.where(
+      linked_id: controlled_resources.select(:id),
+      linked_type: resource_class.name
+    )
+    if params.key?(:id)
+      linked_media_scope = linked_media_scope.where(id: params[:id])
+    end
+    @media_controlled_resources = @controlled_resources = linked_media_scope
+    @controlled_resource = nil
   end
 
   def error_unless_exists
@@ -103,6 +79,7 @@ class Api::V1::MediaController < Api::ApiController
     :media
   end
 
+  # this wires up the polymorphic controller scope to load linked resource
   def resource_name
     @resource_name ||= params.keys.find{ |key| key.to_s.match(/_id/) }[0..-4]
   end
@@ -122,13 +99,9 @@ class Api::V1::MediaController < Api::ApiController
 
   private
 
-  def precondition_fails?
-    query = if association_numeration == :single
-              media
-            else
-              Medium.where(id: params[:id])
-            end
-    run_etag_validation(query)
+  def precondition_query_scope
+    set_media_controlled_resources
+    controlled_resources
   end
 
   def resource_scope(resources)
@@ -136,9 +109,12 @@ class Api::V1::MediaController < Api::ApiController
     Medium.where(id: resources.try(:id) || resources.map(&:id))
   end
 
+  def association_reflection
+    resource_class.reflect_on_association(media_name)
+  end
+
   def association_numeration
-    assoc = resource_class.reflect_on_association(media_name)
-    case assoc.macro
+    case association_reflection.macro
     when :has_one
       :single
     when :has_many
@@ -147,28 +123,35 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def media_exists?
-    return false unless media
-    case association_numeration
-    when :single
-      media.exists?
-    when :collection
-      media.exists?(params[:id])
-    end
+    controlled_resources && controlled_resources.exists?
   end
 
-  def create_conditions
+  # check the user can update the linked resource
+  # to create the associated media resource
+  def media_linked_to_resource_scope
     @controlled_resources = api_user.do(:update)
     .to(resource_class, scope_context)
     .with_ids(resource_ids)
     .scope
-    check_controller_resources
+    yield if block_given?
   end
 
   def send_aggregation_ready_email
     return unless params[:media_name] == "aggregations_export"
-    export = media.first
-    if export.metadata.try(:[], "state") == "ready"
-      AggregationDataMailerWorker.perform_async(export.id)
+    binding.pry
+    if controlled_resource.metadata.try(:[], "state") == "ready"
+      AggregationDataMailerWorker.perform_async(controlled_resource.id)
+    end
+  end
+
+  def created_media_resource
+    if association_numeration == :collection
+      controlled_resource.send(media_name).create!(create_params)
+    else
+      if old_resource = controlled_resource.send(media_name)
+        old_resource.destroy
+      end
+      controlled_resource.send("create_#{media_name}!", create_params)
     end
   end
 end

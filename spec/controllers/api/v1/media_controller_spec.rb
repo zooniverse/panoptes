@@ -77,7 +77,6 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         context "when #{media_type} does not exist" do
           let(:media_id) {(Medium.last.id + 100)}
           before(:each) do
-            parent.send(media_type).destroy
             default_request user_id: authorized_user.id, scopes: scopes
             get :show, :"#{parent_name}_id" => parent.id, :media_name => media_type,
               :id => media_id
@@ -101,8 +100,14 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
         before(:each) do
           stub_token(scopes: scopes, user_id: authorized_user.id)
-          set_preconditions
-          params = { :id => resource.id, :"#{parent_name}_id" => parent.id, :media_name => media_type }
+
+          # media controller sets up the media_controlled scope in the
+          # precondition check so it can correctly test the etags,
+          # fake this here but still setup the scope in precondition_fails?
+          allow(controller).to receive(:precondition).and_return("fake_etag")
+          allow(controller).to receive(:run_etag_validation).and_return(false)
+
+          params = { :id => resource.id, :"#{parent_name}_id" => parent.id, :media_name => media_type, test: 1 }
           delete :destroy, params
         end
 
@@ -153,16 +158,45 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           params.merge(:"#{parent_name}_id" => parent.id, :media_name => media_type)
         end
 
-        it_behaves_like "is updatable"
+        # TODO: this is a shit in that it needs the default request setup shared
+        # which skips the load action on the controlled_scope
+        # we need this test to not skip the preconditions check
+        it_behaves_like "is updatable" do
+          let(:manual_request_setup) do
+            set_accept
+            set_accept_language
+            set_preconditions
+            stub_content_filter
+            stub_token(scopes: scopes, user_id: authorized_user.id)
+
+            # media controller sets up the media_controlled scope in the
+            # precondition check so it can correctly test the etags,
+            # fake this here but still setup the scope in precondition_fails?
+            allow(controller).to receive(:precondition).and_return("fake_etag")
+            allow(controller).to receive(:run_etag_validation).and_return(false)
+          end
+        end
 
         if media_type == :aggregations_export
 
           after(:each) do
             default_request scopes: scopes, user_id: authorized_user.id
+            set_accept
+            set_accept_language
+            set_preconditions
+            stub_content_filter
+            stub_token(scopes: scopes, user_id: authorized_user.id)
+
+            # media controller sets up the media_controlled scope in the
+            # precondition check so it can correctly test the etags,
+            # fake this here but still setup the scope in precondition_fails?
+            allow(controller).to receive(:precondition).and_return("fake_etag")
+            allow(controller).to receive(:run_etag_validation).and_return(false)
+
             put :update, update_params
           end
 
-          it 'should send an email' do
+          it 'should send an email', :focus do
             expect(AggregationDataMailerWorker).to receive(:perform_async).with(resource.id)
           end
 
@@ -188,7 +222,6 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           end
         end
       end
-
     end
 
     if actions.include? :index
@@ -275,7 +308,11 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       describe "#destroy" do
         before(:each) do
           stub_token(scopes: scopes, user_id: authorized_user.id)
-          set_preconditions
+          # media controller sets up the media_controlled scope in the
+          # precondition check so it can correctly test the etags,
+          # fake this here but still setup the scope in precondition_fails?
+          allow(controller).to receive(:precondition).and_return("fake_etag")
+          allow(controller).to receive(:run_etag_validation).and_return(false)
           delete :destroy, :"#{parent_name}_id" => parent.id, media_name: media_type
         end
 
@@ -317,7 +354,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       end
     end
 
-    describe "parent is a project" do
+    describe "parent is a project", :focus do
       let(:parent) { project }
 
       it_behaves_like "has_one media",  :project, :avatar, %i(create index destroy), "image/jpeg"

@@ -9,6 +9,7 @@ module JsonApiController
     end
 
     def destroy
+      binding.pry unless controller_name.classify == controlled_resource.class.name
       controlled_resources.destroy_all
       deleted_resource_response
     end
