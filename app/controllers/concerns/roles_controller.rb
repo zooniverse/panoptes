@@ -8,6 +8,8 @@ module RolesController
     before_filter :format_filter_params, only: :index
     before_filter :filter_by_user_id, only: :index
 
+    skip_before_filter :check_destroy_class_matches_controller, only: :destroy
+
     include BuildOverride
   end
 
