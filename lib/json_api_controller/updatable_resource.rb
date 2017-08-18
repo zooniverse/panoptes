@@ -5,9 +5,7 @@ module JsonApiController
     include PreconditionCheck
 
     included do
-      before_action only: :update do |controller|
-        controller.precondition_check
-      end
+      before_action :precondition_check, only: :update
     end
 
     def update
