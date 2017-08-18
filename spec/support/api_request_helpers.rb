@@ -1,34 +1,4 @@
 module APIRequestHelpers
-  class ApiSession
-    attr_reader :spec, :access_token
-
-    def initialize(spec, access_token)
-      @spec = spec
-      @access_token = access_token
-    end
-
-    def post(path, body, custom_headers = {})
-      spec.post(path, body.to_json, headers_with(custom_headers))
-    end
-
-    private
-
-    def headers_with(custom_headers)
-      headers = custom_headers.reverse_merge(
-        "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-        "CONTENT_TYPE" => "application/json"
-      )
-      headers = headers.reverse_merge("HTTP_AUTHORIZATION" => "Bearer #{@access_token.token}") if @access_token
-      headers
-    end
-  end
-
-  def as(user, scopes: %w(public project))
-    access_token = create(:access_token, resource_owner_id: user.id, scopes: scopes.join(" "))
-    api_session = ApiSession.new(self, access_token)
-    yield api_session
-  end
-
   def set_accept
     request.env['HTTP_ACCEPT'] = "application/vnd.api+json; version=1"
   end
