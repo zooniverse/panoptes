@@ -1,9 +1,13 @@
 class Api::V1::MediaController < Api::ApiController
   require_authentication :update, :create, :destroy, scopes: [:medium]
-  resource_actions :default
 
-  before_action :set_media_controlled_resources, only: %i(index show)
-  before_action :error_unless_exists, only: %i(index show)
+  # ensure these before actions register before the resource_actions DSL
+  # so that the precondition checks are testing the correct controlled_resources
+  before_action :media_parental_controlled_resources, only: %i(index show update destroy)
+  before_action :media_controlled_resources, only: %i(index show update destroy)
+  before_action :error_unless_exists, except: :create
+
+  resource_actions :default
 
   schema_type :json_schema
 
@@ -22,40 +26,29 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def update
-    binding.pry
     super
     send_aggregation_ready_email
   end
 
   def create
-    media_linked_to_resource_scope do
+    media_parental_create_resource_scope do
       check_controller_resources
     end
+
+    created_media_resource = Medium.transaction(requires_new: true) do
+      begin
+        if association_numeration == :collection
+          controlled_resource.send(media_name).create!(create_params)
+        else
+          if old_resource = controlled_resource.send(media_name)
+            old_resource.destroy
+          end
+          controlled_resource.send("create_#{media_name}!", create_params)
+        end
+      end
+    end
+
     created_resource_response(created_media_resource)
-  end
-
-  # override the controlled resources to handle the polymorphic media lookup
-  # from the different routes paths, e.g. /api/workflows/:id/attached_images
-  # will lookup the linked attached_images media for the workflow :id
-  def set_media_controlled_resources
-    binding.pry if action_name == "update"
-    # ensure this scope setup only runs once
-    return if @media_controlled_resources
-    linked_media_scope = association_reflection.klass.where(
-      linked_id: controlled_resources.select(:id),
-      linked_type: resource_class.name
-    )
-    if params.key?(:id)
-      linked_media_scope = linked_media_scope.where(id: params[:id])
-    end
-    @media_controlled_resources = @controlled_resources = linked_media_scope
-    @controlled_resource = nil
-  end
-
-  def error_unless_exists
-    unless media_exists?
-      raise Api::NoMediaError.new(media_name, resource_name, resource_ids, params[:id])
-    end
   end
 
   def link_header(resource)
@@ -99,11 +92,6 @@ class Api::V1::MediaController < Api::ApiController
 
   private
 
-  def precondition_query_scope
-    set_media_controlled_resources
-    controlled_resources
-  end
-
   def resource_scope(resources)
     return resources if resources.is_a?(ActiveRecord::Relation)
     Medium.where(id: resources.try(:id) || resources.map(&:id))
@@ -122,13 +110,37 @@ class Api::V1::MediaController < Api::ApiController
     end
   end
 
-  def media_exists?
-    controlled_resources && controlled_resources.exists?
+  # store the original parental contolling scope wired up via the
+  # resource params and the resource_name method
+  # E.g project_id: 1 => Project is the controlled resource
+  def media_parental_controlled_resources
+    @media_parental_controlled_resources ||= controlled_resources
   end
 
-  # check the user can update the linked resource
-  # to create the associated media resource
-  def media_linked_to_resource_scope
+  # override the controlled resources to handle the polymorphic media lookup
+  # from the different routes paths, e.g. /api/workflows/:id/attached_images
+  # will lookup the linked attached_images media for the workflow :id
+  def media_controlled_resources
+    linked_media_scope = association_reflection.klass.where(
+      linked_id: media_parental_controlled_resources.select(:id),
+      linked_type: resource_class.name
+    )
+    if params.key?(:id)
+      linked_media_scope = linked_media_scope.where(id: params[:id])
+    end
+    @controlled_resources = linked_media_scope
+    @controlled_resource = nil
+  end
+
+  def error_unless_exists
+    unless controlled_resources && controlled_resources.exists?
+      raise Api::NoMediaError.new(media_name, resource_name, resource_ids, params[:id])
+    end
+  end
+
+  # check the user can update the linked parental resource
+  # so they can create a linked media resource for it
+  def media_parental_create_resource_scope
     @controlled_resources = api_user.do(:update)
     .to(resource_class, scope_context)
     .with_ids(resource_ids)
@@ -138,20 +150,8 @@ class Api::V1::MediaController < Api::ApiController
 
   def send_aggregation_ready_email
     return unless params[:media_name] == "aggregations_export"
-    binding.pry
     if controlled_resource.metadata.try(:[], "state") == "ready"
       AggregationDataMailerWorker.perform_async(controlled_resource.id)
-    end
-  end
-
-  def created_media_resource
-    if association_numeration == :collection
-      controlled_resource.send(media_name).create!(create_params)
-    else
-      if old_resource = controlled_resource.send(media_name)
-        old_resource.destroy
-      end
-      controlled_resource.send("create_#{media_name}!", create_params)
     end
   end
 end
