@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :null_session
 
-  before_filter :configure_permitted_parameters, if: :devise_controller?
+  before_filter :configure_devise_permitted_parameters, if: :devise_controller?
 
   def unknown_route
     exception = ActionController::RoutingError.new("Not Found")
@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  def configure_permitted_parameters
+  def configure_devise_permitted_parameters
     devise_parameter_sanitizer.for(:sign_up) do |u|
       u.permit(:email, :password, :password_confirmation, :login, :display_name,
                :credited_name, :global_email_communication,
