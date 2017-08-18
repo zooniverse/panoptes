@@ -19,12 +19,8 @@ module JsonApiController
       end
     end
 
-    def precondition_query_scope
-      resource_class.where(id: resource_ids)
-    end
-
     def precondition_fails?
-      run_etag_validation(precondition_query_scope)
+      run_etag_validation(controlled_resources)
     end
 
     def precondition_error_msg
