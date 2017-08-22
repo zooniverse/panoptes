@@ -38,19 +38,26 @@ module RoleControl
     end
 
     def resource_ids
-      @resource_ids ||= _resource_ids
+      return @resource_ids if @resource_ids
+
+      ids = resource_ids_from_params
+      if ids.length < 2
+        ids.first
+      else
+        ids
+      end
+
+      @resource_ids = ids
     end
 
-    def _resource_ids
-      ids = if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
-              params["#{ resource_name }_id"]
-            elsif params.has_key?(:id)
-              params[:id]
-            else
-              ''
-            end.split(',')
-
-      ids.length < 2 ? ids.first : ids
+    def resource_ids_from_params
+      if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
+        params["#{ resource_name }_id"]
+      elsif params.has_key?(:id)
+        params[:id]
+      else
+        ''
+      end.split(',')
     end
 
     def scope_context

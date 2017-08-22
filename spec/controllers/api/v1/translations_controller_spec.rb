@@ -17,6 +17,9 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
       end
 
       it_behaves_like "is indexable" do
+        let(:index_params) do
+          { translated_id: resource.translated_id, translated_type: "project" }
+        end
         let(:n_visible) { 2 }
       end
     end
