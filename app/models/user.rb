@@ -344,10 +344,4 @@ class User < ActiveRecord::Base
   def subject_count_cache_expiry
     ENV.fetch("UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY", 1.hour)
   end
-
-  private
-
-  def subjects_count_cache_key
-    @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count"
-  end
 end
