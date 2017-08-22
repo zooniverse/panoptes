@@ -9,18 +9,26 @@ describe UserInfoScrubber do
   describe '::scrub_personal_info!' do
 
     context "when using an active user" do
-      let(:user) { create(:user) }
+      let(:user) { create(:user, current_sign_in_ip: '1.2.3.4', last_sign_in_ip: '1.2.3.5', tsv: 'foo', private_profile: false) }
 
-      it 'should set set their email address to nil' do
-        scrub_user_details(user)
-        expect(user.email).to be_nil
+      subject(:changes) do
+        -> { described_class.scrub_personal_info!(user) }
       end
 
-      it "should not replace their display name" do
-        prev_user_login = user.login
-        scrub_user_details(user)
-        expect(user.login).to eq(prev_user_login)
-      end
+      it { is_expected.to change(user, :email) }
+      it { is_expected.to change(user, :current_sign_in_ip).to(nil) }
+      it { is_expected.to change(user, :last_sign_in_ip).to(nil) }
+      it { is_expected.to change(user, :display_name).to("Deleted user #{user.id}") }
+      it { is_expected.to change(user, :login).to("deleted-#{user.id}") }
+      it { is_expected.to change(user, :credited_name).to(nil) }
+      it { is_expected.to change(user, :encrypted_password) }
+      it { is_expected.to change(user, :global_email_communication).to(false) }
+      it { is_expected.to change(user, :project_email_communication).to(false) }
+      it { is_expected.to change(user, :beta_email_communication).to(false) }
+      it { is_expected.to change(user, :valid_email).to(false) }
+      it { is_expected.to change(user, :private_profile).to(true) }
+      it { is_expected.to change(user, :api_key).to(nil) }
+      it { is_expected.to change(user, :tsv).to(nil) }
     end
 
     context "when a previous user has been deleted" do
@@ -47,6 +55,9 @@ describe UserInfoScrubber do
         scrub_user_details(user) rescue nil
         expect(user.changed?).to eq(false)
       end
+    end
+
+    describe '#anonymize' do
     end
   end
 end

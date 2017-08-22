@@ -345,24 +345,6 @@ class User < ActiveRecord::Base
     ENV.fetch("UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY", 1.hour)
   end
 
-  def anonymize
-    self.email = "noreply-#{SecureRandom.hex(4)}@zooniverse.org"
-    self.current_sign_in_ip = nil
-    self.last_sign_in_ip = nil
-    self.display_name = "Deleted user #{self.id}"
-    self.login = self.id
-    self.credited_name = nil
-    self.password = self.password_confirmation = SecureRandom.hex(16)
-    self.global_email_communication = false
-    self.project_email_communication = false
-    self.beta_email_communication = false
-    self.valid_email = false
-    self.private_profile = true
-    self.api_key = nil
-    self.tsv = nil
-    self
-  end
-
   private
 
   def subjects_count_cache_key
