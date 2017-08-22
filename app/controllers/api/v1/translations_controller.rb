@@ -12,8 +12,8 @@ class Api::V1::TranslationsController < Api::ApiController
   # will lookup the linked attached_images media for the workflow :id
   def translated_controlled_resources
     translation_scope = Translation.where(
-     translated_id: translated_parental_controlled_resources.select(:id),
-     translated_type: resource_class.name
+      translated_id: translated_parental_controlled_resources.select(:id),
+      translated_type: resource_class.name
     )
     if params.key?(:id)
      translation_scope = translation_scope.where(id: params[:id])
