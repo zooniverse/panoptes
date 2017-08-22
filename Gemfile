@@ -18,7 +18,7 @@ gem 'oauth2', github: 'intridea/oauth2', ref: 'e0006cb5099bf392f011eb5c49cbec4f8
 gem 'omniauth', '~> 1.0'
 gem 'omniauth-facebook', '~> 4.0'
 gem 'omniauth-google-oauth2'
-gem 'puma', '~> 3.9.1'
+gem 'puma', '~> 3.10.0'
 gem 'logstasher', '~> 1.2'
 gem 'semantic_logger', '~> 4.1.1'
 gem 'gelf'
