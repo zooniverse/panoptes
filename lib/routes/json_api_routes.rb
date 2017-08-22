@@ -65,7 +65,7 @@ module Routes
       links = options.delete(:links)
       versioned = options.delete(:versioned)
 
-      options = options.merge(except: [:new, :edit],
+      options = options.merge(except: %i(new edit),
                               constraints: { id: VALID_IDS },
                               format: false)
       create_head(path)
