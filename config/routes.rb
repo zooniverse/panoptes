@@ -138,16 +138,15 @@ Rails.application.routes.draw do
 
       json_api_resources :subject_workflow_statuses, only: [:index, :show]
 
-      namespace :translations do
-        get '/',
-          to: 'projects#index',
-          constraints: Routes::Constraints::ProjectTranslations.new,
-          format: false
-        get '/:id',
-          to: 'projects#show',
-          constraints: Routes::Constraints::ProjectTranslations.new,
-          format: false
-      end
+      # TODO: extract these to a shared helper for different constraint re-use
+      # and ensure the constraints are working as expected via feature / respect specs
+      # https://github.com/rspec/rspec-rails/issues/1328#issuecomment-76747936
+      opts = {
+        constraints: Routes::Constraints::ProjectTranslations.new,
+        format: false,
+        only: %i(show index)
+      }
+      resources(:translations, opts)
     end
   end
 
