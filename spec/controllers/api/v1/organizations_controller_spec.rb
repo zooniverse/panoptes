@@ -186,28 +186,49 @@ describe Api::V1::OrganizationsController, type: :controller do
         end
       end
 
-      it "updates the title to match the display name" do
-        default_request scopes: scopes, user_id: authorized_user.id
-        organization.save!
-        params = { organizations: { display_name: "Also a title"}, id: organization.id }
-        put :update, params
-        expect(json_response["organizations"].first['title']).to eq("Also a title")
-      end
+      context "as a logged in user" do
+        before do
+          default_request scopes: scopes, user_id: authorized_user.id
+          organization.save!
+        end
 
-      it "touches listed_at if listed is true" do
-        default_request scopes: scopes, user_id: authorized_user.id
-        organization.update_attributes({listed: false, listed_at: nil})
-        params = { organizations: { listed: true }, id: organization.id }
-        put :update, params
-        expect(json_response["organizations"].first['listed_at']).to be_truthy
-      end
+        def run_update(params)
+          put :update, params
+        end
 
-      it "nulls listed_at if listed is false" do
-        default_request scopes: scopes, user_id: authorized_user.id
-        organization.update_attributes({listed: true, listed_at: Time.now })
-        params = { organizations: { listed: false }, id: organization.id }
-        put :update, params
-        expect(json_response["organizations"].first['listed_at']).to be_nil
+        it "updates the title to match the display name" do
+          params = { organizations: { display_name: "Also a title"}, id: organization.id }
+          run_update(params)
+          expect(json_response["organizations"].first['title']).to eq("Also a title")
+        end
+
+        it "touches listed_at if listed is true" do
+          organization.update_attributes({listed: false, listed_at: nil})
+          params = { organizations: { listed: true }, id: organization.id }
+          run_update(params)
+          expect(json_response["organizations"].first['listed_at']).to be_truthy
+        end
+
+        it "nulls listed_at if listed is false" do
+          organization.update_attributes({listed: true, listed_at: Time.now })
+          params = { organizations: { listed: false }, id: organization.id }
+          run_update(params)
+          expect(json_response["organizations"].first['listed_at']).to be_nil
+        end
+
+        it "updates the categories" do
+          new_categories = %w(fish snails worms)
+          organization.update_attributes({listed: true, listed_at: Time.now })
+          params = {
+            organizations: {
+              categories: new_categories
+            },
+            id: organization.id
+          }
+          run_update(params)
+          response_categories = json_response["organizations"].first['categories']
+          expect(response_categories).to match_array(new_categories)
+        end
       end
     end
 
