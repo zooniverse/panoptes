@@ -8,4 +8,5 @@ class TutorialSerializer
   can_include :project
   can_include :workflows
   media_include :attached_images
+  can_filter_by :language
 end

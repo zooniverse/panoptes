@@ -28,14 +28,18 @@ describe Api::V1::TutorialsController, type: :controller do
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
       end
+      let(:get_request) do
+        get :index, filter_params
+      end
 
       context "by project id" do
         let(:filter_params) { {project_id: project.id} }
         it "should return tutorial belong to project" do
-          get :index, filter_params
+          get_request
           aggregate_failures "project_id" do
-            expect(json_response["tutorials"].length).to eq(1)
-            expect(json_response["tutorials"][0]["id"]).to eq(tutorials[0].id.to_s)
+            resources = json_response[api_resource_name]
+            expect(resources.length).to eq(1)
+            expect(resources.first["id"]).to eq(tutorials[0].id.to_s)
           end
         end
       end
@@ -44,10 +48,11 @@ describe Api::V1::TutorialsController, type: :controller do
         let(:filter_params) { {workflow_id: workflow.id} }
         it "should return tutorial belong to workflow" do
           workflow_tutorial = create(:tutorial, project: project, workflows: [workflow])
-          get :index, filter_params
+          get_request
           aggregate_failures "workflow_id" do
-            expect(json_response["tutorials"].length).to eq(1)
-            expect(json_response["tutorials"][0]["id"]).to eq(workflow_tutorial.id.to_s)
+            resources = json_response[api_resource_name]
+            expect(resources.length).to eq(1)
+            expect(resources.first["id"]).to eq(workflow_tutorial.id.to_s)
           end
         end
       end
@@ -56,11 +61,25 @@ describe Api::V1::TutorialsController, type: :controller do
         let(:filter_params) { {kind: tutorials[0].kind} }
         it "should return tutorial belong to workflow" do
           tutorials[0].update! kind: "foo"
-          get :index, filter_params
+          get_request
           aggregate_failures "workflow_id" do
-            expect(json_response["tutorials"].length).to eq(1)
-            expect(json_response["tutorials"][0]["id"]).to eq(tutorials[0].id.to_s)
+            resources = json_response[api_resource_name]
+            expect(resources.length).to eq(1)
+            expect(resources.first["id"]).to eq(tutorials[0].id.to_s)
           end
+        end
+      end
+
+      context "by language" do
+        let(:lang) { "es-mx" }
+        let(:filter_params) { {language: lang} }
+
+        it "should return tutorial for es-mx" do
+          tutorials[0].update! language: lang
+          get_request
+          resources = json_response[api_resource_name]
+          expect(resources.length).to eq(1)
+          resources.first["language"] == lang
         end
       end
     end

@@ -4,7 +4,7 @@ describe Api::V1::ProjectPagesController, type: :controller do
   let(:project) { create(:project) }
   let!(:pages) do
     [create(:project_page, project: project),
-     create(:project_page, project: project, url_key: "faq"),
+     create(:project_page, project: project, title: "FAQ", url_key: "faq"),
      create(:project_page, project: project, language: 'zh-tw'),
      create(:project_page)]
   end
@@ -71,28 +71,37 @@ describe Api::V1::ProjectPagesController, type: :controller do
         end
       end
 
-      describe "filter by language", :disabled do
+      describe "filter by language" do
+        let(:taiwanese) { "zh-tw" }
         context "as a query param" do
-          let(:filter_opts) { {language: "zh-tw"} }
+          let(:filter_opts) { {language: taiwanese} }
 
           it 'should return matching pages' do
-            expect(json_response[api_resource_name].map{ |p| p['language'] }).to all( eq("zh-tw") )
+            resources = json_response[api_resource_name]
+            returned_langs = resources.map{ |p| p['language'] }
+            expect(returned_langs).to match_array([taiwanese])
           end
         end
 
-        context "using the Accept-Language Header" do
-          let(:headers) { {"HTTP_ACCEPT_LANGUAGE" => "zh-tw"} }
+        # Prefer the use of explicit query params to determine the
+        # requesting language context for the meantime
+        context "using the Accept-Language Header", :disabled do
+          let(:headers) { {"HTTP_ACCEPT_LANGUAGE" => taiwanese} }
 
           it 'should return matching pages' do
-            expect(json_response[api_resource_name].map{ |p| p['language'] }).to all( eq("zh-tw") )
+            resources = json_response[api_resource_name]
+            returned_langs = resources.map{ |p| p['language'] }
+            expect(returned_langs).to all( eq(taiwanese) )
           end
         end
 
-        context "when language is all" do
-          let(:filter_opts) { {language: "all" } }
+        context "when language is not set" do
+          let(:filter_opts) { {} }
 
-          it 'should not filter by language at all' do
-            expect(json_response[api_resource_name].length).to eq(3)
+          it 'should return en default language project pages' do
+            resources = json_response[api_resource_name]
+            returned_langs = resources.map{ |p| p['language'] }
+            expect(returned_langs).to match_array(["en", "en"])
           end
         end
       end

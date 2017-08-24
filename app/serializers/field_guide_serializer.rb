@@ -7,4 +7,5 @@ class FieldGuideSerializer
 
   can_include :project
   media_include :attached_images
+  can_filter_by :language
 end
