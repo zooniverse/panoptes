@@ -4,4 +4,12 @@ class Api::V1::FieldGuidesController < Api::ApiController
   resource_actions :default
 
   schema_type :json_schema
+
+  before_filter :set_language_if_missing, only: [:index]
+
+  private
+
+  def set_language_if_missing
+    params[:language] ||= "en"
+  end
 end
