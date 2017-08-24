@@ -6,7 +6,8 @@ class OrganizationSerializer
   include CachedSerializer
 
 
-  attributes :id, :display_name, :description, :introduction, :title, :href, :primary_language, :listed_at, :listed, :slug
+  attributes :id, :display_name, :description, :introduction, :title, :href,
+    :primary_language, :listed_at, :listed, :slug, :urls
   optional :avatar_src
   media_include :avatar, :background
   can_filter_by :display_name, :slug, :listed_at
