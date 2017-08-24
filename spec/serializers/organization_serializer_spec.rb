@@ -106,4 +106,17 @@ describe OrganizationSerializer do
       expect(result[:urls]).to match_array(result_urls)
     end
   end
+
+  describe "#categories" do
+    let(:result) do
+      OrganizationSerializer.single(
+        {},
+        Organization.where(id: organization.id),
+        {}
+      )
+    end
+    it "should return the categories by default" do
+      expect(result[:categories]).to match_array(organization.categories)
+    end
+  end
 end
