@@ -10,16 +10,44 @@ module Organizations
     string :description
     string :introduction, default: ''
     array :urls, default: []
+    array :categories, default: []
 
     def execute
-      Organization.transaction do
-        organization = Organization.new owner: api_user.user, display_name: display_name, primary_language: primary_language
-        param_hash = { title: display_name, description: description, introduction: introduction }
-        param_hash.merge! content_from_params(inputs, Api::V1::OrganizationsController::CONTENT_FIELDS)
-        organization.organization_contents.build param_hash
+      Organization.transaction(requires_new: true) do
+        organization = build_organization
+        organization.organization_contents.build(organization_contents_params)
         organization.save!
         organization
       end
+    end
+
+    private
+
+    def build_organization
+      Organization.new(
+        owner: api_user.user,
+        display_name: display_name,
+        primary_language: primary_language,
+        categories: categories
+      )
+    end
+
+    def organization_contents_params
+      organization_contents_params = {
+        title: display_name,
+        description: description,
+        introduction: introduction
+      }
+      organization_contents_params.merge(
+        organization_contents_from_params
+      )
+    end
+
+    def organization_contents_from_params
+      content_from_params(
+        inputs,
+        Api::V1::OrganizationsController::CONTENT_FIELDS
+      )
     end
   end
 end

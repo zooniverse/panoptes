@@ -96,7 +96,8 @@ describe Api::V1::OrganizationsController, type: :controller do
             display_name: "The Illuminati",
             description: "This organization is the most organized organization to ever organize",
             urls: [{label: "Blog", url: "http://blogo.com/example"}],
-            primary_language: "zh-tw"
+            primary_language: "zh-tw",
+            categories: %w(stuff things moar)
           }
         }
       end
@@ -108,6 +109,23 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:api_resource_name) { "organizations" }
         let(:api_resource_attributes) { %w(id display_name) }
         let(:api_resource_links) { %w() }
+
+        context "a logged in user" do
+          before(:each) do
+            default_request scopes: scopes, user_id: authorized_user.id
+            post :create, create_params
+          end
+          let(:test_attr) { :categories }
+          let(:expected_categories) do
+            create_params.dig(:organizations, :categories)
+          end
+
+          # this should really be a spec on the operation to create orgs :sadpanda:
+          it 'should create the organization with the categories' do
+            categories = resource_class.find(created_id).send(test_attr)
+            expect(categories).to match_array(expected_categories)
+          end
+        end
       end
     end
 
