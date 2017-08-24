@@ -1,5 +1,5 @@
 class TutorialSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include MediaLinksSerializer
   include CachedSerializer
 

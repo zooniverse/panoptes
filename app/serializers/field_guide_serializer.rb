@@ -1,5 +1,5 @@
 class FieldGuideSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include MediaLinksSerializer
   include CachedSerializer
 
