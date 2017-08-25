@@ -18,4 +18,14 @@ RSpec.describe Translation, type: :model do
     translation.translated = nil
     expect(translation).to_not be_valid
   end
+
+  describe ".translated_model_names" do
+    let(:expected_model_name) do
+      [ Project.model_name ]
+    end
+
+    it "should list all the model names that have translation resources" do
+      expect(Translation.translated_model_names).to match_array(expected_model_name)
+    end
+  end
 end
