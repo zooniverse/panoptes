@@ -9,6 +9,8 @@ class TranslationSerializer
 
   can_filter_by :language
 
+  # TODO: add the instance href in to the serializer if it's not htere by default.
+
   def self.links
     links = super
     Translation.translated_model_names.each do |model_name|
