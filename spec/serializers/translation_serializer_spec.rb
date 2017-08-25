@@ -29,4 +29,28 @@ describe TranslationSerializer do
       end
     end
   end
+
+  describe "translation links" do
+    let(:serialized_result) do
+      described_class.resource({}, Translation.where(id: translation.id), {})
+    end
+    let(:result_links) { serialized_result.fetch(:links, {}) }
+    let(:expected_links) do
+      [Project].map do |klass|
+        model_name = klass.model_name.singular
+        route_key = klass.model_name.route_key
+        {
+          "translations.#{model_name}" => {
+            href: "/#{route_key}/{translations.#{model_name}}",
+            type: klass.model_name.plural.to_sym
+          }
+        }
+      end
+    end
+
+    it "should include top level links for translated resources" do
+      expect(serialized_result.key?(:links)).to be true
+      expect([result_links]).to match_array(expected_links)
+    end
+  end
 end
