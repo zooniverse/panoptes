@@ -21,8 +21,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
           { translated_type: resource_type.to_s }
         end
         let(:n_visible) { 1 }
-        # TODO: remove the setup for all the specs here...can we do this?
-        let!(:private_resource) do
+        let(:private_resource) do
           create(:translation, translated: create(:private_project))
         end
       end
