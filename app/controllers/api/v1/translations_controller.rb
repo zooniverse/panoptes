@@ -32,11 +32,6 @@ class Api::V1::TranslationsController < Api::ApiController
     @resource_name ||= params[:translated_type]
   end
 
-  # TODO: this may need to have the same treatment of before filters
-  # to ensure the parent ids can cascade into the intial parental? controlled scope
-  # to limit the discovery path to the correct resources
-  # E.g. GET /translations?translated_type=tutorial&project_id=1
-  # E.g. GET /translations?translated_type=tutorial&workflow_id=2
   def resource_ids_from_params
     if params[:translated_id]
       params[:translated_id]
