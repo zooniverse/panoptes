@@ -6,7 +6,10 @@ FactoryGirl.define do
       introduction: "Good times intro",
       workflow_description: "Go outside",
       researcher_quote: "This is my favorite project",
-      url_labels: {"0.label" => "Blog", "1.label" => "Twitter", "2.label" => "Science Case"}
+      urls: [
+        {label: "Blog", url: "http://blog.example.com/"},
+        {label: "Twitter", url: "http://twitter.com/example"}
+      ]
     })
     association :translated, factory: :project
     language "en-GB"
