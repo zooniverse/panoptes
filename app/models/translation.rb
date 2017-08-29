@@ -2,6 +2,8 @@ class Translation < ActiveRecord::Base
   belongs_to :translated, polymorphic: true, required: true
   validate :validate_strings
 
+  #TODO: add a unique validation for translated_type, id, language
+
   # TODO: Look at adding in paper trail change tracking for laguage / strings here
 
   def self.translated_model_names
