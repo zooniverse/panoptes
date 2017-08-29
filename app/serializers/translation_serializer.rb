@@ -9,8 +9,8 @@ class TranslationSerializer
 
   can_filter_by :language
 
-  # TODO: add the instance href in to the serializer if it's not htere by default.
-
+  # Add the polymorphic links to include all the resources
+  # that have the inverse translation assocation
   def self.links
     links = super
     Translation.translated_model_names.each do |model_name|
@@ -23,5 +23,16 @@ class TranslationSerializer
       }
     end
     links
+  end
+
+  # override the default polymorphic translated relation link.
+  # Convert it to a straight belongs_to link based on reflection on the
+  # translated_type / id association foreign key
+  def add_links(model, data)
+    data = super(model, data)
+    polymorphic_belongs_to_link = data[:links].delete(:translated)
+    singular_model_name = polymorphic_belongs_to_link[:type].singularize
+    data[:links][singular_model_name] = polymorphic_belongs_to_link[:id]
+    data
   end
 end
