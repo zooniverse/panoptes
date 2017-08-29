@@ -502,6 +502,11 @@ describe Api::V1::UsersController, type: :controller do
       it_behaves_like "admin only attribute", :upload_whitelist, true
     end
 
+    describe "upload_whitelist" do
+
+      it_behaves_like "admin only attribute", :banned, true
+    end
+
     context "when changing email" do
       let(:put_operations) { {users: {email: "test@example.com"}} }
 
