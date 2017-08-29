@@ -1,5 +1,6 @@
 class Api::V1::TranslationsController < Api::ApiController
-  # require_authentication :update, :destroy, scopes: [:group]
+  # TODO: make sure this authentication scope works
+  # require_authentication :update, :destroy, scopes: [:translations]
   resource_actions :show, :index, :update, :create
   schema_type :json_schema
 
