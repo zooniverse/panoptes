@@ -144,7 +144,7 @@ Rails.application.routes.draw do
       opts = {
         constraints: Routes::Constraints::Translations.new,
         format: false,
-        only: %i(show index)
+        only: %i(show index create)
       }
       resources(:translations, opts)
     end
