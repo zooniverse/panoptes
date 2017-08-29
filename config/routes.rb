@@ -142,7 +142,7 @@ Rails.application.routes.draw do
       # and ensure the constraints are working as expected via feature / respect specs
       # https://github.com/rspec/rspec-rails/issues/1328#issuecomment-76747936
       opts = {
-        constraints: Routes::Constraints::ProjectTranslations.new,
+        constraints: Routes::Constraints::Translations.new,
         format: false,
         only: %i(show index)
       }
