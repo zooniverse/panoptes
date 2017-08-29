@@ -3,6 +3,10 @@ class Api::V1::TranslationsController < Api::ApiController
   resource_actions :show, :index, :update, :create
   schema_type :json_schema
 
+  def schema_class(action)
+    "translation_#{ action }_schema".camelize.constantize
+  end
+
   def translated_parental_controlled_resources
     @translated_parental_controlled_resources ||= controlled_resources
   end
@@ -28,8 +32,24 @@ class Api::V1::TranslationsController < Api::ApiController
     super
   end
 
+  def create
+    translation = Translation.transaction(requires_new: true) do
+      create_params[:translated_type] = params[:translated_type].classify
+      # TODO: should raise an error if this is missing
+      create_params[:translated_id] = params[:translated_id]
+      resource = Translation.new(create_params)
+      resource.save!
+      resource
+    end
+    created_resource_response(translation)
+  end
+
   def resource_name
     @resource_name ||= params[:translated_type]
+  end
+
+  def resource_sym
+    :translations
   end
 
   def resource_ids_from_params
