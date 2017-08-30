@@ -33,6 +33,12 @@ class Api::V1::TranslationsController < Api::ApiController
   end
 
   def create
+    translated_create_resource_scope do
+      check_controller_resources
+    end
+
+    revert_resource_name_to_controller_type
+
     translation = Translation.transaction(requires_new: true) do
       create_params[:translated_type] = params[:translated_type].classify
       # TODO: should raise an error if this is missing
@@ -44,12 +50,21 @@ class Api::V1::TranslationsController < Api::ApiController
     created_resource_response(translation)
   end
 
-  def resource_name
-    @resource_name ||= params[:translated_type]
+  # check the user has the translator role on the translated resource
+  def translated_create_resource_scope
+    @controlled_resources = api_user.do(:translate)
+    .to(resource_class, scope_context)
+    .with_ids(resource_ids)
+    .scope
+    yield if block_given?
   end
 
-  def resource_sym
-    :translations
+  # override the default resource name to wire up the
+  # controller authorization based on the translated_type params
+  # e.g. params[:translated_type] = "Project", uses Project.scope_for(action)
+  # to determine the rights of the logged in user on translation resources
+  def resource_name
+    @resource_name ||= params[:translated_type]
   end
 
   def resource_ids_from_params
@@ -64,5 +79,14 @@ class Api::V1::TranslationsController < Api::ApiController
 
   def serializer
     TranslationSerializer
+  end
+
+  # re-wire the resource name based on controller name
+  # once passed authorization access checks
+  # these instance variables wire up the serializer responses
+  # as well as the class to call scope_for authorization checks on
+  def revert_resource_name_to_controller_type
+    @resource_name = method(:resource_name).super_method.call
+    @resource_class = resource_name.camelize.constantize
   end
 end

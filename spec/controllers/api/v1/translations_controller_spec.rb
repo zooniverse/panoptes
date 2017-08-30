@@ -9,7 +9,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
     let(:api_resource_name) { "translations" }
     let(:api_resource_attributes) { %w(id strings language) }
     let(:api_resource_links) { %w(translations.project) }
-    let(:scopes) { [ resource_type ] }
+    let(:scopes) { %i(translation) }
 
     describe "#index" do
       it_behaves_like "is indexable" do
@@ -28,7 +28,6 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
           end
 
           before(:each) do
-            binding.pry
             default_request scopes: scopes, user_id: authorized_user.id
             get :index, filter_params
           end
@@ -42,11 +41,13 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
       end
     end
 
-    describe "#create", :focus do
+    describe "#create" do
       let(:test_attr) { :language }
       let(:language) { "en-NZ"}
       let(:test_attr_value)  { language }
       let(:translated_resource) { create(resource_type) }
+      let(:translated_resource) { create(resource_type) }
+      let(:resource_class) { Translation }
 
       let(:create_params) do
         {
@@ -69,7 +70,16 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
         }
       end
 
-      it_behaves_like "is creatable"
+      it_behaves_like "is creatable" do
+        before do
+          create(
+            :access_control_list,
+            resource: translated_resource,
+            user_group: authorized_user.identity_group,
+            roles: ["translator"]
+          )
+        end
+      end
     end
   end
 end
