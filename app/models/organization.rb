@@ -23,6 +23,8 @@ class Organization < ActiveRecord::Base
   can_by_role :show, :index, :versions, :version, public: true,
     roles: [ :owner, :collaborator, :tester, :translator, :scientist, :moderator ]
 
+  can_by_role :translate, roles: %i(owner translator collaborator)
+
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :access_control_list, :scope_for, :update, :user
 
