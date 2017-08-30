@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :translation, aliases: [:project_translation]do
+  factory :translation, aliases: [:project_translation] do
     strings({
       title: "A test Project",
       description: "Some Lorem Ipsum",
