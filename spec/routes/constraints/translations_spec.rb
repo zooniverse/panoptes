@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Routes::Constraints::Translations do
-  describe "#matches?", :focus do
+  describe "#matches?" do
     subject { Routes::Constraints::Translations.new }
 
     %w(project organization workflow tutorial field_guide page).each do |translated_type|
