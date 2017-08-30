@@ -10,7 +10,8 @@ module RoleControl
 
     def check_controller_resources
       unless resources_exist?
-        raise RoleControl::AccessDenied, send(:rejected_message)
+        rejected_message = rejected_message(resource_ids)
+        raise RoleControl::AccessDenied, rejected_message
       end
     end
 
@@ -29,11 +30,11 @@ module RoleControl
       action_name.to_sym
     end
 
-    def rejected_message
-      if resource_ids.is_a?(Array)
-        "Could not find #{resource_sym} with ids='#{resource_ids.join(',')}'"
+    def rejected_message(denied_resource_ids)
+      if denied_resource_ids.is_a?(Array)
+        "Could not find #{resource_sym} with ids='#{denied_resource_ids.join(',')}'"
       else
-        "Could not find #{resource_name} with id='#{resource_ids}'"
+        "Could not find #{resource_name} with id='#{denied_resource_ids}'"
       end
     end
 

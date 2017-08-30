@@ -11,6 +11,16 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
     let(:api_resource_links) { %w(translations.project) }
     let(:scopes) { %i(translation) }
 
+    let(:translated_resource) { create(resource_type) }
+    let(:user_translator_role) do
+      create(
+        :access_control_list,
+        resource: translated_resource,
+        user_group: authorized_user.identity_group,
+        roles: ["translator"]
+      )
+    end
+
     describe "#index" do
       it_behaves_like "is indexable" do
         let(:index_params) do
@@ -45,8 +55,6 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
       let(:test_attr) { :language }
       let(:language) { "en-NZ"}
       let(:test_attr_value)  { language }
-      let(:translated_resource) { create(resource_type) }
-      let(:translated_resource) { create(resource_type) }
       let(:resource_class) { Translation }
 
       let(:create_params) do
@@ -71,21 +79,48 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
       end
 
       it_behaves_like "is creatable" do
-        before do
-          create(
-            :access_control_list,
-            resource: translated_resource,
-            user_group: authorized_user.identity_group,
-            roles: ["translator"]
-          )
-        end
+        before { user_translator_role }
       end
     end
 
-    describe "#show", :focus do
-      it_behaves_like "is showable" do
-        let(:show_params) do
-          { translated_type: resource_type.to_s }
+    describe "#show" do
+      let(:show_params) do
+        { translated_type: resource_type.to_s }
+      end
+
+      it_behaves_like "is showable"
+
+      context "with a private translated resource" do
+        let(:resource) do
+          translated_resource.update_column(:private, true)
+          create(:translation, translated: translated_resource)
+        end
+
+        before(:each) do
+          default_request scopes: scopes, user_id: authorized_user.id
+        end
+
+        context "when the user has not roles" do
+          before do
+            get :show, show_params.merge(id: resource.id)
+          end
+
+          it 'should return 404' do
+            expect(response.status).to eq 404
+          end
+
+          it "should return a specific error message in the response body" do
+            not_found_msg = "Could not find translation with id='#{resource.id}'"
+            expect(response.body).to eq(json_error_message(not_found_msg))
+          end
+        end
+
+        context "when the user has a translator role" do
+          it 'should return 200' do
+            user_translator_role
+            get :show, show_params.merge(id: resource.id)
+            expect(response.status).to eq 200
+          end
         end
       end
     end

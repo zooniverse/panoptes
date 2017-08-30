@@ -3,6 +3,7 @@ class Api::V1::TranslationsController < Api::ApiController
 
   before_action :translated_parental_controlled_resources, only: %i(index show)
   before_action :translated_controlled_resources, only: %i(index show)
+  before_action :error_unless_exists, except: :create
 
   # TODO: add in update action
   resource_actions :show, :index, :create
@@ -22,7 +23,7 @@ class Api::V1::TranslationsController < Api::ApiController
       translated_type: resource_class.name
     )
     if params.key?(:id)
-     translation_scope = translation_scope.where(id: params[:id])
+      translation_scope = translation_scope.where(id: params[:id])
     end
     @controlled_resources = translation_scope
     @controlled_resource = nil
@@ -66,8 +67,6 @@ class Api::V1::TranslationsController < Api::ApiController
   def resource_ids_from_params
     if params[:translated_id]
       params[:translated_id]
-    elsif params.has_key?(:id)
-        params[:id]
     else
       ''
     end.split(',')
@@ -84,5 +83,14 @@ class Api::V1::TranslationsController < Api::ApiController
   def revert_resource_name_to_controller_type
     @resource_name = method(:resource_name).super_method.call
     @resource_class = resource_name.camelize.constantize
+  end
+
+  def error_unless_exists
+    revert_resource_name_to_controller_type
+
+    unless controlled_resources && controlled_resources.exists?
+      rejected_message = rejected_message(params[:id])
+      raise RoleControl::AccessDenied, rejected_message
+    end
   end
 end
