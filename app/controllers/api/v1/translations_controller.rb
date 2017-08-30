@@ -1,11 +1,13 @@
 class Api::V1::TranslationsController < Api::ApiController
   require_authentication :create, :update, :destroy, scopes: [:translation]
-  resource_actions :show, :index, :update, :create
-  schema_type :json_schema
 
-  def schema_class(action)
-    "translation_#{ action }_schema".camelize.constantize
-  end
+  before_action :translated_parental_controlled_resources, only: %i(index show)
+  before_action :translated_controlled_resources, only: %i(index show)
+
+  # TODO: add in update action
+  resource_actions :show, :index, :create
+
+  schema_type :json_schema
 
   def translated_parental_controlled_resources
     @translated_parental_controlled_resources ||= controlled_resources
@@ -24,12 +26,6 @@ class Api::V1::TranslationsController < Api::ApiController
     end
     @controlled_resources = translation_scope
     @controlled_resource = nil
-  end
-
-  def index
-    translated_parental_controlled_resources
-    translated_controlled_resources
-    super
   end
 
   def create

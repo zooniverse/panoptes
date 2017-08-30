@@ -81,5 +81,13 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
         end
       end
     end
+
+    describe "#show", :focus do
+      it_behaves_like "is showable" do
+        let(:show_params) do
+          { translated_type: resource_type.to_s }
+        end
+      end
+    end
   end
 end
