@@ -1,12 +1,12 @@
 class Api::V1::TranslationsController < Api::ApiController
   require_authentication :create, :update, :destroy, scopes: [:translation]
 
-  before_action :translated_parental_controlled_resources, only: %i(index show)
-  before_action :translated_controlled_resources, only: %i(index show)
+  before_action :translated_parental_controlled_resources, only: %i(index show update)
+  before_action :translated_controlled_resources, only: %i(index show update)
   before_action :error_unless_exists, except: :create
 
-  # TODO: add in update action
-  resource_actions :show, :index, :create
+  # TODO: add in destroy action
+  resource_actions :show, :index, :create, :update
 
   schema_type :json_schema
 
@@ -91,6 +91,16 @@ class Api::V1::TranslationsController < Api::ApiController
     unless controlled_resources && controlled_resources.exists?
       rejected_message = rejected_message(params[:id])
       raise RoleControl::AccessDenied, rejected_message
+    end
+  end
+
+  # allow translators to update translated_resource otherwise they'd
+  # need access to the can_by_role :update on the translated resource
+  def controlled_scope
+    if action_name.to_sym == :update
+      :translate
+    else
+      super
     end
   end
 end

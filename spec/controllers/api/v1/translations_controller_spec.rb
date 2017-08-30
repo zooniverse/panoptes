@@ -5,13 +5,14 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
 
   # TODO: expand to worklows, tutorials, field guides, etc
   %i(project).each do |resource_type|
-    let(:resource) { create(:translation) }
+    let(:resource_class) { Translation }
+    let(:translated_resource) { create(resource_type) }
+    let(:resource) { create(:translation, translated: translated_resource) }
     let(:api_resource_name) { "translations" }
     let(:api_resource_attributes) { %w(id strings language) }
     let(:api_resource_links) { %w(translations.project) }
     let(:scopes) { %i(translation) }
 
-    let(:translated_resource) { create(resource_type) }
     let(:user_translator_role) do
       create(
         :access_control_list,
@@ -53,9 +54,8 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
 
     describe "#create" do
       let(:test_attr) { :language }
-      let(:language) { "en-NZ"}
+      let(:language) { "en-NZ" }
       let(:test_attr_value)  { language }
-      let(:resource_class) { Translation }
 
       let(:create_params) do
         {
@@ -74,7 +74,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
             language: language
           },
           translated_id: translated_resource.id,
-          translated_type: translated_resource.class.model_name.singular
+          translated_type: resource_type
         }
       end
 
@@ -91,12 +91,8 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
       it_behaves_like "is showable"
 
       context "with a private translated resource" do
-        let(:resource) do
-          translated_resource.update_column(:private, true)
-          create(:translation, translated: translated_resource)
-        end
-
         before(:each) do
+          translated_resource.update_column(:private, true)
           default_request scopes: scopes, user_id: authorized_user.id
         end
 
@@ -121,6 +117,37 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
             get :show, show_params.merge(id: resource.id)
             expect(response.status).to eq 200
           end
+        end
+      end
+    end
+
+    describe "#update" do
+      it_behaves_like "is updatable" do
+        before { user_translator_role }
+
+        let(:translation_strings) do
+          {
+            title: "Un buen proyecto",
+            description: "Esto es increíble",
+            introduction: "Este proyecto tiene como objetivo encontrar",
+            workflow_description: "¿Se ha utilizado este campo?",
+            researcher_quote: "Posiblemente el cuarto proyecto más grande jamás",
+            urls: [
+              {label: "Blog", url: "http://blog.example.com/"},
+              {label: "El Gorjeo", url: "http://twitter.com/example"}
+            ]
+          }
+        end
+        let(:test_attr) { :strings }
+        let(:test_attr_value)  { JSON.parse(translation_strings.to_json) }
+        let(:update_params) do
+          {
+            translations: {
+              strings: translation_strings
+            },
+            translated_id: translated_resource.id,
+            translated_type: resource_type.to_s
+          }
         end
       end
     end
