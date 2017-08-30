@@ -5,9 +5,7 @@ def scrub_user_details(user)(user)
 end
 
 describe UserInfoScrubber do
-
   describe '::scrub_personal_info!' do
-
     context "when using an active user" do
       let(:user) { create(:user, current_sign_in_ip: '1.2.3.4', last_sign_in_ip: '1.2.3.5', tsv: 'foo', private_profile: false) }
 
@@ -55,9 +53,6 @@ describe UserInfoScrubber do
         scrub_user_details(user) rescue nil
         expect(user.changed?).to eq(false)
       end
-    end
-
-    describe '#anonymize' do
     end
   end
 end

@@ -14,8 +14,6 @@ class UserInfoScrubber
     scrub_details(user)
   end
 
-  private
-
   def self.scrub_details(user)
     user.email = "noreply-#{SecureRandom.hex(4)}@zooniverse.org"
     user.current_sign_in_ip = nil
