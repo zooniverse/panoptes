@@ -145,7 +145,6 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
             translations: {
               strings: translation_strings
             },
-            translated_id: translated_resource.id,
             translated_type: resource_type.to_s
           }
         end
