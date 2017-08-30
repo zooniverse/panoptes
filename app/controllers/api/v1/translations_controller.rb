@@ -30,9 +30,9 @@ class Api::V1::TranslationsController < Api::ApiController
   end
 
   def create
-    translated_create_resource_scope do
-      check_controller_resources
-    end
+    # check the translated_resource with translated_id is accessible
+    # for the translator role
+    check_controller_resources
 
     revert_resource_name_to_controller_type
 
@@ -45,15 +45,6 @@ class Api::V1::TranslationsController < Api::ApiController
       resource
     end
     created_resource_response(translation)
-  end
-
-  # check the user has the translator role on the translated resource
-  def translated_create_resource_scope
-    @controlled_resources = api_user.do(:translate)
-    .to(resource_class, scope_context)
-    .with_ids(resource_ids)
-    .scope
-    yield if block_given?
   end
 
   # override the default resource name to wire up the
@@ -94,10 +85,11 @@ class Api::V1::TranslationsController < Api::ApiController
     end
   end
 
-  # allow translators to update translated_resource otherwise they'd
-  # need access to the can_by_role :update on the translated resource
+  # allow translators to access the translated_resource via the translate role
+  # otherwise they'd need access to something like can_by_role :update
+  # on the translated resource
   def controlled_scope
-    if action_name.to_sym == :update
+    if %i(update create).include?(action_name.to_sym)
       :translate
     else
       super
