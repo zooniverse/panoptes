@@ -41,13 +41,11 @@ module RoleControl
       return @resource_ids if @resource_ids
 
       ids = resource_ids_from_params
-      if ids.length < 2
-        ids.first
-      else
-        ids
-      end
-
-      @resource_ids = ids
+      @resource_ids = if ids.length < 2
+                        ids.first
+                      else
+                        ids
+                      end
     end
 
     def resource_ids_from_params
