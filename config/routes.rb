@@ -1,4 +1,4 @@
-ActionDispatch::Routing::Mapper.send :include, JsonApiRoutes
+ActionDispatch::Routing::Mapper.send :include, Routes::JsonApiRoutes
 
 require 'sidekiq/web'
 
@@ -137,6 +137,16 @@ Rails.application.routes.draw do
       end
 
       json_api_resources :subject_workflow_statuses, only: [:index, :show]
+
+      # TODO: extract these to a shared helper for different constraint re-use
+      # and ensure the constraints are working as expected via feature / respect specs
+      # https://github.com/rspec/rspec-rails/issues/1328#issuecomment-76747936
+      opts = {
+        constraints: Routes::Constraints::Translations.new,
+        format: false,
+        only: %i(show index create update)
+      }
+      resources(:translations, opts)
     end
   end
 

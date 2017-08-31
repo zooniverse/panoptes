@@ -10,7 +10,8 @@ module RoleControl
 
     def check_controller_resources
       unless resources_exist?
-        raise RoleControl::AccessDenied, send(:rejected_message)
+        rejected_message = rejected_message(resource_ids)
+        raise RoleControl::AccessDenied, rejected_message
       end
     end
 
@@ -29,28 +30,33 @@ module RoleControl
       action_name.to_sym
     end
 
-    def rejected_message
-      if resource_ids.is_a?(Array)
-        "Could not find #{resource_sym} with ids='#{resource_ids.join(',')}'"
+    def rejected_message(denied_resource_ids)
+      if denied_resource_ids.is_a?(Array)
+        "Could not find #{resource_sym} with ids='#{denied_resource_ids.join(',')}'"
       else
-        "Could not find #{resource_name} with id='#{resource_ids}'"
+        "Could not find #{resource_name} with id='#{denied_resource_ids}'"
       end
     end
 
     def resource_ids
-      @resource_ids ||= _resource_ids
+      return @resource_ids if @resource_ids
+
+      ids = resource_ids_from_params
+      @resource_ids = if ids.length < 2
+                        ids.first
+                      else
+                        ids
+                      end
     end
 
-    def _resource_ids
-      ids = if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
-              params["#{ resource_name }_id"]
-            elsif params.has_key?(:id)
-              params[:id]
-            else
-              ''
-            end.split(',')
-
-      ids.length < 2 ? ids.first : ids
+    def resource_ids_from_params
+      if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
+        params["#{ resource_name }_id"]
+      elsif params.has_key?(:id)
+        params[:id]
+      else
+        ''
+      end.split(',')
     end
 
     def scope_context

@@ -45,6 +45,10 @@ class Project < ActiveRecord::Base
   has_many :tags, through: :tagged_resources
   has_many :first_time_users, class_name: "User", foreign_key: 'project_id', inverse_of: :signup_project, dependent: :restrict_with_exception
 
+  # TODO: extract association and authorization scope to module
+  has_many :translations, as: :translated, dependent: :destroy
+  can_by_role :translate, roles: %i(owner collaborator translator)
+
   has_paper_trail only: [:private, :live, :beta_requested, :beta_approved, :launch_requested, :launch_approved]
 
   enum state: [:paused, :finished]
@@ -68,8 +72,6 @@ class Project < ActiveRecord::Base
 
   can_by_role :show, :index, :versions, :version, public: true,
     roles: [ :owner, :collaborator, :tester, :translator, :scientist, :moderator ]
-
-  can_by_role :translate, roles: [ :owner, :translator, :collaborator ]
 
   can_be_linked :subject_set, :scope_for, :update, :user
   can_be_linked :subject, :scope_for, :update, :user
