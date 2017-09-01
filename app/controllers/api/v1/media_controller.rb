@@ -1,12 +1,6 @@
 class Api::V1::MediaController < Api::ApiController
   require_authentication :update, :create, :destroy, scopes: [:medium]
 
-  # ensure these before actions register before the resource_actions DSL
-  # so that the precondition checks are testing the correct controlled_resources
-  before_action :media_parental_controlled_resources, only: %i(index show update destroy)
-  before_action :media_controlled_resources, only: %i(index show update destroy)
-  before_action :error_unless_exists, except: :create
-
   resource_actions :default
 
   schema_type :json_schema
@@ -72,11 +66,6 @@ class Api::V1::MediaController < Api::ApiController
     :media
   end
 
-  # this wires up the polymorphic controller scope to load linked resource
-  def resource_name
-    @resource_name ||= params.keys.find{ |key| key.to_s.match(/_id/) }[0..-4]
-  end
-
   def media_name
     params[:media_name]
   end
@@ -110,37 +99,48 @@ class Api::V1::MediaController < Api::ApiController
     end
   end
 
-  # store the original parental contolling scope wired up via the
-  # resource params and the resource_name method
-  # E.g project_id: 1 => Project is the controlled resource
-  def media_parental_controlled_resources
-    @media_parental_controlled_resources ||= controlled_resources
-  end
+  def controlled_resources
+    return @controlled_resources if @controlled_resources
 
-  # override the controlled resources to handle the polymorphic media lookup
-  # from the different routes paths, e.g. /api/workflows/:id/attached_images
-  # will lookup the linked attached_images media for the workflow :id
-  def media_controlled_resources
-    linked_media_scope = association_reflection.klass.where(
-      linked_id: media_parental_controlled_resources.select(:id),
-      linked_type: resource_class.name
+    polymorphic_controlled_resourses = find_controlled_resources(polymorphic_klass, polymorphic_ids)
+
+    linked_media_scope = resource_class.where(
+      linked_id: polymorphic_controlled_resourses.select(:id),
+      linked_type: polymorphic_klass
     )
     if params.key?(:id)
       linked_media_scope = linked_media_scope.where(id: params[:id])
     end
+
     @controlled_resources = linked_media_scope
-    @controlled_resource = nil
   end
 
-  def error_unless_exists
-    unless controlled_resources && controlled_resources.exists?
-      raise Api::NoMediaError.new(media_name, resource_name, resource_ids, params[:id])
-    end
+  def polymorphic_klass_name
+    @polymorphic_klass_name ||= params.keys.find{ |key| key.to_s.match(/_id/) }[0..-4]
+  end
+
+  def polymorphic_klass
+    @polymorphic_klass ||= polymorphic_klass_name.camelize.constantize
+  end
+
+  def polymorphic_ids
+    return @polymorphic_ids if @polymorphic_ids
+    polymorphic_ids = if params.has_key?("#{ polymorphic_klass_name }_id")
+                        params["#{ polymorphic_klass_name }_id"]
+                      else
+                        ''
+                      end.split(',')
+    @polymorphic_ids = polymorphic_ids.length < 2 ? polymorphic_ids.first : polymorphic_ids
+  end
+
+  def raise_no_resources_error
+    raise Api::NoMediaError.new(media_name, polymorphic_klass_name, polymorphic_ids, params[:id])
   end
 
   # check the user can update the linked parental resource
   # so they can create a linked media resource for it
   def media_parental_create_resource_scope
+    # TODO: fix this to use the polymorphic parental scope
     @controlled_resources = api_user.do(:update)
     .to(resource_class, scope_context)
     .with_ids(resource_ids)
