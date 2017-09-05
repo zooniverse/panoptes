@@ -218,6 +218,12 @@ class User < ActiveRecord::Base
     authorizations.blank? && !disabled?
   end
 
+  def receives_email?
+    return false if disabled?
+    return false if email.blank?
+    valid_email
+  end
+
   def build_identity_group
     default_display_name
     raise StandardError, "Identity Group Exists" if identity_group
