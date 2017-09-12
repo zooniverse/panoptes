@@ -7,7 +7,7 @@ class UserWelcomeMailerWorker
 
   def perform(user_id, project_id=nil)
     @user = User.find(user_id)
-    if @user && !@user.email.blank?
+    if @user && @user.receives_email?
       @project_name = if project_id
         Project.find(project_id).try(:display_name)
       end
