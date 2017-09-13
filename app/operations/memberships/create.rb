@@ -14,7 +14,7 @@ module Memberships
 
       membership = Membership.find_or_initialize_by(user: api_user.user, user_group: user_group)
       membership.state = :active
-      membership.save!
+      membership.tap(&:save!)
 
     end
 
