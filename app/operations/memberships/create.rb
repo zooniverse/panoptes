@@ -12,7 +12,9 @@ module Memberships
       raise Unauthorized unless user_group.verify_join_token(join_token)
       raise Unauthorized unless user.id == api_user.id
 
-      Membership.create! user: api_user.user, user_group: user_group, state: :active
+      membership = Membership.find_or_initialize_by(user: api_user.user, user_group: user_group)
+      membership.state = :active
+      membership.tap(&:save!)
     end
 
     def user
