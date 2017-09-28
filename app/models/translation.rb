@@ -1,6 +1,7 @@
 class Translation < ActiveRecord::Base
   belongs_to :translated, polymorphic: true, required: true
   validate :validate_strings
+  validates_presence_of :language
 
   # TODO: add a unique validation for translated_type, id, language
 
