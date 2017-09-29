@@ -68,6 +68,6 @@ class SubjectSelectorSerializer
   end
 
   def finished_workflow
-    user&.has_finished?(workflow)
+    @context[:user_has_finished_workflow]
   end
 end
