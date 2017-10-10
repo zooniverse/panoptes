@@ -249,7 +249,7 @@ GEM
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    omniauth (1.6.1)
+    omniauth (1.7.1)
       hashie (>= 3.4.6, < 3.6.0)
       rack (>= 1.6.2, < 3)
     omniauth-facebook (4.0.0)
@@ -470,7 +470,7 @@ DEPENDENCIES
   mock_redis
   newrelic_rpm
   oauth2!
-  omniauth (~> 1.0)
+  omniauth (~> 1.7)
   omniauth-facebook (~> 4.0)
   omniauth-google-oauth2
   p3p (~> 2.0)
