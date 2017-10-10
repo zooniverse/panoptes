@@ -298,7 +298,7 @@ GEM
       pry (>= 0.9.11)
     puma (3.10.0)
     rack (1.6.8)
-    rack-cors (0.4.1)
+    rack-cors (1.0.1)
     rack-protection (2.0.0)
       rack
     rack-test (0.6.3)
@@ -485,7 +485,7 @@ DEPENDENCIES
   pry-rails
   pry-stack_explorer
   puma (~> 3.10.0)
-  rack-cors (~> 0.4)
+  rack-cors (~> 1.0)
   rails (~> 4.2.10)
   ranked-model (~> 0.4.0)
   restpack_serializer!
