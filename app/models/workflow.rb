@@ -32,7 +32,7 @@ class Workflow < ActiveRecord::Base
   # TODO: remove this association from the cache key
   cache_by_resource_method :subjects_count, :finished?
 
-  enum subject_selection_strategy: [:default, :cellect, :designator]
+  enum subject_selection_strategy: [:default, :cellect, :designator, :builtin]
 
   scope :using_cellect, -> { where(subject_selection_strategy: subject_selection_strategies[:cellect]) }
 
@@ -91,31 +91,15 @@ class Workflow < ActiveRecord::Base
   def subject_selector
     @subject_selector ||=
       case
+      when subject_selection_strategy == "builtin"
+        Subjects::BuiltInSelector.new(self)
       when subject_selection_strategy == "cellect"
         Subjects::CellectSelector.new(self)
       when subject_selection_strategy == "designator"
         Subjects::DesignatorSelector.new(self)
-      when using_cellect?
-        Subjects::CellectSelector.new(self)
       else
-        Subjects::BuiltInSelector.new(self)
+        Subjects::DesignatorSelector.new(self)
       end
-  end
-
-  def cellect_size_subject_space?
-    subjects_count >= Panoptes.cellect_min_pool_size
-  end
-
-  def using_cellect?
-    Rails.cache.fetch(model_cache_key(:using_cellect?), expires_in: 1.hour) do
-      if cellect?
-        true
-      elsif designator?
-        false
-      else
-        cellect_size_subject_space?
-      end
-    end
   end
 
   def subjects_count

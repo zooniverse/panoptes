@@ -18,7 +18,7 @@ RSpec.configure do |config|
   config.include APIRequestHelpers, type: :request
   config.include APIResponseHelpers, type: :request
   config.include ValidUserRequestHelper, type: :request
-  config.include CellectHelpers
+  config.include SubjectSelectionHelpers
   config.include Flipper
   config.extend RSpec::Helpers::ActiveRecordMocks
 

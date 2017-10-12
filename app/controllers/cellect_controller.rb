@@ -35,9 +35,9 @@ class CellectController < ApplicationController
   end
 
   def workflows_using_cellect
-    launched_workflows.collect do |w|
-      w.using_cellect? ? w.slice(:id, :pairwise, :prioritized, :grouped) : nil
-    end.compact
+    launched_workflows.using_cellect.collect do |w|
+      w.slice(:id, :pairwise, :prioritized, :grouped)
+    end
   end
 
   def all_cellect_workflows
@@ -58,8 +58,7 @@ class CellectController < ApplicationController
   end
 
   def cellect_workflow_from_param
-    workflow = launched_workflows.find_by_id params[:workflow_id]
-    workflow if workflow&.using_cellect?
+    launched_workflows.find_by_id params[:workflow_id]
   end
 
   def html_to_json_override

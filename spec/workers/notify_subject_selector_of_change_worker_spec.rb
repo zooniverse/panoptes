@@ -2,7 +2,12 @@ require 'spec_helper'
 
 RSpec.describe NotifySubjectSelectorOfChangeWorker do
   let(:worker) { described_class.new }
-  let(:workflow) { create(:workflow) }
+  let(:workflow) { create(:workflow, :designator) }
+  let(:subject_selector) { workflow.subject_selector }
+
+  before do
+    allow(Subjects::DesignatorSelector).to receive(:new).with(workflow).and_return(subject_selector)
+  end
 
   it "should be retryable 3 times" do
     retry_count = worker.class.get_sidekiq_options['retry']
@@ -10,39 +15,13 @@ RSpec.describe NotifySubjectSelectorOfChangeWorker do
   end
 
   describe "#perform" do
+    it "tells subject selector to reload its workflow" do
+      expect(subject_selector).to receive(:reload_workflow)
+      worker.perform(workflow.id)
+    end
+
     it "should gracefully handle a missing workflow lookup" do
       expect{worker.perform(-1)}.not_to raise_error
-    end
-
-    context "when cellect is off" do
-      it "should not call cellect" do
-        expect(CellectClient).not_to receive(:reload_workflow)
-        worker.perform(workflow.id)
-      end
-    end
-
-    context "when cellect is on" do
-      before do
-        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-      end
-
-      it "should not call to cellect if the workflow is not set to use it" do
-        expect(CellectClient).not_to receive(:reload_workflow)
-        worker.perform(workflow.id)
-      end
-
-      context "when the workflow is using cellect" do
-        before do
-          allow_any_instance_of(Workflow)
-          .to receive(:using_cellect?).and_return(true)
-        end
-
-        it "should request that cellect reload it's workflow" do
-          expect(CellectClient).to receive(:reload_workflow)
-            .with(workflow.id)
-          worker.perform(workflow.id)
-        end
-      end
     end
   end
 end

@@ -42,6 +42,7 @@ FactoryGirl.define do
     primary_language 'en'
     project
     retired_set_member_subjects_count 0
+    subject_selection_strategy "builtin"
 
     after(:build) do |w, env|
       if env.build_contents
@@ -73,6 +74,10 @@ FactoryGirl.define do
       after(:create) do |w, evaluator|
         create_list(:subject_set_with_subjects, evaluator.num_sets, workflows: [w], project: w.project)
       end
+    end
+
+    trait :designator do
+      subject_selection_strategy "designator"
     end
 
     trait :question_task do

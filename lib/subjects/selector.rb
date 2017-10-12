@@ -50,21 +50,18 @@ module Subjects
       opts = { limit: subjects_page_size, subject_set_id: subject_set_id }
       fallback_selector = PostgresqlSelection.new(workflow, user, opts)
 
-      sms_ids = []
-      if workflow.using_cellect?
-        sms_ids = fallback_selector.select
-        if data_available = !sms_ids.empty?
-          if Panoptes.flipper[:cellect_sync_error_reload].enabled?
-            NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
-          end
-          Honeybadger.notify(
-            error_class:   "Cellect data sync error",
-            error_message: "Cellect returns no data but PG selector does",
-            context: {
-              workflow: workflow.id
-            }
-          )
+      sms_ids = fallback_selector.select
+      if data_available = !sms_ids.empty?
+        if Panoptes.flipper[:cellect_sync_error_reload].enabled?
+          NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
         end
+        Honeybadger.notify(
+          error_class:   "Cellect data sync error",
+          error_message: "Cellect returns no data but PG selector does",
+          context: {
+            workflow: workflow.id
+          }
+        )
       end
 
       if sms_ids.blank?
