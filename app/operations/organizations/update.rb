@@ -9,7 +9,7 @@ module Organizations
     string :id
 
     def execute
-      Organization.transaction do
+      Organization.transaction(requires_new: true) do
         content_update = {}
         org_update = organization_params.dup
         Api::V1::OrganizationsController::CONTENT_FIELDS.each do |field|

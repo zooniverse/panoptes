@@ -7,7 +7,7 @@ class OrganizationSerializer
 
 
   attributes :id, :display_name, :description, :introduction, :title, :href,
-    :primary_language, :listed_at, :listed, :slug, :urls
+    :primary_language, :listed_at, :listed, :slug, :urls, :categories
   optional :avatar_src
   media_include :avatar, :background
   can_filter_by :display_name, :slug, :listed_at

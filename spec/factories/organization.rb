@@ -10,6 +10,7 @@ FactoryGirl.define do
     listed true
     primary_language "en"
     urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
+    categories %w(bugs fossils plants)
 
     association :owner, factory: :user
 
