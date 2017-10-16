@@ -18,6 +18,8 @@ class UserSerializer
 
   preload :avatar
 
+  cache_total_count true
+
   def admin
     !!@model.admin
   end
@@ -57,10 +59,5 @@ class UserSerializer
 
   def add_links(model, data)
     data[:links] = {}
-  end
-
-  def self.serialize_meta(page, options)
-    page = Serialization::PageWithCachedMetadata.new(page)
-    super(page, options)
   end
 end

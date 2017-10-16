@@ -8,8 +8,9 @@ module Serialization
         super
       end
 
-      # Make sure to fill instance variable cache in object, so that other methods
-      # can use it.
+      # Ensure setting the instance variable cache in delegated monkey patched
+      # AR object (kaminari), as other page count calculation methods
+      # use it in serialize_meta restpack paging method
       __getobj__.instance_variable_set(:@total_count, @total_count)
     end
   end
