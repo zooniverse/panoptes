@@ -19,6 +19,11 @@ RSpec.describe Translation, type: :model do
     expect(translation).to_not be_valid
   end
 
+  it 'should not be valid without a langague code' do
+    translation.language = nil
+    expect(translation).to_not be_valid
+  end
+
   describe ".translated_model_names" do
     let(:expected_model_name) do
       [ Project.model_name ]
