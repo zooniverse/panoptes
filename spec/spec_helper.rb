@@ -31,6 +31,9 @@ RSpec.configure do |config|
 
   Devise.mailer = Devise::Mailer
 
+  # disable slave reads to deal with testing transaction isolation
+  Slavery.disabled = true
+
   # work around https://github.com/celluloid/celluloid/issues/696
   Celluloid.shutdown_timeout = 1
 
@@ -45,9 +48,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do |example|
-    # use truncation to handle distinct read_slave db connection
-    # revert back to :transaction (faster) when the read slave requirement is removed
-    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.start
     ActionMailer::Base.deliveries.clear
 

@@ -127,13 +127,4 @@ module DumpWorker
   def get_resource
     @resource_type.camelize.constantize.find(@resource_id)
   end
-
-  def read_from_slave
-    original_connection = ActiveRecord::Base.remove_connection
-    slave_connection_config = ActiveRecord::Base.configurations["#{ Rails.env }_read_slave"]
-    ActiveRecord::Base.establish_connection(slave_connection_config)
-    yield
-  ensure
-    ActiveRecord::Base.establish_connection(original_connection)
-  end
 end

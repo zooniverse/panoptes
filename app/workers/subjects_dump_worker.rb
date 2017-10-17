@@ -12,10 +12,9 @@ class SubjectsDumpWorker
     raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
     CSV.open(csv_file_path, 'wb') do |csv|
       headers = Formatter::Csv::Subject.headers
-
       csv << headers
 
-      read_from_slave do
+      Slavery.on_slave do
         project_subjects.find_each do |subject|
           Formatter::Csv::Subject.new(resource, subject).to_rows.each do |hash|
             csv << hash.values_at(*headers)
