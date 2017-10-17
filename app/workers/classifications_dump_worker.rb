@@ -12,11 +12,14 @@ class ClassificationsDumpWorker
     CSV.open(csv_file_path, 'wb') do |csv|
       formatter = Formatter::Csv::Classification.new(cache)
       csv << formatter.class.headers
-      completed_resource_classifications.find_in_batches do |batch|
-        subject_ids = setup_subjects_cache(batch)
-        setup_retirement_cache(batch, subject_ids)
-        batch.each do |classification|
-          csv << formatter.to_array(classification)
+
+      read_from_slave do
+        completed_resource_classifications.find_in_batches do |batch|
+          subject_ids = setup_subjects_cache(batch)
+          setup_retirement_cache(batch, subject_ids)
+          batch.each do |classification|
+            csv << formatter.to_array(classification)
+          end
         end
       end
     end

@@ -15,9 +15,11 @@ class SubjectsDumpWorker
 
       csv << headers
 
-      project_subjects.find_each do |subject|
-        Formatter::Csv::Subject.new(resource, subject).to_rows.each do |hash|
-          csv << hash.values_at(*headers)
+      read_from_slave do
+        project_subjects.find_each do |subject|
+          Formatter::Csv::Subject.new(resource, subject).to_rows.each do |hash|
+            csv << hash.values_at(*headers)
+          end
         end
       end
     end

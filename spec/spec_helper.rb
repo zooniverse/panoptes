@@ -45,7 +45,9 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do |example|
-    DatabaseCleaner.strategy = :transaction
+    # use truncation to handle distinct read_slave db connection
+    # revert back to :transaction (faster) when the read slave requirement is removed
+    DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.start
     ActionMailer::Base.deliveries.clear
 
