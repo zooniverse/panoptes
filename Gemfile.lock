@@ -401,6 +401,8 @@ GEM
       celluloid (>= 0.17.3)
       ice_cube (~> 0.14.0)
       sidekiq (>= 4.1.0)
+    slavery (2.1.1)
+      activerecord (>= 3.0.0)
     slop (3.6.0)
     spring (2.0.2)
       activesupport (>= 4.2)
@@ -499,6 +501,7 @@ DEPENDENCIES
   sidekiq-congestion (~> 0.1.0)
   sidekiq-unique-jobs
   sidetiq (~> 0.7)
+  slavery
   spring
   spring-commands-rspec
   stringex (~> 2.7)
@@ -508,4 +511,4 @@ DEPENDENCIES
   zoo_stream (~> 1.0.1)
 
 BUNDLED WITH
-   1.14.6
+   1.15.4

@@ -52,6 +52,7 @@ gem 'flipper-active_record'
 gem 'flipper-ui'
 gem 'panoptes-client'
 gem 'dalli-elasticache'
+gem 'slavery'
 
 group :production, :staging do
   gem 'newrelic_rpm'

@@ -13,10 +13,13 @@ class WorkflowsDumpWorker
     csv_formatter = Formatter::Csv::Workflow.new
     CSV.open(csv_file_path, 'wb') do |csv|
       csv << csv_formatter.class.headers
-      resource.workflows.find_each do |workflow|
-        csv << csv_formatter.to_array(workflow)
-        while workflow = workflow.previous_version
+
+      Slavery.on_slave do
+        resource.workflows.find_each do |workflow|
           csv << csv_formatter.to_array(workflow)
+          while workflow = workflow.previous_version
+            csv << csv_formatter.to_array(workflow)
+          end
         end
       end
     end
