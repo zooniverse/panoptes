@@ -32,9 +32,7 @@ class Workflow < ActiveRecord::Base
   # TODO: remove this association from the cache key
   cache_by_resource_method :subjects_count, :finished?
 
-  enum subject_selection_strategy: [:default, :cellect, :designator, :builtin]
-
-  scope :using_cellect, -> { where(subject_selection_strategy: subject_selection_strategies[:cellect]) }
+  enum subject_selection_strategy: %i{default cellect designator builtin}
 
   DEFAULT_RETIREMENT_OPTIONS = {
     'criteria' => 'classification_count',
