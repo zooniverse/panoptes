@@ -1,4 +1,4 @@
-class CellectController < ApplicationController
+class SubjectSelectionStrategiesController < ApplicationController
   before_filter :html_to_json_override
 
   EXPIRY = 10.minutes.freeze
@@ -10,7 +10,7 @@ class CellectController < ApplicationController
     respond_to do |format|
       format.json do
         cache_response(EXPIRY)
-        render json: { workflows: all_cellect_workflows.as_json }
+        render json: { workflows: workflows_response.as_json }
       end
     end
   end
@@ -19,36 +19,25 @@ class CellectController < ApplicationController
     respond_to do |format|
       format.json do
         expires_in 1.minute, public: true
-        render json: { subjects: cellect_workflow_subjects.as_json }
+        render json: { subjects: subjects_response.as_json }
       end
     end
   end
 
   private
 
-  def launched_workflows
-    Workflow
-      .joins(:project)
-      .where("projects.launch_approved IS TRUE")
-      .order(:id)
-      .select(SELECT_COLS)
-  end
+  def workflows_response
+    cache_key = "#{Rails.env}#workflows_with_subject_selection_strategy/#{strategy}"
 
-  def workflows_using_cellect
-    launched_workflows.collect do |w|
-      w.using_cellect? ? w.slice(:id, :pairwise, :prioritized, :grouped) : nil
-    end.compact
-  end
-
-  def all_cellect_workflows
-    cache_key = "#{Rails.env}#all_cellect_workflows"
     Rails.cache.fetch(cache_key, expires_in: EXPIRY) do
-      workflows_using_cellect
+      workflows_for_strategy.collect do |w|
+        w.slice(:id, :pairwise, :prioritized, :grouped)
+      end
     end
   end
 
-  def cellect_workflow_subjects
-    if workflow = cellect_workflow_from_param
+  def subjects_response
+    if workflow = workflows_for_strategy.find_by_id(params[:workflow_id])
       SetMemberSubject
         .non_retired_for_workflow(workflow)
         .select('set_member_subjects.subject_id as id', :priority, :subject_set_id)
@@ -57,9 +46,17 @@ class CellectController < ApplicationController
     end
   end
 
-  def cellect_workflow_from_param
-    workflow = launched_workflows.find_by_id params[:workflow_id]
-    workflow if workflow&.using_cellect?
+  def workflows_for_strategy
+    Workflow
+      .joins(:project)
+      .where("projects.launch_approved IS TRUE")
+      .where(subject_selection_strategy: strategy)
+      .order(:id)
+      .select(SELECT_COLS)
+  end
+
+  def strategy
+    Workflow.subject_selection_strategies[params.fetch(:strategy)]
   end
 
   def html_to_json_override

@@ -77,15 +77,9 @@ RSpec.describe Subjects::StrategySelection do
     context "when selecting subjects" do
       let(:result_ids) { [1] }
 
-      it "should select using postgresql by default" do
-        expect_any_instance_of(Subjects::PostgresqlSelection)
-          .to receive(:select)
-          .and_call_original
-        subject.select
-      end
-
       context "with cellect" do
         let(:run_selection) { subject.select }
+
         before do
           allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
           workflow.subject_selection_strategy = "cellect"
@@ -148,89 +142,6 @@ RSpec.describe Subjects::StrategySelection do
           expect(SetMemberSubject).to receive(:by_subject_workflow)
             .with(result_ids, workflow.id).and_call_original
           run_selection
-        end
-      end
-    end
-  end
-
-  describe "#strategy" do
-    let(:cellect_size) { Panoptes.cellect_min_pool_size }
-
-    before do
-      allow(subject).to receive(:workflow).and_return(workflow)
-    end
-
-    it "should fall back to postgresql strategy when not set" do
-      expect(subject.strategy).to eq(nil)
-    end
-
-    context "when Cellect config is on" do
-      before do
-        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-        allow(Panoptes.flipper).to receive(:enabled?).with("designator").and_return(true)
-      end
-
-      context "when the workflow is set to use cellect" do
-        it "should use the workflow config strategy" do
-          allow(workflow).to receive(:subject_selection_strategy).and_return("cellect")
-          expect(subject.strategy).to eq(:cellect)
-        end
-      end
-
-      context "when the number of set_member_subjects is large" do
-        it "should use the cellect strategy" do
-          allow(workflow).to receive(:subjects_count).and_return(cellect_size)
-          expect(subject.strategy).to eq(:cellect)
-        end
-      end
-
-      context "workflow is set to use cellect cellect and large subject set size" do
-        it "should only use the workflow strategy", :aggregate_failures do
-          allow(workflow).to receive(:subject_selection_strategy).and_return("cellect")
-          allow(workflow)
-            .to receive(:cellect_size_subject_space?)
-            .and_return(true)
-            .and_call_original
-          expect(workflow).not_to receive(:set_member_subjects)
-          expect(subject.strategy).to eq(:cellect)
-        end
-      end
-    end
-
-    context "when Cellect Config is off" do
-      before do
-        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(false)
-        allow(Panoptes.flipper).to receive(:enabled?).with("designator").and_return(false)
-      end
-
-      context "when the workflow config has a selection strategy" do
-        it "should not ask the workflow" do
-          expect(subject).not_to receive(:workflow_strategy)
-          expect(subject.strategy).to eq(nil)
-        end
-      end
-
-      context "when the number of set_member_subjects is large" do
-        it "should not query workflow about cellect" do
-          expect_any_instance_of(Workflow).not_to receive(:using_subject_selection_strategy)
-          expect(subject.strategy).to eq(nil)
-        end
-      end
-    end
-
-    describe 'designator' do
-      context "when the workflow is set to use designator" do
-        it "should use the workflow config strategy" do
-          allow(workflow).to receive(:subject_selection_strategy).and_return("designator")
-          expect(subject.strategy).to eq(:designator)
-        end
-      end
-
-      context 'when the workflow has a lot of subjects' do
-        it 'should still use designator' do
-          allow(workflow).to receive(:subject_selection_strategy).and_return("designator")
-          allow(workflow).to receive(:subjects_count).and_return(cellect_size)
-          expect(subject.strategy).to eq(:designator)
         end
       end
     end

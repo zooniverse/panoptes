@@ -84,9 +84,8 @@ RSpec.describe Subjects::Selector do
 
     context "when the cellect selection strategy returns an empty set" do
       before do
-        stub_cellect_connection
-        stub_redis_connection
-        allow(workflow).to receive(:using_cellect?).and_return(true)
+        workflow.designator!
+        stub_designator_client
       end
 
       it 'should fallback to using postgres selection' do

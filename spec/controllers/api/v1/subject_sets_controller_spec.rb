@@ -198,8 +198,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
         end
 
         it 'should notify the subject selector' do
-          allow_any_instance_of(Workflow)
-            .to receive(:using_cellect?).and_return(true)
           expect(NotifySubjectSelectorOfChangeWorker)
             .to receive(:perform_async).with(workflow_id)
         end
@@ -214,8 +212,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
         end
 
         it 'should notify subject selector' do
-          allow_any_instance_of(Workflow)
-            .to receive(:using_cellect?).and_return(true)
           workflows.each do |_workflow|
             expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async)
             .with(_workflow.id)
@@ -232,7 +228,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
         end
 
         it 'should not attempt to call cellect', :aggregate_failures do
-          expect(Panoptes).not_to receive(:use_cellect?)
           expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
         end
       end
@@ -246,7 +241,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
         end
 
         it 'should not attempt to call cellect', :aggregate_failures do
-          expect(Panoptes).not_to receive(:use_cellect?)
           expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
         end
       end

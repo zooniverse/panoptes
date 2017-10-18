@@ -2,9 +2,14 @@ require 'spec_helper'
 
 RSpec.describe NotifySubjectSelectorOfRetirementWorker do
   let(:worker) { described_class.new }
-  let(:workflow) { create(:workflow_with_subjects) }
-  let(:subject) { workflow.subjects.first }
-  let(:subject_set) { subject.subject_sets.first }
+  let(:workflow) { create(:workflow, :designator) }
+  let(:subject_selector) { workflow.subject_selector }
+  let(:subject_id) { 1 }
+  let(:subject_set_id) { 2 }
+
+  before do
+    allow(Subjects::DesignatorSelector).to receive(:new).with(workflow).and_return(subject_selector)
+  end
 
   it "should be retryable 3 times" do
     retry_count = worker.class.get_sidekiq_options['retry']
@@ -12,40 +17,13 @@ RSpec.describe NotifySubjectSelectorOfRetirementWorker do
   end
 
   describe "#perform" do
+    it "tells subject selector to retire subject for the workflow and set" do
+      expect(subject_selector).to receive(:remove_subject).with(subject_id)
+      worker.perform(subject_id, workflow.id)
+    end
+
     it "should gracefully handle a missing workflow lookup" do
-      expect{worker.perform(subject.id, -1)}.not_to raise_error
-    end
-
-    context "when cellect is off" do
-      it "should not call cellect" do
-        expect(CellectClient).not_to receive(:remove_subject)
-        worker.perform(subject.id, workflow.id)
-      end
-    end
-
-    context "when cellect is on" do
-      before do
-        allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-      end
-
-      it "should not call to cellect if the workflow is not set to use it" do
-        expect(CellectClient).not_to receive(:remove_subject)
-        worker.perform(subject.id, workflow.id)
-      end
-
-      context "when the workflow is using cellect" do
-        before do
-          allow_any_instance_of(Workflow)
-          .to receive(:using_cellect?).and_return(true)
-        end
-
-        it "should request that cellect retire for the workflow and set" do
-          expect(CellectClient)
-            .to receive(:remove_subject)
-            .with(subject.id, workflow.id, subject_set.id)
-          worker.perform(subject.id, workflow.id)
-        end
-      end
+      expect{worker.perform(subject_id, -1)}.not_to raise_error
     end
   end
 end

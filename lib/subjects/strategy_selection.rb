@@ -16,28 +16,15 @@ module Subjects
 
     def select
       used_strategy, selected_ids = select_sms_ids
-      eventlog.info("Selected subjects", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: selected_ids)
+      eventlog.info("Selected subjects", used_strategy: used_strategy, subject_ids: selected_ids)
 
       selected_ids = selected_ids.compact
       if Panoptes.flipper[:remove_complete_subjects].enabled?
         incomplete_ids = Subjects::CompleteRemover.new(user, workflow, selected_ids).incomplete_ids
-        eventlog.info("Selected subjects after cleanup", desired_strategy: strategy, used_strategy: used_strategy, subject_ids: incomplete_ids)
+        eventlog.info("Selected subjects after cleanup", used_strategy: used_strategy, subject_ids: incomplete_ids)
         incomplete_ids
       else
         selected_ids
-      end
-    end
-
-    def strategy
-      @strategy ||= case
-      when configured_to_use_cellect?
-        :cellect
-      when configured_to_use_designator?
-        :designator
-      when automatically_use_cellect?
-        :cellect
-      else
-        nil
       end
     end
 
@@ -47,21 +34,6 @@ module Subjects
       select_with(desired_selector)
     rescue CellectClient::ConnectionError, DesignatorClient::GenericError
       select_with(default_selector)
-    end
-
-    def configured_to_use_cellect?
-      return nil unless Panoptes.flipper.enabled?("cellect")
-      workflow.subject_selection_strategy.to_s == 'cellect'
-    end
-
-    def configured_to_use_designator?
-      return nil unless Panoptes.flipper.enabled?("designator")
-      workflow.subject_selection_strategy.to_s == 'designator'
-    end
-
-    def automatically_use_cellect?
-      return nil unless Panoptes.flipper.enabled?("cellect")
-      workflow.using_cellect?
     end
 
     def select_with(selector)
