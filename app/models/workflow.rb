@@ -88,13 +88,11 @@ class Workflow < ActiveRecord::Base
 
   def subject_selector
     @subject_selector ||=
-      case
-      when subject_selection_strategy == "builtin"
+      case subject_selection_strategy
+      when "builtin"
         Subjects::BuiltInSelector.new(self)
-      when subject_selection_strategy == "cellect"
+      when "cellect"
         Subjects::CellectSelector.new(self)
-      when subject_selection_strategy == "designator"
-        Subjects::DesignatorSelector.new(self)
       else
         Subjects::DesignatorSelector.new(self)
       end
