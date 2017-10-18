@@ -14,6 +14,16 @@ RSpec.describe ClassificationsDumpWorker do
       let(:num_entries) { classifications.size + 1 }
     end
 
+    context "with read slave enable" do
+      before do
+        Panoptes.flipper["dump_data_from_read_slave"].enable
+      end
+
+      it_behaves_like "dump worker", ClassificationDataMailerWorker, "project_classifications_export" do
+        let(:num_entries) { classifications.size + 1 }
+      end
+    end
+
     context "with multi subject classification" do
       let(:second_subject) { create(:subject, project: project, subject_sets: subject.subject_sets) }
       let(:classifications) do

@@ -14,7 +14,7 @@ class SubjectsDumpWorker
       headers = Formatter::Csv::Subject.headers
       csv << headers
 
-      Slavery.on_slave do
+      read_from_database do
         project_subjects.find_each do |subject|
           Formatter::Csv::Subject.new(resource, subject).to_rows.each do |hash|
             csv << hash.values_at(*headers)

@@ -127,4 +127,14 @@ module DumpWorker
   def get_resource
     @resource_type.camelize.constantize.find(@resource_id)
   end
+
+  def read_from_database
+    if Panoptes.flipper.enabled?("dump_data_from_read_slave")
+      Slavery.on_slave do
+        yield
+      end
+    else
+      yield
+    end
+  end
 end
