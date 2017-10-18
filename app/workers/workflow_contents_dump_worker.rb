@@ -14,7 +14,7 @@ class WorkflowContentsDumpWorker
     CSV.open(csv_file_path, 'wb') do |csv|
       csv << csv_formatter.class.headers
 
-      Slavery.on_slave do
+      read_from_database do
         resource.workflows.each do |workflow|
           workflow.workflow_contents.find_each do |wc|
             csv << csv_formatter.to_array(wc)

@@ -13,7 +13,7 @@ class ClassificationsDumpWorker
       formatter = Formatter::Csv::Classification.new(cache)
       csv << formatter.class.headers
 
-      Slavery.on_slave do
+      read_from_database do
         completed_resource_classifications.find_in_batches do |batch|
           subject_ids = setup_subjects_cache(batch)
           setup_retirement_cache(batch, subject_ids)
