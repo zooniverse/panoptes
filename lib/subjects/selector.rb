@@ -56,8 +56,8 @@ module Subjects
           NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
         end
         Honeybadger.notify(
-          error_class:   "Cellect data sync error",
-          error_message: "Cellect returns no data but PG selector does",
+          error_class:   "Subject selector data sync error",
+          error_message: "Primary subject selector returns no data but PG selector does",
           context: {
             workflow: workflow.id
           }
