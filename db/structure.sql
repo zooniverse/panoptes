@@ -313,6 +313,39 @@ ALTER SEQUENCE collections_subjects_id_seq OWNED BY collections_subjects.id;
 
 
 --
+-- Name: exports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE exports (
+    id integer NOT NULL,
+    exportable_id integer,
+    exportable_type character varying,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: exports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE exports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: exports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE exports_id_seq OWNED BY exports.id;
+
+
+--
 -- Name: field_guides; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1672,6 +1705,13 @@ ALTER TABLE ONLY collections_subjects ALTER COLUMN id SET DEFAULT nextval('colle
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY exports ALTER COLUMN id SET DEFAULT nextval('exports_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY field_guides ALTER COLUMN id SET DEFAULT nextval('field_guides_id_seq'::regclass);
 
 
@@ -1967,6 +2007,14 @@ ALTER TABLE ONLY collections
 
 ALTER TABLE ONLY collections_subjects
     ADD CONSTRAINT collections_subjects_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY exports
+    ADD CONSTRAINT exports_pkey PRIMARY KEY (id);
 
 
 --
@@ -2429,6 +2477,13 @@ CREATE UNIQUE INDEX index_collections_subjects_on_collection_id_and_subject_id O
 --
 
 CREATE INDEX index_collections_subjects_on_subject_id ON collections_subjects USING btree (subject_id);
+
+
+--
+-- Name: index_exports_on_exportable_type_and_exportable_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_exports_on_exportable_type_and_exportable_id ON exports USING btree (exportable_type, exportable_id);
 
 
 --
@@ -3998,4 +4053,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170727142122');
 INSERT INTO schema_migrations (version) VALUES ('20170808130619');
 
 INSERT INTO schema_migrations (version) VALUES ('20170824165411');
+
+INSERT INTO schema_migrations (version) VALUES ('20171019115705');
 
