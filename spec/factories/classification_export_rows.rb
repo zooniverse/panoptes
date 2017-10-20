@@ -8,7 +8,7 @@ FactoryGirl.define do
       c = env.classification || create(:classification)
       cache = ClassificationDumpCache.new
       cache.reset_classification_subjects(
-        [classification.subject_ids.map { |s_id| [ classification.id, s_id ] }]
+        c.subject_ids.map { |s_id| [ c.id, s_id ] }
       )
       cache.reset_subjects(c.subjects)
       formatter = Formatter::Csv::Classification.new(cache)

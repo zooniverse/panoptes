@@ -15,11 +15,14 @@ RSpec.describe ClassificationExportRow, type: :model do
     expect(export_row).to_not be_valid
   end
 
-  it 'should not be valid without data' do
-    invalid_data_msg = ["must be present but can be empty"]
-    export_row.data = nil
-    expect(export_row.valid?).to be false
-    expect(export_row.errors[:data]).to match_array(invalid_data_msg)
+  it 'should not be valid without attributes' do
+    error_msg = [ "can't be blank" ]
+    attributes = %i(workflow_name workflow_version created_at metadata annotations subject_data subject_ids)
+    attributes.each do |attribute|
+      export_row.send("#{attribute}=", nil)
+      expect(export_row.valid?).to be false
+      expect(export_row.errors[attribute]).to match_array(error_msg)
+    end
   end
 
   describe "::create_from_classification" do
