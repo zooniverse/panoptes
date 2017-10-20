@@ -160,6 +160,50 @@ ALTER SEQUENCE authorizations_id_seq OWNED BY authorizations.id;
 
 
 --
+-- Name: classification_export_rows; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE classification_export_rows (
+    id integer NOT NULL,
+    classification_id integer NOT NULL,
+    project_id integer NOT NULL,
+    workflow_id integer NOT NULL,
+    user_id integer,
+    user_name character varying,
+    user_ip character varying,
+    workflow_name character varying,
+    workflow_version character varying,
+    created_at timestamp without time zone,
+    gold_standard boolean,
+    expert character varying,
+    metadata jsonb,
+    annotations jsonb,
+    subject_data jsonb,
+    subject_ids character varying,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: classification_export_rows_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE classification_export_rows_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: classification_export_rows_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE classification_export_rows_id_seq OWNED BY classification_export_rows.id;
+
+
+--
 -- Name: classification_subjects; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -310,39 +354,6 @@ CREATE SEQUENCE collections_subjects_id_seq
 --
 
 ALTER SEQUENCE collections_subjects_id_seq OWNED BY collections_subjects.id;
-
-
---
--- Name: exports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE exports (
-    id integer NOT NULL,
-    exportable_id integer,
-    exportable_type character varying,
-    data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: exports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE exports_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: exports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE exports_id_seq OWNED BY exports.id;
 
 
 --
@@ -1677,6 +1688,13 @@ ALTER TABLE ONLY authorizations ALTER COLUMN id SET DEFAULT nextval('authorizati
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY classification_export_rows ALTER COLUMN id SET DEFAULT nextval('classification_export_rows_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY classifications ALTER COLUMN id SET DEFAULT nextval('classifications_id_seq'::regclass);
 
 
@@ -1699,13 +1717,6 @@ ALTER TABLE ONLY collections ALTER COLUMN id SET DEFAULT nextval('collections_id
 --
 
 ALTER TABLE ONLY collections_subjects ALTER COLUMN id SET DEFAULT nextval('collections_subjects_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY exports ALTER COLUMN id SET DEFAULT nextval('exports_id_seq'::regclass);
 
 
 --
@@ -1978,6 +1989,14 @@ ALTER TABLE ONLY authorizations
 
 
 --
+-- Name: classification_export_rows_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY classification_export_rows
+    ADD CONSTRAINT classification_export_rows_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: classifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2007,14 +2026,6 @@ ALTER TABLE ONLY collections
 
 ALTER TABLE ONLY collections_subjects
     ADD CONSTRAINT collections_subjects_pkey PRIMARY KEY (id);
-
-
---
--- Name: exports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY exports
-    ADD CONSTRAINT exports_pkey PRIMARY KEY (id);
 
 
 --
@@ -2354,6 +2365,13 @@ CREATE INDEX index_authorizations_on_user_id ON authorizations USING btree (user
 
 
 --
+-- Name: index_classification_export_rows_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classification_export_rows_on_workflow_id ON classification_export_rows USING btree (workflow_id);
+
+
+--
 -- Name: index_classification_subjects_on_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2480,10 +2498,10 @@ CREATE INDEX index_collections_subjects_on_subject_id ON collections_subjects US
 
 
 --
--- Name: index_exports_on_exportable_type_and_exportable_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_export_rows_on_project_id_and_classification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_exports_on_exportable_type_and_exportable_id ON exports USING btree (exportable_type, exportable_id);
+CREATE UNIQUE INDEX index_export_rows_on_project_id_and_classification_id ON classification_export_rows USING btree (project_id, classification_id);
 
 
 --
