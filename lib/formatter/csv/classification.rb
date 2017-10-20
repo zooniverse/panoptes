@@ -1,10 +1,11 @@
 module Formatter
   module Csv
     class Classification
-      attr_reader :classification, :cache, :salt
+      attr_accessor :classification
+      attr_reader :cache, :salt
 
-      delegate :user_id, :workflow, :workflow_id, :created_at, :gold_standard,
-        :workflow_version, to: :classification
+      delegate :user_id, :project_id, :workflow, :workflow_id, :created_at,
+        :gold_standard, :workflow_version, to: :classification
 
       def self.headers
         %w(classification_id user_name user_id user_ip workflow_id workflow_name workflow_version
@@ -22,8 +23,6 @@ module Formatter
           send(attribute)
         end
       end
-
-      private
 
       def classification_id
         classification.id
@@ -71,6 +70,8 @@ module Formatter
       def workflow_name
         workflow.display_name
       end
+
+      private
 
       def classification_subject_ids
         cache.subject_ids_from_classification(classification.id)

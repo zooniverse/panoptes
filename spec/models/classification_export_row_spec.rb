@@ -3,10 +3,7 @@ require 'spec_helper'
 RSpec.describe ClassificationExportRow, type: :model do
   let(:classification) { create(:classification) }
   let(:export_row) do
-    build(:classification_export_row) do |export_row|
-      # set the data attributes here...
-      # export_row.
-    end
+    build(:classification_export_row, classification: classification)
   end
 
   it 'should have a valid factory' do
@@ -25,12 +22,11 @@ RSpec.describe ClassificationExportRow, type: :model do
     expect(export_row.errors[:data]).to match_array(invalid_data_msg)
   end
 
-  describe "::create_from_classification", :focus do
+  describe "::create_from_classification" do
     it 'should create a classification_export_row' do
       expect {
         ClassificationExportRow.create_from_classification(classification)
       }.to change {
-        binding.pry
         ClassificationExportRow.where(
           project: classification.project,
           classification: classification

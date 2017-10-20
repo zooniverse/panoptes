@@ -4,25 +4,42 @@ class ClassificationExportRow < ActiveRecord::Base
   belongs_to :workflow, required: true
   belongs_to :user
 
-  validate :validate_data
-
-  # validates_presence_of :classification, :project_id, :workflow_id, :user_id
-
-  before_validation :copy_classification_fkeys
+  validates_presence_of :workflow_name, :workflow_version, :created_at,
+      :metadata, :annotations, :subject_data, :subject_ids
 
   def self.create_from_classification(classification)
-    create!(classification: classification, data: {}) do |export_row|
-      export_row.project_id = classification.project_id
-      export_row.workflow_id = classification.workflow_id
-      export_row.user_id = classification.user_id
-    end
+    # TODO: look at removing the cache object here as
+    # the formatter doesn't need the cache for a single resource,
+    cache = ClassificationDumpCache.new
+    cache.reset_classification_subjects(
+      classification.subject_ids.map { |s_id| [ classification.id, s_id ] }
+    )
+    cache.reset_subjects(classification.subjects)
+
+    formatter = Formatter::Csv::Classification.new(cache)
+    formatter.classification = classification
+
+    attributes = attributes_from_csv_formatter(formatter)
+    create!(attributes.merge(classification: classification))
   end
 
-  private
-
-  def validate_data
-    unless data.is_a?(Hash)
-      errors.add(:data, "must be present but can be empty")
-    end
+  def self.attributes_from_csv_formatter(formatter)
+    {
+      project_id: formatter.project_id,
+      workflow_id: formatter.workflow_id,
+      user_id: formatter.user_id,
+      user_name: formatter.user_name,
+      # TODO: make this consistent across runs
+      user_ip: nil, # formatter.user_ip
+      workflow_name: formatter.workflow_name,
+      workflow_version: formatter.workflow_version,
+      created_at: formatter.created_at,
+      gold_standard: formatter.gold_standard,
+      expert: formatter.expert,
+      metadata: formatter.metadata,
+      annotations: formatter.annotations,
+      subject_data: formatter.subject_data,
+      subject_ids: formatter.subject_ids
+    }
   end
 end
