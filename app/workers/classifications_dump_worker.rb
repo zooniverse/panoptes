@@ -13,12 +13,17 @@ class ClassificationsDumpWorker
       formatter = Formatter::Csv::Classification.new(cache)
       csv << formatter.class.headers
 
+    # 1. compute all the missing export models
+    # TODO: backfill these models
+
       read_from_database do
-        completed_resource_classifications.find_in_batches do |batch|
-          subject_ids = setup_subjects_cache(batch)
-          setup_retirement_cache(batch, subject_ids)
-          batch.each do |classification|
-            csv << formatter.to_array(classification)
+        classification_export_rows_scope.find_in_batches do |batch|
+          batch.each do |export_row|
+            formatted_cols = Formatter::Csv::Classification.headers.map do |header|
+              # TODO: handle subject retirement metadata update
+              export_row.send(header)
+            end
+            csv << formatted_cols
           end
         end
       end
@@ -26,6 +31,16 @@ class ClassificationsDumpWorker
   end
 
   private
+
+  def classification_export_rows_scope
+    scope_filters = case resource_type
+    when "workflow"
+      { project_id: resource.project_id, workflow_id: resource.id }
+    else
+      { project_id: resource.id }
+    end
+    ClassificationExportRow.where(scope_filters)
+  end
 
   def cache
     @cache ||= ClassificationDumpCache.new

@@ -4,7 +4,7 @@ module DumpWorker
   included do
     include ActiveSupport::Callbacks
     define_callbacks :dump
-    attr_reader :resource
+    attr_reader :resource, :resource_type
   end
 
   def perform(resource_id, resource_type, medium_id=nil, requester_id=nil, *args)
