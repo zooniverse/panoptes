@@ -44,6 +44,14 @@ describe Classification, :type => :model do
     expect(build(:classification, workflow_version: nil)).to_not be_valid
   end
 
+  describe "#classification_export_row" do
+    it 'should return the linked classification export row' do
+      row_export = create(:classification_export_row)
+      classification = row_export.classification
+      expect(classification.export_row).to eq(row_export)
+    end
+  end
+
   describe "#metadata" do
     let(:metadata) { build(:classification).metadata }
 

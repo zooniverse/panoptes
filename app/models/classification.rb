@@ -111,6 +111,12 @@ class Classification < ActiveRecord::Base
     read_attribute(:metadata).with_indifferent_access
   end
 
+  def export_row
+    @export_row ||= ClassificationExportRow.where(
+      project_id: project_id, classification_id: id
+    ).first
+  end
+
   private
 
   def validate_metadata
