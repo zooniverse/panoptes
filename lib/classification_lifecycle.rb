@@ -34,7 +34,7 @@ class ClassificationLifecycle
       update_seen_subjects
     end
 
-    notify_cellect
+    notify_subject_selector
     update_counters
     publish_data
   end
@@ -79,7 +79,7 @@ class ClassificationLifecycle
     PublishClassificationWorker.perform_async(classification.id)
   end
 
-  def notify_cellect
+  def notify_subject_selector
     return unless should_update_seen?
     return unless subjects_are_unseen_by_user?
 
