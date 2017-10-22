@@ -46,14 +46,4 @@ RSpec.describe ClassificationsDumpWorker do
       it_behaves_like "dump worker", ClassificationDataMailerWorker, "project_classifications_export"
     end
   end
-
-  describe "#completed_project_classifications" do
-    before(:each) do
-      allow(worker).to receive(:resource).and_return(project)
-    end
-
-    it "should find all the classifications" do
-      expect(worker.send(:completed_resource_classifications)).to match_array(classifications)
-    end
-  end
 end
