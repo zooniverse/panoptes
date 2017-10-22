@@ -74,8 +74,18 @@ class ClassificationsDumpWorker
 
         classification_export_rows_scope.find_each do |export_row|
           formatted_cols = export_row_columns.map do |header|
-            # TODO: handle subject retirement metadata update
             export_row.send(header)
+            # TODO: handle subject retirement metadata update
+            # setup the classification -> subject ids cache
+            # setup the retirement cache
+            # using the cache (can we test if the cache is warm?)
+            # merge in the latest subject retirement data
+            #   {}.tap do |subjects_and_metadata|
+            #     cache.classification_subject_ids.map {|id| cache.subject(id) }.each do |subject|
+            #       retired_data = { retired: cache.retired?(subject.id, workflow.id) }
+            #       subjects_and_metadata[subject.id] = retired_data.reverse_merge!(subject.metadata)
+            #     end
+            #   end.to_json
           end
           csv << formatted_cols
         end
