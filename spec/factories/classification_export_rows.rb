@@ -20,10 +20,10 @@ FactoryGirl.define do
       row.user_id = formatter.user_id
       row.user_name = formatter.user_name
       # TODO: remove / make this consistent
-      row.user_ip = formatter.user_ip
+      row.user_ip = nil
       row.workflow_name = formatter.workflow_name
       row.workflow_version = formatter.workflow_version
-      row.created_at = formatter.created_at
+      row.classification_created_at = formatter.created_at
       row.gold_standard = formatter.gold_standard
       row.expert = formatter.expert
       row.metadata = formatter.metadata

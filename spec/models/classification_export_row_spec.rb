@@ -17,7 +17,7 @@ RSpec.describe ClassificationExportRow, type: :model do
 
   it 'should not be valid without attributes' do
     error_msg = [ "can't be blank" ]
-    attributes = %i(workflow_name workflow_version created_at metadata annotations subject_data subject_ids)
+    attributes = %i(workflow_name workflow_version classification_created_at metadata annotations subject_data subject_ids)
     attributes.each do |attribute|
       export_row.send("#{attribute}=", nil)
       expect(export_row.valid?).to be false

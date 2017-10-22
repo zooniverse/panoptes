@@ -4,8 +4,9 @@ class ClassificationExportRow < ActiveRecord::Base
   belongs_to :workflow, required: true
   belongs_to :user
 
-  validates_presence_of :workflow_name, :workflow_version, :created_at,
-      :metadata, :annotations, :subject_data, :subject_ids
+  validates_presence_of :workflow_name, :workflow_version,
+      :classification_created_at, :metadata, :annotations,
+      :subject_data, :subject_ids
 
   def self.create_from_classification(classification)
     # TODO: look at removing the cache object here as
@@ -33,7 +34,7 @@ class ClassificationExportRow < ActiveRecord::Base
       user_ip: nil, # formatter.user_ip
       workflow_name: formatter.workflow_name,
       workflow_version: formatter.workflow_version,
-      created_at: formatter.created_at,
+      classification_created_at: formatter.created_at,
       gold_standard: formatter.gold_standard,
       expert: formatter.expert,
       metadata: formatter.metadata,
