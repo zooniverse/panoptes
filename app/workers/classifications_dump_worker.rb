@@ -22,6 +22,8 @@ class ClassificationsDumpWorker
 
   class Dumper
     attr_reader :context
+    delegate :read_from_database, :resource, :resource_type, to: :context
+
     def self.headers
       @headers ||= Formatter::Csv::Classification.headers
     end
@@ -32,26 +34,6 @@ class ClassificationsDumpWorker
 
     def export(csv)
       fail NotImplementedError
-    end
-
-    private
-
-    def read_from_database
-      if Panoptes.flipper.enabled?("dump_data_from_read_slave")
-        Slavery.on_slave do
-          yield
-        end
-      else
-        yield
-      end
-    end
-
-    def resource
-      context.resource
-    end
-
-    def resource_type
-      context.resource_type
     end
   end
 
