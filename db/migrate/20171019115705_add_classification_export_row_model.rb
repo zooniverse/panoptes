@@ -9,7 +9,7 @@ class AddClassificationExportRowModel < ActiveRecord::Migration
       t.string :user_ip
       t.string :workflow_name
       t.string :workflow_version
-      t.timestamp :created_at
+      t.timestamp :classification_created_at
       t.boolean :gold_standard
       t.string :expert
       t.jsonb :metadata

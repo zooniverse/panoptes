@@ -173,13 +173,14 @@ CREATE TABLE classification_export_rows (
     user_ip character varying,
     workflow_name character varying,
     workflow_version character varying,
-    created_at timestamp without time zone,
+    classification_created_at timestamp without time zone,
     gold_standard boolean,
     expert character varying,
     metadata jsonb,
     annotations jsonb,
     subject_data jsonb,
     subject_ids character varying,
+    created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
 
