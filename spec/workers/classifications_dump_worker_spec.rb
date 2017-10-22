@@ -34,6 +34,16 @@ RSpec.describe ClassificationsDumpWorker do
       end
 
       it_behaves_like "dump worker", ClassificationDataMailerWorker, "project_classifications_export"
+
+      context "with the export row backfill enabled" do
+        let(:num_entries) { classifications.size + 1 }
+
+        before do
+          Panoptes.flipper["dump_backfill_classification_export_rows"].enable
+        end
+
+        it_behaves_like "dump worker", ClassificationDataMailerWorker, "project_classifications_export"
+      end
     end
 
     context "with multi subject classification" do
