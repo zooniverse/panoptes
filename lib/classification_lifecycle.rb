@@ -25,8 +25,10 @@ class ClassificationLifecycle
   def execute
     return if create? && classification.lifecycled_at.present?
 
-    Classification.transaction do
+    Classification.transaction(requires_new: true) do
       update_classification_data
+      # TODO: do we need these actions in the same transaction?
+      # try to keep transactions short when we can
       process_project_preference
       create_recent
       update_seen_subjects
