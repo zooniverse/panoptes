@@ -73,7 +73,7 @@ class ClassificationsDumpWorker
         backfill_classification_export_rows
 
         classification_export_rows_scope.find_each do |export_row|
-          formatted_cols = self.class.headers.map do |header|
+          formatted_cols = export_row_columns.map do |header|
             # TODO: handle subject retirement metadata update
             export_row.send(header)
           end
@@ -83,6 +83,12 @@ class ClassificationsDumpWorker
     end
 
     private
+
+    def export_row_columns
+      @export_row_columns ||= self.class.headers.map do |header|
+        header == "created_at" ? "classification_created_at" : header
+      end
+    end
 
     def classification_export_rows_scope
       scope_filters = case resource_type
