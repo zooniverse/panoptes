@@ -34,6 +34,7 @@ class ClassificationLifecycle
       update_seen_subjects
     end
 
+    create_export_row
     notify_subject_selector
     update_counters
     publish_data
@@ -86,6 +87,11 @@ class ClassificationLifecycle
     subject_ids.each do |subject_id|
       NotifySubjectSelectorOfSeenWorker.perform_async(workflow.id, user.try(:id), subject_id)
     end
+  end
+
+  def create_export_row
+    return unless classification.complete?
+    ClassificationExportRowWorker.perform_async(classification.id)
   end
 
   def mark_expert_classifier
