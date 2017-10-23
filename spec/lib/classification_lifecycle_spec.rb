@@ -630,6 +630,10 @@ describe ClassificationLifecycle do
   end
 
   describe "#create_export_row" do
+    before do
+      Panoptes.flipper[:create_classification_export_row_in_lifecycle].enable
+    end
+
     after(:each) { subject.create_export_row }
 
     it 'should call the classification export row worker' do
@@ -642,6 +646,14 @@ describe ClassificationLifecycle do
       let(:classification) { build(:classification, completed: false) }
 
       it 'should not call the classification export row worker' do
+        expect(ClassificationExportRowWorker).not_to receive(:perform_async)
+      end
+    end
+
+    context "when the create export_row feature flag is disabled" do
+
+      it 'should not call the classification export row worker' do
+        Panoptes.flipper[:create_classification_export_row_in_lifecycle].disable
         expect(ClassificationExportRowWorker).not_to receive(:perform_async)
       end
     end

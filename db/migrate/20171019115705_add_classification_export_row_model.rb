@@ -1,8 +1,8 @@
 class AddClassificationExportRowModel < ActiveRecord::Migration
   def change
     create_table :classification_export_rows do |t|
-      t.references :classification, null: false
-      t.references :project, null: false
+      t.references :classification, null: false, index: { unique: true }
+      t.references :project, null: false, index: true
       t.references :workflow, null: false, index: true
       t.references :user
       t.string :user_name
@@ -18,10 +18,5 @@ class AddClassificationExportRowModel < ActiveRecord::Migration
       t.string :subject_ids
       t.timestamps
     end
-
-    add_index :classification_export_rows,
-      %i(project_id classification_id),
-      name: 'index_export_rows_on_project_id_and_classification_id',
-      unique: true
   end
 end

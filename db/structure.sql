@@ -2366,6 +2366,20 @@ CREATE INDEX index_authorizations_on_user_id ON authorizations USING btree (user
 
 
 --
+-- Name: index_classification_export_rows_on_classification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_classification_export_rows_on_classification_id ON classification_export_rows USING btree (classification_id);
+
+
+--
+-- Name: index_classification_export_rows_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classification_export_rows_on_project_id ON classification_export_rows USING btree (project_id);
+
+
+--
 -- Name: index_classification_export_rows_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2496,13 +2510,6 @@ CREATE UNIQUE INDEX index_collections_subjects_on_collection_id_and_subject_id O
 --
 
 CREATE INDEX index_collections_subjects_on_subject_id ON collections_subjects USING btree (subject_id);
-
-
---
--- Name: index_export_rows_on_project_id_and_classification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_export_rows_on_project_id_and_classification_id ON classification_export_rows USING btree (project_id, classification_id);
 
 
 --
