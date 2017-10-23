@@ -645,5 +645,15 @@ describe ClassificationLifecycle do
         expect(ClassificationExportRowWorker).not_to receive(:perform_async)
       end
     end
+
+    context "when the disable export_row creation feature flag is on" do
+      before do
+        Panoptes.flipper[:disable_classification_export_row_in_lifecycle].enable
+      end
+
+      it 'should not call the classification export row worker' do
+        expect(ClassificationExportRowWorker).not_to receive(:perform_async)
+      end
+    end
   end
 end

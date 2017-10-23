@@ -91,7 +91,9 @@ class ClassificationLifecycle
 
   def create_export_row
     return unless classification.complete?
-    ClassificationExportRowWorker.perform_async(classification.id)
+    unless Panoptes.flipper[:disable_classification_export_row_in_lifecycle].enabled?
+      ClassificationExportRowWorker.perform_async(classification.id)
+    end
   end
 
   def mark_expert_classifier
