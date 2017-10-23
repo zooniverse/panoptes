@@ -25,14 +25,17 @@ class ClassificationLifecycle
   def execute
     return if create? && classification.lifecycled_at.present?
 
-    Classification.transaction do
+    Classification.transaction(requires_new: true) do
       update_classification_data
+      # TODO: do we need these actions in the same transaction?
+      # try to keep transactions short when we can
       process_project_preference
       create_recent
       update_seen_subjects
     end
 
-    notify_cellect
+    create_export_row
+    notify_subject_selector
     update_counters
     publish_data
   end
@@ -77,12 +80,19 @@ class ClassificationLifecycle
     PublishClassificationWorker.perform_async(classification.id)
   end
 
-  def notify_cellect
+  def notify_subject_selector
     return unless should_update_seen?
     return unless subjects_are_unseen_by_user?
 
     subject_ids.each do |subject_id|
       NotifySubjectSelectorOfSeenWorker.perform_async(workflow.id, user.try(:id), subject_id)
+    end
+  end
+
+  def create_export_row
+    return unless classification.complete?
+    if Panoptes.flipper[:create_classification_export_row_in_lifecycle].enabled?
+      ClassificationExportRowWorker.perform_async(classification.id)
     end
   end
 
