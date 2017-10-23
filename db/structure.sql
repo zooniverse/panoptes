@@ -2369,7 +2369,7 @@ CREATE INDEX index_authorizations_on_user_id ON authorizations USING btree (user
 -- Name: index_classification_export_rows_on_classification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_classification_export_rows_on_classification_id ON classification_export_rows USING btree (classification_id);
+CREATE UNIQUE INDEX index_classification_export_rows_on_classification_id ON classification_export_rows USING btree (classification_id);
 
 
 --

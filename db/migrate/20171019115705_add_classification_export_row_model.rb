@@ -1,7 +1,7 @@
 class AddClassificationExportRowModel < ActiveRecord::Migration
   def change
     create_table :classification_export_rows do |t|
-      t.references :classification, null: false, index: true
+      t.references :classification, null: false, index: { unique: true }
       t.references :project, null: false, index: true
       t.references :workflow, null: false, index: true
       t.references :user
