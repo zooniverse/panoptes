@@ -13,7 +13,7 @@ class Api::V1::CollectionsController < Api::ApiController
   allowed_params :create, :name, :display_name, :private, :favorite, :description,
     links: [ :default_subject, :project, projects: [], subjects: [], owner: polymorphic ]
 
-  allowed_params :update, :name, :display_name, :private, links: [ :default_subject, subjects: [] ]
+  allowed_params :update, :name, :display_name, :private, :description, links: [ :default_subject, subjects: [] ]
 
   search_by do |name, query|
     query.search_display_name(name.join(" "))
