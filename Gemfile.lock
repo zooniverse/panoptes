@@ -42,7 +42,7 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    active_interaction (3.5.3)
+    active_interaction (3.6.0)
       activemodel (>= 4, < 6)
     active_model_serializers (0.10.0.rc2)
       activemodel (>= 4.0)
@@ -445,7 +445,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_interaction (~> 3.5.3)
+  active_interaction (~> 3.6.0)
   active_model_serializers (= 0.10.0.rc2)
   active_record_union (~> 1.2.0)
   activerecord-import (~> 0.20)
