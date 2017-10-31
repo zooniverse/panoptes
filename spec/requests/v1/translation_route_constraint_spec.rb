@@ -14,12 +14,12 @@ describe "translation api constraints", type: :request do
           language: "en-AU",
           strings: { title: "A great title", other: "strings" }
         }
-      }.to_json
+      }
     end
 
     it "should allow create requests", :focus do
-      as(user, scopes: %w(translation)) do
-        post url, payload, headers
+      as(user, scopes: %w(translation)) do |api_session|
+        api_session.post(url, payload)
         expect(response.status).to eq(201)
       end
     end
