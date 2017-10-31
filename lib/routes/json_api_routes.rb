@@ -61,13 +61,19 @@ module Routes
       end
     end
 
+    def json_api_default_opts
+      @json_api_default_opts ||= {
+        except: %i(new edit),
+        constraints: { id: VALID_IDS },
+        format: false
+      }
+    end
+
     def json_api_resources(path, options={})
       links = options.delete(:links)
       versioned = options.delete(:versioned)
 
-      options = options.merge(except: %i(new edit),
-                              constraints: { id: VALID_IDS },
-                              format: false)
+      options = json_api_default_opts.merge(options)
       create_head(path)
       resources(path, options) do
         create_links(path, links) if links
