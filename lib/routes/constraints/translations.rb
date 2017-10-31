@@ -16,7 +16,7 @@ module Routes
       private
 
       def has_translated_type_param?
-        params.key?(:translated_type)
+        !!params.dig(:translations, :translated_type)
       end
 
       def show_route?
