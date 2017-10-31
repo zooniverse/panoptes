@@ -98,6 +98,7 @@ describe Api::V1::CollectionsController, type: :controller do
       {
        collections: {
                      display_name: "Tested Collection",
+                     description: "Super tested collection of subjects, very good very nice",
                      private: false,
                      links: {
                              subjects: subjects.map(&:id).map(&:to_s)
