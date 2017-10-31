@@ -431,7 +431,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.4)
-    versionist (1.6.0)
+    versionist (1.6.1)
       activesupport (>= 3)
       railties (>= 3)
       yard (~> 0.7)
