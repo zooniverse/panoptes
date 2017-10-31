@@ -52,7 +52,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
       end
     end
 
-    describe "#create" do
+    describe "#create", :focus do
       let(:test_attr) { :language }
       let(:language) { "en-NZ" }
       let(:test_attr_value)  { language }
@@ -71,10 +71,10 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
                 {label: "Twits", url: "http://twitter.com/example"}
               ]
             },
-            language: language
-          },
-          translated_id: translated_resource.id,
-          translated_type: resource_type
+            language: language,
+            translated_id: translated_resource.id,
+            translated_type: resource_type
+          }
         }
       end
 

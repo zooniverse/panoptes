@@ -37,9 +37,7 @@ class Api::V1::TranslationsController < Api::ApiController
     revert_resource_name_to_controller_type
 
     translation = Translation.transaction(requires_new: true) do
-      create_params[:translated_type] = params[:translated_type].classify
-      # TODO: should raise an error if this is missing
-      create_params[:translated_id] = params[:translated_id]
+      create_params[:translated_type] = create_params[:translated_type].classify
       resource = Translation.new(create_params)
       resource.save!
       resource
