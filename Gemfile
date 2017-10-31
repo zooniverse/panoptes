@@ -6,7 +6,7 @@ gem 'active_record_union', '~> 1.2.0'
 gem 'sdoc', '~> 0.4.2', group: :doc
 gem 'doorkeeper', '~> 3.0'
 gem 'doorkeeper-jwt', '~> 0.2.1'
-gem 'devise', '~> 3.0'
+gem 'devise', '~> 4.3'
 gem 'versionist', '~> 1.6'
 gem 'rack-cors', '~> 0.4', require: 'rack/cors'
 gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev" # REST API
