@@ -8,10 +8,19 @@ module APIRequestHelpers
     end
 
     def post(path, body, custom_headers = {})
-      spec.post(path, body.to_json, headers_with(custom_headers))
+      request_url(:post, path, body.to_json, headers_with(custom_headers))
+
+    end
+
+    def put(path, body, custom_headers = {})
+      request_url(:put, path, body.to_json, headers_with(custom_headers))
     end
 
     private
+
+    def request_url(method, *params)
+      spec.send(method, *params)
+    end
 
     def headers_with(custom_headers)
       headers = custom_headers.reverse_merge(
