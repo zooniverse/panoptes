@@ -54,9 +54,9 @@ describe WorkflowCounter do
         expect(counter.retired_subjects).to eq(2)
       end
 
-      it "should respect the project launch date" do
+      it "should ignore the project launch date" do
         workflow.project.update_column(:launch_date, DateTime.now + 1.day)
-        expect(counter.retired_subjects).to eq(0)
+        expect(counter.retired_subjects).to eq(2)
       end
 
       it "should return 0 when a subject set was unlinked" do

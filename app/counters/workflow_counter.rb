@@ -11,11 +11,7 @@ class WorkflowCounter
   end
 
   def retired_subjects
-    retired = linked_subject_workflow_status.retired
-    if launch_date
-      retired = retired.where("subject_workflow_counts.retired_at >= ?", launch_date)
-    end
-    retired.count
+    linked_subject_workflow_status.retired.count
   end
 
   private
