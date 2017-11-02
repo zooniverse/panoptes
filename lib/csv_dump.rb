@@ -1,20 +1,27 @@
+require 'csv'
+
 class CsvDump
-  def self.open(&block)
-    csv_dump = new
-    csv_dump.build_csv(&block)
-    csv_dump
+  def initialize
+    @csv_tempfile = Tempfile.new(['export', '.csv'], mode: File::BINARY)
+    @gzip_tempfile = Tempfile.new(['export', '.gz'], mode: File::BINARY)
   end
 
-  def initialize
-    @csv_tempfile = Tempfile.new(['export', '.csv'])
-    @gzip_tempfile = Tempfile.new(['export', '.gz'])
+  def reopen(&block)
+    @csv_tempfile.flush
+    File.open(csv_file_path, 'rb', &block)
+  end
+
+  def <<(row)
+    csv << row
   end
 
   def build_csv(&block)
-    CSV.open(csv_file_path, 'wb', &block)
+    yield self
   end
 
   def gzip!
+    @csv_tempfile.flush
+
     Zlib::GzipWriter.open(gzip_file_path) do |gz|
       gz.mtime = File.mtime(csv_file_path)
       gz.orig_name = File.basename(csv_file_path)
@@ -41,6 +48,10 @@ class CsvDump
   end
 
   private
+
+  def csv
+    @csv ||= CSV.new(@csv_tempfile)
+  end
 
   def remove_tempfile(tempfile)
     return unless tempfile

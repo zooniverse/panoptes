@@ -1,9 +1,7 @@
 module DumpEmails
   def emails_to_csv_file
-    CsvDump.open do |csv|
-      user_emails.find_in_batches do |user_batch|
-        user_batch.each { |user| csv << [ user.email ] }
-      end
+    user_emails.find_in_batches do |user_batch|
+      user_batch.each { |user| csv_dump << [ user.email ] }
     end
   end
 
