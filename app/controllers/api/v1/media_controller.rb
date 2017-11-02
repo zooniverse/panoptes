@@ -25,19 +25,17 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def create
-    media_parental_create_resource_scope do
-      check_controller_resources
-    end
+    check_polymorphic_controller_resources
 
     created_media_resource = Medium.transaction(requires_new: true) do
       begin
         if association_numeration == :collection
-          controlled_resource.send(media_name).create!(create_params)
+          polymorphic_controlled_resourse.send(media_name).create!(create_params)
         else
-          if old_resource = controlled_resource.send(media_name)
+          if old_resource = polymorphic_controlled_resourse.send(media_name)
             old_resource.destroy
           end
-          controlled_resource.send("create_#{media_name}!", create_params)
+          polymorphic_controlled_resourse.send("create_#{media_name}!", create_params)
         end
       end
     end
@@ -81,15 +79,12 @@ class Api::V1::MediaController < Api::ApiController
 
   private
 
-  def resource_scope(resources)
-    return resources if resources.is_a?(ActiveRecord::Relation)
-    Medium.where(id: resources.try(:id) || resources.map(&:id))
-  end
-
+  # @EXTRACT polymorphic helper
   def association_reflection
-    resource_class.reflect_on_association(media_name)
+    polymorphic_klass.reflect_on_association(media_name)
   end
 
+  # @EXTRACT polymorphic helper
   def association_numeration
     case association_reflection.macro
     when :has_one
@@ -102,8 +97,6 @@ class Api::V1::MediaController < Api::ApiController
   def controlled_resources
     return @controlled_resources if @controlled_resources
 
-    polymorphic_controlled_resourses = find_controlled_resources(polymorphic_klass, polymorphic_ids)
-
     linked_media_scope = resource_class.where(
       linked_id: polymorphic_controlled_resourses.select(:id),
       linked_type: polymorphic_klass
@@ -115,14 +108,27 @@ class Api::V1::MediaController < Api::ApiController
     @controlled_resources = linked_media_scope
   end
 
+  # @EXTRACT polymorphic helper
+  def polymorphic_controlled_resourses
+    @polymorphic_controlled_resourses ||= find_controlled_resources(polymorphic_klass, polymorphic_ids)
+  end
+
+  # @EXTRACT polymorphic helper
+  def polymorphic_controlled_resourse
+    @polymorphic_controlled_resourse ||= @polymorphic_controlled_resourses.first
+  end
+
+  # @EXTRACT polymorphic helper
   def polymorphic_klass_name
     @polymorphic_klass_name ||= params.keys.find{ |key| key.to_s.match(/_id/) }[0..-4]
   end
 
+  # @EXTRACT polymorphic helper
   def polymorphic_klass
     @polymorphic_klass ||= polymorphic_klass_name.camelize.constantize
   end
 
+  # @EXTRACT polymorphic helper
   def polymorphic_ids
     return @polymorphic_ids if @polymorphic_ids
     polymorphic_ids = if params.has_key?("#{ polymorphic_klass_name }_id")
@@ -133,19 +139,23 @@ class Api::V1::MediaController < Api::ApiController
     @polymorphic_ids = polymorphic_ids.length < 2 ? polymorphic_ids.first : polymorphic_ids
   end
 
-  def raise_no_resources_error
-    raise Api::NoMediaError.new(media_name, polymorphic_klass_name, polymorphic_ids, params[:id])
+  # @EXTRACT polymorphic helper
+
+  # check the user can update the linked polymorphic resource
+  # so they can create a linked polymorphic resource for it
+  # e.g. A user wants link a background media resource to Project.where(id: 1)
+  def check_polymorphic_controller_resources
+    raise_no_resources_error unless polymorphic_controlled_resourses.exists?
   end
 
-  # check the user can update the linked parental resource
-  # so they can create a linked media resource for it
-  def media_parental_create_resource_scope
-    # TODO: fix this to use the polymorphic parental scope
-    @controlled_resources = api_user.do(:update)
-    .to(resource_class, scope_context)
-    .with_ids(resource_ids)
-    .scope
-    yield if block_given?
+  # @EXTRACT polymorphic helper
+  def _resource_ids
+    params["#{ polymorphic_klass_name }_id"] || super
+  end
+
+  # @EXTRACT polymorphic helper
+  def raise_no_resources_error
+    raise Api::NoMediaError.new(media_name, polymorphic_klass_name, polymorphic_ids, params[:id])
   end
 
   def send_aggregation_ready_email

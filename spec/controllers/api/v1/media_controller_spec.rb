@@ -306,7 +306,10 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         end
 
         it "should raise an error when attempting to delete the wrong resource type" do
-          allow(controller).to receive(:media_controlled_resources)
+          allow(controller)
+            .to receive(:controlled_resources)
+            .and_return(parent.class.where(id: parent.id))
+
           expect{ destroy_action }.to raise_error(
             JsonApiController::DestructableResource::IncorrectClass,
             "Attempting to delete the wrong resource type - #{parent.class.name}"
