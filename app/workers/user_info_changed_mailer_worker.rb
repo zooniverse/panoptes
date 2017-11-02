@@ -7,7 +7,7 @@ class UserInfoChangedMailerWorker
 
   def perform(user_id, info)
     @user = User.find(user_id)
-    if @user && !@user.email.blank?
+    if @user && @user.receives_email?
       UserInfoChangedMailer.user_info_changed(user, info).deliver
     end
   rescue ActiveRecord::RecordNotFound

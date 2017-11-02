@@ -370,8 +370,6 @@ describe Api::V1::WorkflowsController, type: :controller do
             end
 
             it 'should notify the subject selector that the available subjects changed' do
-              allow_any_instance_of(Workflow)
-                .to receive(:using_cellect?).and_return(true)
               expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async)
                 .with(resource.id)
             end
@@ -397,7 +395,6 @@ describe Api::V1::WorkflowsController, type: :controller do
           let(:linked_resource) { create(:subject_set, project: subject_set_project) }
 
           it 'should not attempt to call cellect', :aggregate_failures do
-            expect(Panoptes).not_to receive(:use_cellect?)
             expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
           end
         end
@@ -405,7 +402,6 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       context "without authorized user" do
         it 'should not attempt to call cellect', :aggregate_failures do
-          expect(Panoptes).not_to receive(:use_cellect?)
           expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
         end
       end

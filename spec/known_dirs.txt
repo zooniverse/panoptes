@@ -12,3 +12,4 @@ spec/serializers
 spec/services
 spec/workers
 spec/counters
+spec/routes

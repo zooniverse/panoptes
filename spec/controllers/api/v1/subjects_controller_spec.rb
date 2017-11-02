@@ -189,6 +189,7 @@ describe Api::V1::SubjectsController, type: :controller do
               favorite_subject_ids: [],
               retired_subject_ids: [],
               url_format: :get,
+              user_has_finished_workflow: false,
               select_context: true
             }
           end

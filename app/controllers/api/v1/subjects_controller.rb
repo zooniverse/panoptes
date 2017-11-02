@@ -124,6 +124,7 @@ class Api::V1::SubjectsController < Api::ApiController
         url_format: :get,
         favorite_subject_ids: FavoritesFinder.new(api_user.user, workflow.project, selected_subject_ids).find_favorites,
         retired_subject_ids: SubjectWorkflowRetirements.new(workflow, selected_subject_ids).find_retirees,
+        user_has_finished_workflow: api_user.user&.has_finished?(workflow),
         select_context: true
       }.compact
     end

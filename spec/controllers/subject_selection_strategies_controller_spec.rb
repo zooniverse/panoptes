@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe CellectController, type: :controller do
+describe SubjectSelectionStrategiesController, type: :controller do
   let(:cellect_workflow) do
     create(:workflow_with_subjects, subject_selection_strategy: "cellect")
   end
   let(:non_cellect_workflow) { create(:workflow_with_subjects) }
 
   describe "GET 'workflows'" do
-    let(:run_get) { get 'workflows', format: :json }
+    let(:run_get) { get 'workflows', strategy: 'cellect', format: :json }
 
     context "as json" do
       before(:each) do
@@ -37,20 +37,6 @@ describe CellectController, type: :controller do
         expected = [cellect_workflow.slice(:id, :pairwise, :grouped, :prioritized)].as_json
         expect(json_response['workflows']).to eql(expected)
       end
-
-      context "with a workflow that satifies the cellect subjects critera" do
-        before do
-          allow_any_instance_of(Workflow)
-            .to receive(:cellect_size_subject_space?)
-            .and_return(true)
-        end
-
-        it "should respond with all the workflows" do
-          run_get
-          workflows = Workflow.all.map{ |w| w.slice(:id, :pairwise, :grouped, :prioritized) }
-          expect(json_response["workflows"]).to match_array(workflows)
-        end
-      end
     end
   end
 
@@ -62,7 +48,7 @@ describe CellectController, type: :controller do
       create(:workflow_with_subjects, subject_selection_strategy: "cellect")
     end
     let(:run_get) do
-      get 'subjects', workflow_id: cellect_workflow.id.to_s, format: :json
+      get 'subjects', strategy: 'cellect', workflow_id: cellect_workflow.id.to_s, format: :json
     end
 
     context "as json" do
@@ -109,15 +95,6 @@ describe CellectController, type: :controller do
           run_get
           response_ids = json_response["subjects"].map{ |s| s['id'] }
           expect(response_ids).to match_array(non_retired_ids)
-        end
-      end
-
-      context "when the worklfow is not set to use cellect" do
-        let(:cellect_workflow) { create(:workflow_with_subjects) }
-
-        it "should respond with an empty array" do
-          run_get
-          expect(json_response).to eq({ subjects: [] }.as_json)
         end
       end
     end

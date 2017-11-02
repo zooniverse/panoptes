@@ -18,7 +18,7 @@ RSpec.configure do |config|
   config.include APIRequestHelpers, type: :request
   config.include APIResponseHelpers, type: :request
   config.include ValidUserRequestHelper, type: :request
-  config.include CellectHelpers
+  config.include SubjectSelectionHelpers
   config.include Flipper
   config.extend RSpec::Helpers::ActiveRecordMocks
 
@@ -30,6 +30,9 @@ RSpec.configure do |config|
   config.filter_run_excluding disabled: true
 
   Devise.mailer = Devise::Mailer
+
+  # disable slave reads to deal with testing transaction isolation
+  Slavery.disabled = true
 
   # work around https://github.com/celluloid/celluloid/issues/696
   Celluloid.shutdown_timeout = 1

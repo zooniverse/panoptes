@@ -7,7 +7,7 @@ class UserAddedToProjectMailerWorker
 
   def perform(user_id, project_id, roles)
     @user = User.find(user_id)
-    if @user && !@user.email.blank? && roles
+    if @user && @user.receives_email? && roles
       project = Project.find(project_id)
       UserAddedToProjectMailer.added_to_project(user, project, roles).deliver
     end

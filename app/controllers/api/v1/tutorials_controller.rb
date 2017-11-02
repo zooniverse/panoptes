@@ -5,7 +5,7 @@ class Api::V1::TutorialsController < Api::ApiController
 
   schema_type :json_schema
 
-  before_filter :set_language_from_header, only: [:index]
+  before_filter :set_language_if_missing, only: [:index]
 
   protected
 
@@ -23,7 +23,7 @@ class Api::V1::TutorialsController < Api::ApiController
     @controlled_resources
   end
 
-  def set_language_from_header
-    params[:language] = "en"
+  def set_language_if_missing
+    params[:language] ||= "en"
   end
 end

@@ -24,7 +24,10 @@ describe Api::V1::FieldGuidesController, type: :controller do
     it_behaves_like "is indexable"
 
     describe "filter_params" do
+      let(:setup_field_guide) { }
+
       before(:each) do
+        setup_field_guide
         default_request user_id: authorized_user.id, scopes: scopes
         get :index, filter_params
       end
@@ -35,6 +38,28 @@ describe Api::V1::FieldGuidesController, type: :controller do
           aggregate_failures "project_id" do
             expect(json_response[api_resource_name].length).to eq(1)
             expect(created_instance_id(api_resource_name)).to eq(field_guides.first.id.to_s)
+          end
+        end
+      end
+
+      context "by language" do
+        let(:filter_params) { {language: "es-mx", project_id: project.id} }
+
+        context "with no field guide" do
+          it "should return not field guide" do
+            expect(json_response[api_resource_name].length).to eq(0)
+          end
+        end
+
+        context "with a field guide" do
+          let(:setup_field_guide) do
+            create(:field_guide, project: project, language: "es-mx")
+          end
+
+          it "should return field guide for es-mx" do
+            resources = json_response[api_resource_name]
+            expect(resources.length).to eq(1)
+            resources.first["language"] == "es-mx"
           end
         end
       end

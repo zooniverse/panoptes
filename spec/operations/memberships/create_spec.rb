@@ -39,5 +39,17 @@ describe Memberships::Create do
         operation.run links: {user: you.id, user_group: 0}, join_token: 'wrong_token'
       end.to raise_error(ActiveRecord::RecordNotFound)
     end
+
+    describe 'user group exists' do
+      let(:membership) { create(:membership, user: you, state: Membership.states[:inactive], roles: ["group_admin"], user_group: user_group) }
+
+      it 'finds an existing deactivated membership and reactivates' do
+        membership
+        result = operation.run links: {user: you.id, user_group: user_group.id}, join_token: user_group.join_token
+        expect(result).to be_valid
+        expect(user_group.users).to include(you)
+        expect(membership.reload.state).to eq("active")
+      end
+    end
   end
 end

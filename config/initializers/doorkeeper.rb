@@ -1,7 +1,7 @@
 module Doorkeeper
   module PanoptesScopes
     def self.optional
-      %i(user project group collection classification subject medium organization)
+      %i(user project group collection classification subject medium organization translation)
     end
   end
 end

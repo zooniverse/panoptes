@@ -160,6 +160,51 @@ ALTER SEQUENCE authorizations_id_seq OWNED BY authorizations.id;
 
 
 --
+-- Name: classification_export_rows; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE classification_export_rows (
+    id integer NOT NULL,
+    classification_id integer NOT NULL,
+    project_id integer NOT NULL,
+    workflow_id integer NOT NULL,
+    user_id integer,
+    user_name character varying,
+    user_ip character varying,
+    workflow_name character varying,
+    workflow_version character varying,
+    classification_created_at timestamp without time zone,
+    gold_standard boolean,
+    expert character varying,
+    metadata jsonb,
+    annotations jsonb,
+    subject_data jsonb,
+    subject_ids character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: classification_export_rows_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE classification_export_rows_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: classification_export_rows_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE classification_export_rows_id_seq OWNED BY classification_export_rows.id;
+
+
+--
 -- Name: classification_subjects; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -719,7 +764,8 @@ CREATE TABLE organizations (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     urls jsonb DEFAULT '[]'::jsonb,
-    listed boolean DEFAULT false NOT NULL
+    listed boolean DEFAULT false NOT NULL,
+    categories character varying[] DEFAULT '{}'::character varying[]
 );
 
 
@@ -1191,6 +1237,40 @@ ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
 
 
 --
+-- Name: translations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE translations (
+    id integer NOT NULL,
+    translated_id integer,
+    translated_type character varying,
+    language character varying NOT NULL,
+    strings jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: translations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE translations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: translations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE translations_id_seq OWNED BY translations.id;
+
+
+--
 -- Name: tutorials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1609,6 +1689,13 @@ ALTER TABLE ONLY authorizations ALTER COLUMN id SET DEFAULT nextval('authorizati
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY classification_export_rows ALTER COLUMN id SET DEFAULT nextval('classification_export_rows_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY classifications ALTER COLUMN id SET DEFAULT nextval('classifications_id_seq'::regclass);
 
 
@@ -1805,6 +1892,13 @@ ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclas
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY translations ALTER COLUMN id SET DEFAULT nextval('translations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY tutorials ALTER COLUMN id SET DEFAULT nextval('tutorials_id_seq'::regclass);
 
 
@@ -1893,6 +1987,14 @@ ALTER TABLE ONLY aggregations
 
 ALTER TABLE ONLY authorizations
     ADD CONSTRAINT authorizations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: classification_export_rows_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY classification_export_rows
+    ADD CONSTRAINT classification_export_rows_pkey PRIMARY KEY (id);
 
 
 --
@@ -2120,6 +2222,14 @@ ALTER TABLE ONLY tags
 
 
 --
+-- Name: translations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY translations
+    ADD CONSTRAINT translations_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: tutorials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2253,6 +2363,27 @@ CREATE INDEX index_aggregations_on_workflow_id ON aggregations USING btree (work
 --
 
 CREATE INDEX index_authorizations_on_user_id ON authorizations USING btree (user_id);
+
+
+--
+-- Name: index_classification_export_rows_on_classification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_classification_export_rows_on_classification_id ON classification_export_rows USING btree (classification_id);
+
+
+--
+-- Name: index_classification_export_rows_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classification_export_rows_on_project_id ON classification_export_rows USING btree (project_id);
+
+
+--
+-- Name: index_classification_export_rows_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_classification_export_rows_on_workflow_id ON classification_export_rows USING btree (workflow_id);
 
 
 --
@@ -2820,6 +2951,20 @@ CREATE INDEX index_tags_name_trgrm ON tags USING gin ((COALESCE(name, ''::text))
 --
 
 CREATE UNIQUE INDEX index_tags_on_name ON tags USING btree (name);
+
+
+--
+-- Name: index_translations_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_translations_on_language ON translations USING btree (language);
+
+
+--
+-- Name: index_translations_on_translated_type_and_translated_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_translations_on_translated_type_and_translated_id ON translations USING btree (translated_type, translated_id);
 
 
 --
@@ -3930,4 +4075,10 @@ INSERT INTO schema_migrations (version) VALUES ('20170524210302');
 INSERT INTO schema_migrations (version) VALUES ('20170525151142');
 
 INSERT INTO schema_migrations (version) VALUES ('20170727142122');
+
+INSERT INTO schema_migrations (version) VALUES ('20170808130619');
+
+INSERT INTO schema_migrations (version) VALUES ('20170824165411');
+
+INSERT INTO schema_migrations (version) VALUES ('20171019115705');
 

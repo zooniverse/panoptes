@@ -88,4 +88,35 @@ describe OrganizationSerializer do
       end
     end
   end
+
+  describe "#urls" do
+    let(:result) do
+      OrganizationSerializer.single({}, Organization.where(id: organization.id), {})
+    end
+    let(:result_urls) do
+      organization.urls.map do |url|
+        {
+          url: url["url"],
+          label: url["label"]
+        }
+      end
+    end
+
+    it "should return url attribute" do
+      expect(result[:urls]).to match_array(result_urls)
+    end
+  end
+
+  describe "#categories" do
+    let(:result) do
+      OrganizationSerializer.single(
+        {},
+        Organization.where(id: organization.id),
+        {}
+      )
+    end
+    it "should return the categories by default" do
+      expect(result[:categories]).to match_array(organization.categories)
+    end
+  end
 end

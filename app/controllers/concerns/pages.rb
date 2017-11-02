@@ -9,7 +9,7 @@ module Pages
     allowed_params :create, :url_key, :title, :content, :language
     allowed_params :update, :url_key, :title, :content, :language
 
-    before_filter :set_language_from_header, only: [:index]
+    before_filter :set_language_if_missing, only: [:index]
 
     # Methods defined here in order to avoid being overridden by resource modules
     define_method(:link_header) do |resource|
@@ -44,8 +44,8 @@ module Pages
 
   protected
 
-  def set_language_from_header
-    params[:language] = "en"
+  def set_language_if_missing
+    params[:language] ||= "en"
   end
 
   def serializer
