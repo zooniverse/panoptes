@@ -24,8 +24,8 @@ module RoleControl
       @controlled_resource ||= controlled_resources.first
     end
 
-    def find_controlled_resources(controlled_class, controlled_ids)
-       api_user.do(controlled_scope)
+    def find_controlled_resources(controlled_class, controlled_ids, action=controlled_scope)
+       api_user.do(action)
        .to(controlled_class, scope_context, add_active_scope: add_active_resources_scope)
        .with_ids(controlled_ids)
        .scope

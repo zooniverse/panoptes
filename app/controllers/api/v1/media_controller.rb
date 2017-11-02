@@ -110,7 +110,8 @@ class Api::V1::MediaController < Api::ApiController
 
   # @EXTRACT polymorphic helper
   def polymorphic_controlled_resourses
-    @polymorphic_controlled_resourses ||= find_controlled_resources(polymorphic_klass, polymorphic_ids)
+    @polymorphic_controlled_resourses ||=
+      find_controlled_resources(polymorphic_klass, polymorphic_ids, :update)
   end
 
   # @EXTRACT polymorphic helper
