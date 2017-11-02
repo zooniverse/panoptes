@@ -21,9 +21,9 @@ class AggregationsDumpWorker
     # aggregation engine will write directly to medium when done, no need to cleanup
   end
 
-  def load_medium
-    m = Medium.find(@medium_id)
-    m.update!(path_opts: resource_file_path, private: true, content_type: "application/x-gzip")
-    m
+  def medium
+    @medium ||= Medium.find(@medium_id).tap do |m|
+      m.update!(path_opts: resource_file_path, private: true, content_type: "application/x-gzip")
+    end
   end
 end

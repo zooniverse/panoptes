@@ -12,7 +12,7 @@ module DumpWorker
     raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
     @resource_type = resource_type
     @resource_id = resource_id
-    if @resource = get_resource
+    if @resource = CsvDumps::FindsDumpScope.find(resource_type, resource_id)
       @medium_id = medium_id
       begin
         run_callbacks :dump do
@@ -38,7 +38,7 @@ module DumpWorker
   end
 
   def medium
-    @medium ||= @medium_id ? load_medium : create_medium
+    @medium ||= CsvDumps::FindsMedium.new(@medium_id, dump_type, resource_file_path, @resource, content_disposition).medium
   end
 
   def set_ready_state
@@ -50,31 +50,6 @@ module DumpWorker
     medium.put_file(gzip_file_path, compressed: true)
   end
 
-  def create_medium
-    Medium.create!(
-      content_type: "text/csv",
-      type: dump_type,
-      path_opts: resource_file_path,
-      linked: @resource,
-      metadata: { state: 'creating' },
-      private: true,
-      content_disposition: content_disposition
-    )
-  end
-
-  def load_medium
-    m = Medium.find(@medium_id)
-    metadata = m.metadata.merge("state" => "creating")
-    m.update!(
-      path_opts: resource_file_path,
-      private: true,
-      content_type: "text/csv",
-      content_disposition: content_disposition,
-      metadata: metadata
-    )
-    m
-  end
-
   def content_disposition
     case @resource_type
     when "workflow"
@@ -83,10 +58,6 @@ module DumpWorker
       name = @resource.slug.split("/")[1]
     end
     "attachment; filename=\"#{name}-#{dump_target}.csv\""
-  end
-
-  def get_resource
-    @resource_type.camelize.constantize.find(@resource_id)
   end
 
   def read_from_database(&block)
