@@ -4,14 +4,15 @@ describe "translation api custom route constraints", type: :request do
   include APIRequestHelpers
   let(:translation) { create(:project_translation) }
   let(:user) { translation.translated.owner }
+  let(:query_params) do
+    "translated_type=#{translation.translated_type}&translated_id=#{translation.translated_id}"
+  end
 
   describe "POST request" do
-    let(:url) { "/api/translations" }
+    let(:url) { "/api/translations?#{query_params}" }
     let(:payload) do
       { translations:
         {
-          translated_type: "Project",
-          translated_id: translation.id,
           language: "en-AU",
           strings: { title: "A great title", other: "strings" }
         }
@@ -28,7 +29,7 @@ describe "translation api custom route constraints", type: :request do
   end
 
   describe "PUT request" do
-    let(:url) { "/api/translations/#{translation.id}" }
+    let(:url) { "/api/translations/#{translation.id}?#{query_params}" }
     let(:payload) do
       { translations:
         {
