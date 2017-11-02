@@ -42,7 +42,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     end
 
     it "should compress the csv file" do
-      expect(worker).to receive(:to_gzip).and_call_original
+      expect(worker.csv_dump).to receive(:gzip!).and_call_original
       worker.perform(project.id, "project")
     end
 
@@ -52,7 +52,7 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     end
 
     it "should clean up the file after sending to s3" do
-      expect(worker).to receive(:remove_tempfile).twice.and_call_original
+      expect(worker.csv_dump).to receive(:cleanup!).and_call_original
       worker.perform(project.id, "project")
     end
 

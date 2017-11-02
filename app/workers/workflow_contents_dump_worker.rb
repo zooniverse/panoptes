@@ -11,7 +11,7 @@ class WorkflowContentsDumpWorker
   def perform_dump
     raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
     csv_formatter = Formatter::Csv::WorkflowContent.new
-    CSV.open(csv_file_path, 'wb') do |csv|
+    CsvDump.open do |csv|
       csv << csv_formatter.class.headers
 
       read_from_database do

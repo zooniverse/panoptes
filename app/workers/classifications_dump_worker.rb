@@ -9,7 +9,7 @@ class ClassificationsDumpWorker
   sidekiq_options queue: :data_high
 
   def perform_dump
-    CSV.open(csv_file_path, 'wb') do |csv|
+    CsvDump.open do |csv|
       formatter = Formatter::Csv::Classification.new(cache)
       csv << formatter.class.headers
 

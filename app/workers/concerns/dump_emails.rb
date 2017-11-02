@@ -1,6 +1,6 @@
 module DumpEmails
   def emails_to_csv_file
-    CSV.open(csv_file_path, 'wb') do |csv|
+    CsvDump.open do |csv|
       user_emails.find_in_batches do |user_batch|
         user_batch.each { |user| csv << [ user.email ] }
       end
@@ -15,7 +15,7 @@ module DumpEmails
     exts = file_paths.join(".")
     file_name = "#{export_type}_email_list"
     s3_path = "#{prefix}/#{file_name}.#{exts}"
-    storage_adapter.put_file(s3_path, gzip_file_path, storage_opts(file_name))
+    storage_adapter.put_file(s3_path, csv_dump.gzip_file_path, storage_opts(file_name))
   end
 
   def storage_opts(file_name)

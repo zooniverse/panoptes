@@ -10,7 +10,8 @@ class SubjectsDumpWorker
 
   def perform_dump
     raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
-    CSV.open(csv_file_path, 'wb') do |csv|
+
+    CsvDump.open do |csv|
       headers = Formatter::Csv::Subject.headers
       csv << headers
 

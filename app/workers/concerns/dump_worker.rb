@@ -47,7 +47,7 @@ module DumpWorker
   end
 
   def write_to_s3
-    medium.put_file(gzip_file_path, compressed: true)
+    medium.put_file(csv_dump.gzip_file_path, compressed: true)
   end
 
   def create_medium
