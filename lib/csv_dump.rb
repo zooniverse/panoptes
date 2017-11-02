@@ -8,43 +8,32 @@ class CsvDump
 
   def reopen(&block)
     @csv_tempfile.flush
-    File.open(csv_file_path, 'rb', &block)
+    File.open(@csv_tempfile.path, 'rb', &block)
   end
 
   def <<(row)
     csv << row
   end
 
-  def build_csv(&block)
-    yield self
-  end
-
   def gzip!
-    @csv_tempfile.flush
+    Zlib::GzipWriter.open(@gzip_tempfile.path) do |gz|
+      gz.mtime = @csv_tempfile
+      gz.orig_name = File.basename(@csv_tempfile.path)
 
-    Zlib::GzipWriter.open(gzip_file_path) do |gz|
-      gz.mtime = File.mtime(csv_file_path)
-      gz.orig_name = File.basename(csv_file_path)
-      File.open(csv_file_path) do |fp|
+      reopen do |fp|
         while chunk = fp.read(16 * 1024) do
           gz.write(chunk)
         end
       end
       gz.close
     end
+
+    @gzip_tempfile.path
   end
 
   def cleanup!
     remove_tempfile(@csv_tempfile)
     remove_tempfile(@gzip_tempfile)
-  end
-
-  def csv_file_path
-    @csv_tempfile.path
-  end
-
-  def gzip_file_path
-    @gzip_tempfile.path
   end
 
   private

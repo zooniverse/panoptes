@@ -5,7 +5,7 @@ module DumpEmails
     end
   end
 
-  def write_to_s3
+  def write_to_s3(gzip_file_path)
     storage_path = storage_adapter.stored_path("application/x-gzip", "email_exports")
     prefix = File.dirname(storage_path)
     file_paths = File.basename(storage_path).split(".")
@@ -13,7 +13,7 @@ module DumpEmails
     exts = file_paths.join(".")
     file_name = "#{export_type}_email_list"
     s3_path = "#{prefix}/#{file_name}.#{exts}"
-    storage_adapter.put_file(s3_path, csv_dump.gzip_file_path, storage_opts(file_name))
+    storage_adapter.put_file(s3_path, gzip_file_path, storage_opts(file_name))
   end
 
   def storage_opts(file_name)

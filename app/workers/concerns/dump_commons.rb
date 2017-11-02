@@ -5,8 +5,8 @@ module DumpCommons
   end
 
   def upload_dump
-    csv_dump.gzip!
-    write_to_s3
+    gzip_file_path = csv_dump.gzip!
+    write_to_s3(gzip_file_path)
     yield resource if block_given?
   end
 
