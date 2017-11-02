@@ -8,17 +8,18 @@ class WorkflowContentsDumpWorker
 
   sidekiq_options queue: :data_high
 
-  def perform_dump
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
-    csv_formatter = Formatter::Csv::WorkflowContent.new
-    csv_dump << csv_formatter.class.headers
+  def formatter
+    @formatter ||= Formatter::Csv::WorkflowContent.new
+  end
 
+  def each
     read_from_database do
       resource.workflows.each do |workflow|
         workflow.workflow_contents.find_each do |wc|
-          csv_dump << csv_formatter.to_array(wc)
+          yield wc
+
           while wc = wc.previous_version
-            csv_dump << csv_formatter.to_array(wc)
+            yield wc
           end
         end
       end

@@ -8,16 +8,17 @@ class ClassificationsDumpWorker
 
   sidekiq_options queue: :data_high
 
-  def perform_dump
-    formatter = Formatter::Csv::Classification.new(cache)
-    csv_dump << formatter.class.headers
+  def formatter
+    @formatter ||= Formatter::Csv::Classification.new(cache)
+  end
 
+  def each
     read_from_database do
       completed_resource_classifications.find_in_batches do |batch|
         subject_ids = setup_subjects_cache(batch)
         setup_retirement_cache(batch, subject_ids)
         batch.each do |classification|
-          csv_dump << formatter.to_array(classification)
+          yield classification
         end
       end
     end

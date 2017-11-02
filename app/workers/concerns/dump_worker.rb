@@ -25,6 +25,14 @@ module DumpWorker
     end
   end
 
+  def perform_dump
+    csv_dump << formatter.class.headers
+
+    each do |model|
+      csv_dump << formatter.to_array(model)
+    end
+  end
+
   def dump_target
     @dump_target ||= self.class.to_s.underscore.match(/\A(\w+)_dump_worker\z/)[1]
   end

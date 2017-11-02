@@ -14,11 +14,22 @@ class SubjectsDumpWorker
     headers = Formatter::Csv::Subject.headers
     csv_dump << headers
 
+    each do |model|
+      Formatter::Csv::Subject.new(resource, model).to_rows.each do |hash|
+        csv_dump << hash.values_at(*headers)
+      end
+    end
+
+  end
+
+  def formatter
+    @formatter ||= Formatter::Csv::Subject
+  end
+
+  def each
     read_from_database do
       project_subjects.find_each do |subject|
-        Formatter::Csv::Subject.new(resource, subject).to_rows.each do |hash|
-          csv_dump << hash.values_at(*headers)
-        end
+        yield subject
       end
     end
   end
