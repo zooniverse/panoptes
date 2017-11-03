@@ -14,7 +14,7 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def index
-    if has_one_assocation
+    if has_one_assocation?
       #generate the etag here as we use the index route for linked media has_one relations
       headers['ETag'] = gen_etag(controlled_resources)
       render json_api: serializer.page(params, controlled_resources, context)
@@ -33,7 +33,7 @@ class Api::V1::MediaController < Api::ApiController
 
     created_media_resource = Medium.transaction(requires_new: true) do
       begin
-        if has_many_assocation
+        if has_many_assocation?
           polymorphic_controlled_resourse.send(media_name).create!(create_params)
         else
           if old_resource = polymorphic_controlled_resourse.send(media_name)
@@ -103,11 +103,11 @@ class Api::V1::MediaController < Api::ApiController
     @association_reflection ||= polymorphic_klass.reflect_on_association(media_name)
   end
 
-  def has_one_assocation
+  def has_one_assocation?
     @has_one_assocation ||= association_reflection.macro == :has_one
   end
 
-  def has_many_assocation
+  def has_many_assocation?
     @has_many_assocation ||= association_reflection.macro == :has_many
   end
 end
