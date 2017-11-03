@@ -41,12 +41,15 @@ module RoleControl
       raise RoleControl::AccessDenied, no_resources_error_message
     end
 
-    def no_resources_error_message(resource=resource_name)
-      msg_prefix = "Could not find #{resource} with"
+    def no_resources_error_message
+      "Could not find #{resource_name} with #{no_resources_message_ids}"
+    end
+
+    def no_resources_message_ids
       if resource_ids.is_a?(Array)
-        "#{msg_prefix} ids='#{resource_ids.join(',')}'"
+        "ids='#{resource_ids.join(',')}'"
       else
-        "#{msg_prefix} id='#{resource_ids}'"
+        "id='#{resource_ids}'"
       end
     end
 

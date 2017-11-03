@@ -85,6 +85,6 @@ module PolymorphicResourceScope
   end
 
   def no_resources_error_message
-    super(polymorphic_klass_name)
+    "Could not find #{polymorphic_klass_name} #{controller_name} with #{no_resources_message_ids}"
   end
 end
