@@ -1,4 +1,8 @@
 class Api::V1::MediaController < Api::ApiController
+  include PolymorphicResourceScope
+
+  polymorphic_column :linked
+
   require_authentication :update, :create, :destroy, scopes: [:medium]
 
   resource_actions :default
@@ -10,7 +14,7 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def index
-    if association_numeration == :single
+    if has_one_assocation
       #generate the etag here as we use the index route for linked media has_one relations
       headers['ETag'] = gen_etag(controlled_resources)
       render json_api: serializer.page(params, controlled_resources, context)
@@ -29,7 +33,7 @@ class Api::V1::MediaController < Api::ApiController
 
     created_media_resource = Medium.transaction(requires_new: true) do
       begin
-        if association_numeration == :collection
+        if has_many_assocation
           polymorphic_controlled_resourse.send(media_name).create!(create_params)
         else
           if old_resource = polymorphic_controlled_resourse.send(media_name)
@@ -73,88 +77,12 @@ class Api::V1::MediaController < Api::ApiController
     when /\A(classifications|subjects|aggregations)_export\z/
       :update
     else
-      action_name.to_sym
+      super
     end
   end
 
   private
 
-  # @EXTRACT polymorphic helper
-  def association_reflection
-    polymorphic_klass.reflect_on_association(media_name)
-  end
-
-  # @EXTRACT polymorphic helper
-  def association_numeration
-    case association_reflection.macro
-    when :has_one
-      :single
-    when :has_many
-      :collection
-    end
-  end
-
-  def controlled_resources
-    return @controlled_resources if @controlled_resources
-
-    linked_media_scope = resource_class.where(
-      linked_id: polymorphic_controlled_resourses.select(:id),
-      linked_type: polymorphic_klass
-    )
-    if params.key?(:id)
-      linked_media_scope = linked_media_scope.where(id: params[:id])
-    end
-
-    @controlled_resources = linked_media_scope
-  end
-
-  # @EXTRACT polymorphic helper
-  def polymorphic_controlled_resourses
-    @polymorphic_controlled_resourses ||=
-      find_controlled_resources(polymorphic_klass, polymorphic_ids, :update)
-  end
-
-  # @EXTRACT polymorphic helper
-  def polymorphic_controlled_resourse
-    @polymorphic_controlled_resourse ||= @polymorphic_controlled_resourses.first
-  end
-
-  # @EXTRACT polymorphic helper
-  def polymorphic_klass_name
-    @polymorphic_klass_name ||= params.keys.find{ |key| key.to_s.match(/_id/) }[0..-4]
-  end
-
-  # @EXTRACT polymorphic helper
-  def polymorphic_klass
-    @polymorphic_klass ||= polymorphic_klass_name.camelize.constantize
-  end
-
-  # @EXTRACT polymorphic helper
-  def polymorphic_ids
-    return @polymorphic_ids if @polymorphic_ids
-    polymorphic_ids = if params.has_key?("#{ polymorphic_klass_name }_id")
-                        params["#{ polymorphic_klass_name }_id"]
-                      else
-                        ''
-                      end.split(',')
-    @polymorphic_ids = polymorphic_ids.length < 2 ? polymorphic_ids.first : polymorphic_ids
-  end
-
-  # @EXTRACT polymorphic helper
-
-  # check the user can update the linked polymorphic resource
-  # so they can create a linked polymorphic resource for it
-  # e.g. A user wants link a background media resource to Project.where(id: 1)
-  def check_polymorphic_controller_resources
-    raise_no_resources_error unless polymorphic_controlled_resourses.exists?
-  end
-
-  # @EXTRACT polymorphic helper
-  def _resource_ids
-    params["#{ polymorphic_klass_name }_id"] || super
-  end
-
-  # @EXTRACT polymorphic helper
   def raise_no_resources_error
     raise Api::NoMediaError.new(media_name, polymorphic_klass_name, polymorphic_ids, params[:id])
   end
@@ -164,5 +92,17 @@ class Api::V1::MediaController < Api::ApiController
     if controlled_resource.metadata.try(:[], "state") == "ready"
       AggregationDataMailerWorker.perform_async(controlled_resource.id)
     end
+  end
+
+  def association_reflection
+    @association_reflection ||= polymorphic_klass.reflect_on_association(media_name)
+  end
+
+  def has_one_assocation
+    @has_one_assocation ||= association_reflection.macro == :has_one
+  end
+
+  def has_many_assocation
+    @has_many_assocation ||= association_reflection.macro == :has_many
   end
 end
