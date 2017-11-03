@@ -35,7 +35,7 @@ module PolymorphicResourceScope
       find_controlled_resources(
         polymorphic_klass,
         polymorphic_ids,
-        controlled_action
+        controlled_scope
       )
   end
 
@@ -43,11 +43,11 @@ module PolymorphicResourceScope
   # to be sure they can create an associated resource we test
   # they can update the linked resource instead of :create
   # otherwise default to normal behaviour
-  def controlled_action
+  def controlled_scope
     if action_name == "create"
       :update
     else
-      controlled_scope
+      super
     end
   end
 
