@@ -11,8 +11,8 @@ describe "translation api custom route constraints", type: :request do
   describe "POST request" do
     let(:url) { "/api/translations?#{query_params}" }
     let(:payload) do
-      { translations:
-        {
+      {
+        translations: {
           language: "en-AU",
           strings: { title: "A great title", other: "strings" }
         }
@@ -30,7 +30,8 @@ describe "translation api custom route constraints", type: :request do
   describe "PUT request" do
     let(:url) { "/api/translations/#{translation.id}?#{query_params}" }
     let(:payload) do
-      { translations:
+      {
+        translations:
         {
           strings: { title: "A better title", other: "more of the strings" }
         }
