@@ -67,7 +67,9 @@ module RoleControl
     end
 
     def _resource_ids
-      if params.has_key?(:id)
+      if respond_to?(:resource_name) && params.has_key?("#{ resource_name }_id")
+        params["#{ resource_name }_id"]
+      elsif params.has_key?(:id)
         params[:id]
       else
         ''
