@@ -37,7 +37,12 @@ class Api::V1::TranslationsController < Api::ApiController
     revert_resource_name_to_controller_type
 
     translation = Translation.transaction(requires_new: true) do
-      create_params[:translated_type] = create_params[:translated_type].classify
+
+      # push these scope params into create payload
+      # to validate using the create schema
+      params[:translations][:translated_type] = params[:translated_type].classify
+      params[:translations][:translated_id] = params[:translated_id]
+
       resource = Translation.new(create_params)
       resource.save!
       resource
