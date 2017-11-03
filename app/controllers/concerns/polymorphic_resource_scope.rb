@@ -65,14 +65,10 @@ module PolymorphicResourceScope
     @polymorphic_klass ||= polymorphic_klass_name.camelize.constantize
   end
 
-  def polymorphic_ids
+  def polymorphic_ids(param_name=polymorphic_klass_name)
     return @polymorphic_ids if @polymorphic_ids
-    polymorphic_ids = if params.has_key?("#{ polymorphic_klass_name }_id")
-                        params["#{ polymorphic_klass_name }_id"]
-                      else
-                        ''
-                      end
-    @polymorphic_ids = array_id_params(polymorphic_ids)
+    ids_from_params = params["#{param_name}_id"] || ''
+    @polymorphic_ids = array_id_params(ids_from_params)
   end
 
   # check the user can update the linked polymorphic resource
