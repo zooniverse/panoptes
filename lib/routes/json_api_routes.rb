@@ -1,6 +1,6 @@
 module Routes
   module JsonApiRoutes
-    VALID_IDS = /[0-9]*/.freeze
+    VALID_IDS = /[0-9]*/
 
     def id_constraint(path)
       { :"#{ path.to_s.singularize }_id" => VALID_IDS }
