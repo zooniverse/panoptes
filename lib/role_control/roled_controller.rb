@@ -49,13 +49,16 @@ module RoleControl
     end
 
     def resource_ids
-      return @resource_ids if @resource_ids
-      ids = _resource_ids.split(',')
-      @resource_ids = if ids.length < 2
-                        ids.first
-                      else
-                        ids
-                      end
+      @resource_ids ||= array_id_params(_resource_ids)
+    end
+
+    def array_id_params(string_id_params)
+      ids = string_id_params.split(',')
+      if ids.length < 2
+        ids.first
+      else
+        ids
+      end
     end
 
     def _resource_ids
