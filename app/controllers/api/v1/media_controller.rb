@@ -84,7 +84,12 @@ class Api::V1::MediaController < Api::ApiController
   private
 
   def raise_no_resources_error
-    raise Api::NoMediaError.new(media_name, polymorphic_klass_name, polymorphic_ids, params[:id])
+    raise Api::NoMediaError.new(
+      media_name,
+      polymorphic_klass_name,
+      polymorphic_ids,
+      params[:id]
+    )
   end
 
   def send_aggregation_ready_email
