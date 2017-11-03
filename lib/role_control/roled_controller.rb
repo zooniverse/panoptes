@@ -8,6 +8,8 @@ module RoleControl
       before_action :check_controller_resources, except: :create
     end
 
+    private
+
     def check_controller_resources
       raise_no_resources_error unless resources_exist?
     end
