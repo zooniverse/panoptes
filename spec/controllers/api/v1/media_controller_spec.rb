@@ -100,7 +100,6 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           stub_token(scopes: scopes, user_id: authorized_user.id)
           set_preconditions
         end
-
         let(:resource) { resources.first }
         let(:params) do
           { :id => resource.id, :"#{parent_name}_id" => parent.id, :media_name => media_type, test: 1 }
