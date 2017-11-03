@@ -21,7 +21,6 @@ describe "translation api custom route constraints", type: :request do
 
     it "should allow create requests" do
       as(user, scopes: %w(translation)) do |api_session|
-        binding.pry
         api_session.post(url, payload)
         expect(response.status).to eq(201)
       end
@@ -38,11 +37,14 @@ describe "translation api custom route constraints", type: :request do
       }
     end
 
-    it "should allow update requests", :focus do
+    before do
+      create(:project) # ensure the etag resource id's do not match
+    end
+
+    it "should allow update requests" do
       as(user, scopes: %w(translation)) do |api_session|
-        binding.pry
         api_session.put(url, payload)
-        expect(response.status).to eq(201)
+        expect(response.status).to eq(200)
       end
     end
   end
