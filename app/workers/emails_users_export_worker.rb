@@ -11,7 +11,7 @@ class EmailsUsersExportWorker
 
   def perform(export_type=:global)
     @export_type = export_type
-    @scope = CsvDumps::GenericEmailList.new(export_type)
+    @scope = CsvDumps::FullEmailList.new(export_type)
     begin
       perform_dump
       upload_dump
