@@ -43,4 +43,9 @@ class ClassificationExportRow < ActiveRecord::Base
       subject_ids: formatter.subject_ids
     }
   end
+
+  def subject_data
+    # TODO: check the data is retired and merge this info
+    super
+  end
 end
