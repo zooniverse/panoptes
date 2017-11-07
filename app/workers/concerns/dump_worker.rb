@@ -13,7 +13,7 @@ module DumpWorker
     @resource_type = resource_type
     @resource_id = resource_id
 
-    if @resource = CsvDumps::FindsDumpScope.find(resource_type, resource_id)
+    if @resource = CsvDumps::FindsDumpResource.find(resource_type, resource_id)
       @medium_id = medium_id
       @scope = self
 
