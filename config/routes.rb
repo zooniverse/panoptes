@@ -138,15 +138,10 @@ Rails.application.routes.draw do
 
       json_api_resources :subject_workflow_statuses, only: [:index, :show]
 
-      # TODO: extract these to a shared helper for different constraint re-use
-      # and ensure the constraints are working as expected via feature / respect specs
-      # https://github.com/rspec/rspec-rails/issues/1328#issuecomment-76747936
-      opts = {
+      json_api_resources(:translations, {
         constraints: Routes::Constraints::Translations.new,
-        format: false,
-        only: %i(show index create update)
-      }
-      resources(:translations, opts)
+        except: %i(new edit destroy)
+      })
     end
   end
 
