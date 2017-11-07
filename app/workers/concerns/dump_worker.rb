@@ -5,15 +5,18 @@ module DumpWorker
     include ActiveSupport::Callbacks
     include DumpCommons
     define_callbacks :dump
-    attr_reader :resource
+    attr_reader :resource, :scope
   end
 
   def perform(resource_id, resource_type, medium_id=nil, requester_id=nil, *args)
     raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
     @resource_type = resource_type
     @resource_id = resource_id
+
     if @resource = CsvDumps::FindsDumpScope.find(resource_type, resource_id)
       @medium_id = medium_id
+      @scope = self
+
       begin
         run_callbacks :dump do
           perform_dump(*args)
@@ -28,8 +31,10 @@ module DumpWorker
   def perform_dump
     csv_dump << formatter.class.headers if formatter.class.headers
 
-    each do |model|
-      csv_dump << formatter.to_array(model)
+    read_from_database do
+      scope.each do |model|
+        csv_dump << formatter.to_array(model)
+      end
     end
   end
 
