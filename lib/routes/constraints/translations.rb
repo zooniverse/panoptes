@@ -7,7 +7,7 @@ module Routes
         @params = request.params
 
         if member_route?
-           valid_show_id? && has_translated_type_param?
+           valid_member_id? && has_translated_type_param?
         else
           # all polymorphic controllers need to supply the translated resource
           # type to correctly wire up the controller authorization scopes
@@ -25,7 +25,7 @@ module Routes
         params.key?(:translated_type)
       end
 
-      def valid_show_id?
+      def valid_member_id?
         !!Routes::JsonApiRoutes::VALID_IDS.match(params[:id].to_s)
       end
     end
