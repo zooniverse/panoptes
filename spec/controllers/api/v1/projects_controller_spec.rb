@@ -119,60 +119,9 @@ describe Api::V1::ProjectsController, type: :controller do
           end
         end
 
-        describe "tag filters" do
-          let!(:tags) do
-            [create(:tag, name: "youreit", resource: new_project),
-             create(:tag, name: "youreout", resource: beta_resource)]
-          end
-          let(:tag) { tags.first }
-
-          before do
-            index_request
-          end
-
-          describe "fuzzy filter by tag name" do
-            context "with full tag" do
-              let(:index_options) { { search: "tag:#{tag.name}" } }
-
-              it 'should return a project with the tag' do
-                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
-              end
-            end
-
-            context "partial tag" do
-              let(:index_options) { { search: "tag:#{tag.name[0..-4]}" } }
-
-              it 'should fuzzymatch' do
-                expect(json_response[api_resource_name].map{ |p| p["id"]}).to match_array([new_project.id.to_s, beta_resource.id.to_s])
-              end
-            end
-          end
-
-          describe "strict filter by tag" do
-            context "with full tag" do
-              let(:index_options) { { tags: tag.name } }
-
-              it 'should return a project with the tag' do
-                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
-              end
-            end
-
-            context "case insensitive" do
-              let(:index_options) { { tags: tag.name.upcase } }
-
-              it 'should return a project with the tag' do
-                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
-              end
-            end
-
-            context "partial tag" do
-              let(:index_options) { { tags: tag.name[0..-4] } }
-
-              it 'should return nothing' do
-                expect(json_response[api_resource_name]).to be_empty
-              end
-            end
-          end
+        it_behaves_like "taggable" do
+          let(:resource) { new_project }
+          let(:second_resource) { beta_resource }
         end
 
         describe "filtering" do

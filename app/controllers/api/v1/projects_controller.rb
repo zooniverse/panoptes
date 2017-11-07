@@ -3,6 +3,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include FilterByCurrentUserRoles
   include TranslatableResource
   include IndexSearch
+  include FilterByTags
   include AdminAllowed
   include Versioned
   include UrlLabels
@@ -35,20 +36,10 @@ class Api::V1::ProjectsController < Api::ApiController
                  :classifications_count,
                  :updated_at].freeze
 
-  before_action :filter_by_tags, only: :index
-
   prepend_before_action :require_login,
     only: [:create, :update, :destroy, :create_classifications_export,
     :create_subjects_export, :create_aggregations_export,
     :create_workflows_export, :create_workflow_contents_export]
-
-  search_by do |name, query|
-    query.search_display_name(name.join(" "))
-  end
-
-  search_by :tag do |name, query|
-    query.joins(:tags).merge(Tag.search_tags(name.first))
-  end
 
   def index
     unless params.has_key?(:sort)
@@ -115,13 +106,6 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   private
-
-  def filter_by_tags
-    if tags = params.delete(:tags).try(:split, ",").try(:map, &:downcase)
-      @controlled_resources = controlled_resources
-      .joins(:tags).where(tags: {name: tags})
-    end
-  end
 
   def create_response(projects)
     serializer.resource(

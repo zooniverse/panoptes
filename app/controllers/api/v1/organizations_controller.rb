@@ -2,6 +2,7 @@ class Api::V1::OrganizationsController < Api::ApiController
   include FilterByOwner
   include FilterByCurrentUserRoles
   include IndexSearch
+  include FilterByTags
   include AdminAllowed
   include Slug
 
