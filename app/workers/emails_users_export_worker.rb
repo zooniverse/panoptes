@@ -12,10 +12,22 @@ class EmailsUsersExportWorker
   def perform(export_type=:global)
     @export_type = export_type
     begin
-      emails_to_csv_file
+      perform_dump
       upload_dump
     ensure
       cleanup_dump
+    end
+  end
+
+  def formatter
+    @formatter ||= Formatter::Csv::UserEmail.new
+  end
+
+  def each
+    read_from_database do
+      user_emails.find_each do |user|
+        yield user
+      end
     end
   end
 

@@ -1,10 +1,4 @@
 module DumpEmails
-  def emails_to_csv_file
-    user_emails.find_in_batches do |user_batch|
-      user_batch.each { |user| csv_dump << [ user.email ] }
-    end
-  end
-
   def write_to_s3(gzip_file_path)
     storage_path = storage_adapter.stored_path("application/x-gzip", "email_exports")
     prefix = File.dirname(storage_path)

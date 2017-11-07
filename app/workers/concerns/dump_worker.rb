@@ -26,7 +26,7 @@ module DumpWorker
   end
 
   def perform_dump
-    csv_dump << formatter.class.headers
+    csv_dump << formatter.class.headers if formatter.class.headers
 
     each do |model|
       csv_dump << formatter.to_array(model)

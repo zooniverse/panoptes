@@ -20,6 +20,18 @@ class EmailsProjectsExportWorker
   rescue ActiveRecord::RecordNotFound
   end
 
+  def formatter
+    @formatter ||= Formatter::Csv::UserEmail.new
+  end
+
+  def each
+    read_from_database do
+      user_emails.find_each do |user|
+        yield user
+      end
+    end
+  end
+
   private
 
   def user_emails
