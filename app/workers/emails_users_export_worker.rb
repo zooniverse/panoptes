@@ -2,7 +2,6 @@ require 'csv'
 
 class EmailsUsersExportWorker
   include Sidekiq::Worker
-  include DumpCommons
   include DumpEmails
 
   sidekiq_options queue: :data_low

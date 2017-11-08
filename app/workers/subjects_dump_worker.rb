@@ -8,22 +8,8 @@ class SubjectsDumpWorker
 
   sidekiq_options queue: :data_high
 
-  def perform_dump
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
-
-    headers = Formatter::Csv::Subject.headers
-    csv_dump << headers
-
-    each do |model|
-      Formatter::Csv::Subject.new(resource, model).to_rows.each do |hash|
-        csv_dump << hash.values_at(*headers)
-      end
-    end
-
-  end
-
   def formatter
-    @formatter ||= Formatter::Csv::Subject
+    @formatter ||= Formatter::Csv::Subject.new(resource)
   end
 
   def each

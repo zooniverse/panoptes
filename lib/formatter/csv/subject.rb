@@ -3,18 +3,19 @@ module Formatter
     class Subject
       attr_reader :subject, :project, :project_workflow_ids
 
-      def self.headers
+      def initialize(project)
+        @project = project
+        @project_workflow_ids = project.workflows.pluck(:id)
+      end
+
+      def headers
         %w(subject_id project_id workflow_id subject_set_id metadata locations
            classifications_count retired_at retirement_reason)
       end
 
-      def initialize(project, subject)
-        @project = project
-        @project_workflow_ids = project.workflows.pluck(:id)
+      def to_rows(subject)
         @subject = subject
-      end
 
-      def to_rows
         rows = []
 
         workflow_ids = @project_workflow_ids.present? ? @project_workflow_ids.sort : [nil]
@@ -36,7 +37,7 @@ module Formatter
           end
         end
 
-        rows
+        rows.map { |row| row.values_at(*self.headers) }
       end
 
       private

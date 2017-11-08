@@ -3,9 +3,8 @@ module DumpWorker
 
   included do
     include ActiveSupport::Callbacks
-    include DumpCommons
     define_callbacks :dump
-    attr_reader :resource, :scope
+    attr_reader :resource, :medium, :scope, :processor
   end
 
   def perform(resource_id, resource_type, medium_id=nil, requester_id=nil, *args)
@@ -14,26 +13,12 @@ module DumpWorker
     @resource_id = resource_id
 
     if @resource = CsvDumps::FindsDumpResource.find(resource_type, resource_id)
-      @medium_id = medium_id
+      @medium = CsvDumps::FindsMedium.new(medium_id, dump_type, resource_file_path, @resource, content_disposition).medium
       @scope = self
+      @processor = CsvDumps::GenericDumpProcess.new(formatter, scope, medium)
 
-      begin
-        run_callbacks :dump do
-          perform_dump(*args)
-          upload_dump { set_ready_state }
-        end
-      ensure
-        cleanup_dump
-      end
-    end
-  end
-
-  def perform_dump
-    csv_dump << formatter.class.headers if formatter.class.headers
-
-    read_from_database do
-      scope.each do |model|
-        csv_dump << formatter.to_array(model)
+      run_callbacks :dump do
+        @processor.execute
       end
     end
   end
@@ -48,19 +33,6 @@ module DumpWorker
 
   def resource_file_path
     [dump_type, @resource_id.to_s]
-  end
-
-  def medium
-    @medium ||= CsvDumps::FindsMedium.new(@medium_id, dump_type, resource_file_path, @resource, content_disposition).medium
-  end
-
-  def set_ready_state
-    medium.metadata["state"] = 'ready'
-    medium.save!
-  end
-
-  def write_to_s3(gzip_file_path)
-    medium.put_file(gzip_file_path, compressed: true)
   end
 
   def content_disposition
