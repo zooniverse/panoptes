@@ -13,7 +13,7 @@ module DumpWorker
     @resource_id = resource_id
 
     if @resource = CsvDumps::FindsDumpResource.find(resource_type, resource_id)
-      @medium = CsvDumps::FindsMedium.new(medium_id, dump_type, resource_file_path, @resource, content_disposition).medium
+      @medium = CsvDumps::FindsMedium.new(medium_id, @resource, dump_target).medium
       scope = get_scope(resource)
       @processor = CsvDumps::GenericDumpProcess.new(formatter, scope, medium)
 
@@ -25,24 +25,6 @@ module DumpWorker
 
   def dump_target
     @dump_target ||= self.class.to_s.underscore.match(/\A(\w+)_dump_worker\z/)[1]
-  end
-
-  def dump_type
-    "#{@resource_type}_#{dump_target}_export"
-  end
-
-  def resource_file_path
-    [dump_type, @resource_id.to_s]
-  end
-
-  def content_disposition
-    case @resource_type
-    when "workflow"
-      name = @resource.display_name.parameterize
-    when "project"
-      name = @resource.slug.split("/")[1]
-    end
-    "attachment; filename=\"#{name}-#{dump_target}.csv\""
   end
 
   def read_from_database(&block)
