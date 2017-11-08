@@ -28,22 +28,12 @@ shared_examples "an email dump exporter" do
       .times
   end
 
-  it "should compress the csv file" do
-    expect(worker).to receive(:to_gzip).and_call_original
-  end
-
-  it "push the file to s3 the correct bucket location via a custom storage adapter" do
-    adapter = worker.send(:storage_adapter)
-    expect(adapter).to receive(:stored_path)
-      .with("application/x-gzip", "email_exports")
-      .and_call_original
-    expect(adapter)
-      .to receive(:put_file)
-      .with(s3_path, an_instance_of(String), s3_opts)
-    expect(worker).to receive(:write_to_s3).and_call_original
-  end
-
-  it "should clean up the csv and compressed files after sending to s3" do
-    expect(worker).to receive(:remove_tempfile).twice
+  it 'calls the dump processor' do
+    processor = double
+    expect(CsvDumps::DumpProcessor).to receive(:new)
+                                         .with(an_instance_of(Formatter::Csv::UserEmail),
+                                               an_instance_of(scope_class),
+                                               an_instance_of(CsvDumps::DirectToS3)).and_return(processor)
+    expect(processor).to receive(:execute).once
   end
 end

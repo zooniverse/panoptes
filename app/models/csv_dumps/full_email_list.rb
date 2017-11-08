@@ -1,5 +1,5 @@
 module CsvDumps
-  class FullEmailList
+  class FullEmailList < DumpScope
     EXPORT_FIELDS = {global: :global_email_communication,
                      beta: :beta_email_communication}.freeze
 

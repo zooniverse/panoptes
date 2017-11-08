@@ -18,14 +18,7 @@ describe EmailsProjectsExportWorker do
       create(:user_project_preference, email_communication: false, project: project)
     end
     let(:users) { [ email_pref.user ] }
-    let(:s3_path) { "email_exports/#{project.slug}_email_list.tar.gz" }
-    let(:s3_opts) do
-      {
-        private: true,
-        compressed: true,
-        content_disposition: "attachment; filename=\"#{project.slug}_email_list.csv\""
-      }
-    end
+    let(:scope_class) { CsvDumps::ProjectEmailList }
     let(:export_params) { project.id }
   end
 end

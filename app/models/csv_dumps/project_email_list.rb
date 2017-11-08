@@ -1,5 +1,5 @@
 module CsvDumps
-  class ProjectEmailList
+  class ProjectEmailList < DumpScope
     def initialize(project_id)
       @project_id = project_id
     end

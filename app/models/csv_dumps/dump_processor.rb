@@ -1,5 +1,5 @@
 module CsvDumps
-  class GenericDumpProcess
+  class DumpProcessor
     include ActiveSupport::Callbacks
 
     attr_reader :csv_dump, :formatter, :scope, :medium
