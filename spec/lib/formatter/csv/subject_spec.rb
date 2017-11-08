@@ -41,7 +41,7 @@ RSpec.describe Formatter::Csv::Subject do
           classifications_count: 10,
           retired_at: retirement_date,
           retirement_reason: nil
-        }.with_indifferent_access,
+        }.values,
         {
           subject_id: subject.id,
           project_id: project.id,
@@ -52,11 +52,11 @@ RSpec.describe Formatter::Csv::Subject do
           classifications_count: 5,
           retired_at: nil,
           retirement_reason: nil
-        }.with_indifferent_access
+        }.values
       ]
     end
 
-    let(:result) { described_class.new(project, subject).to_rows }
+    let(:result) { described_class.new(project).to_rows(subject) }
 
     it "should match the expected output" do
       expect(result).to match_array(expected)
@@ -68,7 +68,7 @@ RSpec.describe Formatter::Csv::Subject do
       it "should match the expected output" do
         sms.destroy
         subject.reload
-        expect(result).to match_array(expected.map { |row| row.merge(subject_set_id: nil) })
+        expect(result).to match_array(expected.map { |row| row[3] = nil; row })
       end
     end
 

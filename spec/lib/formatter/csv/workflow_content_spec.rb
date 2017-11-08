@@ -18,9 +18,9 @@ RSpec.describe Formatter::Csv::WorkflowContent do
     %w(workflow_content_id workflow_id language version strings)
   end
 
-  describe "::workflow_contents_headers" do
+  describe "#headers" do
     it 'should contain the required headers' do
-      expect(described_class.headers).to match_array(header)
+      expect(described_class.new.headers).to match_array(header)
     end
   end
 

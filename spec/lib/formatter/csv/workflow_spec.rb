@@ -31,9 +31,9 @@ RSpec.describe Formatter::Csv::Workflow do
     %w(workflow_id display_name version active classifications_count pairwise grouped prioritized primary_language first_task tutorial_subject_id retired_set_member_subjects_count tasks retirement aggregation)
   end
 
-  describe "::workflow_headers" do
+  describe "#headers" do
     it 'should contain the required headers' do
-      expect(described_class.headers).to match_array(header)
+      expect(described_class.new.headers).to match_array(header)
     end
   end
 

@@ -45,9 +45,9 @@ RSpec.describe Formatter::Csv::Classification do
   let(:classification) { build_stubbed(:classification, project: project, workflow: workflow, subjects: [subject]) }
   let(:formatter) { described_class.new(cache) }
 
-  describe "::project_headers?" do
+  describe "#headers" do
     it 'should be have the expected headers' do
-      expect(formatter.class.headers).to match_array(project_headers)
+      expect(formatter.headers).to match_array(project_headers)
     end
   end
 
