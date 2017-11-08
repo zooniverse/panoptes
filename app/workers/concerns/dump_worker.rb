@@ -14,7 +14,7 @@ module DumpWorker
 
     if @resource = CsvDumps::FindsDumpResource.find(resource_type, resource_id)
       @medium = CsvDumps::FindsMedium.new(medium_id, dump_type, resource_file_path, @resource, content_disposition).medium
-      @scope = self
+      scope = get_scope(resource)
       @processor = CsvDumps::GenericDumpProcess.new(formatter, scope, medium)
 
       run_callbacks :dump do

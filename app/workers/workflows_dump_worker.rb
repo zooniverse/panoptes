@@ -12,15 +12,7 @@ class WorkflowsDumpWorker
     @formatter ||= Formatter::Csv::Workflow.new
   end
 
-  def each
-    read_from_database do
-      resource.workflows.find_each do |workflow|
-        yield workflow
-
-        while workflow = workflow.previous_version
-          yield workflow
-        end
-      end
-    end
+  def get_scope(resource)
+    @scope ||= CsvDumps::WorkflowScope.new(resource)
   end
 end
