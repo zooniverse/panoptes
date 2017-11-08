@@ -33,7 +33,8 @@ class Api::V1::ProjectsController < Api::ApiController
                  :redirect,
                  :avatar_src,
                  :classifications_count,
-                 :updated_at].freeze
+                 :updated_at,
+                 :launch_approved].freeze
 
   before_action :filter_by_tags, only: :index
 
