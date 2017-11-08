@@ -8,8 +8,10 @@ module CsvDumps
     end
 
     def each
-      user_emails.find_each do |user|
-        yield user
+      read_from_database do
+        user_emails.find_each do |user|
+          yield user
+        end
       end
     end
 

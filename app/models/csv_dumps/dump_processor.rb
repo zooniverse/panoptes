@@ -25,11 +25,9 @@ module CsvDumps
     def perform_dump
       csv_dump << formatter.headers if formatter.headers
 
-      read_from_database do
-        scope.each do |model|
-          formatter.to_rows(model).each do |row|
-            csv_dump << row
-          end
+      scope.each do |model|
+        formatter.to_rows(model).each do |row|
+          csv_dump << row
         end
       end
     end
@@ -53,10 +51,6 @@ module CsvDumps
 
     def write_to_s3(gzip_file_path)
       medium.put_file(gzip_file_path, compressed: true)
-    end
-
-    def read_from_database(&block)
-      DatabaseReplica.read("dump_data_from_read_slave", &block)
     end
   end
 end
