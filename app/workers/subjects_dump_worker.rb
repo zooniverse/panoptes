@@ -12,7 +12,6 @@ class SubjectsDumpWorker
     @formatter ||= Formatter::Csv::Subject.new(resource)
   end
 
-
   def get_scope(resource)
     CsvDumps::SubjectScope.new(resource)
   end

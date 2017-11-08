@@ -37,7 +37,7 @@ module Formatter
           end
         end
 
-        rows.map { |row| row.values_at(*self.headers) }
+        rows.map { |row| row.values_at(*headers) }
       end
 
       private

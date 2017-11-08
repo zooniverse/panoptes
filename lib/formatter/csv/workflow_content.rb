@@ -15,7 +15,7 @@ module Formatter
 
       def to_array(workflow_content)
         @workflow_content = workflow_content
-        self.headers.map { |header| send(header) }
+        headers.map { |header| send(header) }
       end
 
       private
