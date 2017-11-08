@@ -35,8 +35,6 @@ module CsvDumps
       }
     end
 
-    private
-
     def storage_adapter
       return @storage_adapter if @storage_adapter
       storage_config = Panoptes::StorageAdapter.configuration
