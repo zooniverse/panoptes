@@ -154,41 +154,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         end
 
         it_behaves_like "is updatable"
-
-        if media_type == :aggregations_export
-
-          after(:each) do
-            default_request scopes: scopes, user_id: authorized_user.id
-            put :update, update_params
-          end
-
-          it 'should send an email' do
-            expect(AggregationDataMailerWorker).to receive(:perform_async).with(resource.id)
-          end
-
-          context "when the update is not finished" do
-            let(:metadata) { { metadata: { "state" => "uploading" } } }
-
-            it 'should not send an email' do
-              expect(AggregationDataMailerWorker).not_to receive(:perform_async)
-            end
-          end
-
-          context "when aggregation media resource is missing" do
-            let(:resource) { nil }
-
-            it 'should not send an email', :aggreate_failures do
-              expect(subject).not_to receive(:send_aggregation_ready_email)
-              expect(AggregationDataMailerWorker).not_to receive(:perform_async)
-            end
-          end
-        else
-          it 'should not send an email' do
-            expect(AggregationDataMailerWorker).not_to receive(:perform_async)
-          end
-        end
       end
-
     end
 
     if actions.include? :index
@@ -325,7 +291,6 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       it_behaves_like "has_many media", :project, :attached_images, %i(index create show destroy), 'image/jpeg'
       it_behaves_like "has_one media", :project, :classifications_export, %i(index), 'text/csv'
       it_behaves_like "has_one media", :project, :subjects_export, %i(index), 'text/csv'
-      it_behaves_like "has_one media", :project, :aggregations_export, %i(index update), 'application/x-gzip'
 
       describe "classifications_exports #index" do
         let!(:resources) do

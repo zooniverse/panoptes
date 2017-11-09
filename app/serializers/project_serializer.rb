@@ -34,8 +34,7 @@ class ProjectSerializer
     :project_roles, :pages, :organization
   media_include :avatar, :background, :attached_images,
     classifications_export: { include: false},
-    subjects_export: { include: false },
-    aggregations_export: { include: false }
+    subjects_export: { include: false }
   can_filter_by :display_name, :slug, :beta_requested, :beta_approved,
     :launch_requested, :launch_approved, :private, :state, :live,
     :mobile_friendly, :organization_id
