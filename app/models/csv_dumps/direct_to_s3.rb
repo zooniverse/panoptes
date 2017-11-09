@@ -1,4 +1,7 @@
 module CsvDumps
+  # TODO: use zoo wide email export media resources once bucket paths
+  # can be set per medium, https://github.com/zooniverse/Panoptes/issues/2140
+  # At that point normal Medium objects should be used instead of this.
   class DirectToS3
     attr_reader :export_type
 
