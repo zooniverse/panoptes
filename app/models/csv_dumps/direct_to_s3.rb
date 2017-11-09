@@ -42,9 +42,11 @@ module CsvDumps
       return @storage_adapter if @storage_adapter
       storage_config = Panoptes::StorageAdapter.configuration
       adapter = storage_config[:adapter]
-      storage_opts = { bucket: ENV["EMAIL_EXPORT_S3_BUCKET"] }
-      storage_opts = storage_opts.merge(storage_config.except(:adapter))
-      @storage_adapter = MediaStorage.send(:load_from_included, adapter).new(storage_opts)
+      storage_opts = {
+        bucket: ENV.fetch("EMAIL_EXPORT_S3_BUCKET", 'zooniverse-exports'),
+        prefix: ENV.fetch("EMAIL_EXPORT_S3_PREFIX", "emails/#{Rails.env}/")
+      }
+      @storage_adapter = MediaStorage.send(:load_adapter, adapter, storage_opts)
     end
   end
 end

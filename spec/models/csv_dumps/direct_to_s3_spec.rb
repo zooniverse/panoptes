@@ -14,12 +14,17 @@ describe CsvDumps::DirectToS3 do
   end
   let(:file_path) { "/tmp/foobar" }
 
-  it "push the file to s3 the correct bucket location via a custom storage adapter" do
-    expect(adapter).to receive(:stored_path)
-                         .with("application/x-gzip", "email_exports")
-                         .and_call_original
-    expect(adapter).to receive(:put_file)
-                         .with(s3_path, an_instance_of(String), s3_opts)
+  it "should use a custom storage adapter" do
+    opts = {
+      bucket: 'zooniverse-exports',
+      prefix: "emails/#{Rails.env}/"
+    }
+    expect(MediaStorage)
+      .to receive(:load_adapter)
+      .with("test", opts)
+      .and_call_original
+    direct_to_s3.put_file(file_path)
+  end
 
   it "push the file to s3 the correct bucket location via a custom storage adapter" do
     expect(adapter)
