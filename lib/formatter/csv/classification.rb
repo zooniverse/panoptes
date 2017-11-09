@@ -21,8 +21,6 @@ module Formatter
         [to_array(classification)]
       end
 
-      private
-
       def to_array(classification)
         @classification = classification
         headers.map { |header| send(header) }
