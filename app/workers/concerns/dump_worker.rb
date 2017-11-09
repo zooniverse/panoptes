@@ -9,8 +9,6 @@ module DumpWorker
 
   def perform(resource_id, resource_type, medium_id=nil, requester_id=nil, *args)
     raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
-    @resource_type = resource_type
-    @resource_id = resource_id
 
     if @resource = CsvDumps::FindsDumpResource.find(resource_type, resource_id)
       @medium = CsvDumps::FindsMedium.new(medium_id, @resource, dump_target).medium
