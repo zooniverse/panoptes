@@ -13,12 +13,12 @@ module Formatter
         [to_array(workflow_content)]
       end
 
+      private
+
       def to_array(workflow_content)
         @workflow_content = workflow_content
         headers.map { |header| send(header) }
       end
-
-      private
 
       def workflow_content_id
         workflow_content.id

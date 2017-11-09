@@ -6,11 +6,9 @@ module Formatter
       end
 
       def to_rows(user)
-        [to_array(user)]
-      end
-
-      def to_array(user)
-        [user.email]
+        [
+          [user.email]
+        ]
       end
     end
   end
