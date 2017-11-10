@@ -100,13 +100,11 @@ Rails.application.routes.draw do
         media_resources :avatar, :background, :attached_images,
           classifications_export: { except: [:create] },
           subjects_export: { except: [:create] },
-          aggregations_export: { except: [:create] },
           workflows_export: { except: [:create] },
           workflow_contents_export: { except: [:create] }
 
         post "/classifications_export", to: "projects#create_classifications_export", format: false
         post "/subjects_export", to: "projects#create_subjects_export", format: false
-        post "/aggregations_export", to: "projects#create_aggregations_export", format: false
         post "/workflows_export", to: "projects#create_workflows_export", format: false
         post "/workflow_contents_export", to: "projects#create_workflow_contents_export", format: false
 
@@ -138,15 +136,10 @@ Rails.application.routes.draw do
 
       json_api_resources :subject_workflow_statuses, only: [:index, :show]
 
-      # TODO: extract these to a shared helper for different constraint re-use
-      # and ensure the constraints are working as expected via feature / respect specs
-      # https://github.com/rspec/rspec-rails/issues/1328#issuecomment-76747936
-      opts = {
+      json_api_resources(:translations, {
         constraints: Routes::Constraints::Translations.new,
-        format: false,
-        only: %i(show index create update)
-      }
-      resources(:translations, opts)
+        except: %i(new edit destroy)
+      })
     end
   end
 

@@ -23,11 +23,6 @@ class Api::V1::MediaController < Api::ApiController
     end
   end
 
-  def update
-    super
-    send_aggregation_ready_email
-  end
-
   def create
     check_polymorphic_controller_resources
 
@@ -74,7 +69,7 @@ class Api::V1::MediaController < Api::ApiController
 
   def controlled_scope
     case media_name
-    when /\A(classifications|subjects|aggregations)_export\z/
+    when /\A(classifications|subjects)_export\z/
       :update
     else
       super
@@ -90,13 +85,6 @@ class Api::V1::MediaController < Api::ApiController
       polymorphic_ids,
       params[:id]
     )
-  end
-
-  def send_aggregation_ready_email
-    return unless params[:media_name] == "aggregations_export"
-    if controlled_resource.metadata.try(:[], "state") == "ready"
-      AggregationDataMailerWorker.perform_async(controlled_resource.id)
-    end
   end
 
   def association_reflection

@@ -279,9 +279,9 @@ describe Api::V1::SubjectsController, type: :controller do
             get :index, request_params
           end
 
-          it 'should return user finished_workflow as false for each subject' do
+          it 'should return user finished_workflow as true for each subject' do
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
-            expect(seen_all).to all be(false)
+            expect(seen_all).to all be(true)
           end
 
           it 'should return all subjects as retired' do
@@ -461,9 +461,9 @@ describe Api::V1::SubjectsController, type: :controller do
             get :queued, request_params
           end
 
-          it 'should return user finished_workflow as false for each subject' do
+          it 'should return user finished_workflow as true for each subject' do
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
-            expect(seen_all).to all be(false)
+            expect(seen_all).to all be(true)
           end
 
           it 'should return all subjects as retired' do

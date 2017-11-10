@@ -56,18 +56,12 @@ RSpec.describe JsonSchema do
         }
       end
 
-      it 'should raise an error' do
+      it 'raise an error with a formatted error message for use in the API response' do
+        message = { "name" => "of type integer did not match the following type: string",
+                    "metadata" => "did not contain a required property of 'start'" }
         expect do
           subject.validate!(invalid_json)
-        end.to raise_error(JsonSchema::ValidationError)
-      end
-
-      it 'should format the error message for use in the API response' do
-        message = { "name" => "of type Integer did not match the following type: string",
-                    "metadata" => "did not contain a required property of 'start'" }.to_s
-        expect do
-          subject.validate!(invalid_json)
-        end.to raise_error(message)
+        end.to raise_error(JsonSchema::ValidationError, message.to_s)
       end
     end
   end

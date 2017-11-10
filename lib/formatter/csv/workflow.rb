@@ -5,18 +5,22 @@ module Formatter
 
       JSON_FIELDS = [:tasks, :aggregation ].freeze
 
-      def self.headers
+      def headers
         %w(workflow_id display_name version active classifications_count pairwise
         grouped prioritized primary_language first_task tutorial_subject_id
         retired_set_member_subjects_count tasks retirement aggregation)
       end
 
-      def to_array(workflow)
-        @workflow = workflow
-        self.class.headers.map { |header| send(header) }
+      def to_rows(workflow)
+        [to_array(workflow)]
       end
 
       private
+
+      def to_array(workflow)
+        @workflow = workflow
+        headers.map { |header| send(header) }
+      end
 
       def workflow_id
         workflow.id

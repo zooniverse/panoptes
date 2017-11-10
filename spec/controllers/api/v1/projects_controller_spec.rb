@@ -25,7 +25,6 @@ describe Api::V1::ProjectsController, type: :controller do
       "projects.avatar",
       "projects.background",
       "projects.classifications_export",
-      "projects.aggregations_export",
       "projects.subjects_export",
       "projects.attached_images" ]
   end
@@ -109,7 +108,7 @@ describe Api::V1::ProjectsController, type: :controller do
         describe "cards only" do
           let(:index_options) { { cards: true } }
           let(:card_attrs) do
-            ["id", "display_name", "description", "slug", "redirect", "avatar_src", "links", "updated_at", "classifications_count"]
+            ["id", "display_name", "description", "slug", "redirect", "avatar_src", "links", "updated_at", "classifications_count", "launch_approved"]
           end
 
           it "should return only serialise the card data" do
@@ -878,14 +877,6 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:test_attr_value) { "project_classifications_export" }
 
       it_behaves_like "is creatable", :create_classifications_export
-    end
-
-    describe "#create_aggregations_export" do
-      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/aggregations_export/ }
-      let(:test_attr_value) { "project_aggregations_export" }
-      let(:content_type) { "application/x-gzip" }
-
-      it_behaves_like "is creatable", :create_aggregations_export
     end
 
     describe "#create_subjects_export" do

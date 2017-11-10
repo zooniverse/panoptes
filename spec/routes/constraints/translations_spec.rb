@@ -23,7 +23,7 @@ describe Routes::Constraints::Translations do
 
         it 'should not match when id is invalid and translated_type is a project' do
           request = double(params: { id: "nan", translated_type: translated_type})
-          expect(subject.matches?(request)).to be true
+          expect(subject.matches?(request)).to be false
         end
       end
     end

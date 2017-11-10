@@ -7,21 +7,23 @@ module Formatter
       delegate :user_id, :project_id, :workflow, :workflow_id, :created_at,
         :gold_standard, :workflow_version, to: :classification
 
-      def self.headers
-        %w(classification_id user_name user_id user_ip workflow_id workflow_name workflow_version
-           created_at gold_standard expert metadata annotations subject_data subject_ids)
-      end
-
       def initialize(cache)
         @cache = cache
         @salt = Time.now.to_i
       end
 
+      def headers
+        %w(classification_id user_name user_id user_ip workflow_id workflow_name workflow_version
+           created_at gold_standard expert metadata annotations subject_data subject_ids)
+      end
+
+      def to_rows(classification)
+        [to_array(classification)]
+      end
+
       def to_array(classification)
         @classification = classification
-        self.class.headers.map do |attribute|
-          send(attribute)
-        end
+        headers.map { |header| send(header) }
       end
 
       def classification_id
@@ -70,8 +72,6 @@ module Formatter
       def workflow_name
         workflow.display_name
       end
-
-      private
 
       def classification_subject_ids
         cache.subject_ids_from_classification(classification.id)

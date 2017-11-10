@@ -12,7 +12,6 @@ class Medium < ActiveRecord::Base
 
   ALLOWED_UPLOAD_CONTENT_TYPES = %w(image/jpeg image/png image/gif image/svg+xml audio/mpeg audio/mp3 audio/mp4 audio/x-m4a).freeze
   ALLOWED_EXPORT_CONTENT_TYPES  = %w(text/csv).freeze
-  ALLOWED_AGGREGATION_EXPORT_CONTENT_TYPES = %w(application/x-gzip).freeze
 
   validate do |medium|
     if !allow_any_content_type && !allowed_content_types.include?(medium.content_type)
@@ -96,8 +95,6 @@ class Medium < ActiveRecord::Base
 
   def allowed_content_types
     case type
-    when "project_aggregations_export"
-        ALLOWED_AGGREGATION_EXPORT_CONTENT_TYPES
     when /\A(project|workflow)_[a-z_]+_export\z/i
       ALLOWED_EXPORT_CONTENT_TYPES
     else

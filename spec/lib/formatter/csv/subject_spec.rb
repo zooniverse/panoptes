@@ -29,34 +29,37 @@ RSpec.describe Formatter::Csv::Subject do
         subject: subject)
     end
 
-    let(:expected) do
-      [
-        {
-          subject_id: subject.id,
-          project_id: project.id,
-          workflow_id: workflow.id,
-          subject_set_id: subject_set.id,
-          metadata: subject.metadata.to_json,
-          locations: ordered_subject_locations.to_json,
-          classifications_count: 10,
-          retired_at: retirement_date,
-          retirement_reason: nil
-        }.with_indifferent_access,
-        {
-          subject_id: subject.id,
-          project_id: project.id,
-          workflow_id: workflow_two.id,
-          subject_set_id: subject_set.id,
-          metadata: subject.metadata.to_json,
-          locations: ordered_subject_locations.to_json,
-          classifications_count: 5,
-          retired_at: nil,
-          retirement_reason: nil
-        }.with_indifferent_access
-      ]
+    let(:workflow_one_row) do
+      {
+        subject_id: subject.id,
+        project_id: project.id,
+        workflow_id: workflow.id,
+        subject_set_id: subject_set.id,
+        metadata: subject.metadata.to_json,
+        locations: ordered_subject_locations.to_json,
+        classifications_count: 10,
+        retired_at: retirement_date,
+        retirement_reason: nil
+      }
     end
 
-    let(:result) { described_class.new(project, subject).to_rows }
+    let(:workflow_two_row) do
+      {
+        subject_id: subject.id,
+        project_id: project.id,
+        workflow_id: workflow_two.id,
+        subject_set_id: subject_set.id,
+        metadata: subject.metadata.to_json,
+        locations: ordered_subject_locations.to_json,
+        classifications_count: 5,
+        retired_at: nil,
+        retirement_reason: nil
+      }
+    end
+
+    let(:expected) { [workflow_one_row.values, workflow_two_row.values] }
+
+    let(:result) { described_class.new(project).to_rows(subject) }
 
     it "should match the expected output" do
       expect(result).to match_array(expected)
@@ -68,7 +71,9 @@ RSpec.describe Formatter::Csv::Subject do
       it "should match the expected output" do
         sms.destroy
         subject.reload
-        expect(result).to match_array(expected.map { |row| row.merge(subject_set_id: nil) })
+        expected = [workflow_one_row.merge(subject_set_id: nil).values,
+                    workflow_two_row.merge(subject_set_id: nil).values]
+        expect(result).to match_array(expected)
       end
     end
 

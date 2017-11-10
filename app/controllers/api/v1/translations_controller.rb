@@ -13,9 +13,12 @@ class Api::V1::TranslationsController < Api::ApiController
     check_polymorphic_controller_resources
 
     translation = Translation.transaction(requires_new: true) do
-      create_params[:translated_type] = params[:translated_type].classify
-      # TODO: should raise an error if this is missing
-      create_params[:translated_id] = params[:translated_id]
+
+      # push these scope params into create payload
+      # to validate using the create schema
+      params[:translations][:translated_type] = params[:translated_type].classify
+      params[:translations][:translated_id] = params[:translated_id]
+
       resource = Translation.new(create_params)
       resource.save!
       resource
