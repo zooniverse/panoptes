@@ -1,4 +1,4 @@
-shared_examples "taggable" do
+shared_context "indexable by tag" do
   describe "tag filters" do
     let!(:tags) do
       [create(:tag, name: "youreit", resource: resource),
@@ -52,6 +52,34 @@ shared_examples "taggable" do
           expect(json_response[api_resource_name]).to be_empty
         end
       end
+    end
+  end
+end
+
+shared_context "has updatable tags" do
+  describe "updates tags" do
+    def tag_update
+      default_request scopes: scopes, user_id: authorized_user.id
+      put :update, tag_params
+    end
+
+    it 'should remove all previous tags' do
+      create(:tag, name: "GONE", resource: resource)
+      tag_update
+      resource.reload
+      expect(resource.tags.pluck(:name)).to_not include("GONE")
+    end
+
+    it 'should update with new tags' do
+      tag_update
+      resource.reload
+      expect(resource.tags.pluck(:name)).to match_array(tag_array)
+    end
+
+    it "should touch the resource to modify the cache_key / etag" do
+      expect {
+        tag_update
+      }.to change { resource.reload.updated_at }
     end
   end
 end

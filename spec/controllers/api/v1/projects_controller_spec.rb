@@ -119,7 +119,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
         end
 
-        it_behaves_like "taggable" do
+        it_behaves_like "indexable by tag" do
           let(:resource) { new_project }
           let(:second_resource) { beta_resource }
         end
@@ -605,35 +605,10 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     it_behaves_like "is updatable"
-
-    describe "update tags" do
-      let(:tags) { ["astro", "gastro"] }
+    it_behaves_like "has updatable tags" do
+      let(:tag_array) { ["astro", "gastro"] }
       let(:tag_params) do
-        { projects: { tags: tags }, id: resource.id }
-      end
-
-      def tag_update
-        default_request scopes: scopes, user_id: authorized_user.id
-        put :update, tag_params
-      end
-
-      it 'should remove all previous tags' do
-        create(:tag, name: "GONE", resource: resource)
-        tag_update
-        resource.reload
-        expect(resource.tags.pluck(:name)).to_not include("GONE")
-      end
-
-      it 'should update with new tags' do
-        tag_update
-        resource.reload
-        expect(resource.tags.pluck(:name)).to match_array(tags)
-      end
-
-      it "should touch the project resource to modify the cache_key / etag" do
-        expect {
-          tag_update
-        }.to change { resource.reload.updated_at }
+        { projects: { tags: tag_array }, id: resource.id }
       end
     end
 

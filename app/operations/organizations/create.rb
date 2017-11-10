@@ -11,11 +11,16 @@ module Organizations
     string :introduction, default: ''
     array :urls, default: []
     array :categories, default: []
+    array :tags, default: []
 
     def execute
       Organization.transaction(requires_new: true) do
         organization = build_organization
         organization.organization_contents.build(organization_contents_params)
+
+        tags = Tags::BuildTags.run!(api_user: api_user, tag_array: tags) if tags
+        organization.tags = tags unless tags.nil?
+
         organization.save!
         organization
       end

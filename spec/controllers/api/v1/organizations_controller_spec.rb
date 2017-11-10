@@ -66,7 +66,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         end
       end
 
-      it_behaves_like "taggable" do
+      it_behaves_like "indexable by tag" do
         let(:resource) { organization }
         let(:second_resource) { build(:organization, listed_at: Time.now, owner: authorized_user) }
       end
@@ -155,6 +155,14 @@ describe Api::V1::OrganizationsController, type: :controller do
         end
         let(:test_attr) { :display_name }
         let(:test_attr_value) { "Def Not Illuminati" }
+      end
+
+      it_behaves_like "has updatable tags" do
+        let(:resource) { create(:organization, owner: authorized_user) }
+        let(:tag_array) { ["astro", "gastro"] }
+        let(:tag_params) do
+          { organizations: { tags: tag_array }, id: resource.id }
+        end
       end
 
       context "includes exceptional parameters" do

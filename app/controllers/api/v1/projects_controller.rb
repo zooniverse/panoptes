@@ -65,9 +65,7 @@ class Api::V1::ProjectsController < Api::ApiController
         resource.primary_content.update!(content_attributes)
       end
 
-      # TODO: move this to a service object to create/update
-      # tags for the project
-      tags = create_or_update_tags(update_params.dup)
+      tags = Tags::BuildTags.run!(api_user: api_user, tag_array: update_params[:tags]) if update_params[:tags]
       resource.tags = tags unless tags.nil?
 
       if !content_attributes.blank? || !tags.nil?
@@ -126,9 +124,11 @@ class Api::V1::ProjectsController < Api::ApiController
 
     content_attributes = primary_content_attributes(create_params)
     create_params[:project_contents] = [ ProjectContent.new(content_attributes) ]
-    if create_params.has_key? :tags
-      create_params[:tags] = create_or_update_tags(create_params)
+
+    if create_params.key?(:tags)
+      create_params[:tags] = Tags::BuildTags.run!(api_user: api_user, tag_array: create_params[:tags])
     end
+
     add_user_as_linked_owner(create_params)
 
     super(create_params.except(*CONTENT_FIELDS))
@@ -163,13 +163,6 @@ class Api::V1::ProjectsController < Api::ApiController
           item
         end
       end
-    end
-  end
-
-  def create_or_update_tags(hash)
-    hash.delete(:tags).try(:map) do |tag|
-      name = tag.downcase
-      Tag.find_or_initialize_by(name: name)
     end
   end
 
