@@ -639,33 +639,38 @@ describe User, type: :model do
 
   describe "has_finished?" do
     let(:user) { create(:user) }
+    let(:workflow) { create(:workflow_with_subjects) }
+
     subject { user.has_finished?(workflow) }
 
+    context 'when the workflow is finished' do
+      before do
+        workflow.update_column(:finished_at, DateTime.now)
+      end
+
+      it { is_expected.to be true }
+    end
+
     context 'when the user has classified all subjects in a workflow' do
-      let(:workflow) do
-        workflow = create(:workflow_with_subjects)
+      before do
         ids = workflow.subject_sets.flat_map(&:subjects).map(&:id)
         create(:user_seen_subject, user: user, workflow: workflow, subject_ids: ids)
         create(:classification, user: user, workflow: workflow, subjects: Subject.where(id: ids))
-        workflow
       end
 
       it { is_expected.to be true }
     end
 
     context 'when the user has not seen any data for a workflow' do
-      let(:workflow) do
-        workflow = create(:workflow_with_subjects)
+      before do
         create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [])
-        workflow
       end
 
       it { is_expected.to be false }
     end
 
     context 'when the user only classified old (unlinked) subjects in a workflow' do
-      let(:workflow) do
-        workflow = create(:workflow_with_subjects)
+      before do
         ids = workflow.subject_sets.flat_map(&:subjects).map(&:id)
         create(:user_seen_subject, user: user, workflow: workflow, subject_ids: ids)
         new_data_set = create(:subject_set_with_subjects,
@@ -673,7 +678,6 @@ describe User, type: :model do
           project: workflow.project
         )
         workflow.subject_sets = [ new_data_set ]
-        workflow
       end
 
       it { is_expected.to be false }
