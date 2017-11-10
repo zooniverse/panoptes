@@ -20,5 +20,7 @@ module TasksVisitors
     alias :visit_label :substitute_string
     alias :visit_question :substitute_string
     alias :visit_help :substitute_string
+    alias :visit_description :substitute_string
+    alias :visit_confusions :substitute_string
   end
 end
