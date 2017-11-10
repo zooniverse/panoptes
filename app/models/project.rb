@@ -30,8 +30,6 @@ class Project < ActiveRecord::Base
     as: :linked
   has_one :classifications_export, -> { where(type: "project_classifications_export").order(created_at: :desc) },
     class_name: "Medium", as: :linked
-  has_one :aggregations_export, -> { where(type: "project_aggregations_export").order(created_at: :desc) },
-    class_name: "Medium", as: :linked
   has_one :subjects_export, -> { where(type: "project_subjects_export").order(created_at: :desc) },
     class_name: "Medium", as: :linked
   has_one :workflows_export, -> { where(type: "project_workflows_export").order(created_at: :desc) },
@@ -67,7 +65,7 @@ class Project < ActiveRecord::Base
   scope :launched, -> { where("launch_approved IS TRUE") }
 
   can_by_role :destroy, :update, :update_links, :destroy_links, :create_classifications_export,
-    :create_subjects_export, :create_aggregations_export, :create_workflows_export,
+    :create_subjects_export, :create_workflows_export,
     :create_workflow_contents_export, :retire_subjects, roles: [ :owner, :collaborator ]
 
   can_by_role :show, :index, :versions, :version, public: true,

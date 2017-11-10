@@ -1,1 +1,0 @@
-AggregationClient.load_configuration

@@ -11,8 +11,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include MediumResponse
 
   require_authentication :update, :create, :destroy, :create_classifications_export,
-    :create_subjects_export, :create_aggregations_export,
-    :create_workflows_export, :create_workflow_contents_export,
+    :create_subjects_export, :create_workflows_export, :create_workflow_contents_export,
     scopes: [:project]
   resource_actions :show, :index, :create, :update, :deactivate
   schema_type :json_schema
@@ -40,8 +39,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
   prepend_before_action :require_login,
     only: [:create, :update, :destroy, :create_classifications_export,
-    :create_subjects_export, :create_aggregations_export,
-    :create_workflows_export, :create_workflow_contents_export]
+    :create_subjects_export, :create_workflows_export, :create_workflow_contents_export]
 
   search_by do |name, query|
     query.search_display_name(name.join(" "))
@@ -93,11 +91,6 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def create_subjects_export
     medium = Projects::CreateSubjectsExport.with(api_user: api_user, object: controlled_resource).run!(params)
-    medium_response(medium)
-  end
-
-  def create_aggregations_export
-    medium = Projects::CreateAggregationsExport.with(api_user: api_user, object: controlled_resource).run!(params)
     medium_response(medium)
   end
 

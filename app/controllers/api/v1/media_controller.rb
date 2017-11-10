@@ -35,7 +35,6 @@ class Api::V1::MediaController < Api::ApiController
     error_unless_exists
     set_controlled_resources
     super
-    send_aggregation_ready_email
   end
 
   def destroy
@@ -113,7 +112,7 @@ class Api::V1::MediaController < Api::ApiController
 
   def controlled_scope
     case media_name
-    when /\A(classifications|subjects|aggregations)_export\z/
+    when /\A(classifications|subjects)_export\z/
       :update
     else
       action_name.to_sym
@@ -162,13 +161,5 @@ class Api::V1::MediaController < Api::ApiController
     .with_ids(resource_ids)
     .scope
     check_controller_resources
-  end
-
-  def send_aggregation_ready_email
-    return unless params[:media_name] == "aggregations_export"
-    export = media.first
-    if export.metadata.try(:[], "state") == "ready"
-      AggregationDataMailerWorker.perform_async(export.id)
-    end
   end
 end
