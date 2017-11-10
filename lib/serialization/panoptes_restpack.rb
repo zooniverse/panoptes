@@ -16,6 +16,14 @@ module Serialization
       def preloads
         @preloads || []
       end
+
+      def cache_total_count(cache_setting)
+        @cache_total_count ||= !!cache_setting
+      end
+
+      def cache_total_count_on
+        @cache_total_count || false
+      end
     end
 
     module ClassMethodOverrides
@@ -62,6 +70,14 @@ module Serialization
         else
           "#{href_prefix}/#{key}"
         end
+      end
+
+      def serialize_meta(page, options)
+        if cache_total_count_on
+          page = Serialization::PageWithCachedMetadata.new(page)
+        end
+
+        super(page, options)
       end
     end
   end
