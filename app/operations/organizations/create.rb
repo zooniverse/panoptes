@@ -18,8 +18,8 @@ module Organizations
         organization = build_organization
         organization.organization_contents.build(organization_contents_params)
 
-        tags = Tags::BuildTags.run!(api_user: api_user, tag_array: tags) if tags
-        organization.tags = tags unless tags.nil?
+        tag_objects = Tags::BuildTags.run!(api_user: api_user, tag_array: tags) if tags
+        organization.tags = tag_objects unless tags.nil?
 
         organization.save!
         organization
