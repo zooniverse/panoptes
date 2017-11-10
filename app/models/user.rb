@@ -236,6 +236,8 @@ class User < ActiveRecord::Base
   end
 
   def has_finished?(workflow)
+    return true if workflow.finished?
+
     current_seen_count = SetMemberSubject
       .seen_for_user_by_workflow(self, workflow)
       .count
