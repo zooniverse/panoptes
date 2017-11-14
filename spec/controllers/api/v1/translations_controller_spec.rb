@@ -96,7 +96,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
           default_request scopes: scopes, user_id: authorized_user.id
         end
 
-        context "when the user has not roles" do
+        context "when the user has no roles" do
           before do
             get :show, show_params.merge(id: resource.id)
           end
@@ -106,7 +106,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
           end
 
           it "should return a specific error message in the response body" do
-            not_found_msg = "Could not find translation with id='#{resource.id}'"
+            not_found_msg = "Could not find #{resource_type} translations with id='#{resource.id}'"
             expect(response.body).to eq(json_error_message(not_found_msg))
           end
         end

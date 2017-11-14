@@ -1,8 +1,11 @@
 class Api::V1::MediaController < Api::ApiController
-  require_authentication :update, :create, :destroy, scopes: [:medium]
-  resource_actions :default
+  include PolymorphicResourceScope
 
-  before_action :create_conditions, only: :create
+  polymorphic_column :linked
+
+  require_authentication :update, :create, :destroy, scopes: [:medium]
+
+  resource_actions :default
 
   schema_type :json_schema
 
@@ -11,74 +14,32 @@ class Api::V1::MediaController < Api::ApiController
   end
 
   def index
-    unless media.blank?
-      @controlled_resources = media
-      if association_numeration == :single
-        #generate the etag here as we use the index route for linked media has_one relations
-        headers['ETag'] = gen_etag(controlled_resources)
-        render json_api: serializer.page(params, controlled_resources, context)
-      else
-        super
-      end
+    if has_one_assocation?
+      #generate the etag here as we use the index route for linked media has_one relations
+      headers['ETag'] = gen_etag(controlled_resources)
+      render json_api: serializer.page(params, controlled_resources, context)
     else
-      raise Api::NoMediaError.new(media_name, resource_name, resource_ids)
+      super
     end
-  end
-
-  def show
-    error_unless_exists
-    set_controlled_resources
-    super
-  end
-
-  def update
-    error_unless_exists
-    set_controlled_resources
-    super
-  end
-
-  def destroy
-    error_unless_exists
-    set_controlled_resources
-    super
   end
 
   def create
-    created = if association_numeration == :collection
-                controlled_resource.send(media_name).create!(create_params)
-              else
-                if old_resource = controlled_resource.send(media_name)
-                  old_resource.destroy
-                end
-                controlled_resource.send("create_#{media_name}!", create_params)
-              end
-    created_resource_response(created)
-  end
+    check_polymorphic_controller_resources
 
-  def set_controlled_resources
-    if association_numeration == :collection
-      @controlled_resources = media.where(id: params[:id])
-    else
-      @controlled_resources = media
+    created_media_resource = Medium.transaction(requires_new: true) do
+      begin
+        if has_many_assocation?
+          polymorphic_controlled_resourse.send(media_name).create!(create_params)
+        else
+          if old_resource = polymorphic_controlled_resourse.send(media_name)
+            old_resource.destroy
+          end
+          polymorphic_controlled_resourse.send("create_#{media_name}!", create_params)
+        end
+      end
     end
 
-  end
-
-  def media
-    return @media if @media
-    linked_media = controlled_resource.send(media_name)
-    @media = if linked_media && association_numeration == :single
-               id = params[:id] ? params[:id] : linked_media.id
-               linked_media.class.where(id: id)
-             else
-               linked_media
-             end
-  end
-
-  def error_unless_exists
-    unless media_exists?
-      raise Api::NoMediaError.new(media_name, resource_name, resource_ids, params[:id])
-    end
+    created_resource_response(created_media_resource)
   end
 
   def link_header(resource)
@@ -102,10 +63,6 @@ class Api::V1::MediaController < Api::ApiController
     :media
   end
 
-  def resource_name
-    @resource_name ||= params.keys.find{ |key| key.to_s.match(/_id/) }[0..-4]
-  end
-
   def media_name
     params[:media_name]
   end
@@ -115,51 +72,30 @@ class Api::V1::MediaController < Api::ApiController
     when /\A(classifications|subjects)_export\z/
       :update
     else
-      action_name.to_sym
+      super
     end
   end
 
   private
 
-  def precondition_fails?
-    query = if association_numeration == :single
-              media
-            else
-              Medium.where(id: params[:id])
-            end
-    run_etag_validation(query)
+  def raise_no_resources_error
+    raise Api::NoMediaError.new(
+      media_name,
+      polymorphic_klass_name,
+      polymorphic_ids,
+      params[:id]
+    )
   end
 
-  def resource_scope(resources)
-    return resources if resources.is_a?(ActiveRecord::Relation)
-    Medium.where(id: resources.try(:id) || resources.map(&:id))
+  def association_reflection
+    @association_reflection ||= polymorphic_klass.reflect_on_association(media_name)
   end
 
-  def association_numeration
-    assoc = resource_class.reflect_on_association(media_name)
-    case assoc.macro
-    when :has_one
-      :single
-    when :has_many
-      :collection
-    end
+  def has_one_assocation?
+    @has_one_assocation ||= association_reflection.macro == :has_one
   end
 
-  def media_exists?
-    return false unless media
-    case association_numeration
-    when :single
-      media.exists?
-    when :collection
-      media.exists?(params[:id])
-    end
-  end
-
-  def create_conditions
-    @controlled_resources = api_user.do(:update)
-    .to(resource_class, scope_context)
-    .with_ids(resource_ids)
-    .scope
-    check_controller_resources
+  def has_many_assocation?
+    @has_many_assocation ||= association_reflection.macro == :has_many
   end
 end

@@ -80,10 +80,6 @@ module JsonApiController
     {}
   end
 
-  def controlled_resource
-    @controlled_resource ||= controlled_resources.first
-  end
-
   private
 
   def gen_etag(query)

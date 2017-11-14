@@ -98,7 +98,6 @@ describe "api should allow conditional requests", type: :request do
     let(:method) { :delete }
 
     context "for projects" do
-
       it_behaves_like "precondition required"
     end
 

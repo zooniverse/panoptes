@@ -77,7 +77,6 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         context "when #{media_type} does not exist" do
           let(:media_id) {(Medium.last.id + 100)}
           before(:each) do
-            parent.send(media_type).destroy
             default_request user_id: authorized_user.id, scopes: scopes
             get :show, :"#{parent_name}_id" => parent.id, :media_name => media_type,
               :id => media_id
@@ -97,21 +96,35 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
     if actions.include? :destroy
       describe "#destroy" do
-        let(:resource) { resources.first }
-
         before(:each) do
           stub_token(scopes: scopes, user_id: authorized_user.id)
           set_preconditions
-          params = { :id => resource.id, :"#{parent_name}_id" => parent.id, :media_name => media_type }
+        end
+        let(:resource) { resources.first }
+        let(:params) do
+          { :id => resource.id, :"#{parent_name}_id" => parent.id, :media_name => media_type, test: 1 }
+        end
+        let(:destroy_action) do
           delete :destroy, params
         end
 
         it "should return 204" do
+          destroy_action
           expect(response).to have_http_status(:no_content)
         end
 
         it "should delete the resource" do
+          destroy_action
           expect{resource_class.find(resource.id)}.to raise_error(ActiveRecord::RecordNotFound)
+        end
+
+        it "should raise an error when attempting to delete the wrong resource type" do
+          parent_scope = parent.class.where(id: parent.id)
+          allow(controller).to receive(:controlled_resources).and_return(parent_scope)
+          expect{ destroy_action }.to raise_error(
+            JsonApiController::DestructableResource::IncorrectClass,
+            "Attempting to delete the wrong resource type - #{parent.class.name}"
+          )
         end
       end
     end
@@ -242,15 +255,30 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         before(:each) do
           stub_token(scopes: scopes, user_id: authorized_user.id)
           set_preconditions
+        end
+        let(:destroy_action) do
           delete :destroy, :"#{parent_name}_id" => parent.id, media_name: media_type
         end
 
         it "should return 204" do
+          destroy_action
           expect(response).to have_http_status(:no_content)
         end
 
         it "should delete the resource" do
+          destroy_action
           expect{resource_class.find(resource.id)}.to raise_error(ActiveRecord::RecordNotFound)
+        end
+
+        it "should raise an error when attempting to delete the wrong resource type" do
+          allow(controller)
+            .to receive(:controlled_resources)
+            .and_return(parent.class.where(id: parent.id))
+
+          expect{ destroy_action }.to raise_error(
+            JsonApiController::DestructableResource::IncorrectClass,
+            "Attempting to delete the wrong resource type - #{parent.class.name}"
+          )
         end
       end
     end
