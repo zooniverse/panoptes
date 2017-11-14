@@ -6,7 +6,7 @@ module Tags
     def execute
       tags = tag_array.try(:map) do |tag|
         name = tag.downcase
-        Tag.find_or_initialize_by(name: name)
+        Tag.where(name: name).first_or_create
       end
       tags
     end
