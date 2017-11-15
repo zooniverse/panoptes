@@ -211,7 +211,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
         context "when another media type exits" do
           before do
-            create(:medium, linked: parent, type: "another_media_type", content_type: content_type)
+            create(:medium, linked: parent, type: "another_media_type", content_type: "image/jpeg")
             get_index
           end
 
