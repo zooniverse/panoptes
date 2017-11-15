@@ -98,4 +98,14 @@ class Api::V1::MediaController < Api::ApiController
   def has_many_assocation?
     @has_many_assocation ||= association_reflection.macro == :has_many
   end
+
+  # locate the only the linked media type if it's supplied as a param (via routes)
+  def controlled_resources
+    @controlled_resources ||= if params[:media_name]
+                                linked_media_type = "#{polymorphic_klass_name}_#{params[:media_name]}"
+                                super.where(type: linked_media_type)
+                              else
+                                super
+                              end
+  end
 end
