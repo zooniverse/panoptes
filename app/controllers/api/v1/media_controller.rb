@@ -108,8 +108,8 @@ class Api::V1::MediaController < Api::ApiController
                               end
   end
 
-  # attached images have where(type: "tutorial_attached_image") } polymorphic scope
-  # so these has_many relatinos need to be singular types scopes
+  # attached images have where(type: "tutorial_attached_image") } filters
+  # so these has_many relations need to be singular types
   def singular_linked_media_type
     "#{polymorphic_klass_name}_#{params[:media_name]}".singularize
   end
