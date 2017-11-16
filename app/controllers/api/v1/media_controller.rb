@@ -98,4 +98,19 @@ class Api::V1::MediaController < Api::ApiController
   def has_many_assocation?
     @has_many_assocation ||= association_reflection.macro == :has_many
   end
+
+  # locate the only the linked media type if it's supplied as a param (via routes)
+  def controlled_resources
+    @controlled_resources ||= if params[:media_name]
+                                super.where(type: singular_linked_media_type)
+                              else
+                                super
+                              end
+  end
+
+  # attached images have where(type: "tutorial_attached_image") } polymorphic scope
+  # so these has_many relatinos need to be singular types scopes
+  def singular_linked_media_type
+    "#{polymorphic_klass_name}_#{params[:media_name]}".singularize
+  end
 end

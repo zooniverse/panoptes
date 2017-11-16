@@ -172,10 +172,14 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
     if actions.include? :index
       describe "#index" do
+        let(:get_index) do
+          default_request user_id: authorized_user.id, scopes: scopes
+          get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+        end
+
         context "when #{media_type} exists" do
           before(:each) do
-            default_request user_id: authorized_user.id, scopes: scopes
-            get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+            get_index
           end
 
           it 'should return ok' do
@@ -192,8 +196,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         context "when #{media_type} does not exist" do
           before(:each) do
             resource.destroy
-            default_request user_id: authorized_user.id, scopes: scopes
-            get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+            get_index
           end
 
           it 'should return 404' do
@@ -203,6 +206,22 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           it 'should return an error message' do
             msg = json_response['errors'][0]['message']
             expect(msg).to match(/No #{media_type} exists for #{parent_name} ##{parent.id}/)
+          end
+        end
+
+        context "when another media type exits" do
+          before do
+            create(:medium, linked: parent, type: "another_media_type", content_type: "image/jpeg")
+            get_index
+          end
+
+          it 'should return ok' do
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'should include only the requested media type item' do
+            expect(json_response["media"].length).to eq(1)
+            expect(json_response["media"][0]["media_type"]).to eq("#{parent_name}_#{media_type}")
           end
         end
       end
