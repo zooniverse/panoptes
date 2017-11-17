@@ -7,8 +7,14 @@ module Subjects
       @limit = limit
     end
 
+    # ensure the order runs outside the subselect here
+    # otherwise it attemps to sort the whole available complex joinsed scope
     def select
-      available.order(priority: :asc).limit(limit).pluck(:id)
+      SetMemberSubject
+      .where(id: available)
+      .order(priority: :asc)
+      .limit(limit)
+      .pluck(:id)
     end
   end
 end
