@@ -31,10 +31,13 @@ module Subjects
       @available_count ||= available.except(:select).count
     end
 
+    # ensure the order runs outside the subselect here
+    # otherwise it attemps to sort the whole available complex joinsed scope
     def focus_window_random_sample
-      available
-        .order(random: [:asc, :desc].sample)
-        .limit(focus_set_window_size)
+      SetMemberSubject
+      .where(id: available)
+      .order(random: %i(asc desc).sample)
+      .limit(focus_set_window_size)
     end
 
     def focus_set_window_size
