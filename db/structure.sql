@@ -2422,10 +2422,10 @@ CREATE INDEX index_classifications_on_lifecycled_at ON classifications USING btr
 
 
 --
--- Name: index_classifications_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_classifications_on_project_id_and_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_classifications_on_project_id ON classifications USING btree (project_id);
+CREATE INDEX index_classifications_on_project_id_and_id ON classifications USING btree (project_id, id);
 
 
 --
@@ -4081,4 +4081,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170808130619');
 INSERT INTO schema_migrations (version) VALUES ('20170824165411');
 
 INSERT INTO schema_migrations (version) VALUES ('20171019115705');
+
+INSERT INTO schema_migrations (version) VALUES ('20171120222438');
 
