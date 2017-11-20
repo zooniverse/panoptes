@@ -81,5 +81,12 @@ shared_context "has updatable tags" do
         tag_update
       }.to change { resource.reload.updated_at }
     end
+
+    it "error response is returned if tag is invalid" do
+      borked_params = { organizations: { tags: "bork" }, id: resource.id }
+      default_request scopes: scopes, user_id: authorized_user.id
+      put :update, borked_params
+      expect(response.status).to eq(422)
+    end
   end
 end
