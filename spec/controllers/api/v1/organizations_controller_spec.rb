@@ -6,6 +6,17 @@ describe Api::V1::OrganizationsController, type: :controller do
   let(:unlisted_organization) { build(:unlisted_organization) }
   let(:owned_unlisted_organization) { build(:unlisted_organization, owner: authorized_user) }
 
+  let(:api_resource_name) { "organizations" }
+  let(:api_resource_links) do
+    [ "organizations.projects",
+      "organizations.organization_contents",
+      "organizations.organization_roles",
+      "organizations.avatar",
+      "organizations.background",
+      "organizations.pages",
+      "organizations.owner",
+      "organizations.attached_images" ]
+  end
   let(:scopes) { %w(public organization) }
 
   describe "when not logged in" do
@@ -25,10 +36,7 @@ describe Api::V1::OrganizationsController, type: :controller do
     describe "#index" do
       it_behaves_like "is indexable" do
         let(:private_resource) { unlisted_organization }
-        let(:api_resource_name) { "organizations" }
         let(:api_resource_attributes) { %w(id display_name) }
-        let(:api_resource_links) { %w() }
-
         let(:n_visible) { 1 }
 
         before do
@@ -83,7 +91,6 @@ describe Api::V1::OrganizationsController, type: :controller do
 
       it_behaves_like "is showable" do
         let(:resource) { organization }
-        let(:api_resource_name) { "organizations" }
         let(:api_resource_attributes) { %w(id display_name) }
         let(:api_resource_links) { %w() }
       end
@@ -106,7 +113,6 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:test_attr) { :display_name }
         let(:test_attr_value) { "The Illuminati" }
         let(:resource_class) { Organization }
-        let(:api_resource_name) { "organizations" }
         let(:api_resource_attributes) { %w(id display_name) }
         let(:api_resource_links) { %w() }
 
@@ -133,7 +139,6 @@ describe Api::V1::OrganizationsController, type: :controller do
       it_behaves_like "is updatable" do
         let(:resource) { create(:organization, owner: authorized_user) }
         let(:resource_class) { Organization }
-        let(:api_resource_name) { "organizations" }
         let(:api_resource_attributes) { ["display_name", "description"] }
         let(:api_resource_links) { [] }
         let(:update_params) do

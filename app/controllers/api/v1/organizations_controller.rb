@@ -4,6 +4,7 @@ class Api::V1::OrganizationsController < Api::ApiController
   include IndexSearch
   include AdminAllowed
   include Slug
+  include MediumResponse
 
   require_authentication :update, :create, :destroy, scopes: [:organization]
 
