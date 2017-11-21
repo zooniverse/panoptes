@@ -17,4 +17,10 @@ describe CsvDumps::FullEmailList do
     list = described_class.new(:beta)
     expect { |b| list.each(&b) }.to yield_successive_args(*users)
   end
+
+  it 'should handle matching string args ala sidekiq' do
+    users = [all_email_user, global_email_user]
+    list = described_class.new("global")
+    expect { |b| list.each(&b) }.to yield_successive_args(*users)
+  end
 end
