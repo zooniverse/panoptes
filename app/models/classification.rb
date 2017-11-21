@@ -27,7 +27,10 @@ class Classification < ActiveRecord::Base
   scope :created_by, -> (user) { where(user_id: user.id) }
   scope :complete, -> { where(completed: true) }
   scope :gold_standard, -> { where("gold_standard IS TRUE") }
-  scope :after_id, -> (last_id) { where("classifications.id > ?", last_id) }
+  scope :after_id, lambda { |last_id|
+    where("classifications.id > ?", last_id)
+    .order("classifications.id")
+  }
 
   def self.scope_for(action, user, opts={})
     return all if user.is_admin? && action != :gold_standard
