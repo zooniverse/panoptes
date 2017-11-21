@@ -3,20 +3,31 @@ class RebuildClassificationIndexes < ActiveRecord::Migration
   TABLE_NAME = :classifications
 
   def change
+    reversible do |direction|
+      direction.up do
+        rebuild_non_spare_indexes
+        rebuild_sparse_indexes
+      end
+    end
+  end
+
+  private
+
+  def rebuild_non_spare_indexes
     index_cols.each do |column|
       rebuild_index(column) do
         add_index TABLE_NAME, column, algorithm: :concurrently
       end
     end
+  end
 
+  def rebuild_sparse_indexes
     sparse_index_rebuilds.each do |column, clause|
       rebuild_index(column) do
         add_index TABLE_NAME, column, where: clause, algorithm: :concurrently
       end
     end
   end
-
-  private
 
   def rebuild_index(column)
     renamed_index_name = to_delete_index_name(column)
