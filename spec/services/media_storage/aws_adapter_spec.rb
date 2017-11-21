@@ -11,8 +11,12 @@ RSpec.describe MediaStorage::AwsAdapter do
   let(:uri_regex) { /\A#{URI::DEFAULT_PARSER.make_regexp}\z/ }
 
   context 'when keys are passed to the initializer' do
-    it 'should set the aws config ' do
-      expect(AWS).to receive(:config).with(access_key_id: 'fake', secret_access_key: 'keys')
+    it 'should set the aws config through the s3 client ' do
+      opts = { access_key_id: 'fake', secret_access_key: 'keys', region: 'us-east-1' }
+      expect(Aws::S3::Client)
+        .to receive(:new)
+        .with(opts)
+        .and_call_original
       described_class.new(access_key_id: 'fake', secret_access_key: 'keys')
     end
   end

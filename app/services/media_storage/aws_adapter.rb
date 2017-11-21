@@ -1,19 +1,19 @@
 module MediaStorage
   class AwsAdapter < AbstractAdapter
     attr_accessor :prefix, :bucket
+    attr_reader :s3
 
     def initialize(opts={})
       @prefix = opts[:prefix] || Rails.env
       @bucket = opts[:bucket]
       @get_expiration = opts.dig(:expiration, :get) || 60
       @put_expiration = opts.dig(:expiration, :put) || 20
-      keys = opts.slice(:access_key_id, :secret_access_key)
-      AWS.config(keys) unless keys.empty?
+      @s3 = Aws::S3::Resource.new(client: s3_client(opts))
     end
 
     def bucket
       return @bucket unless @bucket.is_a?(String)
-      @bucket = s3.buckets[@bucket]
+      @bucket = s3.bucket(@bucket)
     end
 
     def stored_path(content_type, medium_type, *path_prefix)
@@ -58,9 +58,6 @@ module MediaStorage
       if opts[:content_disposition]
         upload_options[:content_disposition] = opts[:content_disposition]
       end
-      if opts[:signature_version]
-        upload_options[:signature_version] = opts[:signature_version]
-      end
       object(path).write(**upload_options)
     end
 
@@ -75,12 +72,14 @@ module MediaStorage
       bucket.objects[path]
     end
 
-    def s3
-      @s3 ||= AWS::S3.new
-    end
-
     def expires_in(mins)
       (mins * 60).to_i
+    end
+
+    def s3_client(opts)
+      client_opts = opts.slice(:access_key_id, :secret_access_key)
+      client_opts[:region] = ENV.fetch('AWS_REGION', 'us-east-1')
+      Aws::S3::Client.new(client_opts)
     end
   end
 end
