@@ -37,4 +37,10 @@ describe CsvDumps::DirectToS3 do
       .with(s3_path, file_path, s3_opts)
     direct_to_s3.put_file(file_path)
   end
+
+  # it should test the bucket encryption
+#   resp = client.get_bucket_encryption({
+#   bucket: "BucketName", # required
+#   use_accelerate_endpoint: false,
+# })
 end
