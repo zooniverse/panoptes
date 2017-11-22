@@ -9,7 +9,8 @@ describe CsvDumps::DirectToS3 do
     {
       private: true,
       compressed: true,
-      content_disposition: "attachment; filename=\"full_email_list.csv\""
+      content_disposition: "attachment; filename=\"full_email_list.csv\"",
+      signature_version: :v4
     }
   end
   let(:file_path) { "/tmp/foobar" }
