@@ -5,8 +5,18 @@ UUIDv4Regex = /[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-
 RSpec.describe MediaStorage::AwsAdapter do
   let(:prefix) { "panoptes_staging" }
   let(:bucket) { "media.zooniverse.org" }
+  let(:s3_opts) do
+    {
+      prefix: prefix,
+      bucket: bucket,
+      access_key_id: 'fake',
+      secret_access_key: 'keys',
+      region: 'us-east-1',
+      stub_responses: true
+    }
+  end
   let(:adapter) do
-    described_class.new(prefix: prefix, bucket: bucket, access_key_id: 'fake', secret_access_key: 'keys')
+    described_class.new(s3_opts)
   end
   let(:uri_regex) { /\A#{URI::DEFAULT_PARSER.make_regexp}\z/ }
 
@@ -15,9 +25,9 @@ RSpec.describe MediaStorage::AwsAdapter do
       opts = { access_key_id: 'fake', secret_access_key: 'keys', region: 'us-east-1' }
       expect(Aws::S3::Client)
         .to receive(:new)
-        .with(opts)
+        .with(s3_opts.except(:prefix, :bucket))
         .and_call_original
-      described_class.new(access_key_id: 'fake', secret_access_key: 'keys')
+      adapter
     end
   end
 
@@ -138,23 +148,6 @@ RSpec.describe MediaStorage::AwsAdapter do
             content_disposition: disposition
           )
         put_opts = { content_type: content_type, content_disposition: disposition }
-        adapter.put_file("src", file_path, put_opts)
-      end
-    end
-
-    context "when opts[:signature_version] is set" do
-      let(:signature_version) { :v4 }
-
-      it 'should call write with the signature_version set' do
-        expect(obj_double)
-          .to receive(:write)
-          .with(
-            file: file_path,
-            content_type: content_type,
-            acl: 'public-read',
-            signature_version: signature_version
-          )
-        put_opts = { content_type: content_type, signature_version: signature_version }
         adapter.put_file("src", file_path, put_opts)
       end
     end
