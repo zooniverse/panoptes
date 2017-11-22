@@ -107,13 +107,64 @@ RSpec.describe TasksVisitors::ExtractStrings do
     end
 
     context "without an hash collector" do
-
       it 'should return the strings via the collect method' do
         subject.visit(task_hash)
         expect(subject.collector).to include("interest.question" => "Color some points",
                                              "interest.tools.0.label" => 'Red',
                                              "roundness.question" => 'How round is it?',
                                              "roundness.answers.2.label" => "Cigar shaped")
+      end
+    end
+
+    context "with a survey task" do
+      let(:survey_task_hash) do
+        {
+          "T1"=>{
+            "type"=>"survey",
+            "images"=> {},
+            "choices"=>{
+              "FR"=>{
+                "label"=>"Fire",
+                "images"=>["fire-1.jpg"],
+                "confusions"=>{},
+                "description"=>"It's a fire. Pretty sure you know what this looks like.",
+                "noQuestions"=>true,
+                "characteristics"=>{"LK"=>[], "TL"=>[], "BLD"=>[], "CLR"=>[], "HRNS"=>[], "PTTRN"=>[]},
+                "confusionsOrder"=>[]
+              },
+              "CVT"=>{
+                "label"=>"Civet",
+                "images"=>["civet-1.jpg", "civet-2.jpg", "civet-3.jpg"],
+                "confusions"=>{
+                  "GNT"=>"Okay these two actually are confusing, but genets are cuter and more weasel/cat like."
+                },
+                "description"=>"Long, stocky mammal with short legs and a pointy face. Fur is light brown-gray with a dark mask, white at the tip of the muzzle, dark legs, spots, and bands along the neck.",
+                "noQuestions"=>false,
+                "characteristics"=>{
+                  "LK"=>["CTDG", "WSL"],
+                  "TL"=>["SMTH", "BSH", "LNG", "SHRT"],
+                  "BLD"=>["SMLL", "LWSLNG"],
+                  "CLR"=>["TNLLW", "BRWN", "WHT", "GR", "BLCK"],
+                  "HRNS"=>[],
+                  "PTTRN"=>["STRPS", "BNDS", "SPTS"]
+                },
+                "confusionsOrder"=>["GNT"]
+              }
+            }
+          },
+          "T2"=>{
+             "type"=>"shortcut",
+             "answers"=>[{"label"=>"Nothing Here"}]
+          }
+        }
+      end
+
+      it 'should return the strings via the collect method' do
+        subject.visit(survey_task_hash)
+        expect(subject.collector).to include(
+          "T1.choices.CVT.confusions" => {"GNT"=>"Okay these two actually are confusing, but genets are cuter and more weasel/cat like."},
+          "T1.choices.FR.description" => "It's a fire. Pretty sure you know what this looks like."
+        )
       end
     end
   end
