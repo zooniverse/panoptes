@@ -8,6 +8,7 @@ RSpec.describe MediaStorage::AwsAdapter do
   let(:adapter) do
     described_class.new(prefix: prefix, bucket: bucket, access_key_id: 'fake', secret_access_key: 'keys')
   end
+  let(:uri_regex) { /\A#{URI::DEFAULT_PARSER.make_regexp}\z/ }
 
   context 'when keys are passed to the initializer' do
     it 'should set the aws config ' do
@@ -46,7 +47,7 @@ RSpec.describe MediaStorage::AwsAdapter do
   end
 
   shared_examples "signed s3 url" do
-    it { is_expected.to match(/\A#{URI::regexp}\z/) }
+    it { is_expected.to match(uri_regex) }
     it { is_expected.to match(/#{bucket}/) }
     it { is_expected.to match(/Expires=[0-9]+&Signature=[%A-z0-9]+/) }
   end
@@ -55,7 +56,7 @@ RSpec.describe MediaStorage::AwsAdapter do
     context "when the path is public" do
       subject{ adapter.get_path("subject_locations/name.jpg") }
 
-      it { is_expected.to match(/\A#{URI.regexp}\z/) }
+      it { is_expected.to match(uri_regex) }
     end
 
     context "when the path is private" do
