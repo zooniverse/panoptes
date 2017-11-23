@@ -37,7 +37,10 @@ class TranslationStrings
   end
 
   def workflow_attributes
-    raise NotImplementedError
+    # display_name == title in this case,
+    # something to ensure is fixed for all
+    # resources that have these confused attributes
+    %i(title strings)
   end
 
   def tutorial_attributes
