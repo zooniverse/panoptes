@@ -35,4 +35,32 @@ class TranslationStrings
   def project_attributes
     %i(title description workflow_description introduction researcher_quote url_labels)
   end
+
+  def workflow_attributes
+    {}
+  end
+
+  def organization_attributes
+    {}
+  end
+
+  def tutorial_attributes
+    {}
+  end
+
+  def field_guide_attributes
+    {}
+  end
+
+  def project_page_attributes
+    {}
+  end
+
+  def organization_attributes
+    {}
+  end
+
+  def organization_page_attributes
+    {}
+  end
 end
