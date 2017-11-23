@@ -36,7 +36,8 @@ RSpec.describe MediaStorage::AwsAdapter do
 
   context 'when no prefix is passed to the initializer' do
     it 'should set the prefix to the Rails.env' do
-      adapter = described_class.new(access_key_id: 'fake', secret_access_key: 'keys')
+      opts = s3_opts.slice(%i(access_key_id secret_access_key))
+      adapter = described_class.new(opts)
       expect(adapter.prefix).to eq("test")
     end
   end
