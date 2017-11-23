@@ -4,6 +4,7 @@ module CsvDumps
   # At that point normal Medium objects should be used instead of this.
   class DirectToS3
     attr_reader :export_type
+    class UnencryptedBucket < StandardError; end
 
     def initialize(export_type)
       @export_type = export_type
@@ -18,6 +19,8 @@ module CsvDumps
     end
 
     def put_file(gzip_file_path, compressed: true)
+      check_encrypted_bucket
+
       storage_path = storage_adapter.stored_path("application/x-gzip", "email_exports")
       prefix = File.dirname(storage_path)
       file_paths = File.basename(storage_path).split(".")
@@ -48,6 +51,13 @@ module CsvDumps
         prefix: ENV.fetch("EMAIL_EXPORT_S3_PREFIX", "emails/#{Rails.env}/")
       }
       @storage_adapter = MediaStorage.send(:load_adapter, adapter, storage_opts)
+    end
+
+    def check_encrypted_bucket
+      binding.pry
+      unless storage_adapter.encrypted_bucket?
+        raise UnencryptedBucket.new("the destination bucket is not encrypted")
+      end
     end
   end
 end

@@ -69,6 +69,13 @@ module MediaStorage
       object(path).delete
     end
 
+    def encrypted_bucket?
+      s3.client.get_bucket_encryption({ bucket: bucket.name })
+      true
+    rescue Aws::S3::Errors::ServerSideEncryptionConfigurationNotFoundError
+      false
+    end
+
     private
 
     def object(path)
