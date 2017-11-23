@@ -37,4 +37,18 @@ describe CsvDumps::DirectToS3 do
       .with(s3_path, file_path, s3_opts)
     direct_to_s3.put_file(file_path)
   end
+
+  describe "bucket encryption", :focus do
+    # resp = client.get_bucket_encryption({bucket: "BucketName"})
+
+    it "should raise an error if it's not encrypted" do
+      expect{
+        direct_to_s3.put_file(file_path)
+      }.to raise_error(UnencryptedBucket, "the destination bucket is not encrypted")
+    end
+
+    it "should not raise when the bucket is encrypted" do
+      expect{ direct_to_s3.put_file(file_path) }.not_to raise_error
+    end
+  end
 end
