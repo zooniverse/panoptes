@@ -27,6 +27,10 @@ module MediaStorage
       raise NotImplementedError
     end
 
+    def encrypted_bucket?
+      raise NotImplementedError
+    end
+
     def configure
       yield self if block_given?
     end

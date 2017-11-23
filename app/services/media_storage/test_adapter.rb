@@ -19,5 +19,9 @@ module MediaStorage
     def put_path(path, opts={})
       "https://#{path}"
     end
+
+    def encrypted_bucket?
+      true
+    end
   end
 end
