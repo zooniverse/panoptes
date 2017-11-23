@@ -5,6 +5,6 @@ class MediumRemovalWorker
 
   def perform(medium_src)
     MediaStorage.delete_file(medium_src)
-  rescue AWS::S3::Errors::AccessDenied
+  rescue Aws::S3::Errors::AccessDenied
   end
 end
