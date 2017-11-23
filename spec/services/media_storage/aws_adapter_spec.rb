@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-UUIDv4Regex = /[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/
+UUID_V4_REGEX = /[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/
 
 RSpec.describe MediaStorage::AwsAdapter do
   let(:prefix) { "panoptes_staging" }
@@ -48,12 +48,12 @@ RSpec.describe MediaStorage::AwsAdapter do
     it { is_expected.to match(/#{prefix}/)}
     it { is_expected.to match(/subject_location/)}
     it { is_expected.to match(/\.jpeg/)}
-    it { is_expected.to match(UUIDv4Regex)}
+    it { is_expected.to match(UUID_V4_REGEX)}
 
     context "with an extract path prefix" do
       subject { adapter.stored_path('image/jpeg', 'subject_location', "extra", "prefixes")}
 
-      it { is_expected.to match(/extra\/prefixes/)}
+      it { is_expected.to match(%r{extra\/prefixes})}
     end
 
     context "with an application/x-gzip content-type" do
