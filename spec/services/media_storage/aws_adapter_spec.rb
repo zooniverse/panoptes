@@ -11,22 +11,26 @@ RSpec.describe MediaStorage::AwsAdapter do
       bucket: bucket,
       access_key_id: 'fake',
       secret_access_key: 'keys',
-      region: 'us-east-1',
-      stub_responses: true
+      region: 'us-east-1'
     }
   end
-  let(:adapter) do
-    described_class.new(s3_opts)
-  end
+  let(:adapter) { described_class.new(s3_opts) }
   let(:uri_regex) { /\A#{URI::DEFAULT_PARSER.make_regexp}\z/ }
 
   context 'when keys are passed to the initializer' do
-    it 'should set the aws config through the s3 client ' do
+    let(:expectation) do
       expect(Aws::S3::Client)
-        .to receive(:new)
-        .with(s3_opts.except(:prefix, :bucket))
-        .and_call_original
+      .to receive(:new)
+      .with(s3_opts.except(:prefix, :bucket))
+      .and_call_original
+    end
+
+    it 'should set the aws config through the s3 client ' do
       adapter
+    end
+
+    it 'should deafult to the us-east-1 region' do
+      described_class.new(s3_opts.except(:region))
     end
   end
 

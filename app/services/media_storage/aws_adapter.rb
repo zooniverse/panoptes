@@ -7,8 +7,6 @@ module MediaStorage
       access_key_id
       secret_access_key
       region
-      s3_signature_version
-      stub_responses
     ).freeze
 
     def initialize(opts={})
