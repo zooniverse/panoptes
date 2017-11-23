@@ -17,6 +17,8 @@ class TranslationStrings
   end
 
   def primary_content_attributes
+    return {} unless resource.class.respond_to?(:content_association)
+
     content_assocation = resource.class.content_association
     resource
       .send(content_assocation)
