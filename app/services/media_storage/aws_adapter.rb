@@ -1,6 +1,6 @@
 module MediaStorage
   class AwsAdapter < AbstractAdapter
-    attr_accessor :prefix, :bucket
+    attr_accessor :prefix
     attr_reader :s3
 
     def initialize(opts={})
