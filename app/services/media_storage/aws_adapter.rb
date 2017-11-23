@@ -81,7 +81,7 @@ module MediaStorage
     end
 
     def s3_client(client_opts)
-      client_opts[:region] = ENV.fetch('AWS_REGION', 'us-east-1')
+      client_opts[:region] ||= ENV.fetch('AWS_REGION', 'us-east-1')
       Aws::S3::Client.new(client_opts)
     end
   end
