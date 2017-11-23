@@ -22,7 +22,6 @@ RSpec.describe MediaStorage::AwsAdapter do
 
   context 'when keys are passed to the initializer' do
     it 'should set the aws config through the s3 client ' do
-      opts = { access_key_id: 'fake', secret_access_key: 'keys', region: 'us-east-1' }
       expect(Aws::S3::Client)
         .to receive(:new)
         .with(s3_opts.except(:prefix, :bucket))
@@ -63,10 +62,10 @@ RSpec.describe MediaStorage::AwsAdapter do
   shared_examples "signed s3 url" do
     it { is_expected.to match(uri_regex) }
     it { is_expected.to match(/#{bucket}/) }
-    it { is_expected.to match(/Expires=[0-9]+&Signature=[%A-z0-9]+/) }
+    it { is_expected.to match(/Expires=[0-9]+&.+Signature=[%A-z0-9]+/) }
   end
 
-  describe "#get_path", :focus do
+  describe "#get_path" do
     context "when the path is public" do
       subject{ adapter.get_path("subject_locations/name.jpg") }
 
@@ -99,12 +98,10 @@ RSpec.describe MediaStorage::AwsAdapter do
   end
 
   describe "#put_file" do
-    let(:obj_double) { double(write: true) }
+    let(:obj_double) { double(upload_file: true) }
     let(:file_path) { "a_path.txt" }
     let(:content_type) { "text/csv" }
-    let(:upload_opts) do
-      { content_type: content_type, acl: 'public-read' }
-    end
+    let(:upload_opts) {{ content_type: content_type, acl: 'public-read' }}
 
     before(:each) do
       allow(adapter).to receive(:object).and_return(obj_double)
@@ -114,7 +111,7 @@ RSpec.describe MediaStorage::AwsAdapter do
       it 'should call write with the content_type, file, and private acl' do
         expect(obj_double)
           .to receive(:upload_file)
-          .with(file_path, upload_opts.merge({ acl: 'private' }))
+          .with(file_path, upload_opts.merge({acl: 'private'}))
         adapter.put_file("src", file_path, content_type: content_type, private: true)
       end
     end
@@ -132,7 +129,7 @@ RSpec.describe MediaStorage::AwsAdapter do
       it 'should call write wtih the content_encoding set to gzip' do
         expect(obj_double)
           .to receive(:upload_file)
-          .with(file_path, upload_opts.merge({ content_encoding: 'gzip' }))
+          .with(file_path, upload_opts.merge({content_encoding: 'gzip'}))
         adapter.put_file("src", file_path, content_type: content_type, private: false, compressed: true)
       end
     end
