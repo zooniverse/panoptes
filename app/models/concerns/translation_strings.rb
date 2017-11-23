@@ -37,30 +37,26 @@ class TranslationStrings
   end
 
   def workflow_attributes
-    {}
-  end
-
-  def organization_attributes
-    {}
+    raise NotImplementedError
   end
 
   def tutorial_attributes
-    {}
+    raise NotImplementedError
   end
 
   def field_guide_attributes
-    {}
+    raise NotImplementedError
   end
 
   def project_page_attributes
-    {}
+    raise NotImplementedError
   end
 
   def organization_attributes
-    {}
+    raise NotImplementedError
   end
 
   def organization_page_attributes
-    {}
+    nil
   end
 end
