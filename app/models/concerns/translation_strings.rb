@@ -44,22 +44,22 @@ class TranslationStrings
   end
 
   def tutorial_attributes
-    raise NotImplementedError
+    raise NotImplementedError.new("Tutorial")
   end
 
   def field_guide_attributes
-    raise NotImplementedError
+    raise NotImplementedError.new("FieldGuide")
   end
 
   def project_page_attributes
-    raise NotImplementedError
+    raise NotImplementedError.new("ProjectPage")
   end
 
   def organization_attributes
-    raise NotImplementedError
+    raise NotImplementedError.new("Org")
   end
 
   def organization_page_attributes
-    nil
+    raise NotImplementedError.new("OrgPage")
   end
 end
