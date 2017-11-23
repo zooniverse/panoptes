@@ -18,7 +18,7 @@ module MediaStorage
 
     def stored_path(content_type, medium_type, *path_prefix)
       extension = get_extension(content_type)
-      path = "#{prefix}"
+      path = prefix.to_s
       path += "/" unless path[-1] == '/'
       path += "#{medium_type}/"
       path += "#{path_prefix.join('/')}/" unless path_prefix.empty?
