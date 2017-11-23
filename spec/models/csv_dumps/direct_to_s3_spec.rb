@@ -41,7 +41,6 @@ describe CsvDumps::DirectToS3 do
 
   describe "bucket encryption" do
     it "should raise an error if it's not encrypted" do
-      adapter = direct_to_s3.storage_adapter
       allow(adapter).to receive(:encrypted_bucket?).and_return(false)
       expect{
         direct_to_s3.put_file(file_path)
