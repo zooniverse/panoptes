@@ -34,7 +34,8 @@ module CsvDumps
       {
         private: true,
         compressed: true,
-        content_disposition: "attachment; filename=\"#{file_name}.csv\""
+        content_disposition: "attachment; filename=\"#{file_name}.csv\"",
+        signature_version: :v4
       }
     end
 

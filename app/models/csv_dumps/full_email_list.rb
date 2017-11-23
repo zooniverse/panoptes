@@ -1,7 +1,11 @@
 module CsvDumps
   class FullEmailList < DumpScope
-    EXPORT_FIELDS = {global: :global_email_communication,
-                     beta: :beta_email_communication}.freeze
+    attr_reader :type
+
+    EXPORT_FIELDS = {
+      global: :global_email_communication,
+      beta: :beta_email_communication
+    }.with_indifferent_access.freeze
 
     def initialize(type)
       @type = type
@@ -27,7 +31,7 @@ module CsvDumps
     end
 
     def export_field
-      EXPORT_FIELDS.fetch(@type)
+      EXPORT_FIELDS.fetch(type)
     end
   end
 end

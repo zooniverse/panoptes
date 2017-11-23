@@ -8,11 +8,7 @@ module MediaStorage
       @get_expiration = opts.dig(:expiration, :get) || 60
       @put_expiration = opts.dig(:expiration, :put) || 20
       keys = opts.slice(:access_key_id, :secret_access_key)
-      aws.config(keys) unless keys.empty?
-    end
-
-    def aws
-      AWS
+      AWS.config(keys) unless keys.empty?
     end
 
     def bucket
@@ -61,6 +57,9 @@ module MediaStorage
       upload_options[:content_encoding] = 'gzip' if opts[:compressed]
       if opts[:content_disposition]
         upload_options[:content_disposition] = opts[:content_disposition]
+      end
+      if opts[:signature_version]
+        upload_options[:signature_version] = opts[:signature_version]
       end
       object(path).write(**upload_options)
     end

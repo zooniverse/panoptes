@@ -8,6 +8,7 @@ RSpec.describe MediaStorage::AwsAdapter do
   let(:adapter) do
     described_class.new(prefix: prefix, bucket: bucket, access_key_id: 'fake', secret_access_key: 'keys')
   end
+  let(:uri_regex) { /\A#{URI::DEFAULT_PARSER.make_regexp}\z/ }
 
   context 'when keys are passed to the initializer' do
     it 'should set the aws config ' do
@@ -46,26 +47,26 @@ RSpec.describe MediaStorage::AwsAdapter do
   end
 
   shared_examples "signed s3 url" do
-    it { is_expected.to match(/\A#{URI::regexp}\z/) }
+    it { is_expected.to match(uri_regex) }
     it { is_expected.to match(/#{bucket}/) }
     it { is_expected.to match(/Expires=[0-9]+&Signature=[%A-z0-9]+/) }
   end
 
   describe "#get_path" do
     context "when the path is public" do
-      subject{ adapter.get_path("media.zooniverse.org/subject_locations/name.jpg") }
+      subject{ adapter.get_path("subject_locations/name.jpg") }
 
-      it { is_expected.to match(/\A#{URI::regexp}\z/) }
+      it { is_expected.to match(uri_regex) }
     end
 
     context "when the path is private" do
-      subject{ adapter.get_path("media.zooniverse.org/subject_locations/name.jpg", private: true) }
+      subject{ adapter.get_path("subject_locations/name.jpg", private: true) }
       it_behaves_like "signed s3 url"
     end
   end
 
   describe "#put_path" do
-    subject{ adapter.put_path("media.zooniverse.org/subject_locations/name.jpg") }
+    subject{ adapter.put_path("subject_locations/name.jpg") }
 
     it_behaves_like "signed s3 url"
   end
@@ -133,6 +134,23 @@ RSpec.describe MediaStorage::AwsAdapter do
             content_disposition: disposition
           )
         put_opts = { content_type: content_type, content_disposition: disposition }
+        adapter.put_file("src", file_path, put_opts)
+      end
+    end
+
+    context "when opts[:signature_version] is set" do
+      let(:signature_version) { :v4 }
+
+      it 'should call write with the signature_version set' do
+        expect(obj_double)
+          .to receive(:write)
+          .with(
+            file: file_path,
+            content_type: content_type,
+            acl: 'public-read',
+            signature_version: signature_version
+          )
+        put_opts = { content_type: content_type, signature_version: signature_version }
         adapter.put_file("src", file_path, put_opts)
       end
     end
