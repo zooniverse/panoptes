@@ -66,7 +66,7 @@ RSpec.describe MediaStorage::AwsAdapter do
     it { is_expected.to match(/Expires=[0-9]+&Signature=[%A-z0-9]+/) }
   end
 
-  describe "#get_path" do
+  describe "#get_path", :focus do
     context "when the path is public" do
       subject{ adapter.get_path("subject_locations/name.jpg") }
 
@@ -102,6 +102,9 @@ RSpec.describe MediaStorage::AwsAdapter do
     let(:obj_double) { double(write: true) }
     let(:file_path) { "a_path.txt" }
     let(:content_type) { "text/csv" }
+    let(:upload_opts) do
+      { content_type: content_type, acl: 'public-read' }
+    end
 
     before(:each) do
       allow(adapter).to receive(:object).and_return(obj_double)
@@ -109,28 +112,27 @@ RSpec.describe MediaStorage::AwsAdapter do
 
     context "when opts[:private] is true" do
       it 'should call write with the content_type, file, and private acl' do
-        expect(obj_double).to receive(:write).with(file: file_path,
-          content_type: content_type,
-          acl: 'private')
+        expect(obj_double)
+          .to receive(:upload_file)
+          .with(file_path, upload_opts.merge({ acl: 'private' }))
         adapter.put_file("src", file_path, content_type: content_type, private: true)
       end
     end
 
     context "when opts[:private] is false" do
       it 'should call write with the content_type, file, and public-read acl' do
-        expect(obj_double).to receive(:write).with(file: file_path,
-          content_type: content_type,
-          acl: 'public-read')
+        expect(obj_double)
+          .to receive(:upload_file)
+          .with(file_path, upload_opts)
         adapter.put_file("src", file_path, content_type: content_type, private: false)
       end
     end
 
     context "when opts[:compressed] is true" do
       it 'should call write wtih the content_encoding set to gzip' do
-        expect(obj_double).to receive(:write).with(file: file_path,
-          content_type: content_type,
-          acl: 'public-read',
-          content_encoding: 'gzip')
+        expect(obj_double)
+          .to receive(:upload_file)
+          .with(file_path, upload_opts.merge({ content_encoding: 'gzip' }))
         adapter.put_file("src", file_path, content_type: content_type, private: false, compressed: true)
       end
     end
@@ -140,13 +142,8 @@ RSpec.describe MediaStorage::AwsAdapter do
 
       it 'should call write with the content_disposition set' do
         expect(obj_double)
-          .to receive(:write)
-          .with(
-            file: file_path,
-            content_type: content_type,
-            acl: 'public-read',
-            content_disposition: disposition
-          )
+          .to receive(:upload_file)
+          .with(file_path, upload_opts.merge({content_disposition: disposition}))
         put_opts = { content_type: content_type, content_disposition: disposition }
         adapter.put_file("src", file_path, put_opts)
       end
