@@ -11,7 +11,8 @@ RSpec.describe MediaStorage::AwsAdapter do
       bucket: bucket,
       access_key_id: 'fake',
       secret_access_key: 'keys',
-      region: 'us-east-1'
+      region: 'us-east-1',
+      stub_responses: true
     }
   end
   let(:adapter) { described_class.new(s3_opts) }
