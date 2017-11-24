@@ -33,14 +33,11 @@ class TranslationStrings
   end
 
   def project_attributes
-    %i(title description workflow_description introduction researcher_quote url_labels)
+    %i(display_name title description workflow_description introduction researcher_quote url_labels)
   end
 
   def workflow_attributes
-    # display_name == title in this case,
-    # something to ensure is fixed for all
-    # resources that have these confused attributes
-    %i(title strings)
+    %i(display_name strings)
   end
 
   def tutorial_attributes

@@ -3,6 +3,7 @@ require 'spec_helper'
 describe TranslationStrings do
   def project_strings
     {
+      "display_name" => "A Test Project",
       "title" => "A Test Project",
       "description" => "Some Lorem Ipsum",
       "workflow_description" => "Go outside",
@@ -17,7 +18,21 @@ describe TranslationStrings do
   end
 
   def workflow_strings
-    {}
+    {
+      "display_name" => "A Workflow",
+      "strings" => {
+        "interest.question" => "Draw a circle",
+        "interest.help" => "Duh?",
+        "interest.tools.0.label" => "Red",
+        "interest.tools.1.label" => "Green",
+        "interest.tools.2.label" => "Blue",
+        "shape.question" => "What shape is this galaxy",
+        "shape.help" => "Duh?",
+        "shape.answers.0.label" => "Smooth",
+        "shape.answers.1.label" => "Features",
+        "shape.answers.2.label" => "Star or artifact"
+      }
+    }
   end
 
   def tutorial_strings
