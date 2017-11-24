@@ -1,25 +1,43 @@
 require 'spec_helper'
 
-UUIDv4Regex = /[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/
+UUID_V4_REGEX = /[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/
 
 RSpec.describe MediaStorage::AwsAdapter do
   let(:prefix) { "panoptes_staging" }
   let(:bucket) { "media.zooniverse.org" }
-  let(:adapter) do
-    described_class.new(prefix: prefix, bucket: bucket, access_key_id: 'fake', secret_access_key: 'keys')
+  let(:s3_opts) do
+    {
+      prefix: prefix,
+      bucket: bucket,
+      access_key_id: 'fake',
+      secret_access_key: 'keys',
+      region: 'us-east-1'
+    }
   end
+  let(:adapter) { described_class.new(s3_opts) }
   let(:uri_regex) { /\A#{URI::DEFAULT_PARSER.make_regexp}\z/ }
 
   context 'when keys are passed to the initializer' do
-    it 'should set the aws config ' do
-      expect(AWS).to receive(:config).with(access_key_id: 'fake', secret_access_key: 'keys')
-      described_class.new(access_key_id: 'fake', secret_access_key: 'keys')
+    let(:expectation) do
+      expect(Aws::S3::Client)
+      .to receive(:new)
+      .with(s3_opts.except(:prefix, :bucket))
+      .and_call_original
+    end
+
+    it 'should set the aws config through the s3 client ' do
+      adapter
+    end
+
+    it 'should deafult to the us-east-1 region' do
+      described_class.new(s3_opts.except(:region))
     end
   end
 
   context 'when no prefix is passed to the initializer' do
     it 'should set the prefix to the Rails.env' do
-      adapter = described_class.new(access_key_id: 'fake', secret_access_key: 'keys')
+      opts = s3_opts.slice(%i(access_key_id secret_access_key))
+      adapter = described_class.new(opts)
       expect(adapter.prefix).to eq("test")
     end
   end
@@ -31,12 +49,12 @@ RSpec.describe MediaStorage::AwsAdapter do
     it { is_expected.to match(/#{prefix}/)}
     it { is_expected.to match(/subject_location/)}
     it { is_expected.to match(/\.jpeg/)}
-    it { is_expected.to match(UUIDv4Regex)}
+    it { is_expected.to match(UUID_V4_REGEX)}
 
     context "with an extract path prefix" do
       subject { adapter.stored_path('image/jpeg', 'subject_location', "extra", "prefixes")}
 
-      it { is_expected.to match(/extra\/prefixes/)}
+      it { is_expected.to match(%r{extra\/prefixes})}
     end
 
     context "with an application/x-gzip content-type" do
@@ -49,7 +67,7 @@ RSpec.describe MediaStorage::AwsAdapter do
   shared_examples "signed s3 url" do
     it { is_expected.to match(uri_regex) }
     it { is_expected.to match(/#{bucket}/) }
-    it { is_expected.to match(/Expires=[0-9]+&Signature=[%A-z0-9]+/) }
+    it { is_expected.to match(/Expires=[0-9]+&.+Signature=[%A-z0-9]+/) }
   end
 
   describe "#get_path" do
@@ -85,9 +103,10 @@ RSpec.describe MediaStorage::AwsAdapter do
   end
 
   describe "#put_file" do
-    let(:obj_double) { double(write: true) }
+    let(:obj_double) { double(upload_file: true) }
     let(:file_path) { "a_path.txt" }
     let(:content_type) { "text/csv" }
+    let(:upload_opts) {{ content_type: content_type, acl: 'public-read' }}
 
     before(:each) do
       allow(adapter).to receive(:object).and_return(obj_double)
@@ -95,28 +114,27 @@ RSpec.describe MediaStorage::AwsAdapter do
 
     context "when opts[:private] is true" do
       it 'should call write with the content_type, file, and private acl' do
-        expect(obj_double).to receive(:write).with(file: file_path,
-          content_type: content_type,
-          acl: 'private')
+        expect(obj_double)
+          .to receive(:upload_file)
+          .with(file_path, upload_opts.merge({acl: 'private'}))
         adapter.put_file("src", file_path, content_type: content_type, private: true)
       end
     end
 
     context "when opts[:private] is false" do
       it 'should call write with the content_type, file, and public-read acl' do
-        expect(obj_double).to receive(:write).with(file: file_path,
-          content_type: content_type,
-          acl: 'public-read')
+        expect(obj_double)
+          .to receive(:upload_file)
+          .with(file_path, upload_opts)
         adapter.put_file("src", file_path, content_type: content_type, private: false)
       end
     end
 
     context "when opts[:compressed] is true" do
       it 'should call write wtih the content_encoding set to gzip' do
-        expect(obj_double).to receive(:write).with(file: file_path,
-          content_type: content_type,
-          acl: 'public-read',
-          content_encoding: 'gzip')
+        expect(obj_double)
+          .to receive(:upload_file)
+          .with(file_path, upload_opts.merge({content_encoding: 'gzip'}))
         adapter.put_file("src", file_path, content_type: content_type, private: false, compressed: true)
       end
     end
@@ -126,31 +144,9 @@ RSpec.describe MediaStorage::AwsAdapter do
 
       it 'should call write with the content_disposition set' do
         expect(obj_double)
-          .to receive(:write)
-          .with(
-            file: file_path,
-            content_type: content_type,
-            acl: 'public-read',
-            content_disposition: disposition
-          )
+          .to receive(:upload_file)
+          .with(file_path, upload_opts.merge({content_disposition: disposition}))
         put_opts = { content_type: content_type, content_disposition: disposition }
-        adapter.put_file("src", file_path, put_opts)
-      end
-    end
-
-    context "when opts[:signature_version] is set" do
-      let(:signature_version) { :v4 }
-
-      it 'should call write with the signature_version set' do
-        expect(obj_double)
-          .to receive(:write)
-          .with(
-            file: file_path,
-            content_type: content_type,
-            acl: 'public-read',
-            signature_version: signature_version
-          )
-        put_opts = { content_type: content_type, signature_version: signature_version }
         adapter.put_file("src", file_path, put_opts)
       end
     end
