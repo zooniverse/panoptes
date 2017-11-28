@@ -45,7 +45,7 @@ class TranslationStrings
   end
 
   def field_guide_attributes
-    raise NotImplementedError.new("FieldGuide")
+    %i(items)
   end
 
   def project_page_attributes

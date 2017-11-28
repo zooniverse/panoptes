@@ -40,7 +40,20 @@ describe TranslationStrings do
   end
 
   def field_guide_strings
-    {}
+    {
+      "items" =>
+      [
+        {
+          "title" => "Page 1",
+          "content" => "stuff and things",
+          "icon" => "123456"
+        }, {
+          "title" => "Other guide",
+          "content" => "animals & such",
+          "icon" => "654321"
+        }
+      ]
+     }
   end
 
   def project_page_strings
