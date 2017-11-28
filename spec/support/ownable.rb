@@ -26,4 +26,38 @@ shared_examples "is ownable" do
       expect(owned.owner?(not_the_owner)).to be_falsy
     end
   end
+
+  describe "#owner=" do
+    let(:new_owner) { create(:user) }
+    let!(:old_owner) { owned.owner }
+
+    it "should change the owner of a resource" do
+      owned.owner = new_owner
+      expect(owned.owner?(new_owner)).to be_truthy
+    end
+
+    # it "should remove the old owner acl" do
+    #   owned.save
+    #   old_owner_acl = owned.owner_control_list
+    #   owned.owner = new_owner
+    #   expect(owned.owner?(@old_owner)).to be_falsy
+    #   expect{old_owner_acl.reload}.to raise_error(ActiveRecord::RecordNotFound)
+    # end
+
+    context "changing owner to an existing collaborator" do
+      before do
+        owned.save
+        create(:access_control_list, resource: owned, user_group: new_owner.identity_group)
+        owned.owner = new_owner
+      end
+
+      it "should assign the new owner" do
+        expect(owned.reload.owner?(new_owner)).to be_truthy
+      end
+
+      it "should change the exising ACL from collab to owner" do
+        pending
+      end
+    end
+  end
 end

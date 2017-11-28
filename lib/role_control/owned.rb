@@ -30,6 +30,8 @@ module RoleControl
                        when UserGroup
                          o
                        end
+        # TODO: todo update an existing ACL if there is one
+        # on this resource instead of trying to build a new invalid one
         build_owner_control_list(user_group: owning_group, roles: ["owner"])
         super(owning_group)
       end
