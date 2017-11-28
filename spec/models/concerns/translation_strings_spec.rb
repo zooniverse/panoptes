@@ -68,7 +68,8 @@ describe TranslationStrings do
     {}
   end
 
-  %i(project workflow tutorial field_guide project_page organization organization_page).each do |resource_type|
+  # %i(project workflow field_guide)
+  %i(tutorial field_guide project_page organization organization_page).each do |resource_type|
 
     describe "#extract" do
       it "should extract all the available content to a strings hash", :focus do
