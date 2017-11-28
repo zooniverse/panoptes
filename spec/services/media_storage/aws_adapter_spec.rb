@@ -27,18 +27,19 @@ RSpec.describe MediaStorage::AwsAdapter do
     end
 
     describe "s3 client config" do
-      before do
-        expect(Aws::S3::Client)
-        .to receive(:new)
-        .with(s3_opts.except(:prefix, :bucket))
-        .and_call_original
-      end
-
       it 'should set the aws config through the s3 client ' do
+        expect(Aws::S3::Client)
+          .to receive(:new)
+          .with(s3_opts.except(:prefix, :bucket))
+          .and_call_original
         adapter
       end
 
       it 'should deafult to the us-east-1 region' do
+        expect(Aws::S3::Client)
+          .to receive(:new)
+          .with(s3_opts.except(:prefix, :bucket))
+          .and_call_original
         described_class.new(s3_opts.except(:region))
       end
     end
