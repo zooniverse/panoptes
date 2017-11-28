@@ -227,7 +227,7 @@ describe Classification, :type => :model do
           expect(result).not_to include Classification.first
         end
 
-        it 'should order by id for determinisitc result sets' do
+        it 'should order by id for deterministic result sets' do
           expect(result.to_sql).to include("ORDER BY classifications.id")
         end
 
