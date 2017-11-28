@@ -11,7 +11,8 @@ RSpec.describe MediaStorage::AwsAdapter do
       bucket: bucket,
       access_key_id: 'fake',
       secret_access_key: 'keys',
-      region: 'us-east-1'
+      region: 'us-east-1',
+      stub_responses: true
     }
   end
   let(:adapter) { described_class.new(s3_opts) }
@@ -150,6 +151,21 @@ RSpec.describe MediaStorage::AwsAdapter do
         put_opts = { content_type: content_type, content_disposition: disposition }
         adapter.put_file("src", file_path, put_opts)
       end
+    end
+  end
+
+  describe "#encrypted_bucket?" do
+    it "should raise an error if the bucket is not encrypted" do
+      adapter.s3.client.stub_responses(
+        :get_bucket_encryption,
+        'ServerSideEncryptionConfigurationNotFoundError'
+      )
+      expect(adapter.encrypted_bucket?).to eq(false)
+    end
+
+    it "should not raise an error if the bucket is encrypted" do
+      adapter.s3.client.stub_responses(:get_bucket_encryption)
+      expect(adapter.encrypted_bucket?).to eq(true)
     end
   end
 

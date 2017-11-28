@@ -1,20 +1,14 @@
 module MediaStorage
   class AwsAdapter < AbstractAdapter
-    attr_accessor :prefix, :bucket
+    attr_accessor :prefix
     attr_reader :s3
-
-    S3_CLIENT_OPTS = %i(
-      access_key_id
-      secret_access_key
-      region
-    ).freeze
 
     def initialize(opts={})
       @prefix = opts[:prefix] || Rails.env
       @bucket = opts[:bucket]
       @get_expiration = opts.dig(:expiration, :get) || 60
       @put_expiration = opts.dig(:expiration, :put) || 20
-      @s3 = Aws::S3::Resource.new(client: s3_client(opts.slice(*S3_CLIENT_OPTS)))
+      @s3 = Aws::S3::Resource.new(client: s3_client(opts))
     end
 
     def bucket
@@ -24,7 +18,7 @@ module MediaStorage
 
     def stored_path(content_type, medium_type, *path_prefix)
       extension = get_extension(content_type)
-      path = "#{prefix}"
+      path = prefix.to_s
       path += "/" unless path[-1] == '/'
       path += "#{medium_type}/"
       path += "#{path_prefix.join('/')}/" unless path_prefix.empty?
@@ -68,6 +62,13 @@ module MediaStorage
       object(path).delete
     end
 
+    def encrypted_bucket?
+      s3.client.get_bucket_encryption({ bucket: bucket.name })
+      true
+    rescue Aws::S3::Errors::ServerSideEncryptionConfigurationNotFoundError
+      false
+    end
+
     private
 
     def object(path)
@@ -79,9 +80,19 @@ module MediaStorage
       (mins * 60).to_i
     end
 
-    def s3_client(client_opts)
+    def s3_client(opts)
+      client_opts = opts.slice(*s3_client_opts)
       client_opts[:region] ||= ENV.fetch('AWS_REGION', 'us-east-1')
       Aws::S3::Client.new(client_opts)
+    end
+
+    def s3_client_opts
+      %i(
+        access_key_id
+        secret_access_key
+        region
+        stub_responses
+      )
     end
   end
 end
