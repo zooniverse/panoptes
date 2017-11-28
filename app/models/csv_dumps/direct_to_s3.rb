@@ -51,7 +51,7 @@ module CsvDumps
     end
 
     def emails_export_path(path="email_exports")
-      storage_path = storage_adapter.stored_path("application/x-gzip", path)
+      storage_path = storage_adapter.stored_path("text/csv", path)
       prefix = File.dirname(storage_path)
       file_paths = File.basename(storage_path).split(".")
       file_paths.shift

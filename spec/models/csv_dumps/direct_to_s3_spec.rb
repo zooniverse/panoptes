@@ -4,7 +4,7 @@ describe CsvDumps::DirectToS3 do
   let(:direct_to_s3) { described_class.new("full") }
   let(:adapter) { direct_to_s3.send(:storage_adapter) }
   let(:s3_file_name) { "full_email_list" }
-  let(:s3_path) { "email_exports/#{s3_file_name}.tar.gz" }
+  let(:s3_path) { "email_exports/#{s3_file_name}.csv" }
   let(:s3_opts) do
     {
       private: true,
@@ -30,7 +30,7 @@ describe CsvDumps::DirectToS3 do
     it "should upload the file to the a known bucket location" do
       expect(adapter)
         .to receive(:stored_path)
-        .with("application/x-gzip", "email_exports")
+        .with("text/csv", "email_exports")
         .and_call_original
       expect(adapter)
         .to receive(:put_file)
