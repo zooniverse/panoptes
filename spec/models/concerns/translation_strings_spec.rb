@@ -20,7 +20,7 @@ describe TranslationStrings do
   def workflow_strings
     {
       "display_name" => "A Workflow",
-      "strings" => {
+      "tasks" => {
         "interest.question" => "Draw a circle",
         "interest.help" => "Duh?",
         "interest.tools.0.label" => "Red",
