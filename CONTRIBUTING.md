@@ -23,7 +23,7 @@ All changes are welcome but cosmetic changes may not be reviewed as quickly.
 
 #### **Do you intend to add a new feature or change an existing one?**
 
-* Suggest your change first using to ensure there is a good chance of it being accepted. 
+* Suggest your change first using to ensure there is a good chance of it being accepted.
 
 * Some changes may not be accepted until you have collected positive feedback about the change.
 
@@ -31,11 +31,15 @@ All changes are welcome but cosmetic changes may not be reviewed as quickly.
 
 * Ask any question about how to use Panoptes via GitHub issues.
 
-#### **Do you want to contribute to the Panoptes documentation?**
+#### **Do you want to contribute to the documentation?**
 
 * The documentation is located in the file [apiary.apib](https://github.com/zooniverse/Panoptes/blob/master/apiary.apib) using the [Apiary](https://apiary.io/) format.
 
+#### **Do you want to contribute to the codebase?**
+* Please read the  [Development Guide](https://github.com/zooniverse/Panoptes/wiki/Development-Guide-for-Panoptes) to get started with running specs and some details on the components being used.
+
 Panoptes is a Zooniverse led effort and we code in the open. We encourage you to pitch in and join the team!
+
 
 Thanks! :heart: :heart: :heart:
 
