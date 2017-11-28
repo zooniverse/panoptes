@@ -18,20 +18,30 @@ RSpec.describe MediaStorage::AwsAdapter do
   let(:adapter) { described_class.new(s3_opts) }
   let(:uri_regex) { /\A#{URI::DEFAULT_PARSER.make_regexp}\z/ }
 
-  context 'when keys are passed to the initializer' do
-    let(:expectation) do
-      expect(Aws::S3::Client)
-      .to receive(:new)
-      .with(s3_opts.except(:prefix, :bucket))
-      .and_call_original
+  context 'when opts are passed to the initializer' do
+    it "should use default expiration values" do
+      adapter = described_class.new(s3_opts)
+      default = MediaStorage::AwsAdapter::DEFAULT_EXPIRES_IN
+      expect(adapter.get_expiration).to eq(default)
+      expect(adapter.put_expiration).to eq(default)
     end
 
-    it 'should set the aws config through the s3 client ' do
-      adapter
-    end
+    describe "s3 client config" do
+      it 'should set the aws config through the s3 client ' do
+        expect(Aws::S3::Client)
+          .to receive(:new)
+          .with(s3_opts.except(:prefix, :bucket))
+          .and_call_original
+        adapter
+      end
 
-    it 'should deafult to the us-east-1 region' do
-      described_class.new(s3_opts.except(:region))
+      it 'should deafult to the us-east-1 region' do
+        expect(Aws::S3::Client)
+          .to receive(:new)
+          .with(s3_opts.except(:prefix, :bucket))
+          .and_call_original
+        described_class.new(s3_opts.except(:region))
+      end
     end
   end
 

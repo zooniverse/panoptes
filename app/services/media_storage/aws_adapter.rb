@@ -1,19 +1,18 @@
 module MediaStorage
   class AwsAdapter < AbstractAdapter
-    attr_accessor :prefix
-    attr_reader :s3
+    attr_reader :prefix, :s3, :get_expiration, :put_expiration
+    DEFAULT_EXPIRES_IN = 180
 
     def initialize(opts={})
       @prefix = opts[:prefix] || Rails.env
-      @bucket = opts[:bucket]
-      @get_expiration = opts.dig(:expiration, :get) || 60
-      @put_expiration = opts.dig(:expiration, :put) || 20
+      @bucket_name = opts[:bucket]
+      @get_expiration = opts.dig(:expiration, :get) || DEFAULT_EXPIRES_IN
+      @put_expiration = opts.dig(:expiration, :put) || DEFAULT_EXPIRES_IN
       @s3 = Aws::S3::Resource.new(client: s3_client(opts))
     end
 
     def bucket
-      return @bucket unless @bucket.is_a?(String)
-      @bucket = s3.bucket(@bucket)
+      @bucket ||= s3.bucket(@bucket_name)
     end
 
     def stored_path(content_type, medium_type, *path_prefix)
@@ -27,7 +26,7 @@ module MediaStorage
     end
 
     def get_path(path, opts={})
-      expires = expires_in(opts[:get_expires] || @get_expiration)
+      expires = expires_in(opts[:get_expires] || get_expiration)
       if opts[:private]
         object(path).presigned_url(:get, expires_in: expires).to_s
       else
@@ -37,7 +36,7 @@ module MediaStorage
 
     def put_path(path, opts={})
       content_type = opts[:content_type]
-      expires = expires_in(opts[:put_expires] || @put_expiration)
+      expires = expires_in(opts[:put_expires] || put_expiration)
       object(path).presigned_url(
         :put,
         content_type: content_type,
