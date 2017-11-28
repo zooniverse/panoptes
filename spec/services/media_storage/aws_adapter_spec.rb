@@ -85,7 +85,8 @@ RSpec.describe MediaStorage::AwsAdapter do
   end
 
   describe "#put_path" do
-    subject{ adapter.put_path("subject_locations/name.jpg") }
+    let(:opts) { { private: false, content_type: "image/jpeg" } }
+    subject{ adapter.put_path("subject_locations/name.jpg", opts) }
 
     it_behaves_like "signed s3 url"
   end

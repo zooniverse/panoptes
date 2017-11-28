@@ -42,7 +42,6 @@ module MediaStorage
         :put,
         content_type: content_type,
         expires_in: expires,
-        response_content_type: content_type,
         acl: opts[:private] ? 'private' : 'public-read'
       ).to_s
     end
