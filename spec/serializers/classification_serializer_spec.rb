@@ -38,10 +38,12 @@ describe ClassificationSerializer do
       end
       let(:prefix) { "/classifications?last_id=" }
       let(:suffix) { "&page_size=1&project_id=#{project.id}" }
+      let(:params) do
+        { project_id: project.id, last_id: last_id, page_size: 1 }
+      end
 
       it "should insert the highest page set id into the next_href" do
         second = create(:classification, project: project)
-        params = {project_id: project.id, last_id: last_id, page_size: 1}
         result = ClassificationSerializer.page(params, scope, {})
         meta = result[:meta][:classifications]
         expect(meta[:previous_href]).to eq("#{prefix}#{last_id}#{suffix}")
@@ -49,8 +51,8 @@ describe ClassificationSerializer do
       end
 
       it "should construct valid hrefs when there is no data" do
-        params = {project_id: project.id, last_id: last_id, page: 2, page_size: 1}
-        result = ClassificationSerializer.page(params, scope, {})
+        page2_params = params.merge({page: 2})
+        result = ClassificationSerializer.page(page2_params, scope, {})
         meta = result[:meta][:classifications]
         expect(meta[:previous_href]).to eq("#{prefix}#{last_id}#{suffix}")
         expect(meta[:next_href]).to be_nil
