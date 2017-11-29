@@ -33,21 +33,28 @@ describe ClassificationSerializer do
     context "project context with last_id param present" do
       let(:project) { classification.project }
       let(:last_id) { classification.id }
-
-      it "should insert the next hightest last_id into the next_href" do
-        second = create(:classification, project: project)
-        params = {project_id: project.id, last_id: last_id, page_size: 1}
-        result = ClassificationSerializer.page(params, Classification.all, {})
-        meta = result[:meta][:classifications]
-        expect(meta[:previous_href]).to eq("/classifications?last_id=#{last_id}&page_size=1&project_id=#{project.id}")
-        expect(meta[:next_href]).to eq("/classifications?last_id=#{second.id}&page_size=1&project_id=#{project.id}")
+      let(:scope) do
+        Classification.where(project_id: project.id).after_id(last_id)
+      end
+      let(:prefix) { "/classifications?last_id=" }
+      let(:suffix) { "&page_size=1&project_id=#{project.id}" }
+      let(:params) do
+        { project_id: project.id, last_id: last_id, page_size: 1 }
       end
 
-      it "should constructu valid hrefs when there is no data" do
-        params = {project_id: project.id, last_id: last_id, page: 2, page_size: 1}
-        result = ClassificationSerializer.page(params, Classification.all, {})
+      it "should insert the highest page set id into the next_href" do
+        second = create(:classification, project: project)
+        result = ClassificationSerializer.page(params, scope, {})
         meta = result[:meta][:classifications]
-        expect(meta[:previous_href]).to eq("/classifications?last_id=#{last_id}&page_size=1&project_id=#{project.id}")
+        expect(meta[:previous_href]).to eq("#{prefix}#{last_id}#{suffix}")
+        expect(meta[:next_href]).to eq("#{prefix}#{second.id}#{suffix}")
+      end
+
+      it "should construct valid hrefs when there is no data" do
+        page2_params = params.merge({page: 2})
+        result = ClassificationSerializer.page(page2_params, scope, {})
+        meta = result[:meta][:classifications]
+        expect(meta[:previous_href]).to eq("#{prefix}#{last_id}#{suffix}")
         expect(meta[:next_href]).to be_nil
       end
     end
