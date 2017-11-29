@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe TranslationStrings do
-  def project_strings
+  def project_strings(resource)
     {
-      "display_name" => "A Test Project",
+      "display_name" => resource.display_name,
       "title" => "A Test Project",
       "description" => "Some Lorem Ipsum",
       "workflow_description" => "Go outside",
@@ -17,7 +17,7 @@ describe TranslationStrings do
     }
   end
 
-  def workflow_strings
+  def workflow_strings(resource)
     {
       "display_name" => "A Workflow",
       "tasks" => {
@@ -35,7 +35,7 @@ describe TranslationStrings do
     }
   end
 
-  def tutorial_strings
+  def tutorial_strings(resource)
     {
       "display_name" => "A Tutorial",
       "steps" =>
@@ -52,7 +52,7 @@ describe TranslationStrings do
     }
   end
 
-  def field_guide_strings
+  def field_guide_strings(resource)
     {
       "items" =>
       [
@@ -68,16 +68,16 @@ describe TranslationStrings do
      }
   end
 
-  def project_page_strings
+  def project_page_strings(resource)
     {
       "title" => "Science Case",
       "content" => "Crap about science"
     }
   end
 
-  def organization_strings
+  def organization_strings(resource)
     {
-      "display_name" => "Test Organization 1",
+      "display_name" => resource.display_name,
       "title" => "Test Organization",
       "description" => "This is the description for an Organization",
       "introduction" => "This is the intro for an Organization",
@@ -88,7 +88,7 @@ describe TranslationStrings do
     }
   end
 
-  def organization_page_strings
+  def organization_page_strings(resource)
     {
       "title" => "Science Case",
       "content" => "Crap about science"
@@ -96,12 +96,11 @@ describe TranslationStrings do
   end
 
   %i(project workflow field_guide organization_page organization project_page tutorial).each do |resource_type|
-
     describe "#extract" do
       it "should extract all the available content to a strings hash" do
         resource = create(resource_type)
         subject = TranslationStrings.new(resource)
-        expect(subject.extract).to eq(send("#{resource_type}_strings"))
+        expect(subject.extract).to eq(send("#{resource_type}_strings", resource))
       end
     end
   end
