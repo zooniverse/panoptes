@@ -95,11 +95,10 @@ describe TranslationStrings do
     }
   end
 
-  # %i(project workflow field_guide organization_page organization project_page)
-  %i(tutorial).each do |resource_type|
+  %i(project workflow field_guide organization_page organization project_page tutorial).each do |resource_type|
 
     describe "#extract" do
-      it "should extract all the available content to a strings hash", :focus do
+      it "should extract all the available content to a strings hash" do
         resource = create(resource_type)
         subject = TranslationStrings.new(resource)
         expect(subject.extract).to eq(send("#{resource_type}_strings"))
