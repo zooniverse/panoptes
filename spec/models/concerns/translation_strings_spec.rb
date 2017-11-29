@@ -9,7 +9,7 @@ describe TranslationStrings do
       "workflow_description" => "Go outside",
       "introduction" => "MORE IPSUM",
       "researcher_quote" => "This is my favorite project",
-      "url_labels" =>{
+      "url_labels" => {
         "0.label"=>"Blog",
         "1.label"=>"Twitter",
         "2.label"=>"Science Case"
