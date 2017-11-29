@@ -61,7 +61,16 @@ describe TranslationStrings do
   end
 
   def organization_strings
-    {}
+    {
+      "display_name" => "Test Organization 1",
+      "title" => "Test Organization",
+      "description" => "This is the description for an Organization",
+      "introduction" => "This is the intro for an Organization",
+      "url_labels" => {
+        "0.label" => "Blog",
+        "1.label" => "Twitter"
+      }
+    }
   end
 
   def organization_page_strings
