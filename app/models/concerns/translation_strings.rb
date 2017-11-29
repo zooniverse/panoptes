@@ -1,4 +1,5 @@
 class TranslationStrings
+  TRANSFORM_RESOURCES = %w(field_guide workflow).freeze
   attr_reader :resource
 
   def initialize(resource)
@@ -6,10 +7,23 @@ class TranslationStrings
   end
 
   def extract
-    resource_attributes.slice(*translatable_attributes)
+    extracted_attributes = resource_attributes.slice(*translatable_attributes)
+    if transform_resource_attributes?
+      send("transform_#{resource_name}_attributes", extracted_attributes)
+    else
+      extracted_attributes
+    end
   end
 
   private
+
+  def resource_name
+    resource.model_name.singular
+  end
+
+  def transform_resource_attributes?
+    TRANSFORM_RESOURCES.include?(resource_name)
+  end
 
   # def visitor_extract_strings
   #   if content_model_resource?
@@ -26,7 +40,7 @@ class TranslationStrings
   #
   # CONTENT_MODELS = %w(project workflow).freeze
   # def content_model_resource?
-  #   CONTENT_MODELS.include?(resource.model_name.singular)
+  #   CONTENT_MODELS.include?(resource_name)
   # end
 
   def resource_attributes
@@ -47,7 +61,7 @@ class TranslationStrings
   end
 
   def translatable_attributes
-    send("#{resource.model_name.singular}_attributes")
+    send("#{resource_name}_attributes")
   end
 
   def project_attributes
@@ -76,5 +90,21 @@ class TranslationStrings
 
   def organization_page_attributes
     %i(title content)
+  end
+
+  # field guide item has icon attributes that should not be translated
+  def transform_field_guide_attributes(attributes)
+    attributes_to_slice = %i(title content)
+    {"items" => []}.tap do |field_guide_attrs|
+      attributes[:items].map do |item|
+        field_guide_attrs["items"] << item.slice(*attributes_to_slice)
+      end
+    end
+  end
+
+  # pandora app uses the tasks key to find the tasks strings
+  def transform_workflow_attributes(attributes)
+    attributes["tasks"] = attributes.delete("strings")
+    attributes
   end
 end
