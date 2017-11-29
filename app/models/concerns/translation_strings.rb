@@ -75,6 +75,6 @@ class TranslationStrings
   end
 
   def organization_page_attributes
-    raise NotImplementedError.new("OrgPage")
+    %i(title content)
   end
 end
