@@ -45,12 +45,11 @@ describe TranslationStrings do
       [
         {
           "title" => "Page 1",
-          "content" => "stuff and things",
-          "icon" => "123456"
-        }, {
+          "content" => "stuff and things"
+        },
+        {
           "title" => "Other guide",
-          "content" => "animals & such",
-          "icon" => "654321"
+          "content" => "animals & such"
         }
       ]
      }
