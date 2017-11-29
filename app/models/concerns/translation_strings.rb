@@ -59,7 +59,7 @@ class TranslationStrings
   end
 
   def tutorial_attributes
-    raise NotImplementedError.new("Tutorial")
+    %i(display_name steps)
   end
 
   def field_guide_attributes

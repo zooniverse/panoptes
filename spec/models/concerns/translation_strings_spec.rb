@@ -36,7 +36,20 @@ describe TranslationStrings do
   end
 
   def tutorial_strings
-    {}
+    {
+      "display_name" => "A Tutorial",
+      "steps" =>
+      [
+        {
+          "media" => "asdfasdf",
+          "content" => "asdfkajlsdf;"
+        },
+        {
+          "media" => "asdfasdf",
+          "content" => "asdkfljds;lj"
+        }
+      ]
+    }
   end
 
   def field_guide_strings
