@@ -5,7 +5,7 @@ class RebuildClassificationIndexes < ActiveRecord::Migration
   def change
     reversible do |direction|
       direction.up do
-        rebuild_non_spare_indexes
+        rebuild_non_sparse_indexes
         rebuild_sparse_indexes
       end
     end
@@ -13,7 +13,7 @@ class RebuildClassificationIndexes < ActiveRecord::Migration
 
   private
 
-  def rebuild_non_spare_indexes
+  def rebuild_non_sparse_indexes
     index_cols.each do |column|
       rebuild_index(column) do
         add_index TABLE_NAME, column, algorithm: :concurrently
