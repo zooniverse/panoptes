@@ -56,7 +56,10 @@ describe TranslationStrings do
   end
 
   def project_page_strings
-    {}
+    {
+      "title" => "Science Case",
+      "content" => "Crap about science"
+    }
   end
 
   def organization_strings
@@ -79,8 +82,8 @@ describe TranslationStrings do
     }
   end
 
-  # %i(project workflow field_guide organization_page organization)
-  %i(tutorial project_page).each do |resource_type|
+  # %i(project workflow field_guide organization_page organization project_page)
+  %i(tutorial).each do |resource_type|
 
     describe "#extract" do
       it "should extract all the available content to a strings hash", :focus do
