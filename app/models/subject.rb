@@ -33,7 +33,7 @@ class Subject < ActiveRecord::Base
   def self.nonstandard_mimetypes
     {
       "audio/mp3" => "audio/mpeg",
-      "audio/x-wav" => "audio/mpeg",
+      "audio/x-wav" => "audio/mpeg"
     }
   end
 
