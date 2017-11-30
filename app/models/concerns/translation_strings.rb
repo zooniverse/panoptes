@@ -1,28 +1,25 @@
 class TranslationStrings
-  TRANSFORM_RESOURCES = %w(field_guide workflow).freeze
-  attr_reader :resource
+  attr_reader :resource, :attributes
 
   def initialize(resource)
     @resource = resource
   end
 
   def extract
-    extracted_attributes = resource_attributes.slice(*translatable_attributes)
-    if transform_resource_attributes?
-      send("transform_#{resource_name}_attributes", extracted_attributes)
-    else
-      extracted_attributes
+    @attributes = resource_attributes.slice(*translatable_attributes)
+
+    transform_method = "transform_#{resource_name}_attributes"
+    if respond_to?(transform_method, true)
+      send(transform_method)
     end
+
+    flatten_nested_schema(attributes)
   end
 
   private
 
   def resource_name
     resource.model_name.singular
-  end
-
-  def transform_resource_attributes?
-    TRANSFORM_RESOURCES.include?(resource_name)
   end
 
   def resource_attributes
@@ -75,18 +72,42 @@ class TranslationStrings
   end
 
   # field guide item has icon attributes that should not be translated
-  def transform_field_guide_attributes(attributes)
-    attributes_to_slice = %i(title content)
-    {"items" => []}.tap do |field_guide_attrs|
-      attributes[:items].map do |item|
-        field_guide_attrs["items"] << item.slice(*attributes_to_slice)
-      end
-    end
+  def transform_field_guide_attributes(nested_key="items")
+    attributes[nested_key] = removed_nested_attributes(%i(title content), nested_key)
   end
 
   # pandora app uses the tasks key to find the tasks strings
-  def transform_workflow_attributes(attributes)
+  def transform_workflow_attributes
     attributes["tasks"] = attributes.delete("strings")
-    attributes
+  end
+
+  def transform_tutorial_attributes(nested_key="steps")
+    attributes[nested_key] = removed_nested_attributes(%i(content), nested_key)
+  end
+
+  def removed_nested_attributes(attributes_to_slice, key)
+    attributes[key.to_sym].map do |nested_object|
+      nested_object.slice(*attributes_to_slice)
+    end
+  end
+
+  def flatten_nested_schema(hash_schema)
+    # TODO: convert this to a visitor class that task the schema and converts
+    # as it visits, see TasksVisitor for an example
+    hash_schema.each_with_object({}) do |(parent_key, value), flattened_hash|
+      if value.is_a? Array
+        value.each_with_index.map do |nested_object, index|
+          nested_object.each do |a_k, a_v|
+            flattened_hash["#{parent_key}.#{index}.#{a_k}"] = a_v
+          end
+        end
+      elsif value.is_a? Hash
+        flatten_nested_schema(value).map do |h_k, h_v|
+          flattened_hash["#{parent_key}.#{h_k}"] = h_v
+        end
+      else
+        flattened_hash[parent_key] = value
+      end
+    end
   end
 end
