@@ -98,6 +98,8 @@ class Api::V1::SubjectsController < Api::ApiController
   def location_params(locations)
     (locations || []).map.with_index do |loc, i|
       location_params = case loc
+                        when *Subject.nonstandard_mimetypes.keys
+                          { content_type: Subject.nonstandard_mimetypes[loc] }
                         when String
                           { content_type: loc }
                         when Hash
