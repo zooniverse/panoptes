@@ -89,5 +89,37 @@ RSpec.describe TasksVisitors::InjectStrings do
     it 'should substitute a string at the correct index' do
       expect(task_hash[:interest][:question]).to eq("q1")
     end
+
+    context "with a survey task" do
+      let(:strings) do
+        {
+          "T1.choices.CVT.confusions" => {"GNT"=>"Okay these two actually are confusing, but genets are cuter and more weasel/cat like."},
+          "T1.choices.FR.description" => "It's a fire. Pretty sure you know what this looks like."
+        }
+      end
+      let(:task_hash) do
+        {
+          "T1"=>{
+            "type"=>"survey",
+            "images"=> {},
+            "choices"=>{
+              "FR"=>{
+                "description"=>"T1.choices.FR.description"
+              },
+              "CVT"=>{
+                "confusions"=>{"GNT"=>"T1.choices.CVT.confusions"}
+              }
+            }
+          }
+        }.with_indifferent_access
+      end
+
+      it 'should return the substituted strings' do
+        description = task_hash.dig(:T1, :choices, :FR, :description)
+        expect(description).to eq(strings["T1.choices.FR.description"])
+        confusions = task_hash.dig(:T1, :choices, :CVT, :confusions)
+        expect(confusions).to eq(strings["T1.choices.CVT.confusions"])
+      end
+    end
   end
 end
