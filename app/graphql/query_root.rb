@@ -1,7 +1,7 @@
 QueryRoot = GraphQL::ObjectType.define do
   name "QueryRoot"
 
-  field :me, ApiUser::Type do
+  field :me, ApiUserType do
     resolve ->(obj, args, ctx) { ctx[:api_user] if ctx[:api_user].logged_in? }
   end
 
