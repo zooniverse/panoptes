@@ -19,8 +19,12 @@ class Organization < ActiveRecord::Base
     end
 
     field :projects, types[Project::Type] do
+      argument :tags, types[types.String], "Filter by tags. If multiple specified, then returns projects that have any of the specified tags"
+
       resolve ->(obj, args, ctx) {
-        obj.projects.where(private: false)
+        scope = obj.projects.where(private: false).preload(:project_contents)
+        scope = scope.joins(:tags).where(tags: {name: args[:tags].map(&:downcase)}) if args[:tags].present?
+        scope
       }
     end
   end
