@@ -1,4 +1,30 @@
 class Organization < ActiveRecord::Base
+  Type = GraphQL::ObjectType.define do
+    name "Organization"
+    description "Organizations allow grouping of projects."
+
+    field :id, !types.ID
+    field :displayName, !types.String
+    field :slug, !types.String
+
+    field :classificationsCount, !types.Int do
+      description "Aggregated number of classifications across all projects."
+      resolve ->(obj, args, ctx) {
+        obj.projects.sum(:classifications_count)
+      }
+    end
+
+    field :retiredSubjectsCount, !types.Int, property: :retired_subjects_count do
+      description "Aggregated number of classifications across all projects."
+    end
+
+    field :projects, types[Project::Type] do
+      resolve ->(obj, args, ctx) {
+        obj.projects.where(private: false)
+      }
+    end
+  end
+
   include RoleControl::Owned
   include RoleControl::Controlled
   include Activatable
@@ -30,4 +56,7 @@ class Organization < ActiveRecord::Base
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :access_control_list, :scope_for, :update, :user
 
+  def retired_subjects_count
+    projects.joins(:active_workflows).sum("workflows.retired_set_member_subjects_count")
+  end
 end

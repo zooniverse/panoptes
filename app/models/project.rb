@@ -1,4 +1,14 @@
 class Project < ActiveRecord::Base
+  Type = GraphQL::ObjectType.define do
+    name "Project"
+
+    field :id, !types.ID
+    field :displayName, !types.String
+    field :slug, !types.String
+
+    field :classificationsCount, !types.Int, property: :classifications_count
+    field :retiredSubjectsCount, !types.Int, property: :retired_subjects_count
+  end
   include RoleControl::Owned
   include RoleControl::Controlled
   include Activatable
