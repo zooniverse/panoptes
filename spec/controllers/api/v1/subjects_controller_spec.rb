@@ -626,6 +626,14 @@ describe Api::V1::SubjectsController, type: :controller do
       expect(locations).to eq(["image/jpeg", "image/jpeg", "image/png"])
     end
 
+    it "should replace non-standard mimetypes" do
+      create_params[:subjects][:locations] = ["audio/mp3", "audio/x-wav"]
+      default_request user_id: authorized_user.id, scopes: scopes
+      post :create, create_params
+      locations = json_response[api_resource_name][0]["locations"].flat_map(&:keys)
+      expect(locations).to eq(["audio/mpeg", "audio/mpeg"])
+    end
+
     it 'should create externally linked media resources' do
       default_request user_id: authorized_user.id, scopes: scopes
       external_locs = [{"image/jpeg" => "http://example.com/1.jpg"}, {"image/jpeg" => "http://example.com/2.jpg"}]
@@ -668,7 +676,6 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         context "when uploading restricted content_types" do
-
           it 'should return the created status' do
             create_params.deep_merge!({ subjects: { locations: [ "video/mp4" ] } })
             upload_subjects
@@ -700,7 +707,6 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "when the user is an admin" do
-
         it 'should return the created status' do
           allow_any_instance_of(ApiUser).to receive(:is_admin?).and_return(true)
           upload_subjects
@@ -709,7 +715,6 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "when the user is whitelisted to upload" do
-
         it 'should return the created status' do
           allow_any_instance_of(User).to receive(:upload_whitelist).and_return(true)
           upload_subjects

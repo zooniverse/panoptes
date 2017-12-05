@@ -30,6 +30,13 @@ class Subject < ActiveRecord::Base
   can_through_parent :project, :update, :index, :show, :destroy, :update_links,
                      :destroy_links, :versions, :version
 
+  def self.nonstandard_mimetypes
+    {
+      "audio/mp3" => "audio/mpeg",
+      "audio/x-wav" => "audio/mpeg"
+    }
+  end
+
   def migrated_subject?
     !!migrated
   end
