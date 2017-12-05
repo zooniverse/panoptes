@@ -9,7 +9,7 @@ QueryRoot = GraphQL::ObjectType.define do
     type OrganizationType
     argument :id, !types.ID, "Filter by organization ID"
     resolve ->(obj, args, ctx) {
-      Organization.find(args[:id])
+      Organization.public_scope.find(args[:id])
     }
   end
 end

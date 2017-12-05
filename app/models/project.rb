@@ -1,12 +1,4 @@
 class Project < ActiveRecord::Base
-  # ProjectUrlType = GraphQL::ObjectType.define do
-  #   name "ProjectUrl"
-
-  #   field :url, !types.String, hash_key: :url
-  #   field :label, !types.String, hash_key: :label
-  # end
-
-
   include RoleControl::Owned
   include RoleControl::Controlled
   include Activatable

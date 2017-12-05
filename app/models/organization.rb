@@ -1,5 +1,4 @@
 class Organization < ActiveRecord::Base
-
   include RoleControl::Owned
   include RoleControl::Controlled
   include Activatable
