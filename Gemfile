@@ -11,7 +11,7 @@ gem 'versionist', '~> 1.6'
 gem 'rack-cors', '~> 0.4', require: 'rack/cors'
 gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev" # REST API
 gem 'active_model_serializers', '0.10.0.rc2' # Event stream
-gem 'paper_trail', '~> 3.0'
+gem 'paper_trail', '~> 4.0'
 # Needed because version 1.1.0 locks JWT at an older version than doorkeeper-jwt requires.
 # Not a lot of commits between 1.1.0 and this ref. Remove this once the next version is released.
 gem 'oauth2', github: 'intridea/oauth2', ref: 'e0006cb5099bf392f011eb5c49cbec4f893bbdba'
