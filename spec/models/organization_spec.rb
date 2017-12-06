@@ -53,4 +53,13 @@ describe Organization, type: :model do
       expect(organization.organization_roles).to_not include(preferences[0])
     end
   end
+
+  describe '#retired_subjects_count' do
+    it 'counts across active workflows' do
+      project1 = create :project, organization: organization
+      workflow1 = create(:workflow, project: project1, retired_set_member_subjects_count: 4)
+      workflow2 = create(:workflow, project: project1, retired_set_member_subjects_count: 2)
+      expect(organization.retired_subjects_count).to eq(6)
+    end
+  end
 end

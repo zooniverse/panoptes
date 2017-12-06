@@ -53,6 +53,8 @@ gem 'flipper-ui'
 gem 'panoptes-client'
 gem 'dalli-elasticache'
 gem 'slavery'
+gem 'graphql'
+gem 'graphiql-rails'
 
 group :production, :staging do
   gem 'newrelic_rpm'

@@ -30,4 +30,7 @@ class Organization < ActiveRecord::Base
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :access_control_list, :scope_for, :update, :user
 
+  def retired_subjects_count
+    projects.joins(:active_workflows).sum("workflows.retired_set_member_subjects_count")
+  end
 end
