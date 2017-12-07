@@ -1,14 +1,4 @@
 GIT
-  remote: git://github.com/edpaget/restpack_serializer.git
-  revision: 9a7cdb2777006c7cd05c512859f5c9451248ca8d
-  branch: dev
-  specs:
-    restpack_serializer (0.5.9)
-      activerecord (>= 4.0.3, < 5.0)
-      activesupport (>= 4.0.3, < 5.0)
-      kaminari (~> 0.16.1)
-
-GIT
   remote: git://github.com/intridea/oauth2.git
   revision: e0006cb5099bf392f011eb5c49cbec4f893bbdba
   ref: e0006cb5099bf392f011eb5c49cbec4f893bbdba
@@ -19,6 +9,16 @@ GIT
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
+
+GIT
+  remote: git://github.com/zooniverse/restpack_serializer.git
+  revision: a0c2bc4725dbdd86783f09c88054280e110da752
+  branch: rails5
+  specs:
+    restpack_serializer (0.5.9)
+      activerecord (>= 4.0.3, < 6.0)
+      activesupport (>= 4.0.3, < 6.0)
+      kaminari (~> 0.16.1)
 
 GEM
   remote: https://rubygems.org/
@@ -117,7 +117,7 @@ GEM
       connection_pool (>= 2.0)
       redis (>= 3.1)
     connection_pool (2.2.1)
-    crass (1.0.2)
+    crass (1.0.3)
     dalli (2.7.6)
     dalli-elasticache (0.2.0)
       dalli (>= 1.0.0)

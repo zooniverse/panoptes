@@ -9,7 +9,7 @@ gem 'doorkeeper-jwt', '~> 0.2.1'
 gem 'devise', '~> 3.0'
 gem 'versionist', '~> 1.6'
 gem 'rack-cors', '~> 0.4', require: 'rack/cors'
-gem 'restpack_serializer', github: "edpaget/restpack_serializer", branch: "dev" # REST API
+gem 'restpack_serializer', github: "zooniverse/restpack_serializer", branch: "rails5" # REST API
 gem 'active_model_serializers', '0.10.0.rc2' # Event stream
 gem 'paper_trail', '~> 4.0'
 # Needed because version 1.1.0 locks JWT at an older version than doorkeeper-jwt requires.
