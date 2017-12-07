@@ -3,7 +3,7 @@ OrganizationType = GraphQL::ObjectType.define do
   description "Organizations allow grouping of projects."
 
   field :id, !types.ID
-  field :displayName, !types.String
+  field :displayName, !types.String, property: :display_name
   field :slug, !types.String
 
   field :classificationsCount, !types.Int do
@@ -14,7 +14,7 @@ OrganizationType = GraphQL::ObjectType.define do
   end
 
   field :retiredSubjectsCount, !types.Int, property: :retired_subjects_count do
-    description "Aggregated number of classifications across all projects."
+    description "Aggregated number of retired subjects across all projects."
   end
 
   field :projects, types[ProjectType] do

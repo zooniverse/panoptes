@@ -2,7 +2,7 @@ ProjectType = GraphQL::ObjectType.define do
   name "Project"
 
   field :id, !types.ID
-  field :displayName, !types.String
+  field :displayName, !types.String, property: :display_name
   field :slug, !types.String
   field :createdAt, !types.String, property: :created_at
   field :updatedAt, !types.String, property: :updated_at
