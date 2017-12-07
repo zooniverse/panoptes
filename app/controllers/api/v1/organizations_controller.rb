@@ -5,6 +5,7 @@ class Api::V1::OrganizationsController < Api::ApiController
   include FilterByTags
   include AdminAllowed
   include Slug
+  include MediumResponse
 
   require_authentication :update, :create, :destroy, scopes: [:organization]
 
