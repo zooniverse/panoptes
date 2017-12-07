@@ -3,6 +3,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include FilterByCurrentUserRoles
   include TranslatableResource
   include IndexSearch
+  include FilterByTags
   include AdminAllowed
   include Versioned
   include UrlLabels
@@ -35,19 +36,9 @@ class Api::V1::ProjectsController < Api::ApiController
                  :updated_at,
                  :launch_approved].freeze
 
-  before_action :filter_by_tags, only: :index
-
   prepend_before_action :require_login,
     only: [:create, :update, :destroy, :create_classifications_export,
     :create_subjects_export, :create_workflows_export, :create_workflow_contents_export]
-
-  search_by do |name, query|
-    query.search_display_name(name.join(" "))
-  end
-
-  search_by :tag do |name, query|
-    query.joins(:tags).merge(Tag.search_tags(name.first))
-  end
 
   def index
     unless params.has_key?(:sort)
@@ -73,9 +64,7 @@ class Api::V1::ProjectsController < Api::ApiController
         resource.primary_content.update!(content_attributes)
       end
 
-      # TODO: move this to a service object to create/update
-      # tags for the project
-      tags = create_or_update_tags(update_params.dup)
+      tags = Tags::BuildTags.run!(api_user: api_user, tag_array: update_params[:tags]) if update_params[:tags]
       resource.tags = tags unless tags.nil?
 
       if !content_attributes.blank? || !tags.nil?
@@ -110,13 +99,6 @@ class Api::V1::ProjectsController < Api::ApiController
 
   private
 
-  def filter_by_tags
-    if tags = params.delete(:tags).try(:split, ",").try(:map, &:downcase)
-      @controlled_resources = controlled_resources
-      .joins(:tags).where(tags: {name: tags})
-    end
-  end
-
   def create_response(projects)
     serializer.resource(
       { include: 'owners' },
@@ -136,9 +118,11 @@ class Api::V1::ProjectsController < Api::ApiController
 
     content_attributes = primary_content_attributes(create_params)
     create_params[:project_contents] = [ ProjectContent.new(content_attributes) ]
-    if create_params.has_key? :tags
-      create_params[:tags] = create_or_update_tags(create_params)
+
+    if create_params.key?(:tags)
+      create_params[:tags] = Tags::BuildTags.run!(api_user: api_user, tag_array: create_params[:tags])
     end
+
     add_user_as_linked_owner(create_params)
 
     super(create_params.except(*CONTENT_FIELDS))
@@ -173,13 +157,6 @@ class Api::V1::ProjectsController < Api::ApiController
           item
         end
       end
-    end
-  end
-
-  def create_or_update_tags(hash)
-    hash.delete(:tags).try(:map) do |tag|
-      name = tag.downcase
-      Tag.find_or_initialize_by(name: name)
     end
   end
 

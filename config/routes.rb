@@ -12,6 +12,9 @@ Rails.application.routes.draw do
     mount Flipper::UI.app(flipper_block) => '/flipper'
   end
 
+  post '/graphql', to: 'graphql#execute'
+  mount GraphiQL::Rails::Engine, at: '/graphiql', graphql_path: '/graphql'
+
   use_doorkeeper do
     controllers authorizations: 'authorizations',
                 tokens: 'tokens',

@@ -17,6 +17,8 @@ class Organization < ActiveRecord::Base
   has_many :pages, class_name: "OrganizationPage", dependent: :destroy
   has_many :attached_images, -> { where(type: "org_attached_image") }, class_name: "Medium",
     as: :linked
+  has_many :tagged_resources, as: :resource
+  has_many :tags, through: :tagged_resources
 
   accepts_nested_attributes_for :organization_contents
 
@@ -30,4 +32,7 @@ class Organization < ActiveRecord::Base
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :access_control_list, :scope_for, :update, :user
 
+  def retired_subjects_count
+    projects.joins(:active_workflows).sum("workflows.retired_set_member_subjects_count")
+  end
 end

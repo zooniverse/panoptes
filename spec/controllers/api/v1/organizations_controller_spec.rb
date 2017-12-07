@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::OrganizationsController, type: :controller do
   let(:authorized_user) { create(:user) }
+  let(:api_resource_name) { "organizations" }
   let(:organization) { build(:organization, listed_at: Time.now, owner: authorized_user) }
   let(:unlisted_organization) { build(:unlisted_organization) }
   let(:owned_unlisted_organization) { build(:unlisted_organization, owner: authorized_user) }
@@ -71,6 +72,11 @@ describe Api::V1::OrganizationsController, type: :controller do
           get :index
           expect(json_response["organizations"]).to be_empty
         end
+      end
+
+      it_behaves_like "indexable by tag" do
+        let(:resource) { organization }
+        let(:second_resource) { build(:organization, listed_at: Time.now, owner: authorized_user) }
       end
 
       describe "filtering by slug" do
@@ -154,6 +160,14 @@ describe Api::V1::OrganizationsController, type: :controller do
         end
         let(:test_attr) { :display_name }
         let(:test_attr_value) { "Def Not Illuminati" }
+      end
+
+      it_behaves_like "has updatable tags" do
+        let(:resource) { create(:organization, owner: authorized_user) }
+        let(:tag_array) { ["astro", "gastro"] }
+        let(:tag_params) do
+          { organizations: { tags: tag_array }, id: resource.id }
+        end
       end
 
       context "includes exceptional parameters" do

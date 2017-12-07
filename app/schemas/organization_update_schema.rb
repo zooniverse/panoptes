@@ -52,6 +52,13 @@ class OrganizationUpdateSchema < JsonSchema
       end
     end
 
+    property "tags" do
+      type "array"
+      items do
+        type "string"
+      end
+    end
+
     property "links" do
       type "object"
       additional_properties false

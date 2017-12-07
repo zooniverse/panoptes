@@ -6,6 +6,7 @@ class ApiUser
   delegate :memberships_for, :owns?, :id, :languages, :user_groups,
     :project_preferences, :collection_preferences, :classifications,
     :user_groups, :has_finished?, :memberships, :upload_whitelist,
+    :display_name,
     to: :user, allow_nil: true
 
   def initialize(user, admin: false)

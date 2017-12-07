@@ -118,60 +118,9 @@ describe Api::V1::ProjectsController, type: :controller do
           end
         end
 
-        describe "tag filters" do
-          let!(:tags) do
-            [create(:tag, name: "youreit", resource: new_project),
-             create(:tag, name: "youreout", resource: beta_resource)]
-          end
-          let(:tag) { tags.first }
-
-          before do
-            index_request
-          end
-
-          describe "fuzzy filter by tag name" do
-            context "with full tag" do
-              let(:index_options) { { search: "tag:#{tag.name}" } }
-
-              it 'should return a project with the tag' do
-                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
-              end
-            end
-
-            context "partial tag" do
-              let(:index_options) { { search: "tag:#{tag.name[0..-4]}" } }
-
-              it 'should fuzzymatch' do
-                expect(json_response[api_resource_name].map{ |p| p["id"]}).to match_array([new_project.id.to_s, beta_resource.id.to_s])
-              end
-            end
-          end
-
-          describe "strict filter by tag" do
-            context "with full tag" do
-              let(:index_options) { { tags: tag.name } }
-
-              it 'should return a project with the tag' do
-                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
-              end
-            end
-
-            context "case insensitive" do
-              let(:index_options) { { tags: tag.name.upcase } }
-
-              it 'should return a project with the tag' do
-                expect(json_response[api_resource_name][0]["id"]).to eq(new_project.id.to_s)
-              end
-            end
-
-            context "partial tag" do
-              let(:index_options) { { tags: tag.name[0..-4] } }
-
-              it 'should return nothing' do
-                expect(json_response[api_resource_name]).to be_empty
-              end
-            end
-          end
+        it_behaves_like "indexable by tag" do
+          let(:resource) { new_project }
+          let(:second_resource) { beta_resource }
         end
 
         describe "filtering" do
@@ -655,35 +604,10 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     it_behaves_like "is updatable"
-
-    describe "update tags" do
-      let(:tags) { ["astro", "gastro"] }
+    it_behaves_like "has updatable tags" do
+      let(:tag_array) { ["astro", "gastro"] }
       let(:tag_params) do
-        { projects: { tags: tags }, id: resource.id }
-      end
-
-      def tag_update
-        default_request scopes: scopes, user_id: authorized_user.id
-        put :update, tag_params
-      end
-
-      it 'should remove all previous tags' do
-        create(:tag, name: "GONE", resource: resource)
-        tag_update
-        resource.reload
-        expect(resource.tags.pluck(:name)).to_not include("GONE")
-      end
-
-      it 'should update with new tags' do
-        tag_update
-        resource.reload
-        expect(resource.tags.pluck(:name)).to match_array(tags)
-      end
-
-      it "should touch the project resource to modify the cache_key / etag" do
-        expect {
-          tag_update
-        }.to change { resource.reload.updated_at }
+        { projects: { tags: tag_array }, id: resource.id }
       end
     end
 

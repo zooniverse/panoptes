@@ -2,6 +2,7 @@ class Api::V1::OrganizationsController < Api::ApiController
   include FilterByOwner
   include FilterByCurrentUserRoles
   include IndexSearch
+  include FilterByTags
   include AdminAllowed
   include Slug
   include MediumResponse
@@ -23,7 +24,7 @@ class Api::V1::OrganizationsController < Api::ApiController
                     :url_labels].freeze
 
   def create
-    organizations = Organization.transaction do
+    organizations = Organization.transaction(requires_new: true) do
       Array.wrap(params[:organizations]).map do |organization_params|
         Organizations::Create.with(api_user: api_user).run!(organization_params)
       end
@@ -33,7 +34,7 @@ class Api::V1::OrganizationsController < Api::ApiController
   end
 
   def update
-    Organization.transaction do
+    Organization.transaction(requires_new: true) do
       Array.wrap(resource_ids).zip(Array.wrap(params[:organizations])).map do |organization_id, organization_params|
         wrapper = { organization_params: organization_params }
         Organizations::Update.with(api_user: api_user, id: organization_id).run!(wrapper)
@@ -44,7 +45,7 @@ class Api::V1::OrganizationsController < Api::ApiController
   end
 
   def destroy
-    Organization.transaction do
+    Organization.transaction(requires_new: true) do
       Array.wrap(resource_ids).zip(Array.wrap(params[:organizations])).map do |organization_id, organization_params|
         Organizations::Destroy.with(api_user: api_user, id: organization_id).run!
       end

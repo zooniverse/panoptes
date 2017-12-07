@@ -3,7 +3,7 @@ module Organizations
     integer :id
 
     def execute
-      Organization.transaction do
+      Organization.transaction(requires_new: true) do
         organization = Organization.find(id)
         Activation.disable_instances!([organization])
       end
