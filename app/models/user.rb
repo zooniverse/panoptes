@@ -337,7 +337,7 @@ class User < ActiveRecord::Base
   end
 
   def favorite_collections_for_project(project)
-    collections.where(favorite: true, projects: [project])
+    collections.joins(:projects).where(favorite: true, projects: {id: project.id})
   end
 
   private

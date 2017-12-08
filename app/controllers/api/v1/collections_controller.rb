@@ -39,7 +39,7 @@ class Api::V1::CollectionsController < Api::ApiController
   def filter_by_project_ids
     if ids_string = (params.delete(:project_ids) || params.delete(:project_id)).try(:split, ',')
       project_ids = ids_string.split(",")
-      @controlled_resources = controlled_resources.where.overlap(project_ids: project_ids)
+      @controlled_resources = controlled_resources.joins(:projects).where(projects: {id: project_ids})
     end
   end
 

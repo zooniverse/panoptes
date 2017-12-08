@@ -252,4 +252,17 @@ namespace :migrate do
       end
     end
   end
+
+  namespace :collections do
+    desc "Convert collection.project_ids from belongs_to_many to join table"
+    task :convert_belongs_to_many => :environment do
+      Collection.transaction do
+        Collection.find_each do |collection|
+          # just in case a new project was added to the habtm association already, keep it
+          collection.project_ids = collection.project_ids | collection.read_attribute(:project_ids)
+          collection.save!
+        end
+      end
+    end
+  end
 end
