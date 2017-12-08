@@ -125,8 +125,6 @@ Rails.application.routes.draw do
 
       json_api_resources :collections, links: [:subjects, :default_subject]
 
-      json_api_resources :subject_queues, links: [:subjects]
-
       json_api_resources :tags, only: [:index, :show]
 
       json_api_resources :tutorials do
