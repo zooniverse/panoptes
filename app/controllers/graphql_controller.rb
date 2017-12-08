@@ -23,7 +23,7 @@ class GraphqlController < ApplicationController
   end
 
   def admin_flag?
-    false
+    !!params[:variables][:admin]
   end
 
   # Handle form data, JSON body, or a blank value
