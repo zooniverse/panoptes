@@ -6,7 +6,7 @@ RSpec.describe Subjects::StrategySelection do
   let(:subject_set) { workflow.subject_sets.first }
   let(:smses) { subject_set.set_member_subjects }
   let(:user) { workflow.project.owner }
-  let(:limit) { SubjectQueue::DEFAULT_LENGTH }
+  let(:limit) { described_class::DEFAULT_LIMIT }
   subject do
     described_class.new(workflow, user, subject_set.id, limit)
   end
