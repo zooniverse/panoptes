@@ -431,7 +431,7 @@ GEM
       hitimes
     tzinfo (1.2.4)
       thread_safe (~> 0.1)
-    uglifier (4.0.1)
+    uglifier (4.0.2)
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
