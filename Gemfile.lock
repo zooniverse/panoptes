@@ -189,7 +189,7 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     hashie (3.5.6)
     hitimes (1.2.4)
-    honeybadger (3.1.2)
+    honeybadger (3.2.0)
     http (0.9.9)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
@@ -474,7 +474,7 @@ DEPENDENCIES
   graphiql-rails
   graphql
   guard-rspec
-  honeybadger (~> 3.1)
+  honeybadger (~> 3.2)
   jquery-rails (~> 4.3)
   json-schema (~> 2.8)
   librato-metrics (~> 2.1.2)
