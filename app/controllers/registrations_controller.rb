@@ -1,17 +1,6 @@
 class RegistrationsController < Devise::RegistrationsController
   include JSONApiRender
 
-  def create
-    respond_to do |format|
-      format.json do
-        create_from_json { |resource| subscribe_to_emails(resource) }
-      end
-      format.html do
-        super { |resource| subscribe_to_emails(resource) }
-      end
-    end
-  end
-
   def update
     respond_to do |format|
       format.json { update_from_json }
@@ -60,12 +49,6 @@ class RegistrationsController < Devise::RegistrationsController
         response_body.merge!({ errors: [ message: resource.errors ] })
       end
       [ :unprocessable_entity, response_body ]
-    end
-  end
-
-  def subscribe_to_emails(resource)
-    if resource.persisted? && resource.global_email_communication
-      SubscribeWorker.perform_async(resource.email)
     end
   end
 end
