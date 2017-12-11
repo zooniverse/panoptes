@@ -18,7 +18,6 @@ class Workflow < ActiveRecord::Base
   has_many :subjects, through: :set_member_subjects
   has_many :classifications, dependent: :restrict_with_exception
   has_many :user_seen_subjects, dependent: :destroy
-  has_many :subject_queues, dependent: :destroy
   has_many :workflow_tutorials, dependent: :destroy
   has_many :tutorials, through: :workflow_tutorials
   has_many :aggregations, dependent: :destroy
@@ -52,7 +51,6 @@ class Workflow < ActiveRecord::Base
     :destroy_links, :translate, :versions, :version, :retire_subject, :create_classifications_export
 
   can_be_linked :subject_set, :same_project?, :model
-  can_be_linked :subject_queue, :scope_for, :update, :user
   can_be_linked :aggregation, :scope_for, :update, :user
 
   ranks :display_order, with_same: :project_id

@@ -35,8 +35,6 @@ class User < ActiveRecord::Base
   has_many :user_seen_subjects, dependent: :destroy
   has_many :uploaded_subjects, class_name: "Subject", foreign_key: "upload_user_id", dependent: :restrict_with_exception
 
-  has_many :subject_queues, dependent: :destroy
-
   belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
 
   cache_by_resource_method :uploaded_subjects_count
@@ -65,7 +63,6 @@ class User < ActiveRecord::Base
 
   can_be_linked :membership, :all
   can_be_linked :user_group, :all
-  can_be_linked :subject_queue, :all
   can_be_linked :user_project_preference, :all
   can_be_linked :user_collection_preference, :all
   can_be_linked :project, :scope_for, :update, :user

@@ -8,8 +8,6 @@ class SubjectSet < ActiveRecord::Base
 
   has_many :set_member_subjects, dependent: :destroy
   has_many :subjects, through: :set_member_subjects
-  has_many :subject_queues, dependent: :restrict_with_exception
-
   validates_presence_of :project
 
   validates_uniqueness_of :display_name, scope: :project_id

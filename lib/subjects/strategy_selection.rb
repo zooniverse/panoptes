@@ -5,9 +5,11 @@ module Subjects
   class StrategySelection
     include Logging
 
+    DEFAULT_LIMIT = 20
+
     attr_reader :workflow, :user, :subject_set_id, :limit
 
-    def initialize(workflow, user, subject_set_id, limit=SubjectQueue::DEFAULT_LENGTH)
+    def initialize(workflow, user, subject_set_id, limit=DEFAULT_LIMIT)
       @workflow = workflow
       @user = user
       @subject_set_id = subject_set_id

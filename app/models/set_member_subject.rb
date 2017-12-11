@@ -24,16 +24,7 @@ class SetMemberSubject < ActiveRecord::Base
   can_through_parent :subject_set, :update, :show, :destroy, :index, :update_links,
     :destroy_links
 
-  can_be_linked :subject_queue, :in_queue_workflow, :model
-
   before_create :set_random
-
-  def self.in_queue_workflow(queue)
-    query = joins(subject_set: :workflows)
-      .where(workflows: { id: queue.workflow.id })
-    query = query.where(subject_set_id: queue.subject_set.id) if queue.subject_set
-    query
-  end
 
   def self.by_subject_workflow(subject_id, workflow_id)
     joins(subject_set: :workflows)
