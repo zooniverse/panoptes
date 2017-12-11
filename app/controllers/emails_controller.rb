@@ -53,8 +53,4 @@ class EmailsController < ActionController::Base
   rescue ActiveRecord::RecordInvalid
     nil
   end
-
-  def unsubscribe_from_list(email)
-    UnsubscribeWorker.perform_async(email)
-  end
 end
