@@ -24,7 +24,6 @@ class EmailsController < ActionController::Base
   def unsubscribe_token
     if token = params.delete(:token)
       if user = User.user_from_unsubscribe_token(token)
-        unsubscribe_from_list(user.email)
         revoke_email_subscriptions(user)
       end
       redirect_to "#{Panoptes.unsubscribe_redirect}?processed=true"
@@ -35,7 +34,6 @@ class EmailsController < ActionController::Base
 
   def unsubscribe_email
     if email = params.delete(:email)
-      unsubscribe_from_list(email)
       if user = User.find_for_authentication(email: email)
         revoke_email_subscriptions(user)
       end
