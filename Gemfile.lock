@@ -421,7 +421,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    stringex (2.7.1)
+    stringex (2.8.1)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -512,7 +512,7 @@ DEPENDENCIES
   slavery
   spring
   spring-commands-rspec
-  stringex (~> 2.7)
+  stringex (~> 2.8)
   therubyracer (~> 0.12)
   uglifier (~> 4.0)
   versionist (~> 1.6)
