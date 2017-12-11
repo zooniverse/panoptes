@@ -1,6 +1,17 @@
 class RegistrationsController < Devise::RegistrationsController
   include JSONApiRender
 
+  def create
+    respond_to do |format|
+      format.json do
+        create_from_json
+      end
+      format.html do
+        super
+      end
+    end
+  end
+
   def update
     respond_to do |format|
       format.json { update_from_json }
