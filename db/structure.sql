@@ -765,7 +765,8 @@ CREATE TABLE organizations (
     updated_at timestamp without time zone NOT NULL,
     urls jsonb DEFAULT '[]'::jsonb,
     listed boolean DEFAULT false NOT NULL,
-    categories character varying[] DEFAULT '{}'::character varying[]
+    categories character varying[] DEFAULT '{}'::character varying[],
+    private boolean DEFAULT false
 );
 
 
@@ -4085,4 +4086,6 @@ INSERT INTO schema_migrations (version) VALUES ('20171019115705');
 INSERT INTO schema_migrations (version) VALUES ('20171120222438');
 
 INSERT INTO schema_migrations (version) VALUES ('20171121120455');
+
+INSERT INTO schema_migrations (version) VALUES ('20171212154401');
 
