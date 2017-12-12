@@ -42,18 +42,7 @@ class Api::V1::UsersController < Api::ApiController
 
   def update
     super do |user|
-      case
-      when user.global_email_communication_changed?
-        if user.global_email_communication
-          SubscribeWorker.perform_async(user.email)
-        else
-          UnsubscribeWorker.perform_async(user.email)
-        end
-      when user.email_changed?
-        if user.global_email_communication
-          SubscribeWorker.perform_async(user.email)
-          UnsubscribeWorker.perform_async(user.changes[:email].first)
-        end
+      if user.email_changed?
         UserInfoChangedMailerWorker.perform_async(user.id, "email") if user.valid?
       end
     end
@@ -69,7 +58,6 @@ class Api::V1::UsersController < Api::ApiController
   def destroy
     sign_out_current_user!
     revoke_doorkeeper_request_token!
-    UnsubscribeWorker.perform_async(user.email)
     UserInfoScrubber.scrub_personal_info!(user)
     super
   end

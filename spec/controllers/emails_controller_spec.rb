@@ -12,11 +12,6 @@ describe EmailsController, type: :controller do
       end
     end
 
-    it 'should queue an unsubscribe maillist worker' do
-      expect(UnsubscribeWorker).to receive(:perform_async).with(user.email)
-      unsubscribe_user
-    end
-
     context "when the user has user project preferences" do
       let!(:upp) do
         create_list(:user_project_preference, 3, user: user)
@@ -121,11 +116,6 @@ describe EmailsController, type: :controller do
         it "should be successful" do
           unsubscribe
           expect(response).to have_http_status(:ok)
-        end
-
-        it 'should queue an unsubscribe maillist worker' do
-          expect(UnsubscribeWorker).to receive(:perform_async).with(unknown_email)
-          unsubscribe
         end
       end
 

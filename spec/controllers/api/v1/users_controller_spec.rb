@@ -524,73 +524,11 @@ describe Api::V1::UsersController, type: :controller do
           expect(UserInfoChangedMailerWorker).to_not receive(:perform_async).with(user.id, "email")
         end
       end
-
-      context 'when email preferences are true' do
-        it 'should subscribe the new email' do
-          expect(SubscribeWorker).to receive(:perform_async).with("test@example.com")
-        end
-
-        it 'should remove the old email' do
-          expect(UnsubscribeWorker).to receive(:perform_async).with(user.email)
-        end
-      end
-
-      context 'when email preferences are false' do
-        let(:user) { create(:user, global_email_communication: false) }
-        it 'should subscribe the new email' do
-          expect(SubscribeWorker).to_not receive(:perform_async)
-        end
-
-        it 'should not call unsubscribe' do
-          expect(UnsubscribeWorker).to_not receive(:perform_async)
-        end
-      end
     end
 
     context "when changing global_email_communication" do
       after(:each) do
         update_request
-      end
-
-      context "from false to true" do
-        let(:user) { create(:user, global_email_communication: false) }
-        let(:put_operations) { {users: {global_email_communication: true}} }
-
-        it 'should queue a subscribe worker' do
-          expect(SubscribeWorker).to receive(:perform_async).with(user.email)
-        end
-      end
-
-      context "from true to false" do
-        let(:user) { create(:user, global_email_communication: true) }
-        let(:put_operations) { {users: {login: "TEST", global_email_communication: false}} }
-        it 'should queue an unsubscribe worker' do
-          expect(UnsubscribeWorker).to receive(:perform_async).with(user.email)
-        end
-      end
-
-      context "from true to true" do
-        let(:user) { create(:user, global_email_communication: true) }
-        let(:put_operations) { {users: {global_email_communication: true}} }
-        it 'should not queue a subscribe worker' do
-          expect(SubscribeWorker).to_not receive(:perform_async)
-        end
-
-        it 'should not queue a unsubscribe worker' do
-          expect(UnsubscribeWorker).to_not receive(:perform_async)
-        end
-      end
-
-      context "from false to false" do
-        let(:user) { create(:user, global_email_communication: false) }
-        let(:put_operations) { {users: {global_email_communication: false}} }
-        it 'should not queue a subscribe worker' do
-          expect(SubscribeWorker).to_not receive(:perform_async)
-        end
-
-        it 'should not queue a unsubscribe worker' do
-          expect(UnsubscribeWorker).to_not receive(:perform_async)
-        end
       end
     end
 

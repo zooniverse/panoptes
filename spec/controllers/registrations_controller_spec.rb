@@ -47,11 +47,6 @@ describe RegistrationsController, type: :controller do
           expect(response).to have_http_status(:no_content)
         end
 
-        it "should not call the subscribe worker" do
-          expect(SubscribeWorker).not_to receive(:perform_async)
-          post_update
-        end
-
         it "should queue a mailer worker" do
           expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, "password")
           post_update
@@ -181,32 +176,6 @@ describe RegistrationsController, type: :controller do
         end
       end
 
-      context "when email communications are true" do
-        let(:extra_attributes) { { login: 'asdfasdfasdf', global_email_communication: true } }
-
-        it 'should call subscribe worker' do
-          expect(SubscribeWorker).to receive(:perform_async).with(user_attributes[:email])
-          post :create, user: user_attributes
-        end
-
-        context "when the resource doesn't save" do
-
-          it 'should not call subscribe worker' do
-            allow_any_instance_of(User).to receive(:persisted?).and_return(false)
-            expect(SubscribeWorker).to_not receive(:perform_async)
-            post :create, user: user_attributes
-          end
-        end
-      end
-
-      context "when email communications are false" do
-        let(:extra_attributes) { { login: 'asdfasdf', global_email_communication: false } }
-        it 'should not call subscribe worker' do
-          expect(SubscribeWorker).to_not receive(:perform_async)
-          post :create, user: user_attributes
-        end
-      end
-
       context "with caps and spaces in the display name" do
         let(:extra_attributes) { { login: "Test_User_Login" } }
 
@@ -313,22 +282,6 @@ describe RegistrationsController, type: :controller do
 
         it "should queue a welcome worker to send an email" do
           expect(UserWelcomeMailerWorker).to receive(:perform_async)
-          post :create, user: user_attributes
-        end
-      end
-
-      context "when email communications are true" do
-        let(:extra_attributes) { { login: 'asdfasdf', global_email_communication: true } }
-        it 'should call subscribe worker' do
-          expect(SubscribeWorker).to receive(:perform_async).with(user_attributes[:email])
-          post :create, user: user_attributes
-        end
-      end
-
-      context "when email communications are true" do
-        let(:extra_attributes) { { login: 'asdfasdf', global_email_communication: false } }
-        it 'should call subscribe worker' do
-          expect(SubscribeWorker).to_not receive(:perform_async)
           post :create, user: user_attributes
         end
       end
