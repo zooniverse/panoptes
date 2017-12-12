@@ -22,6 +22,8 @@ class Organization < ActiveRecord::Base
 
   accepts_nested_attributes_for :organization_contents
 
+  validates_inclusion_of :private, in: [true, false], message: "must be true or false"
+
   can_by_role :destroy, :update, :update_links, :destroy_links, roles: [ :owner, :collaborator ]
 
   can_by_role :show, :index, :versions, :version, public: true,

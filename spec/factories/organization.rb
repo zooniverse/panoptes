@@ -8,6 +8,7 @@ FactoryGirl.define do
     sequence(:display_name) { |n| "Test Organization #{ n }" }
     listed_at Time.now
     listed true
+    private false
     primary_language "en"
     urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
     categories %w(bugs fossils plants)

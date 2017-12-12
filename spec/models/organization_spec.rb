@@ -16,11 +16,15 @@ describe Organization, type: :model do
     let(:translatable) { create(:organization) }
     let(:translatable_without_content) { build(:organization, build_contents: false) }
     let(:primary_language_factory) { :organization }
-    let(:private_model) { create(:organization, listed_at: nil) }
+    let(:private_model) { create(:organization, private: true, listed_at: nil) }
   end
 
   it "should have a valid factory" do
     expect(organization).to be_valid
+  end
+
+  it 'should require a private field to be set' do
+    expect(build(:organization, private: nil)).to_not be_valid
   end
 
   it "should require a primary language field to be set" do
