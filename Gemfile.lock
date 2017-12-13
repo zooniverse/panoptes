@@ -471,6 +471,7 @@ DEPENDENCIES
   json-schema (~> 2.8)
   librato-metrics (~> 2.1.2)
   logstasher (~> 1.2)
+  mime-types
   mock_redis
   newrelic_rpm
   oauth2
