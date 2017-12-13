@@ -12,6 +12,15 @@ RSpec.describe Translation, type: :model do
     translation.valid?
     expect(translation.language).to eq("en-gb")
   end
+
+  it 'should not allow duplicate translations for a resource' do
+    translation.save
+    dup_translation = build(:translation, translated: translation.translated)
+    expect(dup_translation).not_to be_valid
+    expected_errors = ["Language translation already exists for this resource"]
+    expect(dup_translation.errors).to match_array(expected_errors)
+  end
+
   it 'should not be valid without strings' do
     invalid_strings_msg = ["must be present but can be empty"]
     translation.strings = nil

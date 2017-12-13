@@ -3,8 +3,11 @@ class Translation < ActiveRecord::Base
   validate :validate_strings
   validates_presence_of :language
 
-  # TODO: add a unique validation for translated_type, id, language
   before_validation :downcase_language, on: :create
+
+  validates_uniqueness_of :language,
+    scope: %i(translated_type translated_id),
+    message: "translation already exists for this resource"
 
   # TODO: Look at adding in paper trail change tracking for laguage / strings here
 
