@@ -2284,6 +2284,20 @@ CREATE UNIQUE INDEX idx_lower_email ON users USING btree (lower((email)::text));
 
 
 --
+-- Name: idx_queues_on_ssid_wid_and_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX idx_queues_on_ssid_wid_and_id ON subject_queues USING btree (subject_set_id, workflow_id, user_id);
+
+
+--
+-- Name: idx_translations_on_translated_type+id_and_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX "idx_translations_on_translated_type+id_and_language" ON translations USING btree (translated_type, translated_id, language);
+
+
+--
 -- Name: index_access_control_lists_on_resource_id_and_resource_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2925,13 +2939,6 @@ CREATE UNIQUE INDEX index_tags_on_name ON tags USING btree (name);
 --
 
 CREATE INDEX index_translations_on_language ON translations USING btree (language);
-
-
---
--- Name: index_translations_on_translated_type_and_translated_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_translations_on_translated_type_and_translated_id ON translations USING btree (translated_type, translated_id);
 
 
 --
@@ -4044,6 +4051,8 @@ INSERT INTO schema_migrations (version) VALUES ('20171019115705');
 INSERT INTO schema_migrations (version) VALUES ('20171120222438');
 
 INSERT INTO schema_migrations (version) VALUES ('20171121120455');
+
+INSERT INTO schema_migrations (version) VALUES ('20171213144807');
 
 INSERT INTO schema_migrations (version) VALUES ('20171208141841');
 
