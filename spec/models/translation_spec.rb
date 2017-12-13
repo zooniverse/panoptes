@@ -1,12 +1,17 @@
 require 'spec_helper'
 
 RSpec.describe Translation, type: :model do
-  let(:translation) { create(:translation) }
+  let(:translation) { build(:translation) }
 
   it 'should have a valid factory' do
     expect(translation).to be_valid
   end
 
+  it 'should downcase the language code before validation' do
+    expect(translation.language).to eq("en-GB")
+    translation.valid?
+    expect(translation.language).to eq("en-gb")
+  end
   it 'should not be valid without strings' do
     invalid_strings_msg = ["must be present but can be empty"]
     translation.strings = nil
