@@ -67,10 +67,6 @@ class WorkflowCreateSchema < JsonSchema
       type "object"
     end
 
-    property "nero_config" do
-      type "object"
-    end
-
     property "configuration" do
       type "object"
     end
