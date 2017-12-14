@@ -1640,7 +1640,6 @@ CREATE TABLE workflows (
     current_version_number character varying,
     activated_state integer DEFAULT 0 NOT NULL,
     subject_selection_strategy integer DEFAULT 0,
-    nero_config jsonb DEFAULT '{}'::jsonb,
     mobile_friendly boolean DEFAULT false NOT NULL
 );
 
@@ -4085,4 +4084,6 @@ INSERT INTO schema_migrations (version) VALUES ('20171019115705');
 INSERT INTO schema_migrations (version) VALUES ('20171120222438');
 
 INSERT INTO schema_migrations (version) VALUES ('20171121120455');
+
+INSERT INTO schema_migrations (version) VALUES ('20171214121332');
 
