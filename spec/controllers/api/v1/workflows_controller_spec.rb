@@ -14,7 +14,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:api_resource_attributes) do
     %w(id display_name tasks classifications_count subjects_count
     created_at updated_at first_task primary_language content_language
-    version grouped prioritized pairwise retirement aggregation nero_config
+    version grouped prioritized pairwise retirement aggregation
     active mobile_friendly configuration finished_at public_gold_standard)
   end
   let(:api_resource_links)do
@@ -115,11 +115,6 @@ describe Api::V1::WorkflowsController, type: :controller do
           active: false,
           retirement: {criteria: "classification_count"},
           aggregation: {},
-          nero_config: {
-            extractors: {surv: {type: 'survey'}},
-            reducers: {custom: {type: 'external', url: 'https://example.org/reduce'}},
-            rules: [{if: ["const", true], then: [{action: 'retire_subject'}]}]
-          },
           configuration: {},
           public_gold_standard: true,
           tasks: {
@@ -524,11 +519,6 @@ describe Api::V1::WorkflowsController, type: :controller do
           active: true,
           retirement: {criteria: "classification_count"},
           aggregation: {public: true},
-          nero_config: {
-            extractors: {surv: {type: 'survey'}},
-            reducers: {custom: {type: 'external', url: 'https://example.org/reduce'}},
-            rules: [{if: ["const", true], then: [{action: 'retire_subject'}]}]
-          },
           configuration: {autoplay_subjects: true},
           public_gold_standard: true,
           tasks: create_task_params,
