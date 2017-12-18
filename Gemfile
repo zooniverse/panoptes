@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.10'
+gem 'rails', '~> 5.1.4'
 gem 'postgres_ext', '~> 3.0.0'
 gem 'active_record_union', '~> 1.2.0'
 gem 'sdoc', '~> 0.4.2', group: :doc
@@ -34,7 +34,7 @@ gem 'faraday', '~> 0.9'
 gem 'faraday_middleware', '~> 0.12'
 gem 'faraday-http-cache', '~> 2.0'
 gem 'activerecord-import', '~> 0.21'
-gem 'schema_plus_pg_indexes', '~> 0.1'
+gem 'schema_plus_pg_indexes', '~> 0.3'
 gem 'pg_search'
 gem 'ranked-model', '~> 0.4.0'
 gem 'sidekiq-congestion', '~> 0.1.0'
