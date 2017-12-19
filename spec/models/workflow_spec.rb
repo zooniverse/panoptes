@@ -116,10 +116,10 @@ describe Workflow, type: :model do
     end
 
     it 'caches the new version number', :aggregate_failures do
-      previous_number = workflow.current_version_number
+      previous_number = workflow.current_version_number.to_i
       workflow.update!(tasks: {blha: 'asdfasd', quera: "asdfas"})
-      expect(workflow.current_version_number).to eq(previous_number + 1)
-      expect(workflow.current_version_number).to eq(ModelVersion.version_number(workflow))
+      expect(workflow.current_version_number.to_i).to eq(previous_number + 1)
+      expect(workflow.current_version_number.to_i).to eq(ModelVersion.version_number(workflow))
     end
   end
 
