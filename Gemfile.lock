@@ -314,8 +314,8 @@ GEM
       sprockets-rails
     rails-deprecated_sanitizer (1.0.3)
       activesupport (>= 4.2.0.alpha)
-    rails-dom-testing (1.0.8)
-      activesupport (>= 4.2.0.beta, < 5.0)
+    rails-dom-testing (1.0.9)
+      activesupport (>= 4.2.0, < 5.0)
       nokogiri (~> 1.6)
       rails-deprecated_sanitizer (>= 1.0.1)
     rails-html-sanitizer (1.0.3)
@@ -428,13 +428,13 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.4)
-    versionist (1.6.1)
+    versionist (1.7.0)
       activesupport (>= 3)
       railties (>= 3)
-      yard (~> 0.7)
+      yard (~> 0.9.11)
     warden (1.2.7)
       rack (>= 1.0)
-    yard (0.9.9)
+    yard (0.9.12)
     zoo_stream (1.0.1)
       aws-sdk
 
