@@ -268,9 +268,8 @@ GEM
       faraday
       faraday-panoptes (~> 0.3.0)
       jwt (~> 1.5.0)
-    paper_trail (4.2.0)
-      activerecord (>= 3.0, < 6.0)
-      activesupport (>= 3.0, < 6.0)
+    paper_trail (8.1.1)
+      activerecord (>= 4.2, < 5.2)
       request_store (~> 1.1)
     pg (0.21.0)
     pg_array_parser (0.0.9)
@@ -480,7 +479,7 @@ DEPENDENCIES
   omniauth-google-oauth2
   p3p (~> 2.0)
   panoptes-client
-  paper_trail (~> 4.0)
+  paper_trail (~> 8.1)
   pg (~> 0.21)
   pg_search
   postgres_ext (~> 3.0.0)
