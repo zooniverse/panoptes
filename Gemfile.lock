@@ -423,7 +423,7 @@ GEM
       hitimes
     tzinfo (1.2.4)
       thread_safe (~> 0.1)
-    uglifier (4.0.2)
+    uglifier (4.1.2)
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
@@ -507,7 +507,7 @@ DEPENDENCIES
   spring-commands-rspec
   stringex (~> 2.8)
   therubyracer (~> 0.12)
-  uglifier (~> 4.0)
+  uglifier (~> 4.1)
   versionist (~> 1.6)
   zoo_stream (~> 1.0.1)
 
