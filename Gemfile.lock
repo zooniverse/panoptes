@@ -274,7 +274,7 @@ GEM
       request_store (~> 1.1)
     pg (0.21.0)
     pg_array_parser (0.0.9)
-    pg_search (2.1.1)
+    pg_search (2.1.2)
       activerecord (>= 4.2)
       activesupport (>= 4.2)
       arel (>= 6)
