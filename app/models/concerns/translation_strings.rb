@@ -73,7 +73,7 @@ class TranslationStrings
 
   # field guide item has icon attributes that should not be translated
   def transform_field_guide_attributes(nested_key="items")
-    attributes[nested_key] = removed_nested_attributes(%i(title content), nested_key)
+    attributes[nested_key] = extract_nested_attributes(%i(title content), nested_key)
   end
 
   # pandora app uses the tasks key to find the tasks strings
@@ -82,10 +82,10 @@ class TranslationStrings
   end
 
   def transform_tutorial_attributes(nested_key="steps")
-    attributes[nested_key] = removed_nested_attributes(%i(content), nested_key)
+    attributes[nested_key] = extract_nested_attributes(%i(content), nested_key)
   end
 
-  def removed_nested_attributes(attributes_to_slice, key)
+  def extract_nested_attributes(attributes_to_slice, key)
     attributes[key.to_sym].map do |nested_object|
       nested_object.slice(*attributes_to_slice)
     end
