@@ -15,7 +15,7 @@ gem 'paper_trail', '~> 4.0'
 # Needed because version 1.1.0 locks JWT at an older version than doorkeeper-jwt requires.
 # Not a lot of commits between 1.1.0 and this ref. Remove this once the next version is released.
 gem 'oauth2'
-gem 'omniauth', '~> 1.7'
+gem 'omniauth', '~> 1.8'
 gem 'omniauth-facebook', '~> 4.0'
 gem 'omniauth-google-oauth2'
 gem 'puma', '~> 3.11.0'
