@@ -1001,40 +1001,6 @@ ALTER SEQUENCE set_member_subjects_id_seq OWNED BY set_member_subjects.id;
 
 
 --
--- Name: subject_queues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE subject_queues (
-    id integer NOT NULL,
-    user_id integer,
-    workflow_id integer,
-    set_member_subject_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    lock_version integer DEFAULT 0,
-    subject_set_id integer
-);
-
-
---
--- Name: subject_queues_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE subject_queues_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: subject_queues_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE subject_queues_id_seq OWNED BY subject_queues.id;
-
-
 --
 -- Name: subject_sets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
@@ -1842,13 +1808,6 @@ ALTER TABLE ONLY set_member_subjects ALTER COLUMN id SET DEFAULT nextval('set_me
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY subject_queues ALTER COLUMN id SET DEFAULT nextval('subject_queues_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY subject_sets ALTER COLUMN id SET DEFAULT nextval('subject_sets_id_seq'::regclass);
 
 
@@ -2165,14 +2124,6 @@ ALTER TABLE ONLY set_member_subjects
 
 
 --
--- Name: subject_queues_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY subject_queues
-    ADD CONSTRAINT subject_queues_pkey PRIMARY KEY (id);
-
-
---
 -- Name: subject_sets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2320,13 +2271,6 @@ CREATE UNIQUE INDEX classification_subjects_pk ON classification_subjects USING 
 --
 
 CREATE UNIQUE INDEX idx_lower_email ON users USING btree (lower((email)::text));
-
-
---
--- Name: idx_queues_on_ssid_wid_and_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_queues_on_ssid_wid_and_id ON subject_queues USING btree (subject_set_id, workflow_id, user_id);
 
 
 --
@@ -3368,14 +3312,6 @@ ALTER TABLE ONLY workflows
 
 
 --
--- Name: fk_rails_446d9f4164; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY subject_queues
-    ADD CONSTRAINT fk_rails_446d9f4164 FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: fk_rails_489b3ea925; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3445,14 +3381,6 @@ ALTER TABLE ONLY oauth_access_tokens
 
 ALTER TABLE ONLY classification_subjects
     ADD CONSTRAINT fk_rails_7c8fb1018a FOREIGN KEY (classification_id) REFERENCES classifications(id);
-
-
---
--- Name: fk_rails_81596e7851; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY subject_queues
-    ADD CONSTRAINT fk_rails_81596e7851 FOREIGN KEY (subject_set_id) REFERENCES subject_sets(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -3637,14 +3565,6 @@ ALTER TABLE ONLY subjects
 
 ALTER TABLE ONLY subjects
     ADD CONSTRAINT fk_rails_f26c409132 FOREIGN KEY (project_id) REFERENCES projects(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-
---
--- Name: fk_rails_f826bcd8a1; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY subject_queues
-    ADD CONSTRAINT fk_rails_f826bcd8a1 FOREIGN KEY (workflow_id) REFERENCES workflows(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -4084,6 +4004,8 @@ INSERT INTO schema_migrations (version) VALUES ('20171019115705');
 INSERT INTO schema_migrations (version) VALUES ('20171120222438');
 
 INSERT INTO schema_migrations (version) VALUES ('20171121120455');
+
+INSERT INTO schema_migrations (version) VALUES ('20171208141841');
 
 INSERT INTO schema_migrations (version) VALUES ('20171214121332');
 
