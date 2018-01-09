@@ -4,9 +4,12 @@ class Translation < ActiveRecord::Base
   validates_presence_of :language
 
   # TODO: add a unique validation for translated_type, id, language
+  # and a unique index
 
   # TODO: Look at adding in paper trail change tracking for laguage / strings here
 
+  # TODO: these inverse relations need expanding to ensure the polymorphic
+  # links are correctly serialized
   def self.translated_model_names
     @translated_class_names ||= [].tap do |translated|
       ActiveRecord::Base.subclasses.each do |klass|
