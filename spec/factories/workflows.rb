@@ -17,7 +17,21 @@ FactoryGirl.define do
           tools: [
             {value: 'red', label: "interest.tools.0.label", type: 'point', color: 'red'},
             {value: 'green', label: "interest.tools.1.label", type: 'point', color: 'lime'},
-            {value: 'blue', label: "interest.tools.2.label", type: 'point', color: 'blue'}
+            {value: 'blue', label: "interest.tools.2.label", type: 'point', color: 'blue'},
+            {
+              label: "interest.tools.3.label",
+              type: 'ellipse',
+              color: 'purple',
+              details: [{
+                help: "",
+                type: "single",
+                answers: [
+                  { label: "interest.tools.3.details.0.answers.0.label"},
+                  { label: "interest.tools.3.details.0.answers.1.label"}
+                ],
+                question: "interest.tools.3.details.0.question"
+              }]
+            }
           ],
           next: 'shape'
         },
