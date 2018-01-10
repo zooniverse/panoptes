@@ -259,7 +259,7 @@ namespace :migrate do
       Collection.transaction do
         Collection.find_each do |collection|
           # just in case a new project was added to the habtm association already, keep it
-          collection.project_ids = collection.project_ids | collection.read_attribute(:project_ids)
+          collection.habtm_project_ids = collection.habtm_project_ids | collection.project_ids
           collection.save!
         end
       end
