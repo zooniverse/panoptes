@@ -64,6 +64,20 @@ describe Project, type: :model do
     expect(build(:project, live: nil)).to_not be_valid
   end
 
+  describe 'featured projects' do
+    it 'can be featured' do
+      project = create :project, featured: true
+      expect(Project.featured).to eq([project])
+    end
+
+    it 'only allows one featured project at a time' do
+      featured_project = create :project, featured: true
+      other_project = build :project, featured: true
+      expect(other_project).not_to be_valid
+      expect(other_project.errors[:featured]).to be_present
+    end
+  end
+
   describe "links" do
     let(:user) { ApiUser.new(create(:user)) }
 

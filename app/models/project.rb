@@ -57,12 +57,15 @@ class Project < ActiveRecord::Base
 
   validates_inclusion_of :private, :live, in: [true, false], message: "must be true or false"
 
+  validates :featured, uniqueness: {conditions: -> { featured } }
+
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
   after_update :send_notifications
 
   scope :launched, -> { where("launch_approved IS TRUE") }
+  scope :featured, -> { where(featured: true) }
 
   can_by_role :destroy, :update, :update_links, :destroy_links, :create_classifications_export,
     :create_subjects_export, :create_workflows_export,
