@@ -2010,15 +2010,20 @@ link to a *project*. Can optionally set cellect parameters *grouped*,
 A SubjectSet that already belongs to another workflow will be
 duplicated when it is linked.
 
-A Workflow may also include a _retirement_ object with a
-_criteria_ key and an _options_ key. _criteria_ describes the strategy
-Panoptes will use to decide when to retire subjects. Currently, this
-may only be 'classification\_count' which retires subjects after a
-target number of classifications are reached. _options_ describes the
-parameters for the strategy. The 'classification\_count' strategy
-accepts _count_ as an option with an integer number of classifications
-for each subject. If _retirement_ is left blank Panoptes defaults to
-the 'classification\_count' strategy with 15 classifications per subject.
+A Workflow may also include a _retirement_ object with a _criteria_
+key and an _options_ key. _criteria_ describes the strategy Panoptes
+will use to decide when to retire subjects while _options_ configures
+the strategy. There are 2 valid criteria:
+ 1. `classification_count` will retire subjects after a target number
+ of classifications are reached. You must supply an `options` hash
+ with an integer `count` to specify the minimum number of classifications.
+   + `{"criteria": "classification_count", "options": {"count": 15} }`
+ 2. `never_retire` will never retire subjects and requires an empty
+ `options` hash.
+   + `{"criteria": "never_retire "options": {} }`
+
+If retirement is left blank Panoptes defaults to the `classification_count`
+strategy with 15 classifications per subject.
 
 + Request
 
