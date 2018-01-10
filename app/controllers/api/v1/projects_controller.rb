@@ -110,7 +110,7 @@ class Api::V1::ProjectsController < Api::ApiController
   def admin_allowed_params
     [ :beta_approved, :launch_approved, :redirect,
       :launched_row_order_position, :beta_row_order_position,
-      :experimental_tools ]
+      :experimental_tools, :featured ]
   end
 
   def build_resource_for_create(create_params)

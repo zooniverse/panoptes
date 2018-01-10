@@ -54,6 +54,10 @@ class ProjectUpdateSchema < JsonSchema
       type "boolean"
     end
 
+    property "featured" do
+      type "boolean"
+    end
+
     property "live" do
       type "boolean"
     end
