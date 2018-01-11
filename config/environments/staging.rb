@@ -90,4 +90,10 @@ Rails.application.configure do
   config.logstasher.enabled = true
   # Enable logging of controller params
   config.logstasher.log_controller_parameters = true
+
+  if ENV.fetch("LOG_TO_GRAYLOG", true)
+    config.lograge.enabled = true
+    config.lograge.log_format = :graylog2
+    config.logger = GELF::Logger.new(*Logging::GraylogDefaults.config)
+  end
 end
