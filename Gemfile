@@ -56,6 +56,7 @@ gem 'slavery'
 gem 'graphql'
 gem 'graphiql-rails'
 gem 'mime-types'
+gem "lograge" # this can be moved to staging / prod group after testing
 
 group :production, :staging do
   gem 'newrelic_rpm'
