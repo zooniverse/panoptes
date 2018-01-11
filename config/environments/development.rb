@@ -37,4 +37,14 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  if ENV.fetch("LOG_TO_GRAYLOG", false)
+    config.lograge.enabled = true
+    config.lograge.log_format = :graylog2
+    config.logger = GELF::Logger.new(*Logging::GraylogDefaults.config)
+  else
+    # Use default logging formatter so that PID and timestamp are
+    # included in default rails logs
+    config.log_formatter = ::Logger::Formatter.new
+  end
 end
