@@ -21,15 +21,6 @@ RSpec.describe Api::V1::SetMemberSubjectsController, type: :controller do
     let(:n_visible) { 2 }
 
     it_behaves_like "is indexable"
-
-    describe "top level links" do
-
-      it "should not include a nil key for the belongs_to_many association" do
-        default_request scopes: scopes, user_id: authorized_user.id if authorized_user
-        get :index
-        expect(json_response["links"][""]).to be_nil
-      end
-    end
   end
 
   describe "#show" do
