@@ -42,5 +42,9 @@ Rails.application.configure do
     config.lograge.enabled = true
     config.lograge.log_format = :graylog2
     config.logger = GELF::Logger.new(*Logging::GraylogDefaults.config)
+  else
+    # Use default logging formatter so that PID and timestamp are
+    # included in default rails logs
+    config.log_formatter = ::Logger::Formatter.new
   end
 end
