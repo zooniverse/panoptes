@@ -80,20 +80,20 @@ Rails.application.configure do
   # Disable automatic flushing of the log to improve performance.
   # config.autoflush_log = false
 
-  # Use default logging formatter so that PID and timestamp are not suppressed.
-  config.log_formatter = ::Logger::Formatter.new
-
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
-
-  # Enable the logstasher logs for the current environment
-  config.logstasher.enabled = true
-  # Enable logging of controller params
-  config.logstasher.log_controller_parameters = true
 
   if ENV.fetch("LOG_TO_GRAYLOG", true)
     config.lograge.enabled = true
     config.lograge.log_format = :graylog2
     config.logger = GELF::Logger.new(*Logging::GraylogDefaults.config)
+  else
+    # Use default logging formatter so that PID and timestamp are
+    # included in default rails logs
+    config.log_formatter = ::Logger::Formatter.new
+    # Enable the logstasher logs for the current environment
+    config.logstasher.enabled = true
+    # Enable logging of controller params
+    config.logstasher.log_controller_parameters = true
   end
 end
