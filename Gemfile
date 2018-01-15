@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'active_interaction', '~> 3.6.1'
 gem 'active_model_serializers', '0.10.0.rc2' # Event stream
-gem 'active_record_union', '~> 1.2.0'
+gem 'active_record_union', '~> 1.3.0'
 gem 'activerecord-import', '~> 0.21'
 gem 'aws-sdk', '~> 2.10'
 gem "cellect-client", '~> 3.0.2'
