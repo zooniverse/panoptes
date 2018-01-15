@@ -3,13 +3,6 @@ require 'spec_helper'
 describe CollectionSerializer do
   let(:collection) { create(:collection_with_subjects) }
 
-  describe "::btm_associations" do
-    it "should be overriden" do
-      expected = [ Collection.reflect_on_association(:projects) ]
-      expect(CollectionSerializer.btm_associations).to match_array(expected)
-    end
-  end
-
   it_should_behave_like "a panoptes restpack serializer" do
     let(:resource) { collection }
     let(:includes) { [ :owner, :collection_roles, :subjects ] }
@@ -38,7 +31,7 @@ describe CollectionSerializer do
     end
 
     let(:first_by_name) do
-      create(:collection, build_projects: false, display_name: "Aardvarks")
+      create(:collection, display_name: "Aardvarks")
     end
     let(:serialized_page) do
       CollectionSerializer.page({sort: "display_name"}, Collection.all, {})

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe SubjectSerializer do
   let(:subject) { create(:subject, :with_subject_sets, num_sets: 1) }
   let!(:collection) do
-    create(:collection, build_projects: false, owner: subject.project.owner, subjects: [subject])
+    create(:collection, owner: subject.project.owner, subjects: [subject])
   end
 
   it_should_behave_like "a panoptes restpack serializer" do

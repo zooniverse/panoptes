@@ -8,7 +8,8 @@ class Collection < ActiveRecord::Base
   include SluggedName
   include BelongsToMany
 
-  belongs_to_many :projects
+  belongs_to_many :projects # TODO: After PR #2563, remove this line
+  has_and_belongs_to_many :habtm_projects, class_name: "Project", join_table: "collections_projects" # TODO: After PR #2563, rename to just "projects"
   has_many :collections_subjects, dependent: :destroy
   has_many :subjects, through: :collections_subjects
   has_many :collection_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource

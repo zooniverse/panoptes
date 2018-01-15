@@ -1,8 +1,5 @@
 FactoryGirl.define do
   factory :collection do
-    transient do
-      build_projects true
-    end
     sequence(:name) { |n| "collection_name_#{ n }" }
     sequence(:display_name) { |n| "another name #{ n }" }
     sequence(:description) { |n| "This collection is SO GOOD, it is #{ n } times better than any other" }
@@ -12,11 +9,7 @@ FactoryGirl.define do
     association :owner, factory: :user
 
     project_ids do
-      if build_projects
-        [ create(:project).id ]
-      else
-        (1..10).to_a.sample(2)
-      end
+      [ create(:project).id ]
     end
 
     factory :private_collection do

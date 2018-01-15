@@ -328,7 +328,17 @@ ALTER SEQUENCE collections_id_seq OWNED BY collections.id;
 
 
 --
--- Name: collections_subjects; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: collections_projects; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE collections_projects (
+    collection_id integer NOT NULL,
+    project_id integer NOT NULL
+);
+
+
+--
+-- Name: collections_subjects; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE collections_subjects (
@@ -2442,7 +2452,14 @@ CREATE INDEX index_collections_on_slug ON collections USING btree (slug);
 
 
 --
--- Name: index_collections_subjects_on_collection_id_and_subject_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_collections_projects_on_collection_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_collections_projects_on_collection_id ON collections_projects USING btree (collection_id);
+
+
+--
+-- Name: index_collections_subjects_on_collection_id_and_subject_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_collections_subjects_on_collection_id_and_subject_id ON collections_subjects USING btree (collection_id, subject_id);
@@ -3248,7 +3265,15 @@ ALTER TABLE ONLY workflow_contents
 
 
 --
--- Name: fk_rails_1d218ca624; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: collections_projects fk_rails_1be0872ee9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY collections_projects
+    ADD CONSTRAINT fk_rails_1be0872ee9 FOREIGN KEY (collection_id) REFERENCES collections(id);
+
+
+--
+-- Name: gold_standard_annotations fk_rails_1d218ca624; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY gold_standard_annotations
@@ -3392,7 +3417,15 @@ ALTER TABLE ONLY tutorials
 
 
 --
--- Name: fk_rails_93073bf3b1; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: collections_projects fk_rails_895b025564; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY collections_projects
+    ADD CONSTRAINT fk_rails_895b025564 FOREIGN KEY (project_id) REFERENCES projects(id);
+
+
+--
+-- Name: set_member_subjects fk_rails_93073bf3b1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY set_member_subjects
@@ -4006,6 +4039,8 @@ INSERT INTO schema_migrations (version) VALUES ('20171120222438');
 INSERT INTO schema_migrations (version) VALUES ('20171121120455');
 
 INSERT INTO schema_migrations (version) VALUES ('20171208141841');
+
+INSERT INTO schema_migrations (version) VALUES ('20171208142645');
 
 INSERT INTO schema_migrations (version) VALUES ('20171214121332');
 

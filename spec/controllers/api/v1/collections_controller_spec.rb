@@ -162,6 +162,14 @@ describe Api::V1::CollectionsController, type: :controller do
 
     it_behaves_like 'is creatable'
 
+    # TODO: After 2563 remove this additional spec
+    it 'adds projects via the join table' do
+      default_request scopes: scopes, user_id: authorized_user.id
+      post :create, create_params
+      collection = Collection.find(created_instance_id(api_resource_name))
+      expect(collection.habtm_projects).to include(project)
+    end
+
     context "with singular project link object" do
       let(:create_links) { { project: project.id } }
 
@@ -174,6 +182,12 @@ describe Api::V1::CollectionsController, type: :controller do
         expect(response).to have_http_status(:created)
         created_links = created_instance(api_resource_name)["links"]
         expect(created_links.has_key?("projects")).to be_truthy
+      end
+
+      # TODO: After 2563 remove this additional spec
+      it 'adds projects via the join table' do
+        collection = Collection.find(created_instance_id(api_resource_name))
+        expect(collection.habtm_projects).to include(project)
       end
 
       context "when passing inconsistent project links" do
