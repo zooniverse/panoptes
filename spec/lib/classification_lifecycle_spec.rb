@@ -344,6 +344,33 @@ describe ClassificationLifecycle do
         expect(PublishClassificationWorker).not_to receive(:perform_async)
       end
     end
+
+    describe "allow_in_stream project configuation" do
+      let(:classification) { build(:classification) }
+
+      it 'should call the publish classification worker when configuration is missing' do
+        expect(PublishClassificationWorker).to receive(:perform_async)
+      end
+
+      context "with non-default configuration" do
+        def update_stream_metadata(allow)
+          classification
+            .project
+            .configuration
+            .merge!("allow_in_stream" => allow)
+        end
+
+        it 'should call the publish classification worker when it is allowed' do
+          update_stream_metadata(true)
+          expect(PublishClassificationWorker).to receive(:perform_async)
+        end
+
+        it 'should not call the publish classification worker when it is not allowed' do
+          update_stream_metadata(false)
+          expect(PublishClassificationWorker).not_to receive(:perform_async)
+        end
+      end
+    end
   end
 
   describe "#create_project_preference" do

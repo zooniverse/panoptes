@@ -77,7 +77,10 @@ class ClassificationLifecycle
   def publish_data
     return unless classification.complete?
 
-    PublishClassificationWorker.perform_async(classification.id)
+    allow_in_stream = !!project.configuration.fetch("allow_in_stream", true)
+    if allow_in_stream
+      PublishClassificationWorker.perform_async(classification.id)
+    end
   end
 
   def notify_subject_selector
