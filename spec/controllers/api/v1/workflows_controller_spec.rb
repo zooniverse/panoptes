@@ -676,5 +676,21 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     it_behaves_like "is creatable", :create_classifications_export
+
+    context "when the project has exports disabled" do
+      let(:project) { workflow.project }
+      before do
+        private_data_config = project.configuration.merge("private_data" => true)
+        project.update_column(:configuration, private_data_config)
+      end
+
+      it 'throws a forbidden error with a useful message' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create_classifications_export, create_params
+        expect(json_response['errors'][0]['message'])
+          .to eq("Data exports are disabled for this project")
+        expect(response.status).to eq(403)
+      end
+    end
   end
 end
