@@ -77,8 +77,7 @@ class ClassificationLifecycle
   def publish_data
     return unless classification.complete?
 
-    private_data = !!project.configuration.fetch("private_data", false)
-    unless private_data
+    unless project.disabled_data_export?
       PublishClassificationWorker.perform_async(classification.id)
     end
   end

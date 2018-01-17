@@ -166,4 +166,8 @@ class Project < ActiveRecord::Base
       live ? "live" : "development"
     end
   end
+
+  def disabled_data_export?
+    !!configuration.fetch("private_data", false)
+  end
 end

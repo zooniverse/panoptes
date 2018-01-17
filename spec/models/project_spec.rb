@@ -504,4 +504,20 @@ describe Project, type: :model do
       end
     end
   end
+
+  describe "#disabled_data_export?" do
+    it "should not return true when no private config" do
+      expect(project.disabled_data_export?).to eq(false)
+    end
+
+    it "should not return true when private config is false" do
+      project.configuration = project.configuration.merge("private_data" => false)
+      expect(project.disabled_data_export?).to eq(false)
+    end
+
+    it "should not return true when private config is true" do
+      project.configuration = project.configuration.merge("private_data" => true)
+      expect(project.disabled_data_export?).to eq(true)
+    end
+  end
 end
