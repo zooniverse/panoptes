@@ -6,7 +6,6 @@ describe Api::V1::ProjectsController, type: :controller do
     create_list(:project_with_contents, 2, owner: user)
   end
   let(:project) { create(:project_with_contents, owner: user, state: "paused") }
-  let(:authorized_user) { user }
 
   let(:api_resource_name) { "projects" }
   let(:api_resource_attributes) do
