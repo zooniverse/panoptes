@@ -40,7 +40,7 @@ class Api::V1::ProjectsController < Api::ApiController
     only: [:create, :update, :destroy, :create_classifications_export,
     :create_subjects_export, :create_workflows_export, :create_workflow_contents_export]
 
-  prepend_before_action :available_to_export, only: :create_classifications_export
+  before_action :available_to_export, only: :create_classifications_export
 
   def index
     unless params.has_key?(:sort)

@@ -11,7 +11,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   schema_type :json_schema
 
   prepend_before_action :require_login, only: [:create, :update, :destroy, :create_classifications_export]
-  prepend_before_action :available_to_export, only: :create_classifications_export
+  before_action :available_to_export, only: :create_classifications_export
 
   def index
     unless params.has_key?(:sort)
