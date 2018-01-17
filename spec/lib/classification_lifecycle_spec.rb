@@ -345,7 +345,7 @@ describe ClassificationLifecycle do
       end
     end
 
-    describe "allow_in_stream project configuation" do
+    describe "no_public_data project configuation" do
       let(:classification) { build(:classification) }
 
       it 'should call the publish classification worker when configuration is missing' do
@@ -357,16 +357,16 @@ describe ClassificationLifecycle do
           classification
             .project
             .configuration
-            .merge!("allow_in_stream" => allow)
+            .merge!("private_data" => allow)
         end
 
-        it 'should call the publish classification worker when it is allowed' do
-          update_stream_metadata(true)
+        it 'should call the publish classification worker when public' do
+          update_stream_metadata(false)
           expect(PublishClassificationWorker).to receive(:perform_async)
         end
 
-        it 'should not call the publish classification worker when it is not allowed' do
-          update_stream_metadata(false)
+        it 'should not call the publish classification worker when private' do
+          update_stream_metadata(true)
           expect(PublishClassificationWorker).not_to receive(:perform_async)
         end
       end

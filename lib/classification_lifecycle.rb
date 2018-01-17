@@ -77,8 +77,8 @@ class ClassificationLifecycle
   def publish_data
     return unless classification.complete?
 
-    allow_in_stream = !!project.configuration.fetch("allow_in_stream", true)
-    if allow_in_stream
+    private_data = !!project.configuration.fetch("private_data", false)
+    unless private_data
       PublishClassificationWorker.perform_async(classification.id)
     end
   end
