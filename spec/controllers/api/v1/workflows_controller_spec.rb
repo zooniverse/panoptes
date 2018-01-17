@@ -677,10 +677,8 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     it_behaves_like "is creatable", :create_classifications_export
 
-    describe "dsakjhfkjd", :focus do
-      it_behaves_like "it forbids data exports" do
-        let(:project) { workflow.project }
-      end
+    it_behaves_like "it forbids data exports" do
+      let(:project) { workflow.project }
     end
   end
 end
