@@ -23,7 +23,6 @@ FactoryGirl.define do
               type: 'ellipse',
               color: 'purple',
               details: [{
-                help: "",
                 type: "single",
                 answers: [
                   { label: "interest.tools.3.details.0.answers.0.label"},
