@@ -18,7 +18,7 @@ describe TranslationSerializer do
     let(:filtered_ids) { filtered_resources.map { |p| p[:id] } }
 
     context "language" do
-      let(:lang_code) { "en-AU"}
+      let(:lang_code) { "en-au"}
       let(:filtered_translation) { create(:translation, language: lang_code) }
       let(:filter) { { language: lang_code } }
 
