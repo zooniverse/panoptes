@@ -211,21 +211,5 @@ describe JsonApiController::RelationManager do
         expect(resource.projects).to_not include(*resource_to_remove)
       end
     end
-
-    context "belongs_to_many" do
-      let!(:resource) { create(:collection, projects: [project]) }
-      let(:resource_to_remove) { resource.projects[0] }
-      let(:relation) { :projects }
-      let(:del_string) { resource.projects.map(&:id).join(",") }
-
-      it "does not destroy the unlinked item" do
-        expect{ destroy_helper }.to change{ Project.count }.by(0)
-      end
-
-      it "removes the linked relation" do
-        destroy_helper
-        expect(resource.projects).to_not include(*resource_to_remove)
-      end
-    end
   end
 end
