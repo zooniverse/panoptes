@@ -34,19 +34,36 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
         end
 
         describe "filtering" do
-          let(:filter_params) do
-            { translated_id: resource.translated_id, translated_type: resource_type.to_s }
+          let(:non_filter_translation) do
+            create(:translation, language: "en-AU")
           end
 
           before(:each) do
+            non_filter_translation
             default_request scopes: scopes, user_id: authorized_user.id
             get :index, filter_params
           end
 
-          it "should filter the translated parent scope" do
-            create(:translation)
-            expect(json_response[api_resource_name].length).to eq(1)
-            expect(resource_ids).to match_array([resource.id])
+          describe "filtering on translation resources" do
+            let(:filter_params) do
+              { translated_id: resource.translated_id, translated_type: resource_type.to_s }
+            end
+
+            it "should return the filtered resource only" do
+              expect(json_response[api_resource_name].length).to eq(1)
+              expect(resource_ids).to match_array([resource.id])
+            end
+          end
+
+          describe "filtering on language code" do
+            let(:filter_params) do
+              { language: resource.language.upcase, translated_type: resource_type.to_s }
+            end
+
+            it "should return the filtered resource only" do
+              expect(json_response[api_resource_name].length).to eq(1)
+              expect(resource_ids).to match_array([resource.id])
+            end
           end
         end
       end
@@ -55,14 +72,14 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
     describe "#create" do
       let(:test_attr) { :language }
       let(:language) { "en-NZ" }
-      let(:test_attr_value)  { language }
+      let(:test_attr_value)  { language.downcase }
 
       let(:create_params) do
         {
           translations: {
             strings: {
               title: "The frozen plant",
-              description: "Bro, how icy is this plant?",
+              description: "Burr, how icy is this plant?",
               introduction: "This project aims to find six of the coolest plants",
               workflow_description: "Is this field even used?",
               researcher_quote: "A really great project, you should help :)",

@@ -22,16 +22,16 @@ FactoryGirl.define do
             type: 'drawing',
             question: "Draw a circle",
             help: "Duh?",
-            # the tool lables array might be best un-wound to avoid ambiguity
-            # "tool_lablel.2" => "Blue",
-            tool_labels: %w(Red Green Blue)
+            "tool_label.0" => "Red",
+            "tool_label.1" => "Green",
+            "tool_label.2" => "Blue"
           },
           shape: {
             question: "What shape is this galaxy",
             help: "Duh?",
-            # the answers array might be best un-wound to avoid ambiguity
-            # "answers.0" => "Smooth",
-            answers: ["Smooth", "Features", "Star or artifact"]
+            "answers.0" => "Smooth",
+            "answers.1" => "Features",
+            "answers.2" => "Star or artifact"
           }
         ]
       })

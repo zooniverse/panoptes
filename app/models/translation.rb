@@ -3,13 +3,14 @@ class Translation < ActiveRecord::Base
   validate :validate_strings
   validates_presence_of :language
 
-  # TODO: add a unique validation for translated_type, id, language
-  # and a unique index
+  before_validation :downcase_language, on: :create
+
+  validates_uniqueness_of :language,
+    scope: %i(translated_type translated_id),
+    message: "translation already exists for this resource"
 
   # TODO: Look at adding in paper trail change tracking for laguage / strings here
 
-  # TODO: these inverse relations need expanding to ensure the polymorphic
-  # links are correctly serialized
   def self.translated_model_names
     @translated_class_names ||= [].tap do |translated|
       ActiveRecord::Base.subclasses.each do |klass|
@@ -30,6 +31,12 @@ class Translation < ActiveRecord::Base
   def validate_strings
     unless strings.is_a?(Hash)
       errors.add(:strings, "must be present but can be empty")
+    end
+  end
+
+  def downcase_language
+    if language
+      self.language = language.downcase
     end
   end
 end
