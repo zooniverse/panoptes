@@ -55,7 +55,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
     describe "#create" do
       let(:test_attr) { :language }
       let(:language) { "en-NZ" }
-      let(:test_attr_value)  { language }
+      let(:test_attr_value)  { language.downcase }
 
       let(:create_params) do
         {
