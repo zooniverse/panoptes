@@ -9,6 +9,8 @@ class Api::V1::TranslationsController < Api::ApiController
 
   schema_type :json_schema
 
+  before_action :downcase_language_param, except: :create
+
   def create
     check_polymorphic_controller_resources
 
@@ -49,5 +51,9 @@ class Api::V1::TranslationsController < Api::ApiController
 
   def polymorphic_ids
     super("translated")
+  end
+
+  def downcase_language_param
+    params[:language] = params[:language]&.downcase
   end
 end
