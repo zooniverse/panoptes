@@ -22,9 +22,9 @@ FactoryGirl.define do
             type: 'drawing',
             question: "Draw a circle",
             help: "Duh?",
-            "tool_lablel.0" => "Red",
-            "tool_lablel.1" => "Green",
-            "tool_lablel.2" => "Blue"
+            "tool_label.0" => "Red",
+            "tool_label.1" => "Green",
+            "tool_label.2" => "Blue"
           },
           shape: {
             question: "What shape is this galaxy",
