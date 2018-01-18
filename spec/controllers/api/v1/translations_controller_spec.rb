@@ -62,7 +62,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
           translations: {
             strings: {
               title: "The frozen plant",
-              description: "Bro, how icy is this plant?",
+              description: "Burr, how icy is this plant?",
               introduction: "This project aims to find six of the coolest plants",
               workflow_description: "Is this field even used?",
               researcher_quote: "A really great project, you should help :)",
