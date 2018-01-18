@@ -1,5 +1,7 @@
 class AddUniqueTranslatedLangaugeIndex < ActiveRecord::Migration
   def change
+    Translation.update_all("language = lower(language)")
+
     table_name = :translations
     index_cols = %i(translated_type translated_id)
 
