@@ -2284,13 +2284,6 @@ CREATE UNIQUE INDEX idx_lower_email ON users USING btree (lower((email)::text));
 
 
 --
--- Name: idx_queues_on_ssid_wid_and_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_queues_on_ssid_wid_and_id ON subject_queues USING btree (subject_set_id, workflow_id, user_id);
-
-
---
 -- Name: idx_translations_on_translated_type+id_and_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4045,11 +4038,11 @@ INSERT INTO schema_migrations (version) VALUES ('20171120222438');
 
 INSERT INTO schema_migrations (version) VALUES ('20171121120455');
 
-INSERT INTO schema_migrations (version) VALUES ('20171213144807');
-
 INSERT INTO schema_migrations (version) VALUES ('20171208141841');
 
 INSERT INTO schema_migrations (version) VALUES ('20171208142645');
+
+INSERT INTO schema_migrations (version) VALUES ('20171213144807');
 
 INSERT INTO schema_migrations (version) VALUES ('20171214121332');
 
