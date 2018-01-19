@@ -75,6 +75,7 @@ group :test do
   gem 'database_cleaner', '~> 1.6.2'
   gem 'factory_girl_rails'
   gem 'guard-rspec', require: false
+  gem 'hashdiff'
   gem 'mock_redis'
   gem 'rspec'
   gem 'rspec-rails'
