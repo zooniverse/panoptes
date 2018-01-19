@@ -99,8 +99,7 @@ class Project < ActiveRecord::Base
 
   def expert_classifier_level(classifier)
     expert_roles = project_roles.where(user_group: classifier.identity_group)
-      .where
-      .overlap(roles: EXPERT_ROLES)
+      .where("roles && ARRAY[?]::varchar[]", EXPERT_ROLES)
     if roles = expert_roles.first.try(:roles)
       (EXPERT_ROLES & roles.map(&:to_sym)).first
     end

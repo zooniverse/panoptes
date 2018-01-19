@@ -181,7 +181,7 @@ class User < ActiveRecord::Base
 
   def memberships_for(action, klass)
     membership_roles = UserGroup.roles_allowed_to_access(action, klass)
-    active_memberships.where.overlap(roles: membership_roles)
+    active_memberships.where("roles && ARRAY[?]::varchar[]", membership_roles)
   end
 
   def password_required?
