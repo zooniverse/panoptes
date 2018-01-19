@@ -56,7 +56,7 @@ describe CsvDumps::FindsMedium do
       finder.medium
       medium.reload
       name = resource.slug.split("/")[1]
-      type = medium.type.match(/\project_(\w+)_export\z/)[1]
+      type = medium.type.match(/\Aproject_(\w+)_export\z/)[1]
       ext = MIME::Types[medium.content_type].first.extensions.first
       file_name = "#{name}-#{type}.#{ext}"
       expect(medium.content_disposition).to eq("attachment; filename=\"#{file_name}\"")
