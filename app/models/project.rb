@@ -167,7 +167,7 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def disabled_data_export?
-    !!configuration.fetch("private_data", false)
+  def keep_data_in_panoptes_only?
+    !!configuration.fetch("keep_data_in_panoptes_only", false)
   end
 end

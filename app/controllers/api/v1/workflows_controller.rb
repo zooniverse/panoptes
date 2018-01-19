@@ -199,7 +199,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def available_to_export
-    if controlled_resource.project.disabled_data_export?
+    if controlled_resource.project.keep_data_in_panoptes_only?
       raise Api::DisabledDataExport.new(
         "Data exports are disabled for this project"
       )

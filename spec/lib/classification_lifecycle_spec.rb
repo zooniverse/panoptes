@@ -345,7 +345,7 @@ describe ClassificationLifecycle do
       end
     end
 
-    describe "no_public_data project configuation" do
+    describe "keep_data_in_panoptes_only project configuation" do
       let(:classification) { build(:classification) }
 
       it 'should call the publish classification worker when configuration is missing' do
@@ -353,20 +353,20 @@ describe ClassificationLifecycle do
       end
 
       context "with non-default configuration" do
-        def update_stream_metadata(allow)
+        def update_project_metadata(allow)
           classification
             .project
             .configuration
-            .merge!("private_data" => allow)
+            .merge!("keep_data_in_panoptes_only" => allow)
         end
 
         it 'should call the publish classification worker when public' do
-          update_stream_metadata(false)
+          update_project_metadata(false)
           expect(PublishClassificationWorker).to receive(:perform_async)
         end
 
         it 'should not call the publish classification worker when private' do
-          update_stream_metadata(true)
+          update_project_metadata(true)
           expect(PublishClassificationWorker).not_to receive(:perform_async)
         end
       end

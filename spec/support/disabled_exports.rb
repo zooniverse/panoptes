@@ -1,7 +1,9 @@
 shared_examples "it forbids data exports" do
-  context "when the project resource has exports disabled" do
+  context "when the project resource has internal data only flag enabled" do
     before do
-      private_data_config = project.configuration.merge("private_data" => true)
+      private_data_config = project.configuration.merge(
+        "keep_data_in_panoptes_only" => true
+      )
       project.update_column(:configuration, private_data_config)
     end
 

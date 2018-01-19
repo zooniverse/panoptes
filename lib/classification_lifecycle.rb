@@ -77,7 +77,7 @@ class ClassificationLifecycle
   def publish_data
     return unless classification.complete?
 
-    unless project.disabled_data_export?
+    unless project.keep_data_in_panoptes_only?
       PublishClassificationWorker.perform_async(classification.id)
     end
   end

@@ -505,19 +505,23 @@ describe Project, type: :model do
     end
   end
 
-  describe "#disabled_data_export?" do
+  describe "#keep_data_in_panoptes_only?" do
     it "should not return true when no private config" do
-      expect(project.disabled_data_export?).to eq(false)
+      expect(project.keep_data_in_panoptes_only?).to eq(false)
     end
 
     it "should not return true when private config is false" do
-      project.configuration = project.configuration.merge("private_data" => false)
-      expect(project.disabled_data_export?).to eq(false)
+      project.configuration = project.configuration.merge(
+        "keep_data_in_panoptes_only" => false
+      )
+      expect(project.keep_data_in_panoptes_only?).to eq(false)
     end
 
     it "should not return true when private config is true" do
-      project.configuration = project.configuration.merge("private_data" => true)
-      expect(project.disabled_data_export?).to eq(true)
+      project.configuration = project.configuration.merge(
+        "keep_data_in_panoptes_only" => true
+      )
+      expect(project.keep_data_in_panoptes_only?).to eq(true)
     end
   end
 end
