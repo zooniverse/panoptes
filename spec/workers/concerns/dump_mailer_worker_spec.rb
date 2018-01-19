@@ -44,22 +44,10 @@ describe DumpMailerWorker do
 
     context "with no specified recipients" do
       let(:metadata) { { } }
+      let(:expected_emails) { [ owner.email ] }
 
-      context "a normal project" do
-        let(:expected_emails) { [ resource.owner.email ] }
-
-        it 'queues an email to the owner' do
-          worker.send_email
-        end
-      end
-
-      context "when the project is internal panoptes only" do
-        let(:metadata) { { } }
-        let(:expected_emails) { [ resource.owner.email ] }
-
-        it 'queues an email to the owner', :focus do
-          worker.send_email
-        end
+      it 'queues an email to the owner' do
+        worker.send_email
       end
     end
   end
