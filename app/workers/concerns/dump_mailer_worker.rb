@@ -15,14 +15,21 @@ module DumpMailerWorker
   end
 
   def emails
-    if recipients = medium.try(:metadata).try(:[], "recipients")
+    recipients = medium&.metadata.dig("recipients")
+    if recipients
       User.where(id: recipients).pluck(:email)
     else
-      [resource.owner.email]
+      resource_comms_emails
     end
   end
 
   def media_get_url(expires=24*60)
     medium.get_url(get_expires: expires)
+  end
+
+  private
+
+  def resource_comms_emails
+    resource.communication_emails
   end
 end
