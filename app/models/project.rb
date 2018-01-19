@@ -167,6 +167,12 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def communication_emails
+    User.joins(user_groups: :access_control_lists)
+    .merge(acls.where.overlap(roles: %w(owner communications)))
+    .pluck(:email)
+  end
+
   def keep_data_in_panoptes_only?
     !!configuration.fetch("keep_data_in_panoptes_only", false)
   end

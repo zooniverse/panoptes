@@ -56,6 +56,7 @@ class Workflow < ActiveRecord::Base
   ranks :display_order, with_same: :project_id
 
   delegate :owner, to: :project
+  delegate :communication_emails, to: :project
 
   def self.same_project?(subject_set)
     where(project: subject_set.project)
