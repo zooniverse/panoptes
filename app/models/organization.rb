@@ -13,7 +13,7 @@ class Organization < ActiveRecord::Base
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
   has_one :avatar, -> { where(type: "organization_avatar") }, class_name: "Medium", as: :linked
   has_one :background, -> { where(type: "organization_background") }, class_name: "Medium", as: :linked
-  has_many :organization_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
+  has_many :organization_roles, ->{ where.not("access_control_lists.roles = '{}'") }, class_name: "AccessControlList", as: :resource
   has_many :pages, class_name: "OrganizationPage", dependent: :destroy
   has_many :attached_images, -> { where(type: "organization_attached_image") }, class_name: "Medium",
     as: :linked

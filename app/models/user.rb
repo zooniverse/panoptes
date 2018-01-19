@@ -224,7 +224,7 @@ class User < ActiveRecord::Base
   def build_identity_group
     default_display_name
     raise StandardError, "Identity Group Exists" if identity_group
-    build_identity_membership
+    build_identity_membership(roles: ["group_admin"])
     identity_membership.build_user_group(display_name: display_name, name: login)
   end
 

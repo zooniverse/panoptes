@@ -24,7 +24,7 @@ class Project < ActiveRecord::Base
   has_many :classifications, dependent: :restrict_with_exception
   has_many :subjects, dependent: :restrict_with_exception
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
-  has_many :project_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
+  has_many :project_roles, -> { where.not("access_control_lists.roles = '{}'") }, class_name: "AccessControlList", as: :resource
   has_one :avatar, -> { where(type: "project_avatar") }, class_name: "Medium", as: :linked
   has_one :background, -> { where(type: "project_background") }, class_name: "Medium",
     as: :linked
