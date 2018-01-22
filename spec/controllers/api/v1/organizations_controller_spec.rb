@@ -154,7 +154,8 @@ describe Api::V1::OrganizationsController, type: :controller do
               display_name: "Def Not Illuminati",
               description: "This Organization is not affiliated with the Illuminati, absolutely not no way",
               urls: [{label: "Blog", url: "http://blogo.com/example"}],
-              introduction: "Hello and welcome to Illuminati Headquarters oh wait damn"
+              introduction: "Hello and welcome to Illuminati Headquarters oh wait damn",
+              announcement: "Hear Ye, Hear Ye"
             }
           }
         end

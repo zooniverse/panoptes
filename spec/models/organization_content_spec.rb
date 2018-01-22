@@ -26,6 +26,10 @@ RSpec.describe OrganizationContent, :type => :model do
     expect(build(:organization_content, introduction: '0' * 5001)).to_not be_valid
   end
 
+  it 'should restrict the maximum length of announcement' do
+    expect(build(:organization_content, announcement: '0' * 5001)).to_not be_valid
+  end
+
   describe "versioning" do
     subject do
       create(:organization_content)

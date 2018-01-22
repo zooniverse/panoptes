@@ -65,6 +65,7 @@ describe TranslationStrings do
       "title" => "Test Organization",
       "description" => "This is the description for an Organization",
       "introduction" => "This is the intro for an Organization",
+      "announcement" => "Alert: This organization has something to let you know",
       "url_labels.0.label" => "Blog",
       "url_labels.1.label" => "Twitter"
     }

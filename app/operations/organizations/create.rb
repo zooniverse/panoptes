@@ -9,6 +9,7 @@ module Organizations
     # Organization Contents Fields
     string :description
     string :introduction, default: ''
+    string :announcement, default: ''
     array :urls, default: []
     array :categories, default: []
     array :tags, default: []
@@ -41,7 +42,8 @@ module Organizations
       organization_contents_params = {
         title: display_name,
         description: description,
-        introduction: introduction
+        introduction: introduction,
+        announcement: announcement
       }
       organization_contents_params.merge(
         organization_contents_from_params
