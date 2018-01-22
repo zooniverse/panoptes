@@ -2593,13 +2593,6 @@ CREATE UNIQUE INDEX index_oauth_applications_on_uid ON oauth_applications USING 
 
 
 --
--- Name: index_organization_contents_on_announcement; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX index_organization_contents_on_announcement ON organization_contents USING btree (announcement);
-
-
---
 -- Name: index_organization_pages_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
