@@ -627,7 +627,8 @@ CREATE TABLE oauth_access_tokens (
     expires_in integer,
     revoked_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    scopes character varying
+    scopes character varying,
+    previous_refresh_token character varying DEFAULT ''::character varying NOT NULL
 );
 
 
@@ -4050,4 +4051,6 @@ INSERT INTO schema_migrations (version) VALUES ('20171214121332');
 INSERT INTO schema_migrations (version) VALUES ('20180110133833');
 
 INSERT INTO schema_migrations (version) VALUES ('20180115214144');
+
+INSERT INTO schema_migrations (version) VALUES ('20180122134607');
 
