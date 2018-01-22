@@ -64,7 +64,7 @@ class TranslationStrings
   end
 
   def organization_attributes
-    %i(display_name title description introduction url_labels)
+    %i(display_name title description introduction announcement url_labels)
   end
 
   def organization_page_attributes

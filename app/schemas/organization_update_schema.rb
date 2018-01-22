@@ -22,6 +22,10 @@ class OrganizationUpdateSchema < JsonSchema
        type "string"
     end
 
+    property "announcement" do
+       type "string"
+    end
+
     property "listed_at" do
        type "string"
     end

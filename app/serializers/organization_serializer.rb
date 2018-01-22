@@ -7,7 +7,7 @@ class OrganizationSerializer
 
 
   attributes :id, :display_name, :description, :introduction, :title, :href,
-    :primary_language, :listed_at, :listed, :slug, :urls, :categories
+    :primary_language, :listed_at, :listed, :slug, :urls, :categories, :announcement
   optional :avatar_src
   media_include :avatar, :background, :attached_images
   can_filter_by :display_name, :slug, :listed
@@ -25,6 +25,10 @@ class OrganizationSerializer
     content[:introduction]
   end
 
+  def announcement
+    content[:announcement]
+  end
+
   def content
     @content ||= _content
   end
@@ -38,7 +42,7 @@ class OrganizationSerializer
   end
 
   def fields
-    %i(title description introduction)
+    %i(title description introduction announcement)
   end
 
   def self.links

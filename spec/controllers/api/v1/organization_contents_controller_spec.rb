@@ -5,7 +5,7 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
   let(:organization) { create(:organization) }
   let(:api_resource_name) { 'organization_contents' }
   let(:api_resource_attributes) do
-    %w(id title description introduction language)
+    %w(id title description introduction announcement language)
   end
   let(:api_resource_links) { %w(organization_contents.organization) }
 
@@ -53,6 +53,7 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
           title: test_attr_value,
           description: "Worse Content",
           introduction: "Useless Science",
+          announcement: "Here Ye, Hear Ye",
           language: "en-CA",
           links: { organization: organization.id.to_s }
         }

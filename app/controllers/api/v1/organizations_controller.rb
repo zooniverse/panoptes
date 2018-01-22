@@ -16,11 +16,13 @@ class Api::V1::OrganizationsController < Api::ApiController
 
   CONTENT_PARAMS = [:description,
                     :title,
-                    :introduction].freeze
+                    :introduction,
+                    :announcement].freeze
 
   CONTENT_FIELDS = [:description,
                     :title,
                     :introduction,
+                    :announcement,
                     :url_labels].freeze
 
   def create
