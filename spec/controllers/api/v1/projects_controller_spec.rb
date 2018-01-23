@@ -37,6 +37,15 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:unapproved_resource) { create(:project, beta_approved: false, launch_approved: false) }
   let(:deactivated_resource) { create(:project, activated_state: :inactive) }
 
+  shared_examples "it syncs the primary language translation strings" do
+    it 'should queue a translation sync worker' do
+      translated_resource_id = translated_resource_id || be_kind_of(Integer)
+      expect(TranslationSyncWorker)
+        .to receive(:perform_async)
+        .with(translated_klass_name, translated_resource_id, translated_language)
+    end
+  end
+
   describe "#index" do
     context "not logged in" do
       let(:authorized_user) { nil }
@@ -374,6 +383,17 @@ describe Api::V1::ProjectsController, type: :controller do
       ps
     end
 
+    it_behaves_like "it syncs the primary language translation strings" do
+      let(:translated_klass_name) { Project.name }
+      let(:translated_resource_id) { nil }
+      let(:translated_language) { 'en' }
+
+      after do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, create_params
+      end
+    end
+
     describe "redirect option" do
       it_behaves_like "admin only option", :redirect, "http://example.com"
     end
@@ -608,6 +628,17 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:tag_array) { ["astro", "gastro"] }
       let(:tag_params) do
         { projects: { tags: tag_array }, id: resource.id }
+      end
+    end
+
+    it_behaves_like "it syncs the primary language translation strings" do
+      let(:translated_klass_name) { resource.class.name }
+      let(:translated_resource_id) { resource.id }
+      let(:translated_language) { resource.primary_language }
+
+      after do
+        default_request scopes: scopes, user_id: authorized_user.id
+        put :update, update_params.merge(id: resource.id)
       end
     end
 
