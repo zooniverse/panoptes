@@ -13,7 +13,9 @@ production:
 # Set timeout to 8 on Heroku, longer if you manage your own systems.
 :timeout: 30
 :queues:
+  - really_high
   - high
-  - medium
+  - data_high
+  - data_medium
   - default
-  - low
+  - data_low
