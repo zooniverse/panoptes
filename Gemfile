@@ -36,7 +36,7 @@ gem 'pg', '~> 0.21'
 gem 'pg_search'
 gem 'postgres_ext', '~> 3.0.0'
 gem 'puma', '~> 3.11.2'
-gem 'rack-cors', '~> 0.4', require: 'rack/cors'
+gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 gem 'rails', '~> 4.2.10'
 gem 'ranked-model', '~> 0.4.0'
 gem 'restpack_serializer', github: "zooniverse/restpack_serializer", branch: "rails5" # REST API
