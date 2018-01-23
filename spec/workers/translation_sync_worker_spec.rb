@@ -36,7 +36,7 @@ RSpec.describe TranslationSyncWorker do
     # or do we fire a bunch of workers for each type of resource?
     # prefer the latter version ^ use concurrency like a boss
     # project - ✓
-    # project.workflows -
+    # project.workflows - ✓
     # project.pages -
     # project.field_guides -
     # project.tutorials -

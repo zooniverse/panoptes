@@ -3,6 +3,7 @@ require 'model_version'
 class Api::V1::WorkflowsController < Api::ApiController
   include Versioned
   include TranslatableResource
+  include SyncResourceTranslationStrings
   include MediumResponse
 
   require_authentication :update, :create, :destroy, :retire_subjects, :create_classifications_export, scopes: [:project]
