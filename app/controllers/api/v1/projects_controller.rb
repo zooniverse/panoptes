@@ -55,9 +55,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def update
-    updated_project = nil
     super do |resource|
-      updated_project = resource
       # TODO: extract this primary project content update
       # to a service object that sits in the project
       # transaction.
@@ -73,14 +71,6 @@ class Api::V1::ProjectsController < Api::ApiController
         resource.updated_at = Time.zone.now
       end
     end
-
-    # this is a reason to move to an after_commit callback on the model
-    # or another good reason for operations
-    TranslationSyncWorker.perform_async(
-      updated_project.class.name,
-      updated_project.id,
-      updated_project.primary_language
-    )
   end
 
   def create_classifications_export
@@ -104,14 +94,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create
-    super do |project|
-      TalkAdminCreateWorker.perform_async(project.id)
-      TranslationSyncWorker.perform_async(
-        project.class.name,
-        project.id,
-        project.primary_language
-      )
-    end
+    super { |project| TalkAdminCreateWorker.perform_async(project.id) }
   end
 
   private
