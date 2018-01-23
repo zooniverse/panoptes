@@ -37,15 +37,6 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:unapproved_resource) { create(:project, beta_approved: false, launch_approved: false) }
   let(:deactivated_resource) { create(:project, activated_state: :inactive) }
 
-  shared_examples "it syncs the primary language translation strings" do
-    it 'should queue a translation sync worker' do
-      translated_resource_id = translated_resource_id || be_kind_of(Integer)
-      expect(TranslationSyncWorker)
-        .to receive(:perform_async)
-        .with(translated_klass_name, translated_resource_id, translated_language)
-    end
-  end
-
   describe "#index" do
     context "not logged in" do
       let(:authorized_user) { nil }
@@ -383,15 +374,14 @@ describe Api::V1::ProjectsController, type: :controller do
       ps
     end
 
-    it_behaves_like "it syncs the primary language translation strings" do
+    it_behaves_like "it syncs the resource translation strings" do
       let(:translated_klass_name) { Project.name }
-      let(:translated_resource_id) { nil }
-      let(:translated_language) { 'en' }
-
-      after do
-        default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
+      let(:translated_resource_id) { be_kind_of(Integer) }
+      let(:translated_language) do
+        default_create_params.dig(:projects, :primary_language)
       end
+      let(:controller_action) { :create }
+      let(:controller_action_params) { create_params }
     end
 
     describe "redirect option" do
@@ -631,15 +621,12 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
 
-    it_behaves_like "it syncs the primary language translation strings" do
+    it_behaves_like "it syncs the resource translation strings" do
       let(:translated_klass_name) { resource.class.name }
       let(:translated_resource_id) { resource.id }
       let(:translated_language) { resource.primary_language }
-
-      after do
-        default_request scopes: scopes, user_id: authorized_user.id
-        put :update, update_params.merge(id: resource.id)
-      end
+      let(:controller_action) { :update }
+      let(:controller_action_params) { update_params.merge(id: resource.id) }
     end
 
     describe "launch_approved" do
