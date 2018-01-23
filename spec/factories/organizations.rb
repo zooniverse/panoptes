@@ -23,7 +23,7 @@ FactoryBot.define do
       if env.build_media
         o.avatar = create(:medium, type: "organization_avatar", linked: o)
         o.background = create(:medium, type: "organization_background", linked: o)
-        o.attached_images << create(:medium, type: "org_attached_image", linked: o)
+        o.attached_images << create(:medium, type: "organization_attached_image", linked: o)
       end
     end
 
