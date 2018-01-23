@@ -98,8 +98,9 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       run_update
       updated_upp = json_response[api_resource_name].first
       expect(updated_upp).not_to be_empty
-      modified = upp.updated_at.httpdate
-      expect(response.headers).to include('Last-Modified' => modified)
+      modified_dt = upp.updated_at.httpdate.to_datetime
+      response_dt = response.headers['Last-Modified'].to_datetime
+      expect(response_dt).to be_within(1.second).of(modified_dt)
     end
 
     it "updates the UPP settings attribute" do
