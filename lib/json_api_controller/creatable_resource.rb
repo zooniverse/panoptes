@@ -3,7 +3,7 @@ module JsonApiController
     include RelationManager
 
     def create
-      resources = resource_class.transaction(requires_new: true) do
+      @created_resources = resource_class.transaction(requires_new: true) do
         begin
           Array.wrap(create_params).map do |ps|
             resource = build_resource_for_create(ps)
@@ -13,11 +13,11 @@ module JsonApiController
         end
       end
 
-      resources.each do |resource|
+      created_resources.each do |resource|
         yield resource if block_given?
       end
 
-      created_resource_response(resources)
+      created_resource_response(created_resources)
     end
 
     protected
@@ -49,6 +49,10 @@ module JsonApiController
 
     def link_header(resource)
       send(:"api_#{ resource_name }_url", resource)
+    end
+
+    def created_resources
+      @created_resources || []
     end
   end
 end
