@@ -2,6 +2,8 @@ module Pages
   extend ActiveSupport::Concern
 
   included do
+    include SyncResourceTranslationStrings
+
     resource_actions :default
 
     schema_type :strong_params
