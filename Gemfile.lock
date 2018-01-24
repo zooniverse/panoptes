@@ -452,7 +452,7 @@ DEPENDENCIES
   dalli-elasticache
   database_cleaner (~> 1.6.2)
   devise (~> 4.3)
-  doorkeeper (~> 4.0)
+  doorkeeper (~> 4.2)
   doorkeeper-jwt (~> 0.2.1)
   factory_girl_rails
   faraday (~> 0.9)
