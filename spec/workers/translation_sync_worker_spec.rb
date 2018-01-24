@@ -30,16 +30,5 @@ RSpec.describe TranslationSyncWorker do
         }.from(old_title).to(new_title)
       end
     end
-
-    # TODO: this should sync all the related resources for a project.
-    # do we wrap this in a long running transaction?
-    # or do we fire a bunch of workers for each type of resource?
-    # prefer the latter version ^ use concurrency like a boss
-    # project - ✓
-    # project.workflows - ✓
-    # project.pages - ✓
-    # project.field_guides -
-    # project.tutorials -
-    # orgs?
   end
 end
