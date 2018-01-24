@@ -6,7 +6,7 @@ class Membership < ActiveRecord::Base
   enum state: [:active, :invited, :inactive]
 
   scope :active, -> { where(state: states[:active]) }
-  scope :identity, -> { active.where(identity: true).where("'group_admin' = ANY(memberships.roles)") }
+  scope :identity, -> { active.where(identity: true).where("memberships.roles = '{group_admin}'") }
   scope :not_identity, -> { where(identity: false) }
 
   validates_presence_of :user, unless: :identity
