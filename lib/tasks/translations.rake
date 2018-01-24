@@ -15,7 +15,6 @@ namespace :translations do
     project = Project.find(args[:project_id])
     language = project.primary_language
 
-# TODO: extract all these steps to a worker
     puts "Syncing project - #{project.id} strings to translations"
     create_or_update_translation_strings(project, language)
 
