@@ -37,7 +37,7 @@ RSpec.describe TranslationSyncWorker do
     # prefer the latter version ^ use concurrency like a boss
     # project - ✓
     # project.workflows - ✓
-    # project.pages -
+    # project.pages - ✓
     # project.field_guides -
     # project.tutorials -
     # orgs?
