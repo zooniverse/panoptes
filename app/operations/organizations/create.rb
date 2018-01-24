@@ -25,8 +25,6 @@ module Organizations
     }
 
     def execute
-      organization = nil
-
       Organization.transaction(requires_new: true) do
         organization = build_organization
         organization.organization_contents.build(organization_contents_params)
