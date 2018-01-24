@@ -4,8 +4,7 @@ class AddPreviousRefreshTokenToAccessTokens < ActiveRecord::Migration
       :oauth_access_tokens,
       :previous_refresh_token,
       :string,
-      default: "",
-      null: false
+      default: ""
     )
   end
 end

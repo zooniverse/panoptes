@@ -628,7 +628,7 @@ CREATE TABLE oauth_access_tokens (
     revoked_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     scopes character varying,
-    previous_refresh_token character varying DEFAULT ''::character varying NOT NULL
+    previous_refresh_token character varying DEFAULT ''::character varying
 );
 
 
