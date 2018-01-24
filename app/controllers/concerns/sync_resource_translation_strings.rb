@@ -18,7 +18,12 @@ module SyncResourceTranslationStrings
   end
 
   def translatable_resources
-    controlled_resources | created_resources
+    if action_name == "create"
+      created_resources
+    else
+      controlled_resources
+    end
+  end
 
   def translatable_language(resource)
     if resource.respond_to?(:primary_language)
