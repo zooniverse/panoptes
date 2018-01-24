@@ -17,7 +17,7 @@ class ProjectPage < ActiveRecord::Base
       super
     else
       translatable = Project.scope_for(:translate, user, opts)
-      joins(:project).merge(translatable)
+      where(project_id: translatable.select(:id))
     end
   end
 end
