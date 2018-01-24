@@ -8,6 +8,16 @@ module Organizations
     organization :organization_params
     string :id
 
+    set_callback :execute, :around, lambda { |_interaction, block|
+      updated_organization = block.call
+      TranslationSyncWorker.perform_async(
+        Organization.name,
+        updated_organization.id,
+        updated_organization.primary_language
+      )
+      updated_organization
+    }
+
     def execute
       Organization.transaction(requires_new: true) do
         content_update = {}
@@ -36,6 +46,7 @@ module Organizations
         org_update[:listed] == true ? organization.touch(:listed_at) : organization[:listed_at] = nil
 
         organization.save!
+        organization
       end
     end
 

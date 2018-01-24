@@ -6,7 +6,6 @@ class Api::V1::OrganizationsController < Api::ApiController
   include AdminAllowed
   include Slug
   include MediumResponse
-  include SyncResourceTranslationStrings
 
   require_authentication :update, :create, :destroy, scopes: [:organization]
 
@@ -27,13 +26,13 @@ class Api::V1::OrganizationsController < Api::ApiController
                     :url_labels].freeze
 
   def create
-    @created_resources = Organization.transaction(requires_new: true) do
+    organizations = Organization.transaction(requires_new: true) do
       Array.wrap(params[:organizations]).map do |organization_params|
         Organizations::Create.with(api_user: api_user).run!(organization_params)
       end
     end
 
-    created_resource_response(created_resources)
+    created_resource_response(organizations)
   end
 
   def update
