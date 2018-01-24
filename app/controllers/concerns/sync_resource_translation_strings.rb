@@ -8,7 +8,7 @@ module SyncResourceTranslationStrings
   private
 
   def sync_translatable_resource_strings
-    translable_resources.each do |resource|
+    translatable_resources.each do |resource|
       TranslationSyncWorker.perform_async(
         resource.class.name,
         resource.id,
@@ -17,7 +17,7 @@ module SyncResourceTranslationStrings
     end
   end
 
-  def translable_resources
+  def translatable_resources
     controlled_resources | created_resources
   end
 end
