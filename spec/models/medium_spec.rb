@@ -17,7 +17,7 @@ RSpec.describe Medium, :type => :model do
 
     it 'should be invalid with an disallowed content_types' do
       aggregate_failures "disallowed content types" do
-        %w(text/plain video/mp4).each do |content_type|
+        %w(text/html video/mp4).each do |content_type|
           m = build(:medium, content_type: content_type)
           expect(m).to_not be_valid
         end
@@ -42,7 +42,7 @@ RSpec.describe Medium, :type => :model do
 
       it 'should be valid with both content_types' do
         aggregate_failures "content types" do
-          %w(text/plain video/mp4).each do |content_type|
+          %w(text/html video/mp4).each do |content_type|
             m = build(:medium, allow_any_content_type: true, content_type: content_type)
             expect(m).to be_valid
           end

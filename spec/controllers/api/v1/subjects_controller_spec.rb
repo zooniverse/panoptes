@@ -564,7 +564,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       context "when the mime type is not allowed" do
-        let(:locations) { [ "text/plain" ] }
+        let(:locations) { [ "text/html" ] }
 
         it "should not overwrite existing locations" do
           loc_ids = resource.locations.map(&:id)
