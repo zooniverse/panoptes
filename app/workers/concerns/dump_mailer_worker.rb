@@ -15,8 +15,8 @@ module DumpMailerWorker
   end
 
   def emails
-    recipients = medium&.metadata.dig("recipients")
-    if recipients
+    metadata = medium&.metadata
+    if recipients = metadata&.dig("recipients")
       User.where(id: recipients).pluck(:email)
     else
       resource_comms_emails
