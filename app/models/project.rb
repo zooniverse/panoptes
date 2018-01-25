@@ -166,8 +166,11 @@ class Project < ActiveRecord::Base
   end
 
   def users_with_project_roles(roles)
-    User.joins(user_groups: :access_control_lists)
-    .merge(acls.where.overlap(roles: roles))
+    project_roles = acls.where(
+      "access_control_lists.roles && ARRAY[?]::varchar[]",
+      roles
+    )
+    User.joins(user_groups: :access_control_lists).merge(project_roles)
   end
 
   def communication_emails
