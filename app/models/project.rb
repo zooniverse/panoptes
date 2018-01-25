@@ -111,9 +111,7 @@ class Project < ActiveRecord::Base
   end
 
   def owners_and_collaborators
-    User.joins(user_groups: :access_control_lists)
-      .merge(acls.where.overlap(roles: %w(owner collaborator)))
-      .select(:id)
+    users_with_project_roles(%w(owner collaborator)).select(:id)
   end
 
   def create_talk_admin(client)
@@ -167,10 +165,13 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def communication_emails
+  def users_with_project_roles(roles)
     User.joins(user_groups: :access_control_lists)
-    .merge(acls.where.overlap(roles: %w(owner communications)))
-    .pluck(:email)
+    .merge(acls.where.overlap(roles: roles))
+  end
+
+  def communication_emails
+    users_with_project_roles(%w(owner communications)).pluck(:email)
   end
 
   def keep_data_in_panoptes_only?
