@@ -18,7 +18,11 @@ describe SubjectWorkflowCounter do
     context "with classifications" do
       before do
         2.times do
-          create(:classification,  subject_ids: [sws.subject_id], project: project, workflow: workflow)
+          create(:classification,
+            subject_ids: [sws.subject_id],
+            project: project,
+            workflow: workflow
+          )
         end
       end
 
@@ -30,6 +34,16 @@ describe SubjectWorkflowCounter do
         allow(project).to receive(:launch_date).and_return(now)
         expect(counter.classifications).to eq(0)
         allow(project).to receive(:launch_date).and_return(now-1.day)
+        expect(counter.classifications).to eq(2)
+      end
+
+      it "should ignore any incomplete classifications" do
+        incomplete = create(:classification,
+          subject_ids: [sws.subject_id],
+          project: project,
+          workflow: workflow,
+          completed: false
+        )
         expect(counter.classifications).to eq(2)
       end
 
