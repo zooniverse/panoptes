@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :translation, aliases: [:project_translation] do
     strings({
       title: "A test Project",

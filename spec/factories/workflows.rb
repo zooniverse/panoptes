@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :workflow, aliases: [:workflow_with_contents] do
     transient do
       build_contents true

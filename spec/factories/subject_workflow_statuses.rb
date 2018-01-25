@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :subject_workflow_status do
     transient do
       link_subject_sets true

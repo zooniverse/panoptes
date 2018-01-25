@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :membership do
     state { Membership.states.keys.sample }
     roles ["group_member"]

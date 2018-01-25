@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :organization do
     transient do
       build_contents true

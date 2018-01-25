@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :collection do
     sequence(:name) { |n| "collection_name_#{ n }" }
     sequence(:display_name) { |n| "another name #{ n }" }

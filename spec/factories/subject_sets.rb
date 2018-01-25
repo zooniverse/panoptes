@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :subject_set do
     sequence(:display_name) { |n| "Subject Set #{n}" }
 

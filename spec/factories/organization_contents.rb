@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :organization_content do
     organization
     description "This is the description for an Organization"

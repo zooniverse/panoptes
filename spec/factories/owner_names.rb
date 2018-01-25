@@ -1,6 +1,6 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :owner_name do
 
     factory :owner_name_for_user do

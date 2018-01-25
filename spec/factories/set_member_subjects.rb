@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :set_member_subject do
     subject_set
     subject

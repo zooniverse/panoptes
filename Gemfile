@@ -73,7 +73,7 @@ end
 
 group :test do
   gem 'database_cleaner', '~> 1.6.2'
-  gem 'factory_girl_rails'
+  gem "factory_bot_rails"
   gem 'guard-rspec', require: false
   gem 'hashdiff'
   gem 'mock_redis'

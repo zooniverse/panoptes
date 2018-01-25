@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :workflow_content do
     workflow
     language "en"
