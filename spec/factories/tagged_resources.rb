@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :tagged_resource do
     tag
     association :resource, factory: :project

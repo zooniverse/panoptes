@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :aggregation do
     workflow
     subject

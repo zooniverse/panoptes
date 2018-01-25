@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :project_page do
     title "Science Case"
     url_key "science_case"
