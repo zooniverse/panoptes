@@ -45,6 +45,7 @@ class Medium < ActiveRecord::Base
   end
 
   def linked_resource_details
+    # field_guide has a _ in it so manually find it vs prefix_*
     details = /\A(?<resource>field_guide|[a-z]+)_(?<media_type>\w+)/i.match(type)
     [ details[:resource], details[:media_type] ]
   end

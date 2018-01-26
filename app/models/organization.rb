@@ -15,7 +15,7 @@ class Organization < ActiveRecord::Base
   has_one :background, -> { where(type: "organization_background") }, class_name: "Medium", as: :linked
   has_many :organization_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
   has_many :pages, class_name: "OrganizationPage", dependent: :destroy
-  has_many :attached_images, -> { where(type: "org_attached_image") }, class_name: "Medium",
+  has_many :attached_images, -> { where(type: "organization_attached_image") }, class_name: "Medium",
     as: :linked
   has_many :tagged_resources, as: :resource
   has_many :tags, through: :tagged_resources
