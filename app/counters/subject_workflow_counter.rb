@@ -12,6 +12,7 @@ class SubjectWorkflowCounter
       .joins("INNER JOIN classification_subjects cs ON cs.classification_id = classifications.id")
       .where("cs.subject_id = ?", swc.subject_id)
       .where("gold_standard IS NOT TRUE")
+      .where.not("metadata ? 'seen_before'")
       .complete
 
     if launch_date = swc.project.launch_date
