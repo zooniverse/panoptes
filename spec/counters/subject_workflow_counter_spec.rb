@@ -37,14 +37,28 @@ describe SubjectWorkflowCounter do
         expect(counter.classifications).to eq(2)
       end
 
-      it "should ignore any incomplete classifications" do
-        incomplete = create(:classification,
-          subject_ids: [sws.subject_id],
-          project: project,
-          workflow: workflow,
-          completed: false
-        )
-        expect(counter.classifications).to eq(2)
+      context "with classifications that do not count" do
+        let(:default_attrs) do
+          {
+            subject_ids: [sws.subject_id],
+            project: project,
+            workflow: workflow,
+            user: project.owner
+          }
+        end
+        def create_non_counting_classification(attrs)
+          create(:classification, default_attrs.merge(attrs))
+        end
+
+        it "should ignore any incomplete classifications" do
+          create_non_counting_classification(completed: false)
+          expect(counter.classifications).to eq(2)
+        end
+
+        it "should ignore any gold standard classifications" do
+          create_non_counting_classification(gold_standard: true)
+          expect(counter.classifications).to eq(2)
+        end
       end
 
       context "when the subject is classified for other workflows" do
