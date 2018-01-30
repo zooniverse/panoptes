@@ -41,13 +41,20 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def update
-    super do |user|
+    [].tap do |update_email_user_ids|
 
-      unless user.project_email_communication
-        unsubscribe_all_project_emails(user)
+      super do |user|
+        unless user.project_email_communication
+          unsubscribe_all_project_emails(user)
+        end
+
+        if user.email_changed?
+          update_email_user_ids << user.id
+        end
       end
-      if user.email_changed?
-        UserInfoChangedMailerWorker.perform_async(user.id, "email") if user.valid?
+
+      update_email_user_ids.each do |user_id|
+        UserInfoChangedMailerWorker.perform_async(user_id, "email")
       end
     end
   end
