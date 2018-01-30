@@ -19,7 +19,8 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def update
-    super { |classification| lifecycle(:update, classification) }
+    super
+    controlled_resources.each { |resource| lifecycle(:update, resource) }
   end
 
   def gold_standard
