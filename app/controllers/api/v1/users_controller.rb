@@ -42,6 +42,10 @@ class Api::V1::UsersController < Api::ApiController
 
   def update
     super do |user|
+
+      unless user.project_email_communication
+        unsubscribe_all_project_emails(user)
+      end
       if user.email_changed?
         UserInfoChangedMailerWorker.perform_async(user.id, "email") if user.valid?
       end
@@ -87,5 +91,11 @@ class Api::V1::UsersController < Api::ApiController
   def revoke_doorkeeper_request_token!
     token = Doorkeeper.authenticate(request)
     token.revoke
+  end
+
+  def unsubscribe_all_project_emails(user)
+    UserProjectPreference
+     .where(user_id: user.id)
+     .update_all(email_communication: false)
   end
 end
