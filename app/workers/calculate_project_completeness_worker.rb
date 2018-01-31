@@ -12,7 +12,14 @@ class CalculateProjectCompletenessWorker
       project.workflows.each do |workflow|
         workflow.update_columns completeness: workflow_completeness(workflow)
       end
-      project.update_columns completeness: project_completeness(project)
+
+      completeness = project_completeness(project)
+      columns_to_update = { completeness: completeness }
+      if completeness.to_i == 1
+        columns_to_update[:state] = Project.states[:paused]
+      end
+
+      project.update_columns(columns_to_update)
     end
   rescue ActiveRecord::RecordNotFound
     nil

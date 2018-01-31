@@ -65,8 +65,28 @@ describe CalculateProjectCompletenessWorker do
     end
   end
 
-  describe "project state transitions", :focus
-    context "when the project is active and complete", :focus do
+  describe "project state transitions" do
+    before do
+      allow(Project).to receive(:find).and_return(project)
+    end
+
+    context "when the project is not complete" do
+      before do
+        allow(project)
+        .to receive(:active_workflows)
+        .and_return([double(completeness: 0.91)])
+      end
+
+      it "should not move a non-finished project to paused" do
+        expect {
+          worker.perform(project)
+        }.not_to change {
+          project.state
+        }
+      end
+    end
+
+    context "when the project is active and complete" do
       before do
         allow(project)
         .to receive(:active_workflows)
@@ -78,7 +98,7 @@ describe CalculateProjectCompletenessWorker do
           worker.perform(project)
         }.to change {
           project.state
-        }.to(:paused)
+        }.to("paused")
       end
     end
   end
