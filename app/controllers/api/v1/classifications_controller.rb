@@ -68,6 +68,9 @@ class Api::V1::ClassificationsController < Api::ApiController
     end
   end
 
+  # update actions should be lifecycled in band?
+  # as if we have redis failures, we wont ever pick them up again, bad.
+  # also saves sync issues with state & transactions vs bg workers
   def lifecycle(action, classification)
     if Panoptes.flipper[:classification_lifecycle_in_background].enabled?
       ClassificationLifecycle.queue(classification, action)

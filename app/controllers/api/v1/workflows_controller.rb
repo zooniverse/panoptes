@@ -88,6 +88,10 @@ class Api::V1::WorkflowsController < Api::ApiController
           NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
         end
       when :subject_sets, 'subject_sets'
+        # these calls calculate the completeness worker
+        # are in a race with the other counter in update_links
+        # WorkflowRetiredCountWorker, simple effort, perahps just delay it for a bit?
+        # how long does a retired counter run for?
         CalculateProjectCompletenessWorker.perform_async(workflow.project_id)
         NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
       end
