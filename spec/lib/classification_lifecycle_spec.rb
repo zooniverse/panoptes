@@ -96,10 +96,10 @@ describe ClassificationLifecycle do
         subject.execute
       end
 
-      context "when the classification has the already_seen metadata value" do
-        let!(:classification) { create(:anonymous_already_seen_classification) }
+      context "when the classification has already been seen" do
 
         it 'should not count towards retirement' do
+          allow(subject).to receive(:subjects_are_seen_by_user?).and_return(true)
           expect(subject.send(:should_count_towards_retirement?)).to be false
           subject.execute
         end
@@ -255,12 +255,10 @@ describe ClassificationLifecycle do
           subject.execute
         end
 
-        context "when the classification has the already_seen metadata value" do
-          let!(:classification) do
-            create(:anonymous_already_seen_classification)
-          end
+        context "when the classification has been seen by the user" do
 
           it 'should not call the classification count worker' do
+            allow(subject).to receive(:subjects_are_seen_by_user?).and_return(true)
             expect(ClassificationCountWorker).to_not receive(:perform_async)
             subject.execute
           end
@@ -288,8 +286,6 @@ describe ClassificationLifecycle do
     end
 
     it "should notify the subject selector" do
-      allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-
       classification.subject_ids.each do |subject_id|
         expect(NotifySubjectSelectorOfSeenWorker).to receive(:perform_async).with(workflow.id, user.id, subject_id)
       end
@@ -480,7 +476,7 @@ describe ClassificationLifecycle do
 
         context "when the subject is already seen" do
           it "should not mark the classification as expert" do
-            allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
+            allow(subject).to receive(:subjects_are_seen_by_user?).and_return(true)
             subject.mark_expert_classifier
             expect(classification.expert_classifier).to be_nil
           end
@@ -621,7 +617,7 @@ describe ClassificationLifecycle do
 
       context "when the user has seen the subject before" do
         it "should add the seen_before metadata value" do
-          allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
+          allow(subject).to receive(:subjects_are_seen_by_user?).and_return(true)
           subject.add_seen_before_for_user
           expect(classification.metadata[:seen_before]).to eq(true)
         end
