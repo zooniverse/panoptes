@@ -496,9 +496,22 @@ describe ClassificationLifecycle do
 
   describe "#update_classification_data" do
     let(:update_classification_data) { subject.update_classification_data }
+    let(:update_methods) do
+      %i(
+        mark_expert_classifier
+        add_seen_before_for_user
+        add_project_live_state
+        add_user_groups
+        add_lifecycled_at
+      )
+    end
 
-    it "should wrap the calls in a transaction" do
-      expect(Classification).to receive(:transaction)
+    it "should not update any data if classification is incomplete" do
+      allow(classification).to receive(:complete?).and_return(false)
+      update_methods.each do |method|
+        expect(subject).not_to receive(method)
+      end
+      expect(classification).not_to receive(:save!)
       update_classification_data
     end
 

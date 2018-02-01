@@ -41,12 +41,14 @@ class ClassificationLifecycle
   end
 
   def update_classification_data
-    mark_expert_classifier
-    add_seen_before_for_user
-    add_project_live_state
-    add_user_groups
-    add_lifecycled_at
-    classification.save!
+    if classification.complete?
+      mark_expert_classifier
+      add_seen_before_for_user
+      add_project_live_state
+      add_user_groups
+      add_lifecycled_at
+      classification.save!
+    end
   end
 
   def update_counters
