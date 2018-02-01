@@ -36,7 +36,6 @@ module Organizations
         org_update[:listed] == true ? organization.touch(:listed_at) : organization[:listed_at] = nil
 
         organization.save!
-        organization
       end
     end
 
