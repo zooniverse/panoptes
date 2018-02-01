@@ -66,7 +66,7 @@ class ClassificationLifecycle
   end
 
   def create_recent
-    return if classification.anonymous?
+    return unless completed_user_classification?
     return if subjects_are_seen_by_user?
 
     Recent.create_from_classification(classification)
