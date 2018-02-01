@@ -55,7 +55,7 @@ class ClassificationLifecycle
     return unless should_count_towards_retirement?
 
     classification.subject_ids.each do |sid|
-      ClassificationCountWorker.perform_async(sid, classification.workflow.id, update?)
+      ClassificationCountWorker.perform_async(sid, classification.workflow.id)
     end
   end
 
@@ -192,9 +192,5 @@ class ClassificationLifecycle
     else
       [nil]
     end
-  end
-
-  def update?
-    action == "update"
   end
 end
