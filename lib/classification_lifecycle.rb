@@ -23,7 +23,7 @@ class ClassificationLifecycle
   end
 
   def execute
-    return if create? && classification.lifecycled_at.present?
+    return if action == "create" && classification.lifecycled_at.present?
 
     Classification.transaction(requires_new: true) do
       update_classification_data
@@ -192,10 +192,6 @@ class ClassificationLifecycle
     else
       [nil]
     end
-  end
-
-  def create?
-    action == "create"
   end
 
   def update?
