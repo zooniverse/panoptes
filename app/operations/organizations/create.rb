@@ -14,16 +14,6 @@ module Organizations
     array :categories, default: []
     array :tags, default: []
 
-    set_callback :execute, :around, lambda { |_interaction, block|
-      created_organization = block.call
-      TranslationSyncWorker.perform_async(
-        Organization.name,
-        created_organization.id,
-        created_organization.primary_language
-      )
-      created_organization
-    }
-
     def execute
       Organization.transaction(requires_new: true) do
         organization = build_organization
