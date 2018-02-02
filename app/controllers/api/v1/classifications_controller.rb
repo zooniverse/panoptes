@@ -56,8 +56,8 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def resources_completed?
     Classification.created_by(api_user.user)
-      .merge(Classification.complete)
-      .exists?(id: resource_ids)
+    .complete
+    .exists?(id: resource_ids)
   end
 
   def build_resource_for_create(create_params)
