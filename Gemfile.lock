@@ -385,7 +385,7 @@ GEM
     semantic_logger (4.2.0)
       concurrent-ruby (~> 1.0)
     shellany (0.0.1)
-    sidekiq (5.0.5)
+    sidekiq (5.1.0)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
       rack-protection (>= 1.5.0)
@@ -499,7 +499,7 @@ DEPENDENCIES
   scientist (~> 1.1.0)
   sdoc (~> 0.4.2)
   semantic_logger (~> 4.2.0)
-  sidekiq (~> 5.0)
+  sidekiq (~> 5.1)
   sidekiq-congestion (~> 0.1.0)
   sidekiq-unique-jobs
   sidetiq (~> 0.7)
