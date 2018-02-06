@@ -11,7 +11,7 @@ class WorkflowRetiredCountWorker
     key: ->(workflow_id) { "workflow_#{workflow_id}_retired_count_worker" }
   }
 
-  sidekiq_options unique: :until_executing
+  sidekiq_options unique: :until_executed
 
   def perform(workflow_id)
     workflow = Workflow.find(workflow_id)
