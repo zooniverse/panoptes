@@ -344,6 +344,33 @@ describe ClassificationLifecycle do
         expect(PublishClassificationWorker).not_to receive(:perform_async)
       end
     end
+
+    describe "keep_data_in_panoptes_only project configuation" do
+      let(:classification) { build(:classification) }
+
+      it 'should call the publish classification worker when configuration is missing' do
+        expect(PublishClassificationWorker).to receive(:perform_async)
+      end
+
+      context "with non-default configuration" do
+        def update_project_metadata(allow)
+          classification
+            .project
+            .configuration
+            .merge!("keep_data_in_panoptes_only" => allow)
+        end
+
+        it 'should call the publish classification worker when public' do
+          update_project_metadata(false)
+          expect(PublishClassificationWorker).to receive(:perform_async)
+        end
+
+        it 'should not call the publish classification worker when private' do
+          update_project_metadata(true)
+          expect(PublishClassificationWorker).not_to receive(:perform_async)
+        end
+      end
+    end
   end
 
   describe "#create_project_preference" do

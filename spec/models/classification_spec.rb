@@ -143,6 +143,17 @@ describe Classification, :type => :model do
         user_group: user_group, state: :active)
     end
 
+    it "should return empty set when project#keep_data_in_panoptes_only is true" do
+      only_panoptes_config = project.configuration.merge(
+        "keep_data_in_panoptes_only" => true
+      )
+      project.update_column(:configuration, only_panoptes_config)
+      classification = create(:classification, user: user.owner, project_id: project.id)
+      %i(index show update destroy incomplete project gold_standard).each do |action|
+        expect(Classification.scope_for(action, user)).to be_empty
+      end
+    end
+
     describe "#show/index" do
       it 'should return an ActiveRecord::Relation' do
         expect(Classification.scope_for(:index, user)).to be_a(ActiveRecord::Relation)
@@ -249,7 +260,8 @@ describe Classification, :type => :model do
 
     describe "#gold_standard" do
       it 'should return all gold_standard project data' do
-        gsa = create(:gold_standard_annotation,
+        gsa = create(
+          :gold_standard_annotation,
           project: project, user: project.owner
         )
         gsa.workflow.update_column(:public_gold_standard, true)

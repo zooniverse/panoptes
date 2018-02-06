@@ -17,7 +17,8 @@ module Api
       Subjects::Selector::MissingSubjectSet,
       Subjects::Selector::MissingSubjects,                 with: :not_found
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
-    rescue_from Api::LiveProjectChanges,                   with: :forbidden
+    rescue_from Api::LiveProjectChanges,
+      Api::DisabledDataExport,                             with: :forbidden
     rescue_from Api::NotLoggedIn,
       Api::UnauthorizedTokenError,
       Operation::Unauthenticated,                          with: :not_authenticated

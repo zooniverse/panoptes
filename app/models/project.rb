@@ -166,4 +166,8 @@ class Project < ActiveRecord::Base
       live ? "live" : "development"
     end
   end
+
+  def keep_data_in_panoptes_only?
+    !!configuration.fetch("keep_data_in_panoptes_only", false)
+  end
 end

@@ -12,6 +12,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   schema_type :json_schema
 
   prepend_before_action :require_login, only: [:create, :update, :destroy, :create_classifications_export]
+  before_action :available_to_export, only: :create_classifications_export
 
   def index
     unless params.has_key?(:sort)
@@ -195,6 +196,14 @@ class Api::V1::WorkflowsController < Api::ApiController
       SubjectWorkflowStatus
     else
       super
+    end
+  end
+
+  def available_to_export
+    if controlled_resource.project.keep_data_in_panoptes_only?
+      raise Api::DisabledDataExport.new(
+        "Data exports are disabled for this project"
+      )
     end
   end
 end
