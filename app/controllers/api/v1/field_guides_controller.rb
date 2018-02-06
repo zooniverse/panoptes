@@ -1,4 +1,6 @@
 class Api::V1::FieldGuidesController < Api::ApiController
+  include SyncResourceTranslationStrings
+
   require_authentication :update, :create, :destroy, scopes: [:project]
 
   resource_actions :default

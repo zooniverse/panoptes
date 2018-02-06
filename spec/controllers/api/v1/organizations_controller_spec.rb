@@ -139,36 +139,57 @@ describe Api::V1::OrganizationsController, type: :controller do
           end
         end
       end
+
+      it_behaves_like "it syncs the resource translation strings" do
+        let(:translated_klass_name) { Organization.name }
+        let(:translated_resource_id) { be_kind_of(Integer) }
+        let(:translated_language) do
+          create_params.dig(:organizations, :primary_language)
+        end
+        let(:controller_action) { :create }
+        let(:controller_action_params) { create_params }
+      end
     end
 
     describe "#update" do
+      let(:language) { "tw" }
+      let(:resource) do
+        create(:organization, owner: authorized_user, primary_language: language)
+      end
+      let(:update_params) do
+        {
+          organizations: {
+            primary_language: language,
+            display_name: "Def Not Illuminati",
+            description: "This Organization is not affiliated with the Illuminati, absolutely not no way",
+            urls: [{label: "Blog", url: "http://blogo.com/example"}],
+            introduction: "Hello and welcome to Illuminati Headquarters oh wait damn",
+            announcement: "Hear Ye, Hear Ye"
+          }
+        }
+      end
+
       it_behaves_like "is updatable" do
-        let(:resource) { create(:organization, owner: authorized_user) }
         let(:resource_class) { Organization }
         let(:api_resource_attributes) { ["display_name", "description"] }
         let(:api_resource_links) { [] }
-        let(:update_params) do
-          {
-            organizations: {
-              primary_language: "tw",
-              display_name: "Def Not Illuminati",
-              description: "This Organization is not affiliated with the Illuminati, absolutely not no way",
-              urls: [{label: "Blog", url: "http://blogo.com/example"}],
-              introduction: "Hello and welcome to Illuminati Headquarters oh wait damn",
-              announcement: "Hear Ye, Hear Ye"
-            }
-          }
-        end
         let(:test_attr) { :display_name }
         let(:test_attr_value) { "Def Not Illuminati" }
       end
 
       it_behaves_like "has updatable tags" do
-        let(:resource) { create(:organization, owner: authorized_user) }
         let(:tag_array) { ["astro", "gastro"] }
         let(:tag_params) do
           { organizations: { tags: tag_array }, id: resource.id }
         end
+      end
+
+      it_behaves_like "it syncs the resource translation strings" do
+        let(:translated_klass_name) { resource.class.name }
+        let(:translated_resource_id) { resource.id }
+        let(:translated_language) { resource.primary_language }
+        let(:controller_action) { :update }
+        let(:controller_action_params) { update_params.merge(id: resource.id) }
       end
 
       context "includes exceptional parameters" do

@@ -374,6 +374,16 @@ describe Api::V1::ProjectsController, type: :controller do
       ps
     end
 
+    it_behaves_like "it syncs the resource translation strings" do
+      let(:translated_klass_name) { Project.name }
+      let(:translated_resource_id) { be_kind_of(Integer) }
+      let(:translated_language) do
+        default_create_params.dig(:projects, :primary_language)
+      end
+      let(:controller_action) { :create }
+      let(:controller_action_params) { create_params }
+    end
+
     describe "redirect option" do
       it_behaves_like "admin only option", :redirect, "http://example.com"
     end
@@ -609,6 +619,14 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:tag_params) do
         { projects: { tags: tag_array }, id: resource.id }
       end
+    end
+
+    it_behaves_like "it syncs the resource translation strings" do
+      let(:translated_klass_name) { resource.class.name }
+      let(:translated_resource_id) { resource.id }
+      let(:translated_language) { resource.primary_language }
+      let(:controller_action) { :update }
+      let(:controller_action_params) { update_params.merge(id: resource.id) }
     end
 
     describe "launch_approved" do

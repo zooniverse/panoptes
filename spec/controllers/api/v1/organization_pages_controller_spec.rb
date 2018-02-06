@@ -110,6 +110,16 @@ describe Api::V1::OrganizationPagesController, type: :controller do
 
     it_behaves_like "is creatable"
 
+    it_behaves_like "it syncs the resource translation strings" do
+      let(:translated_klass_name) { OrganizationPage.name }
+      let(:translated_resource_id) { be_kind_of(Integer) }
+      let(:translated_language) do
+        create_params.dig(:organization_pages, :language)
+      end
+      let(:controller_action) { :create }
+      let(:controller_action_params) { create_params }
+    end
+
     it 'should set organization from the organization_id param' do
       default_request scopes: scopes, user_id: authorized_user.id
       post :create, create_params
@@ -130,6 +140,14 @@ describe Api::V1::OrganizationPagesController, type: :controller do
     end
 
     it_behaves_like "is updatable"
+
+    it_behaves_like "it syncs the resource translation strings" do
+      let(:translated_klass_name) { resource.class.name }
+      let(:translated_resource_id) { resource.id }
+      let(:translated_language) { resource.language }
+      let(:controller_action) { :update }
+      let(:controller_action_params) { update_params.merge(id: resource.id) }
+    end
   end
 
   describe "#destroy" do
