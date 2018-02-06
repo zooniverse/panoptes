@@ -42,7 +42,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
       super
 
       subject_ids.each_with_index do |subject_id, index|
-        SubjectRemovalWorker.perform_in(index.minute, subject_id)
+        SubjectRemovalWorker.perform_in(index.seconds, subject_id)
       end
     end
   end

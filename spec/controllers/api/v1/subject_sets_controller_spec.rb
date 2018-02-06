@@ -342,7 +342,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
     it 'should call the subject removal worker' do
       subject_set.subjects.each_with_index do |s, index|
-        expect(SubjectRemovalWorker).to receive(:perform_in).with(index.minute, s.id)
+        expect(SubjectRemovalWorker)
+          .to receive(:perform_in)
+          .with(index.seconds, s.id)
       end
       delete_resources
     end
