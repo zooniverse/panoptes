@@ -524,7 +524,7 @@ describe Project, type: :model do
         )
       end
 
-      it 'should return the owner by default' do
+      it 'should return the owner and comms roles emails' do
         expect(project.communication_emails).to match_array([owner_email, comms_user.email])
       end
     end
