@@ -505,6 +505,31 @@ describe Project, type: :model do
     end
   end
 
+  describe "#communication_emails" do
+    let(:project) { create(:project) }
+    let(:owner_email) { project.owner.email }
+
+    it 'should return the owner by default' do
+      expect(project.communication_emails).to match_array([owner_email])
+    end
+
+    context "with communication project roles" do
+      let(:comms_user) { create(:user) }
+      before do
+        create(
+          :access_control_list,
+          user_group: comms_user.identity_group,
+          resource: project,
+          roles: ["communications"]
+        )
+      end
+
+      it 'should return the owner and comms roles emails' do
+        expect(project.communication_emails).to match_array([owner_email, comms_user.email])
+      end
+    end
+  end
+
   describe "#keep_data_in_panoptes_only?" do
     it "should not return true when no private config" do
       expect(project.keep_data_in_panoptes_only?).to eq(false)
