@@ -34,7 +34,7 @@ module CsvDumps
     def completed_resource_classifications
       resource.classifications
         .complete
-        .joins(:workflow)
+        .joins(:workflow).where(workflows: {activated_state: "active"})
         .includes(:user, workflow: [:workflow_contents])
     end
 
