@@ -889,7 +889,7 @@ CREATE TABLE projects (
     primary_language character varying,
     private boolean,
     lock_version integer DEFAULT 0,
-    configuration jsonb,
+    configuration jsonb DEFAULT '{}'::jsonb NOT NULL,
     live boolean DEFAULT false NOT NULL,
     urls jsonb DEFAULT '[]'::jsonb,
     migrated boolean DEFAULT false,
@@ -4053,4 +4053,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180110133833');
 INSERT INTO schema_migrations (version) VALUES ('20180115214144');
 
 INSERT INTO schema_migrations (version) VALUES ('20180122134607');
+
+INSERT INTO schema_migrations (version) VALUES ('20180207120238');
 
