@@ -40,7 +40,7 @@ describe SubjectWorkflowCounter do
         expect(counter.classifications).to eq(2)
       end
 
-      context "with classifications that do not count", :disabled do
+      context "with classifications that do not count" do
         let(:default_attrs) do
           {
             subject_ids: [sws.subject_id],
