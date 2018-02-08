@@ -19,9 +19,47 @@ class SubjectWorkflowStatus < ActiveRecord::Base
 
   can_through_parent :workflow, :show, :index
 
+  # this is an optimized query to access the subject_id index on this table.
+  # It uses an IN query with a CTE to create a subselect to access
+  # the subject_id index as simple Joins do not use the index on this table
   def self.by_set(subject_set_id)
-    joins(:subject => :set_member_subjects)
-      .where(set_member_subjects: {subject_set_id: subject_set_id})
+    # create the CTE for reuse, e.g.
+    # sws_by_set AS (
+    #   SELECT set_member_subjects.subject_id
+    #   FROM set_member_subjects
+    #   WHERE set_member_subjects.subject_set_id = 1
+    # )
+    cte_table = Arel::Table.new(:sws_by_set)
+    smses_arel = SetMemberSubject.arel_table
+    composed_cte = Arel::Nodes::As.new(
+      cte_table,
+      smses_arel.where(
+        smses_arel[:subject_set_id].eq(subject_set_id)
+      ).project(smses_arel[:subject_id])
+    )
+
+    # create the select from CTE, e.g
+    # SELECT subject_id FROM sws_by_set
+    swses_arel = arel_table
+    select_manager = Arel::SelectManager.new(cte_table.engine)
+    select_manager.project(:subject_id)
+    select_manager.from("sws_by_set")
+
+    # create the where in clause matching the select from CTE, e.g.
+    # subject_workflow_counts.subject_id IN (SELECT subject_id FROM sws_by_set)
+    subquery_where = swses_arel[:subject_id].in(select_manager)
+
+    # put it all together and combine the in clause with the CTE, e.g.
+    # WITH sws_by_set AS (
+    #   SELECT set_member_subjects.subject_id
+    #   FROM set_member_subjects
+    #   WHERE set_member_subjects.subject_set_id = 1
+    # )
+    # SELECT subject_workflow_counts.*
+    # FROM subject_workflow_counts
+    # WHERE subject_workflow_counts.subject_id
+    # IN (SELECT subject_id FROM sws_by_set)
+    where(subquery_where).with(composed_cte)
   end
 
   def self.by_subject(subject_id)
