@@ -6,7 +6,7 @@ class WorkflowRetiredCountWorker
   sidekiq_options congestion: {
     interval: 10,
     max_in_interval: 1,
-    min_delay: 0,
+    min_delay: 10,
     reject_with: :reschedule,
     key: ->(workflow_id) { "workflow_#{workflow_id}_retired_count_worker" }
   }
