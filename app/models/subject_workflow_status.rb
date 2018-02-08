@@ -22,7 +22,7 @@ class SubjectWorkflowStatus < ActiveRecord::Base
   # this is an optimized query to access the subject_id index on this table.
   # It uses an IN query with a CTE to create a subselect to access
   # the subject_id index as simple Joins do not use the index on this table
-  def self.by_set(subject_set_id)
+  def self.by_set(subject_set_ids)
     # create the CTE for reuse, e.g.
     # sws_by_set AS (
     #   SELECT set_member_subjects.subject_id
@@ -34,7 +34,7 @@ class SubjectWorkflowStatus < ActiveRecord::Base
     composed_cte = Arel::Nodes::As.new(
       cte_table,
       smses_arel.where(
-        smses_arel[:subject_set_id].eq(subject_set_id)
+        smses_arel[:subject_set_id].in(subject_set_ids)
       ).project(smses_arel[:subject_id])
     )
 
