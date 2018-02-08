@@ -13,7 +13,7 @@ describe MediumSerializer do
         "/organizations/#{org.id}/attached_images/#{medium.id}"
       end
 
-      it "should return the attached image href", :focus do
+      it "should return the attached image href" do
         expect(result[:href]).to eq(medium_href)
       end
     end
