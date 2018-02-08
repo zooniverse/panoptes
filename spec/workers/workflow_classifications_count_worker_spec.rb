@@ -10,7 +10,7 @@ RSpec.describe WorkflowClassificationsCountWorker do
     opts = worker.class.get_sidekiq_options['congestion']
     expect(opts[:interval]).to eq(60)
     expect(opts[:max_in_interval]).to eq(1)
-    expect(opts[:min_delay]).to eq(10)
+    expect(opts[:min_delay]).to eq(60)
     expect(opts[:reject_with]).to eq(:reschedule)
   end
 
