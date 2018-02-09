@@ -502,9 +502,14 @@ describe Api::V1::UsersController, type: :controller do
       it_behaves_like "admin only attribute", :upload_whitelist, true
     end
 
-    describe "upload_whitelist" do
+    describe "banned" do
 
       it_behaves_like "admin only attribute", :banned, true
+    end
+
+    describe "valid_email" do
+
+      it_behaves_like "admin only attribute", :valid_email, true
     end
 
     context "when changing email" do
