@@ -40,14 +40,13 @@ class SubjectWorkflowStatus < ActiveRecord::Base
 
     # create the select from CTE, e.g
     # SELECT subject_id FROM sws_by_set
-    swses_arel = arel_table
     select_manager = Arel::SelectManager.new(cte_table.engine)
     select_manager.project(:subject_id)
     select_manager.from("sws_by_set")
 
     # create the where in clause matching the select from CTE, e.g.
     # subject_workflow_counts.subject_id IN (SELECT subject_id FROM sws_by_set)
-    subquery_where = swses_arel[:subject_id].in(select_manager)
+    subquery_where = arel_table[:subject_id].in(select_manager)
 
     # put it all together and combine the in clause with the CTE, e.g.
     # WITH sws_by_set AS (
