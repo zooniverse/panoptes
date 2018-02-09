@@ -41,8 +41,6 @@ class Api::V1::ProjectsController < Api::ApiController
     only: [:create, :update, :destroy, :create_classifications_export,
     :create_subjects_export, :create_workflows_export, :create_workflow_contents_export]
 
-  before_action :available_to_export, only: :create_classifications_export
-
   def index
     unless params.has_key?(:sort)
       @controlled_resources = case
@@ -182,14 +180,6 @@ class Api::V1::ProjectsController < Api::ApiController
   def primary_content_attributes(content_attributes)
     content_from_params(content_attributes.dup, CONTENT_FIELDS) do |ps|
       ps[:title] = ps[:display_name]
-    end
-  end
-
-  def available_to_export
-    if controlled_resource.keep_data_in_panoptes_only?
-      raise Api::DisabledDataExport.new(
-        "Data exports are disabled for this project"
-      )
     end
   end
 end

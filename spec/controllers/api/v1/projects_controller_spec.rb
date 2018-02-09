@@ -6,6 +6,7 @@ describe Api::V1::ProjectsController, type: :controller do
     create_list(:project_with_contents, 2, owner: user)
   end
   let(:project) { create(:project_with_contents, owner: user, state: "paused") }
+  let(:authorized_user) { user }
 
   let(:api_resource_name) { "projects" }
   let(:api_resource_attributes) do
@@ -818,8 +819,6 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:test_attr_value) { "project_classifications_export" }
 
       it_behaves_like "is creatable", :create_classifications_export
-
-      it_behaves_like "it forbids data exports"
     end
 
     describe "#create_subjects_export" do
