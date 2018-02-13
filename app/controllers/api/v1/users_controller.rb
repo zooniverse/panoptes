@@ -60,7 +60,9 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def index
-    if logins = params.delete(:login).try(:split, ',').try(:map, &:downcase)
+    if api_user.is_admin? and emails = params.delete(:email).try(:split, ',').try(:map, &:downcase)
+      @controlled_resources = controlled_resources.where(User.arel_table[:email].lower.in(logins))
+    elsif logins = params.delete(:login).try(:split, ',').try(:map, &:downcase)
       @controlled_resources = controlled_resources.where(User.arel_table[:login].lower.in(logins))
     end
     super
