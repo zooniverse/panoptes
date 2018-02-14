@@ -16,8 +16,8 @@ module JsonApiController
 
       resource_class.transaction(requires_new: true) do
         controlled_resources.each do |resource|
-          yield resource if block_given?
           resource.save!
+          yield resource if block_given?
         end
       end
 
