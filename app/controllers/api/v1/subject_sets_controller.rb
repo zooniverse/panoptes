@@ -45,9 +45,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
       end
     end
 
-
     reset_workflow_retired_counts(affected_workflow_ids)
-
     subject_ids.each_with_index do |subject_id, index|
       SubjectRemovalWorker.perform_in(index.seconds, subject_id)
     end
