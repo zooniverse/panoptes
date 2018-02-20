@@ -163,6 +163,7 @@ describe Api::V1::UsersController, type: :controller do
       let(:resource) { user }
 
       before(:each) do
+        default_request(scopes: scopes, user_id: user.id)
         get :index, index_options
       end
 
@@ -209,8 +210,10 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       context "as an admin user" do
-        let(:index_options) { { email: user.email, admin: true} }
         let(:user) { create(:user, admin: true) }
+        let(:index_options) do
+          { email: user.email, admin: true}
+        end
 
         describe "filter by email" do
           it "should respond with 1 item" do
