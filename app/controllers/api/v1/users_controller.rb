@@ -60,10 +60,14 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def index
-    if api_user.is_admin? && emails = params.delete(:email).try(:split, ',').try(:map, &:downcase)
-      @controlled_resources = controlled_resources.where(User.arel_table[:email].lower.in(emails))
-    elsif logins = params.delete(:login).try(:split, ',').try(:map, &:downcase)
-      @controlled_resources = controlled_resources.where(User.arel_table[:login].lower.in(logins))
+    if api_user.is_admin? && downcased_emails = downcase_filter_params(:email)
+      @controlled_resources = controlled_resources.where(
+        User.arel_table[:email].lower.in(downcased_emails)
+      )
+    elsif downcased_login = downcase_filter_params(:login)
+      @controlled_resources = controlled_resources.where(
+        User.arel_table[:login].lower.in(downcased_login)
+      )
     end
     super
   end
@@ -107,5 +111,11 @@ class Api::V1::UsersController < Api::ApiController
     UserProjectPreference
      .where(user_id: user.id)
      .update_all(email_communication: false)
+  end
+
+  def downcase_filter_params(key)
+    if param_value = params.delete(key)
+      param_value.split(',').map(&:downcase)
+    end
   end
 end
