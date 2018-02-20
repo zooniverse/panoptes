@@ -29,22 +29,30 @@ class Api::V1::SubjectSetsController < Api::ApiController
     end
   end
 
+  # avoid calling destroy_all on each controlled_resource
+  # to optimize sets and linked relation cleanup
   def destroy
+    subject_ids = []
+    affected_workflow_ids = []
     resource_class.transaction(requires_new: true) do
-      smses = controlled_resource.set_member_subjects
-      subject_ids = smses.map(&:subject_id)
-      remove_linked_set_member_subjects(smses)
-      reset_subject_set_workflow_counts(controlled_resource)
-      controlled_resource.subject_sets_workflows.delete_all
-      #avoid optimisitc locking errors
-      controlled_resource.reload
-
-      super
-
-      subject_ids.each_with_index do |subject_id, index|
-        SubjectRemovalWorker.perform_in(index.seconds, subject_id)
+      controlled_resources.each do |subject_set|
+        smses = subject_set.set_member_subjects
+        subject_ids.concat(smses.map(&:subject_id))
+        remove_linked_set_member_subjects(smses)
+        affected_workflow_ids.concat(controlled_resource.workflows.pluck(:id))
+        controlled_resource.subject_sets_workflows.delete_all
+        controlled_resource.delete
       end
     end
+
+
+    reset_workflow_retired_counts(affected_workflow_ids)
+
+    subject_ids.each_with_index do |subject_id, index|
+      SubjectRemovalWorker.perform_in(index.seconds, subject_id)
+    end
+
+    deleted_resource_response
   end
 
   def destroy_links
@@ -97,7 +105,8 @@ class Api::V1::SubjectSetsController < Api::ApiController
       linked_sms_ids = value.split(',').map(&:to_i)
       set_member_subjects = resource.set_member_subjects.where(subject_id: linked_sms_ids)
       remove_linked_set_member_subjects(set_member_subjects)
-      reset_subject_set_workflow_counts(controlled_resource)
+
+      reset_workflow_retired_counts(controlled_resource.workflows.pluck(:id))
     else
       super
     end
@@ -109,8 +118,8 @@ class Api::V1::SubjectSetsController < Api::ApiController
     set_member_subjects.delete_all
   end
 
-  def reset_subject_set_workflow_counts(subject_set)
-    subject_set.workflows.pluck(:id).each do |w_id|
+  def reset_workflow_retired_counts(workflow_ids)
+    workflow_ids.each do |w_id|
       WorkflowRetiredCountWorker.perform_async(w_id)
     end
   end
