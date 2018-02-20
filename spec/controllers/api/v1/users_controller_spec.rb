@@ -192,6 +192,30 @@ describe Api::V1::UsersController, type: :controller do
         end
       end
 
+      describe "filter by email" do
+        let(:index_options) { { login: user.email} }
+
+        it "should respond with 1 item" do
+          expect(json_response[api_resource_name].length).to eq(1)
+        end
+
+        it "should respond with the correct item" do
+          expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+        end
+      end
+
+      describe "filter by case insensitive email" do
+        let(:index_options) { { login: user.email.upcase } }
+
+        it "should respond with 1 item" do
+          expect(json_response[api_resource_name].length).to eq(1)
+        end
+
+        it "should respond with the correct item" do
+          expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+        end
+      end
+
       describe "include avatars" do
         let(:index_options) { { include: 'avatar' } }
 
