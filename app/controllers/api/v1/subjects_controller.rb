@@ -39,12 +39,15 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def destroy
-    super do |subject|
-      begin
+    super
+
+    begin
+      # use the memoized non-destroyed resource ids to setup a worker
+      controlled_resources.each do |subject|
         SubjectRemovalWorker.perform_async(subject.id)
-      rescue Timeout::Error => e
-        Honeybadger.notify(e)
       end
+    rescue Timeout::Error => e
+      Honeybadger.notify(e)
     end
   end
 
