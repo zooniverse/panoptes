@@ -13,12 +13,11 @@ class Api::V1::SetMemberSubjectsController < Api::ApiController
   end
 
   def destroy
-    resource_class.transaction(requires_new: true) do
-      set_id = controlled_resource.subject_set_id
-      subject_id = controlled_resource.subject_id
-      super
-      update_set_counts(set_id)
-      SubjectRemovalWorker.perform_async(subject_id)
+    super
+    # use the memoized non-destroyed resource ids to setup a worker
+    controlled_resources.each do |sms|
+      update_set_counts(sms.subject_set_id)
+      SubjectRemovalWorker.perform_async(sms.subject_id)
     end
   end
 
