@@ -192,27 +192,47 @@ describe Api::V1::UsersController, type: :controller do
         end
       end
 
-      describe "filter by email" do
+      describe "filter by email (non-admin)" do
         let(:index_options) { { email: user.email} }
 
-        it "should respond with 1 item" do
-          expect(json_response[api_resource_name].length).to eq(1)
-        end
-
-        it "should respond with the correct item" do
-          expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+        it "should respond with 2 items" do
+          expect(json_response[api_resource_name].length).to eq(2)
         end
       end
 
-      describe "filter by case insensitive email" do
+      describe "filter by case insensitive email (non-admin)" do
         let(:index_options) { { email: user.email.upcase } }
 
-        it "should respond with 1 item" do
-          expect(json_response[api_resource_name].length).to eq(1)
+        it "should respond with 2 items" do
+          expect(json_response[api_resource_name].length).to eq(2)
+        end
+      end
+
+      context "as an admin user" do
+        let(:user) { create(:user, admin: true) }
+
+        describe "filter by email" do
+          let(:index_options) { { email: user.email, admin: true} }
+
+          it "should respond with 1 item" do
+            expect(json_response[api_resource_name].length).to eq(1)
+          end
+
+          it "should respond with the correct item" do
+            expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+          end
         end
 
-        it "should respond with the correct item" do
-          expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+        describe "filter by case insensitive email" do
+          let(:index_options) { { email: user.email.upcase, admin: true } }
+
+          it "should respond with 1 item" do
+            expect(json_response[api_resource_name].length).to eq(1)
+          end
+
+          it "should respond with the correct item" do
+            expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+          end
         end
       end
 
