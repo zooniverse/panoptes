@@ -209,11 +209,10 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       context "as an admin user" do
+        let(:index_options) { { email: user.email, admin: true} }
         let(:user) { create(:user, admin: true) }
 
         describe "filter by email" do
-          let(:index_options) { { email: user.email, admin: true} }
-
           it "should respond with 1 item" do
             expect(json_response[api_resource_name].length).to eq(1)
           end
@@ -224,8 +223,6 @@ describe Api::V1::UsersController, type: :controller do
         end
 
         describe "filter by case insensitive email" do
-          let(:index_options) { { email: user.email.upcase, admin: true } }
-
           it "should respond with 1 item" do
             expect(json_response[api_resource_name].length).to eq(1)
           end
