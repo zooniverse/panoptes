@@ -69,8 +69,7 @@ class Api::V1::UsersController < Api::ApiController
   def destroy
     sign_out_current_user!
     revoke_doorkeeper_request_token!
-    UserInfoScrubber.scrub_personal_info!(user)
-    super
+    super { |user| UserInfoScrubber.scrub_personal_info!(user) }
   end
 
   def build_update_hash(update_params, id)
