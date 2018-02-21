@@ -15,14 +15,12 @@ module Formatter
 
       def to_rows(subject)
         @subject = subject
+        reset_the_sws_memoizer_for_the_new_subject
 
         rows = []
 
-        workflow_ids = @project_workflow_ids.present? ? @project_workflow_ids.sort : [nil]
-        subject_set_ids = subject.subject_set_ids.present? ? subject.subject_set_ids.sort : [nil]
-
-        workflow_ids.each do |workflow_id|
-          subject_set_ids.each do |subject_set_id|
+        sorted_project_workflow_ids.each do |workflow_id|
+          sorted_subject_set_ids(subject).each do |subject_set_id|
             rows << HashWithIndifferentAccess.new(
               subject_id: subject_id,
               project_id: project_id,
@@ -46,12 +44,28 @@ module Formatter
         subject.id
       end
 
+      def sorted_subject_set_ids(subject)
+        if subject.subject_set_ids.present?
+          subject.subject_set_ids.sort
+        else
+          [nil]
+        end
+      end
+
       def subject_set_ids
         subject.subject_set_ids.to_json
       end
 
       def project_id
         project.id
+      end
+
+      def sorted_project_workflow_ids
+        if @project_workflow_ids.present?
+          @project_workflow_ids.sort
+        else
+          [nil]
+        end
       end
 
       def workflow_ids
@@ -85,8 +99,13 @@ module Formatter
         subject_workflow_status&.classifications_count || 0
       end
 
+      def reset_the_sws_memoizer_for_the_new_subject
+        @subject_workflow_statuses = nil
+      end
+
       def subject_workflow_statuses
-        @swses ||= SubjectWorkflowStatus.by_subject(subject.id)
+        @subject_workflow_statuses ||=
+          SubjectWorkflowStatus.by_subject(subject.id)
           .where(workflow_id: project_workflow_ids)
           .to_a
           .index_by(&:workflow_id)

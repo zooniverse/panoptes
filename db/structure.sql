@@ -302,7 +302,6 @@ CREATE TABLE collections (
     lock_version integer DEFAULT 0,
     slug character varying DEFAULT ''::character varying,
     favorite boolean DEFAULT false NOT NULL,
-    project_ids integer[] DEFAULT '{}'::integer[],
     default_subject_id integer,
     description text DEFAULT ''::text
 );
@@ -2447,13 +2446,6 @@ CREATE INDEX index_collections_on_private ON collections USING btree (private);
 
 
 --
--- Name: index_collections_on_project_ids; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_collections_on_project_ids ON collections USING gin (project_ids);
-
-
---
 -- Name: index_collections_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4051,6 +4043,8 @@ INSERT INTO schema_migrations (version) VALUES ('20171214121332');
 INSERT INTO schema_migrations (version) VALUES ('20180110133833');
 
 INSERT INTO schema_migrations (version) VALUES ('20180115214144');
+
+INSERT INTO schema_migrations (version) VALUES ('20180119110708');
 
 INSERT INTO schema_migrations (version) VALUES ('20180122134607');
 

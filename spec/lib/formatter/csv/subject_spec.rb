@@ -86,5 +86,23 @@ RSpec.describe Formatter::Csv::Subject do
         expect(result).to match_array(expected)
       end
     end
+
+    describe "on reuse of the formatter for the next subject" do
+      let(:next_subject) do
+        create(:subject, :with_mediums, project: project, uploader: project.owner)
+      end
+      let(:formatter) { described_class.new(project) }
+
+      before do
+        create(:set_member_subject, subject_set: subject_set, subject: next_subject)
+      end
+
+      it "should not memoize any data and have 0 counts on the second run" do
+        first_result = formatter.to_rows(subject)
+        second_result = formatter.to_rows(next_subject)
+        classification_counts = second_result.map { |result| result[6] }
+        expect(classification_counts).to match_array([0,0])
+      end
+    end
   end
 end

@@ -678,34 +678,20 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     context "when unsubscribing from project emails" do
-      let(:project_email_comms) { false }
       let(:put_operations) do
-        { users: { project_email_communication: project_email_comms } }
+        { users: { project_email_communication: false } }
       end
       let(:user_project_preferences) do
         create(:user_project_preference, user: user)
       end
 
-      it "should unsubscribe all the user project emails prefs when false" do
+      it "should not modify any of the user project emails prefs" do
         user_project_preferences
         expect {
           update_request
-        }.to change {
+        }.not_to change {
           user_project_preferences.reload.email_communication
-        }.from(true).to(false)
-      end
-
-      context "when the unsubscribe email prefs is true" do
-        let(:project_email_comms) { true }
-
-        it "should not unsubscribe all the user project emails prefs when false" do
-          user_project_preferences
-          expect {
-            update_request
-          }.not_to change {
-            user_project_preferences.reload.email_communication
-          }
-        end
+        }
       end
     end
   end
