@@ -52,12 +52,12 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 0. Install Docker from the appropriate link above.
 
-0.  + **If you have an existing Panoptes Docker container, or if your Gemfile or Ruby version has changed,** run `docker-compose build` to rebuild the containers.
+0.  + **If you have an existing Panoptes Docker container or if your Dockerfile.dev has changed,** run `docker-compose build` to rebuild the containers.
     + Otherwise, create and run the application containers by running `docker-compose up`
 
-0. After step 5 finishes, open a new terminal and run `docker-compose run --rm --entrypoint=rake panoptes db:setup` to setup the database. This will launch a new Docker container, run the rake DB setup task, and then clean up the container.
+0. After step 5 finishes (most likely with a missing db error), open a new terminal and run `docker-compose run --rm --entrypoint="bundle exec rake db:setup" panoptes` to setup the database. This will launch a new Docker container, run the rake DB setup task, and then clean up the container.
 
-0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `docker-compose run --rm --entrypoint=rails panoptes runner db/fig_dev_seed_data/fig_dev_seed_data.rb`
+0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `docker-compose run --rm --entrypoint="bundle exec rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb" panoptes`
 
 0. Open up the application in your browser:
   + It should be running on http://localhost:3000
@@ -76,9 +76,9 @@ There are multiple options for setting up a testing environment:
 
 0. Run it entirely from within docker-compose:
 
-    0. Create config files if you don't already have them, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint=rake panoptes configure:local`
-    0. To create the testing database, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint=rake panoptes db:setup`.
-    0. Run the full spec suite `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint=rspec panoptes`. Note: this will be slow. Use rspec focus set or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="rspec path/to/spec/file.rb" panoptes`
+    0. Create config files if you don't already have them, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint="bundle exec rake configure:local" panoptes`
+    0. To create the testing database, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint="bundle exec rake db:setup" panoptes`.
+    0. Run the full spec suite `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes`. Note: this will be slow. Use rspec focus set or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="rspec path/to/spec/file.rb" panoptes`
 
 0. Use parts of docker-compose manually and wire them up manually to create a testing environment.
 
