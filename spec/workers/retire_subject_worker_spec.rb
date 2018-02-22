@@ -36,7 +36,7 @@ RSpec.describe RetireSubjectWorker do
     end
 
     it 'queues a workflow retired counter' do
-      expect(WorkflowRetiredCountWorker).to receive(:perform_async).with(workflow.id)
+      expect(RefreshWorkflowStatusWorker).to receive(:perform_async).with(workflow.id)
       worker.perform(workflow.id, [sms.subject_id])
     end
 
@@ -48,7 +48,7 @@ RSpec.describe RetireSubjectWorker do
     it 'does not queue workers if something went wrong' do
       allow(Workflow).to receive(:find).and_return(workflow)
       allow(workflow).to receive(:retire_subject).with(sms.subject_id, nil) { raise "some error" }
-      expect(WorkflowRetiredCountWorker).not_to receive(:perform_async)
+      expect(RefreshWorkflowStatusWorker).not_to receive(:perform_async)
       expect(NotifySubjectSelectorOfRetirementWorker).not_to receive(:perform_async)
       expect {
         worker.perform(workflow.id, [sms.subject_id])
