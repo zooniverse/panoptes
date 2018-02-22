@@ -30,14 +30,14 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def update_links
     super do |workflow|
-      UnfinishWorkflowWorker.perform_async(workflow.id)
-      WorkflowRetiredCountWorker.perform_async(workflow.id)
       post_link_actions(workflow)
     end
   end
 
   def destroy_links
-    super { |workflow| post_link_actions(workflow) }
+    super do |workflow|
+      post_link_actions(workflow)
+    end
   end
 
   def retire_subjects
@@ -82,17 +82,13 @@ class Api::V1::WorkflowsController < Api::ApiController
   # be easily located in specific controller actions
   def post_link_actions(workflow)
     if workflow.set_member_subjects.exists?
+      RefreshWorkflowStatusWorker.perform_async(workflow.id)
       case relation
-      when :retired_subjects, 'retired_subjects'
+      when /\Aretired_subjects\z/
         params[:retired_subjects].each do |subject_id|
           NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
         end
-      when :subject_sets, 'subject_sets'
-        # these calls calculate the completeness worker
-        # are in a race with the other counter in update_links
-        # WorkflowRetiredCountWorker, simple effort, perahps just delay it for a bit?
-        # how long does a retired counter run for?
-        CalculateProjectCompletenessWorker.perform_async(workflow.project_id)
+      when /\Asubject_sets\z/
         NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
       end
     end
