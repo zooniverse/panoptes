@@ -43,15 +43,6 @@ RSpec.describe SubjectWorkflowStatus, type: :model do
     end
   end
 
-  describe '#by_set' do
-    it 'retrieves by subject association' do
-      sms = create(:set_member_subject)
-      sws = create(:subject_workflow_status, subject_id: sms.subject_id)
-      query = SubjectWorkflowStatus.by_set(sms.subject_set_id, "COUNT(*)")
-      expect(ActiveRecord::Base.connection.execute(query.to_sql).to_a[0]["count"].to_i).to eq(1)
-    end
-  end
-
   describe '#by_subject_workflow' do
     it 'retrieves by subject association' do
       sms = create(:set_member_subject)
