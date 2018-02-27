@@ -11,7 +11,7 @@ class UserGroup < ActiveRecord::Base
   has_many :classifications, dependent: :restrict_with_exception
   has_many :access_control_lists, dependent: :destroy
 
-  has_many :owned_resources, -> { where.overlap(roles: ["owner"]) },
+  has_many :owned_resources, -> { where("roles && '{owner}'") },
            class_name: "AccessControlList"
 
   has_many :projects, through: :owned_resources, source: :resource,

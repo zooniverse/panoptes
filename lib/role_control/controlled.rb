@@ -31,7 +31,7 @@ module RoleControl
           .where(user_group_id: user_group_memberships)
           .where(resource_type: model_name.name)
           .select(:resource_id)
-          .where.overlap(roles: roles)
+          .where("roles && ARRAY[?]::varchar[]", roles)
       end
 
       def user_can_access_scope(private_query, public_flag)

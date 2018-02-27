@@ -10,7 +10,7 @@ class Collection < ActiveRecord::Base
   has_and_belongs_to_many :projects
   has_many :collections_subjects, dependent: :destroy
   has_many :subjects, through: :collections_subjects
-  has_many :collection_roles, -> { where.not(roles: []) }, class_name: "AccessControlList", as: :resource
+  has_many :collection_roles, -> { where.not("access_control_lists.roles = '{}'") }, class_name: "AccessControlList", as: :resource
   has_many :user_collection_preferences, dependent: :destroy
   belongs_to :default_subject, :class_name => "Subject"
 

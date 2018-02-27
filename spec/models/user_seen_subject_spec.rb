@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 def created_uss
-  UserSeenSubject.where(params.except(:subject)).first
+  query = UserSeenSubject.where(params.except(:subject, :subject_ids))
+  query = query.where("subject_ids = ARRAY[?]::int[]", params[:subject_ids]) if params.key?(:subject_ids)
+  query.first
 end
 
 RSpec.describe UserSeenSubject, :type => :model do

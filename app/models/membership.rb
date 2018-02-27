@@ -6,7 +6,7 @@ class Membership < ActiveRecord::Base
   enum state: [:active, :invited, :inactive]
 
   scope :active, -> { where(state: states[:active]) }
-  scope :identity, -> { active.where(identity: true, roles: ["group_admin"]) }
+  scope :identity, -> { active.where(identity: true).where("memberships.roles = '{group_admin}'") }
   scope :not_identity, -> { where(identity: false) }
 
   validates_presence_of :user, unless: :identity
@@ -29,7 +29,7 @@ class Membership < ActiveRecord::Base
   def self.scope_for(action, user, opts={})
     return all if user.is_admin?
     roles, _ = parent_class.roles(action)
-    accessible_group_ids = user.user_groups.where.overlap(memberships: {roles: roles}).select(:id)
+    accessible_group_ids = user.user_groups.where("memberships.roles && ARRAY[?]::varchar[]", roles).select(:id)
     query = not_identity.where(user_group_id: accessible_group_ids)
             .or(not_identity.where(user_id: user.id))
 
