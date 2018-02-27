@@ -22,7 +22,7 @@ class SubjectWorkflowStatus < ActiveRecord::Base
   # this is an optimized query to access the subject_id index on this table.
   # It uses an IN query with a CTE to create a subselect to access
   # the subject_id index as simple Joins do not use the index on this table
-  def self.by_set(subject_set_ids)
+  def self.by_set(subject_set_ids, select)
     # create the CTE for reuse, e.g.
     # sws_by_set AS (
     #   SELECT set_member_subjects.subject_id
@@ -58,7 +58,9 @@ class SubjectWorkflowStatus < ActiveRecord::Base
     # FROM subject_workflow_counts
     # WHERE subject_workflow_counts.subject_id
     # IN (SELECT subject_id FROM sws_by_set)
-    where(subquery_where).with(composed_cte)
+    where(subquery_where)
+      .select(select)
+      .with(composed_cte)
   end
 
   def self.by_subject(subject_id)
