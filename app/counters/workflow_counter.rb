@@ -36,7 +36,7 @@ class WorkflowCounter
   # this is an optimized query to access the subject_id index on this table.
   # It uses an IN query with a CTE to create a subselect to access
   # the subject_id index as simple Joins do not use the index on this table
-  #
+  # E.g
   # WITH sws_by_set AS (
   #   SELECT set_member_subjects.subject_id
   #   FROM set_member_subjects
