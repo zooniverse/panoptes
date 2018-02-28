@@ -7,24 +7,17 @@ class WorkflowCounter
   end
 
   def classifications
-    rows = sws_query do |query|
-      query.where(
-        SubjectWorkflowStatus.arel_table[:workflow_id].eq(workflow.id)
-      )
+    sws_query("sum") do |query|
       query.select("SUM(classifications_count)")
     end
-    rows[0]["sum"].to_i
   end
 
   def retired_subjects
-    rows = sws_query do |query|
-      query.where(
-        SubjectWorkflowStatus.arel_table[:workflow_id].eq(workflow.id),
-        SubjectWorkflowStatus.arel_table[:retired_at].not_eq(nil)
-      )
-      query.select("COUNT(*)")
+    sws_query("count") do |query|
+      query
+      .where(SubjectWorkflowStatus.arel_table[:retired_at].not_eq(nil))
+      .select("COUNT(*)")
     end
-    rows[0]["count"].to_i
   end
 
   private
@@ -46,16 +39,21 @@ class WorkflowCounter
   # FROM subject_workflow_counts
   # WHERE subject_workflow_counts.subject_id
   # IN (SELECT subject_id FROM sws_by_set)
-  def sws_query
-    cte = sws_by_set_cte(workflow.subject_sets.pluck(:id))
-    select_manager = sws_by_set_select
-    query = SubjectWorkflowStatus.where(select_manager)
+  def sws_query(select_field)
+    query = SubjectWorkflowStatus
+      .where(sws_by_set_select)
+      .where(
+        SubjectWorkflowStatus.arel_table[:workflow_id].eq(workflow.id)
+      )
 
-    # yield to construct the specific select and where clauses
+    # yield to construct the specific select clause
     query = yield(query)
 
+    cte = sws_by_set_cte(workflow.subject_sets.pluck(:id))
     query = query.with(cte)
-    SubjectWorkflowStatus.connection.execute(query.to_sql)
+
+    rows = SubjectWorkflowStatus.connection.execute(query.to_sql)
+    rows.first[select_field].to_i
   end
 
   # create the CTE for reuse, e.g.
