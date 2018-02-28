@@ -7,20 +7,22 @@ class WorkflowCounter
   end
 
   def classifications
-    rows = sws_query("SUM(classifications_count)") do |query|
+    rows = sws_query do |query|
       query.where(
         SubjectWorkflowStatus.arel_table[:workflow_id].eq(workflow.id)
       )
+      query.select("SUM(classifications_count)")
     end
     rows[0]["sum"].to_i
   end
 
   def retired_subjects
-    rows = sws_query("COUNT(*)") do |query|
+    rows = sws_query do |query|
       query.where(
         SubjectWorkflowStatus.arel_table[:workflow_id].eq(workflow.id),
         SubjectWorkflowStatus.arel_table[:retired_at].not_eq(nil)
       )
+      query.select("COUNT(*)")
     end
     rows[0]["count"].to_i
   end
@@ -44,14 +46,14 @@ class WorkflowCounter
   # FROM subject_workflow_counts
   # WHERE subject_workflow_counts.subject_id
   # IN (SELECT subject_id FROM sws_by_set)
-  def sws_query(select_clause)
+  def sws_query
     cte = sws_by_set_cte(workflow.subject_sets.pluck(:id))
     select_manager = sws_by_set_select
     query = SubjectWorkflowStatus.where(select_manager)
 
+    # yield to construct the specific select and where clauses
     query = yield(query)
 
-    query = query.select(select_clause)
     query = query.with(cte)
     SubjectWorkflowStatus.connection.execute(query.to_sql)
   end
