@@ -113,6 +113,6 @@ Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panop
 
 ## License
 
-Copyright 2014-2016 by the Zooniverse
+Copyright 2014-2018 by the Zooniverse
 
 Distributed under the Apache Public License v2. See LICENSE
