@@ -58,10 +58,6 @@ group :production, :staging do
   gem 'newrelic_rpm'
 end
 
-group :development do
-  gem 'fig_rake', '~> 0.9.3'
-end
-
 group :development, :test do
   gem 'foreman'
   gem 'pry-byebug'
