@@ -10,7 +10,12 @@ module JsonApiController
     end
 
     def destroy
-      controlled_resources.destroy_all
+      resource_class.transaction(requires_new: true) do
+        controlled_resources.each do |resource|
+          yield resource if block_given?
+          resource.destroy
+        end
+      end
       deleted_resource_response
     end
 

@@ -9,10 +9,12 @@ module JsonApiController
     end
 
     def destroy
-      Activation.disable_instances!(to_disable)
+      resource_class.transaction(requires_new: true) do
+        Activation.disable_instances!(to_disable)
 
-      to_disable.each do |resource|
-        yield resource if block_given?
+        to_disable.each do |resource|
+          yield resource if block_given?
+        end
       end
 
       deleted_resource_response
