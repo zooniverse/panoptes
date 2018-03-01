@@ -32,14 +32,14 @@ class Api::V1::SubjectSetsController < Api::ApiController
   # avoid calling destroy_all on each controlled_resource
   # to optimize sets and linked relation cleanup
   def destroy
-    subject_ids = []
-    affected_workflow_ids = []
+    subject_ids = Set.new
+    affected_workflow_ids = Set.new
     resource_class.transaction(requires_new: true) do
       controlled_resources.each do |subject_set|
         smses = subject_set.set_member_subjects
-        subject_ids.concat(smses.map(&:subject_id))
+        subject_ids |= smses.map(&:subject_id)
         remove_linked_set_member_subjects(smses)
-        affected_workflow_ids.concat(controlled_resource.workflows.pluck(:id))
+        affected_workflow_ids |= controlled_resource.workflows.pluck(:id)
         controlled_resource.subject_sets_workflows.delete_all
         controlled_resource.delete
       end
