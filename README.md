@@ -48,13 +48,13 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 0. Run `docker-compose build` to build the containers Panoptes API container. You will need to re-run this command on any changes to `Dockerfile.dev`
 
 0. Install the gem dependencies for the application
-  + Run: `docker-compose run --rm --entrypoint="bundle install" panoptes`
+  * Run: `docker-compose run --rm --entrypoint="bundle install" panoptes`
 
 0. Setup the configuration files via a rake task
-  + Run: `docker-compose run --rm --entrypoint="bundle exec rake configure:local" panoptes`
-  + Run: `docker-compose run --rm --entrypoint="bundle exec rake configure:doorkeeper_keys" panoptes`
-  + Alternatively, manually copy the example configuration files and setup the doorkeeper keys.
-    + Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
+  * Run: `docker-compose run --rm --entrypoint="bundle exec rake configure:local" panoptes`
+  * Run: `docker-compose run --rm --entrypoint="bundle exec rake configure:doorkeeper_keys" panoptes`
+  * Alternatively, manually copy the example configuration files and setup the doorkeeper keys.
+    * Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
 
 0. Create and run the application containers with `docker-compose up`
 
@@ -74,11 +74,11 @@ There are multiple options for setting up a testing environment:
 
   1. Run `docker-compose build` to build the panoptes container.
   0. Install the gem dependencies for the application
-    + Run: `docker-compose run --rm --entrypoint="bundle install" panoptes`
+    * Run: `docker-compose run --rm --entrypoint="bundle install" panoptes`
   0. Create config files if you don't already have them, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint="bundle exec rake configure:local" panoptes`
   0. To create the testing database, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint="bundle exec rake db:setup" panoptes`
   0. Run the full spec suite `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes` noting that running all tests is slow.
-    + Use rspec focus keyword in your specs or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="rspec path/to/spec/file.rb" panoptes`
+    * Use rspec focus keyword in your specs or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="rspec path/to/spec/file.rb" panoptes`
 
 0. Use parts of docker-compose manually and wire them up manually to create a testing environment.
 
