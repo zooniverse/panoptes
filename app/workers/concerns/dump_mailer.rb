@@ -1,8 +1,10 @@
-module DumpMailerWorker
-  extend ActiveSupport::Concern
+class DumpMailer
+  attr_reader :resource, :medium, :dump_target
 
-  included do
-    set_callback :dump, :after, :send_email
+  def initialize(resource, medium, dump_target)
+    @resource = resource
+    @medium = medium
+    @dump_target = dump_target
   end
 
   def send_email

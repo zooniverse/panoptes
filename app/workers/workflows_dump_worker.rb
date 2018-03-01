@@ -2,13 +2,10 @@ require 'csv'
 
 class WorkflowsDumpWorker
   include Sidekiq::Worker
-  include DumpMailerWorker
   include RateLimitDumpWorker
 
   sidekiq_options queue: :data_high
 
-  include ActiveSupport::Callbacks
-  define_callbacks :dump
   attr_reader :resource, :medium, :scope, :processor
 
   def perform(resource_id, resource_type, medium_id=nil, requester_id=nil, *args)
@@ -18,10 +15,8 @@ class WorkflowsDumpWorker
       @medium = CsvDumps::FindsMedium.new(medium_id, @resource, dump_target).medium
       scope = get_scope(resource)
       @processor = CsvDumps::DumpProcessor.new(formatter, scope, medium)
-
-      run_callbacks :dump do
-        @processor.execute
-      end
+      @processor.execute
+      DumpMailer.new(resource, medium, dump_target).send_email
     end
   end
 
