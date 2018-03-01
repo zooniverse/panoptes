@@ -70,11 +70,15 @@ Once all the above steps complete you will have a working copy of the checked ou
 
 There are multiple options for setting up a testing environment:
 
-0. Run it entirely from within docker-compose:
+1. Run it entirely from within docker-compose:
 
-    0. Create config files if you don't already have them, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint="bundle exec rake configure:local" panoptes`
-    0. To create the testing database, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint="bundle exec rake db:setup" panoptes`.
-    0. Run the full spec suite `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes`. Note: this will be slow. Use rspec focus set or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="rspec path/to/spec/file.rb" panoptes`
+  1. Run `docker-compose build` to build the panoptes container.
+  0. Install the gem dependencies for the application
+    + Run: `docker-compose run --rm --entrypoint="bundle install" panoptes`
+  0. Create config files if you don't already have them, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint="bundle exec rake configure:local" panoptes`
+  0. To create the testing database, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint="bundle exec rake db:setup" panoptes`
+  0. Run the full spec suite `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes` noting that running all tests is slow.
+    + Use rspec focus keyword in your specs or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="rspec path/to/spec/file.rb" panoptes`
 
 0. Use parts of docker-compose manually and wire them up manually to create a testing environment.
 
@@ -83,11 +87,12 @@ There are multiple options for setting up a testing environment:
     docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes
     ```
 
-0. Assuming you have a Ruby environment already setup:
+0. Assuming you have the correct Ruby environment already setup:
 
-    0. Run `bundle install`
+    1. Run `bundle install`
     0. Start the docker Postgres container by running `docker-compose run -d --name postgres --service-ports postgres`
-    0. Modify your `config/database.yml` test env to point to the running Postgres container, e.g. `host: localhost`
+      + You can run your own postgres server instead.
+    0. Modify your `config/database.yml` test env to point to the running Postgres server, e.g. `host: localhost`
     0. Setup the testing database if you haven't already, by running `RAILS_ENV=test rake db:setup`
     0. Finally, run rspec with `RAILS_ENV=test rspec`
 
