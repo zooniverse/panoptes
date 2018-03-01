@@ -90,8 +90,7 @@ There are multiple options for setting up a testing environment:
 0. Assuming you have the correct Ruby environment already setup:
 
     1. Run `bundle install`
-    0. Start the docker Postgres container by running `docker-compose run -d --name postgres --service-ports postgres`
-      + You can run your own postgres server instead.
+    0. Start the docker Postgres container by running `docker-compose run -d --name postgres --service-ports postgres` or run your own
     0. Modify your `config/database.yml` test env to point to the running Postgres server, e.g. `host: localhost`
     0. Setup the testing database if you haven't already, by running `RAILS_ENV=test rake db:setup`
     0. Finally, run rspec with `RAILS_ENV=test rspec`
