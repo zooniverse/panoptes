@@ -39,7 +39,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
         smses = subject_set.set_member_subjects
         subject_ids |= smses.map(&:subject_id)
         remove_linked_set_member_subjects(smses)
-        affected_workflow_ids |= controlled_resource.workflows.pluck(:id)
+        affected_workflow_ids |= controlled_resource.workflow_ids
         controlled_resource.subject_sets_workflows.delete_all
         controlled_resource.delete
       end
