@@ -39,36 +39,32 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 #### Usage
 
-0. Clone the repository `git clone https://github.com/zooniverse/Panoptes`.
-
-0. `cd` into the cloned folder.
-
-0. Setup the configuration files via a rake task
-  + Run: `rake configure:local`
-
-  Or manually copy the example configuration files and setup the doorkeeper keys.
-  + Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
-  + Run: `rake configure:doorkeeper_keys`
+1. Clone the repository `git clone https://github.com/zooniverse/Panoptes`.
 
 0. Install Docker from the appropriate link above.
 
-0.  + **If you have an existing Panoptes Docker container or if your Dockerfile.dev has changed,** run `docker-compose build` to rebuild the containers.
-    + Otherwise, create and run the application containers by running `docker-compose up`
+0. `cd` into the cloned folder.
 
-0. After step 5 finishes (most likely with a missing db error), open a new terminal and run `docker-compose run --rm --entrypoint="bundle exec rake db:setup" panoptes` to setup the database. This will launch a new Docker container, run the rake DB setup task, and then clean up the container.
+0. Run `docker-compose build` to build the containers Panoptes API container. You will need to re-run this command on any changes to `Dockerfile.dev`
+
+0. Install the gem dependencies for the application
+  + Run: `docker-compose run --rm --entrypoint="bundle install" panoptes`
+
+0. Setup the configuration files via a rake task
+  + Run: `docker-compose run --rm --entrypoint="bundle exec rake configure:local" panoptes`
+  + Run: `docker-compose run --rm --entrypoint="bundle exec rake configure:doorkeeper_keys" panoptes`
+  + Alternatively, manually copy the example configuration files and setup the doorkeeper keys.
+    + Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
+
+0. Create and run the application containers with `docker-compose up`
+
+0. If the above step reports a missing database error, kill the docker-compose process or open a new terminal window in the current directory and then run `docker-compose run --rm --entrypoint="bundle exec rake db:setup" panoptes` to setup the database. This command will launch a new Docker container, run the rake DB setup task, and then clean up the container.
 
 0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `docker-compose run --rm --entrypoint="bundle exec rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb" panoptes`
 
-0. Open up the application in your browser:
-  + It should be running on http://localhost:3000
-  + If it's not and you're on a Mac, run `docker ps`, and find the IP address where the `panoptes_panoptes` image is running. E.g.: 0.0.0.0:3000->3000/tcp means running on localhost at port 3000.
+0. Open up the application in your browser at http://localhost:3000
 
-     ```
-CONTAINER ID        IMAGE                         COMMAND                  CREATED             STATUS              PORTS                            NAMES
-1f98164914be        panoptes_panoptes             "/bin/sh -c /rails_ap"   16 minutes ago      Up 16 minutes       80/tcp, **0.0.0.0:3000->3000/tcp**   panoptes_panoptes_1
-     ```
-
-This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
+Once all the above steps complete you will have a working copy of the checked out code base. Keep your code up to date and rebuild the image on any code or configuration changes.
 
 ## Testing
 
