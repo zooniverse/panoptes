@@ -1,7 +1,7 @@
 module RoleControl
-  class AccessDenied < StandardError; end
-
   module RoledController
+    class AccessDenied < StandardError; end
+
     extend ActiveSupport::Concern
 
     included do
@@ -38,7 +38,7 @@ module RoleControl
     end
 
     def raise_no_resources_error
-      raise RoleControl::AccessDenied, no_resources_error_message
+      raise AccessDenied, no_resources_error_message
     end
 
     def no_resources_error_message

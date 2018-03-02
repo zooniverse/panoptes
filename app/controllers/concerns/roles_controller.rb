@@ -50,7 +50,7 @@ module RolesController
       ig = User.where(id: user_id).first
       .try(:identity_group)
 
-      raise Api::NoUserError, "No User with id: #{user_id} exists" unless ig
+      raise ApiErrors::NoUserError, "No User with id: #{user_id} exists" unless ig
 
       create_params[:links][:user_group] = ig
       create_params[:links][:resource] =

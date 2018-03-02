@@ -164,7 +164,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def reject_live_project_changes(workflow, update_hash)
     if workflow.active && workflow.project.live && non_permitted_changes?(workflow, update_hash)
-      raise Api::LiveProjectChanges.new("Can't change an active workflow for a live project.")
+      raise ApiErrors::LiveProjectChanges.new("Can't change an active workflow for a live project.")
     end
   end
 
@@ -200,7 +200,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def available_to_export
     if controlled_resource.project.keep_data_in_panoptes_only?
-      raise Api::DisabledDataExport.new(
+      raise ApiErrors::DisabledDataExport.new(
         "Data exports are disabled for this project"
       )
     end

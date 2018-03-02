@@ -12,7 +12,7 @@ module Api
 
     rescue_from ActiveRecord::RecordNotFound,
       NoMediaError,
-      RoleControl::AccessDenied,
+      RoleControl::RoledController::AccessDenied,
       Subjects::Selector::MissingSubjectSet,
       Subjects::Selector::MissingSubjects,        with: :not_found
     rescue_from ActiveRecord::RecordInvalid,      with: :invalid_record
@@ -149,7 +149,7 @@ module Api
 
     def require_login
       unless api_user.logged_in?
-        raise Api::NotLoggedIn.new(
+        raise ApiErrors::NotLoggedIn.new(
           "You must be logged in to access this resource."
         )
       end

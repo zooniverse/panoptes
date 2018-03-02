@@ -188,7 +188,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def available_to_export
     if controlled_resource.keep_data_in_panoptes_only?
-      raise Api::DisabledDataExport.new(
+      raise ApiErrors::DisabledDataExport.new(
         "Data exports are disabled for this project"
       )
     end
