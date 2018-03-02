@@ -55,9 +55,9 @@ module Api
 
     def self.require_authentication(*actions, scopes: [])
       if actions == [:all]
-        before_action -> { check_authentication(scopes) }
+        before_action -> { doorkeeper_authorize!(*scopes) }
       else
-        before_action -> { check_authentication(scopes) }, only: actions
+        before_action -> { doorkeeper_authorize!(*scopes) }, only: actions
       end
     end
 
@@ -103,10 +103,6 @@ module Api
     def self.resource_name
       @resource_name ||= name.match(/::([a-zA-Z]*)Controller/)[1]
                        .underscore.singularize
-    end
-
-    def check_authentication(scopes)
-      doorkeeper_authorize!(*scopes)
     end
 
     def current_resource_owner
