@@ -103,7 +103,7 @@ describe Api::ApiController, type: :controller do
   describe "#current_language" do
     controller do
       def index
-        render json_api: current_languages
+        render json_api: UserLanguages.new(self).ordered
       end
     end
 

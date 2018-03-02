@@ -117,26 +117,8 @@ module Api
       @api_user ||= ApiUser.new(current_resource_owner, admin: admin_flag?)
     end
 
-    def current_languages
-      param_langs  = [ params[:language] ]
-      user_langs   = user_accept_languages
-      header_langs = parse_http_accept_languages
-      ( param_langs | user_langs | header_langs ).compact
-    end
-
     def user_for_paper_trail
       @whodunnit_id ||= current_resource_owner.try(:id) || "UnauthenticatedUser"
-    end
-
-    def user_accept_languages
-      api_user.try(:languages) || []
-    end
-
-    def parse_http_accept_languages
-      language_extractor = AcceptLanguageExtractor
-        .new(request.env['HTTP_ACCEPT_LANGUAGE'])
-
-      language_extractor.parse_languages
     end
 
     def request_ip
@@ -197,7 +179,7 @@ module Api
     def context
       case action_name
       when "show", "index"
-        { languages: current_languages }
+        { languages: UserLanguages.new(self).ordered }
       else
         { }
       end
