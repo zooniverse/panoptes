@@ -1,5 +1,3 @@
-require 'accept_language_extractor'
-
 module Api
   class ApiController < ApplicationController
     include ApiErrors
