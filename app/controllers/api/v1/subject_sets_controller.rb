@@ -1,4 +1,5 @@
 class Api::V1::SubjectSetsController < Api::ApiController
+  include RoleControl::RoledController
   include FilterByMetadata
 
   require_authentication :create, :update, :destroy, scopes: [:project]

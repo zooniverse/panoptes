@@ -1,4 +1,5 @@
 class Api::V1::AggregationsController < Api::ApiController
+  include RoleControl::RoledController
 
   require_authentication :create, :update, scopes: [:project]
   resource_actions :create, :update, :show, :index

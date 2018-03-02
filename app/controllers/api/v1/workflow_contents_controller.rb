@@ -1,4 +1,5 @@
 class Api::V1::WorkflowContentsController < Api::ApiController
+  include RoleControl::RoledController
   include Versioned
 
   require_authentication :all, scopes: [:project]

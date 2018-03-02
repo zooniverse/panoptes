@@ -1,4 +1,5 @@
 class Api::V1::CollectionsController < Api::ApiController
+  include RoleControl::RoledController
   include FilterByOwner
   include FilterByCurrentUserRoles
   include IndexSearch

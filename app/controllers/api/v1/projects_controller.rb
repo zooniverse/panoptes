@@ -1,4 +1,5 @@
 class Api::V1::ProjectsController < Api::ApiController
+  include RoleControl::RoledController
   include FilterByOwner
   include FilterByCurrentUserRoles
   include TranslatableResource

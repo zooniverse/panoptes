@@ -1,6 +1,7 @@
 require 'model_version'
 
 class Api::V1::WorkflowsController < Api::ApiController
+  include RoleControl::RoledController
   include Versioned
   include TranslatableResource
   include SyncResourceTranslationStrings

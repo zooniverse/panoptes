@@ -1,7 +1,6 @@
 module Api
   class ApiController < ApplicationController
     include ApiErrors
-    include RoleControl::RoledController
 
     API_ACCEPTED_CONTENT_TYPES = %w(
       application/json
