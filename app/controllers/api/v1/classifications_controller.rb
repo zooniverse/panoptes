@@ -1,5 +1,3 @@
-require 'classification_lifecycle'
-
 class Api::V1::ClassificationsController < Api::ApiController
   include RoleControl::RoledController
 
