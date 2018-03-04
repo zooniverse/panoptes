@@ -1,14 +1,19 @@
 class Api::V1::SubjectsController < Api::ApiController
-  include RoleControl::RoledController
   include Versioned
+
+  attr_reader :auth_scheme
+  delegate :check_controller_resources,
+    :controlled_resources,
+    :controlled_resource,
+    to: :auth_scheme
 
   require_authentication :update, :create, :destroy, :version, :versions,
     scopes: [:subject]
   resource_actions :show, :index, :create, :update, :deactivate
   schema_type :json_schema
 
-  alias_method :subject, :controlled_resource
-
+  before_action :setup_auth_scheme, except: :create
+  before_action :check_controller_resources, except: :create
   before_action :check_subject_limit, only: :create
 
   def index
@@ -135,5 +140,9 @@ class Api::V1::SubjectsController < Api::ApiController
     if api_user.user
       UserSeenSubject.where(user: api_user.user, workflow: workflow).first
     end
+  end
+
+  def setup_auth_scheme
+    @auth_scheme = RoleControl::ControlledResources.new(self)
   end
 end
