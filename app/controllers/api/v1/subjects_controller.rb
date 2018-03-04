@@ -78,9 +78,9 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def build_update_hash(update_params, resource)
     locations = update_params.delete(:locations)
-    new_locations = add_locations(locations, resource)
-    subject.save!
-    subject.locations = new_locations if new_locations
+    if new_locations = add_locations(locations, resource)
+      resource.locations = new_locations
+    end
     super(update_params, resource)
   end
 
