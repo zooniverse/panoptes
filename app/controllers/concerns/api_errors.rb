@@ -35,4 +35,5 @@ module ApiErrors
   class PreconditionNotPresent < StandardError; end
   class PreconditionFailed < StandardError; end
   class NotLinkable < StandardError; end
+  class AccessDenied < StandardError; end
 end

@@ -14,7 +14,7 @@ module RoleControl
 
     def check_controller_resources
       unless resources_exist?
-        raise ApiErrors::AccessDenied(no_resources_error_message)
+        raise ApiErrors::AccessDenied.new(no_resources_error_message)
       end
     end
 

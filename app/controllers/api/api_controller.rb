@@ -13,6 +13,7 @@ module Api
     rescue_from ActiveRecord::RecordNotFound,
       NoMediaError,
       RoleControl::RoledController::AccessDenied,
+      AccessDenied,
       Subjects::Selector::MissingSubjectSet,
       Subjects::Selector::MissingSubjects,        with: :not_found
     rescue_from ActiveRecord::RecordInvalid,      with: :invalid_record
