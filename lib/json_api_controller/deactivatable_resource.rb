@@ -3,9 +3,7 @@ module JsonApiController
     extend ActiveSupport::Concern
 
     included do
-      before_action only: :destroy do |controller|
-        controller.precondition_check
-      end
+      before_action :precondition_check, only: :destroy
     end
 
     def destroy
