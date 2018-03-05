@@ -9,7 +9,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   schema_type :json_schema
 
-  rescue_from RoleControl::RoledController::AccessDenied, with: :access_denied
+  rescue_from ApiErrors::AccessDenied, with: :access_denied
 
   before_action :filter_plural_subject_ids,
     only: [ :index, :gold_standard, :incomplete, :project ]
