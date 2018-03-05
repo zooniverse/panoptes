@@ -115,7 +115,9 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def setup_auth_scheme
-    scope_context = params.dup
-    @auth_scheme = RoleControl::ControlledResources.new(self, scope_context)
+    @auth_scheme = RoleControl::ControlledResources.new(
+      self,
+      scope_context: params.dup
+    )
   end
 end
