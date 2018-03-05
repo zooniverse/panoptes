@@ -28,6 +28,10 @@ module RoleControl
       @controlled_resource ||= controlled_resources.first
     end
 
+    def resource_ids
+      @resource_ids ||= array_id_params(_resource_ids)
+    end
+
     private
 
     def resources_exist?
@@ -55,10 +59,6 @@ module RoleControl
       else
         "id='#{resource_ids}'"
       end
-    end
-
-    def resource_ids
-      @resource_ids ||= array_id_params(_resource_ids)
     end
 
     def array_id_params(string_id_params)
