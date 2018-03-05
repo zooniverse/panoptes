@@ -9,12 +9,13 @@ class Api::V1::SubjectsController < Api::ApiController
 
   require_authentication :update, :create, :destroy, :version, :versions,
     scopes: [:subject]
-  resource_actions :show, :index, :create, :update, :deactivate
-  schema_type :json_schema
 
   before_action :setup_auth_scheme, except: :create
   before_action :check_controller_resources, except: :create
   before_action :check_subject_limit, only: :create
+
+  resource_actions :show, :index, :create, :update, :deactivate
+  schema_type :json_schema
 
   def index
     case params[:sort]
