@@ -1,6 +1,6 @@
 module RoleControl
   class ControlledResources
-    attr_reader :controller
+    attr_reader :controller, :scope_context, :add_active_resources_scope
     delegate :action_name,
       :params,
       :resource_name,
@@ -8,9 +8,10 @@ module RoleControl
       :api_user,
       to: :controller
 
-    def initialize(controller, scope_context=nil)
+    def initialize(controller, scope_context: {}, add_active_resources_scope: true)
       @controller = controller
       @scope_context = scope_context
+      @add_active_resources_scope = add_active_resources_scope
     end
 
     def check_controller_resources
@@ -79,14 +80,6 @@ module RoleControl
       else
         ''
       end
-    end
-
-    def scope_context
-      @scope_context || {}
-    end
-
-    def add_active_resources_scope
-      true
     end
   end
 end
