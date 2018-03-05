@@ -28,17 +28,26 @@ cellect:
     - redis
     - postgres:pg
 
+gem_cache:
+  image: busybox
+  volumes:
+    - /gem_cache
+
 panoptes:
   dockerfile: Dockerfile.dev
   build: ./
   volumes:
     - ./:/rails_app
+  volumes_from:
+    - gem_cache
   ports:
     - "3000:3000"
   environment:
     - "RAILS_ENV=development"
     - "CELLECT_MIN_POOL_SIZE=100"
     - "ATTENTION_REDIS_URL=redis://redis:6379/1"
+    - "BUNDLE_PATH=/gem_cache"
+    - "BUNDLE_BIN=/gem_cache/bin"
   links:
     - redis:redis
     - postgres:pg

@@ -39,59 +39,54 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 #### Usage
 
-0. Clone the repository `git clone https://github.com/zooniverse/Panoptes`.
-
-0. `cd` into the cloned folder.
-
-0. Setup the configuration files via a rake task
-  + Run: `rake configure:local`
-
-  Or manually copy the example configuration files and setup the doorkeeper keys.
-  + Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
-  + Run: `rake configure:doorkeeper_keys`
+1. Clone the repository `git clone https://github.com/zooniverse/Panoptes`.
 
 0. Install Docker from the appropriate link above.
 
-0.  + **If you have an existing Panoptes Docker container, or if your Gemfile or Ruby version has changed,** run `docker-compose build` to rebuild the containers.
-    + Otherwise, create and run the application containers by running `docker-compose up`
+0. `cd` into the cloned folder.
 
-0. After step 5 finishes, open a new terminal and run `docker-compose run --rm --entrypoint=rake panoptes db:setup` to setup the database. This will launch a new Docker container, run the rake DB setup task, and then clean up the container.
+0. Run `docker-compose build` to build the containers Panoptes API container. You will need to re-run this command on any changes to `Dockerfile.dev`
 
-0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `docker-compose run --rm --entrypoint=rails panoptes runner db/fig_dev_seed_data/fig_dev_seed_data.rb`
+0. Install the gem dependencies for the application
+    * Run: `docker-compose run --rm --entrypoint="bundle install" panoptes`
 
-0. Open up the application in your browser:
-  + It should be running on http://localhost:3000
-  + If it's not and you're on a Mac, run `docker ps`, and find the IP address where the `panoptes_panoptes` image is running. E.g.: 0.0.0.0:3000->3000/tcp means running on localhost at port 3000.
+0. Setup the configuration files via a rake task
+    * Run: `docker-compose run --rm --entrypoint="bundle exec rake configure:local" panoptes`
+    * Run: `docker-compose run --rm --entrypoint="bundle exec rake configure:doorkeeper_keys" panoptes`
+    * Alternatively, manually copy the example configuration files and setup the doorkeeper keys.
+      - Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
 
-     ```
-CONTAINER ID        IMAGE                         COMMAND                  CREATED             STATUS              PORTS                            NAMES
-1f98164914be        panoptes_panoptes             "/bin/sh -c /rails_ap"   16 minutes ago      Up 16 minutes       80/tcp, **0.0.0.0:3000->3000/tcp**   panoptes_panoptes_1
-     ```
+0. Create and run the application containers with `docker-compose up`
 
-This will get you a working copy of the checked out code base. Keep your code up to date and rebuild the image if needed!
+0. If the above step reports a missing database error, kill the docker-compose process or open a new terminal window in the current directory and then run `docker-compose run --rm --entrypoint="bundle exec rake db:setup" panoptes` to setup the database. This command will launch a new Docker container, run the rake DB setup task, and then clean up the container.
+
+0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `docker-compose run --rm --entrypoint="bundle exec rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb" panoptes`
+
+0. Open up the application in your browser at http://localhost:3000
+
+Once all the above steps complete you will have a working copy of the checked out code base. Keep your code up to date and rebuild the image on any code or configuration changes.
 
 ## Testing
 
 There are multiple options for setting up a testing environment:
 
-0. Run it entirely from within docker-compose:
-
-    0. Create config files if you don't already have them, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint=rake panoptes configure:local`
-    0. To create the testing database, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint=rake panoptes db:setup`.
-    0. Run the full spec suite `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint=rspec panoptes`. Note: this will be slow. Use rspec focus set or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="rspec path/to/spec/file.rb" panoptes`
+1. Run it entirely from within docker-compose:
+    1. Run `docker-compose build` to build the panoptes container.
+    0. Install the gem dependencies for the application
+        * Run: `docker-compose run --rm --entrypoint="bundle install" panoptes`
+    0. Create config files if you don't already have them, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint="bundle exec rake configure:local" panoptes`
+    0. To create the testing database, run `docker-compose run --rm -e RAILS_ENV=test --entrypoint="bundle exec rake db:setup" panoptes`
+    0. Run the full spec suite `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes` noting that running all tests is slow.
+        * Use rspec focus keyword in your specs or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="rspec path/to/spec/file.rb" panoptes`
 
 0. Use parts of docker-compose manually and wire them up manually to create a testing environment.
+    1. Run `docker-compose run -d --name postgres --service-ports postgres` to start the postgres container
+    0. Run `docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes` to run the full test suite
 
-    ```
-    docker-compose run -d --name postgres --service-ports postgres
-    docker-compose run -T --rm -e RAILS_ENV=test --entrypoint="bundle exec rspec" panoptes
-    ```
-
-0. Assuming you have a Ruby environment already setup:
-
-    0. Run `bundle install`
-    0. Start the docker Postgres container by running `docker-compose run -d --name postgres --service-ports postgres`
-    0. Modify your `config/database.yml` test env to point to the running Postgres container, e.g. `host: localhost`
+0. Assuming you have the correct Ruby environment already setup:
+    1. Run `bundle install`
+    0. Start the docker Postgres container by running `docker-compose run -d --name postgres --service-ports postgres` or run your own
+    0. Modify your `config/database.yml` test env to point to the running Postgres server, e.g. `host: localhost`
     0. Setup the testing database if you haven't already, by running `RAILS_ENV=test rake db:setup`
     0. Finally, run rspec with `RAILS_ENV=test rspec`
 
@@ -112,6 +107,6 @@ Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panop
 
 ## License
 
-Copyright 2014-2016 by the Zooniverse
+Copyright 2014-2018 by the Zooniverse
 
 Distributed under the Apache Public License v2. See LICENSE

@@ -141,7 +141,6 @@ GEM
     faraday_middleware (0.12.2)
       faraday (>= 0.7.4, < 1.0)
     ffi (1.9.18)
-    fig_rake (0.9.3)
     flipper (0.9.2)
     flipper-active_record (0.9.2)
       activerecord (>= 3.2, < 6)
@@ -452,7 +451,6 @@ DEPENDENCIES
   faraday (~> 0.9)
   faraday-http-cache (~> 2.0)
   faraday_middleware (~> 0.12)
-  fig_rake (~> 0.9.3)
   flipper
   flipper-active_record
   flipper-ui
