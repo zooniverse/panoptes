@@ -11,17 +11,16 @@ class Api::V1::ClassificationsController < Api::ApiController
   require_authentication :show, :index, :destroy, :update, :incomplete, :project,
     scopes: [:classification]
 
+  before_action :setup_auth_scheme, except: :create
+  before_action :check_controller_resources, except: :create
+  before_action :filter_plural_subject_ids,
+    only: %i(index gold_standard incomplete project)
+
   resource_actions :default
 
   schema_type :json_schema
 
   rescue_from ApiErrors::AccessDenied, with: :access_denied
-
-  before_action :setup_auth_scheme, except: :create
-  before_action :check_controller_resources, except: :create
-
-  before_action :filter_plural_subject_ids,
-    only: %i(index gold_standard incomplete project)
 
   def create
     super { |classification| lifecycle(:create, classification) }
