@@ -1,5 +1,11 @@
 class Api::V1::ClassificationsController < Api::ApiController
-  include RoleControl::RoledController
+
+  attr_reader :auth_scheme
+  delegate :check_controller_resources,
+    :controlled_resources,
+    :controlled_resource,
+    :resource_ids,
+    to: :auth_scheme
 
   skip_before_filter :require_login, only: :create
   require_authentication :show, :index, :destroy, :update, :incomplete, :project,
@@ -11,8 +17,11 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   rescue_from ApiErrors::AccessDenied, with: :access_denied
 
+  before_action :setup_auth_scheme, except: :create
+  before_action :check_controller_resources, except: :create
+
   before_action :filter_plural_subject_ids,
-    only: [ :index, :gold_standard, :incomplete, :project ]
+    only: %i(index gold_standard incomplete project)
 
   def create
     super { |classification| lifecycle(:create, classification) }
@@ -41,10 +50,6 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   private
-
-  def scope_context
-    params
-  end
 
   def access_denied(exception)
     if %w(update destroy).include?(action_name) && resources_completed?
@@ -108,5 +113,10 @@ class Api::V1::ClassificationsController < Api::ApiController
     if subject_ids = params.delete(:subject_ids)
       params[:subject_id] = subject_ids
     end
+  end
+
+  def setup_auth_scheme
+    scope_context = params.dup
+    @auth_scheme = RoleControl::ControlledResources.new(self, scope_context)
   end
 end
