@@ -8,8 +8,9 @@ module RoleControl
       :api_user,
       to: :controller
 
-    def initialize(controller)
+    def initialize(controller, scope_context=nil)
       @controller = controller
+      @scope_context = scope_context
     end
 
     def check_controller_resources
@@ -81,7 +82,7 @@ module RoleControl
     end
 
     def scope_context
-      {}
+      @scope_context || {}
     end
 
     def add_active_resources_scope
