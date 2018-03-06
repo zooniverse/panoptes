@@ -3,7 +3,7 @@ module JsonApiController
     extend ActiveSupport::Concern
 
     included do
-      before_action :precondition_check, only: :destroy
+      before_action :destroy_precondition_check, only: :destroy
       before_action :check_destroy_class_matches_controller, only: :destroy
     end
 
@@ -13,6 +13,10 @@ module JsonApiController
     end
 
     private
+
+    def destroy_precondition_check
+      precondition_check
+    end
 
     def check_destroy_class_matches_controller
       resource_class_name = controlled_resource.class.name

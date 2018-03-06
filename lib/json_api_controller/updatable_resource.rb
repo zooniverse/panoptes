@@ -5,7 +5,7 @@ module JsonApiController
     include PreconditionCheck
 
     included do
-      before_action :precondition_check, only: :update
+      before_action :update_precondition_check, only: :update
     end
 
     def update
@@ -75,6 +75,12 @@ module JsonApiController
 
     def relation
       params[:link_relation].to_sym
+    end
+
+    private
+
+    def update_precondition_check
+      precondition_check
     end
   end
 end
