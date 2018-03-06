@@ -45,7 +45,7 @@ class WorkflowSerializer
   end
 
   def content
-    @content ||= @model.content_for(@context[:languages])
+    @content ||= @model.primary_content
   end
 
   def retirement
