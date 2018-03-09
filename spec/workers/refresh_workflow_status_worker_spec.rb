@@ -3,31 +3,39 @@ require 'spec_helper'
 RSpec.describe RefreshWorkflowStatusWorker do
   let(:worker) { described_class.new }
   let(:workflow) { create(:workflow) }
+  let(:unfinish_worker_double) { double(:peform) }
+  let(:retired_count_worker_double) { double(:peform) }
+  let(:completeness_worker_double) { double(:peform) }
+  let(:klass_doubles) do
+    {
+      UnfinishWorkflowWorker => unfinish_worker_double,
+      WorkflowRetiredCountWorker => retired_count_worker_double,
+      CalculateProjectCompletenessWorker => completeness_worker_double
+    }
+  end
 
   describe "#perform" do
-    let(:ordered_worker_instances) do
-      [
-        UnfinishWorkflowWorker,
-        WorkflowRetiredCountWorker,
-        CalculateProjectCompletenessWorker
-      ].map(&:new)
-    end
-
     before do
-      allow(worker)
-      .to receive(:ordered_workers)
-      .and_return(ordered_worker_instances)
+      klass_doubles.each do |klass, double|
+        allow(klass)
+          .to receive(:new)
+          .and_return(double)
+      end
     end
 
-    it "should chain the following workers in this order" do
-      ordered_worker_instances[0..1].each do |worker|
-        expect(worker).to receive(:perform).with(workflow.id).ordered
-      end
-      expect(ordered_worker_instances.last)
+    it "should call a chain of ordered workers" do
+      expect(unfinish_worker_double)
+        .to receive(:perform)
+        .with(workflow.id)
+        .ordered
+      expect(retired_count_worker_double)
+        .to receive(:perform)
+        .with(workflow.id)
+        .ordered
+      expect(completeness_worker_double)
         .to receive(:perform)
         .with(workflow.project_id)
         .ordered
-
       worker.perform(workflow.id)
     end
   end
