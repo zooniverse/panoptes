@@ -10,17 +10,8 @@ class RefreshWorkflowStatusWorker
     # run these in band and in order to ensure
     # we don't have state race conditions
     # between workers and/or db transactions
-    ordered_workers[0..1].each do |worker|
-      worker.perform(workflow.id)
-    end
-    ordered_workers.last.perform(workflow.project_id)
-  end
-
-  def ordered_workers
-    [
-      UnfinishWorkflowWorker,
-      WorkflowRetiredCountWorker,
-      CalculateProjectCompletenessWorker
-    ].map(&:new)
+    UnfinishWorkflowWorker.new.perform(workflow.id)
+    WorkflowRetiredCountWorker.new.perform(workflow.id)
+    CalculateProjectCompletenessWorker.new.perform(workflow.project_id)
   end
 end
