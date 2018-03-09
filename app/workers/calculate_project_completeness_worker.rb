@@ -6,10 +6,6 @@ class CalculateProjectCompletenessWorker
 
   sidekiq_options queue: :data_medium
 
-  # lock this until it's finished executing to avoid
-  # multiple workflow update_links calls
-  # on the same project, when linking new subject sets
-
   def perform(project_id)
     project = Project.find(project_id)
     Project.transaction do
