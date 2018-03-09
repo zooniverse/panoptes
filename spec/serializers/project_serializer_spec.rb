@@ -45,7 +45,8 @@ describe ProjectSerializer do
     end
 
     it "includes the defined content fields" do
-      expect(serializer.content.keys).to contain_exactly(*Api::V1::ProjectsController::CONTENT_FIELDS)
+      fields = Api::V1::ProjectsController::CONTENT_FIELDS.map(&:to_s)
+      expect(serializer.content.keys).to contain_exactly(*fields)
     end
   end
 

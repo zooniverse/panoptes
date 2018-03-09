@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe Formatter::Csv::WorkflowContent do
   let(:workflow) { create(:workflow) }
   let(:project) { workflow.project }
-  let(:workflow_content) { workflow.content_for(workflow.primary_language) }
+  let(:workflow_content) { workflow.primary_content }
   let(:wc_version) { workflow_content }
 
   let(:rows) do
