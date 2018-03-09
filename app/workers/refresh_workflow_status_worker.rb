@@ -1,9 +1,17 @@
 class RefreshWorkflowStatusWorker
   include Sidekiq::Worker
 
-  # drop any other jobs once this is in the queue
-  # and until it has finished executing
-  sidekiq_options queue: :data_high, unique: :until_executed
+  sidekiq_options congestion: {
+    interval: 15,
+    max_in_interval: 1,
+    min_delay: 0,
+    reject_with: :reschedule,
+    key: ->(workflow_id) {
+      "refresh_worklow_status_worker_#{workflow_id}"
+    }
+  }
+
+  sidekiq_options queue: :data_high, unique: :until_executing
 
   def perform(workflow_id)
     workflow = Workflow.find(workflow_id)
