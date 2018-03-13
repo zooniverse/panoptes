@@ -45,8 +45,8 @@ class UserSerializer
 
   %w(credited_name email languages global_email_communication
      project_email_communication beta_email_communication
-     uploaded_subjects_count subject_limit admin login_prompt zooniverse_id,
-     upload_whitelist, valid_email).each do |me_only_attribute|
+     uploaded_subjects_count subject_limit admin login_prompt zooniverse_id
+     upload_whitelist valid_email).each do |me_only_attribute|
     alias_method :"include_#{me_only_attribute}?", :permitted_requester?
   end
 
