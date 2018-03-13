@@ -157,8 +157,9 @@ GEM
       json
     globalid (0.4.1)
       activesupport (>= 4.2.0)
-    graphiql-rails (1.4.9)
-      rails
+    graphiql-rails (1.4.10)
+      railties
+      sprockets-rails
     graphql (1.7.12)
     guard (2.14.1)
       formatador (>= 0.2.4)
@@ -290,7 +291,7 @@ GEM
       pry (>= 0.9.11)
     public_suffix (3.0.1)
     puma (3.11.2)
-    rack (1.6.8)
+    rack (1.6.9)
     rack-cors (0.4.1)
     rack-protection (2.0.0)
       rack
