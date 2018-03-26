@@ -231,7 +231,7 @@ GEM
     mini_mime (1.0.0)
     mini_portile2 (2.3.0)
     minitest (5.11.3)
-    mock_redis (0.17.3)
+    mock_redis (0.18.0)
     modware (0.1.3)
       key_struct (~> 0.4)
     multi_json (1.13.1)
