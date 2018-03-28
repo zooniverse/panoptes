@@ -216,7 +216,7 @@ Style/EmptyElse:
 # Configuration parameters: AllowAdjacentOneLineDefs.
 Layout/EmptyLineBetweenDefs:
   Exclude:
-    - 'db/fig_dev_seed_data/fig_dev_seed_data.rb'
+    - 'db/dev_seed_data/dev_seed_data.rb'
     - 'db/migrate/20150318132024_project_contents_text.rb'
     - 'spec/lib/role_control/actor_spec.rb'
 
@@ -354,7 +354,7 @@ Layout/LeadingCommentSpace:
     - 'app/controllers/api/v1/subjects_controller.rb'
     - 'app/workers/subject_import_worker.rb'
     - 'config/environments/test.rb'
-    - 'db/fig_dev_seed_data/fig_dev_seed_data.rb'
+    - 'db/dev_seed_data/dev_seed_data.rb'
     - 'db/migrate/20150430084746_add_live_field_to_projects.rb'
     - 'lib/classification_lifecycle.rb'
     - 'spec/controllers/passwords_controller_spec.rb'
@@ -598,7 +598,7 @@ Style/StringLiteralsInInterpolation:
 # Configuration parameters: IgnoredMethods.
 Style/SymbolProc:
   Exclude:
-    - 'db/fig_dev_seed_data/fig_dev_seed_data.rb'
+    - 'db/dev_seed_data/dev_seed_data.rb'
     - 'lib/json_api_controller/deactivatable_resource.rb'
     - 'lib/json_api_controller/destructable_resource.rb'
     - 'lib/json_api_controller/updatable_resource.rb'
