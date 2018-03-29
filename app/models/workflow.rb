@@ -33,6 +33,8 @@ class Workflow < ActiveRecord::Base
 
   enum subject_selection_strategy: %i{default cellect designator builtin}
 
+  max_paginates_per 25
+
   DEFAULT_RETIREMENT_OPTIONS = {
     'criteria' => 'classification_count',
     'options' => {'count' => 15}

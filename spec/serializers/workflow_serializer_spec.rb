@@ -98,4 +98,15 @@ describe WorkflowSerializer do
       end
     end
   end
+
+  describe "#page_size" do
+    let(:scope) { Workflow.where(id: workflow.id) }
+    let(:params) {{ page_size: 50 }}
+
+    it "should default to the max model limit" do
+      result = WorkflowSerializer.page(params, scope)
+      page_size = result.dig(:meta, :workflows, :page_size)
+      expect(page_size).to eq(25)
+    end
+  end
 end
