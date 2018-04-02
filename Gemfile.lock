@@ -293,7 +293,7 @@ GEM
     puma (3.11.3)
     rack (1.6.9)
     rack-cors (0.4.1)
-    rack-protection (2.0.0)
+    rack-protection (2.0.1)
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -380,7 +380,7 @@ GEM
     semantic_logger (4.2.0)
       concurrent-ruby (~> 1.0)
     shellany (0.0.1)
-    sidekiq (5.1.1)
+    sidekiq (5.1.2)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
       rack-protection (>= 1.5.0)
@@ -492,7 +492,7 @@ DEPENDENCIES
   scientist (~> 1.1.1)
   sdoc (~> 1.0.0)
   semantic_logger (~> 4.2.0)
-  sidekiq (~> 5.1.1)
+  sidekiq (~> 5.1.2)
   sidekiq-congestion (~> 0.1.0)
   sidekiq-unique-jobs
   sidetiq (~> 0.7)
