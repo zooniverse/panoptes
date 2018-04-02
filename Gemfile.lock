@@ -293,7 +293,7 @@ GEM
     puma (3.11.3)
     rack (1.6.9)
     rack-cors (0.4.1)
-    rack-protection (2.0.0)
+    rack-protection (2.0.1)
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
