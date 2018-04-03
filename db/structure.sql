@@ -1463,7 +1463,8 @@ CREATE TABLE users (
     subject_limit integer,
     private_profile boolean DEFAULT true,
     tsv tsvector,
-    upload_whitelist boolean DEFAULT false NOT NULL
+    upload_whitelist boolean DEFAULT false NOT NULL,
+    ux_testing_email_communication boolean DEFAULT false
 );
 
 
@@ -3083,6 +3084,13 @@ CREATE UNIQUE INDEX index_users_on_unsubscribe_token ON users USING btree (unsub
 
 
 --
+-- Name: index_users_on_ux_testing_email_communication; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_users_on_ux_testing_email_communication ON users USING btree (ux_testing_email_communication) WHERE (ux_testing_email_communication IS TRUE);
+
+
+--
 -- Name: index_users_on_zooniverse_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4049,4 +4057,8 @@ INSERT INTO schema_migrations (version) VALUES ('20180119110708');
 INSERT INTO schema_migrations (version) VALUES ('20180122134607');
 
 INSERT INTO schema_migrations (version) VALUES ('20180207120238');
+
+INSERT INTO schema_migrations (version) VALUES ('20180403150901');
+
+INSERT INTO schema_migrations (version) VALUES ('20180403160419');
 
