@@ -83,12 +83,12 @@ class Api::V1::WorkflowsController < Api::ApiController
   def post_link_actions(workflow)
     if workflow.set_member_subjects.exists?
       RefreshWorkflowStatusWorker.perform_async(workflow.id)
-      case relation
-      when /\Aretired_subjects\z/
+      case relation.to_s
+      when "retired_subjects"
         params[:retired_subjects].each do |subject_id|
           NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
         end
-      when /\Asubject_sets\z/
+      when "subject_sets"
         NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
       end
     end
