@@ -28,10 +28,6 @@ class OrganizationSerializer
     content[:announcement]
   end
 
-  def content
-    @content ||= _content
-  end
-
   def avatar_src
     if avatar = @model.avatar
       avatar.external_link ? avatar.external_link : avatar.src
