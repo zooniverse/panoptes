@@ -5,27 +5,17 @@ class Medium < ActiveRecord::Base
 
   before_validation :create_path, unless: :external_link
   validates :src, presence: true, unless: :external_link
+  validates :content_type, presence: true
 
   before_destroy :queue_medium_removal, unless: :external_link
 
-  attr_writer :allow_any_content_type
-
-  ALLOWED_UPLOAD_CONTENT_TYPES = %w(
-    image/jpeg
-    image/png
-    image/gif
-    image/svg+xml
-    audio/mpeg
-    audio/mp3
-    audio/mp4
-    audio/x-m4a
-    text/plain
-  ).freeze
   ALLOWED_EXPORT_CONTENT_TYPES = %w(text/csv).freeze
+  EXPORT_MEDIUM_TYPE_REGEX = /\A(project|workflow)_[a-z_]+_export\z/i
 
   validate do |medium|
-    if !allow_any_content_type && !allowed_content_types.include?(medium.content_type)
-      medium.errors.add(:content_type, "Content-Type must be one of #{allowed_content_types.join(", ")}")
+    export_medium = medium.type.match?(EXPORT_MEDIUM_TYPE_REGEX)
+    if export_medium && !ALLOWED_EXPORT_CONTENT_TYPES.include?(medium.content_type)
+      medium.errors.add(:content_type, "Content-Type must be one of #{ALLOWED_EXPORT_CONTENT_TYPES.join(", ")}")
     end
   end
 
@@ -99,19 +89,6 @@ class Medium < ActiveRecord::Base
   end
 
   private
-
-  def allow_any_content_type
-    @allow_any_content_type || false
-  end
-
-  def allowed_content_types
-    case type
-    when /\A(project|workflow)_[a-z_]+_export\z/i
-      ALLOWED_EXPORT_CONTENT_TYPES
-    else
-      ALLOWED_UPLOAD_CONTENT_TYPES
-    end
-  end
 
   def queue_medium_removal
     MediumRemovalWorker.perform_async(src)
