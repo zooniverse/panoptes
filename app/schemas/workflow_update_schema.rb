@@ -6,7 +6,7 @@ class WorkflowUpdateSchema < JsonSchema
     additional_properties false
 
     property "display_order_position" do
-      type "integer"
+      type "string", "integer"
     end
 
     property "pairwise" do
