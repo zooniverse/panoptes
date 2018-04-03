@@ -43,7 +43,7 @@ gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'scientist', '~> 1.1.1'
 gem 'sdoc', '~> 1.0.0', group: :doc
 gem 'semantic_logger', '~> 4.2.1'
-gem 'sidekiq', '~> 5.1.1'
+gem 'sidekiq', '~> 5.1.3'
 gem 'sidekiq-congestion', '~> 0.1.0'
 gem 'sidekiq-unique-jobs'
 gem 'sidetiq', '~> 0.7'
