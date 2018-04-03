@@ -49,7 +49,7 @@ puts "email: #{green(admin.email)}\n"
 #setup a doorkeeper first party oauth application with scopes for the client
 app = Doorkeeper::Application.create do |da|
   da.owner = admin
-  da.name = 'FigDevAppClient'
+  da.name = 'DevAppClient'
   #testing redirect URL
   da.redirect_uri = 'urn:ietf:wg:oauth:2.0:oob'
   # zooniverse first-party app

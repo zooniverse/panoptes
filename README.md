@@ -26,8 +26,6 @@ Optionally, you can also run the following:
 
 We only support running Panoptes via Docker and Docker Compose. If you'd like to run it outside a container, see the above Requirements sections to get started.
 
-It's possible to run Panoptes only having to install the `fig_rake` gem. Alternatives to various rake tasks are presented.
-
 ### Setup Docker and Docker Compose
 
 * Docker
@@ -60,7 +58,7 @@ It's possible to run Panoptes only having to install the `fig_rake` gem. Alterna
 
 0. If the above step reports a missing database error, kill the docker-compose process or open a new terminal window in the current directory and then run `docker-compose run --rm --entrypoint="bundle exec rake db:setup" panoptes` to setup the database. This command will launch a new Docker container, run the rake DB setup task, and then clean up the container.
 
-0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `docker-compose run --rm --entrypoint="bundle exec rails runner db/fig_dev_seed_data/fig_dev_seed_data.rb" panoptes`
+0. To seed the development database with an Admin user and a Doorkeeper client application for API access run `docker-compose run --rm --entrypoint="bundle exec rails runner db/dev_seed_data/dev_seed_data.rb" panoptes`
 
 0. Open up the application in your browser at http://localhost:3000
 
