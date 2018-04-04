@@ -563,16 +563,6 @@ describe Api::V1::SubjectsController, type: :controller do
         end
       end
 
-      context "when the mime type is not allowed" do
-        let(:locations) { [ "text/html" ] }
-
-        it "should not overwrite existing locations" do
-          loc_ids = resource.locations.map(&:id)
-          put :update, update_params.merge(id: resource.id)
-          expect(loc_ids).to match_array(resource.reload.locations.map(&:id))
-        end
-      end
-
       context "when the locations array is empty" do
         let(:locations) { [] }
 

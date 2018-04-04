@@ -14,39 +14,48 @@ RSpec.describe Medium, :type => :model do
   end
 
   describe "#content_type" do
-
-    it 'should be invalid with an disallowed content_types' do
-      aggregate_failures "disallowed content types" do
-        %w(text/html video/mp4).each do |content_type|
-          m = build(:medium, content_type: content_type)
-          expect(m).to_not be_valid
-        end
-      end
-    end
-
     it 'should not be valid with an empty content_type' do
-      m = build(:medium, content_type: "", src: nil)
+      m = build(:medium, content_type: "")
       expect(m).to_not be_valid
     end
 
-    it 'should be valid with allowed content_types' do
-      aggregate_failures "allowed content types" do
-        Medium::ALLOWED_UPLOAD_CONTENT_TYPES.each do |content_type|
-          m = build(:medium, content_type: content_type)
-          expect(m).to be_valid
+    context "non-export medium types" do
+      it 'should be valid with all content_types' do
+        aggregate_failures "content types" do
+          limited_list_of_allowed_mime_types = %w(
+            image/jpeg
+            image/png
+            image/gif
+            image/svg+xml
+            audio/mpeg
+            audio/mp3
+            audio/mp4
+            audio/x-m4a
+            text/plain
+            text/html
+            video/mp4
+          )
+          limited_list_of_allowed_mime_types.each do |content_type|
+            m = build(:medium, content_type: content_type)
+            expect(m).to be_valid
+          end
         end
       end
     end
 
-    context "with the allow_any_content_type flag set" do
+    context "export medium types" do
+      let(:export_medium) do
+        build(:medium, type: "project_test_export")
+      end
 
-      it 'should be valid with both content_types' do
-        aggregate_failures "content types" do
-          %w(text/html video/mp4).each do |content_type|
-            m = build(:medium, allow_any_content_type: true, content_type: content_type)
-            expect(m).to be_valid
-          end
-        end
+      it 'should be valid for csv content_types' do
+        export_medium.content_type = "text/csv"
+        expect(export_medium).to be_valid
+      end
+
+      it 'should not be valid non-csv content_types' do
+        export_medium.content_type = "text/html"
+        expect(export_medium).not_to be_valid
       end
     end
   end

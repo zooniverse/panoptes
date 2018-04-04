@@ -111,7 +111,6 @@ class Api::V1::SubjectsController < Api::ApiController
                           }
                         end
       location_params[:metadata] = { index: i }
-      location_params[:allow_any_content_type] = true if api_user.is_admin?
       location_params
     end
   end
