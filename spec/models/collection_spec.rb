@@ -62,6 +62,11 @@ describe Collection, type: :model do
     it "should have many subjects" do
       expect(collection.subjects).to all( be_a(Subject) )
     end
+
+    it "should order the subject association by most recetly added" do
+      order_clause = "ORDER BY \"collections_subjects\".\"id\" DESC"
+      expect(collection.subjects.to_sql).to include(order_clause)
+    end
   end
 
   context "contribution" do
