@@ -62,6 +62,10 @@ describe Api::V1::UsersController, type: :controller do
           expect(requester).to include("beta_email_communication")
         end
 
+        it 'should have a ux testing email communication' do
+          expect(requester).to include("ux_testing_email_communication")
+        end
+
         it "should have a uploaded_subjects_count" do
           expect(requester).to include("uploaded_subjects_count")
         end
@@ -96,6 +100,10 @@ describe Api::V1::UsersController, type: :controller do
 
         it 'should not have a beta email communication' do
           expect(not_requester).to_not include("beta_email_communication")
+        end
+
+        it 'should not have a ux testing email communication' do
+          expect(not_requester).to_not include("ux_testing_email_communication")
         end
 
         it "should not have a uploaded_subjects_count" do
@@ -143,6 +151,10 @@ describe Api::V1::UsersController, type: :controller do
 
       it 'should not have a beta email communication' do
         expect(json_response[api_resource_name][0]).to_not include("beta_email_communication")
+      end
+
+      it 'should not have a ux testing email communication' do
+        expect(json_response[api_resource_name][0]).to_not include("ux_testing_email_communication")
       end
 
       it "should not have a uploaded_subjects_count" do
