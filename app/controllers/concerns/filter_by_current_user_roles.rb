@@ -8,7 +8,8 @@ module FilterByCurrentUserRoles
   # Filter controlled_resources by what role you have onto them,
   # e.g., "only show me projects that I am a collaborator in".
   def add_roles_to_filter_params!
-    roles_filter = params.delete(:current_user_roles).try(:split, ",")
+    roles_filter = params.delete(:current_user_roles)
+    roles_filter = roles_filter.split(',') if String === roles_filter
     if !roles_filter.blank? && api_user.logged_in?
       @controlled_resources = controlled_resources
                                        .joins(:access_control_lists)
