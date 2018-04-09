@@ -13,7 +13,7 @@ namespace :user do
 
   desc "Backfill UX testing emails comms field in batches"
   task backfill_ux_testing_email_field: :environment do
-    User.find_in_batches do |users|
+    User.select(:id).find_in_batches do |users|
       null_ux_testing_user_scope = User.where(
         id: users.map(&:id),
         ux_testing_email_communication: nil
