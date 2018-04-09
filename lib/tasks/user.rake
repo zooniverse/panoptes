@@ -11,6 +11,19 @@ namespace :user do
     end
   end
 
+  desc "Backfill UX testing emails comms field in batches"
+  task backfill_ux_testing_email_field: :environment do
+    User.select(:id).find_in_batches do |users|
+      null_ux_testing_user_scope = User.where(
+        id: users.map(&:id),
+        ux_testing_email_communication: nil
+      )
+      null_ux_testing_user_scope.update_all(
+        ux_testing_email_communication: false
+      )
+    end
+  end
+
   namespace :limit do
 
     class UpdateUserLimitArgsError < StandardError; end
