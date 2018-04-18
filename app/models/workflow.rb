@@ -40,12 +40,7 @@ class Workflow < ActiveRecord::Base
 
   validates_presence_of :project, :display_name
 
-  validate do |workflow|
-    criteria = RetirementSchemes::CRITERIA.keys
-    unless workflow.retirement.empty? || criteria.include?(workflow.retirement['criteria'])
-      workflow.errors.add(:"retirement.criteria", "Retirement criteria must be one of #{criteria.join(', ')}")
-    end
-  end
+  validate :retirement_config
 
   can_through_parent :project, :update, :index, :show, :destroy, :update_links,
     :destroy_links, :translate, :versions, :version, :retire_subject, :create_classifications_export
@@ -120,5 +115,9 @@ class Workflow < ActiveRecord::Base
       else
         retired_subjects_count >= subjects_count
       end
+  end
+
+  def retirement_config
+    RetirementValidator.new(self).validate
   end
 end
