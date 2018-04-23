@@ -109,7 +109,7 @@ GEM
     dalli (2.7.6)
     dalli-elasticache (0.2.0)
       dalli (>= 1.0.0)
-    database_cleaner (1.6.2)
+    database_cleaner (1.7.0)
     debug_inspector (0.0.2)
     devise (4.3.0)
       bcrypt (~> 3.0)
@@ -444,7 +444,7 @@ DEPENDENCIES
   aws-sdk (~> 2.10)
   cellect-client (~> 3.0.2)
   dalli-elasticache
-  database_cleaner (~> 1.6.2)
+  database_cleaner (~> 1.7.0)
   devise (~> 4.3)
   doorkeeper (~> 4.2)
   doorkeeper-jwt (~> 0.2.1)
