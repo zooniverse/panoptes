@@ -4,9 +4,9 @@ module JsonApiController
 
     def precondition_check
       if !precondition
-        raise PreconditionNotPresent, precondition_error_msg
+        raise ApiErrors::PreconditionNotPresent, precondition_error_msg
       elsif precondition_fails?
-        raise PreconditionFailed
+        raise ApiErrors::PreconditionFailed
       end
     end
 

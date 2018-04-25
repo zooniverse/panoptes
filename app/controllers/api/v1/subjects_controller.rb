@@ -1,4 +1,5 @@
 class Api::V1::SubjectsController < Api::ApiController
+  include RoleControl::RoledController
   include Versioned
 
   require_authentication :update, :create, :destroy, :version, :versions,
@@ -56,7 +57,7 @@ class Api::V1::SubjectsController < Api::ApiController
   def check_subject_limit
     if api_user.above_subject_limit?
       current, max = api_user.subject_limits
-      raise Api::LimitExceeded, "User has uploaded #{current} subjects of #{max} maximum"
+      raise ApiErrors::LimitExceeded, "User has uploaded #{current} subjects of #{max} maximum"
     end
   end
 

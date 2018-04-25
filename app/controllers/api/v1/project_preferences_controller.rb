@@ -1,4 +1,5 @@
 class Api::V1::ProjectPreferencesController < Api::ApiController
+  include RoleControl::RoledController
   include PreferencesController
 
   require_authentication :all, scopes: [:project]
@@ -21,7 +22,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
       project_id: params_for[:project_id]
     )
     unless @upp.project.owners_and_collaborators.include?(api_user.user)
-      raise Api::Unauthorized.new("You must be the project owner")
+      raise ApiErrors::Unauthorized.new("You must be the project owner")
     end
   end
 

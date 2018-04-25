@@ -46,12 +46,12 @@ describe ContentTypeFilter do
     end
 
     it 'should raise an error on a PUT request without an included content type' do
-      expect{ request.put('', 'CONTENT_TYPE' => 'text/html') }.to raise_error(Api::UnsupportedMediaType)
+      expect{ request.put('', 'CONTENT_TYPE' => 'text/html') }.to raise_error(ApiErrors::UnsupportedMediaType)
     end
 
     it 'should respect any overriden content types for a particular method' do
       expect{ request.patch('', 'CONTENT_TYPE' => 'application/patch+json') }.to_not raise_error
-      expect{ request.patch('', 'CONTENT_TYPE' => 'application/json') }.to raise_error(Api::UnsupportedMediaType)
+      expect{ request.patch('', 'CONTENT_TYPE' => 'application/json') }.to raise_error(ApiErrors::UnsupportedMediaType)
     end
   end
 end

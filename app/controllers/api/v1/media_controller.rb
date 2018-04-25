@@ -1,4 +1,5 @@
 class Api::V1::MediaController < Api::ApiController
+  include RoleControl::RoledController
   include PolymorphicResourceScope
 
   polymorphic_column :linked
@@ -79,7 +80,7 @@ class Api::V1::MediaController < Api::ApiController
   private
 
   def raise_no_resources_error
-    raise Api::NoMediaError.new(
+    raise ApiErrors::NoMediaError.new(
       media_name,
       polymorphic_klass_name,
       polymorphic_ids,

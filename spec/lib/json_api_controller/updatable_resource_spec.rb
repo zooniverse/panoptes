@@ -56,7 +56,7 @@ describe JsonApiController::UpdatableResource, type: :controller do
           post :update_links, {id: resource.id,
                                link_relation: :sujbcts,
                                subjects: subjects.map(&:id).map(&:to_s)}
-        end.to raise_error(JsonApiController::BadLinkParams)
+        end.to raise_error(ApiErrors::BadLinkParams)
       end
     end
 

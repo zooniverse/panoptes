@@ -1,6 +1,6 @@
-require 'classification_lifecycle'
-
 class Api::V1::ClassificationsController < Api::ApiController
+  include RoleControl::RoledController
+
   skip_before_filter :require_login, only: :create
   require_authentication :show, :index, :destroy, :update, :incomplete, :project,
     scopes: [:classification]
@@ -9,7 +9,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   schema_type :json_schema
 
-  rescue_from RoleControl::AccessDenied, with: :access_denied
+  rescue_from RoleControl::RoledController::AccessDenied, with: :access_denied
 
   before_action :filter_plural_subject_ids,
     only: [ :index, :gold_standard, :incomplete, :project ]

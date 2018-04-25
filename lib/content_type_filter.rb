@@ -10,7 +10,7 @@ class ContentTypeFilter
     setup_request_variables(controller)
     return true if empty_request?
     unless acceptable_content?
-      raise Api::UnsupportedMediaType.new(unsupported_media_type_message)
+      raise ApiErrors::UnsupportedMediaType.new(unsupported_media_type_message)
     end
   end
 

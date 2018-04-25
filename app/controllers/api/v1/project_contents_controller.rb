@@ -1,4 +1,5 @@
 class Api::V1::ProjectContentsController < Api::ApiController
+  include RoleControl::RoledController
   include Versioned
 
   CONTENT_PARAMS = [

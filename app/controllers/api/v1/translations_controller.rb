@@ -1,4 +1,5 @@
 class Api::V1::TranslationsController < Api::ApiController
+  include RoleControl::RoledController
   include PolymorphicResourceScope
   polymorphic_column :translated
 
