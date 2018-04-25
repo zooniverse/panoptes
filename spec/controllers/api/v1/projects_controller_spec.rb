@@ -628,6 +628,31 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:controller_action_params) { update_params.merge(id: resource.id) }
     end
 
+    describe "primary_language", :focus do
+      let(:new_lang_code) { "en-AU" }
+      let(:update_params) do
+        {
+          projects: {
+            primary_language: new_lang_code,
+          }
+        }
+      end
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it "should change the primary language" do
+        put :update, update_params.merge(id: resource.id)
+        expect(response).to have_http_status(:ok)
+        expect(resource.reload.primary_language).to eq(new_lang_code)
+      end
+
+      it "should copy the project contents to the new language" do
+        pending("i'm not sure this is a valid idea")
+      end
+    end
+
     describe "launch_approved" do
       let(:ps) do
         ps = update_params
