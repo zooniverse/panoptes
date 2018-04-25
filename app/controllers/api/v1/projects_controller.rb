@@ -59,9 +59,6 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def update
     super do |resource|
-      # TODO: extract this primary project content update
-      # to a service object that sits in the project
-      # transaction.
       content_attributes = primary_content_attributes(update_params)
       unless content_attributes.blank?
         resource.primary_content.update!(content_attributes)
