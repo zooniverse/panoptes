@@ -1,4 +1,5 @@
 class Api::V1::CollectionPreferencesController < Api::ApiController
+  include RoleControl::RoledController
   include PreferencesController
 
   require_authentication :all, scopes: [:collection]

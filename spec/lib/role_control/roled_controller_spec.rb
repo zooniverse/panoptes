@@ -61,7 +61,11 @@ describe RoleControl::RoledController, type: :controller do
 
   describe "user is not enrolled on controlled object" do
     it 'should raise an AccessDenied error' do
-      expect{ put :update, id: controlled.id }.to raise_error(RoleControl::AccessDenied)
+      expect{
+        put :update, id: controlled.id
+      }.to raise_error(
+        RoleControl::RoledController::AccessDenied
+      )
     end
   end
 end

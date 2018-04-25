@@ -77,7 +77,7 @@ module JsonApiController
 
     def raise_link_error(relation_klass, error_name)
       msg = "Couldn't find linked #{relation_klass.model_name.send(error_name)} for current user"
-      raise JsonApiController::NotLinkable.new(msg)
+      raise ApiErrors::NotLinkable.new(msg)
     end
   end
 end

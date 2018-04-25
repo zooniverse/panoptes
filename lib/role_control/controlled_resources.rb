@@ -1,29 +1,43 @@
 module RoleControl
-  module RoledController
-    class AccessDenied < StandardError; end
+  class ControlledResources
+    attr_reader :controller, :scope_context, :add_active_resources_scope
+    delegate :action_name,
+      :params,
+      :resource_name,
+      :resource_class,
+      :api_user,
+      to: :controller
 
-    extend ActiveSupport::Concern
-
-    included do
-      before_action :check_controller_resources, except: :create
+    def initialize(controller, scope_context: {}, add_active_resources_scope: true)
+      @controller = controller
+      @scope_context = scope_context
+      @add_active_resources_scope = add_active_resources_scope
     end
-
-    private
 
     def check_controller_resources
-      raise_no_resources_error unless resources_exist?
-    end
-
-    def resources_exist?
-      resource_ids.blank? ? true : controlled_resources.exists?
+      unless resources_exist?
+        raise ApiErrors::AccessDenied.new(no_resources_error_message)
+      end
     end
 
     def controlled_resources
-      @controlled_resources ||= find_controlled_resources(resource_class, resource_ids)
+      @controlled_resources ||= find_controlled_resources(
+        resource_class, resource_ids
+      )
     end
 
     def controlled_resource
       @controlled_resource ||= controlled_resources.first
+    end
+
+    def resource_ids
+      @resource_ids ||= array_id_params(_resource_ids)
+    end
+
+    private
+
+    def resources_exist?
+      resource_ids.blank? ? true : controlled_resources.exists?
     end
 
     def find_controlled_resources(controlled_class, controlled_ids, action=controlled_scope)
@@ -37,10 +51,6 @@ module RoleControl
       action_name.to_sym
     end
 
-    def raise_no_resources_error
-      raise AccessDenied, no_resources_error_message
-    end
-
     def no_resources_error_message
       "Could not find #{resource_name} with #{no_resources_message_ids}"
     end
@@ -51,10 +61,6 @@ module RoleControl
       else
         "id='#{resource_ids}'"
       end
-    end
-
-    def resource_ids
-      @resource_ids ||= array_id_params(_resource_ids)
     end
 
     def array_id_params(string_id_params)
@@ -74,14 +80,6 @@ module RoleControl
       else
         ''
       end
-    end
-
-    def scope_context
-      {}
-    end
-
-    def add_active_resources_scope
-      true
     end
   end
 end

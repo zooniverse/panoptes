@@ -1,4 +1,5 @@
 class Api::V1::SetMemberSubjectsController < Api::ApiController
+  include RoleControl::RoledController
   require_authentication :create, :update, :destroy, scopes: [:project]
   resource_actions :default
   schema_type :strong_params

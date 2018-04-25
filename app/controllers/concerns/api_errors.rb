@@ -31,4 +31,10 @@ module ApiErrors
       super("Feature has been temporarily disabled")
     end
   end
+  class BadLinkParams < StandardError; end
+  class PreconditionNotPresent < StandardError; end
+  class PreconditionFailed < StandardError; end
+  class NotLinkable < StandardError; end
+  class AccessDenied < StandardError; end
+  class IncorrectClass < StandardError; end
 end

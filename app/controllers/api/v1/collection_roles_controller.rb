@@ -1,4 +1,5 @@
 class Api::V1::CollectionRolesController < Api::ApiController
+  include RoleControl::RoledController
   include RolesController
   require_authentication :create, :update, :destroy, scopes: [:collection]
 

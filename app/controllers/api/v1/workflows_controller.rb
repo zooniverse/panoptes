@@ -1,6 +1,5 @@
-require 'model_version'
-
 class Api::V1::WorkflowsController < Api::ApiController
+  include RoleControl::RoledController
   include Versioned
   include TranslatableResource
   include SyncResourceTranslationStrings
@@ -57,7 +56,9 @@ class Api::V1::WorkflowsController < Api::ApiController
   def context
     case action_name
     when "show", "index"
-      { languages: current_languages }.merge field_context
+      {
+        languages: UserLanguages.new(self).ordered
+      }.merge(field_context)
     else
       {}
     end
@@ -165,7 +166,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def reject_live_project_changes(workflow, update_hash)
     if workflow.active && workflow.project.live && non_permitted_changes?(workflow, update_hash)
-      raise Api::LiveProjectChanges.new("Can't change an active workflow for a live project.")
+      raise ApiErrors::LiveProjectChanges.new("Can't change an active workflow for a live project.")
     end
   end
 
@@ -201,7 +202,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def available_to_export
     if controlled_resource.project.keep_data_in_panoptes_only?
-      raise Api::DisabledDataExport.new(
+      raise ApiErrors::DisabledDataExport.new(
         "Data exports are disabled for this project"
       )
     end

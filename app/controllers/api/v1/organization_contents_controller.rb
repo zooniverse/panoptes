@@ -1,4 +1,5 @@
 class Api::V1::OrganizationContentsController < Api::ApiController
+  include RoleControl::RoledController
   include Versioned
 
   require_authentication :all, scopes: [:organization]

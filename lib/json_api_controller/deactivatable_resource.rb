@@ -3,9 +3,7 @@ module JsonApiController
     extend ActiveSupport::Concern
 
     included do
-      before_action only: :destroy do |controller|
-        controller.precondition_check
-      end
+      before_action :destroy_precondition_check, only: :destroy
     end
 
     def destroy
@@ -22,6 +20,12 @@ module JsonApiController
 
     def to_disable
       controlled_resources
+    end
+
+    private
+
+    def destroy_precondition_check
+      precondition_check
     end
   end
 end

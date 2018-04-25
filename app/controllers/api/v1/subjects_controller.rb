@@ -1,14 +1,21 @@
 class Api::V1::SubjectsController < Api::ApiController
   include Versioned
 
+  attr_reader :auth_scheme
+  delegate :check_controller_resources,
+    :controlled_resources,
+    :controlled_resource,
+    to: :auth_scheme
+
   require_authentication :update, :create, :destroy, :version, :versions,
     scopes: [:subject]
+
+  before_action :setup_auth_scheme, except: :create
+  before_action :check_controller_resources, except: :create
+  before_action :check_subject_limit, only: :create
+
   resource_actions :show, :index, :create, :update, :deactivate
   schema_type :json_schema
-
-  alias_method :subject, :controlled_resource
-
-  before_action :check_subject_limit, only: :create
 
   def index
     case params[:sort]
@@ -56,7 +63,7 @@ class Api::V1::SubjectsController < Api::ApiController
   def check_subject_limit
     if api_user.above_subject_limit?
       current, max = api_user.subject_limits
-      raise Api::LimitExceeded, "User has uploaded #{current} subjects of #{max} maximum"
+      raise ApiErrors::LimitExceeded, "User has uploaded #{current} subjects of #{max} maximum"
     end
   end
 
@@ -75,9 +82,9 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def build_update_hash(update_params, resource)
     locations = update_params.delete(:locations)
-    new_locations = add_locations(locations, resource)
-    subject.save!
-    subject.locations = new_locations if new_locations
+    if new_locations = add_locations(locations, resource)
+      resource.locations = new_locations
+    end
     super(update_params, resource)
   end
 
@@ -136,5 +143,9 @@ class Api::V1::SubjectsController < Api::ApiController
     if api_user.user
       UserSeenSubject.where(user: api_user.user, workflow: workflow).first
     end
+  end
+
+  def setup_auth_scheme
+    @auth_scheme = RoleControl::ControlledResources.new(self)
   end
 end

@@ -53,7 +53,7 @@ describe JsonApiController::RelationManager do
         it 'should raise an error' do
           expect do
             test_instance.update_relation(resource, :subjects, [-10, -2])
-          end.to raise_error(JsonApiController::NotLinkable, /subjects\s/)
+          end.to raise_error(ApiErrors::NotLinkable, /subjects\s/)
         end
       end
 
@@ -77,7 +77,7 @@ describe JsonApiController::RelationManager do
         it 'should raise an error' do
           expect do
             test_instance.update_relation(*update_params)
-          end.to raise_error(JsonApiController::NotLinkable, /user_group\s/)
+          end.to raise_error(ApiErrors::NotLinkable, /user_group\s/)
         end
       end
     end

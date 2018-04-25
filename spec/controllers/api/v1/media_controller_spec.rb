@@ -122,7 +122,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           parent_scope = parent.class.where(id: parent.id)
           allow(controller).to receive(:controlled_resources).and_return(parent_scope)
           expect{ destroy_action }.to raise_error(
-            JsonApiController::DestructableResource::IncorrectClass,
+            ApiErrors::IncorrectClass,
             "Attempting to delete the wrong resource type - #{parent.class.name}"
           )
         end
@@ -295,7 +295,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
             .and_return(parent.class.where(id: parent.id))
 
           expect{ destroy_action }.to raise_error(
-            JsonApiController::DestructableResource::IncorrectClass,
+            ApiErrors::IncorrectClass,
             "Attempting to delete the wrong resource type - #{parent.class.name}"
           )
         end
