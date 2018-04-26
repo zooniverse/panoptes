@@ -64,4 +64,42 @@ describe CalculateProjectCompletenessWorker do
       it_should_behave_like "it reports completeness correctly"
     end
   end
+
+  describe "project state transitions" do
+    before do
+      allow(Project).to receive(:find).and_return(project)
+    end
+
+    context "when the project is not complete" do
+      before do
+        allow(project)
+        .to receive(:active_workflows)
+        .and_return([double(completeness: 0.91)])
+      end
+
+      it "should not move a non-finished project to paused" do
+        expect {
+          worker.perform(project)
+        }.not_to change {
+          project.state
+        }
+      end
+    end
+
+    context "when the project is active and complete" do
+      before do
+        allow(project)
+        .to receive(:active_workflows)
+        .and_return([double(completeness: 1)])
+      end
+
+      it "should move it to paused" do
+        expect {
+          worker.perform(project)
+        }.to change {
+          project.state
+        }.to("paused")
+      end
+    end
+  end
 end

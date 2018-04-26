@@ -14,7 +14,7 @@ class RetireSubjectWorker
       end
     end
 
-    WorkflowRetiredCountWorker.perform_async(workflow.id)
+    RefreshWorkflowStatusWorker.perform_async(workflow.id)
 
     subject_ids.each do |subject_id|
       NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)

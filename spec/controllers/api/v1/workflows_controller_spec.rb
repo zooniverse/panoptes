@@ -356,20 +356,10 @@ describe Api::V1::WorkflowsController, type: :controller do
         context "when the workflow has subjects" do
           case link_to_test
           when :subject_sets
-            it "should call unfinish_workflow_worker" do
-              expect(UnfinishWorkflowWorker).to receive(:perform_async).with(resource.id)
-            end
-
-            it 'should call the workflow retired counter worker' do
-              expect(WorkflowRetiredCountWorker)
-                .to receive(:perform_async)
-                .with(resource.id)
-            end
-
-            it 'should call the project completeness worker' do
-              expect(CalculateProjectCompletenessWorker)
-                .to receive(:perform_async)
-                .with(resource.project_id)
+            it "should call refresh workflow status worker" do
+              expect(RefreshWorkflowStatusWorker)
+              .to receive(:perform_async)
+              .with(resource.id)
             end
 
             it 'should notify the subject selector that the available subjects changed' do
@@ -377,12 +367,8 @@ describe Api::V1::WorkflowsController, type: :controller do
                 .with(resource.id)
             end
           when :retired_subjects
-            it 'should not call reload cellect worker' do
-              expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
-            end
-
             it 'should call the workflow retired counter worker' do
-              expect(WorkflowRetiredCountWorker)
+              expect(RefreshWorkflowStatusWorker)
                 .to receive(:perform_async)
                 .with(resource.id)
             end
@@ -397,7 +383,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         context "when the workflow has no subjects" do
           let(:linked_resource) { create(:subject_set, project: subject_set_project) }
 
-          it 'should not attempt to call cellect', :aggregate_failures do
+          it 'should not attempt to notify the subject selector' do
             expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
           end
         end
