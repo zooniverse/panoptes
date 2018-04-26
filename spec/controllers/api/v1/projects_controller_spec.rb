@@ -445,7 +445,7 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       describe "project contents" do
-        let(:contents) { Project.find(created_project_id).project_contents.first }
+        let(:contents) { Project.find(created_project_id).project_contents }
 
         it "should create an associated project_content model" do
           expect(contents).to_not be_nil

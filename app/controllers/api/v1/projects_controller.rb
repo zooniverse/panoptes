@@ -119,7 +119,7 @@ class Api::V1::ProjectsController < Api::ApiController
     admin_allowed create_params, *admin_allowed_params
 
     content_attributes = primary_content_attributes(create_params)
-    create_params[:project_contents] = [ ProjectContent.new(content_attributes) ]
+    create_params[:project_contents] = ProjectContent.new(content_attributes)
 
     if create_params.key?(:tags)
       create_params[:tags] = Tags::BuildTags.run!(api_user: api_user, tag_array: create_params[:tags])
@@ -150,7 +150,7 @@ class Api::V1::ProjectsController < Api::ApiController
       case item
       when Workflow
         item.dup.tap do |dup_object|
-          dup_object.workflow_contents = item.workflow_contents.map(&:dup)
+          dup_object.workflow_contents = item.workflow_contents.dup
         end
       when SubjectSet
         if !item.belongs_to_project?(project_id)
