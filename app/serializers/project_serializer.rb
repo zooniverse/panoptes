@@ -4,11 +4,10 @@ class ProjectSerializer
   include RestPack::Serializer
   include OwnerLinkSerializer
   include MediaLinksSerializer
-  include ContentSerializer
   include CachedSerializer
 
   PRELOADS = [
-    # :project_contents, Note: re-add when the eager_load from translatable_resources is removed
+    :project_contents,
     :workflows,
     :active_workflows,
     :subject_sets,
@@ -52,14 +51,12 @@ class ProjectSerializer
       end
     end
 
-    if Panoptes.flipper["eager_load_projects"].enabled?
-      preloads = if context[:cards]
-        :avatar
-      else
-        PRELOADS
-      end
-      scope = scope.preload(*preloads)
-    end
+    preloads = if context[:cards]
+                 :avatar
+               else
+                 PRELOADS
+               end
+    scope = scope.preload(*preloads)
 
     super(params, scope, context)
   end
@@ -127,7 +124,10 @@ class ProjectSerializer
     end
   end
 
-  def fields
-    %i(title description workflow_description introduction url_labels researcher_quote)
+  def content
+    return @content if @content
+    content = @model.project_contents.attributes.with_indifferent_access
+    content.default = ""
+    @content = content.slice(*Api::V1::ProjectsController::CONTENT_FIELDS)
   end
 end

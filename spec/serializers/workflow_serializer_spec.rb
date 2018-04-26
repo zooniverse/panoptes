@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe WorkflowSerializer do
   let(:workflow) { create(:workflow_with_contents) }
-  let(:content) { workflow.workflow_contents.first }
+  let(:content) { workflow.workflow_contents }
   let(:serializer) do
     serializer = WorkflowSerializer.new
     serializer.instance_variable_set(:@model, workflow)
@@ -14,7 +14,7 @@ describe WorkflowSerializer do
   it_should_behave_like "a panoptes restpack serializer" do
     let(:resource) { workflow }
     let(:includes) { %i(project subject_sets tutorial_subject) }
-    let(:preloads) { %i(subject_sets attached_images) }
+    let(:preloads) { %i(subject_sets attached_images workflow_contents) }
   end
 
   it_should_behave_like "a filter has many serializer" do
@@ -44,15 +44,11 @@ describe WorkflowSerializer do
     end
   end
 
-  context "when there is no content_association" do
+  context "when there is no workflow_contents association" do
     let!(:workflow) do
       create(:workflow) do |workflow|
-        workflow.workflow_contents = []
+        workflow.workflow_contents = nil
       end
-    end
-
-    it "should not have a content association" do
-      expect(workflow.content_association).to be_empty
     end
 
     describe "#version", versioning: true do
