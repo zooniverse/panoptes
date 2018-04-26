@@ -1,7 +1,6 @@
 class OrganizationSerializer
   include RestPack::Serializer
   include OwnerLinkSerializer
-  include ContentSerializer
   include MediaLinksSerializer
   include CachedSerializer
 
@@ -36,10 +35,6 @@ class OrganizationSerializer
     end
   end
 
-  def fields
-    %i(title description introduction announcement)
-  end
-
   def self.links
     links = super
     links["organizations.pages"] = {
@@ -47,5 +42,12 @@ class OrganizationSerializer
                                type: "organization_pages"
                               }
     links
+  end
+
+  def content
+    return @content if @content
+    content = @model.organization_contents.attributes.with_indifferent_access
+    content.default = ""
+    @content = content.slice(*Api::V1::OrgnazationsController::CONTENT_FIELDS)
   end
 end
