@@ -22,7 +22,8 @@ describe OrganizationSerializer do
     end
 
     it "includes the defined content fields" do
-      expect(serializer.content.keys).to contain_exactly(*Api::V1::OrganizationsController::CONTENT_PARAMS)
+      fields = Api::V1::OrganizationsController::CONTENT_PARAMS.map(&:to_s)
+      expect(serializer.content.keys).to contain_exactly(*fields)
     end
 
     describe "includes avatar and background" do

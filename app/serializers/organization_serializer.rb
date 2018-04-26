@@ -5,7 +5,6 @@ class OrganizationSerializer
   include MediaLinksSerializer
   include CachedSerializer
 
-
   attributes :id, :display_name, :description, :introduction, :title, :href,
     :primary_language, :listed_at, :listed, :slug, :urls, :categories, :announcement
   optional :avatar_src
@@ -27,10 +26,6 @@ class OrganizationSerializer
 
   def announcement
     content[:announcement]
-  end
-
-  def content
-    @content ||= _content
   end
 
   def avatar_src

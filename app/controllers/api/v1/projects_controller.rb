@@ -1,7 +1,6 @@
 class Api::V1::ProjectsController < Api::ApiController
   include FilterByOwner
   include FilterByCurrentUserRoles
-  include TranslatableResource
   include SyncResourceTranslationStrings
   include IndexSearch
   include FilterByTags

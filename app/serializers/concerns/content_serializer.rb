@@ -1,14 +1,8 @@
 module ContentSerializer
-  extend ActiveSupport::Concern
-
-  def _content
-    content = @model.content_for(@context[:languages])
-    content = fields.map{ |k| Hash[k, content.send(k)] }.reduce(&:merge)
-    content.default_proc = proc { |hash, key| "" }
-    content
-  end
-
   def content
-    @content ||= _content
+    return @content if @content
+    content = @model.primary_content.attributes.with_indifferent_access
+    content.default = ""
+    @content = content.slice(*fields)
   end
 end
