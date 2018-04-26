@@ -5,7 +5,7 @@
 
         <div class="row" >
         <fieldset class="fieldset--text">
-            <%= f.label :login, "Username" %><small class="errored"><%= resource.errors[:login].join(', ')%></small><br />
+            <%= f.label :login, "Username (required)" %><small class="errored"><%= resource.errors[:login].join(', ')%></small><br />
             <%= f.text_field :login, autofocus: true, required: true %>
         </fieldset>
         </div>
@@ -20,19 +20,19 @@
 
         <div class="row" >
         <fieldset class="fieldset--email">
-            <%= f.label :email %><small class="errored"><%= resource.errors[:email].join(', ')%></small><br />
+            <%= f.label :email, "Email (required)"%><small class="errored"><%= resource.errors[:email].join(', ')%></small><br />
             <%= f.email_field :email, required: true %>
         </fieldset>
         </div>
 
         <div class="row" >
         <fieldset class="fieldset--password">
-            <%= f.label :password %><small class="errored"><%= resource.errors[:password].join(', ')%></small><br />
+            <%= f.label :password, "Password (required)"%><small class="errored"><%= resource.errors[:password].join(', ')%></small><br />
             <%= f.password_field :password, autocomplete: "off", required: true %>
         </fieldset>
 
         <fieldset class="fieldset--password">
-            <%= f.label :password_confirmation %><small class="errored"><%= resource.errors[:password_confirmation].join(', ')%></small><br />
+            <%= f.label :password_confirmation, "Password confirmation (required)" %><small class="errored"><%= resource.errors[:password_confirmation].join(', ')%></small><br />
             <%= f.password_field :password_confirmation, autocomplete: "off", required: true %>
         </fieldset>
         </div>
