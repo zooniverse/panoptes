@@ -12,7 +12,7 @@ describe Workflow, type: :model do
   it_behaves_like "has subject_count"
 
   it_behaves_like "is translatable" do
-    let(:translatable) { create(:workflow_with_contents, build_extra_contents: true) }
+    let(:translatable) { create(:workflow_with_contents) }
     let(:translatable_without_content) { build(:workflow, build_contents: false) }
     let(:primary_language_factory) { :workflow }
     let(:private_project) { create(:project, private: true) }

@@ -22,7 +22,7 @@ describe Project, type: :model do
   end
 
   it_behaves_like "is translatable" do
-    let(:translatable) { create(:project_with_contents, build_extra_contents: true) }
+    let(:translatable) { create(:project_with_contents) }
     let(:translatable_without_content) { build(:project, build_contents: false) }
     let(:primary_language_factory) { :project }
     let(:private_model) { create(:project, private: true) }

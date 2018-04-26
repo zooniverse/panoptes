@@ -13,29 +13,6 @@ shared_examples "is translatable" do
     end
   end
 
-  describe "#primary_content" do
-    it "should have a primary_content association" do
-      expected_content_class = translatable.class.content_model
-      expect(translatable.primary_content).to be_a(expected_content_class)
-    end
-
-    context "without a primary_content association" do
-      before do
-        translatable.send(:"#{described_class.name.underscore}_contents=", [])
-        translatable.primary_content = nil
-        translatable.valid?
-      end
-
-      it "should not be valid" do
-        expect(translatable).to be_invalid
-      end
-
-      it "should have the correct error message" do
-        expect(translatable.errors[:primary_content]).to eq(["can't be blank"])
-      end
-    end
-  end
-
   describe "#primary_language" do
     let(:factory) { primary_language_factory }
     let(:locale_field) { :primary_language }

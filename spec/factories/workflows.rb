@@ -2,7 +2,6 @@ FactoryBot.define do
   factory :workflow, aliases: [:workflow_with_contents] do
     transient do
       build_contents true
-      build_extra_contents false
     end
 
     display_name "A Workflow"
@@ -59,11 +58,7 @@ FactoryBot.define do
 
     after(:build) do |w, env|
       if env.build_contents
-        w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: w.primary_language)
-        if env.build_extra_contents
-          w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: 'en-US')
-          w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: 'zh-TW')
-        end
+        w.workflow_contents = build(:workflow_content, workflow: w, language: w.primary_language)
       end
     end
 
