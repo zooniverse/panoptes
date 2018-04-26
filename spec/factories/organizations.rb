@@ -16,8 +16,7 @@ FactoryBot.define do
 
     after(:build) do |o, env|
       if env.build_contents
-        o.organization_contents << build_list(:organization_content, 1, organization: o, language: o.primary_language)
-        o.organization_contents << build_list(:organization_content, 1, organization: o, language: 'en-US')
+        o.organization_contents = build(:organization_content, organization: o, language: o.primary_language)
       end
 
       if env.build_media
