@@ -43,7 +43,7 @@ class UserSerializer
     @permitted ||= @context[:include_private] || requester
   end
 
-  %w(credited_name email languages global_email_communication
+  %w(email languages global_email_communication
      project_email_communication beta_email_communication
      uploaded_subjects_count subject_limit admin login_prompt zooniverse_id
      upload_whitelist valid_email, ux_testing_email_communication).each do |me_only_attribute|
