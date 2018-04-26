@@ -14,16 +14,15 @@ describe OrganizationSerializer do
   describe "#content" do
     let(:organization_with_media) { create(:organization, build_media: true) }
     let(:links) { [:avatar, :background] }
-    let(:serialized) { OrganizationSerializer.resource({include: 'avatar,background,owners'}, Organization.where(id: organization_with_media.id), context) }
-
-    it "should return organization content for the preferred language" do
-      expect(serializer.content).to be_a( Hash )
-      expect(serializer.content).to include(:title)
-    end
+    let(:scope)  { Organization.where(id: organization_with_media.id) }
+    let(:params) { {include: 'avatar,background,owner'} }
+    let(:serialized) { OrganizationSerializer.resource(params, scope, context) }
+    let(:serialized) { OrganizationSerializer.page(params, scope, context) }
 
     it "includes the defined content fields" do
-      fields = Api::V1::OrganizationsController::CONTENT_PARAMS.map(&:to_s)
-      expect(serializer.content.keys).to contain_exactly(*fields)
+      single = OrganizationSerializer.single(params, scope, context)
+      fields = Api::V1::OrganizationsController::CONTENT_PARAMS
+      expect(single.keys).to include(*fields)
     end
 
     describe "includes avatar and background" do
@@ -95,10 +94,11 @@ describe OrganizationSerializer do
       OrganizationSerializer.single({}, Organization.where(id: organization.id), {})
     end
     let(:result_urls) do
-      organization.urls.map do |url|
+      url_labels = organization.organization_contents.url_labels
+      organization.urls.each_with_index.map do |url, index|
         {
           url: url["url"],
-          label: url["label"]
+          label: url_labels["#{index}.label"]
         }
       end
     end
