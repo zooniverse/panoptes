@@ -61,4 +61,13 @@ RSpec.describe UserSerializer do
       expect(result[:users][0][:avatar_src]).to eq(avatar.url_for_format(:get))
     end
   end
+
+  describe "a confused user" do
+    let!(:confused_user) { create(:user, credited_name: "oops@email.com", login: "confused_user" )}
+    let(:confused_serializer) { described_class.serialize(confused_user) }
+
+    it "serialized the user's login as credited_name if credited_name contains an @" do
+      expect(confused_serializer[:users][0][:credited_name]).to eq("confused_user")
+    end
+  end
 end

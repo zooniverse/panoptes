@@ -37,6 +37,10 @@ class UserSerializer
     @model.avatar&.url_for_format(:get)
   end
 
+  def credited_name
+    @model.credited_name.include?('@') ? @model.login : @model.credited_name
+  end
+
   private
 
   def permitted_requester?
