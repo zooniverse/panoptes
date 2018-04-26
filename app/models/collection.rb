@@ -8,7 +8,9 @@ class Collection < ActiveRecord::Base
   include SluggedName
 
   has_and_belongs_to_many :projects
-  has_many :collections_subjects, dependent: :destroy
+  has_many :collections_subjects,
+    -> { order(id: :desc) },
+    dependent: :destroy
   has_many :subjects, through: :collections_subjects
   has_many :collection_roles, -> { where.not("access_control_lists.roles = '{}'") }, class_name: "AccessControlList", as: :resource
   has_many :user_collection_preferences, dependent: :destroy
