@@ -4,7 +4,7 @@ describe Subjects::DesignatorSelector do
   let(:client) { instance_double(DesignatorClient) }
   let(:workflow) { instance_double(Workflow, id: 1) }
   let(:selector) { described_class.new(workflow)}
-  
+
   before do
     allow(described_class).to receive(:client).and_return(client)
   end
@@ -77,7 +77,18 @@ describe Subjects::DesignatorSelector do
       allow(client).to receive(:get_subjects).with(workflow.id, 2, nil, 10).and_return(set_member_subjects.map(&:subject_id))
 
       set_member_subject_ids = selector.get_subjects(user, nil, 10)
-      expect(set_member_subject_ids).to match_array(set_member_subjects.map(&:id))
+      expect(set_member_subject_ids).to eq(set_member_subjects.map(&:id))
+    end
+
+    it 'returns set_member_subject_ids in the same order that Designator returned the subject_ids' do
+      subject_set = create(:subject_set, workflows: [workflow])
+      set_member_subjects = create_list(:set_member_subject, 5, subject_set: subject_set)
+      set_member_subjects.reverse!
+
+      allow(client).to receive(:get_subjects).with(workflow.id, 2, nil, 10).and_return(set_member_subjects.map(&:subject_id))
+
+      set_member_subject_ids = selector.get_subjects(user, nil, 10)
+      expect(set_member_subject_ids).to eq(set_member_subjects.map(&:id))
     end
 
     it 'returns an empty array unless enabled', :aggregate_failures do
