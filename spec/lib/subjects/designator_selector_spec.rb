@@ -91,6 +91,12 @@ describe Subjects::DesignatorSelector do
       expect(set_member_subject_ids).to eq(set_member_subjects.map(&:id))
     end
 
+    it 'does not allow sql injection' do
+      allow(client).to receive(:get_subjects).with(workflow.id, 2, nil, 10).and_return([1, 2, '1], set_member_subjects.id); DROP TABLE users; -- '])
+      expect { selector.get_subjects(user, nil, 10) }
+        .to raise_error(StandardError, "Hacking attempt")
+    end
+
     it 'returns an empty array unless enabled', :aggregate_failures do
       Panoptes.flipper["designator"].disable
       expect(client).not_to receive(:get_subjects)
