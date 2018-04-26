@@ -86,7 +86,7 @@ The User resource has the following attributes:
 - languages
 
 *id*, *zooniverse_id*, *created_at*, *updated_at*, and
- *classification_count* are created and updated by the Panoptes API.
+ *classification_count* are created and updated by the Panoptes API. `credited_name` is the publicly available name with which a volunteer will be credited on papers, posters, etc. When serialized, if an `@` character is found, the user's login will be returned instead for privacy reasons.
 
 + Parameters
     + id (integer) ... ID of the User as an integer key
