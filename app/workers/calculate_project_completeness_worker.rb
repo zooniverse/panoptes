@@ -26,6 +26,8 @@ class CalculateProjectCompletenessWorker
   end
 
   def project_completeness(project)
+    return 0.0 if project.active_workflows.empty?
+
     completenesses = project.active_workflows.map(&:completeness)
     completenesses.sum / completenesses.size.to_f
   end

@@ -20,6 +20,12 @@ describe CalculateProjectCompletenessWorker do
         worker.perform("-1")
       end
     end
+
+    context "when a project has no active workflows" do
+      it "should set to 0.0" do
+        expect(worker.project_completeness(project)).to eq(0.0)
+      end
+    end
   end
 
   describe '#workflow_completeness' do
