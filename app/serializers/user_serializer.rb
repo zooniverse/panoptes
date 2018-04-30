@@ -38,7 +38,11 @@ class UserSerializer
   end
 
   def credited_name
-    @model.credited_name.include?('@') ? @model.login : @model.credited_name
+    if !@model.credited_name || @model.credited_name.include?('@')
+      @model.login
+    else
+      @model.credited_name
+    end
   end
 
   private
