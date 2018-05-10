@@ -2,7 +2,7 @@ class SubjectSerializer
   include Serialization::PanoptesRestpack
   include FilterHasMany
 
-  attributes :id, :metadata, :locations, :zooniverse_id,
+  attributes :id, :metadata, :locations, :zooniverse_id, :external_id,
     :created_at, :updated_at, :href
 
   can_include :project, :collections, :subject_sets

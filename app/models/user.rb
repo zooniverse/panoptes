@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
   has_many :collection_roles, through: :identity_group
   has_many :user_seen_subjects, dependent: :destroy
   has_many :uploaded_subjects, class_name: "Subject", foreign_key: "upload_user_id", dependent: :restrict_with_exception
+  has_many :subject_set_imports
 
   belongs_to :signup_project, class_name: 'Project', foreign_key: "project_id"
 

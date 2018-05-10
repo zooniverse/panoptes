@@ -5,6 +5,10 @@ class SubjectCreateSchema < JsonSchema
     required "links", "locations"
     additional_properties false
 
+    property "external_id" do
+      type "string"
+    end
+
     property "metadata" do
       type "object"
     end
