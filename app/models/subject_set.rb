@@ -21,6 +21,7 @@ class SubjectSet < ActiveRecord::Base
   can_be_linked :project, :scope_for, :show, :user
   can_be_linked :workflow, :scope_for, :show, :user
   can_be_linked :set_member_subject, :scope_for, :update, :user
+  can_be_linked :subject_set_import, :scope_for, :update, :user
 
   def belongs_to_project?(other_project_id)
     project_id == other_project_id

@@ -188,6 +188,8 @@ GEM
       domain_name (~> 0.5)
     http-form_data (1.0.3)
     http_parser.rb (0.6.0)
+    httparty (0.16.2)
+      multi_xml (>= 0.5.2)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     ice_cube (0.14.0)
@@ -462,6 +464,7 @@ DEPENDENCIES
   guard-rspec
   hashdiff
   honeybadger (~> 3.3)
+  httparty
   jquery-rails (~> 4.3)
   json-schema (~> 2.8)
   librato-metrics (~> 2.1.2)
