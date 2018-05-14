@@ -30,9 +30,11 @@ Rails.application.routes.draw do
     post "/users/sign_in" => "sessions#create", as: :user_session
     delete "/users/sign_out" => "sessions#destroy", as: :destroy_user_session
 
+    get '/profile' => 'registrations#edit', as: :edit_user_registration
     get "/users/sign_up" => "registrations#new", as: :new_user_registration
     post "/users" => "registrations#create", as: :user_registration
     put "/users" => "registrations#update"
+    delete "/users" => "registrations#destroy", as: :destroy_user_registration
   end
 
   get "unsubscribe", to: "emails#unsubscribe_via_token"

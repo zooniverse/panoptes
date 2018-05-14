@@ -19,6 +19,19 @@ class RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  def destroy
+    if current_user.valid_password?(params[:user][:current_password])
+      UserInfoScrubber.scrub_personal_info!(current_user)
+      Activation.disable_instances!([current_user])
+      Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
+      set_flash_message! :notice, :destroyed
+      respond_with_navigational(resource){ redirect_to after_sign_out_path_for(resource_name) }
+    else
+      flash[:delete_alert] = "Incorrect password"
+      render action: :edit
+    end
+  end
+
   private
 
   def create_from_json
