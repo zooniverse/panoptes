@@ -37,13 +37,21 @@ class UserSerializer
     @model.avatar&.url_for_format(:get)
   end
 
+  def credited_name
+    if !@model.credited_name || @model.credited_name.include?('@')
+      @model.login
+    else
+      @model.credited_name
+    end
+  end
+
   private
 
   def permitted_requester?
     @permitted ||= @context[:include_private] || requester
   end
 
-  %w(credited_name email languages global_email_communication
+  %w(email languages global_email_communication
      project_email_communication beta_email_communication
      uploaded_subjects_count subject_limit admin login_prompt zooniverse_id
      upload_whitelist valid_email, ux_testing_email_communication).each do |me_only_attribute|

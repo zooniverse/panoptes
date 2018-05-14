@@ -86,10 +86,6 @@ describe Api::V1::UsersController, type: :controller do
           expect(not_requester).to_not include("email")
         end
 
-        it 'should not have a credited name' do
-          expect(not_requester).to_not include("credited_name")
-        end
-
         it 'should not have a global email communication' do
           expect(not_requester).to_not include("global_email_communication")
         end
@@ -131,10 +127,6 @@ describe Api::V1::UsersController, type: :controller do
 
       it 'should not have an email address' do
         expect(json_response[api_resource_name][0]).to_not include("email")
-      end
-
-      it 'should not have a credited name' do
-        expect(json_response[api_resource_name][0]).to_not include("credited_name")
       end
 
       it 'should not have languages' do
