@@ -143,7 +143,9 @@ describe Workflow, type: :model do
     end
 
     context "classification_count" do
-      let(:retirement) { { 'criteria' => 'classification_count', 'options' => {'count' => 1} } }
+      let(:retirement) do
+        { 'criteria' => 'classification_count', 'options' => {'count' => 1} }
+      end
 
       it "should return a classification count scheme" do
         expect(subject.retirement_scheme).to be_a(RetirementSchemes::ClassificationCount)
@@ -172,6 +174,27 @@ describe Workflow, type: :model do
       let(:retirement) { { 'criteria' => 'classification_count' } }
 
       it { is_expected.to be_valid }
+
+      describe "empty count vales" do
+        let(:retirement) do
+          {
+            'criteria' => 'classification_count',
+            'options' => { 'count' =>nil }
+           }
+        end
+
+        it "should not be valid" do
+          expect(subject.valid?).to eq(false)
+        end
+
+        it "should have a useful error message" do
+          subject.valid?
+          expected_msg = "Retirement count must be a number"
+          expect(
+            subject.errors[:"retirement.options.count"]
+          ).to match_array([expected_msg])
+        end
+      end
     end
 
     context "anything else" do
