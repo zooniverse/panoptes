@@ -40,7 +40,7 @@ gem 'rails', '~> 4.2.10'
 gem 'ranked-model', '~> 0.4.0'
 gem 'restpack_serializer', github: "zooniverse/restpack_serializer", branch: "rails5" # REST API
 gem 'schema_plus_pg_indexes', '~> 0.1'
-gem 'scientist', '~> 1.1.1'
+gem 'scientist', '~> 1.1.2'
 gem 'sdoc', '~> 1.0.0', group: :doc
 gem 'semantic_logger', '~> 4.3.0'
 gem 'sidekiq', '~> 5.1.3'
