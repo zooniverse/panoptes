@@ -64,6 +64,38 @@ RSpec.describe UserSeenSubject, :type => :model do
     end
   end
 
+  describe '::has_seen_subjects_for_workflow?' do
+    let(:subject_ids) { [ 1 ] }
+    let(:user) { user_seen_subject.user }
+    let(:workflow) { user_seen_subject.workflow }
+
+    def run_seens_query
+      UserSeenSubject.has_seen_subjects_for_workflow?(
+        user,
+        workflow,
+        subject_ids
+      )
+    end
+
+    it 'should return false when no seen subject record exists' do
+      expect(run_seens_query).to eq(false)
+    end
+
+    context "when a user seen record exists" do
+
+      it 'should return false with no overlap in subject ids ' do
+        user_seen_subject.save
+        expect(run_seens_query).to eq(false)
+      end
+
+      it 'should return true with overlap in subject ids ' do
+        user_seen_subject.subject_ids = subject_ids
+        user_seen_subject.save
+        expect(run_seens_query).to eq(true)
+      end
+    end
+  end
+
   context "counting user activity" do
     let(:user_seen_subject) { create(:user_seen_subject) }
     let!(:another_uss) { create(:user_seen_subject, user: user_seen_subject.user) }

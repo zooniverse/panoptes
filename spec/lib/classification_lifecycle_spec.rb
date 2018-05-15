@@ -96,10 +96,10 @@ describe ClassificationLifecycle do
         subject.execute
       end
 
-      context "when the classification has the already_seen metadata value" do
-        let!(:classification) { create(:anonymous_already_seen_classification) }
+      context "when the classification has already been seen" do
 
         it 'should not count towards retirement' do
+          allow(subject).to receive(:subjects_are_seen_by_user?).and_return(true)
           expect(subject.send(:should_count_towards_retirement?)).to be false
           subject.execute
         end
@@ -230,8 +230,11 @@ describe ClassificationLifecycle do
       let(:subject_ids) { classification.subject_ids }
 
       it 'should call classification count worker' do
-        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == "update")
-        expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == "update")
+        subject_ids.each do |subject_id|
+          expect(ClassificationCountWorker)
+            .to receive(:perform_async)
+            .with(subject_id, workflow.id)
+        end
         subject.execute
       end
 
@@ -250,17 +253,18 @@ describe ClassificationLifecycle do
         let(:classification) { create(:classification, user: nil) }
 
         it 'should call the classification count worker' do
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == "update")
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == "update")
+          subject_ids.each do |subject_id|
+            expect(ClassificationCountWorker)
+              .to receive(:perform_async)
+              .with(subject_id, workflow.id)
+          end
           subject.execute
         end
 
-        context "when the classification has the already_seen metadata value" do
-          let!(:classification) do
-            create(:anonymous_already_seen_classification)
-          end
+        context "when the classification has been seen by the user" do
 
           it 'should not call the classification count worker' do
+            allow(subject).to receive(:subjects_are_seen_by_user?).and_return(true)
             expect(ClassificationCountWorker).to_not receive(:perform_async)
             subject.execute
           end
@@ -280,16 +284,17 @@ describe ClassificationLifecycle do
 
       context 'when classification is complete' do
         it 'should queue the count worker' do
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[0], workflow.id, action == "update")
-          expect(ClassificationCountWorker).to receive(:perform_async).with(subject_ids[1], workflow.id, action == "update")
+          subject_ids.each do |subject_id|
+            expect(ClassificationCountWorker)
+              .to receive(:perform_async)
+              .with(subject_id, workflow.id)
+          end
           subject.execute
         end
       end
     end
 
     it "should notify the subject selector" do
-      allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
-
       classification.subject_ids.each do |subject_id|
         expect(NotifySubjectSelectorOfSeenWorker).to receive(:perform_async).with(workflow.id, user.id, subject_id)
       end
@@ -507,7 +512,7 @@ describe ClassificationLifecycle do
 
         context "when the subject is already seen" do
           it "should not mark the classification as expert" do
-            allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
+            allow(subject).to receive(:subjects_are_seen_by_user?).and_return(true)
             subject.mark_expert_classifier
             expect(classification.expert_classifier).to be_nil
           end
@@ -527,9 +532,22 @@ describe ClassificationLifecycle do
 
   describe "#update_classification_data" do
     let(:update_classification_data) { subject.update_classification_data }
+    let(:update_methods) do
+      %i(
+        mark_expert_classifier
+        add_seen_before_for_user
+        add_project_live_state
+        add_user_groups
+        add_lifecycled_at
+      )
+    end
 
-    it "should wrap the calls in a transaction" do
-      expect(Classification).to receive(:transaction)
+    it "should not update any data if classification is incomplete" do
+      allow(classification).to receive(:complete?).and_return(false)
+      update_methods.each do |method|
+        expect(subject).not_to receive(method)
+      end
+      expect(classification).not_to receive(:save!)
       update_classification_data
     end
 
@@ -648,7 +666,7 @@ describe ClassificationLifecycle do
 
       context "when the user has seen the subject before" do
         it "should add the seen_before metadata value" do
-          allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
+          allow(subject).to receive(:subjects_are_seen_by_user?).and_return(true)
           subject.add_seen_before_for_user
           expect(classification.metadata[:seen_before]).to eq(true)
         end

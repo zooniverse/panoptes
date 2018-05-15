@@ -23,7 +23,7 @@ class ClassificationLifecycle
   end
 
   def execute
-    return if create? && classification.lifecycled_at.present?
+    return if action == "create" && classification.lifecycled_at.present?
 
     Classification.transaction(requires_new: true) do
       update_classification_data
@@ -41,35 +41,40 @@ class ClassificationLifecycle
   end
 
   def update_classification_data
-    mark_expert_classifier
-    add_seen_before_for_user
-    add_project_live_state
-    add_user_groups
-    add_lifecycled_at
-    classification.save!
+    if classification.complete?
+      mark_expert_classifier
+      add_seen_before_for_user
+      add_project_live_state
+      add_user_groups
+      add_lifecycled_at
+      classification.save!
+    end
   end
 
   def update_counters
     return unless should_count_towards_retirement?
 
     classification.subject_ids.each do |sid|
-      ClassificationCountWorker.perform_async(sid, classification.workflow.id, update?)
+      ClassificationCountWorker.perform_async(sid, classification.workflow.id)
     end
   end
 
   def process_project_preference
-    return unless should_create_project_preference?
-    UserProjectPreferences::FindOrCreate.run! user: user, project: project
+    unless classification.anonymous?
+      UserProjectPreferences::FindOrCreate.run! user: user, project: project
+    end
   end
 
   def create_recent
-    return unless should_update_seen? && subjects_are_unseen_by_user?
+    return unless completed_user_classification?
+    return if subjects_are_seen_by_user?
 
     Recent.create_from_classification(classification)
   end
 
   def update_seen_subjects
-    return unless should_update_seen? && subjects_are_unseen_by_user?
+    return unless completed_user_classification?
+    return if subjects_are_seen_by_user?
 
     UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
   end
@@ -83,8 +88,8 @@ class ClassificationLifecycle
   end
 
   def notify_subject_selector
-    return unless should_update_seen?
-    return unless subjects_are_unseen_by_user?
+    return unless completed_user_classification?
+    return if subjects_are_seen_by_user?
 
     subject_ids.each do |subject_id|
       NotifySubjectSelectorOfSeenWorker.perform_async(workflow.id, user.try(:id), subject_id)
@@ -99,7 +104,7 @@ class ClassificationLifecycle
   end
 
   def mark_expert_classifier
-    unseen_gold_std = subjects_are_unseen_by_user? && classification.gold_standard
+    unseen_gold_std = !subjects_are_seen_by_user? && classification.gold_standard
     expert_user = user && expert_level = project.expert_classifier_level(user)
     if unseen_gold_std && expert_user
       classification.expert_classifier = expert_level
@@ -107,7 +112,7 @@ class ClassificationLifecycle
   end
 
   def add_seen_before_for_user
-    if should_update_seen? && !subjects_are_unseen_by_user?
+    if completed_user_classification? && subjects_are_seen_by_user?
       update_classification_metadata(:seen_before, true)
     end
   end
@@ -127,28 +132,27 @@ class ClassificationLifecycle
 
   private
 
-  def subjects_are_unseen_by_user?
-    return @unseen if @unseen
-    @unseen = !UserSeenSubject.find_by!(user: user, workflow: workflow)
-    .try(:subjects_seen?, subject_ids)
-  rescue ActiveRecord::RecordNotFound
-    @unseen = true
-  end
-
-  def should_count_towards_retirement?
-    if !classification.complete? || classification.seen_before?
-      false
+  def subjects_are_seen_by_user?
+    return @subjects_are_seen_by_user if defined?(@subjects_are_seen_by_user)
+    @subjects_are_seen_by_user = if user
+      UserSeenSubject.has_seen_subjects_for_workflow?(
+        user,
+        workflow,
+        subject_ids
+      )
     else
-      classification.anonymous? || subjects_are_unseen_by_user?
+      false
     end
   end
 
-  def should_update_seen?
-    !classification.anonymous? && classification.complete?
+  def should_count_towards_retirement?
+    return false unless classification.complete?
+    return false if subjects_are_seen_by_user?
+    true
   end
 
-  def should_create_project_preference?
-    !classification.anonymous?
+  def completed_user_classification?
+    !classification.anonymous? && classification.complete?
   end
 
   def user
@@ -190,13 +194,5 @@ class ClassificationLifecycle
     else
       [nil]
     end
-  end
-
-  def create?
-    action == "create"
-  end
-
-  def update?
-    action == "update"
   end
 end

@@ -27,6 +27,12 @@ class UserSeenSubject < ActiveRecord::Base
     scope.group(:workflow_id).sum("cardinality(subject_ids)").as_json
   end
 
+  def self.has_seen_subjects_for_workflow?(user, workflow, subject_ids)
+    where(user: user, workflow: workflow)
+    .where("subject_ids && ARRAY[?]::integer[]", subject_ids)
+    .exists?
+  end
+
   def subjects_seen?(ids)
     Array.wrap(ids).any? { |id| subject_ids.include?(id) }
   end
