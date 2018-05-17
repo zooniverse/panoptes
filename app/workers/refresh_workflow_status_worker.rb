@@ -4,7 +4,7 @@ class RefreshWorkflowStatusWorker
   sidekiq_options congestion: {
     interval: 15,
     max_in_interval: 1,
-    min_delay: 0,
+    min_delay: 15,
     reject_with: :reschedule,
     key: ->(workflow_id) {
       "refresh_worklow_status_worker_#{workflow_id}"
