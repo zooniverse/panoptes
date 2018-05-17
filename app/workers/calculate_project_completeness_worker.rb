@@ -4,7 +4,17 @@ class CalculateProjectCompletenessWorker
   include Sidekiq::Worker
   using Refinements::RangeClamping
 
-  sidekiq_options queue: :data_medium
+  sidekiq_options congestion: {
+    interval: 300,
+    max_in_interval: 1,
+    min_delay: 300,
+    reject_with: :cancel,
+    key: ->(project_id) {
+      "calc_project_completeness_worker#{project_id}"
+    }
+  }
+
+  sidekiq_options queue: :data_medium, unique: :until_executed
 
   def perform(project_id)
     project = Project.find(project_id)

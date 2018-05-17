@@ -24,5 +24,7 @@ class WorkflowRetiredCountWorker
     if workflow.finished_at.nil? && workflow.finished?
       Workflow.where(id: workflow.id).update_all(finished_at: Time.now)
     end
+
+    CalculateProjectCompletenessWorker.perform_async(workflow.project_id)
   end
 end
