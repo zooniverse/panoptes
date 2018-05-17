@@ -19,6 +19,13 @@ RSpec.describe WorkflowRetiredCountWorker do
       expect(WorkflowCounter).to receive(:new).with(workflow).and_return(counter)
       worker.perform(workflow.id)
     end
+
+    it 'should schedule a project completeness calculation worker' do
+      expect(CalculateProjectCompletenessWorker)
+        .to receive(:perform_async)
+        .with(workflow.project_id)
+      worker.perform(workflow.id)
+    end
   end
 
   describe "finishing workflows" do
