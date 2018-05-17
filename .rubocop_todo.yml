@@ -561,7 +561,7 @@ Layout/SpaceInsideBlockBraces:
 
 # Offense count: 218
 # Cop supports --auto-correct.
-Layout/SpaceInsideBrackets:
+Layout/SpaceInsideArrayLiteralBrackets:
   Enabled: false
 
 # Offense count: 427
