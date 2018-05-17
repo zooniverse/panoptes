@@ -36,7 +36,7 @@ RSpec.describe RetireSubjectWorker do
     end
 
     it 'queues a workflow retired counter' do
-      expect(RefreshWorkflowStatusWorker).to receive(:perform_async).with(workflow.id)
+      expect(WorkflowRetiredCountWorker).to receive(:perform_async).with(workflow.id)
       worker.perform(workflow.id, [sms.subject_id])
     end
 
