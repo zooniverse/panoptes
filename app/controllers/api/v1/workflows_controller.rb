@@ -126,9 +126,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def add_relation(resource, relation, value)
     if relation == :retired_subjects && value.is_a?(Array)
-      resource.save!
       value.each {|id| resource.retire_subject(id) }
-      resource.reload
     else
       super
     end
@@ -137,9 +135,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   def new_items(resource, relation, value)
     case relation
     when :retired_subjects, 'retired_subjects'
-      resource.save!
       value.flat_map {|id| resource.retire_subject(id) }
-      resource.reload
     when :subject_sets, 'subject_sets'
       items = construct_new_items(super(resource, relation, value), resource.project_id)
       if items.any? { |item| item.is_a?(SubjectSet) }
