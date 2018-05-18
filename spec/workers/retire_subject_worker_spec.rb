@@ -61,7 +61,7 @@ RSpec.describe RetireSubjectWorker do
       }.to raise_error(RuntimeError, 'some error')
     end
 
-    context "with a retired subject" do
+    context "when given subjects are all already retired" do
       before do
         count.update_columns(retirement_reason: "blank", retired_at: Time.zone.now)
       end
