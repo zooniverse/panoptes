@@ -357,6 +357,11 @@ describe RegistrationsController, type: :controller do
           expect(flash[:notice]).to be_present
         end
 
+        it 'signs out the user' do
+          expect(controller).to receive(:sign_out)
+          delete :destroy, user: {current_password: password}
+        end
+
         it 'deactivates the user' do
           delete :destroy, user: {current_password: password}
           expect(user.reload.active?).to be_falsey
