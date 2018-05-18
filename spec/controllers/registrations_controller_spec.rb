@@ -256,7 +256,6 @@ describe RegistrationsController, type: :controller do
     end
 
     describe "#create" do
-
       context "with valid user attributes" do
         let(:login) { "zoonser" }
         let(:extra_attributes) { { login: login } }
@@ -338,6 +337,55 @@ describe RegistrationsController, type: :controller do
           expect{ post :create, user: attrs }.not_to change{ UserGroup.count }
         end
       end
+    end
+
+    describe '#destroy' do
+      let(:password) { 'password' }
+      let(:user) { create :user, password: password }
+      let(:user_id) { user.id }
+      let(:access_token) { create(:access_token, resource_owner_id: user_id) }
+
+      before(:each) do
+        sign_in user
+        request.env["HTTP_ACCEPT"] = "text/html"
+      end
+
+      context 'with correct password' do
+        it 'redirects to root' do
+          delete :destroy, user: {current_password: password}
+          expect(response).to redirect_to('/')
+          expect(flash[:notice]).to be_present
+        end
+
+        it 'deactivates the user' do
+          delete :destroy, user: {current_password: password}
+          expect(user.reload.active?).to be_falsey
+        end
+
+        it 'scrubs the users information' do
+          expect(UserInfoScrubber).to receive(:scrub_personal_info!).with(user)
+          delete :destroy, user: {current_password: password}
+        end
+      end
+
+      context 'with incorrect password' do
+        it 'renders error' do
+          delete :destroy, user: {current_password: 'wrong'}
+          expect(user.reload.active?).to be_truthy
+          expect(flash[:delete_alert]).to be_present
+        end
+      end
+
+      let(:authorized_user) { user }
+      let(:resource) { user }
+      let(:instances_to_disable) do
+        [resource] |
+          resource.projects |
+          resource.memberships |
+          resource.collections
+      end
+
+      # it_behaves_like "is deactivatable"
     end
   end
 end
