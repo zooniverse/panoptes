@@ -19,7 +19,7 @@ Lint/AmbiguousRegexpLiteral:
 
 # Offense count: 5
 # Cop supports --auto-correct.
-Lint/BlockAlignment:
+Layout/BlockAlignment:
   Exclude:
     - 'app/schemas/project_update_schema.rb'
     - 'spec/controllers/registrations_controller_spec.rb'
@@ -30,13 +30,13 @@ Lint/BlockAlignment:
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: AlignWith, SupportedStyles, AutoCorrect.
-Lint/DefEndAlignment:
+Layout/DefEndAlignment:
   Enabled: false
 
 # Offense count: 11
 # Cop supports --auto-correct.
 # Configuration parameters: AlignWith, SupportedStyles, AutoCorrect.
-Lint/EndAlignment:
+Layout/EndAlignment:
   Enabled: false
 
 # Offense count: 2
@@ -180,7 +180,7 @@ Style/CommentAnnotation:
     - 'config/environments/test.rb'
 
 # Offense count: 1
-Style/ConstantName:
+Naming/ConstantName:
   Exclude:
     - 'spec/lib/media_storage/aws_adapter_spec.rb'
 
@@ -377,7 +377,7 @@ Style/MethodCallWithoutArgsParentheses:
 
 # Offense count: 2
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MethodName:
+Naming/MethodName:
   Enabled: false
 
 # Offense count: 2
@@ -433,7 +433,7 @@ Style/NumericLiterals:
 
 # Offense count: 5
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.
-Style/PredicateName:
+Naming/PredicateName:
   Exclude:
     - 'app/models/api_user.rb'
     - 'app/models/concerns/translated_content.rb'
@@ -561,7 +561,7 @@ Layout/SpaceInsideBlockBraces:
 
 # Offense count: 218
 # Cop supports --auto-correct.
-Layout/SpaceInsideBrackets:
+Layout/SpaceInsideArrayLiteralBrackets:
   Enabled: false
 
 # Offense count: 427
