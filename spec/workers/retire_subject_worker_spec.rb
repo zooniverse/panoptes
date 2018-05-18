@@ -35,24 +35,46 @@ RSpec.describe RetireSubjectWorker do
       expect(count.reload.retired_at).not_to be_nil
     end
 
-    it 'queues a workflow retired counter' do
-      expect(WorkflowRetiredCountWorker).to receive(:perform_async).with(workflow.id)
+    it 'should ignore unknown subjects' do
+      expect(count.reload.retired_at).to be_nil
+      worker.perform(workflow.id, [-1, sms.subject_id])
+      expect(count.reload.retired_at).not_to be_nil
+    end
+
+    it 'queues a notify selector retirement' do
+      expect(NotifySubjectSelectorOfRetirementWorker).to receive(:perform_async).with(sms.subject_id, workflow.id)
       worker.perform(workflow.id, [sms.subject_id])
     end
 
-    it 'queues a cellect retirement if the workflow uses cellect' do
-      expect(NotifySubjectSelectorOfRetirementWorker).to receive(:perform_async).with(sms.subject_id, workflow.id)
+    it 'queues a retired count worker' do
+      expect(WorkflowRetiredCountWorker).to receive(:perform_async).with(workflow.id)
       worker.perform(workflow.id, [sms.subject_id])
     end
 
     it 'does not queue workers if something went wrong' do
       allow(Workflow).to receive(:find).and_return(workflow)
       allow(workflow).to receive(:retire_subject).with(sms.subject_id, nil) { raise "some error" }
-      expect(RefreshWorkflowStatusWorker).not_to receive(:perform_async)
+      expect(WorkflowRetiredCountWorker).not_to receive(:perform_async)
       expect(NotifySubjectSelectorOfRetirementWorker).not_to receive(:perform_async)
       expect {
         worker.perform(workflow.id, [sms.subject_id])
       }.to raise_error(RuntimeError, 'some error')
+    end
+
+    context "when given subjects are all already retired" do
+      before do
+        count.update_columns(retirement_reason: "blank", retired_at: Time.zone.now)
+      end
+
+      it 'should not queue a notify selector retirement' do
+        expect(NotifySubjectSelectorOfRetirementWorker).not_to receive(:perform_async)
+        worker.perform(workflow.id, [sms.subject_id])
+      end
+
+      it 'should not queue a retired count worker' do
+        expect(WorkflowRetiredCountWorker).not_to receive(:perform_async)
+        worker.perform(workflow.id, [sms.subject_id])
+      end
     end
   end
 end
