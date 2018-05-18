@@ -384,8 +384,6 @@ describe RegistrationsController, type: :controller do
           resource.memberships |
           resource.collections
       end
-
-      # it_behaves_like "is deactivatable"
     end
   end
 end
