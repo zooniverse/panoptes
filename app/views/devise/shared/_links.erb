@@ -1,4 +1,4 @@
-<nav class="devise-shared-links">
+<nav class="devise-shared-links clearfix">
 
   <div class="oauth-links">
     <%- if devise_mapping.confirmable? && controller_name != 'confirmations' %>
@@ -30,7 +30,7 @@
     <% end -%>
 
     <%- if devise_mapping.registerable? && controller_name != 'registrations' %>
-      <%= link_to "Sign up", new_registration_path(resource_name), class: 'devise-shared-link sign-up-link' %>
+      <%= link_to "Create account", new_registration_path(resource_name), class: 'devise-shared-link sign-up-link' %>
     <% end -%>
   </div>
 </nav>

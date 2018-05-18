@@ -1,6 +1,6 @@
 html, body {
   background: #fbfbfb;
-  font: 400 10px/20px Arial, sans-serif;
+  font: 400 12px/20px Arial, sans-serif;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
@@ -66,19 +66,19 @@ h1 {
 }
 
 h2 {
-  font-size: 4.2em;
+  font-size: 3.2em;
 }
 
 h3 {
-  font-size: 3.6em;
+  font-size: 3em;
 }
 
 h4 {
-  font-size: 3em
+  font-size: 2.8em;
 }
 
 h5 {
-  font-size: 2.4em
+  font-size: 2.4em;
 }
 
 h6 {
