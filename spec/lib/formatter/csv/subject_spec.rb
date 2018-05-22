@@ -67,12 +67,22 @@ RSpec.describe Formatter::Csv::Subject do
 
     context "with an old unlinked subject" do
       let(:subject_set_ids) { [ ] }
+      let(:empty_attrs) do
+        {
+          subject_set_id: nil,
+          workflow_id: nil,
+          classifications_count: 0,
+          retired_at: nil,
+          retirement_reason: nil
+        }
+      end
+      let(:expected) do
+        [ workflow_one_row.merge(empty_attrs).values ]
+      end
 
       it "should match the expected output" do
         sms.destroy
         subject.reload
-        expected = [workflow_one_row.merge(subject_set_id: nil).values,
-                    workflow_two_row.merge(subject_set_id: nil).values]
         expect(result).to match_array(expected)
       end
     end
@@ -102,6 +112,30 @@ RSpec.describe Formatter::Csv::Subject do
         second_result = formatter.to_rows(next_subject)
         classification_counts = second_result.map { |result| result[6] }
         expect(classification_counts).to match_array([0,0])
+      end
+    end
+
+    context "when in another set that is not linked to a workflow" do
+      let(:not_linked_set) do
+        create(:subject_set, project: project, num_workflows: 0)
+      end
+      let(:non_linked_subject) do
+        {
+          subject_id: subject.id,
+          project_id: project.id,
+          workflow_id: nil,
+          subject_set_id: not_linked_set.id,
+          metadata: subject.metadata.to_json,
+          locations: ordered_subject_locations.to_json,
+          classifications_count: 0,
+          retired_at: nil,
+          retirement_reason: nil
+        }
+      end
+
+      it "should export a third row for the non-linked set" do
+        subject.subject_sets << not_linked_set
+        expect(result).to match_array(expected | [ non_linked_subject.values ])
       end
     end
   end

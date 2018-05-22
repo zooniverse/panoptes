@@ -19,20 +19,19 @@ module Formatter
 
         rows = []
 
-        sorted_project_workflow_ids.each do |workflow_id|
-          sorted_subject_set_ids(subject).each do |subject_set_id|
-            rows << HashWithIndifferentAccess.new(
-              subject_id: subject_id,
-              project_id: project_id,
-              workflow_id: workflow_id,
-              subject_set_id: subject_set_id,
-              metadata: metadata,
-              locations: locations,
-              classifications_count: classifications_count(workflow_id),
-              retired_at: retired_at(workflow_id),
-              retirement_reason: retirement_reason(workflow_id)
-            )
-          end
+        linked_workflows_and_sets(subject).each do |subject_workflow_set_link|
+          workflow_id = subject_workflow_set_link.workflow_id
+          rows << HashWithIndifferentAccess.new(
+            subject_id: subject_workflow_set_link.subject.id,
+            project_id: project_id,
+            workflow_id: workflow_id,
+            subject_set_id: subject_workflow_set_link.subject_set_id,
+            metadata: metadata,
+            locations: locations,
+            classifications_count: classifications_count(workflow_id),
+            retired_at: retired_at(workflow_id),
+            retirement_reason: retirement_reason(workflow_id)
+          )
         end
 
         rows.map { |row| row.values_at(*headers) }
@@ -48,7 +47,7 @@ module Formatter
         if subject.subject_set_ids.present?
           subject.subject_set_ids.sort
         else
-          [nil]
+          []
         end
       end
 
@@ -109,6 +108,44 @@ module Formatter
           .where(workflow_id: project_workflow_ids)
           .to_a
           .index_by(&:workflow_id)
+      end
+
+      def linked_workflows_and_sets(subject)
+        subject_set_ids = sorted_subject_set_ids(subject)
+        if subject_set_ids.empty?
+          [ SubjectWorkflowSetLinks.new(nil, nil, subject) ]
+        else
+          subject_workflow_set_links = []
+          set_workflow_links = subject_set_workflow_links(subject_set_ids)
+
+          subject_set_ids.each do |set_id|
+            set_workflow_links = set_workflow_links[set_id] || [ SubjectSetsWorkflow.new(subject_set_id: set_id) ]
+            set_workflow_links.each do |ssw|
+              subject_workflow_set_links << SubjectWorkflowSetLinks.new(
+                ssw.workflow_id, ssw.subject_set_id, subject
+              )
+            end
+          end
+
+          subject_workflow_set_links
+        end
+      end
+
+      def subject_set_workflow_links(subject_set_ids)
+        SubjectSetsWorkflow.where(
+          workflow_id: project_workflow_ids,
+          subject_set_id: subject_set_ids
+        ).group_by(&:subject_set_id)
+      end
+
+      class SubjectWorkflowSetLinks
+        attr_reader :workflow_id, :subject_set_id, :subject
+
+        def initialize(workflow_id, subject_set_id, subject)
+          @workflow_id = workflow_id
+          @subject_set_id = subject_set_id
+          @subject = subject
+        end
       end
     end
   end
