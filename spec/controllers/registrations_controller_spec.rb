@@ -83,7 +83,7 @@ describe RegistrationsController, type: :controller do
            password: 'testpassword',
            password_confirmation: 'testpassword',
            current_password: user.password,
-           email: 'ohno@example.com'
+           project_id: 123
           }
         end
 
