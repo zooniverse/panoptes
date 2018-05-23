@@ -25,6 +25,12 @@ class ApplicationController < ActionController::Base
                :project_email_communication, :beta_email_communication,
                :project_id)
     end
+
+    devise_parameter_sanitizer.permit(:account_update) do |u|
+      u.permit(:email, :password, :password_confirmation, :current_password, :display_name,
+               :credited_name, :global_email_communication,
+               :project_email_communication, :beta_email_communication)
+    end
   end
 
   private
