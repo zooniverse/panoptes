@@ -112,30 +112,34 @@ module Formatter
 
       def linked_workflows_and_sets(subject)
         subject_set_ids = sorted_subject_set_ids(subject)
-        if subject_set_ids.empty?
-          [ SubjectWorkflowSetLinks.new(nil, nil, subject) ]
-        else
-          subject_workflow_set_links = []
-          set_workflow_links = subject_set_workflow_links(subject_set_ids)
 
-          subject_set_ids.each do |set_id|
-            set_workflow_links = set_workflow_links[set_id] || [ SubjectSetsWorkflow.new(subject_set_id: set_id) ]
-            set_workflow_links.each do |ssw|
-              subject_workflow_set_links << SubjectWorkflowSetLinks.new(
-                ssw.workflow_id, ssw.subject_set_id, subject
-              )
+        [].tap do |subject_workflow_links|
+          if subject_set_ids.empty?
+            subject_workflow_links << SubjectWorkflowSetLinks.new(nil, nil, subject)
+          else
+            grouped_ssws = grouped_subject_set_workflows(subject_set_ids)
+            subject_set_ids.each do |set_id|
+              subject_set_workflows_for_set(grouped_ssws, set_id).each do |ssw|
+                subject_workflow_links << SubjectWorkflowSetLinks.new(
+                  ssw.workflow_id,
+                  ssw.subject_set_id,
+                  subject
+                )
+              end
             end
           end
-
-          subject_workflow_set_links
         end
       end
 
-      def subject_set_workflow_links(subject_set_ids)
+      def grouped_subject_set_workflows(subject_set_ids)
         SubjectSetsWorkflow.where(
           workflow_id: project_workflow_ids,
           subject_set_id: subject_set_ids
         ).group_by(&:subject_set_id)
+      end
+
+      def subject_set_workflows_for_set(grouped_ssws, set_id)
+        grouped_ssws[set_id] || [ SubjectSetsWorkflow.new(subject_set_id: set_id) ]
       end
 
       class SubjectWorkflowSetLinks
