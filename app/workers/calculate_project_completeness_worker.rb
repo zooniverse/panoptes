@@ -27,6 +27,8 @@ class CalculateProjectCompletenessWorker
       columns_to_update = { completeness: completeness }
       if completeness.to_i == 1
         columns_to_update[:state] = Project.states[:paused]
+      elsif project.paused?
+        columns_to_update[:state] = Project.states[:active]
       end
 
       project.update_columns(columns_to_update)
