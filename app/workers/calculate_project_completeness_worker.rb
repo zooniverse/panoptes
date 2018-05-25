@@ -30,6 +30,7 @@ class CalculateProjectCompletenessWorker
       end
 
       project.update_columns(columns_to_update)
+      project.touch
     end
   rescue ActiveRecord::RecordNotFound
     nil
