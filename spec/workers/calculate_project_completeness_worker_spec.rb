@@ -83,7 +83,33 @@ describe CalculateProjectCompletenessWorker do
         .and_return([double(completeness: 0.91)])
       end
 
-      it "should not move a non-finished project to paused" do
+      it "should not move the project to paused" do
+        expect {
+          worker.perform(project)
+        }.not_to change {
+          project.state
+        }
+      end
+
+      it "should move a paused project to active" do
+        project.paused!
+        expect {
+          worker.perform(project)
+        }.to change {
+          project.reload.attributes["state"]
+        }.to(nil)
+      end
+
+      it "should not move an active project to active" do
+        expect {
+          worker.perform(project)
+        }.not_to change {
+          project.state
+        }
+      end
+
+      it "should not move a finished project to active" do
+        project.finished!
         expect {
           worker.perform(project)
         }.not_to change {
