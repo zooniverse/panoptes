@@ -6,9 +6,9 @@ module Workflows
       in: SubjectWorkflowStatus.retirement_reasons.keys,
       allow_nil: true
     }
+    validates :workflow_id, presence: true
 
-    object :workflow
-
+    integer :workflow_id
     integer :subject_id, default: nil
     array :subject_ids, default: [] do
       integer
@@ -17,7 +17,7 @@ module Workflows
 
     def execute
       return if subject_ids.empty?
-      RetireSubjectWorker.perform_async(workflow.id, subject_ids, retirement_reason)
+      RetireSubjectWorker.perform_async(workflow_id, subject_ids, retirement_reason)
     end
 
     def subject_ids
