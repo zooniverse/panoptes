@@ -28,10 +28,26 @@ RSpec.describe RetireSubjectWorker do
       worker.perform(workflow.id, subject.id, reason)
     end
 
-    it 'should raise if there is a problem creating the sws resource' do
-      expect {
-        worker.perform(workflow.id, -1)
-      }.to raise_error(ActiveRecord::RecordInvalid)
+    it 'should not do any work if the workflow is not found' do
+      expect(worker).not_to receive(:subject_workflow_status)
+      expect(RetirementWorker).not_to receive(:perform_async)
+      worker.perform(-1, subject.id)
+    end
+
+    describe "creating the sws resource" do
+      it 'should raise if there is a problem with the workflow' do
+        allow(worker).to receive(:workflow_exists?).and_return(true)
+        expect {
+          worker.perform(-1, subject.id)
+        }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it 'should raise if there is a problem with the subject' do
+        allow(worker).to receive(:workflow_exists?).and_return(true)
+        expect {
+          worker.perform(workflow.id, -1)
+        }.to raise_error(ActiveRecord::RecordInvalid)
+      end
     end
   end
 end
