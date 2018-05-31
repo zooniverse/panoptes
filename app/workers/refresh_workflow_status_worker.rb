@@ -14,10 +14,11 @@ class RefreshWorkflowStatusWorker
   sidekiq_options queue: :data_high, unique: :until_executing
 
   def perform(workflow_id)
-    workflow = Workflow.find(workflow_id)
-    # run the first worker manually to ensure we don't have state race
-    # conditions between workers and/or db transactions
-    UnfinishWorkflowWorker.new.perform(workflow.id)
-    WorkflowRetiredCountWorker.perform_async(workflow.id)
+    if Workflow.where(id: workflow_id).exists?
+      # run the first worker manually to ensure we don't have state race
+      # conditions between workers and/or db transactions
+      UnfinishWorkflowWorker.new.perform(workflow_id)
+      WorkflowRetiredCountWorker.perform_async(workflow_id)
+    end
   end
 end

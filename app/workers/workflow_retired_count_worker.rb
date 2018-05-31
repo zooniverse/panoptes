@@ -14,7 +14,7 @@ class WorkflowRetiredCountWorker
   sidekiq_options unique: :until_executed
 
   def perform(workflow_id)
-    workflow = Workflow.find(workflow_id)
+    workflow = Workflow.find_without_json_attrs(workflow_id)
     counter = WorkflowCounter.new(workflow)
     workflow.update_column(
       :retired_set_member_subjects_count,

@@ -16,10 +16,10 @@ class WorkflowClassificationsCountWorker
   sidekiq_options unique: :until_executed
 
   def perform(workflow_id)
-    workflow = Workflow.find(workflow_id)
+    workflow = Workflow.find_without_json_attrs(workflow_id)
     counter = WorkflowCounter.new(workflow)
     workflow.update_column(:classifications_count, counter.classifications)
 
-    ProjectClassificationsCountWorker.perform_async(workflow.project.id)
+    ProjectClassificationsCountWorker.perform_async(workflow.project_id)
   end
 end
