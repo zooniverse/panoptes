@@ -7,7 +7,10 @@ RSpec.describe WorkflowRetiredCountWorker do
   describe "#perform" do
 
     it 'should update the workflow retired count' do
-      allow(Workflow).to receive(:find).and_return(workflow)
+      allow(Workflow)
+        .to receive(:find_without_json_attrs)
+        .with(workflow.id)
+        .and_return(workflow)
       expect(workflow)
         .to receive(:update_column)
         .with(:retired_set_member_subjects_count, anything)

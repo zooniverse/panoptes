@@ -40,6 +40,8 @@ class Workflow < ActiveRecord::Base
     'options' => {'count' => 15}
   }.freeze
 
+  JSON_ATTRIBUTES = %w(tasks retirement aggregation configuration).freeze
+
   validates_presence_of :project, :display_name
 
   validate :retirement_config
@@ -54,6 +56,18 @@ class Workflow < ActiveRecord::Base
 
   delegate :owner, to: :project
   delegate :communication_emails, to: :project
+
+  # select a workflow without any json attributes (some can be very large)
+  # this can be used generally in most workers
+  # access to non-loaded attributes will raise an undefined_error
+  # workflow.reload can be used to retrieve the missing attributes if needed
+  #
+  # Longer term the large json attributes could be sliced out to their own table
+  # and linked to the workflow as an assocaition
+  def self.find_without_json_attrs(id)
+    non_json_attrs = Workflow.attribute_names - JSON_ATTRIBUTES
+    select(*non_json_attrs).find(id)
+  end
 
   def self.same_project?(subject_set)
     where(project: subject_set.project)

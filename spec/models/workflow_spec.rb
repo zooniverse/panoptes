@@ -37,6 +37,25 @@ describe Workflow, type: :model do
     expect(workflow).to be_valid
   end
 
+  describe "::find_without_json_attrs" do
+    let(:workflow) { create(:workflow) }
+    let(:json_attrs) do
+      %w(tasks retirement aggregation configuration)
+    end
+    let(:non_json_attrs) do
+      Workflow.attribute_names - json_attrs
+    end
+
+    it "should load the workflow without the tasks attribute" do
+      expect(Workflow)
+        .to receive(:select)
+        .with(*non_json_attrs)
+        .and_call_original
+      no_json_workflow = Workflow.find_without_json_attrs(workflow.id)
+      expect(no_json_workflow.id).to eq(workflow.id)
+    end
+  end
+
   describe "#display_name" do
     let(:workflow) { build(:workflow, display_name: nil) }
 
