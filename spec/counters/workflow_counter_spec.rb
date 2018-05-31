@@ -21,6 +21,17 @@ describe WorkflowCounter do
         expect(counter.classifications).to eq(2)
       end
 
+      context "using workflow without_json_attrs" do
+        let(:counter) do
+          non_json_workflow = Workflow.find_without_json_attrs(workflow.id)
+          WorkflowCounter.new(non_json_workflow)
+        end
+
+        it "should return 2" do
+          expect(counter.classifications).to eq(2)
+        end
+      end
+
       context "when unlinking subject_sets" do
         let(:workflow) { create(:workflow_with_subjects, num_sets: 2) }
 
