@@ -21,4 +21,3 @@ class SubjectSetImportCreateSchema < JsonSchema
     end
   end
 end
-

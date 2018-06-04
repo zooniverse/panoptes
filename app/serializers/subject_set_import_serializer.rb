@@ -7,4 +7,3 @@ class SubjectSetImportSerializer
 
   can_filter_by :subject_set, :user
 end
-

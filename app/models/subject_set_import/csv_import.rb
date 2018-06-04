@@ -7,7 +7,7 @@ class SubjectSetImport::CsvImport
 
   def each
     return Enumerator.new(self) unless block_given?
-    
+
     csv = CSV.new(@io, headers: true)
 
     csv.each do |row|
@@ -26,7 +26,7 @@ class SubjectSetImport::CsvImport
           metadata[key] = value
         end
       end
-      
+
       yield uuid, build_attributes(locations, metadata)
     end
   end
