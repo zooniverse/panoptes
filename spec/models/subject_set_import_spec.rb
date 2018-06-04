@@ -7,11 +7,11 @@ describe SubjectSetImport, type: :model do
 
   let(:source_url) { "https://example.org/file.csv" }
   let(:csv_file) do
-    StringIO.new <<-END
+    StringIO.new <<-CSV
 uuid,location:1,location:2,metadata:size,metadata:cuteness
 1,https://placekitten.com/200/300.jpg,https://placekitten.com/200/100.jpg,small,cute
 2,https://placekitten.com/400/900.jpg,https://placekitten.com/500/100.jpg,large,cute
-    END
+    CSV
   end
 
   it 'imports subjects' do
