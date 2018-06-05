@@ -1,13 +1,17 @@
 FactoryBot.define do
   factory :subject_set do
+    transient do
+      num_workflows 1
+    end
+
     sequence(:display_name) { |n| "Subject Set #{n}" }
 
     metadata({ just_some: "stuff" })
     project
 
-    after(:create) do |ss|
-      if ss.workflows.empty?
-        create_list(:workflow, 1, subject_sets: [ss])
+    after(:create) do |ss, evaluator|
+      if ss.workflows.empty? && evaluator.num_workflows
+        create_list(:workflow, evaluator.num_workflows, subject_sets: [ss])
       end
     end
 
