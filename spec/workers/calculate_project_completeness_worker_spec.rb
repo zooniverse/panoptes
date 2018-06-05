@@ -89,9 +89,9 @@ describe CalculateProjectCompletenessWorker do
       it "should not move the project to paused" do
         expect {
           worker.perform(project)
-        }.not_to change {
-          project.state
-        }
+        }.not_to(
+          change { project.state }
+        )
       end
 
       it "should move a paused project to active" do
@@ -106,9 +106,9 @@ describe CalculateProjectCompletenessWorker do
       it "should not move an active project to active" do
         expect {
           worker.perform(project)
-        }.not_to change {
-          project.state
-        }
+        }.not_to(
+          change { project.state }
+        )
       end
 
       context "with a finished project" do
@@ -119,18 +119,18 @@ describe CalculateProjectCompletenessWorker do
         it "should not move to active" do
           expect {
             worker.perform(project)
-          }.not_to change {
-            project.state
-          }
+          }.not_to(
+            change { project.state }
+          )
         end
 
         it "should not move a complete project to paused" do
           allow(worker).to receive(:project_completeness).and_return(1.0)
           expect {
             worker.perform(project)
-          }.not_to change {
-            project.state
-          }
+          }.not_to(
+            change { project.state }
+          )
         end
       end
     end
