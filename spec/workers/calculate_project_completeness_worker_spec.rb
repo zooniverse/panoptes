@@ -4,7 +4,6 @@ describe CalculateProjectCompletenessWorker do
   let(:worker) { described_class.new }
   let(:project) { create :project }
 
-
   it "should fail quickly when it can't find the project" do
     expect(Project).not_to receive(:transaction)
     worker.perform("-1")
