@@ -3,9 +3,9 @@ class RetirementWorker
 
   sidekiq_options queue: :high
 
-  def perform(status_id, reason="classification_count")
-    status = SubjectWorkflowStatus.where(id: status_id).first
-    if status&.retire?
+  def perform(status_id, reason="classification_count", force_retire: false)
+    status = SubjectWorkflowStatus.find(status_id)
+    if status.retire?
       status.retire!(reason)
 
       workflow_id = status.workflow_id
@@ -14,5 +14,6 @@ class RetirementWorker
       NotifySubjectSelectorOfRetirementWorker
         .perform_async(status.subject_id, workflow_id)
     end
+  rescue ActiveRecord::RecordNotFound
   end
 end
