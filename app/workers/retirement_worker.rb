@@ -3,7 +3,7 @@ class RetirementWorker
 
   sidekiq_options queue: :high
 
-  def perform(status_id, reason="classification_count", force_retire: false)
+  def perform(status_id, force_retire=false, reason="classification_count")
     status = SubjectWorkflowStatus.find(status_id)
     not_retired = !status.retired?
     if (force_retire && not_retired) || status.retire?

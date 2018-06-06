@@ -36,13 +36,13 @@ RSpec.describe RetirementWorker do
 
       it 'should record the reason for retirement' do
         reason = "nothing_here"
-        expect { worker.perform(status.id, reason) }.to change {
+        expect { worker.perform(status.id, false, reason) }.to change {
           status.reload.retirement_reason
         }.to(reason)
       end
 
       it 'should allow a nil reason for retirement' do
-        expect { worker.perform(status.id, nil) }.not_to change {
+        expect { worker.perform(status.id, false, nil) }.not_to change {
           status.reload.retirement_reason
         }
       end
@@ -101,7 +101,7 @@ RSpec.describe RetirementWorker do
       context "with a force_retire param" do
         it "should retire the subject" do
           expect(status).to receive(:retire!).with("classification_count")
-          worker.perform(status.id, force_retire: true)
+          worker.perform(status.id, true)
         end
       end
 
@@ -122,7 +122,7 @@ RSpec.describe RetirementWorker do
       context "with a force_retire param" do
         it "should not retire the subject" do
           expect(status).not_to receive(:retire!)
-          worker.perform(status.id, force_retire: true)
+          worker.perform(status.id, true)
         end
       end
 
