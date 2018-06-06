@@ -100,6 +100,13 @@ RSpec.describe RetirementWorker do
       end
 
       it_behaves_like "it does not run the post retirement workers"
+
+      context "with a force_retire param" do
+        it "should retire the subject" do
+          expect(count).to receive(:retire!).with("classification_count")
+          worker.perform(count.id, force_retire: true)
+        end
+      end
     end
 
     context 'when the sms is already retired' do
