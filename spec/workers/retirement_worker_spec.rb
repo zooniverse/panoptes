@@ -99,14 +99,14 @@ RSpec.describe RetirementWorker do
         expect(sms.retired_workflows).to_not include(workflow)
       end
 
-      it_behaves_like "it does not run the post retirement workers"
-
       context "with a force_retire param" do
         it "should retire the subject" do
           expect(count).to receive(:retire!).with("classification_count")
           worker.perform(count.id, force_retire: true)
         end
       end
+
+      it_behaves_like "it does not run the post retirement workers"
     end
 
     context 'when the sms is already retired' do
@@ -118,6 +118,13 @@ RSpec.describe RetirementWorker do
       it 'should not retire the subject for the workflow' do
         expect(count).to_not receive :retire!
         worker.perform count.id
+      end
+
+      context "with a force_retire param" do
+        it "should not retire the subject" do
+          expect(count).not_to receive(:retire!)
+          worker.perform(count.id, force_retire: true)
+        end
       end
 
       it_behaves_like "it does not run the post retirement workers"
