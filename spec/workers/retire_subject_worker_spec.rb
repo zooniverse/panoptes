@@ -17,14 +17,22 @@ RSpec.describe RetireSubjectWorker do
     end
 
     it 'should call the retirement worker with the subject workflow status resource' do
-      expect(RetirementWorker).to receive(:perform_async).with(count.id, nil).ordered
-      expect(RetirementWorker).to receive(:perform_async).with(count2.id, nil).ordered
+      expect(RetirementWorker)
+        .to receive(:perform_async)
+        .with(count.id, true, nil)
+        .ordered
+      expect(RetirementWorker)
+        .to receive(:perform_async)
+        .with(count2.id, true, nil)
+        .ordered
       worker.perform(workflow.id, subject_ids)
     end
 
     it 'should pass the reason to the retirement worker' do
       reason = "nothing_here"
-      expect(RetirementWorker).to receive(:perform_async).with(count.id, reason)
+      expect(RetirementWorker)
+        .to receive(:perform_async)
+        .with(count.id, true, reason)
       worker.perform(workflow.id, subject.id, reason)
     end
 
