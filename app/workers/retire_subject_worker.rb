@@ -9,7 +9,7 @@ class RetireSubjectWorker
     if workflow_exists?
       Array.wrap(subject_ids).each do |subject_id|
         count = subject_workflow_status(subject_id)
-        RetirementWorker.perform_async(count.id, reason)
+        RetirementWorker.perform_async(count.id, true, reason)
       end
     end
   end
