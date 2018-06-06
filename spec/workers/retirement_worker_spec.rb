@@ -10,7 +10,6 @@ RSpec.describe RetirementWorker do
   end
 
   describe "#perform" do
-
     it "should ignore any missing SubjectWorkflowStatus resources" do
       expect{
         worker.perform(-1)
