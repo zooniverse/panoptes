@@ -48,5 +48,11 @@ describe Api::V1::SubjectSetImportsController, type: :controller do
     end
 
     it_behaves_like "is creatable"
+
+    it 'enqueues a worker' do
+      default_request scopes: scopes, user_id: authorized_user.id
+      expect { post :create, create_params }
+        .to change(SubjectSetImportWorker.jobs, :size).by(1)
+    end
   end
 end
