@@ -6,8 +6,8 @@ class SubjectSetImport::Processor
     @uploader = uploader
   end
 
-  def import(uuid, attributes)
-    subject = subject_set.subjects.where(external_id: uuid).first_or_initialize
+  def import(external_id, attributes)
+    subject = subject_set.subjects.where(external_id: external_id).first_or_initialize
     subject.subject_sets << subject_set
     subject.project = subject_set.project
     subject.uploader = uploader

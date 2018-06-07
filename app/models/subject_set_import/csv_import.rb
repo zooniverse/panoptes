@@ -11,7 +11,7 @@ class SubjectSetImport::CsvImport
     csv = CSV.new(@io, headers: true)
 
     csv.each do |row|
-      uuid = row["uuid"]
+      external_id = row["id"]
       locations = []
       metadata = {}
 
@@ -27,7 +27,7 @@ class SubjectSetImport::CsvImport
         end
       end
 
-      yield uuid, build_attributes(locations, metadata)
+      yield external_id, build_attributes(locations, metadata)
     end
   end
 

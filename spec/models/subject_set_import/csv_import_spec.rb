@@ -3,7 +3,7 @@ require 'spec_helper'
 describe SubjectSetImport::CsvImport do
   let(:csv_data) do
     <<~CSV
-      uuid,location:1,location:2,metadata:size,metadata:cuteness
+      id,location:1,location:2,metadata:size,metadata:cuteness
       1,https://placekitten.com/200/300.jpg,https://placekitten.com/200/100.jpg,small,cute
       2,https://placekitten.com/400/900.jpg,https://placekitten.com/500/100.jpg,large,cute
     CSV
