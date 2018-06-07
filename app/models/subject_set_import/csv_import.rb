@@ -20,7 +20,7 @@ class SubjectSetImport::CsvImport
 
         case type
         when 'location'
-          mime_type = guess_mime_type(value)
+          mime_type = mime_type_from_file_extension(value)
           locations << {mime_type => value}
         when 'metadata'
           metadata[key] = value
@@ -41,7 +41,7 @@ class SubjectSetImport::CsvImport
     {locations: locations, metadata: metadata}
   end
 
-  def guess_mime_type(url)
+  def mime_type_from_file_extension(url)
     extension = File.extname(url).sub(/\A\./, '')
     Mime::Type.lookup_by_extension(extension).to_s
   end
