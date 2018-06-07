@@ -31,7 +31,7 @@ describe SubjectSetImport, type: :model do
       import.save!
     end
 
-    it 'disallows peasants to create an import' do
+    it 'does not allow a non-collaborator to create an import' do
       user = create :user
       api_user = ApiUser.new(user)
       import = described_class.new
