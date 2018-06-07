@@ -4,10 +4,6 @@ class SubjectUpdateSchema < JsonSchema
     description "A peice of media to classifiy"
     additional_properties false
 
-    property "external_id" do
-      type "string"
-    end
-
     property "metadata" do
       type "object"
     end
