@@ -2897,6 +2897,13 @@ CREATE INDEX index_subject_set_imports_on_subject_set_id ON public.subject_set_i
 
 
 --
+-- Name: index_subject_set_imports_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_subject_set_imports_on_user_id ON public.subject_set_imports USING btree (user_id);
+
+
+--
 -- Name: index_subject_sets_on_metadata; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
