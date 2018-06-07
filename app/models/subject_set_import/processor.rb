@@ -9,7 +9,7 @@ class SubjectSetImport::Processor
   def import(external_id, attributes)
     subject = subject_set.subjects.where(external_id: external_id).first_or_initialize
     subject.subject_sets << subject_set
-    subject.project = subject_set.project
+    subject.project_id = subject_set.project_id
     subject.uploader = uploader
     subject.assign_attributes(attributes.except(:locations))
 
