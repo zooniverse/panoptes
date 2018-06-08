@@ -9,11 +9,34 @@ describe CalculateProjectCompletenessWorker do
     worker.perform("-1")
   end
 
+  describe "perform" do
+    let(:project) { create(:full_project) }
+    let(:workflow) { project.workflows.first }
+    before do
+      workflow.update_column(:retired_set_member_subjects_count, 2)
+    end
+
+    it "should update the workflow completeness metric" do
+      expect {
+        worker.perform(project.id)
+      }.to change {
+        workflow.reload.completeness
+      }.to(0.5)
+    end
+
+    it "should update the project completeness metric" do
+      expect {
+        worker.perform(project.id)
+      }.to change {
+        workflow.reload.completeness
+      }.to(0.5)
+    end
+  end
+
   describe '#project_completeness' do
     let(:project) do
-      double(
-        active_workflows: [ double(completeness: 1), double(completeness: 0) ]
-      )
+      workflows_double = double(pluck: [1, 0], empty?: false)
+      double(active_workflows: workflows_double)
     end
     before do
       allow(worker).to receive(:project).and_return(project)
@@ -23,11 +46,9 @@ describe CalculateProjectCompletenessWorker do
       expect(worker.project_completeness).to eq(0.5)
     end
 
-    context "when a project has no active workflows" do
-      it "should set to 0.0" do
-        allow(project).to receive(:active_workflows).and_return([])
-        expect(worker.project_completeness).to eq(0.0)
-      end
+    it "should set to 0.0 when a project has no active workflows" do
+      allow(project).to receive(:active_workflows).and_return([])
+      expect(worker.project_completeness).to eq(0.0)
     end
   end
 
@@ -83,15 +104,15 @@ describe CalculateProjectCompletenessWorker do
       before do
         allow(project)
         .to receive(:active_workflows)
-        .and_return([double(completeness: 0.91)])
+        .and_return(double(pluck: [0.91], empty?: false))
       end
 
       it "should not move the project to paused" do
         expect {
           worker.perform(project)
-        }.not_to(
-          change { project.state }
-        )
+        }.not_to change {
+          project.state
+        }
       end
 
       it "should move a paused project to active" do
@@ -106,9 +127,9 @@ describe CalculateProjectCompletenessWorker do
       it "should not move an active project to active" do
         expect {
           worker.perform(project)
-        }.not_to(
-          change { project.state }
-        )
+        }.not_to change {
+          project.state
+        }
       end
 
       context "with a finished project" do
@@ -139,7 +160,7 @@ describe CalculateProjectCompletenessWorker do
       before do
         allow(project)
         .to receive(:active_workflows)
-        .and_return([double(completeness: 1)])
+        .and_return(double(pluck: [1], empty?: false))
       end
 
       it "should move it to paused" do

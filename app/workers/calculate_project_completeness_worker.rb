@@ -20,7 +20,11 @@ class CalculateProjectCompletenessWorker
   def perform(project_id)
     @project = Project.find(project_id)
     Project.transaction do
-      project.workflows.each do |workflow|
+      project_workflows = project.workflows.select(
+        :id,
+        :retired_set_member_subjects_count
+      )
+      project_workflows.each do |workflow|
         workflow.update_columns completeness: workflow_completeness(workflow)
       end
 
@@ -34,7 +38,7 @@ class CalculateProjectCompletenessWorker
   def project_completeness
     return 0.0 if project.active_workflows.empty?
 
-    completenesses = project.active_workflows.map(&:completeness)
+    completenesses = project.active_workflows.pluck(:completeness)
     completenesses.sum / completenesses.size.to_f
   end
 
