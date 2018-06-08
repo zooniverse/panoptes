@@ -76,11 +76,17 @@ RSpec.describe SubjectWorkflowStatus, type: :model do
       expect(sws.retire?).to be_falsey
     end
 
-    it 'should test against the workflow retirement scheme' do
-      d = double
-      allow(sws.workflow).to receive(:retirement_scheme).and_return(d)
-      expect(d).to receive(:retire?).with(sws)
-      sws.retire?
+    it 'should be false on the workflow retirement scheme' do
+      expect(sws.retire?).to eq(false)
+    end
+
+    it 'should be true with a workflow retirement scheme' do
+      custom_scheme = {
+        'criteria' => 'classification_count',
+        'options' => {'count' => 1}
+      }
+      sws.workflow.update_column(:retirement, custom_scheme)
+      expect(sws.retire?).to eq(true)
     end
   end
 end
