@@ -22,7 +22,7 @@ RSpec.describe Subjects::PostgresqlInOrderSelection do
   end
 
   describe "priority selection" do
-    let(:ordered) { available.order(priority: :asc).pluck(:id) }
+    let(:ordered) { available.order(priority: :asc).pluck(:subject_id) }
     let(:limit) { available.size }
 
     before do

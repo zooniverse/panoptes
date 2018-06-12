@@ -82,7 +82,7 @@ RSpec.describe Subjects::Selector do
       end
     end
 
-    context "when the cellect selection strategy returns an empty set" do
+    context "when the selection strategy returns an empty set" do
       before do
         workflow.designator!
         stub_designator_client
@@ -95,19 +95,14 @@ RSpec.describe Subjects::Selector do
         subject.get_subjects
       end
 
-      it "should notify cellect to reload" do
-        Panoptes.flipper[:cellect_sync_error_reload].enable
+      it "should notify selector to reload" do
+        Panoptes.flipper[:selector_sync_error_reload].enable
         expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async).with(workflow.id)
         subject.get_subjects
       end
 
-      it "should not notify cellect to reload if the feature is disabled" do
+      it "should not notify selector to reload if the feature is disabled" do
         expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
-        subject.get_subjects
-      end
-
-      it "should notify us this sync error occurred" do
-        expect(Honeybadger).to receive(:notify)
         subject.get_subjects
       end
 
@@ -146,8 +141,8 @@ RSpec.describe Subjects::Selector do
 
     it "should respect the order of the sms selection" do
       ordered_sms = smses.sample(5)
-      sms_ids = ordered_sms.map(&:id)
-      expect(subject).to receive(:run_strategy_selection).and_return(sms_ids)
+      subject_ids = ordered_sms.map(&:subject_id)
+      expect(subject).to receive(:run_strategy_selection).and_return(subject_ids)
       subjects = subject.selected_subjects
       expect(ordered_sms.map(&:subject_id)).to eq(subjects.map(&:id))
     end
