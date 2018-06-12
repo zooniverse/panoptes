@@ -25,6 +25,10 @@ module RolesController
     AccessControlList
   end
 
+  def policy_object
+    RoledControllerPolicy.new(api_user, resource_class, resource_name, action_name, params, scope_context: scope_context)
+  end
+
   def scope_context
     { resource_type: enrolled_resource.camelize.constantize }
   end
