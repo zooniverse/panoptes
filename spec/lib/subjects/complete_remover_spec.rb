@@ -1,24 +1,23 @@
 require 'spec_helper'
 
 RSpec.describe Subjects::CompleteRemover do
-  let(:append_sms_ids) { (1..10).to_a | sms_ids }
+  let(:append_subject_ids) { (1..10).to_a | subject_ids }
   let(:workflow) { create(:workflow) }
   let(:user) { workflow.project.owner }
   let(:sms) { create(:set_member_subject) }
-  let(:sms_ids) { [ sms.id ] }
-  let(:subject_ids) { [ sms.subject.id ] }
+  let(:subject_ids) { [ sms.subject_id ] }
 
-  subject { described_class.new(user, workflow, append_sms_ids) }
+  subject { described_class.new(user, workflow, append_subject_ids) }
 
-  describe "#incomplete_ids" do
+  describe "#incomplete_ids"  do
     let(:result) { subject.incomplete_ids }
 
     it "should return the whole set if there are no seen or retired subjects" do
-      expect(result).to match_array(append_sms_ids)
+      expect(result).to match_array(append_subject_ids)
     end
 
     context "with an empty set" do
-      let(:append_sms_ids){ [] }
+      let(:append_subject_ids){ [] }
 
       it "should fast return if the set is empty" do
         expect(subject).not_to receive(:retired_seen_ids)
@@ -28,7 +27,7 @@ RSpec.describe Subjects::CompleteRemover do
 
     context "with seen subjects" do
 
-      it "should return the diff set when seens match inputs" do
+      it "should return the diff set when seens match inputs", :focus do
         create(:user_seen_subject, user: user, workflow: workflow, subject_ids: subject_ids)
         expected = append_sms_ids - sms_ids
         expect(result).to match_array(expected)
