@@ -3,6 +3,7 @@ require 'retirement_schemes'
 class CalculateProjectCompletenessWorker
   include Sidekiq::Worker
   using Refinements::RangeClamping
+  attr_reader :project
 
   sidekiq_options congestion: {
     interval: 300,
@@ -17,28 +18,20 @@ class CalculateProjectCompletenessWorker
   sidekiq_options queue: :data_medium, unique: :until_executed
 
   def perform(project_id)
-    project = Project.find(project_id)
+    @project = Project.find(project_id)
     Project.transaction do
       project.workflows.each do |workflow|
         workflow.update_columns completeness: workflow_completeness(workflow)
       end
 
-      completeness = project_completeness(project)
-      columns_to_update = { completeness: completeness }
-      if completeness.to_i == 1
-        columns_to_update[:state] = Project.states[:paused]
-      elsif project.paused?
-        columns_to_update[:state] = Project.states[:active]
-      end
-
-      project.update_columns(columns_to_update)
+      project.update_columns(project_columns_to_update)
       project.touch
     end
   rescue ActiveRecord::RecordNotFound
     nil
   end
 
-  def project_completeness(project)
+  def project_completeness
     return 0.0 if project.active_workflows.empty?
 
     completenesses = project.active_workflows.map(&:completeness)
@@ -55,5 +48,23 @@ class CalculateProjectCompletenessWorker
       total_subjects = workflow_subjects_count
       (0.0..1.0).clamp(retired_subjects / total_subjects.to_f)
     end
+  end
+
+  def project_columns_to_update
+    completeness = project_completeness
+    columns_to_update = { completeness: completeness }
+
+    # avoid the overriden project.finished? method
+    if project.state == "finished"
+      return columns_to_update
+    end
+
+    if completeness.to_i == 1
+      columns_to_update[:state] = Project.states[:paused]
+    elsif project.paused?
+      columns_to_update[:state] = Project.states[:active]
+    end
+
+    columns_to_update
   end
 end

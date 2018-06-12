@@ -4,26 +4,29 @@ describe CalculateProjectCompletenessWorker do
   let(:worker) { described_class.new }
   let(:project) { create :project }
 
-  describe '#project_completeness' do
-    it 'returns the average of the workflow completenesses' do
-      project = double(active_workflows: [
-        double(completeness: 1),
-        double(completeness: 0)
-      ])
+  it "should fail quickly when it can't find the project" do
+    expect(Project).not_to receive(:transaction)
+    worker.perform("-1")
+  end
 
-      expect(worker.project_completeness(project)).to eq(0.5)
+  describe '#project_completeness' do
+    let(:project) do
+      double(
+        active_workflows: [ double(completeness: 1), double(completeness: 0) ]
+      )
+    end
+    before do
+      allow(worker).to receive(:project).and_return(project)
     end
 
-    context "when it can't find the project" do
-      it "should fail quickly" do
-        expect(Project).not_to receive(:transaction)
-        worker.perform("-1")
-      end
+    it 'returns the average of the workflow completenesses' do
+      expect(worker.project_completeness).to eq(0.5)
     end
 
     context "when a project has no active workflows" do
       it "should set to 0.0" do
-        expect(worker.project_completeness(project)).to eq(0.0)
+        allow(project).to receive(:active_workflows).and_return([])
+        expect(worker.project_completeness).to eq(0.0)
       end
     end
   end
@@ -86,9 +89,9 @@ describe CalculateProjectCompletenessWorker do
       it "should not move the project to paused" do
         expect {
           worker.perform(project)
-        }.not_to change {
-          project.state
-        }
+        }.not_to(
+          change { project.state }
+        )
       end
 
       it "should move a paused project to active" do
@@ -103,18 +106,32 @@ describe CalculateProjectCompletenessWorker do
       it "should not move an active project to active" do
         expect {
           worker.perform(project)
-        }.not_to change {
-          project.state
-        }
+        }.not_to(
+          change { project.state }
+        )
       end
 
-      it "should not move a finished project to active" do
-        project.finished!
-        expect {
-          worker.perform(project)
-        }.not_to change {
-          project.state
-        }
+      context "with a finished project" do
+        before do
+          project.finished!
+        end
+
+        it "should not move to active" do
+          expect {
+            worker.perform(project)
+          }.not_to(
+            change { project.state }
+          )
+        end
+
+        it "should not move a complete project to paused" do
+          allow(worker).to receive(:project_completeness).and_return(1.0)
+          expect {
+            worker.perform(project)
+          }.not_to(
+            change { project.state }
+          )
+        end
       end
     end
 
