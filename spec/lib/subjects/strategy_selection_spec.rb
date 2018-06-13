@@ -100,14 +100,6 @@ RSpec.describe Subjects::StrategySelection do
           run_selection
         end
 
-        it "should convert the cellect subject_ids to panoptes sms_ids" do
-          allow(CellectClient).to receive(:get_subjects)
-            .and_return(result_ids)
-          expect(SetMemberSubject).to receive(:by_subject_workflow)
-            .with(result_ids, workflow.id).and_call_original
-          run_selection
-        end
-
         context "when the cellect client can't reach a server" do
           it "should fall back to postgres strategy" do
             allow(CellectClient).to receive(:get_subjects)
@@ -132,14 +124,6 @@ RSpec.describe Subjects::StrategySelection do
             .to receive(:get_subjects)
             .with(user, subject_set.id, limit)
             .and_return(result_ids)
-          run_selection
-        end
-
-        it "should convert the designator subject_ids to panoptes sms_ids" do
-          allow_any_instance_of(DesignatorClient).to receive(:get_subjects)
-            .and_return(result_ids)
-          expect(SetMemberSubject).to receive(:by_subject_workflow)
-            .with(result_ids, workflow.id).and_call_original
           run_selection
         end
       end
