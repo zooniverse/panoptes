@@ -1,5 +1,5 @@
 class Api::V1::SubjectSetImportsController < Api::ApiController
-  require_authentication :create, scopes: [:project]
+  require_authentication :all, scopes: [:project]
 
   resource_actions :index, :show, :create
 
