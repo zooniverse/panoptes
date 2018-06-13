@@ -93,13 +93,6 @@ RSpec.describe Subjects::StrategySelection do
           run_selection
         end
 
-        it "should use a cellect session instance for session tracking" do
-          stub_cellect_connection
-          stub_redis_connection
-          expect(Subjects::CellectSession).to receive(:new).and_call_original
-          run_selection
-        end
-
         context "when the cellect client can't reach a server" do
           it "should fall back to postgres strategy" do
             allow(CellectClient).to receive(:get_subjects)
