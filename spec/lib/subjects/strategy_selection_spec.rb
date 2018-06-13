@@ -48,7 +48,7 @@ RSpec.describe Subjects::StrategySelection do
           end
 
           it 'should not return retired subjects' do
-            expect(result).not_to include(sms.id)
+            expect(result).not_to include(sms.subject_id)
           end
 
           context "when the sms is retired for a different workflow" do
@@ -57,7 +57,7 @@ RSpec.describe Subjects::StrategySelection do
             end
 
             it 'should return all the subjects' do
-              expect(result).to include(sms.id)
+              expect(result).to include(sms.subject_id)
             end
           end
         end
