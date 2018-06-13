@@ -5,77 +5,65 @@ RSpec.describe RoleControl::Actor do
     include RoleControl::Actor
   end
 
-  class ControlledResource < ActiveRecord::Base
-    def self.scope(name=:name, lamda=nil); end
-    def self.scope_for(action, user, opts={}); none end
-
-    include RoleControl::Controlled
-  end
-
-  let(:with_actor) { HasActor.new }
+  let(:actor) { HasActor.new }
   let(:action) { :index }
 
-  describe "#do" do
-
-    it "should return a DoChain object" do
-      expect(with_actor.do(action)).to be_kind_of(RoleControl::Actor::DoChain)
+  let(:scope) do
+    double.tap do |scope|
+      allow(scope).to receive(:where).and_return(scope)
+      allow(scope).to receive(:order).and_return(scope)
+      allow(scope).to receive(:merge).and_return(scope)
     end
   end
 
-  describe "DoChain Object" do
+  let(:klass) do
+    double.tap do |klass|
+      allow(klass).to receive(:scope_for).with(action, actor, {}).and_return(scope)
+    end
+  end
 
-    let(:do_chain) { with_actor.do(action) }
-    let(:controlled_resource) { ControlledResource.new }
+  describe "#scope" do
+    it "should call scope_for" do
+      expect(klass).to receive(:scope_for).with(action, actor, {})
+      actor.scope(klass: klass, action: action)
+    end
 
-    describe "#to" do
-
-      it "should call scope_for" do
-        expect(ControlledResource).to receive(:scope_for).with(action, with_actor, {})
-        do_chain.to(ControlledResource)
+    context 'active scoping' do
+      it "should call active if the klass responds to active" do
+        allow(klass).to receive(:respond_to?).and_return(true)
+        expect(klass).to receive(:active).with(no_args)
+        actor.scope(klass: klass, action: action)
       end
 
-      it "should not call active" do
-        allow(ControlledResource).to receive(:respond_to?).and_return(false)
-        expect(ControlledResource).to_not receive(:active)
-        do_chain.to(ControlledResource)
+      it "should not call active if the klass doesnt have an active scope" do
+        allow(klass).to receive(:respond_to?).and_return(false)
+        expect(klass).to_not receive(:active)
+        actor.scope(klass: klass, action: action)
       end
 
-      context "when passing add_active_scope: false" do
-
-        it "should not call active" do
-          allow(ControlledResource).to receive(:respond_to?).and_return(true)
-          expect(ControlledResource).to_not receive(:active)
-          do_chain.to(ControlledResource, add_active_scope: false)
-        end
-      end
-
-      context "when the klass responds to active" do
-
-        it "should not call active" do
-          allow(ControlledResource).to receive(:respond_to?).and_return(true)
-          expect(ControlledResource).to receive(:active).with(no_args)
-          do_chain.to(ControlledResource)
-        end
+      it "should not call active if passing add_active_scope: false" do
+        allow(klass).to receive(:respond_to?).and_return(true)
+        expect(klass).to_not receive(:active)
+        actor.scope(klass: klass, action: action, add_active_scope: false)
       end
     end
 
-    describe "#with_ids" do
+    context "filtering to ids" do
       let(:ids) { [1] }
-      let(:do_chain_to) { do_chain.to(ControlledResource) }
-      let(:scope) { do_chain_to.scope }
 
       before(:each) do
+        allow(klass).to receive(:scope_for).and_return(scope)
         allow(scope).to receive(:where).and_return(scope)
       end
 
       it "should call where on the scope" do
         expect(scope).to receive(:where).with(id: ids)
-        do_chain_to.with_ids(ids)
+        actor.scope(klass: klass, action: action, ids: ids)
       end
 
       it "should call order on the scope" do
         expect(scope).to receive(:order).with(:id)
-        do_chain_to.with_ids(ids)
+        actor.scope(klass: klass, action: action, ids: ids)
       end
 
       context "when ids are blank" do
@@ -83,12 +71,12 @@ RSpec.describe RoleControl::Actor do
 
         it "should not call where on the scope" do
           expect(scope).to_not receive(:where)
-          do_chain_to.with_ids(ids)
+          actor.scope(klass: klass, action: action, ids: ids)
         end
 
         it "should not call order on the scope" do
           expect(scope).to_not receive(:order)
-          do_chain_to.with_ids(ids)
+          actor.scope(klass: klass, action: action, ids: ids)
         end
       end
     end

@@ -1,13 +1,15 @@
 require 'spec_helper'
 
 describe RoledControllerPolicy do
-  let(:user) { create :user }
-  let(:api_user) { ApiUser.new(user) }
+  let(:api_user) { instance_double(ApiUser) }
   let(:resource_class) { User }
   let(:resource_name) { nil }
   let(:action_name) { :index }
 
   describe '#resources_exist?' do
+    let(:user) { create :user }
+    let(:api_user) { ApiUser.new(user) }
+
     it 'returns true when no ids were given' do
       policy = described_class.new(api_user, resource_class, resource_name, action_name, {})
       expect(policy.resources_exist?).to be_truthy
@@ -54,6 +56,17 @@ describe RoledControllerPolicy do
   end
 
   describe '#scope' do
-    it 'returns a scoped query object'
+    it 'returns a scoped query object' do
+      scope = double
+      expect(api_user).to receive(:scope).with(klass: User,
+                                               action: :index,
+                                               ids: ["123", "456"],
+                                               add_active_scope: false,
+                                               context: {login: "foo"})
+                            .and_return(scope)
+
+      policy = described_class.new(api_user, resource_class, resource_name, action_name, {id: '123,456'}, scope_context: {login: 'foo'}, add_active_resources_scope: false)
+      expect(policy.scope).to eq(scope)
+    end
   end
 end

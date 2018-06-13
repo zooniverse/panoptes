@@ -1,29 +1,17 @@
 module RoleControl
   module Actor
-    class DoChain
-      attr_reader :scope, :action, :actor
+    def scope(klass:, action:, ids: nil, context: {}, add_active_scope: true)
+      scope = klass.scope_for(action, self, context)
 
-      def initialize(actor, action)
-        @actor = actor
-        @action = action
+      if add_active_scope && klass.respond_to?(:active)
+        scope = scope.merge(klass.active)
       end
 
-      def to(klass, context={}, add_active_scope: true)
-        @scope = klass.scope_for(action, actor, context)
-        if add_active_scope && klass.respond_to?(:active)
-          @scope = @scope.merge(klass.active)
-        end
-        self
+      if ids.present?
+        scope = scope.where(id: ids).order(:id)
       end
 
-      def with_ids(ids)
-        @scope = scope.where(id: ids).order(:id) unless ids.blank?
-        self
-      end
-    end
-
-    def do(action, &block)
-      DoChain.new(self, action, &block)
+      scope
     end
   end
 end

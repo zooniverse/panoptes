@@ -109,10 +109,11 @@ module PolymorphicResourceScope
   end
 
   def find_controlled_resources(controlled_class, controlled_ids, action=controlled_scope)
-    api_user.do(action)
-      .to(controlled_class, scope_context, add_active_scope: add_active_resources_scope)
-      .with_ids(controlled_ids)
-      .scope
+    api_user.scope(klass: controlled_class,
+                   action: action,
+                   ids: controlled_ids,
+                   context: scope_context,
+                   add_active_scope: add_active_resources_scope)
   end
 
   def raise_no_resources_error
