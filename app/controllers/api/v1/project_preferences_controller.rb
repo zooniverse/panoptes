@@ -25,10 +25,6 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
     end
   end
 
-  def resource_name
-    "project_preference"
-  end
-
   def update_settings_response
     response.headers['Last-Modified'] = @upp.updated_at.httpdate
     render(

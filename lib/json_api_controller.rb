@@ -47,8 +47,7 @@ module JsonApiController
     end
 
     def resource_name
-      @resource_name ||= name.match(/::([a-zA-Z]*)Controller/)[1]
-                       .underscore.singularize
+      controller_name.singularize
     end
   end
 

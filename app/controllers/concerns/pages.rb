@@ -36,10 +36,6 @@ module Pages
     self.class::PARENT_RESOURCE
   end
 
-  def resource_name
-    @resource_name ||= controller_name.singularize
-  end
-
   def resource_id
     params[:"#{parent_resource}_id"]
   end

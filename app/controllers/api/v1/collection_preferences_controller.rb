@@ -7,10 +7,4 @@ class Api::V1::CollectionPreferencesController < Api::ApiController
   allowed_params :create, preferences: [:display], links: [:collection]
 
   allowed_params :update, preferences: [:display]
-
-  private
-
-  def resource_name
-    "collection_preference"
-  end
 end
