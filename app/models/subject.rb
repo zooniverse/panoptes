@@ -30,11 +30,30 @@ class Subject < ActiveRecord::Base
   can_through_parent :project, :update, :index, :show, :destroy, :update_links,
                      :destroy_links, :versions, :version
 
-  def self.nonstandard_mimetypes
-    {
-      "audio/mp3" => "audio/mpeg",
-      "audio/x-wav" => "audio/mpeg"
-    }
+  NONSTANDARD_MIMETYPES = {
+    "audio/mp3" => "audio/mpeg",
+    "audio/x-wav" => "audio/mpeg"
+  }.freeze
+
+  def self.location_attributes_from_params(locations)
+    (locations || []).map.with_index do |loc, i|
+      location_params = case loc
+                        when String
+                          { content_type: standardize_mimetype(loc) }
+                        when Hash
+                          {
+                            content_type: standardize_mimetype(loc.keys.first),
+                            external_link: true,
+                            src: loc.values.first
+                          }
+                        end
+      location_params[:metadata] = { index: i }
+      location_params
+    end
+  end
+
+  def self.standardize_mimetype(mimetype)
+    NONSTANDARD_MIMETYPES[mimetype] || mimetype
   end
 
   def migrated_subject?

@@ -85,7 +85,7 @@ class Api::V1::SubjectsController < Api::ApiController
     if locations.blank?
       nil
     else
-      subject.locations.build(location_params(locations))
+      subject.locations.build(Subject.location_attributes_from_params(locations))
     end
   end
 
@@ -95,23 +95,6 @@ class Api::V1::SubjectsController < Api::ApiController
       { url_format: :put }
     else
       { url_format: :get }
-    end
-  end
-
-  def location_params(locations)
-    (locations || []).map.with_index do |loc, i|
-      location_params = case loc
-                        when String
-                          { content_type: Subject.nonstandard_mimetypes[loc] || loc }
-                        when Hash
-                          {
-                            content_type: loc.keys.first,
-                            external_link: true,
-                            src: loc.values.first
-                          }
-                        end
-      location_params[:metadata] = { index: i }
-      location_params
     end
   end
 

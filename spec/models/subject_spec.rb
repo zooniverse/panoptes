@@ -145,4 +145,37 @@ describe Subject, :type => :model do
       end
     end
   end
+
+  describe '.location_attributes_from_params' do
+    context 'when given a string' do
+      it 'sets content type when an element is a string' do
+        results = Subject.location_attributes_from_params(['image/jpeg'])
+        expect(results).to eq([{content_type: "image/jpeg", metadata: {index: 0}}])
+      end
+
+      it 'converts non-standard mimetypes' do
+        results = Subject.location_attributes_from_params(['audio/mp3'])
+        expect(results).to eq([{content_type: 'audio/mpeg', metadata: {index: 0}}])
+      end
+    end
+
+    context 'when given a hash' do
+      it 'generates an external location' do
+        results = Subject.location_attributes_from_params([{"image/jpeg" => "https://example.org/kittens.jpg"}])
+        expect(results).to eq([{content_type: 'image/jpeg',
+                                external_link: true,
+                                src: "https://example.org/kittens.jpg",
+                                metadata: {index: 0}}])
+      end
+
+      it 'converts non-standard mimetypes' do
+        results = Subject.location_attributes_from_params([{"audio/mp3" => "https://example.org/kittens.mp3"}])
+        expect(results).to eq([{content_type: 'audio/mpeg',
+                                external_link: true,
+                                src: "https://example.org/kittens.mp3",
+                                metadata: {index: 0}}])
+        
+      end
+    end
+  end
 end

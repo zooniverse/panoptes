@@ -13,27 +13,11 @@ class SubjectSetImport::Processor
     subject.uploader = uploader
     subject.assign_attributes(attributes.except(:locations))
 
-    location_params(attributes[:locations]).each do |location|
-      subject.locations.build(location)
+    Subject.location_attributes_from_params(attributes[:locations]).each do |location_attributes|
+      subject.locations.build(location_attributes)
     end
 
     subject.save!
   end
 
-  def location_params(locations)
-    (locations || []).map.with_index do |loc, i|
-      location_params = case loc
-                        when String
-                          { content_type: Subject.nonstandard_mimetypes[loc] || loc }
-                        when Hash
-                          {
-                            content_type: loc.keys.first,
-                            external_link: true,
-                            src: loc.values.first
-                          }
-                        end
-      location_params[:metadata] = { index: i }
-      location_params
-    end
-  end
 end
