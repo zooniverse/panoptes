@@ -397,8 +397,13 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           context "with deactivated subjects" do
+            before do
+              Subject
+              .where(id: sms.map(&:subject_id))
+              .update_all(activated_state: 1)
+            end
+
             it "should return no subjects" do
-              Subject.update_all(activated_state: 1)
               get :queued, request_params
               expect(json_response[api_resource_name].length).to eq(0)
             end
