@@ -16,7 +16,11 @@ class RoledControllerPolicy
   end
 
   def scope
-    @scope ||= find_scope(resource_class, resource_ids)
+    @scope ||= api_user.scope(klass: resource_class,
+                              action: controlled_scope,
+                              ids: resource_ids,
+                              context: scope_context,
+                              add_active_scope: add_active_resources_scope)
   end
 
   def resource_ids
@@ -27,14 +31,6 @@ class RoledControllerPolicy
 
   def controlled_scope
     action_name.to_sym
-  end
-
-  def find_scope(controlled_class, controlled_ids, action=controlled_scope)
-    api_user.scope(klass: controlled_class,
-                   action: action,
-                   ids: controlled_ids,
-                   context: scope_context,
-                   add_active_scope: add_active_resources_scope,)
   end
 
   def array_id_params(string_id_params)
