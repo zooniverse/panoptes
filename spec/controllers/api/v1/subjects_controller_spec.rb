@@ -379,6 +379,30 @@ describe Api::V1::SubjectsController, type: :controller do
               expect(response.body).to eq(json_error_message(error_body))
             end
           end
+
+          context "with ordered subject selection" do
+            it "should respect the order of the subjects from selector" do
+              ordered_subject_ids = sms.map(&:subject_id).reverse.map(&:to_s)
+              allow_any_instance_of(
+                Subjects::Selector
+              ).to receive(
+                :get_subject_ids
+              ).and_return(ordered_subject_ids)
+
+              get :queued, request_params
+
+              selected_subject_ids = created_instance_ids(api_resource_name)
+              expect(selected_subject_ids).to eq(ordered_subject_ids)
+            end
+          end
+
+          context "with deactivated subjects" do
+            it "should return no subjects" do
+              Subject.update_all(activated_state: 1)
+              get :queued, request_params
+              expect(json_response[api_resource_name].length).to eq(0)
+            end
+          end
         end
       end
     end
