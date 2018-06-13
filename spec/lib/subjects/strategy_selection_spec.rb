@@ -81,7 +81,6 @@ RSpec.describe Subjects::StrategySelection do
         let(:run_selection) { subject.select }
 
         before do
-          allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
           workflow.subject_selection_strategy = "cellect"
         end
 
