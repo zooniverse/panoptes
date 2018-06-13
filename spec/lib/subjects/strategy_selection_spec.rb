@@ -20,7 +20,7 @@ RSpec.describe Subjects::StrategySelection do
 
     context "removing completes is enabled" do
       it "should call the complete remover after selection", :aggregate_failures do
-        expect(subject).to receive(:select_sms_ids).and_return([:default, [1,2,3]]).ordered
+        expect(subject).to receive(:select_subject_ids).and_return([:default, [1,2,3]]).ordered
         expect(Subjects::CompleteRemover)
           .to receive(:new)
           .with(user, workflow, an_instance_of(Array))
@@ -35,7 +35,9 @@ RSpec.describe Subjects::StrategySelection do
         let(:result) { subject.select }
 
         before do
-          allow(subject).to receive(:select_sms_ids).and_return([:default, smses.map(&:id)])
+          allow(subject)
+          .to receive(:select_subject_ids)
+          .and_return([:default, smses.map(&:subject_id)])
         end
 
         context "retired subjects" do
@@ -68,7 +70,7 @@ RSpec.describe Subjects::StrategySelection do
           end
 
           it 'should not return seen subjects' do
-            expect(result).not_to include(sms.id)
+            expect(result).not_to include(sms.subject_id)
           end
         end
       end

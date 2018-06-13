@@ -17,7 +17,7 @@ module Subjects
     end
 
     def select
-      used_strategy, selected_ids = select_sms_ids
+      used_strategy, selected_ids = select_subject_ids
       eventlog.info("Selected subjects", used_strategy: used_strategy, subject_ids: selected_ids)
 
       selected_ids = selected_ids.compact
@@ -32,7 +32,7 @@ module Subjects
 
     private
 
-    def select_sms_ids
+    def select_subject_ids
       select_with(desired_selector)
     rescue CellectClient::ConnectionError, DesignatorClient::GenericError
       select_with(default_selector)
