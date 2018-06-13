@@ -10,41 +10,35 @@ module Subjects
     end
 
     def incomplete_ids
-      return subject_ids if subject_ids.empty?
-      subject_ids - retired_seen_ids
+      if subject_ids.empty?
+        subject_ids
+      else
+        subject_ids - retired_seen_subject_ids
+      end
     end
 
     private
 
-    def retired_seen_ids
-      Set.new(retired_seen_scope.pluck(:subject_id)).to_a
+    def retired_seen_subject_ids
+      retired_subject_ids | user_seen_subject_ids
     end
 
-    def retired_seen_scope
-      if user_seen_ids.empty?
-        retired_scope
-      else
-        retired_scope.union_all(seen_scope)
-      end
+    def retired_subject_ids
+      SubjectWorkflowStatus
+      .where(workflow_id: workflow.id)
+      .where.not(retired_at: nil)
+      .where(subject_id: subject_ids)
+      .pluck(:subject_id)
     end
 
-    def retired_scope
-      SetMemberSubject
-      .retired_for_workflow(workflow)
-      .where(set_member_subjects: {subject_id: subject_ids})
-    end
+    def user_seen_subject_ids
+      user_seen_subject = UserSeenSubject.find_by(
+        user: user,
+        workflow: workflow
+      )
 
-    def seen_scope
-      SetMemberSubject.where(subject_id: user_seen_ids)
-    end
-
-    def user_seens
-      @user_seens ||= UserSeenSubject.find_by(user: user, workflow: workflow)
-    end
-
-    def user_seen_ids
-      @user_seen_ids ||= if user_seens
-        user_seens.subject_ids
+      if user_seen_subject
+        user_seen_subject.subject_ids
       else
         []
       end
