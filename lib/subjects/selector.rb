@@ -68,7 +68,6 @@ module Subjects
       .order("idx(array[#{subject_ids.join(',')}], id)")
     end
 
-
     def needs_set_id?
       workflow.grouped && !params.has_key?(:subject_set_id)
     end
