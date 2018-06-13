@@ -9,11 +9,11 @@ RSpec.describe Subjects::Selector do
 
   subject { described_class.new(user, workflow, params) }
 
-  describe "#get_subjects" do
+  describe "#get_subject_ids" do
     context "when the workflow doesn't have any subject sets" do
       it 'should raise an informative error' do
         allow_any_instance_of(Workflow).to receive(:subject_sets).and_return([])
-        expect{subject.get_subjects}.to raise_error(
+        expect{subject.get_subject_ids}.to raise_error(
           Subjects::Selector::MissingSubjectSet,
           "no subject set is associated with this workflow"
         )
@@ -26,7 +26,7 @@ RSpec.describe Subjects::Selector do
           .to receive(:set_member_subjects).and_return([])
         message = "No data available for selection"
         expect {
-          subject.get_subjects
+          subject.get_subject_ids
         }.to raise_error(Subjects::Selector::MissingSubjects, message)
       end
     end
@@ -36,11 +36,11 @@ RSpec.describe Subjects::Selector do
         selector = instance_double("Subjects::StrategySelection")
         expect(selector).to receive(:select).and_return([1])
         expect(Subjects::StrategySelection).to receive(:new).and_return(selector)
-        subject.get_subjects
+        subject.get_subject_ids
       end
 
       it 'should return the default subjects set size' do
-        subjects = subject.get_subjects
+        subjects = subject.get_subject_ids
         expect(subjects.length).to eq(10)
       end
 
@@ -48,11 +48,11 @@ RSpec.describe Subjects::Selector do
         let(:size) { 2 }
         subject do
           params = { page_size: size }
-          described_class.new(user, workflow, params, Subject.all)
+          described_class.new(user, workflow, params)
         end
 
         it 'should return the page_size number of subjects' do
-          subjects = subject.get_subjects
+          subjects = subject.get_subject_ids
           expect(subjects.length).to eq(size)
         end
       end
@@ -68,7 +68,7 @@ RSpec.describe Subjects::Selector do
       end
 
       it 'should fallback to selecting some data' do
-        subjects = subject.get_subjects
+        subjects = subject.get_subject_ids
       end
 
       context "and the workflow is grouped" do
@@ -77,7 +77,7 @@ RSpec.describe Subjects::Selector do
 
         it 'should fallback to selecting some grouped data' do
           allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
-          subjects = subject.get_subjects
+          subjects = subject.get_subject_ids
         end
       end
     end
@@ -92,18 +92,18 @@ RSpec.describe Subjects::Selector do
         expect_any_instance_of(Subjects::PostgresqlSelection)
           .to receive(:select)
           .and_call_original
-        subject.get_subjects
+        subject.get_subject_ids
       end
 
       it "should notify selector to reload" do
         Panoptes.flipper[:selector_sync_error_reload].enable
         expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async).with(workflow.id)
-        subject.get_subjects
+        subject.get_subject_ids
       end
 
       it "should not notify selector to reload if the feature is disabled" do
         expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
-        subject.get_subjects
+        subject.get_subject_ids
       end
 
       context "when the default postgres selector returns no data" do
@@ -117,41 +117,36 @@ RSpec.describe Subjects::Selector do
           expect_any_instance_of(Subjects::PostgresqlSelection)
             .to receive(:any_workflow_data)
             .and_call_original
-          subject.get_subjects
+          subject.get_subject_ids
         end
       end
     end
   end
 
-  describe '#selected_subjects' do
-
-    it 'should not return deactivated subjects' do
-      deactivated_ids = smses[0..smses.length-2].map(&:subject_id)
-      Subject.where(id: deactivated_ids).update_all(activated_state: 1)
-      result_ids = subject.selected_subjects.pluck(&:id)
-      expect(result_ids).not_to include(*deactivated_ids)
-    end
+  describe '#selected_subject_ids' do
 
     it 'should return something when everything selected is retired' do
       smses.each do |sms|
         swc = create(:subject_workflow_status, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
       end
-      expect(subject.selected_subjects.size).to be > 0
+      expect(subject.selected_subject_ids.size).to be > 0
     end
 
-    it "should respect the order of the sms selection" do
+    it "should respect the order of the subjects from strategy selector" do
       ordered_sms = smses.sample(5)
       subject_ids = ordered_sms.map(&:subject_id)
-      expect(subject).to receive(:run_strategy_selection).and_return(subject_ids)
-      subjects = subject.selected_subjects
-      expect(ordered_sms.map(&:subject_id)).to eq(subjects.map(&:id))
+      allow_any_instance_of(
+        Subjects::StrategySelection
+      ).to receive(:select).and_return(subject_ids)
+      retured_subject_ids = subject.selected_subject_ids
+      expect(subject_ids).to eq(retured_subject_ids)
     end
 
     it 'does not allow sql injection' do
       hacking_attempt = [1, 2, '1], set_member_subjects.id); DROP TABLE users; -- ']
       expect(subject).to receive(:run_strategy_selection).and_return(hacking_attempt)
       expect {
-        subject.selected_subjects
+        subject.selected_subject_ids
       }.to raise_error(
         Subjects::Selector::MalformedSelectedIds,
         "Selector returns non-integers, hacking attempt?!"

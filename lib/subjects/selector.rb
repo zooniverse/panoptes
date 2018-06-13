@@ -7,21 +7,21 @@ module Subjects
     class MissingSubjects < StandardError; end
     class MalformedSelectedIds < StandardError; end
 
-    attr_reader :user, :params, :workflow, :scope
+    attr_reader :user, :params, :workflow
 
-    def initialize(user, workflow, params, scope=Subject.all)
-      @user, @workflow, @params, @scope = user, workflow, params, scope
+    def initialize(user, workflow, params)
+      @user, @workflow, @params = user, workflow, params
     end
 
-    def get_subjects
+    def get_subject_ids
       raise workflow_id_error unless workflow
       raise group_id_error if needs_set_id?
       raise missing_subject_set_error if workflow.subject_sets.empty?
       raise missing_subjects_error if workflow.set_member_subjects.empty?
-      selected_subjects
+      selected_subject_ids
     end
 
-    def selected_subjects
+    def selected_subject_ids
       unless workflow.finished_at
         subject_ids = run_strategy_selection
       end
@@ -30,7 +30,16 @@ module Subjects
         subject_ids = fallback_selection
       end
 
-      active_subjects_in_selection_order(subject_ids)
+      # when on Rails 5
+      # move to AR_Scope.order(["idx(array[?]), id", subject_ids])
+      # instead of manually checking and raising
+      unless subject_ids.all? { |i| i.is_a? Integer }
+        raise MalformedSelectedIds.new(
+          "Selector returns non-integers, hacking attempt?!"
+        )
+      end
+
+      subject_ids
     end
 
     private
@@ -60,21 +69,6 @@ module Subjects
       else
         subject_ids
       end
-    end
-
-    def active_subjects_in_selection_order(subject_ids)
-      # when on Rails 5 - move to .order(["idx(array[?]), id", subject_ids])
-      # instead of manually checking and raising
-      unless subject_ids.all? { |i| i.is_a? Integer }
-        raise MalformedSelectedIds.new(
-          "Selector returns non-integers, hacking attempt?!"
-        )
-      end
-
-      scope
-      .active
-      .where(id: subject_ids)
-      .order("idx(array[#{subject_ids.join(',')}], id)")
     end
 
     def needs_set_id?
