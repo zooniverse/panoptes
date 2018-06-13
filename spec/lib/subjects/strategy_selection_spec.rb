@@ -1,5 +1,4 @@
 require "spec_helper"
-require 'subjects/cellect_session'
 
 RSpec.describe Subjects::StrategySelection do
   let(:workflow) { create(:workflow_with_subjects, num_sets: 1) }
