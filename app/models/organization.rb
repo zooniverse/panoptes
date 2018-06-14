@@ -22,15 +22,12 @@ class Organization < ActiveRecord::Base
 
   accepts_nested_attributes_for :organization_contents
 
-  can_by_role :destroy, :update, :update_links, :destroy_links, roles: [ :owner, :collaborator ]
-
-  can_by_role :show, :index, :versions, :version, public: true,
-    roles: [ :owner, :collaborator, :tester, :translator, :scientist, :moderator ]
-
-  can_by_role :translate, roles: %i(owner translator collaborator)
-
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :access_control_list, :scope_for, :update, :user
+
+  def self.scope_for(action, api_user, opts={})
+    Pundit.policy!(api_user, self).scope_for(action)
+  end
 
   def retired_subjects_count
     projects.joins(:active_workflows).sum("workflows.retired_set_member_subjects_count")
