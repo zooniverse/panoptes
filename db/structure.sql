@@ -3051,10 +3051,10 @@ CREATE INDEX index_user_groups_on_private ON public.user_groups USING btree (pri
 
 
 --
--- Name: index_user_project_preferences_on_user_id_and_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_project_preferences_on_project_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_user_project_preferences_on_user_id_and_project_id ON public.user_project_preferences USING btree (user_id, project_id);
+CREATE UNIQUE INDEX index_user_project_preferences_on_project_id_and_user_id ON public.user_project_preferences USING btree (project_id, user_id);
 
 
 --
@@ -4148,4 +4148,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180404144531');
 INSERT INTO schema_migrations (version) VALUES ('20180510100328');
 
 INSERT INTO schema_migrations (version) VALUES ('20180510121206');
+
+INSERT INTO schema_migrations (version) VALUES ('20180614131933');
 
