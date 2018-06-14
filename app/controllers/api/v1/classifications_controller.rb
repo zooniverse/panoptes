@@ -9,7 +9,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   schema_type :json_schema
 
-  rescue_from RoleControl::AccessDenied, with: :access_denied
+  rescue_from JsonApiController::AccessDenied, with: :access_denied
 
   before_action :filter_plural_subject_ids,
     only: [ :index, :gold_standard, :incomplete, :project ]
@@ -42,8 +42,8 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   private
 
-  def scope_context
-    params
+  def policy_object
+    @policy_object ||= RoledControllerPolicy.new(api_user, resource_class, resource_name, action_name, params, scope_context: params)
   end
 
   def access_denied(exception)

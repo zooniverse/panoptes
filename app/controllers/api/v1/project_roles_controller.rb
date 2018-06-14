@@ -5,10 +5,6 @@ class Api::V1::ProjectRolesController < Api::ApiController
   allowed_params :create, roles: [], links: [:user, :project]
   allowed_params :update, roles: []
 
-  def resource_name
-    "project_role"
-  end
-
   def update
     super
     if new_roles_present?(roles)

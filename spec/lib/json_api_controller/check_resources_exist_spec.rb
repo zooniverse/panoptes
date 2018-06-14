@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RoleControl::RoledController, type: :controller do
+describe JsonApiController::CheckResourcesExist, type: :controller do
   setup_role_control_tables
 
   let!(:enrolled_actor) { create(:user) }
@@ -12,7 +12,11 @@ describe RoleControl::RoledController, type: :controller do
   end
 
   controller(ApplicationController) do
-    include RoleControl::RoledController
+    include JsonApiController::CheckResourcesExist
+
+    def policy_object
+      RoledControllerPolicy.new(api_user, resource_class, resource_name, action_name, params)
+    end
 
     def api_user
       ApiUser.new(User.first)
@@ -61,7 +65,7 @@ describe RoleControl::RoledController, type: :controller do
 
   describe "user is not enrolled on controlled object" do
     it 'should raise an AccessDenied error' do
-      expect{ put :update, id: controlled.id }.to raise_error(RoleControl::AccessDenied)
+      expect{ put :update, id: controlled.id }.to raise_error(JsonApiController::AccessDenied)
     end
   end
 end

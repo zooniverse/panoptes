@@ -18,7 +18,7 @@ class Api::V1::MembershipsController < Api::ApiController
 
   private
 
-  def add_active_resources_scope
-    false
+  def policy_object
+    RoledControllerPolicy.new(api_user, resource_class, resource_name, action_name, params, add_active_resources_scope: false)
   end
 end

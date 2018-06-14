@@ -5,7 +5,7 @@ module Api
 
   class ApiController < ApplicationController
     include JsonApiController
-    include RoleControl::RoledController
+    include JsonApiController::CheckResourcesExist
 
     API_ACCEPTED_CONTENT_TYPES = ['application/json',
                                   'application/vnd.api+json']
@@ -13,7 +13,7 @@ module Api
 
     rescue_from ActiveRecord::RecordNotFound,
       Api::NoMediaError,
-      RoleControl::AccessDenied,
+      JsonApiController::AccessDenied,
       Subjects::Selector::MissingSubjectSet,
       Subjects::Selector::MissingSubjects,                 with: :not_found
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
