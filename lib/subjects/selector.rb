@@ -5,6 +5,7 @@ module Subjects
     class MissingParameter < StandardError; end
     class MissingSubjectSet < StandardError; end
     class MissingSubjects < StandardError; end
+    class MalformedSelectedIds < StandardError; end
 
     attr_reader :user, :params, :workflow, :scope
 
@@ -62,6 +63,12 @@ module Subjects
     end
 
     def active_subjects_in_selection_order(subject_ids)
+      unless subject_ids.all? { |i| i.is_a? Integer }
+        raise MalformedSelectedIds.new(
+          "Selector returns non-integers, hacking attempt?!"
+        )
+      end
+
       scope
       .active
       .where(id: subject_ids)

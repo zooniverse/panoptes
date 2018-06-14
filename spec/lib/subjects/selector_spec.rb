@@ -146,5 +146,16 @@ RSpec.describe Subjects::Selector do
       subjects = subject.selected_subjects
       expect(ordered_sms.map(&:subject_id)).to eq(subjects.map(&:id))
     end
+
+    it 'does not allow sql injection' do
+      hacking_attempt = [1, 2, '1], set_member_subjects.id); DROP TABLE users; -- ']
+      expect(subject).to receive(:run_strategy_selection).and_return(hacking_attempt)
+      expect {
+        subject.selected_subjects
+      }.to raise_error(
+        Subjects::Selector::MalformedSelectedIds,
+        "Selector returns non-integers, hacking attempt?!"
+      )
+    end
   end
 end
