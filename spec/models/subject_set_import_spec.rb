@@ -22,7 +22,7 @@ describe SubjectSetImport, type: :model do
     expect(subject_set.subjects.count).to eq(2)
   end
 
-  describe 'scope_for' do
+  describe 'link permissions' do
     it 'allows project owners to create an import' do
       api_user = ApiUser.new(user)
       import = described_class.new
@@ -32,8 +32,8 @@ describe SubjectSetImport, type: :model do
     end
 
     it 'does not allow a non-collaborator to create an import' do
-      user = create :user
-      api_user = ApiUser.new(user)
+      non_collaborator = create :user
+      api_user = ApiUser.new(non_collaborator)
       import = described_class.new
       import.subject_set = SubjectSet.link_to_resource(import, api_user).where(id: subject_set.id).first
       import.user = User.link_to_resource(import, api_user).where(id: user.id).first

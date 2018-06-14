@@ -174,7 +174,6 @@ describe Subject, :type => :model do
                                 external_link: true,
                                 src: "https://example.org/kittens.mp3",
                                 metadata: {index: 0}}])
-        
       end
     end
   end
