@@ -42,8 +42,8 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   private
 
-  def policy_object
-    @policy_object ||= RoledControllerPolicy.new(api_user, resource_class, resource_name, action_name, params, scope_context: params)
+  def policy_options
+    {scope_context: params}
   end
 
   def access_denied(exception)

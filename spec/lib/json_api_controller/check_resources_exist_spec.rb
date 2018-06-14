@@ -13,10 +13,7 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
 
   controller(ApplicationController) do
     include JsonApiController::CheckResourcesExist
-
-    def policy_object
-      RoledControllerPolicy.new(api_user, resource_class, resource_name, action_name, params)
-    end
+    include JsonApiController::LegacyPolicy
 
     def api_user
       ApiUser.new(User.first)
@@ -26,12 +23,12 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
       ControlledTable
     end
 
-    def resource_sym
-      :controlled_tables
-    end
-
     def resource_name
       "controlled_table"
+    end
+
+    def resource_ids
+      params[:id]
     end
 
     def update

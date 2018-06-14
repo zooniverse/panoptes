@@ -25,8 +25,8 @@ module RolesController
     AccessControlList
   end
 
-  def policy_object
-    RoledControllerPolicy.new(api_user, resource_class, resource_name, action_name, params, scope_context: scope_context)
+  def policy_options
+    {scope_context: scope_context}
   end
 
   def scope_context
