@@ -337,8 +337,8 @@ class User < ActiveRecord::Base
     Rails.cache.increment(subjects_count_cache_key)
   end
 
-  def favorite_collections_for_project(project)
-    collections.joins(:projects).where(favorite: true, projects: {id: project.id})
+  def favorite_collections_for_project(project_id)
+    collections.joins(:projects).where(favorite: true, projects: {id: project_id})
   end
 
   private
