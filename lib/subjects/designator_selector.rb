@@ -33,10 +33,7 @@ module Subjects
     def get_subjects(user, group_id, limit)
       return [] unless enabled?
 
-      subject_ids = self.class.client.get_subjects(workflow.id, user.try(&:id), group_id, limit)
-      return [] unless subject_ids.present?
-      raise "Hacking attempt" unless subject_ids.all? { |i| i.is_a? Integer }
-      subject_ids
+      self.class.client.get_subjects(workflow.id, user.try(&:id), group_id, limit)
     end
 
     def enabled?
