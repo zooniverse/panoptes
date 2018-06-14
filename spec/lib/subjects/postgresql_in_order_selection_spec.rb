@@ -22,7 +22,7 @@ RSpec.describe Subjects::PostgresqlInOrderSelection do
   end
 
   describe "priority selection" do
-    let(:ordered) { available.order(priority: :asc).pluck(:id) }
+    let(:ordered) { available.order(priority: :asc).pluck(:subject_id) }
     let(:limit) { available.size }
 
     before do
@@ -41,7 +41,7 @@ RSpec.describe Subjects::PostgresqlInOrderSelection do
         sms_subject = create(:subject, project: project, uploader: uploader)
         sms = create(:set_member_subject, subject: sms_subject, subject_set: subject_set, priority: -10.to_f)
         first_id = selector.select.first
-        expect(first_id).to eq(sms.id)
+        expect(first_id).to eq(sms.subject_id)
       end
     end
   end

@@ -60,7 +60,7 @@ RSpec.describe Subjects::PostgresqlSelection do
       end
 
       describe "priority selection" do
-        let(:ordered) { sms.order(priority: :asc).pluck(:id) }
+        let(:ordered) { sms.order(priority: :asc).pluck(:subject_id) }
         let(:limit) { ordered.size }
         let(:opts) { { limit: limit } }
 
@@ -103,7 +103,7 @@ RSpec.describe Subjects::PostgresqlSelection do
 
         it 'should only select subjects in the specified group' do
           result = subject.select
-          ordered = sms.limit(result.length).order(priority: :asc).pluck(:id)
+          ordered = sms.limit(result.length).order(priority: :asc).pluck(:subject_id)
           expect(result).to eq(ordered)
         end
       end

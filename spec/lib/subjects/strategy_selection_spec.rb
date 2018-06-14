@@ -1,5 +1,4 @@
 require "spec_helper"
-require 'subjects/cellect_session'
 
 RSpec.describe Subjects::StrategySelection do
   let(:workflow) { create(:workflow_with_subjects, num_sets: 1) }
@@ -20,7 +19,7 @@ RSpec.describe Subjects::StrategySelection do
 
     context "removing completes is enabled" do
       it "should call the complete remover after selection", :aggregate_failures do
-        expect(subject).to receive(:select_sms_ids).and_return([:default, [1,2,3]]).ordered
+        expect(subject).to receive(:select_subject_ids).and_return([:default, [1,2,3]]).ordered
         expect(Subjects::CompleteRemover)
           .to receive(:new)
           .with(user, workflow, an_instance_of(Array))
@@ -35,7 +34,9 @@ RSpec.describe Subjects::StrategySelection do
         let(:result) { subject.select }
 
         before do
-          allow(subject).to receive(:select_sms_ids).and_return([:default, smses.map(&:id)])
+          allow(subject)
+          .to receive(:select_subject_ids)
+          .and_return([:default, smses.map(&:subject_id)])
         end
 
         context "retired subjects" do
@@ -48,7 +49,7 @@ RSpec.describe Subjects::StrategySelection do
           end
 
           it 'should not return retired subjects' do
-            expect(result).not_to include(sms.id)
+            expect(result).not_to include(sms.subject_id)
           end
 
           context "when the sms is retired for a different workflow" do
@@ -57,7 +58,7 @@ RSpec.describe Subjects::StrategySelection do
             end
 
             it 'should return all the subjects' do
-              expect(result).to include(sms.id)
+              expect(result).to include(sms.subject_id)
             end
           end
         end
@@ -68,7 +69,7 @@ RSpec.describe Subjects::StrategySelection do
           end
 
           it 'should not return seen subjects' do
-            expect(result).not_to include(sms.id)
+            expect(result).not_to include(sms.subject_id)
           end
         end
       end
@@ -81,7 +82,6 @@ RSpec.describe Subjects::StrategySelection do
         let(:run_selection) { subject.select }
 
         before do
-          allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
           workflow.subject_selection_strategy = "cellect"
         end
 
@@ -91,21 +91,6 @@ RSpec.describe Subjects::StrategySelection do
             .to receive(:get_subjects)
             .with(*cellect_params)
             .and_return(result_ids)
-          run_selection
-        end
-
-        it "should use a cellect session instance for session tracking" do
-          stub_cellect_connection
-          stub_redis_connection
-          expect(Subjects::CellectSession).to receive(:new).and_call_original
-          run_selection
-        end
-
-        it "should convert the cellect subject_ids to panoptes sms_ids" do
-          allow(CellectClient).to receive(:get_subjects)
-            .and_return(result_ids)
-          expect(SetMemberSubject).to receive(:by_subject_workflow)
-            .with(result_ids, workflow.id).and_call_original
           run_selection
         end
 
@@ -133,14 +118,6 @@ RSpec.describe Subjects::StrategySelection do
             .to receive(:get_subjects)
             .with(user, subject_set.id, limit)
             .and_return(result_ids)
-          run_selection
-        end
-
-        it "should convert the designator subject_ids to panoptes sms_ids" do
-          allow_any_instance_of(DesignatorClient).to receive(:get_subjects)
-            .and_return(result_ids)
-          expect(SetMemberSubject).to receive(:by_subject_workflow)
-            .with(result_ids, workflow.id).and_call_original
           run_selection
         end
       end

@@ -33,14 +33,7 @@ module Subjects
     def get_subjects(user, group_id, limit)
       return [] unless enabled?
 
-      subject_ids = self.class.client.get_subjects(workflow.id, user.try(&:id), group_id, limit)
-      return [] unless subject_ids.present?
-      raise "Hacking attempt" unless subject_ids.all? { |i| i.is_a? Integer }
-
-      sms_scope = SetMemberSubject.by_subject_workflow(subject_ids, workflow.id)
-        .order("idx(array[#{subject_ids.join(',')}], set_member_subjects.subject_id)")
-
-      sms_scope.pluck("set_member_subjects.id")
+      self.class.client.get_subjects(workflow.id, user.try(&:id), group_id, limit)
     end
 
     def enabled?

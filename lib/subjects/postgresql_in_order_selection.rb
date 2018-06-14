@@ -14,7 +14,7 @@ module Subjects
       .where(id: available)
       .order(priority: :asc)
       .limit(limit)
-      .pluck(:id)
+      .pluck(:subject_id)
     end
   end
 end
