@@ -1,4 +1,5 @@
 class Api::V1::ProjectPreferencesController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include PreferencesController
 
   require_authentication :all, scopes: [:project]

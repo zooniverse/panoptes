@@ -1,4 +1,5 @@
 class Api::V1::ProjectsController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include FilterByOwner
   include FilterByCurrentUserRoles
   include SyncResourceTranslationStrings

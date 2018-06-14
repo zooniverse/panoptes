@@ -1,5 +1,7 @@
 class Api::V1::TranslationsController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include PolymorphicResourceScope
+
   polymorphic_column :translated
 
   require_authentication :create, :update, :destroy, scopes: [:translation]

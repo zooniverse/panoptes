@@ -1,4 +1,5 @@
 class Api::V1::TagsController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include IndexSearch
 
   resource_actions :index, :show

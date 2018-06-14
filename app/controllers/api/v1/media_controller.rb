@@ -1,4 +1,5 @@
 class Api::V1::MediaController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include PolymorphicResourceScope
 
   polymorphic_column :linked

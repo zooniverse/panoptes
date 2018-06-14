@@ -1,4 +1,6 @@
 class Api::V1::SetMemberSubjectsController < Api::ApiController
+  include JsonApiController::LegacyPolicy
+
   require_authentication :create, :update, :destroy, scopes: [:project]
   resource_actions :default
   schema_type :strong_params

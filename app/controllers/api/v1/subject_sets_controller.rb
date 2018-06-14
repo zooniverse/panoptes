@@ -1,4 +1,5 @@
 class Api::V1::SubjectSetsController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include FilterByMetadata
 
   require_authentication :create, :update, :destroy, scopes: [:project]

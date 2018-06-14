@@ -1,4 +1,5 @@
 class Api::V1::FieldGuidesController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include SyncResourceTranslationStrings
 
   require_authentication :update, :create, :destroy, scopes: [:project]

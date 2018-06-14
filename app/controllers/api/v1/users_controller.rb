@@ -1,4 +1,5 @@
 class Api::V1::UsersController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include Recents
   include IndexSearch
   include AdminAllowed

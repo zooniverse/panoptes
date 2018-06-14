@@ -1,5 +1,7 @@
 class Api::V1::CollectionRolesController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include RolesController
+
   require_authentication :create, :update, :destroy, scopes: [:collection]
 
   allowed_params :create, roles: [], links: [:user, :collection]

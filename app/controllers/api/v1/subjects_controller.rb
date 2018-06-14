@@ -1,4 +1,5 @@
 class Api::V1::SubjectsController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include Versioned
 
   require_authentication :update, :create, :destroy, :version, :versions,

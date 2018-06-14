@@ -1,4 +1,5 @@
 class Api::V1::OrganizationsController < Api::ApiController
+  include JsonApiController::PunditPolicy
   include FilterByOwner
   include FilterByCurrentUserRoles
   include IndexSearch
@@ -7,7 +8,6 @@ class Api::V1::OrganizationsController < Api::ApiController
   include Slug
   include MediumResponse
   include SyncResourceTranslationStrings
-  include JsonApiController::PunditPolicy
 
   require_authentication :update, :create, :destroy, scopes: [:organization]
 

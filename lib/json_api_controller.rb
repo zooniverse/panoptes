@@ -51,10 +51,6 @@ module JsonApiController
     end
   end
 
-  included do
-    include LegacyPolicy
-  end
-
   def serializer
     @serializer ||= "#{ resource_name.camelize }Serializer".constantize
   end

@@ -1,12 +1,12 @@
 class Organization < ActiveRecord::Base
   include RoleControl::Owned
-  include RoleControl::Controlled
+  include RoleControl::PunditInterop
   include Activatable
   include Linkable
   include SluggedName
   include Translatable
 
-  scope :public_scope, -> { where(listed: true) }
+  # Still needed for HttpCacheable
   scope :private_scope, -> { where(listed: false) }
 
   has_many :projects
@@ -24,10 +24,6 @@ class Organization < ActiveRecord::Base
 
   can_be_linked :project, :scope_for, :update, :user
   can_be_linked :access_control_list, :scope_for, :update, :user
-
-  def self.scope_for(action, api_user, opts={})
-    Pundit.policy!(api_user, self).scope_for(action)
-  end
 
   def retired_subjects_count
     projects.joins(:active_workflows).sum("workflows.retired_set_member_subjects_count")

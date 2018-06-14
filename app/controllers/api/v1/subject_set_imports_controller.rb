@@ -1,4 +1,6 @@
 class Api::V1::SubjectSetImportsController < Api::ApiController
+  include JsonApiController::LegacyPolicy
+
   require_authentication :all, scopes: [:project]
 
   resource_actions :index, :show, :create

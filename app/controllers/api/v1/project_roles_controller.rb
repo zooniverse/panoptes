@@ -1,5 +1,7 @@
 class Api::V1::ProjectRolesController < Api::ApiController
+  include JsonApiController::LegacyPolicy
   include RolesController
+
   require_authentication :create, :update, :destroy, scopes: [:project]
 
   allowed_params :create, roles: [], links: [:user, :project]
