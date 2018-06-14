@@ -1,6 +1,6 @@
 class RoledControllerPolicy
   attr_reader :api_user, :resource_class, :resource_name, :action_name, :params, :scope_context, :add_active_resources_scope
-  
+
   def initialize(api_user, resource_class, resource_name, action_name, params, scope_context: {}, add_active_resources_scope: true, **kwargs)
     @api_user = api_user
     @resource_class = resource_class

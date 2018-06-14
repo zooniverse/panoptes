@@ -50,7 +50,7 @@ module PolymorphicResourceScope
       action_name.to_sym
     end
   end
-  
+
   def polymorphic_controlled_resourse
     @polymorphic_controlled_resourse ||= @polymorphic_controlled_resourses.first
   end
