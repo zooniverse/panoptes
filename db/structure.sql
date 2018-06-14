@@ -1012,6 +1012,42 @@ ALTER SEQUENCE public.set_member_subjects_id_seq OWNED BY public.set_member_subj
 
 
 --
+-- Name: subject_set_imports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.subject_set_imports (
+    id integer NOT NULL,
+    subject_set_id integer NOT NULL,
+    user_id integer NOT NULL,
+    source_url character varying,
+    imported_count integer DEFAULT 0 NOT NULL,
+    failed_count integer DEFAULT 0 NOT NULL,
+    failed_uuids character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: subject_set_imports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.subject_set_imports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: subject_set_imports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.subject_set_imports_id_seq OWNED BY public.subject_set_imports.id;
+
+
+--
 -- Name: subject_sets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1126,7 +1162,8 @@ CREATE TABLE public.subjects (
     migrated boolean,
     lock_version integer DEFAULT 0,
     upload_user_id integer,
-    activated_state integer DEFAULT 0 NOT NULL
+    activated_state integer DEFAULT 0 NOT NULL,
+    external_id character varying
 );
 
 
@@ -1819,6 +1856,13 @@ ALTER TABLE ONLY public.set_member_subjects ALTER COLUMN id SET DEFAULT nextval(
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.subject_set_imports ALTER COLUMN id SET DEFAULT nextval('public.subject_set_imports_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.subject_sets ALTER COLUMN id SET DEFAULT nextval('public.subject_sets_id_seq'::regclass);
 
 
@@ -2132,6 +2176,14 @@ ALTER TABLE ONLY public.recents
 
 ALTER TABLE ONLY public.set_member_subjects
     ADD CONSTRAINT set_member_subjects_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: subject_set_imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.subject_set_imports
+    ADD CONSTRAINT subject_set_imports_pkey PRIMARY KEY (id);
 
 
 --
@@ -2838,6 +2890,20 @@ CREATE INDEX index_set_member_subjects_on_subject_set_id ON public.set_member_su
 
 
 --
+-- Name: index_subject_set_imports_on_subject_set_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_subject_set_imports_on_subject_set_id ON public.subject_set_imports USING btree (subject_set_id);
+
+
+--
+-- Name: index_subject_set_imports_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_subject_set_imports_on_user_id ON public.subject_set_imports USING btree (user_id);
+
+
+--
 -- Name: index_subject_sets_on_metadata; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3418,6 +3484,14 @@ ALTER TABLE ONLY public.tutorials
 
 
 --
+-- Name: fk_rails_8661e689b0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_set_imports
+    ADD CONSTRAINT fk_rails_8661e689b0 FOREIGN KEY (subject_set_id) REFERENCES public.subject_sets(id);
+
+
+--
 -- Name: fk_rails_895b025564; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3535,6 +3609,14 @@ ALTER TABLE ONLY public.set_member_subjects
 
 ALTER TABLE ONLY public.workflow_tutorials
     ADD CONSTRAINT fk_rails_bcabfcd540 FOREIGN KEY (workflow_id) REFERENCES public.workflows(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_d596712569; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_set_imports
+    ADD CONSTRAINT fk_rails_d596712569 FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
@@ -4062,4 +4144,8 @@ INSERT INTO schema_migrations (version) VALUES ('20180403150901');
 INSERT INTO schema_migrations (version) VALUES ('20180404144354');
 
 INSERT INTO schema_migrations (version) VALUES ('20180404144531');
+
+INSERT INTO schema_migrations (version) VALUES ('20180510100328');
+
+INSERT INTO schema_migrations (version) VALUES ('20180510121206');
 
