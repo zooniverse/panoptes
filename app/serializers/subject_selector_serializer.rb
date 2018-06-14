@@ -29,6 +29,10 @@ class SubjectSelectorSerializer
     !!(user_seen&.subjects_seen?(@model.id))
   end
 
+  def finished_workflow
+    @context[:user_has_finished_workflow]
+  end
+
   def favorite
     @context[:favorite_subject_ids].include? @model.id
   end
@@ -52,22 +56,10 @@ class SubjectSelectorSerializer
   end
 
   def select_context?
-    @context[:select_context]
-  end
-
-  def workflow
-    @context[:workflow]
-  end
-
-  def user
-    @context[:user]
+    !!@context[:select_context]
   end
 
   def user_seen
     @context[:user_seen]
-  end
-
-  def finished_workflow
-    @context[:user_has_finished_workflow]
   end
 end
