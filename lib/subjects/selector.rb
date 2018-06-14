@@ -63,6 +63,8 @@ module Subjects
     end
 
     def active_subjects_in_selection_order(subject_ids)
+      # when on Rails 5 - move to .order(["idx(array[?]), id", subject_ids])
+      # instead of manually checking and raising
       unless subject_ids.all? { |i| i.is_a? Integer }
         raise MalformedSelectedIds.new(
           "Selector returns non-integers, hacking attempt?!"
