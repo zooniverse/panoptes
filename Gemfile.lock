@@ -293,6 +293,8 @@ GEM
       pry (>= 0.9.11)
     public_suffix (3.0.1)
     puma (3.11.4)
+    pundit (1.1.0)
+      activesupport (>= 3.0.0)
     rack (1.6.10)
     rack-cors (0.4.1)
     rack-protection (2.0.1)
@@ -485,6 +487,7 @@ DEPENDENCIES
   pry-rails
   pry-stack_explorer
   puma (~> 3.11.4)
+  pundit (~> 1.1.0)
   rack-cors (~> 0.4)
   rails (~> 4.2.10)
   ranked-model (~> 0.4.0)
@@ -509,4 +512,4 @@ DEPENDENCIES
   zoo_stream (~> 1.0.1)
 
 BUNDLED WITH
-   1.16.1
+   1.16.2
