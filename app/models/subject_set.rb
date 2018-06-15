@@ -1,5 +1,5 @@
 class SubjectSet < ActiveRecord::Base
-  include RoleControl::ParentalControlled
+  include RoleControl::PunditInterop
   include Linkable
 
   belongs_to :project
@@ -14,9 +14,6 @@ class SubjectSet < ActiveRecord::Base
   validates_uniqueness_of :display_name, scope: :project_id
 
   scope :expert_sets, -> { where(expert_set: true) }
-
-  can_through_parent :project, :update, :show, :destroy, :index, :update_links,
-    :destroy_links
 
   can_be_linked :project, :scope_for, :show, :user
   can_be_linked :workflow, :scope_for, :show, :user
