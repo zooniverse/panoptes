@@ -1,10 +1,8 @@
 class SubjectSetImport < ActiveRecord::Base
-  include RoleControl::ParentalControlled
+  include RoleControl::PunditInterop
 
   belongs_to :subject_set
   belongs_to :user
-
-  can_through_parent :subject_set
 
   def import!
     processor = SubjectSetImport::Processor.new(subject_set, user)
@@ -16,5 +14,4 @@ class SubjectSetImport < ActiveRecord::Base
       end
     end
   end
-
 end

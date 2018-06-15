@@ -1,5 +1,5 @@
 class Api::V1::SubjectSetImportsController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
 
   require_authentication :all, scopes: [:project]
 

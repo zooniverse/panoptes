@@ -22,7 +22,10 @@ describe Api::V1::SubjectSetImportsController, type: :controller do
   let(:resource_class) { SubjectSetImport }
 
   describe "#index" do
-    let(:n_visible) { 2 }
+    # The first import is linked to the project that we're the owner of, and should be visible
+    # The second import is linked to a different public project, which we don't own, and should be invisible
+    # The third import is linked to a different private project, which we also don't own, and should be invisible
+    let(:n_visible) { 1 }
     let(:private_resource) { subject_set_imports.last }
 
     it_behaves_like "is indexable"
