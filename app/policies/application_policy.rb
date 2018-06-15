@@ -7,9 +7,9 @@ class ApplicationPolicy
   end
 
   @scopes_by_action = {}
-  
+
   def self.scope(*actions, with:)
-    actions.each do |action| 
+    actions.each do |action|
       @scopes_by_action ||= {}
       @scopes_by_action[action] = with
     end
