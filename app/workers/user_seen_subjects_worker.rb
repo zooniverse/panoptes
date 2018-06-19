@@ -1,7 +1,7 @@
 class UserSeenSubjectsWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :data_high
+  sidekiq_options queue: :data_high, unique: :until_executed
 
   def perform(user_id, workflow_id, subject_ids)
     user = User.find(user_id)
