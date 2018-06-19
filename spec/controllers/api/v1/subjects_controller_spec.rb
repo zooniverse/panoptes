@@ -239,11 +239,6 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(retired).to all( be false )
           end
 
-          it "creates a new FavoritesFinder instance" do
-            expect(FavoritesFinder).to receive(:find).and_return([])
-            get :queued, request_params
-          end
-
           it_behaves_like "an api response" do
             before { get :index, request_params }
           end
@@ -452,11 +447,6 @@ describe Api::V1::SubjectsController, type: :controller do
             get :queued, request_params
             retired = json_response["subjects"].map{ |s| s['retired']}
             expect(retired).to all( be false )
-          end
-
-          it "creates a new FavoritesFinder instance" do
-            expect(FavoritesFinder).to receive(:find).and_return([])
-            get :queued, request_params
           end
 
           it_behaves_like "an api response" do
