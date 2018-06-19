@@ -18,7 +18,7 @@ module Subjects
         url_format: :get,
         favorite_subject_ids: favorite_subject_ids,
         retired_subject_ids: retired_subject_ids,
-        user_has_finished_workflow: user_has_finished_workflow?,
+        user_has_finished_workflow: user_has_finished_workflow,
         select_context: true
       }.compact
     end
@@ -42,8 +42,10 @@ module Subjects
       end
     end
 
-    def user_has_finished_workflow?
-      api_user.user&.has_finished?(workflow)
+    def user_has_finished_workflow
+      if user = api_user.user
+        user.has_finished?(workflow)
+      end
     end
   end
 end
