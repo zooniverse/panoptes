@@ -58,30 +58,22 @@ describe ClassificationLifecycle do
     context "when an anonymous user classification" do
       let(:classification) { create(:classification, user: nil) }
 
-      it "should wrap the calls in transactions" do
-        expect(Classification).to receive(:transaction).twice.and_call_original
+      it "should call the #update_classification_data!" do
+        expect(subject).to receive(:update_classification_data!)
         subject.execute
       end
 
-      it "should call the #update_classification_data" do
-        expect(subject).to receive(:update_classification_data)
-        subject.execute
-      end
-
-      it "should not attempt to update the seen subjects" do
-        expect_any_instance_of(UserSeenSubject).to_not receive(:subjects_seen?)
-        subject.execute
-      end
-
-      it "should call the #create_recent" do
-        aggregate_failures "recents" do
-          expect(subject).to receive(:create_recent).and_call_original
-          expect(Recent).to_not receive(:create_from_classification)
-        end
+      it "should call the #process_project_preference" do
+        expect(subject).to receive(:update_seen_subjects)
         subject.execute
       end
 
       it "should call the #update_seen_subjects" do
+        expect(subject).to receive(:update_seen_subjects)
+        subject.execute
+      end
+
+      it "should call the #create_recent" do
         expect(subject).to receive(:update_seen_subjects)
         subject.execute
       end
@@ -113,21 +105,18 @@ describe ClassificationLifecycle do
         allow(UserSeenSubject).to receive(:find_by).and_return(uss)
       end
 
-      it "should wrap the calls in transactions" do
-        expect(Classification).to receive(:transaction).twice.and_call_original
+      it "should call the #update_classification_data!" do
+        expect(subject).to receive(:update_classification_data!)
         subject.execute
       end
 
-      it "should call the #update_classification_data" do
-        expect(subject).to receive(:update_classification_data)
+      it "should call the #process_project_preference" do
+        expect(subject).to receive(:process_project_preference)
         subject.execute
       end
 
       it "should call the #create_recent" do
-        aggregate_failures "recents" do
-          expect(subject).to receive(:create_recent).and_call_original
-          expect(Recent).to receive(:create_from_classification)
-        end
+        expect(subject).to receive(:create_recent)
         subject.execute
       end
 
@@ -161,10 +150,7 @@ describe ClassificationLifecycle do
       end
 
       it "should call the #create_recent" do
-        aggregate_failures "recents" do
-          expect(subject).to receive(:create_recent).and_call_original
-          expect(Recent).to_not receive(:create_from_classification)
-        end
+        expect(subject).to receive(:create_recent)
         subject.execute
       end
 
@@ -373,102 +359,74 @@ describe ClassificationLifecycle do
     end
   end
 
-  describe "#create_project_preference" do
+  describe "#process_project_preference" do
     context "with a user" do
       let(:user) { create(:user) }
       let(:project) { create(:project) }
       let(:classification) { build(:classification, project: project, user: user) }
 
-      context "when no preference exists"  do
-        it 'should create a project preference' do
-          expect do
-            subject.process_project_preference
-          end.to change{ UserProjectPreference.count }.from(0).to(1)
-        end
-
-        it "should set the communication preferences to the user's default" do
-          subject.process_project_preference
-          email_pref = UserProjectPreference
-            .where(user: classification.user, project: classification.project)
-            .first.email_communication
-          expect(email_pref).to eq(classification.user.project_email_communication)
-        end
-
-        it "should save the preference" do
-          expect_any_instance_of(UserProjectPreference).to receive(:save!)
-          subject.process_project_preference
-        end
-
-        it "saves the project id" do
-          subject.process_project_preference
-          expect(user.reload.project_id).to eq(project.id)
-        end
-
-        it 'does not overwrite an existing project id' do
-          other_project = create :project
-          user.update! project_id: other_project.id
-          subject.process_project_preference
-          expect(user.reload.project_id).to eq(other_project.id)
-        end
-      end
-
-      context "when a preference exists" do
-        let!(:upp) { create(:user_project_preference, user: user, project: project) }
-
-        it "should not create a project preference" do
-          expect do
-            subject.process_project_preference
-          end.to_not change{ UserProjectPreference.count }
-        end
-
-        it "should touch the updated_at timestamp" do
-          expect_any_instance_of(UserProjectPreference).to receive(:touch)
-          subject.process_project_preference
-        end
-
-        context "when the upp was created before the first classification was received" do
-          let!(:upp) do
-            create(:user_project_preference, email_communication: nil, user: user, project: project)
-          end
-
-          it "should update the email_communication if not set" do
-            subject.process_project_preference
-            expect(upp.reload.email_communication).to be_truthy
-          end
-        end
+      it "should call the worker" do
+        expect(UserProjectPreferencesWorker)
+          .to receive(:perform_async)
+          .with(user.id, project.id)
+        subject.process_project_preference
       end
     end
 
     context "without a user" do
       let(:classification) { build(:classification, user: nil) }
-      it 'should not create a project preference' do
-        expect do
-          subject.process_project_preference
-        end.to_not change{ UserProjectPreference.count }
+      it 'should not call the worker' do
+        expect(UserProjectPreferencesWorker).not_to receive(:perform_async)
+        subject.process_project_preference
       end
     end
   end
 
-  describe "#update_seen_subjects" do
-    let(:seen_params) do
-      { user: classification.user,
-        workflow: classification.workflow,
-        subject_ids: classification.subject_ids }
+  describe "#create_recent" do
+    it 'should call the worker when not seen and completed user classification' do
+      expect(RecentCreateWorker).to receive(:perform_async).with(classification.id)
+      subject.create_recent
     end
 
-    context "with a user", :cellect do
-      it 'should add the subject_id to the seen subjects' do
-        expect(UserSeenSubject).to receive(:add_seen_subjects_for_user)
-        .with(seen_params)
+    it 'should not call the worker when seen and completed user classification' do
+      allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
+      expect(RecentCreateWorker).not_to receive(:perform_async)
+      subject.create_recent
+    end
+
+    it 'should not call the worker when not seen and not completed user classification' do
+      allow(subject).to receive(:should_update_seen?).and_return(false)
+      expect(RecentCreateWorker).not_to receive(:perform_async)
+      subject.create_recent
+    end
+  end
+
+  describe "#update_seen_subjects" do
+    context "with a user" do
+      it 'should call the worker to add the subject_id to the seen subjects' do
+        expect(UserSeenSubjectsWorker)
+          .to receive(:perform_async)
+          .with(
+            classification.user_id,
+            classification.workflow_id,
+            classification.subject_ids
+          )
         subject.update_seen_subjects
       end
     end
 
     context "without a user" do
       let(:classification) { build(:classification, user: nil) }
-      it 'should do nothing' do
-        expect(UserSeenSubject).to_not receive(:add_seen_subject_for_user)
+      it 'should not call the worker' do
+        expect(UserSeenSubjectsWorker).to_not receive(:perform_async)
+        subject.update_seen_subjects
       end
+    end
+
+    it 'should not call the worker when subjects have been seen' do
+      allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
+      expect(UserSeenSubjectsWorker).to_not receive(:perform_async)
+      subject.update_seen_subjects
     end
   end
 
@@ -525,8 +483,8 @@ describe ClassificationLifecycle do
     end
   end
 
-  describe "#update_classification_data" do
-    let(:update_classification_data) { subject.update_classification_data }
+  describe "#update_classification_data!" do
+    let(:update_classification_data) { subject.update_classification_data! }
 
     it "should wrap the calls in a transaction" do
       expect(Classification).to receive(:transaction)
