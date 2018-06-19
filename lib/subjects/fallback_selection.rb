@@ -9,7 +9,7 @@ module Subjects
     def any_workflow_data
       any_workflow_data_scope
         .limit(limit)
-        .pluck("set_member_subjects.subject_id")
+        .pluck("set_member_subjects.id")
         .shuffle
     end
 

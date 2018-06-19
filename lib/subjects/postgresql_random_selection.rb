@@ -10,7 +10,7 @@ module Subjects
     end
 
     def select
-      ids = available_scope.pluck(:subject_id).sample(limit)
+      ids = available_scope.pluck(:id).sample(limit)
       if reassign_random?
         RandomOrderShuffleWorker.perform_async(ids)
       end

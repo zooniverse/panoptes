@@ -5,7 +5,6 @@ module Subjects
     class MissingParameter < StandardError; end
     class MissingSubjectSet < StandardError; end
     class MissingSubjects < StandardError; end
-    class MalformedSelectedIds < StandardError; end
 
     attr_reader :user, :params, :workflow, :scope
 
@@ -22,20 +21,16 @@ module Subjects
     end
 
     def selected_subjects
-      unless workflow.finished_at
-        subject_ids = run_strategy_selection
-      end
-
-      if subject_ids.blank?
-        subject_ids = fallback_selection
-      end
-
-      active_subjects_in_selection_order(subject_ids)
+      sms_ids = run_strategy_selection unless workflow.finished_at
+      sms_ids = fallback_selection if sms_ids.blank?
+      active_subjects_in_selection_order(sms_ids)
     end
 
     private
 
     def run_strategy_selection
+      eventlog.info "Selecting subjects based on workflow config", workflow_id: workflow.id, user_id: user&.id
+
       Subjects::StrategySelection.new(
         workflow,
         user,
@@ -45,36 +40,43 @@ module Subjects
     end
 
     def fallback_selection
+      msg = if workflow.finished_at
+        "Skipped selection for the finished workflow"
+      else
+        "Preferred strategy returned no results, trying fallback"
+      end
+      eventlog.info msg, workflow_id: workflow.id, user_id: user&.id
+
       opts = { limit: subjects_page_size, subject_set_id: subject_set_id }
       fallback_selector = PostgresqlSelection.new(workflow, user, opts)
 
-      subject_ids = fallback_selector.select
-      if data_available = !subject_ids.empty?
-        if Panoptes.flipper[:selector_sync_error_reload].enabled?
+      sms_ids = fallback_selector.select
+      if data_available = !sms_ids.empty?
+        if Panoptes.flipper[:cellect_sync_error_reload].enabled?
           NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
         end
-      end
-
-      if subject_ids.blank?
-        fallback_selector.any_workflow_data
-      else
-        subject_ids
-      end
-    end
-
-    def active_subjects_in_selection_order(subject_ids)
-      # when on Rails 5 - move to .order(["idx(array[?]), id", subject_ids])
-      # instead of manually checking and raising
-      unless subject_ids.all? { |i| i.is_a? Integer }
-        raise MalformedSelectedIds.new(
-          "Selector returns non-integers, hacking attempt?!"
+        Honeybadger.notify(
+          error_class:   "Subject selector data sync error",
+          error_message: "Primary subject selector returns no data but PG selector does",
+          context: {
+            workflow: workflow.id
+          }
         )
       end
 
-      scope
-      .active
-      .where(id: subject_ids)
-      .order("idx(array[#{subject_ids.join(',')}], id)")
+      if sms_ids.blank?
+        eventlog.info "Fallback failed to return unseen unretired data, falling back to selecting anything", workflow_id: workflow.id, user_id: user&.id
+        fallback_selector.any_workflow_data
+      else
+        sms_ids
+      end
+    end
+
+    def active_subjects_in_selection_order(sms_ids)
+      scope.active
+        .eager_load(:set_member_subjects)
+        .where(set_member_subjects: {id: sms_ids})
+        .order("idx(array[#{sms_ids.join(',')}], set_member_subjects.id)")
     end
 
     def needs_set_id?

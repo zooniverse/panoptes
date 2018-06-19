@@ -82,7 +82,7 @@ RSpec.describe Subjects::Selector do
       end
     end
 
-    context "when the selection strategy returns an empty set" do
+    context "when the cellect selection strategy returns an empty set" do
       before do
         workflow.designator!
         stub_designator_client
@@ -95,14 +95,19 @@ RSpec.describe Subjects::Selector do
         subject.get_subjects
       end
 
-      it "should notify selector to reload" do
-        Panoptes.flipper[:selector_sync_error_reload].enable
+      it "should notify cellect to reload" do
+        Panoptes.flipper[:cellect_sync_error_reload].enable
         expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async).with(workflow.id)
         subject.get_subjects
       end
 
-      it "should not notify selector to reload if the feature is disabled" do
+      it "should not notify cellect to reload if the feature is disabled" do
         expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
+        subject.get_subjects
+      end
+
+      it "should notify us this sync error occurred" do
+        expect(Honeybadger).to receive(:notify)
         subject.get_subjects
       end
 
@@ -141,21 +146,10 @@ RSpec.describe Subjects::Selector do
 
     it "should respect the order of the sms selection" do
       ordered_sms = smses.sample(5)
-      subject_ids = ordered_sms.map(&:subject_id)
-      expect(subject).to receive(:run_strategy_selection).and_return(subject_ids)
+      sms_ids = ordered_sms.map(&:id)
+      expect(subject).to receive(:run_strategy_selection).and_return(sms_ids)
       subjects = subject.selected_subjects
       expect(ordered_sms.map(&:subject_id)).to eq(subjects.map(&:id))
-    end
-
-    it 'does not allow sql injection' do
-      hacking_attempt = [1, 2, '1], set_member_subjects.id); DROP TABLE users; -- ']
-      expect(subject).to receive(:run_strategy_selection).and_return(hacking_attempt)
-      expect {
-        subject.selected_subjects
-      }.to raise_error(
-        Subjects::Selector::MalformedSelectedIds,
-        "Selector returns non-integers, hacking attempt?!"
-      )
     end
   end
 end
