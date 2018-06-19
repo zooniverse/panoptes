@@ -42,11 +42,11 @@ module Subjects
       subject_ids
     end
 
-    private
-
     def workflow
       @workflow ||= Workflow.find_without_json_attrs(params[:workflow_id])
     end
+
+    private
 
     def run_strategy_selection
       Subjects::StrategySelection.new(

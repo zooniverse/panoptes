@@ -22,10 +22,8 @@ class Api::V1::SubjectsController < Api::ApiController
   def queued
     non_filterable_params = params.except(:project_id, :collection_id)
 
-    selected_subject_ids = Subjects::Selector.new(
-      api_user.user,
-      params
-    ).get_subject_ids
+    subject_selector = Subjects::Selector.new(api_user.user, params)
+    selected_subject_ids = subject_selector.get_subject_ids
 
     selected_subject_scope = Subject
       .active
@@ -37,7 +35,7 @@ class Api::V1::SubjectsController < Api::ApiController
       selected_subject_scope,
       Subjects::SelectorContext.new(
         api_user,
-        workflow,
+        subject_selector.workflow,
         selected_subject_ids
       ).format
     )
