@@ -1,6 +1,6 @@
 class Tutorial < ActiveRecord::Base
+  include RoleControl::PunditInterop
   include Linkable
-  include RoleControl::ParentalControlled
 
   belongs_to :project
   has_many :workflow_tutorials
@@ -9,8 +9,6 @@ class Tutorial < ActiveRecord::Base
     as: :linked
 
   validates_presence_of :project
-
-  can_through_parent :project, :update, :index, :show, :destroy
 
   def steps
     super.map(&:with_indifferent_access)
