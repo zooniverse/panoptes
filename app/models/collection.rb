@@ -1,5 +1,5 @@
 class Collection < ActiveRecord::Base
-  include RoleControl::Controlled
+  include RoleControl::PunditInterop
   include RoleControl::Owned
   include Activatable
   include Linkable
@@ -20,10 +20,6 @@ class Collection < ActiveRecord::Base
   validates :private, inclusion: { in: [true, false], message: "can't be blank" }
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
-
-  can_by_role :destroy, :update, :destroy_links, roles: [ :owner, :collaborator ]
-  can_by_role :update_links, roles: [ :owner, :collaborator, :contributor ]
-  can_by_role :index, :show, public: true, roles: [ :owner, :collaborator, :viewer, :contributor ]
 
   can_be_linked :access_control_list, :scope_for, :update, :user
 
