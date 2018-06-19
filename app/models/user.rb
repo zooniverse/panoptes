@@ -338,10 +338,6 @@ class User < ActiveRecord::Base
   end
 
   def favorite_collections_for_project(project_id)
-    # CREATE TABLE public.collections_projects (
-    #     collection_id integer NOT NULL,
-    #     project_id integer NOT NULL
-    # );
     collections.joins(:projects).where(favorite: true, projects: {id: project_id})
   end
 

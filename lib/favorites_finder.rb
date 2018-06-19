@@ -7,7 +7,9 @@ class FavoritesFinder
 
     fav_collections = user.favorite_collections_for_project(project_id)
 
-binding.pry
-    CollectionsSubject.where(collection_id: fav_collections.select(:id)).pluck("subject_id")
+    fav_collections
+    .joins(:subjects)
+    .where(subjects: {id: subject_ids})
+    .pluck("subjects.id")
   end
 end

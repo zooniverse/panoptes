@@ -13,24 +13,24 @@ RSpec.describe FavoritesFinder do
 
   context "user has no favorites" do
     it "returns favorite as false" do
-      expect(FavoritesFinder.find(user, project, subject_ids)).to eq([])
+      expect(FavoritesFinder.find(user, project.id, subject_ids)).to eq([])
     end
   end
 
   context "user has favorites" do
     before { collection }
     it "favorite returns true for favorited subjects" do
-      expect(FavoritesFinder.find(user, project, subject_ids)).to include(fav_subject.id)
+      expect(FavoritesFinder.find(user, project.id, subject_ids)).to include(fav_subject.id)
     end
 
     it "favorite returns false for non-favorited subjects" do
-      expect(FavoritesFinder.find(user, project, subject_ids)).to_not include(non_fav_subject.id)
+      expect(FavoritesFinder.find(user, project.id, subject_ids)).to_not include(non_fav_subject.id)
     end
   end
 
   context "not logged in" do
     it "returns favorites as false" do
-      expect(FavoritesFinder.find(nil, project, subject_ids)).to eq([])
+      expect(FavoritesFinder.find(nil, project.id, subject_ids)).to eq([])
     end
   end
 
@@ -38,7 +38,7 @@ RSpec.describe FavoritesFinder do
     it "returns an empty array" do
       collection
       Panoptes.flipper[:skip_favorites_finder].enable
-      expect(FavoritesFinder.find(user, project, subject_ids)).to eq([])
+      expect(FavoritesFinder.find(user, project.id, subject_ids)).to eq([])
     end
   end
 end
