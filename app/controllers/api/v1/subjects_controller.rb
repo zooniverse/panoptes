@@ -36,7 +36,11 @@ class Api::V1::SubjectsController < Api::ApiController
     render json_api: SubjectSelectorSerializer.page(
       non_filterable_params,
       selected_subject_scope,
-      selector_context(selected_subject_ids)
+      Subjects::SelectorContext.new(
+        api_user,
+        workflow,
+        selected_subject_ids
+      ).format
     )
   end
 
@@ -105,30 +109,6 @@ class Api::V1::SubjectsController < Api::ApiController
       { url_format: :put }
     else
       { url_format: :get }
-    end
-  end
-
-  def selector_context(selected_subject_ids)
-    if Panoptes.flipper[:skip_subject_selection_context].enabled?
-      {}
-    else
-      {
-        user_seen: user_seen,
-        url_format: :get,
-        favorite_subject_ids: FavoritesFinder.new(api_user.user, workflow.project, selected_subject_ids).find_favorites,
-        retired_subject_ids: SubjectWorkflowRetirements.new(workflow, selected_subject_ids).find_retirees,
-        user_has_finished_workflow: api_user.user&.has_finished?(workflow),
-        select_context: true
-      }.compact
-    end
-  end
-
-  def user_seen
-    if user_id = api_user.id
-      UserSeenSubject.where(
-        user_id: user_id,
-        workflow_id: workflow.id
-      ).first
     end
   end
 end
