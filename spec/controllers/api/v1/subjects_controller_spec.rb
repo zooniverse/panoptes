@@ -75,7 +75,7 @@ describe Api::V1::SubjectsController, type: :controller do
             json_response[api_resource_name].map { |s| s.has_key?(optional_attr) }.uniq
           end
 
-          %w( retired already_seen finished_workflow favorite ).each do |attr|
+          %w(retired already_seen finished_workflow favorite).each do |attr|
             let(:optional_attr) { attr }
 
             it "should not serialize the #{attr} attribute" do
@@ -665,7 +665,7 @@ describe Api::V1::SubjectsController, type: :controller do
       default_request user_id: authorized_user.id, scopes: scopes
       external_locs = [{"image/jpeg" => "http://example.com/1.jpg"}, {"image/jpeg" => "http://example.com/2.jpg"}]
       external_src_urls = external_locs.map { |loc| loc.to_a.flatten[1] }
-      create_params[:subjects].merge!(locations: external_locs)
+      create_params[:subjects][:locations] = external_locs
       post :create, create_params
       locations = Subject.find(created_instance_id("subjects")).locations
       aggregate_failures "external srcs" do
