@@ -19,8 +19,7 @@ class WorkflowSerializer
 
   can_filter_by :active, :mobile_friendly
 
-  # :workflow_contents, Note: re-add when the eager_load from translatable_resources is removed
-  preload :subject_sets, :attached_images
+  preload :subject_sets, :attached_images, :workflow_contents
 
   def version
     "#{@model.current_version_number}.#{content_version}"
@@ -45,7 +44,7 @@ class WorkflowSerializer
   end
 
   def content
-    @content ||= @model.primary_content
+    @content ||= @model.workflow_contents
   end
 
   def retirement

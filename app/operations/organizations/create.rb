@@ -17,7 +17,7 @@ module Organizations
     def execute
       Organization.transaction(requires_new: true) do
         organization = build_organization
-        organization.organization_contents.build(organization_contents_params)
+        organization.build_organization_contents(organization_contents_params)
 
         tag_objects = Tags::BuildTags.run!(api_user: api_user, tag_array: tags) if tags
         organization.tags = tag_objects unless tags.nil?

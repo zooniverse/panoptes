@@ -10,7 +10,7 @@ module Organizations
 
     def execute
       Organization.transaction(requires_new: true) do
-        content_update = {}
+        content_update = HashWithIndifferentAccess.new
         org_update = organization_params.dup
         Api::V1::OrganizationsController::CONTENT_FIELDS.each do |field|
           if organization_params[field]
@@ -25,17 +25,20 @@ module Organizations
           org_update.delete(:tags)
         end
 
-        organization.update!(org_update.symbolize_keys)
-        organization.organization_contents.find_or_initialize_by(language: language).tap do |content|
+        organization.organization_contents.tap do |content|
           results = content_from_params(inputs[:organization_params], Api::V1::OrganizationsController::CONTENT_FIELDS) do |ps|
             ps["title"] = ps["display_name"]
           end
           content_update.merge! results
-          content.update! content_update.symbolize_keys
+          content.assign_attributes(content_update)
         end
-        org_update[:listed] == true ? organization.touch(:listed_at) : organization[:listed_at] = nil
 
-        organization.save!
+        if org_update[:listed] == true
+          organization.listed_at = Time.zone.now
+        else
+          organization[:listed_at] = nil
+        end
+        organization.update!(org_update.symbolize_keys)
       end
     end
 

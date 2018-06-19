@@ -14,7 +14,7 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
     create(:organization_content, language: "en-CA", organization: organization)
   end
   let(:resource_class) { OrganizationContent }
-  let(:primary_content) { organization.primary_content }
+  let(:organization_contents) { organization.organization_contents }
 
   let(:acl_roles) { %w(translator) }
   let(:acl) do
@@ -28,12 +28,12 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
     let(:acl_roles) { %w(collaborator) }
 
     let!(:private_resource) do
-      create(:unlisted_organization).organization_contents.first
+      create(:unlisted_organization).organization_contents
     end
 
     before { acl }
 
-    let(:n_visible) { 3 }
+    let(:n_visible) { 2 }
 
     it_behaves_like "is indexable"
   end
@@ -87,7 +87,7 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
 
         before(:each) do
           default_request user_id: authorized_user.id, scopes: scopes
-          params = update_params.merge(id: primary_content.id)
+          params = update_params.merge(id: organization_contents.id)
           put :update, params
         end
 
@@ -96,8 +96,8 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
         end
 
         it 'should not update the content' do
-          primary_content.reload
-          expect(primary_content.title).to_not eq(test_attr_value)
+          organization_contents.reload
+          expect(organization_contents.title).to_not eq(test_attr_value)
         end
       end
     end
@@ -112,7 +112,7 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
     context "primary-langauge content" do
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
-        delete :destroy, id: primary_content.id
+        delete :destroy, id: organization_contents.id
       end
 
       it 'should return forbidden' do
@@ -120,7 +120,7 @@ RSpec.describe Api::V1::OrganizationContentsController, type: :controller do
       end
 
       it 'should not delete the content' do
-        expect(OrganizationContent.find(primary_content.id)).to eq(primary_content)
+        expect(OrganizationContent.find(organization_contents.id)).to eq(organization_contents)
       end
     end
   end

@@ -33,7 +33,6 @@ class TranslationStrings
     content_assocation = resource.class.content_association
     resource
       .send(content_assocation)
-      .find_by(language: resource.primary_language)
       .attributes
       .dup
       .except(:id)
