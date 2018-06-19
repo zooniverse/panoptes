@@ -71,7 +71,7 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def workflow
-    @workflow ||= Workflow.where(id: params[:workflow_id]).first
+    @workflow ||= Workflow.find_without_json_attrs(params[:workflow_id])
   end
 
   def build_resource_for_create(create_params)
@@ -113,8 +113,6 @@ class Api::V1::SubjectsController < Api::ApiController
       {}
     else
       {
-        workflow: workflow,
-        user: api_user.user,
         user_seen: user_seen,
         url_format: :get,
         favorite_subject_ids: FavoritesFinder.new(api_user.user, workflow.project, selected_subject_ids).find_favorites,
@@ -126,8 +124,11 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def user_seen
-    if api_user.user
-      UserSeenSubject.where(user: api_user.user, workflow: workflow).first
+    if user_id = api_user.id
+      UserSeenSubject.where(
+        user_id: user_id,
+        workflow_id: workflow.id
+      ).first
     end
   end
 end
