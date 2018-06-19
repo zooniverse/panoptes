@@ -25,28 +25,28 @@ class ClassificationLifecycle
   def execute
     return if create? && classification.lifecycled_at.present?
 
-    Classification.transaction(requires_new: true) do
-      update_classification_data
-      # TODO: do we need these actions in the same transaction?
-      # try to keep transactions short when we can
-      process_project_preference
-      create_recent
-      update_seen_subjects
-    end
+    # update the saved classification data
+    update_classification_data!
 
+    # fan out workers to deal with the associated data models
+    process_project_preference
+    create_recent
+    update_seen_subjects
     create_export_row
     notify_subject_selector
     update_counters
     publish_data
   end
 
-  def update_classification_data
-    mark_expert_classifier
-    add_seen_before_for_user
-    add_project_live_state
-    add_user_groups
-    add_lifecycled_at
-    classification.save!
+  def update_classification_data!
+    Classification.transaction do
+      mark_expert_classifier
+      add_seen_before_for_user
+      add_project_live_state
+      add_user_groups
+      add_lifecycled_at
+      classification.save!
+    end
   end
 
   def update_counters
@@ -58,20 +58,21 @@ class ClassificationLifecycle
   end
 
   def process_project_preference
-    return unless should_create_project_preference?
-    UserProjectPreferences::FindOrCreate.run! user: user, project: project
+    if should_create_project_preference?
+      UserProjectPreferencesWorker.perform_async(user.id, project.id)
+    end
   end
 
   def create_recent
-    return unless should_update_seen? && subjects_are_unseen_by_user?
-
-    Recent.create_from_classification(classification)
+    if should_update_seen? && subjects_are_unseen_by_user?
+      RecentCreateWorker.perform_async(classification.id)
+    end
   end
 
   def update_seen_subjects
-    return unless should_update_seen? && subjects_are_unseen_by_user?
-
-    UserSeenSubject.add_seen_subjects_for_user(**user_workflow_subject)
+    if should_update_seen? && subjects_are_unseen_by_user?
+      UserSeenSubjectsWorker.perform_async(user.id, workflow.id, subject_ids)
+    end
   end
 
   def publish_data
@@ -156,7 +157,7 @@ class ClassificationLifecycle
   end
 
   def workflow
-    @workflow ||= classification.workflow
+    @workflow ||= Workflow.find_without_json_attrs(classification.workflow_id)
   end
 
   def project
@@ -165,14 +166,6 @@ class ClassificationLifecycle
 
   def subject_ids
     @subject_ids ||= classification.subject_ids
-  end
-
-  def user_workflow_subject
-    @user_workflow_subject ||= {
-      user: user,
-      workflow: workflow,
-      subject_ids: subject_ids
-    }
   end
 
   def update_classification_metadata(key, value)
