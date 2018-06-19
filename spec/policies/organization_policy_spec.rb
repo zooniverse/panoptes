@@ -9,9 +9,6 @@ describe OrganizationPolicy do
     let(:listed_organization) { build(:organization, listed_at: Time.now, owner: resource_owner) }
     let(:unlisted_organization) { build(:unlisted_organization, owner: resource_owner) }
 
-    let(:api_resource_name) { "organizations" }
-    let(:scopes) { %w(public organization) }
-
     describe 'index, show, versions, version' do
       let(:resolved_scope) do
         Pundit.policy!(api_user, Organization).scope_for(:index)

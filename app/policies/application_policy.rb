@@ -76,7 +76,7 @@ class ApplicationPolicy
 
     def private_query(action, target, roles)
       user_group_memberships = user.memberships_for(action, model).select(:user_group_id)
-      
+
       AccessControlList
         .where(user_group_id: user_group_memberships)
         .where(resource_type: model.model_name.name)

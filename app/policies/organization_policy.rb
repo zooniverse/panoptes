@@ -1,6 +1,6 @@
 class OrganizationPolicy < ApplicationPolicy
   class ReadScope < Scope
-    roles_for_private_scope %i(:owner, :collaborator, :tester, :translator, :scientist, :moderator)
+    roles_for_private_scope %i(owner collaborator tester translator scientist moderator)
 
     def public_scope
       scope.where(listed: true)
@@ -8,11 +8,11 @@ class OrganizationPolicy < ApplicationPolicy
   end
 
   class WriteScope < Scope
-    roles_for_private_scope %i(:owner, :collaborator)
+    roles_for_private_scope %i(owner collaborator)
   end
 
   class TranslateScope < Scope
-    roles_for_private_scope %i(:owner, :collaborator, :translator)
+    roles_for_private_scope %i(owner collaborator translator)
   end
 
   scope :index, :show, :versions, :version, with: ReadScope
