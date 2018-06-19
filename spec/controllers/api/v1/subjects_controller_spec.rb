@@ -181,7 +181,7 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
         let(:api_resource_links) { [] }
 
-        describe "selection context" do
+        describe "selection context", :focus do
           let(:selector_context) do
             {
               workflow: workflow,

@@ -26,7 +26,7 @@ class SubjectSelectorSerializer
   end
 
   def already_seen
-    !!(user_seen&.subjects_seen?(@model.id))
+    @context[:user_seen_subject_ids].include?(@model.id)
   end
 
   def finished_workflow
@@ -57,9 +57,5 @@ class SubjectSelectorSerializer
 
   def select_context?
     !!@context[:select_context]
-  end
-
-  def user_seen
-    @context[:user_seen]
   end
 end

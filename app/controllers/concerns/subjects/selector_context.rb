@@ -10,17 +10,17 @@ module Subjects
 
     def format
       if Panoptes.flipper[:skip_subject_selection_context].enabled?
-        return {}
+        {}
+      else
+        {
+          user_seen_subject_ids: user_seen_subject_ids,
+          url_format: :get,
+          favorite_subject_ids: favorite_subject_ids,
+          retired_subject_ids: retired_subject_ids,
+          user_has_finished_workflow: user_has_finished_workflow,
+          select_context: true
+        }.compact
       end
-
-      {
-        user_seen: user_seen,
-        url_format: :get,
-        favorite_subject_ids: favorite_subject_ids,
-        retired_subject_ids: retired_subject_ids,
-        user_has_finished_workflow: user_has_finished_workflow,
-        select_context: true
-      }.compact
     end
 
     private
@@ -33,12 +33,13 @@ module Subjects
       SubjectWorkflowRetirements.find(workflow.id, subject_ids)
     end
 
-    def user_seen
+    def user_seen_subject_ids
       if user_id = api_user.id
-        UserSeenSubject.where(
+        uss = UserSeenSubject.where(
           user_id: user_id,
           workflow_id: workflow.id
         ).first
+        uss.subject_ids
       end
     end
 
