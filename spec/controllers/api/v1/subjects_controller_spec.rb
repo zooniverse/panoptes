@@ -299,7 +299,7 @@ describe Api::V1::SubjectsController, type: :controller do
             { sort: 'queued' }
           end
 
-          it 'should return 422' do
+          it 'should return 422', :focus do
             expect(response.status).to eq(422)
           end
         end

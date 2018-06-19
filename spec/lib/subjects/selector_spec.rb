@@ -5,11 +5,22 @@ RSpec.describe Subjects::Selector do
   let(:subject_set) { workflow.subject_sets.first }
   let(:user) { create(:user) }
   let!(:smses) { create_list(:set_member_subject, 10, subject_set: subject_set).reverse }
-  let(:params) { {} }
+  let(:params) { { workflow_id: workflow.id } }
 
-  subject { described_class.new(user, workflow, params) }
+  subject { described_class.new(user, params) }
 
   describe "#get_subject_ids" do
+    context "without a workflow_id param" do
+      let(:params) { {} }
+
+      it 'should raise a missing param error' do
+        expect{subject.get_subject_ids}.to raise_error(
+          Subjects::Selector::MissingParameter,
+          "workflow_id parameter missing"
+        )
+      end
+    end
+
     context "when the workflow doesn't have any subject sets" do
       it 'should raise an informative error' do
         allow_any_instance_of(Workflow).to receive(:subject_sets).and_return([])
@@ -47,8 +58,8 @@ RSpec.describe Subjects::Selector do
       context "when the params page size is set as a string" do
         let(:size) { 2 }
         subject do
-          params = { page_size: size }
-          described_class.new(user, workflow, params)
+          params = { page_size: size, workflow_id: workflow.id }
+          described_class.new(user, params)
         end
 
         it 'should return the page_size number of subjects' do
@@ -73,7 +84,12 @@ RSpec.describe Subjects::Selector do
 
       context "and the workflow is grouped" do
         let(:subject_set_id) { subject_set.id }
-        let(:params) { { subject_set_id: subject_set_id } }
+        let(:params) do
+          {
+            subject_set_id: subject_set_id,
+            workflow_id: workflow.id
+          }
+        end
 
         it 'should fallback to selecting some grouped data' do
           allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)

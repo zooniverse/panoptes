@@ -7,14 +7,14 @@ module Subjects
     class MissingSubjects < StandardError; end
     class MalformedSelectedIds < StandardError; end
 
-    attr_reader :user, :params, :workflow
+    attr_reader :user, :params
 
-    def initialize(user, workflow, params)
-      @user, @workflow, @params = user, workflow, params
+    def initialize(user, params)
+      @user, @params = user, params
     end
 
     def get_subject_ids
-      raise workflow_id_error unless workflow
+      raise workflow_id_error unless !!params[:workflow_id]
       raise group_id_error if needs_set_id?
       raise missing_subject_set_error if workflow.subject_sets.empty?
       raise missing_subjects_error if workflow.set_member_subjects.empty?
@@ -43,6 +43,10 @@ module Subjects
     end
 
     private
+
+    def workflow
+      @workflow ||= Workflow.find_without_json_attrs(params[:workflow_id])
+    end
 
     def run_strategy_selection
       Subjects::StrategySelection.new(
@@ -76,7 +80,7 @@ module Subjects
     end
 
     def workflow_id_error
-      MissingParameter.new("workflow_id parameter missing")
+      raise MissingParameter.new("workflow_id parameter missing")
     end
 
     def group_id_error

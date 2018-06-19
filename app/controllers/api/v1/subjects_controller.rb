@@ -24,7 +24,6 @@ class Api::V1::SubjectsController < Api::ApiController
 
     selected_subject_ids = Subjects::Selector.new(
       api_user.user,
-      workflow,
       params
     ).get_subject_ids
 
@@ -72,10 +71,6 @@ class Api::V1::SubjectsController < Api::ApiController
       current, max = api_user.subject_limits
       raise Api::LimitExceeded, "User has uploaded #{current} subjects of #{max} maximum"
     end
-  end
-
-  def workflow
-    @workflow ||= Workflow.find_without_json_attrs(params[:workflow_id])
   end
 
   def build_resource_for_create(create_params)
