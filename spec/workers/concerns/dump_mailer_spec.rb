@@ -22,6 +22,8 @@ describe DumpMailer do
     end
 
     it 'queues up an email job' do
+      expected_emails = users.map(&:email)
+      allow(dump_mailer).to receive(:emails).and_return(expected_emails)
       dump_mailer.send_email
     end
 
