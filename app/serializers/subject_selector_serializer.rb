@@ -5,7 +5,8 @@ class SubjectSelectorSerializer
   attributes :id, :metadata, :locations, :zooniverse_id,
     :created_at, :updated_at, :href
 
-  optional :retired, :already_seen, :finished_workflow, :favorite
+  optional :retired, :already_seen, :finished_workflow,
+    :user_has_finished_workflow, :favorite, :selection_state
 
   preload :locations
 
@@ -30,11 +31,19 @@ class SubjectSelectorSerializer
   end
 
   def finished_workflow
+    @context[:finished_workflow]
+  end
+
+  def user_has_finished_workflow
     @context[:user_has_finished_workflow]
   end
 
   def favorite
-    @context[:favorite_subject_ids].include? @model.id
+    @context[:favorite_subject_ids].include?(@model.id)
+  end
+
+  def selection_state
+    @context[:selection_state]
   end
 
   private
@@ -51,7 +60,15 @@ class SubjectSelectorSerializer
     select_context?
   end
 
+  def include_user_has_finished_workflow?
+    select_context?
+  end
+
   def include_favorite?
+    select_context?
+  end
+
+  def include_selection_state?
     select_context?
   end
 

@@ -243,10 +243,16 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(already_seen).to all( be true )
           end
 
-          it 'should return finished_workflow as true' do
+          it 'should return finished_workflow as false' do
             get :index, request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
-            expect(seen_all).to all( be true )
+            expect(seen_all).to all( be false )
+          end
+
+          it 'should return user_has_finished_workflow as true for each subject' do
+            get :index, request_params
+            seen_all = json_response["subjects"].map{ |s| s['user_has_finished_workflow']}
+            expect(seen_all).to all be(true)
           end
         end
 
@@ -262,8 +268,13 @@ describe Api::V1::SubjectsController, type: :controller do
             get :index, request_params
           end
 
-          it 'should return user finished_workflow as true for each subject' do
+          it 'should return finished_workflow as false for each subject' do
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
+            expect(seen_all).to all be(true)
+          end
+
+          it 'should return user_has_finished_workflow as true for each subject' do
+            seen_all = json_response["subjects"].map{ |s| s['user_has_finished_workflow']}
             expect(seen_all).to all be(true)
           end
 
