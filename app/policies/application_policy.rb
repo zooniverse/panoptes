@@ -54,15 +54,13 @@ class ApplicationPolicy
     end
 
     def resolve(action = nil)
-      case
-      when user.is_admin?
+      if user.is_admin?
         scope.all
-      when user.logged_in?
+      elsif user.logged_in?
         user_can_access_scope(
-          private_query(action, user, self.class.roles),
-          public_flag
+          private_query(action, self.class.roles)
         )
-      when public_flag
+      elsif public_flag
         public_scope
       else
         scope.none
@@ -74,14 +72,14 @@ class ApplicationPolicy
       !public_scope.is_a?(ActiveRecord::NullRelation)
     end
 
-    def user_can_access_scope(private_query, public_flag)
+    def user_can_access_scope(private_query)
       accessible = scope
       accessible = accessible.where(id: private_query.select(:resource_id))
       accessible = accessible.or(public_scope) if public_flag
       accessible
     end
 
-    def private_query(action, target, roles)
+    def private_query(action, roles)
       user_group_memberships = user.memberships_for(action, model).select(:user_group_id)
 
       AccessControlList
