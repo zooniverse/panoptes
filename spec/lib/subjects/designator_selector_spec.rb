@@ -70,6 +70,33 @@ describe Subjects::DesignatorSelector do
       selector.get_subjects(user, nil, 10)
     end
 
+    it 'converts subject_ids from the client into set_member_subject ids' do
+      subject_set = create(:subject_set, workflows: [workflow])
+      set_member_subjects = create_list(:set_member_subject, 5, subject_set: subject_set)
+
+      allow(client).to receive(:get_subjects).with(workflow.id, 2, nil, 10).and_return(set_member_subjects.map(&:subject_id))
+
+      set_member_subject_ids = selector.get_subjects(user, nil, 10)
+      expect(set_member_subject_ids).to eq(set_member_subjects.map(&:id))
+    end
+
+    it 'returns set_member_subject_ids in the same order that Designator returned the subject_ids' do
+      subject_set = create(:subject_set, workflows: [workflow])
+      set_member_subjects = create_list(:set_member_subject, 5, subject_set: subject_set)
+      set_member_subjects.reverse!
+
+      allow(client).to receive(:get_subjects).with(workflow.id, 2, nil, 10).and_return(set_member_subjects.map(&:subject_id))
+
+      set_member_subject_ids = selector.get_subjects(user, nil, 10)
+      expect(set_member_subject_ids).to eq(set_member_subjects.map(&:id))
+    end
+
+    it 'does not allow sql injection' do
+      allow(client).to receive(:get_subjects).with(workflow.id, 2, nil, 10).and_return([1, 2, '1], set_member_subjects.id); DROP TABLE users; -- '])
+      expect { selector.get_subjects(user, nil, 10) }
+        .to raise_error(StandardError, "Hacking attempt")
+    end
+
     it 'returns an empty array unless enabled', :aggregate_failures do
       Panoptes.flipper["designator"].disable
       expect(client).not_to receive(:get_subjects)

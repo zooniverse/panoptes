@@ -19,7 +19,7 @@ describe Subjects::FallbackSelection do
     let(:subject_set_id) { nil }
     let(:opts) { { limit: 5, subject_set_id: subject_set_id } }
     let(:expected_ids) do
-      workflow.set_member_subjects.pluck("set_member_subjects.subject_id")
+      workflow.set_member_subjects.pluck("set_member_subjects.id")
     end
     let(:subject_ids) { selector.any_workflow_data }
 
