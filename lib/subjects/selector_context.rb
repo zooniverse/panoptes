@@ -68,7 +68,7 @@ module Subjects
           true
         end
       else
-        # no known user and workflow_still has data
+        # no known user and workflow has data
         false
       end
     end
