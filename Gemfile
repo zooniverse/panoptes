@@ -75,6 +75,7 @@ group :test do
   gem 'hashdiff'
   gem 'mock_redis'
   gem 'rspec'
+  gem 'rspec-its'
   gem 'rspec-rails'
   gem 'spring-commands-rspec'
 end
