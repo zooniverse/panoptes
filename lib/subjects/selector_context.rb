@@ -39,12 +39,15 @@ module Subjects
           user_id: user_id,
           workflow_id: workflow.id
         ).first
-        uss.subject_ids
+        uss&.subject_ids
       end
     end
 
     def user_has_finished_workflow
       if user = api_user.user
+        # convert this count lookup to use the seen_subject_ids
+        # or some way to determine if the user has finished the available pool
+        # of subjects, how can we do this optimally? Do we really need this?
         user.has_finished?(workflow)
       end
     end
