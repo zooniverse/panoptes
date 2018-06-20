@@ -1,10 +1,10 @@
 module Subjects
   class SelectorContext
-    attr_reader :api_user, :workflow, :subject_ids
+    attr_reader :selector, :subject_ids
+    delegate :user, :workflow, to: :selector
 
-    def initialize(api_user, workflow, subject_ids)
-      @api_user = api_user
-      @workflow = workflow
+    def initialize(selector, subject_ids)
+      @selector = selector
       @subject_ids = subject_ids
     end
 
@@ -14,10 +14,12 @@ module Subjects
       else
         {
           user_seen_subject_ids: user_seen_subject_ids,
-          url_format: :get,
           favorite_subject_ids: favorite_subject_ids,
           retired_subject_ids: retired_subject_ids,
           user_has_finished_workflow: user_has_finished_workflow,
+          finished_workflow: finished_workflow?,
+          selection_state: :normal,
+          url_format: :get,
           select_context: true
         }.compact
       end
@@ -26,7 +28,7 @@ module Subjects
     private
 
     def favorite_subject_ids
-      FavoritesFinder.find(api_user.user, workflow.project_id, subject_ids)
+      FavoritesFinder.find(user, workflow.project_id, subject_ids)
     end
 
     def retired_subject_ids
@@ -34,21 +36,40 @@ module Subjects
     end
 
     def user_seen_subject_ids
-      if user_id = api_user.id
+      seen_subject_ids = []
+      if user_id = user.id
         uss = UserSeenSubject.where(
           user_id: user_id,
           workflow_id: workflow.id
         ).first
-        uss&.subject_ids
+
+        if uss
+          seen_subject_ids = uss.subject_ids
+        end
       end
+
+      seen_subject_ids
+    end
+
+    def finished_workflow?
+      !!workflow.finished_at
     end
 
     def user_has_finished_workflow
-      if user = api_user.user
-        # convert this count lookup to use the seen_subject_ids
-        # or some way to determine if the user has finished the available pool
-        # of subjects, how can we do this optimally? Do we really need this?
-        user.has_finished?(workflow)
+      return true if finished_workflow?
+
+      if user
+        case selector.selection_state
+        when :normal # selector service returned data
+          false
+        when :internal_fallback # failed over to internal selector but returned data
+          false
+        when :failover_fallback # no selection service returned data, they are finished
+          true
+        end
+      else
+        # no known user and workflow_still has data
+        false
       end
     end
   end

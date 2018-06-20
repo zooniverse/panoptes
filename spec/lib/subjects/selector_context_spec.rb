@@ -11,19 +11,29 @@ RSpec.describe Subjects::SelectorContext do
       user_seen_subject_ids: subject_ids,
       favorite_subject_ids: subject_ids - [1],
       retired_subject_ids: subject_ids - [2],
-      url_format: :get,
       user_has_finished_workflow: false,
+      finished_workflow: false,
+      selection_state: :normal,
+      url_format: :get,
       select_context: true
     }
   end
-  subject { described_class.new(api_user, workflow, subject_ids) }
+  let(:selector) do
+    selector = instance_double("Subjects::Selector")
+    allow(selector).to receive(:user).and_return(user)
+    allow(selector).to receive(:workflow).and_return(workflow)
+    allow(selector).to receive(:selection_state).and_return(:normal)
+    selector
+  end
+
+  subject { described_class.new(selector, subject_ids) }
 
   it 'should return an empty object if skip flag is set' do
     Panoptes.flipper[:skip_subject_selection_context].enable
     expect(subject.format).to eq({})
   end
 
-  context "with seens, favourites and retired data", :focus do
+  context "with seens, favourites and retired data" do
     before do
       create(
         :user_seen_subject,
