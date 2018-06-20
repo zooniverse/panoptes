@@ -20,8 +20,6 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def queued
-    non_filterable_params = params.except(:project_id, :collection_id)
-
     subject_selector = Subjects::Selector.new(api_user.user, params)
     selected_subject_ids = subject_selector.get_subject_ids
 
@@ -30,14 +28,17 @@ class Api::V1::SubjectsController < Api::ApiController
       .where(id: selected_subject_ids)
       .order("idx(array[#{selected_subject_ids.join(',')}], id)")
 
+    selection_context = Subjects::SelectorContext.new(
+      subject_selector,
+      selected_subject_ids
+    ).format
+
+    non_filterable_params = params.except(:project_id, :collection_id)
+
     render json_api: SubjectSelectorSerializer.page(
       non_filterable_params,
       selected_subject_scope,
-      Subjects::SelectorContext.new(
-        api_user,
-        subject_selector.workflow,
-        selected_subject_ids
-      ).format
+      selection_context
     )
   end
 
