@@ -637,53 +637,6 @@ describe User, type: :model do
     end
   end
 
-  describe "has_finished?" do
-    let(:user) { create(:user) }
-    let(:workflow) { create(:workflow_with_subjects) }
-
-    subject { user.has_finished?(workflow) }
-
-    context 'when the workflow is finished' do
-      before do
-        workflow.update_column(:finished_at, DateTime.now)
-      end
-
-      it { is_expected.to be true }
-    end
-
-    context 'when the user has classified all subjects in a workflow' do
-      before do
-        ids = workflow.subject_sets.flat_map(&:subjects).map(&:id)
-        create(:user_seen_subject, user: user, workflow: workflow, subject_ids: ids)
-        create(:classification, user: user, workflow: workflow, subjects: Subject.where(id: ids))
-      end
-
-      it { is_expected.to be true }
-    end
-
-    context 'when the user has not seen any data for a workflow' do
-      before do
-        create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [])
-      end
-
-      it { is_expected.to be false }
-    end
-
-    context 'when the user only classified old (unlinked) subjects in a workflow' do
-      before do
-        ids = workflow.subject_sets.flat_map(&:subjects).map(&:id)
-        create(:user_seen_subject, user: user, workflow: workflow, subject_ids: ids)
-        new_data_set = create(:subject_set_with_subjects,
-          workflows: [],
-          project: workflow.project
-        )
-        workflow.subject_sets = [ new_data_set ]
-      end
-
-      it { is_expected.to be false }
-    end
-  end
-
   describe "#password" do
     it "should set a user's hash_func to bcrypt" do
       u = build(:insecure_user)

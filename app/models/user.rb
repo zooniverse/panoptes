@@ -233,15 +233,6 @@ class User < ActiveRecord::Base
     !!admin
   end
 
-  def has_finished?(workflow)
-    return true if workflow.finished?
-
-    current_seen_count = SetMemberSubject
-      .seen_for_user_by_workflow(self, workflow)
-      .count
-    !!(current_seen_count >= workflow.subjects_count)
-  end
-
   def valid_sha1_password?(plain_password)
     worked = nil
     1.upto(25).each do |n|
