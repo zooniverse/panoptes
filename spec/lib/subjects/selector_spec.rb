@@ -173,21 +173,21 @@ RSpec.describe Subjects::Selector do
   describe "selection_state" do
     it "should default respond with normal" do
       subject.get_subject_ids
-      expect(subject.selection_state).to eq("normal")
+      expect(subject.selection_state).to eq(:normal)
     end
 
     it "should default respond with internal_fallback" do
       allow(subject).to receive(:run_strategy_selection).and_return([])
       allow(subject).to receive(:internal_fallback).and_return([1])
       subject.get_subject_ids
-      expect(subject.selection_state).to eq("internal_fallback")
+      expect(subject.selection_state).to eq(:internal_fallback)
     end
 
     it "should default respond with failover_fallback" do
       allow(subject).to receive(:run_strategy_selection).and_return([])
       allow(subject).to receive(:internal_fallback).and_return([])
       subject.get_subject_ids
-      expect(subject.selection_state).to eq("failover_fallback")
+      expect(subject.selection_state).to eq(:failover_fallback)
     end
   end
 end

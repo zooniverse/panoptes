@@ -8,9 +8,9 @@ module Subjects
     class MalformedSelectedIds < StandardError; end
 
     SELECTION_STATE_ENUM = {
-      0 => "normal",
-      1 => "internal_fallback",
-      2 => "failover_fallback"
+      0 => :normal,
+      1 => :internal_fallback,
+      2 => :failover_fallback
     }.freeze
 
     attr_reader :user, :params
