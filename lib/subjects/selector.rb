@@ -7,10 +7,17 @@ module Subjects
     class MissingSubjects < StandardError; end
     class MalformedSelectedIds < StandardError; end
 
+    SELECTION_STATE_ENUM = {
+      0 => "normal",
+      1 => "internal_fallback",
+      2 => "failover_fallback"
+    }.freeze
+
     attr_reader :user, :params
 
     def initialize(user, params)
       @user, @params = user, params
+      @selection_state = 0
     end
 
     def get_subject_ids
@@ -22,12 +29,19 @@ module Subjects
     end
 
     def selected_subject_ids
-      unless workflow.finished_at
+      if workflow_has_data?
         subject_ids = run_strategy_selection
+        @selection_state = 0
+      end
+
+      if subject_ids.blank? && workflow_has_data?
+        subject_ids = internal_fallback
+        @selection_state = 1
       end
 
       if subject_ids.blank?
-        subject_ids = fallback_selection
+        subject_ids = fallback_selector.any_workflow_data
+        @selection_state = 2
       end
 
       # when on Rails 5
@@ -46,6 +60,14 @@ module Subjects
       @workflow ||= Workflow.find_without_json_attrs(params[:workflow_id])
     end
 
+    def workflow_has_data?
+      @workflow_has_data ||= !workflow.finished_at
+    end
+
+    def selection_state
+      SELECTION_STATE_ENUM[@selection_state]
+    end
+
     private
 
     def run_strategy_selection
@@ -57,22 +79,28 @@ module Subjects
       ).select
     end
 
-    def fallback_selection
-      opts = { limit: subjects_page_size, subject_set_id: subject_set_id }
-      fallback_selector = PostgresqlSelection.new(workflow, user, opts)
+    def fallback_selector_opts
+      { limit: subjects_page_size, subject_set_id: subject_set_id }
+    end
 
+    def fallback_selector
+      @fallback_selector ||= PostgresqlSelection.new(
+        workflow,
+        user,
+        fallback_selector_opts
+      )
+    end
+
+    def internal_fallback
       subject_ids = fallback_selector.select
+
       if data_available = !subject_ids.empty?
         if Panoptes.flipper[:selector_sync_error_reload].enabled?
           NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
         end
       end
 
-      if subject_ids.blank?
-        fallback_selector.any_workflow_data
-      else
-        subject_ids
-      end
+      subject_ids
     end
 
     def needs_set_id?
