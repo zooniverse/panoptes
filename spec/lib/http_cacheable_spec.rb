@@ -50,7 +50,7 @@ describe HttpCacheable do
         end
 
         it "should return false with a private resource" do
-          parent_relation = resource_klass.parent_relation
+          parent_relation = :project
           parent_resource = resource.send(parent_relation)
           make_private(parent_resource)
           expect(http_cache.public_resources?).to be false
