@@ -1,4 +1,6 @@
 class ApplicationPolicy
+  class UnknownAction < StandardError; end
+
   attr_reader :user, :record
 
   def initialize(user, record)
@@ -26,7 +28,12 @@ class ApplicationPolicy
               record.class
             end
 
-    self.class.scopes_by_action[action].new(user, scope).resolve(action)
+    scope_klass = self.class.scopes_by_action[action]
+    if scope_klass.present?
+      scope_klass.new(user, scope).resolve(action)
+    else
+      raise UnknownAction, "Action #{action} not defined for #{scope}"
+    end
   end
 
   class Scope
