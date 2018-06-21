@@ -62,7 +62,9 @@ module Subjects
       if user
         case selector.selection_state
         when :normal # selector service returned data
-          false
+          seen_and_retired_ids = (user_seen_subject_ids | retired_subject_ids)
+          unseen_non_retired_selected_subject_ids = subject_ids - seen_and_retired_ids
+          unseen_non_retired_selected_subject_ids.empty?
         when :internal_fallback # failed over to internal selector but returned data
           false
         when :failover_fallback # no selection service returned data, they are finished

@@ -8,9 +8,9 @@ RSpec.describe Subjects::SelectorContext do
   let(:subject_ids) { [1,2] }
   let(:expected_context) do
     {
-      user_seen_subject_ids: subject_ids,
-      favorite_subject_ids: subject_ids - [1],
-      retired_subject_ids: subject_ids - [2],
+      user_seen_subject_ids: [1],
+      favorite_subject_ids: [2],
+      retired_subject_ids: [1],
       user_has_finished_workflow: false,
       finished_workflow: false,
       selection_state: :normal,
@@ -40,10 +40,41 @@ RSpec.describe Subjects::SelectorContext do
         user: user,
         workflow: workflow,
         build_real_subjects: false,
-        subject_ids: subject_ids
+        subject_ids: [1]
       )
       allow(FavoritesFinder).to receive(:find).and_return([2])
       allow(SubjectWorkflowRetirements).to receive(:find).and_return([1])
+    end
+
+    it 'should return the expected format' do
+      expect(subject.format).to eq(expected_context)
+    end
+  end
+
+  context "with retired and seen data but external selector returns stale data" do
+    before do
+      create(
+        :user_seen_subject,
+        user: user,
+        workflow: workflow,
+        build_real_subjects: false,
+        subject_ids: [1]
+      )
+      allow(FavoritesFinder).to receive(:find).and_return([])
+      allow(SubjectWorkflowRetirements).to receive(:find).and_return([2])
+    end
+
+    let(:expected_context) do
+      {
+        user_seen_subject_ids: [1],
+        favorite_subject_ids: [],
+        retired_subject_ids: [2],
+        user_has_finished_workflow: true,
+        finished_workflow: false,
+        selection_state: :normal,
+        url_format: :get,
+        select_context: true
+      }
     end
 
     it 'should return the expected format' do
