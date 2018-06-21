@@ -37,9 +37,10 @@ module Subjects
 
     def user_seen_subject_ids
       seen_subject_ids = []
-      if user_id = user.id
+
+      if user
         uss = UserSeenSubject.where(
-          user_id: user_id,
+          user_id: user.id,
           workflow_id: workflow.id
         ).first
 
