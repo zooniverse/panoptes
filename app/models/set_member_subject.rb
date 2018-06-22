@@ -22,12 +22,15 @@ class SetMemberSubject < ActiveRecord::Base
   before_create :set_random
 
   def self.by_subject_workflow(subject_id, workflow_id)
-    joins(subject_set: :workflows)
-      .where(subject_id: subject_id, workflows: {id: workflow_id })
+    by_workflow(workflow_id).where(subject_id: subject_id)
   end
 
-  def self.by_workflow(workflow)
-    joins(:workflows).where(workflows: {id: workflow.id})
+  def self.by_workflow(workflow_id)
+    linked_workflow_set_ids = SubjectSetsWorkflow
+      .where(workflow_id: workflow_id)
+      .select(:subject_set_id)
+
+    where(subject_set_id: linked_workflow_set_ids)
   end
 
   def self.non_retired_for_workflow(workflow)
@@ -42,27 +45,27 @@ class SetMemberSubject < ActiveRecord::Base
     .where("subject_workflow_counts.retired_at IS NOT NULL")
   end
 
-  def self.seen_for_user_by_workflow(user, workflow)
-    seen_subjects = for_user_by_workflow_scope(user, workflow)
-    by_workflow(workflow).where(seen_subjects.exists)
+  def self.seen_for_user_by_workflow(user_id, workflow_id)
+    all_sms = all_sms_for_user_by_workflow(user_id, workflow_id)
+    seen_smses = all_sms.where("seen_subject_ids.subject_id IS NOT NULL")
+    by_workflow(workflow_id).where(seen_subjects.exists)
   end
 
-  def self.unseen_for_user_by_workflow(user, workflow)
-    seen_subjects = for_user_by_workflow_scope(user, workflow)
-    by_workflow(workflow).where(seen_subjects.exists.not)
+  def self.unseen_for_user_by_workflow(user_id, workflow_id)
+    all_sms = all_sms_for_user_by_workflow(user_id, workflow_id)
+    unseen_smses = all_sms.where("seen_subject_ids.subject_id IS NULL")
+    by_workflow(workflow_id).merge(unseen_smses)
   end
 
-  def self.for_user_by_workflow_scope(user, workflow)
+  def self.all_sms_for_user_by_workflow(user_id, workflow_id)
     uss = UserSeenSubject.arel_table
-    sms = SetMemberSubject.arel_table
     seens = uss.project('UNNEST(subject_ids) as subject_id')
-    seens.where(uss[:user_id].eq(user.id).and(uss[:workflow_id].eq(workflow.id)))
-    seens_subquery = seens.as(Arel.sql('as seen_subjects'))
-    manager = Arel::SelectManager.new(uss.engine)
-    manager.project("null")
-    manager.from(seens_subquery)
-    subquery_where = sms[:subject_id].eq(Arel.sql('seen_subjects.subject_id'))
-    manager.where(subquery_where)
+    seens.where(uss[:user_id].eq(user_id).and(uss[:workflow_id].eq(workflow_id)))
+    seens_subquery = seens.as(Arel.sql('as seen_subject_ids'))
+    joins(
+      "LEFT OUTER JOIN #{seens_subquery.to_sql} " \
+      "ON set_member_subjects.subject_id = seen_subject_ids.subject_id"
+    )
   end
 
   def retired_workflow_ids
