@@ -104,13 +104,30 @@ describe Subjects::SetMemberSubjectSelector do
         end
       end
 
-      context "when there are set_member_subjects from another workfow" do
-        it "should only return set_member_subjects from the set workflow" do
+      context "when there are set_member_subjects from another workflow" do
+        before do
           sms = create(:set_member_subject)
-          workflow_smses = [ subject, non_retired_unseen]
-            .map(&:set_member_subjects)
-            .flatten
-          expect(sms_to_classify).to match_array(workflow_smses)
+        end
+
+        it "should not return set_member_subjects" do
+          expect(sms_to_classify).to be_empty
+        end
+
+        context "with linked subject_workflow_status records" do
+          it "should only return set_member_subjects from the workflow" do
+            workflow_smses = [ subject, non_retired_unseen]
+              .map(&:set_member_subjects)
+              .flatten
+
+            workflow_smses.each do |sms|
+              SubjectWorkflowStatus.create!(
+                subject_id: sms.subject_id,
+                workflow_id: workflow.id
+              )
+            end
+
+            expect(sms_to_classify).to match_array(workflow_smses)
+          end
         end
       end
     end
