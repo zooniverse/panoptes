@@ -7,9 +7,20 @@ FactoryBot.define do
       sequence(:priority)
     end
 
-    after(:create) do |sms|
+    transient do
+      setup_subject_workflow_statuses false
+    end
+
+    after(:create) do |sms, env|
       SubjectSet.where(id: sms.subject_set_id)
         .update_all("set_member_subjects_count = set_member_subjects_count + 1")
+
+      if env.setup_subject_workflow_statuses
+        SubjectWorkflowStatus.create!(
+          subject_id: sms.subject_id,
+          workflow_id: sms.workflows.first.id
+        )
+      end
     end
   end
 end

@@ -4,7 +4,14 @@ RSpec.describe Subjects::Selector do
   let(:workflow) { create(:workflow_with_subject_set) }
   let(:subject_set) { workflow.subject_sets.first }
   let(:user) { create(:user) }
-  let!(:smses) { create_list(:set_member_subject, 10, subject_set: subject_set).reverse }
+  let!(:smses) do
+    create_list(
+      :set_member_subject,
+      10,
+      setup_subject_workflow_statuses: true,
+      subject_set: subject_set
+    ).reverse
+  end
   let(:params) { { workflow_id: workflow.id } }
 
   subject { described_class.new(user, params) }
@@ -140,11 +147,7 @@ RSpec.describe Subjects::Selector do
   end
 
   describe '#selected_subject_ids' do
-
     it 'should return something when everything selected is retired' do
-      smses.each do |sms|
-        swc = create(:subject_workflow_status, subject: sms.subject, workflow: workflow, retired_at: Time.zone.now)
-      end
       expect(subject.selected_subject_ids.size).to be > 0
     end
 
