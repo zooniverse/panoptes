@@ -59,25 +59,36 @@ describe SetMemberSubject, :type => :model do
     let(:workflow) { create(:workflow, subject_sets: [set_member_subject.subject_set]) }
     let(:count) { create(:subject_workflow_status, subject: set_member_subject.subject, workflow: workflow) }
 
+    it "should not return any smses with no linked workflow status instances" do
+      expect(SetMemberSubject.non_retired_for_workflow(workflow.id)).not_to include(set_member_subject)
+    end
+
+    it "should return the sms with linked workflow status instances" do
+      count
+      expect(SetMemberSubject.non_retired_for_workflow(workflow.id)).to include(set_member_subject)
+    end
+
     context "when none are retired" do
       it "should return the workflow's non retired sms" do
-        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(set_member_subject)
+        count
+        expect(SetMemberSubject.non_retired_for_workflow(workflow.id)).to include(set_member_subject)
       end
     end
 
     context "when the workflow sms is retired" do
       it "should return an empty set" do
         count.retire!
-        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to be_empty
+        expect(SetMemberSubject.non_retired_for_workflow(workflow.id)).to be_empty
       end
     end
 
     context 'when the workflow sms is retired for another workflow' do
       it 'should return the sms' do
+        count
         workflow2 = create(:workflow, subject_sets: [set_member_subject.subject_set])
         count2 = create(:subject_workflow_status, subject: set_member_subject.subject, workflow: workflow2)
         count2.retire!
-        expect(SetMemberSubject.non_retired_for_workflow(workflow)).to include(set_member_subject)
+        expect(SetMemberSubject.non_retired_for_workflow(workflow.id)).to include(set_member_subject)
       end
     end
   end
@@ -89,24 +100,30 @@ describe SetMemberSubject, :type => :model do
       create(:subject_workflow_status, subject: sms.subject, workflow: workflow)
     end
 
+    it "should not return any smses with no workflow status instances" do
+      expect(SetMemberSubject.retired_for_workflow(workflow.id)).not_to include(sms)
+    end
+
     context "when none are retired" do
       it "should return an empty set" do
-        expect(SetMemberSubject.retired_for_workflow(workflow)).to be_empty
+        count
+        expect(SetMemberSubject.retired_for_workflow(workflow.id)).to be_empty
       end
     end
 
     context "when the workflow sms is retired" do
       it "should return the sms id" do
         count.retire!
-        expect(SetMemberSubject.retired_for_workflow(workflow)).to include(sms)
+        binding.pry
+        expect(SetMemberSubject.retired_for_workflow(workflow.id)).to include(sms)
       end
     end
 
     context 'when the workflow sms is retired for another workflow' do
-      it 'should return the sms' do
+      it 'should not return the sms' do
         workflow2 = create(:workflow, subject_sets: [sms.subject_set])
         create(:subject_workflow_status, subject: sms.subject, workflow: workflow2, retired_at: DateTime.now)
-        expect(SetMemberSubject.retired_for_workflow(workflow2)).to include(sms)
+        expect(SetMemberSubject.retired_for_workflow(workflow.id)).not_to include(sms)
       end
     end
   end

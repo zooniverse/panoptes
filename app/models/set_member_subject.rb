@@ -33,27 +33,42 @@ class SetMemberSubject < ActiveRecord::Base
     where(subject_set_id: linked_workflow_set_ids)
   end
 
-  def self.non_retired_for_workflow(workflow)
-    by_workflow(workflow)
-    .joins(sanitize_sql_for_conditions(["LEFT OUTER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id AND subject_workflow_counts.workflow_id = ?", workflow.id]))
-    .where('subject_workflow_counts.retired_at IS NULL')
+  def self.non_retired_for_workflow(workflow_id)
+    non_retired_subject_ids = SubjectWorkflowStatus
+      .where(workflow_id: workflow_id)
+      .where(retired_at: nil)
+      .select(:subject_id)
+
+    where(subject_id: non_retired_subject_ids)
   end
 
-  def self.retired_for_workflow(workflow)
-    by_workflow(workflow)
-    .joins(sanitize_sql_for_conditions(["INNER JOIN subject_workflow_counts ON subject_workflow_counts.subject_id = set_member_subjects.subject_id AND subject_workflow_counts.workflow_id = ?", workflow.id]))
-    .where("subject_workflow_counts.retired_at IS NOT NULL")
+  def self.retired_for_workflow(workflow_id)
+    retired_subject_ids = SubjectWorkflowStatus
+      .where(workflow_id: workflow_id)
+      .where.not(retired_at: nil)
+      .select(:subject_id)
+
+    where(subject_id: retired_subject_ids)
   end
 
+  # THIS can be removed after https://github.com/zooniverse/Panoptes/pull/2805
   def self.seen_for_user_by_workflow(user_id, workflow_id)
     all_sms = all_sms_for_user_by_workflow(user_id, workflow_id)
     seen_smses = all_sms.where("seen_subject_ids.subject_id IS NOT NULL")
-    by_workflow(workflow_id).where(seen_subjects.exists)
+
+    by_workflow(workflow_id).merge(seen_smses)
   end
 
+  # Be careful using this query as it's not selective on a large table
+  # and the LEFT OUTER JOIN can take a long time to resolve
+  #
+  # Note: push this into where it's being used to ensure it's a more selective
+  # query and we don't use it on it's own
+  # After https://github.com/zooniverse/Panoptes/pull/2805 is in
   def self.unseen_for_user_by_workflow(user_id, workflow_id)
     all_sms = all_sms_for_user_by_workflow(user_id, workflow_id)
     unseen_smses = all_sms.where("seen_subject_ids.subject_id IS NULL")
+
     by_workflow(workflow_id).merge(unseen_smses)
   end
 
