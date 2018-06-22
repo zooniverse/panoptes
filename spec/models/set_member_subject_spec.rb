@@ -114,7 +114,6 @@ describe SetMemberSubject, :type => :model do
     context "when the workflow sms is retired" do
       it "should return the sms id" do
         count.retire!
-        binding.pry
         expect(SetMemberSubject.retired_for_workflow(workflow.id)).to include(sms)
       end
     end
