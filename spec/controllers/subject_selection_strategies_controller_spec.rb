@@ -1,6 +1,15 @@
 require 'spec_helper'
 
 describe SubjectSelectionStrategiesController, type: :controller do
+  def create_workflow_sws_records(workflow)
+    workflow.subjects.each do |subject|
+      SubjectWorkflowStatus.create!(
+        subject_id: subject.id,
+        workflow_id: workflow.id
+      )
+    end
+  end
+
   let(:cellect_workflow) do
     create(:workflow_with_subjects, subject_selection_strategy: "cellect")
   end
@@ -13,6 +22,9 @@ describe SubjectSelectionStrategiesController, type: :controller do
       before(:each) do
         cellect_workflow
         non_cellect_workflow
+        [ cellect_workflow, non_cellect_workflow ].each do |workflow|
+          create_workflow_sws_records(workflow)
+        end
       end
 
       it "returns success" do
@@ -65,6 +77,9 @@ describe SubjectSelectionStrategiesController, type: :controller do
       before do
         cellect_workflow
         another_cellect_workflow
+        [ cellect_workflow, another_cellect_workflow ].each do |workflow|
+          create_workflow_sws_records(workflow)
+        end
       end
 
       it "returns a public cache header" do
@@ -83,9 +98,10 @@ describe SubjectSelectionStrategiesController, type: :controller do
       context "with a retired subject" do
         let(:retired_subject) { cellect_workflow.subjects.all.sample }
         let!(:retired_swc) do
-          create(:subject_workflow_status,
+          SubjectWorkflowStatus.where(
             subject_id: retired_subject.id,
-            workflow_id: cellect_workflow.id,
+            workflow_id: cellect_workflow.id
+          ).update_all(
             retired_at: DateTime.now
           )
         end
