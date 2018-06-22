@@ -39,7 +39,7 @@ class SetMemberSubject < ActiveRecord::Base
       .where(retired_at: nil)
       .select(:subject_id)
 
-    where(subject_id: non_retired_subject_ids)
+    by_workflow(workflow_id).where(subject_id: non_retired_subject_ids)
   end
 
   def self.retired_for_workflow(workflow_id)
@@ -48,7 +48,7 @@ class SetMemberSubject < ActiveRecord::Base
       .where.not(retired_at: nil)
       .select(:subject_id)
 
-    where(subject_id: retired_subject_ids)
+    by_workflow(workflow_id).where(subject_id: retired_subject_ids)
   end
 
   # THIS can be removed after https://github.com/zooniverse/Panoptes/pull/2805
