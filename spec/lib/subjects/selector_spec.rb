@@ -148,7 +148,13 @@ RSpec.describe Subjects::Selector do
 
   describe '#selected_subject_ids' do
     it 'should return something when everything selected is retired' do
-      expect(subject.selected_subject_ids.size).to be > 0
+      SubjectWorkflowStatus.where(
+        subject_id: smses.map(&:subject_id),
+        workflow_id: workflow.id
+      ).update_all(
+        retired_at: Time.zone.now
+      )
+      expect(subject.selected_subjects.size).to be > 0
     end
 
     it "should respect the order of the subjects from strategy selector" do
