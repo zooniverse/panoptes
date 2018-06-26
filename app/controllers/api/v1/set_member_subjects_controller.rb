@@ -7,8 +7,15 @@ class Api::V1::SetMemberSubjectsController < Api::ApiController
   allowed_params :update, :priority, links: [retired_workflows: []]
 
   def create
-    super do |set_member_subject|
-      update_set_counts(set_member_subject.subject_set_id)
+    super do |sms|
+      set_id = sms.subject_set_id
+      update_set_counts(set_id)
+      linked_workflow_ids(set_id).each do |workflow_id|
+        SubjectWorkflowStatusCreateWorker.perform_async(
+          sms.subject_id,
+          workflow_id
+        )
+      end
     end
   end
 
@@ -26,4 +33,8 @@ class Api::V1::SetMemberSubjectsController < Api::ApiController
   def update_set_counts(set_id)
     SubjectSetSubjectCounterWorker.perform_async(set_id)
   end
+
+  def linked_workflow_ids(set_id)
+    SubjectSetsWorkflow.where(subject_set_id: set_id).pluck(:workflow_id)
+    end
 end
