@@ -252,4 +252,21 @@ namespace :migrate do
       end
     end
   end
+
+  namespace :subject_workflow_status do
+    desc "Create SubjectWorklfowStatus records for the internal PG subject selector"
+    task :create_records_for_pg_selector => :environment do
+      Workflow.select(:id).find_each do |workflow|
+        linked_workflow_sets = workflow
+          .subject_sets_workflows
+          .select(%i(id subject_set_id))
+        linked_workflow_sets.find_each do |subject_set_workflow|
+          SubjectSetStatusesCreateWorker.perform_async(
+            subject_set_workflow.subject_set_id,
+            workflow.id
+          )
+        end
+      end
+    end
+  end
 end
