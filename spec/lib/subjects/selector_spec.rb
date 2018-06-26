@@ -154,7 +154,7 @@ RSpec.describe Subjects::Selector do
       ).update_all(
         retired_at: Time.zone.now
       )
-      expect(subject.selected_subjects.size).to be > 0
+      expect(subject.selected_subject_ids.size).to be > 0
     end
 
     it "should respect the order of the subjects from strategy selector" do
