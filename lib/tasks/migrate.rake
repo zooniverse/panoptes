@@ -256,7 +256,10 @@ namespace :migrate do
   namespace :subject_workflow_status do
     desc "Create SubjectWorklfowStatus records for the internal PG subject selector"
     task :create_records_for_pg_selector => :environment do
-      Workflow.select(:id).find_each do |workflow|
+      Workflow.active.select(%i(id project_id)).find_each do |workflow|
+        project_finished = Project.where(id: workflow.project_id).finished.exists?
+        next if project_finished
+
         linked_workflow_sets = workflow
           .subject_sets_workflows
           .select(%i(id subject_set_id))
