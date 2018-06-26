@@ -92,6 +92,13 @@ class Api::V1::SubjectSetsController < Api::ApiController
       new_sms_values = subject_ids_to_link.map do |subject_id|
         [ resource.id, subject_id, rand ]
       end
+
+      resource.subject_sets_workflows.pluck(:workflow_id).each do |workflow_id|
+        subject_ids_to_link.each do |subject_id|
+          SubjectWorkflowStatusCreateWorker.perform_async(subject_id, workflow_id)
+        end
+      end
+
       SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
     else
       super
