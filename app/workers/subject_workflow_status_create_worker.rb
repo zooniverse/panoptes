@@ -10,6 +10,6 @@ class SubjectWorkflowStatusCreateWorker
         workflow_id: workflow_id
       )
     end
-  rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid
+  rescue ActiveRecord::RecordInvalid
   end
 end
