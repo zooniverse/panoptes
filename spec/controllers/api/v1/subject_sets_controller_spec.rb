@@ -162,9 +162,8 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
 
       it "should call SWS create worker" do
-        subject_ids = subjects.map(&:id)
         resource.workflows.each do |workflow|
-          subject_ids.each do |subject_id|
+          test_relation_ids.each do |subject_id|
             expect(SubjectWorkflowStatusCreateWorker)
             .to receive(:perform_async)
             .with(subject_id, workflow.id)
