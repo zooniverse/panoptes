@@ -233,15 +233,6 @@ class User < ActiveRecord::Base
     !!admin
   end
 
-  def has_finished?(workflow)
-    return true if workflow.finished?
-
-    current_seen_count = SetMemberSubject
-      .seen_for_user_by_workflow(self, workflow)
-      .count
-    !!(current_seen_count >= workflow.subjects_count)
-  end
-
   def valid_sha1_password?(plain_password)
     worked = nil
     1.upto(25).each do |n|
@@ -337,8 +328,8 @@ class User < ActiveRecord::Base
     Rails.cache.increment(subjects_count_cache_key)
   end
 
-  def favorite_collections_for_project(project)
-    collections.joins(:projects).where(favorite: true, projects: {id: project.id})
+  def favorite_collections_for_project(project_id)
+    collections.joins(:projects).where(favorite: true, projects: {id: project_id})
   end
 
   private

@@ -11,67 +11,32 @@ RSpec.describe Subjects::StrategySelection do
   end
 
   describe "#select" do
-    context "removing completes is disabled" do
-      it "the complete remover is not called" do
-        expect(Subjects::CompleteRemover).to_not receive(:new)
-      end
+    it "should not call the complete remover when disabled" do
+      Panoptes.flipper[:remove_complete_subjects].disable
+      expect(Subjects::CompleteRemover).to_not receive(:new)
+      subject.select
     end
 
     context "removing completes is enabled" do
-      it "should call the complete remover after selection", :aggregate_failures do
-        expect(subject).to receive(:select_subject_ids).and_return([:default, [1,2,3]]).ordered
-        expect(Subjects::CompleteRemover)
-          .to receive(:new)
-          .with(user, workflow, an_instance_of(Array))
-          .ordered
-          .and_return(instance_double(Subjects::CompleteRemover, incomplete_ids: [1]))
-        subject.select
+      let(:complete_remover) do
+        instance_double(
+          Subjects::CompleteRemover,
+          incomplete_ids: [1]
+        )
+      end
+      let(:selected_subject_ids) { [ 1, 3, 2] }
+
+      before do
+        allow(subject).to receive(:select_subject_ids).and_return(selected_subject_ids)
       end
 
-      describe "remove completed after selection" do
-        let(:retired_workflow) { workflow }
-        let(:sms) { smses[0] }
-        let(:result) { subject.select }
-
-        before do
-          allow(subject)
-          .to receive(:select_subject_ids)
-          .and_return([:default, smses.map(&:subject_id)])
-        end
-
-        context "retired subjects" do
-          let!(:sws) do
-            create(:subject_workflow_status,
-              subject: sms.subject,
-              workflow: retired_workflow,
-              retired_at: Time.zone.now
-            )
-          end
-
-          it 'should not return retired subjects' do
-            expect(result).not_to include(sms.subject_id)
-          end
-
-          context "when the sms is retired for a different workflow" do
-            let(:retired_workflow) do
-              create(:workflow, subject_sets: workflow.subject_sets)
-            end
-
-            it 'should return all the subjects' do
-              expect(result).to include(sms.subject_id)
-            end
-          end
-        end
-
-        context "seen subjects" do
-          let!(:seens) do
-            create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [sms.subject.id])
-          end
-
-          it 'should not return seen subjects' do
-            expect(result).not_to include(sms.subject_id)
-          end
-        end
+      it "should call the complete remover after selection" do
+        expect(complete_remover).to receive(:incomplete_ids)
+        expect(Subjects::CompleteRemover)
+          .to receive(:new)
+          .with(user, workflow, selected_subject_ids)
+          .and_return(complete_remover)
+        subject.select
       end
     end
 
