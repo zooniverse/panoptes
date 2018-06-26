@@ -90,6 +90,9 @@ class Api::V1::WorkflowsController < Api::ApiController
           NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
         end
       when "subject_sets"
+        params[:subject_sets].each do |set_id|
+          SubjectSetStatusesCreateWorker.perform_async(set_id, workflow.id)
+        end
         NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
       end
     end
