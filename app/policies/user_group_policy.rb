@@ -28,6 +28,6 @@ class UserGroupPolicy < ApplicationPolicy
     roles_for_private_scope %i(group_admin)
   end
 
-  scope :index, :show, with: ReadScope
+  scope :index, :show, :recents, with: ReadScope
   scope :update, :destroy, :update_links, :destroy_links, with: WriteScope
 end

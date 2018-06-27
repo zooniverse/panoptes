@@ -41,15 +41,15 @@ describe MembershipPolicy do
         expect(scope.resolve(:show)).to include(membership1)
       end
 
-      it 'can not see who are members of private groups they are in' do
+      it 'can see who are members of private groups they are in' do
         other_user = create :user
         membership1 = create :membership, user: logged_in_user, user_group: public_user_group
         membership2 = create :membership, user: logged_in_user, user_group: private_user_group
         membership3 = create :membership, user: other_user, user_group: public_user_group
         membership4 = create :membership, user: other_user, user_group: private_user_group
 
-        expect(scope.resolve(:index)).not_to include(membership4)
-        expect(scope.resolve(:show)).not_to include(membership4)
+        expect(scope.resolve(:index)).to include(membership1, membership2, membership3, membership4)
+        expect(scope.resolve(:show)).to include(membership1, membership2, membership3, membership4)
       end
 
       it "cannot modify other user's memberships" do
