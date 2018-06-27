@@ -21,19 +21,22 @@ class ApplicationPolicy
     @scopes_by_action || {}
   end
 
+  def scope_klass_for action
+    scope_klass = self.class.scopes_by_action[action]
+    if scope_klass.present?
+      scope_klass
+    else
+      raise UnknownAction, "Action #{action} not defined for #{scope}"
+    end
+  end
+
   def scope_for(action)
     scope = if record.is_a?(Class)
               record
             else
               record.class
             end
-
-    scope_klass = self.class.scopes_by_action[action]
-    if scope_klass.present?
-      scope_klass.new(user, scope).resolve(action)
-    else
-      raise UnknownAction, "Action #{action} not defined for #{scope}"
-    end
+    scope_klass_for(action).new(user, scope).resolve(action)
   end
 
   class Scope
