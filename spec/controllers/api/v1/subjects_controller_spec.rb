@@ -388,6 +388,17 @@ describe Api::V1::SubjectsController, type: :controller do
               selected_subject_ids = created_instance_ids(api_resource_name)
               expect(selected_subject_ids).to eq(ordered_subject_ids)
             end
+
+            it "should not try to order missing subject_ids" do
+              allow_any_instance_of(
+                Subjects::Selector
+              ).to receive(
+                :get_subject_ids
+              ).and_return([])
+
+              get :queued, request_params
+              expect(json_response[api_resource_name].length).to eq(0)
+            end
           end
 
           context "with deactivated subjects" do
