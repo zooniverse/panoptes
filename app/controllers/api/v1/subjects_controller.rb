@@ -23,10 +23,16 @@ class Api::V1::SubjectsController < Api::ApiController
     subject_selector = Subjects::Selector.new(api_user.user, params)
     selected_subject_ids = subject_selector.get_subject_ids
 
-    selected_subject_scope = Subject
+    selected_subject_scope = if selected_subject_ids.empty?
+      Subject.none
+    else
+      Subject
       .active
       .where(id: selected_subject_ids)
-      .order("idx(array[#{selected_subject_ids.join(',')}], id)")
+      .order(
+        "idx(array[#{selected_subject_ids.join(',')}], id)"
+      )
+    end
 
     selection_context = Subjects::SelectorContext.new(
       subject_selector,
