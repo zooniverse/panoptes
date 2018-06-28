@@ -73,10 +73,6 @@ class Workflow < ActiveRecord::Base
     where(project: subject_set.project)
   end
 
-  def tasks
-    read_attribute(:tasks).with_indifferent_access
-  end
-
   def retired_subjects
     subject_workflow_statuses.retired.includes(:subject).map(&:subject)
   end

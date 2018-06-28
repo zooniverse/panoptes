@@ -298,7 +298,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       context "when the user updates help text within a task" do
         let(:update_params) do
           tasks = resource.tasks
-          tasks[:interest][:help] = "Something new"
+          tasks["interest"]["help"] = "Something new"
           {tasks: tasks}
         end
 
