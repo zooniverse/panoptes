@@ -7,6 +7,8 @@ class Api::V1::UsersController < Api::ApiController
   require_authentication :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show
 
+  before_action :filter_by_params, only: :index
+
   schema_type :strong_params
 
   allowed_params :update, :login, :display_name, :email, :credited_name,
@@ -55,19 +57,6 @@ class Api::V1::UsersController < Api::ApiController
     end
   end
 
-  def index
-    if api_user.is_admin? && downcased_emails = downcase_filter_params(:email)
-      @controlled_resources = controlled_resources.where(
-        User.arel_table[:email].lower.in(downcased_emails)
-      )
-    elsif downcased_login = downcase_filter_params(:login)
-      @controlled_resources = controlled_resources.where(
-        User.arel_table[:login].lower.in(downcased_login)
-      )
-    end
-    super
-  end
-
   def destroy
     sign_out_current_user!
     revoke_doorkeeper_request_token!
@@ -103,9 +92,29 @@ class Api::V1::UsersController < Api::ApiController
     token.revoke
   end
 
-  def downcase_filter_params(key)
-    if param_value = params.delete(key)
-      param_value.split(',').map(&:downcase)
+  def filter_by_params
+    # delete the params to ensure non-admin users can not
+    # filter on email through the serializer can_filter_by DSL
+    if email_param = params.delete(:email)
+      if api_user.is_admin?
+        # re-add the email for href construction in serializer meta
+        params[:email] = email_param
+        downcased_emails = downcase_filter_params(email_param)
+        @controlled_resources = controlled_resources.where(
+          User.arel_table[:email].lower.in(downcased_emails)
+        )
+      end
     end
+
+    if params[:login]
+      downcased_logins = downcase_filter_params(params[:login])
+      @controlled_resources = controlled_resources.where(
+        User.arel_table[:login].lower.in(downcased_logins)
+      )
+    end
+  end
+
+  def downcase_filter_params(param_value)
+    param_value.split(',').map(&:downcase)
   end
 end

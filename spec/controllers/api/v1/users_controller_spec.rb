@@ -228,6 +228,21 @@ describe Api::V1::UsersController, type: :controller do
           it "should respond with the correct item" do
             expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
           end
+
+          context "with filtering emails on multiple emails" do
+            let(:another_user) { create(:user) }
+            let(:emails_filter) do
+              [ email, another_user.email ].map(&:upcase).join(',')
+            end
+            let(:index_options) do
+              { email: emails_filter, admin: true, page_size: 1 }
+            end
+
+            it "should respond include the filter in the next href" do
+              next_href = json_response.dig("meta", "users", "next_href")
+              expect(next_href).to include("email=#{emails_filter}")
+            end
+          end
         end
 
         describe "filter by case insensitive email" do
