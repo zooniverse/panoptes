@@ -1,5 +1,6 @@
 class ApplicationPolicy
   class UnknownAction < StandardError; end
+  class UnknownLink < StandardError; end
 
   attr_reader :user, :record
 
@@ -8,8 +9,6 @@ class ApplicationPolicy
     @record = record
   end
 
-  @scopes_by_action = {}
-
   def self.scope(*actions, with:)
     actions.each do |action|
       @scopes_by_action ||= {}
@@ -17,8 +16,17 @@ class ApplicationPolicy
     end
   end
 
+  def self.link_with(relation, scope:, model:, action:)
+    @links ||= {}
+    @links[relation] = {scope: scope, model: model, action: action}
+  end
+
   def self.scopes_by_action
     @scopes_by_action || {}
+  end
+
+  def self.links
+    @links || {}
   end
 
   def scope_klass_for(action)
@@ -37,6 +45,16 @@ class ApplicationPolicy
               record.class
             end
     scope_klass_for(action).new(user, scope).resolve(action)
+  end
+
+  def linkable_for(relation)
+    options = self.class.links[relation]
+
+    if options
+      options[:scope].new(user, options[:model]).resolve(options[:action])
+    else
+      raise UnknownLink, "Link #{relation} not defined for #{record}"
+    end
   end
 
   class Scope

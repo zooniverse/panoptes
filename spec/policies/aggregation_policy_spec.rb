@@ -103,4 +103,19 @@ describe AggregationPolicy do
 
     end
   end
+
+  describe 'links' do
+    let(:resource_owner) { create(:user) }
+
+    let(:project)  { build(:project, owner: resource_owner) }
+
+    let(:aggregation) { build(:aggregation, workflow: build(:workflow, project: project, aggregation: {public: true})) }
+
+    it 'links against workflows of my projects' do
+      workflow1 = create :workflow, project: project
+      workflow2 = create :workflow
+
+      expect(policy.linkable_for(:workflow)).to match_array(workflow1)
+    end
+  end
 end
