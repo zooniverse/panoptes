@@ -24,7 +24,7 @@ class UserSerializer
   cache_total_count true
 
   def self.page(params = {}, scope = nil, context = {})
-    page_with_options DowncaseFilterOptions.new(self, params, scope, context)
+    page_with_options NonCustomScopeFilterOptions.new(self, params, scope, context)
   end
 
   def admin
@@ -77,12 +77,14 @@ class UserSerializer
     data[:links] = {}
   end
 
-  class DowncaseFilterOptions < RestPack::Serializer::Options
+  class NonCustomScopeFilterOptions < RestPack::Serializer::Options
+    CUSTOM_SCOPE_FILTERS = %i(email login).freeze
+
     def scope_with_filters
       scope_filter = {}
-      downcase_filters = @filters.except(:email, :login)
 
-      downcase_filters.keys.each do |filter|
+      non_custom_filters = @filters.except(*CUSTOM_SCOPE_FILTERS)
+      non_custom_filters.keys.each do |filter|
         value = query_to_array(@filters[filter])
         scope_filter[filter] = value
       end
