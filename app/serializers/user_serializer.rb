@@ -17,9 +17,15 @@ class UserSerializer
 
   media_include :avatar, :profile_header
 
+  can_filter_by :login, :email
+
   preload :avatar
 
   cache_total_count true
+
+  def self.page(params = {}, scope = nil, context = {})
+    page_with_options NonCustomScopeFilterOptions.new(self, params, scope, context)
+  end
 
   def admin
     !!@model.admin
@@ -69,5 +75,21 @@ class UserSerializer
 
   def add_links(model, data)
     data[:links] = {}
+  end
+
+  class NonCustomScopeFilterOptions < RestPack::Serializer::Options
+    CUSTOM_SCOPE_FILTERS = %i(email login).freeze
+
+    def scope_with_filters
+      scope_filter = {}
+
+      non_custom_filters = @filters.except(*CUSTOM_SCOPE_FILTERS)
+      non_custom_filters.keys.each do |filter|
+        value = query_to_array(@filters[filter])
+        scope_filter[filter] = value
+      end
+
+      @scope.where(scope_filter)
+    end
   end
 end
