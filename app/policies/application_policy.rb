@@ -26,7 +26,7 @@ class ApplicationPolicy
     if scope_klass.present?
       scope_klass
     else
-      raise UnknownAction, "Action #{action} not defined for #{record}"
+      raise UnknownAction, "Action #{action.inspect} not defined for #{self}"
     end
   end
 
