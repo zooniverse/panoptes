@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
   include Linkable
   include PgSearch
   include ExtendedCacheKey
+  include RoleControl::PunditInterop
 
   ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
@@ -92,17 +93,6 @@ class User < ActiveRecord::Base
       trigram: {}
     },
     ranked_by: ":tsearch + (0.25 * :trigram)"
-
-  def self.scope_for(action, user, opts={})
-    case
-    when user.is_admin?
-      User.all
-    when [ :show, :index ].include?(action)
-      where(ouroboros_created: false).merge(active)
-    else
-      where(id: user.id)
-    end
-  end
 
   def self.from_omniauth(auth_hash)
     transaction do
