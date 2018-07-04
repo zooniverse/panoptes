@@ -1,5 +1,6 @@
 class Tag < ActiveRecord::Base
   include PgSearch
+  include RoleControl::PunditInterop
   has_many :tagged_resources
   has_many :projects, through: :tagged_resources, source: :resource, source_type: "Project"
   has_many :organizations, through: :tagged_resources, source: :resource, source_type: "Organization"
@@ -12,10 +13,6 @@ class Tag < ActiveRecord::Base
     against: :name,
     using: :trigram,
     ranked_by: ":trigram"
-
-  def self.scope_for(*args)
-    all
-  end
 
   def downcase_name
     self.name = name.try(:downcase)
