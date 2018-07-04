@@ -14,5 +14,3 @@ module FilterForbiddenProjects
     exportable_scope = scope.where.not(project_id: forbidden_project_ids)
   end
 end
-
-
