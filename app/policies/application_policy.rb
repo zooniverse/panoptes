@@ -92,6 +92,10 @@ class ApplicationPolicy
         .where("roles && ARRAY[?]::varchar[]", roles)
     end
 
+    def policy_for(model)
+      Pundit.policy!(user, model)
+    end
+
     def model
       if scope.is_a?(ActiveRecord::Relation)
         scope.klass

@@ -1,7 +1,7 @@
 class SubjectWorkflowStatusPolicy < ApplicationPolicy
   class Scope < Scope
     def resolve(action)
-      parent_scope = Workflow.scope_for(action, user)
+      parent_scope = policy_for(Workflow).scope_for(action)
       scope.where(workflow_id: parent_scope.select(:id))
     end
   end

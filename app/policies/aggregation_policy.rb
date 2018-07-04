@@ -2,7 +2,7 @@ class AggregationPolicy < ApplicationPolicy
   class ReadScope < Scope
     # Allow access to public aggregations
     def resolve(action)
-      updatable_parents = Workflow.scope_for(:update, user)
+      updatable_parents = policy_for(Workflow).scope_for(:update)
       updatable_scope = scope.joins(:workflow).merge(updatable_parents)
 
       scope.joins(:workflow)
@@ -13,7 +13,7 @@ class AggregationPolicy < ApplicationPolicy
 
   class WriteScope < Scope
     def resolve(action)
-      parent_scope = Workflow.scope_for(action, user)
+      parent_scope = policy_for(Workflow).scope_for(action)
       scope.where(workflow_id: parent_scope.select(:id))
     end
   end

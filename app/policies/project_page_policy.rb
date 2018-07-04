@@ -1,7 +1,7 @@
 class ProjectPagePolicy < ApplicationPolicy
   class Scope < Scope
     def resolve(action)
-      parent_scope = Project.scope_for(action, user)
+      parent_scope = policy_for(Project).scope_for(action)
       scope.where(project_id: parent_scope.select(:id))
     end
   end

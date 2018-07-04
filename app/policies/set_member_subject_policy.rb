@@ -1,7 +1,7 @@
 class SetMemberSubjectPolicy < ApplicationPolicy
   class Scope < Scope
     def resolve(action)
-      parent_scope = SubjectSet.scope_for(action, user)
+      parent_scope = policy_for(SubjectSet).scope_for(action)
       scope.where(subject_set_id: parent_scope.select(:id))
     end
   end

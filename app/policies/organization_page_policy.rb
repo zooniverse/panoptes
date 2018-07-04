@@ -1,7 +1,7 @@
 class OrganizationPagePolicy < ApplicationPolicy
   class Scope < Scope
     def resolve(action)
-      parent_scope = Organization.scope_for(action, user)
+      parent_scope = policy_for(Organization).scope_for(action)
       scope.where(organization_id: parent_scope.select(:id))
     end
   end
