@@ -36,9 +36,14 @@ describe MembershipPolicy do
         other_user = create :user
         membership1 = create :membership, user: other_user, user_group: public_user_group
         membership2 = create :membership, user: other_user, user_group: private_user_group
+        membership3 = create :membership, user_group: public_user_group, state: :inactive
 
         expect(scope.resolve(:index)).to include(membership1)
         expect(scope.resolve(:show)).to include(membership1)
+        expect(scope.resolve(:index)).not_to include(membership2)
+        expect(scope.resolve(:show)).not_to include(membership2)
+        expect(scope.resolve(:index)).not_to include(membership3)
+        expect(scope.resolve(:show)).not_to include(membership3)
       end
 
       it 'can see who are members of private groups they are in' do

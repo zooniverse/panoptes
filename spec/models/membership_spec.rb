@@ -16,61 +16,6 @@ describe Membership, :type => :model do
     end
   end
 
-  describe "::scope_for" do
-    let(:memberships) { [create(:membership, state: :active),
-                         create(:membership, state: :inactive),
-                         create(:membership, state: :invited)] }
-
-    let(:actor) { ApiUser.new(create(:user)) }
-
-    context ":show, :index" do
-      it 'should return all a users memberships' do
-        actor.user.memberships << memberships
-        actor.user.save!
-
-        expect(Membership.scope_for(:show, actor)).to match_array(memberships)
-      end
-
-      it 'should return all memberships in a group the user is member of' do
-        ug = create(:user_group, private: true)
-        ug.memberships << memberships
-        membership = ug.memberships.build(user: actor.user, state: :active)
-        ug.save!
-
-        memberships.push(membership)
-        expect(Membership.scope_for(:show, actor)).to match_array(memberships)
-      end
-
-      it 'should return all active memberships of public groups' do
-        ug = create(:user_group, private: false)
-        ug.memberships << memberships
-        ug.save!
-        expect(Membership.scope_for(:show, actor)).to match_array([memberships[0]])
-      end
-    end
-
-    context ":update, :destroy" do
-      it 'should return all memberships belonging to the user' do
-        actor.user.memberships << memberships
-        actor.user.save!
-
-        expect(Membership.scope_for(:update, actor)).to match_array(memberships)
-      end
-
-      it 'should return all memmbership belonging to a group the user administrates' do
-        ug = create(:user_group, private: true)
-        ug.memberships << memberships
-        membership = ug.memberships.build(user: actor.user,
-                                          state: :active,
-                                          roles: ["group_admin"])
-        ug.save!
-
-        memberships.push(membership)
-        expect(Membership.scope_for(:destroy, actor)).to match_array(memberships)
-      end
-    end
-  end
-
   describe "#user" do
     it "must have a user" do
       expect(build(:membership, user: nil)).to_not be_valid
