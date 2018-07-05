@@ -13,10 +13,5 @@ module Preferences
       validates_presence_of @preferences_for
       validates_uniqueness_of :user_id, scope: :"#{preference}_id"
     end
-
-    def scope_for(action, user, opts={})
-      return all if user.is_admin?
-      where(user_id: user.id)
-    end
   end
 end

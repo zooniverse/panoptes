@@ -15,7 +15,7 @@ RSpec.shared_examples "has preferences scope" do
   subject{ described_class.scope_for(action, user) }
 
   context "when action is index or show" do
-    let(:actions) { ["index", "show"] }
+    let(:actions) { [:index, :show] }
 
     it 'should return preferences for the acting user' do
       expect(subject).to include(preferences[0])
@@ -35,7 +35,7 @@ RSpec.shared_examples "has preferences scope" do
   end
 
   context "when action is update or destroy" do
-    let(:actions) { ["update", "destroy"] }
+    let(:actions) { [:update, :destroy] }
 
     it 'should only return the prefs for the acting user' do
       expect(subject).to match_array(preferences.slice(0,1))
