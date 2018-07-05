@@ -1,5 +1,6 @@
 class ProjectContent < ActiveRecord::Base
   include TranslatedContent
+  include RoleControl::PunditInterop
 
   validates_presence_of :title, :description, :language
   validates_length_of :title, maximum: 255
