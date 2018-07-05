@@ -1,5 +1,5 @@
 class Api::V1::TranslationsController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
   include PolymorphicResourceScope
 
   polymorphic_column :translated

@@ -13,7 +13,7 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
 
   controller(ApplicationController) do
     include JsonApiController::CheckResourcesExist
-    include JsonApiController::LegacyPolicy
+    include JsonApiController::PunditPolicy
 
     def api_user
       ApiUser.new(User.first)

@@ -1,5 +1,5 @@
 class Api::V1::SubjectWorkflowStatusesController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
 
   resource_actions :index, :show
 end

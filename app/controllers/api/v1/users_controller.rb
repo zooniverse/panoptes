@@ -1,5 +1,5 @@
 class Api::V1::UsersController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
   include Recents
   include IndexSearch
   include AdminAllowed
@@ -36,6 +36,8 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def me
+    skip_policy_scope
+
     if stale?(last_modified: current_resource_owner.updated_at)
       render json_api: serializer.resource({},
                                            resource_scope(current_resource_owner),

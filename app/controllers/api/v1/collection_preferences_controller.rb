@@ -1,5 +1,5 @@
 class Api::V1::CollectionPreferencesController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
   include PreferencesController
 
   require_authentication :all, scopes: [:collection]

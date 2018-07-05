@@ -1,5 +1,5 @@
 class Api::V1::CollectionsController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
   include FilterByOwner
   include FilterByCurrentUserRoles
   include IndexSearch

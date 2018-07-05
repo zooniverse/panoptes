@@ -1,6 +1,4 @@
 class ApiUser
-  include RoleControl::Actor
-
   attr_reader :user
 
   delegate :memberships_for, :owns?, :id, :languages, :user_groups,

@@ -23,7 +23,15 @@ module JsonApiController
         scope = scope.where(id: resource_ids)
       end
 
+      if add_active_scope && scope.respond_to?(:active)
+        scope = scope.active
+      end
+
       scope
+    end
+
+    def add_active_scope
+      true
     end
 
     def skip_policy_scope

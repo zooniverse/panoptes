@@ -1,5 +1,5 @@
 class Api::V1::MembershipsController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
 
   before_filter :require_login
   require_authentication :all, scopes: [:group]
@@ -20,7 +20,7 @@ class Api::V1::MembershipsController < Api::ApiController
 
   private
 
-  def policy_options
-    {add_active_resources_scope: false}
+  def add_active_scope
+    false
   end
 end
