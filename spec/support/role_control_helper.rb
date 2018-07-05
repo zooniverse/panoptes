@@ -18,11 +18,11 @@ def setup_role_control_tables
   unless const_defined?("ControlledTablePolicy")
     Object.const_set("ControlledTablePolicy",
                      Class.new(ApplicationPolicy) do
-                       indexScope = Class.new(ApplicationPolicy::Scope) do
+                       index_scope = Class.new(ApplicationPolicy::Scope) do
                          roles_for_private_scope %(admin)
                        end
 
-                       readScope = Class.new(ApplicationPolicy::Scope) do
+                       read_scope = Class.new(ApplicationPolicy::Scope) do
                          roles_for_private_scope %i(admin test_role)
 
                          def public_scope
@@ -30,13 +30,13 @@ def setup_role_control_tables
                          end
                        end
 
-                       writeScope = Class.new(ApplicationPolicy::Scope) do
+                       write_scope = Class.new(ApplicationPolicy::Scope) do
                          roles_for_private_scope %(test_role)
                        end
 
-                       scope :index, with: indexScope
-                       scope :read, :show, with: readScope
-                       scope :update, with: writeScope
+                       scope :index, with: index_scope
+                       scope :read, :show, with: read_scope
+                       scope :update, with: write_scope
                      end)
   end
 end
