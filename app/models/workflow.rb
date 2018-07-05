@@ -1,5 +1,4 @@
 class Workflow < ActiveRecord::Base
-  include RoleControl::PunditInterop
   include Activatable
   include Linkable
   include Translatable

@@ -1,5 +1,4 @@
 class Aggregation < ActiveRecord::Base
-  include RoleControl::PunditInterop
 
   belongs_to :workflow
   belongs_to :subject

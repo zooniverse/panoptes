@@ -1,5 +1,4 @@
 class Project < ActiveRecord::Base
-  include RoleControl::PunditInterop
   include RoleControl::Owned
   include Activatable
   include Linkable

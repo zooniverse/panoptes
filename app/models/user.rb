@@ -5,7 +5,6 @@ class User < ActiveRecord::Base
   include Linkable
   include PgSearch
   include ExtendedCacheKey
-  include RoleControl::PunditInterop
 
   ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/

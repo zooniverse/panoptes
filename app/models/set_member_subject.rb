@@ -1,7 +1,6 @@
 require 'subjects/set_member_subject_selector'
 
 class SetMemberSubject < ActiveRecord::Base
-  include RoleControl::PunditInterop
   include Linkable
 
   belongs_to :subject_set

@@ -1,5 +1,4 @@
 class Tutorial < ActiveRecord::Base
-  include RoleControl::PunditInterop
   include Linkable
 
   belongs_to :project

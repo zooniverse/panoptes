@@ -1,5 +1,4 @@
 class FieldGuide < ActiveRecord::Base
-  include RoleControl::PunditInterop
   include Linkable
   include LanguageValidation
 

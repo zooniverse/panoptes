@@ -1,6 +1,5 @@
 class UserProjectPreference < ActiveRecord::Base
   include Preferences
-  include RoleControl::PunditInterop
 
   preferences_for :project
 

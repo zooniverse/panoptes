@@ -1,7 +1,6 @@
 class SubjectWorkflowStatus < ActiveRecord::Base
   self.table_name = 'subject_workflow_counts'
 
-  include RoleControl::PunditInterop
 
   belongs_to :subject
   belongs_to :workflow

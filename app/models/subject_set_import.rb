@@ -1,5 +1,4 @@
 class SubjectSetImport < ActiveRecord::Base
-  include RoleControl::PunditInterop
 
   belongs_to :subject_set
   belongs_to :user

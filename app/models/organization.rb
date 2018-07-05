@@ -1,6 +1,5 @@
 class Organization < ActiveRecord::Base
   include RoleControl::Owned
-  include RoleControl::PunditInterop
   include Activatable
   include Linkable
   include SluggedName

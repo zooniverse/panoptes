@@ -1,5 +1,4 @@
 class UserGroup < ActiveRecord::Base
-  include RoleControl::PunditInterop
   include Activatable
   include Linkable
   include PgSearch

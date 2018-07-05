@@ -1,7 +1,6 @@
 class WorkflowContent < ActiveRecord::Base
   include TranslatedContent
   include CacheModelVersion
-  include RoleControl::PunditInterop
 
   validates_presence_of :language
   validate :validate_strings

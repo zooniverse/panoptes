@@ -1,5 +1,4 @@
 class Subject < ActiveRecord::Base
-  include RoleControl::PunditInterop
   include Linkable
   include Activatable
   include OrderedLocations

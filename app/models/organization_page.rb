@@ -1,5 +1,4 @@
 class OrganizationPage < ActiveRecord::Base
-  include RoleControl::PunditInterop
   include Linkable
   include LanguageValidation
 

@@ -1,5 +1,4 @@
 class Classification < ActiveRecord::Base
-  include RoleControl::PunditInterop
 
   class MissingParameter < StandardError; end
 
