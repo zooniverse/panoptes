@@ -1,7 +1,4 @@
 class UserGroupPolicy < ApplicationPolicy
-  # The old can_by_role scopes used to take into accuont a `project_editor` and `collection_editor`.
-  # Neither of these exist in the database, and therefore these are no longer included now.
-
   class Scope < Scope
     def private_query(action, roles)
       scope.joins(:memberships).merge(user.memberships_for(action, model))
