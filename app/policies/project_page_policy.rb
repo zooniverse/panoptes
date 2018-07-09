@@ -15,4 +15,8 @@ class ProjectPagePolicy < ApplicationPolicy
 
   scope :index, :show, with: Scope
   scope :update, :destroy, :update_links, :destroy_links, :versions, :version, with: TranslateScope
+
+  def linkable_projects
+    policy_for(Project).scope_for(:update)
+  end
 end

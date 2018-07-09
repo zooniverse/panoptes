@@ -33,4 +33,16 @@ class ClassificationPolicy < ApplicationPolicy
   scope :show, with: ShowScope
   scope :project, with: ProjectScope
   scope :update, :destroy, :incomplete, with: IncompleteScope
+
+  def linkable_projects
+    policy_for(Project).scope_for(:show)
+  end
+
+  def linkable_workflows
+    policy_for(Workflow).scope_for(:show)
+  end
+
+  def linkable_subjects
+    policy_for(Subject).scope_for(:show)
+  end
 end

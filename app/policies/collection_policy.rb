@@ -18,4 +18,24 @@ class CollectionPolicy < ApplicationPolicy
   scope :index, :show, with: ReadScope
   scope :update, :destroy, :destroy_links, with: WriteScope
   scope :update_links, with: ContributorScope
+
+  def linkable_subjects
+    policy_for(Subject).scope_for(:show)
+  end
+
+  def linkable_default_subjects
+    linkable_subjects
+  end
+
+  def linkable_projects
+    policy_for(Project).scope_for(:show)
+  end
+
+  def linkable_owners
+    [user]
+  end
+
+  def linkable_user_collection_preferences
+    policy_for(UserCollectionPreference).scope_for(:show)
+  end
 end

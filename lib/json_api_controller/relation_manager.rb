@@ -31,16 +31,18 @@ module JsonApiController
 
     def find_for_string_type(resource, type, id)
       relation_find(id) do
-        type.camelize
-          .singularize
-          .constantize
-          .link_to_resource(resource, api_user)
+        #type.camelize
+          #.singularize
+          #.constantize
+          #.link_to_resource(resource, api_user)
+        Pundit.policy!(api_user, resource).linkable_for(type)
       end
     end
 
     def new_items(resource, relation, value, *args)
       relation_find(value) do
-        assoc_class(relation).link_to_resource(resource, api_user, *args)
+        # assoc_class(relation).link_to_resource(resource, api_user, *args)
+        Pundit.policy!(api_user, resource).linkable_for(relation)
       end
     end
 

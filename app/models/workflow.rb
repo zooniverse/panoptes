@@ -49,7 +49,7 @@ class Workflow < ActiveRecord::Base
   validate :retirement_config
 
   can_be_linked :subject_set, :same_project?, :model
-  can_be_linked :aggregation, :scope_for, :update, :user
+  #can_be_linked :aggregation, :scope_for, :update, :user
 
   ranks :display_order, with_same: :project_id
 

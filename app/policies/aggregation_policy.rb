@@ -21,6 +21,11 @@ class AggregationPolicy < ApplicationPolicy
   scope :index, :show, with: ReadScope
   scope :update, :destroy, :update_links, :destroy_links, :versions, :version, with: WriteScope
 
-  link_with :subjects, scope: SubjectPolicy::Scope, model: Subject, action: :show
-  link_with :workflow, scope: WorkflowPolicy::Scope, model: Workflow, action: :update
+  def linkable_subjects
+    policy_for(Subject).scope_for(:show)
+  end
+
+  def linkable_workflows
+    policy_for(Workflow).scope_for(:update)
+  end
 end

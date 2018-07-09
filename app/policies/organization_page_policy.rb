@@ -15,4 +15,8 @@ class OrganizationPagePolicy < ApplicationPolicy
 
   scope :index, :show, with: Scope
   scope :update, :destroy, :update_links, :destroy_links, :versions, :version, with: TranslateScope
+
+  def linkable_organizations
+    policy_for(Organization).scope_for(:update)
+  end
 end

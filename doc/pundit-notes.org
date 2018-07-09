@@ -96,7 +96,7 @@ project_content (via Translatable, can_be_linked, scope_for :translate)
 
 ** ProjectContents
 *** Create strongparams
-project
+project !!! SECURITY
 
 ** Project Preference
 *** Create schema:

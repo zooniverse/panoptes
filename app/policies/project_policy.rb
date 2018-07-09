@@ -23,4 +23,19 @@ class ProjectPolicy < ApplicationPolicy
         :create_workflow_contents_export,
         :retire_subjects, with: WriteScope
   scope :translate, with: TranslateScope
+
+  def linkable_subject_sets
+    # We return all visible sets here, but those that don't belong to this
+    # resource will get cloned when linked.
+    policy_for(SubjectSet).scope_for(:show)
+  end
+
+  def linkable_workflows
+    # We return all visible workflows here, but those that don't belong to this
+    # resource will get cloned when linked.
+    policy_for(Workflow).scope_for(:show)
+  end
+
+  def linkable_user_groups
+  end
 end

@@ -18,4 +18,8 @@ class OrganizationPolicy < ApplicationPolicy
   scope :index, :show, :versions, :version, with: ReadScope
   scope :update, :update_links, :destroy, :destroy_links, with: WriteScope
   scope :translate, with: TranslateScope
+
+  def linkable_projects
+    policy_for(Project).scope_for(:update)
+  end
 end

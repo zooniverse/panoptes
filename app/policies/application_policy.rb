@@ -16,17 +16,16 @@ class ApplicationPolicy
     end
   end
 
-  def self.link_with(relation, scope:, model:, action:)
-    @links ||= {}
-    @links[relation] = {scope: scope, model: model, action: action}
-  end
-
   def self.scopes_by_action
     @scopes_by_action || {}
   end
 
   def self.links
     @links || {}
+  end
+
+  def policy_for(model)
+    Pundit.policy!(user, model)
   end
 
   def scope_klass_for(action)
@@ -48,13 +47,7 @@ class ApplicationPolicy
   end
 
   def linkable_for(relation)
-    options = self.class.links[relation]
-
-    if options
-      options[:scope].new(user, options[:model]).resolve(options[:action])
-    else
-      raise UnknownLink, "Link #{relation} not defined for #{record}"
-    end
+    public_send("linkable_#{relation.to_s.pluralize}")
   end
 
   class Scope
