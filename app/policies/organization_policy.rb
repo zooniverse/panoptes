@@ -20,6 +20,8 @@ class OrganizationPolicy < ApplicationPolicy
   scope :translate, with: TranslateScope
 
   def linkable_projects
-    policy_for(Project).scope_for(:update)
+    # TODO: Is this really right? This lets me stick any
+    # project in my organization. What if they don't want to?
+    policy_for(Project).scope_for(:show)
   end
 end

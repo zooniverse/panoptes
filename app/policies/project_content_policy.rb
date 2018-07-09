@@ -19,6 +19,6 @@ class ProjectContentPolicy < ApplicationPolicy
   scope :update, :destroy, with: WriteScope
 
   def linkable_projects
-    policy_for(Project).scope_for(:update)
+    policy_for(Project).scope_for(:translate)
   end
 end

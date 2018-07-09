@@ -31,10 +31,6 @@ class CollectionPolicy < ApplicationPolicy
     policy_for(Project).scope_for(:show)
   end
 
-  def linkable_owners
-    [user]
-  end
-
   def linkable_user_collection_preferences
     policy_for(UserCollectionPreference).scope_for(:show)
   end

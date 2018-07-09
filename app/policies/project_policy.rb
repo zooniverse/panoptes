@@ -36,6 +36,12 @@ class ProjectPolicy < ApplicationPolicy
     policy_for(Workflow).scope_for(:show)
   end
 
+  def linkable_users
+    policy_for(User).scope_for(:update)
+  end
+
   def linkable_user_groups
+    # TODO Surely this isn't right?
+    policy_for(UserGroup).scope_for(:show)
   end
 end

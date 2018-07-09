@@ -19,6 +19,6 @@ class OrganizationContentPolicy < ApplicationPolicy
   scope :update, :destroy, with: WriteScope
 
   def linkable_organizations
-    policy_for(Organization).scope_for(:update)
+    policy_for(Organization).scope_for(:translate)
   end
 end

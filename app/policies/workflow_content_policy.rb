@@ -19,6 +19,6 @@ class WorkflowContentPolicy < ApplicationPolicy
   scope :update, :destroy, with: WriteScope
 
   def linkable_workflows
-    policy_for(Workflow).scope_for(:update)
+    policy_for(Workflow).scope_for(:translate)
   end
 end
