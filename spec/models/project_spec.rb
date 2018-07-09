@@ -78,30 +78,6 @@ describe Project, type: :model do
     end
   end
 
-  describe "links" do
-    let(:user) { ApiUser.new(create(:user)) }
-
-    it "should allow workflows to link when user has update permissions" do
-      expect(Project).to link_to(Workflow).given_args(user)
-                          .with_scope(:scope_for, :update, user)
-    end
-
-    it "should allow subject_sets to link when user has update permissions" do
-      expect(Project).to link_to(SubjectSet).given_args(user)
-                          .with_scope(:scope_for, :update, user)
-    end
-
-    it "should allow subjects to link when user has update permissions" do
-      expect(Project).to link_to(Subject).given_args(user)
-                          .with_scope(:scope_for, :update, user)
-    end
-
-    it "should allow collections to link user has show permissions" do
-      expect(Project).to link_to(Collection).given_args(user)
-                          .with_scope(:scope_for, :show, user)
-    end
-  end
-
   describe "#live" do
     before(:each) do
       project.update_attributes(live: nil)
