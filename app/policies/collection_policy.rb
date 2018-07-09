@@ -34,4 +34,8 @@ class CollectionPolicy < ApplicationPolicy
   def linkable_user_collection_preferences
     policy_for(UserCollectionPreference).scope_for(:show)
   end
+
+  def linkable_user_groups
+    policy_for(UserGroup).scope_for(:show)
+  end
 end
