@@ -1,7 +1,6 @@
 class Collection < ActiveRecord::Base
   include RoleControl::Owned
   include Activatable
-  include PreferencesLink
   include PgSearch
   include SluggedName
 
@@ -18,9 +17,6 @@ class Collection < ActiveRecord::Base
   validates :private, inclusion: { in: [true, false], message: "can't be blank" }
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
-
-
-  preferences_model :user_collection_preference
 
   pg_search_scope :search_display_name,
     against: :display_name,
