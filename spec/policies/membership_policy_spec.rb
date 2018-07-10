@@ -92,4 +92,15 @@ describe MembershipPolicy do
       end
     end
   end
+
+  describe "links" do
+    let(:user) { create :user }
+    let(:api_user) { ApiUser.new(user) }
+    let(:membership) { build :membership, user: nil }
+    let(:policy) { described_class.new(api_user, membership) }
+
+    it "should allow membership links to any user" do
+      expect(policy.linkable_users).to match_array(user)
+    end
+  end
 end

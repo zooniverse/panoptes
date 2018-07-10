@@ -18,16 +18,6 @@ describe User, type: :model do
     end
   end
 
-  describe "links" do
-    it "should allow membership links to any user" do
-      expect(User).to link_to(Membership).with_scope(:all)
-    end
-
-    it "should allow user_gruop links to any user" do
-      expect(User).to link_to(UserGroup).with_scope(:all)
-    end
-  end
-
   describe '::from_omniauth' do
     let(:auth_hash) { OmniAuth.config.mock_auth[:facebook] }
 
