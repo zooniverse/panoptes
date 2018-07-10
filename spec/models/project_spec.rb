@@ -136,7 +136,7 @@ describe Project, type: :model do
   describe "#live_subject_sets" do
     let(:project) { full_project }
     let!(:unlinked_subject_set) do
-      create(:subject_set, project: project)
+      create(:subject_set, project: project, num_workflows: 0)
     end
 
     it "should have many subject_sets" do
