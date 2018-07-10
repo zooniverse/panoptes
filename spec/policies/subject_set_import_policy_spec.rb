@@ -49,4 +49,18 @@ describe SubjectSetImportPolicy do
       end
     end
   end
+
+  describe 'links' do
+    let(:resource_owner) { create :user }
+    let(:project) { create :project, owner: resource_owner }
+    let(:subject_set) { create :subject_set, project: project }
+    let(:subject_set_import) { build :subject_set_import, subject_set: subject_set, user: resource_owner }
+    let(:api_user) { ApiUser.new(resource_owner) }
+    let(:policy) { SubjectSetImportPolicy.new(api_user, subject_set_import) }
+
+    it 'links to subject sets of projects the user is a collaborator of' do
+      create :subject_set # not owned
+      expect(policy.linkable_subject_sets).to match_array([subject_set])
+    end
+  end
 end
