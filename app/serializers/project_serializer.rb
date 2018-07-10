@@ -8,7 +8,7 @@ class ProjectSerializer
   include CachedSerializer
 
   PRELOADS = [
-    # :project_contents, Note: re-add when the eager_load from translatable_resources is removed
+    :project_contents,
     :workflows,
     :active_workflows,
     :subject_sets,
