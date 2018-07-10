@@ -1,6 +1,5 @@
 class ApplicationPolicy
   class UnknownAction < StandardError; end
-  class UnknownLink < StandardError; end
 
   attr_reader :user, :record
 
@@ -18,10 +17,6 @@ class ApplicationPolicy
 
   def self.scopes_by_action
     @scopes_by_action || {}
-  end
-
-  def self.links
-    @links || {}
   end
 
   def policy_for(model)
