@@ -10,7 +10,7 @@ module JSONApiRender
 
       if !Rails.env.production? && options[:add_http_cache] == "true"
         http_cacheable = HttpCacheable.new(controlled_resources)
-        if http_cacheable.public_resources?
+        if http_cacheable.cacheable?
           self.headers["Cache-Control"] = http_cacheable.resource_cache_directive
         end
       end

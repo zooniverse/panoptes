@@ -9,31 +9,19 @@ class HttpCacheable
     @resource_symbol = resource_class.model_name.plural.to_sym
   end
 
-  def public_resources?
+  def cacheable?
     return false unless cacheable_resource?
-    !controlled_resources_any_private?
+    !any_private_resources?
   end
 
   def resource_cache_directive
+    return unless cacheable?
+
     @resource_cache_directive ||=
-      if CACHEABLE_RESOURCES.include?(resource_symbol)
-        "#{public_private_directive} max-age: #{max_age_directive}"
-      end
+      "#{public_private_directive} max-age: #{max_age_directive}"
   end
 
   private
-
-  def any_private_parent_resources?
-    parent_fk_scope = controlled_resources.select(
-      resource_class.parent_foreign_key
-    )
-
-    resource_class
-      .parent_class
-      .private_scope
-      .where(id: parent_fk_scope)
-      .exists?
-  end
 
   def any_private_resources?
     controlled_resources.private_scope.exists?
@@ -53,14 +41,7 @@ class HttpCacheable
   end
 
   def cacheable_resource?
-    Panoptes.flipper[:http_caching].enabled? && !!resource_cache_directive
-  end
-
-  def controlled_resources_any_private?
-    if resource_class.respond_to?(:parent_class)
-      any_private_parent_resources?
-    else
-      any_private_resources?
-    end
+    Panoptes.flipper[:http_caching].enabled? &&
+      CACHEABLE_RESOURCES.include?(resource_symbol)
   end
 end
