@@ -252,4 +252,24 @@ namespace :migrate do
       end
     end
   end
+
+  namespace :user_seen_subjects do
+    desc "Merge USS for the same user/workflow"
+    task :merge_duplicates => :environment do
+      UserSeenSubject.select("user_id, workflow_id").group("user_id, workflow_id").having("COUNT(*) > 1").each do |duplicate|
+        user_seen_subjects = UserSeenSubject.where(user_id: duplicate.user_id, workflow_id: duplicate.workflow_id)
+        target = user_seen_subjects[0]
+        dupes = user_seen_subjects[1..-1]
+
+        dupes.each do |dupe|
+          UserSeenSubject.transaction do
+            target.reload
+            target.subject_ids = target.subject_ids | dupe.subject_ids
+            target.save!
+            dupe.destroy
+          end
+        end
+      end
+    end
+  end
 end
