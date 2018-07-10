@@ -1,5 +1,4 @@
 class Tutorial < ActiveRecord::Base
-  include Linkable
 
   belongs_to :project
   has_many :workflow_tutorials

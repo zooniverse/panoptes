@@ -1,7 +1,6 @@
 class Collection < ActiveRecord::Base
   include RoleControl::Owned
   include Activatable
-  include Linkable
   include PreferencesLink
   include PgSearch
   include SluggedName
@@ -20,7 +19,6 @@ class Collection < ActiveRecord::Base
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
-  can_be_linked :access_control_list, :scope_for, :update, :user
 
   preferences_model :user_collection_preference
 

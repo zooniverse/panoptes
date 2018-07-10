@@ -1,7 +1,6 @@
 class Organization < ActiveRecord::Base
   include RoleControl::Owned
   include Activatable
-  include Linkable
   include SluggedName
   include Translatable
 
@@ -21,8 +20,6 @@ class Organization < ActiveRecord::Base
 
   accepts_nested_attributes_for :organization_contents
 
-  can_be_linked :project, :scope_for, :update, :user
-  can_be_linked :access_control_list, :scope_for, :update, :user
 
   def retired_subjects_count
     projects.joins(:active_workflows).sum("workflows.retired_set_member_subjects_count")
