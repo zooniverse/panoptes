@@ -21,7 +21,7 @@ class ApplicationPolicy
     @scopes_by_action || {}
   end
 
-  def scope_klass_for action
+  def scope_klass_for(action)
     scope_klass = self.class.scopes_by_action[action]
     if scope_klass.present?
       scope_klass

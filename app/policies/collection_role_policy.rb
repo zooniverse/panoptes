@@ -16,4 +16,3 @@ class CollectionRolePolicy < ApplicationPolicy
 
   scope :index, :show, :update, :destroy, with: Scope
 end
-
