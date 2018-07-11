@@ -263,9 +263,8 @@ namespace :migrate do
 
         dupes.each do |dupe|
           UserSeenSubject.transaction do
-            target.reload
-            target.subject_ids = target.subject_ids | dupe.subject_ids
-            target.save!
+            UserSeenSubject.where(id: target.id)
+              .update_all(["subject_ids = uniq(subject_ids + array[?])", dupe.subject_ids])
             dupe.destroy
           end
         end
