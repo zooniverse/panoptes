@@ -30,6 +30,10 @@ class Api::V1::ClassificationsController < Api::ApiController
     resources = Pundit.policy!(api_user, GoldStandardAnnotation).scope_for(:index)
     resources = resources.where(workflow_id: params[:workflow_id]) if params[:workflow_id]
 
+    if resource_ids.present?
+      resources = resources.where(id: resource_ids)
+    end
+
     gold_standard_page = GoldStandardAnnotationSerializer.page(
       params,
       resources,
