@@ -7,7 +7,8 @@ class MembershipPolicy < ApplicationPolicy
       # Get the roles that are allowed to see groups for the current action
       roles = UserGroupPolicy.new(user, UserGroup).scope_klass_for(action).roles
 
-      # Find all of the groups that we would be able to perform the current action on
+      # Find all of the groups the current user is a member of, where their
+      # membership role is one of the roles allowed for the action, as loaded above
       accessible_group_ids = user.user_groups.where("memberships.roles && ARRAY[?]::varchar[]", roles).select(:id)
 
       memberships_for_my_groups = scope.where(identity: false, user_group_id: accessible_group_ids)
