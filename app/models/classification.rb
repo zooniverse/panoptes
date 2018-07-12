@@ -1,7 +1,4 @@
 class Classification < ActiveRecord::Base
-
-  class MissingParameter < StandardError; end
-
   belongs_to :project
   belongs_to :user
   belongs_to :workflow

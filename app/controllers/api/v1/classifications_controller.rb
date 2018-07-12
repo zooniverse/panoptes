@@ -3,6 +3,9 @@ require 'classification_lifecycle'
 class Api::V1::ClassificationsController < Api::ApiController
   include JsonApiController::PunditPolicy
 
+  class MissingParameter < StandardError; end
+
+
   skip_before_filter :require_login, only: :create
   require_authentication :show, :index, :destroy, :update, :incomplete, :project,
     scopes: [:classification]
@@ -12,6 +15,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   schema_type :json_schema
 
   rescue_from JsonApiController::AccessDenied, with: :access_denied
+  rescue_from MissingParameter, with: :unprocessable_entity
 
   before_action :filter_plural_subject_ids,
     only: [ :index, :gold_standard, :incomplete, :project ]
@@ -48,7 +52,7 @@ class Api::V1::ClassificationsController < Api::ApiController
 
   def project
     if params[:last_id] && !params[:project_id]
-      raise Classification::MissingParameter.new("Project ID required if last_id is included")
+      raise MissingParameter.new("Project ID required if last_id is included")
     end
 
     resources = controlled_resources
