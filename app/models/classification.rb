@@ -1,6 +1,4 @@
 class Classification < ActiveRecord::Base
-  class MissingParameter < StandardError; end
-
   belongs_to :project
   belongs_to :user
   belongs_to :workflow
@@ -32,77 +30,12 @@ class Classification < ActiveRecord::Base
     .order("classifications.id")
   }
 
-  def self.scope_for(action, user, opts={})
-    if user.is_admin? && action != :gold_standard
-      return all
-    end
-
-    scope = case action
-    when :index
-      complete.merge(created_by(user))
-    when :show
-      created_by(user)
-    when :update, :destroy
-      incomplete_for_user(user)
-    when :incomplete
-      incomplete_for_user(user)
-    when :project
-      classifications_for_project(user, opts)
-    when :gold_standard
-      gold_standard_for_user(user, opts)
-    else
-      none
-    end
-
-    # Tested on prod all projects table scan:
-    # "Seq Scan on public.projects  (cost=0.00..1097.20 rows=6 width=4) (actual time=16.918..16.918 rows=0 loops=1)"
-    # "  Output: id"
-    # "  Filter: (projects.configuration ? 'keep_data_in_panoptes_only'::text)"
-    # "  Rows Removed by Filter: 5776"
-    # "Planning time: 0.101 ms"
-    # "Execution time: 23.301 ms
-
-    # this seems to add a small overhead to the query, it should be
-    # removed once the panoptes only data project has finished
-    forbidden_project_ids = Project.where("configuration ? 'keep_data_in_panoptes_only'").select(:id)
-    exportable_scope = scope.where.not(project_id: forbidden_project_ids)
-  end
-
   def self.joins_classification_subjects
     joins("INNER JOIN classification_subjects ON classifications.id = classification_subjects.classification_id")
   end
 
   def self.incomplete_for_user(user)
     incomplete.merge(created_by(user))
-  end
-
-  def self.gold_standard_for_user(user, opts)
-    return GoldStandardAnnotation.all if user.is_admin?
-
-    public_workflows = Workflow.where("public_gold_standard IS TRUE")
-    if opts[:workflow_id]
-      public_workflows = public_workflows.where(id: opts[:workflow_id])
-    end
-    public_workflow_ids = public_workflows.select(:id)
-    GoldStandardAnnotation
-      .where(workflow_id: public_workflow_ids)
-      .order(id: :asc)
-  end
-
-  def self.classifications_for_project(user, opts)
-    if opts[:last_id] && !opts[:project_id]
-      raise Classification::MissingParameter.new("Project ID required if last_id is included")
-    end
-    user_project_ids = user_projects(user,opts).select(:id)
-    scope = where(project_id: user_project_ids)
-    scope = scope.after_id(opts[:last_id]) if opts[:last_id]
-    scope
-  end
-
-  def self.user_projects(user, opts)
-    projects = Project.scope_for(:update, user)
-    projects = projects.where(id: opts[:project_id]) if opts[:project_id]
-    projects
   end
 
   def created_and_incomplete?(actor)

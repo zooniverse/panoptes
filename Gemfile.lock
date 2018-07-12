@@ -349,6 +349,9 @@ GEM
     rspec-expectations (3.7.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.7.0)
+    rspec-its (1.2.0)
+      rspec-core (>= 3.0.0)
+      rspec-expectations (>= 3.0.0)
     rspec-mocks (3.7.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.7.0)
@@ -493,6 +496,7 @@ DEPENDENCIES
   ranked-model (~> 0.4.0)
   restpack_serializer!
   rspec
+  rspec-its
   rspec-rails
   schema_plus_pg_indexes (~> 0.1)
   scientist (~> 1.1.2)

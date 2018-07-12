@@ -1,5 +1,5 @@
 class Api::V1::UserGroupsController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
   include Recents
   include IndexSearch
 

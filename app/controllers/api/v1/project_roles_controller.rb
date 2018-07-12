@@ -1,5 +1,5 @@
 class Api::V1::ProjectRolesController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
   include RolesController
 
   require_authentication :create, :update, :destroy, scopes: [:project]

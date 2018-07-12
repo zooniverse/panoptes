@@ -9,172 +9,152 @@ describe OrganizationPolicy do
     let(:listed_organization) { build(:organization, listed_at: Time.now, owner: resource_owner) }
     let(:unlisted_organization) { build(:unlisted_organization, owner: resource_owner) }
 
-    describe 'index, show, versions, version' do
-      let(:resolved_scope) do
-        Pundit.policy!(api_user, Organization).scope_for(:index)
-      end
+    before do
+      listed_organization.save!
+      unlisted_organization.save!
 
-      context 'for an anonymous user' do
-        let(:api_user) { ApiUser.new(anonymous_user) }
-
-        it "includes listed organizations" do
-          listed_organization.save!
-          expect(resolved_scope).to include(listed_organization)
-        end
-
-        it 'should not include private resources' do
-          unlisted_organization.save!
-          expect(resolved_scope).not_to include(unlisted_organization)
-        end
-      end
-
-      context 'for a normal user' do
-        let(:api_user) { ApiUser.new(logged_in_user) }
-
-        it "includes listed organizations" do
-          listed_organization.save!
-          expect(resolved_scope).to include(listed_organization)
-        end
-
-        it 'should not include private resources' do
-          unlisted_organization.save!
-          expect(resolved_scope).not_to include(unlisted_organization)
-        end
-      end
-
-      context 'for the resource owner' do
-        let(:api_user) { ApiUser.new(resource_owner) }
-
-        it "includes listed organizations" do
-          listed_organization.save!
-          expect(resolved_scope).to include(listed_organization)
-        end
-
-        it 'includes owned resources' do
-          unlisted_organization.save!
-          expect(resolved_scope).to include(unlisted_organization)
-        end
-      end
-
-      context 'for an admin' do
-        let(:admin_user) { create :user, admin: true }
-        let(:api_user) { ApiUser.new(admin_user, admin: true) }
-
-        it 'should include the non-visible resource' do
-          listed_organization.save!
-          unlisted_organization.save!
-          expect(resolved_scope).to include(listed_organization, unlisted_organization)
-        end
-      end
+      create :unlisted_organization # Should never be seen by anyone
     end
 
-    describe 'update, destroy, update_links, destroy_links' do
-      let(:resolved_scope) do
-        Pundit.policy!(api_user, Organization).scope_for(:update)
-      end
-
-      context 'for an anonymous user' do
-        let(:api_user) { ApiUser.new(anonymous_user) }
-
-        it "includes nothing" do
-          listed_organization.save!
-          unlisted_organization.save!
-          expect(resolved_scope).to be_empty
-        end
-      end
-
-      context 'for a normal user' do
-        let(:api_user) { ApiUser.new(logged_in_user) }
-
-        it "includes nothing" do
-          listed_organization.save!
-          unlisted_organization.save!
-          expect(resolved_scope).to be_empty
-        end
-      end
-
-      context 'for the resource owner' do
-        let(:api_user) { ApiUser.new(resource_owner) }
-
-        it "includes owned organizations" do
-          listed_organization.save!
-          unlisted_organization.save!
-          expect(resolved_scope).to include(listed_organization, unlisted_organization)
-        end
-      end
-
-      context 'for an admin' do
-        let(:admin_user) { create :user, admin: true }
-        let(:api_user) { ApiUser.new(admin_user, admin: true) }
-
-        it 'includes all organizations' do
-          listed_organization.save!
-          unlisted_organization.save!
-          expect(resolved_scope).to include(listed_organization, unlisted_organization)
-        end
-      end
+    subject do
+      PunditScopeTester.new(Organization, api_user)
     end
 
-    describe 'translate' do
-      let(:resolved_scope) do
-        Pundit.policy!(api_user, Organization).scope_for(:translate)
+    context 'as an anonymous user' do
+      let(:api_user) { ApiUser.new(anonymous_user) }
+
+      its(:index) { is_expected.to match_array(listed_organization) }
+      its(:show) { is_expected.to match_array(listed_organization) }
+      its(:update) { is_expected.to be_empty }
+      its(:destroy) { is_expected.to be_empty }
+      its(:update_links) { is_expected.to be_empty }
+      its(:destroy_links) { is_expected.to be_empty }
+      its(:versions) { is_expected.to match_array(listed_organization) }
+      its(:version) { is_expected.to match_array(listed_organization) }
+      its(:translate) { is_expected.to be_empty }
+    end
+
+    context 'as a normal user' do
+      let(:api_user) { ApiUser.new(logged_in_user) }
+
+      its(:index) { is_expected.to match_array(listed_organization) }
+      its(:show) { is_expected.to match_array(listed_organization) }
+      its(:update) { is_expected.to be_empty }
+      its(:destroy) { is_expected.to be_empty }
+      its(:update_links) { is_expected.to be_empty }
+      its(:destroy_links) { is_expected.to be_empty }
+      its(:versions) { is_expected.to match_array(listed_organization) }
+      its(:version) { is_expected.to match_array(listed_organization) }
+      its(:translate) { is_expected.to be_empty }
+    end
+
+    context 'as a tester' do
+      let(:api_user) { ApiUser.new(logged_in_user) }
+
+      before do
+        create :access_control_list, user_group: logged_in_user.identity_group, resource: listed_organization, roles: ['tester']
+        create :access_control_list, user_group: logged_in_user.identity_group, resource: unlisted_organization, roles: ['tester']
       end
 
-      context 'for an anonymous user' do
-        let(:api_user) { ApiUser.new(anonymous_user) }
+      its(:index) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:show) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:update) { is_expected.to be_empty }
+      its(:destroy) { is_expected.to be_empty }
+      its(:update_links) { is_expected.to be_empty }
+      its(:destroy_links) { is_expected.to be_empty }
+      its(:versions) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:version) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:translate) { is_expected.to be_empty }
+    end
 
-        it "includes nothing" do
-          listed_organization.save!
-          unlisted_organization.save!
-          expect(resolved_scope).to be_empty
-        end
+    context 'as a translator' do
+      let(:api_user) { ApiUser.new(logged_in_user) }
+
+      before do
+        create :access_control_list, user_group: logged_in_user.identity_group, resource: listed_organization, roles: ['translator']
+        create :access_control_list, user_group: logged_in_user.identity_group, resource: unlisted_organization, roles: ['translator']
       end
 
-      context 'for a normal user' do
-        let(:api_user) { ApiUser.new(logged_in_user) }
+      its(:index) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:show) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:update) { is_expected.to be_empty }
+      its(:destroy) { is_expected.to be_empty }
+      its(:update_links) { is_expected.to be_empty }
+      its(:destroy_links) { is_expected.to be_empty }
+      its(:versions) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:version) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:translate) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+    end
 
-        it "includes nothing" do
-          listed_organization.save!
-          unlisted_organization.save!
-          expect(resolved_scope).to be_empty
-        end
+    context 'as a scientist' do
+      let(:api_user) { ApiUser.new(logged_in_user) }
+
+      before do
+        create :access_control_list, user_group: logged_in_user.identity_group, resource: listed_organization, roles: ['scientist']
+        create :access_control_list, user_group: logged_in_user.identity_group, resource: unlisted_organization, roles: ['scientist']
       end
 
-      context 'for the resource owner' do
-        let(:api_user) { ApiUser.new(resource_owner) }
+      its(:index) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:show) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:update) { is_expected.to be_empty }
+      its(:destroy) { is_expected.to be_empty }
+      its(:update_links) { is_expected.to be_empty }
+      its(:destroy_links) { is_expected.to be_empty }
+      its(:versions) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:version) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:translate) { is_expected.to be_empty }
+    end
 
-        it "includes owned organizations" do
-          listed_organization.save!
-          unlisted_organization.save!
-          expect(resolved_scope).to include(listed_organization, unlisted_organization)
-        end
+    context 'as a moderator' do
+      let(:api_user) { ApiUser.new(logged_in_user) }
+
+      before do
+        create :access_control_list, user_group: logged_in_user.identity_group, resource: listed_organization, roles: ['moderator']
+        create :access_control_list, user_group: logged_in_user.identity_group, resource: unlisted_organization, roles: ['moderator']
       end
 
-      context 'for a translator' do
-        let(:translator) { create(:user) }
-        let(:api_user) { ApiUser.new(translator) }
+      its(:index) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:show) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:update) { is_expected.to be_empty }
+      its(:destroy) { is_expected.to be_empty }
+      its(:update_links) { is_expected.to be_empty }
+      its(:destroy_links) { is_expected.to be_empty }
+      its(:versions) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:version) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:translate) { is_expected.to be_empty }
+    end
 
-        it "includes owned organizations" do
-          listed_organization.save!
-          unlisted_organization.save!
+    context 'as a collaborator' do
+      let(:api_user) { ApiUser.new(logged_in_user) }
 
-          create :access_control_list, user_group: translator.identity_group, resource: listed_organization, roles: ['translator']
-          create :access_control_list, user_group: translator.identity_group, resource: unlisted_organization, roles: ['translator']
-
-          expect(resolved_scope).to include(listed_organization, unlisted_organization)
-        end
+      before do
+        create :access_control_list, user_group: logged_in_user.identity_group, resource: listed_organization, roles: ['collaborator']
+        create :access_control_list, user_group: logged_in_user.identity_group, resource: unlisted_organization, roles: ['collaborator']
       end
 
-      context 'for an admin' do
-        let(:admin_user) { create :user, admin: true }
-        let(:api_user) { ApiUser.new(admin_user, admin: true) }
+      its(:index) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:show) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:update) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:destroy) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:update_links) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:destroy_links) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:versions) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:version) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:translate) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+    end
 
-        it 'includes all organizations' do
-          listed_organization.save!
-          unlisted_organization.save!
-          expect(resolved_scope).to include(listed_organization, unlisted_organization)
-        end
-      end
+    context 'as the owner' do
+      let(:api_user) { ApiUser.new(resource_owner) }
+
+      its(:index) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:show) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:update) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:destroy) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:update_links) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:destroy_links) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:versions) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:version) { is_expected.to match_array([listed_organization, unlisted_organization]) }
+      its(:translate) { is_expected.to match_array([listed_organization, unlisted_organization]) }
     end
   end
 end

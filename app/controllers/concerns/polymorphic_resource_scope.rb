@@ -109,11 +109,16 @@ module PolymorphicResourceScope
   end
 
   def find_controlled_resources(controlled_class, controlled_ids, action=controlled_scope)
-    api_user.scope(klass: controlled_class,
-                   action: action,
-                   ids: controlled_ids,
-                   context: scope_context,
-                   add_active_scope: add_active_resources_scope)
+    skip_policy_scope
+
+    scope = Pundit.policy!(api_user, controlled_class).scope_for(action.to_sym)
+
+    if controlled_ids.present?
+      scope = scope.where(id: controlled_ids)
+    end
+
+    scope = scope.active if scope.respond_to?(:active)
+    scope
   end
 
   def raise_no_resources_error
@@ -143,9 +148,5 @@ module PolymorphicResourceScope
 
   def scope_context
     {}
-  end
-
-  def add_active_resources_scope
-    true
   end
 end

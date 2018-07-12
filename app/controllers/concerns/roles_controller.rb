@@ -21,6 +21,14 @@ module RolesController
     @serializer ||= "#{resource_name.camelize}Serializer".constantize
   end
 
+  def policy
+    @policy ||= policy_class.new(api_user, AccessControlList)
+  end
+
+  def policy_class
+    "#{resource_name.camelize}Policy".constantize
+  end
+
   def resource_class
     AccessControlList
   end

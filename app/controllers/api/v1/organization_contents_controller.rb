@@ -1,5 +1,5 @@
 class Api::V1::OrganizationContentsController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
   include Versioned
 
   require_authentication :all, scopes: [:organization]

@@ -11,28 +11,32 @@ def setup_role_control_tables
   unless const_defined?("ControlledTable")
     Object.const_set("ControlledTable",
                      Class.new(ActiveRecord::Base) do
-                       include RoleControl::Controlled
-
                        has_many :access_control_lists, as: :resource
-
-                       can_by_role :read, :show,
-                                   public: true,
-                                   roles: [:admin, :test_role]
-
-                       can_by_role :update, roles: [:test_role]
-
-                       can_by_role :index, roles: [:admin]
                      end)
   end
 
-  unless const_defined?("TestParentControlTable")
-    Object.const_set("TestParentControlTable",
-                     Class.new(ActiveRecord::Base) do
-                       include RoleControl::ParentalControlled
+  unless const_defined?("ControlledTablePolicy")
+    Object.const_set("ControlledTablePolicy",
+                     Class.new(ApplicationPolicy) do
+                       index_scope = Class.new(ApplicationPolicy::Scope) do
+                         roles_for_private_scope %(admin)
+                       end
 
-                       belongs_to :controlled_table
+                       read_scope = Class.new(ApplicationPolicy::Scope) do
+                         roles_for_private_scope %i(admin test_role)
 
-                       can_through_parent :controlled_table, :index, :read, :show, :update
+                         def public_scope
+                           scope.where(private: false)
+                         end
+                       end
+
+                       write_scope = Class.new(ApplicationPolicy::Scope) do
+                         roles_for_private_scope %(test_role)
+                       end
+
+                       scope :index, with: index_scope
+                       scope :read, :show, with: read_scope
+                       scope :update, with: write_scope
                      end)
   end
 end

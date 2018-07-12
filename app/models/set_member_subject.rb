@@ -1,7 +1,6 @@
 require 'subjects/set_member_subject_selector'
 
 class SetMemberSubject < ActiveRecord::Base
-  include RoleControl::ParentalControlled
   include Linkable
 
   belongs_to :subject_set
@@ -20,9 +19,6 @@ class SetMemberSubject < ActiveRecord::Base
 
   validates_presence_of :subject_set, :subject
   validates_uniqueness_of :subject_id, scope: :subject_set_id
-
-  can_through_parent :subject_set, :update, :show, :destroy, :index, :update_links,
-    :destroy_links
 
   before_create :set_random
 

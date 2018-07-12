@@ -1,7 +1,7 @@
 require 'model_version'
 
 class Api::V1::WorkflowsController < Api::ApiController
-  include JsonApiController::LegacyPolicy
+  include JsonApiController::PunditPolicy
   include Versioned
   include SyncResourceTranslationStrings
   include MediumResponse

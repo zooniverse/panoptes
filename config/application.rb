@@ -18,6 +18,7 @@ module Panoptes
     config.eager_load_paths += Dir[Rails.root.join('app', 'operations', '*/')]
     config.eager_load_paths += Dir[Rails.root.join('app', 'serializers', '*/')]
     config.eager_load_paths += Dir[Rails.root.join('app', 'formatters', '*/')]
+    config.eager_load_paths += Dir[Rails.root.join('app', 'policies', '*/')]
 
     config.eager_load_paths += Dir[Rails.root.join('lib', '**/')]
 

@@ -93,17 +93,6 @@ class User < ActiveRecord::Base
     },
     ranked_by: ":tsearch + (0.25 * :trigram)"
 
-  def self.scope_for(action, user, opts={})
-    case
-    when user.is_admin?
-      User.all
-    when [ :show, :index ].include?(action)
-      where(ouroboros_created: false).merge(active)
-    else
-      where(id: user.id)
-    end
-  end
-
   def self.from_omniauth(auth_hash)
     transaction do
       auth = Authorization.from_omniauth(auth_hash)

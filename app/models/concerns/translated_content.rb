@@ -1,13 +1,10 @@
 module TranslatedContent
   extend ActiveSupport::Concern
-  include RoleControl::ParentalControlled
 
   included do
     has_paper_trail ignore: [:language]
     validates :language, format: {with: LanguageValidation.lang_regex}
     belongs_to translated_for, touch: true
-
-    can_through_parent translated_for, :show, :index, :versions, :version
   end
 
   module ClassMethods
@@ -17,20 +14,6 @@ module TranslatedContent
 
     def translated_class
       translated_for.to_s.camelize.constantize
-    end
-
-    def scope_for(action, user, opts={})
-      case action
-      when :show, :index
-        super
-      else
-        translatable = translated_class
-          .scope_for(:translate, user, opts)
-        joins(translated_for)
-          .merge(translatable)
-          .where
-          .not("\"#{translated_class.table_name}\".\"primary_language\" = \"#{table_name}\".\"language\"")
-      end
     end
   end
 

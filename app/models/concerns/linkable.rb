@@ -17,6 +17,10 @@ module Linkable
       send(method, *scope_args)
     end
 
+    def scope_for(action, api_user, opts={})
+      Pundit.policy!(api_user, self).scope_for(action)
+    end
+
     protected
 
     def link_scope_arguments(default_args, model, user, additional_args)
