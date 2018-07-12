@@ -1,27 +1,25 @@
 require 'spec_helper'
 
 describe Doorkeeper::AccessCleanup do
-
   shared_examples 'it cleans up after doorkeeper' do
-
-    it "should not cleanup expired" do
+    it "should not cleanup non-expired"  do
       cleaner.cleanup!
       expect{ instance.reload }.not_to raise_error
     end
 
-    it "should not cleanup revoked" do
+    it "should not cleanup non-revoked" do
       cleaner.cleanup!
       expect{ instance.reload }.not_to raise_error
     end
 
-    it "should cleanup a revoked" do
+    it "should cleanup all revoked" do
       instance.revoke
       cleaner.cleanup!
       expect{ instance.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should cleanup an old expired" do
-      instance.update_column(:created_at, DateTime.now - 31.day)
+    it "should cleanup all expired" do
+      instance.update_column(:created_at, Time.now - (expires_in + 60).seconds)
       cleaner.cleanup!
       expect{ instance.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
@@ -31,28 +29,47 @@ describe Doorkeeper::AccessCleanup do
     let(:cleaner) { described_class.new }
     let(:owner) { create(:user) }
     let(:app) { create(:application, owner: owner)}
+    let(:expires_in) { 7200 }
+    let(:scopes) { "public test" }
 
-    it_should_behave_like "it cleans up after doorkeeper" do
-      let!(:instance) do
-        Doorkeeper::AccessToken.create! do |ac|
-          ac.resource_owner_id = owner.id
-          ac.application_id = app.id
-          ac.expires_in = 7200
-          ac.scopes = "public test"
+    describe "tokens" do
+      let(:instance) do
+        create(:access_token,
+          scopes: scopes,
+          resource_owner_id: owner.id,
+          application_id: app.id,
+          expires_in: expires_in,
+          use_refresh_token: true)
+      end
+
+      it "should cleanup an expired refreshable token that has not been refreshed" do
+        instance.update_column(:created_at, Time.now - 14.days)
+        cleaner.cleanup!
+        expect{ instance.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it_should_behave_like "it cleans up after doorkeeper" do
+        let!(:instance) do
+          create(:access_token,
+            scopes: scopes,
+            resource_owner_id: owner.id,
+            application_id: app.id,
+            expires_in: expires_in)
         end
       end
     end
 
-    it_should_behave_like "it cleans up after doorkeeper" do
+    describe "grants" do
       let!(:instance) do
-        Doorkeeper::AccessGrant.create! do |ag|
-          ag.resource_owner_id = owner.id
-          ag.application_id = app.id
-          ag.redirect_uri = 'urn:ietf:wg:oauth:2.0:oob'
-          ag.expires_in = 7200
-          ag.scopes = "public test"
-        end
+        create(:access_grant,
+          resource_owner_id: owner.id,
+          application_id: app.id,
+          redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
+          expires_in: expires_in,
+          scopes: scopes)
       end
+
+      it_should_behave_like "it cleans up after doorkeeper"
     end
   end
 end
