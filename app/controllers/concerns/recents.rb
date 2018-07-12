@@ -1,6 +1,4 @@
 module Recents
-  extend ActiveSupport::Concern
-
   def recents
     ps = params.dup
     ps.delete "#{resource_name}_id"
