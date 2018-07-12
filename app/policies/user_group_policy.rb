@@ -6,8 +6,7 @@ class UserGroupPolicy < ApplicationPolicy
     end
 
     def user_can_access_scope(private_query)
-      accessible = scope
-      accessible = accessible.where(id: private_query.select(:id))
+      accessible = scope.where(id: private_query.select(:id))
       accessible = accessible.or(public_scope) if public_flag
       accessible
     end
