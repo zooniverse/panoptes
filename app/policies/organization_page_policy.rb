@@ -7,8 +7,9 @@ class OrganizationPagePolicy < ApplicationPolicy
   end
 
   class TranslateScope < Scope
-    def resolve(action)
-      super(:translate)
+    def resolve(_action)
+      parent_scope = policy_for(Organization).scope_for(:translate)
+      scope.where(organization_id: parent_scope.select(:id))
     end
   end
 

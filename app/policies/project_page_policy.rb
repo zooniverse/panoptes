@@ -7,8 +7,9 @@ class ProjectPagePolicy < ApplicationPolicy
   end
 
   class TranslateScope < Scope
-    def resolve(action)
-      super(:translate)
+    def resolve(_action)
+      parent_scope = policy_for(Project).scope_for(:translate)
+      scope.where(project_id: parent_scope.select(:id))
     end
   end
 
