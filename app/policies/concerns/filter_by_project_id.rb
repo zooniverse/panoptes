@@ -1,5 +1,5 @@
-module FilterForbiddenProjects
-  def filter_forbidden_projects(scope)
+module FilterByProjectId
+  def self.remove_non_exportable_projects(scope)
     # Tested on prod all projects table scan:
     # "Seq Scan on public.projects  (cost=0.00..1097.20 rows=6 width=4) (actual time=16.918..16.918 rows=0 loops=1)"
     # "  Output: id"
