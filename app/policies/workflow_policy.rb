@@ -11,12 +11,8 @@ class WorkflowPolicy < ApplicationPolicy
         with: Scope
 
   def linkable_subject_sets
-    # TODO: Any set that is not part of the same project should get duplicated, not linked.
-    # This currently gets done by the controller, and is set up such that this code here
-    # must allow it to be in scope for linking. However, this opens the door for bugs to
-    # accidentally allow linkage of foreign subject sets. It would be much better if the
-    # "same-project" rule was enforced here, and the controller would copy any "not-found"
-    # sets into the project.
+    # Note: Any set that is not part of the same project gets duplicated in the
+    # controller, not associated directly.
     policy_for(SubjectSet).scope_for(:show)
   end
 
