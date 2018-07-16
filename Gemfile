@@ -38,7 +38,7 @@ gem 'pg_search'
 gem 'puma', '~> 3.11.4'
 gem 'rack-cors', '~> 0.4', require: 'rack/cors'
 gem 'rails', '~> 4.2.10'
-gem 'ranked-model', '~> 0.4.0'
+gem 'ranked-model', '~> 0.4.1'
 gem 'restpack_serializer', github: "zooniverse/restpack_serializer", branch: "rails5" # REST API
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'scientist', '~> 1.2.0'
