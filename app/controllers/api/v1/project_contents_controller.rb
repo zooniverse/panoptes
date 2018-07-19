@@ -1,4 +1,5 @@
 class Api::V1::ProjectContentsController < Api::ApiController
+  include JsonApiController::PunditPolicy
   include Versioned
 
   CONTENT_PARAMS = [

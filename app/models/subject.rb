@@ -1,6 +1,4 @@
 class Subject < ActiveRecord::Base
-  include RoleControl::ParentalControlled
-  include Linkable
   include Activatable
   include OrderedLocations
 
@@ -25,10 +23,10 @@ class Subject < ActiveRecord::Base
     foreign_key: 'tutorial_subject_id',
     dependent: :restrict_with_exception
 
-  validates_presence_of :project, :uploader
+  # Used by HttpCacheable
+  scope :private_scope, -> { where(project_id: Project.private_scope) }
 
-  can_through_parent :project, :update, :index, :show, :destroy, :update_links,
-                     :destroy_links, :versions, :version
+  validates_presence_of :project, :uploader
 
   NONSTANDARD_MIMETYPES = {
     "audio/mp3" => "audio/mpeg",

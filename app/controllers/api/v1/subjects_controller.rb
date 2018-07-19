@@ -1,4 +1,5 @@
 class Api::V1::SubjectsController < Api::ApiController
+  include JsonApiController::PunditPolicy
   include Versioned
 
   require_authentication :update, :create, :destroy, :version, :versions,
@@ -20,6 +21,8 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def queued
+    skip_policy_scope
+
     subject_selector = Subjects::Selector.new(api_user.user, params)
     selected_subject_ids = subject_selector.get_subject_ids
 

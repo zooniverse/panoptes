@@ -1,8 +1,6 @@
 class Workflow < ActiveRecord::Base
   include Activatable
-  include Linkable
   include Translatable
-  include RoleControl::ParentalControlled
   include ExtendedCacheKey
   include RankedModel
   include CacheModelVersion
@@ -42,15 +40,13 @@ class Workflow < ActiveRecord::Base
 
   JSON_ATTRIBUTES = %w(tasks retirement aggregation configuration).freeze
 
+  # Used by HttpCacheable
+  scope :private_scope, -> { where(project_id: Project.private_scope) }
+
   validates_presence_of :project, :display_name
 
   validate :retirement_config
 
-  can_through_parent :project, :update, :index, :show, :destroy, :update_links,
-    :destroy_links, :translate, :versions, :version, :retire_subject, :create_classifications_export
-
-  can_be_linked :subject_set, :same_project?, :model
-  can_be_linked :aggregation, :scope_for, :update, :user
 
   ranks :display_order, with_same: :project_id
 

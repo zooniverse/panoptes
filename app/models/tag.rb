@@ -13,10 +13,6 @@ class Tag < ActiveRecord::Base
     using: :trigram,
     ranked_by: ":trigram"
 
-  def self.scope_for(*args)
-    all
-  end
-
   def downcase_name
     self.name = name.try(:downcase)
   end

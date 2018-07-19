@@ -2,7 +2,6 @@ require "user_unsubscribe_message_verifier"
 
 class User < ActiveRecord::Base
   include Activatable
-  include Linkable
   include PgSearch
   include ExtendedCacheKey
 
@@ -62,12 +61,6 @@ class User < ActiveRecord::Base
   delegate :subjects, to: :identity_group
   delegate :owns?, to: :identity_group
 
-  can_be_linked :membership, :all
-  can_be_linked :user_group, :all
-  can_be_linked :user_project_preference, :all
-  can_be_linked :user_collection_preference, :all
-  can_be_linked :project, :scope_for, :update, :user
-  can_be_linked :collection, :scope_for, :update, :user
 
   pg_search_scope :search_name,
     against: [:login],
@@ -92,17 +85,6 @@ class User < ActiveRecord::Base
       trigram: {}
     },
     ranked_by: ":tsearch + (0.25 * :trigram)"
-
-  def self.scope_for(action, user, opts={})
-    case
-    when user.is_admin?
-      User.all
-    when [ :show, :index ].include?(action)
-      where(ouroboros_created: false).merge(active)
-    else
-      where(id: user.id)
-    end
-  end
 
   def self.from_omniauth(auth_hash)
     transaction do

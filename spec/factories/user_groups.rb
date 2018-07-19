@@ -4,6 +4,19 @@ FactoryBot.define do
     display_name{ name.try :titleize }
     activated_state :active
 
+    transient do
+      admin { nil }
+    end
+
+    after :create do |user_group, evaluator|
+      if evaluator.admin.present?
+        create :membership, state: Membership.states[:active],
+               roles: ['group_admin'],
+               user: evaluator.admin,
+               user_group: user_group
+      end
+    end
+
     factory :user_group_with_users do
       after(:create) do |ug|
         create_list(:membership, 2, state: Membership.states[:active],

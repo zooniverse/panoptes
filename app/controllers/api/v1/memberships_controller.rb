@@ -1,4 +1,6 @@
 class Api::V1::MembershipsController < Api::ApiController
+  include JsonApiController::PunditPolicy
+
   before_filter :require_login
   require_authentication :all, scopes: [:group]
   resource_actions :index, :show, :create, :update, :deactivate
@@ -18,7 +20,7 @@ class Api::V1::MembershipsController < Api::ApiController
 
   private
 
-  def policy_object
-    RoledControllerPolicy.new(api_user, resource_class, resource_name, action_name, params, add_active_resources_scope: false)
+  def add_active_scope
+    false
   end
 end

@@ -1,4 +1,5 @@
 class Api::V1::ProjectsController < Api::ApiController
+  include JsonApiController::PunditPolicy
   include FilterByOwner
   include FilterByCurrentUserRoles
   include SyncResourceTranslationStrings

@@ -1,6 +1,13 @@
 module JsonApiController
   class AccessDenied < StandardError; end
 
+  # Depends on the following methods to be defined wherever this is mixed in:
+  #
+  # * resource_ids
+  # * resource_name
+  # * policy_scope
+  #
+  # These are normally provided by JsonApiController
   module CheckResourcesExist
     extend ActiveSupport::Concern
 
@@ -11,7 +18,11 @@ module JsonApiController
     private
 
     def check_controller_resources
-      raise_no_resources_error unless policy_object.resources_exist?
+      raise_no_resources_error unless resources_exist?
+    end
+
+    def resources_exist?
+      resource_ids.blank? ? true : policy_scope.exists?
     end
 
     def raise_no_resources_error
@@ -23,10 +34,10 @@ module JsonApiController
     end
 
     def no_resources_message_ids
-      if policy_object.resource_ids.is_a?(Array)
-        "ids='#{policy_object.resource_ids.join(',')}'"
+      if resource_ids.is_a?(Array)
+        "ids='#{resource_ids.join(',')}'"
       else
-        "id='#{policy_object.resource_ids}'"
+        "id='#{resource_ids}'"
       end
     end
   end

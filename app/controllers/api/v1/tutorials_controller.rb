@@ -1,4 +1,5 @@
 class Api::V1::TutorialsController < Api::ApiController
+  include JsonApiController::PunditPolicy
   include SyncResourceTranslationStrings
 
   require_authentication :update, :create, :destroy, scopes: [:project]

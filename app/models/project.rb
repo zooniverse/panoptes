@@ -1,10 +1,7 @@
 class Project < ActiveRecord::Base
   include RoleControl::Owned
-  include RoleControl::Controlled
   include Activatable
-  include Linkable
   include Translatable
-  include PreferencesLink
   include ExtendedCacheKey
   include PgSearch
   include RankedModel
@@ -45,7 +42,6 @@ class Project < ActiveRecord::Base
 
   # TODO: extract association and authorization scope to module
   has_many :translations, as: :translated, dependent: :destroy
-  can_by_role :translate, roles: %i(owner collaborator translator)
 
   has_paper_trail only: [:private, :live, :beta_requested, :beta_approved, :launch_requested, :launch_approved]
 
@@ -64,24 +60,11 @@ class Project < ActiveRecord::Base
 
   after_update :send_notifications
 
+  # Still needed for HttpCacheable
+  scope :private_scope, -> { where(private: true) }
+
   scope :launched, -> { where("launch_approved IS TRUE") }
   scope :featured, -> { where(featured: true) }
-
-  can_by_role :destroy, :update, :update_links, :destroy_links, :create_classifications_export,
-    :create_subjects_export, :create_workflows_export,
-    :create_workflow_contents_export, :retire_subjects, roles: [ :owner, :collaborator ]
-
-  can_by_role :show, :index, :versions, :version, public: true,
-    roles: [ :owner, :collaborator, :tester, :translator, :scientist, :moderator ]
-
-  can_be_linked :subject_set, :scope_for, :update, :user
-  can_be_linked :subject, :scope_for, :update, :user
-
-  can_be_linked :workflow, :scope_for, :update, :user
-  can_be_linked :access_control_list, :scope_for, :update, :user
-  can_be_linked :user_group, :scope_for, :edit_project, :user
-
-  preferences_model :user_project_preference
 
   pg_search_scope :search_display_name,
     against: :display_name,

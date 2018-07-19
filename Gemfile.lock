@@ -293,6 +293,8 @@ GEM
       pry (>= 0.9.11)
     public_suffix (3.0.1)
     puma (3.11.4)
+    pundit (1.1.0)
+      activesupport (>= 3.0.0)
     rack (1.6.10)
     rack-cors (0.4.1)
     rack-protection (2.0.1)
@@ -347,6 +349,9 @@ GEM
     rspec-expectations (3.7.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.7.0)
+    rspec-its (1.2.0)
+      rspec-core (>= 3.0.0)
+      rspec-expectations (>= 3.0.0)
     rspec-mocks (3.7.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.7.0)
@@ -485,11 +490,13 @@ DEPENDENCIES
   pry-rails
   pry-stack_explorer
   puma (~> 3.11.4)
+  pundit (~> 1.1.0)
   rack-cors (~> 0.4)
   rails (~> 4.2.10)
   ranked-model (~> 0.4.1)
   restpack_serializer!
   rspec
+  rspec-its
   rspec-rails
   schema_plus_pg_indexes (~> 0.1)
   scientist (~> 1.2.0)
@@ -509,4 +516,4 @@ DEPENDENCIES
   zoo_stream (~> 1.0.1)
 
 BUNDLED WITH
-   1.16.1
+   1.16.2
