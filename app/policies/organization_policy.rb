@@ -18,4 +18,10 @@ class OrganizationPolicy < ApplicationPolicy
   scope :index, :show, :versions, :version, with: ReadScope
   scope :update, :update_links, :destroy, :destroy_links, with: WriteScope
   scope :translate, with: TranslateScope
+
+  def linkable_projects
+    # TODO: Is this really right? This lets me stick any
+    # project in my organization. What if they don't want to?
+    policy_for(Project).scope_for(:show)
+  end
 end

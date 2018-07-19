@@ -17,4 +17,8 @@ class WorkflowContentPolicy < ApplicationPolicy
 
   scope :index, :show, :versions, :version, with: ReadScope
   scope :update, :destroy, with: WriteScope
+
+  def linkable_workflows
+    policy_for(Workflow).scope_for(:translate)
+  end
 end

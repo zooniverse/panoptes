@@ -11,7 +11,7 @@ FactoryBot.define do
 
     after(:create) do |ss, evaluator|
       if ss.workflows.empty? && evaluator.num_workflows
-        create_list(:workflow, evaluator.num_workflows, subject_sets: [ss])
+        create_list(:workflow, evaluator.num_workflows, subject_sets: [ss], project: ss.project)
       end
     end
 

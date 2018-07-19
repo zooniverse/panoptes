@@ -157,4 +157,16 @@ describe OrganizationPolicy do
       its(:translate) { is_expected.to match_array([listed_organization, unlisted_organization]) }
     end
   end
+
+  describe "links" do
+    let(:resource_owner) { create :user }
+    let(:organization) { build :organization, owner: resource_owner }
+    let(:api_user) { ApiUser.new(resource_owner) }
+    let(:policy) { OrganizationPolicy.new(api_user, organization) }
+
+    it "should allow projects to link when user has update permissions" do
+      project = create :project, owner: resource_owner
+      expect(policy.linkable_projects).to match_array([project])
+    end
+  end
 end

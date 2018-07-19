@@ -66,4 +66,15 @@ describe UserGroupPolicy do
       its(:destroy_links) { is_expected.to match_array([public_user_group, private_user_group]) }
     end
   end
+
+  describe "links" do
+    let(:user) { create :user }
+    let(:api_user) { ApiUser.new(user) }
+    let(:user_group) { build :user_group }
+    let(:policy) { described_class.new(api_user, user_group) }
+
+    it "should allow user_gruop links to any user" do
+      expect(policy.linkable_users).to match_array(user)
+    end
+  end
 end

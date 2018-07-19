@@ -9,4 +9,8 @@ class SubjectSetImportPolicy < ApplicationPolicy
   end
 
   scope :index, :show, with: Scope
+
+  def linkable_subject_sets
+    policy_for(SubjectSet).scope_for(:update)
+  end
 end

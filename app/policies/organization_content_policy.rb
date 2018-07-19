@@ -17,4 +17,8 @@ class OrganizationContentPolicy < ApplicationPolicy
 
   scope :index, :show, :versions, :version, with: ReadScope
   scope :update, :destroy, with: WriteScope
+
+  def linkable_organizations
+    policy_for(Organization).scope_for(:translate)
+  end
 end

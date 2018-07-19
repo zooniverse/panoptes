@@ -58,4 +58,17 @@ describe WorkflowPolicy do
       end
     end
   end
+
+  describe 'links' do
+    let(:resource_owner) { create :user }
+    let(:project) { create :project, owner: resource_owner }
+    let(:workflow) { create(:workflow, project: project) }
+    let(:api_user) { ApiUser.new(resource_owner) }
+    let(:policy) { WorkflowPolicy.new(api_user, workflow)}
+
+    it 'allows subject_sets in the same project' do
+      subject_set = create(:subject_set, project: project)
+      expect(policy.linkable_subject_sets).to match_array([subject_set])
+    end
+  end
 end

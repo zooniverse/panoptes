@@ -18,38 +18,6 @@ describe UserGroup, :type => :model do
     expect(build(:user_group)).to be_valid
   end
 
-  describe "::scope_for" do
-    context "action is show" do
-      let(:member) do
-        membership = create(:membership,
-                            state: :active,
-                            user_group: user_group,
-                            roles: ["group_member"])
-        membership.user
-      end
-
-      let!(:public_group) do
-        create(:user_group, private: false)
-      end
-
-      let(:private_group) do
-        create(:user_group, private: true)
-      end
-
-      it "should return groups the user is an active member of" do
-        expect(UserGroup.scope_for(:show, ApiUser.new(member))).to include(user_group)
-      end
-
-      it "should return groups that are public" do
-        expect(UserGroup.scope_for(:show, ApiUser.new(member))).to include(public_group)
-      end
-
-      it "should not return private groups a user is not a member of" do
-        expect(UserGroup.scope_for(:show, ApiUser.new(member))).not_to include(private_group)
-      end
-    end
-  end
-
   describe "#display_name" do
     it 'should validate presence' do
       expect(build(:user_group, display_name: "")).to_not be_valid

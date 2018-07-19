@@ -7,4 +7,12 @@ class UserCollectionPreferencePolicy < ApplicationPolicy
   end
 
   scope :index, :show, :update, :destroy, with: Scope
+
+  def linkable_collections
+    policy_for(Collection).scope_for(:show)
+  end
+
+  def linkable_users
+    User.all
+  end
 end

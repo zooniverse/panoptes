@@ -1,6 +1,5 @@
 class UserGroup < ActiveRecord::Base
   include Activatable
-  include Linkable
   include PgSearch
 
   has_many :memberships, dependent: :destroy

@@ -1,9 +1,7 @@
 class Project < ActiveRecord::Base
   include RoleControl::Owned
   include Activatable
-  include Linkable
   include Translatable
-  include PreferencesLink
   include ExtendedCacheKey
   include PgSearch
   include RankedModel
@@ -67,15 +65,6 @@ class Project < ActiveRecord::Base
 
   scope :launched, -> { where("launch_approved IS TRUE") }
   scope :featured, -> { where(featured: true) }
-
-  can_be_linked :subject_set, :scope_for, :update, :user
-  can_be_linked :subject, :scope_for, :update, :user
-
-  can_be_linked :workflow, :scope_for, :update, :user
-  can_be_linked :access_control_list, :scope_for, :update, :user
-  can_be_linked :user_group, :scope_for, :edit_project, :user
-
-  preferences_model :user_project_preference
 
   pg_search_scope :search_display_name,
     against: :display_name,

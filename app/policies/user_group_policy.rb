@@ -26,4 +26,9 @@ class UserGroupPolicy < ApplicationPolicy
 
   scope :index, :show, :recents, with: ReadScope
   scope :update, :destroy, :update_links, :destroy_links, with: WriteScope
+
+  def linkable_users
+    # TODO: At the very least, this should filter out inactive users
+    User.all
+  end
 end

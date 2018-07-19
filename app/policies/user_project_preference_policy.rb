@@ -7,4 +7,8 @@ class UserProjectPreferencePolicy < ApplicationPolicy
   end
 
   scope :index, :show, :update, :destroy, with: Scope
+
+  def linkable_projects
+    policy_for(Project).scope_for(:show)
+  end
 end

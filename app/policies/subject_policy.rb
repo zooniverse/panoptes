@@ -7,4 +7,12 @@ class SubjectPolicy < ApplicationPolicy
   end
 
   scope :index, :show, :update, :destroy, :update_links, :destroy_links, :versions, :version, with: Scope
+
+  def linkable_projects
+    policy_for(Project).scope_for(:update)
+  end
+
+  def linkable_subject_sets
+    policy_for(SubjectSet).scope_for(:update)
+  end
 end

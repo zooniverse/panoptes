@@ -8,8 +8,6 @@ class ApplicationPolicy
     @record = record
   end
 
-  @scopes_by_action = {}
-
   def self.scope(*actions, with:)
     actions.each do |action|
       @scopes_by_action ||= {}
@@ -19,6 +17,10 @@ class ApplicationPolicy
 
   def self.scopes_by_action
     @scopes_by_action || {}
+  end
+
+  def policy_for(model)
+    Pundit.policy!(user, model)
   end
 
   def scope_klass_for(action)
@@ -37,6 +39,10 @@ class ApplicationPolicy
               record.class
             end
     scope_klass_for(action).new(user, scope).resolve(action)
+  end
+
+  def linkable_for(relation)
+    public_send("linkable_#{relation.to_s.pluralize}")
   end
 
   class Scope

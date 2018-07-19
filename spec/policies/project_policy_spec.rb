@@ -197,4 +197,40 @@ describe ProjectPolicy do
       its(:translate) { is_expected.to match_array([public_project, private_project]) }
     end
   end
+
+  describe "links" do
+    let(:resource_owner) { create :user }
+    let(:project) { create :project }
+    let(:api_user) { ApiUser.new(resource_owner) }
+    let(:policy) { ProjectPolicy.new(api_user, project) }
+
+    it "should allow workflows to link when user has update permissions" do
+      workflow_in_project = create :workflow, project: project
+      workflow_other_project = create :workflow
+
+      expect(policy.linkable_workflows).to match_array([workflow_in_project, workflow_other_project])
+    end
+
+    it "should allow subject_sets to link when user has update permissions" do
+      subject_set_in_project = create :subject_set, project: project, num_workflows: 0
+      subject_set_other_project = create :subject_set, num_workflows: 0
+
+      expect(policy.linkable_subject_sets).to match_array([subject_set_in_project, subject_set_other_project])
+    end
+
+    # This is not part of the create/update schema for project
+    # it "should allow subjects to link when user has update permissions" do
+    #   expect(Project).to link_to(Subject).given_args(user)
+    #                       .with_scope(:scope_for, :update, user)
+    # end
+
+    # There is not part of the create/update schema for project
+    # it "should allow collections to link user has show permissions" do
+    #   collection1 = create :collection, owner: resource_owner
+    #   collection2 = create :collection
+    #   collection3 = create :collection, private: true
+
+    #   expect(policy.linkable_collections).to match_array([collection1, collection2])
+    # end
+  end
 end

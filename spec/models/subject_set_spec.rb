@@ -25,18 +25,6 @@ describe SubjectSet, :type => :model do
     end.to raise_error(ActiveRecord::RecordInvalid)
   end
 
-
-  describe "links" do
-    let(:project) { create(:project) }
-    let(:workflow) { create(:workflow, project: project) }
-    let(:user) { ApiUser.new(create(:user)) }
-
-    it 'should allow links to workflows in other projects' do
-      expect(SubjectSet).to link_to(workflow).given_args(user)
-        .with_scope(:scope_for, :show, user)
-    end
-  end
-
   describe "#project" do
     it "should have a project" do
       expect(subject_set.project).to be_a(Project)
