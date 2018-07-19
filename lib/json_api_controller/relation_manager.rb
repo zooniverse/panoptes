@@ -30,23 +30,22 @@ module JsonApiController
     protected
 
     def find_for_string_type(resource, type, id)
-      relation_find(id) do
-        Pundit.policy!(api_user, resource).linkable_for(type)
-      end
+      policy = Pundit.policy!(api_user, resource)
+      linkable_resources = policy.linkable_for(type)
+      relation_find(id, linkable_resources)
     end
 
     def new_items(resource, relation, value, *args)
-      relation_find(value) do
-        Pundit.policy!(api_user, resource).linkable_for(relation)
-      end
+      policy = Pundit.policy!(api_user, resource)
+      linkable_resources = policy.linkable_for(relation)
+      relation_find(value, linkable_resources)
     end
 
     def assoc_class(relation)
       resource_class.reflect_on_association(relation).klass
     end
 
-    def relation_find(find_arg)
-      relation = yield
+    def relation_find(find_arg, relation)
       relation = relation.where(id: find_arg)
 
       # This is a workaround for  https://github.com/rails/arel/pull/349
