@@ -12,7 +12,7 @@ node {
     newImage.push()
   }
 
-  if (BRANCH_NAME == 'jenkinsfile') { // TODO: change this to "master"
+  if (BRANCH_NAME == 'master') { // TODO: change this to "master"
     stage('Update latest tag') {
       newImage.push('latest')
     }
