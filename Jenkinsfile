@@ -18,22 +18,17 @@ node {
     }
 
     stage('Build staging AMIs') {
-      failFast true
-
-      parallel {
-        stage('Build staging AMI') {
-          sh """
-            cd "/var/jenkins_home/jobs/Zooniverse GitHub/jobs/operations/branches/master/workspace" && \
-            ./rebuild.sh panoptes-api-staging
-          """
-        }
-
-        stage('Build staging dump worker AMI') {
-          sh """
-            cd "/var/jenkins_home/jobs/Zooniverse GitHub/jobs/operations/branches/master/workspace" && \
-            ./rebuild.sh panoptes-dumpworker-staging
-          """
-        }
+      parallel api: {
+        sh """
+          cd "/var/jenkins_home/jobs/Zooniverse GitHub/jobs/operations/branches/master/workspace" && \
+          ./rebuild.sh panoptes-api-staging
+        """
+      },
+      worker: {
+        sh """
+          cd "/var/jenkins_home/jobs/Zooniverse GitHub/jobs/operations/branches/master/workspace" && \
+          ./rebuild.sh panoptes-dumpworker-staging
+        """
       }
     }
 
