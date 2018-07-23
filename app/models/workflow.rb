@@ -48,6 +48,21 @@ class Workflow < ActiveRecord::Base
 
   validate :retirement_config
 
+  def current_version_id
+    self.versions.last&.id
+  end
+
+  def at_version_id(version_id)
+    papertrail_version = versions.order(id: :asc).where("id > ?", version_id).first
+
+    if papertrail_version
+      papertrail_version.reify
+    else
+      # If there is no Papertrail object more recent than the given ID,
+      # it means the current object is the most recent version
+      self
+    end
+  end
 
   ranks :display_order, with_same: :project_id
 
