@@ -867,22 +867,4 @@ describe User, type: :model do
       expect(user.favorite_collections_for_project(owned.id)).to eq([fav_collection])
     end
   end
-
-  describe "#can_recieve_notifications?", :focus do
-    it "should be allow notifications by default" do
-      expect(user.can_recieve_notifications?).to eq(true)
-    end
-
-    it "should allow the user to opt-out of notifications" do
-      user.intervention_notifications = false
-      expect(user.can_recieve_notifications?).to eq(false)
-    end
-
-    it "should allow the user to opt back into notifications" do
-      user.intervention_notifications = false
-      expect(user.can_recieve_notifications?).to eq(false)
-      user.intervention_notifications = true
-      expect(user.can_recieve_notifications?).to eq(true)
-    end
-  end
 end
