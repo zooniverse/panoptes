@@ -107,39 +107,44 @@ describe Workflow, type: :model do
     it_behaves_like "it has a classifications assocation"
   end
 
+  describe 'publishing', versioning: true do
+    let(:workflow) { create(:workflow, tasks: {version: 1}) }
+
+    it 'works with the first version' do
+      workflow.publish!
+      workflow.update!(tasks: {version: 2})
+      workflow.update!(tasks: {version: 3})
+      workflow.update!(tasks: {version: 4})
+
+      active_version = workflow.published_version
+      expect(active_version.tasks).to eq("version" => 1)
+    end
+
+    it 'works with an in-between version' do
+      workflow.update!(tasks: {version: 2})
+      workflow.update!(tasks: {version: 3})
+      workflow.publish!
+      workflow.update!(tasks: {version: 4})
+
+      active_version = workflow.published_version
+      expect(active_version.tasks).to eq("version" => 3)
+    end
+
+    it 'works with the latest version' do
+      workflow.update!(tasks: {version: 2})
+      workflow.update!(tasks: {version: 3})
+      workflow.update!(tasks: {version: 4})
+      workflow.publish!
+
+      active_version = workflow.published_version
+      expect(active_version.tasks).to eq("version" => 4)
+    end
+  end
+
   describe "versioning", versioning: true do
     let(:workflow) { create(:workflow, tasks: {version: 1}) }
 
     it { is_expected.to be_versioned }
-
-    describe '#at_version_id' do
-      it 'works with the first version' do
-        active_version_id = workflow.current_version_id
-        workflow.update!(tasks: {version: 2})
-        workflow.update!(tasks: {version: 3})
-        workflow.update!(tasks: {version: 4})
-        active_version = workflow.at_version_id(active_version_id)
-        expect(active_version.tasks).to eq("version" => 1)
-      end
-
-      it 'works with an in-between version' do
-        workflow.update!(tasks: {version: 2})
-        workflow.update!(tasks: {version: 3})
-        active_version_id = workflow.current_version_id
-        workflow.update!(tasks: {version: 4})
-        active_version = workflow.at_version_id(active_version_id)
-        expect(active_version.tasks).to eq("version" => 3)
-      end
-
-      it 'works with the latest version' do
-        workflow.update!(tasks: {version: 2})
-        workflow.update!(tasks: {version: 3})
-        workflow.update!(tasks: {version: 4})
-        active_version_id = workflow.current_version_id
-        active_version = workflow.at_version_id(active_version_id)
-        expect(active_version.tasks).to eq("version" => 4)
-      end
-    end
 
     it 'should track changes to tasks' do
       new_tasks = { blha: 'asdfasd', quera: "asdfas" }
