@@ -479,12 +479,6 @@ describe Api::V1::UsersController, type: :controller do
       end
     end
 
-    context "when changing global_email_communication" do
-      after(:each) do
-        update_request
-      end
-    end
-
     context "when updating a non-existant user" do
       before(:each) { update_request }
       let!(:user_id) { User.last.id + 1 }
@@ -506,11 +500,19 @@ describe Api::V1::UsersController, type: :controller do
       let(:new_gec) { false }
       let(:new_pec) { false }
       let(:new_bec) { false }
+      let(:new_ux_testing) { false }
+      let(:new_intervention_notifications) { false }
       let(:put_operations) do
-        { users: { login: new_login,
-                  global_email_communication: new_gec,
-                  project_email_communication: new_pec,
-                  beta_email_communication: new_bec } }
+        {
+          users: {
+            login: new_login,
+            global_email_communication: new_gec,
+            project_email_communication: new_pec,
+            beta_email_communication: new_bec,
+            ux_testing_email_communication: new_ux_testing,
+            intervention_notifications: new_intervention_notifications
+          }
+        }
       end
 
       it "should return 200 status" do
@@ -531,6 +533,14 @@ describe Api::V1::UsersController, type: :controller do
 
       it "should have updated the beta email communication attribute" do
         expect(user.reload.beta_email_communication).to eq(new_bec)
+      end
+
+      it "should have updated the ux testing email comms attribute" do
+        expect(user.reload.ux_testing_email_communication).to eq(new_bec)
+      end
+
+      it "should have updated the intervention notifications attribute" do
+        expect(user.reload.intervention_notifications).to eq(new_bec)
       end
 
       it "should have a single group" do
