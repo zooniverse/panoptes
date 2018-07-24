@@ -84,7 +84,7 @@ RSpec.describe UserSerializer do
         { requester: ApiUser.new(user) }
       end
 
-      it 'should include the private user data' do
+      it 'should include the private user data', :aggregate_failures do
         private_attrs.each do |me_only_attr|
           private_user_data = user.send(me_only_attr)
           serialized_result = result[me_only_attr.to_sym]
@@ -99,7 +99,7 @@ RSpec.describe UserSerializer do
         { requester: ApiUser.new(another_user) }
       end
 
-      it 'should not include the private user data' do
+      it 'should not include the private user data', :aggregate_failures do
         private_attrs.each do |me_only_attr|
           expect(result.has_key?(me_only_attr.to_sym)).to eq(false)
         end
