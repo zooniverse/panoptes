@@ -70,4 +70,40 @@ RSpec.describe UserSerializer do
       expect(confused_serializer[:users][0][:credited_name]).to eq("confused_user")
     end
   end
+
+  describe "private user attributes" do
+    let(:result) do
+      UserSerializer.single({}, User.where(id: user.id), context)
+    end
+    let(:private_attrs) do
+      UserSerializer::ME_ONLY_ATTRS - ["login_prompt"]
+    end
+
+    context "when i am the permitted requester" do
+      let(:context) do
+        { requester: ApiUser.new(user) }
+      end
+
+      it 'should include the private user data' do
+        private_attrs.each do |me_only_attr|
+          private_user_data = user.send(me_only_attr)
+          serialized_result = result[me_only_attr.to_sym]
+          expect(serialized_result).to eq(private_user_data)
+        end
+      end
+    end
+
+    context "when i am not the permitted requester" do
+      let(:another_user) { create(:user) }
+      let(:context) do
+        { requester: ApiUser.new(another_user) }
+      end
+
+      it 'should not include the private user data' do
+        private_attrs.each do |me_only_attr|
+          expect(result.has_key?(me_only_attr.to_sym)).to eq(false)
+        end
+      end
+    end
+  end
 end

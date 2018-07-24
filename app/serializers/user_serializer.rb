@@ -4,12 +4,20 @@ class UserSerializer
   include MediaLinksSerializer
   include CachedSerializer
 
+  ME_ONLY_ATTRS = %w(
+    email languages global_email_communication
+    project_email_communication beta_email_communication
+    uploaded_subjects_count subject_limit admin login_prompt zooniverse_id
+    upload_whitelist valid_email ux_testing_email_communication
+    intervention_notifications
+  ).freeze
+
   attributes :id, :login, :display_name, :credited_name, :email, :languages,
     :created_at, :updated_at, :type, :global_email_communication,
     :project_email_communication, :beta_email_communication,
     :subject_limit, :uploaded_subjects_count, :admin, :href, :login_prompt,
     :private_profile, :zooniverse_id, :upload_whitelist, :avatar_src,
-    :valid_email, :ux_testing_email_communication
+    :valid_email, :ux_testing_email_communication, :intervention_notifications
 
   can_include :classifications, :project_preferences, :collection_preferences,
     projects: { param: "owner", value: "login" },
@@ -57,10 +65,7 @@ class UserSerializer
     @permitted ||= @context[:include_private] || requester
   end
 
-  %w(email languages global_email_communication
-     project_email_communication beta_email_communication
-     uploaded_subjects_count subject_limit admin login_prompt zooniverse_id
-     upload_whitelist valid_email, ux_testing_email_communication).each do |me_only_attribute|
+  ME_ONLY_ATTRS.each do |me_only_attribute|
     alias_method :"include_#{me_only_attribute}?", :permitted_requester?
   end
 
