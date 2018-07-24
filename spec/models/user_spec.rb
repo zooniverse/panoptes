@@ -869,12 +869,19 @@ describe User, type: :model do
   end
 
   describe "#can_recieve_notifications?" do
-    it "should be false by default" do
-      expect(user.can_recieve_notifications?).to eq(false)
+    it "should be allow notifications by default" do
+      expect(user.can_recieve_notifications?).to eq(true)
     end
 
     it "should allow the user to opt-out of notifications" do
-      user.notifications_opt_out = true
+      user.notify_opt_out!
+      expect(user.can_recieve_notifications?).to eq(false)
+    end
+
+    it "should allow the user to opt back into notifications" do
+      user.notify_opt_out!
+      expect(user.can_recieve_notifications?).to eq(false)
+      user.notify_opt_in!
       expect(user.can_recieve_notifications?).to eq(true)
     end
   end
