@@ -17,4 +17,14 @@ namespace :project do
       end
     end
   end
+
+  namespace :email_list do
+    desc "Export a project's email list to S3"
+    task export: :environemnt do
+      project_ids = Array.wrap(ENV['EXPORT_PROJECT_IDS'].try(:split, ","))
+      project_ids.each do |project_id|
+        EmailsProjectsExportWorker.perform(project_id)
+      end
+    end
+  end
 end
