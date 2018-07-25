@@ -36,5 +36,5 @@ class Api::V1::SetMemberSubjectsController < Api::ApiController
 
   def linked_workflow_ids(set_id)
     SubjectSetsWorkflow.where(subject_set_id: set_id).pluck(:workflow_id)
-    end
+  end
 end
