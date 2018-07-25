@@ -26,7 +26,14 @@ class Api::V1::SubjectSetsController < Api::ApiController
     super do |subject_set|
       notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
-      reset_workflow_finished_at(subject_set.workflows.pluck(:id))
+
+      subject_set.subject_sets_workflows.pluck(:workflow_id).each do |workflow_id|
+        UnfinishWorkflowWorker.perform_async(workflow_id)
+        params[:subjects].each do |subject_id|
+          SubjectWorkflowStatusCreateWorker.perform_async(subject_id, workflow_id)
+        end
+
+      end
     end
   end
 
@@ -96,6 +103,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
       new_sms_values = subject_ids_to_link.map do |subject_id|
         [ resource.id, subject_id, rand ]
       end
+
       SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
     else
       super
@@ -126,9 +134,5 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def reset_subject_counts(set_id)
     SubjectSetSubjectCounterWorker.perform_async(set_id)
-  end
-
-  def reset_workflow_finished_at(workflow_ids)
-    workflow_ids.map { |id| UnfinishWorkflowWorker.perform_async(id) }
   end
 end

@@ -411,6 +411,20 @@ describe Api::V1::WorkflowsController, type: :controller do
       it_behaves_like "supports update_links"
       it_behaves_like "reloads the non logged in queues", :subject_sets
 
+      it "should call SubjectSetStatusesCreateWorker" do
+        expect(SubjectSetStatusesCreateWorker)
+        .to receive(:perform_async)
+        .with(subject_set_id, resource.id)
+
+        default_request scopes: scopes, user_id: authorized_user.id
+        params = {
+          link_relation: test_relation.to_s,
+          test_relation => test_relation_ids,
+          resource_id => resource.id
+        }
+        post :update_links, params
+      end
+
       context "when the subject_set links belong to another project" do
         let!(:subject_set_project) do
           workflows.find { |w| w.project != project }.project

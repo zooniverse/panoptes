@@ -39,13 +39,14 @@ RSpec.describe Api::V1::SetMemberSubjectsController, type: :controller do
   end
 
   describe "#create" do
+    let(:linked_subject) { create(:subject) }
     let(:test_attr) { :subject_set }
     let(:test_attr_value) { subject_set }
     let(:create_params) do
       {
         set_member_subjects: {
           links: {
-            subject: create(:subject).id.to_s,
+            subject: linked_subject.id.to_s,
             subject_set: subject_set.id.to_s
           }
         }
@@ -57,6 +58,17 @@ RSpec.describe Api::V1::SetMemberSubjectsController, type: :controller do
     it 'should call the set count worker after action' do
       default_request user_id: authorized_user.id, scopes: scopes
       expect(SubjectSetSubjectCounterWorker).to receive(:perform_async).once
+      post :create, create_params
+    end
+
+    it 'should call the sws status create worker' do
+      linked_workflow_ids = subject_set.subject_sets_workflows.pluck(:workflow_id)
+      linked_workflow_ids.each do |workflow_id|
+        expect(SubjectWorkflowStatusCreateWorker)
+        .to receive(:perform_async)
+        .with(linked_subject.id, workflow_id)
+      end
+      default_request user_id: authorized_user.id, scopes: scopes
       post :create, create_params
     end
   end

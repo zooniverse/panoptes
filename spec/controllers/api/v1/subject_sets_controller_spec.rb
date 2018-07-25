@@ -161,6 +161,17 @@ describe Api::V1::SubjectSetsController, type: :controller do
         run_update_links
       end
 
+      it "should call SWS create worker" do
+        resource.workflows.each do |workflow|
+          test_relation_ids.each do |subject_id|
+            expect(SubjectWorkflowStatusCreateWorker)
+            .to receive(:perform_async)
+            .with(subject_id, workflow.id)
+          end
+        end
+        run_update_links
+      end
+
       context "when the linking resources are not persisted" do
 
         it "should return a 422 with a missing subject" do
