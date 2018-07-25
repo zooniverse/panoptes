@@ -20,7 +20,7 @@ namespace :project do
 
   namespace :email_list do
     desc "Export a project's email list to S3"
-    task export: [:project_id] => [:environment] do |t, args|
+    task :export, [:project_id] => [:environment] do |t, args|
       EmailsProjectsExportWorker.perform(args[:project_id])
     end
   end
