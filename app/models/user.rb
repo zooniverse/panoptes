@@ -2,7 +2,6 @@ require "user_unsubscribe_message_verifier"
 
 class User < ActiveRecord::Base
   include Activatable
-  include Linkable
   include PgSearch
   include ExtendedCacheKey
 
@@ -62,12 +61,6 @@ class User < ActiveRecord::Base
   delegate :subjects, to: :identity_group
   delegate :owns?, to: :identity_group
 
-  can_be_linked :membership, :all
-  can_be_linked :user_group, :all
-  can_be_linked :user_project_preference, :all
-  can_be_linked :user_collection_preference, :all
-  can_be_linked :project, :scope_for, :update, :user
-  can_be_linked :collection, :scope_for, :update, :user
 
   pg_search_scope :search_name,
     against: [:login],
@@ -92,17 +85,6 @@ class User < ActiveRecord::Base
       trigram: {}
     },
     ranked_by: ":tsearch + (0.25 * :trigram)"
-
-  def self.scope_for(action, user, opts={})
-    case
-    when user.is_admin?
-      User.all
-    when [ :show, :index ].include?(action)
-      where(ouroboros_created: false).merge(active)
-    else
-      where(id: user.id)
-    end
-  end
 
   def self.from_omniauth(auth_hash)
     transaction do
@@ -233,15 +215,6 @@ class User < ActiveRecord::Base
     !!admin
   end
 
-  def has_finished?(workflow)
-    return true if workflow.finished?
-
-    current_seen_count = SetMemberSubject
-      .seen_for_user_by_workflow(self, workflow)
-      .count
-    !!(current_seen_count >= workflow.subjects_count)
-  end
-
   def valid_sha1_password?(plain_password)
     worked = nil
     1.upto(25).each do |n|
@@ -337,8 +310,8 @@ class User < ActiveRecord::Base
     Rails.cache.increment(subjects_count_cache_key)
   end
 
-  def favorite_collections_for_project(project)
-    collections.joins(:projects).where(favorite: true, projects: {id: project.id})
+  def favorite_collections_for_project(project_id)
+    collections.joins(:projects).where(favorite: true, projects: {id: project_id})
   end
 
   private

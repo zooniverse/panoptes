@@ -1,4 +1,5 @@
 class Api::V1::SubjectSetsController < Api::ApiController
+  include JsonApiController::PunditPolicy
   include FilterByMetadata
 
   require_authentication :create, :update, :destroy, scopes: [:project]
@@ -64,6 +65,9 @@ class Api::V1::SubjectSetsController < Api::ApiController
     super do |subject_set|
       notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
+      reset_workflow_retired_counts(
+        subject_set.subject_sets_workflows.pluck(:workflow_id)
+      )
     end
   end
 
@@ -80,7 +84,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
   def build_resource_for_create(create_params)
     super do |_, link_params|
       if collection_id = link_params.delete("collection")
-        if collection = Collection.scope_for(:show, api_user).where(id: collection_id).first
+        if collection = Pundit.policy!(api_user, Collection).scope_for(:show).where(id: collection_id).first
           link_params["subjects"] = collection.subjects
         else
           raise ActiveRecord::RecordNotFound, "No Record Found for Collection with id: #{collection_id}"
@@ -111,8 +115,6 @@ class Api::V1::SubjectSetsController < Api::ApiController
       linked_sms_ids = value.split(',').map(&:to_i)
       set_member_subjects = resource.set_member_subjects.where(subject_id: linked_sms_ids)
       remove_linked_set_member_subjects(set_member_subjects)
-
-      reset_workflow_retired_counts(controlled_resource.workflows.pluck(:id))
     else
       super
     end

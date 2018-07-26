@@ -7,30 +7,65 @@ module Subjects
     class MissingSubjects < StandardError; end
     class MalformedSelectedIds < StandardError; end
 
-    attr_reader :user, :params, :workflow, :scope
+    SELECTION_STATE_ENUM = {
+      0 => :normal,
+      1 => :internal_fallback,
+      2 => :failover_fallback
+    }.freeze
 
-    def initialize(user, workflow, params, scope=Subject.all)
-      @user, @workflow, @params, @scope = user, workflow, params, scope
+    attr_reader :user, :params
+
+    def initialize(user, params)
+      @user, @params = user, params
+      @selection_state = 0
     end
 
-    def get_subjects
-      raise workflow_id_error unless workflow
+    def get_subject_ids
+      raise workflow_id_error unless !!params[:workflow_id]
       raise group_id_error if needs_set_id?
       raise missing_subject_set_error if workflow.subject_sets.empty?
       raise missing_subjects_error if workflow.set_member_subjects.empty?
-      selected_subjects
+      selected_subject_ids
     end
 
-    def selected_subjects
-      unless workflow.finished_at
+    def selected_subject_ids
+      if workflow_has_data?
         subject_ids = run_strategy_selection
+        @selection_state = 0
+      end
+
+      if subject_ids.blank? && workflow_has_data?
+        subject_ids = internal_fallback
+        @selection_state = 1
       end
 
       if subject_ids.blank?
-        subject_ids = fallback_selection
+        subject_ids = fallback_selector.any_workflow_data
+        @selection_state = 2
       end
 
-      active_subjects_in_selection_order(subject_ids)
+      # when on Rails 5
+      # move to AR_Scope.order(["idx(array[?]), id", subject_ids])
+      # instead of manually checking and raising
+      unless subject_ids.all? { |i| i.is_a? Integer }
+        raise MalformedSelectedIds.new(
+          "Selector returns non-integers, hacking attempt?!"
+        )
+      end
+
+      subject_ids
+    end
+
+    def workflow
+      @workflow ||= Workflow.find_without_json_attrs(params[:workflow_id])
+    end
+
+    def workflow_has_data?
+      @workflow_has_data ||= !workflow.finished_at
+    end
+
+    def selection_state
+      SELECTION_STATE_ENUM[@selection_state]
     end
 
     private
@@ -44,37 +79,28 @@ module Subjects
       ).select
     end
 
-    def fallback_selection
-      opts = { limit: subjects_page_size, subject_set_id: subject_set_id }
-      fallback_selector = PostgresqlSelection.new(workflow, user, opts)
+    def fallback_selector_opts
+      { limit: subjects_page_size, subject_set_id: subject_set_id }
+    end
 
+    def fallback_selector
+      @fallback_selector ||= PostgresqlSelection.new(
+        workflow,
+        user,
+        fallback_selector_opts
+      )
+    end
+
+    def internal_fallback
       subject_ids = fallback_selector.select
+
       if data_available = !subject_ids.empty?
         if Panoptes.flipper[:selector_sync_error_reload].enabled?
           NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
         end
       end
 
-      if subject_ids.blank?
-        fallback_selector.any_workflow_data
-      else
-        subject_ids
-      end
-    end
-
-    def active_subjects_in_selection_order(subject_ids)
-      # when on Rails 5 - move to .order(["idx(array[?]), id", subject_ids])
-      # instead of manually checking and raising
-      unless subject_ids.all? { |i| i.is_a? Integer }
-        raise MalformedSelectedIds.new(
-          "Selector returns non-integers, hacking attempt?!"
-        )
-      end
-
-      scope
-      .active
-      .where(id: subject_ids)
-      .order("idx(array[#{subject_ids.join(',')}], id)")
+      subject_ids
     end
 
     def needs_set_id?
@@ -82,7 +108,7 @@ module Subjects
     end
 
     def workflow_id_error
-      MissingParameter.new("workflow_id parameter missing")
+      raise MissingParameter.new("workflow_id parameter missing")
     end
 
     def group_id_error

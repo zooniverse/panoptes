@@ -1,4 +1,6 @@
 class Api::V1::SetMemberSubjectsController < Api::ApiController
+  include JsonApiController::PunditPolicy
+
   require_authentication :create, :update, :destroy, scopes: [:project]
   resource_actions :default
   schema_type :strong_params
@@ -36,5 +38,5 @@ class Api::V1::SetMemberSubjectsController < Api::ApiController
 
   def linked_workflow_ids(set_id)
     SubjectSetsWorkflow.where(subject_set_id: set_id).pluck(:workflow_id)
-    end
+  end
 end

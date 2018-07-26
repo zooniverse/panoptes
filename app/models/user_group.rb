@@ -1,7 +1,5 @@
 class UserGroup < ActiveRecord::Base
-  include RoleControl::Controlled
   include Activatable
-  include Linkable
   include PgSearch
 
   has_many :memberships, dependent: :destroy
@@ -28,22 +26,6 @@ class UserGroup < ActiveRecord::Base
   before_validation :default_join_token, on: [:create]
 
   scope :public_groups, -> { where(private: false) }
-
-  can_by_role :show, :index,
-              public: :public_groups,
-              roles: [ :group_admin,
-                       :project_editor,
-                       :collection_editor,
-                       :group_member ]
-
-  can_by_role :update, :destroy, :update_links, :destroy_links,
-              roles: [ :group_admin ]
-
-  can_by_role :edit_project,
-              roles: [ :group_admin, :project_editor ]
-
-  can_by_role :edit_collection,
-              roles: [ :group_admin, :collection_editor ]
 
   pg_search_scope :search_name,
     against: :display_name,

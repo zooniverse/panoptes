@@ -11,31 +11,20 @@ describe ProjectSerializer do
     s
   end
 
-  it "should not preload the serialized associations by default" do
-    expect_any_instance_of(Project::ActiveRecord_Relation).not_to receive(:preload)
+  it "should preload the serialized associations ny default" do
+    expect_any_instance_of(Project::ActiveRecord_Relation)
+      .to receive(:preload)
+      .with(*ProjectSerializer::PRELOADS)
+      .and_call_original
     ProjectSerializer.page({}, Project.all, {})
   end
 
-  context "with enabled preload feature" do
-    before do
-      Panoptes.flipper["eager_load_projects"].enable
-    end
-
-    it "should preload avatars with cards context" do
-      expect_any_instance_of(Project::ActiveRecord_Relation)
-        .to receive(:preload)
-        .with(:avatar)
-        .and_call_original
-      ProjectSerializer.page({}, Project.all, {cards: true})
-    end
-
-    it "should preload the serialized associations without cards context" do
-      expect_any_instance_of(Project::ActiveRecord_Relation)
-        .to receive(:preload)
-        .with(*ProjectSerializer::PRELOADS)
-        .and_call_original
-      ProjectSerializer.page({}, Project.all, {})
-    end
+  it "should preload avatars with cards context" do
+    expect_any_instance_of(Project::ActiveRecord_Relation)
+      .to receive(:preload)
+      .with(:avatar)
+      .and_call_original
+    ProjectSerializer.page({}, Project.all, {cards: true})
   end
 
   describe "#content" do

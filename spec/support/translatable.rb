@@ -25,27 +25,4 @@ shared_examples "is translatable" do
       expect(translatable.available_languages).to include('en')
     end
   end
-
-  describe "::scope_for" do
-    let(:users) { create_list(:user, 2) }
-    let!(:acl) do
-      resource = translatable.try(:project) || translatable
-      create(:access_control_list,
-             user_group: users.first.identity_group,
-             resource: resource,
-             roles: ["translator"])
-    end
-
-    it 'should include projects a user is a translator for' do
-      expect(described_class.scope_for(:translate, ApiUser.new(users.first))).to match_array([translatable])
-    end
-
-    it 'should not include projects a user is not a translator for' do
-      expect(described_class.scope_for(:translate, ApiUser.new(users.first))).to_not include(private_model)
-    end
-
-    it 'should by empty when a user not a translator on any project' do
-      expect(described_class.scope_for(:translate, ApiUser.new(users[1]))).to be_empty
-    end
-  end
 end

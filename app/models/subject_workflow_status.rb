@@ -1,7 +1,6 @@
 class SubjectWorkflowStatus < ActiveRecord::Base
   self.table_name = 'subject_workflow_counts'
 
-  include RoleControl::ParentalControlled
 
   belongs_to :subject
   belongs_to :workflow
@@ -16,8 +15,6 @@ class SubjectWorkflowStatus < ActiveRecord::Base
 
   delegate :set_member_subjects, to: :subject
   delegate :project, to: :workflow
-
-  can_through_parent :workflow, :show, :index
 
   def self.by_subject(subject_id)
     where(subject_id: subject_id)

@@ -55,20 +55,16 @@ module JsonApiController
     @serializer ||= "#{ resource_name.camelize }Serializer".constantize
   end
 
-  def policy_object
-    @policy_object ||= RoledControllerPolicy.new(api_user, resource_class, resource_name, action_name, params)
-  end
-
   def controlled_resources
-    @controlled_resources ||= policy_object.scope
+    @controlled_resources ||= policy_scope
   end
 
   def controlled_resource
-    policy_object.scope.first
+    controlled_resources.first
   end
 
   def resource_ids
-    policy_object.resource_ids
+    ResourceIds.from(params, resource_name)
   end
 
   def resource_name

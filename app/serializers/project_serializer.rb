@@ -8,7 +8,7 @@ class ProjectSerializer
   include CachedSerializer
 
   PRELOADS = [
-    # :project_contents, Note: re-add when the eager_load from translatable_resources is removed
+    :project_contents,
     :workflows,
     :active_workflows,
     :subject_sets,
@@ -52,14 +52,13 @@ class ProjectSerializer
       end
     end
 
-    if Panoptes.flipper["eager_load_projects"].enabled?
-      preloads = if context[:cards]
+    preloads =
+      if context[:cards]
         :avatar
       else
         PRELOADS
       end
-      scope = scope.preload(*preloads)
-    end
+    scope = scope.preload(*preloads)
 
     super(params, scope, context)
   end

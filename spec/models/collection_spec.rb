@@ -68,22 +68,4 @@ describe Collection, type: :model do
       expect(collection.subjects.to_sql).to include(order_clause)
     end
   end
-
-  context "contribution" do
-    let(:contributor) { ApiUser.new(create(:user)) }
-    let(:collab_collection) { create(:collection) }
-
-    it "allows contributor to update links" do
-      AccessControlList.new(
-        user_group: contributor.user.identity_group,
-        resource: collab_collection,
-        roles: ["contributor"]
-      ).save!
-      expect(Collection.scope_for(:update_links, contributor)).to include(collab_collection)
-    end
-
-    it "does not allow non-contributor to update links" do
-      expect(Collection.scope_for(:update_links, contributor)).to_not include(collab_collection)
-    end
-  end
 end

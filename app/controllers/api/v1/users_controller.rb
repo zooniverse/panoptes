@@ -1,4 +1,5 @@
 class Api::V1::UsersController < Api::ApiController
+  include JsonApiController::PunditPolicy
   include Recents
   include IndexSearch
   include AdminAllowed
@@ -7,12 +8,15 @@ class Api::V1::UsersController < Api::ApiController
   require_authentication :update, :destroy, scopes: [:user]
   resource_actions :deactivate, :update, :index, :show
 
+  before_action :filter_by_params, only: :index
+
   schema_type :strong_params
 
   allowed_params :update, :login, :display_name, :email, :credited_name,
    :global_email_communication, :project_email_communication,
    :beta_email_communication, :languages, :subject_limit, :upload_whitelist,
-   :banned, :valid_email
+   :banned, :valid_email, :ux_testing_email_communication,
+   :intervention_notifications
 
   alias_method :user, :controlled_resource
 
@@ -33,6 +37,8 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def me
+    skip_policy_scope
+
     if stale?(last_modified: current_resource_owner.updated_at)
       render json_api: serializer.resource({},
                                            resource_scope(current_resource_owner),
@@ -53,19 +59,6 @@ class Api::V1::UsersController < Api::ApiController
         UserInfoChangedMailerWorker.perform_async(user_id, "email")
       end
     end
-  end
-
-  def index
-    if api_user.is_admin? && downcased_emails = downcase_filter_params(:email)
-      @controlled_resources = controlled_resources.where(
-        User.arel_table[:email].lower.in(downcased_emails)
-      )
-    elsif downcased_login = downcase_filter_params(:login)
-      @controlled_resources = controlled_resources.where(
-        User.arel_table[:login].lower.in(downcased_login)
-      )
-    end
-    super
   end
 
   def destroy
@@ -103,9 +96,29 @@ class Api::V1::UsersController < Api::ApiController
     token.revoke
   end
 
-  def downcase_filter_params(key)
-    if param_value = params.delete(key)
-      param_value.split(',').map(&:downcase)
+  def filter_by_params
+    # delete the params to ensure non-admin users can not
+    # filter on email through the serializer can_filter_by DSL
+    if email_param = params.delete(:email)
+      if api_user.is_admin?
+        # re-add the email for href construction in serializer meta
+        params[:email] = email_param
+        downcased_emails = downcase_filter_params(email_param)
+        @controlled_resources = controlled_resources.where(
+          User.arel_table[:email].lower.in(downcased_emails)
+        )
+      end
     end
+
+    if params[:login]
+      downcased_logins = downcase_filter_params(params[:login])
+      @controlled_resources = controlled_resources.where(
+        User.arel_table[:login].lower.in(downcased_logins)
+      )
+    end
+  end
+
+  def downcase_filter_params(param_value)
+    param_value.split(',').map(&:downcase)
   end
 end

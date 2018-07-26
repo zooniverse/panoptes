@@ -40,126 +40,8 @@ describe Api::V1::UsersController, type: :controller do
         expect(json_response[api_resource_name].length).to eq(2)
       end
 
-      context "the record for the requesting user" do
-        let(:requester) { json_response[api_resource_name].find{ |records| records["id"] == users.first.id.to_s } }
-        it 'should have an email address' do
-          expect(requester).to include("email")
-        end
-
-        it 'should have a credited name' do
-          expect(requester).to include("credited_name")
-        end
-
-        it 'should have a global email communication' do
-          expect(requester).to include("global_email_communication")
-        end
-
-        it 'should have a project email communication' do
-          expect(requester).to include("project_email_communication")
-        end
-
-        it 'should have a beta email communication' do
-          expect(requester).to include("beta_email_communication")
-        end
-
-        it 'should have a ux testing email communication' do
-          expect(requester).to include("ux_testing_email_communication")
-        end
-
-        it "should have a uploaded_subjects_count" do
-          expect(requester).to include("uploaded_subjects_count")
-        end
-
-        it "should have a subject_limit" do
-          expect(requester).to include("subject_limit")
-        end
-
-        it "should have a upload_whitelist" do
-          expect(requester).to include("upload_whitelist")
-        end
-      end
-
-      context "a record for a different user" do
-        let(:not_requester) { json_response[api_resource_name].find{ |records| records["id"] != users.first.id.to_s } }
-
-        it 'should not have an email address' do
-          expect(not_requester).to_not include("email")
-        end
-
-        it 'should not have a global email communication' do
-          expect(not_requester).to_not include("global_email_communication")
-        end
-
-        it 'should not have a project email communication' do
-          expect(not_requester).to_not include("project_email_communication")
-        end
-
-        it 'should not have a beta email communication' do
-          expect(not_requester).to_not include("beta_email_communication")
-        end
-
-        it 'should not have a ux testing email communication' do
-          expect(not_requester).to_not include("ux_testing_email_communication")
-        end
-
-        it "should not have a uploaded_subjects_count" do
-          expect(not_requester).to_not include("uploaded_subjects_count")
-        end
-
-        it "should not have a subject_limit" do
-          expect(not_requester).to_not include("subject_limit")
-        end
-
-        it "should not have a upload_whitelist" do
-          expect(not_requester).to_not include("upload_whitelist")
-        end
-      end
-
       it_behaves_like "an api response"
       it_behaves_like 'an indexable etag response'
-    end
-
-    context "an unauthenticated request" do
-      before(:each) do
-        unauthenticated_request
-        get :index
-      end
-
-      it 'should not have an email address' do
-        expect(json_response[api_resource_name][0]).to_not include("email")
-      end
-
-      it 'should not have languages' do
-        expect(json_response[api_resource_name][0]).to_not include("languages")
-      end
-
-      it 'should not have a global email communication' do
-        expect(json_response[api_resource_name][0]).to_not include("global_email_communication")
-      end
-
-      it 'should not have a project email communication' do
-        expect(json_response[api_resource_name][0]).to_not include("project_email_communication")
-      end
-
-      it 'should not have a beta email communication' do
-        expect(json_response[api_resource_name][0]).to_not include("beta_email_communication")
-      end
-
-      it 'should not have a ux testing email communication' do
-        expect(json_response[api_resource_name][0]).to_not include("ux_testing_email_communication")
-      end
-
-      it "should not have a uploaded_subjects_count" do
-        expect(json_response[api_resource_name][0]).to_not include("uploaded_subjects_count")
-      end
-
-      it "should not have a subject_limit" do
-        expect(json_response[api_resource_name][0]).to_not include("subject_limit")
-      end
-
-      it "should not have a upload_whitelist" do
-        expect(json_response[api_resource_name][0]).to_not include("upload_whitelist")
-      end
     end
 
     describe "params" do
@@ -227,6 +109,21 @@ describe Api::V1::UsersController, type: :controller do
 
           it "should respond with the correct item" do
             expect(json_response[api_resource_name][0]['display_name']).to eq(user.display_name)
+          end
+
+          context "with filtering emails on multiple emails" do
+            let(:another_user) { create(:user) }
+            let(:emails_filter) do
+              [ email, another_user.email ].map(&:upcase).join(',')
+            end
+            let(:index_options) do
+              { email: emails_filter, admin: true, page_size: 1 }
+            end
+
+            it "should respond include the filter in the next href" do
+              next_href = json_response.dig("meta", "users", "next_href")
+              expect(next_href).to include("email=#{emails_filter}")
+            end
           end
         end
 
@@ -582,12 +479,6 @@ describe Api::V1::UsersController, type: :controller do
       end
     end
 
-    context "when changing global_email_communication" do
-      after(:each) do
-        update_request
-      end
-    end
-
     context "when updating a non-existant user" do
       before(:each) { update_request }
       let!(:user_id) { User.last.id + 1 }
@@ -609,11 +500,19 @@ describe Api::V1::UsersController, type: :controller do
       let(:new_gec) { false }
       let(:new_pec) { false }
       let(:new_bec) { false }
+      let(:new_ux_testing) { false }
+      let(:new_intervention_notifications) { false }
       let(:put_operations) do
-        { users: { login: new_login,
-                  global_email_communication: new_gec,
-                  project_email_communication: new_pec,
-                  beta_email_communication: new_bec } }
+        {
+          users: {
+            login: new_login,
+            global_email_communication: new_gec,
+            project_email_communication: new_pec,
+            beta_email_communication: new_bec,
+            ux_testing_email_communication: new_ux_testing,
+            intervention_notifications: new_intervention_notifications
+          }
+        }
       end
 
       it "should return 200 status" do
@@ -634,6 +533,14 @@ describe Api::V1::UsersController, type: :controller do
 
       it "should have updated the beta email communication attribute" do
         expect(user.reload.beta_email_communication).to eq(new_bec)
+      end
+
+      it "should have updated the ux testing email comms attribute" do
+        expect(user.reload.ux_testing_email_communication).to eq(new_bec)
+      end
+
+      it "should have updated the intervention notifications attribute" do
+        expect(user.reload.intervention_notifications).to eq(new_bec)
       end
 
       it "should have a single group" do

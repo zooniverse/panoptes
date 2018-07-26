@@ -34,7 +34,6 @@ module Api
       ActionController::UnpermittedParameters,
       ActionController::ParameterMissing,
       Subjects::Selector::MissingParameter,
-      Classification::MissingParameter,
       Api::RolesExist,
       JsonSchema::ValidationError,
       JsonApiController::NotLinkable,

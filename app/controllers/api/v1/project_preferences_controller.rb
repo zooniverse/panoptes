@@ -1,4 +1,5 @@
 class Api::V1::ProjectPreferencesController < Api::ApiController
+  include JsonApiController::PunditPolicy
   include PreferencesController
 
   require_authentication :all, scopes: [:project]
@@ -8,6 +9,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   before_action :find_upp_for_update_settings, only: [:update_settings]
 
   def update_settings
+    skip_policy_scope
     @upp.settings.merge! params_for[:settings]
     @upp.save!
     update_settings_response

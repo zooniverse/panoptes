@@ -1,4 +1,5 @@
 class Api::V1::SubjectsController < Api::ApiController
+  include JsonApiController::PunditPolicy
   include Versioned
 
   require_authentication :update, :create, :destroy, :version, :versions,
@@ -20,13 +21,33 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def queued
-    selector = Subjects::Selector.new(api_user.user, workflow, params)
+    skip_policy_scope
+
+    subject_selector = Subjects::Selector.new(api_user.user, params)
+    selected_subject_ids = subject_selector.get_subject_ids
+
+    selected_subject_scope = if selected_subject_ids.empty?
+      Subject.none
+    else
+      Subject
+      .active
+      .where(id: selected_subject_ids)
+      .order(
+        "idx(array[#{selected_subject_ids.join(',')}], id)"
+      )
+    end
+
+    selection_context = Subjects::SelectorContext.new(
+      subject_selector,
+      selected_subject_ids
+    ).format
+
     non_filterable_params = params.except(:project_id, :collection_id)
-    selected_subjects = selector.get_subjects
+
     render json_api: SubjectSelectorSerializer.page(
       non_filterable_params,
-      selected_subjects,
-      selector_context(selected_subjects.map(&:id))
+      selected_subject_scope,
+      selection_context
     )
   end
 
@@ -60,10 +81,6 @@ class Api::V1::SubjectsController < Api::ApiController
     end
   end
 
-  def workflow
-    @workflow ||= Workflow.where(id: params[:workflow_id]).first
-  end
-
   def build_resource_for_create(create_params)
     locations = create_params.delete(:locations)
     subject = super(create_params) do |object, linked|
@@ -95,29 +112,6 @@ class Api::V1::SubjectsController < Api::ApiController
       { url_format: :put }
     else
       { url_format: :get }
-    end
-  end
-
-  def selector_context(selected_subject_ids)
-    if Panoptes.flipper[:skip_subject_selection_context].enabled?
-      {}
-    else
-      {
-        workflow: workflow,
-        user: api_user.user,
-        user_seen: user_seen,
-        url_format: :get,
-        favorite_subject_ids: FavoritesFinder.new(api_user.user, workflow.project, selected_subject_ids).find_favorites,
-        retired_subject_ids: SubjectWorkflowRetirements.new(workflow, selected_subject_ids).find_retirees,
-        user_has_finished_workflow: api_user.user&.has_finished?(workflow),
-        select_context: true
-      }.compact
-    end
-  end
-
-  def user_seen
-    if api_user.user
-      UserSeenSubject.where(user: api_user.user, workflow: workflow).first
     end
   end
 end

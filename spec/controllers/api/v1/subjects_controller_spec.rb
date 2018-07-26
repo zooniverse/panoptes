@@ -75,7 +75,7 @@ describe Api::V1::SubjectsController, type: :controller do
             json_response[api_resource_name].map { |s| s.has_key?(optional_attr) }.uniq
           end
 
-          %w( retired already_seen finished_workflow favorite ).each do |attr|
+          %w(retired already_seen finished_workflow favorite).each do |attr|
             let(:optional_attr) { attr }
 
             it "should not serialize the #{attr} attribute" do
@@ -181,33 +181,17 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:request_params) { { sort: 'queued', workflow_id: workflow.id.to_s } }
         let(:api_resource_links) { [] }
 
-        describe "selection context" do
-          let(:selector_context) do
-            {
-              workflow: workflow,
-              user: user,
-              favorite_subject_ids: [],
-              retired_subject_ids: [],
-              url_format: :get,
-              user_has_finished_workflow: false,
-              select_context: true
-            }
-          end
-
-          it 'should pass the selection context to the serializer' do
-            expect(SubjectSelectorSerializer)
-              .to receive(:page)
-              .with(anything, anything, selector_context)
-            get :index, request_params
-          end
-
-          it 'should pass empty selection context if feature flag is enabled' do
-            Panoptes.flipper[:skip_subject_selection_context].enable
-            expect(SubjectSelectorSerializer)
-              .to receive(:page)
-              .with(anything, anything, {})
-            get :index, request_params
-          end
+        it 'should pass the selector context to the serializer' do
+          formatted_context = {}
+          context_double = instance_double("Subjects::SelectorContext")
+          allow(context_double).to receive(:format).and_return(formatted_context)
+          allow(Subjects::SelectorContext)
+            .to receive(:new)
+            .and_return(context_double)
+          expect(SubjectSelectorSerializer)
+            .to receive(:page)
+            .with(anything, anything, formatted_context)
+          get :index, request_params
         end
 
         context "with subjects" do
@@ -239,7 +223,6 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(retired).to all( be false )
           end
 
-          it_behaves_like "favorited subjects"
           it_behaves_like "an api response" do
             before { get :index, request_params }
           end
@@ -260,10 +243,16 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(already_seen).to all( be true )
           end
 
-          it 'should return finished_workflow as true' do
+          it 'should return finished_workflow as false' do
             get :index, request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
-            expect(seen_all).to all( be true )
+            expect(seen_all).to all( be false )
+          end
+
+          it 'should return user_has_finished_workflow as true for each subject' do
+            get :index, request_params
+            seen_all = json_response["subjects"].map{ |s| s['user_has_finished_workflow']}
+            expect(seen_all).to all be(true)
           end
         end
 
@@ -279,8 +268,13 @@ describe Api::V1::SubjectsController, type: :controller do
             get :index, request_params
           end
 
-          it 'should return user finished_workflow as true for each subject' do
+          it 'should return finished_workflow as true for each subject' do
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
+            expect(seen_all).to all be(true)
+          end
+
+          it 'should return user_has_finished_workflow as true for each subject' do
+            seen_all = json_response["subjects"].map{ |s| s['user_has_finished_workflow']}
             expect(seen_all).to all be(true)
           end
 
@@ -379,6 +373,46 @@ describe Api::V1::SubjectsController, type: :controller do
               expect(response.body).to eq(json_error_message(error_body))
             end
           end
+
+          context "with ordered subject selection" do
+            it "should respect the order of the subjects from selector" do
+              ordered_subject_ids = sms.map(&:subject_id).reverse.map(&:to_s)
+              allow_any_instance_of(
+                Subjects::Selector
+              ).to receive(
+                :get_subject_ids
+              ).and_return(ordered_subject_ids)
+
+              get :queued, request_params
+
+              selected_subject_ids = created_instance_ids(api_resource_name)
+              expect(selected_subject_ids).to eq(ordered_subject_ids)
+            end
+
+            it "should not try to order missing subject_ids" do
+              allow_any_instance_of(
+                Subjects::Selector
+              ).to receive(
+                :get_subject_ids
+              ).and_return([])
+
+              get :queued, request_params
+              expect(json_response[api_resource_name].length).to eq(0)
+            end
+          end
+
+          context "with deactivated subjects" do
+            before do
+              Subject
+              .where(id: sms.map(&:subject_id))
+              .update_all(activated_state: 1)
+            end
+
+            it "should return no subjects" do
+              get :queued, request_params
+              expect(json_response[api_resource_name].length).to eq(0)
+            end
+          end
         end
       end
     end
@@ -421,7 +455,6 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(retired).to all( be false )
           end
 
-          it_behaves_like "favorited subjects"
           it_behaves_like "an api response" do
             before { get :queued, request_params }
           end
@@ -442,9 +475,15 @@ describe Api::V1::SubjectsController, type: :controller do
             expect(already_seen).to all( be true )
           end
 
-          it 'should return finished_workflow as true' do
+          it 'should return finished_workflow as false' do
             get :queued, request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
+            expect(seen_all).to all( be false )
+          end
+
+          it 'should return user_has_finished_workflow as true' do
+            get :queued, request_params
+            seen_all = json_response["subjects"].map{ |s| s['user_has_finished_workflow']}
             expect(seen_all).to all( be true )
           end
         end
@@ -628,7 +667,7 @@ describe Api::V1::SubjectsController, type: :controller do
       default_request user_id: authorized_user.id, scopes: scopes
       external_locs = [{"image/jpeg" => "http://example.com/1.jpg"}, {"image/jpeg" => "http://example.com/2.jpg"}]
       external_src_urls = external_locs.map { |loc| loc.to_a.flatten[1] }
-      create_params[:subjects].merge!(locations: external_locs)
+      create_params[:subjects][:locations] = external_locs
       post :create, create_params
       locations = Subject.find(created_instance_id("subjects")).locations
       aggregate_failures "external srcs" do

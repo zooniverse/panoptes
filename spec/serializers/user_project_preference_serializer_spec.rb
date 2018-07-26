@@ -11,7 +11,7 @@ describe UserProjectPreferenceSerializer do
     let(:serialized_page) do
       UserProjectPreferenceSerializer.page(
         params,
-        UserProjectPreference.scope_for(:index, user),
+        UserProjectPreference.all,
         {}
       )
     end

@@ -4,8 +4,6 @@ RSpec.describe UserProjectPreference, type: :model do
   let(:user_project) { build(:user_project_preference) }
   let(:factory) { :user_project_preference }
 
-  it_behaves_like "has preferences scope"
-
   it 'should have a valid factory' do
     expect(user_project).to be_valid
   end
@@ -19,7 +17,6 @@ RSpec.describe UserProjectPreference, type: :model do
   end
 
   describe "#summated_activity_count" do
-
     it "should summate correctly for activity_count only" do
       upp = build(:user_project_preference)
       expect(upp.summated_activity_count).to eq(upp.activity_count)

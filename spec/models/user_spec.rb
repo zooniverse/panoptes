@@ -18,16 +18,6 @@ describe User, type: :model do
     end
   end
 
-  describe "links" do
-    it "should allow membership links to any user" do
-      expect(User).to link_to(Membership).with_scope(:all)
-    end
-
-    it "should allow user_gruop links to any user" do
-      expect(User).to link_to(UserGroup).with_scope(:all)
-    end
-  end
-
   describe '::from_omniauth' do
     let(:auth_hash) { OmniAuth.config.mock_auth[:facebook] }
 
@@ -601,89 +591,6 @@ describe User, type: :model do
     end
   end
 
-  describe "::scope_for" do
-    let(:ouroboros_user) do
-      User.skip_callback :validation, :before, :update_ouroboros_created
-      u = build(:user, activated_state: 0, ouroboros_created: true, build_group: false)
-      u.save(validate: false)
-      User.set_callback :validation, :before, :update_ouroboros_created
-      u
-    end
-    let(:users) do
-      [ create(:user, activated_state: 0),
-        create(:user, activated_state: 0),
-        ouroboros_user,
-        create(:user, activated_state: 1) ]
-    end
-
-    let(:actor) { ApiUser.new(users.first) }
-
-    context "action is show" do
-      it 'should return the active users and non ouroboros_created users' do
-        expect(User.scope_for(:show, actor)).to match_array(users.values_at(0,1))
-      end
-    end
-
-    context "action is index" do
-      it 'should return the active users and non ouroboros_created users' do
-        expect(User.scope_for(:show, actor)).to match_array(users.values_at(0,1))
-      end
-    end
-
-    context "action is destroy or update" do
-      it 'should only return the acting user' do
-        expect(User.scope_for(:destroy, actor)).to match_array(users.first)
-      end
-    end
-  end
-
-  describe "has_finished?" do
-    let(:user) { create(:user) }
-    let(:workflow) { create(:workflow_with_subjects) }
-
-    subject { user.has_finished?(workflow) }
-
-    context 'when the workflow is finished' do
-      before do
-        workflow.update_column(:finished_at, DateTime.now)
-      end
-
-      it { is_expected.to be true }
-    end
-
-    context 'when the user has classified all subjects in a workflow' do
-      before do
-        ids = workflow.subject_sets.flat_map(&:subjects).map(&:id)
-        create(:user_seen_subject, user: user, workflow: workflow, subject_ids: ids)
-        create(:classification, user: user, workflow: workflow, subjects: Subject.where(id: ids))
-      end
-
-      it { is_expected.to be true }
-    end
-
-    context 'when the user has not seen any data for a workflow' do
-      before do
-        create(:user_seen_subject, user: user, workflow: workflow, subject_ids: [])
-      end
-
-      it { is_expected.to be false }
-    end
-
-    context 'when the user only classified old (unlinked) subjects in a workflow' do
-      before do
-        ids = workflow.subject_sets.flat_map(&:subjects).map(&:id)
-        create(:user_seen_subject, user: user, workflow: workflow, subject_ids: ids)
-        new_data_set = create(:subject_set_with_subjects,
-          workflows: [],
-          project: workflow.project
-        )
-        workflow.subject_sets = [ new_data_set ]
-      end
-
-      it { is_expected.to be false }
-    end
-  end
-
   describe "#password" do
     it "should set a user's hash_func to bcrypt" do
       u = build(:insecure_user)
@@ -957,7 +864,7 @@ describe User, type: :model do
     let!(:fav_collection) { create(:collection, projects: [owned], owner: user, favorite: true) }
 
     it "returns the favorite collections for the project" do
-      expect(user.favorite_collections_for_project(owned)).to eq([fav_collection])
+      expect(user.favorite_collections_for_project(owned.id)).to eq([fav_collection])
     end
   end
 end

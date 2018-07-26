@@ -1500,7 +1500,8 @@ CREATE TABLE public.users (
     private_profile boolean DEFAULT true,
     tsv tsvector,
     upload_whitelist boolean DEFAULT false NOT NULL,
-    ux_testing_email_communication boolean DEFAULT false
+    ux_testing_email_communication boolean DEFAULT false,
+    intervention_notifications boolean DEFAULT true
 );
 
 
@@ -3061,7 +3062,7 @@ CREATE UNIQUE INDEX index_user_project_preferences_on_project_id_and_user_id ON 
 -- Name: index_user_seen_subjects_on_user_id_and_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_user_seen_subjects_on_user_id_and_workflow_id ON public.user_seen_subjects USING btree (user_id, workflow_id);
+CREATE UNIQUE INDEX index_user_seen_subjects_on_user_id_and_workflow_id ON public.user_seen_subjects USING btree (user_id, workflow_id);
 
 
 --
@@ -4150,4 +4151,8 @@ INSERT INTO schema_migrations (version) VALUES ('20180510100328');
 INSERT INTO schema_migrations (version) VALUES ('20180510121206');
 
 INSERT INTO schema_migrations (version) VALUES ('20180614131933');
+
+INSERT INTO schema_migrations (version) VALUES ('20180710151618');
+
+INSERT INTO schema_migrations (version) VALUES ('20180724112620');
 

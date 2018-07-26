@@ -81,16 +81,6 @@ describe Workflow, type: :model do
     end.to raise_error(ActiveRecord::RecordInvalid)
   end
 
-  describe "links" do
-    let(:project) { create(:project) }
-    let(:subject_set) { create(:subject_set, project: project) }
-
-    it 'should allow links to subject_sets in the same project' do
-      expect(Workflow).to link_to(subject_set)
-        .with_scope(:where, { project: project })
-    end
-  end
-
   describe "#project" do
     let(:workflow) { create(:workflow) }
 

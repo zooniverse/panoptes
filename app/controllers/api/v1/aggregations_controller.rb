@@ -1,4 +1,5 @@
 class Api::V1::AggregationsController < Api::ApiController
+  include JsonApiController::PunditPolicy
 
   require_authentication :create, :update, scopes: [:project]
   resource_actions :create, :update, :show, :index
