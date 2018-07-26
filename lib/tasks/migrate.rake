@@ -253,6 +253,26 @@ namespace :migrate do
     end
   end
 
+  namespace :subject_workflow_status do
+    desc "Create SubjectWorklfowStatus records for the internal PG subject selector"
+    task :create_records_for_pg_selector => :environment do
+      Workflow.active.select(%i(id project_id)).find_each do |workflow|
+        project_finished = Project.where(id: workflow.project_id).finished.exists?
+        next if project_finished
+
+        linked_workflow_sets = workflow
+          .subject_sets_workflows
+          .select(%i(id subject_set_id))
+        linked_workflow_sets.find_each do |subject_set_workflow|
+          SubjectSetStatusesCreateWorker.perform_async(
+            subject_set_workflow.subject_set_id,
+            workflow.id
+          )
+        end
+      end
+    end
+  end
+
   namespace :user_seen_subjects do
     desc "Merge USS for the same user/workflow"
     task :merge_duplicates => :environment do
