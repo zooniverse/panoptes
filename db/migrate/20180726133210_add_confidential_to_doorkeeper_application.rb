@@ -22,9 +22,15 @@ class AddConfidentialToDoorkeeperApplication < ActiveRecord::Migration
         .where("redirect_uri !~* ?", 'auth/.+/callback') # not the omniauth server apps
         .update_all(non_confidential_opts)
 
+        # only change the apps we know use the password grant without a client_secret
+        known_non_confidential_first_party_app_names = [
+          "ZooniverseFirstParty - PFE",
+          "Panoptes python client - official",
+          "PFE Application"
+        ]
         Doorkeeper::Application
         .first_party # all first_party apps (e.g. PFE, python client)
-        .where("redirect_uri !~* ?", 'auth/.+/callback') # not the omniauth server apps
+        .where(name: known_non_confidential_first_party_app_names)
         .where.not(confidential: false)
         .update_all(non_confidential_opts)
       end
