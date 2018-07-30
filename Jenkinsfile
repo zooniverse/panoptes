@@ -37,5 +37,24 @@ pipeline {
         }
       }
     }
+
+    stage('Deploy staging AMIs') {
+      when {
+        anyOf { branch 'master'; branch 'fix_jenkinsfile' }
+      }
+      failFast true
+      parallel {
+        stage('Deploy API') {
+          steps {
+            build job: '/Deploy latest Panoptes Staging build'
+          }
+        }
+        stage('Deploy Dump workers') {
+          steps {
+            build job: '/Deploy latest Panoptes Staging dump worker build'
+          }
+        }
+      }
+    }
   }
 }
