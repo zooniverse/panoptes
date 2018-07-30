@@ -1,25 +1,28 @@
-#!groovy
+pipeline {
+  agent any
 
-node {
   checkout scm
 
-  def dockerRepoName = 'zooniverse/panoptes-jenkins'
-  def dockerImageName = "${dockerRepoName}:${BRANCH_NAME}"
-  def newImage = null
-
   stage('Build Docker image') {
-    newImage = docker.build(dockerImageName)
-    newImage.push()
+    steps {
+      script {
+        def dockerRepoName = 'zooniverse/panoptes-jenkins'
+        def dockerImageName = "${dockerRepoName}:${BRANCH_NAME}"
+        def newImage = docker.build(dockerImageName)
+        newImage.push()
+
+        if (BRANCH_NAME == 'master') {
+          stage('Update latest tag') {
+          newImage.push('latest')
+        }
+      }
+    }
   }
 
   stage('Deployment') {
     when {
       // change back to branch 'master', remove anyOf
       anyOf { branch 'master'; branch 'fix_jenkinsfile' }
-
-      //stage('Update latest tag') {
-      //  newImage.push('latest')
-      //}
 
       stage('Build staging AMIs') {
         failFast true
