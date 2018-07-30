@@ -101,14 +101,12 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def copy
-    # if project.configuration["template"]
-      # ProjectCopyWorker.perform_async(api_user.id, project.id)
-      binding.pry
-      Projects::Copy.with(project_id: project_id, user_id: user_id).run!()
-      render nothing: true, status: 204
-    # else
-        # raise MethodNotAllowed or something
-    # end
+    if project.configuration["template"] && !project.live
+      ProjectCopyWorker.perform_async(project.id, api_user.id)
+      head :accepted
+    else
+      head :method_not_allowed
+    end
   end
 
   private

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ProjectCopier do
-  describe '::copy' do
+  describe '#copy' do
     let(:project) { create(:full_project, build_extra_contents: true)}
     let(:copyist) { create(:user) }
     let(:tags) { create(:tag, resource: project) }
@@ -10,27 +10,31 @@ describe ProjectCopier do
 
     context "a template project" do
       let(:copied_project) { described_class.copy(project.id, copyist.id) }
-      # "and just test the returned copy"
-
-      # or...
-
-      # subject(:copy) do
-        # -> { described_class.copy(project.id, copyist.id) }
-      # end
-      # "and test the method call but pay the cost of copying over and over again for as many things as I test"
 
       it "returns a valid project" do
-        binding.pry
-      #   "just that it exists and saved"
+        expect(described_class.copy(project.id, copyist.id)).to be_valid
       end
 
-      it "has matching attributes (...but that's what dup does so why test it?)" do
+      it "sets the owner to the api_user" do
+        expect(copied_project.owner).to eq(copyist)
+      end
+
+      it "renames a project when the owner is copying their own project" do
+        new_copy = described_class.copy(project.id, project.owner.id)
+        expect(new_copy.display_name).to include("(copy)")
+      end
+
+      it "has matching attributes" do
+        expect(copied_project.display_name).to eq(project.display_name)
+      end
+
+      it "strips the template config" do
+        expect(copied_project.configuration).not_to include(:template)
       end
 
       it "has valid workflows" do
-      end
-
-      it "...has an avatar? How much of this do I have to do? Do I test every association?" do
+        expect(copied_project.workflows.first).to be_valid
+        expect(copied_project.workflows.first.display_name).to eq(project.workflows.first.display_name)
       end
     end
   end

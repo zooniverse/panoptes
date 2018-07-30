@@ -17,6 +17,13 @@ class ProjectCopier
 
     copied_project = project.deep_clone include: INCLUDE_ATTRIBUTES, except: EXCLUDE_ATTRIBUTES
     copied_project.owner = user
+    copied_project.configuration.delete(:template)
+
+    if user == project.owner
+      copied_project.display_name += " (copy)"
+    end
+
+    copied_project.update_attributes(launch_approved: false, live: false)
     copied_project.save!
     copied_project
   end

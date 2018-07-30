@@ -113,6 +113,7 @@ Rails.application.routes.draw do
         post "/subjects_export", to: "projects#create_subjects_export", format: false
         post "/workflows_export", to: "projects#create_workflows_export", format: false
         post "/workflow_contents_export", to: "projects#create_workflow_contents_export", format: false
+        post "/copy", to: "projects#copy", format: false
 
         json_api_resources :pages, controller: "project_pages"
       end

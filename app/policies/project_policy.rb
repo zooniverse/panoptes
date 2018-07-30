@@ -21,7 +21,7 @@ class ProjectPolicy < ApplicationPolicy
         :create_subjects_export,
         :create_workflows_export,
         :create_workflow_contents_export,
-        :retire_subjects, with: WriteScope
+        :retire_subjects, :copy, with: WriteScope
   scope :translate, with: TranslateScope
 
   def linkable_subject_sets
