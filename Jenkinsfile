@@ -27,12 +27,12 @@ pipeline {
       parallel {
         stage('Build API') {
           steps {
-            build job: 'Panoptes/job/Build Panoptes Staging AMI'
+            build job: '/Build Panoptes Staging AMI'
           }
         }
         stage('Build Dump workers') {
           steps {
-            build job: 'Panoptes/job/Build Panoptes Staging Dump Worker AMI'
+            build job: '/Build Panoptes Staging Dump Worker AMI'
           }
         }
       }
