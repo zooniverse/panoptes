@@ -12,7 +12,10 @@ node {
     newImage.push()
   }
 
-  if (BRANCH_NAME == 'master') {
+  when {
+    # change back to branch 'master', remove anyOf
+    anyOf { branch 'master'; branch 'fix_jenkinsfile' }
+
     stage('Update latest tag') {
       newImage.push('latest')
     }
