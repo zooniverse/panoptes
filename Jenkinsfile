@@ -18,12 +18,12 @@ node {
     }
 
     stage('Build staging AMIs') {
-      parallel {
-        failFast true
+      failFast true
 
+      parallel {
         stage('Build API') {
           build job: 'Panoptes/job/Build Panoptes Staging AMI'
-        },
+        }
         stage('Build Dump workers') {
           build job: 'Panoptes/job/Build Panoptes Staging Dump Worker AMI'
         }
@@ -31,12 +31,12 @@ node {
     }
 
     stage('Deploy staging') {
-      parallel {
-        failFast true
+      failFast true
 
+      parallel {
         stage('Build API') {
           build job: 'Panoptes/job/Deploy latest Panoptes Staging build'
-        },
+        }
         stage('Build Dump workers') {
           build job: 'Panoptes/job/	Deploy latest Panoptes Staging dump worker build'
         }
