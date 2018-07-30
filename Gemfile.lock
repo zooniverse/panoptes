@@ -402,7 +402,7 @@ GEM
       celluloid (>= 0.17.3)
       ice_cube (~> 0.14.0)
       sidekiq (>= 4.1.0)
-    slavery (3.0.0)
+    slavery (4.0.0)
       activerecord (>= 3.0.0)
     spring (2.0.2)
       activesupport (>= 4.2)
