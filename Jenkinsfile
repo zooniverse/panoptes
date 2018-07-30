@@ -1,7 +1,9 @@
 pipeline {
   agent any
 
-  checkout scm
+  node {
+      checkout scm
+  }
 
   stage('Build Docker image') {
     steps {
