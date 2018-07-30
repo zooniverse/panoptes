@@ -18,17 +18,15 @@ node {
     }
 
     stage('Build staging AMIs') {
-      parallel api: {
-        sh """
-          cd "/var/jenkins_home/jobs/Zooniverse GitHub/jobs/operations/branches/master/workspace" && \
-          ./rebuild.sh panoptes-api-staging
-        """
-      },
-      worker: {
-        sh """
-          cd "/var/jenkins_home/jobs/Zooniverse GitHub/jobs/operations/branches/master/workspace" && \
-          ./rebuild.sh panoptes-dumpworker-staging
-        """
+      parallel {
+        failFast true
+
+        stage('Build API') {
+          build job: 'Panoptes/job/Build Panoptes Staging AMI'
+        },
+        stage('Build Dump workers') {
+          build job: 'Panoptes/job/Build Panoptes Staging Dump Worker AMI'
+        }
       }
     }
 
@@ -50,17 +48,15 @@ node {
     }
 
     stage('Deploy staging') {
-      parallel api: {
-        sh """
-          cd "/var/jenkins_home/jobs/Zooniverse GitHub/jobs/operations/branches/master/workspace" && \
-          ./deploy_latest.sh panoptes-api-staging
-        """
-      },
-      worker: {
-        sh """
-          cd "/var/jenkins_home/jobs/Zooniverse GitHub/jobs/operations/branches/master/workspace" && \
-          ./deploy_latest.sh panoptes-dumpworker-staging
-        """
+      parallel {
+        failFast true
+
+        stage('Build API') {
+          build job: 'Panoptes/job/Deploy latest Panoptes Staging build'
+        },
+        stage('Build Dump workers') {
+          build job: 'Panoptes/job/	Deploy latest Panoptes Staging dump worker build'
+        }
       }
     }
   }
