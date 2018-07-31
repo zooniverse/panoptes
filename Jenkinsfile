@@ -21,7 +21,7 @@ pipeline {
 
     stage('Build staging AMIs') {
       when {
-        anyOf { branch 'master'; branch 'fix_jenkinsfile' }
+        branch 'master' }
       }
       failFast true
       parallel {
@@ -40,7 +40,7 @@ pipeline {
 
     stage('Deploy staging AMIs') {
       when {
-        anyOf { branch 'master'; branch 'fix_jenkinsfile' }
+        branch 'master'
       }
       failFast true
       parallel {
