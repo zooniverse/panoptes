@@ -6,7 +6,7 @@ describe ClassificationPolicy do
     let(:logged_in_user) { create(:user) }
     let(:resource_owner) { create(:user) }
 
-    let(:keep_data_in_panoptes_only_project) { create :project, configuration: {"keep_data_in_panoptes_only" => true} }
+    let(:keep_data_in_panoptes_only_project) { create :project, owner: resource_owner, configuration: {"keep_data_in_panoptes_only" => true} }
     let(:project) { create :project, owner: resource_owner }
 
     let(:keep_data_in_panoptes_only_classification) { build :classification, project: keep_data_in_panoptes_only_project }
@@ -45,7 +45,7 @@ describe ClassificationPolicy do
       its(:destroy) { is_expected.to match_array([incomplete_classification]) }
     end
 
-    context 'as the project owner or collaborator', :focus do
+    context 'as the project owner or collaborator' do
       let(:api_user) { ApiUser.new(resource_owner) }
 
       its(:index) { is_expected.to be_empty }

@@ -27,7 +27,6 @@ class ClassificationPolicy < ApplicationPolicy
         FilterByProjectId.whitelist_exportable_projects(scope.all)
       else
         projects = policy_for(Project).scope_for(:update)
-        binding.pry
         FilterByProjectId.whitelist_exportable_projects(
           scope.where(project_id: projects.select(:id))
         )
