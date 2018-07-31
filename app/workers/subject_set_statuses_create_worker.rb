@@ -1,9 +1,11 @@
 class SubjectSetStatusesCreateWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :data_high, unique: :until_executed
+  sidekiq_options queue: :data_medium, unique: :until_executed
 
   def perform(subject_set_id, workflow_id)
+    return unless Panoptes.flipper[:subject_set_statuses_create_worker].enabled?
+
     set_is_linked_to_workflow = SubjectSetsWorkflow.where(
       subject_set_id: subject_set_id,
       workflow_id: workflow_id

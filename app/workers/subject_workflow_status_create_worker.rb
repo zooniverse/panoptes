@@ -4,6 +4,8 @@ class SubjectWorkflowStatusCreateWorker
   sidekiq_options queue: :data_high, unique: :until_executed
 
   def perform(subject_id, workflow_id)
+    return unless Panoptes.flipper[:subject_workflow_status_create_worker].enabled?
+
     if SetMemberSubject.by_subject_workflow(subject_id, workflow_id).exists?
       SubjectWorkflowStatus.create!(
         subject_id: subject_id,
