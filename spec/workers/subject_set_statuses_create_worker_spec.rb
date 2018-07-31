@@ -10,6 +10,8 @@ RSpec.describe SubjectSetStatusesCreateWorker do
     SubjectSetStatusesCreateWorker.new
   end
 
+  before { Panoptes.flipper[:subject_set_statuses_create_worker].enable }
+
   describe "#perform" do
     it "should not raise if the subject set can't be found" do
       expect {
