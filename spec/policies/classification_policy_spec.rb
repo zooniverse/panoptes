@@ -45,7 +45,7 @@ describe ClassificationPolicy do
       its(:destroy) { is_expected.to match_array([incomplete_classification]) }
     end
 
-    context 'as the project owner or collaborator' do
+    context 'as the project owner or collaborator', :focus do
       let(:api_user) { ApiUser.new(resource_owner) }
 
       its(:index) { is_expected.to be_empty }
