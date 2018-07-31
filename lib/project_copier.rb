@@ -1,5 +1,5 @@
 class ProjectCopier
-  EXCLUDE_ATTRIBUTES = [ :classifications_count, :launched_row_order, :beta_row_order ]
+  EXCLUDE_ATTRIBUTES = [ :classifications_count, :launched_row_order, :beta_row_order ].freeze
   INCLUDE_ATTRIBUTES = [  :project_contents,
                           :tutorials,
                           :field_guides,
@@ -9,7 +9,7 @@ class ProjectCopier
                           :avatar,
                           :background,
                           { active_workflows: [ :tutorials, :attached_images, :workflow_contents ] }
-                        ]
+                        ].freeze
 
   def self.copy(project_id, user_id)
     project = Project.find(project_id)
