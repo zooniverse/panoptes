@@ -21,7 +21,7 @@ pipeline {
 
     stage('Build staging AMIs') {
       when {
-        branch 'master' }
+        branch 'master'
       }
       failFast true
       parallel {
