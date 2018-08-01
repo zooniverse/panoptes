@@ -6,6 +6,7 @@ class ProjectPagePolicy < ApplicationPolicy
     end
   end
 
+  # TODO: look into removing :update_links, :destroy_links as these route actions don't exist for this resource
   scope :index, :show, :update, :destroy, :translate, :versions,
         :version, :update_links, :destroy_links, with: Scope
 
