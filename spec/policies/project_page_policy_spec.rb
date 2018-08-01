@@ -31,8 +31,8 @@ describe ProjectPagePolicy do
       its(:translate) { is_expected.to be_empty }
       its(:update_links) { is_expected.to be_empty }
       its(:destroy_links) { is_expected.to be_empty }
-      its(:versions) { is_expected.to be_empty }
-      its(:version) { is_expected.to be_empty }
+      its(:versions) { is_expected.to match_array([public_project_page]) }
+      its(:version) { is_expected.to match_array([public_project_page]) }
     end
 
     context 'for a normal user' do
@@ -45,8 +45,8 @@ describe ProjectPagePolicy do
       its(:translate) { is_expected.to be_empty }
       its(:update_links) { is_expected.to be_empty }
       its(:destroy_links) { is_expected.to be_empty }
-      its(:versions) { is_expected.to be_empty }
-      its(:version) { is_expected.to be_empty }
+      its(:versions) { is_expected.to match_array([public_project_page]) }
+      its(:version) { is_expected.to match_array([public_project_page]) }
     end
 
     context 'for the resource owner' do
@@ -59,8 +59,8 @@ describe ProjectPagePolicy do
       its(:translate) { is_expected.to match_array([private_project_page]) }
       its(:update_links) { is_expected.to match_array([private_project_page]) }
       its(:destroy_links) { is_expected.to match_array([private_project_page]) }
-      its(:versions) { is_expected.to match_array([private_project_page]) }
-      its(:version) { is_expected.to match_array([private_project_page]) }
+      its(:versions) { is_expected.to match_array([public_project_page, private_project_page]) }
+      its(:version) { is_expected.to match_array([public_project_page, private_project_page]) }
     end
 
     context 'for a translator user' do
@@ -76,13 +76,13 @@ describe ProjectPagePolicy do
 
       its(:index) { is_expected.to match_array([public_project_page, private_project_page]) }
       its(:show) { is_expected.to match_array([public_project_page, private_project_page]) }
-      its(:update) { is_expected.to match_array([private_project_page]) }
-      its(:destroy) { is_expected.to match_array([private_project_page]) }
+      its(:update) { is_expected.to be_empty }
+      its(:destroy) { is_expected.to be_empty }
       its(:translate) { is_expected.to match_array([private_project_page]) }
-      its(:update_links) { is_expected.to match_array([private_project_page]) }
-      its(:destroy_links) { is_expected.to match_array([private_project_page]) }
-      its(:versions) { is_expected.to match_array([private_project_page]) }
-      its(:version) { is_expected.to match_array([private_project_page]) }
+      its(:update_links) { is_expected.to be_empty }
+      its(:destroy_links) { is_expected.to be_empty }
+      its(:versions) { is_expected.to match_array([public_project_page, private_project_page]) }
+      its(:version) { is_expected.to match_array([public_project_page, private_project_page]) }
     end
 
     context 'for an admin' do

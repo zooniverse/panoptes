@@ -6,17 +6,8 @@ class ProjectPagePolicy < ApplicationPolicy
     end
   end
 
-  class TranslateScope < Scope
-    def resolve(_action)
-      parent_scope = policy_for(Project).scope_for(:translate)
-      scope.where(project_id: parent_scope.select(:id))
-    end
-  end
-
-  scope :index, :show, with: Scope
-  scope :update, :destroy, :translate,
-        :update_links, :destroy_links,
-        :versions, :version, with: TranslateScope
+  scope :index, :show, :update, :destroy, :translate, :versions,
+        :version, :update_links, :destroy_links, with: Scope
 
   def linkable_projects
     policy_for(Project).scope_for(:update)
