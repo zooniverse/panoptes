@@ -6,7 +6,7 @@ class TutorialPolicy < ApplicationPolicy
     end
   end
 
-  scope :index, :show, :update, :destroy, with: Scope
+  scope :index, :show, :update, :destroy, :translate, with: Scope
 
   def linkable_projects
     policy_for(Project).scope_for(:update)
