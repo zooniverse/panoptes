@@ -49,6 +49,24 @@ describe ProjectPagePolicy do
       end
     end
 
+    context 'for a translator user' do
+      let(:api_user) { ApiUser.new(logged_in_user) }
+
+      before do
+        create(
+          :access_control_list,
+          resource: private_project,
+          user_group: logged_in_user.identity_group,
+          roles: ["translator"]
+        )
+      end
+
+      it "includes project_pages from private translation projects" do
+        resolved_scope = Pundit.policy!(api_user, ProjectPage).scope_for(:translate)
+        expect(resolved_scope).to match_array(private_project_page)
+      end
+    end
+
     context 'for an admin' do
       let(:admin_user) { create :user, admin: true }
       let(:api_user) { ApiUser.new(admin_user, admin: true) }
