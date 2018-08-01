@@ -6,14 +6,14 @@ describe ProjectPagePolicy do
     let(:logged_in_user) { create(:user) }
     let(:resource_owner) { create(:user) }
 
-    let(:public_project)  { build(:project, owner: resource_owner) }
+    let(:public_project)  { build(:project) }
     let(:private_project) { build(:project, owner: resource_owner, private: true) }
 
     let(:public_project_page) { build(:project_page, project: public_project) }
     let(:private_project_page) { build(:project_page, project: private_project) }
 
-    let(:resolved_scope) do
-      Pundit.policy!(api_user, ProjectPage).scope_for(:index)
+    subject do
+      PunditScopeTester.new(ProjectPage, api_user)
     end
 
     before do
@@ -24,34 +24,47 @@ describe ProjectPagePolicy do
     context 'for an anonymous user' do
       let(:api_user) { ApiUser.new(anonymous_user) }
 
-      it "includes project_pages from public projects" do
-        expect(resolved_scope).to match_array(public_project_page)
-      end
+      its(:index) { is_expected.to match_array([public_project_page]) }
+      its(:show) { is_expected.to match_array([public_project_page]) }
+      its(:update) { is_expected.to be_empty }
+      its(:destroy) { is_expected.to be_empty }
+      its(:translate) { is_expected.to be_empty }
+      its(:update_links) { is_expected.to be_empty }
+      its(:destroy_links) { is_expected.to be_empty }
+      its(:versions) { is_expected.to be_empty }
+      its(:version) { is_expected.to be_empty }
     end
 
     context 'for a normal user' do
       let(:api_user) { ApiUser.new(logged_in_user) }
 
-      it "includes project_pages from public projects" do
-        expect(resolved_scope).to match_array(public_project_page)
-      end
+      its(:index) { is_expected.to match_array([public_project_page]) }
+      its(:show) { is_expected.to match_array([public_project_page]) }
+      its(:update) { is_expected.to be_empty }
+      its(:destroy) { is_expected.to be_empty }
+      its(:translate) { is_expected.to be_empty }
+      its(:update_links) { is_expected.to be_empty }
+      its(:destroy_links) { is_expected.to be_empty }
+      its(:versions) { is_expected.to be_empty }
+      its(:version) { is_expected.to be_empty }
     end
 
     context 'for the resource owner' do
       let(:api_user) { ApiUser.new(resource_owner) }
 
-      it "includes project_pages from public projects" do
-        expect(resolved_scope).to include(public_project_page)
-      end
-
-      it 'includes project_pages from owned private projects' do
-        expect(resolved_scope).to include(private_project_page)
-      end
+      its(:index) { is_expected.to match_array([public_project_page, private_project_page]) }
+      its(:show) { is_expected.to match_array([public_project_page, private_project_page]) }
+      its(:update) { is_expected.to match_array([private_project_page]) }
+      its(:destroy) { is_expected.to match_array([private_project_page]) }
+      its(:translate) { is_expected.to match_array([private_project_page]) }
+      its(:update_links) { is_expected.to match_array([private_project_page]) }
+      its(:destroy_links) { is_expected.to match_array([private_project_page]) }
+      its(:versions) { is_expected.to match_array([private_project_page]) }
+      its(:version) { is_expected.to match_array([private_project_page]) }
     end
 
     context 'for a translator user' do
       let(:api_user) { ApiUser.new(logged_in_user) }
-
       before do
         create(
           :access_control_list,
@@ -61,19 +74,33 @@ describe ProjectPagePolicy do
         )
       end
 
-      it "includes project_pages from private translation projects" do
-        resolved_scope = Pundit.policy!(api_user, ProjectPage).scope_for(:translate)
-        expect(resolved_scope).to match_array(private_project_page)
-      end
+      its(:index) { is_expected.to match_array([public_project_page, private_project_page]) }
+      its(:show) { is_expected.to match_array([public_project_page, private_project_page]) }
+      its(:update) { is_expected.to match_array([private_project_page]) }
+      its(:destroy) { is_expected.to match_array([private_project_page]) }
+      its(:translate) { is_expected.to match_array([private_project_page]) }
+      its(:update_links) { is_expected.to match_array([private_project_page]) }
+      its(:destroy_links) { is_expected.to match_array([private_project_page]) }
+      its(:versions) { is_expected.to match_array([private_project_page]) }
+      its(:version) { is_expected.to match_array([private_project_page]) }
     end
 
     context 'for an admin' do
       let(:admin_user) { create :user, admin: true }
       let(:api_user) { ApiUser.new(admin_user, admin: true) }
-
-      it 'includes everything' do
-        expect(resolved_scope).to include(public_project_page, private_project_page)
+      let(:all_project_pages) do
+        [public_project_page, private_project_page]
       end
+
+      its(:index) { is_expected.to match_array(all_project_pages) }
+      its(:show) { is_expected.to match_array(all_project_pages) }
+      its(:update) { is_expected.to match_array(all_project_pages) }
+      its(:destroy) { is_expected.to match_array(all_project_pages) }
+      its(:translate) { is_expected.to match_array(all_project_pages) }
+      its(:update_links) { is_expected.to match_array(all_project_pages) }
+      its(:destroy_links) { is_expected.to match_array(all_project_pages) }
+      its(:versions) { is_expected.to match_array(all_project_pages) }
+      its(:version) { is_expected.to match_array(all_project_pages) }
     end
   end
 end
