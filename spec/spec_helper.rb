@@ -2,7 +2,6 @@ ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "sidekiq/testing"
-require 'sidekiq_unique_jobs/testing'
 require "paper_trail/frameworks/rspec"
 require 'flipper/adapters/memory'
 
@@ -43,7 +42,7 @@ RSpec.configure do |config|
     DatabaseCleaner.clean_with(:truncation)
 
     SidekiqUniqueJobs.configure do |suj_config|
-      suj_config.redis_test_mode = :mock
+      suj_config.enabled = !Rails.env.test?
     end
   end
 
