@@ -48,8 +48,8 @@ describe SubjectPolicy do
 
       its(:index) { is_expected.to match_array([public_subject, private_subject]) }
       its(:show) { is_expected.to match_array([public_subject, private_subject]) }
-      its(:update) { is_expected.to be_empty }
-      its(:destroy) { is_expected.to be_empty }
+      its(:update) { is_expected.to match_array([private_subject]) }
+      its(:destroy) { is_expected.to match_array([private_subject]) }
       its(:version) { is_expected.to match_array([public_subject, private_subject]) }
       its(:versions) { is_expected.to match_array([public_subject, private_subject]) }
     end
