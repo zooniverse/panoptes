@@ -29,8 +29,6 @@ describe ProjectPagePolicy do
       its(:update) { is_expected.to be_empty }
       its(:destroy) { is_expected.to be_empty }
       its(:translate) { is_expected.to be_empty }
-      its(:update_links) { is_expected.to be_empty }
-      its(:destroy_links) { is_expected.to be_empty }
       its(:versions) { is_expected.to match_array([public_project_page]) }
       its(:version) { is_expected.to match_array([public_project_page]) }
     end
@@ -43,8 +41,6 @@ describe ProjectPagePolicy do
       its(:update) { is_expected.to be_empty }
       its(:destroy) { is_expected.to be_empty }
       its(:translate) { is_expected.to be_empty }
-      its(:update_links) { is_expected.to be_empty }
-      its(:destroy_links) { is_expected.to be_empty }
       its(:versions) { is_expected.to match_array([public_project_page]) }
       its(:version) { is_expected.to match_array([public_project_page]) }
     end
@@ -57,8 +53,6 @@ describe ProjectPagePolicy do
       its(:update) { is_expected.to match_array([private_project_page]) }
       its(:destroy) { is_expected.to match_array([private_project_page]) }
       its(:translate) { is_expected.to match_array([private_project_page]) }
-      its(:update_links) { is_expected.to match_array([private_project_page]) }
-      its(:destroy_links) { is_expected.to match_array([private_project_page]) }
       its(:versions) { is_expected.to match_array([public_project_page, private_project_page]) }
       its(:version) { is_expected.to match_array([public_project_page, private_project_page]) }
     end
@@ -79,8 +73,6 @@ describe ProjectPagePolicy do
       its(:update) { is_expected.to be_empty }
       its(:destroy) { is_expected.to be_empty }
       its(:translate) { is_expected.to match_array([private_project_page]) }
-      its(:update_links) { is_expected.to be_empty }
-      its(:destroy_links) { is_expected.to be_empty }
       its(:versions) { is_expected.to match_array([public_project_page, private_project_page]) }
       its(:version) { is_expected.to match_array([public_project_page, private_project_page]) }
     end
@@ -97,8 +89,6 @@ describe ProjectPagePolicy do
       its(:update) { is_expected.to match_array(all_project_pages) }
       its(:destroy) { is_expected.to match_array(all_project_pages) }
       its(:translate) { is_expected.to match_array(all_project_pages) }
-      its(:update_links) { is_expected.to match_array(all_project_pages) }
-      its(:destroy_links) { is_expected.to match_array(all_project_pages) }
       its(:versions) { is_expected.to match_array(all_project_pages) }
       its(:version) { is_expected.to match_array(all_project_pages) }
     end
