@@ -9,7 +9,7 @@ class SubjectSetSubjectCounterWorker
           "subject_set_#{ subject_set_id }_counter_worker"
         }
       }),
-    unique: :until_executing
+    lock: :until_executing
 
   def perform(subject_set_id)
     set = SubjectSet.find(subject_set_id)

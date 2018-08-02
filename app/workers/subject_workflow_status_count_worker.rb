@@ -13,7 +13,7 @@ class SubjectWorkflowStatusCountWorker
     }
   }
 
-  sidekiq_options unique: :until_executing
+  sidekiq_options lock: :until_executing
 
   def perform(count_id)
     sws = SubjectWorkflowStatus.find(count_id)

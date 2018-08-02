@@ -13,7 +13,7 @@ class ProjectClassificationsCountWorker
     }
   }
 
-  sidekiq_options unique: :until_executed
+  sidekiq_options lock: :until_executed
 
   def perform(project_id)
     project = Project.find(project_id)

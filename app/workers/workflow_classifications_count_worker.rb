@@ -13,7 +13,7 @@ class WorkflowClassificationsCountWorker
     }
   }
 
-  sidekiq_options unique: :until_executed
+  sidekiq_options lock: :until_executed
 
   def perform(workflow_id)
     workflow = Workflow.find_without_json_attrs(workflow_id)
