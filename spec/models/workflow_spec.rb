@@ -139,6 +139,23 @@ describe Workflow, type: :model do
       active_version = workflow.published_version
       expect(active_version.tasks).to eq("version" => 4)
     end
+
+    it 'publishes primary content' do
+      workflow.primary_content.update(strings: {version: "one"})
+      workflow.publish!
+      workflow.primary_content.update(strings: {version: "two"})
+
+      active_version = Workflow.find(workflow.id).published_version
+      expect(active_version.primary_content.strings).to eq("version" => "one")
+    end
+
+    it 'publishes all contents' do
+      workflow.workflow_contents.create(language: "es", strings: {version: "dos"})
+      workflow.publish!
+
+      active_version = Workflow.find(workflow.id).published_version
+      expect(active_version.workflow_content_versions.where(language: "es").first.strings).to eq("version" => "dos")
+    end
   end
 
   describe "versioning", versioning: true do
