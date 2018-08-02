@@ -15,13 +15,13 @@ class ProjectPolicy < ApplicationPolicy
     roles_for_private_scope %i(owner collaborator translator)
   end
 
-  scope :index, :show, :versions, :version, with: ReadScope
+  scope :index, :show, :versions, :version, :copy, with: ReadScope
   scope :update, :update_links, :destroy, :destroy_links,
         :create_classifications_export,
         :create_subjects_export,
         :create_workflows_export,
         :create_workflow_contents_export,
-        :retire_subjects, :copy, with: WriteScope
+        :retire_subjects, with: WriteScope
   scope :translate, with: TranslateScope
 
   def linkable_subject_sets

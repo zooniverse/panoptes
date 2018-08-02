@@ -28,6 +28,11 @@ describe ProjectCopier do
         expect(copied_project.display_name).to eq(project.display_name)
       end
 
+      it "has updated attributes" do
+        expect(copied_project.live).to be false
+        expect(copied_project.launch_approved).to be false
+      end
+
       it "strips the template config" do
         expect(copied_project.configuration).not_to include(:template)
       end

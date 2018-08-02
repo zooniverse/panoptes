@@ -1,4 +1,4 @@
-class SubjectWorkflowStatusCreateWorker
+  class SubjectWorkflowStatusCreateWorker
   include Sidekiq::Worker
 
   sidekiq_options queue: :data_high, lock: :until_executed
