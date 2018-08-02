@@ -11,7 +11,7 @@ class ProjectClassifiersCountWorker
     key: ->(project_id) { "project_#{project_id}_classifiers_count_worker" }
   }
 
-  sidekiq_options unique: :until_executing
+  sidekiq_options lock: :until_executing
 
   def perform(project_id)
     project = Project.find(project_id)

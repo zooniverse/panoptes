@@ -11,7 +11,7 @@ class RefreshWorkflowStatusWorker
     }
   }
 
-  sidekiq_options queue: :data_high, unique: :until_executing
+  sidekiq_options queue: :data_high, lock: :until_executing
 
   def perform(workflow_id)
     if Workflow.where(id: workflow_id).exists?
