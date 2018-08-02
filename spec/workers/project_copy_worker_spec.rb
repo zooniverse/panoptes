@@ -4,7 +4,6 @@ describe ProjectCopyWorker do
   let(:worker) { described_class.new }
   let(:project) { create(:project) }
   let(:user) { create(:user) }
-  let(:copier) { double(ProjectCopier, copied_project: true)}
 
   it { is_expected.to be_a Sidekiq::Worker }
 
