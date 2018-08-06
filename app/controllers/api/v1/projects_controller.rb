@@ -58,13 +58,34 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def update
+    primary_language_update = update_params.delete(:primary_language)
     super do |resource|
-      # TODO: extract this primary project content update
-      # to a service object that sits in the project
-      # transaction.
       content_attributes = primary_content_attributes(update_params)
-      unless content_attributes.blank?
-        resource.primary_content.update!(content_attributes)
+
+      if primary_language_update
+        content_attrs = { project_id: resource.id }
+        old_primary_content = ProjectContent.find_by(
+          content_attrs.merge(language: resource.primary_language)
+        )
+        new_content_attrs = content_attrs.merge(
+          language: primary_language_update
+        )
+        new_primary_content = ProjectContent.find_or_initialize_by(new_content_attrs) do |pc|
+          attrs_to_add = old_primary_content.dup.attributes.except("language", "project_id").compact
+          attrs_to_add.each do |attribute, value|
+            pc.send("#{attribute}=", value)
+          end
+        end
+        resource.primary_language = primary_language_update
+        new_primary_content.assign_attributes(content_attributes)
+        # add the new contents resource to the has_many without saving it
+        # allow the project.save! in the update super operation to autosave it
+        # as that association is set to autosave
+        if new_primary_content.new_record?
+          resource.association(:project_contents).add_to_target(new_primary_content)
+        end
+      elsif !content_attributes.blank?
+        resource.primary_content.assign_attributes(content_attributes)
       end
 
       tags = Tags::BuildTags.run!(api_user: api_user, tag_array: update_params[:tags]) if update_params[:tags]
