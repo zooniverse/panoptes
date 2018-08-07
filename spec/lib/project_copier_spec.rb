@@ -4,9 +4,9 @@ describe ProjectCopier do
   describe '#copy' do
     let(:project) { create(:full_project, build_extra_contents: true)}
     let(:copyist) { create(:user) }
-    let(:tags) { create(:tag, resource: project) }
-    let(:field_guide) { create(:field_guide, project: project) }
-    let(:page) { create(:project_page, project: project) }
+    let!(:tags) { create(:tag, resource: project) }
+    let!(:field_guide) { create(:field_guide, project: project) }
+    let!(:page) { create(:project_page, project: project) }
 
     context "a template project" do
       let(:copied_project) { described_class.copy(project.id, copyist.id) }
@@ -37,9 +37,15 @@ describe ProjectCopier do
         expect(copied_project.configuration).not_to include(:template)
       end
 
-      it "has valid workflows" do
+      it "has valid copied workflows" do
         expect(copied_project.workflows.first).to be_valid
         expect(copied_project.workflows.first.display_name).to eq(project.workflows.first.display_name)
+      end
+
+      it "has other valid copied associations" do
+        expect(copied_project.tags.first).to be_valid
+        expect(copied_project.field_guides.first).to be_valid
+        expect(copied_project.pages.first).to be_valid
       end
     end
   end
