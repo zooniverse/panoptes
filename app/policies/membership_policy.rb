@@ -27,7 +27,7 @@ class MembershipPolicy < ApplicationPolicy
     end
   end
 
-  scope :index, :show, :update, :destroy, :update_links, :destroy_links, with: Scope
+  scope :index, :show, :update, :destroy, with: Scope
 
   def linkable_users
     User.all

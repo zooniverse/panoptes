@@ -66,13 +66,9 @@ describe MembershipPolicy do
 
         expect(scope.resolve(:update)).to include(membership1, membership2)
         expect(scope.resolve(:destroy)).to include(membership1, membership2)
-        expect(scope.resolve(:update_links)).to include(membership1, membership2)
-        expect(scope.resolve(:destroy_links)).to include(membership1, membership2)
 
         expect(scope.resolve(:update)).not_to include(membership3, membership4)
         expect(scope.resolve(:destroy)).not_to include(membership3, membership4)
-        expect(scope.resolve(:update_links)).not_to include(membership3, membership4)
-        expect(scope.resolve(:destroy_links)).not_to include(membership3, membership4)
       end
     end
 
@@ -87,8 +83,6 @@ describe MembershipPolicy do
         expect(scope.resolve(:show)).to include(membership1, membership2)
         expect(scope.resolve(:update)).to include(membership1, membership2)
         expect(scope.resolve(:destroy)).to include(membership1, membership2)
-        expect(scope.resolve(:update_links)).to include(membership1, membership2)
-        expect(scope.resolve(:destroy_links)).to include(membership1, membership2)
       end
     end
   end

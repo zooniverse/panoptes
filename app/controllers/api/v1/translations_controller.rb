@@ -36,9 +36,7 @@ class Api::V1::TranslationsController < Api::ApiController
 
   private
 
-  # allow translators to access the translated_resource via the translate role
-  # otherwise they'd need access to something like can_by_role :update
-  # on the translated resource
+  # ensure translators can update and create translated resources
   def controlled_scope
     if %i(update create).include?(action_name.to_sym)
       :translate
