@@ -8,6 +8,10 @@ FactoryBot.define do
 
     factory :first_party_app do
       trust_level 2
+
+      factory :non_confidential_first_party_app do
+        confidential false
+      end
     end
 
     factory :secure_app do

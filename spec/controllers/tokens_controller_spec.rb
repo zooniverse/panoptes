@@ -84,6 +84,7 @@ describe TokensController, type: :controller do
       end
 
       context "when supplied a valid users's devise session" do
+        let(:app) { create(:non_confidential_first_party_app, owner: owner) }
         let(:req) do
           @request.env['devise.mapping'] = Devise.mappings[:user]
           sign_in owner

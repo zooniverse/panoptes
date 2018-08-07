@@ -665,7 +665,8 @@ CREATE TABLE public.oauth_applications (
     owner_type character varying,
     trust_level integer DEFAULT 1 NOT NULL,
     default_scope character varying[] DEFAULT '{}'::character varying[],
-    scopes character varying DEFAULT ''::character varying NOT NULL
+    scopes character varying DEFAULT ''::character varying NOT NULL,
+    confidential boolean DEFAULT true NOT NULL
 );
 
 
@@ -4155,4 +4156,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180614131933');
 INSERT INTO schema_migrations (version) VALUES ('20180710151618');
 
 INSERT INTO schema_migrations (version) VALUES ('20180724112620');
+
+INSERT INTO schema_migrations (version) VALUES ('20180726133210');
 
