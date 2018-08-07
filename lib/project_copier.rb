@@ -8,7 +8,8 @@ class ProjectCopier
                             :tagged_resources,
                             :avatar,
                             :background,
-                            { active_workflows: [ :tutorials, :attached_images, :workflow_contents ] }].freeze
+                            :translations,
+                            { active_workflows: [ :tutorials, :attached_images, :workflow_contents] }].freeze
 
   def self.copy(project_id, user_id)
     project = Project.find(project_id)

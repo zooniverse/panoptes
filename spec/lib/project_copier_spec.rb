@@ -7,6 +7,7 @@ describe ProjectCopier do
     let!(:tags) { create(:tag, resource: project) }
     let!(:field_guide) { create(:field_guide, project: project) }
     let!(:page) { create(:project_page, project: project) }
+    let!(:project_translation) { create(:project_translation, translated: project) }
 
     context "a template project" do
       let(:copied_project) { described_class.copy(project.id, copyist.id) }
@@ -46,6 +47,7 @@ describe ProjectCopier do
         expect(copied_project.tags.first).to be_valid
         expect(copied_project.field_guides.first).to be_valid
         expect(copied_project.pages.first).to be_valid
+        expect(copied_project.translations.first).to be_valid
       end
     end
   end
