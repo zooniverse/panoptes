@@ -54,6 +54,10 @@ class Workflow < ActiveRecord::Base
   delegate :owner, to: :project
   delegate :communication_emails, to: :project
 
+  def self.translatable_attributes
+    %i(display_name strings)
+  end
+
   # select a workflow without any json attributes (some can be very large)
   # this can be used generally in most workers
   # access to non-loaded attributes will raise an undefined_error

@@ -9,6 +9,10 @@ class FieldGuide < ActiveRecord::Base
   validates_uniqueness_of :language, case_sensitive: false, scope: :project_id
   validates_presence_of :project
 
+  def self.translatable_attributes
+    %i(items)
+  end
+
   def items
     super.map(&:with_indifferent_access)
   end

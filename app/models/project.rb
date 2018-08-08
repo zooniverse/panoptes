@@ -78,6 +78,10 @@ class Project < ActiveRecord::Base
   ranks :launched_row_order
   ranks :beta_row_order
 
+  def self.translatable_attributes
+    %i(display_name title description workflow_description introduction researcher_quote url_labels)
+  end
+
   def expert_classifier_level(classifier)
     expert_roles = project_roles.where(user_group: classifier.identity_group)
       .where("roles && ARRAY[?]::varchar[]", EXPERT_ROLES)

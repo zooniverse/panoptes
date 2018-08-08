@@ -6,4 +6,10 @@ module Translatable
   included do
     has_many :translations, as: :translated, dependent: :destroy
   end
+
+  module ClassMethods
+    def translatable_attributes
+      %i().freeze
+    end
+  end
 end

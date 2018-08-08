@@ -9,6 +9,10 @@ class Tutorial < ActiveRecord::Base
 
   validates_presence_of :project
 
+  def self.translatable_attributes
+    %i(display_name steps)
+  end
+
   def steps
     super.map(&:with_indifferent_access)
   end

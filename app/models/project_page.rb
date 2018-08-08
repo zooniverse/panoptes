@@ -7,4 +7,8 @@ class ProjectPage < ActiveRecord::Base
   belongs_to :project
 
   validates_uniqueness_of :url_key, scope: [:project_id, :language]
+
+  def self.translatable_attributes
+    %i(title content)
+  end
 end

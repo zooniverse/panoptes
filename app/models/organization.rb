@@ -21,6 +21,9 @@ class Organization < ActiveRecord::Base
 
   accepts_nested_attributes_for :organization_contents
 
+  def self.translatable_attributes
+    %i(display_name title description introduction announcement url_labels)
+  end
 
   def retired_subjects_count
     projects.joins(:active_workflows).sum("workflows.retired_set_member_subjects_count")
