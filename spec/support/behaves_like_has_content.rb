@@ -1,7 +1,5 @@
-shared_examples "is translatable" do
-
+shared_examples "has content" do
   context "missing content_association" do
-
     it "should not be valid" do
       expect(translatable_without_content).to be_invalid
     end

@@ -21,7 +21,7 @@ describe Project, type: :model do
     let(:activatable) { project }
   end
 
-  it_behaves_like "is translatable" do
+  it_behaves_like "has content" do
     let(:translatable) { create(:project_with_contents, build_extra_contents: true) }
     let(:translatable_without_content) { build(:project, build_contents: false) }
     let(:primary_language_factory) { :project }
