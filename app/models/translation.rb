@@ -10,8 +10,7 @@ class Translation < ActiveRecord::Base
     scope: %i(translated_type translated_id),
     message: "translation already exists for this resource"
 
-
-  # TODO: Look at adding in paper trail change tracking for laguage / strings here
+  # TODO: Look at adding in PaperTrail change tracking for language / strings here
 
   def self.translated_model_names
     @translated_class_names ||= [].tap do |translated|

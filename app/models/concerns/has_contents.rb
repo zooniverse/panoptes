@@ -29,11 +29,11 @@ module HasContents
   # TODO: this should become the association instead of the has_many
   def primary_content
     @primary_content ||= if content_association.loaded?
-      content_association.to_a.find do |content|
-        content.language == primary_language
-      end
-    else
-      content_association.find_by(language: primary_language)
-    end
+                           content_association.to_a.find do |content|
+                             content.language == primary_language
+                           end
+                         else
+                           content_association.find_by(language: primary_language)
+                         end
   end
 end
