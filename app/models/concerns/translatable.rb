@@ -9,7 +9,7 @@ module Translatable
 
   module ClassMethods
     def translatable_attributes
-      %i().freeze
+      raise NotImplementedError, "Translatable model needs to specify which attributes are translatable."
     end
   end
 end
