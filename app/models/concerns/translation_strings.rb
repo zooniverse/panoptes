@@ -23,7 +23,7 @@ class TranslationStrings
   end
 
   def resource_attributes
-    attrs = resource.attributes.dup.except(:id)
+    attrs = resource.attributes.except(:id)
     attrs.merge(primary_content_attributes).with_indifferent_access
   end
 
