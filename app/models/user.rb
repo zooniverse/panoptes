@@ -86,6 +86,11 @@ class User < ActiveRecord::Base
     },
     ranked_by: ":tsearch + (0.25 * :trigram)"
 
+  def self.dormant
+    binding.pry
+    where.not(last_sign_in_at: nil)
+  end
+
   def self.from_omniauth(auth_hash)
     transaction do
       auth = Authorization.from_omniauth(auth_hash)

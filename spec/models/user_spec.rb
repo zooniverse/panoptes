@@ -18,6 +18,14 @@ describe User, type: :model do
     end
   end
 
+  describe '::dormant', :focus do
+    let!(:user) { create(:user, last_sign_in_at: Time.now) }
+
+    it "should find dormant users, who haven't signed in for x time" do
+      expect(User.dormant).to match_array([user])
+    end
+  end
+
   describe '::from_omniauth' do
     let(:auth_hash) { OmniAuth.config.mock_auth[:facebook] }
 
