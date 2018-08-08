@@ -14,12 +14,12 @@ class TranslationSerializer
   def self.links
     links = super
     Translation.translated_model_names.each do |model_name|
-      singular = model_name.singular
-      link_key = "#{key}.#{singular}"
-      serializer = "#{singular}_serializer".classify.constantize
+      link_key = "#{key}.#{model_name}"
+      serializer = "#{model_name}_serializer".classify.constantize
+
       links[link_key] = {
         href: "/#{serializer.url}/{#{link_key}}",
-        type: model_name.plural.to_sym
+        type: model_name.pluralize.to_sym
       }
     end
     links
