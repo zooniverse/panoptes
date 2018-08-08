@@ -1,4 +1,5 @@
 class Tutorial < ActiveRecord::Base
+  include Translatable
 
   belongs_to :project
   has_many :workflow_tutorials

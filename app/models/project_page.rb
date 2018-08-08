@@ -1,4 +1,5 @@
 class ProjectPage < ActiveRecord::Base
+  include Translatable
   include LanguageValidation
 
   has_paper_trail ignore: [:language]

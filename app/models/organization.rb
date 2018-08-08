@@ -3,6 +3,7 @@ class Organization < ActiveRecord::Base
   include Activatable
   include SluggedName
   include HasContents
+  include Translatable
 
   # Still needed for HttpCacheable
   scope :private_scope, -> { where(listed: false) }

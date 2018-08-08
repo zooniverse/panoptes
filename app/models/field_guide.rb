@@ -1,4 +1,5 @@
 class FieldGuide < ActiveRecord::Base
+  include Translatable
   include LanguageValidation
 
   belongs_to :project

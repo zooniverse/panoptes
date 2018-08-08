@@ -5,6 +5,7 @@ class Workflow < ActiveRecord::Base
   include RankedModel
   include CacheModelVersion
   include ModelCacheKey
+  include Translatable
 
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
 
