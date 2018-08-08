@@ -13,18 +13,15 @@ class Translation < ActiveRecord::Base
   # TODO: Versioning and maintaining a live, published version
 
   def self.translated_model_names
-    @translated_class_names ||= [].tap do |translated|
-      ActiveRecord::Base.subclasses.each do |klass|
-        klass_associations = klass.reflect_on_all_associations
-        translated_associations = klass_associations.select do |assoc|
-          assoc.options[:as] == :translated
-        end
-
-        unless translated_associations.empty?
-          translated << klass.model_name
-        end
-      end
-    end
+    @translated_model_names ||= %w(
+      project
+      project_page
+      organization
+      organization_page
+      field_guide
+      tutorial
+      workflow
+    ).freeze
   end
 
   private
