@@ -25,17 +25,42 @@ pipeline {
       when {
         branch 'master'
       }
+      agent {
+        docker { image 'zooniverse/operations:latest' }
+      }
       failFast true
       parallel {
         stage('Build API') {
           steps {
-            build job: '/Build Panoptes Staging AMI'
+            sh './rebuild.sh panoptes-api-staging'
           }
         }
         stage('Build Dump workers') {
           steps {
-            build job: '/Build Panoptes Staging Dump Worker AMI'
+            sh './rebuild.sh panoptes-dumpworker-staging'
           }
+        }
+      }
+    }
+
+    stage('Migrate') {
+      when {
+        branch 'master'
+      }
+      agent {
+        docker { image 'zooniverse/operations:latest' }
+      }
+      stage('Staging DB') {
+        steps {
+          sh """#!/bin/bash -e
+            source auto_cleanup.sh
+            source deploylib.sh
+            INSTANCE_ID=\$(./launch_latest.sh -q panoptes-api-staging)
+            INSTANCE_DNS_NAME=\$(instance_dns_name \$INSTANCE_ID)
+            # Wait for instance/panoptes to come up
+            timeout_cmd "timeout 5m ssh ubuntu@\$INSTANCE_DNS_NAME docker-compose -f /opt/docker_start/docker-compose.yml -p panoptes-api-staging exec -T panoptes true"
+            ssh ubuntu@\$INSTANCE_DNS_NAME docker-compose -f /opt/docker_start/docker-compose.yml -p panoptes-api-staging exec -T panoptes ./migrate.sh
+          """
         }
       }
     }
@@ -44,16 +69,19 @@ pipeline {
       when {
         branch 'master'
       }
+      agent {
+        docker { image 'zooniverse/operations:latest' }
+      }
       failFast true
       parallel {
         stage('Deploy API') {
           steps {
-            build job: '/Deploy latest Panoptes Staging build'
+            sh './deploy_latest.sh panoptes-api-staging'
           }
         }
         stage('Deploy Dump workers') {
           steps {
-            build job: '/Deploy latest Panoptes Staging dump worker build'
+            sh './deploy_latest.sh panoptes-dumpworker-staging'
           }
         }
       }
