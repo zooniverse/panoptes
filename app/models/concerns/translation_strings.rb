@@ -23,7 +23,7 @@ class TranslationStrings
   end
 
   def resource_attributes
-    attrs = resource.attributes.dup.except(:id)
+    attrs = resource.attributes.except(:id)
     attrs.merge(primary_content_attributes).with_indifferent_access
   end
 
@@ -40,35 +40,7 @@ class TranslationStrings
   end
 
   def translatable_attributes
-    send("#{resource_name}_attributes")
-  end
-
-  def project_attributes
-    %i(display_name title description workflow_description introduction researcher_quote url_labels)
-  end
-
-  def workflow_attributes
-    %i(display_name strings)
-  end
-
-  def tutorial_attributes
-    %i(display_name steps)
-  end
-
-  def field_guide_attributes
-    %i(items)
-  end
-
-  def project_page_attributes
-    %i(title content)
-  end
-
-  def organization_attributes
-    %i(display_name title description introduction announcement url_labels)
-  end
-
-  def organization_page_attributes
-    %i(title content)
+    resource.class.translatable_attributes
   end
 
   # field guide item has icon attributes that should not be translated

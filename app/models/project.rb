@@ -1,11 +1,12 @@
 class Project < ActiveRecord::Base
   include RoleControl::Owned
   include Activatable
-  include Translatable
+  include HasContents
   include ExtendedCacheKey
   include PgSearch
   include RankedModel
   include SluggedName
+  include Translatable
 
   EXPERT_ROLES = [:owner, :expert].freeze
 
@@ -39,9 +40,6 @@ class Project < ActiveRecord::Base
   has_many :tagged_resources, as: :resource
   has_many :tags, through: :tagged_resources
   has_many :first_time_users, class_name: "User", foreign_key: 'project_id', inverse_of: :signup_project, dependent: :restrict_with_exception
-
-  # TODO: extract association and authorization scope to module
-  has_many :translations, as: :translated, dependent: :destroy
 
   has_paper_trail only: [:private, :live, :beta_requested, :beta_approved, :launch_requested, :launch_approved]
 
@@ -79,6 +77,10 @@ class Project < ActiveRecord::Base
 
   ranks :launched_row_order
   ranks :beta_row_order
+
+  def self.translatable_attributes
+    %i(display_name title description workflow_description introduction researcher_quote url_labels)
+  end
 
   def expert_classifier_level(classifier)
     expert_roles = project_roles.where(user_group: classifier.identity_group)

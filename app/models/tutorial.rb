@@ -1,4 +1,5 @@
 class Tutorial < ActiveRecord::Base
+  include Translatable
 
   belongs_to :project
   has_many :workflow_tutorials
@@ -7,6 +8,10 @@ class Tutorial < ActiveRecord::Base
     as: :linked
 
   validates_presence_of :project
+
+  def self.translatable_attributes
+    %i(display_name steps)
+  end
 
   def steps
     super.map(&:with_indifferent_access)

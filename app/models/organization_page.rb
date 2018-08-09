@@ -1,5 +1,10 @@
 class OrganizationPage < ActiveRecord::Base
+  include Translatable
   include LanguageValidation
+
+  def self.translatable_attributes
+    %i(title content)
+  end
 
   has_paper_trail ignore: [:language]
 

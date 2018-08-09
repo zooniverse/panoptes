@@ -41,40 +41,37 @@ describe TranslationSerializer do
     end
     let(:result_links) { serialized_result.fetch(:links, {}) }
 
-    # for each translated resource type
-    [Project].each do |klass|
-
-      describe "top level links" do
-        let(:serialize_method) { :resource }
-        let(:expected_links) do
-          model_name = klass.model_name.singular
-          route_key = klass.model_name.route_key
-          {
-            "translations.#{model_name}" => {
-              href: "/#{route_key}/{translations.#{model_name}}",
-              type: klass.model_name.plural.to_sym
-            }
+    describe "top level links" do
+      let(:serialize_method) { :resource }
+      let(:expected_links) do
+        links = {}
+        Translation.translated_model_names.each do |model_name|
+          plural_model_name = model_name.pluralize
+          links["translations.#{model_name}"] = {
+            href: "/#{plural_model_name}/{translations.#{model_name}}",
+            type: plural_model_name.to_sym
           }
         end
-
-        it "should include top level links for translated resources" do
-          expect(serialized_result.key?(:links)).to be true
-          expect(result_links).to match_array(expected_links)
-        end
+        links
       end
 
-      describe "resource links" do
-        let(:expected_links) do
-          { klass.model_name.singular.to_sym => translation.translated_id.to_s }
-        end
+      it "should include top level links for translated resources" do
+        expect(serialized_result.key?(:links)).to be true
+        expect(result_links).to match_array(expected_links)
+      end
+    end
 
-        context "with a serialized resource" do
-          let(:serialize_method) { :single }
+    describe "resource links" do
+      let(:expected_links) do
+        { translation.translated.model_name.singular.to_sym => translation.translated_id.to_s }
+      end
 
-          it "should include resource links for the polymorphic translated association" do
-            expect(serialized_result.key?(:links)).to be true
-            expect(result_links).to eq(expected_links)
-          end
+      context "with a serialized resource" do
+        let(:serialize_method) { :single }
+
+        it "should include resource links for the polymorphic translated association" do
+          expect(serialized_result.key?(:links)).to be true
+          expect(result_links).to eq(expected_links)
         end
       end
     end

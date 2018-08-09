@@ -39,12 +39,20 @@ RSpec.describe Translation, type: :model do
   end
 
   describe ".translated_model_names" do
-    let(:expected_model_name) do
-      [ Project.model_name ]
+    let(:expected_model_names) do
+      %w(
+        project
+        project_page
+        organization
+        organization_page
+        field_guide
+        tutorial
+        workflow
+      )
     end
 
     it "should list all the model names that have translation resources" do
-      expect(Translation.translated_model_names).to match_array(expected_model_name)
+      expect(Translation.translated_model_names).to match_array(expected_model_names)
     end
   end
 end
