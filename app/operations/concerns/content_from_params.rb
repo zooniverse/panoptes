@@ -4,7 +4,7 @@ module ContentFromParams
     content = ps.slice(*content_fields)
     content[:language] = ps[:primary_language]
     if ps.key? :urls
-      urls, labels = extract_url_labels(ps[:urls])
+      urls, labels = UrlLabels.extract_url_labels(ps[:urls])
       content[:url_labels] = labels
       ps[:urls] = urls
     end
