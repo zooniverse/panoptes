@@ -26,7 +26,10 @@ pipeline {
       parallel {
         stage('Build API') {
           agent {
-            docker { image 'zooniverse/operations:latest' }
+            docker {
+              image 'zooniverse/operations:latest'
+              args '-v $HOME/.ssh/:/home/ubuntu/.ssh -e "AWS_DEFAULT_REGION=us-east-1" -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"'
+            }
           }
           steps {
             sh './rebuild.sh panoptes-api-staging'
