@@ -25,17 +25,20 @@ pipeline {
       when {
         branch 'master'
       }
-      agent {
-        docker { image 'zooniverse/operations:latest' }
-      }
       failFast true
       parallel {
         stage('Build API') {
+          agent {
+            docker { image 'zooniverse/operations:latest' }
+          }
           steps {
             sh './rebuild.sh panoptes-api-staging'
           }
         }
         stage('Build Dump workers') {
+          agent {
+            docker { image 'zooniverse/operations:latest' }
+          }
           steps {
             sh './rebuild.sh panoptes-dumpworker-staging'
           }
@@ -67,17 +70,20 @@ pipeline {
       when {
         branch 'master'
       }
-      agent {
-        docker { image 'zooniverse/operations:latest' }
-      }
       failFast true
       parallel {
         stage('Deploy API') {
+          agent {
+            docker { image 'zooniverse/operations:latest' }
+          }
           steps {
             sh './deploy_latest.sh panoptes-api-staging'
           }
         }
         stage('Deploy Dump workers') {
+          agent {
+            docker { image 'zooniverse/operations:latest' }
+          }
           steps {
             sh './deploy_latest.sh panoptes-dumpworker-staging'
           }
