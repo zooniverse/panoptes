@@ -1,7 +1,7 @@
 class SubjectWorkflowStatusCreateWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :data_low, lock: :until_executed
+  sidekiq_options lock: :until_executed
 
   def perform(subject_id, workflow_id)
     return unless Panoptes.flipper[:subject_workflow_status_create_worker].enabled?
