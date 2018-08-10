@@ -1,8 +1,5 @@
 module Organizations
   class Create < Operation
-    include UrlLabels
-    include ContentFromParams
-
     string :display_name
     string :primary_language
 
@@ -51,10 +48,8 @@ module Organizations
     end
 
     def organization_contents_from_params
-      content_from_params(
-        inputs,
-        Api::V1::OrganizationsController::CONTENT_FIELDS
-      )
+      fields = Api::V1::OrganizationsController::CONTENT_FIELDS
+      ContentFromParams.content_from_params(inputs, fields)
     end
   end
 end

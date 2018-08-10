@@ -1,14 +1,14 @@
 module ContentFromParams
-  def content_from_params(ps, content_fields)
-    yield ps if block_given?
-    content = ps.slice(*content_fields)
-    content[:language] = ps[:primary_language]
-    if ps.key? :urls
-      urls, labels = UrlLabels.extract_url_labels(ps[:urls])
-      content[:url_labels] = labels
-      ps[:urls] = urls
+  def self.content_from_params(params, content_fields)
+    content_params = params.slice(*content_fields)
+    content_params[:language] = params[:primary_language]
+
+    if params.key? :urls
+      urls, labels = UrlLabels.extract_url_labels(params[:urls])
+      content_params[:url_labels] = labels
+      params[:urls] = urls
     end
-    ps.except!(*content_fields)
-    content.select { |k,v| !!v }
+
+    content_params.select { |k,v| !!v }
   end
 end
