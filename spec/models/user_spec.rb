@@ -17,11 +17,49 @@ describe User, type: :model do
     end
   end
 
-  describe '::dormant', :focus do
-    let!(:user) { create(:user, last_sign_in_at: Time.now) }
+  describe '::dormant' do
+    let(:user) { create(:user) }
 
-    it "should find dormant users, who haven't signed in for x time" do
-      expect(User.dormant).to match_array([user])
+    def dormant_user_ids
+      [].tap do |user_ids|
+        User.dormant do |dormant_user|
+          user_ids << dormant_user.id
+        end
+      end
+    end
+
+    before { user }
+
+    it "should not find any users that have not signed in" do
+      expect(dormant_user_ids).to match_array([])
+    end
+
+    context "with a login 5 days ago" do
+      let(:user) do
+        create(:user, current_sign_in_at: 5.days.ago)
+      end
+
+      it "should find the dormant user" do
+        expect(dormant_user_ids).to match_array([user.id])
+      end
+    end
+
+    context "multiple users: 2 dormant, 1 not" do
+      let(:user) do
+        create(:user, current_sign_in_at: 12.months.ago)
+      end
+      let(:another_user) do
+        create(:user, current_sign_in_at: 30.days.ago)
+      end
+      let(:non_dormant_user) do
+        create(:user, current_sign_in_at: 1.day.ago)
+      end
+
+      it "should find dormant users with a block" do
+        non_dormant_user
+        expected_ids = [ user.id, another_user.id ]
+        expect(dormant_user_ids).to match_array(expected_ids)
+      end
     end
   end
 

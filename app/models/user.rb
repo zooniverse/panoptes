@@ -86,9 +86,14 @@ class User < ActiveRecord::Base
     },
     ranked_by: ":tsearch + (0.25 * :trigram)"
 
-  def self.dormant
-    binding.pry
-    where.not(last_sign_in_at: nil)
+   def self.dormant(days_between_signin=5)
+    DatabaseReplica.read("read_dormant_users_from_replica") do
+      # devise trackable sets the current_sign_in_at on each login
+      havent_signed_in_since = "date(now()) - date(current_sign_in_at) >= #{days_between_signin}"
+      where(havent_signed_in_since).find_each do |dormant_user|
+        yield(dormant_user)
+      end
+    end
   end
 
   def self.from_omniauth(auth_hash)
