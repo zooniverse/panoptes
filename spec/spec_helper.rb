@@ -36,7 +36,7 @@ RSpec.configure do |config|
   MOCK_REDIS ||= MockRedis.new
 
   config.before(:suite) do
-    DatabaseCleaner.clean_with(:truncation)
+    DatabaseCleaner.clean_with(:deletion)
 
     SidekiqUniqueJobs.configure do |suj_config|
       suj_config.enabled = !Rails.env.test?
