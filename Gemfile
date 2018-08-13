@@ -6,6 +6,7 @@ gem 'active_record_union', '~> 1.3.0'
 gem 'activerecord-import', '~> 0.25'
 gem 'aws-sdk', '~> 2.10'
 gem "cellect-client", '~> 3.0.2'
+gem 'celluloid', '~> 0.18.0.pre' # to work around https://github.com/celluloid/celluloid/issues/696
 gem 'dalli-elasticache'
 gem 'devise', '~> 4.3'
 gem 'doorkeeper', '~> 4.4'

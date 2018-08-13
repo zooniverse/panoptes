@@ -33,9 +33,6 @@ RSpec.configure do |config|
   # disable slave reads to deal with testing transaction isolation
   Slavery.disabled = true
 
-  # work around https://github.com/celluloid/celluloid/issues/696
-  Celluloid.shutdown_timeout = 1
-
   MOCK_REDIS ||= MockRedis.new
 
   config.before(:suite) do
