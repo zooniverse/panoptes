@@ -58,43 +58,13 @@ describe ClassificationLifecycle do
     context "when an anonymous user classification" do
       let(:classification) { create(:classification, user: nil) }
 
-      it "should call the #update_classification_data!" do
-        expect(subject).to receive(:update_classification_data!)
+      it "should call the #update_classification_data" do
+        expect(subject).to receive(:update_classification_data)
         subject.execute
       end
 
-      it "should call the #process_project_preference" do
-        expect(subject).to receive(:process_project_preference)
-        subject.execute
-      end
-
-      it "should call the #create_recent" do
-        expect(subject).to receive(:create_recent)
-        subject.execute
-      end
-
-      it "should call the #update_seen_subjects" do
-        expect(subject).to receive(:update_seen_subjects)
-        subject.execute
-      end
-
-      it "should call #create_export_row" do
-        expect(subject).to receive(:create_export_row)
-        subject.execute
-      end
-
-      it "should call #notify_subject_selector" do
-        expect(subject).to receive(:notify_subject_selector)
-        subject.execute
-      end
-
-      it "should call #update_counters" do
-        expect(subject).to receive(:update_counters)
-        subject.execute
-      end
-
-      it "should call #publish_data" do
-        expect(subject).to receive(:publish_data)
+      it "should call the #queue_associated_workers" do
+        expect(subject).to receive(:queue_associated_workers)
         subject.execute
       end
 
@@ -152,41 +122,19 @@ describe ClassificationLifecycle do
 
     context "when invalid classification updates are made" do
       before(:each) do
-        allow_any_instance_of(Classification).to receive(:save!)
-          .and_raise(ActiveRecord::RecordInvalid.new(classification))
+        allow(classification).to receive(:valid?).and_return(false)
       end
 
-      it 'should not call #create_recent' do
+      it 'should not schedule workers and error' do
         aggregate_failures "failure point" do
-          expect(subject).to_not receive(:create_recent)
+          expect(subject).to_not receive(:queue_associated_workers)
           expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
 
-      it 'should not call #update_seen_subjects' do
+      it 'should not save and error' do
         aggregate_failures "failure point" do
-          expect(subject).to_not receive(:update_seen_subjects)
-          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call #publish_data' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:publish_data)
-          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call #create_export_row' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:create_export_row)
-          expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      it 'should not call should_count_towards_retirement?' do
-        aggregate_failures "failure point" do
-          expect(subject).to_not receive(:should_count_towards_retirement?)
+          expect(subject).to_not receive(:save!)
           expect{ subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
@@ -269,8 +217,11 @@ describe ClassificationLifecycle do
 
     it_behaves_like "create and update"
 
-    it 'should do something' do
-      expect(subject).to receive(:process_project_preference)
+    it 'should ensure the classification save, workers and lifecycled_at calls are in order' do
+      expect(subject).to receive(:update_classification_data).ordered
+      expect(classification).to receive(:save!).ordered
+      expect(subject).to receive(:queue_associated_workers).ordered
+      expect(subject).to receive(:mark_classification_lifecycled_at).ordered
       subject.execute
     end
 
@@ -463,21 +414,47 @@ describe ClassificationLifecycle do
     end
   end
 
-  describe "#update_classification_data!" do
-    let(:update_classification_data) { subject.update_classification_data! }
+  describe "#queue_associated_workers" do
 
-    it "should wrap the calls in a transaction" do
-      expect(Classification).to receive(:transaction)
-      update_classification_data
+    it "should call process_project_preference" do
+      expect(subject).to receive(:process_project_preference)
+      subject.queue_associated_workers
     end
 
-    it "should call add_project_live_state" do
-      expect(subject).to receive(:add_project_live_state)
-      update_classification_data
+    it "should call create_recent" do
+      expect(subject).to receive(:create_recent)
+      subject.queue_associated_workers
     end
 
-    it "should call add_lifecycled_at" do
-      expect(subject).to receive(:add_lifecycled_at)
+    it "should call update_seen_subjects" do
+      expect(subject).to receive(:update_seen_subjects)
+      subject.queue_associated_workers
+    end
+
+    it "should call create_export_row" do
+      expect(subject).to receive(:create_export_row)
+      subject.queue_associated_workers
+    end
+    it "should call notify_subject_selector" do
+      expect(subject).to receive(:notify_subject_selector)
+      subject.queue_associated_workers
+    end
+    it "should call update_counters" do
+      expect(subject).to receive(:update_counters)
+      subject.queue_associated_workers
+    end
+
+    it "should call publish_data" do
+      expect(subject).to receive(:publish_data)
+      subject.queue_associated_workers
+    end
+  end
+
+  describe "#update_classification_data" do
+    let(:update_classification_data) { subject.update_classification_data }
+
+    it "should call mark_expert_classifier" do
+      expect(subject).to receive(:mark_expert_classifier)
       update_classification_data
     end
 
@@ -486,13 +463,13 @@ describe ClassificationLifecycle do
       update_classification_data
     end
 
-    it "should call mark_expert_classifier" do
-      expect(subject).to receive(:mark_expert_classifier)
+    it "should call add_project_live_state" do
+      expect(subject).to receive(:add_project_live_state)
       update_classification_data
     end
 
-    it "should call classification save!" do
-      expect(classification).to receive(:save!)
+    it "should call add_user_groups" do
+      expect(subject).to receive(:add_user_groups)
       update_classification_data
     end
   end
@@ -553,11 +530,13 @@ describe ClassificationLifecycle do
   end
 
   describe "#add_lifecycled_at" do
-    it "should mark the lifecycled_at timestamp" do
-      subject.add_lifecycled_at
-      prev, current = classification.changes[:lifecycled_at]
-      expect(prev).to be_nil
-      expect(current).to be_a(ActiveSupport::TimeWithZone)
+    it "should directly update the lifecycled_at timestamp via sql" do
+      classification.save
+      expect {
+        subject.mark_classification_lifecycled_at
+      }.to change {
+        classification.lifecycled_at
+      }
     end
   end
 
