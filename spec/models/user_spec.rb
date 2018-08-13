@@ -20,9 +20,9 @@ describe User, type: :model do
   describe '::dormant' do
     let(:user) { create(:user) }
 
-    def dormant_user_ids
+    def dormant_user_ids(num_days_since_activity=5)
       [].tap do |user_ids|
-        User.dormant do |dormant_user|
+        User.dormant(num_days_since_activity) do |dormant_user|
           user_ids << dormant_user.id
         end
       end
@@ -42,6 +42,10 @@ describe User, type: :model do
       it "should find the dormant user" do
         expect(dormant_user_ids).to match_array([user.id])
       end
+
+      it "should not find the dormant user with 6 days gap between signin" do
+        expect(dormant_user_ids(6)).to match_array([])
+      end
     end
 
     context "multiple users: 2 dormant, 1 not" do
@@ -55,10 +59,19 @@ describe User, type: :model do
         create(:user, current_sign_in_at: 1.day.ago)
       end
 
-      it "should find dormant users with a block" do
+      it "should find dormant users" do
         non_dormant_user
         expected_ids = [ user.id, another_user.id ]
         expect(dormant_user_ids).to match_array(expected_ids)
+      end
+
+      it "should find only one dormant user with 31 day gap between signin" do
+        expect(dormant_user_ids(31)).to match_array([user.id])
+      end
+
+      it "should find the all the dormant users with 1 day gap between signin" do
+        expected_ids = [ user.id, another_user.id, non_dormant_user.id ]
+        expect(dormant_user_ids(1)).to match_array(expected_ids)
       end
     end
   end
