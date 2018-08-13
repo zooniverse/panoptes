@@ -25,10 +25,20 @@ class ClassificationLifecycle
   def execute
     return if create? && classification.lifecycled_at.present?
 
-    # update the saved classification data
-    update_classification_data!
+    update_classification_data
 
-    # fan out workers to deal with the associated data models
+    classification.save!
+
+    queue_associated_workers
+
+    # Save the lifecycled_at attribute after queuing the workers as
+    # any background job scheduling failures (e.g redis failue)
+    # will be handled by re-running this job via RequeueClassificationsWorker
+    mark_classification_lifecycled_at
+  end
+
+  # fan out workers to deal with the associated data models and services
+  def queue_associated_workers
     process_project_preference
     create_recent
     update_seen_subjects
@@ -38,15 +48,11 @@ class ClassificationLifecycle
     publish_data
   end
 
-  def update_classification_data!
-    Classification.transaction do
-      mark_expert_classifier
-      add_seen_before_for_user
-      add_project_live_state
-      add_user_groups
-      add_lifecycled_at
-      classification.save!
-    end
+  def update_classification_data
+    mark_expert_classifier
+    add_seen_before_for_user
+    add_project_live_state
+    add_user_groups
   end
 
   def update_counters
@@ -122,8 +128,8 @@ class ClassificationLifecycle
     update_classification_metadata(:user_group_ids, user.non_identity_user_group_ids)
   end
 
-  def add_lifecycled_at
-    classification.lifecycled_at = Time.zone.now
+  def mark_classification_lifecycled_at
+    classification.update_columns(lifecycled_at: Time.zone.now)
   end
 
   private
