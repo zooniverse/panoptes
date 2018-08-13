@@ -64,7 +64,12 @@ describe ClassificationLifecycle do
       end
 
       it "should call the #process_project_preference" do
-        expect(subject).to receive(:update_seen_subjects)
+        expect(subject).to receive(:process_project_preference)
+        subject.execute
+      end
+
+      it "should call the #create_recent" do
+        expect(subject).to receive(:create_recent)
         subject.execute
       end
 
@@ -73,18 +78,23 @@ describe ClassificationLifecycle do
         subject.execute
       end
 
-      it "should call the #create_recent" do
-        expect(subject).to receive(:update_seen_subjects)
+      it "should call #create_export_row" do
+        expect(subject).to receive(:create_export_row)
+        subject.execute
+      end
+
+      it "should call #notify_subject_selector" do
+        expect(subject).to receive(:notify_subject_selector)
+        subject.execute
+      end
+
+      it "should call #update_counters" do
+        expect(subject).to receive(:update_counters)
         subject.execute
       end
 
       it "should call #publish_data" do
         expect(subject).to receive(:publish_data)
-        subject.execute
-      end
-
-      it "should call #create_export_row" do
-        expect(subject).to receive(:create_export_row)
         subject.execute
       end
 
@@ -103,36 +113,6 @@ describe ClassificationLifecycle do
         uss = instance_double("UserSeenSubject")
         allow(uss).to receive(:subjects_seen?).and_return(false)
         allow(UserSeenSubject).to receive(:find_by).and_return(uss)
-      end
-
-      it "should call the #update_classification_data!" do
-        expect(subject).to receive(:update_classification_data!)
-        subject.execute
-      end
-
-      it "should call the #process_project_preference" do
-        expect(subject).to receive(:process_project_preference)
-        subject.execute
-      end
-
-      it "should call the #create_recent" do
-        expect(subject).to receive(:create_recent)
-        subject.execute
-      end
-
-      it "should call the #update_seen_subjects" do
-        expect(subject).to receive(:update_seen_subjects)
-        subject.execute
-      end
-
-      it "should call #publish_data" do
-        expect(subject).to receive(:publish_data)
-        subject.execute
-      end
-
-      it "should call #create_export_row" do
-        expect(subject).to receive(:create_export_row)
-        subject.execute
       end
 
       it 'should count towards retirement' do
@@ -289,7 +269,7 @@ describe ClassificationLifecycle do
 
     it_behaves_like "create and update"
 
-    it 'should call process_project_preferences' do
+    it 'should do something' do
       expect(subject).to receive(:process_project_preference)
       subject.execute
     end
