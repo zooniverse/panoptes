@@ -353,48 +353,28 @@ describe Api::V1::WorkflowsController, type: :controller do
           post :update_links, update_link_params
         end
 
-        context "when the workflow has subjects" do
-          case link_to_test
-          when :subject_sets
-            it "should call refresh workflow status worker" do
-              expect(RefreshWorkflowStatusWorker)
+        it 'should run refresh workflow status worker' do
+          expect(RefreshWorkflowStatusWorker)
+            .to receive(:perform_async)
+        end
+
+        case link_to_test
+        when :subject_sets
+          it "should call post link subject set workers", :aggregate_failures do
+            test_relation_ids.each do |set_id|
+              expect(SubjectSetStatusesCreateWorker)
+              .to receive(:perform_async)
+              .with(set_id, resource.id)
+            end
+            expect(NotifySubjectSelectorOfChangeWorker)
               .to receive(:perform_async)
               .with(resource.id)
-            end
-
-            it 'should notify the subject selector that the available subjects changed' do
-              expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async)
-                .with(resource.id)
-            end
-          when :retired_subjects
-            it 'should call the workflow retired counter worker' do
-              expect(RefreshWorkflowStatusWorker)
-                .to receive(:perform_async)
-                .with(resource.id)
-            end
-
-            it 'should notify the subject selector that subjects were retired' do
-              expect(NotifySubjectSelectorOfRetirementWorker).to receive(:perform_async)
-                .with(linked_resource.id.to_s, workflow.id)
-            end
           end
-        end
-
-        context "when the workflow has no subjects" do
-          let(:linked_resource) { create(:subject_set, project: subject_set_project) }
-
-          if %i(subject_sets retired_subjects).include?(link_to_test)
-            it 'should run the workers', :aggregate_failures, :focus do
-              expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async)
-              expect(RefreshWorkflowStatusWorker).to receive(:perform_async)
-            end
+        when :retired_subjects
+          it 'should notify the subject selector that subjects were retired' do
+            expect(NotifySubjectSelectorOfRetirementWorker).to receive(:perform_async)
+              .with(linked_resource.id.to_s, workflow.id)
           end
-        end
-      end
-
-      context "without authorized user" do
-        it 'should not attempt to call cellect', :aggregate_failures do
-          expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
         end
       end
     end
@@ -412,6 +392,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:copied_resource) { resource.reload.send(test_relation).first }
 
       it_behaves_like "supports update_links"
+
       it_behaves_like "reloads the non logged in queues", :subject_sets
 
       it "should call SubjectSetStatusesCreateWorker" do
