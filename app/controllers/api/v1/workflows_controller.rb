@@ -99,7 +99,7 @@ class Api::V1::WorkflowsController < Api::ApiController
       RefreshWorkflowStatusWorker.perform_async(workflow.id)
     end
 
-    if relation_index == 0
+    if relation_index&.zero?
       NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
     end
   end
