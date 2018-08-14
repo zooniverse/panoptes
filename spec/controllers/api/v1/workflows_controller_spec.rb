@@ -615,6 +615,40 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
   end
 
+  describe '#destroy_links' do
+    context "removing a subject set from the workflow" do
+      let!(:linked_resources) do
+        [
+          create(:subject_set_with_subjects, workflows: [workflow], project: project),
+          create(:subject_set_with_subjects, workflows: [workflow], project: project)
+        ]
+      end
+      let(:linked_resource_to_destroy) { linked_resources.sample }
+      let(:remaining_linked_resource) do
+        linked_resources - [linked_resource_to_destroy ]
+      end
+      let(:link_ids) { linked_resource_to_destroy.id.to_s }
+      let(:destroy_link_params) do
+        {
+          link_relation: "subject_sets",
+          link_ids: link_ids,
+          workflow_id: workflow.id
+        }
+      end
+
+      before(:each) do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it "should unlink the subject set from the workflow" do
+        expect(workflow.subject_sets).to match_array(linked_resources)
+        delete :destroy_links, destroy_link_params
+        still_linked_sets = workflow.reload.subject_sets
+        expect(still_linked_sets).to match_array(remaining_linked_resource)
+      end
+    end
+  end
+
   describe "#show" do
     let(:resource) { workflows.first }
 
