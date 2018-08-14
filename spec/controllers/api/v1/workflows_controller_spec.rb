@@ -392,7 +392,6 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:copied_resource) { resource.reload.send(test_relation).first }
 
       it_behaves_like "supports update_links"
-
       it_behaves_like "reloads the non logged in queues", :subject_sets
 
       it "should call SubjectSetStatusesCreateWorker" do
