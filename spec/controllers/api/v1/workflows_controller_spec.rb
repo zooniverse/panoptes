@@ -634,9 +634,9 @@ describe Api::V1::WorkflowsController, type: :controller do
         expect(NotifySubjectSelectorOfChangeWorker)
           .to receive(:perform_async)
           .with(workflow.id)
-          expect(RefreshWorkflowStatusWorker)
-            .to receive(:perform_async)
-            .with(workflow.id)
+        expect(RefreshWorkflowStatusWorker)
+          .to receive(:perform_async)
+          .with(workflow.id)
         delete :destroy_links, destroy_link_params
       end
 
