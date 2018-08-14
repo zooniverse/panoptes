@@ -383,8 +383,11 @@ describe Api::V1::WorkflowsController, type: :controller do
         context "when the workflow has no subjects" do
           let(:linked_resource) { create(:subject_set, project: subject_set_project) }
 
-          it 'should not attempt to notify the subject selector' do
-            expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
+          if %i(subject_sets retired_subjects).include?(link_to_test)
+            it 'should run the workers', :aggregate_failures, :focus do
+              expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async)
+              expect(RefreshWorkflowStatusWorker).to receive(:perform_async)
+            end
           end
         end
       end
@@ -635,6 +638,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           workflow_id: workflow.id
         }
       end
+      let(:still_linked_sets) { workflow.reload.subject_sets }
 
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
@@ -643,8 +647,26 @@ describe Api::V1::WorkflowsController, type: :controller do
       it "should unlink the subject set from the workflow" do
         expect(workflow.subject_sets).to match_array(linked_resources)
         delete :destroy_links, destroy_link_params
-        still_linked_sets = workflow.reload.subject_sets
         expect(still_linked_sets).to match_array(remaining_linked_resource)
+      end
+
+      it "should call the appropriate workers" do
+        expect(NotifySubjectSelectorOfChangeWorker)
+          .to receive(:perform_async)
+          .with(workflow.id)
+          expect(RefreshWorkflowStatusWorker)
+            .to receive(:perform_async)
+            .with(workflow.id)
+        delete :destroy_links, destroy_link_params
+      end
+
+      context "with link_ids as a comma separated list" do
+        let(:link_ids) { linked_resources.map(&:id).join(',') }
+
+        it "should unlink the subject set from the workflow" do
+          delete :destroy_links, destroy_link_params
+          expect(still_linked_sets).to match_array([])
+        end
       end
     end
   end

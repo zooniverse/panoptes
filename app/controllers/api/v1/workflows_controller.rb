@@ -33,6 +33,17 @@ class Api::V1::WorkflowsController < Api::ApiController
   def update_links
     super do |workflow|
       post_link_actions(workflow)
+
+      case relation.to_s
+      when "retired_subjects"
+        params[:retired_subjects].each do |subject_id|
+          NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
+        end
+      when "subject_sets"
+        params[:subject_sets].each do |set_id|
+          SubjectSetStatusesCreateWorker.perform_async(set_id, workflow.id)
+        end
+      end
     end
   end
 
@@ -79,23 +90,17 @@ class Api::V1::WorkflowsController < Api::ApiController
     end
   end
 
-  # This is a very good reason to move away from the api controller work we've got
-  # it's hard to hook into the right place to run actions that in theory should
-  # be easily located in specific controller actions
+  # Allways update the state of the workflow & selector services
+  # when modifying the subject sets or retired_subjects links
   def post_link_actions(workflow)
-    if workflow.set_member_subjects.exists?
+    relation_index = %w(subject_sets retired_subjects).index(relation.to_s)
+
+    if relation_index
       RefreshWorkflowStatusWorker.perform_async(workflow.id)
-      case relation.to_s
-      when "retired_subjects"
-        Array.wrap(params[:retired_subjects]).each do |subject_id|
-          NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
-        end
-      when "subject_sets"
-        Array.wrap(params[:subject_sets]).each do |set_id|
-          SubjectSetStatusesCreateWorker.perform_async(set_id, workflow.id)
-        end
-        NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
-      end
+    end
+
+    if relation_index.zero?
+      NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
     end
   end
 
