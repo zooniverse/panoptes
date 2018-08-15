@@ -29,10 +29,10 @@ matrix:
         - SPECS=spec/controllers/api/v1/[t-z]*.rb
     - rvm: 2.4
       env:
-        - SPECS="spec/controllers/**.rb spec/controllers/api/*.rb spec/models spec/operations spec/counters spec/routes"
+        - SPECS="spec/controllers/**.rb spec/controllers/api/*.rb spec/models spec/operations spec/counters spec/routes spec/policies"
     - rvm: 2.4
       env:
-        - SPECS="spec/lib spec/workers spec/serializers spec/services spec/requests spec/middleware spec/mailers spec/policies"
+        - SPECS="spec/lib spec/workers spec/serializers spec/services spec/requests spec/middleware spec/mailers"
 
 services:
   - postgresql
