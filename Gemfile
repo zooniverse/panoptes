@@ -9,7 +9,7 @@ gem "cellect-client", '~> 3.0.2'
 gem 'celluloid', '~> 0.18.0.pre' # to work around https://github.com/celluloid/celluloid/issues/696
 gem 'dalli-elasticache'
 gem 'devise', '~> 4.3'
-gem 'doorkeeper', '~> 4.4'
+gem 'doorkeeper', '= 4.4.0'
 gem 'doorkeeper-jwt', '~> 0.2.1'
 gem 'httparty'
 gem 'faraday', '~> 0.9'
