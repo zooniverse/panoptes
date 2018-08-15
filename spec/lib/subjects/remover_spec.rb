@@ -7,6 +7,9 @@ RSpec.describe Subjects::Remover do
   end
   let(:subjects) { subject_set.subjects }
   let(:subject) { subjects.sample }
+  let!(:linked_sws) do
+    create(:subject_workflow_status, workflow: workflow, subject: subject)
+  end
   let(:remover) { Subjects::Remover.new(subject.id) }
 
   describe "#cleanup" do
@@ -63,6 +66,35 @@ RSpec.describe Subjects::Remover do
       it "should remove a subject that has not been used" do
         remover.cleanup
         expect { Subject.find(subject.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      context "with a non-zero count sws record" do
+        let(:linked_sws) do
+          create(
+            :subject_workflow_status,
+            workflow: workflow,
+            subject: subject,
+            classifications_count: 10
+          )
+        end
+        it "should not remove a subject that has a non-zero count a sws record" do
+          expect(remover.cleanup).to be_falsey
+        end
+      end
+
+      context "with a non-zero count sws record" do
+        let(:linked_sws) do
+          create(
+            :subject_workflow_status,
+            workflow: workflow,
+            subject: subject,
+            retired_at: Time.now,
+            retirement_reason: :flagged
+          )
+        end
+        it "should not remove a subject that has a retired sws record" do
+          expect(remover.cleanup).to be_falsey
+        end
       end
 
       it "should remove the associated set_member_subjects" do
