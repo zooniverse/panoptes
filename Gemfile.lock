@@ -451,7 +451,6 @@ DEPENDENCIES
   activerecord-import (~> 0.25)
   aws-sdk (~> 2.10)
   cellect-client (~> 3.0.2)
-  celluloid (~> 0.18.0.pre)
   dalli-elasticache
   database_cleaner (~> 1.7.0)
   devise (~> 4.3)
