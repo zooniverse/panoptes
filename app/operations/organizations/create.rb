@@ -27,12 +27,13 @@ module Organizations
     private
 
     def build_organization
-      Organization.new(
+      Organization.new({
         owner: api_user.user,
         display_name: display_name,
         primary_language: primary_language,
-        categories: categories
-      )
+        categories: categories,
+        urls: urls
+      }.merge(organization_contents_params.slice(:title, :description, :introduction, :announcement, :url_labels)))
     end
 
     def organization_contents_params

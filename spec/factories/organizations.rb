@@ -12,6 +12,12 @@ FactoryBot.define do
     urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
     categories %w(bugs fossils plants)
 
+    description "This is the description for an Organization"
+    title "Test Organization"
+    introduction "This is the intro for an Organization"
+    announcement "Alert: This organization has something to let you know"
+    url_labels({"0.label" => "Blog", "1.label" => "Twitter"})
+
     association :owner, factory: :user
 
     after(:build) do |o, env|

@@ -22,14 +22,17 @@ module Organizations
           org_update.delete(:tags)
         end
 
+        content_update.merge! content_params
+        org_update.merge!(content_update.with_indifferent_access.except(:language))
+
         organization.update!(org_update.symbolize_keys)
         organization.organization_contents.find_or_initialize_by(language: language).tap do |content|
-          content_update.merge! content_params
           content.update! content_update.symbolize_keys
         end
         org_update[:listed] == true ? organization.touch(:listed_at) : organization[:listed_at] = nil
 
         organization.save!
+        organization
       end
     end
 
@@ -46,7 +49,7 @@ module Organizations
     def content_params
       params = inputs[:organization_params].merge("title" => organization_params["display_name"])
       fields = Api::V1::OrganizationsController::CONTENT_FIELDS
-      ContentFromParams.content_from_params(params, fields)
+      @content_params ||= ContentFromParams.content_from_params(params, fields)
     end
   end
 end
