@@ -80,7 +80,7 @@ GEM
       attention (~> 0.0.4)
       http (~> 0.9)
       multi_json (~> 1.11)
-    celluloid (0.18.0.pre)
+    celluloid (0.17.3)
       celluloid-essentials
       celluloid-extras
       celluloid-fsm
