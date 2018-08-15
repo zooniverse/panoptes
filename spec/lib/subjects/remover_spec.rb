@@ -43,6 +43,7 @@ RSpec.describe Subjects::Remover do
       end
 
       context "without a real subject" do
+        let(:linked_sws) { nil }
         let(:subject) { double(id: 100) }
 
         it "should ignore non existant subject ids" do
