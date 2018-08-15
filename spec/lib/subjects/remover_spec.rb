@@ -8,7 +8,12 @@ RSpec.describe Subjects::Remover do
   let(:subjects) { subject_set.subjects }
   let(:subject) { subjects.sample }
   let!(:linked_sws) do
-    create(:subject_workflow_status, workflow: workflow, subject: subject)
+    create(
+      :subject_workflow_status,
+      workflow: workflow,
+      subject: subject,
+      classifications_count: 0
+    )
   end
   let(:remover) { Subjects::Remover.new(subject.id) }
 
