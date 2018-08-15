@@ -93,13 +93,11 @@ class Api::V1::WorkflowsController < Api::ApiController
   # Allways update the state of the workflow & selector services
   # when modifying the subject sets or retired_subjects links
   def post_link_actions(workflow)
-    relation_index = %w(subject_sets retired_subjects).index(relation.to_s)
-
-    if relation_index
+    if %w(subject_sets retired_subjects).include?(relation.to_s)
       RefreshWorkflowStatusWorker.perform_async(workflow.id)
     end
 
-    if relation_index&.zero?
+    if relation.to_s == "subject_sets"
       NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
     end
   end
