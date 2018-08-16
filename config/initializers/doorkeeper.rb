@@ -22,7 +22,16 @@ Doorkeeper.configure do
 
   access_token_generator "Doorkeeper::JWT"
 
-  force_ssl_in_redirect_uri { |uri| uri.host != 'localhost' }
+  # Remove the scheme check
+  # once Doorkeeper v5 is released (no backport fix)
+  # https://github.com/doorkeeper-gem/doorkeeper/issues/1091
+  force_ssl_in_redirect_uri do |uri|
+    if uri.scheme == 'https'
+      false
+    else
+      uri.host != 'localhost'
+    end
+  end
 
   resource_owner_authenticator do
     u = current_user || warden.authenticate!(scope: :user)
