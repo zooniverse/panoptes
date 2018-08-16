@@ -104,7 +104,7 @@ describe ApplicationsController, type: :controller do
       expect(application.reload.name).to eq('changed')
     end
 
-    it 'allows insecure localhost scheme URIs', :focus do
+    it 'allows insecure localhost scheme URIs' do
       sign_in application.owner
       redirect_uri = "http://localhost"
       expect {
@@ -116,7 +116,7 @@ describe ApplicationsController, type: :controller do
       }.to(redirect_uri)
     end
 
-    it 'should not allow insecure non-localhost scheme URIs', :focus do
+    it 'should not allow insecure non-localhost scheme URIs' do
       sign_in application.owner
       original_redirect = application.redirect_uri
       put :update, id: application.id, application: {redirect_uri: "http://example.com"}
