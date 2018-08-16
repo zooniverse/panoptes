@@ -49,10 +49,36 @@ describe ApplicationsController, type: :controller do
   end
 
   describe "#create" do
-    it 'should set the owner of the application' do
+    before do
       sign_in normal_user
-      post :create, application: { name: "test app", redirect_uri: "https://test.example.com" }
+    end
+
+    it 'should set the owner of the application' do
+      post :create, {
+        application: { name: "test app", redirect_uri: "https://example.com" }
+      }
       expect(Doorkeeper::Application.first.owner).to eq(normal_user)
+    end
+
+    it 'should allows insecure localhost scheme URIs' do
+      expect {
+        post :create, {
+          application: { name: "test app", redirect_uri: "http://localhost" }
+        }
+      }.to change {
+        Doorkeeper::Application.count
+      }.by(1)
+    end
+
+    it 'should not allow insecure non-localhost scheme URIs' do
+      sign_in normal_user
+      expect {
+        post :create, {
+          application: { name: "test app", redirect_uri: "http://example.com" }
+        }
+      }.not_to change {
+        Doorkeeper::Application.count
+      }
     end
   end
 
@@ -76,6 +102,25 @@ describe ApplicationsController, type: :controller do
       sign_in admin_user
       put :update, id: application.id, application: {name: 'changed'}
       expect(application.reload.name).to eq('changed')
+    end
+
+    it 'allows insecure localhost scheme URIs', :focus do
+      sign_in application.owner
+      redirect_uri = "http://localhost"
+      expect {
+        put :update, id: application.id, application: {
+          redirect_uri: redirect_uri
+        }
+      }.to change {
+        application.reload.redirect_uri
+      }.to(redirect_uri)
+    end
+
+    it 'should not allow insecure non-localhost scheme URIs', :focus do
+      sign_in application.owner
+      original_redirect = application.redirect_uri
+      put :update, id: application.id, application: {redirect_uri: "http://example.com"}
+      expect(application.redirect_uri).to eq(original_redirect)
     end
   end
 
