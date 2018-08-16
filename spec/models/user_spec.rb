@@ -17,7 +17,7 @@ describe User, type: :model do
     end
   end
 
-  describe '::dormant' do
+  describe '::dormant', :focus do
     let(:user) { create(:user) }
 
     def dormant_user_ids(num_days_since_activity=5)
@@ -45,6 +45,19 @@ describe User, type: :model do
 
       it "should not find the dormant user with 6 days gap between signin" do
         expect(dormant_user_ids(6)).to match_array([])
+      end
+
+      context "with classifications" do
+
+        it "should return the user with no classifications in the last 5 days" do
+          FactoryBot.create(:classification, user: user, created_at: 5.days.ago)
+          expect(dormant_user_ids).to match_array([user.id])
+        end
+
+        it "should not return the user with classifications in the last 5 days" do
+          FactoryBot.create(:classification, user: user, created_at: 2.days.ago)
+          expect(dormant_user_ids).to match_array([])
+        end
       end
     end
 
