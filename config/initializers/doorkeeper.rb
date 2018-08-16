@@ -22,6 +22,8 @@ Doorkeeper.configure do
 
   access_token_generator "Doorkeeper::JWT"
 
+  force_ssl_in_redirect_uri { |uri| uri.host != 'localhost' }
+
   resource_owner_authenticator do
     u = current_user || warden.authenticate!(scope: :user)
     u if !u.disabled?
