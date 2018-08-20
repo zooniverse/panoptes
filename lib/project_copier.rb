@@ -24,6 +24,7 @@ class ProjectCopier
     end
 
     copied_project.assign_attributes(launch_approved: false, live: false)
+    copied_project.configuration[:source_project_id] = project.id
     copied_project.save!
     copied_project
   end

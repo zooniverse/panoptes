@@ -38,6 +38,10 @@ describe ProjectCopier do
         expect(copied_project.configuration).not_to include(:template)
       end
 
+      it "adds the source project id to the copied project's configuration" do
+        expect(copied_project.configuration[:source_project_id]).to be(project.id)
+      end
+
       it "has valid copied workflows" do
         expect(copied_project.workflows.first).to be_valid
         expect(copied_project.workflows.first.display_name).to eq(project.workflows.first.display_name)
