@@ -15,7 +15,7 @@ class ProjectPolicy < ApplicationPolicy
     roles_for_private_scope %i(owner collaborator translator)
   end
 
-  scope :index, :show, :versions, :version, with: ReadScope
+  scope :index, :show, :versions, :version, :copy, with: ReadScope
   scope :update, :update_links, :destroy, :destroy_links,
         :create_classifications_export,
         :create_subjects_export,

@@ -851,6 +851,46 @@ describe Api::V1::ProjectsController, type: :controller do
     it_behaves_like "is deactivatable"
   end
 
+  describe "#copy" do
+    let!(:resource) { create(:private_project, owner: authorized_user, configuration: {template: true} ) }
+
+    context "by the owner" do
+      let(:req) do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :copy, { project_id: resource.id }
+      end
+
+      it 'queues a ProjectCopy worker' do
+        expect(ProjectCopyWorker)
+          .to receive(:perform_async)
+          .with(resource.id, authorized_user.id)
+        req
+      end
+
+      context "the project is uncopyable" do
+        before { resource.update(live: true) }
+
+        it "is not copied and returns status code 405" do
+          expect{ req }.to_not change{Project.count}
+          expect(response).to have_http_status(:method_not_allowed)
+        end
+      end
+    end
+
+    context "an unauthorized user" do
+      let(:unauthorized_user) { create(:user) }
+      let(:req) do
+        default_request scopes: scopes, user_id: unauthorized_user.id
+        post :copy, { project_id: resource.id }
+      end
+
+      it "is not copied and returns status code 404" do
+        expect{ req }.to_not change{Project.count}
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
   describe "versioning" do
     let(:resource) { project }
     let!(:existing_versions) { resource.versions.length }

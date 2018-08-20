@@ -13,7 +13,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include MediumResponse
 
   require_authentication :update, :create, :destroy, :create_classifications_export,
-    :create_subjects_export, :create_workflows_export, :create_workflow_contents_export,
+    :create_subjects_export, :create_workflows_export, :create_workflow_contents_export, :copy,
     scopes: [:project]
   resource_actions :show, :index, :create, :update, :deactivate
   schema_type :json_schema
@@ -98,6 +98,15 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def create
     super { |project| TalkAdminCreateWorker.perform_async(project.id) }
+  end
+
+  def copy
+    if project.configuration["template"] && !project.live
+      ProjectCopyWorker.perform_async(project.id, api_user.id)
+      head :accepted
+    else
+      head :method_not_allowed
+    end
   end
 
   private
