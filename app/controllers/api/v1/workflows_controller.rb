@@ -24,8 +24,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   def update
     super do |resource|
       if update_params.key? :tasks
-        _, strings = extract_strings(update_params[:tasks])
-        resource.primary_content.update(strings: strings)
+        resource.primary_content.update(strings: resource.strings)
       end
     end
   end
@@ -106,6 +105,7 @@ class Api::V1::WorkflowsController < Api::ApiController
     if update_params.key? :tasks
       stripped_tasks, strings = extract_strings(update_params[:tasks])
       update_params[:tasks] = stripped_tasks
+      update_params[:strings] = strings
     end
 
     reject_live_project_changes(resource, update_params)
@@ -115,6 +115,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   def build_resource_for_create(create_params)
     stripped_tasks, strings = extract_strings(create_params[:tasks])
     create_params[:tasks] = stripped_tasks
+    create_params[:strings] = strings
     create_params[:active] = false if project_live?
     workflow = super(create_params)
     workflow.workflow_contents.build(
