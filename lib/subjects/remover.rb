@@ -30,34 +30,31 @@ module Subjects
 
     def can_be_removed?
       # subject has been collected or classified
-      return false unless orphan_subject_scope.exists?
+      return false if has_been_collected_or_classified?
 
       # subject has been talked about
-      return false unless no_talk_discussions?
+      return false if has_been_talked_about?
 
       # subject has been counted or retired via a SubjectWorkflowStatus record
-      if has_not_been_counted_or_retired?
-        true
-      else
-        false
-      end
-    end
+      return false if has_been_counted_or_retired?
 
-    def orphan_subject_scope
-      Subject
-      .where(id: subject_id)
-      .joins("LEFT OUTER JOIN classification_subjects ON classification_subjects.subject_id = subjects.id")
-      .where("classification_subjects.subject_id IS NULL")
-      .joins("LEFT OUTER JOIN collections_subjects ON collections_subjects.subject_id = subjects.id")
-      .where("collections_subjects.subject_id IS NULL")
+      # subject has no record of use in zooniverse
+      true
     end
 
     def orphan_subject
-      @orphan_subject ||= orphan_subject_scope.first
+      @orphan_subject ||=
+        Subject
+        .where(id: subject_id)
+        .joins("LEFT OUTER JOIN classification_subjects ON classification_subjects.subject_id = subjects.id")
+        .where("classification_subjects.subject_id IS NULL")
+        .joins("LEFT OUTER JOIN collections_subjects ON collections_subjects.subject_id = subjects.id")
+        .where("collections_subjects.subject_id IS NULL")
+        .first
     end
 
-    def no_talk_discussions?
-      panoptes_client.discussions(focus_id: subject_id, focus_type: 'Subject').empty?
+    def has_been_collected_or_classified?
+      !orphan_subject
     end
 
     def has_been_talked_about?
@@ -77,12 +74,10 @@ module Subjects
       SubjectWorkflowStatus.where(subject_id: subject_id)
     end
 
-    def orphan_subject_sws_counted_or_retired_scope
-      orphan_subject_sws_scope.where("classifications_count > 0 OR retired_at IS NOT NULL")
-    end
-
-    def has_not_been_counted_or_retired?
-      !orphan_subject_sws_counted_or_retired_scope.exists?
+    def has_been_counted_or_retired?
+      orphan_subject_sws_scope
+      .where("classifications_count > 0 OR retired_at IS NOT NULL")
+      .exists?
     end
   end
 end
