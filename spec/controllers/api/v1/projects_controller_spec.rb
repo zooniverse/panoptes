@@ -445,26 +445,29 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       describe "project contents" do
-        let(:contents) { Project.find(created_project_id).project_contents.first }
+        let(:project) { Project.find(created_project_id) }
+        let(:contents) { project.project_contents.first }
 
         it "should create an associated project_content model" do
           expect(contents).to_not be_nil
         end
 
         it 'should extract labels from the urls' do
-          expect(Project.find(created_project_id).urls).to eq([{"label" => "0.label", "url" => "http://twitter.com/example"}])
+          expect(project.urls).to eq([{"label" => "0.label", "url" => "http://twitter.com/example"}])
         end
 
-
         it 'should save labels to contents' do
+          expect(project.url_labels).to eq({"0.label" => "Twitter"})
           expect(contents.url_labels).to eq({"0.label" => "Twitter"})
         end
 
         it 'should set the contents title do' do
+          expect(project.title).to eq('New Zoo')
           expect(contents.title).to eq('New Zoo')
         end
 
         it 'should set the description' do
+          expect(project.description).to eq('A new Zoo for you!')
           expect(contents.description).to eq('A new Zoo for you!')
         end
 

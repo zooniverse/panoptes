@@ -64,6 +64,8 @@ class Project < ActiveRecord::Base
   scope :launched, -> { where("launch_approved IS TRUE") }
   scope :featured, -> { where(featured: true) }
 
+  alias_attribute :title, :display_name
+
   pg_search_scope :search_display_name,
     against: :display_name,
     using: {

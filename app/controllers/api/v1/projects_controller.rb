@@ -128,6 +128,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
     content_attributes = primary_content_attributes(create_params)
     create_params[:project_contents] = [ ProjectContent.new(content_attributes) ]
+    create_params[:url_labels] = content_attributes[:url_labels]
 
     if create_params.key?(:tags)
       create_params[:tags] = Tags::BuildTags.run!(api_user: api_user, tag_array: create_params[:tags])
@@ -135,7 +136,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
     add_user_as_linked_owner(create_params)
 
-    super(create_params.except(*CONTENT_FIELDS))
+    super(create_params)
   end
 
   def build_update_hash(update_params, resource)
@@ -146,7 +147,7 @@ class Api::V1::ProjectsController < Api::ApiController
     end
 
     update_attributes = super(update_params, resource)
-    update_attributes.except(:tags, *CONTENT_FIELDS)
+    update_attributes.except(:tags)
   end
 
   def new_items(resource, relation, value)
