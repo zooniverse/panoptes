@@ -914,7 +914,6 @@ CREATE TABLE public.projects (
     organization_id integer,
     mobile_friendly boolean DEFAULT false NOT NULL,
     featured boolean DEFAULT false NOT NULL,
-    title character varying,
     description text,
     introduction text,
     url_labels jsonb,
