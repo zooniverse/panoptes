@@ -1,9 +1,10 @@
 module Subjects
   class Remover
-    attr_reader :subject_id
+    attr_reader :subject_id, :panoptes_client
 
-    def initialize(subject_id)
+    def initialize(subject_id, client=nil)
       @subject_id = subject_id
+      @panoptes_client = client || Panoptes::Client.new(env: Rails.env)
     end
 
     def cleanup
@@ -59,8 +60,11 @@ module Subjects
       panoptes_client.discussions(focus_id: subject_id, focus_type: 'Subject').empty?
     end
 
-    def panoptes_client
-      @client ||= Panoptes::Client.new(env: Rails.env)
+    def has_been_talked_about?
+      panoptes_client.discussions(
+        focus_id: subject_id,
+        focus_type: 'Subject'
+      ).any?
     end
 
     def notify_subject_selector(workflow_ids)
