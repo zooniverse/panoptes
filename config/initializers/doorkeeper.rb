@@ -1,7 +1,17 @@
 module Doorkeeper
-  module PanoptesScopes
-    def self.optional
-      %i(user project group collection classification subject medium organization translation)
+  module Panoptes
+    module Scopes
+      def self.optional
+        %i(user project group collection classification subject medium organization translation)
+      end
+    end
+
+    module Host
+      ALLOWED_INSECURE_HOSTS = %w(localhost local.zooniverse.org).freeze
+
+      def self.force_secure_scheme?(host)
+        !ALLOWED_INSECURE_HOSTS.include?(host)
+      end
     end
   end
 end
@@ -29,7 +39,7 @@ Doorkeeper.configure do
     if uri.scheme == 'https'
       false
     else
-      uri.host != 'localhost'
+      Doorkeeper::Panoptes::Host.force_secure_scheme?(uri.host)
     end
   end
 

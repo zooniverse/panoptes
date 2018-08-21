@@ -70,6 +70,16 @@ describe ApplicationsController, type: :controller do
       }.by(1)
     end
 
+    it 'should allows insecure local zooniverse scheme URIs' do
+      expect {
+        post :create, {
+          application: { name: "test app", redirect_uri: "http://local.zooniverse.org" }
+        }
+      }.to change {
+        Doorkeeper::Application.count
+      }.by(1)
+    end
+
     it 'should not allow insecure non-localhost scheme URIs' do
       sign_in normal_user
       expect {
@@ -107,6 +117,18 @@ describe ApplicationsController, type: :controller do
     it 'allows insecure localhost scheme URIs' do
       sign_in application.owner
       redirect_uri = "http://localhost"
+      expect {
+        put :update, id: application.id, application: {
+          redirect_uri: redirect_uri
+        }
+      }.to change {
+        application.reload.redirect_uri
+      }.to(redirect_uri)
+    end
+
+    it 'allows insecure localhost scheme URIs' do
+      sign_in application.owner
+      redirect_uri = "http://local.zooniverse.org"
       expect {
         put :update, id: application.id, application: {
           redirect_uri: redirect_uri
