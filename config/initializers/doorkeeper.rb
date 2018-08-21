@@ -24,7 +24,7 @@ Doorkeeper.configure do
   enable_application_owner :confirmation => true
 
   default_scopes  :public
-  optional_scopes *Doorkeeper::PanoptesScopes.optional
+  optional_scopes *Doorkeeper::Panoptes::Scopes.optional
 
   realm "Panoptes"
 
