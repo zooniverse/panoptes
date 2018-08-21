@@ -30,7 +30,7 @@
   <%= content_tag :div, class: "form-group#{' has-error' if application.errors[:default_scope].present?}" do %>
     <h3>Application Scopes</h3>
     <div class="row">
-      <% Doorkeeper::PanoptesScopes.optional.each do |scope| %>
+      <% Doorkeeper::Panoptes::Scopes.optional.each do |scope| %>
         <div class="col-sm-10">
           <%= f.label scope, class: 'col-sm-2 control-label', for: "application_default_scope_#{scope}" %>
           <%= check_box_tag "application[default_scope][]", scope, application.default_scope.include?(scope.to_s) %>

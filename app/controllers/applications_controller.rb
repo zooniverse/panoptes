@@ -21,7 +21,7 @@ class ApplicationsController < Doorkeeper::ApplicationsController
   end
 
   def update
-    if @application.update!(application_params)
+    if @application.update(application_params)
       flash[:notice] = I18n.t(:notice, scope: [:doorkeeper, :flash, :applications, :update])
       respond_with :oauth, @application, location: oauth_application_url( @application )
     else

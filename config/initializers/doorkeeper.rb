@@ -1,7 +1,17 @@
 module Doorkeeper
-  module PanoptesScopes
-    def self.optional
-      %i(user project group collection classification subject medium organization translation)
+  module Panoptes
+    module Scopes
+      def self.optional
+        %i(user project group collection classification subject medium organization translation)
+      end
+    end
+
+    module Host
+      ALLOWED_INSECURE_HOSTS = %w(localhost local.zooniverse.org).freeze
+
+      def self.force_secure_scheme?(host)
+        !ALLOWED_INSECURE_HOSTS.include?(host)
+      end
     end
   end
 end
@@ -14,13 +24,24 @@ Doorkeeper.configure do
   enable_application_owner :confirmation => true
 
   default_scopes  :public
-  optional_scopes *Doorkeeper::PanoptesScopes.optional
+  optional_scopes *Doorkeeper::Panoptes::Scopes.optional
 
   realm "Panoptes"
 
   grant_flows ["authorization_code", "client_credentials", "implicit", "password"]
 
   access_token_generator "Doorkeeper::JWT"
+
+  # Remove the scheme check
+  # once Doorkeeper v5 is released (no backport fix)
+  # https://github.com/doorkeeper-gem/doorkeeper/issues/1091
+  force_ssl_in_redirect_uri do |uri|
+    if uri.scheme == 'https'
+      false
+    else
+      Doorkeeper::Panoptes::Host.force_secure_scheme?(uri.host)
+    end
+  end
 
   resource_owner_authenticator do
     u = current_user || warden.authenticate!(scope: :user)
