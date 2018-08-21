@@ -21,6 +21,8 @@ class Organization < ActiveRecord::Base
 
   accepts_nested_attributes_for :organization_contents
 
+  alias_attribute :title, :display_name
+
   def self.translatable_attributes
     %i(display_name title description introduction announcement url_labels)
   end

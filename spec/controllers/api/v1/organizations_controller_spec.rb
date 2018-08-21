@@ -108,6 +108,8 @@ describe Api::V1::OrganizationsController, type: :controller do
           organizations: {
             display_name: "The Illuminati",
             description: "This organization is the most organized organization to ever organize",
+            introduction: "org intro",
+            announcement: "We dont exist",
             urls: [{label: "Blog", url: "http://blogo.com/example"}],
             primary_language: "zh-tw",
             categories: %w(stuff things moar)
@@ -136,6 +138,15 @@ describe Api::V1::OrganizationsController, type: :controller do
           it 'should create the organization with the categories' do
             categories = resource_class.find(created_id).send(test_attr)
             expect(categories).to match_array(expected_categories)
+          end
+
+          it 'should set content attributes on the main model' do
+            resource = resource_class.find(created_id)
+            expect(resource.title).to eq("The Illuminati")
+            expect(resource.description).to eq("This organization is the most organized organization to ever organize")
+            expect(resource.introduction).to eq("org intro")
+            expect(resource.url_labels).to eq({"0.label" => "Blog"})
+            expect(resource.announcement).to eq("We dont exist")
           end
         end
       end

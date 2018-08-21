@@ -1,8 +1,5 @@
 module Organizations
   class Create < Operation
-    include UrlLabels
-    include ContentFromParams
-
     string :display_name
     string :primary_language
 
@@ -30,12 +27,13 @@ module Organizations
     private
 
     def build_organization
-      Organization.new(
+      Organization.new({
         owner: api_user.user,
         display_name: display_name,
         primary_language: primary_language,
-        categories: categories
-      )
+        categories: categories,
+        urls: urls
+      }.merge(organization_contents_params.slice(:description, :introduction, :announcement, :url_labels)))
     end
 
     def organization_contents_params
@@ -51,10 +49,8 @@ module Organizations
     end
 
     def organization_contents_from_params
-      content_from_params(
-        inputs,
-        Api::V1::OrganizationsController::CONTENT_FIELDS
-      )
+      fields = Api::V1::OrganizationsController::CONTENT_FIELDS
+      ContentFromParams.content_from_params(inputs, fields)
     end
   end
 end

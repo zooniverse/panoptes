@@ -291,4 +291,19 @@ namespace :migrate do
       end
     end
   end
+
+  namespace :contents do
+    desc "Copy org contents to orgs"
+    task :copy_org_contents do
+      Organization.find_each do |org|
+        content = org.primary_content
+        org.title = content.title
+        org.description = content.description
+        org.introduction = content.introduction
+        org.url_labels = content.url_labels
+        org.announcement = content.announcement
+        org.save!
+      end
+    end
+  end
 end

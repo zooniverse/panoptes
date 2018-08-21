@@ -7,8 +7,6 @@ class Api::V1::ProjectsController < Api::ApiController
   include FilterByTags
   include AdminAllowed
   include Versioned
-  include UrlLabels
-  include ContentFromParams
   include Slug
   include MediumResponse
 
@@ -189,9 +187,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def primary_content_attributes(content_attributes)
-    content_from_params(content_attributes.dup, CONTENT_FIELDS) do |ps|
-      ps[:title] = ps[:display_name]
-    end
+    content_attributes = content_attributes.merge(title: content_attributes[:display_name])
+    ContentFromParams.content_from_params(content_attributes, CONTENT_FIELDS)
   end
 
   def available_to_export
