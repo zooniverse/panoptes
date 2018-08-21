@@ -62,6 +62,12 @@ class Api::V1::ProjectsController < Api::ApiController
       # transaction.
       content_attributes = primary_content_attributes(update_params)
       unless content_attributes.blank?
+        resource.display_name = content_attributes[:title] if content_attributes.key?(:title)
+        resource.description = content_attributes[:description] if content_attributes.key?(:description)
+        resource.introduction = content_attributes[:introduction] if content_attributes.key?(:introduction)
+        resource.url_labels = content_attributes[:url_labels] if content_attributes.key?(:url_labels)
+        resource.workflow_description = content_attributes[:workflow_description] if content_attributes.key?(:workflow_description)
+        resource.researcher_quote = content_attributes[:researcher_quote] if content_attributes.key?(:researcher_quote)
         resource.primary_content.update!(content_attributes)
       end
 

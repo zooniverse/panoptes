@@ -679,6 +679,9 @@ describe Api::V1::ProjectsController, type: :controller do
         { projects: { description: 'SC' }, id: resource.id }
       end
 
+      let(:project) { resource }
+      let(:contents) { resource.primary_content }
+
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
       end
@@ -686,13 +689,17 @@ describe Api::V1::ProjectsController, type: :controller do
       it 'should update the default contents when the display_name is updated' do
         params[:projects][test_attr] = test_attr_value
         put :update, params
-        contents_title = resource.primary_content.reload
-        contents_title = resource.primary_content.title
-        expect(contents_title).to eq(test_attr_value)
+        project.reload
+        contents.reload
+        expect(project.title).to eq(test_attr_value)
+        expect(contents.title).to eq(test_attr_value)
       end
 
       it 'should update the default contents when the description changes' do
         put :update, params
+        project.reload
+        expect(project.description).to eq('SC')
+        expect(contents.description).to eq('SC')
         expect(json_response['projects'][0]['description']).to eq('SC')
       end
 
