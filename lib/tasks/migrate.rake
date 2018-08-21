@@ -305,5 +305,14 @@ namespace :migrate do
         org.save!
       end
     end
+
+    desc "Copy org contents to orgs"
+    task :copy_workflow_contents do
+      Workflow.find_each do |workflow|
+        content = workflow.primary_content
+        workflow.strings = content.strings
+        workflow.save!
+      end
+    end
   end
 end
