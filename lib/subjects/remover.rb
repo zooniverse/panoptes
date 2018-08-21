@@ -29,13 +29,10 @@ module Subjects
     private
 
     def can_be_removed?
-      # subject has been collected or classified
       return false if has_been_collected_or_classified?
 
-      # subject has been talked about
       return false if has_been_talked_about?
 
-      # subject has been counted or retired via a SubjectWorkflowStatus record
       return false if has_been_counted_or_retired?
 
       # subject has no record of use in zooniverse
