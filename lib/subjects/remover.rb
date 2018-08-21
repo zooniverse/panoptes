@@ -42,15 +42,17 @@ module Subjects
       true
     end
 
+    def orphan_subject_scope
+      Subject
+      .where(id: subject_id)
+      .joins("LEFT OUTER JOIN classification_subjects ON classification_subjects.subject_id = subjects.id")
+      .where("classification_subjects.subject_id IS NULL")
+      .joins("LEFT OUTER JOIN collections_subjects ON collections_subjects.subject_id = subjects.id")
+      .where("collections_subjects.subject_id IS NULL")
+    end
+
     def orphan_subject
-      @orphan_subject ||=
-        Subject
-        .where(id: subject_id)
-        .joins("LEFT OUTER JOIN classification_subjects ON classification_subjects.subject_id = subjects.id")
-        .where("classification_subjects.subject_id IS NULL")
-        .joins("LEFT OUTER JOIN collections_subjects ON collections_subjects.subject_id = subjects.id")
-        .where("collections_subjects.subject_id IS NULL")
-        .first
+      @orphan_subject ||= orphan_subject_scope.first
     end
 
     def has_been_collected_or_classified?
