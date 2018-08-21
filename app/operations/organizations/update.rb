@@ -23,7 +23,7 @@ module Organizations
         end
 
         content_update.merge! content_params
-        org_update.merge!(content_update.with_indifferent_access.except(:language))
+        org_update.merge!(content_update.with_indifferent_access.except(:title, :language))
 
         organization.update!(org_update.symbolize_keys)
         organization.organization_contents.find_or_initialize_by(language: language).tap do |content|

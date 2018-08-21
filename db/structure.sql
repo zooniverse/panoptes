@@ -777,7 +777,6 @@ CREATE TABLE public.organizations (
     urls jsonb DEFAULT '[]'::jsonb,
     listed boolean DEFAULT false NOT NULL,
     categories character varying[] DEFAULT '{}'::character varying[],
-    title character varying,
     description character varying,
     introduction text,
     url_labels jsonb,

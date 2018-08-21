@@ -33,7 +33,7 @@ module Organizations
         primary_language: primary_language,
         categories: categories,
         urls: urls
-      }.merge(organization_contents_params.slice(:title, :description, :introduction, :announcement, :url_labels)))
+      }.merge(organization_contents_params.slice(:description, :introduction, :announcement, :url_labels)))
     end
 
     def organization_contents_params
