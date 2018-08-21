@@ -88,7 +88,7 @@ RSpec.describe Subjects::Remover do
         end
       end
 
-      context "with a non-zero count sws record" do
+      context "with a retired count sws record" do
         let(:linked_sws) do
           create(
             :subject_workflow_status,
