@@ -112,7 +112,7 @@ RSpec.describe Subjects::Remover do
         expect { Medium.find(media_ids) }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
-      it "notify cellect about the subject removal" do
+      it "notify selector service about the subject removal" do
         expect(NotifySubjectSelectorOfRetirementWorker)
           .to receive(:perform_async)
           .with(subject.id, workflow.id)
