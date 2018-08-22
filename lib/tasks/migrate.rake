@@ -316,7 +316,7 @@ namespace :migrate do
     end
 
     desc "Copy project contents to projects"
-    task :copy_project_contents do
+    task :copy_project_contents => :environment do
       Project.find_each do |project|
         content = project.primary_content
         project.description = content.description
