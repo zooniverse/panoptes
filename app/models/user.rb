@@ -91,9 +91,13 @@ class User < ActiveRecord::Base
       # devise trackable sets the current_sign_in_at on each login
       havent_signed_in_since = "date(now()) - date(current_sign_in_at) >= #{window}"
       where(havent_signed_in_since).select(:id).find_each do |dormant_user|
-        # user project preferences are updated each time
-        # a user classifies on the project
-        # see UserProjectPreferences::FindOrCreate
+        # A user's project preference (UPP) is updated
+        # each time they classify on a project.
+        # The last updated UPP is a proxy to a user's classification activity
+        # and the query is much less expensive than classifications or recents
+        #
+        # Ideally this should move to a last_classifcation FK attribute on the
+        # user which is updated in the classification lifecycle
         last_classified_upp = UserProjectPreference
           .where(user_id: dormant_user.id)
           .where.not(email_communication: nil)
