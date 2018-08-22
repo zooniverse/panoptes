@@ -13,22 +13,6 @@ class OrganizationSerializer
   can_filter_by :display_name, :slug, :listed
   can_include :organization_contents, :organization_roles, :projects, :owners, :pages
 
-  def title
-    content[:title]
-  end
-
-  def description
-    content[:description]
-  end
-
-  def introduction
-    content[:introduction]
-  end
-
-  def announcement
-    content[:announcement]
-  end
-
   def avatar_src
     if avatar = @model.avatar
       avatar.external_link ? avatar.external_link : avatar.src
