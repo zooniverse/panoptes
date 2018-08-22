@@ -36,7 +36,7 @@ class OrganizationSerializer
     end
   end
 
-  def fields
+  def content_serializer_fields
     %i(title description introduction announcement)
   end
 
