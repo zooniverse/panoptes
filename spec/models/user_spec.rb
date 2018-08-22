@@ -17,7 +17,7 @@ describe User, type: :model do
     end
   end
 
-  describe '::dormant', :focus do
+  describe '::dormant' do
     let(:user) { create(:user) }
 
     def dormant_user_ids(num_days_since_activity=5)
@@ -47,16 +47,34 @@ describe User, type: :model do
         expect(dormant_user_ids(6)).to match_array([])
       end
 
-      context "with classifications" do
-
-        it "should return the user with no classifications in the last 5 days" do
-          FactoryBot.create(:classification, user: user, created_at: 5.days.ago)
-          expect(dormant_user_ids).to match_array([user.id])
+      context "with lifecycled classifications", sidekiq: :inline do
+        let(:classification) do
+          create(:classification, user: user, created_at: days_ago)
         end
 
-        it "should not return the user with classifications in the last 5 days" do
-          FactoryBot.create(:classification, user: user, created_at: 2.days.ago)
-          expect(dormant_user_ids).to match_array([])
+        before do
+          ClassificationLifecycle.perform(classification, "create")
+          upp = UserProjectPreference.where(
+            user_id: user.id,
+            project_id: classification.project_id
+          ).first
+          upp.update_column(:updated_at, days_ago)
+        end
+
+        context "user last classified 5 days ago" do
+          let(:days_ago) { 5.days.ago}
+
+          it "should return the user" do
+            expect(dormant_user_ids).to match_array([user.id])
+          end
+        end
+
+        context "user last classified 2 days ago" do
+          let(:days_ago) { 2.days.ago}
+
+          it "should not return the user" do
+            expect(dormant_user_ids).to match_array([])
+          end
         end
       end
     end

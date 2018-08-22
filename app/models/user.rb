@@ -90,15 +90,25 @@ class User < ActiveRecord::Base
     DatabaseReplica.read("read_dormant_users_from_replica") do
       # devise trackable sets the current_sign_in_at on each login
       havent_signed_in_since = "date(now()) - date(current_sign_in_at) >= #{window}"
-      where(havent_signed_in_since).find_each do |dormant_user|
-        latest_user_classification = Classification.where(user_id: dormant_user).order(created_at: :desc).first
-        has_no_recent_classification =
-          if latest_user_classification
-            Time.now.utc - latest_user_classification.created_at > window.days
+      where(havent_signed_in_since).select(:id).find_each do |dormant_user|
+        # user project preferences are updated each time
+        # a user classifies on the project
+        # see UserProjectPreferences::FindOrCreate
+        last_classified_upp = UserProjectPreference
+          .where(user_id: dormant_user.id)
+          .where.not(email_communication: nil)
+          .order(updated_at: :desc)
+          .first
+
+        has_not_recently_classified =
+          if last_classified_upp
+            time_since_activity = Time.now.utc - last_classified_upp.updated_at
+            time_since_activity >= window.days.to_i
           else
             true
           end
-        if has_no_recent_classification
+
+        if has_not_recently_classified
           yield(dormant_user)
         end
       end
