@@ -18,6 +18,12 @@ FactoryBot.define do
     live false
     urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
 
+    description "Some Lorem Ipsum"
+    introduction "MORE IPSUM"
+    workflow_description "Go outside"
+    researcher_quote "This is my favorite project"
+    url_labels({"0.label" => "Blog", "1.label" => "Twitter", "2.label" => "Science Case"})
+
     association :owner, factory: :user
 
     after(:build) do |p, env|
