@@ -20,14 +20,14 @@ RSpec.describe UserWelcomeMailer, :type => :mailer do
     end
 
     it 'should have the user name in the body' do
-      expect(mail.body.encoded).to match("#{user.display_name}")
+      expect(mail.body.encoded).to match(user.display_name)
     end
 
     context "with a project name" do
       let!(:mail) { UserWelcomeMailer.welcome_user(user, project.display_name) }
 
       it 'should have the project name in the body' do
-        expect(mail.body.encoded).to match("#{project.display_name}")
+        expect(mail.body.encoded).to match(project.display_name)
       end
     end
   end
