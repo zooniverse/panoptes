@@ -1,7 +1,7 @@
 class DormantUserMailer < ApplicationMailer
   layout false
 
-  DEFAULT_SUBJECT = "Come back to the Zooniverse"
+  DEFAULT_SUBJECT = "Come back to the Zooniverse".freeze
 
   def email_dormant_user(user)
     @user = user
