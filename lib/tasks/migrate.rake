@@ -294,7 +294,7 @@ namespace :migrate do
 
   namespace :contents do
     desc "Copy org contents to orgs"
-    task :copy_org_contents do
+    task :copy_org_contents => :environment do
       Organization.find_each do |org|
         content = org.primary_content
         org.title = content.title
