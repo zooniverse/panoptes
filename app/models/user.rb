@@ -91,13 +91,11 @@ class User < ActiveRecord::Base
       # devise trackable sets the current_sign_in_at on each login
       havent_signed_in_since = "date(now()) - date(current_sign_in_at) >= #{window}"
       where(havent_signed_in_since).find_each do |dormant_user|
-        # Check if dormant user has classified in last 5 days, only yield block if meet warden_conditions
         latest_user_classification = Classification.where(user_id: dormant_user).order(created_at: :desc).first
         has_no_recent_classification =
           if latest_user_classification
             Time.now.utc - latest_user_classification.created_at > window.days
           else
-            # some users just don't classify, that's ok too. lets email them to remind them to!
             true
           end
         if has_no_recent_classification
