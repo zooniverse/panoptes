@@ -1,7 +1,7 @@
 class DormantUserMailerWorker
   include Sidekiq::Worker
 
-attr_reader :user
+  attr_reader :user
 
   def perform(user_id)
     @user = User.find(user_id)
