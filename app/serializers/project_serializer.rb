@@ -4,8 +4,12 @@ class ProjectSerializer
   include RestPack::Serializer
   include OwnerLinkSerializer
   include MediaLinksSerializer
-  include ContentSerializer
   include CachedSerializer
+
+  CONTENT_FIELDS = %i(
+    title description workflow_description
+    introduction url_labels researcher_quote
+  ).freeze
 
   PRELOADS = [
     :project_contents,
@@ -126,7 +130,10 @@ class ProjectSerializer
     end
   end
 
-  def content_serializer_fields
-    %i(title description workflow_description introduction url_labels researcher_quote)
+  def content
+    return @content if @content
+    content = @model.primary_content.attributes.with_indifferent_access
+    content.default = ""
+    @content = content.slice(*CONTENT_FIELDS)
   end
 end

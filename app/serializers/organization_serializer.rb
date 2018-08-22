@@ -1,9 +1,10 @@
 class OrganizationSerializer
   include RestPack::Serializer
   include OwnerLinkSerializer
-  include ContentSerializer
   include MediaLinksSerializer
   include CachedSerializer
+
+  CONTENT_FIELDS = %i(title description introduction announcement).freeze
 
   attributes :id, :display_name, :description, :introduction, :title, :href,
     :primary_language, :listed_at, :listed, :slug, :urls, :categories, :announcement
@@ -36,8 +37,11 @@ class OrganizationSerializer
     end
   end
 
-  def content_serializer_fields
-    %i(title description introduction announcement)
+  def content
+    return @content if @content
+    content = @model.primary_content.attributes.with_indifferent_access
+    content.default = ""
+    @content = content.slice(*CONTENT_FIELDS)
   end
 
   def self.links
