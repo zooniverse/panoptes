@@ -18,15 +18,27 @@ pipeline {
               newImage.push('latest')
             }
           }
+
+          if (BRANCH_NAME == 'master') {
+            stage('Update latest tag') {
+              newImage.push('latest')
+            }
+          }
+
+          if (TAG_NAME == 'production') {
+            stage('Update production tag') {
+              newImage.push('production')
+            }
+          }
         }
       }
     }
 
-    stage('Build staging AMIs') {
-      when { branch 'master' }
+    stage('Build AMIs') {
       failFast true
       parallel {
-        stage('Build API') {
+        stage('Staging API') {
+          when { branch 'master' }
           options {
             skipDefaultCheckout true
           }
@@ -46,7 +58,8 @@ pipeline {
             """
           }
         }
-        stage('Build Dump workers') {
+        stage('Staging Dump workers') {
+          when { branch 'master' }
           options {
             skipDefaultCheckout true
           }
@@ -62,6 +75,48 @@ pipeline {
               KEEP_ALIVE_ECHO_JOB=\$!
               cd /operations
               ./rebuild.sh panoptes-dumpworker-staging
+              kill \${KEEP_ALIVE_ECHO_JOB}
+            """
+          }
+        }
+        stage('Production API') {
+          when { tag 'production' }
+          options {
+            skipDefaultCheckout true
+          }
+          agent {
+            docker {
+              image 'zooniverse/operations:latest'
+              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
+            }
+          }
+          steps {
+            sh """#!/bin/bash -e
+              while true; do sleep 3; echo -n "."; done &
+              KEEP_ALIVE_ECHO_JOB=\$!
+              cd /operations
+              ./rebuild.sh panoptes-api
+              kill \${KEEP_ALIVE_ECHO_JOB}
+            """
+          }
+        }
+        stage('Production Dump workers') {
+          when { tag 'production' }
+          options {
+            skipDefaultCheckout true
+          }
+          agent {
+            docker {
+              image 'zooniverse/operations:latest'
+              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
+            }
+          }
+          steps {
+            sh """#!/bin/bash -e
+              while true; do sleep 3; echo -n "."; done &
+              KEEP_ALIVE_ECHO_JOB=\$!
+              cd /operations
+              ./rebuild.sh panoptes-dumpworker
               kill \${KEEP_ALIVE_ECHO_JOB}
             """
           }
