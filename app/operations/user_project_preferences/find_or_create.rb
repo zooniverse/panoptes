@@ -1,6 +1,5 @@
 module UserProjectPreferences
   class FindOrCreate < Operation
-    object :api_user, default: nil
     object :user
     object :project
 
