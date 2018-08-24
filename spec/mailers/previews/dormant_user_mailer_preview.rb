@@ -1,4 +1,9 @@
-# Preview all emails at http://localhost:3000/rails/mailers/project_request_mailer
-class DormantUserMailer < ActionMailer::Preview
+# Preview this email at
+# http://localhost:3000/rails/mailers/dormant_user_mailer/dormant_user
+class DormantUserMailerPreview < ActionMailer::Preview
 
+  def dormant_user
+    user = User.first
+    DormantUserMailer.email_dormant_user(user)
+  end
 end
