@@ -18,13 +18,6 @@ pipeline {
               newImage.push('latest')
             }
           }
-
-          def tag = sh(returnStdout: true, script: "git tag --contains | head -1").trim()
-          if (tag == 'production') {
-            stage('Update production tag') {
-              newImage.push('production')
-            }
-          }
         }
       }
     }
