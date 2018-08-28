@@ -19,12 +19,6 @@ pipeline {
             }
           }
 
-          if (BRANCH_NAME == 'master') {
-            stage('Update latest tag') {
-              newImage.push('latest')
-            }
-          }
-
           if (TAG_NAME == 'production') {
             stage('Update production tag') {
               newImage.push('production')
