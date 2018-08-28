@@ -8,7 +8,7 @@ pipeline {
       agent any
       steps {
         script {
-          def dockerRepoName = 'zooniverse/panoptes-jenkins'
+          def dockerRepoName = 'zooniverse/panoptes'
           def dockerImageName = "${dockerRepoName}:${BRANCH_NAME}"
           def newImage = docker.build(dockerImageName)
           newImage.push()
