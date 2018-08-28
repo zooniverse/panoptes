@@ -19,7 +19,8 @@ pipeline {
             }
           }
 
-          if (TAG_NAME == 'production') {
+          def tag = sh(returnStdout: true, script: "git tag --contains | head -1").trim()
+          if (tag == 'production') {
             stage('Update production tag') {
               newImage.push('production')
             }
