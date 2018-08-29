@@ -14,9 +14,9 @@ RSpec.describe ClassificationsDumpWorker do
       let(:num_entries) { classifications.size + 1 }
     end
 
-    context "with read slave enable" do
+    context "with standby read replica enabled" do
       before do
-        Panoptes.flipper["dump_data_from_read_slave"].enable
+        Panoptes.flipper["dump_data_from_read_replica"].enable
       end
 
       it_behaves_like "dump worker", ClassificationDataMailerWorker, "project_classifications_export" do

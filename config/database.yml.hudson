@@ -12,7 +12,7 @@ development:
   <<: *default
   database: panoptes_development
 
-development_slave:
+development_standby:
   <<: *default
   database: panoptes_development
 
@@ -20,6 +20,6 @@ test:
   <<: *default
   database: panoptes_test
 
-test_slave:
+test_standby:
   <<: *default
   database: panoptes_test

@@ -404,8 +404,6 @@ GEM
       celluloid (>= 0.17.3)
       ice_cube (~> 0.14.0)
       sidekiq (>= 4.1.0)
-    slavery (3.0.0)
-      activerecord (>= 3.0.0)
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-commands-rspec (1.0.4)
@@ -417,6 +415,8 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
+    standby (4.0.0)
+      activerecord (>= 3.0.0)
     stringex (2.8.4)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
@@ -509,9 +509,9 @@ DEPENDENCIES
   sidekiq-congestion (~> 0.1.0)
   sidekiq-unique-jobs
   sidetiq (~> 0.7)
-  slavery
   spring
   spring-commands-rspec
+  standby
   stringex (~> 2.8)
   therubyracer (~> 0.12)
   uglifier (~> 4.1)

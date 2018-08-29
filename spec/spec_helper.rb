@@ -30,8 +30,8 @@ RSpec.configure do |config|
 
   Devise.mailer = Devise::Mailer
 
-  # disable slave reads to deal with testing transaction isolation
-  Slavery.disabled = true
+  # disable standby reads to deal with testing transaction isolation
+  Standby.disabled = true
 
   # work around https://github.com/celluloid/celluloid/issues/696
   Celluloid.shutdown_timeout = 1
