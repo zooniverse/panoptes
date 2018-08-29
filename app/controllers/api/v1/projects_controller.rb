@@ -109,11 +109,11 @@ class Api::V1::ProjectsController < Api::ApiController
 
   private
 
-  def create_response(projects)
+  def create_response(project_scope)
     serializer.resource(
       { include: 'owners' },
-      resource_scope(projects),
-      fields: CONTENT_FIELDS
+      project_scope,
+      context
     )
   end
 
