@@ -162,8 +162,9 @@ describe Api::V1::WorkflowsController, type: :controller do
         put :update, update_params
         instance = Workflow.find(created_instance_id(api_resource_name))
         expect(instance.tasks["interest"]["question"]).to eq("interest.question")
-        updated_string = instance.primary_content.strings["interest.question"]
-        expect(updated_string).to eq(new_question)
+        contents = instance.primary_content
+        expect(instance.strings["interest.question"]).to eq(new_question)
+        expect(contents.strings["interest.question"]).to eq(new_question)
       end
 
       context "when only updating the task content strings" do
@@ -186,8 +187,9 @@ describe Api::V1::WorkflowsController, type: :controller do
         it 'should update the associated contents' do
           put :update, task_only_update_params
           instance = Workflow.find(created_instance_id(api_resource_name))
-          updated_string = instance.primary_content.strings["interest.question"]
-          expect(updated_string).to eq(new_question)
+          contents = instance.primary_content
+          expect(instance.strings["interest.question"]).to eq(new_question)
+          expect(contents.strings["interest.question"]).to eq(new_question)
         end
       end
 
@@ -550,6 +552,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         post :create, create_params
         instance = Workflow.find(created_instance_id(api_resource_name))
         expect(instance.tasks["interest"]["question"]).to eq("interest.question")
+        expect(instance.strings["interest.question"]).to eq("Draw a Circle")
       end
     end
 

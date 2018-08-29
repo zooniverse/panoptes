@@ -1660,7 +1660,8 @@ CREATE TABLE public.workflows (
     current_version_number character varying,
     activated_state integer DEFAULT 0 NOT NULL,
     subject_selection_strategy integer DEFAULT 0,
-    mobile_friendly boolean DEFAULT false NOT NULL
+    mobile_friendly boolean DEFAULT false NOT NULL,
+    strings jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -4164,4 +4165,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180724112620');
 INSERT INTO schema_migrations (version) VALUES ('20180726133210');
 
 INSERT INTO schema_migrations (version) VALUES ('20180808140938');
+
+INSERT INTO schema_migrations (version) VALUES ('20180821151555');
 
