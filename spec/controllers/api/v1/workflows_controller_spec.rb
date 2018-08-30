@@ -410,6 +410,18 @@ describe Api::V1::WorkflowsController, type: :controller do
         post :update_links, params
       end
 
+      it "should handle non-array link formats" do
+        default_request scopes: scopes, user_id: authorized_user.id
+        params = {
+          link_relation: test_relation.to_s,
+          test_relation => linked_resource.id.to_s,
+          resource_id => resource.id
+        }
+        post :update_links, params
+        linked_subject_set_ids = resource.subject_sets.pluck(:id)
+        expect(linked_subject_set_ids).to eq([linked_resource.id])
+      end
+
       context "when the subject_set links belong to another project" do
         let!(:subject_set_project) do
           workflows.find { |w| w.project != project }.project

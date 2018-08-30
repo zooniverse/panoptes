@@ -35,11 +35,11 @@ class Api::V1::WorkflowsController < Api::ApiController
 
       case relation.to_s
       when "retired_subjects"
-        params[:retired_subjects].each do |subject_id|
+        Array.wrap(params[:retired_subjects]).each do |subject_id|
           NotifySubjectSelectorOfRetirementWorker.perform_async(subject_id, workflow.id)
         end
       when "subject_sets"
-        params[:subject_sets].each do |set_id|
+        Array.wrap(params[:subject_sets]).each do |set_id|
           SubjectSetStatusesCreateWorker.perform_async(set_id, workflow.id)
         end
       end
