@@ -57,6 +57,23 @@ FactoryBot.define do
     retired_set_member_subjects_count 0
     subject_selection_strategy "builtin"
 
+    strings({
+            "interest.question" => "Draw a circle",
+            "interest.help" => "Duh?",
+            "interest.tools.0.label" => "Red",
+            "interest.tools.1.label" => "Green",
+            "interest.tools.2.label" => "Blue",
+            "interest.tools.3.label" => "Purple",
+            "interest.tools.3.details.0.answers.0.label"=>"Painfully wow",
+            "interest.tools.3.details.0.answers.1.label"=>"Just wow",
+            "interest.tools.3.details.0.question"=>"Wow rating:",
+            "shape.question" => "What shape is this galaxy",
+            "shape.help" => "Duh?",
+            "shape.answers.0.label" => "Smooth",
+            "shape.answers.1.label" => "Features",
+            "shape.answers.2.label" => "Star or artifact",
+            })
+
     after(:build) do |w, env|
       if env.build_contents
         w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: w.primary_language)
@@ -106,6 +123,13 @@ FactoryBot.define do
           }
         }
       )
+
+      strings ({
+        "init.help" => "You know what a cat looks like right?",
+        "init.answers.0.label" => "Yes",
+        "init.answers.1.label" => "No",
+        "init.question" => "Is there a cat in the image"
+      })
 
       after(:build) do |w, env|
         if env.build_contents
@@ -274,6 +298,11 @@ FactoryBot.define do
           }
         }
       )
+
+      strings ({
+        "init.answers.0.label" => "yes",
+        "init.question" => "Fire present?"
+      })
 
       after(:build) do |w, env|
         if env.build_contents
