@@ -62,15 +62,19 @@ class Api::V1::ProjectsController < Api::ApiController
       # transaction.
       content_attributes = primary_content_attributes(update_params)
 
-      unless content_attributes.blank?
-        resource.assign_attributes(content_attributes.except(:title))
+      if content_attributes.present?
         resource.primary_content.update!(content_attributes)
+      end
+
+      if content_attributes.key?(:url_labels)
+        resource.url_labels = content_attributes[:url_labels]
+        resource.urls = update_params[:urls]
       end
 
       tags = Tags::BuildTags.run!(api_user: api_user, tag_array: update_params[:tags]) if update_params[:tags]
       resource.tags = tags unless tags.nil?
 
-      if !content_attributes.blank? || !tags.nil?
+      if content_attributes.present? || !tags.nil?
         resource.updated_at = Time.zone.now
       end
     end

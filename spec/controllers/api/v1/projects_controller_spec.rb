@@ -676,7 +676,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
     context "project_contents" do
       let(:params) do
-        { projects: { description: 'SC' }, id: resource.id }
+        { projects: { description: 'SC', urls: [{label: "About", url: "https://zooniverse.org/about"}] }, id: resource.id }
       end
 
       let(:project) { resource }
@@ -701,6 +701,21 @@ describe Api::V1::ProjectsController, type: :controller do
         expect(project.description).to eq('SC')
         expect(contents.description).to eq('SC')
         expect(json_response['projects'][0]['description']).to eq('SC')
+      end
+
+      it 'should extract labels from the urls' do
+        put :update, params
+        project.reload
+        contents.reload
+        expect(project.urls).to eq([{"label" => "0.label", "url" => "https://zooniverse.org/about"}])
+      end
+
+      it 'should save labels to contents' do
+        put :update, params
+        project.reload
+        contents.reload
+        expect(project.url_labels).to eq({"0.label" => "About"})
+        expect(contents.url_labels).to eq({"0.label" => "About"})
       end
 
       it "should touch the project resource to modify the cache_key / etag" do
