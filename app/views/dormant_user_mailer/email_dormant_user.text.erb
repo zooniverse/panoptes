@@ -4,18 +4,12 @@ Our projects still need you!
 
 Whether it is helping to classify galaxies, map organutan nesting sites, identify antibiotic resistant bacteria or to transcribe anti-slavery manuscripts, there are many exciting research projects to get involved with in the Zooniverse.
 
-Pick up where you last left off on [project name, with embedded link]<%= @last_project %>, or check out all our projects here: (https://zooniverse.org/#/projects)
+Pick up where you last left off on [project name, with embedded link]<%= @last_project ? "i have a project" : "nae project" %>, or check out all our projects here: (https://zooniverse.org/#/projects)
+
+<%= @last_project.slug %>
 
 Don't forget to log in so you can keep track of your contributions and get involved on the project discussion boards (https://zooniverse.org/#/talk).
 
 Thanks for your help, and see you out there!
 
 The Zooniverse Team
-
-UNSUBSCRIBE INSTRUCTIONS:
-<%= yield %>
-<% if @user %>
-  To unsubscribe to these messages instantly visit <%= unsubscribe_url(token: @user.unsubscribe_token) %>
-  Please be aware that this action will unsubscribe you from ALL Zooniverse emails; if you wish to manage individual project subscriptions, please visit your settings page link below.
-<% end %>
-To manage your email subscription preferences visit https://zooniverse.org/#/settings
