@@ -157,5 +157,8 @@ Rails.application.routes.draw do
 
   get "health_check", to: "home#index"
   root to: "home#index"
-  match "*path", to: "application#unknown_route", via: :all
+
+  unless Rails.env.development?
+    match "*path", to: "application#unknown_route", via: :all
+  end
 end
