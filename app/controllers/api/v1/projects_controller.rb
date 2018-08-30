@@ -61,14 +61,20 @@ class Api::V1::ProjectsController < Api::ApiController
       # to a service object that sits in the project
       # transaction.
       content_attributes = primary_content_attributes(update_params)
-      unless content_attributes.blank?
+
+      if content_attributes.present?
         resource.primary_content.update!(content_attributes)
+      end
+
+      if content_attributes.key?(:url_labels)
+        resource.url_labels = content_attributes[:url_labels]
+        resource.urls = update_params[:urls]
       end
 
       tags = Tags::BuildTags.run!(api_user: api_user, tag_array: update_params[:tags]) if update_params[:tags]
       resource.tags = tags unless tags.nil?
 
-      if !content_attributes.blank? || !tags.nil?
+      if content_attributes.present? || !tags.nil?
         resource.updated_at = Time.zone.now
       end
     end
@@ -128,6 +134,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
     content_attributes = primary_content_attributes(create_params)
     create_params[:project_contents] = [ ProjectContent.new(content_attributes) ]
+    create_params[:url_labels] = content_attributes[:url_labels]
 
     if create_params.key?(:tags)
       create_params[:tags] = Tags::BuildTags.run!(api_user: api_user, tag_array: create_params[:tags])
@@ -135,7 +142,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
     add_user_as_linked_owner(create_params)
 
-    super(create_params.except(*CONTENT_FIELDS))
+    super(create_params)
   end
 
   def build_update_hash(update_params, resource)
@@ -146,7 +153,7 @@ class Api::V1::ProjectsController < Api::ApiController
     end
 
     update_attributes = super(update_params, resource)
-    update_attributes.except(:tags, *CONTENT_FIELDS)
+    update_attributes.except(:tags)
   end
 
   def new_items(resource, relation, value)

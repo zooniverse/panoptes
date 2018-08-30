@@ -913,7 +913,12 @@ CREATE TABLE public.projects (
     state integer,
     organization_id integer,
     mobile_friendly boolean DEFAULT false NOT NULL,
-    featured boolean DEFAULT false NOT NULL
+    featured boolean DEFAULT false NOT NULL,
+    description text,
+    introduction text,
+    url_labels jsonb,
+    workflow_description text,
+    researcher_quote text
 );
 
 
@@ -4165,6 +4170,8 @@ INSERT INTO schema_migrations (version) VALUES ('20180724112620');
 INSERT INTO schema_migrations (version) VALUES ('20180726133210');
 
 INSERT INTO schema_migrations (version) VALUES ('20180808140938');
+
+INSERT INTO schema_migrations (version) VALUES ('20180821125430');
 
 INSERT INTO schema_migrations (version) VALUES ('20180821151555');
 
