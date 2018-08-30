@@ -410,7 +410,6 @@ describe Api::V1::WorkflowsController, type: :controller do
         post :update_links, params
       end
 
-
       it "should handle non-array link formats" do
         default_request scopes: scopes, user_id: authorized_user.id
         params = {
