@@ -67,11 +67,11 @@ group :development, :test do
   gem 'pry-rails'
   gem 'pry-stack_explorer'
   gem 'spring'
+  gem "factory_bot_rails"
 end
 
 group :test do
   gem 'database_cleaner', '~> 1.7.0'
-  gem "factory_bot_rails"
   gem 'guard-rspec', require: false
   gem 'hashdiff'
   gem 'mock_redis'
