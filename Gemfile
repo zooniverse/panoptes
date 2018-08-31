@@ -62,12 +62,12 @@ group :production, :staging do
 end
 
 group :development, :test do
+  gem "factory_bot_rails"
   gem 'foreman'
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'pry-stack_explorer'
   gem 'spring'
-  gem "factory_bot_rails"
 end
 
 group :test do
