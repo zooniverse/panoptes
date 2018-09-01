@@ -20,7 +20,7 @@ RSpec.describe DormantUserMailer, :type => :mailer do
     end
 
     it 'should have the user name in the body' do
-      expect(mail.body.encoded).to match("#{user.display_name}")
+      expect(mail.body.encoded).to match(user.display_name)
     end
 
     context "when the user has not classified before" do
