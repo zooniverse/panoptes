@@ -5,8 +5,8 @@ class DormantUserMailerWorker
 
   def perform(user_id)
     @user = User.find(user_id)
-    if @user && @user.receives_email?
-      DormantUserMailer.email_dormant_user(user).deliver
+    if @user&.receives_email?
+      DormantUserMailer.email_dormant_user(@user).deliver
     end
   end
 end
