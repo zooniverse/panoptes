@@ -1,6 +1,5 @@
 require "spec_helper"
 
-
 RSpec.describe DormantUserMailer, :type => :mailer do
   let(:user) { create(:user) }
   let(:mail) { DormantUserMailer.email_dormant_user(user)}
