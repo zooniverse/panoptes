@@ -61,8 +61,8 @@ describe User, type: :model do
           upp.update_column(:updated_at, days_ago)
         end
 
-        context "user last classified 5 days ago" do
-          let(:days_ago) { 5.days.ago}
+        context "user last classified 14 days ago" do
+          let(:days_ago) { 14.days.ago}
 
           it "should return the user" do
             expect(dormant_user_ids).to match_array([user.id])

@@ -86,7 +86,7 @@ class User < ActiveRecord::Base
     },
     ranked_by: ":tsearch + (0.25 * :trigram)"
 
-  def self.dormant(window=5)
+  def self.dormant(window=14)
     DatabaseReplica.read("read_dormant_users_from_replica") do
       # devise trackable sets the current_sign_in_at on each login
       havent_signed_in_since = "date(now()) - date(current_sign_in_at) >= #{window}"
