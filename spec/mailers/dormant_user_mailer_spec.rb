@@ -22,10 +22,18 @@ RSpec.describe DormantUserMailer, :type => :mailer do
       expect(mail.body.encoded).to match(user.display_name)
     end
 
+    it 'should contain an unsubscribe notice' do
+      expect(mail.body).to include("http://www.zooniverse.org/unsubscribe")
+    end
+
     context "when the user has not classified before" do
 
       it 'should give a link to the main projects page' do
         expect(mail.body).to include("Check out the complete suite of projects here: https://zooniverse.org/projects")
+      end
+
+      it 'should be a general call to help' do
+        expect(mail.body).to include("Our projects still need you!")
       end
 
     end
