@@ -86,11 +86,16 @@ class User < ActiveRecord::Base
     },
     ranked_by: ":tsearch + (0.25 * :trigram)"
 
-  def self.dormant(window=14)
+  def self.subset_selection(ending_in = 5)
+    subset_selection = "id%10 = ?"
+    where(subset_selection, ending_in)
+  end
+
+  def self.dormant(window=14, query=User)
     DatabaseReplica.read("read_dormant_users_from_replica") do
       # devise trackable sets the current_sign_in_at on each login
       havent_signed_in_since = "date(now()) - date(current_sign_in_at) >= #{window}"
-      query = where(valid_email: true).where(havent_signed_in_since)
+      query = query.where(valid_email: true).where(havent_signed_in_since)
       query = query.where(activated_state: User.activated_states[:active]).select(:id)
       query.find_each do |dormant_user|
         # A user's project preference (UPP) is updated

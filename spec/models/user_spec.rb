@@ -17,6 +17,14 @@ describe User, type: :model do
     end
   end
 
+  describe '::subset_selection' do
+    it "should find users with ids ending in 5 only" do
+      unselected_user = create(:user, id: 37)
+      selected_user = create(:user, id: 35)
+      expect(User.subset_selection).to match_array([selected_user])
+    end
+  end
+
   describe '::dormant' do
     let(:user) { create(:user) }
 
