@@ -90,7 +90,9 @@ class User < ActiveRecord::Base
     DatabaseReplica.read("read_dormant_users_from_replica") do
       # devise trackable sets the current_sign_in_at on each login
       havent_signed_in_since = "date(now()) - date(current_sign_in_at) >= #{window}"
-      where(havent_signed_in_since).select(:id).find_each do |dormant_user|
+      query = where(valid_email: true).where(havent_signed_in_since)
+      query = query.where(activated_state: User.activated_states[:active]).select(:id)
+      query.find_each do |dormant_user|
         # A user's project preference (UPP) is updated
         # each time they classify on a project.
         # The last updated UPP is a proxy to a user's classification activity

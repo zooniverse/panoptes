@@ -39,6 +39,16 @@ describe User, type: :model do
         create(:user, current_sign_in_at: 5.days.ago)
       end
 
+      it "should find users with a valid email" do
+        invalid = create(:user, valid_email: false, current_sign_in_at: 5.days.ago)
+        expect(dormant_user_ids).to match_array([user.id])
+      end
+
+      it "should find active users" do
+        inactive = create(:inactive_user, current_sign_in_at: 5.days.ago)
+          expect(dormant_user_ids).to match_array([user.id])
+        end
+
       it "should find the dormant user" do
         expect(dormant_user_ids).to match_array([user.id])
       end
