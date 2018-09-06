@@ -7,8 +7,8 @@ describe GetDormantUsersWorker do
     dormant_user1 = create(:user, id: 45, current_sign_in_at: 5.days.ago)
     dormant_user2 = create(:user, id: 5, current_sign_in_at: 5.days.ago)
 
-    expect(DormantUserMailerWorker).to receive(:perform_async).with(dormant_user_1.id)
-    expect(DormantUserMailerWorker).to receive(:perform_async).with(dormant_user_2.id)
+    expect(DormantUserMailerWorker).to receive(:perform_async).with(dormant_user1.id)
+    expect(DormantUserMailerWorker).to receive(:perform_async).with(dormant_user2.id)
 
     worker.perform(5, 5)
   end
