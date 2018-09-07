@@ -52,6 +52,11 @@ describe User, type: :model do
         expect(dormant_user_ids).to match_array([user.id])
       end
 
+      it "should find users who have opted in to zooniverse emails" do
+        opt_out = create(:user, global_email_communication: false, current_sign_in_at: 5.days.ago)
+        expect(dormant_user_ids).to match_array([user.id])
+      end
+
       it "should find active users" do
         inactive = create(:inactive_user, current_sign_in_at: 5.days.ago)
           expect(dormant_user_ids).to match_array([user.id])
