@@ -30,5 +30,5 @@ class Operation < ActiveInteraction::Base
     PreScopedOperation.new(self, scope)
   end
 
-  object :api_user, class: :ApiUser
+  object :api_user, class: :ApiUser, default: nil
 end

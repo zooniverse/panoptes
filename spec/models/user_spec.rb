@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 require 'spec_helper'
 
 describe User, type: :model do
@@ -15,6 +14,119 @@ describe User, type: :model do
 
     it_behaves_like "has an extended cache key" do
       let(:methods) { %i(uploaded_subjects_count) }
+    end
+  end
+
+  describe '::subset_selection' do
+    it "should find users with ids ending in 5 only" do
+      unselected_user = create(:user, id: 37)
+      selected_user = create(:user, id: 35)
+      expect(User.subset_selection).to match_array([selected_user])
+    end
+  end
+
+  describe '::dormant' do
+    let(:user) { create(:user) }
+
+    def dormant_user_ids(num_days_since_activity=5)
+      [].tap do |user_ids|
+        User.dormant(num_days_since_activity) do |dormant_user|
+          user_ids << dormant_user.id
+        end
+      end
+    end
+
+    before { user }
+
+    it "should not find any users that have not signed in" do
+      expect(dormant_user_ids).to match_array([])
+    end
+
+    context "with a login 5 days ago" do
+      let(:user) do
+        create(:user, current_sign_in_at: 5.days.ago)
+      end
+
+      it "should find users with a valid email" do
+        invalid = create(:user, valid_email: false, current_sign_in_at: 5.days.ago)
+        expect(dormant_user_ids).to match_array([user.id])
+      end
+
+      it "should find users who have opted in to zooniverse emails" do
+        opt_out = create(:user, global_email_communication: false, current_sign_in_at: 5.days.ago)
+        expect(dormant_user_ids).to match_array([user.id])
+      end
+
+      it "should find active users" do
+        inactive = create(:inactive_user, current_sign_in_at: 5.days.ago)
+          expect(dormant_user_ids).to match_array([user.id])
+      end
+
+      it "should find the dormant user" do
+        expect(dormant_user_ids).to match_array([user.id])
+      end
+
+      it "should not find the dormant user with 6 days gap between signin" do
+        expect(dormant_user_ids(6)).to match_array([])
+      end
+
+      context "with lifecycled classifications", sidekiq: :inline do
+        let(:classification) do
+          create(:classification, user: user, created_at: days_ago)
+        end
+
+        before do
+          ClassificationLifecycle.perform(classification, "create")
+          upp = UserProjectPreference.where(
+            user_id: user.id,
+            project_id: classification.project_id
+          ).first
+          upp.update_column(:updated_at, days_ago)
+        end
+
+        context "user last classified 14 days ago" do
+          let(:days_ago) { 14.days.ago}
+
+          it "should return the user" do
+            expect(dormant_user_ids).to match_array([user.id])
+          end
+        end
+
+        context "user last classified 2 days ago" do
+          let(:days_ago) { 2.days.ago}
+
+          it "should not return the user" do
+            expect(dormant_user_ids).to match_array([])
+          end
+        end
+      end
+    end
+
+    context "multiple users: 2 dormant, 1 not" do
+      let(:user) do
+        create(:user, current_sign_in_at: 12.months.ago)
+      end
+      let(:another_user) do
+        create(:user, current_sign_in_at: 30.days.ago)
+      end
+      let(:non_dormant_user) do
+        create(:user, current_sign_in_at: 1.day.ago)
+      end
+
+      it "should find dormant users" do
+        non_dormant_user
+        expected_ids = [ user.id, another_user.id ]
+        expect(dormant_user_ids).to match_array(expected_ids)
+      end
+
+      it "should find only one dormant user with 31 day gap between signin" do
+        expect(dormant_user_ids(31)).to match_array([user.id])
+      end
+
+      it "should find the all the dormant users with 1 day gap between signin" do
+        expected_ids = [ user.id, another_user.id, non_dormant_user.id ]
+        expect(dormant_user_ids(1)).to match_array(expected_ids)
+      end
     end
   end
 

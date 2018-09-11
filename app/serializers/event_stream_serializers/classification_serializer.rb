@@ -1,5 +1,3 @@
-require 'serialization/v1_adapter'
-
 module EventStreamSerializers
   class ClassificationSerializer < ActiveModel::Serializer
     def self.serialize(classification, options = {})

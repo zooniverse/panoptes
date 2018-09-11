@@ -86,6 +86,49 @@ class User < ActiveRecord::Base
     },
     ranked_by: ":tsearch + (0.25 * :trigram)"
 
+  def self.subset_selection(ending_in = 5)
+    id_mod_10_remainder_ends_in = "id % 10 = ?"
+    where(id_mod_10_remainder_ends_in, ending_in)
+  end
+
+  def self.dormant(window=14, query=User)
+    DatabaseReplica.read("read_dormant_users_from_replica") do
+      # devise trackable sets the current_sign_in_at on each login
+      havent_signed_in_since = "date(now()) - date(current_sign_in_at) >= #{window}"
+      query = query.where(valid_email: true)
+      query = query.where(havent_signed_in_since)
+      query = query.where(activated_state: User.activated_states[:active])
+      query = query.where(global_email_communication: true)
+      query = query.select(:id)
+      query.find_each do |dormant_user|
+        # A user's project preference (UPP) is updated
+        # each time they classify on a project.
+        # The last updated UPP is a proxy to a user's classification activity
+        # and the query is much less expensive than classifications or recents
+        #
+        # Ideally this should move to a last_classifcation FK attribute on the
+        # user which is updated in the classification lifecycle
+        last_classified_upp = UserProjectPreference
+          .where(user_id: dormant_user.id)
+          .where.not(email_communication: nil)
+          .order(updated_at: :desc)
+          .first
+
+        has_not_recently_classified =
+          if last_classified_upp
+            time_since_activity = Time.now.utc - last_classified_upp.updated_at
+            time_since_activity >= window.days.to_i
+          else
+            true
+          end
+
+        if has_not_recently_classified
+          yield(dormant_user)
+        end
+      end
+    end
+  end
+
   def self.from_omniauth(auth_hash)
     transaction do
       auth = Authorization.from_omniauth(auth_hash)

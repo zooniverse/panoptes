@@ -157,5 +157,9 @@ Rails.application.routes.draw do
 
   get "health_check", to: "home#index"
   root to: "home#index"
-  match "*path", to: "application#unknown_route", via: :all
+
+  # In development mode, this route blocks access to the mailer preview pages that Rails has built-in.
+  unless Rails.env.development?
+    match "*path", to: "application#unknown_route", via: :all
+  end
 end

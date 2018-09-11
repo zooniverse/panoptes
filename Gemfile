@@ -62,6 +62,7 @@ group :production, :staging do
 end
 
 group :development, :test do
+  gem "factory_bot_rails"
   gem 'foreman'
   gem 'pry-byebug'
   gem 'pry-rails'
@@ -71,7 +72,6 @@ end
 
 group :test do
   gem 'database_cleaner', '~> 1.7.0'
-  gem "factory_bot_rails"
   gem 'guard-rspec', require: false
   gem 'hashdiff'
   gem 'mock_redis'
