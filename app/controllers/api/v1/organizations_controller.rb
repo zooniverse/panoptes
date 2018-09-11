@@ -19,7 +19,8 @@ class Api::V1::OrganizationsController < Api::ApiController
   CONTENT_PARAMS = [:description,
                     :title,
                     :introduction,
-                    :announcement].freeze
+                    :announcement,
+                    :url_labels].freeze
 
   CONTENT_FIELDS = [:description,
                     :title,

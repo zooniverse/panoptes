@@ -91,20 +91,12 @@ describe OrganizationSerializer do
   end
 
   describe "#urls" do
-    let(:result) do
-      OrganizationSerializer.single({}, Organization.where(id: organization.id), {})
-    end
-    let(:result_urls) do
-      organization.urls.map do |url|
-        {
-          url: url["url"],
-          label: url["label"]
-        }
-      end
-    end
-
-    it "should return url attribute" do
-      expect(result[:urls]).to match_array(result_urls)
+    it "should return the translated version of the url labels" do
+      urls = [{"label" => "Blog",
+               "url" => "http://blog.example.com/"},
+              {"label" => "Twitter",
+               "url" => "http://twitter.com/example"}]
+      expect(serializer.urls).to eq(urls)
     end
   end
 
