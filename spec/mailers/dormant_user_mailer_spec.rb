@@ -22,8 +22,9 @@ RSpec.describe DormantUserMailer, :type => :mailer do
       expect(mail.body.encoded).to match(user.display_name)
     end
 
-    it 'should contain an unsubscribe notice' do
-      expect(mail.body).to include("http://www.zooniverse.org/unsubscribe")
+    it 'should contain a custom user unsubscribe notice' do
+      unsubscribe_url = unsubscribe_url(token: user.unsubscribe_token)
+      expect(mail.body).to include(unsubscribe_url)
     end
 
     context "when the user has not classified before" do
