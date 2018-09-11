@@ -87,8 +87,8 @@ class User < ActiveRecord::Base
     ranked_by: ":tsearch + (0.25 * :trigram)"
 
   def self.subset_selection(ending_in = 5)
-    subset_selection = "id%10 = ?"
-    where(subset_selection, ending_in)
+    id_mod_10_remainder_ends_in = "id % 10 = ?"
+    where(id_mod_10_remainder_ends_in, ending_in)
   end
 
   def self.dormant(window=14, query=User)
