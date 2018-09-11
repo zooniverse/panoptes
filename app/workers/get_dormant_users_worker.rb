@@ -1,6 +1,7 @@
 class GetDormantUsersWorker
-  class DoNotRunOnStagingError < StandardError; end
   include Sidekiq::Worker
+
+  class DoNotRunOnStagingError < StandardError; end
 
   def perform(num_days_since_activity, ending_in)
     raise DoNotRunOnStagingError if Rails.env.staging?
