@@ -1,5 +1,3 @@
-require "tasks_visitors/inject_strings"
-
 class OrganizationSerializer
   include RestPack::Serializer
   include OwnerLinkSerializer
