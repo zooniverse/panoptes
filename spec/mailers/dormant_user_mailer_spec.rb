@@ -27,6 +27,16 @@ RSpec.describe DormantUserMailer, :type => :mailer do
       expect(mail.body).to include(unsubscribe_url)
     end
 
+    it 'should contain a generic unsubscribe notice' do
+      generic_unsubscribe = "Alternatively visit https://zooniverse.org/unsubscribe"
+      expect(mail.body).to include(generic_unsubscribe)
+    end
+
+    it 'should contain a notice on how to manage your subscription prefs' do
+      manage_subs = "To manage your email subscription preferences visit https://zooniverse.org/settings"
+      expect(mail.body).to include(manage_subs)
+    end
+
     context "when the user has not classified before" do
 
       it 'should give a link to the main projects page' do
