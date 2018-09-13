@@ -1,11 +1,15 @@
 require 'spec_helper'
 
-describe GetDormantUsersWorker do
+describe EmailDormantUsersWorker do
   let(:worker) { described_class.new }
 
   it "should raise error if running on staging" do
     allow(Rails).to receive(:env) { "staging".inquiry }
-    expect { worker.perform(5, 5) }.to raise_error(GetDormantUsersWorker::DoNotRunOnStagingError)
+    expect {
+      worker.perform(5, 5)
+    }.to raise_error(
+      EmailDormantUsersWorker::DoNotRunOnStagingError
+    )
   end
 
   it "should email dormant users in subselection" do
