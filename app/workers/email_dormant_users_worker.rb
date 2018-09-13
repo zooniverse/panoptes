@@ -1,4 +1,4 @@
-class GetDormantUsersWorker
+class EmailDormantUsersWorker
   include Sidekiq::Worker
 
   class DoNotRunOnStagingError < StandardError; end
