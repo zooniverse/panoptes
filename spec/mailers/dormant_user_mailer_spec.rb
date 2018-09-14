@@ -29,6 +29,7 @@ RSpec.describe DormantUserMailer, :type => :mailer do
 
     it 'should contain google analytic campaign codes' do
       expect(mail.body).to include("?utm_source=Newsletter&utm_campaign=")
+    end
 
     it 'should contain a generic unsubscribe notice' do
       generic_unsubscribe = "Alternatively visit https://zooniverse.org/unsubscribe"
