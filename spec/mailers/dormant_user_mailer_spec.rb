@@ -27,6 +27,10 @@ RSpec.describe DormantUserMailer, :type => :mailer do
       expect(mail.body).to include(unsubscribe_url)
     end
 
+    it 'should contain google analytic campaign codes' do
+      expect(mail.body).to include("?utm_source=Newsletter&utm_campaign=")
+    end
+
     context "when the user has not classified before" do
 
       it 'should give a link to the main projects page' do
