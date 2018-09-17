@@ -4,7 +4,7 @@ class OrganizationSerializer
   include MediaLinksSerializer
   include CachedSerializer
 
-  CONTENT_FIELDS = %i(title description introduction announcement).freeze
+  CONTENT_FIELDS = %i(title description introduction announcement url_labels).freeze
 
   attributes :id, :display_name, :description, :introduction, :title, :href,
     :primary_language, :listed_at, :listed, :slug, :urls, :categories, :announcement
@@ -51,5 +51,15 @@ class OrganizationSerializer
                                type: "organization_pages"
                               }
     links
+  end
+
+  def urls
+    if content
+      urls = @model.urls.dup
+      TasksVisitors::InjectStrings.new(content[:url_labels]).visit(urls)
+      urls
+    else
+      []
+    end
   end
 end

@@ -18,7 +18,7 @@ describe Organizations::Update do
 
   let(:operation) { described_class.with(api_user: api_user, id: organization.id.to_s) }
 
-  it 'sets the urls, splitting out translatable content' do
+  it 'sets the untranslated attribute' do
     organization = operation.run!(organization_params: params)
     organization.reload
     expect(organization.urls).to eq([{"label" => "0.label", "url" => "http://blogo.com/example"}])
