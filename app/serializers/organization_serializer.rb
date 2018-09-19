@@ -38,12 +38,8 @@ class OrganizationSerializer
   end
 
   def urls
-    if content
-      urls = @model.urls.dup
-      TasksVisitors::InjectStrings.new(content[:url_labels]).visit(urls)
-      urls
-    else
-      []
-    end
+    urls = @model.urls.dup
+    TasksVisitors::InjectStrings.new(@model.url_labels).visit(urls)
+    urls
   end
 end
