@@ -36,7 +36,7 @@ class WorkflowSerializer
 
   def tasks
     if content
-      TasksVisitors::InjectStrings.new(@model.strings).visit(@model.tasks)
+      TasksVisitors::InjectStrings.new(content.strings).visit(@model.tasks)
       @model.tasks
     else
       {}
