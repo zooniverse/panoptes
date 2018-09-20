@@ -117,7 +117,7 @@ class User < ActiveRecord::Base
         has_not_recently_classified =
           if last_classified_upp
             time_since_activity = Time.now.utc - last_classified_upp.updated_at
-            time_since_activity >= window.days.to_i
+            time_since_activity >= window.to_i.days.to_i
           else
             true
           end

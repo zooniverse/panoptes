@@ -90,6 +90,10 @@ describe User, type: :model do
           it "should return the user" do
             expect(dormant_user_ids).to match_array([user.id])
           end
+
+          it "should handle window period string params" do
+            expect(dormant_user_ids("5")).to match_array([user.id])
+          end
         end
 
         context "user last classified 2 days ago" do
