@@ -13,22 +13,6 @@ class OrganizationSerializer
   can_filter_by :display_name, :slug, :listed
   can_include :organization_contents, :organization_roles, :projects, :owners, :pages
 
-  def title
-    content[:title]
-  end
-
-  def description
-    content[:description]
-  end
-
-  def introduction
-    content[:introduction]
-  end
-
-  def announcement
-    content[:announcement]
-  end
-
   def avatar_src
     if avatar = @model.avatar
       avatar.external_link ? avatar.external_link : avatar.src
@@ -54,12 +38,8 @@ class OrganizationSerializer
   end
 
   def urls
-    if content
-      urls = @model.urls.dup
-      TasksVisitors::InjectStrings.new(content[:url_labels]).visit(urls)
-      urls
-    else
-      []
-    end
+    urls = @model.urls.dup
+    TasksVisitors::InjectStrings.new(@model.url_labels).visit(urls)
+    urls
   end
 end
