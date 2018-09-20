@@ -27,6 +27,18 @@ describe ProjectSerializer do
     ProjectSerializer.page({}, Project.all, {cards: true})
   end
 
+  describe "#content" do
+    it "should return project content for the preferred language" do
+      expect(serializer.content).to be_a( Hash )
+      expect(serializer.content).to include(:title)
+    end
+
+    it "includes the defined content fields" do
+      fields = Api::V1::ProjectsController::CONTENT_FIELDS.map(&:to_s)
+      expect(serializer.content.keys).to contain_exactly(*fields)
+    end
+  end
+
   describe "#urls" do
     it "should return the translated version of the url labels" do
       urls = [{"label" => "Blog",
