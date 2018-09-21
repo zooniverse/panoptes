@@ -74,7 +74,7 @@ RSpec.describe DormantUserMailer, :type => :mailer do
 
       context 'when the last project is not launch approved' do
         before(:context) do
-          (user_project_preference.project).launch_approved = true
+          user_project_preference.project.launch_approved = true
         end
 
         it 'should not have the last project url in the body' do
