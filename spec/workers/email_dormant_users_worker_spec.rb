@@ -8,6 +8,11 @@ describe EmailDormantUsersWorker do
     expect(retry_count).to eq(0)
   end
 
+  it "should be in the low data queue" do
+    queue = worker.class.get_sidekiq_options['queue']
+    expect(queue).to eq(:data_low)
+  end
+
   it "should raise error if running on staging" do
     allow(Rails).to receive(:env) { "staging".inquiry }
     expect {
