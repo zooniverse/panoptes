@@ -3,6 +3,9 @@ class EmailDormantUsersWorker
 
   class DoNotRunOnStagingError < StandardError; end
 
+  # skip retries for this job so we don't email users multiple times
+  sidekiq_options retry: 0
+
   def perform(num_days_since_activity, only_user_ids_ending_in)
     raise DoNotRunOnStagingError if Rails.env.staging?
 
