@@ -3,6 +3,11 @@ require 'spec_helper'
 describe EmailDormantUsersWorker do
   let(:worker) { described_class.new }
 
+  it "should be not retry on failure" do
+    retry_count = worker.class.get_sidekiq_options['retry']
+    expect(retry_count).to eq(0)
+  end
+
   it "should raise error if running on staging" do
     allow(Rails).to receive(:env) { "staging".inquiry }
     expect {
