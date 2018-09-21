@@ -72,7 +72,16 @@ RSpec.describe DormantUserMailer, :type => :mailer do
         expect(mail.body).to include("https://www.zooniverse.org/projects/#{last_project.slug}")
       end
 
-    end
+      context 'when the last project is not launch approved' do
+        before(:context) do
+          (user_project_preference.project).launch_approved = true
+        end
 
+        it 'should not have the last project url in the body' do
+          last_project = user_project_preference.project
+          expect(mail.body).not_to include("https://www.zooniverse.org/projects/#{last_project.slug}")
+        end
+      end
+    end
   end
 end
