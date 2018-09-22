@@ -73,7 +73,7 @@ RSpec.describe DormantUserMailer, :type => :mailer do
       end
     end
 
-    context 'when the last project is not launch approved' do
+    context 'when the users last project is not launch approved' do
       let(:user_project_preference) do
         create(:user_project_preference, user: user, project: create(:project, launch_approved: false))
       end
