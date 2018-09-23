@@ -16,13 +16,13 @@ The Zooniverse Team
 Unsubscribe Notice: You are receiving this email because you have taken part in <%=@last_project.display_name%>
 
 <% elsif @last_project && @last_project.launch_approved && @last_project.completeness == 1.0 %>
-Thank you for your help on <%=@last_project.display_name%>, we are really happy to say that all the data for this project has now been classified! Keep an eye out on the project result page for updates about the outcomes from this project: https://www.zooniverse.org/projects/<%=@last_project.slug%>/about/results.
+Thank you for your help on <%=@last_project.display_name%>, we are really happy to say that all the data for this project has now been classified! Keep an eye out on the project result page for updates about the outcomes from this project: https://www.zooniverse.org/projects/<%=@last_project.slug%>/about/results<%=@dormant_with_last_project_complete_ga_code%>&utm_content=b.
 
 Our other projects still need you though! Whether it is helping to classify galaxies, map orangutan nesting sites, identify antibiotic resistant bacteria or transcribe anti-slavery manuscripts, there are many exciting research projects to get involved with in the Zooniverse.
 
-Check out the complete suite of projects here: https://zooniverse.org/projects.
+Check out the complete suite of projects here: https://zooniverse.org/projects<%=@dormant_with_last_project_complete_ga_code%>&utm_content=a.
 
-Don't forget to log in so you can keep track of your contributions and get involved on the project discussion boards (https://zooniverse.org/talk).
+Don't forget to log in so you can keep track of your contributions and get involved on the project discussion boards (https://zooniverse.org/talk<%=@dormant_with_last_project_complete_ga_code%>&utm_content=c).
 
 Thanks for your help, and see you out there!
 
