@@ -1,6 +1,6 @@
 Dear <%= @user.display_name %>,
 
-<% if @last_project && @last_project.launch_approved %>
+<% if @last_project && @last_project.launch_approved && @last_project.completeness < 1.0 %>
 We still need your help on <%=@last_project.display_name%>!
 
 Pick up where you last left off (https://www.zooniverse.org/projects/<%=@last_project.slug%><%=@dormant_with_classification_ga_code%>&utm_content=b) or check out some of the other exciting projects on the Zooniverse: https://zooniverse.org/projects<%=@dormant_with_classification_ga_code%>&utm_content=a.
