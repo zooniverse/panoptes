@@ -83,5 +83,16 @@ RSpec.describe DormantUserMailer, :type => :mailer do
         expect(mail.body).not_to include("https://www.zooniverse.org/projects/#{last_project.slug}")
       end
     end
+
+    context 'when the users last project is completed' do
+      let(:user_project_preference) do
+        create(:user_project_preference, user: user, project: create(:project, completeness: 1.0))
+      end
+
+      it 'should not have the users last project url in the body' do
+        last_project = user_project_preference.project
+        expect(mail.body).not_to include("https://www.zooniverse.org/projects/#{last_project.slug}")
+      end
+    end
   end
 end
