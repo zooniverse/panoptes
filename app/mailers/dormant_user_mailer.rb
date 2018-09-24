@@ -6,8 +6,10 @@ class DormantUserMailer < ApplicationMailer
     @user = user
     @email_to = user.email
     @last_project = last_classified_project(user.id)
+    @last_launch_approved_project = @last_project&.launch_approved
     google_analytic_prefix = "?utm_source=Newsletter&utm_campaign="
     @dormant_with_classification_ga_code = "#{google_analytic_prefix}dormant_with_classifications"
+    @dormant_with_last_project_complete_ga_code = "#{google_analytic_prefix}dormant_with_last_project_complete"
     @dormant_without_classification_ga_code = "#{google_analytic_prefix}dormant_no_classifications"
     mail(to: @email_to, subject: DEFAULT_SUBJECT)
   end

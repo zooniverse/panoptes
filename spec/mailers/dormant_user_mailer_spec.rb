@@ -57,22 +57,47 @@ RSpec.describe DormantUserMailer, :type => :mailer do
 
     end
 
-    context "when the user has user project preferences" do
+    context "when user has user project preference" do
       let(:user_project_preference) do
-        create(:user_project_preference, user: user)
+        create(:user_project_preference, project: project, user: user)
+      end
+      let(:last_project) { user_project_preference.project }
+
+      before do
+        last_project
       end
 
-      it 'should have the name of the users last classified project in the body' do
-        last_project = user_project_preference.project
-        expect(mail.body).to include(last_project.display_name)
+      context "when the users upp is their last project" do
+        let(:project) { create(:project, owner: user) }
+
+        it 'should have the name of the users last classified project in the body' do
+          expect(mail.body).to include(last_project.display_name)
+        end
+
+        it 'should have the url for the users last classified project in the body' do
+          expect(mail.body).to include("https://www.zooniverse.org/projects/#{last_project.slug}")
+        end
       end
 
-      it 'should have the url for the users last classified project in the body' do
-        last_project = user_project_preference.project
-        expect(mail.body).to include("https://www.zooniverse.org/projects/#{last_project.slug}")
+      context 'when the users last project is not launch approved' do
+        let(:project) { create(:project, launch_approved: false, owner: user) }
+
+        it 'should not have the last project url in the body' do
+          expect(mail.body).not_to include("https://www.zooniverse.org/projects/#{last_project.slug}")
+        end
       end
 
+      context 'when the users last project is completed' do
+        let(:project) { create(:project, completeness: 1.0, owner: user) }
+
+        it 'should thank the user for their contributions to the project' do
+          expect(mail.body).to include("Thank you for your help on #{last_project.display_name}")
+        end
+
+        it 'should have the url for project result page in the body' do
+          expect(mail.body).to include("https://www.zooniverse.org/projects/#{last_project.slug}/about/results")
+        end
+      end
     end
-
   end
 end

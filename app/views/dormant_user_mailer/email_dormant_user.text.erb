@@ -1,6 +1,6 @@
 Dear <%= @user.display_name %>,
 
-<% if @last_project %>
+<% if @last_launch_approved_project && @last_project.completeness < 1.0 %>
 We still need your help on <%=@last_project.display_name%>!
 
 Pick up where you last left off (https://www.zooniverse.org/projects/<%=@last_project.slug%><%=@dormant_with_classification_ga_code%>&utm_content=b) or check out some of the other exciting projects on the Zooniverse: https://zooniverse.org/projects<%=@dormant_with_classification_ga_code%>&utm_content=a.
@@ -14,6 +14,22 @@ Thanks for your help, and see you out there!
 The Zooniverse Team
 
 Unsubscribe Notice: You are receiving this email because you have taken part in <%=@last_project.display_name%>
+
+<% elsif @last_launch_approved_project && @last_project.completeness == 1.0 %>
+Thank you for your help on <%=@last_project.display_name%>, we are really happy to say that all the data for this project has now been classified! Keep an eye out on the project result page for updates about the outcomes from this project: https://www.zooniverse.org/projects/<%=@last_project.slug%>/about/results<%=@dormant_with_last_project_complete_ga_code%>&utm_content=b.
+
+Our other projects still need you though! Whether it is helping to classify galaxies, map orangutan nesting sites, identify antibiotic resistant bacteria or transcribe anti-slavery manuscripts, there are many exciting research projects to get involved with in the Zooniverse.
+
+Check out the complete suite of projects here: https://zooniverse.org/projects<%=@dormant_with_last_project_complete_ga_code%>&utm_content=a.
+
+Don't forget to log in so you can keep track of your contributions and get involved on the project discussion boards.
+
+Thanks for your help, and see you out there!
+
+The Zooniverse Team
+
+Unsubscribe Notice: You are receiving this email because you have taken part in <%=@last_project.display_name%>
+
 <% else %>
 Our projects still need you!
 
@@ -21,7 +37,7 @@ Whether it is helping to classify galaxies, map orangutan nesting sites, identif
 
 Check out the complete suite of projects here: https://zooniverse.org/projects<%=@dormant_without_classification_ga_code%>&utm_content=a.
 
-Don't forget to log in so you can keep track of your contributions and get involved on the project discussion boards (https://zooniverse.org/talk<%=@dormant_without_classification_ga_code%>&utm_content=c).
+Don't forget to log in so you can keep track of your contributions and get involved on the project discussion boards.
 
 Thanks for your help, and see you out there!
 
