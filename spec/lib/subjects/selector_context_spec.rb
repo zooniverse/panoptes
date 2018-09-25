@@ -81,4 +81,13 @@ RSpec.describe Subjects::SelectorContext do
       expect(subject.format).to eq(expected_context)
     end
   end
+
+  context "with as the selector selection_state changes" do
+    it 'should return the expected state' do
+      Subjects::Selector::SELECTION_STATE_ENUM.values.each do |selection_state|
+        allow(selector).to receive(:selection_state).and_return(selection_state)
+        expect(subject.format[:selection_state]).to eq(selection_state)
+      end
+    end
+  end
 end

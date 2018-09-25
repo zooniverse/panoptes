@@ -18,7 +18,7 @@ module Subjects
           retired_subject_ids: retired_subject_ids,
           user_has_finished_workflow: user_has_finished_workflow,
           finished_workflow: finished_workflow?,
-          selection_state: :normal,
+          selection_state: selector.selection_state,
           url_format: :get,
           select_context: true
         }.compact
