@@ -2,7 +2,7 @@ class AddLastActivityClassificationIdToWorkflow < ActiveRecord::Migration
   def change
     add_column :workflows, :activity_classification_id, :integer
 
-    # backfill the workflow activity columns
+    # backfill the workflow activity_classification_id column
     period = CalculateProjectActivityWorker::WorkflowActivityPeriod::ACTIVITY_PERIOD
     Workflow.select(:id).find_each do |workflow|
       # ensure we backfill to the earliest classification id
