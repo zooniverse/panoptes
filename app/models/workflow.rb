@@ -58,6 +58,21 @@ class Workflow < ActiveRecord::Base
     %i(display_name strings)
   end
 
+  before_save :update_version
+
+  def update_version
+    self.major_version ||= 0
+    self.minor_version ||= 0
+
+    if changes.include? :tasks
+      self.major_version += 1
+    end
+
+    if changes.include? :strings
+      self.minor_version += 1
+    end
+  end
+
   # select a workflow without any json attributes (some can be very large)
   # this can be used generally in most workers
   # access to non-loaded attributes will raise an undefined_error
