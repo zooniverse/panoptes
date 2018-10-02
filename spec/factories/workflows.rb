@@ -49,6 +49,8 @@ FactoryBot.define do
       }
     )
 
+    steps({})
+
     pairwise false
     grouped false
     prioritized false

@@ -7,7 +7,7 @@ class WorkflowSerializer
   include MediaLinksSerializer
   include CachedSerializer
 
-  attributes :id, :display_name, :tasks, :classifications_count, :subjects_count,
+  attributes :id, :display_name, :tasks, :steps, :classifications_count, :subjects_count,
              :created_at, :updated_at, :finished_at, :first_task, :primary_language,
              :version, :content_language, :prioritized, :grouped, :pairwise,
              :retirement, :retired_set_member_subjects_count, :href, :active, :mobile_friendly,
