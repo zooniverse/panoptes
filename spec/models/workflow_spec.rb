@@ -130,6 +130,26 @@ describe Workflow, type: :model do
       expect(workflow.current_version_number.to_i).to eq(previous_number + 1)
       expect(workflow.current_version_number.to_i).to eq(ModelVersion.version_number(workflow))
     end
+
+    it 'tracks major version number' do
+      expect do
+        workflow.update!(tasks: {blha: 'asdfasd', quera: "asdfas"})
+      end.to change { workflow.major_version }.by(1)
+
+      expect do
+        workflow.update!(strings: {})
+      end.not_to change { workflow.major_version }
+    end
+
+    it 'tracks minor version number' do
+      expect do
+        workflow.update!(strings: {a: 4})
+      end.to change { workflow.minor_version }.by(1)
+
+      expect do
+        workflow.update!(tasks: {blha: 'asdfasd', quera: "asdfas"})
+      end.not_to change { workflow.minor_version }
+    end
   end
 
   describe "#retirement_scheme" do
