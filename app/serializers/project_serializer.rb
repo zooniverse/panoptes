@@ -82,34 +82,10 @@ class ProjectSerializer
     end
   end
 
-  def title
-    content[:title]
-  end
-
-  def description
-    content[:description]
-  end
-
-  def workflow_description
-    content[:workflow_description]
-  end
-
-  def introduction
-    content[:introduction]
-  end
-
-  def researcher_quote
-    content[:researcher_quote]
-  end
-
   def urls
-    if content
-      urls = @model.urls.dup
-      TasksVisitors::InjectStrings.new(content[:url_labels]).visit(urls)
-      urls
-    else
-      []
-    end
+    urls = @model.urls.dup
+    TasksVisitors::InjectStrings.new(@model.url_labels).visit(urls)
+    urls
   end
 
   def tags
