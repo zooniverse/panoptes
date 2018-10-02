@@ -242,6 +242,14 @@ namespace :migrate do
         w.send(:update_workflow_version_cache)
       end
     end
+
+    desc "Backfill new style of version numbers from Papertrail versions"
+    task :backfill_major_minor_versions => :environment do
+      Workflow.find_each do |workflow|
+        workflow.update! major_version: workflow.current_version_number.to_i,
+                         minor_version: workflow.primary_content.current_version_number.to_i
+      end
+    end
   end
 
   namespace :workflow_contents do
