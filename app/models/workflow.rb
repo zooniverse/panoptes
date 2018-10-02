@@ -64,7 +64,7 @@ class Workflow < ActiveRecord::Base
     self.major_version ||= 0
     self.minor_version ||= 0
 
-    if changes.include? :tasks
+    if (changes.keys & %w(tasks grouped pairwise prioritized)).present?
       self.major_version += 1
     end
 
