@@ -61,9 +61,6 @@ class Workflow < ActiveRecord::Base
   before_save :update_version
 
   def update_version
-    self.major_version ||= 0
-    self.minor_version ||= 0
-
     if (changes.keys & %w(tasks grouped pairwise prioritized)).present?
       self.major_version += 1
     end

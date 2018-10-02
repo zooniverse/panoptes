@@ -143,7 +143,7 @@ describe Workflow, type: :model do
 
     it 'tracks minor version number' do
       expect do
-        workflow.update!(strings: {})
+        workflow.update!(strings: {a: 4})
       end.to change { workflow.minor_version }.by(1)
 
       expect do

@@ -1667,8 +1667,8 @@ CREATE TABLE public.workflows (
     subject_selection_strategy integer DEFAULT 0,
     mobile_friendly boolean DEFAULT false NOT NULL,
     strings jsonb DEFAULT '{}'::jsonb,
-    major_version integer,
-    minor_version integer
+    major_version integer DEFAULT 0 NOT NULL,
+    minor_version integer DEFAULT 0 NOT NULL
 );
 
 
