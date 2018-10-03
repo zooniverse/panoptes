@@ -123,6 +123,7 @@ Rails.application.routes.draw do
 
         post "/retired_subjects", to: "workflows#retire_subjects"
         post "/classifications_export", to: "workflows#create_classifications_export", format: false
+        post '/publish', to: 'workflows#publish'
       end
 
       json_api_resources :subject_sets, links: [:subjects]

@@ -62,6 +62,11 @@ class Api::V1::WorkflowsController < Api::ApiController
     medium_response(medium)
   end
 
+  def publish
+    operation.run!(params)
+    render nothing: true, status: 204
+  end
+
   private
 
   def context
