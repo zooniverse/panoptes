@@ -310,7 +310,7 @@ namespace :migrate do
         org.introduction = content.introduction
         org.url_labels = content.url_labels
         org.announcement = content.announcement
-        org.save!
+        org.save!(validate: false)
       end
     end
 
@@ -319,7 +319,7 @@ namespace :migrate do
       Workflow.find_each do |workflow|
         content = workflow.primary_content
         workflow.strings = content.strings
-        workflow.save!
+        workflow.save!(validate: false)
       end
     end
 
@@ -332,7 +332,7 @@ namespace :migrate do
         project.url_labels = content.url_labels
         project.workflow_description = content.workflow_description
         project.researcher_quote = content.researcher_quote
-        project.save!
+        project.save!(validate: false)
       end
     end
   end
