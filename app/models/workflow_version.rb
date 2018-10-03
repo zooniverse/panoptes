@@ -3,6 +3,8 @@ class WorkflowVersion < ActiveRecord::Base
 
   def self.build_from(workflow)
     version = new
+    version.major_version = workflow.major_version
+    version.minor_version = workflow.minor_version
     version.workflow_id = workflow.id
     version.tasks = workflow.tasks
     version.first_task = workflow.first_task
