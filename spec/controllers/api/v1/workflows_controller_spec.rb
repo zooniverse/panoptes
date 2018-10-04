@@ -97,6 +97,15 @@ describe Api::V1::WorkflowsController, type: :controller do
         expect(response_keys).to match_array ['id', 'links', 'display_name', 'subjects_count']
       end
     end
+
+    describe 'requesting published versions' do
+      it 'should return the published version of records' do
+        filterable_resources[0].publish!
+        filterable_resources[0].update! tasks: {}, strings: {}
+        get :index, published: true
+        expect(json_response[api_resource_name].first["tasks"]).to be_present
+      end
+    end
   end
 
   describe '#update' do

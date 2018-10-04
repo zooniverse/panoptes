@@ -72,7 +72,10 @@ class Api::V1::WorkflowsController < Api::ApiController
   def context
     case action_name
     when "show", "index"
-      { languages: current_languages }.merge field_context
+      {
+        languages: current_languages,
+        published: params["published"]
+      }.merge(field_context)
     else
       {}
     end
