@@ -29,6 +29,15 @@ describe WorkflowSerializer do
     it 'should return the translated tasks' do
       expect(serializer.tasks['interest']['question']).to eq('Draw a circle')
     end
+
+    it 'uses published strings when requested' do
+      workflow.publish!
+      workflow.strings["interest.question"] = "Draw a round thing"
+      workflow.save!
+
+      serializer.instance_variable_set(:@context, {languages: ['en'], published: true})
+      expect(serializer.tasks['interest']['question']).to eq('Draw a circle')
+    end
   end
 
   describe "#version" do
@@ -62,15 +71,7 @@ describe WorkflowSerializer do
       end
     end
 
-    describe "#tasks" do
-
-      it "should return an emtpy hash" do
-        expect(serializer.tasks).to eq({})
-      end
-    end
-
     describe "#content_language" do
-
       it "should be nil" do
         expect(serializer.content_language).to be_nil
       end

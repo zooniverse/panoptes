@@ -35,11 +35,19 @@ class WorkflowSerializer
   end
 
   def tasks
-    if content
-      TasksVisitors::InjectStrings.new(@model.strings).visit(@model.tasks)
-      @model.tasks
+    TasksVisitors::InjectStrings.new(requested_version.strings).visit(requested_version.tasks)
+    requested_version.tasks
+  end
+
+  def first_task
+    requested_version.first_task
+  end
+
+  def requested_version
+    if @context[:published]
+      @model.published_version || @model
     else
-      {}
+      @model
     end
   end
 
