@@ -63,7 +63,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def publish
-    operation.run!(params)
+    controlled_resource.publish!
     render nothing: true, status: 204
   end
 
