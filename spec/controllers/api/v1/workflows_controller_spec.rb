@@ -159,6 +159,17 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:controller_action_params) { update_params.merge(id: resource.id) }
     end
 
+    context "workflow versions" do
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'creates versions' do
+        update_params[:id] = resource.id
+        expect { put :update, update_params }.to change { resource.workflow_versions.count }.by(1)
+      end
+    end
+
     context "extracts strings from workflow" do
       let(:new_question) { "Contemplate" }
       before do
@@ -565,6 +576,18 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:authorized_user) { membership.user }
 
       it_behaves_like "is creatable"
+    end
+
+    context "workflow versions" do
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'creates versions' do
+        post :create, create_params
+        instance = Workflow.find(created_instance_id(api_resource_name))
+        expect(instance.workflow_versions.count).to eq(1)
+      end
     end
 
     context "extracts strings from workflow" do

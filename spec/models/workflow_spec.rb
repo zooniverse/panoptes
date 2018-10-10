@@ -150,6 +150,27 @@ describe Workflow, type: :model do
     end
   end
 
+  describe "non-papertrail versioning", versioning: true do # TODO: keep this and remove papertrail tests later
+    let(:tasks) { {"version" => 1}}
+    let(:workflow) { create(:workflow, tasks: tasks) }
+
+    it 'creates an initial version for the create' do
+      expect(workflow.workflow_versions.count).to eq(1)
+    end
+
+    it 'should track changes to tasks', :aggregate_failures do
+      new_tasks = {"version" => 2}
+      workflow.update!(tasks: new_tasks)
+      expect(workflow.workflow_versions.count).to eq(2)
+      expect(workflow.workflow_versions.first.tasks).to eq(tasks)
+      expect(workflow.workflow_versions.last.tasks).to eq(new_tasks)
+    end
+
+    it 'should not track changes to primary_language' do
+      expect { workflow.update!(primary_language: 'es') }.not_to change { workflow.workflow_versions.count }
+    end
+  end
+
   describe "versioning", versioning: true do
     let(:workflow) { create(:workflow, tasks: {version: 1}) }
 
