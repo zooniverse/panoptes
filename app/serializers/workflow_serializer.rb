@@ -13,7 +13,7 @@ class WorkflowSerializer
              :retirement, :retired_set_member_subjects_count, :href, :active, :mobile_friendly,
              :aggregation, :configuration, :public_gold_standard, :completeness
 
-  can_include :project, :subject_sets, :tutorial_subject
+  can_include :project, :subject_sets, :tutorial_subject, :workflow_versions, :published_version
 
   media_include :attached_images, classifications_export: { include: false }
 
