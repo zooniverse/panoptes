@@ -68,7 +68,7 @@ pipeline {
           }
         }
         stage('Production API') {
-          when { tag 'production' }
+          when { tag 'production-release' }
           options {
             skipDefaultCheckout true
           }
@@ -89,7 +89,7 @@ pipeline {
           }
         }
         stage('Production Dump workers') {
-          when { tag 'production' }
+          when { tag 'production-release' }
           options {
             skipDefaultCheckout true
           }
