@@ -69,8 +69,7 @@ class Workflow < ActiveRecord::Base
   end
 
   before_save :update_version
-  after_create :save_version
-  after_update :save_version
+  after_save :save_version
 
   def update_version
     if (changes.keys & %w(tasks grouped pairwise prioritized)).present?
