@@ -48,6 +48,16 @@ class Workflow < ActiveRecord::Base
 
   validate :retirement_config
 
+  has_many :workflow_versions, dependent: :destroy
+  belongs_to :published_version, class_name: "WorkflowVersion"
+
+  def publish!
+    update!(published_version: workflow_versions.order(:id).last)
+  end
+
+  def latest_version
+    self
+  end
 
   ranks :display_order, with_same: :project_id
 
@@ -59,6 +69,7 @@ class Workflow < ActiveRecord::Base
   end
 
   before_save :update_version
+  after_save :save_version
 
   def update_version
     if (changes.keys & %w(tasks grouped pairwise prioritized)).present?
@@ -67,6 +78,12 @@ class Workflow < ActiveRecord::Base
 
     if changes.include? :strings
       self.minor_version += 1
+    end
+  end
+
+  def save_version
+    if (changes.keys & %w(tasks grouped pairwise prioritized strings)).present?
+      WorkflowVersion.create_from(self)
     end
   end
 

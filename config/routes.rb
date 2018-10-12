@@ -118,12 +118,15 @@ Rails.application.routes.draw do
         json_api_resources :pages, controller: "project_pages"
       end
 
-      json_api_resources :workflows, links: [:subject_sets, :retired_subjects, :tutorials], versioned: true do
+      json_api_resources :workflows, links: [:subject_sets, :retired_subjects, :tutorials, :workflow_versions, :published_version], versioned: true do
         media_resources :attached_images, classifications_export: { except: [:create] }
 
         post "/retired_subjects", to: "workflows#retire_subjects"
         post "/classifications_export", to: "workflows#create_classifications_export", format: false
+        post '/publish', to: 'workflows#publish'
       end
+
+      json_api_resources :workflow_versions, links: [:workflow]
 
       json_api_resources :subject_sets, links: [:subjects]
 

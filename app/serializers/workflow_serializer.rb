@@ -13,7 +13,7 @@ class WorkflowSerializer
              :retirement, :retired_set_member_subjects_count, :href, :active, :mobile_friendly,
              :aggregation, :configuration, :public_gold_standard, :completeness
 
-  can_include :project, :subject_sets, :tutorial_subject
+  can_include :project, :subject_sets, :tutorial_subject, :workflow_versions, :published_version
 
   media_include :attached_images, classifications_export: { include: false }
 
@@ -35,11 +35,19 @@ class WorkflowSerializer
   end
 
   def tasks
-    if content
-      TasksVisitors::InjectStrings.new(@model.strings).visit(@model.tasks)
-      @model.tasks
+    TasksVisitors::InjectStrings.new(requested_version.strings).visit(requested_version.tasks)
+    requested_version.tasks
+  end
+
+  def first_task
+    requested_version.first_task
+  end
+
+  def requested_version
+    if @context[:published]
+      @model.published_version || WorkflowVersion.build_from(@model)
     else
-      {}
+      @model
     end
   end
 

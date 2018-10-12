@@ -107,8 +107,72 @@ describe Workflow, type: :model do
     it_behaves_like "it has a classifications assocation"
   end
 
+  describe 'publishing', versioning: true do
+    let(:workflow) { create(:workflow, tasks: {version: 1}) }
+
+    it 'works with the first version' do
+      workflow.publish!
+      workflow.update!(tasks: {version: 2})
+      workflow.update!(tasks: {version: 3})
+      workflow.update!(tasks: {version: 4})
+
+      active_version = workflow.published_version
+      expect(active_version.tasks).to eq("version" => 1)
+    end
+
+    it 'works with an in-between version' do
+      workflow.update!(tasks: {version: 2})
+      workflow.update!(tasks: {version: 3})
+      workflow.publish!
+      workflow.update!(tasks: {version: 4})
+
+      active_version = workflow.published_version
+      expect(active_version.tasks).to eq("version" => 3)
+    end
+
+    it 'works with the latest version' do
+      workflow.update!(tasks: {version: 2})
+      workflow.update!(tasks: {version: 3})
+      workflow.update!(tasks: {version: 4})
+      workflow.publish!
+
+      active_version = workflow.published_version
+      expect(active_version.tasks).to eq("version" => 4)
+    end
+
+    it 'publishes primary content' do
+      workflow.update(strings: {version: "one"})
+      workflow.publish!
+      workflow.update(strings: {version: "two"})
+
+      active_version = Workflow.find(workflow.id).published_version
+      expect(active_version.strings).to eq("version" => "one")
+    end
+  end
+
+  describe "non-papertrail versioning", versioning: true do # TODO: keep this and remove papertrail tests later
+    let(:tasks) { {"version" => 1}}
+    let(:workflow) { create(:workflow, tasks: tasks) }
+
+    it 'creates an initial version for the create' do
+      expect(workflow.workflow_versions.count).to eq(1)
+    end
+
+    it 'should track changes to tasks', :aggregate_failures do
+      new_tasks = {"version" => 2}
+      workflow.update!(tasks: new_tasks)
+      expect(workflow.workflow_versions.count).to eq(2)
+      expect(workflow.workflow_versions.first.tasks).to eq(tasks)
+      expect(workflow.workflow_versions.last.tasks).to eq(new_tasks)
+    end
+
+    it 'should not track changes to primary_language' do
+      expect { workflow.update!(primary_language: 'es') }.not_to change { workflow.workflow_versions.count }
+    end
+  end
+
   describe "versioning", versioning: true do
-    let(:workflow) { create(:workflow) }
+    let(:workflow) { create(:workflow, tasks: {version: 1}) }
 
     it { is_expected.to be_versioned }
 

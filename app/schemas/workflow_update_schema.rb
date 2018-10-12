@@ -89,6 +89,10 @@ class WorkflowUpdateSchema < JsonSchema
           type "string", "integer"
         end
       end
+
+      property "published_version" do
+        type "string", "integer"
+      end
     end
   end
 end

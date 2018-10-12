@@ -1634,6 +1634,45 @@ ALTER SEQUENCE public.workflow_tutorials_id_seq OWNED BY public.workflow_tutoria
 
 
 --
+-- Name: workflow_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.workflow_versions (
+    id integer NOT NULL,
+    workflow_id integer NOT NULL,
+    major_number integer NOT NULL,
+    minor_number integer NOT NULL,
+    grouped boolean DEFAULT false NOT NULL,
+    pairwise boolean DEFAULT false NOT NULL,
+    prioritized boolean DEFAULT false NOT NULL,
+    tasks jsonb DEFAULT '{}'::jsonb NOT NULL,
+    first_task character varying NOT NULL,
+    strings jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: workflow_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.workflow_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: workflow_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.workflow_versions_id_seq OWNED BY public.workflow_versions.id;
+
+
+--
 -- Name: workflows; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1668,7 +1707,8 @@ CREATE TABLE public.workflows (
     mobile_friendly boolean DEFAULT false NOT NULL,
     strings jsonb DEFAULT '{}'::jsonb,
     major_version integer DEFAULT 0 NOT NULL,
-    minor_version integer DEFAULT 0 NOT NULL
+    minor_version integer DEFAULT 0 NOT NULL,
+    published_version_id integer
 );
 
 
@@ -1983,6 +2023,13 @@ ALTER TABLE ONLY public.workflow_contents ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.workflow_tutorials ALTER COLUMN id SET DEFAULT nextval('public.workflow_tutorials_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.workflow_versions ALTER COLUMN id SET DEFAULT nextval('public.workflow_versions_id_seq'::regclass);
 
 
 --
@@ -2326,6 +2373,14 @@ ALTER TABLE ONLY public.workflow_contents
 
 ALTER TABLE ONLY public.workflow_tutorials
     ADD CONSTRAINT workflow_tutorials_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: workflow_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.workflow_versions
+    ADD CONSTRAINT workflow_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -3474,6 +3529,22 @@ ALTER TABLE ONLY public.user_collection_preferences
 
 
 --
+-- Name: fk_rails_694e2977cf; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.workflows
+    ADD CONSTRAINT fk_rails_694e2977cf FOREIGN KEY (published_version_id) REFERENCES public.workflow_versions(id);
+
+
+--
+-- Name: fk_rails_6c88edf7d9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.workflow_versions
+    ADD CONSTRAINT fk_rails_6c88edf7d9 FOREIGN KEY (workflow_id) REFERENCES public.workflows(id);
+
+
+--
 -- Name: fk_rails_732cb83ab7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4170,6 +4241,10 @@ INSERT INTO schema_migrations (version) VALUES ('20180710151618');
 INSERT INTO schema_migrations (version) VALUES ('20180724112620');
 
 INSERT INTO schema_migrations (version) VALUES ('20180726133210');
+
+INSERT INTO schema_migrations (version) VALUES ('20180730133806');
+
+INSERT INTO schema_migrations (version) VALUES ('20180730150333');
 
 INSERT INTO schema_migrations (version) VALUES ('20180808140938');
 

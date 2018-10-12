@@ -97,6 +97,15 @@ describe Api::V1::WorkflowsController, type: :controller do
         expect(response_keys).to match_array ['id', 'links', 'display_name', 'subjects_count']
       end
     end
+
+    describe 'requesting published versions' do
+      it 'should return the published version of records' do
+        filterable_resources[0].publish!
+        filterable_resources[0].update! tasks: {}, strings: {}
+        get :index, published: true
+        expect(json_response[api_resource_name].first["tasks"]).to be_present
+      end
+    end
   end
 
   describe '#update' do
@@ -148,6 +157,17 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:translated_language) { resource.primary_language }
       let(:controller_action) { :update }
       let(:controller_action_params) { update_params.merge(id: resource.id) }
+    end
+
+    context "workflow versions" do
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'creates versions' do
+        update_params[:id] = resource.id
+        expect { put :update, update_params }.to change { resource.workflow_versions.count }.by(1)
+      end
     end
 
     context "extracts strings from workflow" do
@@ -556,6 +576,18 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:authorized_user) { membership.user }
 
       it_behaves_like "is creatable"
+    end
+
+    context "workflow versions" do
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'creates versions' do
+        post :create, create_params
+        instance = Workflow.find(created_instance_id(api_resource_name))
+        expect(instance.workflow_versions.count).to eq(1)
+      end
     end
 
     context "extracts strings from workflow" do
