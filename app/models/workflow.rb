@@ -52,7 +52,7 @@ class Workflow < ActiveRecord::Base
   belongs_to :published_version, class_name: "WorkflowVersion"
 
   def publish!
-    update!(published_version: workflow_versions.order(:created_at).last)
+    update!(published_version: workflow_versions.order(:id).last)
   end
 
   def latest_version
