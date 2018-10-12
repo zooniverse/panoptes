@@ -45,7 +45,7 @@ class WorkflowSerializer
 
   def requested_version
     if @context[:published]
-      @model.published_version || @model
+      @model.published_version || WorkflowVersion.build_from(@model)
     else
       @model
     end
