@@ -1640,8 +1640,8 @@ ALTER SEQUENCE public.workflow_tutorials_id_seq OWNED BY public.workflow_tutoria
 CREATE TABLE public.workflow_versions (
     id integer NOT NULL,
     workflow_id integer NOT NULL,
-    major_version integer NOT NULL,
-    minor_version integer NOT NULL,
+    major_number integer NOT NULL,
+    minor_number integer NOT NULL,
     grouped boolean DEFAULT false NOT NULL,
     pairwise boolean DEFAULT false NOT NULL,
     prioritized boolean DEFAULT false NOT NULL,

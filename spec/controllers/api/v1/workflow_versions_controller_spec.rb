@@ -19,7 +19,7 @@ describe Api::V1::WorkflowVersionsController, type: :controller do
 
   let(:scopes) { %w(public project) }
   let(:api_resource_name) { "workflow_versions" }
-  let(:api_resource_attributes) { %w(first_task tasks strings major_version minor_version) }
+  let(:api_resource_attributes) { %w(first_task tasks strings major_number minor_number) }
   let(:api_resource_links) { %w(workflow_versions.workflow) }
   let(:authorized_user) { public_project.owner }
   let(:resource) { public_workflow_version }
