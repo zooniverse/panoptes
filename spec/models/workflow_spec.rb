@@ -195,6 +195,14 @@ describe Workflow, type: :model do
       expect(workflow.current_version_number.to_i).to eq(ModelVersion.version_number(workflow))
     end
 
+    it 'defaults version numbers to 1' do
+      workflow = Workflow.new(project: create(:project), display_name: "FOO", primary_language: 'en-us')
+      workflow_content = workflow.workflow_contents.build(language: 'en-us')
+      workflow.save!
+      expect(workflow.major_version).to eq(1)
+      expect(workflow.minor_version).to eq(1)
+    end
+
     it 'tracks major version number' do
       expect do
         workflow.update!(tasks: {blha: 'asdfasd', quera: "asdfas"})

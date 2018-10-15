@@ -79,6 +79,11 @@ class Workflow < ActiveRecord::Base
     if changes.include? :strings
       self.minor_version += 1
     end
+
+    if new_record?
+      self.major_version = 1 if major_version < 1
+      self.minor_version = 1 if minor_version < 1
+    end
   end
 
   def save_version
