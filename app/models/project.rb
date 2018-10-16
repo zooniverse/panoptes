@@ -41,6 +41,8 @@ class Project < ActiveRecord::Base
   has_many :tags, through: :tagged_resources
   has_many :first_time_users, class_name: "User", foreign_key: 'project_id', inverse_of: :signup_project, dependent: :restrict_with_exception
 
+  has_many :project_versions, dependent: :destroy
+
   has_paper_trail only: [:private, :live, :beta_requested, :beta_approved, :launch_requested, :launch_approved]
 
   enum state: [:paused, :finished]
@@ -56,7 +58,14 @@ class Project < ActiveRecord::Base
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
+  after_save :save_version
   after_update :send_notifications
+
+  def save_version
+    if (changes.keys & %w(private live beta_requested beta_approved launch_requested launch_approved display_name description workflow_description introduction url_labels researcher_quote)).present?
+      ProjectVersion.create_from(self)
+    end
+  end
 
   # Still needed for HttpCacheable
   scope :private_scope, -> { where(private: true) }
