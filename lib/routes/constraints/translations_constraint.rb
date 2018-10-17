@@ -1,6 +1,6 @@
 module Routes
   module Constraints
-    class Translations
+    class TranslationsConstraint
       attr_reader :params
 
       def matches?(request)

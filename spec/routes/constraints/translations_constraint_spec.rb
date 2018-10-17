@@ -1,8 +1,8 @@
 require "spec_helper"
 
-describe Routes::Constraints::Translations do
+describe Routes::Constraints::TranslationsConstraint do
   describe "#matches?" do
-    subject { Routes::Constraints::Translations.new }
+    subject { Routes::Constraints::TranslationsConstraint.new }
 
     %w(project organization workflow tutorial field_guide page).each do |translated_type|
       it 'should match when translated_type is a #{translated_type}' do
