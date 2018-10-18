@@ -111,9 +111,6 @@ class ProjectSerializer
     @content = content.slice(*CONTENT_FIELDS)
   end
 
-
-  private
-
   # This method is overridden from PanoptesRestpack to ignore "owners".
   # Owners is a special non-ActiveRecord relation that we support via
   # can_include, but we can't preload it via AR/SQL.
