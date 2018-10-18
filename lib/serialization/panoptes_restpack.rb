@@ -4,6 +4,7 @@ module Serialization
 
     included do
       include RestPack::Serializer
+      include InstanceMethodOverrides
       extend ClassMethodOverrides
     end
 
@@ -32,11 +33,8 @@ module Serialization
       end
 
       def paging_scope(params, scope)
-        if params[:include]
-          param_preloads = params[:include].split(',').map(&:to_sym) & self.can_includes
-        end
+        preload_relations = preloads | param_preloads(params)
 
-        preload_relations = preloads | Array.wrap(param_preloads)
         unless preload_relations.empty?
           scope = scope.preload(*preload_relations)
         end
@@ -45,6 +43,11 @@ module Serialization
       end
 
       private
+
+      def param_preloads(params)
+        return [] unless params[:include]
+        Array.wrap(params[:include].split(',').map(&:to_sym) & self.can_includes)
+      end
 
       def page_href(page, options)
         return nil unless page
@@ -78,6 +81,53 @@ module Serialization
         end
 
         super(page, options)
+      end
+    end
+
+    module InstanceMethodOverrides
+      # The original method in RestPack only serializes links if they aren't
+      # blank. This means that has-many associations with no records don't
+      # serialize as an empty array, but instead are left out completely. This
+      # is undesirable because it means the schema of the JSON responses we send
+      # out varies record by record, and also means that you can't tell from
+      # just the JSON records what associations a model has.
+      def add_links(model, data)
+        self.class.associations.each do |association|
+          data[:links] ||= {}
+          links_value = case association.macro
+                        when :belongs_to
+                          if association.polymorphic?
+                            linked_id = model.send(association.foreign_key)
+                              .try(:to_s)
+                            linked_type = model.send(association.foreign_type)
+                              .try(:to_s)
+                              .demodulize
+                              .underscore
+                              .pluralize
+                            {
+                              href: "/#{linked_type}/#{linked_id}",
+                              id: linked_id,
+                              type: linked_type
+                            }
+                          else
+                            model.send(association.foreign_key).try(:to_s)
+                          end
+                        when :has_one
+                          model.send(association.name).try(:id).try(:to_s)
+                        else
+                          if model.send(association.name).loaded?
+                            model.send(association.name).collect { |associated| associated.id.to_s }
+                          else
+                            model.send(association.name).pluck(:id).map(&:to_s)
+                          end
+                        end
+
+          # PATCH: Compared to the original, deleted an `if links_value.present?`
+          # clause around this next line:
+          data[:links][association.name.to_sym] = links_value
+        end
+
+        data
       end
     end
   end

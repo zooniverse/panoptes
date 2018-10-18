@@ -1,5 +1,5 @@
 class UserCollectionPreferenceSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include CachedSerializer
 
   attributes :id, :preferences, :href

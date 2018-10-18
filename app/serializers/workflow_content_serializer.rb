@@ -1,5 +1,5 @@
 class WorkflowContentSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include CachedSerializer
 
   attributes :id, :language, :strings, :href

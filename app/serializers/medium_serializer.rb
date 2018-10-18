@@ -1,5 +1,5 @@
 class MediumSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include CachedSerializer
 
   attributes :id, :href, :src, :content_type, :media_type, :external_link,

@@ -1,5 +1,5 @@
 class OrganizationSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include OwnerLinkSerializer
   include MediaLinksSerializer
   include CachedSerializer

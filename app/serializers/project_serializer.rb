@@ -1,5 +1,5 @@
 class ProjectSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include OwnerLinkSerializer
   include MediaLinksSerializer
   include CachedSerializer
@@ -109,5 +109,12 @@ class ProjectSerializer
     content = @model.primary_content.attributes.with_indifferent_access
     content.default = ""
     @content = content.slice(*CONTENT_FIELDS)
+  end
+
+
+  private
+
+  def self.param_preloads(params)
+    super - [:owners]
   end
 end

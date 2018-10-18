@@ -1,7 +1,7 @@
 module ACLSerializer
   extend ActiveSupport::Concern
 
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include CachedSerializer
 
   module ClassMethods
