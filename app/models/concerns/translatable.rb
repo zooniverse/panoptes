@@ -12,4 +12,12 @@ module Translatable
       raise NotImplementedError, "Translatable model needs to specify which attributes are translatable."
     end
   end
+
+  def primary_language_translation
+    if respond_to?(:primary_language)
+      translations.find_by(language: primary_language)
+    else
+      translations.find_by(language: language)
+    end
+  end
 end

@@ -55,4 +55,17 @@ RSpec.describe Translation, type: :model do
       expect(Translation.translated_model_names).to match_array(expected_model_names)
     end
   end
+
+  describe '#outdated_strings' do
+    it 'returns empty array if translation is in the primary language' do
+      translation.save!
+      expect(translation.outdated_strings).to be_empty
+    end
+
+    it 'returns diff' do
+      translation.save!
+      other = build(:translation)
+      expect()
+    end
+  end
 end
