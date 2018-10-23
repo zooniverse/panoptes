@@ -40,19 +40,17 @@ describe Workflow, type: :model do
   describe "::find_without_json_attrs" do
     let(:workflow) { create(:workflow) }
     let(:json_attrs) do
-      %w(tasks retirement aggregation configuration)
-    end
-    let(:non_json_attrs) do
-      Workflow.attribute_names - json_attrs
+      col_information = Workflow.columns_hash.select do |name, col|
+        /\Ajson.*/.match?(col.sql_type)
+      end
+      col_information.keys
     end
 
-    it "should load the workflow without the tasks attribute" do
-      expect(Workflow)
-        .to receive(:select)
-        .with(*non_json_attrs)
-        .and_call_original
+    it "should load the workflow without the json attributes" do
       no_json_workflow = Workflow.find_without_json_attrs(workflow.id)
-      expect(no_json_workflow.id).to eq(workflow.id)
+      loaded_attributes = no_json_workflow.attributes.keys
+      non_json_attributes = loaded_attributes - json_attrs
+      expect(loaded_attributes).to match_array(non_json_attributes)
     end
   end
 

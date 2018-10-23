@@ -39,7 +39,7 @@ class Workflow < ActiveRecord::Base
     'options' => {'count' => 15}
   }.freeze
 
-  JSON_ATTRIBUTES = %w(tasks retirement aggregation configuration).freeze
+  JSON_ATTRIBUTES = %w(tasks retirement aggregation configuration strings).freeze
 
   # Used by HttpCacheable
   scope :private_scope, -> { where(project_id: Project.private_scope) }
