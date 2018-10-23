@@ -29,6 +29,25 @@ describe Organization, type: :model do
 
   it_behaves_like "has slugged name"
 
+  describe "versioning" do
+    let(:organization) { create(:organization, display_name: "v1") }
+
+    it 'creates an initial version for the create' do
+      expect(organization.organization_versions.count).to eq(1)
+    end
+
+    it 'should track changes to display_name', :aggregate_failures do
+      organization.update!(display_name: "v2")
+      expect(organization.organization_versions.count).to eq(2)
+      expect(organization.organization_versions.first.display_name).to eq("v1")
+      expect(organization.organization_versions.last.display_name).to eq("v2")
+    end
+
+    it 'should not track changes to primary_language' do
+      expect { organization.update!(primary_language: 'es') }.not_to change { organization.organization_versions.count }
+    end
+  end
+
   describe "#organization_roles" do
     let!(:preferences) do
       [create(:access_control_list, resource: organization, roles: []),

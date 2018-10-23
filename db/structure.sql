@@ -762,6 +762,43 @@ ALTER SEQUENCE public.organization_pages_id_seq OWNED BY public.organization_pag
 
 
 --
+-- Name: organization_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.organization_versions (
+    id integer NOT NULL,
+    organization_id integer NOT NULL,
+    display_name character varying,
+    description character varying,
+    introduction text,
+    urls jsonb,
+    url_labels jsonb,
+    announcement character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_versions_id_seq OWNED BY public.organization_versions.id;
+
+
+--
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1868,6 +1905,13 @@ ALTER TABLE ONLY public.organization_pages ALTER COLUMN id SET DEFAULT nextval('
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.organization_versions ALTER COLUMN id SET DEFAULT nextval('public.organization_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.organizations ALTER COLUMN id SET DEFAULT nextval('public.organizations_id_seq'::regclass);
 
 
@@ -2189,6 +2233,14 @@ ALTER TABLE ONLY public.organization_contents
 
 ALTER TABLE ONLY public.organization_pages
     ADD CONSTRAINT organization_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.organization_versions
+    ADD CONSTRAINT organization_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -2718,6 +2770,13 @@ CREATE INDEX index_organization_pages_on_language ON public.organization_pages U
 --
 
 CREATE INDEX index_organization_pages_on_organization_id ON public.organization_pages USING btree (organization_id);
+
+
+--
+-- Name: index_organization_versions_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organization_versions_on_organization_id ON public.organization_versions USING btree (organization_id);
 
 
 --
@@ -3697,6 +3756,14 @@ ALTER TABLE ONLY public.workflow_tutorials
 
 
 --
+-- Name: fk_rails_be858ed31d; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_versions
+    ADD CONSTRAINT fk_rails_be858ed31d FOREIGN KEY (organization_id) REFERENCES public.organizations(id);
+
+
+--
 -- Name: fk_rails_d596712569; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4253,4 +4320,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180821125430');
 INSERT INTO schema_migrations (version) VALUES ('20180821151555');
 
 INSERT INTO schema_migrations (version) VALUES ('20181001154345');
+
+INSERT INTO schema_migrations (version) VALUES ('20181022172507');
 
