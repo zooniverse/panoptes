@@ -914,6 +914,47 @@ ALTER SEQUENCE public.project_pages_id_seq OWNED BY public.project_pages.id;
 
 
 --
+-- Name: project_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.project_versions (
+    id integer NOT NULL,
+    project_id integer,
+    private boolean,
+    live boolean NOT NULL,
+    beta_requested boolean,
+    beta_approved boolean,
+    launch_requested boolean,
+    launch_approved boolean,
+    display_name character varying,
+    description text,
+    introduction text,
+    url_labels jsonb,
+    workflow_description text,
+    researcher_quote text
+);
+
+
+--
+-- Name: project_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.project_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: project_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.project_versions_id_seq OWNED BY public.project_versions.id;
+
+
+--
 -- Name: projects; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1933,6 +1974,13 @@ ALTER TABLE ONLY public.project_pages ALTER COLUMN id SET DEFAULT nextval('publi
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.project_versions ALTER COLUMN id SET DEFAULT nextval('public.project_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval('public.projects_id_seq'::regclass);
 
 
@@ -2265,6 +2313,14 @@ ALTER TABLE ONLY public.project_contents
 
 ALTER TABLE ONLY public.project_pages
     ADD CONSTRAINT project_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: project_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.project_versions
+    ADD CONSTRAINT project_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -3820,6 +3876,14 @@ ALTER TABLE ONLY public.oauth_access_tokens
 
 
 --
+-- Name: fk_rails_eee5ff31fd; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_versions
+    ADD CONSTRAINT fk_rails_eee5ff31fd FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+
+--
 -- Name: fk_rails_f1e22b77bf; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4320,6 +4384,8 @@ INSERT INTO schema_migrations (version) VALUES ('20180821125430');
 INSERT INTO schema_migrations (version) VALUES ('20180821151555');
 
 INSERT INTO schema_migrations (version) VALUES ('20181001154345');
+
+INSERT INTO schema_migrations (version) VALUES ('20181015112421');
 
 INSERT INTO schema_migrations (version) VALUES ('20181022172507');
 

@@ -64,6 +64,25 @@ describe Project, type: :model do
     expect(build(:project, live: nil)).to_not be_valid
   end
 
+  describe "non-papertrail versioning", versioning: true do # TODO: keep this and remove papertrail tests later
+    let(:project) { create(:project, display_name: "v1") }
+
+    it 'creates an initial version for the create' do
+      expect(project.project_versions.count).to eq(1)
+    end
+
+    it 'should track changes to tasks', :aggregate_failures do
+      project.update!(display_name: "v2")
+      expect(project.project_versions.count).to eq(2)
+      expect(project.project_versions.first.display_name).to eq("v1")
+      expect(project.project_versions.last.display_name).to eq("v2")
+    end
+
+    it 'should not track changes to primary_language' do
+      expect { project.update!(primary_language: 'es') }.not_to change { project.project_versions.count }
+    end
+  end
+
   describe 'featured projects' do
     it 'can be featured' do
       project = create :project, featured: true
