@@ -1,20 +1,12 @@
 class WorkflowVersion < ActiveRecord::Base
   belongs_to :workflow
 
-  def self.build_from(workflow)
-    version = new
-    version.major_number = workflow.major_version
-    version.minor_number = workflow.minor_version
-    version.workflow_id = workflow.id
-    version.tasks = workflow.tasks
-    version.first_task = workflow.first_task
-    version.strings = workflow.strings
-    version
+  # These two aliases are used by Versioning because it doesn't support aliasing directly
+  def major_version=(val)
+    self.major_number = val
   end
 
-  def self.create_from(workflow)
-    version = build_from(workflow)
-    version.save!
-    version
+  def minor_version=(val)
+    self.minor_number = val
   end
 end
