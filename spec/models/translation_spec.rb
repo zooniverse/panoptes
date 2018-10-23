@@ -56,6 +56,37 @@ RSpec.describe Translation, type: :model do
     end
   end
 
+  describe "#update_strings_and_versions" do
+    it 'adds keys' do
+      translation = build :translation, strings: {}, string_versions: {}
+      translation.update_strings_and_versions({title: "Foo"}, 123)
+      expect(translation.strings).to eq({"title" => "Foo"})
+      expect(translation.string_versions).to eq({"title" => 123})
+    end
+
+    it 'updates keys' do
+      translation = build :translation, strings: {title: "Foo"}, string_versions: {title: 1}
+      translation.update_strings_and_versions({title: "Bar"}, 123)
+      expect(translation.strings).to eq({"title" => "Bar"})
+      expect(translation.string_versions).to eq({"title" => 123})
+    end
+
+    it 'leaves unchanged strings at their version' do
+      translation = build :translation, strings: {title: "Foo"}, string_versions: {title: 1}
+      translation.update_strings_and_versions({title: "Foo", description: "Bar"}, 123)
+      expect(translation.strings).to eq({"title" => "Foo", "description" => "Bar"})
+      expect(translation.string_versions).to eq({"title" => 1, "description" => 123})
+
+    end
+
+    it 'removes keys' do
+      translation = build :translation, strings: {title: "Foo", description: "Bar"}, string_versions: {title: 1, description: 1}
+      translation.update_strings_and_versions({title: "Foo"}, 123)
+      expect(translation.strings).to eq({"title" => "Foo"})
+      expect(translation.string_versions).to eq({"title" => 1})
+    end
+  end
+
   describe '#outdated_strings' do
     it 'returns empty array if translation is in the primary language' do
       translation.save!
@@ -65,7 +96,7 @@ RSpec.describe Translation, type: :model do
     it 'returns diff' do
       translation.save!
       other = build(:translation)
-      expect()
+      # todo
     end
   end
 end

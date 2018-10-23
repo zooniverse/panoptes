@@ -24,6 +24,22 @@ class Translation < ActiveRecord::Base
     ).freeze
   end
 
+  def update_strings_and_versions(new_strings, version_number)
+    old_strings = self.strings.stringify_keys
+    new_strings = new_strings.stringify_keys
+
+    Translations::Strings.compare(old_strings, new_strings) do |change, key|
+      case change
+      when :added, :changed
+        strings[key] = new_strings[key]
+        string_versions[key] = version_number
+      when :removed
+        strings.delete(key)
+        string_versions.delete(key)
+      end
+    end
+  end
+
   def outdated_strings
     primary = translated.primary_language_translation
     return [] if primary == self
