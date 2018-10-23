@@ -28,7 +28,7 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
     end
 
     def resource_ids
-      params[:id]
+      JsonApiController::ResourceIds.from(params, resource_name)
     end
 
     def update
@@ -36,6 +36,10 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
     end
 
     def show
+      render nothing: true
+    end
+
+    def index
       render nothing: true
     end
   end
@@ -63,6 +67,24 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
   describe "user is not enrolled on controlled object" do
     it 'should raise an AccessDenied error' do
       expect{ put :update, id: controlled.id }.to raise_error(JsonApiController::AccessDenied)
+    end
+  end
+
+  describe "id params are extracted correctly" do
+    before do
+      routes.draw do
+        get "index" => "anonymous#index"
+      end
+    end
+
+    it 'should handle missing id values' do
+      # manually skip the pundit policy run validation
+      # as this spec won't return resource ids so won't activate the scope
+      # lookup in JsonApiController::CheckResourcesExist.resources_exist?
+      allow(controller).to receive(:policy_scoped?).and_return(true)
+      expect{
+        get :index, id: nil
+      }.not_to raise_error
     end
   end
 end

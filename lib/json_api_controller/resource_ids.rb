@@ -1,7 +1,8 @@
 module JsonApiController
   class ResourceIds
     def self.from(params, resource_name)
-      array_id_params(resource_ids(params, resource_name))
+      non_nil_params = params.compact
+      array_id_params(resource_ids(non_nil_params, resource_name))
     end
 
     def self.array_id_params(string_id_params)
