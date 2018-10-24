@@ -13,11 +13,15 @@ module Translatable
     end
   end
 
-  def primary_language_translation
+  def translatable_language
     if respond_to?(:primary_language)
-      translations.find_by(language: primary_language)
+      primary_language
     else
-      translations.find_by(language: language)
+      language
     end
+  end
+
+  def primary_language_translation
+    translations.find_by(language: translatable_language)
   end
 end

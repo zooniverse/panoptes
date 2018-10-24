@@ -12,7 +12,7 @@ module SyncResourceTranslationStrings
       TranslationSyncWorker.perform_async(
         resource.class.name,
         resource.id,
-        translatable_language(resource)
+        resource.translatable_language
       )
     end
   end
@@ -22,14 +22,6 @@ module SyncResourceTranslationStrings
       created_resources
     else
       controlled_resources
-    end
-  end
-
-  def translatable_language(resource)
-    if resource.respond_to?(:primary_language)
-      resource.primary_language
-    else
-      resource.language
     end
   end
 end
