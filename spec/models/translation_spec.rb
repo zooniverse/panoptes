@@ -28,6 +28,21 @@ RSpec.describe Translation, type: :model do
     expect(translation.errors[:strings]).to match_array(invalid_strings_msg)
   end
 
+  it 'should not be valid without string_versions' do
+    invalid_msg = ["must be present but can be empty"]
+    translation.string_versions = nil
+    expect(translation.valid?).to be false
+    expect(translation.errors[:string_versions]).to match_array(invalid_msg)
+  end
+
+  it 'should not be valid when referencing an unknown version' do
+    invalid_msg = ["references unknown versions: 1, 2"]
+    translation.strings = {foo: "Foo", bar: "Bar"}
+    translation.string_versions = {foo: 1, bar: 2}
+    expect(translation.valid?).to be false
+    expect(translation.errors[:string_versions]).to match_array(invalid_msg)
+  end
+
   it 'should not be valid without a translated resource' do
     translation.translated = nil
     expect(translation).to_not be_valid

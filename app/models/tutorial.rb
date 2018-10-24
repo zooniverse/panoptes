@@ -1,5 +1,6 @@
 class Tutorial < ActiveRecord::Base
   include Translatable
+  include Unversioned
 
   belongs_to :project
   has_many :workflow_tutorials
@@ -11,11 +12,6 @@ class Tutorial < ActiveRecord::Base
 
   def self.translatable_attributes
     %i(display_name steps)
-  end
-
-  # TODO: Add Versioning to this model, and then remove this override
-  def latest_version_id
-    0
   end
 
   def steps

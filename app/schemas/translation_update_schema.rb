@@ -8,5 +8,9 @@ class TranslationUpdateSchema < JsonSchema
     property "strings" do
       type "object"
     end
+
+    property "string_versions" do
+      type "object"
+    end
   end
 end
