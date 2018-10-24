@@ -38,7 +38,7 @@ FactoryBot.define do
         "shape.help" => "Duh?",
         "shape.answers.0.label" => "Smooth",
         "shape.answers.1.label" => "Features",
-        "shape.answers.2.label" => "Star or artifact",
+        "shape.answers.2.label" => "Star or artifact"
       })
 
       association :translated, factory: :workflow

@@ -34,8 +34,8 @@ module Versioning
     end
 
     if (changes.keys & self.class.versioned_attributes).present?
-      self.send(self.class.versioned_association).create!(
-        self.attributes.slice(*self.class.versioned_attributes)
+      send(self.class.versioned_association).create!(
+        attributes.slice(*self.class.versioned_attributes)
       )
     end
   end
