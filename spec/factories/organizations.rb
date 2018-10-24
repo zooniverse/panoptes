@@ -8,7 +8,7 @@ FactoryBot.define do
     sequence(:display_name) { |n| "Test Organization #{ n }" }
     listed_at Time.now
     listed true
-    primary_language "en"
+    primary_language "en-gb"
     urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
     categories %w(bugs fossils plants)
 
