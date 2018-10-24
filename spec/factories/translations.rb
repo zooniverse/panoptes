@@ -9,6 +9,16 @@ FactoryBot.define do
       "urls.0.label" => "Blog",
       "urls.1.label" => "Twitter"
     })
+    string_versions({
+      title: 1,
+      description: 1,
+      introduction: 1,
+      workflow_description: 1,
+      researcher_quote: 1,
+      "urls.0.label" => 1,
+      "urls.1.label" => 1
+    })
+
     association :translated, factory: :project
     language "en-GB"
 
