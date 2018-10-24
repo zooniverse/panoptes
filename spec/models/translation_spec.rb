@@ -86,17 +86,4 @@ RSpec.describe Translation, type: :model do
       expect(translation.string_versions).to eq({"title" => 1})
     end
   end
-
-  describe '#outdated_strings' do
-    it 'returns empty array if translation is in the primary language' do
-      translation.save!
-      expect(translation.outdated_strings).to be_empty
-    end
-
-    it 'returns diff' do
-      translation.save!
-      other = build(:translation)
-      # todo
-    end
-  end
 end

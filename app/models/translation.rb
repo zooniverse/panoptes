@@ -40,12 +40,6 @@ class Translation < ActiveRecord::Base
     end
   end
 
-  def outdated_strings
-    primary = translated.primary_language_translation
-    return [] if primary == self
-    Translations::DiffEngine.new(primary).outdated(self)
-  end
-
   private
 
   def validate_strings
