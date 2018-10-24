@@ -20,8 +20,4 @@ module Translatable
       language
     end
   end
-
-  def primary_language_translation
-    translations.find_by(language: translatable_language)
-  end
 end
