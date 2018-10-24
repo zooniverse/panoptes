@@ -19,6 +19,10 @@ describe Organization, type: :model do
     let(:private_model) { create(:organization, listed_at: nil) }
   end
 
+  it_behaves_like "is translatable" do
+    let(:model) { create :organization }
+  end
+
   it "should have a valid factory" do
     expect(organization).to be_valid
   end

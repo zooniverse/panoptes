@@ -28,6 +28,10 @@ describe Project, type: :model do
     let(:private_model) { create(:project, private: true) }
   end
 
+  it_behaves_like "is translatable" do
+    let(:model) { create :project }
+  end
+
   it_behaves_like "has slugged name"
 
   context "with caching resource associations" do

@@ -13,6 +13,11 @@ class Tutorial < ActiveRecord::Base
     %i(display_name steps)
   end
 
+  # TODO: Add Versioning to this model, and then remove this override
+  def latest_version_id
+    0
+  end
+
   def steps
     super.map(&:with_indifferent_access)
   end
