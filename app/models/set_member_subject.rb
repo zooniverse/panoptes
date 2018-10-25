@@ -53,10 +53,6 @@ class SetMemberSubject < ActiveRecord::Base
 
   # Be careful using this query as it's not selective on a large table
   # and the LEFT OUTER JOIN can take a long time to resolve
-  #
-  # Note: push this into where it's being used to ensure it's a more selective
-  # query and we don't use it on it's own
-  # After https://github.com/zooniverse/Panoptes/pull/2805 is in
   def self.unseen_for_user_by_workflow(user_id, workflow_id)
     all_sms = all_sms_for_user_by_workflow(user_id, workflow_id)
     unseen_smses = all_sms.where("seen_subject_ids.subject_id IS NULL")
