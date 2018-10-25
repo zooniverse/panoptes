@@ -35,7 +35,7 @@ module Subjects
     def select_subject_ids
       select_with(desired_selector)
     rescue CellectClient::ConnectionError, DesignatorClient::GenericError
-      select_with(default_selector)
+      []
     end
 
     def select_with(selector)
