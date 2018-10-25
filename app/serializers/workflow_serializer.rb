@@ -45,7 +45,9 @@ class WorkflowSerializer
 
   def requested_version
     if @context[:published]
-      @model.published_version || WorkflowVersion.build_from(@model)
+      # The model itself is a valid duck type for a workflow version, since a
+      # version is basically just a subset of a Workflow's columns.
+      @model.published_version || @model
     else
       @model
     end
