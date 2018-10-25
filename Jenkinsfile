@@ -3,6 +3,11 @@
 pipeline {
   agent none
 
+  options {
+    quietPeriod(120)
+    disableConcurrentBuilds()
+  }
+
   stages {
     stage('Build Docker image') {
       agent any
