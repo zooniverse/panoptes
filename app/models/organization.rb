@@ -4,6 +4,7 @@ class Organization < ActiveRecord::Base
   include SluggedName
   include HasContents
   include Translatable
+  include Versioning
 
   # Still needed for HttpCacheable
   scope :private_scope, -> { where(listed: false) }
@@ -22,20 +23,13 @@ class Organization < ActiveRecord::Base
 
   accepts_nested_attributes_for :organization_contents
 
+  versioned association: :organization_versions, attributes: %w(display_name description introduction urls url_labels announcement)
+
   alias_attribute :title, :display_name
 
   def self.translatable_attributes
     %i(display_name title description introduction announcement url_labels)
   end
-
-  after_save :save_version
-
-  def save_version
-    if (changes.keys & %w(display_name description introduction urls url_labels announcement)).present?
-      OrganizationVersion.create_from(self)
-    end
-  end
-
 
   def retired_subjects_count
     projects.joins(:active_workflows).sum("workflows.retired_set_member_subjects_count")

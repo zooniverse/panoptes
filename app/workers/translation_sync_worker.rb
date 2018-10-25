@@ -12,7 +12,7 @@ class TranslationSyncWorker
       language: language
     )
     translated_strings = TranslationStrings.new(translated_resource).extract
-    translation.strings = translated_strings
+    translation.update_strings_and_versions(translated_strings, translated_resource.latest_version_id)
     translation.save!
   end
 

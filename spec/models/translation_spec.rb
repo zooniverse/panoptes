@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Translation, type: :model do
-  let(:translation) { build(:translation) }
+  let(:translation) { build(:translation, language: 'en-GB') }
 
   it 'should have a valid factory' do
     expect(translation).to be_valid
@@ -15,7 +15,7 @@ RSpec.describe Translation, type: :model do
 
   it 'should not allow duplicate translations for a resource' do
     translation.save
-    dup_translation = build(:translation, translated: translation.translated)
+    dup_translation = build(:translation, translated: translation.translated, language: 'en-gb')
     expect(dup_translation).not_to be_valid
     expected_errors = ["Language translation already exists for this resource"]
     expect(dup_translation.errors).to match_array(expected_errors)
@@ -53,6 +53,37 @@ RSpec.describe Translation, type: :model do
 
     it "should list all the model names that have translation resources" do
       expect(Translation.translated_model_names).to match_array(expected_model_names)
+    end
+  end
+
+  describe "#update_strings_and_versions" do
+    it 'adds keys' do
+      translation = build :translation, strings: {}, string_versions: {}
+      translation.update_strings_and_versions({title: "Foo"}, 123)
+      expect(translation.strings).to eq({"title" => "Foo"})
+      expect(translation.string_versions).to eq({"title" => 123})
+    end
+
+    it 'updates keys' do
+      translation = build :translation, strings: {title: "Foo"}, string_versions: {title: 1}
+      translation.update_strings_and_versions({title: "Bar"}, 123)
+      expect(translation.strings).to eq({"title" => "Bar"})
+      expect(translation.string_versions).to eq({"title" => 123})
+    end
+
+    it 'leaves unchanged strings at their version' do
+      translation = build :translation, strings: {title: "Foo"}, string_versions: {title: 1}
+      translation.update_strings_and_versions({title: "Foo", description: "Bar"}, 123)
+      expect(translation.strings).to eq({"title" => "Foo", "description" => "Bar"})
+      expect(translation.string_versions).to eq({"title" => 1, "description" => 123})
+
+    end
+
+    it 'removes keys' do
+      translation = build :translation, strings: {title: "Foo", description: "Bar"}, string_versions: {title: 1, description: 1}
+      translation.update_strings_and_versions({title: "Foo"}, 123)
+      expect(translation.strings).to eq({"title" => "Foo"})
+      expect(translation.string_versions).to eq({"title" => 1})
     end
   end
 end

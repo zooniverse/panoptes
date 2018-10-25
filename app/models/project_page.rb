@@ -11,4 +11,9 @@ class ProjectPage < ActiveRecord::Base
   def self.translatable_attributes
     %i(title content)
   end
+
+  # TODO: Add Versioning to this model, and then remove this override
+  def latest_version_id
+    0
+  end
 end

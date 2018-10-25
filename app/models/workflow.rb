@@ -6,8 +6,10 @@ class Workflow < ActiveRecord::Base
   include CacheModelVersion
   include ModelCacheKey
   include Translatable
+  include Versioning
 
   has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
+  versioned association: :workflow_versions, attributes: %w(tasks first_task strings major_version minor_version)
 
   belongs_to :project
   has_many :subject_workflow_statuses, dependent: :destroy
@@ -69,7 +71,6 @@ class Workflow < ActiveRecord::Base
   end
 
   before_save :update_version
-  after_save :save_version
 
   def update_version
     if (changes.keys & %w(tasks grouped pairwise prioritized)).present?
@@ -78,12 +79,6 @@ class Workflow < ActiveRecord::Base
 
     if changes.include? :strings
       self.minor_version += 1
-    end
-  end
-
-  def save_version
-    if (changes.keys & %w(tasks grouped pairwise prioritized strings)).present?
-      WorkflowVersion.create_from(self)
     end
   end
 

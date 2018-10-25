@@ -3,7 +3,8 @@ class TranslationSerializer
   include CachedSerializer
 
   attributes :id, :translated_id, :translated_type,
-    :language, :strings, :href, :created_at, :updated_at
+    :language, :strings, :string_versions,
+    :href, :created_at, :updated_at
 
   can_include :translated
 

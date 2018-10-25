@@ -1348,7 +1348,8 @@ CREATE TABLE public.translations (
     language character varying NOT NULL,
     strings jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    string_versions jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 
@@ -4388,4 +4389,6 @@ INSERT INTO schema_migrations (version) VALUES ('20181001154345');
 INSERT INTO schema_migrations (version) VALUES ('20181015112421');
 
 INSERT INTO schema_migrations (version) VALUES ('20181022172507');
+
+INSERT INTO schema_migrations (version) VALUES ('20181023130028');
 

@@ -13,6 +13,11 @@ class FieldGuide < ActiveRecord::Base
     %i(items)
   end
 
+  # TODO: Add Versioning to this model, and then remove this override
+  def latest_version_id
+    0
+  end
+
   def items
     super.map(&:with_indifferent_access)
   end

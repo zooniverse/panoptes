@@ -19,6 +19,10 @@ describe Workflow, type: :model do
     let(:private_model) { create(:workflow, project: private_project) }
   end
 
+  it_behaves_like "is translatable" do
+    let(:model) { create :workflow }
+  end
+
   it_behaves_like "activatable" do
     let(:activatable) { workflow }
   end
