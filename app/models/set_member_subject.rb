@@ -51,14 +51,6 @@ class SetMemberSubject < ActiveRecord::Base
     by_workflow(workflow_id).where(subject_id: retired_subject_ids)
   end
 
-  # THIS can be removed after https://github.com/zooniverse/Panoptes/pull/2805
-  def self.seen_for_user_by_workflow(user_id, workflow_id)
-    all_sms = all_sms_for_user_by_workflow(user_id, workflow_id)
-    seen_smses = all_sms.where("seen_subject_ids.subject_id IS NOT NULL")
-
-    by_workflow(workflow_id).merge(seen_smses)
-  end
-
   # Be careful using this query as it's not selective on a large table
   # and the LEFT OUTER JOIN can take a long time to resolve
   #

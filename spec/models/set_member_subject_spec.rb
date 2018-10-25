@@ -162,24 +162,6 @@ describe SetMemberSubject, :type => :model do
         end
       end
     end
-
-    describe ":seen_for_user_by_workflow" do
-      context "when the user has not seen any workflow subjects" do
-        let(:subject_ids) { [] }
-
-        it "should return the all the worflow set_member_subjects" do
-          expect(SetMemberSubject.seen_for_user_by_workflow(user, workflow)).to be_empty
-        end
-      end
-
-      context "when the user has seen all the workflow subjects" do
-        let(:subject_ids) { [smses.map(&:subject_id)] }
-
-        it "should return an empty set" do
-          expect(SetMemberSubject.seen_for_user_by_workflow(user, workflow)).to match_array(smses)
-        end
-      end
-    end
   end
 
   describe "#subject_set" do
