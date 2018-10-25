@@ -20,7 +20,11 @@ RSpec.describe Subjects::PostgresqlSelection do
       uploader = create(:user)
       created_workflow = create(:workflow_with_subject_sets)
       create_list(:subject, sms_count, project: created_workflow.project, uploader: uploader).each do |subject|
-        create(:set_member_subject, subject: subject, subject_set: created_workflow.subject_sets.first)
+        create(:set_member_subject,
+          setup_subject_workflow_statuses: true,
+          subject: subject,
+          subject_set: created_workflow.subject_sets.first
+        )
       end
     end
 
