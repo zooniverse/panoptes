@@ -20,7 +20,7 @@ shared_examples "has content" do
 
   describe "#available_languages" do
     it "should return a list of available languages" do
-      expect(translatable.available_languages).to include('en-gb')
+      expect(translatable.available_languages).to include('en')
     end
   end
 end

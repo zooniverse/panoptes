@@ -10,7 +10,7 @@ FactoryBot.define do
     user_count { 10 + rand(1000) }
     activated_state Project.activated_states[:active]
     configuration { { x: "y", z: "q" } }
-    primary_language "en-gb"
+    primary_language "en"
     private false
     launch_approved true
     launched_row_order_position { rand(0..100).to_i }

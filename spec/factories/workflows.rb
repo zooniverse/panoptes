@@ -52,7 +52,7 @@ FactoryBot.define do
     pairwise false
     grouped false
     prioritized false
-    primary_language 'en-gb'
+    primary_language 'en'
     project
     retired_set_member_subjects_count 0
     subject_selection_strategy "builtin"

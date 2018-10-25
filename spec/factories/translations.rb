@@ -20,7 +20,7 @@ FactoryBot.define do
     })
 
     association :translated, factory: :project
-    language "en-GB"
+    language "en"
 
     factory :workflow_translation do
       strings({
