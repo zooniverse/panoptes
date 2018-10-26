@@ -17,8 +17,7 @@ RSpec.describe UnfinishWorkflowWorker do
       end
 
       it "should touch the updated_at timestamp" do
-        workflow.updated_at = Time.now - 1.hour
-        workflow.save!
+        workflow.update(updated_at: Time.now - 1.hour)
         expect { worker.perform(workflow.id) }.to change{ workflow.reload.updated_at}
       end
     end
