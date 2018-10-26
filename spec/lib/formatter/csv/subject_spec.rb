@@ -39,7 +39,9 @@ RSpec.describe Formatter::Csv::Subject do
         locations: ordered_subject_locations.to_json,
         classifications_count: 10,
         retired_at: retirement_date,
-        retirement_reason: nil
+        retirement_reason: nil,
+        created_at: subject.created_at,
+        updated_at: subject.updated_at
       }
     end
 
@@ -53,7 +55,9 @@ RSpec.describe Formatter::Csv::Subject do
         locations: ordered_subject_locations.to_json,
         classifications_count: 5,
         retired_at: nil,
-        retirement_reason: nil
+        retirement_reason: nil,
+        created_at: subject.created_at,
+        updated_at: subject.updated_at
       }
     end
 
@@ -129,7 +133,9 @@ RSpec.describe Formatter::Csv::Subject do
           locations: ordered_subject_locations.to_json,
           classifications_count: 0,
           retired_at: nil,
-          retirement_reason: nil
+          retirement_reason: nil,
+          created_at: subject.created_at,
+          updated_at: subject.updated_at
         }
       end
 
