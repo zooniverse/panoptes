@@ -9,11 +9,17 @@ RSpec.describe UnfinishWorkflowWorker do
       expect { worker.perform(workflow.id) }.not_to change{ workflow.reload.finished_at }
     end
 
-    context "with a finished worklfow" do
+    context "with a finished workflow" do
       let(:workflow) { create(:workflow, finished_at: DateTime.now) }
 
       it "should remove the finished flag if the workflow is finished" do
         expect { worker.perform(workflow.id) }.to change{ workflow.reload.finished_at }
+      end
+
+      it "should touch the updated_at timestamp" do
+        workflow.updated_at = Time.now - 1.hour
+        workflow.save!
+        expect { worker.perform(workflow.id) }.to change{ workflow.reload.updated_at}
       end
     end
   end
