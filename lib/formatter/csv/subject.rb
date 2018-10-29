@@ -10,7 +10,7 @@ module Formatter
 
       def headers
         %w(subject_id project_id workflow_id subject_set_id metadata locations
-           classifications_count retired_at retirement_reason)
+           classifications_count retired_at retirement_reason created_at updated_at)
       end
 
       def to_rows(subject)
@@ -30,7 +30,9 @@ module Formatter
             locations: locations,
             classifications_count: classifications_count(workflow_id),
             retired_at: retired_at(workflow_id),
-            retirement_reason: retirement_reason(workflow_id)
+            retirement_reason: retirement_reason(workflow_id),
+            created_at: subject_workflow_set_link.subject.created_at,
+            updated_at: subject_workflow_set_link.subject.updated_at
           )
         end
 
