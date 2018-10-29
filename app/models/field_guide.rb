@@ -1,6 +1,7 @@
 class FieldGuide < ActiveRecord::Base
   include Translatable
   include LanguageValidation
+  include Unversioned
 
   belongs_to :project
   has_many :attached_images, -> { where(type: "field_guide_attached_image") },
@@ -11,11 +12,6 @@ class FieldGuide < ActiveRecord::Base
 
   def self.translatable_attributes
     %i(items)
-  end
-
-  # TODO: Add Versioning to this model, and then remove this override
-  def latest_version_id
-    0
   end
 
   def items
