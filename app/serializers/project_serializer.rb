@@ -53,12 +53,10 @@ class ProjectSerializer
   end
 
   def self.paging_scope(params, scope, context)
-    preload_relations = preloads | param_preloads(params)
-
     if context[:cards]
       scope.preload(:avatar)
-    elsif !preload_relations.empty?
-      scope.preload(*preload_relations)
+    else
+      super(params, scope, context)
     end
   end
 
