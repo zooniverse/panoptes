@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'active_interaction', '~> 3.6.2'
 gem 'active_model_serializers', '0.10.0.rc2' # Event stream
 gem 'active_record_union', '~> 1.3.0'
-gem 'activerecord-import', '~> 0.26'
+gem 'activerecord-import', '~> 0.27'
 gem 'aws-sdk', '~> 2.10'
 gem "cellect-client", '~> 3.0.2'
 gem 'dalli-elasticache'
