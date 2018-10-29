@@ -11,7 +11,7 @@ describe ProjectSerializer do
     s
   end
 
-  it "should preload the serialized associations ny default" do
+  it "should preload the serialized associations by default" do
     expect_any_instance_of(Project::ActiveRecord_Relation)
       .to receive(:preload)
       .with(*ProjectSerializer.preloads)
@@ -25,6 +25,12 @@ describe ProjectSerializer do
       .with(:avatar)
       .and_call_original
     ProjectSerializer.page({}, Project.all, {cards: true})
+  end
+
+  it_should_behave_like "a panoptes restpack serializer", "test_owner_include" do
+    let(:resource) { project }
+    let(:includes) { %i(workflows active_workflows subject_sets project_roles) }
+    let(:preloads) { ProjectSerializer.preloads }
   end
 
   describe "#urls" do

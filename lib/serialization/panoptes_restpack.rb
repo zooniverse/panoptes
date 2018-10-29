@@ -46,8 +46,7 @@ module Serialization
       private
 
       def param_preloads(params)
-        return [] unless params[:include]
-        Array.wrap(params[:include].split(',').map(&:to_sym) & self.can_includes)
+        PreloadsFromIncludeParams.new(params, can_includes).extract
       end
 
       def page_href(page, options)
@@ -129,6 +128,38 @@ module Serialization
         end
 
         data
+      end
+    end
+
+    # Helper class to extract the valid preloadable relations from params
+    # and handle the special owners relation from RoleControl::Owned
+    class PreloadsFromIncludeParams
+      attr_reader :params, :allowed_includes
+
+      def initialize(params, allowed_includes)
+        @params = params
+        @allowed_includes = allowed_includes
+      end
+
+      def extract
+        return [] unless params.key?(:include)
+
+        preloads = preloads_from_params
+
+        unless preloads.include?(:owners)
+          return preloads
+        end
+
+        includable_preloads = preloads - [ :owners ]
+        includable_preloads << [ owner: { identity_membership: :user } ]
+        includable_preloads
+      end
+
+      private
+
+      def preloads_from_params
+        include_params = params[:include].split(',').map(&:to_sym)
+        Array.wrap(include_params & allowed_includes)
       end
     end
   end
