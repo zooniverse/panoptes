@@ -60,13 +60,20 @@ RSpec.describe Subjects::StrategySelection do
         end
 
         context "when the cellect client can't reach a server" do
-          it "should fall back to postgres strategy" do
-            allow(CellectClient).to receive(:get_subjects)
-              .and_raise(CellectClient::ConnectionError)
+          before do
+            allow(CellectClient)
+            .to receive(:get_subjects)
+            .and_raise(CellectClient::ConnectionError)
+          end
+
+          it "should not use the internal selector" do
             expect_any_instance_of(Subjects::PostgresqlSelection)
-              .to receive(:select)
-              .and_call_original
+              .not_to receive(:select)
             run_selection
+          end
+
+          it "should return an empty array" do
+            expect(run_selection).to match_array([])
           end
         end
       end
