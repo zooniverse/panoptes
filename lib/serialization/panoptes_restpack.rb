@@ -29,10 +29,11 @@ module Serialization
 
     module ClassMethodOverrides
       def page(params = {}, scope = nil, context = {})
-        super(params, paging_scope(params, scope), context)
+        page_scope = paging_scope(params, scope, context)
+        super(params, page_scope, context)
       end
 
-      def paging_scope(params, scope)
+      def paging_scope(params, scope, context)
         preload_relations = preloads | param_preloads(params)
 
         unless preload_relations.empty?

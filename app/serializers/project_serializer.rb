@@ -9,20 +9,6 @@ class ProjectSerializer
     introduction url_labels researcher_quote
   ).freeze
 
-  PRELOADS = [
-    :project_contents,
-    :workflows,
-    :active_workflows,
-    :subject_sets,
-    :project_roles,
-    [ owner: { identity_membership: :user } ],
-    :pages,
-    :attached_images,
-    :avatar,
-    :background,
-    :tags
-  ].freeze
-
   attributes :id, :display_name, :classifications_count,
     :subjects_count, :created_at, :updated_at, :available_languages,
     :title, :description, :introduction, :private, :retired_subjects_count,
@@ -43,26 +29,37 @@ class ProjectSerializer
   can_sort_by :launch_date, :activity, :completeness, :classifiers_count,
     :updated_at, :display_name
 
+  preload :project_contents,
+    :workflows,
+    :active_workflows,
+    :subject_sets,
+    :project_roles,
+    [ owner: { identity_membership: :user } ],
+    :pages,
+    :attached_images,
+    :avatar,
+    :background,
+    :tags
+
   def self.page(params = {}, scope = nil, context = {})
-    if params.key?("state")
-      if Project.states.include?(params["state"])
-        params["state"] = Project.states[params["state"]]
-      elsif params["state"] == "live"
-        params["live"] = true
-        params.delete("state")
-        scope = scope.where(state: nil)
-      end
+    if Project.states.include?(params["state"])
+      params["state"] = Project.states[params["state"]]
+    elsif params["state"] == "live"
+      params["live"] = true
+      params.delete("state")
     end
 
-    preloads =
-      if context[:cards]
-        :avatar
-      else
-        PRELOADS
-      end
-    scope = scope.preload(*preloads)
-
     super(params, scope, context)
+  end
+
+  def self.paging_scope(params, scope, context)
+    preload_relations = preloads | param_preloads(params)
+
+    if context[:cards]
+      scope.preload(:avatar)
+    elsif !preload_relations.empty?
+      scope.preload(*preload_relations)
+    end
   end
 
   def self.links

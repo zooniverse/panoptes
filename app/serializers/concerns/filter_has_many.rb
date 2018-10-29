@@ -17,7 +17,7 @@ module FilterHasMany
         has_many_filters(filters),
         self,
         params,
-        paging_scope(params, scope),
+        paging_scope(params, scope, context),
         context
       )
 
