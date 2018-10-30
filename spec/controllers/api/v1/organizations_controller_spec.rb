@@ -33,7 +33,7 @@ describe Api::V1::OrganizationsController, type: :controller do
     end
   end
 
-  describe "when a logged in user" do
+  describe "with a logged in user" do
     describe "#index" do
       it_behaves_like "is indexable" do
         let(:private_resource) { unlisted_organization }
@@ -151,14 +151,12 @@ describe Api::V1::OrganizationsController, type: :controller do
         end
       end
 
-      it_behaves_like "it syncs the resource translation strings" do
+      it_behaves_like "it syncs the resource translation strings", non_translatable_attributes_possible: false do
         let(:translated_klass_name) { Organization.name }
         let(:translated_resource_id) { be_kind_of(Integer) }
-        let(:translated_language) do
-          create_params.dig(:organizations, :primary_language)
-        end
+        let(:translated_language) { create_params.dig(:organizations, :primary_language) }
         let(:controller_action) { :create }
-        let(:controller_action_params) { create_params }
+        let(:translatable_action_params) { create_params }
       end
     end
 
@@ -200,7 +198,8 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:translated_resource_id) { resource.id }
         let(:translated_language) { resource.primary_language }
         let(:controller_action) { :update }
-        let(:controller_action_params) { update_params.merge(id: resource.id) }
+        let(:translatable_action_params) { update_params.merge(id: resource.id) }
+        let(:non_translatable_action_params) { {id: resource.id, organizations: {listed: true}} }
       end
 
       context "includes exceptional parameters" do

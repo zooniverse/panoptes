@@ -9,11 +9,15 @@ module SyncResourceTranslationStrings
 
   def sync_translatable_resource_strings
     translatable_resources.each do |resource|
-      TranslationSyncWorker.perform_async(
-        resource.class.name,
-        resource.id,
-        resource.translatable_language
-      )
+      # NOTE: In Rails 5 this method is deprecated, and we should use
+      # resource.saved_changes instead.
+      if (resource.previous_changes.keys & resource.class.translatable_attributes.map(&:to_s)).present?
+        TranslationSyncWorker.perform_async(
+          resource.class.name,
+          resource.id,
+          resource.translatable_language
+        )
+      end
     end
   end
 
