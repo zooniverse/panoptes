@@ -1,5 +1,6 @@
-shared_examples "a panoptes restpack serializer" do |test_owner_include=false|
+shared_examples "a panoptes restpack serializer" do |test_owner_include=false, test_blank_links=false|
   let(:scope) { resource.class.all }
+  let(:test_link_serialization) { false }
 
   describe "preload associations" do
     around do |example|
@@ -76,6 +77,15 @@ shared_examples "a panoptes restpack serializer" do |test_owner_include=false|
           .with(*expected_includes)
           .and_call_original
           described_class.page(params, scope, {})
+        end
+      end
+    end
+
+    describe "link serialization" do
+      if !!test_blank_links
+        it "should include all link keys even if blank" do
+          result_links = described_class.single({}, scope, {})[:links]
+          expect(result_links.keys).to match_array(expected_links)
         end
       end
     end
