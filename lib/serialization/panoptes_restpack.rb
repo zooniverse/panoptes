@@ -122,8 +122,8 @@ module Serialization
                           end
                         end
 
-          # PATCH: Compared to the original, deleted an `if links_value.present?`
-          # clause around this next line:
+          # https://github.com/zooniverse/restpack_serializer/blob/a0c2bc4725dbdd86783f09c88054280e110da752/lib/restpack_serializer/serializable.rb#L101
+          # PATCH: Compared to the original above, we now add all links even when blank
           data[:links][association.name.to_sym] = links_value
         end
 
