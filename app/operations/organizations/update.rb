@@ -25,13 +25,18 @@ module Organizations
         content_update.merge! content_params
         org_update.merge!(content_update.with_indifferent_access.except(:title, :language))
 
+        if org_update[:listed] == true
+          org_update[:listed_at] = Time.zone.now
+        else
+          org_update[:listed_at] = nil
+        end
+
         organization.update!(org_update.symbolize_keys)
+
         organization.organization_contents.find_or_initialize_by(language: language).tap do |content|
           content.update! content_update.symbolize_keys
         end
-        org_update[:listed] == true ? organization.touch(:listed_at) : organization[:listed_at] = nil
 
-        organization.save!
         organization
       end
     end
