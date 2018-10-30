@@ -18,8 +18,11 @@ module SyncResourceTranslationStrings
   end
 
   def translatable_resources
-    if action_name == "create"
+    case action_name
+    when "create"
       created_resources
+    when "update"
+      updated_resources
     else
       controlled_resources
     end
