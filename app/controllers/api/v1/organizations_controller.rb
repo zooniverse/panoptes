@@ -39,7 +39,7 @@ class Api::V1::OrganizationsController < Api::ApiController
   end
 
   def update
-    Organization.transaction(requires_new: true) do
+    @updated_resources = Organization.transaction(requires_new: true) do
       Array.wrap(resource_ids).zip(Array.wrap(params[:organizations])).map do |organization_id, organization_params|
         wrapper = { organization_params: organization_params }
         Organizations::Update.with(api_user: api_user, id: organization_id).run!(wrapper)

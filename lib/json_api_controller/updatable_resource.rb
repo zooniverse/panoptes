@@ -9,20 +9,18 @@ module JsonApiController
     end
 
     def update
-      resource_class.transaction(requires_new: true) do
-        resources_with_updates = controlled_resources.zip(
-          Array.wrap(update_params)
-        )
-        resources_with_updates.each do |resource, update_hash|
-          resource.assign_attributes(
-            build_update_hash(update_hash, resource)
-          )
+      @updated_resources = resource_class.transaction(requires_new: true) do
+        resources_with_updates = controlled_resources.zip(Array.wrap(update_params))
+        resources_with_updates.map do |resource, update_hash|
+          resource.assign_attributes(build_update_hash(update_hash, resource))
 
           yield resource if block_given?
 
           resource.save!
+          resource
         end
       end
+
       updated_resource_response
     end
 
@@ -75,6 +73,10 @@ module JsonApiController
 
     def relation
       params[:link_relation].to_sym
+    end
+
+    def updated_resources
+      @updated_resources
     end
   end
 end

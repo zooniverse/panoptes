@@ -149,14 +149,12 @@ describe Api::V1::ProjectPagesController, type: :controller do
       expect(json_response[api_resource_name][0]["links"]["project"]).to eq(project.id.to_s)
     end
 
-    it_behaves_like "it syncs the resource translation strings" do
+    it_behaves_like "it syncs the resource translation strings", non_translatable_attributes_possible: false do
       let(:translated_klass_name) { ProjectPage.name }
       let(:translated_resource_id) { be_kind_of(Integer) }
-      let(:translated_language) do
-        create_params.dig(:project_pages, :language)
-      end
+      let(:translated_language) { create_params.dig(:project_pages, :language) }
       let(:controller_action) { :create }
-      let(:controller_action_params) { create_params }
+      let(:translatable_action_params) { create_params }
     end
   end
 
@@ -179,7 +177,8 @@ describe Api::V1::ProjectPagesController, type: :controller do
       let(:translated_resource_id) { resource.id }
       let(:translated_language) { resource.language }
       let(:controller_action) { :update }
-      let(:controller_action_params) { update_params.merge(id: resource.id) }
+      let(:translatable_action_params) { update_params.merge(id: resource.id) }
+      let(:non_translatable_action_params) { {project_id: project.id, id: resource.id, project_pages: {url_key: "foo"}} }
     end
   end
 
