@@ -27,7 +27,7 @@ You can use Postman, PAW, CURL or one of our official Zooniverse libraries to au
 -----
 There are multiple ways to get an OAuth bearer token from our authentication system, we support most of the oAuth grant types to convert credentials to a token. However our system restricts non-vetted apps from using particular flows, e.g. password (mostly to stop phishing sites harvesting our user credentials).
 
-The easiest to get started with is to use OAuth and the client credentials oAuth flow. Todo do this you will need an oAuth application with our system. You can set one up at  https://signin.zooniverse.org/oAuth/applications/new
+The easiest to get started with is to use OAuth and the client credentials oAuth flow. To do this you will need an oAuth application with our system. You can set one up at  https://signin.zooniverse.org/oAuth/applications/new
 
 Complete the form like the image below:
 ![oAuth Application](images/oauth_application.png)
