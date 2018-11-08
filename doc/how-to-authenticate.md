@@ -32,7 +32,7 @@ The easiest to get started with is to use OAuth and the client credentials oAuth
 Complete the form like the image below:
 ![oAuth Application](images/oauth_application.png)
 
-Tick all the resource scopes you'll be needing access to (start with all). Once setup note your client id and secret for that app and that this app will be linked to your user account. It is **imperative that you do not share the oAuth application secret** as it can gain access to your Zooniverse account as if you were using the system.
+Tick all the resource scopes you'll be needing access to (start with all). Once setup note your client ID and secret for that app and that this app will be linked to your user account. It is **imperative that you do not share the oAuth application secret** as it can gain access to your Zooniverse account as if you were using the system.
 
 There are other oAuth flows that can be used to get bearer tokens, please [email contact@zooniverse.org](mailto:contact@zooniverse.org) to find out more.
 
