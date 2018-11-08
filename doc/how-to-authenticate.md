@@ -2,7 +2,7 @@
 
 Some requests to the Zooniverse API will respond without supplied authentication details as they are public but most require an authentication token to be supplied to access our systems as a known user.
 
-This authentication token is known as a bearer token and is usually supplied as a HTTP request request `authorization` header with the header value being prefixed by `Bearer` and then the token data. E.g.
+This authentication token is known as a bearer token and is usually supplied as a HTTP `authorization` header with the value prefixed by `Bearer` and then the token data. E.g.
 ```
 authorization:"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 ```
