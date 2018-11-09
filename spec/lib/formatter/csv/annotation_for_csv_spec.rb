@@ -220,14 +220,13 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
             ]
           end
           let(:codex) do
-            { "task"=>"T3", "task_label"=>nil, "value"=>[{:error=>"task cannot be exported"}] }
+            { "task"=>"T3", "task_label"=>nil, "value"=>[0] }
           end
 
-          it 'should add the error value' do
+          it 'should output the raw value wrapped in an array' do
             formatted = described_class.new(new_classification, combo_annotation, combo_cache).to_h
             expect(formatted).to eq(codex)
           end
-
         end
       end
 
