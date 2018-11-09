@@ -83,7 +83,7 @@ module Formatter
               when "dropdown"
                 dropdown(task_info)
               else
-                { error: "task cannot be exported" }
+                @current
               end
           end
         end
