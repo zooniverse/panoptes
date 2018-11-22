@@ -198,7 +198,7 @@ describe Workflow, type: :model do
     end
 
     it 'defaults version numbers to 1' do
-      workflow = Workflow.new(project: create(:project), display_name: "FOO", primary_language: 'en-us')
+      workflow = Workflow.new(project: create(:project), display_name: "FOO", primary_language: 'en-us', first_task: 'init')
       workflow_content = workflow.workflow_contents.build(language: 'en-us')
       workflow.save!
       expect(workflow.major_version).to eq(1)
