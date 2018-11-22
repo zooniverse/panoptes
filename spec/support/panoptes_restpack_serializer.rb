@@ -62,21 +62,30 @@ shared_examples "a panoptes restpack serializer" do |test_owner_include=false, t
 
     context "with owner include params" do
       if !!test_owner_include
-        let(:params) do
-          param_includes = (includes | ["owners"]).join(',')
-          { include: param_includes }
-        end
-        let(:expected_includes) do
-          includes | [[ owner: { identity_membership: :user } ]]
+        before do
+          added_owner_includes = described_class.can_includes | %i(owners owner)
+          allow(described_class)
+          .to receive(:can_includes)
+          .and_return(added_owner_includes)
         end
 
-        it "should handle the special owner relation include param" do
-          expect_any_instance_of(
-            resource.class::ActiveRecord_Relation
-          ).to receive(:preload)
-          .with(*expected_includes)
-          .and_call_original
-          described_class.page(params, scope, {})
+        %i(owners owner).each do |owner_include_variant|
+          let(:params) do
+            param_includes = (includes | [owner_include_variant]).join(',')
+            { include: param_includes }
+          end
+          let(:expected_includes) do
+            includes | [[ owner: { identity_membership: :user } ]]
+          end
+
+          it "should handle the special owner relation include param" do
+            expect_any_instance_of(
+              resource.class::ActiveRecord_Relation
+            ).to receive(:preload)
+            .with(*expected_includes)
+            .and_call_original
+            described_class.page(params, scope, {})
+          end
         end
       end
     end

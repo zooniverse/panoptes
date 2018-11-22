@@ -136,6 +136,9 @@ module Serialization
     class PreloadsFromIncludeParams
       attr_reader :params, :allowed_includes
 
+      OWNER_RELATIONS = %i(owners owner).freeze
+      OWNER_PRELOAD = [ owner: { identity_membership: :user } ].freeze
+
       def initialize(params, allowed_includes)
         @params = params
         @allowed_includes = allowed_includes
@@ -145,14 +148,15 @@ module Serialization
         return [] unless params.key?(:include)
 
         preloads = preloads_from_params
+        includes_owner_relation = preloads & OWNER_RELATIONS
 
-        unless preloads.include?(:owners)
-          return preloads
+        if includes_owner_relation.empty?
+          preloads
+        else
+          includable_preloads = preloads - includes_owner_relation
+          includable_preloads << OWNER_PRELOAD
+          includable_preloads
         end
-
-        includable_preloads = preloads - [ :owners ]
-        includable_preloads << [ owner: { identity_membership: :user } ]
-        includable_preloads
       end
 
       private
