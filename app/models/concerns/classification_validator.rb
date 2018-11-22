@@ -6,7 +6,9 @@ class ClassificationValidator
 
   def validate_gold_standard
     if classification.gold_standard
-      unless project.expert_classifier?(user)
+      if user.nil?
+        add_error(:gold_standard, 'user must be logged in')
+      elsif !project.expert_classifier?(user)
         add_error(:gold_standard, 'classifier is not a project expert')
       end
     elsif classification.gold_standard == false

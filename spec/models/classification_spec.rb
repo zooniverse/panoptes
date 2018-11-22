@@ -109,6 +109,11 @@ describe Classification, :type => :model do
     context "when the gold standard value is set to true" do
       let(:gold_standard) { true }
 
+      it "should be invalid when the classification user is not supplied" do
+        classification.user = nil
+        expect(classification).to be_invalid
+      end
+
       context "when the classification user is not authorised for expert mode" do
 
         it "should not be valid" do
