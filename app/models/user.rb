@@ -357,6 +357,26 @@ class User < ActiveRecord::Base
     collections.joins(:projects).where(favorite: true, projects: {id: project_id})
   end
 
+  # REMOVE THE FOLLOWING ACCESSOR OVERRIDES AFTER COLUMN RENAMING DEPLOYS
+  # https://github.com/zooniverse/Panoptes/pull/3010
+  # Allow column rename to serialize the correct attribute
+  def intervention_notifications
+    if attributes['intervention_notifications']
+      super
+    else
+      read_attribute(:interventions)
+    end
+  end
+
+  def interventions
+    if attributes['interventions']
+      super
+    else
+      read_attribute(:intervention_notifications)
+    end
+  end
+  # REMOVE THE ABOVE ACCESSOR OVERRIDES AFTER COLUMN RENAMING DEPLOYS
+
   private
 
   def subjects_count_cache_key
