@@ -24,14 +24,14 @@ namespace :user do
     end
   end
 
-  desc "Backfill intervention_notifications field in batches (restartable)"
-  task backfill_intervention_notifications_field: :environment do
+  desc "Backfill interventions field in batches (restartable)"
+  task backfill_interventions_field: :environment do
     User.select(:id).find_in_batches do |users|
       non_backfilled_users = User.where(
         id: users.map(&:id),
-        intervention_notifications: nil
+        interventions: nil
       )
-      non_backfilled_users.update_all(intervention_notifications: true)
+      non_backfilled_users.update_all(interventions: true)
     end
   end
 

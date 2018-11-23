@@ -501,7 +501,7 @@ describe Api::V1::UsersController, type: :controller do
       let(:new_pec) { false }
       let(:new_bec) { false }
       let(:new_ux_testing) { false }
-      let(:new_intervention_notifications) { false }
+      let(:new_interventions) { false }
       let(:put_operations) do
         {
           users: {
@@ -510,7 +510,7 @@ describe Api::V1::UsersController, type: :controller do
             project_email_communication: new_pec,
             beta_email_communication: new_bec,
             ux_testing_email_communication: new_ux_testing,
-            intervention_notifications: new_intervention_notifications
+            interventions: new_interventions
           }
         }
       end
@@ -539,8 +539,8 @@ describe Api::V1::UsersController, type: :controller do
         expect(user.reload.ux_testing_email_communication).to eq(new_bec)
       end
 
-      it "should have updated the intervention notifications attribute" do
-        expect(user.reload.intervention_notifications).to eq(new_bec)
+      it "should have updated the interventions attribute" do
+        expect(user.reload.interventions).to eq(new_bec)
       end
 
       it "should have a single group" do
