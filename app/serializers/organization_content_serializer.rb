@@ -1,5 +1,5 @@
 class OrganizationContentSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
 
   attributes :id, :language, :title, :description, :introduction, :announcement, :href
 

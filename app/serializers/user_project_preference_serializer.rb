@@ -1,5 +1,5 @@
 class UserProjectPreferenceSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include CachedSerializer
 
   attributes :id, :email_communication, :preferences, :href,

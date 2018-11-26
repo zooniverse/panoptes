@@ -1,5 +1,5 @@
 class TagSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
 
   attributes :id, :href, :created_at, :updated_at, :popularity, :name
 

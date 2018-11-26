@@ -1,5 +1,5 @@
 class WorkflowVersionSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include CachedSerializer
 
   attributes :id, :href, :created_at, :updated_at,

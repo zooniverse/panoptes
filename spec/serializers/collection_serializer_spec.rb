@@ -3,9 +3,9 @@ require 'spec_helper'
 describe CollectionSerializer do
   let(:collection) { create(:collection_with_subjects) }
 
-  it_should_behave_like "a panoptes restpack serializer" do
+  it_should_behave_like "a panoptes restpack serializer", "test_owner_include" do
     let(:resource) { collection }
-    let(:includes) { [ :owner, :collection_roles, :subjects ] }
+    let(:includes) { %i(collection_roles subjects projects) }
     let(:preloads) do
       [
         [ owner: { identity_membership: :user } ],

@@ -1,5 +1,5 @@
 class ProjectContentSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include CachedSerializer
 
   attributes :id, :language, :title, :description, :introduction,

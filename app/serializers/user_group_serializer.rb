@@ -1,5 +1,5 @@
 class UserGroupSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include RecentLinkSerializer
   include CachedSerializer
 

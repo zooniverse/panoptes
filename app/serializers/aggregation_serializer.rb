@@ -1,5 +1,5 @@
 class AggregationSerializer
-  include RestPack::Serializer
+  include Serialization::PanoptesRestpack
   include CachedSerializer
 
   attributes :id, :created_at, :updated_at, :aggregation, :href

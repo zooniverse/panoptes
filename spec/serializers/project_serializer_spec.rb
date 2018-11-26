@@ -11,10 +11,10 @@ describe ProjectSerializer do
     s
   end
 
-  it "should preload the serialized associations ny default" do
+  it "should preload the serialized associations by default" do
     expect_any_instance_of(Project::ActiveRecord_Relation)
       .to receive(:preload)
-      .with(*ProjectSerializer::PRELOADS)
+      .with(*ProjectSerializer.preloads)
       .and_call_original
     ProjectSerializer.page({}, Project.all, {})
   end
@@ -25,6 +25,16 @@ describe ProjectSerializer do
       .with(:avatar)
       .and_call_original
     ProjectSerializer.page({}, Project.all, {cards: true})
+  end
+
+  it_should_behave_like "a panoptes restpack serializer", "test_owner_include", "test_blank_links" do
+    let(:resource) { project }
+    let(:includes) { %i(workflows active_workflows subject_sets project_roles) }
+    let(:preloads) { ProjectSerializer.preloads }
+    let(:expected_links) do
+      non_owners_includes = described_class.can_includes - [:owners]
+      non_owners_includes | [:owner] | described_class.media_links
+    end
   end
 
   describe "#urls" do
@@ -54,19 +64,19 @@ describe ProjectSerializer do
       end
 
       it 'includes filtered projects' do
-        results = described_class.page({"state" => "paused"}, Project)
+        results = described_class.page({"state" => "paused"}, Project.all)
         expect(results[:projects].map { |p| p[:id] }).to include(paused_project.id.to_s)
         expect(results[:projects].count).to eq(1)
       end
 
       it 'includes non-enum states' do
-        results = described_class.page({"state" => "live"}, Project)
+        results = described_class.page({"state" => "live"}, Project.all)
         expect(results[:projects].map { |p| p[:id] }).to include(live_project.id.to_s)
         expect(results[:projects].count).to eq(1)
       end
 
       it 'does not include projects with a state, even if live' do
-        results = described_class.page({"state" => "live"}, Project)
+        results = described_class.page({"state" => "live"}, Project.all)
         expect(results[:projects].map { |p| p[:id] }).not_to include(paused_live_project.id.to_s)
         expect(results[:projects].map { |p| p[:id] }).not_to include(paused_project.id.to_s)
       end
