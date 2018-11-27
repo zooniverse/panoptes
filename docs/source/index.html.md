@@ -10,6 +10,7 @@ toc_footers:
 
 includes:
   - authentication
+  - users
 
 search: true
 ---
