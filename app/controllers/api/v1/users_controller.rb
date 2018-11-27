@@ -16,7 +16,7 @@ class Api::V1::UsersController < Api::ApiController
    :global_email_communication, :project_email_communication,
    :beta_email_communication, :languages, :subject_limit, :upload_whitelist,
    :banned, :valid_email, :ux_testing_email_communication,
-   :intervention_notifications
+   :interventions, :intervention_notifications
 
   alias_method :user, :controlled_resource
 
