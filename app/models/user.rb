@@ -360,16 +360,32 @@ class User < ActiveRecord::Base
   # REMOVE THE FOLLOWING ACCESSOR OVERRIDES AFTER COLUMN RENAMING DEPLOYS
   # https://github.com/zooniverse/Panoptes/pull/3010
   # Allow column rename to serialize the correct attribute
+  def intervention_notifications=(value)
+    if attributes.key?('intervention_notifications')
+      super(value)
+    else
+      write_attribute(:interventions, value)
+    end
+  end
+
   def intervention_notifications
-    if attributes['intervention_notifications']
+    if attributes.key?('intervention_notifications')
       super
     else
       read_attribute(:interventions)
     end
   end
 
+  def interventions=(value)
+    if attributes.key?('interventions')
+      super(value)
+    else
+      write_attribute(:intervention_notifications, value)
+    end
+  end
+
   def interventions
-    if attributes['interventions']
+    if attributes.key?('interventions')
       super
     else
       read_attribute(:intervention_notifications)
