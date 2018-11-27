@@ -9,6 +9,26 @@ pipeline {
   }
 
   stages {
+    stage('Update documentation site') {
+      agent {
+        dockerfile {
+          filename 'Dockerfile.docs'
+          args "-v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -v /etc/shadow:/etc/shadow:ro -u root"
+        }
+      }
+
+      steps {
+        sh "git config remote.origin.url git@github.com:zooniverse/panoptes.git"
+        sh "ls -al /src"
+        sh "whoami"
+        sh "touch /src/foobar"
+        sh "ls -al /src"
+        sshagent(credentials: ["cd5582ce-30e3-49bb-8b04-a1a5d1ff7b56"]) {
+          sh "cd /src/docs && ls -al && ./deploy.sh"
+        }
+      }
+    }
+
     stage('Build Docker image') {
       agent any
       steps {
