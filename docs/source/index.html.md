@@ -10,6 +10,7 @@ toc_footers:
 
 includes:
   - authentication
+  - json_api
   - users
 
 search: true
