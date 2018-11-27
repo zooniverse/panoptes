@@ -18,11 +18,9 @@ pipeline {
       }
 
       steps {
-        sh "git config remote.origin.url git@github.com:zooniverse/panoptes.git"
-        sh "ls -al /src"
-        sh "whoami"
-        sh "touch /src/foobar"
-        sh "ls -al /src"
+        sh "cd /src/docs && git config remote.origin.url git@github.com:zooniverse/panoptes.git"
+        sh "cd /src/docs && git config --global user.email jenkins@zooniverse.org"
+        sh "cd /src/docs && git config --global user.name Zooniverse Jenkins"
         sshagent(credentials: ["cd5582ce-30e3-49bb-8b04-a1a5d1ff7b56"]) {
           sh "cd /src/docs && ls -al && ./deploy.sh"
         }
