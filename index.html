@@ -225,19 +225,36 @@
             <a href="#authentication" class="toc-h1 toc-link" data-title="Authentication">Authentication</a>
           </li>
           <li>
+            <a href="#json-api-conventions" class="toc-h1 toc-link" data-title="JSON-API conventions">JSON-API conventions</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#resource-s-themselves" class="toc-h2 toc-link" data-title="JSON-API conventions">Resource(s) themselves</a>
+                  </li>
+                  <li>
+                    <a href="#links" class="toc-h2 toc-link" data-title="JSON-API conventions">Links</a>
+                  </li>
+                  <li>
+                    <a href="#collections" class="toc-h2 toc-link" data-title="JSON-API conventions">Collections</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#users" class="toc-h1 toc-link" data-title="Users">Users</a>
               <ul class="toc-list-h2">
                   <li>
                     <a href="#user-resource" class="toc-h2 toc-link" data-title="Users">User resource</a>
                   </li>
                   <li>
-                    <a href="#get-users-id" class="toc-h2 toc-link" data-title="Users">GET /users/{id}</a>
+                    <a href="#list-users-users-page-page_size-sort-include" class="toc-h2 toc-link" data-title="Users">List Users [/users{?page,page_size,sort,include}]</a>
                   </li>
                   <li>
-                    <a href="#users-collection-users-page-page_size-sort-include" class="toc-h2 toc-link" data-title="Users">Users Collection [/users{?page,page_size,sort,include}]</a>
+                    <a href="#retrieve-a-single-user" class="toc-h2 toc-link" data-title="Users">Retrieve a single user</a>
                   </li>
                   <li>
-                    <a href="#get-users" class="toc-h2 toc-link" data-title="Users">GET /users</a>
+                    <a href="#edit-a-single-user-put" class="toc-h2 toc-link" data-title="Users">Edit a single User [PUT]</a>
+                  </li>
+                  <li>
+                    <a href="#destroy-a-single-user-delete" class="toc-h2 toc-link" data-title="Users">Destroy a single User [DELETE]</a>
                   </li>
               </ul>
           </li>
@@ -257,9 +274,98 @@ the <em>subject</em> based on a defined <em>workflow</em> for the <em>subject</e
 <h1 id='authentication'>Authentication</h1>
 <p>Panoptes API provides an OAuth 2.0 authentication mechanism. (TODO: Describe
 Authentication Workflow).</p>
-<h1 id='users'>Users</h1>
+<h1 id='json-api-conventions'>JSON-API conventions</h1><h2 id='resource-s-themselves'>Resource(s) themselves</h2><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"users"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
+    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">}],</span><span class="w">
+  </span><span class="err">...</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>If you request a resource, you will find the results under a top-level key with
+the plural name of the resource. So for instance, if you a single specific user,
+you will find the user record under the <code>users</code> key. The value under this will
+always be an array. If you requested a single specific resource (usually by
+passing in its <code>id</code>), you can rely on this being an array with at most one element.</p>
+<h2 id='links'>Links</h2><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
+    </span><span class="err">...</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">123</span><span class="p">],</span><span class="w">
+      </span><span class="s2">"avatar"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/123/avatar"</span><span class="p">,</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"avatars"</span><span class="p">},</span><span class="w">
+      </span><span class="err">...</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"projects.workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows?project_id={projects.id}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"projects.avatar"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/{projects.id}/avatar"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"media"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Any resource returned will specify a list of linked resources under its <code>links</code>
+attribute. Definition on where to request those linked resources can be found
+under the top-level <code>links</code> key (as opposed to the per-resource <code>links</code>).</p>
+<h2 id='collections'>Collections</h2>
+<p>When requesting a collection of resources, rather than a single resource, the
+response will include a top-level <code>meta</code> key. For performance reasons, results
+are returned in pages. You can use the data under the <code>meta</code> key to
+automatically navigate these paginated results.</p>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+  </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users?page_size=2"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users?page=14page_size=2"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users?page=2&amp;page_size=2"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users?page=14&amp;page_size=2"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h1 id='users'>Users</h1>
 <p>Resources related to <em>Panoptes Users</em>.</p>
-<h2 id='user-resource'>User resource</h2>
+<h2 id='user-resource'>User resource</h2><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"users"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
+        </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2014-03-20T00:15:47Z"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2013-09-30T10:20:32Z"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"credited_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Dr. Stuart Lynn"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"login"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stuart"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Stuart"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"owner_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stuart"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stuart@zoooniverse.org"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"zooniverse_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123432"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"classifications_count"</span><span class="p">:</span><span class="w"> </span><span class="s2">"104"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"languages"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"en-gb"</span><span class="p">,</span><span class="w"> </span><span class="s2">"es-mx"</span><span class="p">]</span><span class="w">
+    </span><span class="p">}],</span><span class="w">
+    </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"users.projects"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects?owner={users.owner_name}"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"users.user_groups"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/user_groups?user_id={users.id}"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user_groups"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"users.subjects"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects?user_id={users.id}"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"subjects"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"users.collections"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/collections?owner={users.owner_name}"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"collections"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
 <p>A User is representation of the identity and contributions of a volunteer.</p>
 <h3 id='attributes'>Attributes</h3>
 <table><thead>
@@ -337,7 +443,20 @@ requesting user.</p>
 <li>subjects</li>
 <li>collections</li>
 </ul>
-<h2 id='get-users-id'>GET /users/{id}</h2>
+<h2 id='list-users-users-page-page_size-sort-include'>List Users [/users{?page,page_size,sort,include}]</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/users</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre><h3 id='parameters'>Parameters</h3>
+<ul>
+<li>page (optional, integer) ... index of the collection page, 1 is default</li>
+<li>page_size (optional, integer) ... number of items on a page. 20 is default</li>
+<li>sort (optional, string) ... fields to sort collection by. id is default</li>
+<li>include (optional, string) ... comma separated list of linked resources to include</li>
+</ul>
+<h2 id='retrieve-a-single-user'>Retrieve a single user</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/users/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -353,60 +472,21 @@ requesting user.</p>
 <td>ID of the User as an integer key</td>
 </tr>
 </tbody></table>
-<h3 id='retrieve-a-single-user-get'>Retrieve a single User [GET]</h3><pre class="highlight http tab-http"><code><span class="err">GET /api/users/1
+<h2 id='edit-a-single-user-put'>Edit a single User [PUT]</h2><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/users/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
-Accept: application/vnd.api+json; version=1
-Content-Type: application/json
-</span></code></pre>
-<blockquote>
-<p>Response</p>
-</blockquote>
-<pre class="highlight http tab-http"><code><span class="err">{
-    "users": [{
-        "id": 1,
-        "created_at": "2014-03-20T00:15:47Z",
-        "updated_at": "2013-09-30T10:20:32Z",
-        "credited_name": "Dr. Stuart Lynn",
-        "login": "stuart",
-        "display_name": "Stuart",
-        "owner_name": "stuart",
-        "email": "stuart@zoooniverse.org",
-        "zooniverse_id": "123432",
-        "classifications_count": "104",
-        "languages": ["en-gb", "es-mx"]
-    }],
-    "links": {
-        "users.projects": {
-            "href": "/projects?owner={users.owner_name}",
-            "type": "projects"
-        },
-        "users.user_groups": {
-            "href": "/user_groups?user_id={users.id}",
-            "type": "user_groups"
-        },
-        "users.subjects": {
-            "href": "/subjects?user_id={users.id}",
-            "type": "subjects"
-        },
-        "users.collections": {
-            "href": "/collections?owner={users.owner_name}",
-            "type": "collections"
-        }
-    }
-}
-</span></code></pre><h3 id='edit-a-single-user-put'>Edit a single User [PUT]</h3><pre class="highlight http tab-http"><code><span class="err">Accept: application/vnd.api+json; version=1
-Content-Type: application/json
-
-{
-    "users": {
-        "credited_name": "Dr. Stuart Lynn, DDS"
-    }
-}
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"users"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"credited_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Dr. Stuart Lynn, DDS"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>The currently logged in User may edit their record by sending a
 partial representation of the resource including their changes. A User
 cannot edit linked resources.</p>
-<h3 id='destroy-a-single-user-delete'>Destroy a single User [DELETE]</h3>
+<h2 id='destroy-a-single-user-delete'>Destroy a single User [DELETE]</h2><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/users/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</code></pre>
 <p>The current logged in User may delete themself. This does not fully
 remove the user resource; instead, it deactivates their projects
 and removes personally identifying information including the
@@ -414,91 +494,6 @@ and removes personally identifying information including the
 
 <ul>
 <li>Response 204</li>
-</ul>
-<h2 id='users-collection-users-page-page_size-sort-include'>Users Collection [/users{?page,page_size,sort,include}]</h2>
-<p>Collection of all Users</p>
-
-<p>User resources are included a an array under the <em>users</em> key</p>
-
-<ul>
-<li><p>Model</p>
-
-<p>JSON-API formatted respresentation of the Users collection</p>
-
-<ul>
-<li><p>Headers</p>
-
-<p>Accept: application/vnd.api+json; version=1
-    Content-Type: application/json</p></li>
-<li><p>Body</p>
-
-<p>{
-        &quot;links&quot;: {
-            &quot;users.projects&quot;: {
-                &quot;href&quot;: &quot;/projects?owner={users.owner_name}&quot;,
-                &quot;type&quot;: &quot;projects&quot;
-            },
-            &quot;users.user_groups&quot;: {
-                &quot;href&quot;: &quot;/user_groups?user_id={users.id}&quot;,
-                &quot;type&quot;: &quot;user_groups&quot;
-            },
-            &quot;users.subjects&quot;: {
-                &quot;href&quot;: &quot;/subjects?user_id={users.id}&quot;,
-                &quot;type&quot;: &quot;subjects&quot;
-            },
-            &quot;users.collections&quot;: {
-                &quot;href&quot;: &quot;/collections?owner={users.owner_name}&quot;,
-                &quot;type&quot;: &quot;collections&quot;
-            }
-        },
-        &quot;meta&quot;: {
-            &quot;users&quot;: {
-                &quot;page&quot;: 1,
-                &quot;page_size&quot;: 2,
-                &quot;count&quot;: 28,
-                &quot;include&quot;: [],
-                &quot;page_count&quot;: 14,
-                &quot;previous_page&quot;: 14,
-                &quot;next_page&quot;: 2,
-                &quot;first_href&quot;: &quot;/users?page_size=2&quot;,
-                &quot;previous_href&quot;: &quot;/users?page=14page_size=2&quot;,
-                &quot;next_href&quot;: &quot;/users?page=2&amp;page_size=2&quot;,
-                &quot;last_href&quot;: &quot;/users?page=14&amp;page_size=2&quot;
-            }
-        },
-        &quot;users&quot;: [{
-            &quot;id&quot;: 1,
-            &quot;created_at&quot;: &quot;2014-03-20T00:15:47Z&quot;,
-            &quot;updated_at&quot;: &quot;2013-09-30T10:20:32Z&quot;,
-            &quot;created_name&quot;: &quot;Dr. Stuart Lynn&quot;,
-            &quot;login&quot;: &quot;stuart&quot;,
-            &quot;display_name&quot;: &quot;Stuart&quot;,
-            &quot;email&quot;: &quot;stuart@zoooniverse.org&quot;,
-            &quot;zooniverse_id&quot;: &quot;123432&quot;,
-            &quot;classifications_count&quot;: &quot;104&quot;,
-            &quot;languages&quot;: [&quot;en-gb&quot;, &quot;es-mx&quot;],
-        },
-        {
-            &quot;id&quot;: 2,
-            &quot;created_at&quot;: &quot;2014-03-20T00:15:47Z&quot;,
-            &quot;updated_at&quot;: &quot;2013-09-30T10:20:32Z&quot;,
-            &quot;created_name&quot;: &quot;Dr. Stuart Lynn&quot;,
-            &quot;login&quot;: &quot;stuart&quot;,
-            &quot;display_name&quot;: &quot;Stuart&quot;,
-            &quot;email&quot;: &quot;stuart@zoooniverse.org&quot;,
-            &quot;zooniverse_id&quot;: &quot;123432&quot;,
-            &quot;classifications_count&quot;: &quot;104&quot;,
-            &quot;languages&quot;: [&quot;en-gb&quot;, &quot;es-mx&quot;],
-        }]
-    }</p></li>
-</ul></li>
-</ul>
-<h2 id='get-users'>GET /users</h2><h3 id='parameters'>Parameters</h3>
-<ul>
-<li>page (optional, integer) ... index of the collection page, 1 is default</li>
-<li>page_size (optional, integer) ... number of items on a page. 20 is default</li>
-<li>sort (optional, string) ... fields to sort collection by. id is default</li>
-<li>include (optional, string) ... comma separated list of linked resources to include</li>
 </ul>
 
       </div>
