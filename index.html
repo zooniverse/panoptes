@@ -224,6 +224,23 @@
           <li>
             <a href="#authentication" class="toc-h1 toc-link" data-title="Authentication">Authentication</a>
           </li>
+          <li>
+            <a href="#users" class="toc-h1 toc-link" data-title="Users">Users</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#user-resource" class="toc-h2 toc-link" data-title="Users">User resource</a>
+                  </li>
+                  <li>
+                    <a href="#get-users-id" class="toc-h2 toc-link" data-title="Users">GET /users/{id}</a>
+                  </li>
+                  <li>
+                    <a href="#users-collection-users-page-page_size-sort-include" class="toc-h2 toc-link" data-title="Users">Users Collection [/users{?page,page_size,sort,include}]</a>
+                  </li>
+                  <li>
+                    <a href="#get-users" class="toc-h2 toc-link" data-title="Users">GET /users</a>
+                  </li>
+              </ul>
+          </li>
       </div>
         <ul class="toc-footer">
             <li><a href='https://github.com/zooniverse/caesar/tree/master/docs/source/'>Modify documentation</a></li>
@@ -240,6 +257,249 @@ the <em>subject</em> based on a defined <em>workflow</em> for the <em>subject</e
 <h1 id='authentication'>Authentication</h1>
 <p>Panoptes API provides an OAuth 2.0 authentication mechanism. (TODO: Describe
 Authentication Workflow).</p>
+<h1 id='users'>Users</h1>
+<p>Resources related to <em>Panoptes Users</em>.</p>
+<h2 id='user-resource'>User resource</h2>
+<p>A User is representation of the identity and contributions of a volunteer.</p>
+<h3 id='attributes'>Attributes</h3>
+<table><thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>Integer</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>credited_name</td>
+<td>string</td>
+<td>If user wishes</td>
+</tr>
+<tr>
+<td>login</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>display_name</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>email</td>
+<td>string</td>
+<td>The email of the user</td>
+</tr>
+<tr>
+<td>zooniverse_id</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>classifications_count</td>
+<td>integer</td>
+<td>Number of classifications this user has made site-wide</td>
+</tr>
+<tr>
+<td>languages</td>
+<td>Array(String)</td>
+<td>Array of language identifier string, in order from most to least preferred. Used to determine which language to show translated projects in.</td>
+</tr>
+</tbody></table>
+
+<p><em>id</em>, <em>zooniverse_id</em>, <em>created_at</em>, <em>updated_at</em>, and <em>classification_count</em>
+ are created and updated by the Panoptes API. <code>credited_name</code> is the publicly
+ available name with which a volunteer will be credited on papers, posters, etc.
+ When serialized, if an <code>@</code> character is found, the user&#39;s login will be
+ returned instead for privacy reasons.</p>
+
+<p>The <em>email</em> attribute is only available if the requesting user is an
+administrator or the user resource being requested is that of the
+requesting user.</p>
+<h3 id='links'>Links</h3>
+<ul>
+<li>projects</li>
+<li>user_groups</li>
+<li>subjects</li>
+<li>collections</li>
+</ul>
+<h2 id='get-users-id'>GET /users/{id}</h2>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>integer</td>
+<td></td>
+<td>ID of the User as an integer key</td>
+</tr>
+</tbody></table>
+<h3 id='retrieve-a-single-user-get'>Retrieve a single User [GET]</h3><pre class="highlight http tab-http"><code><span class="err">GET /api/users/1
+
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+</span></code></pre>
+<blockquote>
+<p>Response</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">{
+    "users": [{
+        "id": 1,
+        "created_at": "2014-03-20T00:15:47Z",
+        "updated_at": "2013-09-30T10:20:32Z",
+        "credited_name": "Dr. Stuart Lynn",
+        "login": "stuart",
+        "display_name": "Stuart",
+        "owner_name": "stuart",
+        "email": "stuart@zoooniverse.org",
+        "zooniverse_id": "123432",
+        "classifications_count": "104",
+        "languages": ["en-gb", "es-mx"]
+    }],
+    "links": {
+        "users.projects": {
+            "href": "/projects?owner={users.owner_name}",
+            "type": "projects"
+        },
+        "users.user_groups": {
+            "href": "/user_groups?user_id={users.id}",
+            "type": "user_groups"
+        },
+        "users.subjects": {
+            "href": "/subjects?user_id={users.id}",
+            "type": "subjects"
+        },
+        "users.collections": {
+            "href": "/collections?owner={users.owner_name}",
+            "type": "collections"
+        }
+    }
+}
+</span></code></pre><h3 id='edit-a-single-user-put'>Edit a single User [PUT]</h3><pre class="highlight http tab-http"><code><span class="err">Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+
+{
+    "users": {
+        "credited_name": "Dr. Stuart Lynn, DDS"
+    }
+}
+</span></code></pre>
+<p>The currently logged in User may edit their record by sending a
+partial representation of the resource including their changes. A User
+cannot edit linked resources.</p>
+<h3 id='destroy-a-single-user-delete'>Destroy a single User [DELETE]</h3>
+<p>The current logged in User may delete themself. This does not fully
+remove the user resource; instead, it deactivates their projects
+and removes personally identifying information including the
+<em>credited_name</em> and <em>email</em> address.</p>
+
+<ul>
+<li>Response 204</li>
+</ul>
+<h2 id='users-collection-users-page-page_size-sort-include'>Users Collection [/users{?page,page_size,sort,include}]</h2>
+<p>Collection of all Users</p>
+
+<p>User resources are included a an array under the <em>users</em> key</p>
+
+<ul>
+<li><p>Model</p>
+
+<p>JSON-API formatted respresentation of the Users collection</p>
+
+<ul>
+<li><p>Headers</p>
+
+<p>Accept: application/vnd.api+json; version=1
+    Content-Type: application/json</p></li>
+<li><p>Body</p>
+
+<p>{
+        &quot;links&quot;: {
+            &quot;users.projects&quot;: {
+                &quot;href&quot;: &quot;/projects?owner={users.owner_name}&quot;,
+                &quot;type&quot;: &quot;projects&quot;
+            },
+            &quot;users.user_groups&quot;: {
+                &quot;href&quot;: &quot;/user_groups?user_id={users.id}&quot;,
+                &quot;type&quot;: &quot;user_groups&quot;
+            },
+            &quot;users.subjects&quot;: {
+                &quot;href&quot;: &quot;/subjects?user_id={users.id}&quot;,
+                &quot;type&quot;: &quot;subjects&quot;
+            },
+            &quot;users.collections&quot;: {
+                &quot;href&quot;: &quot;/collections?owner={users.owner_name}&quot;,
+                &quot;type&quot;: &quot;collections&quot;
+            }
+        },
+        &quot;meta&quot;: {
+            &quot;users&quot;: {
+                &quot;page&quot;: 1,
+                &quot;page_size&quot;: 2,
+                &quot;count&quot;: 28,
+                &quot;include&quot;: [],
+                &quot;page_count&quot;: 14,
+                &quot;previous_page&quot;: 14,
+                &quot;next_page&quot;: 2,
+                &quot;first_href&quot;: &quot;/users?page_size=2&quot;,
+                &quot;previous_href&quot;: &quot;/users?page=14page_size=2&quot;,
+                &quot;next_href&quot;: &quot;/users?page=2&amp;page_size=2&quot;,
+                &quot;last_href&quot;: &quot;/users?page=14&amp;page_size=2&quot;
+            }
+        },
+        &quot;users&quot;: [{
+            &quot;id&quot;: 1,
+            &quot;created_at&quot;: &quot;2014-03-20T00:15:47Z&quot;,
+            &quot;updated_at&quot;: &quot;2013-09-30T10:20:32Z&quot;,
+            &quot;created_name&quot;: &quot;Dr. Stuart Lynn&quot;,
+            &quot;login&quot;: &quot;stuart&quot;,
+            &quot;display_name&quot;: &quot;Stuart&quot;,
+            &quot;email&quot;: &quot;stuart@zoooniverse.org&quot;,
+            &quot;zooniverse_id&quot;: &quot;123432&quot;,
+            &quot;classifications_count&quot;: &quot;104&quot;,
+            &quot;languages&quot;: [&quot;en-gb&quot;, &quot;es-mx&quot;],
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;created_at&quot;: &quot;2014-03-20T00:15:47Z&quot;,
+            &quot;updated_at&quot;: &quot;2013-09-30T10:20:32Z&quot;,
+            &quot;created_name&quot;: &quot;Dr. Stuart Lynn&quot;,
+            &quot;login&quot;: &quot;stuart&quot;,
+            &quot;display_name&quot;: &quot;Stuart&quot;,
+            &quot;email&quot;: &quot;stuart@zoooniverse.org&quot;,
+            &quot;zooniverse_id&quot;: &quot;123432&quot;,
+            &quot;classifications_count&quot;: &quot;104&quot;,
+            &quot;languages&quot;: [&quot;en-gb&quot;, &quot;es-mx&quot;],
+        }]
+    }</p></li>
+</ul></li>
+</ul>
+<h2 id='get-users'>GET /users</h2><h3 id='parameters'>Parameters</h3>
+<ul>
+<li>page (optional, integer) ... index of the collection page, 1 is default</li>
+<li>page_size (optional, integer) ... number of items on a page. 20 is default</li>
+<li>sort (optional, string) ... fields to sort collection by. id is default</li>
+<li>include (optional, string) ... comma separated list of linked resources to include</li>
+</ul>
 
       </div>
       <div class="dark-box">
