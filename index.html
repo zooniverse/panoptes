@@ -201,7 +201,7 @@
       <script src="javascripts/all.js"></script>
   </head>
 
-  <body class="index" data-languages="[&quot;http&quot;]">
+  <body class="index" data-languages="[&quot;http&quot;,&quot;python&quot;,&quot;javascript&quot;,&quot;ruby&quot;]">
     <a href="#" id="nav-button">
       <span>
         NAV
@@ -212,6 +212,9 @@
       <img src="images/logo.png" class="logo" alt="Logo" />
         <div class="lang-selector">
               <a href="#" data-language-name="http">http</a>
+              <a href="#" data-language-name="python">python</a>
+              <a href="#" data-language-name="javascript">javascript</a>
+              <a href="#" data-language-name="ruby">ruby</a>
         </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
@@ -245,16 +248,22 @@
             <a href="#projects" class="toc-h1 toc-link" data-title="Projects">Projects</a>
               <ul class="toc-list-h2">
                   <li>
-                    <a href="#project-projects-id-include-display_name-approved-beta-live" class="toc-h2 toc-link" data-title="Projects">Project [/projects/{id}{?include,display_name,approved,beta,live}]</a>
+                    <a href="#project-links" class="toc-h2 toc-link" data-title="Projects">Project Links</a>
                   </li>
                   <li>
-                    <a href="#project-create-links-project-id-links-link_type" class="toc-h2 toc-link" data-title="Projects">Project Create Links [/project/{id}/links/{link_type}]</a>
+                    <a href="#list-all-projects" class="toc-h2 toc-link" data-title="Projects">List All Projects</a>
                   </li>
                   <li>
-                    <a href="#project-destroy-links-project-id-links-link_type-link_ids" class="toc-h2 toc-link" data-title="Projects">Project Destroy Links [/project/{id}/links/{link_type}/{link_ids}]</a>
+                    <a href="#retrieve-a-single-project" class="toc-h2 toc-link" data-title="Projects">Retrieve a single Project</a>
                   </li>
                   <li>
-                    <a href="#project-collection-projects-page-page_size-sort-owner-include" class="toc-h2 toc-link" data-title="Projects">Project Collection [/projects{?page,page_size,sort,owner,include}]</a>
+                    <a href="#create-a-project" class="toc-h2 toc-link" data-title="Projects">Create a Project</a>
+                  </li>
+                  <li>
+                    <a href="#edit-a-single-project" class="toc-h2 toc-link" data-title="Projects">Edit a single Project</a>
+                  </li>
+                  <li>
+                    <a href="#destroy-a-single-project" class="toc-h2 toc-link" data-title="Projects">Destroy a single Project</a>
                   </li>
               </ul>
           </li>
@@ -262,19 +271,19 @@
             <a href="#users" class="toc-h1 toc-link" data-title="Users">Users</a>
               <ul class="toc-list-h2">
                   <li>
-                    <a href="#links" class="toc-h2 toc-link" data-title="Users">Links</a>
+                    <a href="#user-links" class="toc-h2 toc-link" data-title="Users">User Links</a>
                   </li>
                   <li>
-                    <a href="#list-users-users-page-page_size-sort-include" class="toc-h2 toc-link" data-title="Users">List Users [/users{?page,page_size,sort,include}]</a>
+                    <a href="#list-users" class="toc-h2 toc-link" data-title="Users">List Users</a>
                   </li>
                   <li>
                     <a href="#retrieve-a-single-user" class="toc-h2 toc-link" data-title="Users">Retrieve a single user</a>
                   </li>
                   <li>
-                    <a href="#edit-a-single-user-put" class="toc-h2 toc-link" data-title="Users">Edit a single User [PUT]</a>
+                    <a href="#edit-a-single-user" class="toc-h2 toc-link" data-title="Users">Edit a single User</a>
                   </li>
                   <li>
-                    <a href="#destroy-a-single-user-delete" class="toc-h2 toc-link" data-title="Users">Destroy a single User [DELETE]</a>
+                    <a href="#destroy-a-single-user" class="toc-h2 toc-link" data-title="Users">Destroy a single User</a>
                   </li>
               </ul>
           </li>
@@ -428,38 +437,173 @@ text describing the tasks volunteers perform.</p>
 
 <p>It has the following attributes:</p>
 
-<ul>
-<li>id</li>
-<li>display_name</li>
-<li>classifications_count</li>
-<li>subjects_count</li>
-<li>created_at</li>
-<li>updated_at</li>
-<li>available_languages</li>
-<li>title</li>
-<li>description</li>
-<li>guide</li>
-<li>team_members</li>
-<li>science_case</li>
-<li>introduction</li>
-<li>avatar</li>
-<li>background_image</li>
-<li>private</li>
-<li>faq</li>
-<li>result</li>
-<li>education_content</li>
-<li>retired_subjects_count</li>
-<li>configuration</li>
-<li>beta</li>
-<li>approved</li>
-<li>live</li>
-</ul>
+<table><thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>display_name</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>classifications_count</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>subjects_count</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>string</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>string</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>available_languages</td>
+<td>array(string)</td>
+<td></td>
+</tr>
+<tr>
+<td>title</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>description</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>guide</td>
+<td>array(hash)</td>
+<td></td>
+</tr>
+<tr>
+<td>team_members</td>
+<td>array(hash)</td>
+<td></td>
+</tr>
+<tr>
+<td>science_case</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>introduction</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>avatar</td>
+<td>??</td>
+<td></td>
+</tr>
+<tr>
+<td>background_image</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>private</td>
+<td>boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>faq</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>result</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>education_content</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>retired_subjects_count</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>configuration</td>
+<td>hash</td>
+<td></td>
+</tr>
+<tr>
+<td>beta</td>
+<td>boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>approved</td>
+<td>boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>live</td>
+<td>boolean</td>
+<td></td>
+</tr>
+</tbody></table>
 
 <p><em>id</em>, <em>created_at</em>, <em>updated_at</em>, <em>user_count</em>, and
 <em>classifications_count</em> are set by the API.</p>
-<h2 id='project-projects-id-include-display_name-approved-beta-live'>Project [/projects/{id}{?include,display_name,approved,beta,live}]</h2>
+<h3 id='project-links'>Project Links</h3>
 <ul>
-<li><p>Parameters</p>
+<li><code>workflows</code></li>
+<li><code>subject_sets</code> - If you add a link to a subject set that does not already belong
+to the project, Panoptes will make a duplicate of that subject set in this
+project. Note that you can only link subject sets of other projects that you
+are a collaborator on.</li>
+<li>subjects (read-only)</li>
+<li>classifications (read-only)</li>
+<li>owner (read-only)</li>
+</ul>
+<h2 id='list-all-projects'>List All Projects</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/projects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+<ul>
+<li>Parameters
+
+<ul>
+<li>display_name (string) ... project name filter</li>
+<li>approved (boolean) ... approved state filter</li>
+<li>beta (boolean) ... beta state filter</li>
+<li>live (boolean) ... live state filter</li>
+<li>page (optional, integer) ... the index of the page to retrieve default is 1</li>
+<li>page_size (optional, integer) ... number of items to include on a page default is 20</li>
+<li>sort (optional, string) ... field to sort by</li>
+<li>owner (optional, string) ... string owner name of either a user or a user group to filter by.</li>
+<li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
+</ul></li>
+</ul>
+<h2 id='retrieve-a-single-project'>Retrieve a single Project</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/projects/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+<ul>
+<li>Parameters
 
 <ul>
 <li>id (required, integer) ... integer id of the resource to retrieve</li>
@@ -468,32 +612,46 @@ text describing the tasks volunteers perform.</p>
 <li>beta (boolean) ... beta state filter</li>
 <li>live (boolean) ... live state filter</li>
 </ul></li>
-<li><p>Model</p>
-
-<ul>
-<li>Body</li>
-</ul></li>
 </ul>
-<h3 id='retrieve-a-single-project-get'>Retrieve a single Project [GET]</h3>
-<ul>
-<li><p>Parameters</p>
+<h2 id='create-a-project'>Create a Project</h2><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
-<ul>
-<li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
-</ul></li>
-<li><p>Request</p>
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"galaxy_zoo"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"A doubleplus good project"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"primary_language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en-us"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"private"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"1"</span><span class="p">,</span><span class="w"> </span><span class="s2">"2"</span><span class="p">]</span><span class="w">
+            </span><span class="s2">"owner"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Owner 2"</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user_groups"</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user_groups/10"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Requires at least a <em>display_name</em>, <em>description</em>, <em>primary_language</em> and <em>private</em>. Workflows
+and SubjectSets added as links will be copied and their new ids
+returned.</p>
+<h2 id='edit-a-single-project'>Edit a single Project</h2><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/projects/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
-<ul>
-<li><p>Headers</p>
-
-<p>Accept: application/vnd.api+json; version=1
-    Content-Type: application/json</p></li>
-</ul></li>
-<li><p>Response 200</p>
-
-<p>[Project][]</p></li>
-</ul>
-<h3 id='edit-a-single-project-put'>Edit a single Project [PUT]</h3>
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Galaxy Zooooooooo!"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"1"</span><span class="p">],</span><span class="w">
+            </span><span class="s2">"subject_sets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"10"</span><span class="p">]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
 <p>A User must be the owner of a project or have update
 permissions to edit the resource. Workflow and Subject Set links may be
 edited. Removing a subject set or workflow causes the subject set or
@@ -502,305 +660,13 @@ the original to be copied and a new id to be returned.</p>
 
 <p>Setting has may links through a PUT, while supported, is not
 recommended. Instead, use the link endpoints explained below.</p>
-
-<ul>
-<li><p>Request</p>
-
-<ul>
-<li><p>Headers</p>
-
-<p>Accept: application/vnd.api+json; version=1
-    Content-Type: application/json</p></li>
-<li><p>Body</p>
-
-<p>{
-        &quot;projects&quot;: {
-            &quot;display_name&quot;: &quot;Galaxy Zooooooooo!&quot;,
-            &quot;links&quot;: {
-                &quot;workflows&quot;: [&quot;1&quot;],
-                &quot;subject_sets&quot;: [&quot;10&quot;]
-            }
-        }
-    }</p></li>
-</ul></li>
-<li><p>Response 200</p>
-
-<p>[Project][]</p></li>
-</ul>
-<h3 id='destroy-a-single-project-delete'>Destroy a single Project [DELETE]</h3>
+<h2 id='destroy-a-single-project'>Destroy a single Project</h2><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/api/projects/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
 <p>A user may destroy a project they own or have destroy permissions for.</p>
 
-<ul>
-<li><p>Request</p>
-
-<ul>
-<li><p>Headers</p>
-
-<p>Accept: application/vnd.api+json; version=1
-    Content-Type: application/json</p></li>
-</ul></li>
-<li><p>Response 204</p></li>
-</ul>
-<h2 id='project-create-links-project-id-links-link_type'>Project Create Links [/project/{id}/links/{link_type}]</h2>
-<p>The recommended way to edit a project&#39;s subject set and workflow
-links.</p>
-<h3 id='add-a-link-post'>Add a Link [POST]</h3>
-<p>The body key must match the link_type parameter. Workflows and Subject Sets
-added in this way will be copied and their id will be returned as part
-of the complete Project representation response.</p>
-
-<ul>
-<li><p>Parameters</p>
-
-<ul>
-<li>id (required, integer) - the id of the project to add</li>
-<li>link_type (required, string)
-the name of the link to edit
-
-<ul>
-<li>Members
-
-<ul>
-<li><code>workflows</code></li>
-<li><code>subject_sets</code></li>
-</ul></li>
-</ul></li>
-</ul></li>
-<li><p>Request</p>
-
-<ul>
-<li><p>Headers</p>
-
-<p>Accept: application/vnd.api+json; version=1
-    Content-Type: application/json</p></li>
-<li><p>Body</p>
-
-<p>{
-        &quot;subject_sets&quot;: [&quot;1&quot;, &quot;2&quot;]
-    }</p></li>
-</ul></li>
-<li><p>Response 200</p>
-
-<p>[Project][]</p></li>
-</ul>
-<h2 id='project-destroy-links-project-id-links-link_type-link_ids'>Project Destroy Links [/project/{id}/links/{link_type}/{link_ids}]</h2>
-<p>The recommended way to destroy project links.</p>
-<h3 id='destroy-a-link-delete'>Destroy a Link [DELETE]</h3>
-<p>Will destroy the comma separated list of link ids for the given link
-type. For Projects, only workflow and subject_set links can be
-destroyed in this manner. The linked object will be destroyed with
-this action.</p>
-
-<ul>
-<li><p>Parameters</p>
-
-<ul>
-<li>id (required, integer) ... the id of the project to modify</li>
-<li>link_type (required, string)
-the name of the link to edit
-
-<ul>
-<li>Members
-
-<ul>
-<li><code>workflows</code></li>
-<li><code>subject_sets</code></li>
-</ul></li>
-</ul></li>
-<li>link_ids (required, string) ... comma separated list of ids to destroy</li>
-</ul></li>
-<li><p>Request</p>
-
-<ul>
-<li><p>Headers</p>
-
-<p>Accept: application/vnd.api+json; version=1
-    Content-Type: application/json</p></li>
-</ul></li>
-<li><p>Response 204</p></li>
-</ul>
-<h2 id='project-collection-projects-page-page_size-sort-owner-include'>Project Collection [/projects{?page,page_size,sort,owner,include}]</h2>
-<p>A collection of <em>Panotpes Project</em> resources.</p>
-
-<p>All collections add a <em>meta</em> attribute hash containing
-paging information.</p>
-
-<p>Projects are returned as an array under the <em>projects</em> key.</p>
-
-<ul>
-<li><p>Model</p>
-
-<p>A JSON API formatted representation of a collection of Projects.</p>
-
-<ul>
-<li><p>Body</p>
-
-<p>{
-        &quot;links&quot;: {
-            &quot;projects.subjects&quot;: {
-                &quot;href&quot;: &quot;/subjects{?project_id=projects.id},
-                &quot;type&quot;: &quot;subjects&quot;
-            },
-            &quot;projects.classifications&quot;: {
-                &quot;href&quot;: &quot;/classifications{?project_id=projects.id}&quot;,
-                &quot;type&quot;: &quot;classifications&quot;
-            },
-            &quot;projects.workflows&quot;: {
-                &quot;href&quot;: &quot;/workflows/{projects.workflows}&quot;,
-                &quot;type&quot;: &quot;workflows&quot;
-            },
-            &quot;projects.subject_sets&quot;: {
-                &quot;href&quot;: &quot;/subject_sets/{projects.subject_sets}&quot;,
-                &quot;type&quot;: &quot;subject_sets&quot;
-            },
-            &quot;projects.owner&quot;: {
-                &quot;href&quot;: &quot;/{projects.owner.href}&quot;,
-                &quot;type&quot;: &quot;owners&quot;
-            }
-        },
-        &quot;meta&quot;: {
-           &quot;projects&quot;: {
-                &quot;page&quot;: 1,
-                &quot;page_size&quot;: 2,
-                &quot;count&quot;: 28,
-                &quot;include&quot;: [],
-                &quot;page_count&quot;: 14,
-                &quot;previous_page&quot;: 14,
-                &quot;next_page&quot;: 2,
-                &quot;first_href&quot;: &quot;/projects?page_size=2&quot;,
-                &quot;previous_href&quot;: &quot;/projects?page=14page_size=2&quot;,
-                &quot;next_href&quot;: &quot;/projects?page=2&amp;page_size=2&quot;,
-                &quot;last_href&quot;: &quot;/projects?page=14&amp;page_size=2&quot;
-            }
-        },
-        &quot;projects&quot;: [{
-            &quot;id&quot;: &quot;1&quot;,
-            &quot;created_at&quot;: &quot;2014-03-24T10:42:21Z&quot;,
-            &quot;updated_at&quot;: &quot;2014-03-24T10:42:21Z&quot;,
-            &quot;name&quot;: &quot;galaxy_zoo&quot;,
-            &quot;display_name&quot;: &quot;Galaxy Zoo&quot;,
-            &quot;primary_language&quot;: &quot;en&quot;,
-            &quot;user_count&quot;: &quot;10000&quot;,
-            &quot;classifications_count&quot;: &quot;1000000&quot;,
-            &quot;activated_state&quot;: 0,
-            &quot;title&quot;: &quot;Galaxy Zoo&quot;,
-            &quot;description&quot;: &quot;A Project ...&quot;,
-            &quot;introduction&quot;: &quot;asdfasdf&quot;,
-            &quot;science_case&quot;: &quot;88mph + 1.21 GW = 1955&quot;,
-            &quot;team_members&quot;: [{
-                &quot;name&quot;: &quot;Doc Brown&quot;,
-                &quot;bio&quot;: &quot;&quot;,
-                &quot;twitter&quot;: &quot;thatsmydelorean&quot;,
-                &quot;insitution&quot;: nil
-            }],
-            &quot;guide&quot;: [{
-                &quot;image&quot;: &quot;http://something.example.com/delorean.jpg&quot;,
-                &quot;explanation&quot;: &quot;our ride&quot;
-            }],
-            &quot;links&quot;: {
-                &quot;owner&quot;: {
-                    &quot;id&quot;: &quot;2&quot;,
-                    &quot;display_name&quot;: &quot;Owner 2&quot;,
-                    &quot;href&quot;: &quot;/users/2&quot;,
-                    &quot;type&quot;: &quot;users&quot;
-                }
-            }
-        },{
-            &quot;id&quot;: &quot;2&quot;,
-            &quot;created_at&quot;: &quot;2014-03-24T10:42:21Z&quot;,
-            &quot;updated_at&quot;: &quot;2014-03-24T10:42:21Z&quot;,
-            &quot;name&quot;: &quot;galaxy_zoo_2&quot;,
-            &quot;display_name&quot;: &quot;Galaxy Zoo 2&quot;,
-            &quot;primary_language&quot;: &quot;en&quot;,
-            &quot;user_count&quot;: &quot;10000&quot;,
-            &quot;classifications_count&quot;: &quot;1000000&quot;,
-            &quot;activated_state&quot;: 0,
-            &quot;title&quot;: &quot;Galaxy Zoo&quot;,
-            &quot;description&quot;: &quot;A Project ...&quot;,
-            &quot;introduction&quot;: &quot;asdfasdf&quot;,
-            &quot;science_case&quot;: &quot;88mph + 1.21 GW = 1955&quot;,
-            &quot;team_members&quot;: [{
-                &quot;name&quot;: &quot;Doc Brown&quot;,
-                &quot;bio&quot;: &quot;&quot;,
-                &quot;twitter&quot;: &quot;thatsmydelorean&quot;,
-                &quot;insitution&quot;: nil
-            }],
-            &quot;guide&quot;: [{
-                &quot;image&quot;: &quot;http://something.example.com/delorean.jpg&quot;,
-                &quot;explanation&quot;: &quot;our ride&quot;
-            }],
-            &quot;links&quot;: {
-                &quot;owner&quot;: {
-                    &quot;id&quot;: &quot;2&quot;,
-                    &quot;display_name&quot;: &quot;Owner 2&quot;,
-                    &quot;href&quot;: &quot;/users/2&quot;,
-                    &quot;type&quot;: &quot;users&quot;
-                }
-            }
-        }]
-    }</p></li>
-</ul></li>
-</ul>
-<h3 id='list-all-projects-get'>List All Projects [GET]</h3>
-<ul>
-<li><p>Parameters</p>
-
-<ul>
-<li>page (optional, integer) ... the index of the page to retrieve default is 1</li>
-<li>page_size (optional, integer) ... number of items to include on a page default is 20</li>
-<li>sort (optional, string) ... field to sort by</li>
-<li>owner (optional, string) ... string owner name of either a user or a user group to filter by.</li>
-<li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
-</ul></li>
-<li><p>Request</p>
-
-<ul>
-<li><p>Headers</p>
-
-<p>Accept: application/vnd.api+json; version=1
-    Content-Type: application/json</p></li>
-</ul></li>
-<li><p>Response 200</p>
-
-<p>[Project Collection][]</p></li>
-</ul>
-<h3 id='create-a-project-post'>Create a Project [POST]</h3>
-<p>Requires at least a <em>display_name</em>, <em>description</em>, <em>primary_language</em> and <em>private</em>. Workflows
-and Subject sets added as links will be copied and their new ids
-returned.</p>
-
-<ul>
-<li><p>Request</p>
-
-<ul>
-<li><p>Headers</p>
-
-<p>Accept: application/vnd.api+json; version=1
-    Content-Type: application/json</p></li>
-<li><p>Body</p>
-
-<p>{
-        &quot;projects&quot;: {
-            &quot;name&quot;: &quot;galaxy_zoo&quot;,
-            &quot;description&quot;: &quot;A doubleplus good project&quot;,
-            &quot;primary_language&quot;: &quot;en-us&quot;,
-            &quot;private&quot;: true,
-            &quot;links&quot;: {
-                &quot;workflows&quot;: [&quot;1&quot;, &quot;2&quot;]
-                &quot;owner&quot;: {
-                    &quot;id&quot;: 10,
-                    &quot;display_name&quot;: &quot;Owner 2&quot;,
-                    &quot;type&quot;: &quot;user_groups&quot;,
-                    &quot;href&quot;: &quot;user_groups/10&quot;
-                }
-            }
-        }
-    }</p></li>
-</ul></li>
-<li><p>Response 201</p>
-
-<p>[Project][]</p></li>
-</ul>
+<p>Response will be an HTTP 204.</p>
 <h1 id='users'>Users</h1><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"users"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
         </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
@@ -906,17 +772,19 @@ returned.</p>
 <p>The <code>email</code> attribute is only available if the requesting user is an
 administrator or the user resource being requested is that of the requesting
 user.</p>
-<h3 id='links'>Links</h3>
+<h3 id='user-links'>User Links</h3>
 <ul>
 <li>projects</li>
 <li>user_groups</li>
 <li>subjects</li>
 <li>collections</li>
 </ul>
-<h2 id='list-users-users-page-page_size-sort-include'>List Users [/users{?page,page_size,sort,include}]</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/users</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='list-users'>List Users</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/users</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre><h3 id='parameters'>Parameters</h3>
+</code></pre>
+<p>Parameters:</p>
+
 <ul>
 <li>page (optional, integer) ... index of the collection page, 1 is default</li>
 <li>page_size (optional, integer) ... number of items on a page. 20 is default</li>
@@ -942,7 +810,7 @@ user.</p>
 <td>ID of the User as an integer key</td>
 </tr>
 </tbody></table>
-<h2 id='edit-a-single-user-put'>Edit a single User [PUT]</h2><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/users/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='edit-a-single-user'>Edit a single User</h2><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/users/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
@@ -955,7 +823,7 @@ user.</p>
 <p>The currently logged in User may edit their record by sending a
 partial representation of the resource including their changes. A User
 cannot edit linked resources.</p>
-<h2 id='destroy-a-single-user-delete'>Destroy a single User [DELETE]</h2><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/users/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='destroy-a-single-user'>Destroy a single User</h2><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/users/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <p>The current logged in User may delete themself. This does not fully
 remove the user resource; instead, it deactivates their projects
@@ -970,6 +838,9 @@ and removes personally identifying information including the
       <div class="dark-box">
           <div class="lang-selector">
                 <a href="#" data-language-name="http">http</a>
+                <a href="#" data-language-name="python">python</a>
+                <a href="#" data-language-name="javascript">javascript</a>
+                <a href="#" data-language-name="ruby">ruby</a>
           </div>
       </div>
     </div>
