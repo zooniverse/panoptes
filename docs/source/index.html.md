@@ -3,6 +3,9 @@ title: API Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
   - http
+  - python
+  - javascript
+  - ruby
 
 toc_footers:
   - <a href='https://github.com/zooniverse/caesar/tree/master/docs/source/'>Modify documentation</a>

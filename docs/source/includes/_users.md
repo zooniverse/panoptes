@@ -62,21 +62,22 @@ The `email` attribute is only available if the requesting user is an
 administrator or the user resource being requested is that of the requesting
 user.
 
-### Links
+### User Links
 
 - projects
 - user_groups
 - subjects
 - collections
 
-## List Users [/users{?page,page_size,sort,include}]
+## List Users
 
 ```http
 GET /api/users HTTP/1.1
 Accept: application/vnd.api+json; version=1
 Content-Type: application/json
 ```
-### Parameters
+
+Parameters:
 
 + page (optional, integer) ... index of the collection page, 1 is default
 + page_size (optional, integer) ... number of items on a page. 20 is default
@@ -95,7 +96,7 @@ Parameter | Type | Default | Description
 --------- | ---- | ------- | -----------
 id | integer | | ID of the User as an integer key
 
-## Edit a single User [PUT]
+## Edit a single User
 
 ```http
 PUT /api/users/123 HTTP/1.1
@@ -113,7 +114,7 @@ The currently logged in User may edit their record by sending a
 partial representation of the resource including their changes. A User
 cannot edit linked resources.
 
-## Destroy a single User [DELETE]
+## Destroy a single User
 
 ```http
 DELETE /users/123 HTTP/1.1
