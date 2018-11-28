@@ -46,7 +46,11 @@ class ProjectSerializer
       params["state"] = Project.states[params["state"]]
     elsif params["state"] == "live"
       params["live"] = true
+      # ensure we only look for projects missing the paused, finished enum states
+      # this indicates we missed the true state of a project in the enum
+      # we should have an active state instead of checking if state is null
       params.delete("state")
+      scope = scope.where(state: nil)
     end
 
     super(params, scope, context)
