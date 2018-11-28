@@ -58,6 +58,7 @@ describe ProjectSerializer do
       let(:live_project) { create(:full_project, state: nil, live: true) }
 
       before do
+        paused_live_project.save
         live_project.save
         paused_project.save
         project.save
@@ -65,8 +66,9 @@ describe ProjectSerializer do
 
       it 'includes filtered projects' do
         results = described_class.page({"state" => "paused"}, Project.all)
-        expect(results[:projects].map { |p| p[:id] }).to include(paused_project.id.to_s)
-        expect(results[:projects].count).to eq(1)
+        found_project_ids = results[:projects].map { |p| p[:id] }
+        expected_project_ids = [ paused_project.id, paused_live_project.id].map(&:to_s)
+        expect(found_project_ids).to match_array(expected_project_ids)
       end
 
       it 'includes non-enum states' do
