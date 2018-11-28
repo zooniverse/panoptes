@@ -11,6 +11,7 @@ toc_footers:
 includes:
   - authentication
   - json_api
+  - projects
   - users
 
 search: true

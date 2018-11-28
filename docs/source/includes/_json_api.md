@@ -14,9 +14,13 @@
 
 If you request a resource, you will find the results under a top-level key with
 the plural name of the resource. So for instance, if you a single specific user,
-you will find the user record under the `users` key. The value under this will
-always be an array. If you requested a single specific resource (usually by
-passing in its `id`), you can rely on this being an array with at most one element.
+you will find the user record under the `users` key.
+
+<aside class="notice">
+Resources will always be returned an array. If you requested a single specific
+resource (usually by passing in its <code>id</code>), you can rely on this being an array
+with at most one element.
+</aside>
 
 ## Links
 
@@ -48,12 +52,7 @@ Any resource returned will specify a list of linked resources under its `links`
 attribute. Definition on where to request those linked resources can be found
 under the top-level `links` key (as opposed to the per-resource `links`).
 
-## Collections
-
-When requesting a collection of resources, rather than a single resource, the
-response will include a top-level `meta` key. For performance reasons, results
-are returned in pages. You can use the data under the `meta` key to
-automatically navigate these paginated results.
+## Pagination
 
 ```json
 {
@@ -71,3 +70,11 @@ automatically navigate these paginated results.
 }
 ```
 
+When requesting a list of resources, rather than a single resource, the
+response will include a top-level `meta` key. For performance reasons, results
+are returned in pages. You can use the data under the `meta` key to
+automatically navigate these paginated results.
+
+## Including linked resources
+
+TODO

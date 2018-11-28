@@ -1,9 +1,5 @@
 # Users
 
-Resources related to _Panoptes Users_.
-
-## User resource
-
 ```json
 {
     "users": [{
@@ -42,14 +38,12 @@ Resources related to _Panoptes Users_.
 
 A User is representation of the identity and contributions of a volunteer.
 
-### Attributes
-
 Attribute | Type | Description
 --------- | ---- | -----------
 id | Integer |
 created_at | string |
 updated_at | string |
-credited_name | string | If user wishes
+credited_name | string | Publicly available name with which a volunteer will be credited on papers, posters, etc
 login | string |
 display_name | string |
 email | string | The email of the user
@@ -57,15 +51,16 @@ zooniverse_id | string
 classifications_count | integer | Number of classifications this user has made site-wide
 languages | Array(String) | Array of language identifier string, in order from most to least preferred. Used to determine which language to show translated projects in.
 
-*id*, *zooniverse_id*, *created_at*, *updated_at*, and *classification_count*
- are created and updated by the Panoptes API. `credited_name` is the publicly
- available name with which a volunteer will be credited on papers, posters, etc.
- When serialized, if an `@` character is found, the user's login will be
- returned instead for privacy reasons.
+`id`, `zooniverse_id`, `created_at`, `updated_at`, and `classification_count`
+ are created and updated by the Panoptes API.
 
-The *email* attribute is only available if the requesting user is an
-administrator or the user resource being requested is that of the
-requesting user.
+ `credited_name` is the publicly available name with which a volunteer will be
+ credited on papers, posters, etc. When serialized, if an `@` character is
+ found, the user's login will be returned instead for privacy reasons.
+
+The `email` attribute is only available if the requesting user is an
+administrator or the user resource being requested is that of the requesting
+user.
 
 ### Links
 
