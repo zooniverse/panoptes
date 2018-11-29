@@ -20,14 +20,5 @@ describe EventStreamSerializers::ClassificationSerializer do
     after(:each) do
       PaperTrail.enabled = false
     end
-
-    it 'links the correct version of the workflow content' do
-      classification.update! annotations: [{"task" => "interest", "value" => []}], workflow_version: '1.1'
-      old_strings = classification.workflow.primary_content.strings
-      classification.workflow.primary_content.update!(strings: {"foo" => "BAR"})
-
-      adapter = described_class.serialize(classification, include: ['workflow_content'])
-      expect(adapter.as_json[:linked]['workflow_contents'][0][:strings]).to eq(old_strings)
-    end
   end
 end

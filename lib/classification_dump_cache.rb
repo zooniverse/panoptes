@@ -37,8 +37,9 @@ class ClassificationDumpCache
 
   def workflow_at_version(workflow, major_version, minor_version)
     @workflows[workflow.id] ||= {}
-    @workflows[workflow.id][version] ||=
-      workflow.workflow_versions.find_by(major_number: major_version, minor_number: minor_version)
+    @workflows[workflow.id][major_version] ||= {}
+    @workflows[workflow.id][major_version][minor_version] ||=
+      workflow.workflow_versions.find_by!(major_number: major_version, minor_number: minor_version)
   end
 
   def secure_user_ip(ip_string)
