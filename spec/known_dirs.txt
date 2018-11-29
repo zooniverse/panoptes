@@ -14,3 +14,4 @@ spec/workers
 spec/counters
 spec/routes
 spec/policies
+spec/tasks
