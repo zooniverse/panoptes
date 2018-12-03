@@ -15,7 +15,7 @@ FactoryBot.define do
     user
     project
     workflow
-    workflow_version { "#{workflow.major_version}.#{workflow.minor_version}" }
+    workflow_version { workflow ? "#{workflow.major_version}.#{workflow.minor_version}" : nil }
     subject_ids do
       create_list(:set_member_subject, 2).map(&:subject).map(&:id)
     end
