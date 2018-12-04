@@ -184,6 +184,12 @@ describe Workflow, type: :model do
       expect(workflow.previous_version.tasks).to_not eq(new_tasks)
     end
 
+    it 'should track changes to first_task' do
+      expect do
+        workflow.update!(first_task: "T4")
+      end.to change(workflow, :major_version).from(1).to(2)
+    end
+
     it 'should not track changes to primary_language' do
       new_lang = 'en'
       workflow.update!(primary_language: new_lang)
