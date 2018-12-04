@@ -3376,6 +3376,13 @@ CREATE UNIQUE INDEX index_workflow_tutorials_on_workflow_id_and_tutorial_id ON p
 
 
 --
+-- Name: index_workflow_versions_on_workflow_and_major_and_minor; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_workflow_versions_on_workflow_and_major_and_minor ON public.workflow_versions USING btree (workflow_id, major_number, minor_number);
+
+
+--
 -- Name: index_workflows_on_activated_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4391,4 +4398,6 @@ INSERT INTO schema_migrations (version) VALUES ('20181015112421');
 INSERT INTO schema_migrations (version) VALUES ('20181022172507');
 
 INSERT INTO schema_migrations (version) VALUES ('20181023130028');
+
+INSERT INTO schema_migrations (version) VALUES ('20181203164038');
 

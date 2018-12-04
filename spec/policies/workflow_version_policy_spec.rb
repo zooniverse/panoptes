@@ -12,8 +12,8 @@ describe WorkflowVersionPolicy do
     let(:public_workflow) { build(:workflow, project: public_project) }
     let(:private_workflow) { build(:workflow, project: private_project) }
 
-    let(:public_workflow_version) { build(:workflow_version, workflow: public_workflow) }
-    let(:private_workflow_version) { build(:workflow_version, workflow: private_workflow) }
+    let(:public_workflow_version) { build(:workflow_version, workflow: public_workflow, major_number: 2) }
+    let(:private_workflow_version) { build(:workflow_version, workflow: private_workflow, major_number: 2) }
 
     subject do
       PunditScopeTester.new(WorkflowVersion, api_user)
