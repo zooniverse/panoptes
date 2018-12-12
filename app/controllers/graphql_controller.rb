@@ -23,6 +23,7 @@ class GraphqlController < ApplicationController
   end
 
   def admin_flag?
+    return unless params[:variables].present?
     !!params[:variables][:admin]
   end
 
