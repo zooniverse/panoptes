@@ -67,7 +67,7 @@ class Translation < ActiveRecord::Base
     return unless translated.present? # This is a different validation error
 
     known_version_ids = translated.version_ids
-    referenced_version_ids = string_versions.values.uniq
+    referenced_version_ids = string_versions.values.compact.uniq
     unknown_version_ids = referenced_version_ids - known_version_ids
 
     if unknown_version_ids.present?

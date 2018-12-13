@@ -41,7 +41,8 @@ module Versioning
   end
 
   def latest_version_id
-    send(self.class.versioned_association).order(id: :desc).select(:id).first.id
+    latest_version = send(self.class.versioned_association).order(id: :desc).select(:id).first
+    latest_version&.id
   end
 
   def version_ids
