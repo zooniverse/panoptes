@@ -2,7 +2,6 @@ class AddWorkflowSteps < ActiveRecord::Migration
   def change
     add_column :workflows, :steps, :jsonb
 
-
     reversible do |dir|
       dir.up do
         change_column_default(:workflows, :steps, {})
