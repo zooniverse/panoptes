@@ -1787,7 +1787,8 @@ CREATE TABLE public.workflows (
     strings jsonb DEFAULT '{}'::jsonb,
     major_version integer DEFAULT 0 NOT NULL,
     minor_version integer DEFAULT 0 NOT NULL,
-    published_version_id integer
+    published_version_id integer,
+    steps jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 
@@ -4392,6 +4393,8 @@ INSERT INTO schema_migrations (version) VALUES ('20180821125430');
 INSERT INTO schema_migrations (version) VALUES ('20180821151555');
 
 INSERT INTO schema_migrations (version) VALUES ('20181001154345');
+
+INSERT INTO schema_migrations (version) VALUES ('20181002145749');
 
 INSERT INTO schema_migrations (version) VALUES ('20181015112421');
 
