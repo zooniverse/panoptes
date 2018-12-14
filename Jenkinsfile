@@ -10,6 +10,7 @@ pipeline {
 
   stages {
     stage('Update documentation site') {
+      when { branch 'master' }
       agent {
         dockerfile {
           filename 'Dockerfile.docs'
