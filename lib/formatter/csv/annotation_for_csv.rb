@@ -99,18 +99,20 @@ module Formatter
       end
 
       def dropdown_process_selects(selects, index)
-        answer = @current['value'][index]
+        answer_value = nil
+        if answer = @current['value'][index]
+          answer_value = answer['value']
+        end
 
         {}.tap do |drop_anno|
           drop_anno['select_label'] = selects['title']
 
           if selects['allowCreate']
             drop_anno['option'] = false
-            drop_anno['value'] = @current['value'][index]['value']
+            drop_anno['value'] = answer_value
           end
 
-          selected_option = dropdown_find_selected_option(selects, answer)
-          if selected_option
+          if selected_option = dropdown_find_selected_option(selects, answer_value)
             drop_anno['option'] = true
             drop_anno['value'] = selected_option['value']
             drop_anno['label'] = translate(selected_option['label'])
@@ -118,10 +120,10 @@ module Formatter
         end
       end
 
-      def dropdown_find_selected_option(selects, answer)
+      def dropdown_find_selected_option(selects, answer_value)
         selects['options'].each do |key, options|
           options.each do |option|
-            return option if option['value'] == answer['value']
+            return option if option['value'] == answer_value
           end
         end
         nil
