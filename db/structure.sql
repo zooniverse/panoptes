@@ -1788,7 +1788,7 @@ CREATE TABLE public.workflows (
     major_version integer DEFAULT 0 NOT NULL,
     minor_version integer DEFAULT 0 NOT NULL,
     published_version_id integer,
-    steps jsonb
+    steps jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 
