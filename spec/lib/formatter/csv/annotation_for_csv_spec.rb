@@ -264,6 +264,28 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
           formatted = described_class.new(dd_classification, dd_classification.annotations[0], dd_cache).to_h
           expect(formatted).to eq(codex)
         end
+
+        context "with a empty array value (found in production db)" do
+          let(:annotation) do
+            {"task"=>"T7", "value"=>[]}
+          end
+
+          let(:codex) do
+            {
+              "task"=>"T7",
+              "value"=> [
+                {"select_label"=>"Country"},
+                {"select_label"=>"State", "option"=>false, "value"=>nil},
+                {"select_label"=>"City", "option"=>false, "value"=>nil}
+              ]
+            }
+          end
+
+          it 'should add the correct answer labels' do
+            formatted = described_class.new(dd_classification, dd_classification.annotations[0], dd_cache).to_h
+            expect(formatted).to eq(codex)
+          end
+        end
       end
 
       context "with a survey task" do
