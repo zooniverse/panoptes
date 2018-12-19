@@ -15,7 +15,7 @@ class CalculateProjectCompletenessWorker
     }
   }
 
-  sidekiq_options queue: :data_medium, lock: :until_executed
+  sidekiq_options queue: :data_medium, lock: :until_executing
 
   def perform(project_id)
     @project = Project.find(project_id)

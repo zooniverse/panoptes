@@ -11,7 +11,7 @@ class WorkflowRetiredCountWorker
     key: ->(workflow_id) { "workflow_#{workflow_id}_retired_count_worker" }
   }
 
-  sidekiq_options lock: :until_executed
+  sidekiq_options lock: :until_executing
 
   def perform(workflow_id)
     workflow = Workflow.find_without_json_attrs(workflow_id)
