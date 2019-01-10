@@ -859,13 +859,6 @@ describe Api::V1::ProjectsController, type: :controller do
 
       it_behaves_like "is creatable", :create_workflows_export
     end
-
-    describe "#create_workflow_contents_export" do
-      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/workflow_contents_export/ }
-      let(:test_attr_value) { "project_workflow_contents_export" }
-
-      it_behaves_like "is creatable", :create_workflow_contents_export
-    end
   end
 
   describe "#destroy" do

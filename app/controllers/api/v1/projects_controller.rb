@@ -96,8 +96,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_workflow_contents_export
-    medium = Projects::CreateWorkflowContentsExport.with(api_user: api_user, object: controlled_resource).run!(params)
-    medium_response(medium)
+    head :gone
   end
 
   def create
