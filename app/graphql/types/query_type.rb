@@ -1,9 +1,14 @@
 module Types
   class QueryType < Types::BaseObject
     field :me, ApiUserType, null: true
+
+    field :organizations, OrganizationType.connection_type, null: false do
+    end
+
     field :organization, OrganizationType, null: true do
       argument :id, ID, required: true, description: "Filter by organization ID"
     end
+
     field :projects, ProjectType.connection_type, null: false do
       argument :beta_requested, Boolean, required: false
       argument :beta_approved, Boolean, required: false
@@ -23,6 +28,11 @@ module Types
       context[:api_user].scope(klass: Organization, action: :show, ids: id)
     end
 
+    def organizations(**filters)
+      scope = Pundit.policy!(context[:api_user], Organization).scope_for(:index)
+      apply_filters(scope, filters)
+    end
+
     def projects(**filters)
       scope = Pundit.policy!(context[:api_user], Project).scope_for(:index)
       scope = scope.active
@@ -38,11 +48,7 @@ module Types
         scope = scope.where(state: nil)
       end
 
-      filters.each do |filter, val|
-        scope = scope.where(filter => val) unless val.nil?
-      end
-
-      scope
+      apply_filters(scope, filters)
     end
   end
 end
