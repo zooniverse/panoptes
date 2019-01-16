@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Formatter::Csv::AnnotationForCsv do
   let(:workflow_version) { build_stubbed(:workflow_version, workflow: workflow, tasks: workflow.tasks, strings: workflow.strings) }
-  let(:workflow) { build_stubbed(:workflow, build_contents: false) }
+  let(:workflow) { build_stubbed(:workflow) }
   let(:cache)    { instance_double("ClassificationDumpCache")}
   let(:classification) { build_stubbed(:classification, workflow: workflow, subjects: []) }
   let(:annotation) do
@@ -55,6 +55,8 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
   end
 
   it 'just records the tool index if the tool label cannot be translated' do
+    allow(workflow).to receive(:strings).and_return({})
+
     annotation = {"task" => "interest", "value" => [{"x"=>1, "y"=>2, "tool"=>0}]}
     workflow_version.strings = {}
     formatter = described_class.new(classification, annotation, cache)
@@ -306,7 +308,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       context "with a shortcut task" do
         let(:workflow) { build_stubbed(:workflow, :shortcut) }
         let(:tasks) { workflow.tasks }
-        let(:strings) { contents.strings }
+        let(:strings) { workflow.strings }
         let(:annotation) do
           {
             "task"=>"init",

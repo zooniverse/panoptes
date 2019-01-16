@@ -18,16 +18,12 @@ module Export
 
       def self.workflow_attributes
         %w( display_name tasks pairwise grouped prioritized primary_language
-            first_task tutorial_subject_id )
-      end
-
-      def self.workflow_content_attributes
-        %w( language strings )
+            first_task tutorial_subject_id strings )
       end
 
       def initialize(project_id)
         @project = ::Project.where(id: project_id)
-         .includes(:project_contents, workflows: [ :workflow_contents ])
+         .includes(:project_contents, :workflows)
          .first
       end
 
@@ -38,7 +34,6 @@ module Export
           export[:project_background] = background_attrs
           export[:project_content] = project_content_attrs
           export[:workflows] = workflows_attrs
-          export[:workflow_contents] = workflow_contents_attrs
         end.to_json
       end
 
@@ -76,16 +71,6 @@ module Export
         [].tap do |workflows|
           project_workflows.each do |workflow|
             workflows << model_attributes(workflow, self.class.workflow_attributes)
-          end
-        end
-      end
-
-      def workflow_contents_attrs
-        [].tap do |workflow_contents|
-          project_workflows.each do |workflow|
-            workflow.workflow_contents.each do |content|
-              workflow_contents << model_attributes(content, self.class.workflow_content_attributes)
-            end
           end
         end
       end

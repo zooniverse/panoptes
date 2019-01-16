@@ -21,14 +21,6 @@ class Api::V1::WorkflowsController < Api::ApiController
     super
   end
 
-  def update
-    super do |resource|
-      if update_params.key? :tasks
-        resource.primary_content.update(strings: resource.strings)
-      end
-    end
-  end
-
   def update_links
     super do |workflow|
       post_link_actions(workflow)
@@ -125,12 +117,8 @@ class Api::V1::WorkflowsController < Api::ApiController
     create_params[:tasks] = stripped_tasks
     create_params[:strings] = strings
     create_params[:active] = false if project_live?
-    workflow = super(create_params)
-    workflow.workflow_contents.build(
-      strings: strings,
-      language: workflow.primary_language
-    )
-    workflow
+
+    super(create_params)
   end
 
   def extract_strings(tasks)

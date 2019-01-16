@@ -30,15 +30,6 @@ RSpec.describe Export::JSON::Project do
     end
   end
 
-  def workflow_content_attributes
-    attrs = Export::JSON::Project.workflow_content_attributes
-    [].tap do |workflow_contents_attr|
-      workflow_contents.each do |workflow_content|
-        workflow_contents_attr << workflow_content.as_json.slice(*attrs)
-      end
-    end
-  end
-
   def export_json
     {
       project: project_attributes,
@@ -46,7 +37,6 @@ RSpec.describe Export::JSON::Project do
       project_background: project_background_attributes,
       project_content: project_content_attributes,
       workflows: workflows_attributes,
-      workflow_contents: workflow_content_attributes
     }.to_json
   end
 
@@ -59,7 +49,6 @@ RSpec.describe Export::JSON::Project do
   let(:background) { project.background }
   let(:project_content) { project.primary_content }
   let(:workflows) { project.workflows }
-  let(:workflow_contents) { workflows.map(&:primary_content) }
   let(:exporter) { Export::JSON::Project.new(project.id) }
   let(:new_owner) { create(:user) }
 
@@ -131,37 +120,12 @@ RSpec.describe Export::JSON::Project do
         export_values("workflows").each do |workflow_attrs|
           new_workflow = Workflow.new(workflow_attrs)
           new_workflow.valid?
-          expect(new_workflow.errors.keys).to match_array([:workflow_contents, :project])
-        end
-      end
-    end
-
-    describe "workflow_contents" do
-
-      it "should be able to rebuild all the workflow_contents from the export" do
-        export_values("workflow_contents").each do |workflow_attrs|
-          new_workflow_content = WorkflowContent.new(workflow_attrs)
-          expect(new_workflow_content).to be_valid
-        end
-      end
-
-      it "should be for the default workflow language" do
-        export_values("workflow_contents").each_with_index do |attrs, index|
-          new_workflow_content = WorkflowContent.new(attrs)
-          expected = workflows[index].primary_language
-          expect(new_workflow_content.language).to eq(expected)
+          expect(new_workflow.errors.keys).to match_array([:project])
         end
       end
     end
 
     describe "valid export" do
-
-      it "should have one workflow_contents for each workflow" do
-        num_wkfls = export_values("workflows").size
-        num_wcs   = export_values("workflow_contents").size
-        expect(num_wkfls).to eq(num_wcs)
-      end
-
       describe "recreated instances" do
         let(:p){ Project.new(export_values("project").merge(owner: new_owner)) }
         let(:instances) do
@@ -173,14 +137,12 @@ RSpec.describe Export::JSON::Project do
             instances << p.background = Medium.new(export_values("project_background"))
             export_values("workflows").each_with_index do |workflow_attrs, index|
               w = Workflow.new(workflow_attrs.merge(project: p))
-              w.workflow_contents << WorkflowContent.new(export_values("workflow_contents")[index])
-              instances << w << w.workflow_contents.first
             end
           end
         end
 
         it "should build 8 instances" do
-          expect(instances.size).to eq(6)
+          expect(instances.size).to eq(4)
         end
 
         it "should be able to recreate the set of valid project instances" do

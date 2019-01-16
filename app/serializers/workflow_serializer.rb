@@ -27,11 +27,11 @@ class WorkflowSerializer
   end
 
   def content_language
-    content&.language
+    @model.primary_language
   end
 
   def content_version
-    content.try(:current_version_number) || ModelVersion.default_version_num
+    @model.minor_version
   end
 
   def tasks
@@ -51,10 +51,6 @@ class WorkflowSerializer
     else
       @model
     end
-  end
-
-  def content
-    @content ||= @model.primary_content
   end
 
   def retirement

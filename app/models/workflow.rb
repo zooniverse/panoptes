@@ -1,6 +1,5 @@
 class Workflow < ActiveRecord::Base
   include Activatable
-  include HasContents
   include ExtendedCacheKey
   include RankedModel
   include CacheModelVersion

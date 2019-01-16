@@ -43,7 +43,7 @@ RSpec.describe Formatter::Csv::Classification do
     ]
   end
 
-  let(:workflow) { build_stubbed(:workflow, build_contents: false) }
+  let(:workflow) { build_stubbed(:workflow) }
   let(:project) { build_stubbed(:project, workflows: [workflow]) }
   let(:classification) { build_stubbed(:classification, project: project, workflow: workflow, subjects: [subject]) }
   let(:formatter) { described_class.new(cache) }
