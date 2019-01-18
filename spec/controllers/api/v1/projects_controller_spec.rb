@@ -585,11 +585,11 @@ describe Api::V1::ProjectsController, type: :controller do
 
   describe "#update" do
     let(:workflow) { create(:workflow) }
-    let(:subject_set) { create(:subject_set) }
-    let(:tutorial) do
-      workflow = create(:workflow, project: resource)
-      create(:tutorial, workflow: workflow)
-    end
+    let(:subject_set) { create(:subject_set, workflows: [workflow]) }
+    # let(:tutorial) do
+    #   workflow = create(:workflow, project: resource)
+    #   create(:tutorial, workflow: workflow)
+    # end
     let(:resource) { create(:project_with_contents, owner: authorized_user) }
     let(:test_attr) { :display_name }
     let(:test_attr_value) { "A Better Name" }
@@ -725,23 +725,38 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     context "update_links" do
+      let(:params) { update_params.merge(id: resource.id) }
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        params = update_params.merge(id: resource.id)
-        put :update, params
       end
 
       context "copy linked workflow" do
         it 'should have the same tasks workflow' do
+          put :update, params
           expect(resource.workflows.first.tasks).to eq(workflow.tasks)
         end
 
         it 'should have a different id' do
+          put :update, params
           expect(resource.workflows.first.id).to_not eq(workflow.id)
+        end
+
+        it 'should append the copied workflow to a project with a workflow' do
+          resource.workflows << workflow
+          next_workflow_id = Workflow.last.id + 1
+          before_workflow_ids = resource.workflow_ids
+          after_workflow_ids = before_workflow_ids << next_workflow_id
+          put :update, params
+          resource.reload.workflow_ids
+          expect(resource.reload.workflow_ids).to match_array(after_workflow_ids)
         end
       end
 
       context "copy linked subject_set" do
+        before do
+          put :update, params
+        end
+
         it 'should have the same name' do
           expect(resource.subject_sets.first.display_name).to eq(subject_set.display_name)
         end

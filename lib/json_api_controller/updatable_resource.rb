@@ -53,7 +53,7 @@ module JsonApiController
     def build_update_hash(update_params, resource)
       if links = update_params.delete(:links)
         links.try(:reduce, update_params) do |params, (k, v)|
-          params[k] = update_relation(resource, k.to_sym, v)
+          params[k] = add_relation(resource, k.to_sym, v)
           params
         end
       else
