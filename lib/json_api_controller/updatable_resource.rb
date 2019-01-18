@@ -12,7 +12,14 @@ module JsonApiController
       @updated_resources = resource_class.transaction(requires_new: true) do
         resources_with_updates = controlled_resources.zip(Array.wrap(update_params))
         resources_with_updates.map do |resource, update_hash|
-          resource.assign_attributes(build_update_hash(update_hash, resource))
+
+          if update_links = update_params.delete(:links)
+            update_links.each do |relation, value|
+              add_relation(resource, relation.to_sym, value)
+            end
+          end
+
+          resource.assign_attributes(build_update_hash(update_params, resource))
 
           yield resource if block_given?
 
@@ -50,15 +57,10 @@ module JsonApiController
 
     protected
 
+    # overridable in resource controllers
+    # for custom update_params
     def build_update_hash(update_params, resource)
-      if links = update_params.delete(:links)
-        links.try(:reduce, update_params) do |params, (k, v)|
-          params[k] = add_relation(resource, k.to_sym, v)
-          params
-        end
-      else
-        update_params
-      end
+      update_params
     end
 
     def check_relation

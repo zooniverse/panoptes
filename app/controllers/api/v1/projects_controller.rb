@@ -152,8 +152,7 @@ class Api::V1::ProjectsController < Api::ApiController
       resource.launch_date ||= Time.zone.now
     end
 
-    update_attributes = super(update_params, resource)
-    update_attributes.except(:tags)
+    update_params.except(:tags)
   end
 
   def new_items(resource, relation, value)

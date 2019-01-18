@@ -117,7 +117,7 @@ class Api::V1::WorkflowsController < Api::ApiController
     end
 
     reject_live_project_changes(resource, update_params)
-    super(update_params, resource)
+    update_params
   end
 
   def build_resource_for_create(create_params)

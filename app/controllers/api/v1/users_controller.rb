@@ -71,7 +71,8 @@ class Api::V1::UsersController < Api::ApiController
   def build_update_hash(update_params, id)
     admin_allowed(update_params, :subject_limit, :upload_whitelist, :banned,
                   :valid_email)
-    super
+
+    update_params
   end
 
   private
