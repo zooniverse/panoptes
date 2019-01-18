@@ -586,10 +586,6 @@ describe Api::V1::ProjectsController, type: :controller do
   describe "#update" do
     let(:workflow) { create(:workflow) }
     let(:subject_set) { create(:subject_set, workflows: [workflow]) }
-    # let(:tutorial) do
-    #   workflow = create(:workflow, project: resource)
-    #   create(:tutorial, workflow: workflow)
-    # end
     let(:resource) { create(:project_with_contents, owner: authorized_user) }
     let(:test_attr) { :display_name }
     let(:test_attr_value) { "A Better Name" }
