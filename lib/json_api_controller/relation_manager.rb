@@ -1,5 +1,6 @@
 module JsonApiController
   module RelationManager
+    # use this method to retrieve the updatable relation
     def update_relation(resource, relation, value)
       case value
       when Hash
@@ -13,6 +14,7 @@ module JsonApiController
       end
     end
 
+    # use this method to modify the resource relations
     def add_relation(resource, relation, value)
       added_relation = update_relation(resource, relation, value)
       case value
