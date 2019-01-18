@@ -506,6 +506,23 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
 
       it_behaves_like "reloads the non logged in queues", :retired_subjects
+
+      context 'for a subject not in the workflow' do
+        let(:non_workflow_subject) { create(:subject, project: subject_set_project) }
+        let(:update_link_params) do
+          {
+            link_relation: test_relation.to_s,
+            test_relation => [non_workflow_subject.id],
+            resource_id => resource.id
+          }
+        end
+
+        it 'not retire the subject for this workflow' do
+          default_request scopes: scopes, user_id: authorized_user.id
+          expect_any_instance_of(Workflow).not_to receive(:retire_subject)
+          post :update_links, update_link_params
+        end
+      end
     end
   end
 
@@ -717,14 +734,14 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe '#retired_subjects' do
-    before do
-      default_request scopes: scopes, user_id: authorized_user.id
-    end
-
     let(:subject_set_project) { project }
     let(:subject_set) { create(:subject_set, project: project, workflows: [project.workflows.first]) }
     let(:subject_set_id) { subject_set.id }
     let(:subject) { create(:subject, subject_sets: [subject_set]) }
+
+    before do
+      default_request scopes: scopes, user_id: authorized_user.id
+    end
 
     it 'returns a 204 status' do
       post :retire_subjects, workflow_id: workflow.id, subject_id: subject.id

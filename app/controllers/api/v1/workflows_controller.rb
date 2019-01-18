@@ -142,7 +142,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def add_relation(resource, relation, value)
     if relation == :retired_subjects && value.is_a?(Array)
-      value.each {|id| resource.retire_subject(id) }
+      new_items(resource, relation, value)
     else
       super
     end
@@ -151,7 +151,10 @@ class Api::V1::WorkflowsController < Api::ApiController
   def new_items(resource, relation, value)
     case relation
     when :retired_subjects, 'retired_subjects'
-      value.flat_map {|id| resource.retire_subject(id) }
+      retirable_subjects = super(resource, relation, value)
+      retirable_subjects.pluck(:id) do |subject_id|
+        resource.retire_subject(subject_id)
+      end
     when :subject_sets, 'subject_sets'
       items = construct_new_items(super(resource, relation, value), resource.project_id)
       if items.any? { |item| item.is_a?(SubjectSet) }
