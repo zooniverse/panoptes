@@ -720,7 +720,7 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
 
-    context "update_links" do
+    context "update links via link params" do
       let(:params) { update_params.merge(id: resource.id) }
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
@@ -737,14 +737,12 @@ describe Api::V1::ProjectsController, type: :controller do
           expect(resource.workflows.first.id).to_not eq(workflow.id)
         end
 
-        it 'should append the copied workflow to a project with a workflow' do
+        it 'should replace the workflow on a project' do
           resource.workflows << workflow
           next_workflow_id = Workflow.last.id + 1
-          before_workflow_ids = resource.workflow_ids
-          after_workflow_ids = before_workflow_ids << next_workflow_id
           put :update, params
           resource.reload.workflow_ids
-          expect(resource.reload.workflow_ids).to match_array(after_workflow_ids)
+          expect(resource.reload.workflow_ids).to match_array([next_workflow_id])
         end
       end
 
@@ -777,6 +775,24 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:expected_copies_count) { 1 }
 
       it_behaves_like "supports update_links"
+
+      it 'should append the copied workflow' do
+        default_request scopes: scopes, user_id: authorized_user.id
+
+        next_workflow_id = Workflow.last.id + 1
+        before_workflow_ids = resource.workflow_ids
+        after_workflow_ids = before_workflow_ids << next_workflow_id
+
+        params = {
+          link_relation: test_relation.to_s,
+          test_relation => test_relation_ids,
+          resource_id => resource.id
+        }
+        post :update_links, params
+
+        resource.reload.workflow_ids
+        expect(resource.reload.workflow_ids).to match_array(after_workflow_ids)
+      end
 
       describe "linking a workflow that belongs to another project" do
         let!(:linked_resource) { create(:workflow) }

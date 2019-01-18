@@ -15,7 +15,11 @@ module JsonApiController
 
           if update_links = update_params.delete(:links)
             update_links.each do |relation, value|
-              add_relation(resource, relation.to_sym, value)
+              update_params[relation] = update_relation(
+                resource,
+                relation.to_sym,
+                value
+              )
             end
           end
 
