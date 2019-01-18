@@ -694,6 +694,21 @@ describe Api::V1::WorkflowsController, type: :controller do
           expect(still_linked_sets).to match_array([])
         end
       end
+
+      context 'with a subject_set not linked to the workflow' do
+        let(:other_subject_set) { create(:subject_set) }
+        let(:link_ids) { other_subject_set.id.to_s }
+
+        it "should not unlink" do
+          delete :destroy_links, destroy_link_params
+          expect(still_linked_sets).to match_array(linked_resources)
+        end
+
+        it "should respond with not_found" do
+          delete :destroy_links, destroy_link_params
+          expect(response).to have_http_status(:not_found)
+        end
+      end
     end
   end
 
