@@ -57,7 +57,6 @@ RSpec.describe Formatter::Csv::Classification do
   describe "#to_rows" do
     before(:each) do
       allow(Subject).to receive(:where).with(id: classification.subject_ids).and_return([subject])
-      allow(workflow).to receive(:primary_content).and_return(build_stubbed(:workflow_content, workflow: workflow))
     end
 
     it 'return an array formatted classifcation data' do
