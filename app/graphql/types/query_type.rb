@@ -29,13 +29,12 @@ module Types
     end
 
     def organizations(**filters)
-      scope = Pundit.policy!(context[:api_user], Organization).scope_for(:index)
-      apply_filters(scope, filters)
+      binding.pry
+      apply_filters(Organization, filters)
     end
 
     def projects(**filters)
-      scope = Pundit.policy!(context[:api_user], Project).scope_for(:index)
-      scope = scope.active
+      scope = Project.active
 
       if Project.states.include?(filters[:state])
         filters[:state] = Project.states.include?(filters[:state])

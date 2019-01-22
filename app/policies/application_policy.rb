@@ -35,6 +35,8 @@ class ApplicationPolicy
   def scope_for(action)
     scope = if record.is_a?(Class)
               record
+            elsif record.is_a?(ActiveRecord::Relation)
+              record
             else
               record.class
             end

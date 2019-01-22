@@ -15,10 +15,10 @@ module Types
       object.projects.sum(:classifications_count)
     end
 
-    def projects(tags: [])
-      scope = object.projects.where(private: false).preload(:project_contents)
+    def projects(**filters)
+      scope = object.projects.preload(:project_contents)
       scope = scope.joins(:tags).where(tags: {name: tags.map(&:downcase)}) if tags.present?
-      scope
+      apply_filters(scope, filters)
     end
   end
 end

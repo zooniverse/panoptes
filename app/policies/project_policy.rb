@@ -5,6 +5,13 @@ class ProjectPolicy < ApplicationPolicy
     def public_scope
       scope.where(private: false)
     end
+
+    def resolve(action =nil)
+      puts action
+      puts scope.class
+      puts
+      super
+    end
   end
 
   class WriteScope < Scope
