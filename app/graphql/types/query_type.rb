@@ -29,7 +29,6 @@ module Types
     end
 
     def organizations(**filters)
-      binding.pry
       apply_filters(Organization, filters)
     end
 
