@@ -329,8 +329,8 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (12.3.2)
-    ranked-model (0.4.1)
-      activerecord (>= 3.1.12)
+    ranked-model (0.4.2)
+      activerecord (>= 4.1.16)
     rb-fsevent (0.9.8)
     rb-inotify (0.9.8)
       ffi (>= 0.5.0)
@@ -499,7 +499,7 @@ DEPENDENCIES
   pundit (~> 1.1.0)
   rack-cors (~> 0.4)
   rails (~> 4.2.11)
-  ranked-model (~> 0.4.1)
+  ranked-model (~> 0.4.2)
   restpack_serializer!
   rspec
   rspec-its
