@@ -1,4 +1,4 @@
-# Panoptes ![Build Status](https://travis-ci.org/zooniverse/Panoptes.svg?branch=master)
+# Panoptes ![Build Status](https://travis-ci.org/zooniverse/Panoptes.svg?branch=master) [![pullreminders](https://pullreminders.com/badge.svg)](https://pullreminders.com?ref=badge)
 
 The new Zooniverse API for supporting user-created projects.
 
