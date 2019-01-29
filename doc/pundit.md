@@ -17,7 +17,7 @@ can simply initialize with the class of the model, e.g.
 
     CollectionPolicy::ReadScope.new(api_user, Collection)
 
-A general template for a policy is given below. 
+A general template for a policy is given below.
 
 ```ruby
 class CollectionPolicy < ApplicationPolicy
