@@ -226,6 +226,17 @@
           </li>
           <li>
             <a href="#authentication" class="toc-h1 toc-link" data-title="Authentication">Authentication</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#how-do-i-authenticate-with-the-zooniverse-api" class="toc-h2 toc-link" data-title="Authentication">How do I authenticate with the Zooniverse API?</a>
+                  </li>
+                  <li>
+                    <a href="#tools-to-interact-with-the-api" class="toc-h2 toc-link" data-title="Authentication">Tools to interact with the API</a>
+                  </li>
+                  <li>
+                    <a href="#example-using-postman" class="toc-h2 toc-link" data-title="Authentication">Example using Postman</a>
+                  </li>
+              </ul>
           </li>
           <li>
             <a href="#json-api-conventions" class="toc-h1 toc-link" data-title="JSON-API conventions">JSON-API conventions</a>
@@ -303,6 +314,129 @@ the <em>subject</em> based on a defined <em>workflow</em> for the <em>subject</e
 <h1 id='authentication'>Authentication</h1>
 <p>Panoptes API provides an OAuth 2.0 authentication mechanism. (TODO: Describe
 Authentication Workflow).</p>
+<h2 id='how-do-i-authenticate-with-the-zooniverse-api'>How do I authenticate with the Zooniverse API?</h2>
+<p>Some requests to the Zooniverse API will respond without supplied authentication details as they are public but most require an authentication token to be supplied to access our systems as a known user.</p>
+
+<p>This authentication token is known as a bearer token and is usually supplied as a HTTP <code>Authorization</code> header with the value prefixed by <code>Bearer</code> and then the token data. For example:</p>
+
+<p><code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></p>
+
+<p>The bearer tokens we produce are actually <a href="https://jwt.io/">JWT tokens</a> in and of themselves. This means that if you have a bearer token, you can unpack it, verify that it was signed by our servers, and find your user ID, your permissions and some other things.</p>
+<h2 id='tools-to-interact-with-the-api'>Tools to interact with the API</h2>
+<p>You can use Postman, Paw, cURL or one of our official Zooniverse libraries to authenticate and create requests to the API:</p>
+
+<ul>
+<li>Python
+
+<ul>
+<li>https://github.com/zooniverse/panoptes-python-client</li>
+</ul></li>
+<li>JavaScript
+
+<ul>
+<li>https://github.com/zooniverse/panoptes-javascript-client</li>
+</ul></li>
+<li>Ruby
+
+<ul>
+<li>https://github.com/zooniverse/panoptes-client.rb</li>
+</ul></li>
+</ul>
+<h2 id='example-using-postman'>Example using Postman</h2>
+<p><a href="https://www.getpostman.com/">Postman</a> is a graphical tool to help you make API calls.</p>
+<h3 id='how-do-you-get-a-token'>How do you get a token?</h3><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/oauth/token</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"grant_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"client_credentials"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"client_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOUR_CLIENT_ID"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"client_secret"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOUR_CLIENT_SECRET"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><pre class="highlight python tab-python"><code><span class="kn">from</span> <span class="nn">panoptes_client</span> <span class="kn">import</span> <span class="n">Panoptes</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">Panoptes</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">''</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">get_bearer_token</span><span class="p">())</span>
+</code></pre><pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'rubygems'</span>
+<span class="nb">require</span> <span class="s1">'panoptes-client'</span>
+<span class="n">client</span> <span class="o">=</span> <span class="no">Panoptes</span><span class="o">::</span><span class="no">Client</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">auth: </span><span class="p">{</span><span class="ss">client_id: </span><span class="no">CLIENT_ID</span><span class="p">,</span> <span class="ss">client_secret: </span><span class="no">CLIENT_SECRET</span><span class="p">})</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="nf">panoptes</span><span class="p">.</span><span class="nf">connection</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s1">'/me'</span><span class="p">)</span>
+<span class="n">auth</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="nf">env</span><span class="p">.</span><span class="nf">request_headers</span><span class="p">[</span><span class="s2">"Authorization"</span><span class="p">]</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">auth</span><span class="p">.</span><span class="nf">gsub</span><span class="p">(</span><span class="sr">/Bearer (.*)/</span><span class="p">,</span> <span class="s2">"</span><span class="se">\\</span><span class="s2">1"</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="n">token</span>
+</code></pre>
+<p>There are multiple ways to get an OAuth bearer token from our authentication system, we support most of the OAuth grant types to convert credentials to a token. However our system restricts non-vetted apps from using particular flows, e.g. password (mostly to stop phishing sites harvesting our user credentials).</p>
+
+<p>The easiest to get started with is to use OAuth and the client credentials OAuth flow. To do this you will need to <a href="https://signin.zooniverse.org/oauth/applications/new">create an OAuth application with our system</a>.</p>
+
+<p>Complete the form like the image below:
+<img src="images/authentication/oauth_application.png" alt="OAuth Application" /></p>
+
+<p>Tick all the resource scopes you&#39;ll be needing access to (start with all). Once setup note your client ID and secret for that app and that this app will be linked to your user account. It is <strong>imperative that you do not share the OAuth application secret</strong> as it can gain access to your Zooniverse account as if you were using the system.</p>
+
+<p>There are other OAuth flows that can be used to get bearer tokens, please <a href="mailto:contact@zooniverse.org">email contact@zooniverse.org</a> to find out more.</p>
+<h3 id='setup-postman-to-use-the-client-credentials-to-get-api-bearer-tokens'>Setup postman to use the client credentials to get API bearer tokens</h3>
+<p>I won’t go into details on how to setup postman, there are lots of <a href="https://www.getpostman.com/docs/v6/">docs that help with this</a>.</p>
+
+<p>You will need to setup a request to <code>https://signin.zooniverse.org/api/me</code> and under the authorization tab, select OAuth 2.0, and click the ‘Get New Access Token’ button. Complete the forms like the images below:</p>
+
+<p><img src="images/authentication/initial_postman_req.png" alt="initial postman req" /></p>
+
+<p><img src="images/authentication/get_new_access_token.png" alt="get new access token" /></p>
+
+<ol>
+<li>Token name is used to identify the token in Postman, this is for your reference only</li>
+<li>Select the grant type to be ‘Client Credentials’</li>
+<li>Use the client ID from the OAuth application you setup at signin.zooniverse.org</li>
+<li>Same for client secret</li>
+<li>Scope is a lowercase, space separated list of all OAuth application scopes you selected at signin.zooniverse.org, in the image above for my testing app i only ticked user scope.
+
+<ul>
+<li>All scopes - user project group collection classification subject medium organization  translation public</li>
+</ul></li>
+<li>Client authentication - send credentials in the request body</li>
+<li>Press ‘Request Token’ button
+
+<ul>
+<li>If you can’t get a token and get a 422 response from the API ensure your scopes match exactly the list you selected for the app at signin.zooniverse.org earlier.</li>
+<li>Use the Postman console to debug the requests</li>
+</ul></li>
+<li>If successful you’ll see a screen with an access token, scroll down and press the ‘Use Token’ button</li>
+</ol>
+
+<p><img src="images/authentication/access_token.png" alt="access token" /></p>
+
+<p>Now the request will have the authentication token setup for use in postman.</p>
+
+<p><img src="images/authentication/req_with_access_token.png" alt="req with access token" /></p>
+<h3 id='add-extra-zooniverse-api-headers-for-each-request'>Add extra Zooniverse API headers for each request</h3>
+<p>The Zooniverse API requires some extra headers to access the API endpoints, specifically setting the Accept and Content-Type headers.</p>
+
+<p>Click on the ‘Headers’ tab and set the following header key value pairs as per the image below.</p>
+
+<ol>
+<li><code>Accept: application/vnd.api+json; version=1</code></li>
+<li><code>Content-Type: application/json</code></li>
+</ol>
+
+<p><img src="images/authentication/api_headers.png" alt="add extra req headers" /></p>
+
+<p>Without the above extra headers any response to API endpoints will return a HTTP 404 response status code.</p>
+<h3 id='ready-to-send-requests-to-the-zooniverse-api'>Ready to send requests to the Zooniverse API</h3>
+<p>The request is now ready to run, click the ‘Send’ button to send the request to the Zooniverse API, you should see the response show up.</p>
+
+<p>This response is to the https://signin.zooniverse.org/api/me endpoint and requests the information about the owner of the bearer token, i.e. ‘me’.</p>
+
+<p><img src="images/authentication/api_me_response.png" alt="api me response" /></p>
+<h3 id='debugging-requests-and-responses'>Debugging requests and responses</h3>
+<p>Again any request failures can be debugged using the postman console, here you get a detailed view each request / response that postman is sending.</p>
+
+<p><img src="images/authentication/postman_console.png" alt="postman console" /></p>
+
+<p>Some common failure modes:
+1. Can’t get a bearer token from OAuth application credentials
+  + Ensure the app id and secret match exactly what is showing in https://signin.zoonivese.org/oauth/applications
+  + Ensure the scopes match exactly, OAuth app has user selected, scopes should be ‘user public’
+0. Get a 404 on /api/* endpoints request
+  + Ensure the extra Accept and content-type headers are set on the requests, without them the API won’t route requests properly.</p>
 <h1 id='json-api-conventions'>JSON-API conventions</h1><h2 id='resource-s-themselves'>Resource(s) themselves</h2><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"users"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
     </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
