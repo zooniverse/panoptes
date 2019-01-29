@@ -250,6 +250,27 @@ namespace :migrate do
                          minor_version: workflow.primary_content.current_version_number.to_i
       end
     end
+
+    desc "Backfill versioning info"
+    task :backfill_workflow_versions => :environment do
+      bf = ::Tasks::BackfillWorkflowVersions.new
+      Workflow.find_each do |wf|
+        puts wf.id
+        puts Time.now
+        next if wf.configuration['versions_backfilled']
+
+        begin
+          bf.backfill(wf)
+          wf.configuration['versions_backfilled'] = true
+          wf.save!(validate: false)
+        rescue StandardError => e
+          wf.configuration['versions_backfilled'] = 'failed'
+          wf.save!(validate: false)
+          puts "ERRRROROR #{e.message}"
+        end
+      end
+    end
+
   end
 
   namespace :workflow_contents do
