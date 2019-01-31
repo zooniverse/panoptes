@@ -1,14 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe Formatter::Csv::AnnotationForCsv do
-  let(:contents) { build_stubbed(:workflow_content, workflow: nil) }
-  let(:workflow) { build_stubbed(:workflow, workflow_contents: [contents], build_contents: false) }
-  let(:cache)    { double(workflow_at_version: workflow, workflow_content_at_version: contents)}
-  let(:classification) do
-    build_stubbed(:classification, subjects: []).tap do |c|
-      allow(c.workflow).to receive(:primary_content).and_return(contents)
-    end
-  end
+  let(:workflow_version) { build_stubbed(:workflow_version, workflow: workflow, tasks: workflow.tasks, strings: workflow.strings) }
+  let(:workflow) { build_stubbed(:workflow, build_contents: false) }
+  let(:cache)    { instance_double("ClassificationDumpCache")}
+  let(:classification) { build_stubbed(:classification, workflow: workflow, subjects: []) }
   let(:annotation) do
     {
       "task" => "interest",
@@ -22,6 +18,11 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
       "task" => "interest",
       "value" => [{"x"=>1, "y"=>2}]
     }
+  end
+
+  before do
+    maj, min = classification.workflow_version.split('.').map(&:to_i)
+    allow(cache).to receive(:workflow_at_version).with(workflow, maj, min).and_return(workflow_version)
   end
 
   it 'adds the task label' do
@@ -55,9 +56,8 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
 
   it 'just records the tool index if the tool label cannot be translated' do
     annotation = {"task" => "interest", "value" => [{"x"=>1, "y"=>2, "tool"=>0}]}
+    workflow_version.strings = {}
     formatter = described_class.new(classification, annotation, cache)
-    content = double(strings: {})
-    allow(formatter).to receive(:primary_content_at_version).and_return(content)
     formatted = formatter.to_h
     expect(formatted["value"][0]["tool_label"]).to be_nil
     expect(formatted["value"][0]["tool"]).to eq(0)
@@ -71,18 +71,10 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
 
   context "with a versioned workflow question type task" do
     with_versioning do
-      let(:workflow) { create(:workflow, workflow_contents: []) }
-      let(:contents) { create(:workflow_content, workflow: workflow) }
+      let(:workflow) { build_stubbed(:workflow, :question_task) }
+
       let(:classification) do
         build_stubbed(:classification, subjects: [], workflow: workflow)
-      end
-      let(:q_workflow) { build(:workflow, :question_task) }
-      let(:tasks) { q_workflow.tasks }
-      let(:strings) { q_workflow.workflow_contents.first.strings }
-
-      before(:each) do
-        workflow.update(workflow_contents: [contents], tasks: tasks)
-        contents.update(strings: strings)
       end
 
       context "invalid annotation values" do
@@ -132,24 +124,21 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         let(:annotation) { { task: "T1", value: [0,2] } }
 
         it 'should add the correct answer labels' do
+          workflow_version.tasks = tasks
+          workflow_version.strings = strings
           formatted = described_class.new(classification, annotation, cache).to_h
           expect(formatted["value"]).to eq(["I sort of love it", "I don't love it"])
         end
       end
 
       context "with a combo task" do
-        let(:new_classification) do
-          build_stubbed(:classification, subjects: [], workflow: combo_workflow, annotations: annotations)
+        let(:classification) do
+          build_stubbed(:classification, subjects: [], workflow: workflow, annotations: annotations)
         end
-        let(:combo_cache) { double(workflow_at_version: combo_workflow, workflow_content_at_version: combo_contents)}
-        let(:combo_annotation) { new_classification.annotations.first }
+        let(:combo_annotation) { classification.annotations.first }
 
         context "with a valid annotation" do
-          let(:complex_with_combo_workflow) { build(:workflow, :complex_task) }
-          let(:combo_workflow) { complex_with_combo_workflow }
-          let(:combo_contents) do
-            create(:workflow_content, :complex_task, workflow: complex_with_combo_workflow)
-          end
+          let(:workflow) { build_stubbed(:workflow, :complex_task) }
           let(:annotations) do
             [{
               "task"=>"T3",
@@ -198,14 +187,13 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
           end
 
           it 'should add the correct answer labels' do
-            formatted = described_class.new(new_classification, combo_annotation, combo_cache).to_h
+            formatted = described_class.new(classification, combo_annotation, cache).to_h
             expect(formatted).to eq(codex)
           end
         end
 
         context "with an malformed annotation" do
-          let(:combo_workflow) { build(:workflow, :combo_task) }
-          let(:combo_contents) { create(:workflow_content, :combo_task, workflow: combo_workflow) }
+          let(:workflow) { build_stubbed(:workflow, :combo_task) }
           let(:annotations) do
             # A valid annotation for the combo task
             # [{ "task"=>"T3", "value"=>[
@@ -224,14 +212,14 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
           end
 
           it 'should output the raw value wrapped in an array' do
-            formatted = described_class.new(new_classification, combo_annotation, combo_cache).to_h
+            formatted = described_class.new(classification, combo_annotation, cache).to_h
             expect(formatted).to eq(codex)
           end
         end
       end
 
       context "with a dropdown task" do
-        let(:dd_workflow) { build(:workflow, :complex_task) }
+        let(:workflow) { build_stubbed(:workflow, :complex_task) }
         let(:annotation) do
           {
             "task"=>"T7",
@@ -243,11 +231,9 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
            }
         end
 
-        let(:dd_classification) do
-          build_stubbed(:classification, subjects: [], workflow: dd_workflow, annotations: [annotation])
+        let(:classification) do
+          build_stubbed(:classification, subjects: [], workflow: workflow, annotations: [annotation])
         end
-        let(:dd_contents) { create(:workflow_content, :complex_task, workflow: dd_workflow) }
-        let(:dd_cache) { double(workflow_at_version: dd_workflow, workflow_content_at_version: dd_contents)}
 
         let(:codex) do
           {
@@ -261,7 +247,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         end
 
         it 'should add the correct answer labels' do
-          formatted = described_class.new(dd_classification, dd_classification.annotations[0], dd_cache).to_h
+          formatted = described_class.new(classification, classification.annotations[0], cache).to_h
           expect(formatted).to eq(codex)
         end
 
@@ -292,36 +278,33 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         let(:annotation) do
            {"task"=>"T1", "value"=>[{"choice"=>"DR", "answers"=>{"BHVR"=>["MVNG"], "DLTNTLRLSS"=>"1"}, "filters"=>{}}]}
         end
-        let(:survey_workflow) { build(:workflow, :survey_task) }
-        let(:survey_contents) { create(:workflow_content, :survey_task, workflow: survey_workflow) }
-        let(:survey_cache) { double(workflow_at_version: survey_workflow, workflow_content_at_version: survey_contents)}
-        let(:survey_classification) do
-          build_stubbed(:classification, subjects: [], workflow: survey_workflow, annotations: [annotation])
+        let(:workflow) { build_stubbed(:workflow, :survey_task) }
+        let(:classification) do
+          build_stubbed(:classification, subjects: [], workflow: workflow, annotations: [annotation])
         end
 
         it 'returns the unaltered annotation' do
-          formatted = described_class.new(survey_classification, survey_classification.annotations[0], survey_cache).to_h
+          formatted = described_class.new(classification, classification.annotations[0], cache).to_h
           expect(formatted).to eq(annotation)
         end
       end
 
       context "when the classification refers to the workflow and contents at a prev version" do
+        let(:workflow_version) { build_stubbed(:workflow_version, workflow: workflow, strings: {'interest.question' => 'Old version'}) }
         let(:classification) do
-          vers = "#{workflow.versions.first.index + 1}.#{contents.versions.first.index + 1}"
+          vers = "8888888.999999"
           build_stubbed(:classification, subjects: [], workflow: workflow, workflow_version: vers)
         end
 
         it 'should add the correct version task label' do
-          allow(cache).to receive(:workflow_at_version).with(workflow, 1).and_return(workflow.versions[1].reify)
-          allow(cache).to receive(:workflow_content_at_version).with(contents, 1).and_return(contents.versions[1].reify)
+          allow(cache).to receive(:workflow_at_version).with(workflow, 1, 1).and_return(workflow_version)
           formatted = described_class.new(classification, annotation, cache).to_h
-          expect(formatted["task_label"]).to eq("Draw a circle")
+          expect(formatted["task_label"]).to eq("Old version")
         end
       end
 
       context "with a shortcut task" do
-        let(:workflow) { build(:workflow, :shortcut) }
-        let(:contents) { workflow.workflow_contents.first }
+        let(:workflow) { build_stubbed(:workflow, :shortcut) }
         let(:tasks) { workflow.tasks }
         let(:strings) { contents.strings }
         let(:annotation) do

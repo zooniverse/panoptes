@@ -11,11 +11,11 @@ FactoryBot.define do
                  {task: "another_one",
                   value: [1, 2]}]
     user_ip "192.168.0.1"
-    workflow_version "15.15"
     completed true
     user
     project
     workflow
+    workflow_version { workflow ? "#{workflow.major_version}.#{workflow.minor_version}" : nil }
     subject_ids do
       create_list(:set_member_subject, 2).map(&:subject).map(&:id)
     end

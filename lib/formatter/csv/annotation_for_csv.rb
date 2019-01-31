@@ -153,16 +153,12 @@ module Formatter
       end
 
       def translate(string)
-        @translations ||= primary_content_at_version.strings
+        @translations ||= workflow_at_version.strings
         @translations[string]
       end
 
-      def primary_content_at_version
-        cache.workflow_content_at_version(classification.workflow.primary_content, content_version)
-      end
-
       def workflow_at_version
-        cache.workflow_at_version(classification.workflow, workflow_version)
+        cache.workflow_at_version(classification.workflow, workflow_version, content_version)
       end
 
       def workflow_version

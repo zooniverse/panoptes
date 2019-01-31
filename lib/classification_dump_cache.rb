@@ -35,20 +35,11 @@ class ClassificationDumpCache
     (@subject_workflow_statuses[subject_id] || []).find {|swc| swc.workflow_id == workflow_id }
   end
 
-  def workflow_at_version(workflow, version)
+  def workflow_at_version(workflow, major_version, minor_version)
     @workflows[workflow.id] ||= {}
-    @workflows[workflow.id][version] ||= begin
-      old_version = workflow.versions[version].try(:reify)
-      old_version || workflow
-    end
-  end
-
-  def workflow_content_at_version(workflow_content, version)
-    @workflow_contents[workflow_content.id] ||= {}
-    @workflow_contents[workflow_content.id][version] ||= begin
-      old_version = workflow_content.versions[version].try(:reify)
-      old_version || workflow_content
-    end
+    @workflows[workflow.id][major_version] ||= {}
+    @workflows[workflow.id][major_version][minor_version] ||=
+      workflow.workflow_versions.find_by!(major_number: major_version, minor_number: minor_version)
   end
 
   def secure_user_ip(ip_string)
