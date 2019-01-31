@@ -1,5 +1,3 @@
-# lib/backfill_workflow_versions.rb
-
 module Tasks
   class BackfillWorkflowVersions
     def backfill_version(workflow, w_index, wc_index, workflow_at_version, workflow_content_at_version)
@@ -16,14 +14,10 @@ module Tasks
     def backfill(workflow)
       workflow_content = workflow.primary_content
 
-      # It is hard to figure out which combinations of major/minor actually
-      # existed. For now I'm opting to simply generate all permutations.
-      # I'd love to have a discussion on how to do this more wisely.
-      #
       puts "Loading workflow versions"
-      workflow_versions = workflow.versions[1..-1].map(&:reify) + [workflow]
+      workflow_versions = workflow.versions.pluck(:id)[1..-1]
       puts "Loading workflow content versions"
-      workflow_content_versions = workflow_content.versions[1..-1].map(&:reify) + [workflow_content]
+      workflow_content_versions = workflow_content.versions.pluck(:id)[1..-1]
 
       puts "Loaded #{workflow_versions.size} workflow versions, #{workflow_content_versions.size} workflow content versions"
 
@@ -37,12 +31,28 @@ module Tasks
         puts used_version
         workflow_index, workflow_content_index = used_version.split(".").map(&:to_i)
 
-        workflow_at_version = workflow_versions[workflow_index - 1]
-        workflow_content_at_version = workflow_content_versions[workflow_content_index - 1]
+        workflow_at_version = if workflow_index >= workflow_versions.size
+                                # latest workflow, no version
+                                workflow
+                              else
+                                workflow.versions.find(workflow_versions[workflow_index - 1]).reify
+                              end
+
+        workflow_content_at_version = if workflow_content_index >= workflow_content_versions.size
+                                        # latest content, no version
+                                        workflow_content
+                                      else
+                                        workflow_content.versions.find(workflow_content_versions[workflow_content_index - 1]).reify
+                                      end
 
         backfill_version(workflow, workflow_index - 1, workflow_content_index - 1, workflow_at_version, workflow_content_at_version)
       end
 
+      # Initially migration started using simply the code below. The workflows with IDs < 1860(ish) were migrated
+      # in this fashion, and so you'll find that these have a lot more versions attached to them, whereas the code above
+      # is much more limited and only creates WorkflowVersion records for those versions that were actually used in a
+      # classification.
+      #
       # workflow_versions.each_with_index do |workflow_at_version, w_index|
       #   workflow_content_versions.each_with_index do |workflow_content_at_version, wc_index|
       #     backfill_version(workflow, w_index, wc_index, workflow_at_version, workflow_content_at_version)
