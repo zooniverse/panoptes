@@ -50,7 +50,7 @@ RSpec.describe DesignatorClient do
     describe "#get_subjects" do
       it 'returns subject ids' do
         stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-          stub.get('/api/workflows/338?limit=5&strategy=weighted&user_id=1', headers) do |env|
+          stub.get('/api/workflows/338?limit=5&user_id=1', headers) do |env|
             [200, {'Content-Type' => 'application/json'}, [1,2,3,4].to_json]
           end
         end
@@ -62,7 +62,7 @@ RSpec.describe DesignatorClient do
       it_behaves_like "handles server errors" do
         let(:method) { :get_subjects }
         let(:params) { [ 338, 1, nil, 5 ] }
-        let(:url) { '/api/workflows/338?limit=5&strategy=weighted&user_id=1' }
+        let(:url) { '/api/workflows/338?limit=5&user_id=1' }
         let(:http_method) { :get }
       end
     end
