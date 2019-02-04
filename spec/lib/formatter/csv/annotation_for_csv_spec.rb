@@ -268,7 +268,7 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
           end
 
           it 'should add the correct answer labels' do
-            formatted = described_class.new(dd_classification, dd_classification.annotations[0], dd_cache).to_h
+            formatted = described_class.new(classification, classification.annotations[0], cache).to_h
             expect(formatted).to eq(codex)
           end
         end
