@@ -16,7 +16,7 @@ module Types
     end
 
     def projects(**filters)
-      scope = object.projects.preload(:project_contents)
+      scope = object.projects
       scope = scope.joins(:tags).where(tags: {name: tags.map(&:downcase)}) if tags.present?
       apply_filters(scope, filters)
     end
