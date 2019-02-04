@@ -1,4 +1,4 @@
 class GraphqlSchema < GraphQL::Schema
   query(Types::QueryType)
-  # mutation(Types::MutationType)
+  mutation(Types::MutationType)
 end
