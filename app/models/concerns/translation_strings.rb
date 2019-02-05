@@ -48,6 +48,10 @@ class TranslationStrings
     attributes[nested_key] = extract_nested_attributes(%i(title content), nested_key)
   end
 
+  def transform_organization_attributes
+    attributes["title"] = attributes["display_name"]
+  end
+
   # pandora app uses the tasks key to find the tasks strings
   def transform_workflow_attributes
     attributes["tasks"] = attributes.delete("strings")

@@ -28,11 +28,6 @@ describe Organizations::Create do
     expect(organization.url_labels).to eq({"0.label" => "Blog"})
   end
 
-  it 'sets the content attributes on its primary_content' do
-    organization = operation.run!(**params)
-    expect(organization.primary_content.introduction).to eq('org intro')
-  end
-
   it 'sets the content attributes on itself' do
     organization = operation.run!(**params)
     expect(organization.introduction).to eq('org intro')

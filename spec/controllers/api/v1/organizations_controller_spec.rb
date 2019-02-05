@@ -10,7 +10,6 @@ describe Api::V1::OrganizationsController, type: :controller do
   let(:api_resource_name) { "organizations" }
   let(:api_resource_links) do
     [ "organizations.projects",
-      "organizations.organization_contents",
       "organizations.organization_roles",
       "organizations.avatar",
       "organizations.background",

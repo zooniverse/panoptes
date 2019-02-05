@@ -3,7 +3,6 @@ module Organizations
     string :display_name
     string :primary_language
 
-    # Organization Contents Fields
     string :description
     string :introduction, default: ''
     string :announcement, default: ''
@@ -14,7 +13,6 @@ module Organizations
     def execute
       Organization.transaction(requires_new: true) do
         organization = build_organization
-        organization.organization_contents.build(organization_contents_params)
 
         tag_objects = Tags::BuildTags.run!(api_user: api_user, tag_array: tags) if tags
         organization.tags = tag_objects unless tags.nil?
@@ -32,8 +30,12 @@ module Organizations
         display_name: display_name,
         primary_language: primary_language,
         categories: categories,
-        urls: urls
-      }.merge(organization_contents_params.slice(:description, :introduction, :announcement, :url_labels)))
+        urls: urls_without_labels,
+        url_labels: url_labels,
+        description: description,
+        introduction: introduction,
+        announcement: announcement
+      })
     end
 
     def organization_contents_params
@@ -51,6 +53,20 @@ module Organizations
     def organization_contents_from_params
       fields = Api::V1::OrganizationsController::CONTENT_FIELDS
       ContentFromParams.content_from_params(inputs, fields)
+    end
+
+    def urls_without_labels
+      urls_without_labels, _ = extract_url_labels
+      urls_without_labels
+    end
+
+    def url_labels
+      _, url_labels = extract_url_labels
+      url_labels
+    end
+
+    def extract_url_labels
+      @extract_url_labels ||= UrlLabels.extract_url_labels(urls)
     end
   end
 end

@@ -58,8 +58,6 @@ Rails.application.routes.draw do
 
       json_api_resources :project_contents, versioned: true
 
-      json_api_resources :organization_contents, versioned: true
-
       json_api_resources :set_member_subjects, links: [:retired_workflows]
 
       json_api_resources :project_roles
