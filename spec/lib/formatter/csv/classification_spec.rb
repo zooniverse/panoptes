@@ -13,10 +13,9 @@ RSpec.describe Formatter::Csv::Classification do
   let(:subject_ids) { subject.id.to_s }
   let(:secure_user_ip) { SecureRandom.hex(10) }
   let(:cache) do
-    double("Cache", subject: subject,
+    instance_double("ClassificationDumpCache", subject: subject,
       retired?: false,
       workflow_at_version: workflow,
-      workflow_content_at_version: double("WorkflowContent", strings: {}),
       secure_user_ip: secure_user_ip,
       subject_ids_from_classification: [subject.id]
     )

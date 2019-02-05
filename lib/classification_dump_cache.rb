@@ -1,7 +1,6 @@
 class ClassificationDumpCache
   def initialize
     @workflows = {}
-    @workflow_contents = {}
     @subjects = {}
     @subject_workflow_statuses = {}
     @classification_to_subjects = {}

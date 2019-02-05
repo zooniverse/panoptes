@@ -30,7 +30,6 @@ namespace :project do
         end
         dump_data["workflows"].each_with_index do |workflow_attrs, index|
           w = Workflow.new(workflow_attrs.merge(project: p))
-          w.workflow_contents << WorkflowContent.new(dump_data["workflow_contents"][index])
           instances << w << w.workflow_contents.first
         end
         ActiveRecord::Base.transaction { instances.map(&:save!) }

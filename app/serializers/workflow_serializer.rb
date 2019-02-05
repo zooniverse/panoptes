@@ -19,7 +19,6 @@ class WorkflowSerializer
 
   can_filter_by :active, :mobile_friendly
 
-  # :workflow_contents, Note: re-add when the eager_load from translatable_resources is removed
   preload :subject_sets, :attached_images
 
   def version
