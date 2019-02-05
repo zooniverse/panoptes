@@ -49,7 +49,7 @@ class DesignatorClient
 
   def get_subjects(workflow_id, user_id, _group_id, limit)
     url = "/api/workflows/#{workflow_id}"
-    params = { strategy: :weighted, user_id: user_id, limit: limit }
+    params = { user_id: user_id, limit: limit }
     request(:get, [ url, params ])
   end
 
