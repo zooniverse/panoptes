@@ -6,9 +6,9 @@ module Formatter
       JSON_FIELDS = [:tasks, :aggregation, :strings ].freeze
 
       def headers
-        %w(workflow_id display_name version minor_version active classifications_count pairwise
+        %w(workflow_id display_name version active classifications_count pairwise
         grouped prioritized primary_language first_task tutorial_subject_id
-        retired_set_member_subjects_count tasks retirement aggregation strings)
+        retired_set_member_subjects_count tasks retirement aggregation strings minor_version)
       end
 
       def to_rows(workflow_version)
@@ -28,6 +28,26 @@ module Formatter
 
       def retirement
         workflow.retirement_with_defaults.to_json
+      end
+
+      def version
+        workflow_version.major_number
+      end
+
+      def minor_version
+        workflow_version.minor_number
+      end
+
+      def pairwise
+        workflow.pairwise
+      end
+
+      def grouped
+        workflow.grouped
+      end
+
+      def prioritized
+        workflow.prioritized
       end
 
       def method_missing(method, *args, &block)
