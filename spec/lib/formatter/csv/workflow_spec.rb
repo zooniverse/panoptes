@@ -15,7 +15,6 @@ RSpec.describe Formatter::Csv::Workflow do
         workflow.id,
         workflow.display_name,
         workflow_version.major_number,
-        workflow_version.minor_number,
         workflow.active,
         workflow.classifications_count,
         workflow.pairwise,
@@ -28,7 +27,8 @@ RSpec.describe Formatter::Csv::Workflow do
         workflow_version.tasks.to_json,
         retirement_json,
         workflow.aggregation.to_json,
-        workflow_version.strings.to_json
+        workflow_version.strings.to_json,
+        workflow_version.minor_number
       ]
     ]
   end
