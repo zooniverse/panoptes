@@ -27,9 +27,9 @@ RSpec.describe WorkflowsDumpWorker do
       it "should append all previous versions to the csv file" do
         aggregate_failures "versions" do
           expect_any_instance_of(CSV).to receive(:<<).exactly(3).times.and_call_original
-          [ workflow, workflow.previous_version ].each do |version|
+          workflow.workflow_versions.each do |version|
             expect_any_instance_of(Formatter::Csv::Workflow).to receive(:to_array)
-            .with(version).and_call_original
+              .with(version).and_call_original
           end
           worker.perform(project.id, "project")
         end
