@@ -1,0 +1,9 @@
+{
+  "extensions": {
+    "endpoints": {
+      "dev": "http://localhost:3000/graphql",
+      "staging": "https://panoptes-staging.zooniverse.org/graphql",
+      "production": "https://panoptes.zooniverse.org/graphql"
+    }
+  }
+}

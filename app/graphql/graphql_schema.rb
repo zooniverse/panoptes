@@ -1,3 +1,4 @@
-GraphqlSchema = GraphQL::Schema.define do
-  query(QueryRoot)
+class GraphqlSchema < GraphQL::Schema
+  query(Types::QueryType)
+  mutation(Types::MutationType)
 end
