@@ -33,7 +33,7 @@ module Formatter
       def method_missing(method, *args, &block)
         value = if workflow_version.respond_to?(method)
                   workflow_version.public_send(method, *args, &block)
-                else workflow.respond_to?(method)
+                else
                   workflow_version.workflow.public_send(method, *args, &block)
                 end
 
