@@ -12,6 +12,7 @@ class Api::V1::TranslationsController < Api::ApiController
   schema_type :json_schema
 
   before_action :downcase_language_param, except: :create
+  before_action :non_primary_language, only: :update
 
   def create
     check_polymorphic_controller_resources
@@ -55,5 +56,22 @@ class Api::V1::TranslationsController < Api::ApiController
 
   def downcase_language_param
     params[:language] = params[:language]&.downcase
+  end
+
+  # Owners & collaborators should update the primary langauge through the lab app
+  # translators should not be allowed to modify a primary language via the API
+  def non_primary_language
+    translated_resource = controlled_resource.translated
+    # handle the difference between resources like projects & field guides
+    translated_resource_primary_language =
+      if translated_resource.respond_to?(:primary_language)
+        translated_resource.primary_language
+      else
+        translated_resource.language
+      end
+
+    if translated_resource_primary_language == controlled_resource.language
+      raise JsonApiController::AccessDenied, no_resources_error_message
+    end
   end
 end
