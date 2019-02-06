@@ -11,8 +11,6 @@ class Translation < ActiveRecord::Base
 
   before_validation :downcase_language, on: :create
 
-  # TODO: Versioning and maintaining a live, published version
-
   def self.translated_model_names
     @translated_model_names ||= %w(
       project
