@@ -111,6 +111,22 @@ pipeline {
               kill \${KEEP_ALIVE_ECHO_JOB}
             """
           }
+          post {
+            success {
+              slackSend (
+                  color: '#00FF00',
+                  message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
+            failure {
+              slackSend (
+                  color: '#FF0000',
+                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
+          }
         }
         stage('Production Dump workers') {
           when { tag 'production-release' }
@@ -131,6 +147,22 @@ pipeline {
               ./rebuild.sh panoptes-dumpworker
               kill \${KEEP_ALIVE_ECHO_JOB}
             """
+          }
+          post {
+            success {
+              slackSend (
+                  color: '#00FF00',
+                  message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
+            failure {
+              slackSend (
+                  color: '#FF0000',
+                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
           }
         }
       }
@@ -207,6 +239,15 @@ pipeline {
               kill \${KEEP_ALIVE_ECHO_JOB}
             """
           }
+        }
+      }
+      post {
+        failure {
+          slackSend (
+              color: '#FF0000',
+              message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+              channel: "#ops"
+              )
         }
       }
     }
