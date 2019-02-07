@@ -7,7 +7,9 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
   %i(project).each do |resource_type|
     let(:resource_class) { Translation }
     let(:translated_resource) { create(resource_type) }
-    let(:resource) { create(:translation, translated: translated_resource) }
+    let(:resource) do
+      create(:translation, language: 'es', translated: translated_resource)
+    end
     let(:api_resource_name) { "translations" }
     let(:api_resource_attributes) { %w(id strings language) }
     let(:api_resource_links) { %w(translations.project) }
@@ -20,6 +22,30 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
         user_group: authorized_user.identity_group,
         roles: ["translator"]
       )
+    end
+
+    shared_examples "it does not allow primary language payloads" do
+      let(:resource) do
+        create(:translation, translated: translated_resource)
+      end
+
+      context "with a translator role" do
+        before { user_translator_role }
+
+        it "it should not allow changes to primary language translations" do
+          run_request
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+
+      context "with an owner role" do
+        let(:authorized_user) { translated_resource.owner }
+
+        it "it should not allow changes to primary language translations" do
+          run_request
+          expect(response).to have_http_status(:not_found)
+        end
+      end
     end
 
     describe "#index" do
@@ -98,6 +124,14 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
       it_behaves_like "is creatable" do
         before { user_translator_role }
       end
+
+      it_behaves_like "it does not allow primary language payloads" do
+        let(:language) { translated_resource.primary_language }
+        let(:run_request) do
+          default_request scopes: scopes, user_id: authorized_user.id
+          post :create, create_params
+        end
+      end
     end
 
     describe "#show" do
@@ -139,31 +173,39 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
     end
 
     describe "#update" do
+      let(:translation_strings) do
+        {
+          title: "Un buen proyecto",
+          description: "Esto es increíble",
+          introduction: "Este proyecto tiene como objetivo encontrar",
+          workflow_description: "¿Se ha utilizado este campo?",
+          researcher_quote: "Posiblemente el cuarto proyecto más grande jamás",
+          urls: [
+            {label: "Blog", url: "http://blog.example.com/"},
+            {label: "El Gorjeo", url: "http://twitter.com/example"}
+          ]
+        }
+      end
+      let(:update_params) do
+        {
+          translations: {
+            strings: translation_strings
+          },
+          translated_type: resource_type.to_s
+        }
+      end
+
       it_behaves_like "is updatable" do
         before { user_translator_role }
-
-        let(:translation_strings) do
-          {
-            title: "Un buen proyecto",
-            description: "Esto es increíble",
-            introduction: "Este proyecto tiene como objetivo encontrar",
-            workflow_description: "¿Se ha utilizado este campo?",
-            researcher_quote: "Posiblemente el cuarto proyecto más grande jamás",
-            urls: [
-              {label: "Blog", url: "http://blog.example.com/"},
-              {label: "El Gorjeo", url: "http://twitter.com/example"}
-            ]
-          }
-        end
         let(:test_attr) { :strings }
         let(:test_attr_value)  { JSON.parse(translation_strings.to_json) }
-        let(:update_params) do
-          {
-            translations: {
-              strings: translation_strings
-            },
-            translated_type: resource_type.to_s
-          }
+      end
+
+      it_behaves_like "it does not allow primary language payloads" do
+        let(:run_request) do
+          default_request scopes: scopes, user_id: authorized_user.id
+          params = update_params.merge(id: resource.id)
+          put :update, params
         end
       end
     end

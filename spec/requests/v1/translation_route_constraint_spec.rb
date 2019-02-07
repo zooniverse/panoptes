@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "translation api custom route constraints", type: :request do
   include APIRequestHelpers
-  let(:translation) { create(:project_translation) }
+  let(:translation) { create(:project_translation, language: 'en-NZ') }
   let(:user) { translation.translated.owner }
   let(:query_params) do
     "translated_type=#{translation.translated_type}&translated_id=#{translation.translated_id}"
