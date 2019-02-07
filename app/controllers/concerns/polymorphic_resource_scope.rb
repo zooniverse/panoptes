@@ -52,7 +52,7 @@ module PolymorphicResourceScope
   end
 
   def polymorphic_controlled_resourse
-    @polymorphic_controlled_resourse ||= @polymorphic_controlled_resourses.first
+    @polymorphic_controlled_resourse ||= polymorphic_controlled_resourses.first
   end
 
   def polymorphic_klass_name

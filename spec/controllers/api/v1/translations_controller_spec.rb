@@ -24,6 +24,30 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
       )
     end
 
+    shared_examples "it does not allow primary language payloads" do
+      let(:resource) do
+        create(:translation, translated: translated_resource)
+      end
+
+      context "with a translator role" do
+        before { user_translator_role }
+
+        it "it should not allow changes to primary language translations" do
+          run_request
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+
+      context "with an owner role" do
+        let(:authorized_user) { translated_resource.owner }
+
+        it "it should not allow changes to primary language translations" do
+          run_request
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+
     describe "#index" do
       it_behaves_like "is indexable" do
         let(:index_params) do
@@ -100,6 +124,14 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
       it_behaves_like "is creatable" do
         before { user_translator_role }
       end
+
+      it_behaves_like "it does not allow primary language payloads" do
+        let(:language) { translated_resource.primary_language }
+        let(:run_request) do
+          default_request scopes: scopes, user_id: authorized_user.id
+          post :create, create_params
+        end
+      end
     end
 
     describe "#show" do
@@ -169,31 +201,11 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
         let(:test_attr_value)  { JSON.parse(translation_strings.to_json) }
       end
 
-      describe "updates to the primary language" do
-        let(:resource) do
-          create(:translation, translated: translated_resource)
-        end
-
-        context "with a translator role" do
-          before { user_translator_role }
-
-          it "it should not allow changes to primary language translations" do
-            default_request scopes: scopes, user_id: authorized_user.id
-            params = update_params.merge(id: resource.id)
-            put :update, params
-            expect(response).to have_http_status(:not_found)
-          end
-        end
-
-        context "with an owner role" do
-          let(:authorized_user) { translated_resource.owner }
-
-          it "it should not allow changes to primary language translations" do
-            default_request scopes: scopes, user_id: authorized_user.id
-            params = update_params.merge(id: resource.id)
-            put :update, params
-            expect(response).to have_http_status(:not_found)
-          end
+      it_behaves_like "it does not allow primary language payloads" do
+        let(:run_request) do
+          default_request scopes: scopes, user_id: authorized_user.id
+          params = update_params.merge(id: resource.id)
+          put :update, params
         end
       end
     end
