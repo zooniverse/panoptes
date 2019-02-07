@@ -69,6 +69,15 @@ pipeline {
               kill \${KEEP_ALIVE_ECHO_JOB}
             """
           }
+          post {
+            failure {
+              slackSend (
+                  color: '#FF0000',
+                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
+          }
         }
         stage('Staging Dump workers') {
           when { branch 'master' }
@@ -89,6 +98,15 @@ pipeline {
               ./rebuild.sh panoptes-dumpworker-staging
               kill \${KEEP_ALIVE_ECHO_JOB}
             """
+          }
+          post {
+            failure {
+              slackSend (
+                  color: '#FF0000',
+                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
           }
         }
         stage('Production API') {
@@ -111,6 +129,22 @@ pipeline {
               kill \${KEEP_ALIVE_ECHO_JOB}
             """
           }
+          post {
+            success {
+              slackSend (
+                  color: '#00FF00',
+                  message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
+            failure {
+              slackSend (
+                  color: '#FF0000',
+                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
+          }
         }
         stage('Production Dump workers') {
           when { tag 'production-release' }
@@ -131,6 +165,22 @@ pipeline {
               ./rebuild.sh panoptes-dumpworker
               kill \${KEEP_ALIVE_ECHO_JOB}
             """
+          }
+          post {
+            success {
+              slackSend (
+                  color: '#00FF00',
+                  message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
+            failure {
+              slackSend (
+                  color: '#FF0000',
+                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
           }
         }
       }
@@ -161,6 +211,15 @@ pipeline {
           ssh ubuntu@\$INSTANCE_DNS_NAME docker-compose -f /opt/docker_start/docker-compose.yml -p panoptes-api-staging exec -T panoptes ./migrate.sh
           kill \${KEEP_ALIVE_ECHO_JOB}
         """
+      }
+      post {
+        failure {
+          slackSend (
+              color: '#FF0000',
+              message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+              channel: "#ops"
+              )
+        }
       }
     }
 
@@ -207,6 +266,15 @@ pipeline {
               kill \${KEEP_ALIVE_ECHO_JOB}
             """
           }
+        }
+      }
+      post {
+        failure {
+          slackSend (
+              color: '#FF0000',
+              message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+              channel: "#ops"
+              )
         }
       }
     }
