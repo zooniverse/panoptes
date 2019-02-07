@@ -12,13 +12,6 @@ describe Organization, type: :model do
     let(:activatable) { organization }
   end
 
-  it_behaves_like "has content" do
-    let(:translatable) { create(:organization) }
-    let(:translatable_without_content) { build(:organization, build_contents: false) }
-    let(:primary_language_factory) { :organization }
-    let(:private_model) { create(:organization, listed_at: nil) }
-  end
-
   it_behaves_like "is translatable" do
     let(:model) { create :organization }
   end

@@ -25,11 +25,6 @@ describe Organizations::Update do
     expect(organization.url_labels).to eq({"0.label" => "Blog"})
   end
 
-  it 'sets the content attributes on its primary_content' do
-    organization = operation.run!(organization_params: params)
-    expect(organization.reload.primary_content.introduction).to eq('org intro')
-  end
-
   it 'sets the content attributes on itself' do
     organization = operation.run!(organization_params: params)
     expect(organization.introduction).to eq('org intro')

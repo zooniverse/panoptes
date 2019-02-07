@@ -11,7 +11,7 @@ class OrganizationSerializer
   optional :avatar_src
   media_include :avatar, :background, :attached_images
   can_filter_by :display_name, :slug, :listed
-  can_include :organization_contents, :organization_roles, :projects, :owners, :pages
+  can_include :organization_roles, :projects, :owners, :pages
 
   def avatar_src
     if avatar = @model.avatar

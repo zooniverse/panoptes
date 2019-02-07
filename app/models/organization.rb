@@ -2,7 +2,6 @@ class Organization < ActiveRecord::Base
   include RoleControl::Owned
   include Activatable
   include SluggedName
-  include HasContents
   include Translatable
   include Versioning
 
@@ -21,9 +20,9 @@ class Organization < ActiveRecord::Base
   has_many :tagged_resources, as: :resource
   has_many :tags, through: :tagged_resources
 
-  accepts_nested_attributes_for :organization_contents
-
   versioned association: :organization_versions, attributes: %w(display_name description introduction urls url_labels announcement)
+
+  validates :primary_language, format: {with: LanguageValidation.lang_regex}
 
   alias_attribute :title, :display_name
 

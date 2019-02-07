@@ -62,7 +62,7 @@ describe TranslationStrings do
   def organization_strings(resource)
     {
       "display_name" => resource.display_name,
-      "title" => "Test Organization",
+      "title" => resource.display_name,
       "description" => "This is the description for an Organization",
       "introduction" => "This is the intro for an Organization",
       "announcement" => "Alert: This organization has something to let you know",
