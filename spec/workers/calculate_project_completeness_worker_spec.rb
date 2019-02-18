@@ -171,6 +171,20 @@ describe CalculateProjectCompletenessWorker do
         }.to("paused")
       end
     end
+
+    context 'when the project is active with no workflows' do
+      before do
+        allow(project).to receive(:active_workflows).and_return(double(pluck: [], empty?: true))
+      end
+
+      it 'should move it to paused' do
+        expect {
+          worker.perform(project)
+        }.to change {
+          project.state
+        }.to("paused")
+      end
+    end
   end
 
   describe "project touch timestamp" do

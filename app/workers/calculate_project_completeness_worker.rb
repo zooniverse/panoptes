@@ -36,7 +36,7 @@ class CalculateProjectCompletenessWorker
   end
 
   def project_completeness
-    return 0.0 if project.active_workflows.empty?
+    return 0.0 if no_active_workflows?
 
     completenesses = project.active_workflows.pluck(:completeness)
     completenesses.sum / completenesses.size.to_f
@@ -63,12 +63,16 @@ class CalculateProjectCompletenessWorker
       return columns_to_update
     end
 
-    if completeness.to_i == 1
+    if completeness.to_i == 1 || no_active_workflows?
       columns_to_update[:state] = Project.states[:paused]
     elsif project.paused?
       columns_to_update[:state] = Project.states[:active]
     end
 
     columns_to_update
+  end
+
+  def no_active_workflows?
+    project.active_workflows.empty?
   end
 end
