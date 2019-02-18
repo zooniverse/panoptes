@@ -54,8 +54,6 @@ Rails.application.routes.draw do
 
       json_api_resources :collection_preferences
 
-      json_api_resources :workflow_contents, versioned: true
-
       json_api_resources :project_contents, versioned: true
 
       json_api_resources :set_member_subjects, links: [:retired_workflows]

@@ -11,14 +11,6 @@ describe Workflow, type: :model do
 
   it_behaves_like "has subject_count"
 
-  it_behaves_like "has content" do
-    let(:translatable) { create(:workflow_with_contents, build_extra_contents: true) }
-    let(:translatable_without_content) { build(:workflow, build_contents: false) }
-    let(:primary_language_factory) { :workflow }
-    let(:private_project) { create(:project, private: true) }
-    let(:private_model) { create(:workflow, project: private_project) }
-  end
-
   it_behaves_like "is translatable" do
     let(:model) { create :workflow }
   end
@@ -205,7 +197,6 @@ describe Workflow, type: :model do
 
     it 'defaults version numbers to 1' do
       workflow = Workflow.new(project: create(:project), display_name: "FOO", primary_language: 'en-us', first_task: 'init')
-      workflow_content = workflow.workflow_contents.build(language: 'en-us')
       workflow.save!
       expect(workflow.major_version).to eq(1)
       expect(workflow.minor_version).to eq(1)

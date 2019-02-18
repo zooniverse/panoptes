@@ -183,9 +183,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         put :update, update_params
         instance = Workflow.find(created_instance_id(api_resource_name))
         expect(instance.tasks["interest"]["question"]).to eq("interest.question")
-        contents = instance.primary_content
         expect(instance.strings["interest.question"]).to eq(new_question)
-        expect(contents.strings["interest.question"]).to eq(new_question)
       end
 
       context "when only updating the task content strings" do
@@ -205,12 +203,10 @@ describe Api::V1::WorkflowsController, type: :controller do
           }
         end
 
-        it 'should update the associated contents' do
+        it 'should update the strings' do
           put :update, task_only_update_params
           instance = Workflow.find(created_instance_id(api_resource_name))
-          contents = instance.primary_content
           expect(instance.strings["interest.question"]).to eq(new_question)
-          expect(contents.strings["interest.question"]).to eq(new_question)
         end
       end
 
@@ -238,11 +234,11 @@ describe Api::V1::WorkflowsController, type: :controller do
           }
         end
 
-        it "should not update the workflow content strings" do
+        it "should not update the strings" do
           expect {
             put :update, no_task_update_params
           }.not_to change {
-            resource.primary_content.reload.strings
+            resource.reload.strings
           }
         end
       end
@@ -278,11 +274,6 @@ describe Api::V1::WorkflowsController, type: :controller do
 
         it 'should return 403' do
           expect(response).to have_http_status(:forbidden)
-        end
-
-        it 'should not have changed the content model' do
-          content = resource.primary_content
-          expect{ content.reload }.to_not change{content.strings}
         end
       end
 
@@ -330,8 +321,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         end
 
         it 'should update the content model' do
-          content = resource.primary_content
-          expect{ content.reload }.to change{ content.strings }
+          expect{ resource.reload }.to change{ resource.strings }
         end
       end
     end

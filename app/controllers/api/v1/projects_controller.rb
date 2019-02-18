@@ -96,8 +96,7 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def create_workflow_contents_export
-    medium = Projects::CreateWorkflowContentsExport.with(api_user: api_user, object: controlled_resource).run!(params)
-    medium_response(medium)
+    head :gone
   end
 
   def create
@@ -164,9 +163,7 @@ class Api::V1::ProjectsController < Api::ApiController
     Array.wrap(item_scope).map do |item|
       case item
       when Workflow
-        item.dup.tap do |dup_object|
-          dup_object.workflow_contents = item.workflow_contents.map(&:dup)
-        end
+        item.dup
       when SubjectSet
         if !item.belongs_to_project?(project_id)
           SubjectSetCopier.new(item, project_id).duplicate_subject_set_and_subjects

@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe Formatter::Csv::Workflow do
   let(:workflow) { create(:workflow) }
   let(:project) { workflow.project }
-  let(:workflow_version) { workflow }
+  let(:workflow_version) { workflow.workflow_versions.first }
 
   def retirement_json
     ::Workflow::DEFAULT_RETIREMENT_OPTIONS.to_json
@@ -12,27 +12,29 @@ RSpec.describe Formatter::Csv::Workflow do
   let(:rows) do
     [
       [
-        workflow_version.id,
-        workflow_version.display_name,
-        ModelVersion.version_number(workflow_version),
-        workflow_version.active,
-        workflow_version.classifications_count,
-        workflow_version.pairwise,
-        workflow_version.grouped,
-        workflow_version.prioritized,
-        workflow_version.primary_language,
+        workflow.id,
+        workflow.display_name,
+        workflow_version.major_number,
+        workflow.active,
+        workflow.classifications_count,
+        workflow.pairwise,
+        workflow.grouped,
+        workflow.prioritized,
+        workflow.primary_language,
         workflow_version.first_task,
-        workflow_version.tutorial_subject_id,
-        workflow_version.retired_set_member_subjects_count,
+        workflow.tutorial_subject_id,
+        workflow.retired_set_member_subjects_count,
         workflow_version.tasks.to_json,
         retirement_json,
-        workflow_version.aggregation.to_json
+        workflow.aggregation.to_json,
+        workflow_version.strings.to_json,
+        workflow_version.minor_number
       ]
     ]
   end
 
   let(:header) do
-    %w(workflow_id display_name version active classifications_count pairwise grouped prioritized primary_language first_task tutorial_subject_id retired_set_member_subjects_count tasks retirement aggregation)
+    %w(workflow_id display_name version minor_version active classifications_count pairwise grouped prioritized primary_language first_task tutorial_subject_id retired_set_member_subjects_count tasks retirement aggregation strings)
   end
 
   describe "#headers" do
@@ -62,13 +64,13 @@ RSpec.describe Formatter::Csv::Workflow do
       end
 
       describe "#to_rows on the latest version" do
-        subject { described_class.new.to_rows(workflow) }
+        subject { described_class.new.to_rows(workflow_version) }
 
         it { is_expected.to match_array(rows) }
       end
 
       describe "#to_rows on the previous version" do
-        let(:workflow_version) { workflow.previous_version }
+        let(:workflow_version) { workflow.workflow_versions.order(:created_at).first }
 
         subject { described_class.new.to_rows(workflow_version) }
 

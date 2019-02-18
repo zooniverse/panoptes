@@ -13,10 +13,9 @@ RSpec.describe Formatter::Csv::Classification do
   let(:subject_ids) { subject.id.to_s }
   let(:secure_user_ip) { SecureRandom.hex(10) }
   let(:cache) do
-    double("Cache", subject: subject,
+    instance_double("ClassificationDumpCache", subject: subject,
       retired?: false,
       workflow_at_version: workflow,
-      workflow_content_at_version: double("WorkflowContent", strings: {}),
       secure_user_ip: secure_user_ip,
       subject_ids_from_classification: [subject.id]
     )
@@ -43,7 +42,7 @@ RSpec.describe Formatter::Csv::Classification do
     ]
   end
 
-  let(:workflow) { build_stubbed(:workflow, build_contents: false) }
+  let(:workflow) { build_stubbed(:workflow) }
   let(:project) { build_stubbed(:project, workflows: [workflow]) }
   let(:classification) { build_stubbed(:classification, project: project, workflow: workflow, subjects: [subject]) }
   let(:formatter) { described_class.new(cache) }
@@ -57,7 +56,6 @@ RSpec.describe Formatter::Csv::Classification do
   describe "#to_rows" do
     before(:each) do
       allow(Subject).to receive(:where).with(id: classification.subject_ids).and_return([subject])
-      allow(workflow).to receive(:primary_content).and_return(build_stubbed(:workflow_content, workflow: workflow))
     end
 
     it 'return an array formatted classifcation data' do

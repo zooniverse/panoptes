@@ -1,10 +1,5 @@
 FactoryBot.define do
   factory :workflow, aliases: [:workflow_with_contents] do
-    transient do
-      build_contents true
-      build_extra_contents false
-    end
-
     display_name "A Workflow"
 
     first_task "interest"
@@ -76,16 +71,6 @@ FactoryBot.define do
             "shape.answers.2.label" => "Star or artifact",
             })
 
-    after(:build) do |w, env|
-      if env.build_contents
-        w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: w.primary_language)
-        if env.build_extra_contents
-          w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: 'en-US')
-          w.workflow_contents << build_list(:workflow_content, 1, workflow: w, language: 'zh-TW')
-        end
-      end
-    end
-
     factory :workflow_with_subject_set do
       after(:create) do |w|
         create_list(:subject_set, 1, workflows: [w], project: w.project)
@@ -132,18 +117,6 @@ FactoryBot.define do
         "init.answers.1.label" => "No",
         "init.question" => "Is there a cat in the image"
       })
-
-      after(:build) do |w, env|
-        if env.build_contents
-          strings = {
-            "init.help" => "You know what a cat looks like right?",
-            "init.answers.0.label" => "Yes",
-            "init.answers.1.label" => "No",
-            "init.question" => "Is there a cat in the image"
-          }
-          w.workflow_contents.first.update(strings: strings)
-        end
-      end
     end
 
     trait :survey_task do
@@ -152,6 +125,9 @@ FactoryBot.define do
         "T1"=>{
           "type"=>"survey"
         }
+      })
+      strings({
+        "T1.help"=>"this is a survey",
       })
     end
 
@@ -263,6 +239,7 @@ FactoryBot.define do
           }
         }
       )
+
       strings({
         "T2.help"=>"Just pick a fruit already",
         "T2.answers.0.label"=>"Pineapple",
@@ -324,6 +301,15 @@ FactoryBot.define do
           "tasks"=>["T1", "T2"]
         }
       })
+      strings({
+        "T1.help"=>"Just pick a fruit already",
+        "T1.instruction"=>"Tell me a secret.",
+        "T2.help"=>"Help is needed here I see",
+        "T2.question"=>"Choose one of the labels",
+        "T2.answers.0.label"=>"I'm positive.",
+        "T2.answers.1.label"=>"Well now I'm second guessing myself",
+        "T2.answers.2.label"=>"Has to be the correct one, for sure...right"
+      })
     end
 
     trait :shortcut do
@@ -336,21 +322,10 @@ FactoryBot.define do
           }
         }
       )
-
       strings ({
         "init.answers.0.label" => "yes",
         "init.question" => "Fire present?"
       })
-
-      after(:build) do |w, env|
-        if env.build_contents
-          strings = {
-            "init.answers.0.label" => "yes",
-            "init.question" => "Fire present?"
-          }
-          w.workflow_contents.first.update(strings: strings)
-        end
-      end
     end
   end
 end

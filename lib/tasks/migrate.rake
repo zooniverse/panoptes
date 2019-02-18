@@ -252,15 +252,6 @@ namespace :migrate do
     end
   end
 
-  namespace :workflow_contents do
-    desc "Set the workflow_contents version cache key attribute"
-    task :update_version_cache_key => :environment do
-      WorkflowContent.where(current_version_number: nil).find_each do |wc|
-        wc.send(:update_workflow_version_cache)
-      end
-    end
-  end
-
   namespace :subject_workflow_status do
     desc "Create SubjectWorklfowStatus records for the internal PG subject selector"
     task :create_records_for_pg_selector => :environment do
