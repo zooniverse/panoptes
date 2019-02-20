@@ -19,7 +19,6 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:api_resource_links) do
     [ "projects.workflows",
       "projects.subject_sets",
-      "projects.project_contents",
       "projects.project_roles",
       "projects.avatar",
       "projects.background",
@@ -290,7 +289,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
         context "when the serializer models are known" do
           let(:included_models) do
-            %w(workflows subject_sets project_contents project_roles)
+            %w(workflows subject_sets project_roles)
           end
           let(:includes) { included_models.join(',') }
 
@@ -422,7 +421,6 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       context "without commas in the display name" do
-
         it "should return the correct resource in the response" do
           expect(json_response["projects"]).to_not be_empty
         end
@@ -444,33 +442,18 @@ describe Api::V1::ProjectsController, type: :controller do
 
       describe "project contents" do
         let(:project) { Project.find(created_project_id) }
-        let(:contents) { project.project_contents.first }
-
-        it "should create an associated project_content model" do
-          expect(contents).to_not be_nil
-        end
 
         it 'should extract labels from the urls' do
           expect(project.urls).to eq([{"label" => "0.label", "url" => "http://twitter.com/example"}])
-        end
-
-        it 'should save labels to contents' do
           expect(project.url_labels).to eq({"0.label" => "Twitter"})
-          expect(contents.url_labels).to eq({"0.label" => "Twitter"})
         end
 
         it 'should set the contents title do' do
           expect(project.title).to eq('New Zoo')
-          expect(contents.title).to eq('New Zoo')
         end
 
         it 'should set the description' do
           expect(project.description).to eq('A new Zoo for you!')
-          expect(contents.description).to eq('A new Zoo for you!')
-        end
-
-        it 'should set the language' do
-          expect(contents.language).to eq('en')
         end
       end
     end
@@ -673,48 +656,41 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
 
-    context "project_contents" do
+    context "contents fields" do
       let(:params) do
         { projects: { description: 'SC', urls: [{label: "About", url: "https://zooniverse.org/about"}] }, id: resource.id }
       end
 
       let(:project) { resource }
-      let(:contents) { resource.primary_content }
 
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
-      it 'should update the default contents when the display_name is updated' do
+      it 'should update the title' do
         params[:projects][test_attr] = test_attr_value
         put :update, params
         project.reload
-        contents.reload
         expect(project.title).to eq(test_attr_value)
-        expect(contents.title).to eq(test_attr_value)
       end
 
-      it 'should update the default contents when the description changes' do
+      it 'should update the description changes' do
         put :update, params
         project.reload
         expect(project.description).to eq('SC')
-        expect(contents.description).to eq('SC')
         expect(json_response['projects'][0]['description']).to eq('SC')
       end
 
       it 'should extract labels from the urls' do
         put :update, params
         project.reload
-        contents.reload
         expect(project.urls).to eq([{"label" => "0.label", "url" => "https://zooniverse.org/about"}])
       end
 
-      it 'should save labels to contents' do
+      it 'should save labels' do
         put :update, params
         project.reload
-        contents.reload
         expect(project.url_labels).to eq({"0.label" => "About"})
-        expect(contents.url_labels).to eq({"0.label" => "About"})
       end
 
       it "should touch the project resource to modify the cache_key / etag" do
