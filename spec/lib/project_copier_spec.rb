@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe ProjectCopier do
   describe '#copy' do
-    let(:project) { create(:full_project, build_extra_contents: true)}
+    let(:project) { create(:full_project)}
     let(:copyist) { create(:user) }
     let!(:tags) { create(:tag, resource: project) }
     let!(:field_guide) { create(:field_guide, project: project) }

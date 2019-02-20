@@ -4,16 +4,11 @@ module Export
       attr_reader :project
 
       def self.project_attributes
-        %w( name display_name primary_language configuration urls slug )
+        %w( name display_name primary_language configuration urls slug description introduction workflow_description url_labels)
       end
 
       def self.media_attributes
         %w( type content_type src path_opts external_link metadata )
-      end
-
-      def self.project_content_attributes
-        %w( language title description introduction science_case guide
-            faq education_content url_labels )
       end
 
       def self.workflow_attributes
@@ -22,9 +17,7 @@ module Export
       end
 
       def initialize(project_id)
-        @project = ::Project.where(id: project_id)
-         .includes(:project_contents, :workflows)
-         .first
+        @project = ::Project.where(id: project_id).includes(:workflows).first
       end
 
       def to_json
@@ -32,7 +25,6 @@ module Export
           export[:project] = project_attrs
           export[:project_avatar] = avatar_attrs
           export[:project_background] = background_attrs
-          export[:project_content] = project_content_attrs
           export[:workflows] = workflows_attrs
         end.to_json
       end
@@ -61,10 +53,6 @@ module Export
 
       def background_attrs
         model_attributes(project.background, self.class.media_attributes)
-      end
-
-      def project_content_attrs
-        model_attributes(project.primary_content, self.class.project_content_attributes)
       end
 
       def workflows_attrs
