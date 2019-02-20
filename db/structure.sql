@@ -1340,6 +1340,39 @@ ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
+-- Name: translation_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.translation_versions (
+    id integer NOT NULL,
+    translation_id integer NOT NULL,
+    strings jsonb,
+    string_versions jsonb,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: translation_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.translation_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: translation_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.translation_versions_id_seq OWNED BY public.translation_versions.id;
+
+
+--
 -- Name: translations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2055,6 +2088,13 @@ ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.translation_versions ALTER COLUMN id SET DEFAULT nextval('public.translation_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.translations ALTER COLUMN id SET DEFAULT nextval('public.translations_id_seq'::regclass);
 
 
@@ -2405,6 +2445,14 @@ ALTER TABLE ONLY public.tagged_resources
 
 ALTER TABLE ONLY public.tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: translation_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.translation_versions
+    ADD CONSTRAINT translation_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -3176,6 +3224,13 @@ CREATE UNIQUE INDEX index_tags_on_name ON public.tags USING btree (name);
 
 
 --
+-- Name: index_translation_versions_on_translation_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_translation_versions_on_translation_id ON public.translation_versions USING btree (translation_id);
+
+
+--
 -- Name: index_tutorials_on_kind; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3780,6 +3835,14 @@ ALTER TABLE ONLY public.memberships
 
 ALTER TABLE ONLY public.field_guides
     ADD CONSTRAINT fk_rails_a1b35288b8 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_ad41ce8e02; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.translation_versions
+    ADD CONSTRAINT fk_rails_ad41ce8e02 FOREIGN KEY (translation_id) REFERENCES public.translations(id);
 
 
 --
@@ -4407,4 +4470,6 @@ INSERT INTO schema_migrations (version) VALUES ('20181023130028');
 INSERT INTO schema_migrations (version) VALUES ('20181203164038');
 
 INSERT INTO schema_migrations (version) VALUES ('20190220114950');
+
+INSERT INTO schema_migrations (version) VALUES ('20190220155414');
 
