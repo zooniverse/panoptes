@@ -143,6 +143,7 @@ Rails.application.routes.draw do
       json_api_resources :subject_workflow_statuses, only: [:index, :show]
 
       json_api_resources(:translations, {
+        links: [:published_version],
         constraints: Routes::Constraints::TranslationsConstraint.new,
         except: %i(new edit destroy)
       })

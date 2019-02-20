@@ -1384,7 +1384,8 @@ CREATE TABLE public.translations (
     strings jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    string_versions jsonb DEFAULT '{}'::jsonb NOT NULL
+    string_versions jsonb DEFAULT '{}'::jsonb NOT NULL,
+    published_version_id integer
 );
 
 
@@ -3870,6 +3871,14 @@ ALTER TABLE ONLY public.oauth_access_grants
 
 
 --
+-- Name: fk_rails_bae361a0ab; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.translations
+    ADD CONSTRAINT fk_rails_bae361a0ab FOREIGN KEY (published_version_id) REFERENCES public.translation_versions(id);
+
+
+--
 -- Name: fk_rails_bbb4bf5489; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4472,4 +4481,6 @@ INSERT INTO schema_migrations (version) VALUES ('20181203164038');
 INSERT INTO schema_migrations (version) VALUES ('20190220114950');
 
 INSERT INTO schema_migrations (version) VALUES ('20190220155414');
+
+INSERT INTO schema_migrations (version) VALUES ('20190220161628');
 
