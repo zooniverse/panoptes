@@ -1,5 +1,10 @@
 class Translation < ActiveRecord::Base
+  include Versioning
+
   belongs_to :translated, polymorphic: true, required: true
+  has_many :translation_versions, dependent: :destroy
+
+  versioned association: :translation_versions, attributes: %w(strings string_versions)
 
   validate :validate_translated_is_translatable
   validate :validate_strings
