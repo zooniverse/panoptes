@@ -52,6 +52,10 @@ class TranslationStrings
     attributes["title"] = attributes["display_name"]
   end
 
+  def transform_project_attributes
+    attributes["title"] = attributes["display_name"]
+  end
+
   # pandora app uses the tasks key to find the tasks strings
   def transform_workflow_attributes
     attributes["tasks"] = attributes.delete("strings")

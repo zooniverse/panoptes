@@ -4,7 +4,7 @@ describe TranslationStrings do
   def project_strings(resource)
     {
       "display_name" => resource.display_name,
-      "title" => "A Test Project",
+      "title" => resource.display_name,
       "description" => "Some Lorem Ipsum",
       "workflow_description" => "Go outside",
       "introduction" => "MORE IPSUM",
