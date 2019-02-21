@@ -931,7 +931,9 @@ CREATE TABLE public.project_versions (
     introduction text,
     url_labels jsonb,
     workflow_description text,
-    researcher_quote text
+    researcher_quote text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -4403,4 +4405,6 @@ INSERT INTO schema_migrations (version) VALUES ('20181022172507');
 INSERT INTO schema_migrations (version) VALUES ('20181023130028');
 
 INSERT INTO schema_migrations (version) VALUES ('20181203164038');
+
+INSERT INTO schema_migrations (version) VALUES ('20190220114950');
 
