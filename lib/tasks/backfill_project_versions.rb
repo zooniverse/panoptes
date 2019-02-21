@@ -1,29 +1,30 @@
 # lib/backfill_project_versions.rb
-
 module Tasks
   class BackfillProjectVersions
     def backfill_version(project, project_at_version, project_content_at_version)
       timestamp = [project_at_version.updated_at, project_content_at_version.updated_at].max
 
-      project_version = ProjectVersion.find_or_initialize_by(project_id: project.id)
+      project_version = ProjectVersion.new(project_id: project.id)
       project_version.private = project_at_version.private
       project_version.live = project_at_version.live
       project_version.beta_requested = project_at_version.beta_requested
       project_version.beta_approved = project_at_version.beta_approved
       project_version.launch_requested = project_at_version.launch_requested
       project_version.launch_approved = project_at_version.launch_approved
-      project_version.display_name = content_at_version.display_name
-      project_version.description = content_at_version.description
-      project_version.workflow_description = content_at_version.workflow_description
-      project_version.introduction = content_at_version.introduction
-      project_version.url_labels = content_at_version.url_labels
-      project_version.researcher_quote = content_at_version.researcher_quote
+      project_version.display_name = project_at_version.display_name
+      project_version.description = project_content_at_version.description
+      project_version.workflow_description = project_content_at_version.workflow_description
+      project_version.introduction = project_content_at_version.introduction
+      project_version.url_labels = project_content_at_version.url_labels
+      project_version.researcher_quote = project_content_at_version.researcher_quote
       project_version.updated_at = timestamp
       project_version.save!
       print '.'
     end
 
     def backfill(project)
+      project.project_versions.where("created_at IS NOT NULL").delete_all
+
       project_content = project.primary_content
 
       # It is hard to figure out which combinations of major/minor actually
@@ -31,7 +32,7 @@ module Tasks
       # I'd love to have a discussion on how to do this more wisely.
       #
       puts "Loading project versions"
-      project_versions = project.versions[1..-1].map(&:reify) + [project]
+      project_versions = (project.versions[1..-1] || []).map(&:reify) + [project]
       puts "Loading project content versions"
       project_content_versions = project_content.versions[1..-1].map(&:reify) + [project_content]
 
