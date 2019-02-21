@@ -44,7 +44,7 @@ describe TranslationSerializer do
     describe "top level links" do
       let(:serialize_method) { :resource }
       let(:expected_links) do
-        links = {}
+        links = {"translations.published_version" => {href: "/translation_versions/{translations.published_version}", type: :published_versions}}
         Translation.translated_model_names.each do |model_name|
           plural_model_name = model_name.pluralize
           links["translations.#{model_name}"] = {
@@ -63,7 +63,7 @@ describe TranslationSerializer do
 
     describe "resource links" do
       let(:expected_links) do
-        { translation.translated.model_name.singular.to_sym => translation.translated_id.to_s }
+        { translation.translated.model_name.singular.to_sym => translation.translated_id.to_s, published_version: nil }
       end
 
       context "with a serialized resource" do
