@@ -12,5 +12,14 @@ class TranslationUpdateSchema < JsonSchema
     property "string_versions" do
       type "object"
     end
+
+    property "links" do
+      type "object"
+      additional_properties false
+
+      property "published_version" do
+        type "string", "integer"
+      end
+    end
   end
 end

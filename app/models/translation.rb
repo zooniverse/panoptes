@@ -1,5 +1,11 @@
 class Translation < ActiveRecord::Base
+  include Versioning
+
   belongs_to :translated, polymorphic: true, required: true
+  has_many :translation_versions, dependent: :destroy
+  belongs_to :published_version, class_name: "TranslationVersion"
+
+  versioned association: :translation_versions, attributes: %w(strings string_versions)
 
   validate :validate_translated_is_translatable
   validate :validate_strings
@@ -8,6 +14,7 @@ class Translation < ActiveRecord::Base
   validates_uniqueness_of :language,
     scope: %i(translated_type translated_id),
     message: "translation already exists for this resource"
+  validate :validate_published_version_belongs_to_this_translation
 
   before_validation :downcase_language, on: :create
 
@@ -70,6 +77,14 @@ class Translation < ActiveRecord::Base
 
     if unknown_version_ids.present?
       errors.add(:string_versions, "references unknown versions: #{unknown_version_ids.join(", ")}")
+    end
+  end
+
+  def validate_published_version_belongs_to_this_translation
+    return unless published_version_id
+
+    if published_version.translation_id != id
+      errors.add(:published_version, "must be a version that belongs to this translation")
     end
   end
 

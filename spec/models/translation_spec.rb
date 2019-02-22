@@ -48,9 +48,42 @@ RSpec.describe Translation, type: :model do
     expect(translation).to_not be_valid
   end
 
-  it 'should not be valid without a langague code' do
+  it 'should not be valid without a language code' do
     translation.language = nil
     expect(translation).to_not be_valid
+  end
+
+  it 'should not be valid with a published_version of some other translation' do
+    other_translation = create(:translation, language: 'nl-NL')
+    translation.published_version = other_translation.translation_versions.last
+    expect(translation).to_not be_valid
+  end
+
+  describe "versioning" do
+    let(:translation) { build(:translation, language: 'en-GB', strings: {"a" => "v1"}, string_versions: {"a" => 1}) }
+
+    before do
+      allow(translation).to receive(:validate_string_versions).and_return(true)
+      translation.save!
+    end
+
+    it 'creates an initial version for the create' do
+      expect(translation.translation_versions.count).to eq(1)
+    end
+
+    it 'should track changes to strings', :aggregate_failures do
+      translation.update!(strings: {"a" => "v2"})
+      expect(translation.translation_versions.count).to eq(2)
+      expect(translation.translation_versions.first.strings["a"]).to eq("v1")
+      expect(translation.translation_versions.last.strings["a"]).to eq("v2")
+    end
+
+    it 'should track changes to string_versions', :aggregate_failures do
+      translation.update!(string_versions: {"a" => 2})
+      expect(translation.translation_versions.count).to eq(2)
+      expect(translation.translation_versions.first.string_versions["a"]).to eq(1)
+      expect(translation.translation_versions.last.string_versions["a"]).to eq(2)
+    end
   end
 
   describe ".translated_model_names" do

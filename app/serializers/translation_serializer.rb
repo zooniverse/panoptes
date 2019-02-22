@@ -6,7 +6,7 @@ class TranslationSerializer
     :language, :strings, :string_versions,
     :href, :created_at, :updated_at
 
-  can_include :translated
+  can_include :translated, :published_version
 
   can_filter_by :language
 
