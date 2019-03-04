@@ -18,11 +18,6 @@ RSpec.describe Export::JSON::Project do
     project.background.as_json.slice(*attrs)
   end
 
-  def project_content_attributes
-    attrs = Export::JSON::Project.project_content_attributes
-    project_content.as_json.slice(*attrs)
-  end
-
   def workflows_attributes
     attrs = Export::JSON::Project.workflow_attributes
     [].tap do |workflows_attr|
@@ -35,7 +30,6 @@ RSpec.describe Export::JSON::Project do
       project: project_attributes,
       project_avatar: project_avatar_attributes,
       project_background: project_background_attributes,
-      project_content: project_content_attributes,
       workflows: workflows_attributes,
     }.to_json
   end
@@ -47,7 +41,6 @@ RSpec.describe Export::JSON::Project do
   let(:project) { create(:full_project) }
   let(:avatar) { project.avatar }
   let(:background) { project.background }
-  let(:project_content) { project.primary_content }
   let(:workflows) { project.workflows }
   let(:exporter) { Export::JSON::Project.new(project.id) }
   let(:new_owner) { create(:user) }
@@ -65,7 +58,7 @@ RSpec.describe Export::JSON::Project do
 
       it "should be able to rebuild the project from the export" do
         new_project.valid?
-        expect(new_project.errors.keys).to match_array([:owner, :project_contents])
+        expect(new_project.errors.keys).to match_array([:owner])
       end
 
       it "should be private by default" do
@@ -83,7 +76,6 @@ RSpec.describe Export::JSON::Project do
       end
 
       context "when the project avatar is missing" do
-
         it "should not have a project_avatar data" do
           allow_any_instance_of(Project).to receive(:avatar).and_return(nil)
           expect(export_values("project_avatar")).to be_nil
@@ -98,20 +90,6 @@ RSpec.describe Export::JSON::Project do
 
       it "should be able to rebuild the new_project_background from the export" do
         expect(new_project_background).to be_valid
-      end
-    end
-
-    describe "project_content" do
-      let(:new_project_content) do
-        ProjectContent.new(export_values("project_content"))
-      end
-
-      it "should be able to rebuild the project_contents from the export" do
-        expect(new_project_content).to be_valid
-      end
-
-      it "should be for the default project language" do
-        expect(new_project_content.language).to eq(project.primary_language)
       end
     end
 
@@ -131,8 +109,6 @@ RSpec.describe Export::JSON::Project do
         let(:instances) do
           [].tap do |instances|
             instances << p
-            p.project_contents << ProjectContent.new(export_values("project_content"))
-            instances << p.project_contents.first
             instances << p.avatar = Medium.new(export_values("project_avatar"))
             instances << p.background = Medium.new(export_values("project_background"))
             export_values("workflows").each_with_index do |workflow_attrs, index|
@@ -141,8 +117,8 @@ RSpec.describe Export::JSON::Project do
           end
         end
 
-        it "should build 8 instances" do
-          expect(instances.size).to eq(4)
+        it "should build 3 instances" do
+          expect(instances.size).to eq(3)
         end
 
         it "should be able to recreate the set of valid project instances" do

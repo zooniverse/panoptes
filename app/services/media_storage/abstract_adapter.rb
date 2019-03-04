@@ -1,7 +1,4 @@
 module MediaStorage
-  class EmptyPathError < StandardError; end
-  class UnknownContentType < StandardError; end
-
   class AbstractAdapter
     def initialize(opts={})
       @opts = opts

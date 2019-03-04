@@ -4,7 +4,7 @@ class ProjectRequestMailer < ApplicationMailer
     @type = type
     project = Project.find(project_id)
     @owner = project.owner.display_name
-    @name = project.primary_content.title
+    @name = project.display_name
     @url = "#{Panoptes.project_request.base_url}/projects/#{project.slug}"
     mail(
       to: [project.owner.email].concat(Panoptes.project_request.recipients),

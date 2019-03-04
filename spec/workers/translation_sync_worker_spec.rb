@@ -17,12 +17,11 @@ RSpec.describe TranslationSyncWorker do
       let(:translation) do
         create(:translation, translated: project, language: project.primary_language)
       end
-      let(:primary_content) { project.primary_content }
       let(:new_title) { "freshly translated for you" }
 
       it "should update the translation strings for the supplied resource" do
         old_title = translation.strings["title"]
-        primary_content.update_column(:title, new_title)
+        project.update_column(:display_name, new_title)
         expect {
           worker.perform(project.class.to_s, project.id, project.primary_language)
         }.to change {

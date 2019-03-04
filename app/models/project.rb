@@ -1,7 +1,6 @@
 class Project < ActiveRecord::Base
   include RoleControl::Owned
   include Activatable
-  include HasContents
   include ExtendedCacheKey
   include PgSearch
   include RankedModel
@@ -51,8 +50,6 @@ class Project < ActiveRecord::Base
 
   cache_by_resource_method :subjects_count, :retired_subjects_count, :finished?
 
-  accepts_nested_attributes_for :project_contents
-
   validates_inclusion_of :private, :live, in: [true, false], message: "must be true or false"
 
   validates :featured, uniqueness: {conditions: -> { featured } }
@@ -87,6 +84,11 @@ class Project < ActiveRecord::Base
 
   def self.translatable_attributes
     %i(display_name title description workflow_description introduction researcher_quote url_labels)
+  end
+
+  # TODO: FIXME
+  def available_languages
+    [primary_language]
   end
 
   def expert_classifier_level(classifier)

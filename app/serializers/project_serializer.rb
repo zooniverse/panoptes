@@ -18,7 +18,7 @@ class ProjectSerializer
     :completeness, :activity, :state, :researcher_quote, :mobile_friendly, :featured
 
   optional :avatar_src
-  can_include :workflows, :active_workflows, :subject_sets, :owners, :project_contents,
+  can_include :workflows, :active_workflows, :subject_sets, :owners,
     :project_roles, :pages, :organization
   media_include :avatar, :background, :attached_images,
     classifications_export: { include: false},
@@ -29,8 +29,7 @@ class ProjectSerializer
   can_sort_by :launch_date, :activity, :completeness, :classifiers_count,
     :updated_at, :display_name
 
-  preload :project_contents,
-    :workflows,
+  preload :workflows,
     :active_workflows,
     :subject_sets,
     :project_roles,

@@ -1,15 +1,14 @@
 class ProjectCopier
-  EXCLUDE_ATTRIBUTES = [ :classifications_count, :launched_row_order, :beta_row_order ].freeze
-  INCLUDE_ASSOCIATIONS = [  :project_contents,
-                            :tutorials,
-                            :field_guides,
-                            :pages,
-                            :tags,
-                            :tagged_resources,
-                            :avatar,
-                            :background,
-                            :translations,
-                            { active_workflows: [ :tutorials, :attached_images] }].freeze
+  EXCLUDE_ATTRIBUTES = [:classifications_count, :launched_row_order, :beta_row_order].freeze
+  INCLUDE_ASSOCIATIONS = [:tutorials,
+                          :field_guides,
+                          :pages,
+                          :tags,
+                          :tagged_resources,
+                          :avatar,
+                          :background,
+                          :translations,
+                          {active_workflows: [:tutorials, :attached_images]}].freeze
 
   def self.copy(project_id, user_id)
     project = Project.find(project_id)

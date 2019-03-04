@@ -18,10 +18,6 @@ module HasContents
     end
   end
 
-  def available_languages
-    content_association.map { |ca| ca.language.downcase }
-  end
-
   def content_association
     @content_association ||= send(self.class.content_association)
   end

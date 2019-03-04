@@ -1,10 +1,5 @@
 FactoryBot.define do
   factory :project, aliases: [:project_with_contents] do
-    transient do
-      build_contents true
-      build_extra_contents false
-    end
-
     sequence(:name) { |n| "test_project_#{ n }" }
     sequence(:display_name) { |n| "Test Project #{ n }" }
     user_count { 10 + rand(1000) }
@@ -25,16 +20,6 @@ FactoryBot.define do
     url_labels({"0.label" => "Blog", "1.label" => "Twitter", "2.label" => "Science Case"})
 
     association :owner, factory: :user
-
-    after(:build) do |p, env|
-      if env.build_contents
-        p.project_contents << build_list(:project_content, 1, project: p, language: p.primary_language)
-        if env.build_extra_contents
-          p.project_contents << build_list(:project_content, 1, project: p, language: 'zh-TW')
-          p.project_contents << build_list(:project_content, 1, project: p, language: 'en-US')
-        end
-      end
-    end
 
     factory :private_project do
       private(true)

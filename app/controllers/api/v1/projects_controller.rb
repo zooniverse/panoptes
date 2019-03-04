@@ -57,24 +57,16 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def update
     super do |resource|
-      # TODO: extract this primary project content update
-      # to a service object that sits in the project
-      # transaction.
-      content_attributes = primary_content_attributes(update_params)
-
-      if content_attributes.present?
-        resource.primary_content.update!(content_attributes)
-      end
-
-      if content_attributes.key?(:url_labels)
-        resource.url_labels = content_attributes[:url_labels]
-        resource.urls = update_params[:urls]
+      if update_params.key?(:urls)
+        urls, labels = UrlLabels.extract_url_labels(update_params[:urls])
+        resource.url_labels = labels
+        resource.urls = urls
       end
 
       tags = Tags::BuildTags.run!(api_user: api_user, tag_array: update_params[:tags]) if update_params[:tags]
-      resource.tags = tags unless tags.nil?
 
-      if content_attributes.present? || !tags.nil?
+      unless tags.nil?
+        resource.tags = tags
         resource.updated_at = Time.zone.now
       end
     end
@@ -131,9 +123,11 @@ class Api::V1::ProjectsController < Api::ApiController
   def build_resource_for_create(create_params)
     admin_allowed create_params, *admin_allowed_params
 
-    content_attributes = primary_content_attributes(create_params)
-    create_params[:project_contents] = [ ProjectContent.new(content_attributes) ]
-    create_params[:url_labels] = content_attributes[:url_labels]
+    if create_params.key?(:urls)
+      urls, labels = UrlLabels.extract_url_labels(create_params[:urls])
+      create_params[:url_labels] = labels
+      create_params[:urls] = urls
+    end
 
     if create_params.key?(:tags)
       create_params[:tags] = Tags::BuildTags.run!(api_user: api_user, tag_array: create_params[:tags])
@@ -188,11 +182,6 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def cards_exclude_keys
     ProjectSerializer.serializable_attributes.except(*CARD_FIELDS).keys
-  end
-
-  def primary_content_attributes(content_attributes)
-    content_attributes = content_attributes.merge(title: content_attributes[:display_name])
-    ContentFromParams.content_from_params(content_attributes, CONTENT_FIELDS)
   end
 
   def available_to_export

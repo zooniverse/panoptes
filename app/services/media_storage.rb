@@ -2,6 +2,9 @@ require 'media_storage/test_adapter'
 require 'media_storage/aws_adapter'
 
 module MediaStorage
+  class EmptyPathError < StandardError; end
+  class UnknownContentType < StandardError; end
+
   class NoMediaStorage < StandardError
     def initialize(*args)
       super("No Storage has been initialized for Panoptes")
