@@ -15,6 +15,7 @@ includes:
   - authentication
   - json_api
   - projects
+  - subject_set_imports
   - users
 
 search: true
