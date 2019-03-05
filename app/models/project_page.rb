@@ -1,7 +1,10 @@
 class ProjectPage < ActiveRecord::Base
   include Translatable
   include LanguageValidation
-  include Unversioned
+  include Versioning
+
+  has_many :project_page_versions, dependent: :destroy
+  versioned association: :project_page_versions, attributes: %w(title content url_key)
 
   has_paper_trail ignore: [:language]
 

@@ -879,6 +879,40 @@ ALTER SEQUENCE public.project_contents_id_seq OWNED BY public.project_contents.i
 
 
 --
+-- Name: project_page_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.project_page_versions (
+    id integer NOT NULL,
+    project_page_id integer NOT NULL,
+    title text,
+    content text,
+    url_key character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: project_page_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.project_page_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: project_page_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.project_page_versions_id_seq OWNED BY public.project_page_versions.id;
+
+
+--
 -- Name: project_pages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2005,6 +2039,13 @@ ALTER TABLE ONLY public.project_contents ALTER COLUMN id SET DEFAULT nextval('pu
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.project_page_versions ALTER COLUMN id SET DEFAULT nextval('public.project_page_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.project_pages ALTER COLUMN id SET DEFAULT nextval('public.project_pages_id_seq'::regclass);
 
 
@@ -2350,6 +2391,14 @@ ALTER TABLE ONLY public.organizations
 
 ALTER TABLE ONLY public.project_contents
     ADD CONSTRAINT project_contents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: project_page_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.project_page_versions
+    ADD CONSTRAINT project_page_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -2938,6 +2987,13 @@ CREATE INDEX index_project_contents_on_project_id ON public.project_contents USI
 
 
 --
+-- Name: index_project_page_versions_on_project_page_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_project_page_versions_on_project_page_id ON public.project_page_versions USING btree (project_page_id);
+
+
+--
 -- Name: index_project_pages_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2949,6 +3005,13 @@ CREATE INDEX index_project_pages_on_language ON public.project_pages USING btree
 --
 
 CREATE INDEX index_project_pages_on_project_id ON public.project_pages USING btree (project_id);
+
+
+--
+-- Name: index_project_versions_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_project_versions_on_project_id ON public.project_versions USING btree (project_id);
 
 
 --
@@ -3876,6 +3939,11 @@ ALTER TABLE ONLY public.oauth_access_grants
 
 ALTER TABLE ONLY public.translations
     ADD CONSTRAINT fk_rails_bae361a0ab FOREIGN KEY (published_version_id) REFERENCES public.translation_versions(id);
+-- Name: fk_rails_b7ce3e711e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_page_versions
+    ADD CONSTRAINT fk_rails_b7ce3e711e FOREIGN KEY (project_page_id) REFERENCES public.project_pages(id);
 
 
 --
@@ -4484,3 +4552,4 @@ INSERT INTO schema_migrations (version) VALUES ('20190220155414');
 
 INSERT INTO schema_migrations (version) VALUES ('20190220161628');
 
+INSERT INTO schema_migrations (version) VALUES ('20190222121420');
