@@ -279,6 +279,20 @@
               </ul>
           </li>
           <li>
+            <a href="#subjectsetimports" class="toc-h1 toc-link" data-title="SubjectSetImports">SubjectSetImports</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#creating-a-new-import" class="toc-h2 toc-link" data-title="SubjectSetImports">Creating a new import</a>
+                  </li>
+                  <li>
+                    <a href="#retrieve-a-single-import" class="toc-h2 toc-link" data-title="SubjectSetImports">Retrieve a single import</a>
+                  </li>
+                  <li>
+                    <a href="#manifest-csv-format" class="toc-h2 toc-link" data-title="SubjectSetImports">Manifest CSV format</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#users" class="toc-h1 toc-link" data-title="Users">Users</a>
               <ul class="toc-list-h2">
                   <li>
@@ -801,6 +815,88 @@ recommended. Instead, use the link endpoints explained below.</p>
 <p>A user may destroy a project they own or have destroy permissions for.</p>
 
 <p>Response will be an HTTP 204.</p>
+<h1 id='subjectsetimports'>SubjectSetImports</h1><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"source_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://path.to/some/manifest.json"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"subject_set"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>This resource is useful when a researcher has a large batch to add. The upload process goes as follows:</p>
+
+<ol>
+<li>A researcher uploads image files into an S3 bucket, or other publicly
+accessible location. She also creates a manifest file (format described
+below). The manifest file describes &quot;subjects&quot;, which is the Zooniverse term
+for something that is to be classified. A subject is made up of a unique
+UUID, one or more URLs that host media files, and metadata described as
+key-value pairs.</li>
+<li>In the Zooniverse project builder, the researcher navigates to the subject
+set to which they would like to have the subjects added. The researcher then
+clicks &quot;Import manifest&quot;, and enters the URL to the manifest (as given to
+them by step 2)</li>
+</ol>
+
+<p>This calls a Zooniverse API which enqueues a background job on the Zooniverse servers. In the background, the Zooniverse&#39;s job workers download the manifest file, and process it, creating subjects in the specified subject set.
+Additional features beyond the MVP:
+When the science platform opens a new browser tab/window to send the researcher to the project builder, it can pass along the manifest URL for the small sample of &lt;100 subjects as URL query parameters. The Zooniverse project builder will then make the Import button more prominent and prefill the URL.
+After approval, when the researcher needs to get a full set of data into their Zooniverse project, at the end the supertask can call the Zooniverse API to trigger the import rather than requesting the researcher to go back to the project builder and click a button.</p>
+<h2 id='creating-a-new-import'>Creating a new import</h2><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/subject_set_imports</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"subject_set_imports"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+       </span><span class="s2">"source_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://path.to/some/manifest.json"</span><span class="p">,</span><span class="w">
+       </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+           </span><span class="s2">"subject_set"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="w">
+       </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Returns a SubjectSetImport resource with an ID. This resource can be polled in order to get the status of the import.</p>
+<h2 id='retrieve-a-single-import'>Retrieve a single import</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subject_set_imports/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+<ul>
+<li>Parameters
+
+<ul>
+<li>id (required, integer) ... integer id of the resource to retrieve</li>
+</ul></li>
+</ul>
+<h2 id='manifest-csv-format'>Manifest CSV format</h2><pre class="highlight plaintext"><code>uuid,location:1,location:2,metadata:size,metadata:cuteness
+1,https://placekitten.com/200/300.jpg,https://placekitten.com/200/100.jpg,small,cute
+2,https://placekitten.com/400/900.jpg,https://placekitten.com/500/100.jpg,large,cute
+</code></pre>
+<p>The manifest.csv file is contains one row per subject. See the example to the right. It is expected to have
+the following columns:</p>
+
+<ul>
+<li><code>uuid</code> - Zooniverse uses this to deduplicate/upsert existing subjects, so that
+it&#39;s possible to reimport a manifest into a subject set.</li>
+<li><p><code>location:</code> - One or more columns that begin with <code>location:</code> (including the colon), followed by any
+sequence of characters. The values of cells in this column are URLs pointing
+to the uploaded image files in the S3 bucket. Multiple &quot;location:&quot; columns are
+supported (obviously the value after the colon needs to be unique, but is
+otherwise ignored). Supported mimetypes currently are:</p>
+
+<ul>
+<li>image/jpeg</li>
+<li>image/png</li>
+<li>image/gif</li>
+<li>image/svg+xml</li>
+<li>audio/mpeg</li>
+<li>audio/mp3</li>
+<li>audio/mp4</li>
+<li>audio/x-m4a</li>
+<li>video/* (Depends on browser support)</li>
+<li>text/plain</li>
+</ul></li>
+<li><p><code>metadata:</code> - Zero or more columns that begin with <code>metadata:</code> (including the colon), followed by
+the key of the specific metadata in this column.</p></li>
+</ul>
 <h1 id='users'>Users</h1><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"users"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
         </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
