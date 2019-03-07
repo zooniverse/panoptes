@@ -727,6 +727,40 @@ ALTER SEQUENCE public.organization_contents_id_seq OWNED BY public.organization_
 
 
 --
+-- Name: organization_page_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.organization_page_versions (
+    id integer NOT NULL,
+    organization_page_id integer NOT NULL,
+    title text,
+    content text,
+    url_key character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_page_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_page_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_page_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_page_versions_id_seq OWNED BY public.organization_page_versions.id;
+
+
+--
 -- Name: organization_pages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2011,6 +2045,13 @@ ALTER TABLE ONLY public.organization_contents ALTER COLUMN id SET DEFAULT nextva
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.organization_page_versions ALTER COLUMN id SET DEFAULT nextval('public.organization_page_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.organization_pages ALTER COLUMN id SET DEFAULT nextval('public.organization_pages_id_seq'::regclass);
 
 
@@ -2359,6 +2400,14 @@ ALTER TABLE ONLY public.oauth_applications
 
 ALTER TABLE ONLY public.organization_contents
     ADD CONSTRAINT organization_contents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_page_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.organization_page_versions
+    ADD CONSTRAINT organization_page_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -2914,6 +2963,13 @@ CREATE UNIQUE INDEX index_oauth_access_tokens_on_token ON public.oauth_access_to
 --
 
 CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications USING btree (uid);
+
+
+--
+-- Name: index_organization_page_versions_on_organization_page_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organization_page_versions_on_organization_page_id ON public.organization_page_versions USING btree (organization_page_id);
 
 
 --
@@ -3766,6 +3822,14 @@ ALTER TABLE ONLY public.recents
 
 
 --
+-- Name: fk_rails_53b1c6ff8a; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_page_versions
+    ADD CONSTRAINT fk_rails_53b1c6ff8a FOREIGN KEY (organization_page_id) REFERENCES public.organization_pages(id);
+
+
+--
 -- Name: fk_rails_670188dbc7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4553,3 +4617,5 @@ INSERT INTO schema_migrations (version) VALUES ('20190220155414');
 INSERT INTO schema_migrations (version) VALUES ('20190220161628');
 
 INSERT INTO schema_migrations (version) VALUES ('20190222121420');
+
+INSERT INTO schema_migrations (version) VALUES ('20190307114830');
