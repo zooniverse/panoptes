@@ -1477,6 +1477,40 @@ ALTER SEQUENCE public.translations_id_seq OWNED BY public.translations.id;
 
 
 --
+-- Name: tutorial_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.tutorial_versions (
+    id integer NOT NULL,
+    tutorial_id integer NOT NULL,
+    steps json,
+    kind character varying,
+    display_name text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: tutorial_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.tutorial_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: tutorial_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.tutorial_versions_id_seq OWNED BY public.tutorial_versions.id;
+
+
+--
 -- Name: tutorials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2185,6 +2219,13 @@ ALTER TABLE ONLY public.translations ALTER COLUMN id SET DEFAULT nextval('public
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.tutorial_versions ALTER COLUMN id SET DEFAULT nextval('public.tutorial_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.tutorials ALTER COLUMN id SET DEFAULT nextval('public.tutorials_id_seq'::regclass);
 
 
@@ -2560,6 +2601,14 @@ ALTER TABLE ONLY public.translation_versions
 
 ALTER TABLE ONLY public.translations
     ADD CONSTRAINT translations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tutorial_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.tutorial_versions
+    ADD CONSTRAINT tutorial_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -3349,6 +3398,12 @@ CREATE UNIQUE INDEX index_tags_on_name ON public.tags USING btree (name);
 
 CREATE INDEX index_translation_versions_on_translation_id ON public.translation_versions USING btree (translation_id);
 
+--
+-- Name: index_tutorial_versions_on_tutorial_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tutorial_versions_on_tutorial_id ON public.tutorial_versions USING btree (tutorial_id);
+
 
 --
 -- Name: index_tutorials_on_kind; Type: INDEX; Schema: public; Owner: -; Tablespace: 
@@ -3683,6 +3738,14 @@ ALTER TABLE ONLY public.access_control_lists
 
 ALTER TABLE ONLY public.workflow_tutorials
     ADD CONSTRAINT fk_rails_0ca158de43 FOREIGN KEY (tutorial_id) REFERENCES public.tutorials(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_0de211431f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tutorial_versions
+    ADD CONSTRAINT fk_rails_0de211431f FOREIGN KEY (tutorial_id) REFERENCES public.tutorials(id);
 
 
 --
@@ -4619,3 +4682,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190220161628');
 INSERT INTO schema_migrations (version) VALUES ('20190222121420');
 
 INSERT INTO schema_migrations (version) VALUES ('20190307114830');
+
+INSERT INTO schema_migrations (version) VALUES ('20190307121801');
+
