@@ -366,6 +366,38 @@ ALTER SEQUENCE public.collections_subjects_id_seq OWNED BY public.collections_su
 
 
 --
+-- Name: field_guide_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.field_guide_versions (
+    id integer NOT NULL,
+    field_guide_id integer NOT NULL,
+    items json,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: field_guide_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.field_guide_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_guide_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.field_guide_versions_id_seq OWNED BY public.field_guide_versions.id;
+
+
+--
 -- Name: field_guides; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2009,6 +2041,13 @@ ALTER TABLE ONLY public.collections_subjects ALTER COLUMN id SET DEFAULT nextval
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.field_guide_versions ALTER COLUMN id SET DEFAULT nextval('public.field_guide_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.field_guides ALTER COLUMN id SET DEFAULT nextval('public.field_guides_id_seq'::regclass);
 
 
@@ -2361,6 +2400,14 @@ ALTER TABLE ONLY public.collections
 
 ALTER TABLE ONLY public.collections_subjects
     ADD CONSTRAINT collections_subjects_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_guide_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.field_guide_versions
+    ADD CONSTRAINT field_guide_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -2900,6 +2947,13 @@ CREATE UNIQUE INDEX index_collections_subjects_on_collection_id_and_subject_id O
 --
 
 CREATE INDEX index_collections_subjects_on_subject_id ON public.collections_subjects USING btree (subject_id);
+
+
+--
+-- Name: index_field_guide_versions_on_field_guide_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_field_guide_versions_on_field_guide_id ON public.field_guide_versions USING btree (field_guide_id);
 
 
 --
@@ -3722,6 +3776,14 @@ ALTER TABLE ONLY public.gold_standard_annotations
 
 ALTER TABLE ONLY public.gold_standard_annotations
     ADD CONSTRAINT fk_rails_082b4f1af7 FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+
+--
+-- Name: fk_rails_085970853c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.field_guide_versions
+    ADD CONSTRAINT fk_rails_085970853c FOREIGN KEY (field_guide_id) REFERENCES public.field_guides(id);
 
 
 --
@@ -4684,4 +4746,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190222121420');
 INSERT INTO schema_migrations (version) VALUES ('20190307114830');
 
 INSERT INTO schema_migrations (version) VALUES ('20190307121801');
+
+INSERT INTO schema_migrations (version) VALUES ('20190307141138');
 
