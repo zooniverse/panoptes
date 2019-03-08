@@ -20,8 +20,6 @@ namespace :project do
       p = Project.new(dump_data["project"].merge(owner: new_owner))
       [].tap do |instances|
         instances << p
-        p.project_contents << ProjectContent.new(dump_data["project_content"])
-        instances << p.project_contents.first
         if avatar = dump_data["project_avatar"]
           instances << p.avatar = Medium.new(avatar)
         end
