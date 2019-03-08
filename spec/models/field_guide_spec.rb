@@ -3,6 +3,10 @@ require 'spec_helper'
 describe FieldGuide, type: :model do
   let(:field_guide) { build(:field_guide) }
 
+  it_behaves_like "a versioned model" do
+    let(:new_value) { [{"version" => "two"}] }
+  end
+
   it "should have a valid factory" do
     expect(field_guide).to be_valid
   end

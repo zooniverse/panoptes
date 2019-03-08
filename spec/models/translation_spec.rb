@@ -3,6 +3,10 @@ require 'spec_helper'
 RSpec.describe Translation, type: :model do
   let(:translation) { build(:translation, language: 'en-GB') }
 
+  it_behaves_like "a versioned model" do
+    let(:new_value) { {"version" => "two"} }
+  end
+
   it 'should have a valid factory' do
     expect(translation).to be_valid
   end
