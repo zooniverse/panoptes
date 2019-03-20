@@ -3,7 +3,9 @@ class ChangeWorkflowStepsDefault < ActiveRecord::Migration
     reversible do |dir|
       dir.up do
         change_column_default(:workflows, :steps, [])
-        Workflow.update_all(steps: [])
+        Workflow.find_each do |wf|
+          wf.update_column(:steps, [])
+        end
       end
     end
   end
