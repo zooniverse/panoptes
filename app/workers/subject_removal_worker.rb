@@ -1,5 +1,3 @@
-require 'subjects/remover'
-
 class SubjectRemovalWorker
   include Sidekiq::Worker
 

@@ -1,5 +1,3 @@
-require 'classification_lifecycle'
-
 class ClassificationWorker
   include Sidekiq::Worker
 

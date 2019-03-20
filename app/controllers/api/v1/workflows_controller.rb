@@ -1,5 +1,3 @@
-require 'model_version'
-
 class Api::V1::WorkflowsController < Api::ApiController
   include JsonApiController::PunditPolicy
   include Versioned

@@ -1,5 +1,3 @@
-require 'retirement_schemes'
-
 class CalculateProjectCompletenessWorker
   include Sidekiq::Worker
   using Refinements::RangeClamping

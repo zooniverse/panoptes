@@ -1,6 +1,3 @@
-require 'cellect/client'
-require 'subjects/cellect_session'
-
 module CellectClient
   ConnectionError = Class.new(StandardError)
 

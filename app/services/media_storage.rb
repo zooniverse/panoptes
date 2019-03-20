@@ -1,6 +1,3 @@
-require 'media_storage/test_adapter'
-require 'media_storage/aws_adapter'
-
 module MediaStorage
   class EmptyPathError < StandardError; end
   class UnknownContentType < StandardError; end
@@ -48,9 +45,9 @@ module MediaStorage
     def load_from_included(adapter)
       case adapter.to_s
       when "aws"
-        AwsAdapter
+        MediaStorage::AwsAdapter
       when "test"
-        TestAdapter
+        MediaStorage::TestAdapter
       else
         default_adapter
       end
