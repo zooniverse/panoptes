@@ -44,7 +44,7 @@ FactoryBot.define do
       }
     )
 
-    steps({})
+    steps([])
 
     pairwise false
     grouped false

@@ -139,6 +139,7 @@ describe Api::V1::WorkflowsController, type: :controller do
            }
            },
            display_order_position: 1,
+           steps: [],
            links: {
             subject_sets: [subject_set.id.to_s],
             tutorials: [tutorial.id.to_s]
@@ -542,6 +543,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           prioritized: true,
           primary_language: 'en',
           display_order_position: 1,
+          steps: [],
           links: {project: project.id.to_s}
         }
       }
