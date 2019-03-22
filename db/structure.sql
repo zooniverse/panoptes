@@ -366,6 +366,38 @@ ALTER SEQUENCE public.collections_subjects_id_seq OWNED BY public.collections_su
 
 
 --
+-- Name: field_guide_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.field_guide_versions (
+    id integer NOT NULL,
+    field_guide_id integer NOT NULL,
+    items json,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: field_guide_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.field_guide_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_guide_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.field_guide_versions_id_seq OWNED BY public.field_guide_versions.id;
+
+
+--
 -- Name: field_guides; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -727,6 +759,40 @@ ALTER SEQUENCE public.organization_contents_id_seq OWNED BY public.organization_
 
 
 --
+-- Name: organization_page_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.organization_page_versions (
+    id integer NOT NULL,
+    organization_page_id integer NOT NULL,
+    title text,
+    content text,
+    url_key character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_page_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_page_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_page_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_page_versions_id_seq OWNED BY public.organization_page_versions.id;
+
+
+--
 -- Name: organization_pages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -876,6 +942,40 @@ CREATE SEQUENCE public.project_contents_id_seq
 --
 
 ALTER SEQUENCE public.project_contents_id_seq OWNED BY public.project_contents.id;
+
+
+--
+-- Name: project_page_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.project_page_versions (
+    id integer NOT NULL,
+    project_page_id integer NOT NULL,
+    title text,
+    content text,
+    url_key character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: project_page_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.project_page_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: project_page_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.project_page_versions_id_seq OWNED BY public.project_page_versions.id;
 
 
 --
@@ -1409,6 +1509,40 @@ ALTER SEQUENCE public.translations_id_seq OWNED BY public.translations.id;
 
 
 --
+-- Name: tutorial_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE public.tutorial_versions (
+    id integer NOT NULL,
+    tutorial_id integer NOT NULL,
+    steps json,
+    kind character varying,
+    display_name text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: tutorial_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.tutorial_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: tutorial_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.tutorial_versions_id_seq OWNED BY public.tutorial_versions.id;
+
+
+--
 -- Name: tutorials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1907,6 +2041,13 @@ ALTER TABLE ONLY public.collections_subjects ALTER COLUMN id SET DEFAULT nextval
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.field_guide_versions ALTER COLUMN id SET DEFAULT nextval('public.field_guide_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.field_guides ALTER COLUMN id SET DEFAULT nextval('public.field_guides_id_seq'::regclass);
 
 
@@ -1977,6 +2118,13 @@ ALTER TABLE ONLY public.organization_contents ALTER COLUMN id SET DEFAULT nextva
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.organization_page_versions ALTER COLUMN id SET DEFAULT nextval('public.organization_page_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.organization_pages ALTER COLUMN id SET DEFAULT nextval('public.organization_pages_id_seq'::regclass);
 
 
@@ -1999,6 +2147,13 @@ ALTER TABLE ONLY public.organizations ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.project_contents ALTER COLUMN id SET DEFAULT nextval('public.project_contents_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_page_versions ALTER COLUMN id SET DEFAULT nextval('public.project_page_versions_id_seq'::regclass);
 
 
 --
@@ -2097,6 +2252,13 @@ ALTER TABLE ONLY public.translation_versions ALTER COLUMN id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY public.translations ALTER COLUMN id SET DEFAULT nextval('public.translations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tutorial_versions ALTER COLUMN id SET DEFAULT nextval('public.tutorial_versions_id_seq'::regclass);
 
 
 --
@@ -2241,6 +2403,14 @@ ALTER TABLE ONLY public.collections_subjects
 
 
 --
+-- Name: field_guide_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.field_guide_versions
+    ADD CONSTRAINT field_guide_versions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: field_guides_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2321,6 +2491,14 @@ ALTER TABLE ONLY public.organization_contents
 
 
 --
+-- Name: organization_page_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.organization_page_versions
+    ADD CONSTRAINT organization_page_versions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organization_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2350,6 +2528,14 @@ ALTER TABLE ONLY public.organizations
 
 ALTER TABLE ONLY public.project_contents
     ADD CONSTRAINT project_contents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: project_page_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.project_page_versions
+    ADD CONSTRAINT project_page_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -2462,6 +2648,14 @@ ALTER TABLE ONLY public.translation_versions
 
 ALTER TABLE ONLY public.translations
     ADD CONSTRAINT translations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tutorial_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public.tutorial_versions
+    ADD CONSTRAINT tutorial_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -2756,6 +2950,13 @@ CREATE INDEX index_collections_subjects_on_subject_id ON public.collections_subj
 
 
 --
+-- Name: index_field_guide_versions_on_field_guide_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_field_guide_versions_on_field_guide_id ON public.field_guide_versions USING btree (field_guide_id);
+
+
+--
 -- Name: index_field_guides_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2868,6 +3069,13 @@ CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications
 
 
 --
+-- Name: index_organization_page_versions_on_organization_page_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organization_page_versions_on_organization_page_id ON public.organization_page_versions USING btree (organization_page_id);
+
+
+--
 -- Name: index_organization_pages_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2938,6 +3146,13 @@ CREATE INDEX index_project_contents_on_project_id ON public.project_contents USI
 
 
 --
+-- Name: index_project_page_versions_on_project_page_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_project_page_versions_on_project_page_id ON public.project_page_versions USING btree (project_page_id);
+
+
+--
 -- Name: index_project_pages_on_language; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2949,6 +3164,13 @@ CREATE INDEX index_project_pages_on_language ON public.project_pages USING btree
 --
 
 CREATE INDEX index_project_pages_on_project_id ON public.project_pages USING btree (project_id);
+
+
+--
+-- Name: index_project_versions_on_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_project_versions_on_project_id ON public.project_versions USING btree (project_id);
 
 
 --
@@ -3229,6 +3451,12 @@ CREATE UNIQUE INDEX index_tags_on_name ON public.tags USING btree (name);
 --
 
 CREATE INDEX index_translation_versions_on_translation_id ON public.translation_versions USING btree (translation_id);
+
+--
+-- Name: index_tutorial_versions_on_tutorial_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tutorial_versions_on_tutorial_id ON public.tutorial_versions USING btree (tutorial_id);
 
 
 --
@@ -3551,6 +3779,14 @@ ALTER TABLE ONLY public.gold_standard_annotations
 
 
 --
+-- Name: fk_rails_085970853c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.field_guide_versions
+    ADD CONSTRAINT fk_rails_085970853c FOREIGN KEY (field_guide_id) REFERENCES public.field_guides(id);
+
+
+--
 -- Name: fk_rails_0be1922a0e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3564,6 +3800,14 @@ ALTER TABLE ONLY public.access_control_lists
 
 ALTER TABLE ONLY public.workflow_tutorials
     ADD CONSTRAINT fk_rails_0ca158de43 FOREIGN KEY (tutorial_id) REFERENCES public.tutorials(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_0de211431f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tutorial_versions
+    ADD CONSTRAINT fk_rails_0de211431f FOREIGN KEY (tutorial_id) REFERENCES public.tutorials(id);
 
 
 --
@@ -3700,6 +3944,14 @@ ALTER TABLE ONLY public.authorizations
 
 ALTER TABLE ONLY public.recents
     ADD CONSTRAINT fk_rails_5244e2cc55 FOREIGN KEY (subject_id) REFERENCES public.subjects(id);
+
+
+--
+-- Name: fk_rails_53b1c6ff8a; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_page_versions
+    ADD CONSTRAINT fk_rails_53b1c6ff8a FOREIGN KEY (organization_page_id) REFERENCES public.organization_pages(id);
 
 
 --
@@ -3876,6 +4128,11 @@ ALTER TABLE ONLY public.oauth_access_grants
 
 ALTER TABLE ONLY public.translations
     ADD CONSTRAINT fk_rails_bae361a0ab FOREIGN KEY (published_version_id) REFERENCES public.translation_versions(id);
+-- Name: fk_rails_b7ce3e711e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_page_versions
+    ADD CONSTRAINT fk_rails_b7ce3e711e FOREIGN KEY (project_page_id) REFERENCES public.project_pages(id);
 
 
 --
@@ -4483,4 +4740,12 @@ INSERT INTO schema_migrations (version) VALUES ('20190220114950');
 INSERT INTO schema_migrations (version) VALUES ('20190220155414');
 
 INSERT INTO schema_migrations (version) VALUES ('20190220161628');
+
+INSERT INTO schema_migrations (version) VALUES ('20190222121420');
+
+INSERT INTO schema_migrations (version) VALUES ('20190307114830');
+
+INSERT INTO schema_migrations (version) VALUES ('20190307121801');
+
+INSERT INTO schema_migrations (version) VALUES ('20190307141138');
 

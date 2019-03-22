@@ -10,4 +10,8 @@ describe Tutorial, type: :model do
   it_behaves_like "is translatable" do
     let(:model) { create :tutorial }
   end
+
+  it_behaves_like "a versioned model" do
+    let(:versioned_attribute) { "display_name" }
+  end
 end
