@@ -65,8 +65,8 @@ RSpec.describe Api::V1::SetMemberSubjectsController, type: :controller do
       linked_workflow_ids = subject_set.subject_sets_workflows.pluck(:workflow_id)
       linked_workflow_ids.each do |workflow_id|
         expect(SubjectWorkflowStatusCreateWorker)
-        .to receive(:perform_async)
-        .with(linked_subject.id, workflow_id)
+        .to receive(:perform_in)
+        .with(kind_of(Numeric), linked_subject.id, workflow_id)
       end
       default_request user_id: authorized_user.id, scopes: scopes
       post :create, create_params
