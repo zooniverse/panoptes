@@ -16,7 +16,7 @@ class SubjectSetStatusesCreateWorker
       .where(subject_set_id: subject_set_id)
       .select(:id,:subject_id)
 
-    duration = linked_subject_select_scope.length * 4
+    duration = linked_subject_select_scope.scope * 4
     linked_subject_select_scope.find_each do |sms|
       SubjectWorkflowStatusCreateWorker.perform_in(
         duration.seconds*rand,
