@@ -12,11 +12,9 @@ class Api::V1::SetMemberSubjectsController < Api::ApiController
     super do |sms|
       set_id = sms.subject_set_id
       update_set_counts(set_id)
-      set_ids = linked_workflow_ids(set_id)
-      duration = set_ids.length * 4 # Pad times to prevent backlogs
-      set_ids.each do |workflow_id|
+      linked_workflow_ids(set_id).each do |workflow_id|
         SubjectWorkflowStatusCreateWorker.perform_in(
-          duration.seconds*rand,
+          1.minute*rand,
           sms.subject_id,
           workflow_id
         )
