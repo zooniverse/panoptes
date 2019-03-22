@@ -29,8 +29,9 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
       subject_set.subject_sets_workflows.pluck(:workflow_id).each do |workflow_id|
         UnfinishWorkflowWorker.perform_async(workflow_id)
+        duration = params[:subjects].length * 4 # Pad times to prevent backlogs
         params[:subjects].each do |subject_id|
-          SubjectWorkflowStatusCreateWorker.perform_async(subject_id, workflow_id)
+          SubjectWorkflowStatusCreateWorker.perform_in(duration.seconds*rand, subject_id, workflow_id)
         end
 
       end
