@@ -2,8 +2,6 @@ class CodeExperimentConfig < ActiveRecord::Base
   include Scientist::Experiment
   CACHE_TIME = 5.minutes
 
-  has_paper_trail
-
   validates_presence_of :name
   validates_uniqueness_of :name
 

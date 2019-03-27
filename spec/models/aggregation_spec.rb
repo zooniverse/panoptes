@@ -55,19 +55,4 @@ RSpec.describe Aggregation, :type => :model do
       expect{duplicate.save(validate: false)}.to raise_error(ActiveRecord::RecordNotUnique)
     end
   end
-
-  describe "versioning" do
-    let(:aggregation) { create(:aggregation) }
-
-    it { is_expected.to be_versioned }
-
-    it 'should track changes to aggregation', versioning: true do
-      new_aggregation = { "mean" => "1",
-                          "std" => "1",
-                          "count" => ["1","1","1"],
-                          "workflow_version" => "1.2" }
-      aggregation.update!(aggregation: new_aggregation)
-      expect(aggregation.previous_version.aggregation).to_not eq(new_aggregation)
-    end
-  end
 end

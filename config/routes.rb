@@ -74,7 +74,7 @@ Rails.application.routes.draw do
 
       json_api_resources :memberships
 
-      json_api_resources :subjects, versioned: true do
+      json_api_resources :subjects do
         collection do
           get :queued
         end
@@ -96,7 +96,7 @@ Rails.application.routes.draw do
 
       json_api_resources :organization_roles
 
-      json_api_resources :projects, links: [:subject_sets, :workflows], versioned: true do
+      json_api_resources :projects, links: [:subject_sets, :workflows] do
         media_resources :avatar, :background, :attached_images,
           classifications_export: { except: [:create] },
           subjects_export: { except: [:create] },
@@ -112,7 +112,7 @@ Rails.application.routes.draw do
         json_api_resources :pages, controller: "project_pages"
       end
 
-      json_api_resources :workflows, links: [:subject_sets, :retired_subjects, :tutorials, :workflow_versions, :published_version], versioned: true do
+      json_api_resources :workflows, links: [:subject_sets, :retired_subjects, :tutorials, :workflow_versions, :published_version] do
         media_resources :attached_images, classifications_export: { except: [:create] }
 
         post "/retired_subjects", to: "workflows#retire_subjects"

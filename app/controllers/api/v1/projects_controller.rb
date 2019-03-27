@@ -6,7 +6,6 @@ class Api::V1::ProjectsController < Api::ApiController
   include IndexSearch
   include FilterByTags
   include AdminAllowed
-  include Versioned
   include Slug
   include MediumResponse
 

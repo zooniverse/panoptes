@@ -734,16 +734,6 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
   end
 
-  describe "versioning" do
-    let(:resource) { workflow }
-    let!(:existing_versions) { resource.versions.length }
-    let(:num_times) { 11 }
-    let(:update_proc) { Proc.new { |resource, n| resource.update!(prioritized: (n % 2 == 0)) } }
-    let(:resource_param) { :workflow_id }
-
-    it_behaves_like "a versioned resource"
-  end
-
   describe "#create_classifications_export" do
     let(:test_attr) { :type }
     let(:api_resource_name) { "media" }

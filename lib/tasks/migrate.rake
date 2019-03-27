@@ -353,7 +353,7 @@ namespace :migrate do
         end
       end
     end
-    
+
     desc "Backfill project page versions"
     task :backfill_project_page_versions do
       ProjectPage.find_each do |project_page|

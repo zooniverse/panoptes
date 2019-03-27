@@ -6,8 +6,6 @@ class ProjectPage < ActiveRecord::Base
   has_many :project_page_versions, dependent: :destroy
   versioned association: :project_page_versions, attributes: %w(title content url_key)
 
-  has_paper_trail ignore: [:language]
-
   belongs_to :project
 
   validates_uniqueness_of :url_key, scope: [:project_id, :language]
