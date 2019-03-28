@@ -2,6 +2,13 @@ require 'spec_helper'
 
 describe TranslationSerializer do
   let(:translation) { create(:translation) }
+  let(:serializer_context) { {languages: ['en']} }
+  let(:serializer) do
+    serializer = TranslationSerializer.new
+    serializer.instance_variable_set(:@model, translation)
+    serializer.instance_variable_set(:@context, serializer_context)
+    serializer
+  end
 
   it_should_behave_like "a panoptes restpack serializer" do
     let(:resource) { translation }
@@ -74,6 +81,26 @@ describe TranslationSerializer do
           expect(result_links).to eq(expected_links)
         end
       end
+    end
+  end
+
+  describe "#strings" do
+    it 'uses normal strings' do
+      expect(serializer.strings['title']).to eq('A test Project')
+    end
+
+    it 'uses published strings when requested' do
+      translation.publish!
+      translation.strings["title"] = "Something else"
+      translation.save!
+
+      serializer.instance_variable_set(:@context, {languages: ['en'], published: true})
+      expect(serializer.strings['title']).to eq('A test Project')
+    end
+
+    it 'uses normal strings when never published' do
+      serializer.instance_variable_set(:@context, {languages: ['en'], published: true})
+      expect(serializer.strings['title']).to eq('A test Project')
     end
   end
 end

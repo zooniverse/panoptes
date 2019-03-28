@@ -144,7 +144,11 @@ Rails.application.routes.draw do
         links: [:published_version],
         constraints: Routes::Constraints::TranslationsConstraint.new,
         except: %i(new edit destroy)
-      })
+      }) do
+        member do
+          post :publish
+        end
+      end
     end
   end
 

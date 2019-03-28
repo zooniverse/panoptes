@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'spec_helper'
 
 RSpec.describe Api::V1::TranslationsController, type: :controller do
@@ -207,6 +208,30 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
           params = update_params.merge(id: resource.id)
           put :update, params
         end
+      end
+    end
+
+    describe "#publish" do
+      let(:translation) { resource }
+
+      before do
+        create(
+          :access_control_list,
+          resource: translated_resource,
+          user_group: authorized_user.identity_group,
+          roles: ["collaborator"]
+        )
+      end
+
+      it 'marks the latest version as the published version' do
+        allow_any_instance_of(Translation).to receive(:validate_string_versions).and_return(true)
+        translation.publish!
+        published_version = translation.published_version
+        translation.update! strings: {v: 'two'}, string_versions: {v: 2}
+
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :publish, id: translation.id, translated_type: resource_type.to_s
+        expect(translation.reload.published_version).to eq(translation.translation_versions.last)
       end
     end
   end

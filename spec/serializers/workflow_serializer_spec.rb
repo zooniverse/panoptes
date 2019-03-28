@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe WorkflowSerializer do
   let(:workflow) { create(:workflow) }
+  let(:serializer_context) { {languages: ['en']} }
   let(:serializer) do
     serializer = WorkflowSerializer.new
     serializer.instance_variable_set(:@model, workflow)
-    serializer.instance_variable_set(:@context,
-                                     {languages: ['en']})
+    serializer.instance_variable_set(:@context, serializer_context)
     serializer
   end
 

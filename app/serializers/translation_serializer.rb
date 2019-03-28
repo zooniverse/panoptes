@@ -10,6 +10,22 @@ class TranslationSerializer
 
   can_filter_by :language
 
+  def strings
+    requested_version.strings
+  end
+
+  def string_versions
+    requested_version.string_versions
+  end
+
+  def requested_version
+    if @context[:published]
+      @model.published_version || @model
+    else
+      @model
+    end
+  end
+
   # Add the polymorphic links to include all the resources
   # that have the inverse translation assocation
   def self.links

@@ -5,7 +5,7 @@ class Api::V1::TranslationsController < Api::ApiController
 
   polymorphic_column :translated
 
-  require_authentication :create, :update, :destroy, scopes: [:translation]
+  require_authentication :create, :update, :destroy, :publish, scopes: [:translation]
 
   resource_actions :show, :index, :create, :update
 
@@ -31,6 +31,12 @@ class Api::V1::TranslationsController < Api::ApiController
     super
   end
 
+  def publish
+    ensure_non_primary_language_request(controlled_resource.language)
+    controlled_resource.publish!
+    render nothing: true, status: 204
+  end
+
   def serializer
     TranslationSerializer
   end
@@ -39,8 +45,11 @@ class Api::V1::TranslationsController < Api::ApiController
 
   # ensure translators can update and create translated resources
   def controlled_scope
-    if %i(update create).include?(action_name.to_sym)
+    case action_name.to_sym
+    when :create, :update
       :translate
+    when :publish
+      :update
     else
       super
     end
@@ -69,6 +78,15 @@ class Api::V1::TranslationsController < Api::ApiController
 
     if checker.for_primary_language?
       raise JsonApiController::AccessDenied, no_resources_error_message
+    end
+  end
+
+  def context
+    case action_name
+    when "show", "index"
+      super.merge(published: params["published"])
+    else
+      super
     end
   end
 

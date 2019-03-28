@@ -30,6 +30,10 @@ class Translation < ActiveRecord::Base
     ).freeze
   end
 
+  def publish!
+    update!(published_version: translation_versions.order(:id).last)
+  end
+
   def update_strings_and_versions(new_strings, version_number)
     old_strings = self.strings.stringify_keys
     new_strings = new_strings.stringify_keys
