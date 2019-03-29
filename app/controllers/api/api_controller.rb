@@ -80,10 +80,6 @@ module Api
       ( param_langs | user_langs | header_langs ).compact
     end
 
-    def user_for_paper_trail
-      @whodunnit_id ||= current_resource_owner.try(:id) || "UnauthenticatedUser"
-    end
-
     def user_accept_languages
       api_user.try(:languages) || []
     end
@@ -129,13 +125,6 @@ module Api
       else
         { }
       end
-    end
-
-    private
-
-    # Turn on paper trail for all API controllers
-    def paper_trail_enabled_for_controller
-      true
     end
   end
 end

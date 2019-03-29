@@ -23,16 +23,6 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
   let(:scopes) { %w(public project) }
 
-  before(:each) do
-    PaperTrail.enabled = true
-    PaperTrail.enabled_for_controller = true
-  end
-
-  after(:each) do
-    PaperTrail.enabled = false
-    PaperTrail.enabled_for_controller = false
-  end
-
   describe '#index' do
     let(:filterable_resources) { create_list(:workflow_with_subjects, 2) }
     let(:expected_filtered_ids) { [ filterable_resources.first.id.to_s ] }
