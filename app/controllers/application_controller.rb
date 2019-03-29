@@ -35,13 +35,6 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # Turn off paper trail globally and enable it specifically in the required controllers
-  # paper trail calls current_user in a before action which inteferes with
-  # custom devise authentication strategies
-  def paper_trail_enabled_for_controller
-    false
-  end
-
   def json_request?
     request.format.json?
   end

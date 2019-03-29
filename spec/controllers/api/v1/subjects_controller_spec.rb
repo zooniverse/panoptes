@@ -785,16 +785,4 @@ describe Api::V1::SubjectsController, type: :controller do
       delete :destroy, id: resource.id
     end
   end
-
-  describe "versioning" do
-    let(:resource) { create(:subject, project: create(:project, owner: user)) }
-    let!(:existing_versions) { resource.versions.length }
-    let(:num_times) { 10 }
-    let(:update_proc) do
-      Proc.new { |resource, n| resource.update!(metadata: { times: n }) }
-    end
-    let(:resource_param) { :subject_id }
-
-    it_behaves_like "a versioned resource"
-  end
 end

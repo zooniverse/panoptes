@@ -2,8 +2,6 @@ class Subject < ActiveRecord::Base
   include Activatable
   include OrderedLocations
 
-  has_paper_trail only: [:metadata, :locations]
-
   belongs_to :project
   belongs_to :uploader, class_name: "User", foreign_key: "upload_user_id"
   has_many :collections_subjects, dependent: :restrict_with_exception

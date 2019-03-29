@@ -24,18 +24,6 @@ describe Api::ApiController, type: :controller do
         expect(response.status).to eq(200)
       end
     end
-
-    describe "calling paper trail whodunnit before filter" do
-
-      it "should enable current user lookup" do
-        expect(subject.send(:paper_trail_enabled_for_controller)).to be_truthy
-      end
-
-      it "should call the current_user method" do
-        expect(subject).to receive(:user_for_paper_trail).once
-        get :index
-      end
-    end
   end
 
   context "with doorkeeper" do

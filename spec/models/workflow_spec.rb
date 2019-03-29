@@ -151,13 +151,6 @@ describe Workflow, type: :model do
   describe "version numbers", versioning: true do
     let(:workflow) { create(:workflow, tasks: {version: 1}) }
 
-    it 'calculates version numbers', :aggregate_failures do
-      previous_number = workflow.current_version_number.to_i
-      workflow.update!(tasks: {blha: 'asdfasd', quera: "asdfas"})
-      expect(workflow.current_version_number.to_i).to eq(previous_number + 1)
-      expect(workflow.current_version_number.to_i).to eq(ModelVersion.version_number(workflow))
-    end
-
     it 'defaults version numbers to 1' do
       workflow = Workflow.new(project: create(:project), display_name: "FOO", primary_language: 'en-us', first_task: 'init')
       workflow.save!

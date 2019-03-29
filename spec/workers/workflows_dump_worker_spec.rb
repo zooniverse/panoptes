@@ -12,27 +12,25 @@ RSpec.describe WorkflowsDumpWorker do
   end
 
   context "with a versioned workflow" do
-    with_versioning do
-      let(:q_workflow) { build(:workflow, :question_task) }
-      let(:tasks) { q_workflow.tasks }
+    let(:q_workflow) { build(:workflow, :question_task) }
+    let(:tasks) { q_workflow.tasks }
 
-      before(:each) do
-        updates = {
-          tasks: tasks, pairwise: !workflow.pairwise,
-          grouped: !workflow.grouped, prioritized: !workflow.prioritized
-        }
-        workflow.update_attributes(updates)
-      end
+    before(:each) do
+      updates = {
+        tasks: tasks, pairwise: !workflow.pairwise,
+        grouped: !workflow.grouped, prioritized: !workflow.prioritized
+      }
+      workflow.update_attributes(updates)
+    end
 
-      it "should append all previous versions to the csv file" do
-        aggregate_failures "versions" do
-          expect_any_instance_of(CSV).to receive(:<<).exactly(3).times.and_call_original
-          workflow.workflow_versions.each do |version|
-            expect_any_instance_of(Formatter::Csv::Workflow).to receive(:to_array)
-              .with(version).and_call_original
-          end
-          worker.perform(project.id, "project")
+    it "should append all previous versions to the csv file" do
+      aggregate_failures "versions" do
+        expect_any_instance_of(CSV).to receive(:<<).exactly(3).times.and_call_original
+        workflow.workflow_versions.each do |version|
+          expect_any_instance_of(Formatter::Csv::Workflow).to receive(:to_array)
+            .with(version).and_call_original
         end
+        worker.perform(project.id, "project")
       end
     end
   end

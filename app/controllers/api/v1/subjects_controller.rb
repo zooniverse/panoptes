@@ -1,6 +1,5 @@
 class Api::V1::SubjectsController < Api::ApiController
   include JsonApiController::PunditPolicy
-  include Versioned
 
   require_authentication :update, :create, :destroy, :version, :versions,
     scopes: [:subject]

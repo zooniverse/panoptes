@@ -43,7 +43,6 @@ class Project < ActiveRecord::Base
 
   has_many :project_versions, dependent: :destroy
 
-  has_paper_trail only: [:private, :live, :beta_requested, :beta_approved, :launch_requested, :launch_approved]
   versioned association: :project_versions, attributes: %w(private live beta_requested beta_approved launch_requested launch_approved display_name description workflow_description introduction url_labels researcher_quote)
 
   enum state: [:paused, :finished]
