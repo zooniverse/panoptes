@@ -4,11 +4,6 @@ class ProjectSerializer
   include MediaLinksSerializer
   include CachedSerializer
 
-  CONTENT_FIELDS = %i(
-    title description workflow_description
-    introduction url_labels researcher_quote
-  ).freeze
-
   attributes :id, :display_name, :classifications_count,
     :subjects_count, :created_at, :updated_at, :available_languages,
     :title, :description, :introduction, :private, :retired_subjects_count,
@@ -100,12 +95,5 @@ class ProjectSerializer
     else
       ""
     end
-  end
-
-  def content
-    return @content if @content
-    content = @model.primary_content.attributes.with_indifferent_access
-    content.default = ""
-    @content = content.slice(*CONTENT_FIELDS)
   end
 end
