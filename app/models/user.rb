@@ -4,7 +4,6 @@ class User < ActiveRecord::Base
   include Activatable
   include PgSearch
   include ExtendedCacheKey
-  attr_accessor :under_age
 
   ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
