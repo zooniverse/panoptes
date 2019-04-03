@@ -6,7 +6,7 @@ class TranslationStrings
   end
 
   def extract
-    @attributes = resource_attributes.slice(*translatable_attributes)
+    @attributes = translatable_resource_attributes
 
     transform_method = "transform_#{resource_name}_attributes"
     if respond_to?(transform_method, true)
@@ -22,25 +22,10 @@ class TranslationStrings
     resource.model_name.singular
   end
 
-  def resource_attributes
-    attrs = resource.attributes.except(:id)
-    attrs.merge(primary_content_attributes).with_indifferent_access
-  end
-
-  def primary_content_attributes
-    return {} unless resource.class.respond_to?(:content_association)
-
-    content_assocation = resource.class.content_association
-    resource
-      .send(content_assocation)
-      .find_by(language: resource.primary_language)
-      .attributes
-      .dup
-      .except(:id)
-  end
-
-  def translatable_attributes
-    resource.class.translatable_attributes
+  def translatable_resource_attributes
+    translatable_attributes = resource.class.translatable_attributes
+    resource_attributes = resource.attributes.except(:id)
+    resource_attributes.with_indifferent_access.slice(*translatable_attributes)
   end
 
   # field guide item has icon attributes that should not be translated
