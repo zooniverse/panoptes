@@ -38,23 +38,6 @@ module Organizations
       })
     end
 
-    def organization_contents_params
-      organization_contents_params = {
-        title: display_name,
-        description: description,
-        introduction: introduction,
-        announcement: announcement
-      }
-      organization_contents_params.merge(
-        organization_contents_from_params
-      )
-    end
-
-    def organization_contents_from_params
-      fields = Api::V1::OrganizationsController::CONTENT_FIELDS
-      ContentFromParams.content_from_params(inputs, fields)
-    end
-
     def urls_without_labels
       urls_without_labels, _ = extract_url_labels
       urls_without_labels

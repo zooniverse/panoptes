@@ -16,21 +16,11 @@ class Api::V1::OrganizationsController < Api::ApiController
   prepend_before_action :require_login,
     only: [:create, :update, :destroy]
 
-  CONTENT_PARAMS = [:description,
-                    :title,
-                    :introduction,
-                    :announcement,
-                    :url_labels].freeze
-
-  CONTENT_FIELDS = [:description,
-                    :title,
-                    :introduction,
-                    :announcement,
-                    :url_labels].freeze
+  schema_type :json_schema
 
   def create
     @created_resources = Organization.transaction(requires_new: true) do
-      Array.wrap(params[:organizations]).map do |organization_params|
+      Array.wrap(create_params).map do |organization_params|
         Organizations::Create.with(api_user: api_user).run!(organization_params)
       end
     end
@@ -40,7 +30,7 @@ class Api::V1::OrganizationsController < Api::ApiController
 
   def update
     @updated_resources = Organization.transaction(requires_new: true) do
-      Array.wrap(resource_ids).zip(Array.wrap(params[:organizations])).map do |organization_id, organization_params|
+      Array.wrap(resource_ids).zip(Array.wrap(update_params)).map do |organization_id, organization_params|
         wrapper = { organization_params: organization_params }
         Organizations::Update.with(api_user: api_user, id: organization_id).run!(wrapper)
       end
