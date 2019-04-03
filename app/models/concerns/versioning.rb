@@ -40,8 +40,10 @@ module Versioning
     end
   end
 
+  # take the highest associated version_id
+  # via the autoincrementing PK of the versioned_association
   def latest_version_id
-    send(self.class.versioned_association).order(id: :desc).select(:id).first.id
+    version_ids.max
   end
 
   def version_ids

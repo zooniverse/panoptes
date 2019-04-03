@@ -14,4 +14,14 @@ RSpec.shared_examples "a versioned model" do
       model.save!
     end.to change { model.send(model.class.versioned_association).count }.by(1)
   end
+
+  it 'lists the version ids' do
+    expected_ids = model.send(model.class.versioned_association).pluck(:id)
+    expect(model.version_ids).to match_array(expected_ids)
+  end
+
+  it 'records the lastest version id' do
+    expected_id = model.send(model.class.versioned_association).last.id
+    expect(model.latest_version_id).to eq(expected_id)
+  end
 end
