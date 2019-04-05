@@ -9,6 +9,9 @@ class User < ActiveRecord::Base
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
   DUP_LOGIN_SANITATION_ATTEMPTS = 20
 
+  # virtual attribute used on registration form
+  attr_accessor :under_age
+
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
     :omniauthable, omniauth_providers: [:facebook, :google_oauth2]
@@ -53,7 +56,7 @@ class User < ActiveRecord::Base
   validates_with IdentityGroupNameValidator
 
   after_create :set_zooniverse_id
-  after_create :send_welcome_email, unless: :migrated
+  # after_create :send_welcome_email, unless: :migrated
   before_create :set_ouroboros_api_key
 
   delegate :projects, to: :identity_group

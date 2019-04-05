@@ -5,11 +5,11 @@
     <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
 
       <div class="checkbox">
-          <label for="under_age">
-            <input name="under_age" id="under_age" type="checkbox"/>
+          <%= f.label :under_age do %>
+            <%= f.check_box :under_age, id: 'under_age' %>
             If you are under 16 years old, tick this box and complete the form with your parent/guardian.
-          </label>
-      </div>
+          <% end %>
+        </div>
 
       <div class="form-group <%= "has-errors" if resource.errors[:login].present? %>">
         <%= f.label :login, "Username (required)" %><small class="errored"><%= resource.errors[:login].join(', ')%></small><br />
@@ -44,19 +44,19 @@
         </label>
       </div>
 
-        <div class="checkbox">
-          <%= f.label :global_email_communication do %>
-            <%= f.check_box :global_email_communication, checked: true %>
-            <span id="agreement_text"></span>
-          <% end %>
-        </div>
+      <div class="checkbox">
+        <%= f.label :global_email_communication do %>
+          <%= f.check_box :global_email_communication, checked: true %>
+          <span id="agreement_text"></span>
+        <% end %>
+      </div>
 
-        <div class="checkbox">
-          <%= f.label :beta_email_communication do %>
-            <%= f.check_box :beta_email_communication, checked: false %>
-            I’d like to help test new projects, and be emailed when they’re available.
-          <% end %>
-        </div>
+      <div class="checkbox">
+        <%= f.label :beta_email_communication do %>
+          <%= f.check_box :beta_email_communication, checked: false %>
+          I’d like to help test new projects, and be emailed when they’re available.
+        <% end %>
+      </div>
 
       <%= f.submit "Create account", class: 'btn btn-primary' %>
     <% end %>
