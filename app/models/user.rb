@@ -56,7 +56,7 @@ class User < ActiveRecord::Base
   validates_with IdentityGroupNameValidator
 
   after_create :set_zooniverse_id
-  # after_create :send_welcome_email, unless: :migrated
+  after_create :send_welcome_email, unless: :migrated
   before_create :set_ouroboros_api_key
 
   delegate :projects, to: :identity_group
