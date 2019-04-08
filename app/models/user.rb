@@ -9,8 +9,8 @@ class User < ActiveRecord::Base
   USER_LOGIN_REGEX = /\A#{ ALLOWED_LOGIN_CHARACTERS }+\z/
   DUP_LOGIN_SANITATION_ATTEMPTS = 20
 
-  # virtual attribute used on registration form
-  attr_accessor :under_age
+  # virtual attribute used on registration form for minors
+  attr_accessor :minor_age
 
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :trackable, :validatable,
