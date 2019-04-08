@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :workflow, aliases: [:workflow_with_contents] do
-    display_name "A Workflow"
+    display_name { "A Workflow" }
 
     first_task { "interest" }
     tasks {
