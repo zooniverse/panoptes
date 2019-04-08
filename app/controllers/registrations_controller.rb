@@ -55,7 +55,7 @@ class RegistrationsController < Devise::RegistrationsController
     render json: {errors: [{message: e.message}]}, status: :unprocessable_entity
   end
 
-  def build_resource(sign_up_params)
+  def build_resource(sign_up_params={})
     super(sign_up_params)
     resource.display_name = resource.login if resource.display_name.blank?
     resource.project_email_communication = resource.global_email_communication
