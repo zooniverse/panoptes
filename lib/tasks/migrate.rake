@@ -328,7 +328,7 @@ namespace :migrate do
     end
 
     desc "Backfill org page versions"
-    task :backfill_organization_page_versions do
+    task :backfill_organization_page_versions => :environment do
       OrganizationPage.find_each do |org_page|
         OrganizationPage.transaction do
           org_page.organization_page_versions.delete_all
@@ -339,8 +339,8 @@ namespace :migrate do
               title: reified.title,
               content: reified.content,
               url_key: reified.url_key,
-              created_at: version.created_at,
-              updated_at: version.updated_at
+              created_at: reified.created_at,
+              updated_at: reified.updated_at
           end
 
           OrganizationPageVersion.create! \
@@ -348,14 +348,14 @@ namespace :migrate do
             title: org_page.title,
             content: org_page.content,
             url_key: org_page.url_key,
-            created_at: version.created_at,
-            updated_at: version.updated_at
+            created_at: org_page.created_at,
+            updated_at: org_page.updated_at
         end
       end
     end
-    
+
     desc "Backfill project page versions"
-    task :backfill_project_page_versions do
+    task :backfill_project_page_versions => :environment do
       ProjectPage.find_each do |project_page|
         ProjectPage.transaction do
           project_page.project_page_versions.delete_all
@@ -366,17 +366,17 @@ namespace :migrate do
               title: reified.title,
               content: reified.content,
               url_key: reified.url_key,
-              created_at: version.created_at,
-              updated_at: version.updated_at
+              created_at: reified.created_at,
+              updated_at: reified.updated_at
           end
 
           ProjectPageVersion.create! \
             project_page_id: project_page.id,
-            title: org_page.title,
-            content: org_page.content,
-            url_key: org_page.url_key,
-            created_at: version.created_at,
-            updated_at: version.updated_at
+            title: project_page.title,
+            content: project_page.content,
+            url_key: project_page.url_key,
+            created_at: project_page.created_at,
+            updated_at: project_page.updated_at
         end
       end
     end

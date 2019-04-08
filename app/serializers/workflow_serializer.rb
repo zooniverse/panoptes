@@ -1,5 +1,4 @@
 require "tasks_visitors/inject_strings"
-require 'model_version'
 
 class WorkflowSerializer
   include Serialization::PanoptesRestpack

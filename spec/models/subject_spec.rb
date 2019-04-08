@@ -15,31 +15,6 @@ describe Subject, :type => :model do
     expect(subject.active?).to be_truthy
   end
 
-  describe "versioning" do
-    let(:subject) { create(:subject) }
-
-    it { is_expected.to be_versioned }
-
-    it "should create versions when updated", versioning: true do
-      expect do
-        subject.update!(metadata: { more: "Meta" })
-        subject.reload
-      end.to change{subject.versions.length}.from(1).to(2)
-    end
-
-    it "should track metadata changes", versioning: true do
-      new_meta = { more: "META" }
-      subject.update!(metadata: new_meta)
-      expect(subject.previous_version.metadata).to_not eq(new_meta)
-    end
-
-    it 'should not track other attribute changes', versioning: true do
-      project = create(:project)
-      subject.update!(project: project)
-      expect(subject.previous_version).to be_nil
-    end
-  end
-
   it "should be invalid without a project_id" do
     subject.project = nil
     expect(subject).to_not be_valid

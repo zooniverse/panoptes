@@ -2,12 +2,10 @@ class Workflow < ActiveRecord::Base
   include Activatable
   include ExtendedCacheKey
   include RankedModel
-  include CacheModelVersion
   include ModelCacheKey
   include Translatable
   include Versioning
 
-  has_paper_trail only: [:tasks, :grouped, :pairwise, :prioritized]
   versioned association: :workflow_versions, attributes: %w(tasks first_task strings major_version minor_version)
 
   belongs_to :project

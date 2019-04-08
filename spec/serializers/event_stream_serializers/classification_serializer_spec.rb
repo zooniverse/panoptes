@@ -11,14 +11,4 @@ describe EventStreamSerializers::ClassificationSerializer do
     adapter = described_class.serialize(classification, include: ['subjects'])
     expect(adapter.as_json[:linked]['subjects'].size).to eq(1)
   end
-
-  context 'versioned resources' do
-    before(:each) do
-      PaperTrail.enabled = true
-    end
-
-    after(:each) do
-      PaperTrail.enabled = false
-    end
-  end
 end

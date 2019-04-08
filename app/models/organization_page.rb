@@ -6,7 +6,6 @@ class OrganizationPage < ActiveRecord::Base
   belongs_to :organization
   has_many :organization_page_versions, dependent: :destroy
 
-  has_paper_trail ignore: [:language]
   versioned association: :organization_page_versions, attributes: %w(title content url_key)
 
   validates_uniqueness_of :url_key, scope: [:organization_id, :language]

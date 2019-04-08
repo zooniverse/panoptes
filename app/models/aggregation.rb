@@ -3,8 +3,6 @@ class Aggregation < ActiveRecord::Base
   belongs_to :workflow
   belongs_to :subject
 
-  has_paper_trail only: [:aggregation]
-
   validates_presence_of :workflow, :subject, :aggregation
   validates_uniqueness_of :subject_id, scope: :workflow_id
   validate :aggregation, :workflow_version_present
