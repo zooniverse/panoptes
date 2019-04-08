@@ -86,7 +86,7 @@ FactoryBot.define do
     end
 
     factory :workflow_with_subjects do
-      ignore do
+      transient do
         num_sets { 2 }
       end
 

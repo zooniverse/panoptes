@@ -9,7 +9,7 @@ FactoryBot.define do
               loudness: 11} }
 
     trait :with_mediums do
-      ignore do
+      transient do
         num_media { 2 }
       end
 
@@ -25,7 +25,7 @@ FactoryBot.define do
     end
 
     trait :with_subject_sets do
-      ignore do
+      transient do
         num_sets { 2 }
       end
 
