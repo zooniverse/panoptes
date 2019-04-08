@@ -2,19 +2,19 @@ FactoryBot.define do
   factory :access_token, class: Doorkeeper::AccessToken do
     sequence(:resource_owner_id) { |n| n }
     application_id { nil }
-    expires_in 2.hours
-    revoked_at nil
+    expires_in { 2.hours }
+    revoked_at { nil }
 
     factory :limitless_token do
-      expires_in nil
+      expires_in { nil }
     end
 
     factory :expired_token do
-      expires_in -100
+      expires_in { -100 }
     end
 
     factory :revoked_token do
-      revoked_at DateTime.yesterday.beginning_of_day
+      revoked_at { DateTime.yesterday.beginning_of_day }
     end
   end
 end

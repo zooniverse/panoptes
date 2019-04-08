@@ -1,17 +1,17 @@
 FactoryBot.define do
   factory :classification do
-    metadata({
+    metadata { {
               user_agent: "cURL",
               started_at: 2.minutes.ago.to_s,
               finished_at: 1.minute.ago.to_s,
               user_language: 'en',
-             })
-    annotations [{task: "an_annotation",
+             } }
+    annotations { [{task: "an_annotation",
                   value: true},
                  {task: "another_one",
-                  value: [1, 2]}]
-    user_ip "192.168.0.1"
-    completed true
+                  value: [1, 2]}] }
+    user_ip { "192.168.0.1" }
+    completed { true }
     user
     project
     workflow
@@ -33,12 +33,12 @@ FactoryBot.define do
     end
 
     factory :gold_standard_classification do
-      expert_classifier :expert
-      gold_standard true
+      expert_classifier { :expert }
+      gold_standard { true }
     end
 
     factory :fake_gold_standard_classification do
-      gold_standard false
+      gold_standard { false }
     end
 
     factory :already_seen_classification do
@@ -47,7 +47,7 @@ FactoryBot.define do
       end
 
       factory :anonymous_already_seen_classification do
-        user nil
+        user { nil }
       end
     end
   end
