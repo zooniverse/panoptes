@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
       u.permit(:email, :password, :password_confirmation, :login, :display_name,
                :credited_name, :global_email_communication,
                :project_email_communication, :beta_email_communication,
-               :project_id)
+               :project_id, :minor_age)
     end
 
     devise_parameter_sanitizer.permit(:account_update) do |u|
@@ -34,13 +34,6 @@ class ApplicationController < ActionController::Base
   end
 
   private
-
-  # Turn off paper trail globally and enable it specifically in the required controllers
-  # paper trail calls current_user in a before action which inteferes with
-  # custom devise authentication strategies
-  def paper_trail_enabled_for_controller
-    false
-  end
 
   def json_request?
     request.format.json?

@@ -1,5 +1,4 @@
 require "tasks_visitors/inject_strings"
-require 'model_version'
 
 class WorkflowSerializer
   include Serialization::PanoptesRestpack
@@ -22,7 +21,7 @@ class WorkflowSerializer
   preload :subject_sets, :attached_images
 
   def version
-    "#{@model.current_version_number}.#{content_version}"
+    "#{@model.major_version}.#{content_version}"
   end
 
   def content_language

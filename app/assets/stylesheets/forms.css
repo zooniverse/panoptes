@@ -88,21 +88,21 @@
 
 /* Styles for form errors messages */
 
-.form .field_with_errors {
+.field_with_errors {
     display: inline;
 }
 
-.form .field_with_errors label {
+.field_with_errors label {
     color: red;
 }
 
-.form .field_with_errors input {
+.field_with_errors input {
     border: 1px solid red;
 }
 
 /* Styles for new user form */
 
-.form small.errored {
+small.errored {
     color: red;
     padding-left: 1em;
 }

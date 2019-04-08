@@ -37,11 +37,18 @@ class ClassificationDumpCache
   def workflow_at_version(workflow, major_version, minor_version)
     @workflows[workflow.id] ||= {}
     @workflows[workflow.id][major_version] ||= {}
-    @workflows[workflow.id][major_version][minor_version] ||=
-      workflow.workflow_versions.find_by!(major_number: major_version, minor_number: minor_version)
+    @workflows[workflow.id][major_version][minor_version] ||= find_workflow_at_version(workflow, major_version, minor_version)
   end
 
   def secure_user_ip(ip_string)
     @secure_ip_lookup[ip_string] ||= SecureRandom.hex(10)
+  end
+
+  private
+
+  def find_workflow_at_version(workflow, major_version, minor_version)
+    workflow.workflow_versions.where("major_number >= ? AND minor_number >= ?", major_version, minor_version).order("major_number ASC, minor_number ASC").first!
+  rescue ActiveRecord::RecordNotFound
+    workflow.workflow_versions.order("major_number ASC, minor_number ASC").last
   end
 end

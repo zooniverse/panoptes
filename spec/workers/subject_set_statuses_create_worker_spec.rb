@@ -28,8 +28,8 @@ RSpec.describe SubjectSetStatusesCreateWorker do
     it "should call a SubjectWorkflowStatusCreateWorker for each subject" do
       subject_ids.each do |subject_id|
         expect(SubjectWorkflowStatusCreateWorker)
-          .to receive(:perform_async)
-          .with(subject_id, workflow_id)
+          .to receive(:perform_in)
+          .with(kind_of(Numeric), subject_id, workflow_id)
       end
       worker.perform(subject_set.id, workflow_id)
     end

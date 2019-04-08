@@ -23,16 +23,6 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
   let(:scopes) { %w(public project) }
 
-  before(:each) do
-    PaperTrail.enabled = true
-    PaperTrail.enabled_for_controller = true
-  end
-
-  after(:each) do
-    PaperTrail.enabled = false
-    PaperTrail.enabled_for_controller = false
-  end
-
   describe '#index' do
     let(:filterable_resources) { create_list(:workflow_with_subjects, 2) }
     let(:expected_filtered_ids) { [ filterable_resources.first.id.to_s ] }
@@ -734,16 +724,6 @@ describe Api::V1::WorkflowsController, type: :controller do
         .to eq("Retirement reason is not included in the list")
       expect(response.status).to eq(422)
     end
-  end
-
-  describe "versioning" do
-    let(:resource) { workflow }
-    let!(:existing_versions) { resource.versions.length }
-    let(:num_times) { 11 }
-    let(:update_proc) { Proc.new { |resource, n| resource.update!(prioritized: (n % 2 == 0)) } }
-    let(:resource_param) { :workflow_id }
-
-    it_behaves_like "a versioned resource"
   end
 
   describe "#create_classifications_export" do

@@ -15,6 +15,10 @@ describe Workflow, type: :model do
     let(:model) { create :workflow }
   end
 
+  it_behaves_like "a versioned model" do
+    let(:new_value) { {"version" => "two"} }
+  end
+
   it_behaves_like "activatable" do
     let(:activatable) { workflow }
   end
@@ -144,56 +148,8 @@ describe Workflow, type: :model do
     end
   end
 
-  describe "non-papertrail versioning", versioning: true do # TODO: keep this and remove papertrail tests later
-    let(:tasks) { {"version" => 1}}
-    let(:workflow) { create(:workflow, tasks: tasks) }
-
-    it 'creates an initial version for the create' do
-      expect(workflow.workflow_versions.count).to eq(1)
-    end
-
-    it 'should track changes to tasks', :aggregate_failures do
-      new_tasks = {"version" => 2}
-      workflow.update!(tasks: new_tasks)
-      expect(workflow.workflow_versions.count).to eq(2)
-      expect(workflow.workflow_versions.first.tasks).to eq(tasks)
-      expect(workflow.workflow_versions.last.tasks).to eq(new_tasks)
-    end
-
-    it 'should not track changes to primary_language' do
-      expect { workflow.update!(primary_language: 'es') }.not_to change { workflow.workflow_versions.count }
-    end
-  end
-
-  describe "versioning", versioning: true do
+  describe "version numbers", versioning: true do
     let(:workflow) { create(:workflow, tasks: {version: 1}) }
-
-    it { is_expected.to be_versioned }
-
-    it 'should track changes to tasks' do
-      new_tasks = { blha: 'asdfasd', quera: "asdfas" }
-      workflow.update!(tasks: new_tasks)
-      expect(workflow.previous_version.tasks).to_not eq(new_tasks)
-    end
-
-    it 'should track changes to first_task' do
-      expect do
-        workflow.update!(first_task: "T4")
-      end.to change(workflow, :major_version).from(1).to(2)
-    end
-
-    it 'should not track changes to primary_language' do
-      new_lang = 'en'
-      workflow.update!(primary_language: new_lang)
-      expect(workflow.previous_version).to be_nil
-    end
-
-    it 'caches the new version number', :aggregate_failures do
-      previous_number = workflow.current_version_number.to_i
-      workflow.update!(tasks: {blha: 'asdfasd', quera: "asdfas"})
-      expect(workflow.current_version_number.to_i).to eq(previous_number + 1)
-      expect(workflow.current_version_number.to_i).to eq(ModelVersion.version_number(workflow))
-    end
 
     it 'defaults version numbers to 1' do
       workflow = Workflow.new(project: create(:project), display_name: "FOO", primary_language: 'en-us', first_task: 'init')

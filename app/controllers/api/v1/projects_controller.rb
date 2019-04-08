@@ -6,7 +6,6 @@ class Api::V1::ProjectsController < Api::ApiController
   include IndexSearch
   include FilterByTags
   include AdminAllowed
-  include Versioned
   include Slug
   include MediumResponse
 
@@ -17,13 +16,6 @@ class Api::V1::ProjectsController < Api::ApiController
   schema_type :json_schema
 
   alias_method :project, :controlled_resource
-
-  CONTENT_FIELDS = [:title,
-                    :description,
-                    :workflow_description,
-                    :introduction,
-                    :researcher_quote,
-                    :url_labels].freeze
 
   CARD_FIELDS = [:id,
                  :display_name,

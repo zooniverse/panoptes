@@ -16,8 +16,11 @@ RUN apt-get update && apt-get -y upgrade && \
     libpq-dev \
     postgresql-client-9.4 \
     tmpreaper \
+    libjemalloc1 \
     && \
     apt-get clean
+
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/

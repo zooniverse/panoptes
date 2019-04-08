@@ -50,32 +50,29 @@ RSpec.describe Formatter::Csv::Workflow do
   end
 
   context "with a versioned workflow" do
+    let(:q_workflow) { build(:workflow, :question_task) }
+    let(:tasks) { q_workflow.tasks }
 
-    with_versioning do
-      let(:q_workflow) { build(:workflow, :question_task) }
-      let(:tasks) { q_workflow.tasks }
+    before(:each) do
+      updates = {
+        tasks: tasks, pairwise: !workflow.pairwise,
+        grouped: !workflow.grouped, prioritized: !workflow.prioritized
+      }
+      workflow.update_attributes(updates)
+    end
 
-      before(:each) do
-        updates = {
-          tasks: tasks, pairwise: !workflow.pairwise,
-          grouped: !workflow.grouped, prioritized: !workflow.prioritized
-        }
-        workflow.update_attributes(updates)
-      end
+    describe "#to_rows on the latest version" do
+      subject { described_class.new.to_rows(workflow_version) }
 
-      describe "#to_rows on the latest version" do
-        subject { described_class.new.to_rows(workflow_version) }
+      it { is_expected.to match_array(rows) }
+    end
 
-        it { is_expected.to match_array(rows) }
-      end
+    describe "#to_rows on the previous version" do
+      let(:workflow_version) { workflow.workflow_versions.order(:created_at).first }
 
-      describe "#to_rows on the previous version" do
-        let(:workflow_version) { workflow.workflow_versions.order(:created_at).first }
+      subject { described_class.new.to_rows(workflow_version) }
 
-        subject { described_class.new.to_rows(workflow_version) }
-
-        it { is_expected.to match_array(rows) }
-      end
+      it { is_expected.to match_array(rows) }
     end
   end
 end

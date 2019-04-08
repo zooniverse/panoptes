@@ -1,4 +1,4 @@
-FROM ruby:2.4
+FROM ruby:2.4-stretch
 
 WORKDIR /rails_app
 
@@ -9,8 +9,11 @@ RUN apt-get update && \
         supervisor \
         libpq-dev \
         tmpreaper \
+        libjemalloc1 \
         && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 
 RUN mkdir config && curl "https://ip-ranges.amazonaws.com/ip-ranges.json" > config/aws_ips.json
 
