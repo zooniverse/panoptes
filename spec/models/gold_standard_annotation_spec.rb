@@ -13,7 +13,7 @@ describe GoldStandardAnnotation, type: :model do
   end
 
   it "must have a subject" do
-    gsa.subject_id = nil
+    gsa.subject = nil
     expect(gsa).to_not be_valid
   end
 

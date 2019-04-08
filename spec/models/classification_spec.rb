@@ -130,6 +130,7 @@ describe Classification, :type => :model do
       context "when the classification user is authorised for expert mode" do
 
         it "should be valid" do
+          classification.project.save
           classification.user = classification.project.owner
           expect(classification).to be_valid
         end
