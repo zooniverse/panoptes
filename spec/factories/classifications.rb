@@ -1,15 +1,19 @@
 FactoryBot.define do
   factory :classification do
-    metadata { {
-              user_agent: "cURL",
-              started_at: 2.minutes.ago.to_s,
-              finished_at: 1.minute.ago.to_s,
-              user_language: 'en',
-             } }
-    annotations { [{task: "an_annotation",
-                  value: true},
-                 {task: "another_one",
-                  value: [1, 2]}] }
+    metadata {
+      {
+        user_agent: "cURL",
+        started_at: 2.minutes.ago.to_s,
+        finished_at: 1.minute.ago.to_s,
+        user_language: 'en'
+      }
+    }
+    annotations {
+      [
+        {task: "an_annotation", value: true },
+        { task: "another_one", value: [1, 2] }
+      ]
+    }
     user_ip { "192.168.0.1" }
     completed { true }
     user
