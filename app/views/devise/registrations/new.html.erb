@@ -4,9 +4,17 @@
 
     <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
 
+      <div class="checkbox">
+          <%= f.label :minor_age do %>
+            <%= f.check_box :minor_age, id: 'minor_age' %>
+            If you are under 16 years old, tick this box and complete the form with your parent/guardian.
+          <% end %>
+        </div>
+
       <div class="form-group <%= "has-errors" if resource.errors[:login].present? %>">
         <%= f.label :login, "Username (required)" %><small class="errored"><%= resource.errors[:login].join(', ')%></small><br />
         <%= f.text_field :login, autofocus: true, required: true, class: 'form-control' %>
+        <small id="anonymous_text"></small>
       </div>
 
       <div class="form-group <%= "has-errors" if resource.errors[:credited_name].present? %>">
@@ -15,8 +23,8 @@
         <small>We’ll use this to give you credit in scientific papers, posters, etc</small>
       </div>
 
-      <div class="form-group <%= "has-errors" if resource.errors[:email].present? %>">
-        <%= f.label :email, "Email (required)"%><small class="errored"><%= resource.errors[:email].join(', ')%></small><br />
+      <div class="form-group <%= "has-errors" if resource.errors[:email].present? %>" id="email_text">
+        <%= f.label :email%><small class="errored"><%= resource.errors[:email].join(', ')%></small><br />
         <%= f.email_field :email, required: true, class: 'form-control' %>
       </div>
 
@@ -30,24 +38,25 @@
 
       <div class="checkbox" >
         <label for="privacy">
-          <input name="privacy" id="privacy" type="checkbox" />
-          I have read and agreed to the <a href="https://www.zooniverse.org/privacy">Privacy Policy</a>
+          <input name="privacy" id="privacy" type="checkbox" required/>
+          <span id="privacy_text"></span>
+          <a href="https://www.zooniverse.org/privacy">Privacy Policy</a>
         </label>
       </div>
 
-        <div class="checkbox">
-          <%= f.label :global_email_communication do %>
-            <%= f.check_box :global_email_communication, checked: true %>
-            It’s okay to send me email every once in a while.
-          <% end %>
-        </div>
+      <div class="checkbox">
+        <%= f.label :global_email_communication do %>
+          <%= f.check_box :global_email_communication, checked: true %>
+          <span id="agreement_text"></span>
+        <% end %>
+      </div>
 
-        <div class="checkbox">
-          <%= f.label :beta_email_communication do %>
-            <%= f.check_box :beta_email_communication, checked: false %>
-            I’d like to help test new projects, and be emailed when they’re available.
-          <% end %>
-        </div>
+      <div class="checkbox">
+        <%= f.label :beta_email_communication do %>
+          <%= f.check_box :beta_email_communication, checked: false %>
+          I’d like to help test new projects, and be emailed when they’re available.
+        <% end %>
+      </div>
 
       <%= f.submit "Create account", class: 'btn btn-primary' %>
     <% end %>
