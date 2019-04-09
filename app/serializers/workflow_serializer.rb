@@ -12,13 +12,13 @@ class WorkflowSerializer
              :retirement, :retired_set_member_subjects_count, :href, :active, :mobile_friendly,
              :aggregation, :configuration, :public_gold_standard, :completeness
 
-  can_include :project, :subject_sets, :tutorial_subject, :workflow_versions, :published_version
+  can_include :project, :subject_sets, :tutorial_subject, :published_version
 
   media_include :attached_images, classifications_export: { include: false }
 
   can_filter_by :active, :mobile_friendly
 
-  preload :subject_sets, :attached_images
+  preload :subject_sets, :attached_images, :classifications_export, :published_version
 
   def version
     "#{@model.major_version}.#{content_version}"
