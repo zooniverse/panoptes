@@ -8,6 +8,8 @@ class UserGroupSerializer
               projects: { param: "owner", value: "name" },
               collections: { param: "owner", value: "name" }
 
+  preload :memberships, :users, :projects, :collections
+
   can_filter_by :name
 
   def type
