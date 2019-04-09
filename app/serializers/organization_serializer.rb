@@ -13,6 +13,9 @@ class OrganizationSerializer
   can_filter_by :display_name, :slug, :listed
   can_include :organization_roles, :projects, :owners, :pages
 
+  preload :organization_roles, :projects, [ owner: { identity_membership: :user } ], :pages,
+          :avatar, :background, :attached_images
+
   def avatar_src
     if avatar = @model.avatar
       avatar.external_link ? avatar.external_link : avatar.src
