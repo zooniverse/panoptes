@@ -15,6 +15,7 @@ class CollectionSerializer
   preload [ owner: { identity_membership: :user } ],
     :collection_roles,
     :subjects,
+    :projects,
     default_subject: :locations
 
   def default_subject_src
