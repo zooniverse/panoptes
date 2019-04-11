@@ -40,9 +40,24 @@ describe SubjectSelectorSerializer do
   end
 
   context "subject selection" do
-    let(:selection_context) { { select_context: true } }
+    let(:selection_context) do
+      {
+        select_context: true,
+        retired_subject_ids: [],
+        user_seen_subject_ids: [],
+        favorite_subject_ids: [],
+        finished_workflow: false,
+        user_has_finished_workflow: false,
+        selection_state: :normal,
+        selected_at: Time.now.utc
+       }
+    end
     let(:run_serializer) do
       SubjectSelectorSerializer.single({}, Subject.all, selection_context)
+    end
+
+    it "should return the selected_at timestamp" do
+      expect(run_serializer[:selected_at]).to eq(selection_context[:selected_at])
     end
 
     describe "seen, retired, finished selection contexts" do

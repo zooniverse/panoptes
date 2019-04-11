@@ -3,7 +3,7 @@ class SubjectSelectorSerializer
   include NoCountSerializer
 
   attributes :id, :metadata, :locations, :zooniverse_id,
-    :created_at, :updated_at, :href
+    :created_at, :updated_at, :href, :selected_at
 
   optional :retired, :already_seen, :finished_workflow,
     :user_has_finished_workflow, :favorite, :selection_state
@@ -44,6 +44,10 @@ class SubjectSelectorSerializer
 
   def selection_state
     @context[:selection_state]
+  end
+
+  def selected_at
+    @context[:selected_at]
   end
 
   private

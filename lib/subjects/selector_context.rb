@@ -1,11 +1,12 @@
 module Subjects
   class SelectorContext
-    attr_reader :selector, :subject_ids
+    attr_reader :selector, :subject_ids, :selected_at
     delegate :user, :workflow, to: :selector
 
-    def initialize(selector, subject_ids)
+    def initialize(selector, subject_ids, selected_at=Time.now.utc)
       @selector = selector
       @subject_ids = subject_ids
+      @selected_at = selected_at
     end
 
     def format
@@ -19,6 +20,7 @@ module Subjects
           user_has_finished_workflow: user_has_finished_workflow,
           finished_workflow: finished_workflow?,
           selection_state: selector.selection_state,
+          selected_at: selected_at,
           url_format: :get,
           select_context: true
         }.compact
