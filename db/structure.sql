@@ -1958,7 +1958,7 @@ CREATE TABLE public.workflows (
     major_version integer DEFAULT 0 NOT NULL,
     minor_version integer DEFAULT 0 NOT NULL,
     published_version_id integer,
-    steps jsonb DEFAULT '{}'::jsonb NOT NULL
+    steps jsonb DEFAULT '[]'::jsonb NOT NULL
 );
 
 
@@ -3452,6 +3452,7 @@ CREATE UNIQUE INDEX index_tags_on_name ON public.tags USING btree (name);
 
 CREATE INDEX index_translation_versions_on_translation_id ON public.translation_versions USING btree (translation_id);
 
+
 --
 -- Name: index_tutorial_versions_on_tutorial_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
@@ -4123,16 +4124,19 @@ ALTER TABLE ONLY public.oauth_access_grants
 
 
 --
--- Name: fk_rails_bae361a0ab; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.translations
-    ADD CONSTRAINT fk_rails_bae361a0ab FOREIGN KEY (published_version_id) REFERENCES public.translation_versions(id);
 -- Name: fk_rails_b7ce3e711e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_page_versions
     ADD CONSTRAINT fk_rails_b7ce3e711e FOREIGN KEY (project_page_id) REFERENCES public.project_pages(id);
+
+
+--
+-- Name: fk_rails_bae361a0ab; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.translations
+    ADD CONSTRAINT fk_rails_bae361a0ab FOREIGN KEY (published_version_id) REFERENCES public.translation_versions(id);
 
 
 --
@@ -4748,4 +4752,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190307114830');
 INSERT INTO schema_migrations (version) VALUES ('20190307121801');
 
 INSERT INTO schema_migrations (version) VALUES ('20190307141138');
+
+INSERT INTO schema_migrations (version) VALUES ('20190411125709');
 
