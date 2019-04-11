@@ -6,6 +6,7 @@ RSpec.describe Subjects::SelectorContext do
   let(:workflow) { project.workflows.first }
   let(:api_user) { ApiUser.new(user) }
   let(:subject_ids) { [1,2] }
+  let(:selected_at) { Time.now.utc }
   let(:expected_context) do
     {
       user_seen_subject_ids: [1],
@@ -14,6 +15,7 @@ RSpec.describe Subjects::SelectorContext do
       user_has_finished_workflow: false,
       finished_workflow: false,
       selection_state: :normal,
+      selected_at: selected_at,
       url_format: :get,
       select_context: true
     }
@@ -26,7 +28,7 @@ RSpec.describe Subjects::SelectorContext do
     selector
   end
 
-  subject { described_class.new(selector, subject_ids) }
+  subject { described_class.new(selector, subject_ids, selected_at) }
 
   it 'should return an empty object if skip flag is set' do
     Panoptes.flipper[:skip_subject_selection_context].enable
@@ -72,6 +74,7 @@ RSpec.describe Subjects::SelectorContext do
         user_has_finished_workflow: true,
         finished_workflow: false,
         selection_state: :normal,
+        selected_at: selected_at,
         url_format: :get,
         select_context: true
       }
