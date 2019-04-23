@@ -15,6 +15,12 @@ describe OrganizationSerializer do
   let(:links) { [:avatar, :background] }
   let(:serialized) { OrganizationSerializer.resource({include: 'avatar,background,owners'}, Organization.where(id: organization_with_media.id), context) }
 
+  it_should_behave_like "a panoptes restpack serializer", "test_owner_include" do
+    let(:resource) { organization }
+    let(:includes) { %i(organization_roles projects pages) }
+    let(:preloads) { OrganizationSerializer.preloads }
+  end
+
   describe "includes avatar and background" do
     it "should include avatar" do
       expect(serialized[:linked][:avatars].map{ |r| r[:id] })
