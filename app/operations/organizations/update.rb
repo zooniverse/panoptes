@@ -1,8 +1,7 @@
-require_relative '../../../lib/filters/organization_filter.rb'
-
 module Organizations
   class Update < Operation
-    organization :organization_params
+    # https://github.com/AaronLasseigne/active_interaction/tree/fdc00a041e939ef48948baa2f7fd1ce2e4d66982#hash
+    hash :organization_params, strip: false
     string :id
 
     def execute
@@ -37,10 +36,6 @@ module Organizations
 
     def organization
       @organization ||= Organization.find(id)
-    end
-
-    def language
-      @language ||= organization_params[:primary_language] ? organization_params[:primary_language] : @organization.primary_language
     end
   end
 end
