@@ -1,21 +1,19 @@
 module Organizations
   class Create < Operation
-    string :display_name
-    string :primary_language
-
-    string :description
-    string :introduction, default: ''
-    string :announcement, default: ''
-    array :urls, default: []
-    array :categories, default: []
-    array :tags, default: []
+    # trust the controller level json schema validations
+    # https://github.com/AaronLasseigne/active_interaction/tree/fdc00a041e939ef48948baa2f7fd1ce2e4d66982#hash
+    hash :schema_create_params, strip: false
 
     def execute
       Organization.transaction(requires_new: true) do
-        organization = build_organization
+        organization = Organization.new(create_params)
 
-        tag_objects = Tags::BuildTags.run!(api_user: api_user, tag_array: tags) if tags
-        organization.tags = tag_objects unless tags.nil?
+        if schema_create_params[:tags]
+          organization.tags = Tags::BuildTags.run!(
+            api_user: api_user,
+            tag_array: tags
+          )
+        end
 
         organization.save!
         organization
@@ -24,18 +22,14 @@ module Organizations
 
     private
 
-    def build_organization
-      Organization.new({
-        owner: api_user.user,
-        display_name: display_name,
-        primary_language: primary_language,
-        categories: categories,
-        urls: urls_without_labels,
-        url_labels: url_labels,
-        description: description,
-        introduction: introduction,
-        announcement: announcement
-      })
+    def create_params
+      schema_create_params.merge(
+        {
+          owner: api_user.user,
+          urls: urls_without_labels,
+          url_labels: url_labels,
+        }
+      )
     end
 
     def urls_without_labels
@@ -49,7 +43,7 @@ module Organizations
     end
 
     def extract_url_labels
-      @extract_url_labels ||= UrlLabels.extract_url_labels(urls)
+      @extract_url_labels ||= UrlLabels.extract_url_labels(schema_create_params[:urls])
     end
   end
 end

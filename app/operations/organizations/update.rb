@@ -1,12 +1,13 @@
 module Organizations
   class Update < Operation
+    # trust the controller level json schema validations
     # https://github.com/AaronLasseigne/active_interaction/tree/fdc00a041e939ef48948baa2f7fd1ce2e4d66982#hash
-    hash :organization_params, strip: false
+    hash :schema_update_params, strip: false
     string :id
 
     def execute
       Organization.transaction(requires_new: true) do
-        org_update = organization_params.dup
+        org_update = schema_update_params.dup
 
         if org_update.key?(:tags)
           tags = Tags::BuildTags.run!(api_user: api_user, tag_array: org_update[:tags])

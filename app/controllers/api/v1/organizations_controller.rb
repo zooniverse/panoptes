@@ -21,7 +21,8 @@ class Api::V1::OrganizationsController < Api::ApiController
   def create
     @created_resources = Organization.transaction(requires_new: true) do
       Array.wrap(create_params).map do |organization_params|
-        Organizations::Create.with(api_user: api_user).run!(organization_params)
+        operation = Organizations::Create.with(api_user: api_user)
+        operation.run!(schema_create_params: organization_params)
       end
     end
 
@@ -32,7 +33,7 @@ class Api::V1::OrganizationsController < Api::ApiController
     @updated_resources = Organization.transaction(requires_new: true) do
       Array.wrap(resource_ids).zip(Array.wrap(update_params)).map do |organization_id, organization_params|
         update_operation = Organizations::Update.with(api_user: api_user, id: organization_id)
-        update_operation.run!(organization_params: organization_params)
+        update_operation.run!(schema_update_params: organization_params)
       end
     end
 

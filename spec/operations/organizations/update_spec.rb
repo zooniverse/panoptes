@@ -7,7 +7,7 @@ describe Organizations::Update do
 
   let(:update_params) do
     {
-      organization_params: {
+      schema_update_params: {
         display_name: "The Illuminati",
         description: "This organization is the most organized organization to ever organize",
         introduction: "org intro",
