@@ -27,7 +27,7 @@ module Organizations
         {
           owner: api_user.user,
           urls: urls_without_labels,
-          url_labels: url_labels,
+          url_labels: url_labels
         }
       )
     end
