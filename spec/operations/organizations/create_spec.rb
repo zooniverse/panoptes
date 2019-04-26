@@ -5,13 +5,15 @@ describe Organizations::Create do
   let(:api_user){ ApiUser.new(user) }
   let(:params) do
     {
-      display_name: "The Illuminati",
-      description: "This organization is the most organized organization to ever organize",
-      introduction: "org intro",
-      announcement: "We dont exist",
-      urls: [{label: "Blog", url: "http://blogo.com/example"}],
-      primary_language: "zh-tw",
-      categories: %w(stuff things moar)
+      schema_create_params: {
+        display_name: "The Illuminati",
+        description: "This organization is the most organized organization to ever organize",
+        introduction: "org intro",
+        announcement: "We dont exist",
+        urls: [{label: "Blog", url: "http://blogo.com/example"}],
+        primary_language: "zh-tw",
+        categories: %w(stuff things moar)
+      }
     }
   end
 
