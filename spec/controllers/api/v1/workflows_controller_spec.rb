@@ -15,7 +15,8 @@ describe Api::V1::WorkflowsController, type: :controller do
     %w(id display_name tasks classifications_count subjects_count
     created_at updated_at first_task primary_language content_language
     version grouped prioritized pairwise retirement aggregation
-    active mobile_friendly configuration finished_at steps public_gold_standard)
+    active mobile_friendly configuration finished_at steps public_gold_standard
+    education_api)
   end
   let(:api_resource_links) do
     %w(workflows.project workflows.subject_sets workflows.tutorial_subject
@@ -518,7 +519,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       }
     end
 
-    let(:create_params) do
+    let(:default_create_params) do
       {
         workflows: {
           display_name: 'Test workflow',
@@ -538,6 +539,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         }
       }
     end
+    let(:create_params) { default_create_params }
 
     it_behaves_like "it syncs the resource translation strings", non_translatable_attributes_possible: false do
       let(:translated_klass_name) { Workflow.name }
@@ -614,6 +616,13 @@ describe Api::V1::WorkflowsController, type: :controller do
     context "with an empty task set" do
       let(:create_task_params) { {} }
 
+      it_behaves_like "is creatable"
+    end
+
+    context "with an education_api attribute" do
+      let(:create_params) do
+        default_create_params.merge(education_api: true)
+      end
       it_behaves_like "is creatable"
     end
   end

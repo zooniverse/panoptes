@@ -75,6 +75,10 @@ class WorkflowCreateSchema < JsonSchema
       type "object"
     end
 
+    property "education_api" do
+      type "boolean"
+    end
+
     property "links" do
       type "object"
       required "project"
