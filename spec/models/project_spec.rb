@@ -105,6 +105,19 @@ describe Project, type: :model do
       Activation.disable_instances!(project.workflows)
       expect(project.workflows.reload).to be_empty
     end
+
+    context "with education_api workflows" do
+      let(:project) do
+        create(:project_with_workflows) do |p|
+          create(:workflow, education_api: true, project: p)
+        end
+      end
+
+      it "should not include education_api workflows" do
+        expect(project.workflows.count).to eq(2)
+        expect(project.workflows.map(&:education_api).uniq).to match_array([false])
+      end
+    end
   end
 
   describe "#active_workflows" do
@@ -123,6 +136,21 @@ describe Project, type: :model do
     it "should not include inactive workflows" do
       project.active_workflows.first.inactive!
       expect(project.active_workflows.size).to eq(0)
+    end
+
+    context "with education_api workflows" do
+      let(:project) do
+        create(:project) do |p|
+          create(:workflow, project: p, active: true)
+          create(:workflow, project: p, active: true, education_api: true)
+          create(:workflow, project: p, active: false)
+        end
+      end
+
+      it "should not include education_api workflows" do
+        expect(project.active_workflows.count).to eq(1)
+        expect(project.active_workflows.map(&:education_api).uniq).to match_array([false])
+      end
     end
   end
 

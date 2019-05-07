@@ -36,7 +36,7 @@ FactoryBot.define do
 
     factory :project_with_workflow do
       after(:create) do |p|
-        workflow = create(:workflow, project: p)
+        workflow =ccreate(:workflow, project: p)
       end
     end
 
