@@ -518,7 +518,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       }
     end
 
-    let(:create_params) do
+    let(:default_create_params) do
       {
         workflows: {
           display_name: 'Test workflow',
@@ -538,6 +538,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         }
       }
     end
+    let(:create_params) { default_create_params }
 
     it_behaves_like "it syncs the resource translation strings", non_translatable_attributes_possible: false do
       let(:translated_klass_name) { Workflow.name }
@@ -614,6 +615,13 @@ describe Api::V1::WorkflowsController, type: :controller do
     context "with an empty task set" do
       let(:create_task_params) { {} }
 
+      it_behaves_like "is creatable"
+    end
+
+    context "with an serialize_with_project attribute" do
+      let(:create_params) do
+        default_create_params.merge(serialize_with_project: false)
+      end
       it_behaves_like "is creatable"
     end
   end

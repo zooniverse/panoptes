@@ -105,6 +105,21 @@ describe Project, type: :model do
       Activation.disable_instances!(project.workflows)
       expect(project.workflows.reload).to be_empty
     end
+
+    context "with serialize_with_project workflows set to false" do
+      let(:project) do
+        create(:project_with_workflows) do |p|
+          create(:workflow, serialize_with_project: false, project: p)
+        end
+      end
+
+      it "should not include serialize_with_project workflows" do
+        expect(project.workflows.count).to eq(2)
+        expect(
+          project.workflows.map(&:serialize_with_project).uniq
+        ).to match_array([true])
+      end
+    end
   end
 
   describe "#active_workflows" do
@@ -123,6 +138,23 @@ describe Project, type: :model do
     it "should not include inactive workflows" do
       project.active_workflows.first.inactive!
       expect(project.active_workflows.size).to eq(0)
+    end
+
+    context "with serialize_with_project workflows" do
+      let(:project) do
+        create(:project) do |p|
+          create(:workflow, project: p, active: true)
+          create(:workflow, project: p, active: true, serialize_with_project: false)
+          create(:workflow, project: p, active: false)
+        end
+      end
+
+      it "should not include serialize_with_project false workflows" do
+        expect(project.active_workflows.count).to eq(1)
+        expect(
+          project.active_workflows.map(&:serialize_with_project).uniq
+        ).to match_array([true])
+      end
     end
   end
 

@@ -14,9 +14,13 @@ class Project < ActiveRecord::Base
   has_many :field_guides, dependent: :destroy
   belongs_to :organization
   # uses the activated_state enum on the workflow
-  has_many :workflows, -> { active }, dependent: :restrict_with_exception
+  has_many :workflows,
+    -> { where(serialize_with_project: true).active},
+    dependent: :restrict_with_exception
   # use both the activated_state and active attribute on the workflow
-  has_many :active_workflows, -> { where(active: true).active }, class_name: "Workflow"
+  has_many :active_workflows,
+    -> { where(active: true, serialize_with_project: true).active },
+    class_name: "Workflow"
   has_many :subject_sets, dependent: :destroy
   has_many :live_subject_sets, through: :active_workflows, source: 'subject_sets'
   has_many :classifications, dependent: :restrict_with_exception
