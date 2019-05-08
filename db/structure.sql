@@ -1959,7 +1959,7 @@ CREATE TABLE public.workflows (
     minor_version integer DEFAULT 0 NOT NULL,
     published_version_id integer,
     steps jsonb DEFAULT '[]'::jsonb NOT NULL,
-    education_api boolean DEFAULT false
+    serialize_with_project boolean DEFAULT true
 );
 
 
