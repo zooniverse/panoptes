@@ -10,8 +10,7 @@ class WorkflowSerializer
              :created_at, :updated_at, :finished_at, :first_task, :primary_language,
              :version, :content_language, :prioritized, :grouped, :pairwise,
              :retirement, :retired_set_member_subjects_count, :href, :active, :mobile_friendly,
-             :aggregation, :configuration, :public_gold_standard, :completeness,
-             :education_api
+             :aggregation, :configuration, :public_gold_standard, :completeness
 
   can_include :project, :subject_sets, :tutorial_subject, :published_version
 
