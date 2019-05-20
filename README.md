@@ -90,6 +90,10 @@ There are multiple options for setting up a testing environment:
     0. Setup the testing database if you haven't already, by running `RAILS_ENV=test rake db:setup`
     0. Finally, run rspec with `RAILS_ENV=test rspec`
 
+## Rails 5
+
+`DISABLE_SPRING=t BUNDLE_GEMFILE=Gemfile.next bundle exec rspec spec`
+
 ## Contributing
 
 Thanks a bunch for wanting to help Zooniverse. Here are few quick guidelines to start working on our project:
