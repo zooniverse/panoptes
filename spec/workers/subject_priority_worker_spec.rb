@@ -11,7 +11,7 @@ RSpec.describe SubjectPriorityWorker do
   before do
     subject_set.subjects[0].metadata['#priority'] = 1
     subject_set.subjects[1].metadata['#priority'] = "2"
-    subject_set.subjects.map { |s| s.save! }
+    subject_set.subjects.map(&:save)
   end
 
   describe "#perform" do
