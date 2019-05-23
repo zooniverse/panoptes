@@ -154,6 +154,13 @@ describe Api::V1::SubjectSetsController, type: :controller do
         run_update_links
       end
 
+      it "should queue the SMS priority worker" do
+        expect(SubjectPriorityWorker)
+          .to receive(:perform_async)
+          .with(kind_of(Array))
+        run_update_links
+      end
+
       it "should call the unfinish workflow worker" do
         resource.workflows.each do |workflow|
           expect(UnfinishWorkflowWorker).to receive(:perform_async).with(workflow.id)
