@@ -154,10 +154,10 @@ describe Api::V1::SubjectSetsController, type: :controller do
         run_update_links
       end
 
-      it "should queue the SMS priority worker" do
-        expect(SubjectPriorityWorker)
+      it "should queue the SMS metadata worker" do
+        expect(SubjectMetadataWorker)
           .to receive(:perform_async)
-          .with(kind_of(Array))
+          .with(kind_of(Numeric))
         run_update_links
       end
 

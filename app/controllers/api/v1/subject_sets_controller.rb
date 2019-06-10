@@ -106,7 +106,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
       end
 
       result = SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
-      SubjectPriorityWorker.perform_async(result.ids)
+      SubjectMetadataWorker.perform_async(resource.id)
       result
     else
       super
