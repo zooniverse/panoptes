@@ -20,6 +20,20 @@ class WorkflowSerializer
 
   preload :subject_sets, :attached_images, :classifications_export, :published_version
 
+  def self.paging_scope(params, scope, context)
+    if params[:complete]
+      # In Rails 5 convert to use ActiveModel::Type::Boolean.new.cast(value)
+      complete_filter = ActiveRecord::Type::Boolean.new.type_cast_from_user(params[:complete])
+      scope = if complete_filter
+        scope.where(completeness: 1.0)
+      else
+        scope.where('completeness < 1.0')
+      end
+    end
+
+    super(params, scope, context)
+  end
+
   def version
     "#{@model.major_version}.#{content_version}"
   end
