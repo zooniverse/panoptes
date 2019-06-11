@@ -5,17 +5,20 @@ class SubjectMetadataWorker
 
     smses = SetMemberSubject.where(subject_set_id: set_id)
 
-    smses.each do |sms|
-      subject = Subject.find(sms.subject_id)
+    update_sms_priority_sql = <<-SQL
+      UPDATE set_member_subjects
+      SET    priority = CAST(subjects.metadata->>'#priority' AS INTEGER)
+      FROM   subjects
+      WHERE  subjects.id = set_member_subjects.subject_id
+      AND    set_member_subjects.id IN (?)
+    SQL
 
-      if subject.metadata.key?("#priority")
-        sms.update_column(:priority, subject.metadata["#priority"].to_i)
-      end
+    bound_update_sms_priority_sql = ActiveRecord::Base.send(
+      :replace_bind_variables,
+      update_sms_priority_sql,
+      [smses.pluck(:id)]
+    )
 
-      if subject.metadata.key?("#training_subject")
-        # Requires migration
-        # sms.update_column(:training_subject, subject.metadata["#training_subject"])
-      end
-    end
+    ActiveRecord::Base.connection.exec_update(bound_update_sms_priority_sql)
   end
 end
