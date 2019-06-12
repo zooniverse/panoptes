@@ -4,7 +4,7 @@ class SubjectMetadataWorker
   def perform(subject_set_id)
     update_sms_priority_sql = <<-SQL
       UPDATE set_member_subjects
-      SET    priority = CAST(subjects.metadata->>'#priority' AS INTEGER)
+      SET    priority = CAST(subjects.metadata->>'#priority' AS NUMERIC)
       FROM   subjects
       WHERE  subjects.id = set_member_subjects.subject_id
       AND    subjects.metadata ? '#priority'
