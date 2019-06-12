@@ -16,7 +16,7 @@ RSpec.describe SubjectMetadataWorker do
     subject_set.subjects.map(&:save)
   end
 
-  describe "#perform", :focus do
+  describe "#perform" do
     it 'copies priority from metadata to SMS attribute' do
       worker.perform(subject_set.id)
       sms_one, sms_two, sms_three = SetMemberSubject.find(
