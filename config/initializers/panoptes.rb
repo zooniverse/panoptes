@@ -8,4 +8,8 @@ module Panoptes
   def self.disable_lifecycle_worker
     Panoptes.flipper[:disable_lifecycle_worker].enabled?
   end
+
+  def self.rails5?
+    Rails.version[0] == "5"
+  end
 end
