@@ -31,6 +31,7 @@ test:
   adapter: postgresql
   database: travis_ci_test
   username: postgres
+  prepared_statements: false
 YAML
 
     File.open('config/redis.yml', 'w') { |f| f.write(<<YAML) }
