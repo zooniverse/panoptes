@@ -12,6 +12,15 @@ class Workflow < ActiveRecord::Base
   has_many :subject_workflow_statuses, dependent: :destroy
   has_many :subject_sets_workflows, dependent: :destroy
   has_many :subject_sets, through: :subject_sets_workflows
+  # TODO: this is looking like a good reason
+  # to move away from the NOT json attribute present ?
+  # instead add an indexed (binrary) column on the subject_set resource
+  # and search on that instead
+  # DO NOT ALLOW MERGE WITHOUT FIXING THIS
+  has_many :non_training_subject_sets,
+    -> { where("NOT subject_sets.metadata ? 'training'") },
+    through: :subject_sets_workflows,
+    source: :subject_set
   has_many :set_member_subjects, through: :subject_sets
   has_many :subjects, through: :set_member_subjects
   has_many :classifications, dependent: :restrict_with_exception
