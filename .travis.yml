@@ -18,30 +18,32 @@ before_script: &before_script
   - bundle exec rake configure:travis db:setup
   - echo Running script - bundle exec rspec $SPECS
 
-gemfile:
-  - Gemfile
-  - Gemfile.next
-
 matrix:
   fast_finish: true
-  allow_failures:
-    - gemfile: Gemfile.next
   include:
     - rvm: 2.4
+      gemfile: Gemfile
       env:
         - SPECS=spec/controllers/api/v1/[a-m]*.rb
     - rvm: 2.4
+      gemfile: Gemfile
       env:
         - SPECS=spec/controllers/api/v1/[n-s]*.rb
     - rvm: 2.4
+      gemfile: Gemfile
       env:
         - SPECS=spec/controllers/api/v1/[t-z]*.rb
     - rvm: 2.4
+      gemfile: Gemfile
       env:
         - SPECS="spec/controllers/**.rb spec/controllers/api/*.rb spec/models spec/operations spec/counters spec/routes"
     - rvm: 2.4
+      gemfile: Gemfile
       env:
         - SPECS="spec/lib spec/workers spec/serializers spec/services spec/requests spec/middleware spec/mailers spec/policies"
+  allow_failures:
+    - rvm: 2.6
+      gemfile: Gemfile.next
 
 services:
   - postgresql
