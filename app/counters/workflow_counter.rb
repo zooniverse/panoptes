@@ -27,9 +27,6 @@ class WorkflowCounter
   private
 
   def non_training_subject_set_ids_scope
-    workflow
-    .subject_sets
-    .where("NOT subject_sets.metadata ? 'training'")
-    .select(:id)
+    workflow.non_training_subject_sets.select(:id)
   end
 end
