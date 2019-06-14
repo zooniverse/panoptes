@@ -10,7 +10,7 @@ before_install:
   - 'echo ''gem: --no-ri --no-rdoc'' > ~/.gemrc'
 
 install:
-  - next bundle install --path vendor/bundle
+  - bundle install --without development production --path=${BUNDLE_PATH:-vendor/bundle}
 
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
