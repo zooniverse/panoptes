@@ -9,6 +9,9 @@ before_install:
   - if grep -Fxvc -f spec/known_dirs.txt tmp/curr_spec_dirs.txt; then echo 'Detected unkown Spec directories, check the spec/known_dirs.txt!'; exit 1; fi
   - 'echo ''gem: --no-ri --no-rdoc'' > ~/.gemrc'
 
+install:
+  - next bundle install --path vendor/bundle
+
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
   - scripts/no_focus.sh
