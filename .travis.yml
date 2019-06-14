@@ -20,6 +20,8 @@ before_script: &before_script
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - rvm: 2.6
   include:
     - rvm: 2.4
       gemfile: Gemfile
@@ -41,7 +43,6 @@ matrix:
       gemfile: Gemfile
       env:
         - SPECS="spec/lib spec/workers spec/serializers spec/services spec/requests spec/middleware spec/mailers spec/policies"
-  allow_failures:
     - rvm: 2.6
       gemfile: Gemfile.next
 
