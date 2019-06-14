@@ -422,4 +422,16 @@ describe Workflow, type: :model do
       end
     end
   end
+
+  describe "#non_training_subject_sets" do
+    let(:workflow) { create(:workflow_with_subject_sets) }
+    let(:training_set) { workflow.subject_sets.first }
+    let(:real_set) { workflow.subject_sets.last }
+    before do
+      training_set.update_column(:training, true)
+    end
+    it "should only return subjects sets that are not marked as training" do
+      expect(workflow.non_training_subject_sets).to match_array([real_set])
+    end
+  end
 end

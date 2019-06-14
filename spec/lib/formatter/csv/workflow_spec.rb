@@ -49,21 +49,6 @@ RSpec.describe Formatter::Csv::Workflow do
     it { is_expected.to match_array(rows) }
   end
 
-  describe "#non_training_subject_sets" do
-    let(:workflow) { create(:workflow_with_subject_sets) }
-    let(:training_set) { workflow.subject_sets.first }
-    let(:real_set) { workflow.subject_sets.last }
-    before do
-      training_set.update_column(
-        :metadata,
-        training_set.metadata.merge("training" => true)
-      )
-    end
-    it "should only return subjects sets that are not marked as training" do
-      expect(workflow.non_training_subject_sets).to match_array([real_set])
-    end
-  end
-
   context "with a versioned workflow" do
     let(:q_workflow) { build(:workflow, :question_task) }
     let(:tasks) { q_workflow.tasks }
