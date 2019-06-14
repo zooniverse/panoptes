@@ -8,6 +8,7 @@ before_install:
   - find spec -maxdepth 1 -type d | grep spec/ > tmp/curr_spec_dirs.txt
   - if grep -Fxvc -f spec/known_dirs.txt tmp/curr_spec_dirs.txt; then echo 'Detected unkown Spec directories, check the spec/known_dirs.txt!'; exit 1; fi
   - 'echo ''gem: --no-ri --no-rdoc'' > ~/.gemrc'
+  - echo "$BUNDLE_GEMFILE"
   - if [ "$BUNDLE_GEMFILE" = "$PWD/Gemfile.next" ]; then rm -f Gemfile.lock; fi
 
 before_script: &before_script
