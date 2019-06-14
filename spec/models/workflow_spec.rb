@@ -428,7 +428,10 @@ describe Workflow, type: :model do
     let(:training_set) { workflow.subject_sets.first }
     let(:real_set) { workflow.subject_sets.last }
     before do
-      training_set.update_column(:training, true)
+      training_set.update_column(
+        :metadata,
+        training_set.metadata.merge("training" => true)
+      )
     end
     it "should only return subjects sets that are not marked as training" do
       expect(workflow.non_training_subject_sets).to match_array([real_set])
