@@ -47,8 +47,8 @@ describe WorkflowCounter do
         let(:training_set) { workflow.subject_sets.first }
         let(:real_set) { workflow.subject_sets.last }
         before do
-          new_metadata = training_set.metadata.merge("training" => true)
-          training_set.update_column(:metadata, new_metadata)
+          real_set_ar_collection_proxy = SubjectSet.where(id: real_set)
+          allow(workflow).to receive(:non_training_subject_sets).and_return(real_set_ar_collection_proxy)
         end
 
         it "should return non training data classification count only" do
@@ -94,8 +94,8 @@ describe WorkflowCounter do
         let(:training_set) { workflow.subject_sets.first }
         let(:real_set) { workflow.subject_sets.last }
         before do
-          new_metadata = training_set.metadata.merge("training" => true)
-          training_set.update_column(:metadata, new_metadata)
+          real_set_ar_collection_proxy = SubjectSet.where(id: real_set)
+          allow(workflow).to receive(:non_training_subject_sets).and_return(real_set_ar_collection_proxy)
         end
 
         it "should return non training data retired count only" do
