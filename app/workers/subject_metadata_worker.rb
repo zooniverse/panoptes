@@ -2,7 +2,7 @@ class SubjectMetadataWorker
   include Sidekiq::Worker
 
   def perform(subject_set_id)
-    if Panoptes.rails5?
+    if ActiveRecord::VERSION::MAJOR == 5
       update_sms_priority_sql = <<-SQL
         UPDATE set_member_subjects
         SET    priority = CAST(subjects.metadata->>'#priority' AS NUMERIC)
@@ -11,7 +11,6 @@ class SubjectMetadataWorker
         AND    subjects.metadata ? '#priority'
         AND    set_member_subjects.subject_set_id = $1
       SQL
-
       ActiveRecord::Base.connection.exec_update(
         update_sms_priority_sql,
         "SQL",
@@ -26,8 +25,6 @@ class SubjectMetadataWorker
         AND    subjects.metadata ? '#priority'
         AND    set_member_subjects.subject_set_id = :subject_set_id
       SQL
-      # replace the above SQL :subject_set_id named bind var with $1
-      #
       # handle incorrect bind params for non preparted statements
       # in exec_update, fixed in rails 5
       # https://github.com/rails/rails/issues/24893
@@ -37,8 +34,6 @@ class SubjectMetadataWorker
         update_sms_priority_sql,
         {subject_set_id: subject_set_id}
       )
-
-      # Note: In Rails 5 use bound params, [[nil,subject_set_id]]
       ActiveRecord::Base.connection.exec_update(
         bound_update_sms_priority_sql,
         "SQL",
