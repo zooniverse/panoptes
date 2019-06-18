@@ -427,14 +427,19 @@ describe Workflow, type: :model do
     let(:workflow) { create(:workflow_with_subject_sets) }
     let(:training_set) { workflow.subject_sets.first }
     let(:real_set) { workflow.subject_sets.last }
-    before do
-      training_set.update_column(
-        :metadata,
-        training_set.metadata.merge("training" => true)
-      )
-    end
+
     it "should only return subjects sets that are not marked as training" do
+      workflow.configuration["training_set_ids"] = [training_set.id]
       expect(workflow.non_training_subject_sets).to match_array([real_set])
+    end
+
+    it "should always return all real sets with empty training sets config" do
+      workflow.configuration["training_set_ids"] = []
+      expect(workflow.non_training_subject_sets).to match_array(workflow.subject_sets)
+    end
+
+    it "should always return all real sets with no training sets config" do
+      expect(workflow.non_training_subject_sets).to match_array(workflow.subject_sets)
     end
   end
 end

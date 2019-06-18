@@ -13,7 +13,7 @@ class Workflow < ActiveRecord::Base
   has_many :subject_sets_workflows, dependent: :destroy
   has_many :subject_sets, through: :subject_sets_workflows
   has_many :non_training_subject_sets,
-    -> { where("NOT subject_sets.metadata ? 'training'") },
+    ->(workflow) { where.not(subject_sets_workflows: { subject_set_id: workflow.training_set_ids }) },
     through: :subject_sets_workflows,
     source: :subject_set
   has_many :set_member_subjects, through: :subject_sets
@@ -162,5 +162,9 @@ class Workflow < ActiveRecord::Base
 
   def retirement_config
     RetirementValidator.new(self).validate
+  end
+
+  def training_set_ids
+    Array.wrap(configuration.dig("training_set_ids"))
   end
 end

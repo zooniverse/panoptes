@@ -41,10 +41,7 @@ RSpec.describe Subjects::PostgresqlSelection do
           let(:real_set) { workflow.subject_sets.last }
 
           before do
-            training_set.update_column(
-              :metadata,
-              training_set.metadata.merge("training" => true)
-            )
+            workflow.configuration['training_set_ids'] = training_set.id
             create(:subject, project: workflow.project, uploader: uploader) do |subject|
               create(:set_member_subject,
                 setup_subject_workflow_statuses: true,
