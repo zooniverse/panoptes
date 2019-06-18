@@ -39,11 +39,12 @@ describe Workflow, type: :model do
 
   describe "::find_without_json_attrs" do
     let(:workflow) { create(:workflow) }
+    let(:whitelist_json_attrs) { %w(configuration) }
     let(:json_attrs) do
       col_information = Workflow.columns_hash.select do |name, col|
         /\Ajson.*/.match?(col.sql_type)
       end
-      col_information.keys
+      col_information.keys - whitelist_json_attrs
     end
 
     it "should load the workflow without the json attributes" do
