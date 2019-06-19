@@ -166,8 +166,6 @@ class Workflow < ActiveRecord::Base
 
   def training_set_ids
     config_training_set_ids = Array.wrap(configuration.dig("training_set_ids"))
-    config_training_set_ids.select do |id|
-      !id.to_i.zero?
-    end
+    config_training_set_ids.reject { |id| id.to_i.zero? }
   end
 end
