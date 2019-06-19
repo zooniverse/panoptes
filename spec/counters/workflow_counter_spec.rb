@@ -41,6 +41,20 @@ describe WorkflowCounter do
           expect(counter.classifications).to eq(2)
         end
       end
+
+      context "with subject sets marked as training data" do
+        let(:workflow) { create(:workflow_with_subjects, num_sets: 2) }
+        let(:training_set) { workflow.subject_sets.first }
+        let(:real_set) { workflow.subject_sets.last }
+        before do
+          real_set_ar_collection_proxy = SubjectSet.where(id: real_set)
+          allow(workflow).to receive(:non_training_subject_sets).and_return(real_set_ar_collection_proxy)
+        end
+
+        it "should return non training data classification count only" do
+          expect(counter.classifications).to eq(2)
+        end
+      end
     end
   end
 
@@ -73,6 +87,20 @@ describe WorkflowCounter do
       it "should return 0 when a subject set was unlinked" do
         workflow.subject_sets = []
         expect(counter.retired_subjects).to eq(0)
+      end
+
+      context "with subject sets marked as training data" do
+        let(:workflow) { create(:workflow_with_subjects, num_sets: 2) }
+        let(:training_set) { workflow.subject_sets.first }
+        let(:real_set) { workflow.subject_sets.last }
+        before do
+          real_set_ar_collection_proxy = SubjectSet.where(id: real_set)
+          allow(workflow).to receive(:non_training_subject_sets).and_return(real_set_ar_collection_proxy)
+        end
+
+        it "should return non training data retired count only" do
+          expect(counter.retired_subjects).to eq(2)
+        end
       end
     end
   end

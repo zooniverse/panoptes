@@ -17,12 +17,16 @@ class WorkflowCounter
     SubjectWorkflowStatus
     .where(workflow_id: workflow.id)
     .joins("INNER JOIN set_member_subjects ON set_member_subjects.subject_id = subject_workflow_counts.subject_id")
-    .where(set_member_subjects: { subject_set_id: subject_set_ids })
+    .where(
+      set_member_subjects: {
+        subject_set_id: non_training_subject_set_ids_scope
+      }
+    )
   end
 
   private
 
-  def subject_set_ids
-    workflow.subject_sets.pluck(:id)
+  def non_training_subject_set_ids_scope
+    workflow.non_training_subject_sets.select(:id)
   end
 end

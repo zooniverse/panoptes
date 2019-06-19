@@ -39,11 +39,12 @@ describe Workflow, type: :model do
 
   describe "::find_without_json_attrs" do
     let(:workflow) { create(:workflow) }
+    let(:whitelist_json_attrs) { %w(configuration) }
     let(:json_attrs) do
       col_information = Workflow.columns_hash.select do |name, col|
         /\Ajson.*/.match?(col.sql_type)
       end
-      col_information.keys
+      col_information.keys - whitelist_json_attrs
     end
 
     it "should load the workflow without the json attributes" do
@@ -420,6 +421,46 @@ describe Workflow, type: :model do
       it "should be valid" do
         expect(workflow).to be_valid
       end
+    end
+  end
+
+  describe "#training_subject_sets" do
+    let(:training_ids) { ["1"] }
+
+    it "should return the data in the config object" do
+
+      workflow.configuration["training_set_ids"] = training_ids
+      expect(workflow.training_set_ids).to match_array(training_ids)
+    end
+
+    it "should sanitize the return values to known integer values" do
+      workflow.configuration["training_set_ids"] = training_ids | ["test"]
+      expect(workflow.training_set_ids).to match_array(training_ids)
+    end
+  end
+
+  describe "#non_training_subject_sets" do
+    let(:workflow) { create(:workflow_with_subject_sets) }
+    let(:training_set) { workflow.subject_sets.first }
+    let(:real_set) { workflow.subject_sets.last }
+
+    it "should only return subjects sets that are not marked as training" do
+      workflow.configuration["training_set_ids"] = [training_set.id]
+      expect(workflow.non_training_subject_sets).to match_array([real_set])
+    end
+
+    it "should always return all real sets with empty training sets config" do
+      workflow.configuration["training_set_ids"] = []
+      expect(workflow.non_training_subject_sets).to match_array(workflow.subject_sets)
+    end
+
+    it "should always return all real sets with an unkonwn set id" do
+      workflow.configuration["training_set_ids"] = "test"
+      expect(workflow.non_training_subject_sets).to match_array(workflow.subject_sets)
+    end
+
+    it "should always return all real sets with no training sets config" do
+      expect(workflow.non_training_subject_sets).to match_array(workflow.subject_sets)
     end
   end
 end
