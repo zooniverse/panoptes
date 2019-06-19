@@ -424,6 +424,21 @@ describe Workflow, type: :model do
     end
   end
 
+  describe "#training_subject_sets" do
+    let(:training_ids) { ["1"] }
+
+    it "should return the data in the config object" do
+
+      workflow.configuration["training_set_ids"] = training_ids
+      expect(workflow.training_set_ids).to match_array(training_ids)
+    end
+
+    it "should sanitize the return values to known integer values" do
+      workflow.configuration["training_set_ids"] = training_ids | ["test"]
+      expect(workflow.training_set_ids).to match_array(training_ids)
+    end
+  end
+
   describe "#non_training_subject_sets" do
     let(:workflow) { create(:workflow_with_subject_sets) }
     let(:training_set) { workflow.subject_sets.first }
@@ -436,6 +451,11 @@ describe Workflow, type: :model do
 
     it "should always return all real sets with empty training sets config" do
       workflow.configuration["training_set_ids"] = []
+      expect(workflow.non_training_subject_sets).to match_array(workflow.subject_sets)
+    end
+
+    it "should always return all real sets with an unkonwn set id" do
+      workflow.configuration["training_set_ids"] = "test"
       expect(workflow.non_training_subject_sets).to match_array(workflow.subject_sets)
     end
 
