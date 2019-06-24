@@ -29,8 +29,7 @@ FactoryBot.define do
       after(:create) do |p|
         p.avatar = create(:medium, type: "project_avatar", linked: p)
         p.background = create(:medium, type: "project_background", linked: p)
-        workflow = create(:workflow, project: p)
-        create_list(:subject_set_with_subjects, 2, project: p, workflows: [workflow])
+        p.workflows = [ create(:workflow_with_subjects, project: p) ]
       end
     end
 
