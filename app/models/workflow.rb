@@ -136,13 +136,7 @@ class Workflow < ActiveRecord::Base
   end
 
   def subjects_count
-    @subject_count ||= if subject_sets.loaded?
-      subject_sets.inject(0) do |sum,set|
-        sum + set.set_member_subjects_count
-      end
-    else
-      subject_sets.sum :set_member_subjects_count
-    end
+    set_member_subjects_count
   end
 
   def retired_subjects_count
