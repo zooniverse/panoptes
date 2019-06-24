@@ -164,22 +164,6 @@ describe Project, type: :model do
     end
   end
 
-  describe "#live_subject_sets" do
-    let(:project) { full_project }
-    let!(:unlinked_subject_set) do
-      create(:subject_set, project: project, num_workflows: 0)
-    end
-
-    it "should have many subject_sets" do
-      expect(project.live_subject_sets).not_to include(unlinked_subject_set)
-    end
-
-    it "should only get subject_sets from active workflows" do
-      inactive_workflow = create(:workflow_with_subjects, num_sets: 1, active: false, project: project)
-      expect(project.live_subject_sets).not_to include(inactive_workflow.subject_sets.first)
-    end
-  end
-
   describe "#classifications" do
     let(:relation_instance) { project }
 

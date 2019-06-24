@@ -22,7 +22,6 @@ class Project < ActiveRecord::Base
     -> { where(active: true, serialize_with_project: true).active },
     class_name: "Workflow"
   has_many :subject_sets, dependent: :destroy
-  has_many :live_subject_sets, through: :active_workflows, source: 'subject_sets'
   has_many :classifications, dependent: :restrict_with_exception
   has_many :subjects, dependent: :restrict_with_exception
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
