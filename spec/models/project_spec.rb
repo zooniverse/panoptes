@@ -192,19 +192,6 @@ describe Project, type: :model do
     it_behaves_like "it has a subjects association"
   end
 
-  describe "#subjects_count" do
-    let(:expected_count) do
-      subject_relation
-      .subject_sets
-      .map{ |set| set.subjects.count }
-      .reduce(&:+)
-    end
-
-    it "return a count of the associated subjects" do
-      expect(subject_relation.subjects_count).to eq(expected_count)
-    end
-  end
-
   describe "#project_roles" do
     let!(:preferences) do
       [create(:access_control_list, resource: project, roles: []),
@@ -328,29 +315,37 @@ describe Project, type: :model do
 
   describe "#subjects_count" do
     before do
-      subject_sets.map { |set| set.update_column(:set_member_subjects_count, 1) }
+      active_workflows.map do |workflow|
+        workflow.update_column(:real_set_member_subjects_count, 1)
+      end
     end
 
     context "without a loaded association" do
-      let(:subject_sets) { SubjectSet.where(project_id: full_project.id) }
+      let(:active_workflows) do
+        Workflow.active.where(
+          active: true,
+          serialize_with_project: true,
+          project_id: full_project.id
+        )
+      end
 
-      it "should hit the db with a sum query" do
-        expect(full_project.live_subject_sets)
+      it "should hit the db with a sum query across active workflows" do
+        expect(full_project.active_workflows)
           .to receive(:sum)
-          .with(:set_member_subjects_count)
+          .with(:real_set_member_subjects_count)
           .and_call_original
-        expect(full_project.subjects_count).to eq(2)
+        expect(full_project.subjects_count).to eq(1)
       end
     end
 
     context "with a loaded assocation" do
-      let(:subject_sets) { full_project.live_subject_sets }
+      let(:active_workflows) { full_project.active_workflows }
 
       it "should use the association values" do
-        expect(full_project.live_subject_sets)
+        expect(full_project.active_workflows)
           .to receive(:inject)
           .and_call_original
-        expect(full_project.subjects_count).to eq(2)
+        expect(full_project.subjects_count).to eq(1)
       end
     end
   end
