@@ -1974,7 +1974,7 @@ CREATE TABLE public.workflows (
     published_version_id integer,
     steps jsonb DEFAULT '[]'::jsonb NOT NULL,
     serialize_with_project boolean DEFAULT true,
-    set_member_subjects_count integer DEFAULT 0 NOT NULL
+    real_set_member_subjects_count integer DEFAULT 0 NOT NULL
 );
 
 
