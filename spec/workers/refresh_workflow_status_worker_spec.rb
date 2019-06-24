@@ -21,6 +21,10 @@ RSpec.describe RefreshWorkflowStatusWorker do
         .to receive(:perform_async)
         .with(workflow.id)
         .ordered
+      expect(WorkflowSubjectsCountWorker)
+        .to receive(:perform_async)
+        .with(workflow.id)
+        .ordered
       worker.perform(workflow.id)
     end
   end

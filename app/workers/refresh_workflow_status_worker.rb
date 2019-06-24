@@ -19,6 +19,7 @@ class RefreshWorkflowStatusWorker
       # conditions between workers and/or db transactions
       UnfinishWorkflowWorker.new.perform(workflow_id)
       WorkflowRetiredCountWorker.perform_async(workflow_id)
+      WorkflowSubjectsCountWorker.perform_async(workflow_id)
     end
   end
 end
