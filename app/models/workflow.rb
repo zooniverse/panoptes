@@ -136,7 +136,7 @@ class Workflow < ActiveRecord::Base
   end
 
   def subjects_count
-    set_member_subjects_count
+    real_set_member_subjects_count
   end
 
   def retired_subjects_count

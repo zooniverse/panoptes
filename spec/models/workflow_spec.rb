@@ -348,8 +348,8 @@ describe Workflow, type: :model do
   end
 
   describe "#subjects_count" do
-    it "should be an alias for set_member_subjects count" do
-      expect(subject_relation.subjects_count).to eq(subject_relation.set_member_subjects_count)
+    it "should be an alias for real_set_member_subjects count" do
+      expect(subject_relation.subjects_count).to eq(subject_relation.real_set_member_subjects_count)
     end
   end
 

@@ -13,7 +13,7 @@ RSpec.describe WorkflowSubjectsCountWorker do
         .and_return(workflow)
       expect(workflow)
         .to receive(:update_column)
-        .with(:set_member_subjects_count, anything)
+        .with(:real_set_member_subjects_count, anything)
       worker.perform(workflow.id)
     end
 

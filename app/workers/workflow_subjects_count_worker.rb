@@ -18,6 +18,6 @@ class WorkflowSubjectsCountWorker
   def perform(workflow_id)
     workflow = Workflow.find_without_json_attrs(workflow_id)
     counter = WorkflowCounter.new(workflow)
-    workflow.update_column(:set_member_subjects_count, counter.subjects)
+    workflow.update_column(:real_set_member_subjects_count, counter.subjects)
   end
 end
