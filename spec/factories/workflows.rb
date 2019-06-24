@@ -90,6 +90,7 @@ FactoryBot.define do
 
       after(:create) do |w, evaluator|
         create_list(:subject_set_with_subjects, evaluator.num_sets, workflows: [w], project: w.project)
+        w.real_set_member_subjects_count = w.non_training_subject_sets.sum(:set_member_subjects_count)
       end
     end
 
