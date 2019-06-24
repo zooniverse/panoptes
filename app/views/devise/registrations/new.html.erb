@@ -19,7 +19,7 @@
 
       <div class="form-group <%= "has-errors" if resource.errors[:credited_name].present? %>">
         <%= f.label :credited_name, "Real Name (optional)" %><small class="errored"><%= resource.errors[:credited_name].join(', ')%></small><br />
-        <%= f.text_field :credited_name, class: 'form-control' %>
+        <%= f.text_field :credited_name, class: 'form-control', pattern: '[^@]+', title: 'Enter a name, not an email address' %>
         <small>We’ll use this to give you credit in scientific papers, posters, etc</small>
       </div>
 
