@@ -15,8 +15,6 @@ describe Project, type: :model do
     let(:not_owned) { build(:project, owner: nil) }
   end
 
-  it_behaves_like "has subject_count"
-
   it_behaves_like "activatable" do
     let(:activatable) { project }
   end
@@ -192,6 +190,19 @@ describe Project, type: :model do
     let(:relation_instance) { project }
 
     it_behaves_like "it has a subjects association"
+  end
+
+  describe "#subjects_count" do
+    let(:expected_count) do
+      subject_relation
+      .subject_sets
+      .map{ |set| set.subjects.count }
+      .reduce(&:+)
+    end
+
+    it "return a count of the associated subjects" do
+      expect(subject_relation.subjects_count).to eq(expected_count)
+    end
   end
 
   describe "#project_roles" do
