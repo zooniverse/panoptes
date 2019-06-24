@@ -1973,7 +1973,8 @@ CREATE TABLE public.workflows (
     minor_version integer DEFAULT 0 NOT NULL,
     published_version_id integer,
     steps jsonb DEFAULT '[]'::jsonb NOT NULL,
-    serialize_with_project boolean DEFAULT true
+    serialize_with_project boolean DEFAULT true,
+    set_member_subjects_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -4773,4 +4774,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190411125709');
 INSERT INTO schema_migrations (version) VALUES ('20190507103007');
 
 INSERT INTO schema_migrations (version) VALUES ('20190524111214');
+
+INSERT INTO schema_migrations (version) VALUES ('20190624094308');
 
