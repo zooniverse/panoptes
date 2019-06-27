@@ -1,4 +1,4 @@
-FROM ruby:2.5.1
+FROM ruby:2.5
 
 EXPOSE 4567
 WORKDIR /src
