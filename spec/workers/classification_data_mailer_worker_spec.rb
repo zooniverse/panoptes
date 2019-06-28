@@ -1,17 +1,17 @@
 require 'spec_helper'
 
 RSpec.describe ClassificationDataMailerWorker do
-  let(:s3_url) { "https://fake.s3.url.example.com" }
+  let(:url) { "https://www.zooniverse.org/lab/123" }
 
   shared_examples 'is a classification data mailer' do
     it 'should deliver the mail' do
-      expect{ subject.perform(resource.id, resource.class.to_s.downcase, s3_url, ["zach@zooniverse.org"]) }.to change{ ActionMailer::Base.deliveries.count }.by(1)
+      expect{ subject.perform(resource.id, resource.class.to_s.downcase, url, ["zach@zooniverse.org"]) }.to change{ ActionMailer::Base.deliveries.count }.by(1)
     end
 
-    context 'when there are no recipients' do
+    context 'when there are no recipients'  do
       it 'does not call the mailer' do
         expect(ClassificationDataMailer).to receive(:classification_data).never
-        subject.perform(resource.id, resource.class.to_s.downcase, s3_url, [])
+        subject.perform(resource.id, resource.class.to_s.downcase, url, [])
       end
     end
   end
