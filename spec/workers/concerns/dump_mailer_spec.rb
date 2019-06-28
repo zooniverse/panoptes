@@ -40,7 +40,7 @@ describe DumpMailer do
   describe 'lab_export_url' do
     let(:resource) { Project.new(id: 1) }
     let(:project_id) { resource.id }
-    let(:lab_url) { "#{Panoptes.frontend_url}/lab/#{project_id}" }
+    let(:lab_url) { "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports" }
 
     it 'corretly determines the lab url' do
       expect(dump_mailer.lab_export_url).to eq(lab_url)

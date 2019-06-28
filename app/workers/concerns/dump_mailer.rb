@@ -40,7 +40,7 @@ class DumpMailer
         resource.id
       end
 
-    "#{Panoptes.frontend_url}/lab/#{project_id}"
+    "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports"
   end
 
   private
