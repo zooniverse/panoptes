@@ -437,7 +437,7 @@ GEM
       yard (~> 0.9.11)
     warden (1.2.7)
       rack (>= 1.0)
-    yard (0.9.12)
+    yard (0.9.20)
     zoo_stream (1.0.1)
       aws-sdk
 
