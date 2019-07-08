@@ -107,37 +107,25 @@ RSpec.describe DesignatorClient do
       end
     end
 
-    describe "#add_seen_subjects" do
+    describe "#add_seen" do
       let(:params) do
-        { workflow_id: 338, subject_ids: [1,2,3] }
+        { workflow_id: 338, subject_id: 99 }
       end
       it 'returns a no-content response' do
         stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-          stub.put('/api/users/1/add_seen_subjects', params.to_json, headers) do |env|
+          stub.put('/api/users/1/add_seen_subject', params.to_json, headers) do |env|
             [204, {'Content-Type' => 'application/json'}, nil]
           end
         end
 
-        response = described_class.new([:test, stubs]).add_seen_subjects([1,2,3], 338, 1)
-        expect(response).to eq(nil)
-      end
-
-      it 'array wraps an integer subject_ids input' do
-        single_int_params = params.merge(subject_ids: [1])
-        stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-          stub.put('/api/users/1/add_seen_subjects', single_int_params.to_json, headers) do |env|
-            [204, {'Content-Type' => 'application/json'}, nil]
-          end
-        end
-
-        response = described_class.new([:test, stubs]).add_seen_subjects(1, 338, 1)
+        response = described_class.new([:test, stubs]).add_seen(338, 1, 99)
         expect(response).to eq(nil)
       end
 
       it_behaves_like "handles server errors" do
-        let(:method) { :add_seen_subjects }
-        let(:params) { [ [1,2,3], 338, 1] }
-        let(:url) { '/api/users/1/add_seen_subjects' }
+        let(:method) { :add_seen }
+        let(:params) { [338, 1, 99] }
+        let(:url) { '/api/users/1/add_seen_subject' }
         let(:http_method) { :put }
       end
     end

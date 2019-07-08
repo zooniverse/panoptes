@@ -28,8 +28,12 @@ class DesignatorClient
   end
 
   def add_seen(workflow_id, user_id, subject_id)
-    # not needed right now
-    true
+    request(:put, "/api/users/#{user_id}/add_seen_subject") do |req|
+      req.body = {
+        workflow_id: workflow_id,
+        subject_id: subject_id
+      }.to_json
+    end
   end
 
   def load_user(workflow_id, user_id)
@@ -51,15 +55,6 @@ class DesignatorClient
     url = "/api/workflows/#{workflow_id}"
     params = { user_id: user_id, limit: limit }
     request(:get, [ url, params ])
-  end
-
-  def add_seen_subjects(subject_ids, workflow_id, user_id)
-    request(:put, "/api/users/#{user_id}/add_seen_subjects") do |req|
-      req.body = {
-        workflow_id: workflow_id,
-        subject_ids: Array.wrap(subject_ids)
-      }.to_json
-    end
   end
 
   private
