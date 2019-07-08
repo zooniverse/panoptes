@@ -53,6 +53,15 @@ class DesignatorClient
     request(:get, [ url, params ])
   end
 
+  def add_seen_subjects(subject_ids, workflow_id, user_id)
+    request(:put, "/api/users/#{user_id}/add_seen_subjects") do |req|
+      req.body = {
+        workflow_id: workflow_id,
+        subject_ids: Array.wrap(subject_ids)
+      }.to_json
+    end
+  end
+
   private
 
   def request(http_method, params)
