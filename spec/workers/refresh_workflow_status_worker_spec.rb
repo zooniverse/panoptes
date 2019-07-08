@@ -6,14 +6,22 @@ RSpec.describe RefreshWorkflowStatusWorker do
 
   describe "#perform" do
     let(:unfinish_worker_double) { double(:peform) }
+    let(:subject_count_worker_double) { double(:peform) }
     before do
       allow(UnfinishWorkflowWorker)
-      .to receive(:new)
-      .and_return(unfinish_worker_double)
+        .to receive(:new)
+        .and_return(unfinish_worker_double)
+      allow(WorkflowSubjectsCountWorker)
+        .to receive(:new)
+        .and_return(subject_count_worker_double)
     end
 
     it "should call a chain of ordered workers" do
       expect(unfinish_worker_double)
+        .to receive(:perform)
+        .with(workflow.id)
+        .ordered
+      expect(subject_count_worker_double)
         .to receive(:perform)
         .with(workflow.id)
         .ordered

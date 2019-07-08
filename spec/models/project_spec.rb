@@ -15,8 +15,6 @@ describe Project, type: :model do
     let(:not_owned) { build(:project, owner: nil) }
   end
 
-  it_behaves_like "has subject_count"
-
   it_behaves_like "activatable" do
     let(:activatable) { project }
   end
@@ -166,22 +164,6 @@ describe Project, type: :model do
     end
   end
 
-  describe "#live_subject_sets" do
-    let(:project) { full_project }
-    let!(:unlinked_subject_set) do
-      create(:subject_set, project: project, num_workflows: 0)
-    end
-
-    it "should have many subject_sets" do
-      expect(project.live_subject_sets).not_to include(unlinked_subject_set)
-    end
-
-    it "should only get subject_sets from active workflows" do
-      inactive_workflow = create(:workflow_with_subjects, num_sets: 1, active: false, project: project)
-      expect(project.live_subject_sets).not_to include(inactive_workflow.subject_sets.first)
-    end
-  end
-
   describe "#classifications" do
     let(:relation_instance) { project }
 
@@ -317,29 +299,37 @@ describe Project, type: :model do
 
   describe "#subjects_count" do
     before do
-      subject_sets.map { |set| set.update_column(:set_member_subjects_count, 1) }
+      active_workflows.map do |workflow|
+        workflow.update_column(:real_set_member_subjects_count, 1)
+      end
     end
 
     context "without a loaded association" do
-      let(:subject_sets) { SubjectSet.where(project_id: full_project.id) }
+      let(:active_workflows) do
+        Workflow.active.where(
+          active: true,
+          serialize_with_project: true,
+          project_id: full_project.id
+        )
+      end
 
-      it "should hit the db with a sum query" do
-        expect(full_project.live_subject_sets)
+      it "should hit the db with a sum query across active workflows" do
+        expect(full_project.active_workflows)
           .to receive(:sum)
-          .with(:set_member_subjects_count)
+          .with(:real_set_member_subjects_count)
           .and_call_original
-        expect(full_project.subjects_count).to eq(2)
+        expect(full_project.subjects_count).to eq(1)
       end
     end
 
     context "with a loaded assocation" do
-      let(:subject_sets) { full_project.live_subject_sets }
+      let(:active_workflows) { full_project.active_workflows }
 
       it "should use the association values" do
-        expect(full_project.live_subject_sets)
+        expect(full_project.active_workflows)
           .to receive(:inject)
           .and_call_original
-        expect(full_project.subjects_count).to eq(2)
+        expect(full_project.subjects_count).to eq(1)
       end
     end
   end

@@ -22,6 +22,7 @@ class CalculateProjectCompletenessWorker
     Project.transaction do
       project_workflows = project.workflows.select(
         :id,
+        :real_set_member_subjects_count,
         :retired_set_member_subjects_count
       )
       project_workflows.each do |workflow|

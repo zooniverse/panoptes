@@ -66,9 +66,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
     super do |subject_set|
       notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
-      reset_workflow_retired_counts(
-        subject_set.subject_sets_workflows.pluck(:workflow_id)
-      )
+      reset_workflow_retired_counts(subject_set.workflow_ids)
     end
   end
 

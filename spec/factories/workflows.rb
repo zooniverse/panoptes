@@ -84,12 +84,13 @@ FactoryBot.define do
     end
 
     factory :workflow_with_subjects do
-      ignore do
+      transient do
         num_sets 2
       end
 
       after(:create) do |w, evaluator|
         create_list(:subject_set_with_subjects, evaluator.num_sets, workflows: [w], project: w.project)
+        w.update_column(:real_set_member_subjects_count, w.non_training_subject_sets.sum(:set_member_subjects_count))
       end
     end
 

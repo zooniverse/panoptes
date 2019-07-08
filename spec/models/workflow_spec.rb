@@ -9,8 +9,6 @@ describe Workflow, type: :model do
     let(:locked_update) { {display_name: "A Different Name"} }
   end
 
-  it_behaves_like "has subject_count"
-
   it_behaves_like "is translatable" do
     let(:model) { create :workflow }
   end
@@ -346,6 +344,12 @@ describe Workflow, type: :model do
   describe "#retired_subjects_count" do
     it "should be an alias for retired set_member_subjects count" do
       expect(subject_relation.retired_subjects_count).to eq(subject_relation.retired_set_member_subjects_count)
+    end
+  end
+
+  describe "#subjects_count" do
+    it "should be an alias for real_set_member_subjects count" do
+      expect(subject_relation.subjects_count).to eq(subject_relation.real_set_member_subjects_count)
     end
   end
 

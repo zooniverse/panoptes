@@ -63,16 +63,19 @@ describe CalculateProjectCompletenessWorker do
       it 'returns 1 when all the subjects of a workflow have been retired' do
         workflow.classifications_count = 20
         workflow.retired_set_member_subjects_count = 2
+        workflow.real_set_member_subjects_count = 2
         expect(worker.workflow_completeness(workflow)).to eq(1.0)
       end
 
       it 'returns 0.5 when half of the subjects are retired' do
         workflow.retired_set_member_subjects_count = 1
+        workflow.real_set_member_subjects_count = 2
         expect(worker.workflow_completeness(workflow)).to eq(0.5)
       end
 
       it 'returns 1.0 when there are more retired subjects than subjects' do
         workflow.retired_set_member_subjects_count = 3
+        workflow.real_set_member_subjects_count = 2
         expect(worker.workflow_completeness(workflow)).to eq(1.0)
       end
     end

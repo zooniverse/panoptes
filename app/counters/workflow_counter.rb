@@ -13,6 +13,10 @@ class WorkflowCounter
     sws_query.where.not(retired_at: nil).count
   end
 
+  def subjects
+    workflow.non_training_subject_sets.sum(:set_member_subjects_count)
+  end
+
   def sws_query
     SubjectWorkflowStatus
     .where(workflow_id: workflow.id)
