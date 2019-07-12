@@ -67,6 +67,7 @@ group :development, :test do
   gem 'pry-rails'
   gem 'pry-stack_explorer'
   gem 'spring'
+  gem 'strong_migrations'
 end
 
 group :test do
