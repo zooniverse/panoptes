@@ -360,6 +360,15 @@ class User < ActiveRecord::Base
     collections.joins(:projects).where(favorite: true, projects: {id: project_id})
   end
 
+  def sanitized_credited_name
+    if credited_name.blank? || credited_name.include?('@')
+      login
+    else
+      credited_name
+    end
+  end
+end
+
   private
 
   def subjects_count_cache_key
