@@ -2,10 +2,7 @@ FactoryBot.define do
   factory :set_member_subject do
     subject_set
     subject
-
-    trait :with_priorities do
-      sequence(:priority)
-    end
+    sequence(:priority)
 
     transient do
       setup_subject_workflow_statuses false

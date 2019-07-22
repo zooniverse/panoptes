@@ -71,6 +71,12 @@ class Api::V1::SubjectsController < Api::ApiController
     end
   end
 
+  def surrounding
+    skip_policy_scope
+
+    subject.get_surrounding(params[:subject_set_id], params[:window], params[:gap])
+  end
+
   private
 
   def check_subject_limit

@@ -785,4 +785,19 @@ describe Api::V1::SubjectsController, type: :controller do
       delete :destroy, id: resource.id
     end
   end
+
+  describe "#surrounding" do
+    let(:request_params) { { subject_set_id: subject_set.id} }
+    before do
+      allow_any_instance_of(Subject)
+      .to receive(:surrounding)
+      .and_return(subjects)
+      default_request user_id: authorized_user.id, scopes: scopes
+    end
+
+    it "should return an array of serialized subjects" do
+      get :surrounding, subject_id: subjects.first.id, params: request_params
+      expect(response).to include(subjects)
+    end
+  end
 end

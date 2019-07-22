@@ -151,5 +151,39 @@ describe Subject, :type => :model do
                                 metadata: {index: 0}}])
       end
     end
+
+    describe '#surrounding' do
+      let(:workflow) { create(:workflow) }
+      let(:subject_set) { create(:subject_set, project: workflow.project) }
+      let(:smses) { create_list(:set_member_subject, 21, subject_set: subject_set) }
+      let(:test_sms) { smses[smses.length/2] }
+
+      it 'uses the default gap, default window' do
+        result = test_sms.subject.surrounding(subject_set.id)
+
+        # Map across smses for subject ids to avoid testing metadata hash order
+        expect(result.map{|x| x.id}).to eq( smses[5..15].map{|x| x.subject.id} )
+      end
+
+      it 'uses the defined gap and window' do
+        result = test_sms.subject.surrounding(subject_set.id, 3, 2)
+
+        expect(result.map{|x| x.id})
+          .to eq( smses.values_at(4, 6, 8, 10, 12, 14, 16)
+          .map{|x| x.subject.id} )
+      end
+
+      it 'includes nils if surrounding index is out of range' do
+        result = test_sms.subject.surrounding(subject_set.id, 3, 4)
+
+        expect(result.map{|x| x&.id}).to eq(
+          smses.values_at(2, 6, 10, 14, 18)
+               .map{|x| x.subject.id}
+               .push(nil)
+               .unshift(nil)
+        )
+      end
+
+    end
   end
 end
