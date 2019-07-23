@@ -6,7 +6,7 @@ describe ClassificationPolicy do
     let(:logged_in_user) { create(:user) }
     let(:resource_owner) { create(:user) }
 
-    let(:keep_data_in_panoptes_only_project) { create :project, owner: resource_owner, configuration: {"keep_data_in_panoptes_only" => true} }
+    let(:keep_data_in_panoptes_only_project) { create :project, configuration: {"keep_data_in_panoptes_only" => true} }
     let(:project) { create :project, owner: resource_owner }
 
     let(:keep_data_in_panoptes_only_classification) { build :classification, project: keep_data_in_panoptes_only_project }
