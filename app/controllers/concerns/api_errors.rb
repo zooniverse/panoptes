@@ -8,7 +8,6 @@ module ApiErrors
   class NoUserError < PanoptesApiError; end
   class UnpermittedParameter < PanoptesApiError; end
   class LiveProjectChanges < PanoptesApiError; end
-  class DisabledDataExport < PanoptesApiError; end
   class Unauthorized < PanoptesApiError; end
   class NoMediaError < PanoptesApiError
     def initialize(media_type, parent, parent_id, media_id=nil)

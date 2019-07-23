@@ -5,16 +5,11 @@ describe ClassificationPolicy do
     let(:anonymous_user) { nil }
     let(:logged_in_user) { create(:user) }
     let(:resource_owner) { create(:user) }
-
-    let(:keep_data_in_panoptes_only_project) { create :project, configuration: {"keep_data_in_panoptes_only" => true} }
     let(:project) { create :project, owner: resource_owner }
-
-    let(:keep_data_in_panoptes_only_classification) { build :classification, project: keep_data_in_panoptes_only_project }
     let(:incomplete_classification) { build(:classification, project: project, completed: false, user: logged_in_user) }
     let(:classification) { build(:classification, project: project, user: logged_in_user) }
 
     before do
-      keep_data_in_panoptes_only_classification.save!
       incomplete_classification.save!
       classification.save!
     end

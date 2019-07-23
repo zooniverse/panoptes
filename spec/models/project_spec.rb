@@ -528,24 +528,4 @@ describe Project, type: :model do
       end
     end
   end
-
-  describe "#keep_data_in_panoptes_only?" do
-    it "should not return true when no private config" do
-      expect(project.keep_data_in_panoptes_only?).to eq(false)
-    end
-
-    it "should not return true when private config is false" do
-      project.configuration = project.configuration.merge(
-        "keep_data_in_panoptes_only" => false
-      )
-      expect(project.keep_data_in_panoptes_only?).to eq(false)
-    end
-
-    it "should not return true when private config is true" do
-      project.configuration = project.configuration.merge(
-        "keep_data_in_panoptes_only" => true
-      )
-      expect(project.keep_data_in_panoptes_only?).to eq(true)
-    end
-  end
 end

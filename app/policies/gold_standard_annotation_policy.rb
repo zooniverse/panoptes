@@ -6,7 +6,7 @@ class GoldStandardAnnotationPolicy < ApplicationPolicy
       public_workflows = Workflow.where("public_gold_standard IS TRUE")
       public_workflow_ids = public_workflows.select(:id)
 
-      FilterByProjectId.remove_non_exportable_projects(scope.where(workflow_id: public_workflow_ids).order(id: :asc))
+      scope.where(workflow_id: public_workflow_ids).order(id: :asc)
     end
   end
 

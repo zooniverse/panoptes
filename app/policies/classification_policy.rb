@@ -1,31 +1,34 @@
 class ClassificationPolicy < ApplicationPolicy
   class CompleteScope < Scope
     def resolve(action)
-      return FilterByProjectId.remove_non_exportable_projects(scope.complete) if user.is_admin?
-      FilterByProjectId.remove_non_exportable_projects(scope.complete.merge(scope.created_by(user)))
+      return scope.complete if user.is_admin?
+
+      scope.complete.merge(scope.created_by(user))
     end
   end
 
   class ShowScope < Scope
     def resolve(action)
-      return FilterByProjectId.remove_non_exportable_projects(scope.all) if user.is_admin?
-      FilterByProjectId.remove_non_exportable_projects(scope.created_by(user))
+      return scope.all if user.is_admin?
+
+      scope.created_by(user)
     end
   end
 
   class ProjectScope < Scope
     def resolve(action)
-      return FilterByProjectId.remove_non_exportable_projects(scope.all) if user.is_admin?
+      return scope.all if user.is_admin?
 
       projects = policy_for(Project).scope_for(:update)
-      FilterByProjectId.remove_non_exportable_projects(scope.where(project_id: projects.select(:id)))
+      scope.where(project_id: projects.select(:id))
     end
   end
 
   class IncompleteScope < Scope
     def resolve(action)
-      return FilterByProjectId.remove_non_exportable_projects(scope.incomplete) if user.is_admin?
-      FilterByProjectId.remove_non_exportable_projects(scope.incomplete_for_user(user))
+      return scope.incomplete if user.is_admin?
+
+      scope.incomplete_for_user(user)
     end
   end
 

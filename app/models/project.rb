@@ -172,8 +172,4 @@ class Project < ActiveRecord::Base
   def communication_emails
     users_with_project_roles(%w(owner communications)).pluck(:email)
   end
-
-  def keep_data_in_panoptes_only?
-    !!configuration.fetch("keep_data_in_panoptes_only", false)
-  end
 end
