@@ -41,6 +41,7 @@ gem 'rack-cors', '~> 0.4', require: 'rack/cors'
 gem 'rails', '~> 4.2.11'
 gem 'ranked-model', '~> 0.4.1'
 gem 'restpack_serializer', github: "zooniverse/restpack_serializer", branch: "rails5" # REST API
+gem 'strong_migrations'
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'scientist', '~> 1.2.0'
 gem 'sdoc', '~> 1.0.0', group: :doc
