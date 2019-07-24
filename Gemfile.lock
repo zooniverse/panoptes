@@ -295,7 +295,7 @@ GEM
     pundit (1.1.0)
       activesupport (>= 3.0.0)
     rack (1.6.11)
-    rack-cors (0.4.1)
+    rack-cors (1.0.3)
     rack-protection (2.0.5)
       rack
     rack-test (0.6.3)
@@ -494,7 +494,7 @@ DEPENDENCIES
   pry-stack_explorer
   puma (~> 3.12.1)
   pundit (~> 1.1.0)
-  rack-cors (~> 0.4)
+  rack-cors (~> 1.0)
   rails (~> 4.2.11)
   ranked-model (~> 0.4.1)
   restpack_serializer!
