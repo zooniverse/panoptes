@@ -818,8 +818,6 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:test_attr_value) { "project_classifications_export" }
 
       it_behaves_like "is creatable", :create_classifications_export
-
-      it_behaves_like "it forbids data exports"
     end
 
     describe "#create_subjects_export" do
