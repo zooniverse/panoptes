@@ -71,10 +71,17 @@ class Api::V1::SubjectsController < Api::ApiController
     end
   end
 
-  def surrounding
+  def adjacent
     skip_policy_scope
 
-    subject.get_surrounding(params[:subject_set_id], params[:window], params[:gap])
+    # This use of params can't be right, but the spec request's URL is correct
+    sms = SetMemberSubject.where(subject_id: params["subject_id"], subject_set_id: params["params"]["subject_set_id"]).first
+
+    new_smses = sms.adjacent(params[:window], params[:gap])
+    subjects = new_smses.map{|sms| sms&.subject}
+
+    # This is gonna somehow use the SubjectSelectorSerializer when it gets here
+    render json_api: subjects
   end
 
   private

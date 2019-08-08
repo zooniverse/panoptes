@@ -786,18 +786,23 @@ describe Api::V1::SubjectsController, type: :controller do
     end
   end
 
-  describe "#surrounding" do
-    let(:request_params) { { subject_set_id: subject_set.id} }
+  describe "#adjacent" do
+    let(:request_params) { { subject_set_id: subject_set.id } }
     before do
-      allow_any_instance_of(Subject)
-      .to receive(:surrounding)
-      .and_return(subjects)
-      default_request user_id: authorized_user.id, scopes: scopes
+      allow_any_instance_of(SetMemberSubject)
+      .to receive(:adjacent)
+      .and_return(sms)
     end
 
+    # Call should be allowed unscoped, logged/queued req doesn't use this
+    # before(:each) do
+    #   default_request user_id: user.id, scopes: scopes
+    # end
+
     it "should return an array of serialized subjects" do
-      get :surrounding, subject_id: subjects.first.id, params: request_params
-      expect(response).to include(subjects)
+      # subject_id in the URL, subject_set_id in the params
+      get :adjacent, subject_id: subjects.first.id, params: request_params
+      expect(json_response.map {|s| s['id']}).to eq(subjects.map {|s| s.id})
     end
   end
 end
