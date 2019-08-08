@@ -3365,6 +3365,13 @@ CREATE INDEX index_set_member_subjects_on_subject_set_id ON public.set_member_su
 
 
 --
+-- Name: index_set_member_subjects_on_subject_set_id_and_priority; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_set_member_subjects_on_subject_set_id_and_priority ON public.set_member_subjects USING btree (subject_set_id, priority);
+
+
+--
 -- Name: index_subject_set_imports_on_subject_set_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4776,4 +4783,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190507103007');
 INSERT INTO schema_migrations (version) VALUES ('20190524111214');
 
 INSERT INTO schema_migrations (version) VALUES ('20190624094308');
+
+INSERT INTO schema_migrations (version) VALUES ('20190808195854');
 
