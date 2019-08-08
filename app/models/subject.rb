@@ -71,23 +71,4 @@ class Subject < ActiveRecord::Base
       false
     end
   end
-
-  def surrounding(subject_set_id, window=5, gap=1)
-    all_smses = SetMemberSubject.where(subject_set_id: subject_set_id).order(:priority)
-    this_sms = all_smses.where(subject_id: id).first
-    this_index = all_smses.find_index(this_sms)
-
-    indexes = [this_index]
-    x = y = this_index
-    window.times do
-      indexes.push(x + gap)
-      indexes.unshift(y - gap)
-
-      x = (x + gap)
-      y = (y - gap)
-    end
-
-    new_smses = indexes.map{|i| i.negative? ? nil : all_smses[i]}
-    new_smses.map{|sms| sms&.subject}
-  end
 end
