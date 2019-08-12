@@ -189,6 +189,8 @@ module Formatter
          key == annotation["task"]
         end
         @task = task_annotation.try(:last) || {}
+      rescue NoMethodError
+        @task = {}
       end
     end
   end
