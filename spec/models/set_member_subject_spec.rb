@@ -185,4 +185,40 @@ describe SetMemberSubject, :type => :model do
       expect(set_member_subject.subject).to be_a(Subject)
     end
   end
+
+  describe '#adjacent' do
+    let(:workflow) { create(:workflow) }
+    let(:subject_set) { create(:subject_set, project: workflow.project) }
+    let!(:smses) { create_list(:set_member_subject, 21, :with_priorities, subject_set: subject_set) }
+
+    let(:test_sms) { smses[smses.length/2] }
+
+    # before do
+      # smses.map {|sms| sms.subject_set = subject_set; sms.save! }
+    # end
+
+    it 'uses the default gap, default window' do
+      result = test_sms.adjacent
+
+      # Map across smses for subject ids to avoid testing metadata hash order
+      expect(result).to eq(smses[5..15])
+    end
+
+    it 'uses the defined gap and window' do
+      result = test_sms.adjacent(3, 2)
+
+      expect(result)
+        .to eq( smses.values_at(4, 6, 8, 10, 12, 14, 16) )
+    end
+
+    it 'includes nils if adjacent index is out of range' do
+      result = test_sms.adjacent(3, 4)
+
+      expect(result).to eq(
+        smses.values_at(2, 6, 10, 14, 18)
+             .push(nil)
+             .unshift(nil)
+      )
+    end
+  end
 end

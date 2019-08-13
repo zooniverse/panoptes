@@ -84,4 +84,27 @@ class SetMemberSubject < ActiveRecord::Base
   def set_random
     self.random = rand
   end
+
+  def adjacent(window=5, gap=1)
+    upper = priority + (window*gap)
+    lower = priority - (window*gap)
+
+    range_smses = SetMemberSubject
+      .where(subject_set_id: subject_set_id)
+      .where("priority >= ? AND priority <= ?", lower, upper)
+      .order(:priority)
+    this_index = range_smses.find_index(self)
+
+    indexes = [this_index]
+    x = y = this_index
+    window.times do
+      indexes.push(x + gap)
+      indexes.unshift(y - gap)
+
+      x = (x + gap)
+      y = (y - gap)
+    end
+
+    new_smses = indexes.map{|i| i.negative? ? nil : range_smses[i]}
+  end
 end

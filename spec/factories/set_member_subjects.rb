@@ -5,6 +5,7 @@ FactoryBot.define do
 
     trait :with_priorities do
       sequence(:priority)
+      subject_set { subject_set }
     end
 
     transient do

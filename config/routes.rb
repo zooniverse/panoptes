@@ -75,6 +75,7 @@ Rails.application.routes.draw do
       json_api_resources :memberships
 
       json_api_resources :subjects do
+        get :adjacent
         collection do
           get :queued
         end
