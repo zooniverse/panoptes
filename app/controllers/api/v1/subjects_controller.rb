@@ -74,14 +74,22 @@ class Api::V1::SubjectsController < Api::ApiController
   def adjacent
     skip_policy_scope
 
-    # This use of params can't be right, but the spec request's URL is correct
-    sms = SetMemberSubject.where(subject_id: params["subject_id"], subject_set_id: params["params"]["subject_set_id"]).first
+    known_sms = SetMemberSubject.find_by!(
+      subject_id: params[:id],
+      subject_set_id: params[:subject_set_id]
+    )
 
-    new_smses = sms.adjacent(params[:window], params[:gap])
-    subjects = new_smses.map{|sms| sms&.subject}
+    adjacent_smses = known_sms.adjacent(params[:window], params[:gap])
+    # this lookup below is an N+1 query as we haven't pre/eager loaded the subject associations
+    # it could be better to do Subject.where(id: sms.map(&:subject_id))
+    #
+    # longer term - ideally we have 1 DB query to load the subject data by
+    # using the adjacent sms code to construct a subject id result scope
+    # though that can come later on once this is working
+    adjacent_subjects = adjacent_smses.map{ |sms| sms&.subject }
 
     # This is gonna somehow use the SubjectSelectorSerializer when it gets here
-    render json_api: subjects
+    render json_api: adjacent_subjects
   end
 
   private
