@@ -787,7 +787,11 @@ describe Api::V1::SubjectsController, type: :controller do
   end
 
   describe "#adjacent" do
-    let(:request_params) { { subject_set_id: subject_set.id } }
+    let(:expected_subject_ids) { subjects.map(&:id) }
+    let(:request_params) do
+      { id: subjects.first.id, subject_set_id: subject_set.id }
+    end
+
     before do
       allow_any_instance_of(SetMemberSubject)
       .to receive(:adjacent)
@@ -795,9 +799,9 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     it "should return an array of serialized subjects" do
-      # subject_id in the URL, subject_set_id in the params
-      get :adjacent, subject_id: subjects.first.id, params: request_params
-      expect(json_response.map {|s| s['id']}).to eq(subjects.map {|s| s.id})
+      get :adjacent, request_params
+      result_ids = json_response.map {|s| s['id']}
+      expect(result_ids).to eq(expected_subject_ids)
     end
   end
 end
