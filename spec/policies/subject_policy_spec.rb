@@ -26,6 +26,7 @@ describe SubjectPolicy do
 
       its(:index) { is_expected.to match_array([public_subject]) }
       its(:show) { is_expected.to match_array([public_subject]) }
+      its(:adjacent) { is_expected.to match_array([public_subject]) }
       its(:update) { is_expected.to be_empty }
       its(:destroy) { is_expected.to be_empty }
       its(:version) { is_expected.to match_array([public_subject]) }
@@ -37,6 +38,7 @@ describe SubjectPolicy do
 
       its(:index) { is_expected.to match_array([public_subject]) }
       its(:show) { is_expected.to match_array([public_subject]) }
+      its(:adjacent) { is_expected.to match_array([public_subject]) }
       its(:update) { is_expected.to be_empty }
       its(:destroy) { is_expected.to be_empty }
       its(:version) { is_expected.to match_array([public_subject]) }
@@ -48,6 +50,7 @@ describe SubjectPolicy do
 
       its(:index) { is_expected.to match_array([public_subject, private_subject]) }
       its(:show) { is_expected.to match_array([public_subject, private_subject]) }
+      its(:adjacent) { is_expected.to match_array([public_subject, private_subject]) }
       its(:update) { is_expected.to match_array([private_subject]) }
       its(:destroy) { is_expected.to match_array([private_subject]) }
       its(:version) { is_expected.to match_array([public_subject, private_subject]) }
@@ -63,6 +66,7 @@ describe SubjectPolicy do
 
       its(:index) { is_expected.to match_array(all_subjects) }
       its(:show) { is_expected.to match_array(all_subjects) }
+      its(:adjacent) { is_expected.to match_array(all_subjects) }
       its(:update) { is_expected.to match_array(all_subjects) }
       its(:destroy) { is_expected.to match_array(all_subjects) }
       its(:version) { is_expected.to match_array(all_subjects) }

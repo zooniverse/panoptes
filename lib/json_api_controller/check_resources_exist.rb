@@ -12,8 +12,7 @@ module JsonApiController
     extend ActiveSupport::Concern
 
     included do
-      # Whaaaaaaaat this shouldn't be necessary, but ???
-      before_action :check_controller_resources, except: [:create, :adjacent]
+      before_action :check_controller_resources, except: [:create]
     end
 
     private

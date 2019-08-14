@@ -78,4 +78,9 @@ class PunditScopeTester
   def retire_subjects
     Pundit.policy!(@user, @klass).scope_for(:retire_subjects)
   end
+
+  # Used by subjects controller:
+  def adjacent
+    Pundit.policy!(@user, @klass).scope_for(:adjacent)
+  end
 end

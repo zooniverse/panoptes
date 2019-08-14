@@ -794,11 +794,6 @@ describe Api::V1::SubjectsController, type: :controller do
       .and_return(sms)
     end
 
-    # Call should be allowed unscoped, logged/queued req doesn't use this
-    # before(:each) do
-    #   default_request user_id: user.id, scopes: scopes
-    # end
-
     it "should return an array of serialized subjects" do
       # subject_id in the URL, subject_set_id in the params
       get :adjacent, subject_id: subjects.first.id, params: request_params
