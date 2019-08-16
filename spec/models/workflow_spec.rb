@@ -467,4 +467,15 @@ describe Workflow, type: :model do
       expect(workflow.non_training_subject_sets).to match_array(workflow.subject_sets)
     end
   end
+
+  describe "#selector_page_size" do
+    it "should default to 10" do
+      expect(workflow.selector_page_size).to eq(10)
+    end
+
+    it "should respect the selector_page_size value in configuration" do
+      workflow.configuration['selector_page_size'] = 1
+      expect(workflow.selector_page_size).to eq(1)
+    end
+  end
 end

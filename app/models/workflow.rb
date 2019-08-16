@@ -44,6 +44,8 @@ class Workflow < ActiveRecord::Base
 
   JSON_ATTRIBUTES = %w(tasks retirement aggregation strings steps).freeze
 
+  SELECTOR_PAGE_SIZE_KEY = 'selector_page_size'.freeze
+
   # Used by HttpCacheable
   scope :private_scope, -> { where(project_id: Project.private_scope) }
 
@@ -161,5 +163,9 @@ class Workflow < ActiveRecord::Base
   def training_set_ids
     config_training_set_ids = Array.wrap(configuration.dig("training_set_ids"))
     config_training_set_ids.reject { |id| id.to_i.zero? }
+  end
+
+  def selector_page_size(default_page_size=10)
+    configuration.fetch(SELECTOR_PAGE_SIZE_KEY, default_page_size)
   end
 end
