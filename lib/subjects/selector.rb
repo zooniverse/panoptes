@@ -123,9 +123,12 @@ module Subjects
       MissingSubjects.new("No data available for selection")
     end
 
-    def subjects_page_size
-      page_size = params[:page_size] ? params[:page_size].to_i : 10
-      params.merge!(page_size: page_size)
+    def subjects_page_size(default_page_size=10)
+      page_size = (params[:page_size] || workflow.selector_page_size).to_i
+
+      # update the params as they flow through the system, i.e. to the serializer
+      params[:page_size] ||= page_size
+
       page_size
     end
 
