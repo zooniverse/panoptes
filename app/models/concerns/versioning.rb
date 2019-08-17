@@ -34,10 +34,14 @@ module Versioning
     end
 
     if (changes.keys & self.class.versioned_attributes).present?
-      send(self.class.versioned_association).create!(
-        attributes.slice(*self.class.versioned_attributes)
-      )
+      build_version.save!
     end
+  end
+
+  def build_version
+    send(self.class.versioned_association).build(
+      attributes.slice(*self.class.versioned_attributes)
+    )
   end
 
   # take the highest associated version_id
