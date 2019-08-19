@@ -336,6 +336,15 @@ namespace :migrate do
       end
     end
 
+    desc 'backfill workflow versions for those workflows that have none'
+    task :backfill_missing_workflow_versions => :environment do
+      Workflow.find_each do |workflow|
+        if workflow.workflow_versions.count == 0
+          workflow.build_version.save!
+        end
+      end
+    end
+
     desc "Backfill org page versions"
     task :backfill_organization_page_versions => :environment do
       OrganizationPage.find_each do |org_page|

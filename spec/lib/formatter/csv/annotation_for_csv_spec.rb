@@ -321,5 +321,21 @@ RSpec.describe Formatter::Csv::AnnotationForCsv do
         expect(formatted["value"]).to eq(["yes"])
       end
     end
+
+    context 'when the version cannot be loaded' do
+      before do
+        allow(cache).to receive(:workflow_at_version).and_raise(ClassificationDumpCache::MissingWorkflowVersion)
+      end
+
+      it 'should return the annotation without additional formatting' do
+        formatted = described_class.new(classification, annotation, cache).to_h
+        expect(formatted).to eq(annotation)
+      end
+
+      it 'should report to honeybadger' do
+        expect(Honeybadger).to receive(:notify).with(an_instance_of(ClassificationDumpCache::MissingWorkflowVersion), context: {classification_id: classification.id})
+        described_class.new(classification, annotation, cache).to_h
+      end
+    end
   end
 end
