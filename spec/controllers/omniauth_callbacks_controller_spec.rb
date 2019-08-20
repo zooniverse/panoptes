@@ -36,13 +36,23 @@ shared_examples "an omniauth callback" do
     request.env['omniauth.auth']['info']['email'] = user.email
     req
   end
+
+  context "with an already logged in user" do
+    let(:user) { create(:user) }
+
+    it 'should not log the provider user in' do
+      sign_in user
+      expect(User).not_to receive(:from_omniauth)
+      req
+      expect(subject.current_user).to eq(user)
+    end
+  end
 end
 
 describe OmniauthCallbacksController, type: :controller do
   before(:each) do
     request.env['devise.mapping'] = Devise.mappings[:user]
   end
-
 
   describe '#facebook' do
     before(:each) do

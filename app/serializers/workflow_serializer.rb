@@ -12,13 +12,27 @@ class WorkflowSerializer
              :retirement, :retired_set_member_subjects_count, :href, :active, :mobile_friendly,
              :aggregation, :configuration, :public_gold_standard, :completeness
 
-  can_include :project, :subject_sets, :tutorial_subject, :workflow_versions, :published_version
+  can_include :project, :subject_sets, :tutorial_subject, :published_version
 
   media_include :attached_images, classifications_export: { include: false }
 
   can_filter_by :active, :mobile_friendly
 
-  preload :subject_sets, :attached_images
+  preload :subject_sets, :attached_images, :classifications_export, :published_version
+
+  def self.paging_scope(params, scope, context)
+    if params[:complete]
+      # In Rails 5 convert to use ActiveModel::Type::Boolean.new.cast(value)
+      complete_filter = ActiveRecord::Type::Boolean.new.type_cast_from_user(params[:complete])
+      scope = if complete_filter
+        scope.where(completeness: 1.0)
+      else
+        scope.where('completeness < 1.0')
+      end
+    end
+
+    super(params, scope, context)
+  end
 
   def version
     "#{@model.major_version}.#{content_version}"

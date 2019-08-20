@@ -1,4 +1,6 @@
 class ClassificationDumpCache
+  class MissingWorkflowVersion < StandardError; end
+
   def initialize
     @workflows = {}
     @subjects = {}
@@ -37,7 +39,12 @@ class ClassificationDumpCache
   def workflow_at_version(workflow, major_version, minor_version)
     @workflows[workflow.id] ||= {}
     @workflows[workflow.id][major_version] ||= {}
-    @workflows[workflow.id][major_version][minor_version] ||= find_workflow_at_version(workflow, major_version, minor_version)
+
+    if @workflows[workflow.id][major_version].key?(minor_version)
+      @workflows[workflow.id][major_version][minor_version]
+    else
+      @workflows[workflow.id][major_version][minor_version] = find_workflow_at_version(workflow, major_version, minor_version)
+    end
   end
 
   def secure_user_ip(ip_string)
@@ -49,6 +56,13 @@ class ClassificationDumpCache
   def find_workflow_at_version(workflow, major_version, minor_version)
     workflow.workflow_versions.where("major_number >= ? AND minor_number >= ?", major_version, minor_version).order("major_number ASC, minor_number ASC").first!
   rescue ActiveRecord::RecordNotFound
-    workflow.workflow_versions.order("major_number ASC, minor_number ASC").last
+    fallback = workflow.workflow_versions.order("major_number ASC, minor_number ASC").last
+    return fallback if fallback.present?
+
+    if workflow.major_version == major_version && workflow.minor_version == minor_version
+      workflow.build_version
+    else
+      raise MissingWorkflowVersion, workflow: workflow, major_version: major_version, minor_version: minor_version
+    end
   end
 end

@@ -11,6 +11,7 @@ describe CollectionSerializer do
         [ owner: { identity_membership: :user } ],
         :collection_roles,
         :subjects,
+        :projects,
         default_subject: :locations
       ]
     end

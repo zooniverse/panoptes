@@ -12,6 +12,10 @@ class Workflow < ActiveRecord::Base
   has_many :subject_workflow_statuses, dependent: :destroy
   has_many :subject_sets_workflows, dependent: :destroy
   has_many :subject_sets, through: :subject_sets_workflows
+  has_many :non_training_subject_sets,
+    ->(workflow) { where.not(subject_sets_workflows: { subject_set_id: workflow.training_set_ids }) },
+    through: :subject_sets_workflows,
+    source: :subject_set
   has_many :set_member_subjects, through: :subject_sets
   has_many :subjects, through: :set_member_subjects
   has_many :classifications, dependent: :restrict_with_exception
@@ -38,7 +42,7 @@ class Workflow < ActiveRecord::Base
     'options' => {'count' => 15}
   }.freeze
 
-  JSON_ATTRIBUTES = %w(tasks retirement aggregation configuration strings steps).freeze
+  JSON_ATTRIBUTES = %w(tasks retirement aggregation strings steps).freeze
 
   # Used by HttpCacheable
   scope :private_scope, -> { where(project_id: Project.private_scope) }
@@ -132,13 +136,7 @@ class Workflow < ActiveRecord::Base
   end
 
   def subjects_count
-    @subject_count ||= if subject_sets.loaded?
-      subject_sets.inject(0) do |sum,set|
-        sum + set.set_member_subjects_count
-      end
-    else
-      subject_sets.sum :set_member_subjects_count
-    end
+    real_set_member_subjects_count
   end
 
   def retired_subjects_count
@@ -158,5 +156,10 @@ class Workflow < ActiveRecord::Base
 
   def retirement_config
     RetirementValidator.new(self).validate
+  end
+
+  def training_set_ids
+    config_training_set_ids = Array.wrap(configuration.dig("training_set_ids"))
+    config_training_set_ids.reject { |id| id.to_i.zero? }
   end
 end

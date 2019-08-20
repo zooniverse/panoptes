@@ -33,7 +33,9 @@ class ProjectSerializer
     :attached_images,
     :avatar,
     :background,
-    :tags
+    :tags,
+    :classifications_export,
+    :subjects_export
 
   def self.page(params = {}, scope = nil, context = {})
     if Project.states.include?(params["state"])

@@ -2092,6 +2092,7 @@ Workflows are returned as an array under the _workflows_ key.
   + sort (optional, string) ... field to sort by id by default
   + project_id (optional, integer) ... filter workflows by project id
   + include (optional, string) ... comma separated list of linked resources to load
+  + complete (optional, string) ... filter complete ('true') and incomplete ('false') workflows
 
 + Request
 
@@ -2127,6 +2128,18 @@ the strategy. There are 2 valid criteria:
 
 If retirement is left blank Panoptes defaults to the `classification_count`
 strategy with 15 classifications per subject.
+
+A Workflow has a _configuration_ object that is used to store client configuration details.
+Three attributes in this object are reserved: _training_set_ids_, _training_chances_ and _training_default_chance_,
+_training_set_ids_ are used to choose training data from in the subject selectors
+and to tell the counting systems which subjects to ignore as training subjects do not retire.
+_training_default_chance_ is the fallback chance a user will see a training subject and also applies if _training_chances_ are not set
+_training_chances_ are used to determine when to show a training subject and each index reflects a seen subject by the user.
+E.g [ 1, 0.5, 0.1 ] reflects when i have seen 0 subjects (first element) on your workflow i will have a 100% chance of selecting a training subject.
+After seeing 1 subject, I will have a 50% chance, on the second subject i will have a 10% chance, after that the default chance applies.
+
+Normally when setting training subject selection you would set the retirement
+config to "never_retire" and use another system (e.g. Caesar) to handle retirement.
 
 + Request
 

@@ -14,11 +14,14 @@ class Project < ActiveRecord::Base
   has_many :field_guides, dependent: :destroy
   belongs_to :organization
   # uses the activated_state enum on the workflow
-  has_many :workflows, -> { active }, dependent: :restrict_with_exception
+  has_many :workflows,
+    -> { where(serialize_with_project: true).active},
+    dependent: :restrict_with_exception
   # use both the activated_state and active attribute on the workflow
-  has_many :active_workflows, -> { where(active: true).active }, class_name: "Workflow"
+  has_many :active_workflows,
+    -> { where(active: true, serialize_with_project: true).active },
+    class_name: "Workflow"
   has_many :subject_sets, dependent: :destroy
-  has_many :live_subject_sets, through: :active_workflows, source: 'subject_sets'
   has_many :classifications, dependent: :restrict_with_exception
   has_many :subjects, dependent: :restrict_with_exception
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
@@ -126,13 +129,14 @@ class Project < ActiveRecord::Base
   end
 
   def subjects_count
-    @subject_count ||= if live_subject_sets.loaded?
-      live_subject_sets.inject(0) do |sum,set|
-        sum + set.set_member_subjects_count
+    @subjects_count ||=
+      if active_workflows.loaded?
+        active_workflows.inject(0) do |sum,workflow|
+          sum + workflow.real_set_member_subjects_count
+        end
+      else
+        active_workflows.sum :real_set_member_subjects_count
       end
-    else
-      live_subject_sets.sum :set_member_subjects_count
-    end
   end
 
   def retired_subjects_count
@@ -167,9 +171,5 @@ class Project < ActiveRecord::Base
 
   def communication_emails
     users_with_project_roles(%w(owner communications)).pluck(:email)
-  end
-
-  def keep_data_in_panoptes_only?
-    !!configuration.fetch("keep_data_in_panoptes_only", false)
   end
 end

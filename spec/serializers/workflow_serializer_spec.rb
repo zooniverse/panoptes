@@ -13,7 +13,9 @@ describe WorkflowSerializer do
   it_should_behave_like "a panoptes restpack serializer" do
     let(:resource) { workflow }
     let(:includes) { %i(project subject_sets tutorial_subject) }
-    let(:preloads) { %i(subject_sets attached_images) }
+    let(:preloads) do
+      %i(subject_sets attached_images classifications_export published_version)
+    end
   end
 
   it_should_behave_like "a filter has many serializer" do
@@ -82,6 +84,41 @@ describe WorkflowSerializer do
       result = WorkflowSerializer.page(params, scope)
       page_size = result.dig(:meta, :workflows, :page_size)
       expect(page_size).to eq(25)
+    end
+  end
+
+  describe ".paging_scope filtering on completeness" do
+    let(:scope) { Workflow.all }
+    let(:workflow) { create(:workflow) }
+    let(:result) { WorkflowSerializer.page(params, scope) }
+    let(:result_ids) { result[:workflows].collect{ |h| h[:id] } }
+    let(:params) { {} }
+
+    before do
+      workflow
+    end
+
+    it "should not filter on completeness unless params are set" do
+      complete_workflow = create(:workflow, completeness: 1.0)
+      expect(result_ids).to match_array([workflow.id, complete_workflow.id].map(&:to_s))
+    end
+
+    context "with a complete workflow" do
+      let(:params) { { complete: "true" } }
+
+      it "should only return complete workflows" do
+        complete_workflow = create(:workflow, completeness: 1.0)
+        expect(result_ids).to match_array([complete_workflow.id.to_s])
+      end
+    end
+
+    context "with a complete workflow" do
+      let(:params) { { complete: "false" } }
+
+      it "should only return incomplete workflows" do
+        complete_workflow = create(:workflow, completeness: 1.0)
+        expect(result_ids).to match_array([workflow.id.to_s])
+      end
     end
   end
 end

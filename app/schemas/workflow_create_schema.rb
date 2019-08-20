@@ -64,7 +64,7 @@ class WorkflowCreateSchema < JsonSchema
     end
 
     property "steps" do
-      type "object"
+      type "array"
     end
 
     property "aggregation" do
@@ -73,6 +73,10 @@ class WorkflowCreateSchema < JsonSchema
 
     property "configuration" do
       type "object"
+    end
+
+    property "serialize_with_project" do
+      type "boolean"
     end
 
     property "links" do

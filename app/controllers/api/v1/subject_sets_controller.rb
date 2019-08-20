@@ -66,9 +66,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
     super do |subject_set|
       notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
-      reset_workflow_retired_counts(
-        subject_set.subject_sets_workflows.pluck(:workflow_id)
-      )
+      reset_workflow_retired_counts(subject_set.workflow_ids)
     end
   end
 
@@ -105,7 +103,9 @@ class Api::V1::SubjectSetsController < Api::ApiController
         [ resource.id, subject_id, rand ]
       end
 
-      SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
+      result = SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
+      SubjectMetadataWorker.perform_async(resource.id)
+      result
     else
       super
     end
@@ -113,9 +113,12 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def destroy_relation(resource, relation, value)
     if relation == :subjects
-      linked_sms_ids = value.split(',').map(&:to_i)
-      set_member_subjects = resource.set_member_subjects.where(subject_id: linked_sms_ids)
+      linked_subject_ids = value.split(',').map(&:to_i)
+      set_member_subjects = resource.set_member_subjects.where(subject_id: linked_subject_ids)
       remove_linked_set_member_subjects(set_member_subjects)
+      linked_subject_ids.each_with_index do |subject_id, index|
+        SubjectRemovalWorker.perform_in(index.seconds, subject_id)
+      end
     else
       super
     end

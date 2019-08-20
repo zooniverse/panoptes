@@ -1,4 +1,4 @@
-class OrganizationUpdateSchema < JsonSchema
+class OrganizationCreateSchema < JsonSchema
   schema do
     type "object"
     description "An Organization"
@@ -24,14 +24,6 @@ class OrganizationUpdateSchema < JsonSchema
 
     property "announcement" do
        type "string"
-    end
-
-    property "listed_at" do
-       type "string"
-    end
-
-    property "listed" do
-      type "boolean"
     end
 
     property "urls" do

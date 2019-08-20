@@ -106,5 +106,28 @@ RSpec.describe DesignatorClient do
         let(:http_method) { :post }
       end
     end
+
+    describe "#add_seen" do
+      let(:params) do
+        { workflow_id: 338, subject_id: 99 }
+      end
+      it 'returns a no-content response' do
+        stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+          stub.put('/api/users/1/add_seen_subject', params.to_json, headers) do |env|
+            [204, {'Content-Type' => 'application/json'}, nil]
+          end
+        end
+
+        response = described_class.new([:test, stubs]).add_seen(338, 1, 99)
+        expect(response).to eq(nil)
+      end
+
+      it_behaves_like "handles server errors" do
+        let(:method) { :add_seen }
+        let(:params) { [338, 1, 99] }
+        let(:url) { '/api/users/1/add_seen_subject' }
+        let(:http_method) { :put }
+      end
+    end
   end
 end
