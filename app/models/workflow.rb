@@ -44,7 +44,7 @@ class Workflow < ActiveRecord::Base
 
   JSON_ATTRIBUTES = %w(tasks retirement aggregation strings steps).freeze
 
-  SELECTOR_PAGE_SIZE_KEY = 'selector_page_size'.freeze
+  SELECTOR_PAGE_SIZE_KEY = 'subject_queue_page_size'.freeze
 
   # Used by HttpCacheable
   scope :private_scope, -> { where(project_id: Project.private_scope) }

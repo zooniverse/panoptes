@@ -76,10 +76,10 @@ RSpec.describe Subjects::Selector do
           end
         end
 
-        context "when the worfklow config has selector_page_size set" do
+        context "when the workflow config has subject_queue_page_size set" do
           let(:params_page_size) { 2 }
-          let(:selector_page_size) { 1 }
-          let(:config) { { selector_page_size: selector_page_size }}
+          let(:subject_queue_page_size) { 1 }
+          let(:config) { { subject_queue_page_size: subject_queue_page_size }}
           let(:workflow) do
             create(:workflow_with_subject_set, configuration: config)
           end
@@ -93,7 +93,7 @@ RSpec.describe Subjects::Selector do
 
             it 'should respect the config page_size value' do
               subjects = subject.get_subject_ids
-              expect(subjects.length).to eq(selector_page_size)
+              expect(subjects.length).to eq(subject_queue_page_size)
             end
           end
 

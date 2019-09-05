@@ -474,7 +474,7 @@ describe Workflow, type: :model do
     end
 
     it "should respect the selector_page_size value in configuration" do
-      workflow.configuration['selector_page_size'] = 1
+      workflow.configuration['subject_queue_page_size'] = 1
       expect(workflow.selector_page_size).to eq(1)
     end
   end
