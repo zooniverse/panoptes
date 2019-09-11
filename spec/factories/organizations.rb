@@ -1,20 +1,20 @@
 FactoryBot.define do
   factory :organization do
     transient do
-      build_media false
+      build_media { false }
     end
 
     sequence(:display_name) { |n| "Test Organization #{ n }" }
-    listed_at Time.now
-    listed true
-    primary_language "en"
-    urls [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}]
-    categories %w(bugs fossils plants)
+    listed_at { Time.now }
+    listed { true }
+    primary_language { "en" }
+    urls { [{"label" => "0.label", "url" => "http://blog.example.com/"}, {"label" => "1.label", "url" => "http://twitter.com/example"}] }
+    categories { %w(bugs fossils plants) }
 
-    description "This is the description for an Organization"
-    introduction "This is the intro for an Organization"
-    announcement "Alert: This organization has something to let you know"
-    url_labels({"0.label" => "Blog", "1.label" => "Twitter"})
+    description { "This is the description for an Organization" }
+    introduction { "This is the intro for an Organization" }
+    announcement { "Alert: This organization has something to let you know" }
+    url_labels { {"0.label" => "Blog", "1.label" => "Twitter"} }
 
     association :owner, factory: :user
 
@@ -27,8 +27,8 @@ FactoryBot.define do
     end
 
     factory :unlisted_organization do
-      listed_at nil
-      listed false
+      listed_at { nil }
+      listed { false }
     end
   end
 end

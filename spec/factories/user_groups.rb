@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :user_group do
     sequence(:name){ |n| "user_group_#{ n }" }
     display_name{ name.try :titleize }
-    activated_state :active
+    activated_state { :active }
 
     transient do
       admin { nil }

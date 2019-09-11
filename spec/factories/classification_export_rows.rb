@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :classification_export_row do
     transient do
-      classification nil
+      classification { nil }
     end
 
     after(:build) do |row, env|

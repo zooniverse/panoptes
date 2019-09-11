@@ -1,27 +1,29 @@
 FactoryBot.define do
   factory :user do
     transient do
-      build_group true
+      build_group { true }
     end
 
-    hash_func 'bcrypt'
+    hash_func { 'bcrypt' }
     sequence(:email) {|n| "example#{n}@example.com"}
-    password 'password'
+    password { 'password' }
     encrypted_password { User.new.send(:password_digest, 'password') }
-    credited_name 'Dr User'
-    activated_state :active
+    credited_name { 'Dr User' }
+    activated_state { :active }
     sequence(:login) { |n| "new_user_#{n}" }
     display_name{ login.try(:titleize) || login }
-    global_email_communication true
-    project_email_communication true
-    beta_email_communication true
-    admin false
-    banned false
+    global_email_communication { true }
+    project_email_communication { true }
+    beta_email_communication { true }
+    admin { false }
+    banned { false }
 
     after(:build) do |u, env|
       if env.build_group
         u.identity_group = build(:user_group, name: u.login)
         u.identity_membership = build(:membership, user: u, user_group: u.identity_group, state: 0, identity: true, roles: ["group_admin"])
+        # ensure we link the identity group to the idenity membership build strategy
+        u.identity_group.identity_membership = u.identity_membership
       end
     end
 
@@ -32,14 +34,14 @@ FactoryBot.define do
     end
 
     trait :languages do
-      languages ['en', 'es', 'fr-ca']
+      languages { ['en', 'es', 'fr-ca'] }
     end
 
     factory :insecure_user do
       # hash_func 'sha1' # hash func is not set via build / create
       # password 'tajikistan' # password will set the hash_func to bcrypt
-      encrypted_password 'zKUhbXyjCsgmcv6Fh5rQiHTzJWI='
-      password_salt 'nK5bXjD2YS7LSYndVJNGGdY='
+      encrypted_password { 'zKUhbXyjCsgmcv6Fh5rQiHTzJWI=' }
+      password_salt { 'nK5bXjD2YS7LSYndVJNGGdY=' }
     end
 
     factory :project_owner do
@@ -63,13 +65,13 @@ FactoryBot.define do
     end
 
     factory :inactive_user do
-      activated_state :inactive
-      login 'deleted_user'
-      email 'deleted_user@zooniverse.org'
+      activated_state { :inactive }
+      login { 'deleted_user' }
+      email { 'deleted_user@zooniverse.org' }
     end
 
     factory :admin_user do
-      admin true
+      admin { true }
     end
 
     factory :user_with_uploaded_subjects do
@@ -80,8 +82,8 @@ FactoryBot.define do
     end
 
     factory :ouroboros_created_user do
-      build_group false
-      ouroboros_created true
+      build_group { false }
+      ouroboros_created { true }
     end
   end
 
@@ -89,14 +91,16 @@ FactoryBot.define do
     sequence(:login) { |n| "new_user_#{n}" }
     display_name{ login }
     sequence(:email) {|n| "example#{n}@example.com"}
-    password 'password'
-    credited_name 'Dr New User'
-    activated_state :active
-    languages ['en', 'es', 'fr-ca']
+    password { 'password' }
+    credited_name { 'Dr New User' }
+    activated_state { :active }
+    languages { ['en', 'es', 'fr-ca'] }
 
     after(:build) do |u|
       u.identity_group = build(:user_group, display_name: u.login)
       u.identity_membership = build(:membership, user: u, user_group: u.identity_group, state: 0, identity: true, roles: ["group_admin"])
+      # ensure we link the identity group to the idenity membership build strategy
+      u.identity_group.identity_membership = u.identity_membership
       create_list(:authorization, 1, user: u, provider: 'facebook', uid: '12345')
     end
   end

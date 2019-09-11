@@ -306,6 +306,8 @@ describe ClassificationLifecycle do
   end
 
   describe "#update_seen_subjects" do
+    let(:classification) { create(:classification) }
+
     context "with a user" do
       it 'should call the worker to add the subject_id to the seen subjects' do
         expect(UserSeenSubjectsWorker)
@@ -388,6 +390,7 @@ describe ClassificationLifecycle do
   end
 
   describe "#queue_associated_workers" do
+    let(:classification) { create(:classification) }
 
     it "should call process_project_preference" do
       expect(subject).to receive(:process_project_preference)
@@ -408,10 +411,12 @@ describe ClassificationLifecycle do
       expect(subject).to receive(:create_export_row)
       subject.queue_associated_workers
     end
+
     it "should call notify_subject_selector" do
       expect(subject).to receive(:notify_subject_selector)
       subject.queue_associated_workers
     end
+
     it "should call update_counters" do
       expect(subject).to receive(:update_counters)
       subject.queue_associated_workers
@@ -485,6 +490,7 @@ describe ClassificationLifecycle do
     end
 
     it "should add all other groups a user is currently in" do
+      classification.save
       group1 = create :user_group
       group2 = create :user_group
       classification.user.memberships.create! user_group: group1, state: 'active'
@@ -495,6 +501,7 @@ describe ClassificationLifecycle do
     end
 
     it 'should not add groups with inactive memberships' do
+      classification.save
       classification.user.memberships.create! user_group: create(:user_group), state: 'inactive'
 
       subject.add_user_groups

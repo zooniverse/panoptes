@@ -1,13 +1,13 @@
 FactoryBot.define do
   factory :subject_set do
     transient do
-      num_workflows 1
-      num_subjects 2
+      num_workflows { 1 }
+      num_subjects { 2 }
     end
 
     sequence(:display_name) { |n| "Subject Set #{n}" }
 
-    metadata({ just_some: "stuff" })
+    metadata { { just_some: "stuff" } }
     project
 
     after(:create) do |ss, evaluator|

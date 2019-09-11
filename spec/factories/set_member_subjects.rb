@@ -8,7 +8,7 @@ FactoryBot.define do
     end
 
     transient do
-      setup_subject_workflow_statuses false
+      setup_subject_workflow_statuses { false }
     end
 
     after(:create) do |sms, env|
