@@ -433,10 +433,10 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.5)
-    versionist (1.7.0)
+    versionist (2.0.1)
       activesupport (>= 3)
       railties (>= 3)
-      yard (~> 0.9.11)
+      yard (~> 0.9.20)
     warden (1.2.7)
       rack (>= 1.0)
     yard (0.9.20)
@@ -516,7 +516,7 @@ DEPENDENCIES
   strong_migrations
   therubyracer (~> 0.12)
   uglifier (~> 4.1)
-  versionist (~> 1.6)
+  versionist (~> 2.0)
   zoo_stream (~> 1.0.1)
 
 BUNDLED WITH
