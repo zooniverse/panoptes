@@ -54,6 +54,9 @@ app = Doorkeeper::Application.create do |da|
   da.redirect_uri = 'urn:ietf:wg:oauth:2.0:oob'
   # zooniverse first-party app
   da.trust_level = 2
+  # ensure this special first_party app is not confidential
+  # see https://github.com/zooniverse/Panoptes/pull/2847
+  da.confidential = false
   #scoped resources this app has access to
   scopes = [:public] | Doorkeeper::Panoptes::Scopes.optional
   da.default_scope = scopes.map(&:to_s)
