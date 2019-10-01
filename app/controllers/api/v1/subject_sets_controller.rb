@@ -113,12 +113,9 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
   def destroy_relation(resource, relation, value)
     if relation == :subjects
-      linked_subject_ids = value.split(',').map(&:to_i)
-      set_member_subjects = resource.set_member_subjects.where(subject_id: linked_subject_ids)
+      linked_sms_ids = value.split(',').map(&:to_i)
+      set_member_subjects = resource.set_member_subjects.where(subject_id: linked_sms_ids)
       remove_linked_set_member_subjects(set_member_subjects)
-      linked_subject_ids.each_with_index do |subject_id, index|
-        SubjectRemovalWorker.perform_in(index.seconds, subject_id)
-      end
     else
       super
     end
