@@ -381,15 +381,6 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
 
       it_behaves_like "cleans up the linked set member subjects"
-
-      it 'should call the subject removal worker' do
-        sms.map(&:subject_id).each_with_index do |subject_id, index|
-          expect(SubjectRemovalWorker)
-            .to receive(:perform_in)
-            .with(index.seconds, subject_id)
-        end
-        delete_resources
-      end
     end
   end
 end
