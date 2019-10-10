@@ -54,7 +54,7 @@ gem 'standby'
 gem 'stringex', '~> 2.8'
 gem 'therubyracer', '~> 0.12'
 gem 'uglifier', '~> 4.1'
-gem 'versionist', '~> 1.6'
+gem 'versionist', '~> 2.0'
 gem 'zoo_stream', '~> 1.0.1'
 
 group :production, :staging do
