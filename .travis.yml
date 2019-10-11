@@ -8,6 +8,8 @@ before_install:
   - find spec -maxdepth 1 -type d | grep spec/ > tmp/curr_spec_dirs.txt
   - if grep -Fxvc -f spec/known_dirs.txt tmp/curr_spec_dirs.txt; then echo 'Detected unkown Spec directories, check the spec/known_dirs.txt!'; exit 1; fi
   - 'echo ''gem: --no-ri --no-rdoc'' > ~/.gemrc'
+  - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
+  - gem install bundler -v '< 2'
 
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
@@ -17,22 +19,25 @@ before_script: &before_script
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - rvm: 2.6
   include:
-    - rvm: 2.4
+    - rvm: 2.5
       env:
         - SPECS=spec/controllers/api/v1/[a-m]*.rb
-    - rvm: 2.4
+    - rvm: 2.5
       env:
         - SPECS=spec/controllers/api/v1/[n-s]*.rb
-    - rvm: 2.4
+    - rvm: 2.5
       env:
         - SPECS=spec/controllers/api/v1/[t-z]*.rb
-    - rvm: 2.4
+    - rvm: 2.5
       env:
         - SPECS="spec/controllers/**.rb spec/controllers/api/*.rb spec/models spec/operations spec/counters spec/routes"
-    - rvm: 2.4
+    - rvm: 2.5
       env:
         - SPECS="spec/lib spec/workers spec/serializers spec/services spec/requests spec/middleware spec/mailers spec/policies"
+    - rvm: 2.6
 
 services:
   - postgresql

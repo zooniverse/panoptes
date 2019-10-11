@@ -1,4 +1,4 @@
-FROM ruby:2.4-stretch
+FROM ruby:2.5-stretch
 
 WORKDIR /rails_app
 
