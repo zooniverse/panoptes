@@ -4,16 +4,26 @@ RSpec.describe SubjectMetadataWorker do
   let(:user) { create :user }
   let(:project) { create :project_with_workflow, owner: user }
   let(:workflow) { project.workflows.first }
+  let(:subject_one) do
+    create(:subject, project: project, uploader: project.owner, metadata: {'#priority'=>1/3.0})
+  end
+  let(:subject_two) do
+    create(:subject, project: project, uploader: project.owner, metadata: {'#priority'=>'2'})
+  end
   let(:subject_set) do
-    create(:subject_set_with_subjects, num_subjects: 3, project: project, workflows: [workflow])
+    create(
+      :subject_set_with_subjects,
+      num_subjects: 1,
+      project: project,
+      workflows: [workflow],
+      subjects: [subject_one, subject_two]
+    )
   end
 
   subject(:worker) { SubjectMetadataWorker.new }
 
   before do
-    subject_set.subjects[0].metadata['#priority'] = 1/3.0
-    subject_set.subjects[1].metadata['#priority'] = "2"
-    subject_set.subjects.map(&:save)
+    subject_set.subjects.reload
   end
 
   describe "#perform" do
