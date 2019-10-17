@@ -12,7 +12,7 @@ namespace :translations do
       # get the current resource primary language strings
       translated_strings = TranslationStrings.new(resource).extract
       # make sure they end up in a translation model with the correct version resources
-      translation.update_strings_and_versions(translated_strings, translated_resource.latest_version_id)
+      translation.update_strings_and_versions(translated_strings, resource.latest_version_id)
       translation.save!
     else
       false
