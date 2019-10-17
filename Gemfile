@@ -68,6 +68,10 @@ group :development, :test do
   gem 'pry-rails'
   gem 'pry-stack_explorer'
   gem 'spring'
+  gem 'rubocop'
+  gem 'rubocop-rspec'
+  gem 'rubocop-rails'
+  gem 'rubocop-performance'
 end
 
 group :test do
