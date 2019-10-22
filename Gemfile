@@ -67,11 +67,11 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'pry-stack_explorer'
-  gem 'spring'
   gem 'rubocop'
-  gem 'rubocop-rspec'
-  gem 'rubocop-rails'
   gem 'rubocop-performance'
+  gem 'rubocop-rails'
+  gem 'rubocop-rspec'
+  gem 'spring'
 end
 
 group :test do
