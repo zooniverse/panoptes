@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples 'cors headers' do
   it 'should have Access-Control-Allow-Origin header' do
-    expect(response.headers).to include('Access-Control-Allow-Origin' => 'example.com')
+    expect(response.headers).to include('Access-Control-Allow-Origin' => '*')
   end
 
   it 'should have Access-Control-Expose-Headers header' do
@@ -26,11 +26,17 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
   include APIRequestHelpers
 
   let(:user) { create(:user) }
+  let(:request_headers) do
+    {
+      'HTTP_ACCEPT' => 'application/vnd.api+json; version=1',
+      'HTTP_ORIGIN' => 'example.com'
+    }
+  end
 
   describe "non-error requests" do
     before(:each) do
       allow_any_instance_of(Api::ApiController).to receive(:doorkeeper_token).and_return(token(["public", "user"], user.id))
-      get "/api/users/#{user.id}", nil, { "HTTP_ACCEPT" => "application/vnd.api+json; version=1", "HTTP_ORIGIN" => "example.com" }
+      get "/api/users/#{user.id}", nil, request_headers
     end
 
     it { expect(response).to have_http_status(:ok) }
@@ -41,7 +47,7 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
   describe "4xx erro requests" do
     context "401 request" do
       before(:each) do
-        delete "/api/users/#{user.id}", nil, { "HTTP_ACCEPT" => "application/vnd.api+json; version=1", "HTTP_ORIGIN" => "example.com" }
+        delete "/api/users/#{user.id}", nil, request_headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -52,7 +58,7 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
     context "404 request" do
       before(:each) do
         allow_any_instance_of(Api::ApiController).to receive(:doorkeeper_token).and_return(token(["public", "user"], user.id))
-        get "/api/users/asdfasdf", nil, { "HTTP_ACCEPT" => "application/vnd.api+json; version=1", "HTTP_ORIGIN" => "example.com" }
+        get '/api/users/asdfasdf', nil, request_headers
       end
 
       it { expect(response).to have_http_status(:not_found) }
