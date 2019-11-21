@@ -16,7 +16,6 @@ RUN apt-get update && apt-get -y upgrade && \
     libpq-dev \
     postgresql-client-9.4 \
     tmpreaper \
-    libjemalloc1 \
     && \
     apt-get clean
 
