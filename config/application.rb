@@ -37,7 +37,8 @@ module Panoptes
             headers: Panoptes.cors_config.headers,
             methods: Panoptes.cors_config.request_methods,
             expose: Panoptes.cors_config.expose,
-            max_age: Panoptes.cors_config.max_age
+            max_age: Panoptes.cors_config.max_age,
+            credentials: allow_config["credentials"]
         end
       end
     end
