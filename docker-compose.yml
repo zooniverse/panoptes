@@ -1,5 +1,5 @@
 postgres:
-  image: postgres:9.4
+  image: postgres:9.5
   environment:
     - "POSTGRES_USER=panoptes"
     - "POSTGRES_PASSWORD=panoptes"
@@ -9,24 +9,6 @@ postgres:
 redis:
   image: redis
   command: redis-server --appendonly yes
-  # ports:
-  #   - "6379:6379"
-
-cellect:
-  image: zooniverse/cellect-panoptes
-  ports:
-    - "4000:80"
-  environment:
-    - "RACK_ENV=development"
-    #cellect registers a hostname but no port, so we need prod port 80
-    - "PUMA_PORT=80"
-    - "PUMA_MAX_THREADS=16"
-    - "DEBUG_CELLECT_START=true"
-    - "DATABASE_URL=postgresql://panoptes:panoptes@pg:5432/panoptes_development?pool=16"
-    - "ATTENTION_REDIS_URL=redis://redis:6379/1"
-  links:
-    - redis
-    - postgres:pg
 
 gem_cache:
   image: busybox
