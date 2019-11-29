@@ -4,7 +4,11 @@ default: &default
   expose: [ ETag, X-CSRF-Token ]
   max_age: 300
   allows:
-    - {origins: '*', resource: '*'}
+    - { origins: !ruby/regexp '/^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local)(:\d+)?$/', resource: '/users*', credentials: true }
+    - { origins: !ruby/regexp '/^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local)(:\d+)?$/', resource: '/oauth/*', credentials: true }
+    - { origins: '*', resource: '/api/*' }
+    - { origins: '*', resource: '/graphql' }
+
 
 development:
   <<: *default
