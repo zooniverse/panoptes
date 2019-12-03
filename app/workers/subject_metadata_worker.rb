@@ -2,8 +2,10 @@ class SubjectMetadataWorker
   include Sidekiq::Worker
 
   def perform(subject_set_id)
-    # allow this feature to be turned off while we debug the update queries
-    # taking a long time to run with DB CPU spikes and blocking the worker queues
+    # add feature flag for runtime behaviour change
+    # sometimes this update query takes minutes to run
+    # the DB CPU spikes and queues are blocked
+    # with these workers
     return if Panoptes.flipper[:skip_subject_metadata_worker].enabled?
 
     if ActiveRecord::VERSION::MAJOR == 5
