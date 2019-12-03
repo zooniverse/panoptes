@@ -27,6 +27,13 @@ RSpec.describe SubjectMetadataWorker do
   end
 
   describe "#perform" do
+    it 'skips any work when the feature flag is on' do
+      Panoptes.flipper[:skip_subject_metadata_worker].enable
+      allow(ActiveRecord::Base).to receive(:connection)
+      worker.perform(subject_set.id)
+      expect(ActiveRecord::Base).not_to have_received(:connection)
+    end
+
     # TODO: Rails 5 combine the tests to one
     # to test behaviour not AR calling interface
     it 'calls the correct RAILS 5 AR methods' do
