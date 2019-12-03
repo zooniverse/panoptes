@@ -38,7 +38,7 @@ RSpec.describe SubjectMetadataWorker do
         .to receive(:exec_update)
         .with(
           instance_of(String),
-          "SQL",
+          'SQL',
           [[nil, subject_set.id], [nil, subject_ids_from_set]]
         )
       worker.perform(subject_set.id, subject_ids_from_set)

@@ -15,7 +15,7 @@ class SubjectMetadataWorker
       SQL
       ActiveRecord::Base.connection.exec_update(
         update_sms_priority_sql,
-        "SQL",
+        'SQL',
         [[nil, subject_set_id], [nil, subject_ids]]
       )
     else
@@ -40,7 +40,7 @@ class SubjectMetadataWorker
       )
       ActiveRecord::Base.connection.exec_update(
         bound_update_sms_priority_sql,
-        "SQL",
+        'SQL',
         []
       )
     end
