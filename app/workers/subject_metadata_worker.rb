@@ -2,6 +2,8 @@ class SubjectMetadataWorker
   include Sidekiq::Worker
 
   def perform(sms_ids)
+    return if Panoptes.flipper[:skip_subject_metadata_worker].enabled?
+
     if ActiveRecord::VERSION::MAJOR == 5
       update_sms_priority_sql = <<-SQL
         UPDATE set_member_subjects
