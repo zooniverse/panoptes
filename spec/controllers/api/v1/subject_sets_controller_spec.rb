@@ -157,7 +157,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
       it "should queue the SMS metadata worker" do
         expect(SubjectMetadataWorker)
           .to receive(:perform_async)
-          .with(kind_of(Numeric))
+          .with(subjects.map(&:id))
         run_update_links
       end
 
