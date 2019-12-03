@@ -19,8 +19,8 @@ RSpec.describe SubjectMetadataWorker do
       subjects: [subject_one, subject_two]
     )
   end
-  let(:subject_ids_from_set) do
-    subject_set.subject_ids
+  let(:set_member_subject_ids) do
+    subject_set.set_member_subject_ids
   end
 
   subject(:worker) { SubjectMetadataWorker.new }
@@ -39,13 +39,13 @@ RSpec.describe SubjectMetadataWorker do
         .with(
           instance_of(String),
           'SQL',
-          [[nil, subject_set.id], [nil, subject_ids_from_set]]
+          [[nil, set_member_subject_ids]]
         )
-      worker.perform(subject_set.id, subject_ids_from_set)
+      worker.perform(set_member_subject_ids)
     end
 
     it 'copies priority from metadata to SMS attribute' do
-      worker.perform(subject_set.id, subject_ids_from_set)
+      worker.perform(set_member_subject_ids)
       sms_one, sms_two, sms_three = SetMemberSubject.find(
         subject_set.set_member_subject_ids
       ).sort_by(&:id)
