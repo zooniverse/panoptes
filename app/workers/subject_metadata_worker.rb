@@ -2,6 +2,10 @@ class SubjectMetadataWorker
   include Sidekiq::Worker
 
   def perform(subject_set_id)
+    # allow this feature to be turned off while we debug the update queries
+    # taking a long time to run with DB CPU spikes and blocking the worker queues
+    return if Panoptes.flipper[:skip_subject_metadata_worker].enabled?
+
     if ActiveRecord::VERSION::MAJOR == 5
       update_sms_priority_sql = <<-SQL
         UPDATE set_member_subjects
