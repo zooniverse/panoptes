@@ -273,7 +273,7 @@ GEM
     orm_adapter (0.5.0)
     p3p (2.0.0)
       rack (>= 1.6.2)
-    panoptes-client (1.0.0.pre)
+    panoptes-client (1.0.0.pre1)
       deprecate
       faraday
       faraday-panoptes (~> 0.3.0)
@@ -510,7 +510,7 @@ DEPENDENCIES
   omniauth-facebook (~> 5.0)
   omniauth-google-oauth2
   p3p (~> 2.0)
-  panoptes-client (= 1.0.0.pre)
+  panoptes-client (~> 1.0.0.pre1)
   pg (~> 0.21)
   pg_search
   pry-byebug
