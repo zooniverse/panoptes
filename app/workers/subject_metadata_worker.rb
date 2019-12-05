@@ -11,7 +11,6 @@ class SubjectMetadataWorker
         FROM   subjects
         WHERE  subjects.id = set_member_subjects.subject_id
         AND    subjects.metadata ? '#priority'
-        AND    set_member_subjects.priority IS NULL
         AND    set_member_subjects.id IN $1
       SQL
       ActiveRecord::Base.connection.exec_update(
@@ -26,7 +25,6 @@ class SubjectMetadataWorker
         FROM   subjects
         WHERE  subjects.id = set_member_subjects.subject_id
         AND    subjects.metadata ? '#priority'
-        AND    set_member_subjects.priority IS NULL
         AND    set_member_subjects.id IN (:sms_ids)
       SQL
       # handle incorrect bind params for non preparted statements
