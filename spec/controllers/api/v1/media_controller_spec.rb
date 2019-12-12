@@ -251,7 +251,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           expect(json_response["media"][0]["src"]).to eq(new_resource.put_url)
         end
 
-        describe "uploding externally hosted media resources" do
+        describe 'uploading externally hosted media resources' do
           let(:external_media_payload) do
             {
               media: {
