@@ -13,6 +13,10 @@ class MediumCreateSchema < JsonSchema
       type "boolean"
     end
 
+    property "src" do
+      type "string"
+    end
+
     property "metadata" do
       type "object"
     end
