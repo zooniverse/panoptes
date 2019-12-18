@@ -45,8 +45,4 @@ class SubjectWorkflowStatus < ActiveRecord::Base
   def retired?
     retired_at.present?
   end
-
-  def set_member_subject_ids
-    set_member_subjects.pluck(:id)
-  end
 end
