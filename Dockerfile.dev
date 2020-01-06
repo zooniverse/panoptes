@@ -28,6 +28,4 @@ RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xa
 ADD supervisord.conf.dev /etc/supervisor/conf.d/panoptes.conf
 ADD ./ /rails_app
 
-EXPOSE 80
-
 ENTRYPOINT /rails_app/scripts/docker/start.sh
