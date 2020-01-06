@@ -1,35 +1,33 @@
-postgres:
-  image: postgres:9.5
-  environment:
-    - "POSTGRES_USER=panoptes"
-    - "POSTGRES_PASSWORD=panoptes"
-  ports:
-    - "5432:5432"
+version: '3'
+services:
+  postgres:
+    image: postgres:9.5
+    environment:
+      - "POSTGRES_USER=panoptes"
+      - "POSTGRES_PASSWORD=panoptes"
+    ports:
+      - "5432:5432"
 
-redis:
-  image: redis
-  command: redis-server --appendonly yes
+  redis:
+    image: redis
+    command: redis-server --appendonly yes
 
-gem_cache:
-  image: busybox
-  volumes:
-    - /gem_cache
+  panoptes:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./:/rails_app
+      - gem_cache:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    environment:
+      - "RAILS_ENV=development"
+      - "ATTENTION_REDIS_URL=redis://redis:6379/1"
+      - "DISABLE_SPRING=true"
+    links:
+      - redis:redis
+      - postgres:pg
 
-panoptes:
-  dockerfile: Dockerfile.dev
-  build: ./
-  volumes:
-    - ./:/rails_app
-  volumes_from:
-    - gem_cache
-  ports:
-    - "3000:3000"
-  environment:
-    - "RAILS_ENV=development"
-    - "ATTENTION_REDIS_URL=redis://redis:6379/1"
-    - "BUNDLE_PATH=/gem_cache"
-    - "BUNDLE_BIN=/gem_cache/bin"
-    - "DISABLE_SPRING=true"
-  links:
-    - redis:redis
-    - postgres:pg
+volumes:
+  gem_cache:
