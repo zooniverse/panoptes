@@ -43,9 +43,8 @@ module Panoptes
       end
     end
 
-    config.middleware.use Flipper::Middleware::Memoizer, lambda {
-      Panoptes.flipper
-    }
+    config.middleware.use Flipper::Middleware::SetupEnv, -> { Panoptes.flipper }
+    config.middleware.use Flipper::Middleware::Memoizer
 
     if cache_client = Panoptes::ElastiCache.client
       config.cache_store = :dalli_store, cache_client.servers, Panoptes::ElastiCache.options
