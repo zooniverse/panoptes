@@ -10,7 +10,7 @@ class SubjectMetadataWorker
     if ActiveRecord::VERSION::MAJOR == 5
       run_ar5_update
     else
-      run_ar_4_update
+      run_ar4_update
     end
   end
 
@@ -42,7 +42,7 @@ class SubjectMetadataWorker
     )
   end
 
-  def run_ar_4_update
+  def run_ar4_update
     update_sms_priority_sql =
       <<-SQL
         UPDATE set_member_subjects
