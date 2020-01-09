@@ -60,5 +60,12 @@ RSpec.describe SubjectMetadataWorker do
       expect(sms_two.priority).to eq(2)
       expect(sms_three.priority).to be_nil
     end
+
+    it 'raises not found if the SMS resources do not exist' do
+      non_existant_ids = (1..3).to_a - set_member_subject_ids
+      expect {
+        worker.perform(non_existant_ids)
+      }.to raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 end
