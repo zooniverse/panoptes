@@ -26,6 +26,10 @@ Rails.application.configure do
   config.assets.js_compressor = Uglifier.new(harmony: true)
   # config.assets.css_compressor = :sass
 
+  # use a non-default path to provide unique paths for use behind CDNs
+  # E.g. avoid clashes with the PFE UI code uses as it uses '/assets'
+  config.assets.prefix = '/api-assets'
+
   # Do not fallback to assets pipeline if a precompiled asset is missed.
   config.assets.compile = false
 
