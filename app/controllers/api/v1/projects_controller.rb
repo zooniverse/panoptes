@@ -25,6 +25,8 @@ class Api::V1::ProjectsController < Api::ApiController
                  :avatar_src,
                  :classifications_count,
                  :updated_at,
+                 :state,
+                 :completeness,
                  :launch_approved].freeze
 
   prepend_before_action :require_login,
