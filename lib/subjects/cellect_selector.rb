@@ -45,7 +45,7 @@ module Subjects
     end
 
     def self.client
-      @client ||= CellectClient
+      @client ||= CellectClient.new
     end
   end
 end

@@ -2,165 +2,120 @@ require "spec_helper"
 
 RSpec.describe CellectClient do
   let(:cellect_host) { 'example.com' }
-  before(:each) do
-    stub_cellect_connection
-    stub_redis_connection
-  end
+  let(:cellect_request) { instance_double(CellectClient::Request) }
 
-  def raise_error_for(method, times=1)
-    counter = 0
-    allow(Cellect::Client.connection).to receive(method) do
-      (counter += 1) <= times ? raise(StandardError) : true
-    end
+  before do
+    allow(CellectClient::Request).to receive(:new).and_return(cellect_request)
   end
 
   describe "#add_seen" do
     it 'should call the method on the cellect client' do
-      expect(Cellect::Client.connection).to receive(:add_seen)
-                                             .with(host: cellect_host,
-                                                   workflow_id: 1,
-                                                   user_id: 2,
-                                                   subject_id: 4)
-      CellectClient.add_seen(1, 2, 4)
-    end
-
-    it 'should try a new host if the first request fails' do
-      raise_error_for(:add_seen)
-      expect(Cellect::Client.connection).to receive(:add_seen)
-                                             .with(host: cellect_host,
-                                                   workflow_id: 1,
-                                                   user_id: 2,
-                                                   subject_id: 4)
-      CellectClient.add_seen(1, 2, 4)
-    end
-
-    it 'should only retry once' do
-      raise_error_for(:add_seen, 2)
-      expect do
-        CellectClient.add_seen(1, 2, 4)
-      end.to raise_error(
-        CellectClient::ConnectionError,
-        "Cellect can't reach the server"
-      )
+      expect(cellect_request)
+        .to receive(:request)
+        .with(:put, ['/workflows/1/users/2/add_seen', { subject_id: 4 }])
+      described_class.add_seen(1, 2, 4)
     end
   end
 
   describe "#load_user" do
     it 'should call the method on the cellect client' do
-      expect(Cellect::Client.connection).to receive(:load_user)
-                                             .with(host: cellect_host,
-                                                   workflow_id: 1,
-                                                   user_id: 2)
-      CellectClient.load_user(1, 2)
-    end
-
-    it 'should try a new host if the first request fails' do
-      counter = 0
-      allow(Cellect::Client.connection).to receive(:load_user) do
-        (counter += 1) == 1 ? raise(StandardError) : true
-      end
-
-      expect(Cellect::Client.connection).to receive(:load_user)
-                                             .with(host: cellect_host,
-                                                   workflow_id: 1,
-                                                   user_id: 2)
-      CellectClient.load_user(1, 2)
-    end
-
-    it 'should retry four times' do
-      counter = 0
-      allow(Cellect::Client.connection).to receive(:load_user) do
-        (counter += 1) < 4 ? raise(StandardError) : true
-      end
-      CellectClient.load_user(1, 2)
-      expect(counter).to eq(4)
+      expect(cellect_request)
+        .to receive(:request)
+        .with(:post, '/workflows/1/users/2/load')
+      described_class.load_user(1, 2)
     end
   end
 
   describe "#remove_subject" do
     it 'should call the method on the cellect client' do
-      expect(Cellect::Client.connection).to receive(:remove_subject)
-                                             .with(1,
-                                                   workflow_id: 2,
-                                                   group_id: 4)
-      CellectClient.remove_subject(1, 2, 4)
-    end
-
-    it 'should try a new host if the first request fails' do
-      counter = 0
-      allow(Cellect::Client.connection).to receive(:remove_subject) do
-        (counter += 1) == 1 ? raise(StandardError) : true
-      end
-      expect(Cellect::Client.connection).to receive(:remove_subject)
-                                             .with(1,
-                                                   workflow_id: 2,
-                                                   group_id: 4)
-      CellectClient.remove_subject(1, 2, 4)
+      expect(cellect_request)
+        .to receive(:request)
+        .with(:put, ['/workflows/2/remove', {subject_id: 1, group_id: 4}])
+      described_class.remove_subject(1, 2, 4)
     end
   end
 
   describe "#get_subjects" do
-    it 'should call the method on the cellect client' do
-      expect(Cellect::Client.connection).to receive(:get_subjects)
-                                             .with(host: cellect_host,
-                                                   workflow_id: 1,
-                                                   user_id: 2,
-                                                   group_id: nil,
-                                                   limit: 4)
-      CellectClient.get_subjects(1, 2, nil, 4)
-    end
-
-    it 'should try a new host if the first request fails' do
-      counter = 0
-      allow(Cellect::Client.connection).to receive(:get_subjects) do
-        (counter += 1) == 1 ? raise(StandardError) : true
-      end
-      expect(Cellect::Client.connection).to receive(:get_subjects)
-                                             .with(host: cellect_host,
-                                                   workflow_id: 1,
-                                                   user_id: 2,
-                                                   group_id: nil,
-                                                   limit: 4)
-      CellectClient.get_subjects(1, 2, nil, 4)
-    end
-
-    #applies to all RequestToHost methods
-    context "when cellect session cant choose a host due to redis error" do
-      [Redis::CannotConnectError, Timeout::Error, Redis::TimeoutError].each do |error|
-        it 'should raise a connection error' do
-          allow_any_instance_of(Subjects::CellectSession)
-            .to receive(:host)
-            .and_raise(error)
-          expect do
-            CellectClient.get_subjects(1, 2, nil, 4)
-          end.to raise_error(
-            CellectClient::ConnectionError,
-           "Cellect can't find a server host"
-          )
-        end
-      end
-    end
-
-    #applies to all RequestToHost methods
-    context "when cellect session raises no host error" do
-      it 'should raise a connection error' do
-        allow_any_instance_of(Subjects::CellectSession)
-          .to receive(:host)
-          .and_raise(Subjects::CellectSession::NoHostError)
-        expect do
-          CellectClient.get_subjects(1, 2, nil, 4)
-        end.to raise_error(
-          CellectClient::ConnectionError,
-         "Cellect can't find a server host"
-        )
-      end
+    it 'should call the method on the cellect client' do\
+      params = { user_id: 2, group_id: nil, limit: 4 }
+      expect(cellect_request)
+        .to receive(:request)
+        .with(:get, ['/workflows/1', params])
+      described_class.get_subjects(1, 2, nil, 4)
     end
   end
 
   describe "::reload_workflow" do
     it 'should call the method on the cellect client' do
-      expect(Cellect::Client.connection).to receive(:reload_workflow).with(1)
-      CellectClient.reload_workflow(1)
+      expect(cellect_request)
+        .to receive(:request)
+        .with(:post, '/workflows/1/reload')
+      described_class.reload_workflow(1)
+    end
+  end
+end
+
+RSpec.describe CellectClient::Request do
+  let(:host) { 'test.example.com' }
+  let(:url) { "https://#{host}" }
+
+  describe '#request' do
+    let(:headers) { {"Content-Type" => "application/json", "Accept" => "application/json"} }
+
+    it 'sends get request to the remote host' do
+      path = '/api/path/on/host'
+      host_url_path = "#{url}#{path}"
+      response_data = [1, 2, 3, 4]
+      stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+        stub.get(path, headers) do |env|
+          [200, {'Content-Type' => 'application/json'}, response_data.to_json]
+        end
+      end
+
+      result = described_class.new([:test, stubs], url).request(:get, host_url_path)
+      expect(result).to eq(response_data)
+    end
+  end
+
+  describe 'handles server errors' do
+    it "raises if it can't connect" do
+      stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+        stub.get(url) do |env|
+          raise Faraday::ConnectionFailed.new('execution expired')
+        end
+      end
+
+      expect do
+        described_class.new([:test, stubs], url).request(:get, [])
+      end.to raise_error(CellectClient::Request::GenericError)
+    end
+
+    it 'raises if it times out' do
+      stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+        stub.post(url) do |env|
+          raise Faraday::TimeoutError
+        end
+      end
+
+      expect do
+        described_class.new([:test, stubs], url).request(:post, [])
+      end.to raise_error(CellectClient::Request::GenericError)
+    end
+
+    it 'raises if response is an HTTP 500' do
+      stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+        stub.put(url) do |env|
+          [
+            500,
+            { 'Content-Type' => 'application/json' },
+            { 'errors' => { 'detail' => 'Server internal error' } }.to_json
+          ]
+        end
+      end
+
+      expect do
+        described_class.new([:test, stubs], url).request(:put, [])
+      end.to raise_error(CellectClient::Request::ServerError)
     end
   end
 end
