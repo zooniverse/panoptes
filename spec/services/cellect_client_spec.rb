@@ -8,8 +8,8 @@ RSpec.describe CellectClient do
     allow(CellectClient::Request).to receive(:new).and_return(cellect_request)
   end
 
-  describe "#add_seen" do
-    it 'should call the method on the cellect client' do
+  describe '::add_seen' do
+    it 'calls the method on the cellect client' do
       expect(cellect_request)
         .to receive(:request)
         .with(:put, ['/workflows/1/users/2/add_seen', { subject_id: 4 }])
@@ -17,8 +17,8 @@ RSpec.describe CellectClient do
     end
   end
 
-  describe "#load_user" do
-    it 'should call the method on the cellect client' do
+  describe '::load_user' do
+    it 'calls the method on the cellect client' do
       expect(cellect_request)
         .to receive(:request)
         .with(:post, '/workflows/1/users/2/load')
@@ -26,8 +26,8 @@ RSpec.describe CellectClient do
     end
   end
 
-  describe "#remove_subject" do
-    it 'should call the method on the cellect client' do
+  describe '::remove_subject' do
+    it 'calls the method on the cellect client' do
       expect(cellect_request)
         .to receive(:request)
         .with(:put, ['/workflows/2/remove', {subject_id: 1, group_id: 4}])
@@ -35,8 +35,8 @@ RSpec.describe CellectClient do
     end
   end
 
-  describe "#get_subjects" do
-    it 'should call the method on the cellect client' do\
+  describe '::get_subjects' do
+    it 'calls the method on the cellect client' do\
       params = { user_id: 2, group_id: nil, limit: 4 }
       expect(cellect_request)
         .to receive(:request)
@@ -45,8 +45,8 @@ RSpec.describe CellectClient do
     end
   end
 
-  describe "::reload_workflow" do
-    it 'should call the method on the cellect client' do
+  describe '::reload_workflow' do
+    it 'calls the method on the cellect client' do
       expect(cellect_request)
         .to receive(:request)
         .with(:post, '/workflows/1/reload')
@@ -60,7 +60,12 @@ RSpec.describe CellectClient::Request do
   let(:url) { "https://#{host}" }
 
   describe '#request' do
-    let(:headers) { {"Content-Type" => "application/json", "Accept" => "application/json"} }
+    let(:headers) {
+      {
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json'
+      }
+    }
 
     it 'sends get request to the remote host' do
       path = '/api/path/on/host'
