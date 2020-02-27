@@ -74,7 +74,7 @@ RSpec.describe CellectClient::Request do
       host_url_path = "#{url}#{path}"
       response_data = [1, 2, 3, 4]
       stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-        stub.get(path, headers) do |env|
+        stub.get(path, headers) do
           [200, { 'Content-Type' => 'application/json' }, response_data.to_json]
         end
       end
