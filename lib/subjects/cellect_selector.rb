@@ -12,16 +12,19 @@ module Subjects
 
     def add_seen(user_id, subject_id)
       return unless enabled?
+
       CellectClient.add_seen(workflow.id, user_id, subject_id)
     end
 
     def load_user(user_id)
       return unless enabled?
+
       CellectClient.load_user(workflow.id, user_id)
     end
 
     def reload_workflow
       return unless enabled?
+
       CellectClient.reload_workflow(workflow.id)
     end
 
@@ -41,7 +44,7 @@ module Subjects
     end
 
     def enabled?
-      Panoptes.flipper["cellect"].enabled?
+      Panoptes.flipper['cellect'].enabled?
     end
   end
 end
