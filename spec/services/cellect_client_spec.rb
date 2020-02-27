@@ -1,4 +1,6 @@
-require "spec_helper"
+# frozen_string_literal: true
+
+require 'spec_helper'
 
 RSpec.describe CellectClient do
   let(:cellect_host) { 'example.com' }
@@ -30,7 +32,7 @@ RSpec.describe CellectClient do
     it 'calls the method on the cellect client' do
       expect(cellect_request)
         .to receive(:request)
-        .with(:put, ['/workflows/2/remove', {subject_id: 1, group_id: 4}])
+        .with(:put, ['/workflows/2/remove', { subject_id: 1, group_id: 4 }])
       described_class.remove_subject(1, 2, 4)
     end
   end
@@ -60,12 +62,12 @@ RSpec.describe CellectClient::Request do
   let(:url) { "https://#{host}" }
 
   describe '#request' do
-    let(:headers) {
+    let(:headers) do
       {
         'Content-Type' => 'application/json',
         'Accept' => 'application/json'
       }
-    }
+    end
 
     it 'sends get request to the remote host' do
       path = '/api/path/on/host'
@@ -73,7 +75,7 @@ RSpec.describe CellectClient::Request do
       response_data = [1, 2, 3, 4]
       stubs = Faraday::Adapter::Test::Stubs.new do |stub|
         stub.get(path, headers) do |env|
-          [200, {'Content-Type' => 'application/json'}, response_data.to_json]
+          [200, { 'Content-Type' => 'application/json' }, response_data.to_json]
         end
       end
 
@@ -85,8 +87,8 @@ RSpec.describe CellectClient::Request do
   describe 'handles server errors' do
     it "raises if it can't connect" do
       stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-        stub.get(url) do |env|
-          raise Faraday::ConnectionFailed.new('execution expired')
+        stub.get(url) do
+          raise Faraday::ConnectionFailed, 'execution expired'
         end
       end
 
@@ -97,7 +99,7 @@ RSpec.describe CellectClient::Request do
 
     it 'raises if it times out' do
       stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-        stub.post(url) do |env|
+        stub.post(url) do
           raise Faraday::TimeoutError
         end
       end
@@ -109,7 +111,7 @@ RSpec.describe CellectClient::Request do
 
     it 'raises if response is an HTTP 500' do
       stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-        stub.put(url) do |env|
+        stub.put(url) do
           [
             500,
             { 'Content-Type' => 'application/json' },
