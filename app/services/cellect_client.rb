@@ -3,7 +3,12 @@
 module CellectClient
   ConnectionError = Class.new(StandardError)
 
-  CELLECT_HOST = ENV.fetch('CELLECT_HOST', 'https://cellect.zooniverse.org')
+  if Rails.env.production?
+    DEFAULT_CELLECT_HOST = 'https://cellect.zooniverse.org'
+  else
+    DEFAULT_CELLECT_HOST = 'https://cellect-staging.zooniverse.org'
+  end
+  CELLECT_HOST = ENV.fetch('CELLECT_HOST', DEFAULT_CELLECT_HOST)
 
   def self.add_seen(workflow_id, user_id, subject_id)
     path = "/workflows/#{workflow_id}/users/#{user_id}/add_seen"
