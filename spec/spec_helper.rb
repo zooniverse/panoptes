@@ -80,10 +80,6 @@ RSpec.configure do |config|
     allow(Rails).to receive(:cache).and_return(cache_store)
   end
 
-  config.before(:each, type: :controller) do
-    stub_cellect_connection
-  end
-
   config.after(:each) do |example|
     DatabaseCleaner.clean
   end

@@ -1,92 +1,92 @@
-require 'cellect/client'
-require 'subjects/cellect_session'
+# frozen_string_literal: true
 
 module CellectClient
-  ConnectionError = Class.new(StandardError)
+  class ConnectionError < StandardError; end
+  class ResourceNotFound < StandardError; end
+  class ServerError < StandardError; end
 
-  MAX_TRIES = 1
+  def self.default_host
+    if Rails.env.production?
+      'https://cellect.zooniverse.org'
+    else
+      'https://cellect-staging.zooniverse.org'
+    end
+  end
+
+  def self.host
+    ENV.fetch('CELLECT_HOST', default_host)
+  end
 
   def self.add_seen(workflow_id, user_id, subject_id)
-    RequestToHost.new(workflow_id, user_id)
-      .request(:add_seen, subject_id: subject_id)
+    path = "/workflows/#{workflow_id}/users/#{user_id}/add_seen"
+    params = { subject_id: subject_id }
+    Request.new.request(:put, [path, params])
   end
 
   def self.load_user(workflow_id, user_id)
-    RequestToHost.new(workflow_id, user_id, retries: 3)
-      .request(:load_user)
+    path = "/workflows/#{workflow_id}/users/#{user_id}/load"
+    Request.new.request(:post, path)
   end
 
   def self.reload_workflow(workflow_id)
-    return unless Panoptes.flipper.enabled? "cellect"
+    return unless Panoptes.flipper.enabled? 'cellect'
 
-    RequestToAll.new(workflow_id).request(:reload_workflow)
+    path = "/workflows/#{workflow_id}/reload"
+    Request.new.request(:post, path)
   end
 
   def self.remove_subject(subject_id, workflow_id, group_id)
-    RequestToAll.new(workflow_id)
-      .request(:remove_subject, subject_id, group_id: group_id)
+    path = "/workflows/#{workflow_id}/remove"
+    params = { subject_id: subject_id, group_id: group_id }
+    Request.new.request(:put, [path, params])
   end
 
   def self.get_subjects(workflow_id, user_id, group_id, limit)
-    RequestToHost.new(workflow_id, user_id)
-      .request(:get_subjects, group_id: group_id, limit: limit)
+    path = "/workflows/#{workflow_id}"
+    params = { user_id: user_id, group_id: group_id, limit: limit }
+    Request.new.request(:get, [path, params])
   end
 
   class Request
-    attr_reader :workflow_id, :retries
+    attr_reader :connection
 
-    def initialize(workflow_id, retries: MAX_TRIES)
-      @workflow_id = workflow_id
-      @retries = retries
+    def initialize(adapter=Faraday.default_adapter, host=CellectClient.host)
+      @connection = connect!(adapter, host)
     end
 
-    def request(action, *params)
-      tries ||= retries
-      Cellect::Client.connection.send(action, *params)
-    rescue StandardError => e
-      raise ConnectionError, "Cellect can't reach the server" if tries <= 0
-      tries -= 1
-      yield if block_given?
-      retry
-    end
-  end
-
-  class RequestToAll < Request
-    def request(action, *params)
-      params = nil if params.blank?
-      case params
-      when NilClass
-        params = [workflow_id]
-      when Hash
-        params[:workflow_id] = workflow_id
-      when Array
-        params.last[:workflow_id] = workflow_id if params.last.is_a? Hash
+    def request(http_method, params)
+      response = connection.send(http_method, *params) do |req|
+        req.headers['Accept'] = 'application/json'
+        req.headers['Content-Type'] = 'application/json'
+        req.options.timeout = 5      # open/read timeout in seconds
+        req.options.open_timeout = 2 # connection open timeout in seconds
+        yield req if block_given?
       end
-      super action, *params
-    end
-  end
 
-  class RequestToHost < Request
-    attr_reader :user_id
-
-    def initialize(workflow_id, user_id, retries: MAX_TRIES)
-      @session = Subjects::CellectSession.new(user_id, workflow_id)
-      @user_id = user_id
-      super workflow_id, retries: retries
+      handle_response(response)
+    rescue Faraday::TimeoutError,
+           Faraday::ConnectionFailed => e
+      raise ConnectionError, e.message
     end
 
-    def request(action, params={})
-      params[:host] = @session.host
-      params[:workflow_id] = workflow_id
-      params[:user_id] = user_id
-      super(action, params) do
-        params[:host] = @session.reset_host
+    private
+
+    def connect!(adapter, host)
+      Faraday.new(host, ssl: { verify: false }) do |faraday|
+        faraday.response :json, content_type: /\bjson$/
+        faraday.adapter(*adapter)
       end
-    rescue Redis::CannotConnectError,
-           Subjects::CellectSession::NoHostError,
-           Timeout::Error,
-           Redis::TimeoutError
-      raise ConnectionError, "Cellect can't find a server host"
+    end
+
+    def handle_response(response)
+      case response.status
+      when 404
+        raise ResourceNotFound, status: response.status, body: response.body
+      when 400..600
+        raise ServerError, response.body
+      else
+        response.body
+      end
     end
   end
 end

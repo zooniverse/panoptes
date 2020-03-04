@@ -2,3 +2,17 @@ require:
  - rubocop-rails
  - rubocop-performance
  - rubocop-rspec
+
+Style/NumericLiterals:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 160
+Layout/SpaceAroundEqualsInParameterDefault:
+  EnforcedStyle: 'no_space'
+
+Metrics/BlockLength:
+  Exclude:
+    - '**/*_spec.rb'
+
+
