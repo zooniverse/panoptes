@@ -3,12 +3,17 @@
 module CellectClient
   ConnectionError = Class.new(StandardError)
 
-  if Rails.env.production?
-    DEFAULT_CELLECT_HOST = 'https://cellect.zooniverse.org'
-  else
-    DEFAULT_CELLECT_HOST = 'https://cellect-staging.zooniverse.org'
+  def self.default_host
+    if Rails.env.production?
+      'https://cellect.zooniverse.org'
+    else
+      'https://cellect-staging.zooniverse.org'
+    end
   end
-  CELLECT_HOST = ENV.fetch('CELLECT_HOST', DEFAULT_CELLECT_HOST)
+
+  def self.host
+    ENV.fetch('CELLECT_HOST', default_host)
+  end
 
   def self.add_seen(workflow_id, user_id, subject_id)
     path = "/workflows/#{workflow_id}/users/#{user_id}/add_seen"
@@ -46,7 +51,7 @@ module CellectClient
     class ServerError < GenericError; end
     attr_reader :connection
 
-    def initialize(adapter=Faraday.default_adapter, host=CellectClient::CELLECT_HOST)
+    def initialize(adapter=Faraday.default_adapter, host=CellectClient.host)
       @connection = connect!(adapter, host)
     end
 
