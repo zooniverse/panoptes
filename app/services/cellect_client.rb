@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module CellectClient
-  ConnectionError = Class.new(StandardError)
+  class ConnectionError < StandardError; end
+  class ResourceNotFound < StandardError; end
+  class ServerError < StandardError; end
 
   def self.default_host
     if Rails.env.production?
@@ -46,9 +48,6 @@ module CellectClient
   end
 
   class Request
-    class GenericError < StandardError; end
-    class ResourceNotFound < GenericError; end
-    class ServerError < GenericError; end
     attr_reader :connection
 
     def initialize(adapter=Faraday.default_adapter, host=CellectClient.host)
@@ -67,7 +66,7 @@ module CellectClient
       handle_response(response)
     rescue Faraday::TimeoutError,
            Faraday::ConnectionFailed => e
-      raise GenericError, e.message
+      raise ConnectionError, e.message
     end
 
     private

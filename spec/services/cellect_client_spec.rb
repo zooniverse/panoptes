@@ -111,7 +111,7 @@ RSpec.describe CellectClient::Request do
 
       expect do
         described_class.new([:test, stubs], url).request(:get, [])
-      end.to raise_error(CellectClient::Request::GenericError)
+      end.to raise_error(CellectClient::ConnectionError)
     end
 
     it 'raises if it times out' do
@@ -123,7 +123,7 @@ RSpec.describe CellectClient::Request do
 
       expect do
         described_class.new([:test, stubs], url).request(:post, [])
-      end.to raise_error(CellectClient::Request::GenericError)
+      end.to raise_error(CellectClient::ConnectionError)
     end
 
     it 'raises if response is an HTTP 500' do
@@ -139,7 +139,23 @@ RSpec.describe CellectClient::Request do
 
       expect do
         described_class.new([:test, stubs], url).request(:put, [])
-      end.to raise_error(CellectClient::Request::ServerError)
+      end.to raise_error(CellectClient::ServerError)
+    end
+
+    it 'raises if response is an HTTP 404' do
+      stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+        stub.put(url) do
+          [
+            404,
+            { 'Content-Type' => 'application/json' },
+            { 'errors' => 'Not Found' }.to_json
+          ]
+        end
+      end
+
+      expect do
+        described_class.new([:test, stubs], url).request(:put, [])
+      end.to raise_error(CellectClient::ResourceNotFound)
     end
   end
 end
