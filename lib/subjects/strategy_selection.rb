@@ -1,6 +1,3 @@
-require 'subjects/postgresql_selection'
-require 'subjects/complete_remover'
-
 module Subjects
   class StrategySelection
     include Logging
