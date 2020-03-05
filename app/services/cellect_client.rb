@@ -73,6 +73,7 @@ module CellectClient
 
     def connect!(adapter, host)
       Faraday.new(host, ssl: { verify: false }) do |faraday|
+        faraday.request :json
         faraday.response :json, content_type: /\bjson$/
         faraday.adapter(*adapter)
       end
