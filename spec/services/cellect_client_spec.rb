@@ -86,6 +86,12 @@ RSpec.describe CellectClient::Request do
       }
     end
 
+    it 'adds connection middleware for json encoding and decoding' do
+      middleware = described_class.new.connection.builder.handlers
+      expected = [FaradayMiddleware::EncodeJson, FaradayMiddleware::ParseJson]
+      expect(middleware).to include(*expected)
+    end
+
     it 'sends get request to the remote host' do
       path = '/api/path/on/host'
       host_url_path = "#{url}#{path}"
