@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SubjectGroup, type: :model, focus: true do
+describe SubjectGroup, type: :model do
   let(:subject_group) { build(:subject_group) }
 
   it 'has a valid factory' do
