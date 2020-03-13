@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddSubjectGroupModel < ActiveRecord::Migration
   def change
     create_table :subject_groups do |t|

@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
+# rubocop:disable RSpec/NamedSubject
 describe Subject, :type => :model do
   let(:subject) { build(:subject) }
   let(:locked_factory) { :subject }
@@ -60,11 +63,11 @@ describe Subject, :type => :model do
   describe '#subject_groups' do
     it 'can have many subject_groups' do
       subject.subject_groups << build(:subject_group)
-      expect(subject.subject_groups).to all( be_a(SubjectGroup) )
+      expect(subject.subject_groups).to all(be_a(SubjectGroup))
     end
 
     it 'does not need any subject_groups' do
-      expect(subject.subject_groups).to be_empty
+      subject.subject_groups = []
       expect(subject).to be_valid
     end
   end
@@ -165,3 +168,4 @@ describe Subject, :type => :model do
     end
   end
 end
+# rubocop:enable RSpec/NamedSubject
