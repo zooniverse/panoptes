@@ -57,6 +57,18 @@ describe Subject, :type => :model do
     end
   end
 
+  describe '#subject_groups' do
+    it 'can have many subject_groups' do
+      subject.subject_groups << build(:subject_group)
+      expect(subject.subject_groups).to all( be_a(SubjectGroup) )
+    end
+
+    it 'does not need any subject_groups' do
+      expect(subject.subject_groups).to be_empty
+      expect(subject).to be_valid
+    end
+  end
+
   describe "ordered_locations" do
     it_behaves_like "it has ordered locations" do
       let(:resource) do
