@@ -14,7 +14,7 @@ RUN apt-get update && apt-get -y upgrade && \
     curl \
     supervisor \
     libpq-dev \
-    postgresql-client-9.4 \
+    postgresql-client-9.5 \
     tmpreaper \
     && \
     apt-get clean
@@ -28,4 +28,4 @@ RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xa
 ADD supervisord.conf.dev /etc/supervisor/conf.d/panoptes.conf
 ADD ./ /rails_app
 
-ENTRYPOINT /rails_app/scripts/docker/start.sh
+CMD ["/rails_app/scripts/docker/start.sh"]
