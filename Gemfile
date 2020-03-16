@@ -74,7 +74,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'database_cleaner', '~> 1.7.0'
+  gem 'database_cleaner', '~> 1.8.3'
   gem 'guard-rspec', require: false
   gem 'hashdiff'
   gem 'mock_redis'
