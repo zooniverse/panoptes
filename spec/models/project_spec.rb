@@ -69,7 +69,6 @@ describe Project, type: :model do
     end
 
     it 'can be featured' do
-      create :project, featured: true
       expect(described_class.featured).to eq([featured_project])
     end
 
