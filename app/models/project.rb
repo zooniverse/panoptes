@@ -54,8 +54,6 @@ class Project < ActiveRecord::Base
 
   validates_inclusion_of :private, :live, in: [true, false], message: "must be true or false"
 
-  validates :featured, uniqueness: {conditions: -> { featured } }
-
   ## TODO: This potential has locking issues
   validates_with UniqueForOwnerValidator
 
