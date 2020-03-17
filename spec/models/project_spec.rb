@@ -67,9 +67,10 @@ describe Project, type: :model do
     let(:featured_project) do
       create :project, featured: true
     end
+
     it 'can be featured' do
       create :project, featured: true
-      expect(Project.featured).to eq([featured_project])
+      expect(described_class.featured).to eq([featured_project])
     end
 
     it 'allows more than one featured project at a time' do
