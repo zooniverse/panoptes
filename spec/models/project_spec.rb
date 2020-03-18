@@ -64,16 +64,18 @@ describe Project, type: :model do
   end
 
   describe 'featured projects' do
-    it 'can be featured' do
-      project = create :project, featured: true
-      expect(Project.featured).to eq([project])
+    let(:featured_project) do
+      create :project, featured: true
     end
 
-    it 'only allows one featured project at a time' do
-      featured_project = create :project, featured: true
+    it 'can be featured' do
+      expect(described_class.featured).to eq([featured_project])
+    end
+
+    it 'allows more than one featured project at a time' do
+      featured_project
       other_project = build :project, featured: true
-      expect(other_project).not_to be_valid
-      expect(other_project.errors[:featured]).to be_present
+      expect(other_project).to be_valid
     end
   end
 
