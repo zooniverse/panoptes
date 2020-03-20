@@ -1221,12 +1221,44 @@ ALTER SEQUENCE public.set_member_subjects_id_seq OWNED BY public.set_member_subj
 
 
 --
+-- Name: subject_group_members; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.subject_group_members (
+    id integer NOT NULL,
+    subject_group_id integer,
+    subject_id integer,
+    display_order integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: subject_group_members_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.subject_group_members_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: subject_group_members_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.subject_group_members_id_seq OWNED BY public.subject_group_members.id;
+
+
+--
 -- Name: subject_groups; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.subject_groups (
     id integer NOT NULL,
-    ordered_subject_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
     project_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -1250,16 +1282,6 @@ CREATE SEQUENCE public.subject_groups_id_seq
 --
 
 ALTER SEQUENCE public.subject_groups_id_seq OWNED BY public.subject_groups.id;
-
-
---
--- Name: subject_groups_subjects; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.subject_groups_subjects (
-    subject_id integer,
-    subject_group_id integer
-);
 
 
 --
@@ -2258,6 +2280,13 @@ ALTER TABLE ONLY public.set_member_subjects ALTER COLUMN id SET DEFAULT nextval(
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.subject_group_members ALTER COLUMN id SET DEFAULT nextval('public.subject_group_members_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.subject_groups ALTER COLUMN id SET DEFAULT nextval('public.subject_groups_id_seq'::regclass);
 
 
@@ -2646,6 +2675,14 @@ ALTER TABLE ONLY public.recents
 
 ALTER TABLE ONLY public.set_member_subjects
     ADD CONSTRAINT set_member_subjects_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: subject_group_members_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_group_members
+    ADD CONSTRAINT subject_group_members_pkey PRIMARY KEY (id);
 
 
 --
@@ -3427,17 +3464,17 @@ CREATE INDEX index_set_member_subjects_on_subject_set_id ON public.set_member_su
 
 
 --
--- Name: index_subject_groups_subjects_on_subject_group_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_subject_group_members_on_subject_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_subject_groups_subjects_on_subject_group_id ON public.subject_groups_subjects USING btree (subject_group_id);
+CREATE INDEX index_subject_group_members_on_subject_group_id ON public.subject_group_members USING btree (subject_group_id);
 
 
 --
--- Name: index_subject_groups_subjects_on_subject_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_subject_group_members_on_subject_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_subject_groups_subjects_on_subject_id ON public.subject_groups_subjects USING btree (subject_id);
+CREATE INDEX index_subject_group_members_on_subject_id ON public.subject_group_members USING btree (subject_id);
 
 
 --
@@ -4192,6 +4229,14 @@ ALTER TABLE ONLY public.field_guides
 
 
 --
+-- Name: fk_rails_a5b8c1ffff; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_group_members
+    ADD CONSTRAINT fk_rails_a5b8c1ffff FOREIGN KEY (subject_id) REFERENCES public.subjects(id);
+
+
+--
 -- Name: fk_rails_ad41ce8e02; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4272,14 +4317,6 @@ ALTER TABLE ONLY public.subject_set_imports
 
 
 --
--- Name: fk_rails_d59e4b949b; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subject_groups_subjects
-    ADD CONSTRAINT fk_rails_d59e4b949b FOREIGN KEY (subject_id) REFERENCES public.subjects(id);
-
-
---
 -- Name: fk_rails_d6fe15ec78; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4293,14 +4330,6 @@ ALTER TABLE ONLY public.tagged_resources
 
 ALTER TABLE ONLY public.organization_contents
     ADD CONSTRAINT fk_rails_d80672ecd1 FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
-
-
---
--- Name: fk_rails_de6b59dfbd; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subject_groups_subjects
-    ADD CONSTRAINT fk_rails_de6b59dfbd FOREIGN KEY (subject_group_id) REFERENCES public.subject_groups(id);
 
 
 --
@@ -4357,6 +4386,14 @@ ALTER TABLE ONLY public.subjects
 
 ALTER TABLE ONLY public.subjects
     ADD CONSTRAINT fk_rails_f26c409132 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fk_rails_f611f500c0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_group_members
+    ADD CONSTRAINT fk_rails_f611f500c0 FOREIGN KEY (subject_group_id) REFERENCES public.subject_groups(id);
 
 
 --

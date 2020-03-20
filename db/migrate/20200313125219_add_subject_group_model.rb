@@ -3,11 +3,8 @@
 class AddSubjectGroupModel < ActiveRecord::Migration
   def change
     create_table :subject_groups do |t|
-      # I think we will need to record the specific ordering of the subjects
-      t.integer :ordered_subject_ids, array: true, default: [], null: false
-
       # what else about the 'Group' will need to be recorded to understand the
-      # selection, creation and classification events?
+      # selection, creation and classification events for hte 'group' of subjects?
 
       # record which project the subject group belongs to
       # I can't see us querying the Project.subject_groups relation
@@ -17,9 +14,13 @@ class AddSubjectGroupModel < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_join_table :subjects, :subject_groups do |t|
-      t.references :subject, index: true, foreign_key: true
+    create_table :subject_group_members do |t|
       t.references :subject_group, index: true, foreign_key: true
+      t.references :subject, index: true, foreign_key: true
+      # record what position in the group the subject will be displayed
+      t.integer :display_order, null: false
+
+      t.timestamps
     end
   end
 end
