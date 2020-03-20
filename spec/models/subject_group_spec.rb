@@ -37,10 +37,10 @@ describe SubjectGroup, type: :model do
     end
 
     it 'is leaves the subjects intact', :focus do
-      subjects = subject_group.subjects
+      # use true to force the assocation load
+      test_subjects = subject_group.subjects(true)
       subject_group.destroy
-      binding.pry
-      expect(subjects.map(&:destroyed?)).to all(be false)
+      expect(test_subjects.map(&:destroyed?)).to all(be false)
     end
   end
 end
