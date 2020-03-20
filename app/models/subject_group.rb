@@ -6,5 +6,5 @@ class SubjectGroup < ActiveRecord::Base
   has_many :subjects, through: :members
 
   validates :project, presence: true
-  validates :subjects, presence: true
+  validates :members, presence: true
 end
