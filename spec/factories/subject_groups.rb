@@ -2,7 +2,10 @@
 
 FactoryBot.define do
   factory :subject_group do
-    project
-    subjects { [build(:subject)] }
+    project { build(:project) }
+
+    after(:build) do |subject_group|
+      subject_group.members << build(:subject_group_member, subject_group: subject_group)
+    end
   end
 end

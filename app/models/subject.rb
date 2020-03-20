@@ -20,7 +20,7 @@ class Subject < ActiveRecord::Base
     class_name: 'Workflow',
     foreign_key: 'tutorial_subject_id',
     dependent: :restrict_with_exception
-  has_and_belongs_to_many :subject_groups
+  has_many :subject_groups, through: :subject_group_members
 
   # Used by HttpCacheable
   scope :private_scope, -> { where(project_id: Project.private_scope) }
