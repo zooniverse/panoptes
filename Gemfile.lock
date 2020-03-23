@@ -385,7 +385,7 @@ GEM
     scientist (1.4.0)
     sdoc (1.0.0)
       rdoc (>= 5.0)
-    semantic_logger (4.4.0)
+    semantic_logger (4.6.1)
       concurrent-ruby (~> 1.0)
     shellany (0.0.1)
     sidekiq (5.2.8)
@@ -505,7 +505,7 @@ DEPENDENCIES
   schema_plus_pg_indexes (~> 0.1)
   scientist (~> 1.4.0)
   sdoc (~> 1.0.0)
-  semantic_logger (~> 4.4.0)
+  semantic_logger (~> 4.6.1)
   sidekiq (~> 5.2.5)
   sidekiq-congestion (~> 0.1.0)
   sidekiq-unique-jobs
