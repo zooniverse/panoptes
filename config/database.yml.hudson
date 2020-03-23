@@ -8,6 +8,9 @@ default: &default
   pool: 5
   port: 5432
   prepared_statements: false
+  variables:
+    # default 5 minutes for the query exectution (sidekiq uses default, API will set the env param match load balancer)
+    statement_timeout: <%= ENV.fetch('PG_STATEMENT_TIMEOUT', 300000) %>
 
 development:
   <<: *default
