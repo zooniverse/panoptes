@@ -24,18 +24,16 @@ class ProjectSerializer
   can_sort_by :launch_date, :activity, :completeness, :classifiers_count,
     :updated_at, :display_name
 
-  preload :workflows,
-    :active_workflows,
-    :subject_sets,
-    :project_roles,
-    [ owner: { identity_membership: :user } ],
-    :pages,
-    :attached_images,
-    :avatar,
-    :background,
-    :tags,
-    :classifications_export,
-    :subjects_export
+  preload :subject_sets,
+          :project_roles,
+          [owner: { identity_membership: :user }],
+          :pages,
+          :attached_images,
+          :avatar,
+          :background,
+          :tags,
+          :classifications_export,
+          :subjects_export
 
   def self.page(params = {}, scope = nil, context = {})
     if Project.states.include?(params["state"])
@@ -56,6 +54,12 @@ class ProjectSerializer
     if context[:cards]
       scope.preload(:avatar)
     else
+      # this is an experiement to see if the workflow association
+      # preload is causing high CPU
+      # if this lingers past 2nd April 2020 - remove it and the flipper key
+      if Panoptes.flipper[:test_preload_workflow_associations].enabled?
+        scope = scope.preload(:workflows, :active_workflows)
+      end
       super(params, scope, context)
     end
   end
