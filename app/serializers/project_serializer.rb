@@ -24,6 +24,8 @@ class ProjectSerializer
   can_sort_by :launch_date, :activity, :completeness, :classifiers_count,
     :updated_at, :display_name
 
+  # note: workflow(s) associations are preloaded via the
+  # self.serialize_page(page, options) below
   preload :subject_sets,
           :project_roles,
           [owner: { identity_membership: :user }],
@@ -54,14 +56,45 @@ class ProjectSerializer
     if context[:cards]
       scope.preload(:avatar)
     else
-      # this is an experiement to see if the workflow association
-      # preload is causing high CPU
-      # if this lingers past 2nd April 2020 - remove it and the flipper key
-      if Panoptes.flipper[:test_preload_workflow_associations].enabled?
-        scope = scope.preload(:workflows, :active_workflows)
-      end
       super(params, scope, context)
     end
+  end
+
+  # override the serialize page method to preload the
+  # workflow and active_worklfows association data
+  # however avoid loading large json attributes
+  # instead load the data required for serializing
+  # the project and links
+  def self.serialize_page(page, options)
+    project_ids = page.pluck(:id)
+    preloadable_workflows = preload_workflows(project_ids)
+    page.map do |project_model|
+      # select the model relations for assigning to the workflow associations
+      project_model_workflows = preloadable_workflows.select do |workflow|
+        workflow.project_id == project_model.id
+      end
+      project_model_active_workflows = preloadable_workflows.select do |workflow|
+        workflow.active && workflow.project_id == project_model.id
+      end
+      # assign the preloaded workflow records to the model associations targets
+      # use .target here to avoid loading the association before assignment
+      # and thus undoing all the hard work to load only what we need
+      project_model.association(:workflows).target = project_model_workflows
+      project_model.association(:active_workflows).target = project_model_active_workflows
+
+      self.as_json(project_model, options.context)
+    end
+  end
+
+  def self.preload_workflows(project_ids)
+    non_json_attrs = Workflow.attribute_names - Workflow::JSON_ATTRIBUTES
+    # convert these to a workflow scope for reuse if viable
+    # preload the workflow resources without json data attributes
+    # get all worklfows as the active_workflows relation is a subset of the workflows
+    Workflow
+      .active
+      .where(project_id: project_ids, serialize_with_project: true)
+      .select(*non_json_attrs)
   end
 
   def self.links
