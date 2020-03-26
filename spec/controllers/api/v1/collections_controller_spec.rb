@@ -214,7 +214,7 @@ describe Api::V1::CollectionsController, type: :controller do
       context 'when favorite collection already exists for given user/project' do
         let!(:favorite_collection) { create(:collection, favorite: true, owner: owner) }
 
-        it 'raises a 409 conflict error on trying to create a favorite collection', :focus do
+        it 'raises a 409 conflict error on trying to create a favorite collection' do
           post :create, favorite_params
           expect(response).to have_http_status(:bad_request)
         end
