@@ -3,7 +3,8 @@ class RecentCreateWorker
 
   def perform(classification_id)
     classification = Classification.find(classification_id)
-    Recent.create_from_classification(classification)
+    recents = Recent.create_from_classification(classification)
+    latest_recent_id = recents.last.id
 
     # TODO: move this to the Recent class
     # TODO: provide a constant / env var to modify
@@ -15,7 +16,12 @@ class RecentCreateWorker
       project_id: classification.project_id,
       user_id: classification.user_id
     ).order(id: 'DESC')
-    last_id = user_project_recent_scope.limit(1).pluck(:id)
-    user_project_recent_scope.where("id < ?", last_id).update_all(mark_remove: true)
+    # ensure we specify the ID here as the recents table can be big
+    # use the recent id in the creation above to seed the search point
+    # in the recents table
+    oldest_allowed_recent_id = user_project_recent_scope.where('id < ?', latest_recent_id).limit(1).pluck(:id)
+    # then seed the update_all mark query to search the recents table
+    # by the capped collection id offset
+    user_project_recent_scope.where('id < ?', oldest_allowed_recent_id).update_all(mark_remove: true)
   end
 end
