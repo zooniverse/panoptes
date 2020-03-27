@@ -8,4 +8,8 @@ module Panoptes
   def self.disable_lifecycle_worker
     Panoptes.flipper[:disable_lifecycle_worker].enabled?
   end
+
+  def self.pg_statement_timeout
+    ENV.fetch('PG_STATEMENT_TIMEOUT', 300000)
+  end
 end
