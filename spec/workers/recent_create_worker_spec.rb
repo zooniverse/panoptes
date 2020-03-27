@@ -7,6 +7,7 @@ RSpec.describe RecentCreateWorker do
     expect(Recent)
       .to receive(:create_from_classification)
       .with(classification)
+      .and_call_original
     subject.perform(classification.id)
   end
 
