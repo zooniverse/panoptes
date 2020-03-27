@@ -15,4 +15,8 @@ Metrics/BlockLength:
   Exclude:
     - '**/*_spec.rb'
 
+Rails/SkipsModelValidations:
+  Whitelist:
+  - update_all
+
 
