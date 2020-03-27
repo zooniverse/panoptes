@@ -15,7 +15,7 @@ RSpec.describe RecentCreateWorker do
     # to be stubbed to only have to cleanup 1 out of 2
     classification = create(:classification_with_recents)
     classification.recents.last.id
-    recent_to_be_marked = classification.recents.last.id
+    recent_to_be_marked = classification.recents.first.id
     expect {
       subject.perform(classification.id)
     }.to change {
