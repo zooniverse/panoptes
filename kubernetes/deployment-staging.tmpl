@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-staging-app
+  labels:
+    app: panoptes-staging-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: panoptes-staging-app
+  template:
+    metadata:
+      labels:
+        app: panoptes-staging-app
+    spec:
+      containers:
+        - name: panoptes-staging-app
+          image: zooniverse/panoptes:__IMAGE_TAG__
+          env:
+            - name: RAILS_ENV
+              value: staging
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-staging-env-vars
+                  key: SECRET_KEY_BASE
+            - name: AWS_REGION
+              value: us-east-1
+            - name: KINESIS_STREAM
+              value: zooniverse-staging
+            - name: ZOO_STREAM_KINESIS_STREAM_NAME
+              value: zooniverse-staging
+            - name: ZOO_STREAM_SOURCE
+              value: panoptes
+            - name: SUBJECTS_BUCKET
+              value: zooniverse-static
+            - name: BUCKET_PATH
+              value: panoptes-uploads.zooniverse.org
+            - name: EXPORT_BUCKET_PATH
+              value: panoptes-exports.zooniverse.org
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-staging-env-vars
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-staging-env-vars
+                  key: AWS_SECRET_ACCESS_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-staging-app
+spec:
+  selector:
+    app: panoptes-staging-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
