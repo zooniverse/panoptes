@@ -8,25 +8,23 @@ class DatabaseReplica
     end
   end
 
-  # allow dump workers to have twice the length of time to query data from
-  # the database vs the defaults for long running query times
-  # introduce in https://github.com/zooniverse/Panoptes/pull/3278
-  def self.read_longer(feature_flag_key, &block)
+  # avoid connection timeouts: introduced in https://github.com/zooniverse/Panoptes/pull/3278
+  # allow dump workers to have unlimited query time to fetch data
+  # and ensure we reset the connection timeout back to default after query
+  def self.read_without_timeout(feature_flag_key, &block)
     if Panoptes.flipper.enabled?(feature_flag_key)
       # read via the replica settings using Standby gem
       Standby.on_standby do
-        read_with_doubled_timeouts(&block)
+        execute_without_timeout(&block)
       end
     else
-      read_with_doubled_timeouts(&block)
+      execute_without_timeout(&block)
     end
   end
 
-  def self.read_with_doubled_timeouts
-    # double the statement timeout for dump workers
-    ActiveRecord::Base.connection.execute(
-      "SET statement_timeout = #{(Panoptes.pg_statement_timeout * 2).to_i}"
-    )
+  def self.execute_without_timeout
+    # disable the statement timeout
+    ActiveRecord::Base.connection.execute('SET statement_timeout = 0')
 
     yield
   ensure
@@ -35,5 +33,5 @@ class DatabaseReplica
       "SET statement_timeout = #{Panoptes.pg_statement_timeout}"
     )
   end
-  private_class_method :read_with_doubled_timeouts
+  private_class_method :execute_without_timeout
 end

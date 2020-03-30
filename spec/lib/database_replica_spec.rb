@@ -27,10 +27,10 @@ describe DatabaseReplica do
     end
   end
 
-  describe '::read_longer' do
+  describe '::read_without_timeout' do
     let(:pg_statment_timeout) { Panoptes.pg_statement_timeout }
     let(:default_set_timeout) { "SET statement_timeout = #{pg_statment_timeout}" }
-    let(:double_set_timeout) { "SET statement_timeout = #{(pg_statment_timeout * 2).to_i}" }
+    let(:no_timeout) { 'SET statement_timeout = 0' }
     let(:connection_double) do
       connection_double = instance_double('ActiveRecord::ConnectionAdapters::PostgreSQLAdapter')
       allow(connection_double).to receive(:execute)
@@ -38,16 +38,16 @@ describe DatabaseReplica do
     end
 
     it 'defaults to reading from the primary db' do
-      described_class.read_longer(flipper_key) { nil }
+      described_class.read_without_timeout(flipper_key) { nil }
       expect(Standby).not_to have_received(:on_standby)
     end
 
     # rubocop:disable RSpec/MultipleExpectations
-    it 'sets the pg statement timeouts for longer queries' do
+    it 'sets the connection to not timeout and resets to default' do
       allow(ActiveRecord::Base).to receive(:connection).and_return(connection_double)
-      described_class.read_longer(flipper_key) { nil }
+      described_class.read_without_timeout(flipper_key) { nil }
 
-      expect(connection_double).to have_received(:execute).with(double_set_timeout).ordered
+      expect(connection_double).to have_received(:execute).with(no_timeout).ordered
       expect(connection_double).to have_received(:execute).with(default_set_timeout).ordered
     end
     # rubocop:enable RSpec/MultipleExpectations
@@ -58,16 +58,16 @@ describe DatabaseReplica do
       end
 
       it 'uses standby gem to read from replica' do
-        described_class.read_longer(flipper_key) { nil }
+        described_class.read_without_timeout(flipper_key) { nil }
         expect(Standby).to have_received(:on_standby)
       end
 
       # rubocop:disable RSpec/MultipleExpectations
-      it 'sets the pg statement timeouts for longer queries' do
+      it 'sets the connection to not timeout and resets to default' do
         allow(ActiveRecord::Base).to receive(:connection).and_return(connection_double)
-        described_class.read_longer(flipper_key) { nil }
+        described_class.read_without_timeout(flipper_key) { nil }
 
-        expect(connection_double).to have_received(:execute).with(double_set_timeout).ordered
+        expect(connection_double).to have_received(:execute).with(no_timeout).ordered
         expect(connection_double).to have_received(:execute).with(default_set_timeout).ordered
       end
       # rubocop:enable RSpec/MultipleExpectations
