@@ -9,7 +9,7 @@ module CsvDumps
     private
 
     def read_from_database(&block)
-      DatabaseReplica.read_longer('dump_data_from_read_replica', &block)
+      DatabaseReplica.read_without_timeout('dump_data_from_read_replica', &block)
     end
   end
 end
