@@ -1,11 +1,6 @@
 module Panoptes
   def self.user_limits
-    @user_limits ||= begin
-                       file = Rails.root.join('config/user_limits.yml')
-                       YAML.load(File.read(file))[Rails.env].symbolize_keys
-                     rescue Errno::ENOENT, NoMethodError
-                       {  }
-                     end
+    @user_limits ||= { subjects: ENV['USER_SUBJECT_LIMIT'] || 100}
   end
 
   def self.max_subjects
