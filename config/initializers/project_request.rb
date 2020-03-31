@@ -1,12 +1,11 @@
 module Panoptes
   def self.project_request
     @project_request ||= OpenStruct
-      .new(**begin
-               file = Rails.root.join('config/project_request.yml')
-               YAML.load(File.read(file))[Rails.env].symbolize_keys
-             rescue Errno::ENOENT, NoMethodError
-               { }
-             end)
+      .new({
+          base_url: ENV['PROJECT_REQUEST_BASE_URL'] || 'http://localhost:3735',
+          recipients: ENV['PROJECT_REQUEST_RECIPIENTS']&.split(',') || ['no-reply@zooniverse.org'],
+          bcc: ENV['PROJECT_REQUEST_BCC']&.split(',')
+      })
   end
 end
 
