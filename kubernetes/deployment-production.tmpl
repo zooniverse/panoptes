@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-production-app
+  labels:
+    app: panoptes-production-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: panoptes-production-app
+  template:
+    metadata:
+      labels:
+        app: panoptes-production-app
+    spec:
+      containers:
+        - name: panoptes-production-app
+          image: zooniverse/panoptes:__IMAGE_TAG__
+          env:
+            - name: RAILS_ENV
+              value: production
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-production-env-vars
+                  key: SECRET_KEY_BASE
+            - name: AWS_REGION
+              value: us-east-1
+            - name: KINESIS_STREAM
+              value: zooniverse-production
+            - name: ZOO_STREAM_KINESIS_STREAM_NAME
+              value: zooniverse-production
+            - name: ZOO_STREAM_SOURCE
+              value: panoptes
+            - name: SUBJECTS_BUCKET
+              value: zooniverse-static
+            - name: BUCKET_PATH
+              value: panoptes-uploads.zooniverse.org
+            - name: EXPORT_BUCKET_PATH
+              value: panoptes-exports.zooniverse.org
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-production-env-vars
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-production-env-vars
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: DUMP_CONGESTION_OPTS_INTERVAL
+              value: 86400
+            - name: DUMP_CONGESTION_OPTS_MAX_IN_INTERVAL
+              value: 1
+            - name: DUMP_CONGESTION_OPTS_MIN_DELAY
+              value: 43200
+            - name: DUMP_CONGESTION_OPTS_REJECT_WITH
+              value: cancel
+            - name: COUNTER_CONGESTION_OPTS_INTERVAL
+              value: 360
+            - name: COUNTER_CONGESTION_OPTS_MAX_IN_INTERVAL
+              value: 10
+            - name: COUNTER_CONGESTION_OPTS_MIN_DELAY
+              value: 180
+            - name: COUNTER_CONGESTION_OPTS_REJECT_WITH
+              value: cancel
+            - name: CORS_ORIGIN_USERS
+              value: /^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|staging)?\.?heirtagger\.ox\.ac\.uk|(www|lab|learn)\.wildcamgorongosa\.org|www\.diagnosislondon\.org|anno\.tate\.org\.uk|(www|relaunch|field-book)\.notesfromnature\.org|[a-z0-9-]+\.oldweather\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
+            - name: CORS_ORIGIN_OAUTH
+              value: /^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|staging)?\.?heirtagger\.ox\.ac\.uk|(www|lab|learn)\.wildcamgorongosa\.org|www\.diagnosislondon\.org|anno\.tate\.org\.uk|(www|relaunch|field-book)\.notesfromnature\.org|[a-z0-9-]+\.oldweather\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-production-app
+spec:
+  selector:
+    app: panoptes-production-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
