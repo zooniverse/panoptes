@@ -1,11 +1,10 @@
 module Panoptes
   def self.frontend_configuration
-    @frontend_conf ||= begin
-                         file = Rails.root.join('config/frontend_redirect.yml')
-                         YAML.load(File.read(file))[Rails.env].symbolize_keys
-                       rescue Errno::ENOENT, NoMethodError
-                         {  }
-                       end
+    @frontend_conf ||= {
+      base: ENV['REDIRECTS_BASE'] || 'http://localhost:2727',
+      password_reset: ENV['REDIRECTS_PASSWORD_RESET'] || '/#/reset-password',
+      unsubscribe: ENV['REDIRECTS_UNSUBSCRIBE'] || '/#/unsubscribe'
+    }
   end
 
   def self.frontend_url
