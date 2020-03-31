@@ -49,6 +49,22 @@ spec:
                 secretKeyRef:
                   name: panoptes-staging-env-vars
                   key: AWS_SECRET_ACCESS_KEY
+            - name: DUMP_CONGESTION_OPTS_INTERVAL
+              value: 60
+            - name: DUMP_CONGESTION_OPTS_MAX_IN_INTERVAL
+              value: 1
+            - name: DUMP_CONGESTION_OPTS_MIN_DELAY
+              value: 60
+            - name: DUMP_CONGESTION_OPTS_REJECT_WITH
+              value: cancel
+            - name: COUNTER_CONGESTION_OPTS_INTERVAL
+              value: 360
+            - name: COUNTER_CONGESTION_OPTS_MAX_IN_INTERVAL
+              value: 10
+            - name: COUNTER_CONGESTION_OPTS_MIN_DELAY
+              value: 180
+            - name: COUNTER_CONGESTION_OPTS_REJECT_WITH
+              value: cancel
 ---
 apiVersion: v1
 kind: Service
