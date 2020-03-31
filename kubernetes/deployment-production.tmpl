@@ -135,6 +135,23 @@ spec:
                   key: NEW_RELIC_LICENSE_KEY
             - name: PAGE_SIZE_LIMIT
               value: 200
+            - name: SIDEKIQ_HOST
+              value: panoptes-redis.zooniverse.org
+            - name: SIDEKIQ_PORT
+              value: 6379
+            - name: SIDEKIQ_VERBOSE
+              value: false
+            - name: SIDEKIQ_LOGFILE
+              value: ./log/sidekiq.log
+            - name: SIDEKIQ_PIDFILE
+              value: ./tmp/pids/sidekiq.pid
+            - name: SIDEKIQ_CONCURRENCY
+              value: 8
+            - name: SIDEKIQ_TIMEOUT
+              value: 8
+            - name: SIDEKIQ_QUEUES
+              value: really_high,high,medium,default,low
+
 ---
 apiVersion: v1
 kind: Service
