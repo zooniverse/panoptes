@@ -3,11 +3,7 @@ require 'spec_helper'
 RSpec.describe RecentCreateWorker do
   subject(:recent_create_worker) { described_class.new }
 
-  before(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    @classification = create(:classification)
-  end
-
-  let(:classification) { @classification } # rubocop:disable RSpec/InstanceVariable
+  let(:classification) { create(:classification) }
 
   it 'should call create_from_classification' do
     expect(Recent)
