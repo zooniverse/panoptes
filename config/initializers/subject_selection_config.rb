@@ -1,12 +1,18 @@
 module Panoptes
   module SubjectSelection
     def self.config
-      @config ||= begin
-                    file = Rails.root.join('config/subject_selection_config.yml')
-                    YAML.load(File.read(file))[Rails.env].symbolize_keys
-                  rescue Errno::ENOENT, NoMethodError
-                    {  }
-                  end
+      @config ||=
+        {
+          focus_set_window_size: ENV['SELECTION_FOCUS_SET_WINDOW_SIZE'] || 1000,
+          index_rebuild_rate: ENV['SELECTION_INDEX_REBUILD_RATE'] || 0.01,
+          random_order_shuffle_worker_opts:
+            {
+              interval: ENV['SELECTION_RANDOM_INTERVAL'] || 60,
+              max_in_interval: ENV['SELECTION_RANDOM_MAX_IN_INTERVAL'] || 1,
+              MIN_DELAY: ENV['selection_RANDOM_MIN_DELAY'] || 30,
+              reject_with: :cancel
+            }
+        }
     end
 
     def self.focus_set_window_size

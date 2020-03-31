@@ -157,6 +157,18 @@ spec:
               value: zooniverse-static
             - name: STORAGE_PREFIX
               value: panoptes-uploads.zooniverse.org/production/
+            - name: SELECTION_FOCUS_SET_WINDOW_SIZE
+              value: 1000
+            - name: SELECTION_INDEX_REBUILD_RATE
+              value: 0.01
+            - name: SELECTION_RANDOM_INTERVAL
+              value: 60
+            - name: SELECTION_RANDOM_MAX_IN_INTERVAL
+              value: 1
+            - name: SELECTION_RANDOM_MIN_DELAY
+              value: 30
+            - name: UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY
+              value: 604800
 
 ---
 apiVersion: v1
