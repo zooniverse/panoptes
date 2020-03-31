@@ -165,6 +165,33 @@ spec:
               value: 1
             - name: SELECTION_RANDOM_MIN_DELAY
               value: 30
+            - name: SOCIAL_FACEBOOK_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-production-env-vars
+                  key: SOCIAL_FACEBOOK_APP_ID
+            - name: SOCIAL_FACEBOOK_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-production-env-vars
+                  key: SOCIAL_FACEBOOK_APP_SECRET
+            - name: SOCIAL_FACEBOOK_SCOPE
+              value: email,public_profile
+            - name: SOCIAL_GOOGLE_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-production-env-vars
+                  key: SOCIAL_GOOGLE_APP_ID
+            - name: SOCIAL_GOOGLE_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-production-env-vars
+                  key: SOCIAL_GOOGLE_APP_SECRET
+            - name: SOCIAL_GOOGLE_SCOPE
+              value: userinfo.email
+            - name: SOCIAL_GOOGLE_REQUEST_VISIBLE_ACTIONS
+              value: AddActivity,BuyActivity
+
 ---
 apiVersion: v1
 kind: Service

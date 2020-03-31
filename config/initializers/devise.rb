@@ -21,8 +21,19 @@ Devise.setup do |config|
   # OMNIAUTH
 
   def load_social_config
-    config = YAML.load(ERB.new(File.read(Rails.root.join('config/social.yml'))).result)
-    config[Rails.env].symbolize_keys
+    {
+      facebook: {
+        app_id: ENV['SOCIAL_FACEBOOK_APP_ID'],
+        app_secret: ENV['SOCIAL_FACEBOOK_APP_SECRET'],
+        scope: ENV['SOCIAL_FACEBOOK_SCOPE']
+      },
+      google_oauth2: {
+        app_id: ENV['SOCIAL_GOOGLE_APP_ID'],
+        app_secret: ENV['SOCIAL_GOOGLE_APP_SECRET'],
+        scope: ENV['SOCIAL_GOOGLE_SCOPE'],
+        request_visible_actions: ENV['SOCIAL_GOOGLE_REQUEST_VISIBLE_ACTIONS']
+      }
+    }
   end
 
   def social_config
