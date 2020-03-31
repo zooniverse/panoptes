@@ -1,30 +1,50 @@
 require 'spec_helper'
 
 RSpec.describe RecentCreateWorker do
-  let(:classification) { create(:classification) }
+  subject(:recent_create_worker) { described_class.new }
+
+  before(:all) do # rubocop:disable RSpec/BeforeAfterAll
+    @classification = create(:classification)
+  end
+
+  let(:classification) { @classification } # rubocop:disable RSpec/InstanceVariable
 
   it 'should call create_from_classification' do
     expect(Recent)
       .to receive(:create_from_classification)
       .with(classification)
       .and_call_original
-    subject.perform(classification.id)
+    recent_create_worker.perform(classification.id)
   end
 
-  it 'should mark all recents past the capped ammount for deletion' do
-    # TODO: allow the capped collection size
-    # to be stubbed to only have to cleanup 1 out of 2
-    classification = create(:classification_with_recents)
-    classification.recents.last.id
-    recent_to_be_marked = classification.recents.first.id
-    expect {
-      subject.perform(classification.id)
-    }.to change {
-        Recent.where(
-          id: recent_to_be_marked,
-          mark_remove: true
-        ).count
-      }.from(0).to(1)
-  end
+  context 'with existing user recents for this project' do
+    before do
+      subject_id = classification.subject_ids.last
+      recent = Recent.create(classification: classification, subject_id: subject_id)
+      recent.update_column(:classification_id, recent.classification_id + 1) # rubocop:disable Rails/SkipsModelValidations
+    end
 
+    it 'marks all recents beyond the limit to keep for deletion' do
+      allow(Panoptes).to receive(:user_project_recents_limit).and_return(1)
+      expect { recent_create_worker.perform(classification.id) }
+        .to change {
+          Recent.where(
+            user_id: classification.user_id,
+            project_id: classification.project_id,
+            mark_remove: true
+          ).count
+        }.from(0).to(1)
+    end
+
+    it 'does not mark any recents under limit to keep for deletion' do
+      expect { recent_create_worker.perform(classification.id) }
+        .not_to change {
+          Recent.where(
+            user_id: classification.user_id,
+            project_id: classification.project_id,
+            mark_remove: true
+          ).count
+        }
+    end
+  end
 end
