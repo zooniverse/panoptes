@@ -1,12 +1,11 @@
 module Panoptes
   module EventsApi
     def self.auth
-      @events_api_auth ||= begin
-                         file = Rails.root.join('config/events_api_auth.yml')
-                         YAML.load(File.read(file))[Rails.env].symbolize_keys
-                       rescue Errno::ENOENT, NoMethodError
-                         {  }
-                       end
+      @events_api_auth ||=
+        {
+          username: ENV['EVENTS_API_USERNAME'] || 'dev',
+          password: ENV['EVENTS_API_PASSWORD'] || 'dev_password'
+        }
     end
 
     def self.username
