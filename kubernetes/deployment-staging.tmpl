@@ -69,6 +69,15 @@ spec:
               value: /^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.[0-9]+\.[0-9]+\.[0-9]+|[a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
             - name: CORS_ORIGIN_OAUTH
               value: /^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
+            - name: DESIGNATOR_API_HOST
+              value: https://designator-staging.zooniverse.org/
+            - name: DESIGNATOR_API_USERNAME
+              value: staging
+            - name: DESIGNATOR_API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-staging-env-vars
+                  key: DESIGNATOR_API_PASSWORD
             - name: EVENTS_API_PASSWORD
               valueFrom:
                 secretKeyRef:
