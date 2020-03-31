@@ -80,11 +80,8 @@ spec:
                 secretKeyRef:
                   name: panoptes-staging-env-vars
                   key: DESIGNATOR_API_PASSWORD
-            - name: EVENTS_API_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: DESIGNATOR_
+            - name: EMAIL_EXPORT_S3_BUCKET
+              value: zooniverse-exports
             - name: EVENTS_API_USERNAME
               value: staging_api
             - name: EVENTS_API_PASSWORD
@@ -103,6 +100,26 @@ spec:
                 secretKeyRef:
                   name: panoptes-common-env-vars
                   key: HONEYBADGER_API_KEY
+            - name: MAILER_ENABLE_STARTTLS_AUTO
+              value: 'true'
+            - name: MAILER_ADDRESS
+              value: email-smtp.us-east-1.amazonaws.com
+            - name: MAILER_PORT
+              value: 587
+            - name: MAILER_DOMAIN
+              value: zooniverse.org
+            - name: MAILER_AUTHENTICATION
+              value: plain
+            - name: MAILER_USER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-common-env-vars
+                  key: MAILER_USER_NAME
+            - name: MAILER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-common-env-vars
+                  key: MAILER_PASSWORD
             - name: NEW_RELIC_APP_NAME
               value: Panoptes Staging
             - name: NEW_RELIC_LOG_LEVEL
