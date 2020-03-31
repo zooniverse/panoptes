@@ -25,6 +25,8 @@ spec:
                 secretKeyRef:
                   name: panoptes-production-env-vars
                   key: SECRET_KEY_BASE
+            - name: ATTENTION_REDIS_URL
+              value: redis://panoptes-redis.zooniverse.org:6379/1
             - name: AWS_REGION
               value: us-east-1
             - name: KINESIS_STREAM
@@ -100,6 +102,15 @@ spec:
                 secretKeyRef:
                   name: panoptes-common-env-vars
                   key: HONEYBADGER_API_KEY
+            - name: NEW_RELIC_APP_NAME
+              value: Panoptes
+            - name: NEW_RELIC_MONITOR_MODE
+              value: 'true'
+            - name: NEW_RELIC_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-common-env-vars
+                  key: NEW_RELIC_LICENSE_KEY
 ---
 apiVersion: v1
 kind: Service
