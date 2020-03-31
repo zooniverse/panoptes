@@ -42,12 +42,12 @@ spec:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: panoptes-staging-env-vars
+                  name: panoptes-common-env-vars
                   key: AWS_ACCESS_KEY_ID
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: panoptes-staging-env-vars
+                  name: panoptes-common-env-vars
                   key: AWS_SECRET_ACCESS_KEY
             - name: DUMP_CONGESTION_OPTS_INTERVAL
               value: 60
@@ -69,12 +69,17 @@ spec:
               value: /^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.[0-9]+\.[0-9]+\.[0-9]+|[a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
             - name: CORS_ORIGIN_OAUTH
               value: /^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
+            - name: EVENTS_API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-common-env-vars
+                  key: DESIGNATOR_
             - name: EVENTS_API_USERNAME
               value: staging_api
             - name: EVENTS_API_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: panoptes-staging-env-vars
+                  name: panoptes-common-env-vars
                   key: EVENTS_API_PASSWORD
             - name: REDIRECTS_BASE
               value: https://master.pfe-preview.zooniverse.org
@@ -82,6 +87,11 @@ spec:
               value: /#/reset-password
             - name: REDIRECTS_UNSUBSCRIBE
               value: /#/unsubscribe
+            - name: HONEYBADGER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-common-env-vars
+                  key: HONEYBADGER_API_KEY
 ---
 apiVersion: v1
 kind: Service
