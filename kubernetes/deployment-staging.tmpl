@@ -149,6 +149,12 @@ spec:
               value: 8
             - name: SIDEKIQ_QUEUES
               value: really_high,high,medium,default,lo
+            - name: STORAGE_ADAPTER
+              value: aws
+            - name: STORAGE_BUCKET
+              value: zooniverse-static
+            - name: STORAGE_PREFIX
+              value: panoptes-uploads.zooniverse.org/staging/
 ---
 apiVersion: v1
 kind: Service
