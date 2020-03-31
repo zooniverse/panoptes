@@ -1,11 +1,6 @@
 module Panoptes
   def self.page_size_limits
-    @page_limits ||= begin
-                       file = Rails.root.join('config/page_size_limits.yml')
-                       YAML.load(File.read(file))[Rails.env].symbolize_keys
-                     rescue Errno::ENOENT, NoMethodError
-                       {  }
-                     end
+    @page_limits ||= { max: ENV['PAGE_SIZE_LIMIT'] || 100 }
   end
 
   def self.max_page_size_limit

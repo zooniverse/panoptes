@@ -111,6 +111,8 @@ spec:
                 secretKeyRef:
                   name: panoptes-common-env-vars
                   key: NEW_RELIC_LICENSE_KEY
+            - name: PAGE_SIZE_LIMIT
+              value: 200
 ---
 apiVersion: v1
 kind: Service
