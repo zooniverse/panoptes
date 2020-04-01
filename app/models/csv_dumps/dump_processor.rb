@@ -27,6 +27,10 @@ module CsvDumps
 
       scope.each do |model|
 
+        # TODO: search for an existing formatted row
+        # by classification fk presence
+        # use this instead of formatting again
+
         formatter.to_rows(model).each do |row|
           csv_dump << row
         end
@@ -38,6 +42,9 @@ module CsvDumps
         # In the meantime we can rely on the order of execution
         # to set the formatter to have the new model
         # and pass this to our calling context block
+
+        # TODO: skip yielding the block if
+        # we're reusing a previously formatted model
         yield formatter if block_given?
       end
     end
