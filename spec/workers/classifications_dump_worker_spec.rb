@@ -36,5 +36,15 @@ RSpec.describe ClassificationsDumpWorker do
         let(:num_entries) { classifications.size + 1 }
       end
     end
+
+    it 'stores the processed export as a ClassificationExportRow' do
+      create(:classification, project: project, workflow: workflow, subjects: [subject])
+      expect {
+        worker.perform(project.id, 'project')
+      }.to change(
+        ClassificationExportRow,
+        :count
+      ).from(0).to(1)
+    end
   end
 end
