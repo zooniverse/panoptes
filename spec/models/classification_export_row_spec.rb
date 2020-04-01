@@ -6,7 +6,7 @@ RSpec.describe ClassificationExportRow, type: :model do
     build(:classification_export_row, classification: classification)
   end
 
-  it 'should have a valid factory' do
+  it 'should have a valid factory', :focus do
     expect(export_row).to be_valid
   end
 
@@ -22,19 +22,6 @@ RSpec.describe ClassificationExportRow, type: :model do
       export_row.send("#{attribute}=", nil)
       expect(export_row.valid?).to be false
       expect(export_row.errors[attribute]).to match_array(error_msg)
-    end
-  end
-
-  describe "::create_from_classification" do
-    it 'should create a classification_export_row' do
-      expect {
-        ClassificationExportRow.create_from_classification(classification)
-      }.to change {
-        ClassificationExportRow.where(
-          project: classification.project,
-          classification: classification
-        ).count
-      }.by(1)
     end
   end
 end
