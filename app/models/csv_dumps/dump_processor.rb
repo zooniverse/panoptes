@@ -31,6 +31,11 @@ module CsvDumps
         # by classification fk presence
         # use this instead of formatting again
 
+        # TODO: when re-using pre-formatted records
+        # make sure we inject the dump specific data (user_ip)
+        # by using the formatter or cache directly
+        # cache.secure_user_ip(classification.user_ip.to_s)
+
         formatter.to_rows(model).each do |row|
           csv_dump << row
         end
