@@ -55,10 +55,6 @@ module CsvDumps
     end
 
     def upload_dump
-      if block_given?
-        # yield row
-        binding.pry
-      end
       gzip_file_path = csv_dump.gzip!
       write_to_s3(gzip_file_path)
       set_ready_state
