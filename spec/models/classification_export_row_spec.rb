@@ -6,7 +6,7 @@ RSpec.describe ClassificationExportRow, type: :model do
     build(:classification_export_row, classification: classification)
   end
 
-  it 'should have a valid factory', :focus do
+  it 'should have a valid factory' do
     expect(export_row).to be_valid
   end
 
