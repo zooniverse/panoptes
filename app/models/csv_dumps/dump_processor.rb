@@ -26,7 +26,6 @@ module CsvDumps
       csv_dump << formatter.headers if formatter.headers
 
       scope.each do |model|
-
         # TODO: search for an existing formatted row
         # by classification fk presence
         # use this instead of formatting again
