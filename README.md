@@ -50,9 +50,6 @@ We only support running Panoptes via Docker and Docker Compose. If you'd like to
 
 0. Setup the configuration files via a rake task
     * Run: `docker-compose run --rm panoptes bundle exec rake configure:local`
-    * Run: `docker-compose run --rm panoptes bundle exec rake configure:doorkeeper_keys`
-    * Alternatively, manually copy the example configuration files and setup the doorkeeper keys.
-      - Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
 
 0. Create and run the application containers with `docker-compose up`
 
