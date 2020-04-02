@@ -29,7 +29,6 @@ describe ProjectSerializer do
     end
 
     it 'manually preloads the workflow associations' do
-      Panoptes.flipper[:test_preload_workflow_associations].enable
       project
       expect(described_class)
         .to receive(:preload_workflows)
@@ -39,7 +38,6 @@ describe ProjectSerializer do
     end
 
     it 'handles includes correctly' do
-      Panoptes.flipper[:test_preload_workflow_associations].enable
       project
       expected_workflow_ids = project.workflows.pluck(:id).map(&:to_s)
       params = { include: 'workflows,active_workflows' }
