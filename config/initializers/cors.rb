@@ -1,30 +1,26 @@
 require 'ostruct'
 module Panoptes
   def self.cors_config
-    @cors_config ||= OpenStruct.new({
-                      headers: :any,
-                      request_methods: %w[ delete get post options put head ],
-                      expose: %w[ ETag X-CSRF-Param X-CSRF-Token ],
-                      max_age: 300,
-                      allows: [
-                        { "origins" => '*', "resource" => '/api/*' },
-                        { "origins" => '*', "resource" => '/graphql' },
-                        {
-                          "origins" => ENV['CORS_ORIGINS_USERS'] || default_origins,
-                          "resource" => '/users*',
-                          "credentials" => true
-                        },
-                        {
-                          "origins" => ENV['CORS_ORIGINS_OAUTH'] || default_origins,
-                          "resource" => '/oauth/*',
-                          "credentials" => true
-                        }
-                      ]
-                    })
+    @cors_config ||= OpenStruct.new(
+      headers: :any,
+      request_methods: %w[ delete get post options put head ],
+      expose: %w[ ETag X-CSRF-Param X-CSRF-Token ],
+      max_age: ENV.fetch('CORS_MAX_AGE', 300),
+      allows: [
+        { origins: '*', resource: '/api/*' },
+        { origins: '*', resource: '/graphql' },
+        { origins: cors_origins_regex, resource: '/users*', credentials: true },
+        { origins: cors_origins_regex, resource: '/oauth/*', credentials: true }
+      ]
+    )
   end
 
-  def self.default_origins
-    /^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local)(:\d+)?$/
+  def self.cors_origins_regex
+    cors_origins = ENV.fetch(
+      'CORS_ORIGINS',
+      '^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local)(:\d+)?$'
+    )
+    /#{cors_origins}/
   end
 end
 
