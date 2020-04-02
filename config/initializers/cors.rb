@@ -3,8 +3,8 @@ module Panoptes
   def self.cors_config
     @cors_config ||= OpenStruct.new(
       headers: :any,
-      request_methods: %w[ delete get post options put head ],
-      expose: %w[ ETag X-CSRF-Param X-CSRF-Token ],
+      request_methods: %w[delete get post options put head],
+      expose: %w[ETag X-CSRF-Param X-CSRF-Token],
       max_age: ENV.fetch('CORS_MAX_AGE', 300),
       allows: [
         { origins: '*', resource: '/api/*' },
