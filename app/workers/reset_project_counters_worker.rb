@@ -1,14 +1,19 @@
 class ResetProjectCountersWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :data_high,
+  sidekiq_options(
+    queue: :data_high,
+    lock: :until_executing,
     congestion:
-      Panoptes::CongestionControlConfig.counter_worker.congestion_opts.merge({
+      {
+        interval: ENV.fetch('COUNTER_CONGESTION_OPTS_INTERVAL', 360),
+        max_in_interval: ENV.fetch('COUNTER_CONGESTION_OPTS_MAX_IN_INTERVAL', 10),
+        min_delay: ENV.fetch('COUNTER_CONGESTION_OPTS_MIN_DELAY', 180),
         reject_with: :reschedule,
-        key: ->(project_id) { "project_id_#{ project_id }_count_worker" },
-        enabled: ->(project_id, rate_limit=true) { rate_limit }
-      }),
-    lock: :until_executing
+        key: ->(project_id) { "project_id_#{project_id}_count_worker" },
+        enabled: ->(_project_id, rate_limit=true) { rate_limit }
+      }
+  )
 
   def perform(project_id, rate_limit=true)
     project = Project.find(project_id)
