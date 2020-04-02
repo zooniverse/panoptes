@@ -1,19 +1,13 @@
+# frozen_string_literal: true
+
 module Panoptes
   module EventsApi
-    def self.auth
-      @events_api_auth ||=
-        {
-          username: ENV['EVENTS_API_USERNAME'] || 'dev',
-          password: ENV['EVENTS_API_PASSWORD'] || 'dev_password'
-        }
-    end
-
     def self.username
-      auth[:username]
+      ENV.fetch('EVENTS_API_USERNAME', 'dev')
     end
 
     def self.password
-      auth[:password]
+      ENV.fetch('EVENTS_API_PASSWORD', 'dev_password')
     end
   end
 end
