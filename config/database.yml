@@ -1,7 +1,7 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  url: <%= ENV['DATABASE_URL'] %>
+  url: <%= ENV.fetch('DATABASE_URL', 'postgresql://panoptes:panoptes@localhost') %>
   pool: <%= ENV.fetch('PG_POOL_SIZE', 5) %>
   prepared_statements: <%= ENV.fetch('PG_PREPARED_STATEMENTS', false) %>
   variables:
