@@ -10,4 +10,8 @@ module Panoptes
   def self.pg_statement_timeout
     ENV.fetch('PG_STATEMENT_TIMEOUT', 300000)
   end
+
+  def self.max_page_size_limit
+    ENV.fetch('PAGE_SIZE_LIMIT', 100)
+  end
 end
