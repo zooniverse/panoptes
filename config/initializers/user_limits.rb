@@ -1,11 +1,7 @@
-module Panoptes
-  def self.user_limits
-    @user_limits ||= { subjects: ENV['USER_SUBJECT_LIMIT'] || 100}
-  end
+# frozen_string_literal: true
 
+module Panoptes
   def self.max_subjects
-    user_limits[:subjects]
+    ENV.fetch('USER_SUBJECT_LIMIT', 100)
   end
 end
-
-Panoptes.user_limits
