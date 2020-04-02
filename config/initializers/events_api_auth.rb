@@ -11,5 +11,3 @@ module Panoptes
     end
   end
 end
-
-Panoptes::EventsApi.auth
