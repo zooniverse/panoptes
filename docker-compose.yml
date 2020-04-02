@@ -23,7 +23,7 @@ services:
       - "3000:3000"
     environment:
       - "RAILS_ENV=development"
-      - "DATABASE_URL=postgresql://panoptes:panoptes@pg/panoptes_development"
+      - "DATABASE_URL=postgresql://panoptes:panoptes@pg"
       - "REDIS_URL=redis://redis:6379/0"
       - "DISABLE_SPRING=true"
     links:
