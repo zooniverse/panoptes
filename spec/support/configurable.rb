@@ -66,7 +66,7 @@ RSpec.shared_examples "is configurable" do |prefix|
       allow(File).to receive(:read).and_return(
         "test:\n  host: example.coffee\ndevelopment:\n  host: example.sucks"
       )
-      expect(described_class.config_from_file).to eq({ host: 'example.coffee' })
+      expect(described_class.config_from_file).to eq(host: 'example.coffee')
     end
 
     it 'should memoize the results' do
