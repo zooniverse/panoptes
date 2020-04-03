@@ -10,7 +10,9 @@ shared_examples 'cors headers' do
   end
 
   it 'should expose the correct headers' do
-    expect(response.headers["Access-Control-Expose-Headers"]).to eq('ETag, X-CSRF-Token')
+    expect(
+      response.headers['Access-Control-Expose-Headers']
+    ).to eq('ETag, X-CSRF-Param, X-CSRF-Token')
   end
 
   it 'should have Access-Control-Allow-Methods header' do
