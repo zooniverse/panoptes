@@ -28,7 +28,7 @@ class AddMarkRemoveColumnToRecents < ActiveRecord::Migration
 
     # remove recents bloated indexes after data cleanup
     %i[project_id subject_id user_id workflow_id created_at].each do |col|
-      remove_index :recents, column: col
+      remove_index :recents, column: col if index_exists?(:recents, col)
     end
     # rebuild only recent indexes we use to access data
     add_index :recents, :project_id, algorithm: :concurrently
