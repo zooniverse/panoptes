@@ -86,9 +86,8 @@ class Project < ActiveRecord::Base
     %i(display_name title description workflow_description introduction researcher_quote url_labels)
   end
 
-  # TODO: FIXME
   def available_languages
-    [primary_language]
+    [primary_language] | configuration.fetch('languages', [])
   end
 
   def expert_classifier_level(classifier)
