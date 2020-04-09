@@ -3315,13 +3315,6 @@ CREATE INDEX index_projects_on_tsv ON public.projects USING gin (tsv);
 
 
 --
--- Name: index_recents_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_recents_on_created_at ON public.recents USING btree (created_at);
-
-
---
 -- Name: index_recents_on_project_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3329,24 +3322,10 @@ CREATE INDEX index_recents_on_project_id ON public.recents USING btree (project_
 
 
 --
--- Name: index_recents_on_subject_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_recents_on_subject_id ON public.recents USING btree (subject_id);
-
-
---
 -- Name: index_recents_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_recents_on_user_id ON public.recents USING btree (user_id);
-
-
---
--- Name: index_recents_on_workflow_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_recents_on_workflow_id ON public.recents USING btree (workflow_id);
 
 
 --
