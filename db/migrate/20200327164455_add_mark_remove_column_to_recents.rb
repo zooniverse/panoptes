@@ -8,13 +8,8 @@ class AddMarkRemoveColumnToRecents < ActiveRecord::Migration
     remove_foreign_key :recents, :classifications
 
     # find the first known recent older than 2 week
-    recent_older_than_2_weeks = Recent.where(
-      'created_at < ?',
-      Time.now.utc - 14.days
-    ).order(id: 'desc').limit(1).first
-
-    if recent_older_than_2_weeks
-      # use the oldest recent id to find and remove old recents
+    if recent_older_than_2_weeks = Recent.first_older_than(14.days)
+      # use the oldest recent id to destroy old recents
       old_recents_to_remove = Recent.where(
         'id <= ?',
         recent_older_than_2_weeks.id
