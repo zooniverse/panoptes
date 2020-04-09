@@ -17,7 +17,7 @@ RSpec.describe RecentSweeperWorker do
     expect(worker.class.schedule.to_s).to eq('Hourly')
   end
 
-   it 'removes all recents marked for removal' do
+  it 'removes all recents marked for removal' do
     expect {
       worker.perform
     }.to change {
