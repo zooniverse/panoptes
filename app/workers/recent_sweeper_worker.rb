@@ -27,7 +27,10 @@ class RecentSweeperWorker
     old_recents = Recent.where('id <= ?', old_recent.id).select(:id)
 
     old_recents.find_in_batches do |recents|
-      Recent.where(id: recents).update_all(mark_remove: true)
+      Recent.where(
+        id: recents,
+        mark_remove: false
+      ).update_all(mark_remove: true)
     end
   end
 end
