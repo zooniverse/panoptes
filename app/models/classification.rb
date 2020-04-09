@@ -6,7 +6,7 @@ class Classification < ActiveRecord::Base
 
   has_one :export_row, class_name: "ClassificationExportRow"
 
-  has_many :recents, -> { where(mark_remove: false) }
+  has_many :recents, -> { where(mark_remove: false) }, inverse_of: :classification
 
   has_and_belongs_to_many :subjects,
     join_table: :classification_subjects,

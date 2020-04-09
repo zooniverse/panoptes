@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddMarkRemoveColumnToRecents < ActiveRecord::Migration
   disable_ddl_transaction!
   def up

@@ -5,6 +5,9 @@ require:
 
 Style/NumericLiterals:
   Enabled: false
+Style/BlockDelimiters:
+  Exclude:
+    - 'spec/**/*'
 
 Layout/LineLength:
   Max: 160
@@ -22,3 +25,6 @@ Lint/AmbiguousBlockAssociation:
 Rails/SkipsModelValidations:
   Whitelist:
   - update_all
+
+RSpec/ExampleLength:
+  Max: 10
