@@ -74,10 +74,10 @@ Rails.application.configure do
     enable_starttls_auto: ENV['MAILER_ENABLE_STARTTLS_AUTO'] || true,
     address: ENV['MAILER_ADDRESS'],
     port: ENV['MAILER_PORT'].to_i || 587,
-    domain: ENV['MAILER_PORT'] || 'zooniverse.org',
-    authentication: ENV['MAILER_PORT'] || 'plain',
-    user_name: ENV['MAILER_PORT'],
-    password: ENV['MAILER_PORT']
+    domain: ENV['MAILER_DOMAIN'] || 'zooniverse.org',
+    authentication: ENV['MAILER_AUTHENTICATION'] || 'plain',
+    user_name: ENV['MAILER_USER_NAME'],
+    password: ENV['MAILER_PASSWORD']
   }
 
   config.action_mailer.default_url_options = { protocol: 'https',
