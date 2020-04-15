@@ -73,7 +73,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     enable_starttls_auto: ENV['MAILER_ENABLE_STARTTLS_AUTO'] || true,
     address: ENV['MAILER_ADDRESS'],
-    port: ENV['MAILER_PORT'].to_i || 587,
+    port: ENV.fetch('MAILER_PORT', 587).to_i
     domain: ENV['MAILER_DOMAIN'] || 'zooniverse.org',
     authentication: ENV['MAILER_AUTHENTICATION'] || 'plain',
     user_name: ENV['MAILER_USER_NAME'],
