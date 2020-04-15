@@ -25,7 +25,7 @@ Devise.setup do |config|
         facebook: {
           app_id: ENV['SOCIAL_FACEBOOK_APP_ID'],
           app_secret: ENV['SOCIAL_FACEBOOK_APP_SECRET'],
-          scope: ENV.fetch('SOCIAL_FACEBOOK_SCOPE','email, public_profile')
+          scope: ENV.fetch('SOCIAL_FACEBOOK_SCOPE', 'email, public_profile')
         },
         google_oauth2: {
           app_id: ENV['SOCIAL_GOOGLE_APP_ID'],
