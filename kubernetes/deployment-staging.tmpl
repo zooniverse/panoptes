@@ -25,22 +25,12 @@ spec:
                 secretKeyRef:
                   name: panoptes-staging-env-vars
                   key: SECRET_KEY_BASE
-            - name: ATTENTION_REDIS_URL
-              value: redis://panoptes-staging-redis.zooniverse.org:6379/1
             - name: AWS_REGION
               value: us-east-1
-            - name: KINESIS_STREAM
-              value: zooniverse-staging
             - name: ZOO_STREAM_KINESIS_STREAM_NAME
               value: zooniverse-staging
             - name: ZOO_STREAM_SOURCE
               value: panoptes
-            - name: SUBJECTS_BUCKET
-              value: zooniverse-static
-            - name: BUCKET_PATH
-              value: panoptes-uploads.zooniverse.org
-            - name: EXPORT_BUCKET_PATH
-              value: panoptes-exports.zooniverse.org
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -131,10 +121,6 @@ spec:
                   key: NEW_RELIC_LICENSE_KEY
             - name: PAGE_SIZE_LIMIT
               value: 100
-            - name: SIDEKIQ_HOST
-              value: panoptes-staging-redis.zooniverse.org
-            - name: SIDEKIQ_PORT
-              value: 6379
             - name: SIDEKIQ_VERBOSE
               value: false
             - name: SIDEKIQ_LOGFILE
@@ -144,9 +130,7 @@ spec:
             - name: SIDEKIQ_CONCURRENCY
               value: 4
             - name: SIDEKIQ_TIMEOUT
-              value: 8
-            - name: SIDEKIQ_QUEUES
-              value: really_high,high,medium,default,lo
+              value: 30
             - name: STORAGE_ADAPTER
               value: aws
             - name: STORAGE_BUCKET

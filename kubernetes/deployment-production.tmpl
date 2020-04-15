@@ -25,22 +25,12 @@ spec:
                 secretKeyRef:
                   name: panoptes-production-env-vars
                   key: SECRET_KEY_BASE
-            - name: ATTENTION_REDIS_URL
-              value: redis://panoptes-redis.zooniverse.org:6379/1
             - name: AWS_REGION
               value: us-east-1
-            - name: KINESIS_STREAM
-              value: zooniverse-production
             - name: ZOO_STREAM_KINESIS_STREAM_NAME
               value: zooniverse-production
             - name: ZOO_STREAM_SOURCE
               value: panoptes
-            - name: SUBJECTS_BUCKET
-              value: zooniverse-static
-            - name: BUCKET_PATH
-              value: panoptes-uploads.zooniverse.org
-            - name: EXPORT_BUCKET_PATH
-              value: panoptes-exports.zooniverse.org
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -69,10 +59,6 @@ spec:
               value: cancel
             - name: CORS_ORIGIN
               value: /^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|staging)?\.?heirtagger\.ox\.ac\.uk|(www|lab|learn)\.wildcamgorongosa\.org|www\.diagnosislondon\.org|anno\.tate\.org\.uk|(www|relaunch|field-book)\.notesfromnature\.org|[a-z0-9-]+\.oldweather\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
-            - name: CELLECT_EX_API_HOST
-              value: https://designator.zooniverse.org/
-            - name: CELLECT_MIN_POOL_SIZE
-              value: 5000
             - name: DESIGNATOR_API_HOST
               value: https://designator.zooniverse.org/
             - name: DESIGNATOR_API_USERNAME
@@ -139,10 +125,6 @@ spec:
               value: project-review@zooniverse.org
             - name: PROJECT_REQUEST_BCC
               value: i2h6y2f6a7o0x7i9@zooniverse.slack.com
-            - name: SIDEKIQ_HOST
-              value: panoptes-redis.zooniverse.org
-            - name: SIDEKIQ_PORT
-              value: 6379
             - name: SIDEKIQ_VERBOSE
               value: false
             - name: SIDEKIQ_LOGFILE
@@ -152,9 +134,7 @@ spec:
             - name: SIDEKIQ_CONCURRENCY
               value: 8
             - name: SIDEKIQ_TIMEOUT
-              value: 8
-            - name: SIDEKIQ_QUEUES
-              value: really_high,high,medium,default,low
+              value: 30 
             - name: STORAGE_ADAPTER
               value: aws
             - name: STORAGE_BUCKET
