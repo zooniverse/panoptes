@@ -25,8 +25,6 @@ spec:
                 secretKeyRef:
                   name: panoptes-staging-env-vars
                   key: SECRET_KEY_BASE
-            - name: AWS_REGION
-              value: us-east-1
             - name: ZOO_STREAM_KINESIS_STREAM_NAME
               value: zooniverse-staging
             - name: ZOO_STREAM_SOURCE
@@ -43,20 +41,8 @@ spec:
                   key: AWS_SECRET_ACCESS_KEY
             - name: DUMP_CONGESTION_OPTS_INTERVAL
               value: 60
-            - name: DUMP_CONGESTION_OPTS_MAX_IN_INTERVAL
-              value: 1
             - name: DUMP_CONGESTION_OPTS_MIN_DELAY
               value: 60
-            - name: DUMP_CONGESTION_OPTS_REJECT_WITH
-              value: cancel
-            - name: COUNTER_CONGESTION_OPTS_INTERVAL
-              value: 360
-            - name: COUNTER_CONGESTION_OPTS_MAX_IN_INTERVAL
-              value: 10
-            - name: COUNTER_CONGESTION_OPTS_MIN_DELAY
-              value: 180
-            - name: COUNTER_CONGESTION_OPTS_REJECT_WITH
-              value: cancel
             - name: CORS_ORIGIN
               value: /^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.168\.[0-9]+\.[0-9]+|[a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
             - name: DESIGNATOR_API_HOST
@@ -88,16 +74,10 @@ spec:
                 secretKeyRef:
                   name: panoptes-common-env-vars
                   key: HONEYBADGER_API_KEY
-            - name: MAILER_ENABLE_STARTTLS_AUTO
-              value: 'true'
             - name: MAILER_ADDRESS
               value: email-smtp.us-east-1.amazonaws.com
-            - name: MAILER_PORT
-              value: 587
             - name: MAILER_DOMAIN
               value: zooniverse.org
-            - name: MAILER_AUTHENTICATION
-              value: plain
             - name: MAILER_USER_NAME
               valueFrom:
                 secretKeyRef:
@@ -137,16 +117,6 @@ spec:
               value: zooniverse-static
             - name: STORAGE_PREFIX
               value: panoptes-uploads.zooniverse.org/staging/
-            - name: SELECTION_FOCUS_SET_WINDOW_SIZE
-              value: 1000
-            - name: SELECTION_INDEX_REBUILD_RATE
-              value: 0.01
-            - name: SELECTION_RANDOM_INTERVAL
-              value: 60
-            - name: SELECTION_RANDOM_MAX_IN_INTERVAL
-              value: 1
-            - name: SELECTION_RANDOM_MIN_DELAY
-              value: 30
             - name: SOCIAL_FACEBOOK_APP_ID
               valueFrom:
                 secretKeyRef:
@@ -157,8 +127,6 @@ spec:
                 secretKeyRef:
                   name: panoptes-production-env-vars
                   key: SOCIAL_FACEBOOK_APP_SECRET
-            - name: SOCIAL_FACEBOOK_SCOPE
-              value: email,public_profile
             - name: SOCIAL_GOOGLE_APP_ID
               valueFrom:
                 secretKeyRef:
@@ -169,10 +137,6 @@ spec:
                 secretKeyRef:
                   name: panoptes-production-env-vars
                   key: SOCIAL_GOOGLE_APP_SECRET
-            - name: SOCIAL_GOOGLE_SCOPE
-              value: userinfo.email
-            - name: SOCIAL_GOOGLE_REQUEST_VISIBLE_ACTIONS
-              value: AddActivity,BuyActivity
             - name: TALK_API_HOST
               value: https://talk-staging.zooniverse.org
             - name: TALK_API_USER
