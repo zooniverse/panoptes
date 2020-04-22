@@ -51,6 +51,49 @@ describe RegistrationsController, type: :controller do
           expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, "password")
           post_update
         end
+
+        describe 'revoking access tokens' do
+          let(:oauth_app) { create(:non_confidential_first_party_app, owner: user) }
+          let(:other_oauth_app) { create(:non_confidential_first_party_app, owner: user) }
+          let(:user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
+          let(:user_other_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
+          let(:user_revoked_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
+          let(:other_app_token) { create(:access_token, application_id: other_oauth_app.id, resource_owner_id: user.id) }
+
+          before do
+            user_token
+            user_other_token
+            user_revoked_token.revoke
+            other_app_token
+            sign_in user
+          end
+
+          it 'revokes all access tokens for the relevant client app' do
+            request.env["HTTP_AUTHORIZATION"] = "Bearer #{user_token.token}"
+            expect {
+              put :update, user: params
+            }.to change {
+              Doorkeeper::AccessToken.where(application_id: oauth_app.id, resource_owner_id: user.id, revoked_at: nil).count
+            }.from(2).to(0)
+          end
+
+          it 'does not revoke any access tokens for the client app' do
+            expect {
+              put :update, user: params
+            }.not_to change {
+              Doorkeeper::AccessToken.where(revoked_at: nil).count
+            }
+          end
+
+          it 'does not revoke access tokens for other client apps' do
+            request.env["HTTP_AUTHORIZATION"] = "Bearer #{user_token.token}"
+            expect {
+              put :update, user: params
+            }.not_to change {
+              Doorkeeper::AccessToken.where(application_id: other_oauth_app.id, resource_owner_id: user.id, revoked_at: nil).count
+            }
+          end
+        end
       end
 
       context "without the correct old password" do

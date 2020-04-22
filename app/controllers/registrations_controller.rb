@@ -46,6 +46,7 @@ class RegistrationsController < Devise::RegistrationsController
   def update_from_json
     self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
     if resource.update_with_password(account_update_params)
+      revoke_user_access_tokens_for_oauth_application!(resource)
       UserInfoChangedMailerWorker.perform_async(resource.id, "password")
       render json: {}, status: :no_content
     else
@@ -74,5 +75,14 @@ class RegistrationsController < Devise::RegistrationsController
       end
       [ :unprocessable_entity, response_body ]
     end
+  end
+
+  def revoke_user_access_tokens_for_oauth_application!(user)
+    return unless doorkeeper_token
+
+    Doorkeeper::AccessToken.revoke_all_for(
+      doorkeeper_token.application_id,
+      user
+    )
   end
 end
