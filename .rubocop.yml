@@ -6,6 +6,10 @@ require:
 Style/NumericLiterals:
   Enabled: false
 
+Style/BlockDelimiters:
+  Exclude:
+    - 'spec/**/*'
+
 Layout/LineLength:
   Max: 160
 Layout/SpaceAroundEqualsInParameterDefault:
@@ -15,4 +19,9 @@ Metrics/BlockLength:
   Exclude:
     - '**/*_spec.rb'
 
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "spec/**/*"
 
+RSpec/ExampleLength:
+  Max: 10

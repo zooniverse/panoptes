@@ -69,7 +69,7 @@ describe RegistrationsController, type: :controller do
           end
 
           it 'revokes all access tokens for the relevant client app' do
-            request.env["HTTP_AUTHORIZATION"] = "Bearer #{user_token.token}"
+            request.env['HTTP_AUTHORIZATION'] = "Bearer #{user_token.token}"
             expect {
               put :update, user: params
             }.to change {
@@ -86,7 +86,7 @@ describe RegistrationsController, type: :controller do
           end
 
           it 'does not revoke access tokens for other client apps' do
-            request.env["HTTP_AUTHORIZATION"] = "Bearer #{user_token.token}"
+            request.env['HTTP_AUTHORIZATION'] = "Bearer #{user_token.token}"
             expect {
               put :update, user: params
             }.not_to change {
