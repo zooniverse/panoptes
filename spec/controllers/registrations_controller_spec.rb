@@ -97,13 +97,20 @@ describe RegistrationsController, type: :controller do
           end
 
           context 'when supplying a revoke_all_apps param' do
+            let(:non_owned_oauth_app) { create(:application) }
+            let(:non_owned_app_token) do
+              create(:access_token, application_id: non_owned_oauth_app.id, resource_owner_id: user.id)
+            end
+
+            before { non_owned_app_token }
+
             it 'revokes access tokens for all client apps' do
               request.env['HTTP_AUTHORIZATION'] = "Bearer #{user_token.token}"
               expect {
                 put :update, user: params, revoke_all_tokens: 1
               }.to change {
                 Doorkeeper::AccessToken.where(resource_owner_id: user.id, revoked_at: nil).count
-              }.from(3).to(0)
+              }.from(4).to(0)
             end
           end
         end

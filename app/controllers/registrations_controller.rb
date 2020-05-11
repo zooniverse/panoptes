@@ -88,16 +88,11 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def oauth_application_ids_to_revoke
-    oauth_application_ids = [doorkeeper_token&.application_id]
-
     if params.key?(:revoke_all_tokens)
-      # revoke all user owned oauth application tokens
-      oauth_application_ids <<
-        Doorkeeper::Application
-        .where(owner_id: resource.id, owner_type: resource.class.name)
-        .pluck(:id)
+      # revoke tokens for ALL known oauth applications in the system
+      Doorkeeper::Application.pluck(:id)
+    else
+      [doorkeeper_token&.application_id]
     end
-
-    oauth_application_ids.compact.uniq
   end
 end
