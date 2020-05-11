@@ -77,14 +77,6 @@ describe RegistrationsController, type: :controller do
             }.from(2).to(0)
           end
 
-          it 'does not revoke any access tokens for the client app' do
-            expect {
-              put :update, user: params
-            }.not_to change {
-              Doorkeeper::AccessToken.where(revoked_at: nil).count
-            }
-          end
-
           it 'does not revoke access tokens for other client apps' do
             request.env['HTTP_AUTHORIZATION'] = "Bearer #{user_token.token}"
             expect {
@@ -92,6 +84,27 @@ describe RegistrationsController, type: :controller do
             }.not_to change {
               Doorkeeper::AccessToken.where(application_id: other_oauth_app.id, resource_owner_id: user.id, revoked_at: nil).count
             }
+          end
+
+          context 'when not supplying a bearer token' do
+            it 'does not revoke any access tokens' do
+              expect {
+                put :update, user: params
+              }.not_to change {
+                Doorkeeper::AccessToken.where(revoked_at: nil).count
+              }
+            end
+          end
+
+          context 'when supplying a revoke_all_apps param' do
+            it 'revokes access tokens for all client apps' do
+              request.env['HTTP_AUTHORIZATION'] = "Bearer #{user_token.token}"
+              expect {
+                put :update, user: params, revoke_all_tokens: 1
+              }.to change {
+                Doorkeeper::AccessToken.where(resource_owner_id: user.id, revoked_at: nil).count
+              }.from(3).to(0)
+            end
           end
         end
       end
