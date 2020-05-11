@@ -59,12 +59,15 @@ describe RegistrationsController, type: :controller do
           let(:user_other_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
           let(:user_revoked_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
           let(:other_app_token) { create(:access_token, application_id: other_oauth_app.id, resource_owner_id: user.id) }
+          let(:another_user) { create(:user) }
+          let(:other_user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: another_user.id) }
 
           before do
             user_token
             user_other_token
             user_revoked_token.revoke
             other_app_token
+            other_user_token
             sign_in user
           end
 
@@ -86,6 +89,15 @@ describe RegistrationsController, type: :controller do
             }
           end
 
+          it 'does not revoke access tokens for other users' do
+            request.env['HTTP_AUTHORIZATION'] = "Bearer #{user_token.token}"
+            expect {
+              put :update, user: params
+            }.not_to change {
+              Doorkeeper::AccessToken.where(application_id: other_oauth_app.id, resource_owner_id: another_user.id, revoked_at: nil).count
+            }
+          end
+
           context 'when not supplying a bearer token' do
             it 'does not revoke any access tokens' do
               expect {
@@ -102,15 +114,29 @@ describe RegistrationsController, type: :controller do
               create(:access_token, application_id: non_owned_oauth_app.id, resource_owner_id: user.id)
             end
 
-            before { non_owned_app_token }
-
-            it 'revokes access tokens for all client apps' do
+            before do
+              non_owned_app_token
               request.env['HTTP_AUTHORIZATION'] = "Bearer #{user_token.token}"
+            end
+
+            it 'revokes user access tokens for all client apps' do
               expect {
                 put :update, user: params, revoke_all_tokens: 1
               }.to change {
                 Doorkeeper::AccessToken.where(resource_owner_id: user.id, revoked_at: nil).count
               }.from(4).to(0)
+            end
+
+            it 'does not revoke access tokens for other users' do
+              expect {
+                put :update, user: params
+              }.not_to change {
+                Doorkeeper::AccessToken.where(
+                  application_id: other_oauth_app.id,
+                  resource_owner_id: another_user.id,
+                  revoked_at: nil
+                ).count
+              }
             end
           end
         end
