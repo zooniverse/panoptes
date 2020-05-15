@@ -3,13 +3,11 @@ module Validators
   # Validate that only one favorite collection is created per owner for each project
   class OneFavoritePerOwnerValidator < ActiveModel::Validator
     def validate(new_record)
-      return unless new_record.owner
+      return unless new_record.owner && new_record.favorite
 
-      records = new_record.owner.collections
-      return unless records && new_record.favorite
-
-      records.each do |record|
-        new_record.errors[:favorite] = 'Only one favorite collection can be created per owner for each project' if record.favorite
+      owner_has_existing_favorite = new_record.owner.collections.where(favorite: true).exists?
+      if owner_has_existing_favorite
+        new_record.errors[:favorite] = 'Only one favorite collection can be created per owner for each project'
       end
     end
   end

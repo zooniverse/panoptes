@@ -200,23 +200,32 @@ describe Api::V1::CollectionsController, type: :controller do
         }
       end
 
-      before(:each) do
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
       context 'when favorite collection does not exist for given user/project' do
         it 'successfully creates a favorite collection' do
-          post :create, params: favorite_params
+          post :create, favorite_params
           expect(response).to have_http_status(:created)
         end
       end
 
       context 'when favorite collection already exists for given user/project' do
-        let!(:favorite_collection) { create(:collection, favorite: true, owner: owner) }
+        before { create(:collection, favorite: true, owner: owner) }
 
         it 'raises a 400 error on trying to create a favorite collection' do
-          post :create, params: favorite_params
+          post :create, favorite_params
           expect(response).to have_http_status(:bad_request)
+        end
+      end
+
+      context 'when a non-favorite collection exists for a given user/project' do
+        before { create(:collection, favorite: false, owner: owner) }
+
+        it 'successfully creates a favorite collection' do
+          post :create, favorite_params
+          expect(response).to have_http_status(:created)
         end
       end
     end
