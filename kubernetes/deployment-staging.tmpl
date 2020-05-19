@@ -127,22 +127,22 @@ spec:
             - name: SOCIAL_FACEBOOK_APP_ID
               valueFrom:
                 secretKeyRef:
-                  name: panoptes-production-env-vars
+                  name: panoptes-staging-env-vars
                   key: SOCIAL_FACEBOOK_APP_ID
             - name: SOCIAL_FACEBOOK_APP_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: panoptes-production-env-vars
+                  name: panoptes-staging-env-vars
                   key: SOCIAL_FACEBOOK_APP_SECRET
             - name: SOCIAL_GOOGLE_APP_ID
               valueFrom:
                 secretKeyRef:
-                  name: panoptes-production-env-vars
+                  name: panoptes-staging-env-vars
                   key: SOCIAL_GOOGLE_APP_ID
             - name: SOCIAL_GOOGLE_APP_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: panoptes-production-env-vars
+                  name: panoptes-staging-env-vars
                   key: SOCIAL_GOOGLE_APP_SECRET
             - name: TALK_API_HOST
               value: https://talk-staging.zooniverse.org
