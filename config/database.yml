@@ -12,6 +12,10 @@ development:
   <<: *default
   database: panoptes_development
 
+staging:
+  <<: *default
+  database: panoptes
+
 development_standby:
   <<: *default
   database: panoptes_development
