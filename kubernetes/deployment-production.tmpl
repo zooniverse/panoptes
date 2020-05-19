@@ -17,6 +17,13 @@ spec:
       containers:
         - name: panoptes-production-app
           image: zooniverse/panoptes:__IMAGE_TAG__
+          resources:
+            requests:
+              memory: "1500Mi"
+              cpu: "50m"
+            limits:
+              memory: "1500Mi"
+              cpu: "500m"
           env:
             - name: RAILS_ENV
               value: production
