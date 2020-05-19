@@ -33,7 +33,7 @@ pipeline {
       steps {
         script {
           def dockerRepoName = 'zooniverse/panoptes'
-          def dockerImageName = "${dockerRepoName}:${BRANCH_NAME}"
+          def dockerImageName = "${dockerRepoName}:${GIT_COMMIT}"
           def newImage = docker.build(dockerImageName)
           newImage.push()
 
