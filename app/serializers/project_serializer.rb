@@ -60,37 +60,28 @@ class ProjectSerializer
     end
   end
 
-  # override the serialize page method to preload the
-  # workflow and active_worklfows association data
-  # however avoid loading large json attributes
-  # instead load the data required for serializing
-  # the project and links
+  # override the serialize page method to preload the workflows
+  # and active_workflows association data while avoid loading
+  # large json attributes instead load only the data required
+  # for serializing project & links
   def self.serialize_page(page, options)
-    # this is an experiement to see how we can manually preload
-    # project's workflow associations to avoid loading large json data
-    # and thus high DB CPI
-    # if this lingers past mid April 2020 - remove it and the flipper key
-    if Panoptes.flipper[:test_preload_workflow_associations].enabled?
-      project_ids = page.pluck(:id)
-      preloadable_workflows = preload_workflows(project_ids)
-      page.map do |project_model|
-        # select the model relations for assigning to the workflow associations
-        project_model_workflows = preloadable_workflows.select do |workflow|
-          workflow.project_id == project_model.id
-        end
-        project_model_active_workflows = preloadable_workflows.select do |workflow|
-          workflow.active && workflow.project_id == project_model.id
-        end
-        # assign the preloaded workflow records to the model associations targets
-        # use .target here to avoid loading the association before assignment
-        # and thus undoing all the hard work to load only what we need
-        project_model.association(:workflows).target = project_model_workflows
-        project_model.association(:active_workflows).target = project_model_active_workflows
-
-        self.as_json(project_model, options.context)
+    project_ids = page.pluck(:id)
+    preloadable_workflows = preload_workflows(project_ids)
+    page.map do |project_model|
+      # select the model relations for assigning to the workflow associations
+      project_model_workflows = preloadable_workflows.select do |workflow|
+        workflow.project_id == project_model.id
       end
-    else
-      super(page, options)
+      project_model_active_workflows = preloadable_workflows.select do |workflow|
+        workflow.active && workflow.project_id == project_model.id
+      end
+      # assign the preloaded workflow records to the model associations targets
+      # use .target here to avoid loading the association before assignment
+      # and thus undoing all the hard work to load only what we need
+      project_model.association(:workflows).target = project_model_workflows
+      project_model.association(:active_workflows).target = project_model_active_workflows
+
+      self.as_json(project_model, options.context)
     end
   end
 

@@ -530,4 +530,25 @@ describe Project, type: :model do
       end
     end
   end
+
+  describe '#available_languages' do
+    let(:project) { build(:project) }
+    let(:primary_language) { project.primary_language }
+
+    it 'includes the primary langage by default' do
+      expect(project.available_languages).to match_array([primary_language])
+    end
+
+    it 'includes languages stored in the configuration' do
+      project.configuration['languages'] = ['es']
+      expected_languages = [primary_language, 'es']
+      expect(project.available_languages).to match_array(expected_languages)
+    end
+
+    it 'deduplicates configuration languages and primary language' do
+      expected_languages = [primary_language, 'es']
+      project.configuration['languages'] = expected_languages
+      expect(project.available_languages).to match_array(expected_languages)
+    end
+  end
 end
