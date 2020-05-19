@@ -63,9 +63,10 @@ RSpec.shared_examples "is configurable" do |prefix|
     end
 
     it 'should retun the file section for the current rails environment' do
-      expect(YAML).to receive(:load).and_return({"test" => {host: "example.coffee"},
-        "development" => {host: "example.sucks"}})
-      expect(described_class.config_from_file).to eq({host: "example.coffee"})
+      allow(File).to receive(:read).and_return(
+        "test:\n  host: example.coffee\ndevelopment:\n  host: example.sucks"
+      )
+      expect(described_class.config_from_file).to eq(host: 'example.coffee')
     end
 
     it 'should memoize the results' do

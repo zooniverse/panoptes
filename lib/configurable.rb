@@ -32,12 +32,15 @@ module Configurable
     end
 
     def config_from_file
-      @config_from_file ||= begin
-                         config = YAML.load(ERB.new(File.read(Rails.root.join(@config_file))).result)
-                         config[Rails.env].symbolize_keys
-                       rescue Errno::ENOENT, NoMethodError
-                         {  }
-                       end
+      @config_from_file ||=
+        begin
+          config = YAML.safe_load(
+            ERB.new(File.read(Rails.root.join(@config_file))).result
+          )
+          config[Rails.env].symbolize_keys
+        rescue Errno::ENOENT, NoMethodError
+          {}
+        end
     end
 
     def env_vars

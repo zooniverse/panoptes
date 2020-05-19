@@ -1,16 +1,7 @@
-module Panoptes
-  def self.user_limits
-    @user_limits ||= begin
-                       file = Rails.root.join('config/user_limits.yml')
-                       YAML.load(File.read(file))[Rails.env].symbolize_keys
-                     rescue Errno::ENOENT, NoMethodError
-                       {  }
-                     end
-  end
+# frozen_string_literal: true
 
+module Panoptes
   def self.max_subjects
-    user_limits[:subjects]
+    ENV.fetch('USER_SUBJECT_LIMIT', 100)
   end
 end
-
-Panoptes.user_limits

@@ -26,6 +26,7 @@ RSpec.describe ProjectRequestMailer, type: :mailer do
   end
 
   it 'should have a link to the project in the body' do
-    expect(mail.body.encoded).to match(/http:\/\/example.com\/projects\/#{project.slug}/)
+    expected_regex = %r{#{Panoptes.project_request.base_url}/projects/#{project.slug}}
+    expect(mail.body.encoded).to match(expected_regex)
   end
 end

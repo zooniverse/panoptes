@@ -1,7 +1,0 @@
-development:
-  sidekiq:
-    host: redis
-
-test:
-  sidekiq:
-    host: redis

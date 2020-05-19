@@ -23,7 +23,9 @@ services:
       - "3000:3000"
     environment:
       - "RAILS_ENV=development"
-      - "ATTENTION_REDIS_URL=redis://redis:6379/1"
+      - "DATABASE_URL=postgresql://panoptes:panoptes@pg"
+      - "REDIS_URL=redis://redis:6379/0"
+      - "DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true"
       - "DISABLE_SPRING=true"
     links:
       - redis:redis
