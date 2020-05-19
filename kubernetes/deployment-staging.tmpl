@@ -47,9 +47,9 @@ spec:
                   name: panoptes-common-env-vars
                   key: AWS_SECRET_ACCESS_KEY
             - name: DUMP_CONGESTION_OPTS_INTERVAL
-              value: 60
+              value: "60"
             - name: DUMP_CONGESTION_OPTS_MIN_DELAY
-              value: 60
+              value: "60"
             - name: CORS_ORIGIN
               value: /^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.168\.[0-9]+\.[0-9]+|[a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
             - name: DESIGNATOR_API_HOST
@@ -107,17 +107,17 @@ spec:
                   name: panoptes-common-env-vars
                   key: NEW_RELIC_LICENSE_KEY
             - name: PAGE_SIZE_LIMIT
-              value: 100
+              value: '100'
             - name: SIDEKIQ_VERBOSE
-              value: false
+              value: 'false'
             - name: SIDEKIQ_LOGFILE
               value: ./log/sidekiq.log
             - name: SIDEKIQ_PIDFILE
               value: ./tmp/pids/sidekiq.pid
             - name: SIDEKIQ_CONCURRENCY
-              value: 4
+              value: '4'
             - name: SIDEKIQ_TIMEOUT
-              value: 30
+              value: '30'
             - name: STORAGE_ADAPTER
               value: aws
             - name: STORAGE_BUCKET
@@ -147,11 +147,11 @@ spec:
             - name: TALK_API_HOST
               value: https://talk-staging.zooniverse.org
             - name: TALK_API_USER
-              value: 1
+              value: '1'
             - name: TALK_API_APPLICATION
-              value: 1
+              value: '1'
             - name: USER_SUBJECT_LIMIT
-              value: 100
+              value: '100'
 
 ---
 apiVersion: v1
