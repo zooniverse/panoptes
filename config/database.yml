@@ -1,7 +1,9 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  url: <%= ENV.fetch('DATABASE_URL', 'postgresql://panoptes:panoptes@localhost') %>
+  host: <%= ENV.fetch('DATABASE_HOST', 'localhost') %>
+  username: <%= ENV.fetch('DATABASE_USERNAME', 'panoptes' %>
+  password: <%= ENV.fetch('DATABASE_PASSWORD', 'panoptes' %>
   pool: <%= ENV.fetch('PG_POOL_SIZE', 5) %>
   prepared_statements: <%= ENV.fetch('PG_PREPARED_STATEMENTS', false) %>
   variables:
@@ -13,6 +15,10 @@ development:
   database: panoptes_development
 
 staging:
+  <<: *default
+  database: panoptes
+
+production:
   <<: *default
   database: panoptes
 
