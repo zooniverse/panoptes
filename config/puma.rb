@@ -11,7 +11,7 @@ state_path "#{app_path}/tmp/pids/puma.state"
 
 bind "tcp://0.0.0.0:#{port}"
 
-threads_count = ENV.fetch("RAILS_MAX_THREADS") { 2 }.to_i
+threads_count = ENV.fetch('RAILS_MAX_THREADS', 2).to_i
 
 if rails_env == "production"
   stdout_redirect "#{app_path}/log/production.log", "#{app_path}/log/production_err.log", true
