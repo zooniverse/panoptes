@@ -1,26 +1,13 @@
+# frozen_string_literal: true
+
 module Panoptes
   module SubjectSelection
-    def self.config
-      @config ||= begin
-                    file = Rails.root.join('config/subject_selection_config.yml')
-                    YAML.load(File.read(file))[Rails.env].symbolize_keys
-                  rescue Errno::ENOENT, NoMethodError
-                    {  }
-                  end
-    end
-
     def self.focus_set_window_size
-      config[:focus_set_window_size]
+      ENV.fetch('SELECTION_FOCUS_SET_WINDOW_SIZE', 1000)
     end
 
     def self.index_rebuild_rate
-      config[:index_rebuild_rate]
-    end
-
-    def self.random_order_shuffle_worker_opts
-      config.fetch(:random_order_shuffle_worker_opts, {}).symbolize_keys
+      ENV.fetch('SELECTION_INDEX_REBUILD_RATE', 0.01)
     end
   end
 end
-
-Panoptes::SubjectSelection.config

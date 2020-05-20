@@ -2,6 +2,8 @@ language: ruby
 cache: bundler
 sudo: false
 bundler_args: --without development production
+addons:
+  postgresql: "9.5"
 
 before_install:
   - mkdir -p tmp
@@ -14,7 +16,7 @@ before_install:
 before_script: &before_script
   - psql -c 'create database travis_ci_test;' -U postgres
   - scripts/no_focus.sh
-  - bundle exec rake configure:travis db:setup
+  - bundle exec rake configure:local
   - echo Running script - bundle exec rspec $SPECS
 
 matrix:
@@ -24,25 +26,24 @@ matrix:
   include:
     - rvm: 2.5
       env:
+        - DATABASE_URL=postgresql://localhost/travis_ci_test?user=postgres
         - SPECS=spec/controllers/api/v1/[a-m]*.rb
     - rvm: 2.5
       env:
+        - DATABASE_URL=postgresql://localhost/travis_ci_test?user=postgres
         - SPECS=spec/controllers/api/v1/[n-s]*.rb
     - rvm: 2.5
       env:
+        - DATABASE_URL=postgresql://localhost/travis_ci_test?user=postgres
         - SPECS=spec/controllers/api/v1/[t-z]*.rb
     - rvm: 2.5
       env:
+        - DATABASE_URL=postgresql://localhost/travis_ci_test?user=postgres
         - SPECS="spec/controllers/**.rb spec/controllers/api/*.rb spec/models spec/operations spec/counters spec/routes"
     - rvm: 2.5
       env:
+        - DATABASE_URL=postgresql://localhost/travis_ci_test?user=postgres
         - SPECS="spec/lib spec/workers spec/serializers spec/services spec/requests spec/middleware spec/mailers spec/policies"
     - rvm: 2.6
-
-services:
-  - postgresql
-
-addons:
-  postgresql: "9.5"
 
 script: "bundle exec rspec $SPECS"

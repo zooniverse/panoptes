@@ -1,17 +1,22 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe RecentSerializer do
+  let(:recent) { create(:recent) }
   let(:prefix) { "users/1" }
   let(:context) do
     { url_prefix: prefix }
   end
 
-  it "should preload the serialized associations" do
-    expect_any_instance_of(Recent::ActiveRecord_Relation)
-      .to receive(:preload)
-      .with(:locations)
-      .and_call_original
-    RecentSerializer.page({}, Recent.all, context)
+  it_behaves_like 'a panoptes restpack serializer' do
+    let(:resource) { recent }
+    let(:includes) { [] }
+    let(:preloads) { [:locations] }
+  end
+
+  it_behaves_like 'a no count serializer' do
+    let(:resource) { recent }
   end
 
   describe "#locations" do

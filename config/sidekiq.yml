@@ -1,0 +1,17 @@
+# Sample configuration file for Sidekiq.
+# Options here can still be overridden by cmd line args.
+# sidekiq -C config.yml
+---
+:verbose: <%= ENV.fetch('SIDEKIQ_VERBOSE', false) %>
+:logfile: <%= ENV.fetch('SIDEKIQ_LOGFILE', './log/sidekiq.log') %>
+:pidfile: <%= ENV.fetch('SIDEKIQ_PIDFILE', './tmp/pids/sidekiq.pid') %>
+:concurrency: <%= ENV.fetch('SIDEKIQ_CONCURRENCY', 1) %>
+# Set timeout to 8 on Heroku, longer if you manage your own systems.
+:timeout: <%= ENV.fetch('SIDEKIQ_TIMEOUT', 30) %>
+:queues:
+  - really_high
+  - high
+  - data_high
+  - data_medium
+  - default
+  - data_low

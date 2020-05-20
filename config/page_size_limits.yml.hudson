@@ -1,5 +1,0 @@
-development:
-  max: 100
-
-test:
-  max: 100
