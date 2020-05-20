@@ -12,10 +12,6 @@ development:
   <<: *default
   database: panoptes_development
 
-staging:
-  <<: *default
-  database: panoptes
-
 development_standby:
   <<: *default
   database: panoptes_development
@@ -27,3 +23,16 @@ test:
 test_standby:
   <<: *default
   database: panoptes_test
+
+staging:
+  <<: *default
+
+staging_standby:
+  <<: *default
+
+production:
+  <<: *default
+
+production_standby:
+  <<: *default
+  url: <%= ENV.fetch('DATABASE_REPLICA_URL', '') %>
