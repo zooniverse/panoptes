@@ -11,7 +11,7 @@ module Panoptes
     end
 
     def self.expires_in
-      ENV.fetch("CACHE_EXPIRES_IN", 5.minutes)
+      ENV.fetch("CACHE_EXPIRES_IN", 5.minutes).to_i.seconds
     end
 
     def self.compress
@@ -19,7 +19,7 @@ module Panoptes
     end
 
     def self.pool_size
-      ENV.fetch("CACHE_POOL_SIZE", 16)
+      ENV.fetch("CACHE_POOL_SIZE", 16).to_i
     end
   end
 end
