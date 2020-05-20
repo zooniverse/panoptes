@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # For more information: https://github.com/puma/puma/blob/master/examples/config.rb
 app_path = File.expand_path(File.dirname(File.dirname(__FILE__)))
 
@@ -13,14 +15,14 @@ bind "tcp://0.0.0.0:#{port}"
 
 threads_count = ENV.fetch('RAILS_MAX_THREADS', 2).to_i
 
-if rails_env == "production"
+if rails_env == 'production'
   stdout_redirect "#{app_path}/log/production.log", "#{app_path}/log/production_err.log", true
   # === Cluster mode ===
   workers 2 # TODO: move from cluster mode once production is in K8s
-  threads 1,8
+  threads 1, 8
 else
   # === Non-Cluster mode (no worker / forking) ===
-  threads 1,threads_count
+  threads 1, threads_count
 end
 
 # Additional text to display in process listing
