@@ -13,13 +13,12 @@ bind "tcp://0.0.0.0:#{port}"
 
 threads_count = ENV.fetch("RAILS_MAX_THREADS") { 2 }.to_i
 
-case rails_env
-when "production"
+if rails_env == "production"
   stdout_redirect "#{app_path}/log/production.log", "#{app_path}/log/production_err.log", true
   # === Cluster mode ===
   workers 2 # TODO: move from cluster mode once production is in K8s
   threads 1,8
-when "staging"
+else
   # === Non-Cluster mode (no worker / forking) ===
   threads 1,threads_count
 end
