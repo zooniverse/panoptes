@@ -5,7 +5,7 @@ module Panoptes
       headers: :any,
       request_methods: %w[delete get post options put head],
       expose: %w[ETag X-CSRF-Param X-CSRF-Token],
-      max_age: ENV.fetch('CORS_MAX_AGE', 300),
+      max_age: ENV.fetch('CORS_MAX_AGE', 300).to_i,
       allows: [
         { origins: '*', resource: '/api/*' },
         { origins: '*', resource: '/graphql' },

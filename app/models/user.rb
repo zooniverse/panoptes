@@ -367,6 +367,6 @@ class User < ActiveRecord::Base
   end
 
   def subject_count_cache_expiry
-    ENV.fetch("UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY", 1.hour)
+    ENV.fetch("UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY", 1.hour).to_i.seconds
   end
 end
