@@ -5,9 +5,9 @@ class SubjectSetSubjectCounterWorker
     queue: :data_high,
     congestion:
       {
-        interval: ENV.fetch('COUNTER_CONGESTION_OPTS_INTERVAL', 360),
-        max_in_interval: ENV.fetch('COUNTER_CONGESTION_OPTS_MAX_IN_INTERVAL', 10),
-        min_delay: ENV.fetch('COUNTER_CONGESTION_OPTS_MIN_DELAY', 180),
+        interval: ENV.fetch('COUNTER_CONGESTION_OPTS_INTERVAL', 360).to_i,
+        max_in_interval: ENV.fetch('COUNTER_CONGESTION_OPTS_MAX_IN_INTERVAL', 10).to_i,
+        min_delay: ENV.fetch('COUNTER_CONGESTION_OPTS_MIN_DELAY', 180).to_i,
         reject_with: :reschedule,
         key: ->(subject_set_id) { "subject_set_#{subject_set_id}_counter_worker" }
       },

@@ -6,9 +6,9 @@ class ResetProjectCountersWorker
     lock: :until_executing,
     congestion:
       {
-        interval: ENV.fetch('COUNTER_CONGESTION_OPTS_INTERVAL', 360),
-        max_in_interval: ENV.fetch('COUNTER_CONGESTION_OPTS_MAX_IN_INTERVAL', 10),
-        min_delay: ENV.fetch('COUNTER_CONGESTION_OPTS_MIN_DELAY', 180),
+        interval: ENV.fetch('COUNTER_CONGESTION_OPTS_INTERVAL', 360).to_i,
+        max_in_interval: ENV.fetch('COUNTER_CONGESTION_OPTS_MAX_IN_INTERVAL', 10).to_i,
+        min_delay: ENV.fetch('COUNTER_CONGESTION_OPTS_MIN_DELAY', 180).to_i,
         reject_with: :reschedule,
         key: ->(project_id) { "project_id_#{project_id}_count_worker" },
         enabled: ->(_project_id, rate_limit=true) { rate_limit }
