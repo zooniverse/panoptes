@@ -32,6 +32,11 @@ spec:
                 secretKeyRef:
                   name: panoptes-staging-env-vars
                   key: SECRET_KEY_BASE
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: panoptes-staging-env-vars
+                  key: DATABASE_URL
             - name: ZOO_STREAM_KINESIS_STREAM_NAME
               value: zooniverse-staging
             - name: ZOO_STREAM_SOURCE
@@ -163,6 +168,6 @@ spec:
     app: panoptes-staging-app
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 81
+      targetPort: 81
   type: NodePort

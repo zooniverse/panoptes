@@ -2,11 +2,11 @@ default: &default
   adapter: postgresql
   encoding: unicode
   url: <%= ENV.fetch('DATABASE_URL', 'postgresql://panoptes:panoptes@localhost') %>
-  pool: <%= ENV.fetch('PG_POOL_SIZE', 5) %>
+  pool: <%= ENV.fetch('PG_POOL_SIZE', 5).to_i %>
   prepared_statements: <%= ENV.fetch('PG_PREPARED_STATEMENTS', false) %>
   variables:
     # default 5 minutes for the query exectution (sidekiq uses default, API will set the env param match load balancer)
-    statement_timeout: <%= ENV.fetch('PG_STATEMENT_TIMEOUT', 300000) %>
+    statement_timeout: <%= ENV.fetch('PG_STATEMENT_TIMEOUT', 300000).to_i %>
 
 development:
   <<: *default

@@ -37,7 +37,7 @@ class HttpCacheable
   end
 
   def max_age_directive
-    @max_age_directive ||= ENV.fetch("HTTP_#{resource_symbol.to_s.upcase}_MAX_AGE", 60)
+    @max_age_directive ||= ENV.fetch("HTTP_#{resource_symbol.to_s.upcase}_MAX_AGE", 60).to_i
   end
 
   def cacheable_resource?

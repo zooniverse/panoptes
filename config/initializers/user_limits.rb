@@ -2,6 +2,6 @@
 
 module Panoptes
   def self.max_subjects
-    ENV.fetch('USER_SUBJECT_LIMIT', 100)
+    ENV.fetch('USER_SUBJECT_LIMIT', 100).to_i
   end
 end
