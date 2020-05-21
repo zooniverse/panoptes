@@ -1,4 +1,7 @@
 language: ruby
+branches:
+  only:
+    - master
 cache: bundler
 sudo: false
 bundler_args: --without development production
