@@ -12,7 +12,7 @@ module Validators
       owner_has_existing_favorite = new_record.owner.collections.where(favorite: true).exists?
       return unless owner_has_existing_favorite
 
-      new_record.errors[:favorite] = 'Only one favorite collection can be created per owner for each project'
+      new_record.errors[:favorite] = 'An owner can only have one favorite collection per project'
     end
   end
 end

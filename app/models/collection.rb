@@ -16,7 +16,7 @@ class Collection < ActiveRecord::Base
   validates :display_name, presence: true
   validates :private, inclusion: { in: [true, false], message: "can't be blank" }
   ## TODO: UniqueForOwnerValidator potential has locking issues
-  validates_with UniqueForOwnerValidator, Validators::OneFavoritePerOwnerValidator
+  validates_with Validators::UniqueForOwnerValidator, Validators::OneFavoritePerOwnerValidator
 
   pg_search_scope :search_display_name,
                   against: :display_name,
