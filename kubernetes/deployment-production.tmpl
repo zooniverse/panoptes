@@ -47,6 +47,7 @@ data:
       }
 
       location / {
+        add_header X-Forwarded-Host "";
         proxy_pass http://docker-panoptes;
       }
     }
