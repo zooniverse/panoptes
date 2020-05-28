@@ -1,3 +1,59 @@
+apiVersion: v1
+data:
+  nginx.conf: |+
+    upstream docker-panoptes {
+      server localhost:81;
+    }
+
+    server {
+      server_name panoptes.zooniverse.org signin.zooniverse.org;
+      include /etc/nginx/ssl.default.conf;
+      gzip_types *;
+
+      proxy_buffer_size 8k;
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Real-IP $remote_addr;
+
+      location = /commit_id.txt {
+        root /static-assets/;
+        expires off;
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, HEAD';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+      }
+
+      location ~ ^/api-assets/ {
+        root /static-assets/;
+        gzip_static on; # to serve pre-gzipped version
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location = /favicon.ico {
+        root /static-assets/;
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location = /robots.txt {
+        root /static-assets/;
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location /health_check {
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_pass http://docker-panoptes;
+      }
+
+      location / {
+        proxy_pass http://docker-panoptes;
+      }
+    }
+kind: ConfigMap
+metadata:
+  name: panoptes-nginx-conf-production
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -31,6 +87,13 @@ spec:
             limits:
               memory: "1500Mi"
               cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 81
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
           env:
             - name: RAILS_ENV
               value: production
@@ -171,7 +234,40 @@ spec:
               value: '604800'
             - name: USER_SUBJECT_LIMIT
               value: '10000'
-
+          volumeMounts:
+            - name: static-assets
+              mountPath: "/static-assets"
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
+        - name: panoptes-staging-nginx
+          image: zooniverse/apps-nginx:xenial
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
+            limits:
+              memory: "100Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: static-assets
+              mountPath: "/static-assets"
+            - name: panoptes-nginx-config
+              mountPath: "/etc/nginx-sites"
+      volumes:
+        - name: static-assets
+          emptyDir: {}
+        - name: panoptes-nginx-config
+          configMap:
+            name: panoptes-nginx-conf-production
 ---
 apiVersion: v1
 kind: Service
@@ -182,6 +278,6 @@ spec:
     app: panoptes-production-app
   ports:
     - protocol: TCP
-      port: 81
-      targetPort: 81
+      port: 80
+      targetPort: 80
   type: NodePort

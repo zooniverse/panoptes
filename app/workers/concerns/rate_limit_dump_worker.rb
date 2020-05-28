@@ -4,9 +4,9 @@ module RateLimitDumpWorker
   included do
     sidekiq_options congestion:
       {
-        interval: ENV.fetch('DUMP_CONGESTION_OPTS_INTERVAL', 86400),
-        max_in_interval: ENV.fetch('DUMP_CONGESTION_OPTS_MAX_IN_INTERVAL', 1),
-        min_delay: ENV.fetch('DUMP_CONGESTION_OPTS_MIN_DELAY', 43200),
+        interval: ENV.fetch('DUMP_CONGESTION_OPTS_INTERVAL', 86400).to_i,
+        max_in_interval: ENV.fetch('DUMP_CONGESTION_OPTS_MAX_IN_INTERVAL', 1).to_i,
+        min_delay: ENV.fetch('DUMP_CONGESTION_OPTS_MIN_DELAY', 43200).to_i,
         reject_with: ENV.fetch('DUMP_CONGESTION_OPTS_REJECT_WITH', 'cancel').to_sym,
         key: ->(resource_id, resource_type, medium_id, _requester_id=nil) {
           "#{resource_type}_#{resource_id}_#{medium_id}_data_dump_worker"
