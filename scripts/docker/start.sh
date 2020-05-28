@@ -15,7 +15,7 @@ rm -f tmp/pids/*.pid
 if [ "$RAILS_ENV" == "development" ]; then
   exec bundle exec foreman start
 else
-  if [ ! -d public/assets ]
+  if [ ! -d public/api-assets ] || [ "$(ls -A public/api-assets)" == "" ]
   then
       bundle exec rake assets:precompile
   fi

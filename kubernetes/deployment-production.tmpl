@@ -222,11 +222,7 @@ spec:
               value: '10000'
           volumeMounts:
             - name: static-assets
-              mountPath: "/static-assets"
-          lifecycle:
-            postStart:
-              exec:
-                command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
+              mountPath: "/rails_app/public/api-assets"
         - name: panoptes-staging-nginx
           image: zooniverse/apps-nginx:xenial
           ports:
