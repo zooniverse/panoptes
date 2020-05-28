@@ -19,6 +19,8 @@
 /config/aws_ips.json
 /config/doorkeeper-jwt*.pem
 /config/doorkeeper-jwt*.pub
+/config/keys/doorkeeper-jwt*.pem
+/config/keys/doorkeeper-jwt*.pub
 
 .vagrant/
 *.swp
