@@ -27,6 +27,8 @@ ADD supervisord.conf /etc/supervisor/conf.d/panoptes.conf
 ADD ./ /rails_app
 
 RUN (cd /rails_app && git log --format="%H" -n 1 > commit_id.txt)
+RUN (cd /rails_app && mkdir -p tmp/pids && rm -f tmp/pids/*.pid)
+RUN (cd /rails_app && SECRET_KEY_BASE=1 bundle exec rake assets:precompile)
 
 EXPOSE 81
 
