@@ -15,6 +15,12 @@ RUN apt-get update && \
 
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 
+# set a default RAILS_ENV for the build scripts
+# this is required for the `rake assets:precompile` script
+# to write assets to target dir set in `config.assets.prefix`
+ARG RAILS_ENV=production
+ENV RAILS_ENV=$RAILS_ENV
+
 RUN mkdir config && curl "https://ip-ranges.amazonaws.com/ip-ranges.json" > config/aws_ips.json
 
 ADD ./Gemfile /rails_app/
