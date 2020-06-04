@@ -39,7 +39,7 @@ gem 'pundit', '~> 2.1.0'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 gem 'rails', '~> 4.2.11'
 gem 'ranked-model', '~> 0.4.1'
-gem 'restpack_serializer', github: "zooniverse/restpack_serializer", branch: "rails5" # REST API
+gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'rails5-kaminari-bump', ref: 'dd9ce5202e'
 gem 'strong_migrations'
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'scientist', '~> 1.4.0'
