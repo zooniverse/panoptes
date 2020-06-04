@@ -1,12 +1,13 @@
 GIT
-  remote: git://github.com/zooniverse/restpack_serializer.git
-  revision: a0c2bc4725dbdd86783f09c88054280e110da752
-  branch: rails5
+  remote: https://github.com/zooniverse/restpack_serializer.git
+  revision: dd9ce5202eb3fd7422f38cef10254a3d5ef3bf41
+  ref: dd9ce5202e
+  branch: rails5-kaminari-bump
   specs:
     restpack_serializer (0.5.9)
       activerecord (>= 4.0.3, < 6.0)
       activesupport (>= 4.0.3, < 6.0)
-      kaminari (~> 0.16.1)
+      kaminari (< 2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -186,9 +187,18 @@ GEM
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (1.5.6)
-    kaminari (0.16.3)
-      actionpack (>= 3.0.0)
-      activesupport (>= 3.0.0)
+    kaminari (1.2.1)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.2.1)
+      kaminari-activerecord (= 1.2.1)
+      kaminari-core (= 1.2.1)
+    kaminari-actionview (1.2.1)
+      actionview
+      kaminari-core (= 1.2.1)
+    kaminari-activerecord (1.2.1)
+      activerecord
+      kaminari-core (= 1.2.1)
+    kaminari-core (1.2.1)
     key_struct (0.4.2)
     librato-metrics (2.1.2)
       aggregate (~> 0.2.2)
