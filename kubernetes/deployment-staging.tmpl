@@ -47,7 +47,9 @@ data:
       }
 
       location / {
-        add_header X-Forwarded-Host "";
+        # avoid attacker setting the host value for links in rails_app
+        # https://github.com/rails/rails/issues/29893
+        proxy_set_header X-Forwarded-Host $server_name;
         proxy_pass http://docker-panoptes;
       }
     }
