@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/zooniverse/restpack_serializer.git
-  revision: dd9ce5202eb3fd7422f38cef10254a3d5ef3bf41
-  ref: dd9ce5202e
-  branch: rails5-kaminari-bump
+  revision: cef0969cef79a31de774e71c63de2a934c9e9f7f
+  ref: cef0969cef
+  branch: panoptes-api-version
   specs:
     restpack_serializer (0.5.9)
       activerecord (>= 4.0.3, < 6.0)
