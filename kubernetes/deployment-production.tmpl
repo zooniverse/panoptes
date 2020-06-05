@@ -6,7 +6,7 @@ data:
     }
 
     server {
-      server_name panoptes.zooniverse.org signin.zooniverse.org;
+      server_name panoptes.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
       gzip_types *;
 
@@ -47,7 +47,58 @@ data:
       }
 
       location / {
-        add_header X-Forwarded-Host "";
+        # avoid attacker setting the host value for links in rails_app
+        # https://github.com/rails/rails/issues/29893
+        proxy_set_header X-Forwarded-Host $server_name;
+        proxy_pass http://docker-panoptes;
+      }
+    }
+
+    server {
+      server_name signin.zooniverse.org;
+      include /etc/nginx/ssl.default.conf;
+      gzip_types *;
+
+      proxy_buffer_size 8k;
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Real-IP $remote_addr;
+
+      location = /commit_id.txt {
+        root /static-assets/;
+        expires off;
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, HEAD';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+      }
+
+      location ~ ^/api-assets/ {
+        root /static-assets/;
+        gzip_static on; # to serve pre-gzipped version
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location = /favicon.ico {
+        root /static-assets/;
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location = /robots.txt {
+        root /static-assets/;
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location /health_check {
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_pass http://docker-panoptes;
+      }
+
+      location / {
+        # avoid attacker setting the host value for links in rails_app
+        # https://github.com/rails/rails/issues/29893
+        proxy_set_header X-Forwarded-Host $server_name;
         proxy_pass http://docker-panoptes;
       }
     }
