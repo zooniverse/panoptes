@@ -247,6 +247,9 @@ spec:
             httpGet:
               path: /
               port: 80
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
             initialDelaySeconds: 10
           ports:
             - containerPort: 80
