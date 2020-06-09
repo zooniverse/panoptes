@@ -83,10 +83,10 @@ spec:
           resources:
             requests:
               memory: "1500Mi"
-              cpu: "50m"
+              cpu: "500m"
             limits:
               memory: "1500Mi"
-              cpu: "500m"
+              cpu: "1000m"
           livenessProbe:
             httpGet:
               path: /
@@ -254,6 +254,9 @@ spec:
             httpGet:
               path: /
               port: 80
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
             initialDelaySeconds: 10
           ports:
             - containerPort: 80
