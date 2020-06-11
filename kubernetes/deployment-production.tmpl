@@ -122,9 +122,16 @@ spec:
       labels:
         app: panoptes-production-app
     spec:
+      volumes:
+        - name: jwt-production
+          secret:
+            secretName: panoptes-doorkeeper-jwt-production
       containers:
         - name: panoptes-production-app
           image: zooniverse/panoptes:__IMAGE_TAG__
+          volumeMounts:
+            - name: jwt-production
+              mountPath: "/rails_app/config/keys"
           resources:
             requests:
               memory: "1500Mi"
