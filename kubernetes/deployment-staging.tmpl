@@ -82,7 +82,14 @@ spec:
               cpu: "50m"
             limits:
               memory: "700Mi"
-              cpu: "500m"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 81
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
           env:
             - name: RAILS_ENV
               value: staging
@@ -225,6 +232,21 @@ spec:
                 command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
         - name: panoptes-staging-nginx
           image: zooniverse/apps-nginx:xenial
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
+            limits:
+              memory: "100Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
+            initialDelaySeconds: 10
           ports:
             - containerPort: 80
           volumeMounts:
