@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RateLimitDumpWorker
   extend ActiveSupport::Concern
 
@@ -12,8 +14,25 @@ module RateLimitDumpWorker
           "#{resource_type}_#{resource_id}_#{medium_id}_data_dump_worker"
         },
         enabled: ->(_resource_id, _resource_type, _medium_id, requester_id=nil) {
-          requester_id.blank? || !User.find(requester_id).admin?
+          congestion_enabled?(requester_id)
         }
       }
+  end
+
+  module ClassMethods
+    def congestion_enabled?(requester_id)
+      # if the user is missing, should only happen via the rails console
+      return false if requester_id.blank?
+
+      if (skip_id_env = ENV.fetch('SKIP_DUMP_RATE_LIMIT_USER_IDS', nil))
+        skip_ids = skip_id_env.split(',').map(&:to_i)
+        skip_ids.include?(requester_id)
+        # false if the user is a special skip rate limit user
+        false
+      else
+        # false if user is admin, true if not admin
+        !User.find(requester_id).is_admin?
+      end
+    end
   end
 end
