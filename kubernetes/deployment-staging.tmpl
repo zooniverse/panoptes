@@ -6,7 +6,7 @@ data:
     }
 
     server {
-      server_name panoptes.zooniverse.org signin.zooniverse.org;
+      server_name panoptes-staging.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
       gzip_types *;
 
@@ -47,6 +47,9 @@ data:
       }
 
       location / {
+        # avoid attacker setting the host value for links in rails_app
+        # https://github.com/rails/rails/issues/29893
+        proxy_set_header X-Forwarded-Host $server_name;
         proxy_pass http://docker-panoptes;
       }
     }
