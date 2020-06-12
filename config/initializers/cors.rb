@@ -17,7 +17,7 @@ module Panoptes
 
   def self.cors_origins_regex
     cors_origins = ENV.fetch(
-      'CORS_ORIGINS',
+      'CORS_ORIGINS_REGEX',
       '^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local)(:\d+)?$'
     )
     /#{cors_origins}/
