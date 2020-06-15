@@ -292,3 +292,64 @@ spec:
       port: 80
       targetPort: 80
   type: NodePort
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: panoptes-staging-redis
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azurefile
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-staging-redis
+  labels:
+    app: panoptes-staging-redis
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: panoptes-staging-redis
+  template:
+    metadata:
+      labels:
+        app: panoptes-staging-redis
+    spec:
+      containers:
+        - name: panoptes-staging-redis
+          image: redis:6.0.5
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
+            limits:
+              memory: "100Mi"
+              cpu: "500m"
+          volumeMounts:
+          - name: panoptes-staging-redis-data
+            mountPath: "/data"
+      volumes:
+      - name: panoptes-staging-redis-data
+        persistentVolumeClaim:
+          claimName: panoptes-staging-redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-staging-redis
+spec:
+  selector:
+    app: panoptes-staging-redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: NodePort

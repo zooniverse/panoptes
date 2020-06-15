@@ -348,3 +348,64 @@ spec:
       port: 80
       targetPort: 80
   type: NodePort
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: panoptes-production-redis
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azurefile
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-production-redis
+  labels:
+    app: panoptes-production-redis
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: panoptes-production-redis
+  template:
+    metadata:
+      labels:
+        app: panoptes-production-redis
+    spec:
+      containers:
+        - name: panoptes-production-redis
+          image: redis:6.0.5
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
+            limits:
+              memory: "100Mi"
+              cpu: "500m"
+          volumeMounts:
+          - name: panoptes-production-redis-data
+            mountPath: "/data"
+      volumes:
+      - name: panoptes-production-redis-data
+        persistentVolumeClaim:
+          claimName: panoptes-production-redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-production-redis
+spec:
+  selector:
+    app: panoptes-production-redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: NodePort
