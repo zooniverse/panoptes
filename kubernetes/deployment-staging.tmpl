@@ -72,16 +72,9 @@ spec:
       labels:
         app: panoptes-staging-app
     spec:
-      volumes:
-        - name: jwt-staging
-          secret:
-            secretName: panoptes-doorkeeper-jwt-staging
       containers:
         - name: panoptes-staging-app
           image: zooniverse/panoptes:__IMAGE_TAG__
-          volumeMounts:
-            - name: jwt-staging
-              mountPath: "/rails_app/config/keys"
           resources:
             requests:
               memory: "700Mi"
@@ -232,6 +225,9 @@ spec:
           volumeMounts:
             - name: static-assets
               mountPath: "/static-assets"
+            - name: jwt-staging
+              mountPath: "/rails_app/config/keys"
+              readOnly: true
           lifecycle:
             postStart:
               exec:
@@ -266,6 +262,9 @@ spec:
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-staging
+        - name: jwt-staging
+          secret:
+            secretName: panoptes-doorkeeper-jwt-staging
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler

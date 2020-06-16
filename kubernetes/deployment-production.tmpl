@@ -121,16 +121,9 @@ spec:
       labels:
         app: panoptes-production-app
     spec:
-      volumes:
-        - name: jwt-production
-          secret:
-            secretName: panoptes-doorkeeper-jwt-production
       containers:
         - name: panoptes-production-app
           image: zooniverse/panoptes:__IMAGE_TAG__
-          volumeMounts:
-            - name: jwt-production
-              mountPath: "/rails_app/config/keys"
           resources:
             requests:
               memory: "1500Mi"
@@ -288,6 +281,9 @@ spec:
           volumeMounts:
             - name: static-assets
               mountPath: "/static-assets"
+            - name: jwt-production
+              mountPath: "/rails_app/config/keys"
+              readOnly: true
           lifecycle:
             postStart:
               exec:
@@ -322,6 +318,9 @@ spec:
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-production
+        - name: jwt-production
+          secret:
+            secretName: panoptes-doorkeeper-jwt-production
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
