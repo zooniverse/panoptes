@@ -1,8 +1,8 @@
 module Panoptes
-  module ElastiCache
+  module Cache
     def self.client
-      if cluster_name = ENV["ELASTIC_CACHE"]
-        Dalli::ElastiCache.new("#{cluster_name}:11211")
+      if cluster_name = ENV["CACHE_SERVER"]
+        Dalli::Client.new("#{cluster_name}:11211")
       end
     end
 
