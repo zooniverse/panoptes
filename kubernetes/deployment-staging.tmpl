@@ -120,8 +120,8 @@ spec:
               value: "60"
             - name: DUMP_CONGESTION_OPTS_MIN_DELAY
               value: "60"
-            - name: CACHE_SERVER
-              value: panoptes-staging-memcached
+            - name: MEMCACHE_SERVERS
+              value: 'panoptes-staging-memcached:11211'
             - name: CORS_ORIGINS_REGEX
               value: '^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.168\.[0-9]+\.[0-9]+|[a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
             - name: DESIGNATOR_API_HOST
@@ -335,4 +335,4 @@ spec:
     - protocol: TCP
       port: 11211
       targetPort: 11211
-  type: NodePort 
+  type: NodePort
