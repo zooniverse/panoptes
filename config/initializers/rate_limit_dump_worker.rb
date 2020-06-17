@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Panoptes
-  module DumpWorkerRateLimit
+  module RateLimitDumpWorker
     def self.interval
       ENV.fetch('DUMP_CONGESTION_OPTS_INTERVAL', 86400).to_i
     end
