@@ -170,6 +170,8 @@ spec:
                 secretKeyRef:
                   name: panoptes-common-env-vars
                   key: AWS_SECRET_ACCESS_KEY
+            - name: MEMCACHE_SERVERS
+              value: 'panoptes-production-memcached:11211'
             - name: CORS_ORIGINS_REGEX
               value: '^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|staging)?\.?heirtagger\.ox\.ac\.uk|(www|lab|learn)\.wildcamgorongosa\.org|www\.diagnosislondon\.org|anno\.tate\.org\.uk|(www|relaunch|field-book)\.notesfromnature\.org|[a-z0-9-]+\.oldweather\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
             - name: DESIGNATOR_API_HOST
@@ -346,4 +348,47 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-production-memcached
+  labels:
+    app: panoptes-production-memcached
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: panoptes-production-memcached
+  template:
+    metadata:
+      labels:
+        app: panoptes-production-memcached
+    spec:
+      containers:
+        - name: panoptes-production-memcached
+          image: memcached:1.6.6
+          args: ['-m 90']
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
+            limits:
+              memory: "100Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-production-memcached
+spec:
+  selector:
+    app: panoptes-production-memcached
+  ports:
+    - protocol: TCP
+      port: 11211
+      targetPort: 11211
   type: NodePort

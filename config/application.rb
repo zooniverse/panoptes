@@ -46,8 +46,10 @@ module Panoptes
     config.middleware.use Flipper::Middleware::SetupEnv, -> { Panoptes.flipper }
     config.middleware.use Flipper::Middleware::Memoizer
 
-    if cache_client = Panoptes::ElastiCache.client
-      config.cache_store = :dalli_store, cache_client.servers, Panoptes::ElastiCache.options
+    if Panoptes::Cache.enabled?
+      # use ENV MEMCACHE_SERVERS var to configure the servers
+      # https://github.com/petergoldstein/dalli#usage-with-rails-3x-and-4x
+      config.cache_store = :dalli_store, nil, Panoptes::Cache.options
     end
   end
 end

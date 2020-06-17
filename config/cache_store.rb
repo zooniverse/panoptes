@@ -1,9 +1,7 @@
 module Panoptes
-  module ElastiCache
-    def self.client
-      if cluster_name = ENV["ELASTIC_CACHE"]
-        Dalli::ElastiCache.new("#{cluster_name}:11211")
-      end
+  module Cache
+    def self.enabled?
+      ENV.key?('MEMCACHE_SERVERS')
     end
 
     def self.options
@@ -11,15 +9,15 @@ module Panoptes
     end
 
     def self.expires_in
-      ENV.fetch("CACHE_EXPIRES_IN", 5.minutes).to_i.seconds
+      ENV.fetch('CACHE_EXPIRES_IN', 5.minutes).to_i.seconds
     end
 
     def self.compress
-      ENV.fetch("CACHE_COMPRESS", true)
+      ENV.fetch('CACHE_COMPRESS', true)
     end
 
     def self.pool_size
-      ENV.fetch("CACHE_POOL_SIZE", 16).to_i
+      ENV.fetch('RAILS_MAX_THREADS', 8).to_i
     end
   end
 end
