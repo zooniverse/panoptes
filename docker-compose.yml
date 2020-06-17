@@ -20,8 +20,7 @@ services:
       - ./:/rails_app
       - gem_cache:/usr/local/bundle
     ports:
-      - "3000:30o00"
-    command: ["/app/docker/start.sh"]
+      - "3000:3000"
     environment:
       - "RAILS_ENV=development"
       - "DATABASE_URL=postgresql://panoptes:panoptes@pg"
@@ -35,13 +34,10 @@ services:
   sidekiq:
     build:
       context: .
-      dockerfile: Dockerfile.dev
     volumes:
       - ./:/rails_app
       - gem_cache:/usr/local/bundle
-    ports:
-      - "3000:3000"
-    command: ["/app/docker/start-sidekiq.sh"]
+    command: ["/rails_app/scripts/docker/sidekiq-start.sh"]
     environment:
       - "RAILS_ENV=development"
       - "DATABASE_URL=postgresql://panoptes:panoptes@pg"
