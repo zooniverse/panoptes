@@ -3,11 +3,11 @@
 # sidekiq -C config.yml
 ---
 :verbose: <%= ENV.fetch('SIDEKIQ_VERBOSE', false) %>
-:logfile: <%= ENV.fetch('SIDEKIQ_LOGFILE', './log/sidekiq.log') %>
-:pidfile: <%= ENV.fetch('SIDEKIQ_PIDFILE', './tmp/pids/sidekiq.pid') %>
 :concurrency: <%= ENV.fetch('SIDEKIQ_CONCURRENCY', 1).to_i %>
-# Set timeout to 8 on Heroku, longer if you manage your own systems.
-:timeout: <%= ENV.fetch('SIDEKIQ_TIMEOUT', 30).to_i %>
+# Default graceperiod in K8s is 30s
+# we can specify longer but will need to increase the terminationGracePeriod
+# https://cloud.google.com/blog/products/gcp/kubernetes-best-practices-terminating-with-grace
+:timeout: <%= ENV.fetch('SIDEKIQ_TIMEOUT', 25).to_i %>
 :queues:
   - really_high
   - high
