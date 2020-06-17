@@ -14,5 +14,6 @@ Layout/SpaceAroundEqualsInParameterDefault:
 Metrics/BlockLength:
   Exclude:
     - '**/*_spec.rb'
+    - 'spec/support/*.rb'
 
 
