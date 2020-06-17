@@ -538,11 +538,11 @@ metadata:
   name: panoptes-production-redis
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   storageClassName: azurefile
   resources:
     requests:
-      storage: 1Gi
+      storage: 5Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -567,11 +567,11 @@ spec:
           image: redis:6.0.5
           resources:
             requests:
-              memory: "100Mi"
-              cpu: "10m"
-            limits:
-              memory: "100Mi"
+              memory: "4096Mi"
               cpu: "500m"
+            limits:
+              memory: "4096Mi"
+              cpu: "1500m"
           volumeMounts:
           - name: panoptes-production-redis-data
             mountPath: "/data"
