@@ -1,6 +1,5 @@
 module Subjects
   class StrategySelection
-    include Logging
 
     DEFAULT_LIMIT = 20
 
