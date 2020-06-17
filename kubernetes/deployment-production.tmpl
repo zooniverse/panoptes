@@ -359,10 +359,6 @@ spec:
             limits:
               memory: "1500Mi"
               cpu: "1000m"
-          volumes:
-            - name: panoptes-production-dumpworker-data
-              persistentVolumeClaim:
-              claimName: panoptes-production-dumpworker
           env:
             - name: RAILS_ENV
               value: production
@@ -503,6 +499,10 @@ spec:
               value: '604800'
             - name: USER_SUBJECT_LIMIT
               value: '10000'
+      volumes:
+        - name: panoptes-production-dumpworker-data
+          persistentVolumeClaim:
+          claimName: panoptes-production-dumpworker
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
@@ -574,9 +574,9 @@ spec:
           - name: panoptes-production-redis-data
             mountPath: "/data"
       volumes:
-      - name: panoptes-production-redis-data
-        persistentVolumeClaim:
-          claimName: panoptes-production-redis
+        - name: panoptes-production-redis-data
+          persistentVolumeClaim:
+            claimName: panoptes-production-redis
 ---
 apiVersion: v1
 kind: Service
