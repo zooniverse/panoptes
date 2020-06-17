@@ -121,16 +121,9 @@ spec:
       labels:
         app: panoptes-production-app
     spec:
-      volumes:
-        - name: jwt-production
-          secret:
-            secretName: panoptes-doorkeeper-jwt-production
       containers:
         - name: panoptes-production-app
           image: zooniverse/panoptes:__IMAGE_TAG__
-          volumeMounts:
-            - name: jwt-production
-              mountPath: "/rails_app/config/keys"
           resources:
             requests:
               memory: "1500Mi"
@@ -178,7 +171,7 @@ spec:
                   name: panoptes-common-env-vars
                   key: AWS_SECRET_ACCESS_KEY
             - name: CORS_ORIGINS_REGEX
-              value: /^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|staging)?\.?heirtagger\.ox\.ac\.uk|(www|lab|learn)\.wildcamgorongosa\.org|www\.diagnosislondon\.org|anno\.tate\.org\.uk|(www|relaunch|field-book)\.notesfromnature\.org|[a-z0-9-]+\.oldweather\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
+              value: '^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|staging)?\.?heirtagger\.ox\.ac\.uk|(www|lab|learn)\.wildcamgorongosa\.org|www\.diagnosislondon\.org|anno\.tate\.org\.uk|(www|relaunch|field-book)\.notesfromnature\.org|[a-z0-9-]+\.oldweather\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
             - name: DESIGNATOR_API_HOST
               value: https://designator.zooniverse.org/
             - name: DESIGNATOR_API_USERNAME
@@ -288,6 +281,9 @@ spec:
           volumeMounts:
             - name: static-assets
               mountPath: "/static-assets"
+            - name: jwt-production
+              mountPath: "/rails_app/config/keys"
+              readOnly: true
           lifecycle:
             postStart:
               exec:
@@ -322,6 +318,9 @@ spec:
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-production
+        - name: jwt-production
+          secret:
+            secretName: panoptes-doorkeeper-jwt-production
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1

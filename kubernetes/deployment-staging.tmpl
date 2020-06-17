@@ -72,16 +72,9 @@ spec:
       labels:
         app: panoptes-staging-app
     spec:
-      volumes:
-        - name: jwt-staging
-          secret:
-            secretName: panoptes-doorkeeper-jwt-staging
       containers:
         - name: panoptes-staging-app
           image: zooniverse/panoptes:__IMAGE_TAG__
-          volumeMounts:
-            - name: jwt-staging
-              mountPath: "/rails_app/config/keys"
           resources:
             requests:
               memory: "700Mi"
@@ -128,7 +121,7 @@ spec:
             - name: DUMP_CONGESTION_OPTS_MIN_DELAY
               value: "60"
             - name: CORS_ORIGINS_REGEX
-              value: /^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.168\.[0-9]+\.[0-9]+|[a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
+              value: '^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.168\.[0-9]+\.[0-9]+|[a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
             - name: DESIGNATOR_API_HOST
               value: https://designator-staging.zooniverse.org/
             - name: DESIGNATOR_API_USERNAME
@@ -232,6 +225,9 @@ spec:
           volumeMounts:
             - name: static-assets
               mountPath: "/static-assets"
+            - name: jwt-staging
+              mountPath: "/rails_app/config/keys"
+              readOnly: true
           lifecycle:
             postStart:
               exec:
@@ -266,6 +262,9 @@ spec:
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-staging
+        - name: jwt-staging
+          secret:
+            secretName: panoptes-doorkeeper-jwt-staging
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
