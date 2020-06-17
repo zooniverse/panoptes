@@ -33,6 +33,11 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
+  # override default log to stdout, unless env var key exists
+  unless ENV.key?('RAILS_LOG_TO_FILE')
+    config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+  end
+
   config.log_tags = [:uuid]
 
   # Raises error for missing translations
