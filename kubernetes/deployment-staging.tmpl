@@ -442,7 +442,7 @@ spec:
       volumes:
         - name: panoptes-staging-dumpworker-data
           persistentVolumeClaim:
-          claimName: panoptes-staging-dumpworker
+            claimName: panoptes-staging-dumpworker
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler

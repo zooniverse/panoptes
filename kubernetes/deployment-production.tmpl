@@ -504,7 +504,7 @@ spec:
       volumes:
         - name: panoptes-production-dumpworker-data
           persistentVolumeClaim:
-          claimName: panoptes-production-dumpworker
+            claimName: panoptes-production-dumpworker
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
