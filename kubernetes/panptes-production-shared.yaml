@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: panoptes-production-shared
+data:
+  RAILS_ENV: production
+  ZOO_STREAM_KINESIS_STREAM_NAME: zooniverse-production
+  ZOO_STREAM_SOURCE: panoptes
+  CORS_ORIGINS_REGEX: /^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|staging)?\.?heirtagger\.ox\.ac\.uk|(www|lab|learn)\.wildcamgorongosa\.org|www\.diagnosislondon\.org|anno\.tate\.org\.uk|(www|relaunch|field-book)\.notesfromnature\.org|[a-z0-9-]+\.oldweather\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
+  DESIGNATOR_API_HOST: https://designator.zooniverse.org/
+  DESIGNATOR_API_USERNAME: production
+  EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
+  EVENTS_API_USERNAME: api
+  REDIRECTS_BASE: https://www.zooniverse.org
+  REDIRECTS_PASSWORD_RESET: /reset-password
+  REDIRECTS_UNSUBSCRIBE: /unsubscribe
+  MAILER_ADDRESS: email-smtp.us-east-1.amazonaws.com
+  MAILER_DOMAIN: zooniverse.org
+  NEW_RELIC_APP_NAME: Panoptes
+  NEW_RELIC_MONITOR_MODE: 'true'
+  PAGE_SIZE_LIMIT: '200'
+  PROJECT_REQUEST_BASE_URL: https://www.zooniverse.org
+  PROJECT_REQUEST_RECIPIENTS: project-review@zooniverse.org
+  PROJECT_REQUEST_BCC: i2h6y2f6a7o0x7i9@zooniverse.slack.com
+  SIDEKIQ_VERBOSE: 'false'
+  SIDEKIQ_LOGFILE: ./log/sidekiq.log
+  SIDEKIQ_PIDFILE: ./tmp/pids/sidekiq.pid
+  SIDEKIQ_CONCURRENCY: '8'
+  SIDEKIQ_TIMEOUT: '30'
+  STORAGE_ADAPTER: aws
+  STORAGE_BUCKET: zooniverse-static
+  STORAGE_PREFIX: panoptes-uploads.zooniverse.org/production/
+  TALK_API_HOST: https://talk.zooniverse.org
+  TALK_API_USER: '1'
+  TALK_API_APPLICATION: '1'
+  UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY: '604800'
+  USER_SUBJECT_LIMIT: '10000'
