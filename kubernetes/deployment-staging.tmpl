@@ -77,10 +77,12 @@ data:
   REDIRECTS_UNSUBSCRIBE: /#/unsubscribe
   MAILER_ADDRESS: email-smtp.us-east-1.amazonaws.com
   MAILER_DOMAIN: zooniverse.org
+  MEMCACHE_SERVERS: 'panoptes-staging-memcached:11211'
   NEW_RELIC_APP_NAME: Panoptes Staging
   NEW_RELIC_LOG_LEVEL: info
   NEW_RELIC_MONITOR_MODE: 'true'
   PAGE_SIZE_LIMIT: '100'
+  REDIS_URL: 'redis://panoptes-staging-redis:6379/0'
   SIDEKIQ_VERBOSE: 'false'
   SIDEKIQ_LOGFILE: ./log/sidekiq.log
   SIDEKIQ_PIDFILE: ./tmp/pids/sidekiq.pid

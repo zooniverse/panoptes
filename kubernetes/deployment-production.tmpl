@@ -124,12 +124,14 @@ data:
   REDIRECTS_UNSUBSCRIBE: /unsubscribe
   MAILER_ADDRESS: email-smtp.us-east-1.amazonaws.com
   MAILER_DOMAIN: zooniverse.org
+  MEMCACHE_SERVERS: 'panoptes-production-memcached:11211'
   NEW_RELIC_APP_NAME: Panoptes
   NEW_RELIC_MONITOR_MODE: 'true'
   PAGE_SIZE_LIMIT: '200'
   PROJECT_REQUEST_BASE_URL: https://www.zooniverse.org
   PROJECT_REQUEST_RECIPIENTS: project-review@zooniverse.org
   PROJECT_REQUEST_BCC: i2h6y2f6a7o0x7i9@zooniverse.slack.com
+  REDIS_URL: 'redis://panoptes-staging-redis:6379/0'
   SIDEKIQ_VERBOSE: 'false'
   SIDEKIQ_LOGFILE: ./log/sidekiq.log
   SIDEKIQ_PIDFILE: ./tmp/pids/sidekiq.pid
