@@ -223,9 +223,11 @@ spec:
             requests:
               memory: "700Mi"
               cpu: "50m"
+              ephemeral-storage: "10Gi"
             limits:
               memory: "700Mi"
               cpu: "1000m"
+              ephemeral-storage: "10Gi"
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           envFrom:
           - secretRef:
