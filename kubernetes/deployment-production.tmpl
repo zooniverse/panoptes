@@ -290,6 +290,7 @@ spec:
             limits:
               memory: "1500Mi"
               cpu: "1000m"
+          args: ["/rails_app/scripts/docker/sidekiq-start.sh"]
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
