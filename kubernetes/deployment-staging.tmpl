@@ -177,6 +177,32 @@ spec:
           secret:
             secretName: panoptes-doorkeeper-jwt-staging
 ---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: panoptes-staging-app
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: panoptes-staging-app
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-staging-app
+spec:
+  selector:
+    app: panoptes-staging-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -226,32 +252,6 @@ spec:
         - name: panoptes-staging-dumpworker-data
           persistentVolumeClaim:
             claimName: panoptes-staging-dumpworker
----
-apiVersion: autoscaling/v1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: panoptes-staging-app
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: panoptes-staging-app
-  minReplicas: 1
-  maxReplicas: 2
-  targetCPUUtilizationPercentage: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: panoptes-staging-app
-spec:
-  selector:
-    app: panoptes-staging-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-  type: NodePort
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
