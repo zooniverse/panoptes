@@ -2,7 +2,7 @@
 # Options here can still be overridden by cmd line args.
 # sidekiq -C config.yml
 ---
-:verbose: <%= ENV.fetch('SIDEKIQ_VERBOSE', false) %>
+:verbose: <%= !!ENV.fetch('SIDEKIQ_VERBOSE', false) %>
 :concurrency: <%= ENV.fetch('SIDEKIQ_CONCURRENCY', 1).to_i %>
 # Default graceperiod in K8s is 30s
 # we can specify longer but will need to increase the terminationGracePeriod
