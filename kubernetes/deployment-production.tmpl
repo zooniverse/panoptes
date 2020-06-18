@@ -234,16 +234,8 @@ spec:
               value: project-review@zooniverse.org
             - name: PROJECT_REQUEST_BCC
               value: i2h6y2f6a7o0x7i9@zooniverse.slack.com
-            - name: SIDEKIQ_VERBOSE
-              value: 'false'
-            - name: SIDEKIQ_LOGFILE
-              value: ./log/sidekiq.log
-            - name: SIDEKIQ_PIDFILE
-              value: ./tmp/pids/sidekiq.pid
             - name: SIDEKIQ_CONCURRENCY
               value: '8'
-            - name: SIDEKIQ_TIMEOUT
-              value: '30'
             - name: STORAGE_ADAPTER
               value: aws
             - name: STORAGE_BUCKET
