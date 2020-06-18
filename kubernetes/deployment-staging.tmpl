@@ -205,18 +205,6 @@ spec:
       targetPort: 80
   type: NodePort
 ---
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: panoptes-staging-dumpworker
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: azurefile
-  resources:
-    requests:
-      storage: 100Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -250,10 +238,12 @@ spec:
               name: panoptes-staging-env-vars
           - configMapRef:
               name: panoptes-staging-shared
+          volumeMounts:
+          - mountPath: /tmp
+            name: panoptes-staging-dumpworker-data
       volumes:
         - name: panoptes-staging-dumpworker-data
-          persistentVolumeClaim:
-            claimName: panoptes-staging-dumpworker
+          emptyDir: {}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
