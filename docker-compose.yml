@@ -49,22 +49,5 @@ services:
       - redis:redis
       - postgres:pg
 
-  sidekiq:
-    build:
-      context: .
-    volumes:
-      - ./:/rails_app
-      - gem_cache:/usr/local/bundle
-    command: ["/rails_app/scripts/docker/sidekiq-start.sh"]
-    environment:
-      - "RAILS_ENV=development"
-      - "DATABASE_URL=postgresql://panoptes:panoptes@pg"
-      - "REDIS_URL=redis://redis:6379/0"
-      - "DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true"
-      - "DISABLE_SPRING=true"
-    links:
-      - redis:redis
-      - postgres:pg
-
 volumes:
   gem_cache:
