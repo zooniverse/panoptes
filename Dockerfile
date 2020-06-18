@@ -6,7 +6,6 @@ RUN apt-get update && \
     apt-get install --no-install-recommends -y \
         git \
         curl \
-        supervisor \
         libpq-dev \
         tmpreaper \
         libjemalloc1 \
@@ -29,7 +28,6 @@ ADD ./Gemfile.lock /rails_app/
 RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
 RUN bundle install --without development test
 
-ADD supervisord.conf /etc/supervisor/conf.d/panoptes.conf
 ADD ./ /rails_app
 
 RUN (cd /rails_app && git log --format="%H" -n 1 > commit_id.txt)

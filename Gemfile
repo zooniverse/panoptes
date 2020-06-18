@@ -62,7 +62,6 @@ end
 
 group :development, :test do
   gem "factory_bot_rails"
-  gem 'foreman'
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'pry-stack_explorer'
