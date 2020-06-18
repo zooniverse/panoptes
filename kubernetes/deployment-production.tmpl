@@ -106,6 +106,42 @@ kind: ConfigMap
 metadata:
   name: panoptes-nginx-conf-production
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: panoptes-production-shared
+data:
+  RAILS_ENV: production
+  ZOO_STREAM_KINESIS_STREAM_NAME: zooniverse-production
+  ZOO_STREAM_SOURCE: panoptes
+  CORS_ORIGINS_REGEX: '^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|staging)?\.?heirtagger\.ox\.ac\.uk|(www|relaunch|field-book)\.notesfromnature\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
+  DESIGNATOR_API_HOST: https://designator.zooniverse.org/
+  DESIGNATOR_API_USERNAME: production
+  EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
+  EVENTS_API_USERNAME: api
+  REDIRECTS_BASE: https://www.zooniverse.org
+  REDIRECTS_PASSWORD_RESET: /reset-password
+  REDIRECTS_UNSUBSCRIBE: /unsubscribe
+  MAILER_ADDRESS: email-smtp.us-east-1.amazonaws.com
+  MAILER_DOMAIN: zooniverse.org
+  MEMCACHE_SERVERS: 'panoptes-production-memcached:11211'
+  NEW_RELIC_APP_NAME: Panoptes
+  NEW_RELIC_MONITOR_MODE: 'true'
+  PAGE_SIZE_LIMIT: '200'
+  PROJECT_REQUEST_BASE_URL: https://www.zooniverse.org
+  PROJECT_REQUEST_RECIPIENTS: project-review@zooniverse.org
+  PROJECT_REQUEST_BCC: i2h6y2f6a7o0x7i9@zooniverse.slack.com
+  REDIS_URL: 'redis://panoptes-production-redis:6379/0'
+  SIDEKIQ_CONCURRENCY: '8'
+  STORAGE_ADAPTER: aws
+  STORAGE_BUCKET: zooniverse-static
+  STORAGE_PREFIX: panoptes-uploads.zooniverse.org/production/
+  TALK_API_HOST: https://talk.zooniverse.org
+  TALK_API_USER: '1'
+  TALK_API_APPLICATION: '1'
+  UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY: '604800'
+  USER_SUBJECT_LIMIT: '10000'
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -138,140 +174,13 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
-          env:
-            - name: RAILS_ENV
-              value: production
-            - name: SECRET_KEY_BASE
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-production-env-vars
-                  key: SECRET_KEY_BASE
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-production-env-vars
-                  key: DATABASE_URL
-            - name: DATABASE_REPLICA_URL
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-production-env-vars
-                  key: DATABASE_REPLICA_URL
-            - name: ZOO_STREAM_KINESIS_STREAM_NAME
-              value: zooniverse-production
-            - name: ZOO_STREAM_SOURCE
-              value: panoptes
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: AWS_ACCESS_KEY_ID
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: AWS_SECRET_ACCESS_KEY
-            - name: MEMCACHE_SERVERS
-              value: 'panoptes-production-memcached:11211'
-            - name: CORS_ORIGINS_REGEX
-              value: '^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|staging)?\.?heirtagger\.ox\.ac\.uk|(www|relaunch|field-book)\.notesfromnature\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
-            - name: DESIGNATOR_API_HOST
-              value: https://designator.zooniverse.org/
-            - name: DESIGNATOR_API_USERNAME
-              value: production
-            - name: DESIGNATOR_API_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-production-env-vars
-                  key: DESIGNATOR_API_PASSWORD
-            - name: EMAIL_EXPORT_S3_BUCKET
-              value: zooniverse-exports
-            - name: EVENTS_API_USERNAME
-              value: api
-            - name: EVENTS_API_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: EVENTS_API_PASSWORD
-            - name: REDIRECTS_BASE
-              value: https://www.zooniverse.org
-            - name: REDIRECTS_PASSWORD_RESET
-              value: /reset-password
-            - name: REDIRECTS_UNSUBSCRIBE
-              value: /unsubscribe
-            - name: HONEYBADGER_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: HONEYBADGER_API_KEY
-            - name: MAILER_ADDRESS
-              value: email-smtp.us-east-1.amazonaws.com
-            - name: MAILER_DOMAIN
-              value: zooniverse.org
-            - name: MAILER_USER_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: MAILER_USER_NAME
-            - name: MAILER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: MAILER_PASSWORD
-            - name: NEW_RELIC_APP_NAME
-              value: Panoptes
-            - name: NEW_RELIC_MONITOR_MODE
-              value: 'true'
-            - name: NEW_RELIC_LICENSE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: NEW_RELIC_LICENSE_KEY
-            - name: PAGE_SIZE_LIMIT
-              value: '200'
-            - name: PROJECT_REQUEST_BASE_URL
-              value: https://www.zooniverse.org
-            - name: PROJECT_REQUEST_RECIPIENTS
-              value: project-review@zooniverse.org
-            - name: PROJECT_REQUEST_BCC
-              value: i2h6y2f6a7o0x7i9@zooniverse.slack.com
-            - name: SIDEKIQ_CONCURRENCY
-              value: '8'
-            - name: STORAGE_ADAPTER
-              value: aws
-            - name: STORAGE_BUCKET
-              value: zooniverse-static
-            - name: STORAGE_PREFIX
-              value: panoptes-uploads.zooniverse.org/production/
-            - name: SOCIAL_FACEBOOK_APP_ID
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-production-env-vars
-                  key: SOCIAL_FACEBOOK_APP_ID
-            - name: SOCIAL_FACEBOOK_APP_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-production-env-vars
-                  key: SOCIAL_FACEBOOK_APP_SECRET
-            - name: SOCIAL_GOOGLE_APP_ID
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-production-env-vars
-                  key: SOCIAL_GOOGLE_APP_ID
-            - name: SOCIAL_GOOGLE_APP_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-production-env-vars
-                  key: SOCIAL_GOOGLE_APP_SECRET
-            - name: TALK_API_HOST
-              value: https://talk.zooniverse.org
-            - name: TALK_API_USER
-              value: '1'
-            - name: TALK_API_APPLICATION
-              value: '1'
-            - name: UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY
-              value: '604800'
-            - name: USER_SUBJECT_LIMIT
-              value: '10000'
+          envFrom:
+          - secretRef:
+              name: panoptes-common-env-vars
+          - secretRef:
+              name: panoptes-production-env-vars
+          - configMapRef:
+              name: panoptes-production-shared
           volumeMounts:
             - name: static-assets
               mountPath: "/static-assets"
@@ -340,6 +249,110 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-production-sidekiq
+  labels:
+    app: panoptes-production-sidekiq
+spec:
+  selector:
+    matchLabels:
+      app: panoptes-production-sidekiq
+  template:
+    metadata:
+      labels:
+        app: panoptes-production-sidekiq
+    spec:
+      containers:
+        - name: panoptes-production-sidekiq
+          image: zooniverse/panoptes:__IMAGE_TAG__
+          resources:
+            requests:
+              memory: "4000Mi"
+              cpu: "1000m"
+              ephemeral-storage: "50Gi"
+            limits:
+              memory: "4000Mi"
+              cpu: "2000m"
+              ephemeral-storage: "50Gi"
+          args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
+          envFrom:
+          - secretRef:
+              name: panoptes-common-env-vars
+          - secretRef:
+              name: panoptes-production-env-vars
+          - configMapRef:
+              name: panoptes-production-shared
+          volumeMounts:
+          - mountPath: /tmp
+            name: panoptes-production-dumpworker-data
+      volumes:
+        - name: panoptes-production-dumpworker-data
+          emptyDir: {}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: panoptes-production-redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: azurefile
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-production-redis
+  labels:
+    app: panoptes-production-redis
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: panoptes-production-redis
+  template:
+    metadata:
+      labels:
+        app: panoptes-production-redis
+    spec:
+      containers:
+        - name: panoptes-production-redis
+          image: redis:6.0.5
+          args: ['--appendonly yes', '--appendfsync no']
+          resources:
+            requests:
+              memory: "2500Mi"
+              cpu: "500m"
+            limits:
+              memory: "2500Mi"
+              cpu: "1500m"
+          volumeMounts:
+          - name: panoptes-production-redis-data
+            mountPath: "/data"
+      volumes:
+        - name: panoptes-production-redis-data
+          persistentVolumeClaim:
+            claimName: panoptes-production-redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-production-redis
+spec:
+  selector:
+    app: panoptes-production-redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
   type: NodePort
 ---
 apiVersion: apps/v1
