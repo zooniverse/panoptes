@@ -271,12 +271,12 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "1500Mi"
-              cpu: "500m"
+              memory: "4000Mi"
+              cpu: "1000m"
               ephemeral-storage: "50Gi"
             limits:
-              memory: "1500Mi"
-              cpu: "1000m"
+              memory: "4000Mi"
+              cpu: "2000m"
               ephemeral-storage: "50Gi"
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           envFrom:
@@ -328,10 +328,10 @@ spec:
           image: redis:6.0.5
           resources:
             requests:
-              memory: "4096Mi"
+              memory: "2500Mi"
               cpu: "500m"
             limits:
-              memory: "4096Mi"
+              memory: "2500Mi"
               cpu: "1500m"
           volumeMounts:
           - name: panoptes-production-redis-data
