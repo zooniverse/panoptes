@@ -243,6 +243,19 @@ spec:
         - name: panoptes-staging-dumpworker-data
           emptyDir: {}
 ---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: panoptes-staging-sidekiq
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: panoptes-staging-sidekiq
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 95
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
