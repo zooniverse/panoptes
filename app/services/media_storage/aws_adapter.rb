@@ -2,7 +2,7 @@ module MediaStorage
   class AwsAdapter < AbstractAdapter
     attr_reader :prefix, :s3, :get_expiration, :put_expiration
     DEFAULT_EXPIRES_IN = 180
-    S3_CLIENT_OPT_KEYS = %i(access_key_id secret_access_key region stub_responses)
+    S3_CLIENT_OPT_KEYS = %i[access_key_id secret_access_key region stub_responses].freeze
 
     def initialize(opts={})
       @prefix = opts[:prefix] || Rails.env

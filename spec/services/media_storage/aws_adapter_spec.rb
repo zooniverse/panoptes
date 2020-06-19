@@ -29,33 +29,23 @@ RSpec.describe MediaStorage::AwsAdapter do
     describe "s3 client config" do
       let(:options) { s3_opts.except(:prefix, :bucket) }
 
-      it 'should set the aws config through the s3 client ' do
+      it 'sets the aws config through the s3 client ' do
         expect(Aws::S3::Client).to receive(:new).with(options).and_call_original
         adapter
       end
 
       it 'relies on the storage adapter config keys & defaults' do
-        expect(
-          Panoptes::StorageAdapter.configuration
-        ).to include(
-          {
-            adapter: 'test',
-            prefix: nil,
-            bucket: nil,
-            access_key_id: nil,
-            secret_access_key: nil,
-            region: 'us-east-1',
-          }
-        )
+        opts = { adapter: 'test', prefix: nil, bucket: nil, access_key_id: nil, secret_access_key: nil, region: 'us-east-1' }
+        expect(Panoptes::StorageAdapter.configuration).to include(opts)
       end
     end
   end
 
   context 'when no prefix is passed to the initializer' do
-    it 'should set the prefix to the Rails.env' do
-      opts = s3_opts.slice(%i(access_key_id secret_access_key))
+    it 'sets the prefix to the Rails.env' do
+      opts = s3_opts.except(:prefix)
       adapter = described_class.new(opts)
-      expect(adapter.prefix).to eq("test")
+      expect(adapter.prefix).to eq('test')
     end
   end
 
