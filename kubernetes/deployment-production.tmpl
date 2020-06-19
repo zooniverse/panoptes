@@ -293,6 +293,19 @@ spec:
         - name: panoptes-production-dumpworker-data
           emptyDir: {}
 ---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: panoptes-production-sidekiq
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: panoptes-production-sidekiq
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 95
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
