@@ -2,13 +2,16 @@ module MediaStorage
   class AwsAdapter < AbstractAdapter
     attr_reader :prefix, :s3, :get_expiration, :put_expiration
     DEFAULT_EXPIRES_IN = 180
+    S3_CLIENT_OPT_KEYS = %i(access_key_id secret_access_key region stub_responses)
 
     def initialize(opts={})
       @prefix = opts[:prefix] || Rails.env
       @bucket_name = opts[:bucket]
       @get_expiration = opts.dig(:expiration, :get) || DEFAULT_EXPIRES_IN
       @put_expiration = opts.dig(:expiration, :put) || DEFAULT_EXPIRES_IN
-      @s3 = Aws::S3::Resource.new(client: s3_client(opts))
+      s3_client_opts = opts.slice(*S3_CLIENT_OPT_KEYS)
+      s3_client = Aws::S3::Client.new(s3_client_opts)
+      @s3 = Aws::S3::Resource.new(client: s3_client)
     end
 
     def bucket
@@ -77,21 +80,6 @@ module MediaStorage
 
     def expires_in(mins)
       (mins * 60).to_i
-    end
-
-    def s3_client(opts)
-      client_opts = opts.slice(*s3_client_opts)
-      client_opts[:region] ||= ENV.fetch('AWS_REGION', 'us-east-1')
-      Aws::S3::Client.new(client_opts)
-    end
-
-    def s3_client_opts
-      %i(
-        access_key_id
-        secret_access_key
-        region
-        stub_responses
-      )
     end
   end
 end
