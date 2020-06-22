@@ -191,7 +191,7 @@ spec:
             postStart:
               exec:
                 command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
-        - name: panoptes-staging-nginx
+        - name: panoptes-production-nginx
           image: zooniverse/apps-nginx:xenial
           resources:
             requests:
