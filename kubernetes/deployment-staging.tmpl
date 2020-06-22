@@ -286,6 +286,13 @@ spec:
       labels:
         app: panoptes-staging-redis
     spec:
+      initContainers:
+        - name: disable-thp
+          image: busybox
+          volumeMounts:
+            - name: host-sys
+              mountPath: /host-sys
+          command: ["sh", "-c", "echo never >/host-sys/kernel/mm/transparent_hugepage/enabled"]
       containers:
         - name: panoptes-staging-redis
           image: redis:6.0.5
@@ -304,6 +311,9 @@ spec:
         - name: panoptes-staging-redis-data
           persistentVolumeClaim:
             claimName: panoptes-staging-redis
+        - name: host-sys
+          hostPath:
+            path: /sys
 ---
 apiVersion: v1
 kind: Service
