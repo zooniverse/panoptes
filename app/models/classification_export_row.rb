@@ -1,8 +1,5 @@
 class ClassificationExportRow < ActiveRecord::Base
   belongs_to :classification, required: true
-  # TODO - these can all proxy through the classification
-  # no need to store this extra info
-  # just the formatted data
   belongs_to :project, required: true
   belongs_to :workflow, required: true
   belongs_to :user
