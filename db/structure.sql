@@ -185,7 +185,6 @@ CREATE TABLE public.cached_exports (
     id integer NOT NULL,
     resource_id integer NOT NULL,
     resource_type character varying NOT NULL,
-    format character varying NOT NULL,
     data jsonb NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -2873,10 +2872,10 @@ CREATE INDEX index_authorizations_on_user_id ON public.authorizations USING btre
 
 
 --
--- Name: index_cached_exports_on_resource_id_resource_type_and_format; Type: INDEX; Schema: public; Owner: -
+-- Name: index_cached_exports_on_resource_type_and_resource_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_cached_exports_on_resource_id_resource_type_and_format ON public.cached_exports USING btree (resource_id, resource_type, format);
+CREATE INDEX index_cached_exports_on_resource_type_and_resource_id ON public.cached_exports USING btree (resource_type, resource_id);
 
 
 --
