@@ -178,10 +178,10 @@ ALTER SEQUENCE public.authorizations_id_seq OWNED BY public.authorizations.id;
 
 
 --
--- Name: cached_export; Type: TABLE; Schema: public; Owner: -
+-- Name: cached_exports; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.cached_export (
+CREATE TABLE public.cached_exports (
     id integer NOT NULL,
     resource_id integer NOT NULL,
     resource_type character varying NOT NULL,
@@ -193,10 +193,10 @@ CREATE TABLE public.cached_export (
 
 
 --
--- Name: cached_export_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: cached_exports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.cached_export_id_seq
+CREATE SEQUENCE public.cached_exports_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -205,10 +205,10 @@ CREATE SEQUENCE public.cached_export_id_seq
 
 
 --
--- Name: cached_export_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: cached_exports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.cached_export_id_seq OWNED BY public.cached_export.id;
+ALTER SEQUENCE public.cached_exports_id_seq OWNED BY public.cached_exports.id;
 
 
 --
@@ -2061,7 +2061,7 @@ ALTER TABLE ONLY public.authorizations ALTER COLUMN id SET DEFAULT nextval('publ
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.cached_export ALTER COLUMN id SET DEFAULT nextval('public.cached_export_id_seq'::regclass);
+ALTER TABLE ONLY public.cached_exports ALTER COLUMN id SET DEFAULT nextval('public.cached_exports_id_seq'::regclass);
 
 
 --
@@ -2425,11 +2425,11 @@ ALTER TABLE ONLY public.authorizations
 
 
 --
--- Name: cached_export_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: cached_exports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.cached_export
-    ADD CONSTRAINT cached_export_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.cached_exports
+    ADD CONSTRAINT cached_exports_pkey PRIMARY KEY (id);
 
 
 --
@@ -2873,10 +2873,10 @@ CREATE INDEX index_authorizations_on_user_id ON public.authorizations USING btre
 
 
 --
--- Name: index_cached_export_on_resource_id_and_resource_type_and_format; Type: INDEX; Schema: public; Owner: -
+-- Name: index_cached_exports_on_resource_id_resource_type_and_format; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_cached_export_on_resource_id_and_resource_type_and_format ON public.cached_export USING btree (resource_id, resource_type, format);
+CREATE UNIQUE INDEX index_cached_exports_on_resource_id_resource_type_and_format ON public.cached_exports USING btree (resource_id, resource_type, format);
 
 
 --
