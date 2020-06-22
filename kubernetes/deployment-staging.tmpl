@@ -311,6 +311,9 @@ spec:
         - name: panoptes-staging-redis-data
           persistentVolumeClaim:
             claimName: panoptes-staging-redis
+        - name: host-sys
+          hostPath:
+            path: /sys
 ---
 apiVersion: v1
 kind: Service

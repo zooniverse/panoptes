@@ -361,6 +361,10 @@ spec:
         - name: panoptes-production-redis-data
           persistentVolumeClaim:
             claimName: panoptes-production-redis
+        - name: host-sys
+          hostPath:
+            path: /sys
+
 ---
 apiVersion: v1
 kind: Service
