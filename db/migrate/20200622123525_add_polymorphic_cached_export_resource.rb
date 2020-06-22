@@ -7,7 +7,7 @@ class AddPolymorphicCachedExportResource < ActiveRecord::Migration
       t.timestamps
     end
 
-    # add unique case-insensitive compound index on linked resource (id/type) and the format, e.g csv
-    add_index :cached_export, %i[resource_id resource_type format], unique: true, case_sensitive: false
+    # add unique compound index on linked resource (id/type) and the format e.g csv/json etc
+    add_index :cached_export, %i[resource_id resource_type format], unique: true
   end
 end
