@@ -239,9 +239,15 @@ spec:
           volumeMounts:
           - mountPath: /tmp
             name: panoptes-staging-dumpworker-data
+          - name: jwt-staging
+            mountPath: "/rails_app/config/keys"
+            readOnly: true
       volumes:
         - name: panoptes-staging-dumpworker-data
           emptyDir: {}
+        - name: jwt-staging
+          secret:
+            secretName: panoptes-doorkeeper-jwt-staging
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
