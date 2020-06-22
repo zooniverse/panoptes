@@ -3,7 +3,7 @@ class AddPolymorphicCachedExportResource < ActiveRecord::Migration
     create_table :cached_export do |t|
       t.references :resource, polymorphic: true, null: false
       t.string :format, null: false
-      t.jsonb :export_data, null: false
+      t.jsonb :data, null: false
       t.timestamps
     end
 

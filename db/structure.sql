@@ -186,7 +186,7 @@ CREATE TABLE public.cached_export (
     resource_id integer NOT NULL,
     resource_type character varying NOT NULL,
     format character varying NOT NULL,
-    export_data jsonb NOT NULL,
+    data jsonb NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
