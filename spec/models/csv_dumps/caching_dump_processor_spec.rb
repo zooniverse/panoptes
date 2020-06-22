@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe CsvDumps::CachingDumpProcessor, focus: true do
+RSpec.describe CsvDumps::CachingDumpProcessor do
   let(:formatter) { double("Formatter", headers: false).tap { |f| allow(f).to receive(:to_rows) { |model| [model] } } }
   let(:scope) { [] }
   let(:medium) { double("Medium", put_file: true, metadata: {}, save!: true) }
