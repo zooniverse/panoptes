@@ -100,7 +100,7 @@ class SidekiqStatus
     pad = opts[:pad] || 0
     max_length = opts[:max_length] || (80 - pad)
     out = []
-    line = ''
+    line = ''.dup
     values.each do |value|
       if (line.length + value.length) > max_length
         out << line
