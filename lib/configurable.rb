@@ -23,7 +23,8 @@ module Configurable
     def load_configuration
       @fields.each do |key, options|
         field_key = options[:key] || key
-        value = env_vars["#{@api_prefix}_#{field_key.upcase}"]
+        env_key = "#{@api_prefix}_#{field_key}".upcase
+        value = env_vars[env_key]
         value ||= config_from_file[field_key]
         value = value.to_i if options[:type] == :integer
 
