@@ -44,7 +44,6 @@ gem 'strong_migrations'
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'scientist', '~> 1.4.0'
 gem 'sdoc', '~> 1.0.0', group: :doc
-gem 'semantic_logger', '~> 4.4.0'
 gem 'sidekiq', '~> 5.2.5'
 gem 'sidekiq-congestion', '~> 0.1.0'
 gem 'sidekiq-unique-jobs'
