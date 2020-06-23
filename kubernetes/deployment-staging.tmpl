@@ -6,7 +6,7 @@ data:
     }
 
     server {
-      server_name panoptes.zooniverse.org signin.zooniverse.org;
+      server_name panoptes-staging.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
       gzip_types *;
 
@@ -42,12 +42,50 @@ data:
       }
 
       location / {
+        # avoid attacker setting the host value for links in rails_app
+        # https://github.com/rails/rails/issues/29893
+        proxy_set_header X-Forwarded-Host $server_name;
         proxy_pass http://docker-panoptes;
       }
     }
 kind: ConfigMap
 metadata:
   name: panoptes-nginx-conf-staging
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: panoptes-staging-shared
+data:
+  RAILS_ENV: staging
+  ZOO_STREAM_KINESIS_STREAM_NAME: zooniverse-staging
+  ZOO_STREAM_SOURCE: panoptes
+  DUMP_CONGESTION_OPTS_INTERVAL: "60"
+  DUMP_CONGESTION_OPTS_MIN_DELAY: "60"
+  CORS_ORIGINS_REGEX: '^https?:\/\/([a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
+  DESIGNATOR_API_HOST: https://designator-staging.zooniverse.org/
+  DESIGNATOR_API_USERNAME: staging
+  EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
+  EVENTS_API_USERNAME: staging_api
+  REDIRECTS_BASE: https://master.pfe-preview.zooniverse.org
+  REDIRECTS_PASSWORD_RESET: /#/reset-password
+  REDIRECTS_UNSUBSCRIBE: /#/unsubscribe
+  MAILER_ADDRESS: email-smtp.us-east-1.amazonaws.com
+  MAILER_DOMAIN: zooniverse.org
+  MEMCACHE_SERVERS: 'panoptes-staging-memcached:11211'
+  NEW_RELIC_APP_NAME: Panoptes Staging
+  NEW_RELIC_LOG_LEVEL: info
+  NEW_RELIC_MONITOR_MODE: 'true'
+  PAGE_SIZE_LIMIT: '100'
+  REDIS_URL: 'redis://panoptes-staging-redis:6379/0'
+  SIDEKIQ_CONCURRENCY: '4'
+  STORAGE_ADAPTER: aws
+  STORAGE_BUCKET: zooniverse-static
+  STORAGE_PREFIX: panoptes-uploads.zooniverse.org/staging/
+  TALK_API_HOST: https://talk-staging.zooniverse.org
+  TALK_API_USER: '1'
+  TALK_API_APPLICATION: '1'
+  USER_SUBJECT_LIMIT: '100'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -56,7 +94,6 @@ metadata:
   labels:
     app: panoptes-staging-app
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: panoptes-staging-app
@@ -74,7 +111,7 @@ spec:
               cpu: "50m"
             limits:
               memory: "700Mi"
-              cpu: "500m"
+              cpu: "1000m"
           livenessProbe:
             httpGet:
               path: /
@@ -82,142 +119,19 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
-          env:
-            - name: RAILS_ENV
-              value: staging
-            - name: SECRET_KEY_BASE
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-staging-env-vars
-                  key: SECRET_KEY_BASE
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-staging-env-vars
-                  key: DATABASE_URL
-            - name: ZOO_STREAM_KINESIS_STREAM_NAME
-              value: zooniverse-staging
-            - name: ZOO_STREAM_SOURCE
-              value: panoptes
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: AWS_ACCESS_KEY_ID
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: AWS_SECRET_ACCESS_KEY
-            - name: DUMP_CONGESTION_OPTS_INTERVAL
-              value: "60"
-            - name: DUMP_CONGESTION_OPTS_MIN_DELAY
-              value: "60"
-            - name: CORS_ORIGIN
-              value: /^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.168\.[0-9]+\.[0-9]+|[a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$/
-            - name: DESIGNATOR_API_HOST
-              value: https://designator-staging.zooniverse.org/
-            - name: DESIGNATOR_API_USERNAME
-              value: staging
-            - name: DESIGNATOR_API_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-staging-env-vars
-                  key: DESIGNATOR_API_PASSWORD
-            - name: EMAIL_EXPORT_S3_BUCKET
-              value: zooniverse-exports
-            - name: EVENTS_API_USERNAME
-              value: staging_api
-            - name: EVENTS_API_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: EVENTS_API_PASSWORD
-            - name: REDIRECTS_BASE
-              value: https://master.pfe-preview.zooniverse.org
-            - name: REDIRECTS_PASSWORD_RESET
-              value: /#/reset-password
-            - name: REDIRECTS_UNSUBSCRIBE
-              value: /#/unsubscribe
-            - name: HONEYBADGER_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: HONEYBADGER_API_KEY
-            - name: MAILER_ADDRESS
-              value: email-smtp.us-east-1.amazonaws.com
-            - name: MAILER_DOMAIN
-              value: zooniverse.org
-            - name: MAILER_USER_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: MAILER_USER_NAME
-            - name: MAILER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: MAILER_PASSWORD
-            - name: NEW_RELIC_APP_NAME
-              value: Panoptes Staging
-            - name: NEW_RELIC_LOG_LEVEL
-              value: info
-            - name: NEW_RELIC_MONITOR_MODE
-              value: 'true'
-            - name: NEW_RELIC_LICENSE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-common-env-vars
-                  key: NEW_RELIC_LICENSE_KEY
-            - name: PAGE_SIZE_LIMIT
-              value: '100'
-            - name: SIDEKIQ_VERBOSE
-              value: 'false'
-            - name: SIDEKIQ_LOGFILE
-              value: ./log/sidekiq.log
-            - name: SIDEKIQ_PIDFILE
-              value: ./tmp/pids/sidekiq.pid
-            - name: SIDEKIQ_CONCURRENCY
-              value: '4'
-            - name: SIDEKIQ_TIMEOUT
-              value: '30'
-            - name: STORAGE_ADAPTER
-              value: aws
-            - name: STORAGE_BUCKET
-              value: zooniverse-static
-            - name: STORAGE_PREFIX
-              value: panoptes-uploads.zooniverse.org/staging/
-            - name: SOCIAL_FACEBOOK_APP_ID
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-staging-env-vars
-                  key: SOCIAL_FACEBOOK_APP_ID
-            - name: SOCIAL_FACEBOOK_APP_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-staging-env-vars
-                  key: SOCIAL_FACEBOOK_APP_SECRET
-            - name: SOCIAL_GOOGLE_APP_ID
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-staging-env-vars
-                  key: SOCIAL_GOOGLE_APP_ID
-            - name: SOCIAL_GOOGLE_APP_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: panoptes-staging-env-vars
-                  key: SOCIAL_GOOGLE_APP_SECRET
-            - name: TALK_API_HOST
-              value: https://talk-staging.zooniverse.org
-            - name: TALK_API_USER
-              value: '1'
-            - name: TALK_API_APPLICATION
-              value: '1'
-            - name: USER_SUBJECT_LIMIT
-              value: '100'
+          envFrom:
+          - secretRef:
+              name: panoptes-common-env-vars
+          - secretRef:
+              name: panoptes-staging-env-vars
+          - configMapRef:
+              name: panoptes-staging-shared
           volumeMounts:
             - name: static-assets
               mountPath: "/static-assets"
+            - name: jwt-staging
+              mountPath: "/rails_app/config/keys"
+              readOnly: true
           lifecycle:
             postStart:
               exec:
@@ -235,6 +149,9 @@ spec:
             httpGet:
               path: /
               port: 80
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
             initialDelaySeconds: 10
           ports:
             - containerPort: 80
@@ -249,6 +166,22 @@ spec:
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-staging
+        - name: jwt-staging
+          secret:
+            secretName: panoptes-doorkeeper-jwt-staging
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: panoptes-staging-app
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: panoptes-staging-app
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
 ---
 apiVersion: v1
 kind: Service
@@ -262,3 +195,203 @@ spec:
       port: 80
       targetPort: 80
   type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-staging-sidekiq
+  labels:
+    app: panoptes-staging-sidekiq
+spec:
+  selector:
+    matchLabels:
+      app: panoptes-staging-sidekiq
+  template:
+    metadata:
+      labels:
+        app: panoptes-staging-sidekiq
+    spec:
+      containers:
+        - name: panoptes-staging-sidekiq
+          image: zooniverse/panoptes:__IMAGE_TAG__
+          resources:
+            requests:
+              memory: "700Mi"
+              cpu: "50m"
+              ephemeral-storage: "10Gi"
+            limits:
+              memory: "700Mi"
+              cpu: "500m"
+              ephemeral-storage: "10Gi"
+          args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
+          envFrom:
+          - secretRef:
+              name: panoptes-common-env-vars
+          - secretRef:
+              name: panoptes-staging-env-vars
+          - configMapRef:
+              name: panoptes-staging-shared
+          volumeMounts:
+          - mountPath: /tmp
+            name: panoptes-staging-dumpworker-data
+          - name: jwt-staging
+            mountPath: "/rails_app/config/keys"
+            readOnly: true
+      volumes:
+        - name: panoptes-staging-dumpworker-data
+          emptyDir: {}
+        - name: jwt-staging
+          secret:
+            secretName: panoptes-doorkeeper-jwt-staging
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: panoptes-staging-sidekiq
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: panoptes-staging-sidekiq
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 95
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: panoptes-staging-redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: azurefile
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-staging-redis
+  labels:
+    app: panoptes-staging-redis
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: panoptes-staging-redis
+  template:
+    metadata:
+      labels:
+        app: panoptes-staging-redis
+    spec:
+      initContainers:
+        - name: disable-thp
+          image: busybox
+          volumeMounts:
+            - name: host-sys
+              mountPath: /host-sys
+          command: ["sh", "-c", "echo never >/host-sys/kernel/mm/transparent_hugepage/enabled"]
+      containers:
+        - name: panoptes-staging-redis
+          image: redis:6.0.5
+          args: ['--appendonly yes', '--appendfsync no']
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
+            limits:
+              memory: "100Mi"
+              cpu: "500m"
+          volumeMounts:
+          - name: panoptes-staging-redis-data
+            mountPath: "/data"
+      volumes:
+        - name: panoptes-staging-redis-data
+          persistentVolumeClaim:
+            claimName: panoptes-staging-redis
+        - name: host-sys
+          hostPath:
+            path: /sys
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-staging-redis
+spec:
+  selector:
+    app: panoptes-staging-redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-staging-memcached
+  labels:
+    app: panoptes-staging-memcached
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: panoptes-staging-memcached
+  template:
+    metadata:
+      labels:
+        app: panoptes-staging-memcached
+    spec:
+      containers:
+        - name: panoptes-staging-memcached
+          image: memcached:1.6.6
+          args: ['-m 90']
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
+            limits:
+              memory: "100Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-staging-memcached
+spec:
+  selector:
+    app: panoptes-staging-memcached
+  ports:
+    - protocol: TCP
+      port: 11211
+      targetPort: 11211
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: panoptes-staging-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/set-real-ip-from: "10.0.0.0/8"
+spec:
+  tls:
+  - hosts:
+    - panoptes-staging.zooniverse.org
+    secretName: panoptes-staging-tls-secret
+  rules:
+  - host: panoptes-staging.zooniverse.org
+    http:
+      paths:
+      - backend:
+          serviceName: panoptes-staging-app
+          servicePort: 80
+        path: /(.*)

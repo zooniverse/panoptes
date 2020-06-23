@@ -13,8 +13,8 @@ namespace :configure do
   def generate_doorkeeper_keypair(env)
     rsa_private = OpenSSL::PKey::RSA.generate 4096
     rsa_public = rsa_private.public_key
-    File.open("config/doorkeeper-jwt-#{env}.pem", 'w') { |f| f.puts rsa_private.to_s }
-    File.open("config/doorkeeper-jwt-#{env}.pub", 'w') { |f| f.puts rsa_public.to_s }
+    File.open("config/keys/doorkeeper-jwt-#{env}.pem", 'w') { |f| f.puts rsa_private.to_s }
+    File.open("config/keys/doorkeeper-jwt-#{env}.pub", 'w') { |f| f.puts rsa_public.to_s }
   end
 end
 

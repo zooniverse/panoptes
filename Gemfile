@@ -5,7 +5,7 @@ gem 'active_model_serializers', '0.10.0.rc2' # Event stream
 gem 'active_record_union', '~> 1.3.0'
 gem 'activerecord-import', '~> 1.0'
 gem 'aws-sdk', '~> 2.10'
-gem 'dalli-elasticache'
+gem 'dalli'
 gem 'deep_cloneable', '~> 2.3.2'
 gem 'devise', '~> 4.7'
 gem 'doorkeeper', '~> 4.4'
@@ -39,7 +39,7 @@ gem 'pundit', '~> 2.1.0'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 gem 'rails', '~> 4.2.11'
 gem 'ranked-model', '~> 0.4.1'
-gem 'restpack_serializer', github: "zooniverse/restpack_serializer", branch: "rails5" # REST API
+gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: 'cef0969cef'
 gem 'strong_migrations'
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'scientist', '~> 1.4.0'
@@ -62,7 +62,6 @@ end
 
 group :development, :test do
   gem "factory_bot_rails"
-  gem 'foreman'
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'pry-stack_explorer'
@@ -71,6 +70,7 @@ group :development, :test do
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
   gem 'spring'
+  gem 'sprockets', '~>3.7'
 end
 
 group :test do

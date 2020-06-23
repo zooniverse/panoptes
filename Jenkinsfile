@@ -46,8 +46,16 @@ pipeline {
       }
     }
 
+    stage('Dry run deployments') {
+      agent any
+      steps {
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-staging.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-production.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
+      }
+    }
+
     stage('Deploy production to Kubernetes') {
-      when { tag 'production-kubernetes' }
+      when { tag 'production-release' }
       agent any
       steps {
         sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-production.tmpl | kubectl --context azure apply --record -f -"
@@ -55,7 +63,7 @@ pipeline {
       post {
         success {
           script {
-            if (env.TAG_NAME == 'production-kubernetes') {
+            if (env.TAG_NAME == 'production-release') {
               slackSend (
                 color: '#00FF00',
                 message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
@@ -67,7 +75,7 @@ pipeline {
 
         failure {
           script {
-            if (env.TAG_NAME == 'production-kubernetes') {
+            if (env.TAG_NAME == 'production-release') {
               slackSend (
                 color: '#FF0000',
                 message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
