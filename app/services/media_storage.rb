@@ -1,5 +1,6 @@
 require 'media_storage/test_adapter'
 require 'media_storage/aws_adapter'
+require 'media_storage/azure_adapter'
 
 module MediaStorage
   class EmptyPathError < StandardError; end
@@ -47,6 +48,8 @@ module MediaStorage
 
     def load_from_included(adapter)
       case adapter.to_s
+      when "azure"
+        AzureAdapter
       when "aws"
         AwsAdapter
       when "test"
