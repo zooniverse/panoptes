@@ -295,6 +295,20 @@ spec:
       labels:
         app: panoptes-staging-redis
     spec:
+      tolerations:
+      - key: "servicelife"
+        operator: "Equal"
+        value: "longlife"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: servicelife
+                operator: In
+                values:
+                - longlife
       initContainers:
         - name: disable-thp
           image: busybox
@@ -355,6 +369,20 @@ spec:
       labels:
         app: panoptes-staging-memcached
     spec:
+      tolerations:
+      - key: "servicelife"
+        operator: "Equal"
+        value: "longlife"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: servicelife
+                operator: In
+                values:
+                - longlife
       containers:
         - name: panoptes-staging-memcached
           image: memcached:1.6.6
