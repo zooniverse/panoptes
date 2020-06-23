@@ -16,12 +16,12 @@ class SidekiqStatus
     puts
     puts '       <section> (optional) view a specific section of the status output'
     puts "       Valid sections are: #{VALID_SECTIONS.join(', ')}"
-    puts "       Default is 'all'"
+    puts "       Default is 'processes'"
     puts
   end
 
   def display(section = nil)
-    section ||= 'all'
+    section ||= 'processes'
     unless VALID_SECTIONS.include? section
       puts "Invalid section for status check: '#{section}'"
       puts "Try one of these: #{VALID_SECTIONS.join(', ')}"
