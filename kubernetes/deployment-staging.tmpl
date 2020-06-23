@@ -119,6 +119,9 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
+          env:
+          - name: PG_STATEMENT_TIMEOUT
+            value: '65000'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
