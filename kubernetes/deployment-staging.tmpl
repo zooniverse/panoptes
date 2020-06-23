@@ -41,11 +41,6 @@ data:
         add_header Cache-Control public;
       }
 
-      location /health_check {
-        proxy_set_header X-Forwarded-Proto https;
-        proxy_pass http://docker-panoptes;
-      }
-
       location / {
         # avoid attacker setting the host value for links in rails_app
         # https://github.com/rails/rails/issues/29893
