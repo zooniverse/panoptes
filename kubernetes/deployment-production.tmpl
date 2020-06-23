@@ -279,6 +279,11 @@ spec:
               memory: "4000Mi"
               cpu: "2000m"
               ephemeral-storage: "50Gi"
+          livenessProbe:
+            exec:
+              command:
+                - /rails_app/scripts/docker/sidekiq_status
+            initialDelaySeconds: 20
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           envFrom:
           - secretRef:
