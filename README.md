@@ -96,6 +96,10 @@ There are multiple options for setting up a testing environment:
 Using the gem https://github.com/clio/ten_years_rails to help with the upgrade path
 https://www.youtube.com/watch?v=6aCfc0DkSFo
 
+#### Using docker-compose for env setup
+`docker-compose -f docker-compose-rails-5.yml build`
+`docker-compose -f docker-compose-rails-5.yml run --rm -e RAILS_ENV=test panoptes bash`
+
 #### Install the gems via next
 `next bundle install`
 
@@ -104,6 +108,7 @@ https://www.youtube.com/watch?v=6aCfc0DkSFo
 
 #### Run the specs
 `DISABLE_SPRING=t BUNDLE_GEMFILE=Gemfile.next bundle exec rspec spec`
+
 
 ## Contributing
 
