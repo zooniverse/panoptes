@@ -16,7 +16,6 @@ gem 'deep_cloneable', '~> 2.3.2'
 gem 'devise', '~> 4.7'
 gem 'doorkeeper', '~> 4.4'
 gem 'doorkeeper-jwt', '~> 0.2.1'
-gem 'httparty'
 gem 'faraday', '~> 0.15'
 gem 'faraday-http-cache', '~> 2.0'
 gem 'faraday_middleware', '~> 0.13'
@@ -27,6 +26,7 @@ gem 'gelf'
 gem 'graphiql-rails'
 gem 'graphql'
 gem 'honeybadger', '~> 4.5'
+gem 'httparty'
 gem 'jquery-rails', '~> 4.3'
 gem 'json-schema', '~> 2.8'
 gem 'librato-metrics', '~> 2.1.2'
@@ -50,7 +50,6 @@ else
 end
 gem 'ranked-model', '~> 0.4.1'
 gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: 'cef0969cef'
-gem 'strong_migrations'
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'scientist', '~> 1.4.0'
 gem 'sdoc', '~> 1.0.0', group: :doc
@@ -60,6 +59,7 @@ gem 'sidekiq-unique-jobs'
 gem 'sidetiq', '~> 0.7'
 gem 'standby'
 gem 'stringex', '~> 2.8'
+gem 'strong_migrations'
 gem 'therubyracer', '~> 0.12'
 gem 'uglifier', '~> 4.1'
 gem 'versionist', '~> 2.0'
@@ -70,7 +70,7 @@ group :production, :staging do
 end
 
 group :development, :test do
-  gem "factory_bot_rails"
+  gem 'factory_bot_rails'
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'pry-stack_explorer'
