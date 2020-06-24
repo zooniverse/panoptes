@@ -3,8 +3,8 @@ FactoryBot.define do
     sequence(:name) { |n| "collection_name_#{ n }" }
     sequence(:display_name) { |n| "another name #{ n }" }
     sequence(:description) { |n| "This collection is SO GOOD, it is #{ n } times better than any other" }
-    activated_state :active
-    private false
+    activated_state { :active }
+    private { false }
 
     association :owner, factory: :user
 
@@ -13,7 +13,7 @@ FactoryBot.define do
     end
 
     factory :private_collection do
-      private true
+      private { true }
     end
 
     factory :collection_with_subjects do

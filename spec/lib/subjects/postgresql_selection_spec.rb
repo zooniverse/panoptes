@@ -10,20 +10,19 @@ RSpec.describe Subjects::PostgresqlSelection do
 
   describe "selection" do
     let(:user) { User.first }
-    let(:workflow) { Workflow.first }
+    let(:workflow) { create(:workflow_with_subject_sets) }
     let(:sms) { SetMemberSubject.all }
     let(:opts) { {} }
     let(:sms_count) { 25 }
+    let(:uploader) { create(:user) }
     subject { Subjects::PostgresqlSelection.new(workflow, user, opts) }
 
     before do
-      uploader = create(:user)
-      created_workflow = create(:workflow_with_subject_sets)
-      create_list(:subject, sms_count, project: created_workflow.project, uploader: uploader).each do |subject|
+      create_list(:subject, sms_count, project: workflow.project, uploader: uploader).each do |subject|
         create(:set_member_subject,
           setup_subject_workflow_statuses: true,
           subject: subject,
-          subject_set: created_workflow.subject_sets.first
+          subject_set: workflow.subject_sets.first
         )
       end
     end
@@ -33,6 +32,29 @@ RSpec.describe Subjects::PostgresqlSelection do
         it_behaves_like "select for incomplete_project" do
           let(:sms_scope) do
             SetMemberSubject.all
+          end
+        end
+
+        context "with a training set and a real set with data" do
+          let(:sms_count) { 2 }
+          let(:training_set) { workflow.subject_sets.first }
+          let(:real_set) { workflow.subject_sets.last }
+
+          before do
+            workflow.configuration['training_set_ids'] = training_set.id
+            create(:subject, project: workflow.project, uploader: uploader) do |subject|
+              create(:set_member_subject,
+                setup_subject_workflow_statuses: true,
+                subject: subject,
+                subject_set: real_set
+              )
+            end
+          end
+
+          it "should not include training subject sets in the results" do
+            result_ids = subject.select
+            non_training_subject_ids = real_set.subjects.pluck(:id)
+            expect(result_ids).to match_array(non_training_subject_ids)
           end
         end
       end

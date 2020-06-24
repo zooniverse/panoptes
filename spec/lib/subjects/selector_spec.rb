@@ -62,16 +62,49 @@ RSpec.describe Subjects::Selector do
         expect(subjects.length).to eq(10)
       end
 
-      context "when the params page size is set as a string" do
-        let(:size) { 2 }
-        subject do
-          params = { page_size: size, workflow_id: workflow.id }
-          described_class.new(user, params)
+      describe "page_size" do
+        context "when params is set as a string" do
+          let(:size) { 2 }
+          subject do
+            params = { page_size: size, workflow_id: workflow.id }
+            described_class.new(user, params)
+          end
+
+          it 'should return the page_size number of subjects' do
+            subjects = subject.get_subject_ids
+            expect(subjects.length).to eq(size)
+          end
         end
 
-        it 'should return the page_size number of subjects' do
-          subjects = subject.get_subject_ids
-          expect(subjects.length).to eq(size)
+        context "when the workflow config has subject_queue_page_size set" do
+          let(:params_page_size) { 2 }
+          let(:subject_queue_page_size) { 1 }
+          let(:config) { { subject_queue_page_size: subject_queue_page_size }}
+          let(:workflow) do
+            create(:workflow_with_subject_set, configuration: config)
+          end
+
+          subject do
+            described_class.new(user, params)
+          end
+
+          context "when params page_size is missing" do
+            let(:params) { { workflow_id: workflow.id } }
+
+            it 'should respect the config page_size value' do
+              subjects = subject.get_subject_ids
+              expect(subjects.length).to eq(subject_queue_page_size)
+            end
+          end
+
+          context "when params page_size is set" do
+            let(:params) { { page_size: params_page_size, workflow_id: workflow.id } }
+
+            it 'should respect the params page_size value' do
+              subjects = subject.get_subject_ids
+              expect(subjects.length).to eq(params_page_size)
+            end
+          end
         end
       end
     end

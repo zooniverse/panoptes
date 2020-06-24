@@ -66,9 +66,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
     super do |subject_set|
       notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
-      reset_workflow_retired_counts(
-        subject_set.subject_sets_workflows.pluck(:workflow_id)
-      )
+      reset_workflow_retired_counts(subject_set.workflow_ids)
     end
   end
 
@@ -106,7 +104,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
       end
 
       result = SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
-      SubjectMetadataWorker.perform_async(resource.id)
+      SubjectMetadataWorker.perform_async(result.ids)
       result
     else
       super

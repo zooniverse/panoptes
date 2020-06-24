@@ -32,6 +32,11 @@ RSpec.describe UserSeenSubject, :type => :model do
       let(:workflow) { user_seen_subject.workflow }
       let(:user) { user_seen_subject.user }
 
+      before do
+        workflow.save
+        user.save
+      end
+
       context "no user_seen_subject exists" do
 
         it "should create a new user_seen_subject" do

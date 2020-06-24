@@ -23,7 +23,8 @@ module Configurable
     def load_configuration
       @fields.each do |key, options|
         field_key = options[:key] || key
-        value = env_vars["#{@api_prefix}_#{field_key.upcase}"]
+        env_key = "#{@api_prefix}_#{field_key}".upcase
+        value = env_vars[env_key]
         value ||= config_from_file[field_key]
         value = value.to_i if options[:type] == :integer
 
@@ -32,12 +33,15 @@ module Configurable
     end
 
     def config_from_file
-      @config_from_file ||= begin
-                         config = YAML.load(ERB.new(File.read(Rails.root.join(@config_file))).result)
-                         config[Rails.env].symbolize_keys
-                       rescue Errno::ENOENT, NoMethodError
-                         {  }
-                       end
+      @config_from_file ||=
+        begin
+          config = YAML.safe_load(
+            ERB.new(File.read(Rails.root.join(@config_file))).result
+          )
+          config[Rails.env].symbolize_keys
+        rescue Errno::ENOENT, NoMethodError
+          {}
+        end
     end
 
     def env_vars

@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :access_control_list do
     user_group
-    roles ["collaborator"]
+    roles { ["collaborator"] }
     association :resource, factory: :project
 
     factory :access_control_list_with_user_group do

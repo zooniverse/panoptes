@@ -15,8 +15,6 @@ describe Project, type: :model do
     let(:not_owned) { build(:project, owner: nil) }
   end
 
-  it_behaves_like "has subject_count"
-
   it_behaves_like "activatable" do
     let(:activatable) { project }
   end
@@ -66,16 +64,18 @@ describe Project, type: :model do
   end
 
   describe 'featured projects' do
-    it 'can be featured' do
-      project = create :project, featured: true
-      expect(Project.featured).to eq([project])
+    let(:featured_project) do
+      create :project, featured: true
     end
 
-    it 'only allows one featured project at a time' do
-      featured_project = create :project, featured: true
+    it 'can be featured' do
+      expect(described_class.featured).to eq([featured_project])
+    end
+
+    it 'allows more than one featured project at a time' do
+      featured_project
       other_project = build :project, featured: true
-      expect(other_project).not_to be_valid
-      expect(other_project.errors[:featured]).to be_present
+      expect(other_project).to be_valid
     end
   end
 
@@ -163,22 +163,6 @@ describe Project, type: :model do
 
     it "should have many subject_sets" do
       expect(project.subject_sets).to all( be_a(SubjectSet) )
-    end
-  end
-
-  describe "#live_subject_sets" do
-    let(:project) { full_project }
-    let!(:unlinked_subject_set) do
-      create(:subject_set, project: project, num_workflows: 0)
-    end
-
-    it "should have many subject_sets" do
-      expect(project.live_subject_sets).not_to include(unlinked_subject_set)
-    end
-
-    it "should only get subject_sets from active workflows" do
-      inactive_workflow = create(:workflow_with_subjects, num_sets: 1, active: false, project: project)
-      expect(project.live_subject_sets).not_to include(inactive_workflow.subject_sets.first)
     end
   end
 
@@ -317,29 +301,37 @@ describe Project, type: :model do
 
   describe "#subjects_count" do
     before do
-      subject_sets.map { |set| set.update_column(:set_member_subjects_count, 1) }
+      active_workflows.map do |workflow|
+        workflow.update_column(:real_set_member_subjects_count, 1)
+      end
     end
 
     context "without a loaded association" do
-      let(:subject_sets) { SubjectSet.where(project_id: full_project.id) }
+      let(:active_workflows) do
+        Workflow.active.where(
+          active: true,
+          serialize_with_project: true,
+          project_id: full_project.id
+        )
+      end
 
-      it "should hit the db with a sum query" do
-        expect(full_project.live_subject_sets)
+      it "should hit the db with a sum query across active workflows" do
+        expect(full_project.active_workflows)
           .to receive(:sum)
-          .with(:set_member_subjects_count)
+          .with(:real_set_member_subjects_count)
           .and_call_original
-        expect(full_project.subjects_count).to eq(2)
+        expect(full_project.subjects_count).to eq(1)
       end
     end
 
     context "with a loaded assocation" do
-      let(:subject_sets) { full_project.live_subject_sets }
+      let(:active_workflows) { full_project.active_workflows }
 
       it "should use the association values" do
-        expect(full_project.live_subject_sets)
+        expect(full_project.active_workflows)
           .to receive(:inject)
           .and_call_original
-        expect(full_project.subjects_count).to eq(2)
+        expect(full_project.subjects_count).to eq(1)
       end
     end
   end
@@ -539,23 +531,24 @@ describe Project, type: :model do
     end
   end
 
-  describe "#keep_data_in_panoptes_only?" do
-    it "should not return true when no private config" do
-      expect(project.keep_data_in_panoptes_only?).to eq(false)
+  describe '#available_languages' do
+    let(:project) { build(:project) }
+    let(:primary_language) { project.primary_language }
+
+    it 'includes the primary langage by default' do
+      expect(project.available_languages).to match_array([primary_language])
     end
 
-    it "should not return true when private config is false" do
-      project.configuration = project.configuration.merge(
-        "keep_data_in_panoptes_only" => false
-      )
-      expect(project.keep_data_in_panoptes_only?).to eq(false)
+    it 'includes languages stored in the configuration' do
+      project.configuration['languages'] = ['es']
+      expected_languages = [primary_language, 'es']
+      expect(project.available_languages).to match_array(expected_languages)
     end
 
-    it "should not return true when private config is true" do
-      project.configuration = project.configuration.merge(
-        "keep_data_in_panoptes_only" => true
-      )
-      expect(project.keep_data_in_panoptes_only?).to eq(true)
+    it 'deduplicates configuration languages and primary language' do
+      expected_languages = [primary_language, 'es']
+      project.configuration['languages'] = expected_languages
+      expect(project.available_languages).to match_array(expected_languages)
     end
   end
 end

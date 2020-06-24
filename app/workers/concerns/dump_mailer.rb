@@ -9,7 +9,13 @@ class DumpMailer
 
   def send_email
     return unless emails.present?
-    mailer.perform_async(resource.id, resource.class.to_s.downcase, media_get_url, emails)
+
+    mailer.perform_async(
+      resource.id,
+      resource.class.to_s.downcase,
+      lab_export_url,
+      emails
+    )
   end
 
   def mailer
@@ -25,8 +31,16 @@ class DumpMailer
     end
   end
 
-  def media_get_url(expires=24*60)
-    medium.get_url(get_expires: expires)
+  def lab_export_url
+    # resources from export operations are projects but may not be
+    project_id =
+      if resource.is_a?(Workflow)
+        resource.project_id
+      else
+        resource.id
+      end
+
+    "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports"
   end
 
   private

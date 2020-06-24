@@ -15,7 +15,7 @@ RSpec.describe TalkApiClient do
   context "instance methods" do
     let(:stubs) do
       Faraday::Adapter::Test::Stubs.new do |stub|
-        stub.get('/error') do env
+        stub.get('/error') do |env|
           [404,
            {'Content-Type' => 'application/vnd.api+json'},
            {errors: [message: "Not Found"]}.to_json
@@ -71,7 +71,7 @@ RSpec.describe TalkApiClient do
       end
 
       it 'should raise an error on failure' do
-        expect{subject.request('get', '/error')}.to raise_error(NameError)
+        expect{subject.request('get', '/error')}.to raise_error(Faraday::ResourceNotFound)
       end
     end
 

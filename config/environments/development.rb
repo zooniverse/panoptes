@@ -17,8 +17,8 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = false
   config.action_mailer.default_url_options = { host: 'localhost:3000' }
 
-  # Print deprecation notices to the Rails logger.
-  config.active_support.deprecation = :log
+  # Print deprecation notices to the stderr.
+  config.active_support.deprecation = :stderr
 
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
@@ -32,6 +32,11 @@ Rails.application.configure do
   # Checks for improperly declared sprockets dependencies.
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
+
+  # override default log to stdout, unless env var key exists
+  unless ENV.key?('RAILS_LOG_TO_FILE')
+    config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+  end
 
   config.log_tags = [:uuid]
 

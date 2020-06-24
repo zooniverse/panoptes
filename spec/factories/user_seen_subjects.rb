@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :user_seen_subject do
     transient do
-      build_real_subjects true
+      build_real_subjects { true }
     end
     user
     workflow

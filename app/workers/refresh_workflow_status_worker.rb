@@ -15,9 +15,11 @@ class RefreshWorkflowStatusWorker
 
   def perform(workflow_id)
     if Workflow.where(id: workflow_id).exists?
-      # run the first worker manually to ensure we don't have state race
+      # run the first two workers manually to ensure we don't have state race
       # conditions between workers and/or db transactions
+      # and to ensure the retired count worker has the latest real subjects count
       UnfinishWorkflowWorker.new.perform(workflow_id)
+      WorkflowSubjectsCountWorker.new.perform(workflow_id)
       WorkflowRetiredCountWorker.perform_async(workflow_id)
     end
   end

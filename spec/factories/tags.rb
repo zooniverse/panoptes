@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :tag do
     transient do
-      resource nil
+      resource { nil }
     end
 
     sequence(:name) { |n| "tag-#{n}" }

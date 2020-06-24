@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :translation, aliases: [:project_translation] do
-    strings({
+    strings { {
       title: "A test Project",
       description: "Some Lorem Ipsum",
       introduction: "Good times intro",
@@ -8,14 +8,14 @@ FactoryBot.define do
       researcher_quote: "This is my favorite project",
       "urls.0.label" => "Blog",
       "urls.1.label" => "Twitter"
-    })
-    string_versions({})
+    } }
+    string_versions { {} }
 
     association :translated, factory: :project
-    language "en"
+    language { "en" }
 
     factory :workflow_translation do
-      strings({
+      strings { {
         "display_name" => "A translated Workflow name",
         "interest.question" => "Draw a circle",
         "interest.help" => "Duh?",
@@ -31,7 +31,7 @@ FactoryBot.define do
         "shape.answers.0.label" => "Smooth",
         "shape.answers.1.label" => "Features",
         "shape.answers.2.label" => "Star or artifact"
-      })
+      } }
 
       association :translated, factory: :workflow
     end

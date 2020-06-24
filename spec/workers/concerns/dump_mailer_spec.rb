@@ -4,10 +4,10 @@ describe DumpMailer do
   let(:users) { create_list(:user, 2) }
   let(:owner) { users.sample }
   let(:resource) do
-    double(id: 1, class: Workflow, communication_emails: [owner.email])
+    double(id: 1, class: Project, communication_emails: [owner.email])
   end
   let(:metadata) { {"recipients" => users.map(&:id) } }
-  let(:medium) { double(id: 2, get_url: nil, metadata: metadata) }
+  let(:medium) { instance_double("Medium", id: 2, metadata: metadata) }
   let(:dump_mailer) { described_class.new(resource, medium, "classifications") }
 
   describe 'queueing notification emails' do
@@ -16,7 +16,7 @@ describe DumpMailer do
     before do
       expect(ClassificationDataMailerWorker)
       .to receive(:perform_async)
-      .with(resource.id, "workflow", nil, expected_emails)
+      .with(resource.id, "project", instance_of(String), expected_emails)
       .once
       .and_call_original
     end
@@ -33,6 +33,25 @@ describe DumpMailer do
 
       it 'queues an email to the owner' do
         dump_mailer.send_email
+      end
+    end
+  end
+
+  describe 'lab_export_url' do
+    let(:resource) { Project.new(id: 1) }
+    let(:project_id) { resource.id }
+    let(:lab_url) { "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports" }
+
+    it 'corretly determines the lab url' do
+      expect(dump_mailer.lab_export_url).to eq(lab_url)
+    end
+
+    context "when the resource is a workflow" do
+      let(:resource) { Workflow.new(project_id: 2) }
+      let(:project_id) { resource.project_id }
+
+      it 'corretly determines the lab url' do
+        expect(dump_mailer.lab_export_url).to eq(lab_url)
       end
     end
   end

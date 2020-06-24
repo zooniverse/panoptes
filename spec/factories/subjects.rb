@@ -4,13 +4,13 @@ FactoryBot.define do
     association :uploader, factory: :user
 
     sequence(:zooniverse_id) { |n| "TES#{n.to_s(26).rjust(8, '0')}" }
-    metadata({distance_from_earth: "42 light years",
+    metadata { {distance_from_earth: "42 light years",
               brightness: -20,
-              loudness: 11})
+              loudness: 11} }
 
     trait :with_mediums do
-      ignore do
-        num_media 2
+      transient do
+        num_media { 2 }
       end
 
       after :create do |s, evaluator|
@@ -25,8 +25,8 @@ FactoryBot.define do
     end
 
     trait :with_subject_sets do
-      ignore do
-        num_sets 2
+      transient do
+        num_sets { 2 }
       end
 
       after(:create) do |s, evaluator|

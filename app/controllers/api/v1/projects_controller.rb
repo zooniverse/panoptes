@@ -25,13 +25,13 @@ class Api::V1::ProjectsController < Api::ApiController
                  :avatar_src,
                  :classifications_count,
                  :updated_at,
+                 :state,
+                 :completeness,
                  :launch_approved].freeze
 
   prepend_before_action :require_login,
     only: [:create, :update, :destroy, :create_classifications_export,
     :create_subjects_export, :create_workflows_export, :create_workflow_contents_export]
-
-  before_action :available_to_export, only: :create_classifications_export
 
   def index
     unless params.has_key?(:sort)
@@ -174,13 +174,5 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def cards_exclude_keys
     ProjectSerializer.serializable_attributes.except(*CARD_FIELDS).keys
-  end
-
-  def available_to_export
-    if controlled_resource.keep_data_in_panoptes_only?
-      raise Api::DisabledDataExport.new(
-        "Data exports are disabled for this project"
-      )
-    end
   end
 end

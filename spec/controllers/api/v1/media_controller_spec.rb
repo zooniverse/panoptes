@@ -251,6 +251,30 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           expect(json_response["media"][0]["src"]).to eq(new_resource.put_url)
         end
 
+        describe 'uploading externally hosted media resources' do
+          let(:external_media_payload) do
+            {
+              media: {
+                content_type: "image/jpeg",
+                external_link: true,
+                src: 'https://example.com/test.jpeg',
+                metadata: { filename: "image.png" }
+              },
+              :"#{parent_name}_id" => parent.id,
+              media_name: media_type
+            }
+          end
+
+          it "should create an externally hosted media resource" do
+            default_request user_id: authorized_user.id, scopes: scopes
+            post :create, external_media_payload
+            media_location = json_response["media"][0]["src"]
+            expect(media_location).to eq(
+              external_media_payload.dig(:media, :src)
+            )
+          end
+        end
+
         describe "updates relationship" do
           before(:each) do
             default_request user_id: authorized_user.id, scopes: scopes

@@ -4,6 +4,20 @@ describe WorkflowCounter do
   let(:workflow) { create(:workflow_with_subjects, num_sets: 1) }
   let(:counter) { WorkflowCounter.new(workflow) }
 
+  shared_examples "it ignores training data" do
+    let(:workflow) { create(:workflow_with_subjects, num_sets: 2) }
+    let(:training_set) { workflow.subject_sets.first }
+    let(:real_set) { workflow.subject_sets.last }
+    before do
+      real_set_ar_collection_proxy = SubjectSet.where(id: real_set)
+      allow(workflow).to receive(:non_training_subject_sets).and_return(real_set_ar_collection_proxy)
+    end
+
+    it "should return non training data retired count only" do
+      expect(counted).to eq(expected_count)
+    end
+  end
+
   describe 'classifications' do
 
     it "should return 0 if there are none" do
@@ -41,6 +55,11 @@ describe WorkflowCounter do
           expect(counter.classifications).to eq(2)
         end
       end
+
+      it_behaves_like "it ignores training data" do
+        let(:counted) { counter.classifications }
+        let(:expected_count) { 2 }
+      end
     end
   end
 
@@ -73,6 +92,35 @@ describe WorkflowCounter do
       it "should return 0 when a subject set was unlinked" do
         workflow.subject_sets = []
         expect(counter.retired_subjects).to eq(0)
+      end
+
+      it_behaves_like "it ignores training data" do
+        let(:counted) { counter.retired_subjects }
+        let(:expected_count) { 2 }
+      end
+    end
+  end
+
+  describe 'subjects' do
+    it "should return 2" do
+      expect(counter.subjects).to eq(2)
+    end
+
+    it "should return 0 when a subject set was unlinked" do
+      workflow.subject_sets = []
+      expect(counter.subjects).to eq(0)
+    end
+
+    it_behaves_like "it ignores training data" do
+      let(:counted) { counter.subjects }
+      let(:expected_count) { 2 }
+    end
+
+    context "with no subjects" do
+      let(:workflow) { create(:workflow) }
+
+      it "should return 0 if there are none" do
+        expect(counter.subjects).to eq(0)
       end
     end
   end

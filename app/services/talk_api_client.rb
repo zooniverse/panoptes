@@ -65,6 +65,7 @@ class TalkApiClient
     @connection = Faraday.new host do |faraday|
       faraday.response :json, content_type: /\bjson$/
       faraday.use :http_cache, store: Rails.cache, logger: Rails.logger
+      faraday.use Faraday::Response::RaiseError
       faraday.adapter(*adapter)
     end
   end

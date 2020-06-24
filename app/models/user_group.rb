@@ -32,25 +32,6 @@ class UserGroup < ActiveRecord::Base
     using: :trigram,
     ranked_by: ":trigram"
 
-  def self.memberships_query(action, target)
-    target.memberships_for(action)
-  end
-
-  def self.joins_for
-    :memberships
-  end
-
-  def self.private_query(action, target, roles)
-    joins(:memberships).merge(target.memberships_for(action, self))
-      .where(memberships: { identity: false })
-  end
-
-  def self.user_can_access_scope(private_query, public_flag)
-    scope = where(id: private_query.select(:id))
-    scope = scope.or(public_scope) if public_flag
-    scope
-  end
-
   def self.roles_allowed_to_access(action, klass=nil)
     roles = case action
             when :show, :index

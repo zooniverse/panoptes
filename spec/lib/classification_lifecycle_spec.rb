@@ -261,33 +261,6 @@ describe ClassificationLifecycle do
         expect(PublishClassificationWorker).not_to receive(:perform_async)
       end
     end
-
-    describe "keep_data_in_panoptes_only project configuation" do
-      let(:classification) { build(:classification) }
-
-      it 'should call the publish classification worker when configuration is missing' do
-        expect(PublishClassificationWorker).to receive(:perform_async)
-      end
-
-      context "with non-default configuration" do
-        def update_project_metadata(allow)
-          classification
-            .project
-            .configuration
-            .merge!("keep_data_in_panoptes_only" => allow)
-        end
-
-        it 'should call the publish classification worker when public' do
-          update_project_metadata(false)
-          expect(PublishClassificationWorker).to receive(:perform_async)
-        end
-
-        it 'should not call the publish classification worker when private' do
-          update_project_metadata(true)
-          expect(PublishClassificationWorker).not_to receive(:perform_async)
-        end
-      end
-    end
   end
 
   describe "#process_project_preference" do
@@ -333,6 +306,8 @@ describe ClassificationLifecycle do
   end
 
   describe "#update_seen_subjects" do
+    let(:classification) { create(:classification) }
+
     context "with a user" do
       it 'should call the worker to add the subject_id to the seen subjects' do
         expect(UserSeenSubjectsWorker)
@@ -415,6 +390,7 @@ describe ClassificationLifecycle do
   end
 
   describe "#queue_associated_workers" do
+    let(:classification) { create(:classification) }
 
     it "should call process_project_preference" do
       expect(subject).to receive(:process_project_preference)
@@ -435,10 +411,12 @@ describe ClassificationLifecycle do
       expect(subject).to receive(:create_export_row)
       subject.queue_associated_workers
     end
+
     it "should call notify_subject_selector" do
       expect(subject).to receive(:notify_subject_selector)
       subject.queue_associated_workers
     end
+
     it "should call update_counters" do
       expect(subject).to receive(:update_counters)
       subject.queue_associated_workers
@@ -512,6 +490,7 @@ describe ClassificationLifecycle do
     end
 
     it "should add all other groups a user is currently in" do
+      classification.save
       group1 = create :user_group
       group2 = create :user_group
       classification.user.memberships.create! user_group: group1, state: 'active'
@@ -522,6 +501,7 @@ describe ClassificationLifecycle do
     end
 
     it 'should not add groups with inactive memberships' do
+      classification.save
       classification.user.memberships.create! user_group: create(:user_group), state: 'inactive'
 
       subject.add_user_groups

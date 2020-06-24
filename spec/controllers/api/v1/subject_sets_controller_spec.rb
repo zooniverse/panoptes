@@ -155,9 +155,16 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
 
       it "should queue the SMS metadata worker" do
+        fake_sms_ids = %w[1318 1319 1320 1321]
+        import_result_double = instance_double(
+          'ActiveRecord::Import::Result',
+          num_inserts: 1,
+          ids: fake_sms_ids
+        )
+        allow(SetMemberSubject).to receive(:import).and_return(import_result_double)
         expect(SubjectMetadataWorker)
           .to receive(:perform_async)
-          .with(kind_of(Numeric))
+          .with(fake_sms_ids)
         run_update_links
       end
 

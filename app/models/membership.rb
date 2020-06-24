@@ -17,10 +17,6 @@ class Membership < ActiveRecord::Base
     joins(@parent).where(state: states[:active]).merge(parent_class.public_scope)
   }
 
-  def self.joins_for
-    @parent
-  end
-
   def disable!
     inactive!
   end

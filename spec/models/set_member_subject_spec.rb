@@ -22,6 +22,8 @@ describe SetMemberSubject, :type => :model do
   end
 
   describe "::by_subject_workflow" do
+    let(:set_member_subject) { create(:set_member_subject) }
+
     it "should retrieve and object by subject and workflow id" do
       set_member_subject.save!
       sid = set_member_subject.subject_id

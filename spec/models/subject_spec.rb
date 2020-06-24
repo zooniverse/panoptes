@@ -21,7 +21,7 @@ describe Subject, :type => :model do
   end
 
   it "should be invalid without an upload_user_id" do
-    subject.upload_user_id = nil
+    subject.uploader = nil
     expect(subject).to_not be_valid
   end
 

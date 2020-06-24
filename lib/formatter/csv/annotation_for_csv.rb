@@ -25,6 +25,9 @@ module Formatter
         else
           @annotation
         end
+      rescue ClassificationDumpCache::MissingWorkflowVersion => error
+        Honeybadger.notify(error, context: {classification_id: classification.id})
+        @annotation
       end
 
       private

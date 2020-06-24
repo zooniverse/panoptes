@@ -1,0 +1,490 @@
+apiVersion: v1
+data:
+  nginx.conf: |+
+    upstream docker-panoptes {
+      server localhost:81;
+    }
+
+    server {
+      server_name panoptes.zooniverse.org;
+      include /etc/nginx/ssl.default.conf;
+      gzip_types *;
+
+      proxy_buffer_size 8k;
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Real-IP $remote_addr;
+
+      location = /commit_id.txt {
+        root /static-assets/;
+        expires off;
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, HEAD';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+      }
+
+      location ~ ^/api-assets/ {
+        root /static-assets/;
+        gzip_static on; # to serve pre-gzipped version
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location = /favicon.ico {
+        root /static-assets/;
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location = /robots.txt {
+        root /static-assets/;
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location /health_check {
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_pass http://docker-panoptes;
+      }
+
+      location / {
+        # avoid attacker setting the host value for links in rails_app
+        # https://github.com/rails/rails/issues/29893
+        proxy_set_header X-Forwarded-Host $server_name;
+        proxy_pass http://docker-panoptes;
+      }
+    }
+
+    server {
+      server_name signin.zooniverse.org;
+      include /etc/nginx/ssl.default.conf;
+      gzip_types *;
+
+      proxy_buffer_size 8k;
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Real-IP $remote_addr;
+
+      location = /commit_id.txt {
+        root /static-assets/;
+        expires off;
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, HEAD';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+      }
+
+      location ~ ^/api-assets/ {
+        root /static-assets/;
+        gzip_static on; # to serve pre-gzipped version
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location = /favicon.ico {
+        root /static-assets/;
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location = /robots.txt {
+        root /static-assets/;
+        expires max;
+        add_header Cache-Control public;
+      }
+
+      location /health_check {
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_pass http://docker-panoptes;
+      }
+
+      location / {
+        # avoid attacker setting the host value for links in rails_app
+        # https://github.com/rails/rails/issues/29893
+        proxy_set_header X-Forwarded-Host $server_name;
+        proxy_pass http://docker-panoptes;
+      }
+    }
+kind: ConfigMap
+metadata:
+  name: panoptes-nginx-conf-production
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: panoptes-production-shared
+data:
+  RAILS_ENV: production
+  ZOO_STREAM_KINESIS_STREAM_NAME: zooniverse-production
+  ZOO_STREAM_SOURCE: panoptes
+  CORS_ORIGINS_REGEX: '^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|staging)?\.?heirtagger\.ox\.ac\.uk|(www|relaunch|field-book)\.notesfromnature\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
+  DESIGNATOR_API_HOST: https://designator.zooniverse.org/
+  DESIGNATOR_API_USERNAME: production
+  EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
+  EVENTS_API_USERNAME: api
+  REDIRECTS_BASE: https://www.zooniverse.org
+  REDIRECTS_PASSWORD_RESET: /reset-password
+  REDIRECTS_UNSUBSCRIBE: /unsubscribe
+  MAILER_ADDRESS: email-smtp.us-east-1.amazonaws.com
+  MAILER_DOMAIN: zooniverse.org
+  MEMCACHE_SERVERS: 'panoptes-production-memcached:11211'
+  NEW_RELIC_APP_NAME: Panoptes
+  NEW_RELIC_MONITOR_MODE: 'true'
+  PAGE_SIZE_LIMIT: '200'
+  PROJECT_REQUEST_BASE_URL: https://www.zooniverse.org
+  PROJECT_REQUEST_RECIPIENTS: project-review@zooniverse.org
+  PROJECT_REQUEST_BCC: i2h6y2f6a7o0x7i9@zooniverse.slack.com
+  REDIS_URL: 'redis://panoptes-production-redis:6379/0'
+  RAILS_MAX_THREADS: '8'
+  SIDEKIQ_CONCURRENCY: '8'
+  STORAGE_ADAPTER: aws
+  STORAGE_BUCKET: zooniverse-static
+  STORAGE_PREFIX: panoptes-uploads.zooniverse.org/production/
+  TALK_API_HOST: https://talk.zooniverse.org
+  TALK_API_USER: '1'
+  TALK_API_APPLICATION: '1'
+  UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY: '604800'
+  USER_SUBJECT_LIMIT: '10000'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-production-app
+  labels:
+    app: panoptes-production-app
+spec:
+  selector:
+    matchLabels:
+      app: panoptes-production-app
+  template:
+    metadata:
+      labels:
+        app: panoptes-production-app
+    spec:
+      containers:
+        - name: panoptes-production-app
+          image: zooniverse/panoptes:__IMAGE_TAG__
+          resources:
+            requests:
+              memory: "1500Mi"
+              cpu: "500m"
+            limits:
+              memory: "1500Mi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 81
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
+          env:
+          - name: PG_STATEMENT_TIMEOUT
+            value: '65000'
+          envFrom:
+          - secretRef:
+              name: panoptes-common-env-vars
+          - secretRef:
+              name: panoptes-production-env-vars
+          - configMapRef:
+              name: panoptes-production-shared
+          volumeMounts:
+            - name: static-assets
+              mountPath: "/static-assets"
+            - name: jwt-production
+              mountPath: "/rails_app/config/keys"
+              readOnly: true
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
+        - name: panoptes-production-nginx
+          image: zooniverse/apps-nginx:xenial
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
+            limits:
+              memory: "100Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
+            initialDelaySeconds: 10
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: static-assets
+              mountPath: "/static-assets"
+            - name: panoptes-nginx-config
+              mountPath: "/etc/nginx-sites"
+      volumes:
+        - name: static-assets
+          emptyDir: {}
+        - name: panoptes-nginx-config
+          configMap:
+            name: panoptes-nginx-conf-production
+        - name: jwt-production
+          secret:
+            secretName: panoptes-doorkeeper-jwt-production
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: panoptes-production-app
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: panoptes-production-app
+  minReplicas: 2
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-production-app
+spec:
+  selector:
+    app: panoptes-production-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-production-sidekiq
+  labels:
+    app: panoptes-production-sidekiq
+spec:
+  selector:
+    matchLabels:
+      app: panoptes-production-sidekiq
+  template:
+    metadata:
+      labels:
+        app: panoptes-production-sidekiq
+    spec:
+      containers:
+        - name: panoptes-production-sidekiq
+          image: zooniverse/panoptes:__IMAGE_TAG__
+          resources:
+            requests:
+              memory: "4000Mi"
+              cpu: "1000m"
+              ephemeral-storage: "50Gi"
+            limits:
+              memory: "4000Mi"
+              cpu: "2000m"
+              ephemeral-storage: "50Gi"
+          livenessProbe:
+            exec:
+              command:
+                - /rails_app/scripts/docker/sidekiq_status
+            initialDelaySeconds: 20
+          args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
+          envFrom:
+          - secretRef:
+              name: panoptes-common-env-vars
+          - secretRef:
+              name: panoptes-production-env-vars
+          - configMapRef:
+              name: panoptes-production-shared
+          volumeMounts:
+          - mountPath: /tmp
+            name: panoptes-production-dumpworker-data
+          - name: jwt-production
+            mountPath: "/rails_app/config/keys"
+            readOnly: true
+      volumes:
+        - name: panoptes-production-dumpworker-data
+          emptyDir: {}
+        - name: jwt-production
+          secret:
+            secretName: panoptes-doorkeeper-jwt-production
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: panoptes-production-sidekiq
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: panoptes-production-sidekiq
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 95
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: panoptes-production-redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: azurefile
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-production-redis
+  labels:
+    app: panoptes-production-redis
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: panoptes-production-redis
+  template:
+    metadata:
+      labels:
+        app: panoptes-production-redis
+    spec:
+      tolerations:
+      - key: "servicelife"
+        operator: "Equal"
+        value: "longlife"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: servicelife
+                operator: In
+                values:
+                - longlife
+      initContainers:
+        - name: disable-thp
+          image: busybox
+          volumeMounts:
+            - name: host-sys
+              mountPath: /host-sys
+          command: ["sh", "-c", "echo never >/host-sys/kernel/mm/transparent_hugepage/enabled"]
+      containers:
+        - name: panoptes-production-redis
+          image: redis:6.0.5
+          args: ['--appendonly yes', '--appendfsync no']
+          resources:
+            requests:
+              memory: "2500Mi"
+              cpu: "500m"
+            limits:
+              memory: "2500Mi"
+              cpu: "1500m"
+          volumeMounts:
+          - name: panoptes-production-redis-data
+            mountPath: "/data"
+      volumes:
+        - name: panoptes-production-redis-data
+          persistentVolumeClaim:
+            claimName: panoptes-production-redis
+        - name: host-sys
+          hostPath:
+            path: /sys
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-production-redis
+spec:
+  selector:
+    app: panoptes-production-redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-production-memcached
+  labels:
+    app: panoptes-production-memcached
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: panoptes-production-memcached
+  template:
+    metadata:
+      labels:
+        app: panoptes-production-memcached
+    spec:
+      tolerations:
+      - key: "servicelife"
+        operator: "Equal"
+        value: "longlife"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: servicelife
+                operator: In
+                values:
+                - longlife
+      containers:
+        - name: panoptes-production-memcached
+          image: memcached:1.6.6
+          args: ['-m 90']
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
+            limits:
+              memory: "100Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-production-memcached
+spec:
+  selector:
+    app: panoptes-production-memcached
+  ports:
+    - protocol: TCP
+      port: 11211
+      targetPort: 11211
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: panoptes-production-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/set-real-ip-from: "10.0.0.0/8"
+spec:
+  tls:
+  - hosts:
+    - panoptes.azure.zooniverse.org
+    secretName: panoptes-production-tls-secret
+  rules:
+  - host: panoptes.azure.zooniverse.org
+    http:
+      paths:
+      - backend:
+          serviceName: panoptes-production-app
+          servicePort: 80
+        path: /(.*)

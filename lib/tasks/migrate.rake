@@ -250,6 +250,15 @@ namespace :migrate do
                          minor_version: workflow.primary_content.current_version_number.to_i
       end
     end
+
+    desc "Backfill new real_set_member_subjects_count values for cached subjects_count"
+    task :backfill_real_set_member_subjects => :environment do
+      non_backfilled_scope = Workflow.where(real_set_member_subjects_count: 0)
+      non_backfilled_scope.find_each do |workflow|
+        counter = WorkflowCounter.new(workflow)
+        workflow.update!(real_set_member_subjects_count: counter.subjects)
+      end
+    end
   end
 
   namespace :subject_workflow_status do
@@ -324,6 +333,15 @@ namespace :migrate do
         project.workflow_description = content.workflow_description
         project.researcher_quote = content.researcher_quote
         project.save!(validate: false)
+      end
+    end
+
+    desc 'backfill workflow versions for those workflows that have none'
+    task :backfill_missing_workflow_versions => :environment do
+      Workflow.find_each do |workflow|
+        if workflow.workflow_versions.count == 0
+          workflow.build_version.save!
+        end
       end
     end
 

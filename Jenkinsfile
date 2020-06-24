@@ -33,7 +33,7 @@ pipeline {
       steps {
         script {
           def dockerRepoName = 'zooniverse/panoptes'
-          def dockerImageName = "${dockerRepoName}:${BRANCH_NAME}"
+          def dockerImageName = "${dockerRepoName}:${GIT_COMMIT}"
           def newImage = docker.build(dockerImageName)
           newImage.push()
 
@@ -46,235 +46,76 @@ pipeline {
       }
     }
 
-    stage('Build AMIs') {
-      failFast true
-      parallel {
-        stage('Staging API') {
-          when { branch 'master' }
-          options {
-            skipDefaultCheckout true
-          }
-          agent {
-            docker {
-              image 'zooniverse/operations:latest'
-              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
-            }
-          }
-          steps {
-            sh """#!/bin/bash -e
-              while true; do sleep 3; echo -n "."; done &
-              KEEP_ALIVE_ECHO_JOB=\$!
-              cd /operations
-              ./rebuild.sh panoptes-api-staging
-              kill \${KEEP_ALIVE_ECHO_JOB}
-            """
-          }
-          post {
-            failure {
-              slackSend (
-                  color: '#FF0000',
-                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-                  channel: "#ops"
-                  )
-            }
-          }
-        }
-        stage('Staging Dump workers') {
-          when { branch 'master' }
-          options {
-            skipDefaultCheckout true
-          }
-          agent {
-            docker {
-              image 'zooniverse/operations:latest'
-              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
-            }
-          }
-          steps {
-            sh """#!/bin/bash -e
-              while true; do sleep 3; echo -n "."; done &
-              KEEP_ALIVE_ECHO_JOB=\$!
-              cd /operations
-              ./rebuild.sh panoptes-dumpworker-staging
-              kill \${KEEP_ALIVE_ECHO_JOB}
-            """
-          }
-          post {
-            failure {
-              slackSend (
-                  color: '#FF0000',
-                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-                  channel: "#ops"
-                  )
-            }
-          }
-        }
-        stage('Production API') {
-          when { tag 'production-release' }
-          options {
-            skipDefaultCheckout true
-          }
-          agent {
-            docker {
-              image 'zooniverse/operations:latest'
-              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
-            }
-          }
-          steps {
-            sh """#!/bin/bash -e
-              while true; do sleep 3; echo -n "."; done &
-              KEEP_ALIVE_ECHO_JOB=\$!
-              cd /operations
-              ./rebuild.sh panoptes-api
-              kill \${KEEP_ALIVE_ECHO_JOB}
-            """
-          }
-          post {
-            success {
-              slackSend (
-                  color: '#00FF00',
-                  message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-                  channel: "#ops"
-                  )
-            }
-            failure {
-              slackSend (
-                  color: '#FF0000',
-                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-                  channel: "#ops"
-                  )
-            }
-          }
-        }
-        stage('Production Dump workers') {
-          when { tag 'production-release' }
-          options {
-            skipDefaultCheckout true
-          }
-          agent {
-            docker {
-              image 'zooniverse/operations:latest'
-              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
-            }
-          }
-          steps {
-            sh """#!/bin/bash -e
-              while true; do sleep 3; echo -n "."; done &
-              KEEP_ALIVE_ECHO_JOB=\$!
-              cd /operations
-              ./rebuild.sh panoptes-dumpworker
-              kill \${KEEP_ALIVE_ECHO_JOB}
-            """
-          }
-          post {
-            success {
-              slackSend (
-                  color: '#00FF00',
-                  message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-                  channel: "#ops"
-                  )
-            }
-            failure {
-              slackSend (
-                  color: '#FF0000',
-                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-                  channel: "#ops"
-                  )
-            }
-          }
-        }
-      }
-    }
-
-    stage('Migrate Staging DB') {
-      when { branch 'master' }
-      options {
-        skipDefaultCheckout true
-      }
-      agent {
-        docker {
-          image 'zooniverse/operations:latest'
-          args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
-        }
-      }
+    stage('Dry run deployments') {
+      agent any
       steps {
-        sh """#!/bin/bash -e
-          while true; do sleep 3; echo -n "."; done &
-          KEEP_ALIVE_ECHO_JOB=\$!
-          cd /operations
-          source auto_cleanup.sh
-          source deploylib.sh
-          INSTANCE_ID=\$(./launch_latest.sh -q panoptes-api-staging)
-          INSTANCE_DNS_NAME=\$(instance_dns_name \$INSTANCE_ID)
-          # Wait for instance/panoptes to come up
-          timeout_cmd "timeout 5m ssh ubuntu@\$INSTANCE_DNS_NAME docker-compose -f /opt/docker_start/docker-compose.yml -p panoptes-api-staging exec -T panoptes true"
-          ssh ubuntu@\$INSTANCE_DNS_NAME docker-compose -f /opt/docker_start/docker-compose.yml -p panoptes-api-staging exec -T panoptes ./migrate.sh
-          kill \${KEEP_ALIVE_ECHO_JOB}
-        """
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-staging.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-production.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
+      }
+    }
+
+    stage('Deploy production to Kubernetes') {
+      when { tag 'production-release' }
+      agent any
+      steps {
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-production.tmpl | kubectl --context azure apply --record -f -"
       }
       post {
-        failure {
-          slackSend (
-              color: '#FF0000',
-              message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-              channel: "#ops"
+        success {
+          script {
+            if (env.TAG_NAME == 'production-release') {
+              slackSend (
+                color: '#00FF00',
+                message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                channel: "#ops"
               )
+            }
+          }
+        }
+
+        failure {
+          script {
+            if (env.TAG_NAME == 'production-release') {
+              slackSend (
+                color: '#FF0000',
+                message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                channel: "#ops"
+              )
+            }
+          }
         }
       }
     }
 
-    stage('Deploy staging AMIs') {
+    stage('Deploy staging to Kubernetes') {
       when { branch 'master' }
-      failFast true
-      parallel {
-        stage('Deploy API') {
-          options {
-            skipDefaultCheckout true
-          }
-          agent {
-            docker {
-              image 'zooniverse/operations:latest'
-              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
-            }
-          }
-          steps {
-            sh """#!/bin/bash -e
-              while true; do sleep 3; echo -n "."; done &
-              KEEP_ALIVE_ECHO_JOB=\$!
-              cd /operations
-              ./deploy_latest.sh panoptes-api-staging
-              kill \${KEEP_ALIVE_ECHO_JOB}
-            """
-          }
-        }
-        stage('Deploy Dump workers') {
-          options {
-            skipDefaultCheckout true
-          }
-          agent {
-            docker {
-              image 'zooniverse/operations:latest'
-              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
-            }
-          }
-          steps {
-            sh """#!/bin/bash -e
-              while true; do sleep 3; echo -n "."; done &
-              KEEP_ALIVE_ECHO_JOB=\$!
-              cd /operations
-              ./deploy_latest.sh panoptes-dumpworker-staging
-              kill \${KEEP_ALIVE_ECHO_JOB}
-            """
-          }
-        }
+      agent any
+      steps {
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-staging.tmpl | kubectl --context azure apply --record -f -"
       }
       post {
-        failure {
-          slackSend (
-              color: '#FF0000',
-              message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-              channel: "#ops"
+        success {
+          script {
+            if (env.BRANCH_NAME == 'master') {
+              slackSend (
+                color: '#00FF00',
+                message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                channel: "#ops"
               )
+            }
+          }
+        }
+
+        failure {
+          script {
+            if (env.BRANCH_NAME == 'master') {
+              slackSend (
+                color: '#FF0000',
+                message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                channel: "#ops"
+              )
+            }
+          }
         }
       }
     }

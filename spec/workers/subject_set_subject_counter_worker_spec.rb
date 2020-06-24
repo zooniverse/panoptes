@@ -13,5 +13,14 @@ RSpec.describe SubjectSetSubjectCounterWorker do
         .to receive(:touch)
       described_class.new.perform(subject_set.id)
     end
+
+    it "should call a workflow subjects count worker" do
+      subject_set.workflow_ids.each do |workflow_id|
+        expect(WorkflowSubjectsCountWorker)
+          .to receive(:perform_async)
+          .with(workflow_id)
+      end
+      described_class.new.perform(subject_set.id)
+    end
   end
 end
