@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 def next?
-  File.basename(__FILE__) == "Gemfile.next"
+  File.basename(__FILE__) == 'Gemfile.next'
 end
 
 source 'https://rubygems.org'
@@ -46,7 +46,7 @@ gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 if next?
   gem 'rails', '~> 5.0.0'
 else
-  gem 'rails', '~> 4.2.11'
+  gem 'rails', '~> 4.2.11' # rubocop:disable Bundler/DuplicatedGem
 end
 gem 'ranked-model', '~> 0.4.1'
 gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: 'cef0969cef'
