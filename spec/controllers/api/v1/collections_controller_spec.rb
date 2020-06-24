@@ -186,7 +186,7 @@ describe Api::V1::CollectionsController, type: :controller do
       end
     end
 
-    describe 'validation', :focus do
+    describe 'validation' do
       let(:favorite_params) do
         {
           collections: {
