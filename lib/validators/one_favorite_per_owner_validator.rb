@@ -9,14 +9,11 @@ module Validators
     def validate(new_record)
       return unless new_record.owner && new_record.favorite
 
-      owner_favorite_collections = new_record.owner.collections.includes(:projects).where(favorite: true)
-      owner_has_existing_fav_for_project = false
-
-      owner_favorite_collections.each do |collection|
-        if collection.project_ids.include?(new_record.project_ids.first)
-          owner_has_existing_fav_for_project = true
-        end
-      end
+      owner_fav_collections = new_record.owner.collections.where(favorite: true)
+      owner_has_existing_fav_for_project = owner_fav_collections
+        .joins(:projects)
+        .where(projects: { id: new_record.project_ids })
+        .exists?
 
       return unless owner_has_existing_fav_for_project
 
