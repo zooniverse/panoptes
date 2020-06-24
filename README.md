@@ -93,6 +93,16 @@ There are multiple options for setting up a testing environment:
 
 ## Rails 5
 
+Using the gem https://github.com/clio/ten_years_rails to help with the upgrade path
+https://www.youtube.com/watch?v=6aCfc0DkSFo
+
+#### Install the gems via next
+`next bundle install`
+
+### check for incompatible gems for target rails verion
+`bundle exec bundle_report compatibility --rails-version=5.0.7`
+
+#### Run the specs
 `DISABLE_SPRING=t BUNDLE_GEMFILE=Gemfile.next bundle exec rspec spec`
 
 ## Contributing
