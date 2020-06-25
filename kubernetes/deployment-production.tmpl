@@ -484,9 +484,17 @@ spec:
   tls:
   - hosts:
     - panoptes.azure.zooniverse.org
+    - panoptes.zooniverse.org
     secretName: panoptes-production-tls-secret
   rules:
   - host: panoptes.azure.zooniverse.org
+    http:
+      paths:
+      - backend:
+          serviceName: panoptes-production-app
+          servicePort: 80
+        path: /(.*)
+  - host: panoptes.zooniverse.org
     http:
       paths:
       - backend:
