@@ -370,6 +370,8 @@ spec:
                 operator: In
                 values:
                 - longlife
+      securityContext:
+        fsGroup: 999
       initContainers:
         - name: disable-thp
           image: busybox
