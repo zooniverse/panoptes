@@ -380,7 +380,6 @@ spec:
       containers:
         - name: panoptes-production-redis
           image: redis:6.0.5
-          args: ['--appendonly yes', '--appendfsync no']
           resources:
             requests:
               memory: "2500Mi"
