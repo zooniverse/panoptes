@@ -97,18 +97,30 @@ Using the gem https://github.com/clio/ten_years_rails to help with the upgrade p
 https://www.youtube.com/watch?v=6aCfc0DkSFo
 
 #### Using docker-compose for env setup
+
 `docker-compose -f docker-compose-rails-5.yml build`
 `docker-compose -f docker-compose-rails-5.yml run --rm -e RAILS_ENV=test panoptes bash`
 
 #### Install the gems via next
+
 `next bundle install`
 
 ### check for incompatible gems for target rails verion
+
 `bundle exec bundle_report compatibility --rails-version=5.0.7`
 
 #### Run the specs
-`DISABLE_SPRING=t BUNDLE_GEMFILE=Gemfile.next bundle exec rspec spec`
 
+It's recommeded to enable spring for testing env
+`unset DISABLE_SPRING`
+run all specs for rails 5 gemfile
+`BUNDLE_GEMFILE=Gemfile.next bundle exec rspec`
+
+or fail fast
+`BUNDLE_GEMFILE=Gemfile.next bundle exec rspec --fail-fast`
+
+or with gaurd (recommended to enable spring)
+`bundle exec guard -g rails5 --no-interactions`
 
 ## Contributing
 
