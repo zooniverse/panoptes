@@ -24,9 +24,12 @@ module CsvDumps
         row = formatter.headers.map { |header| caching_formatter.send(header) }
         csv_dump << row
 
-        # yield to the external context that knows how to
-        # persistence the cacheable resource
-        yield_block.call(formatter)
+        # yield the caching_formatter to the calling context
+        # as it knows how best to persist the cacheable resource
+        #
+        # Note: this must call with the caching formatter
+        # if not we will reprocess
+        yield_block.call(caching_formatter)
       end
     end
   end
