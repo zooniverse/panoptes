@@ -28,8 +28,6 @@ module Formatter
         @model = model
       end
 
-      private
-
       def to_array
         headers.map { |header| send(header) }
       end
@@ -84,6 +82,8 @@ module Formatter
       def workflow_name
         workflow.display_name
       end
+
+      private
 
       def classification_subject_ids
         cache.subject_ids_from_classification(classification.id)
