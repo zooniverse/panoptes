@@ -4,7 +4,7 @@ module CsvDumps
   class CachingDumpProcessor < DumpProcessor
     attr_accessor :yield_block
 
-    def initialize(formatter, scope, medium, csv_dump, &block)
+    def initialize(formatter, scope, medium, csv_dump=nil, &block)
       super(formatter, scope, medium, csv_dump)
       @yield_block = block
     end

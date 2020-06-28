@@ -1,18 +1,12 @@
 module CsvDumps
   class DumpProcessor
-    include ActiveSupport::Callbacks
-
     attr_reader :csv_dump, :formatter, :scope, :medium
 
-    define_callbacks :dump
-    define_callbacks :upload
-    define_callbacks :cleanup
-
-    def initialize(formatter, scope, medium, csv_dump = CsvDump.new)
+    def initialize(formatter, scope, medium, csv_dump=nil)
       @formatter = formatter
       @scope = scope
       @medium = medium
-      @csv_dump = csv_dump
+      @csv_dump = csv_dump || CsvDump.new
     end
 
     def execute
