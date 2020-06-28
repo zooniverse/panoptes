@@ -15,15 +15,8 @@ bind "tcp://0.0.0.0:#{port}"
 
 threads_count = ENV.fetch('RAILS_MAX_THREADS', 2).to_i
 
-if rails_env == 'production'
-  stdout_redirect "#{app_path}/log/production.log", "#{app_path}/log/production_err.log", true
-  # === Cluster mode ===
-  workers 2 # TODO: move from cluster mode once production is in K8s
-  threads 1, 8
-else
-  # === Non-Cluster mode (no worker / forking) ===
-  threads 1, threads_count
-end
+# === Non-Cluster mode (no worker / forking) ===
+threads 1, threads_count
 
 # Additional text to display in process listing
 tag 'panoptes_api'

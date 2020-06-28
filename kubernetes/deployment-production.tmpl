@@ -132,6 +132,7 @@ data:
   PROJECT_REQUEST_RECIPIENTS: project-review@zooniverse.org
   PROJECT_REQUEST_BCC: i2h6y2f6a7o0x7i9@zooniverse.slack.com
   REDIS_URL: 'redis://panoptes-production-redis:6379/0'
+  RAILS_MAX_THREADS: '8'
   SIDEKIQ_CONCURRENCY: '8'
   STORAGE_ADAPTER: aws
   STORAGE_BUCKET: zooniverse-static
@@ -174,6 +175,9 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
+          env:
+          - name: PG_STATEMENT_TIMEOUT
+            value: '65000'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
@@ -191,7 +195,7 @@ spec:
             postStart:
               exec:
                 command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
-        - name: panoptes-staging-nginx
+        - name: panoptes-production-nginx
           image: zooniverse/apps-nginx:xenial
           resources:
             requests:
@@ -208,6 +212,11 @@ spec:
                  - name: X-Forwarded-Proto
                    value: https
             initialDelaySeconds: 10
+          lifecycle:
+            preStop:
+              exec:
+                # SIGTERM triggers a quick exit; gracefully terminate instead
+                command: ["/usr/sbin/nginx","-s","quit"]
           ports:
             - containerPort: 80
           volumeMounts:
@@ -278,6 +287,11 @@ spec:
               memory: "4000Mi"
               cpu: "2000m"
               ephemeral-storage: "50Gi"
+          livenessProbe:
+            exec:
+              command:
+                - /rails_app/scripts/docker/sidekiq_status
+            initialDelaySeconds: 20
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           envFrom:
           - secretRef:
@@ -289,9 +303,15 @@ spec:
           volumeMounts:
           - mountPath: /tmp
             name: panoptes-production-dumpworker-data
+          - name: jwt-production
+            mountPath: "/rails_app/config/keys"
+            readOnly: true
       volumes:
         - name: panoptes-production-dumpworker-data
           emptyDir: {}
+        - name: jwt-production
+          secret:
+            secretName: panoptes-doorkeeper-jwt-production
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
@@ -336,10 +356,30 @@ spec:
       labels:
         app: panoptes-production-redis
     spec:
+      tolerations:
+      - key: "servicelife"
+        operator: "Equal"
+        value: "longlife"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: servicelife
+                operator: In
+                values:
+                - longlife
+      initContainers:
+        - name: disable-thp
+          image: busybox
+          volumeMounts:
+            - name: host-sys
+              mountPath: /host-sys
+          command: ["sh", "-c", "echo never >/host-sys/kernel/mm/transparent_hugepage/enabled"]
       containers:
         - name: panoptes-production-redis
           image: redis:6.0.5
-          args: ['--appendonly yes', '--appendfsync no']
           resources:
             requests:
               memory: "2500Mi"
@@ -354,6 +394,10 @@ spec:
         - name: panoptes-production-redis-data
           persistentVolumeClaim:
             claimName: panoptes-production-redis
+        - name: host-sys
+          hostPath:
+            path: /sys
+
 ---
 apiVersion: v1
 kind: Service
@@ -386,6 +430,20 @@ spec:
       labels:
         app: panoptes-production-memcached
     spec:
+      tolerations:
+      - key: "servicelife"
+        operator: "Equal"
+        value: "longlife"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: servicelife
+                operator: In
+                values:
+                - longlife
       containers:
         - name: panoptes-production-memcached
           image: memcached:1.6.6
@@ -410,3 +468,35 @@ spec:
       port: 11211
       targetPort: 11211
   type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: panoptes-production-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/set-real-ip-from: "10.0.0.0/8"
+spec:
+  tls:
+  - hosts:
+    - panoptes.azure.zooniverse.org
+    - panoptes.zooniverse.org
+    secretName: panoptes-production-tls-secret
+  rules:
+  - host: panoptes.azure.zooniverse.org
+    http:
+      paths:
+      - backend:
+          serviceName: panoptes-production-app
+          servicePort: 80
+        path: /(.*)
+  - host: panoptes.zooniverse.org
+    http:
+      paths:
+      - backend:
+          serviceName: panoptes-production-app
+          servicePort: 80
+        path: /(.*)

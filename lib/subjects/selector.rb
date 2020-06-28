@@ -1,6 +1,5 @@
 module Subjects
   class Selector
-    include Logging
 
     class MissingParameter < StandardError; end
     class MissingSubjectSet < StandardError; end
