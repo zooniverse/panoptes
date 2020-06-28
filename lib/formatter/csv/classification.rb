@@ -1,11 +1,11 @@
 module Formatter
   module Csv
     class Classification
-      attr_accessor :classification
+      attr_accessor :model
       attr_reader :cache, :salt
 
       delegate :user_id, :project_id, :workflow, :workflow_id, :created_at,
-        :gold_standard, :workflow_version, to: :classification
+        :gold_standard, :workflow_version, to: :model
 
       def initialize(cache)
         @cache = cache
@@ -17,13 +17,25 @@ module Formatter
            created_at gold_standard expert metadata annotations subject_data subject_ids)
       end
 
-      def to_rows(classification)
-        [to_array(classification)]
+      # main interface to update the model for formatting rows
+      def to_rows(model)
+        @model = model
+        [to_array]
       end
 
-      def to_array(classification)
-        @classification = classification
+      # interface to update the model under format
+      def update_model(model)
+        @model = model
+      end
+
+      private
+
+      def to_array
         headers.map { |header| send(header) }
+      end
+
+      def classification
+        model
       end
 
       def classification_id

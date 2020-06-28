@@ -53,6 +53,12 @@ RSpec.describe Formatter::Csv::Classification do
     end
   end
 
+  describe '#update_model' do
+    it 'updates the model being formatted' do
+      expect{ formatter.update_model(classification) }.to change(formatter, :model)
+    end
+  end
+
   describe "#to_rows" do
     before(:each) do
       allow(Subject).to receive(:where).with(id: classification.subject_ids).and_return([subject])
