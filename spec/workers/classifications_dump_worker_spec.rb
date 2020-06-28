@@ -37,14 +37,22 @@ RSpec.describe ClassificationsDumpWorker do
       end
     end
 
-    it 'stores the processed export as a ClassificationExportRow' do
-      create(:classification, project: project, workflow: workflow, subjects: [subject])
-      expect {
-        worker.perform(project.id, 'project')
-      }.to change(
-        ClassificationExportRow,
-        :count
-      ).from(0).to(1)
+    describe 'CachedExport resource storage' do
+      it 'stores the processed export for next run' do
+        create(:classification, project: project, workflow: workflow, subjects: [subject])
+        expect { worker.perform(project.id, 'project') }.to change(
+          CachedExport,
+          :count
+        ).from(0).to(1)
+      end
+
+      it 'does not try store one if one already exists' do
+        create(:classification, project: project, workflow: workflow, subjects: [subject]) do |c|
+          cached_export = create(:cached_export, resource: c)
+          c.update_column(:cached_export_id, cached_export.id) # rubocop:disable Rails/SkipsModelValidations
+        end
+        expect { worker.perform(project.id, 'project') }.not_to change(CachedExport, :count)
+      end
     end
   end
 end

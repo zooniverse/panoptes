@@ -41,10 +41,12 @@ RSpec.describe CsvDumps::CachingDumpProcessor do
     # TODO: spec out using the Formatter::Caching
     # and how we export using this intead of normal
 
-    it 'calls the yield stored block with the formatter' do
+    it 'calls the stored yield block with a caching formatter' do
       allow(my_proc).to receive(:call).once
       processor.perform_dump
-      expect(my_proc).to have_received(:call).with(formatter)
+      expect(my_proc).to have_received(:call).with(
+        instance_of(Formatter::Caching)
+      )
     end
   end
 end
