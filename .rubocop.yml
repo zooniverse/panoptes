@@ -6,6 +6,9 @@ require:
 Style/NumericLiterals:
   Enabled: false
 
+Style/Documentation:
+  Enabled: false
+
 Layout/LineLength:
   Max: 160
 Layout/SpaceAroundEqualsInParameterDefault:
@@ -15,6 +18,10 @@ Metrics/BlockLength:
   Exclude:
     - '**/*_spec.rb'
     - 'spec/support/*.rb'
+
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "spec/**/*"
 
 # new linters - opt in
 Layout/SpaceAroundMethodCallOperator:
