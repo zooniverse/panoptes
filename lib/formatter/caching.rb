@@ -2,7 +2,7 @@
 
 module Formatter
   class Caching
-    attr_reader :cached_resource, :formatter
+    attr_reader :cache_resource, :formatter
 
     def initialize(cache_resource, formatter)
       @cache_resource = cache_resource
