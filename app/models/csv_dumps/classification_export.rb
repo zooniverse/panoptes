@@ -12,7 +12,6 @@ class ClassificationExport
       expert: formatter.expert,
       metadata: formatter.metadata,
       annotations: formatter.annotations,
-      subject_data: formatter.subject_data,
       subject_ids: formatter.subject_ids
     }
   end

@@ -15,7 +15,6 @@ RSpec.describe ClassificationExport do
       expert: classification.expert_classifier,
       metadata: classification.metadata,
       annotations: classification.annotations,
-      subject_data: {},
       subject_ids: '1,2'
     }
   end
@@ -23,7 +22,7 @@ RSpec.describe ClassificationExport do
     instance_double('Formatter::Csv::Classification', data)
   end
 
-  describe '.format', :focus do
+  describe '.format' do
     it 'returns the expected data' do
       expected_data = data.except(:created_at)
       expected_data[:classification_created_at] = classification.created_at
