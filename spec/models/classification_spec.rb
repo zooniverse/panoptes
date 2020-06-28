@@ -17,10 +17,18 @@ describe Classification, :type => :model do
     expect(build(:classification, workflow: nil)).to_not be_valid
   end
 
-  it 'can have a cached export' do
-    classification = build(:classification)
-    cached_export = create(:cached_export, resource: classification)
-    expect(classification.cached_export).to eq(cached_export)
+  describe "#cached_export" do
+    let(:classification) { build(:classification) }
+    let(:cached_export) { create(:cached_export, resource: classification) }
+
+    it 'does not require a cached export' do
+      expect(classification.cached_export).to be_nil
+    end
+
+    it 'can have a direct lookup to a cached export' do
+      classification.cached_export = cached_export
+      expect(classification.cached_export).to eq(cached_export)
+    end
   end
 
   it "must have a user_ip" do

@@ -4,7 +4,7 @@ class Classification < ActiveRecord::Base
   belongs_to :workflow
   belongs_to :user_group
 
-  has_one :cached_export, as: :resource, dependent: :destroy
+  belongs_to :cached_export
 
   has_many :recents, dependent: :destroy
 

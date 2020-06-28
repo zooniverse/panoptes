@@ -284,7 +284,8 @@ CREATE TABLE public.classifications (
     expert_classifier integer,
     metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
     workflow_version text,
-    lifecycled_at timestamp without time zone
+    lifecycled_at timestamp without time zone,
+    cached_export_id integer
 );
 
 
@@ -2872,13 +2873,6 @@ CREATE INDEX index_authorizations_on_user_id ON public.authorizations USING btre
 
 
 --
--- Name: index_cached_exports_on_resource_type_and_resource_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_cached_exports_on_resource_type_and_resource_id ON public.cached_exports USING btree (resource_type, resource_id);
-
-
---
 -- Name: index_classification_export_rows_on_classification_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4838,4 +4832,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190524111214');
 INSERT INTO schema_migrations (version) VALUES ('20190624094308');
 
 INSERT INTO schema_migrations (version) VALUES ('20200622123525');
+
+INSERT INTO schema_migrations (version) VALUES ('20200628104433');
 
