@@ -5,13 +5,6 @@ RSpec.shared_examples 'a dump processor' do
     processor.execute
   end
 
-  it "should create a csv file with the correct number of entries" do
-    scope << 1
-    scope << 2
-    expect(csv_dump).to receive(:<<).exactly(2).times
-    processor.execute
-  end
-
   it "should compress the csv file" do
     expect(csv_dump).to receive(:gzip!)
     processor.execute

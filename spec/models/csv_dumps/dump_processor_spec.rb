@@ -14,4 +14,12 @@ RSpec.describe CsvDumps::DumpProcessor do
   end
 
   it_behaves_like 'a dump processor'
+
+  it 'creates a csv file with the correct number of entries' do
+    allow(csv_dump).to receive(:<<)
+    scope << 1
+    scope << 2
+    processor.execute
+    expect(csv_dump).to have_received(:<<).twice
+  end
 end
