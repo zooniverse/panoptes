@@ -380,7 +380,6 @@ spec:
       containers:
         - name: panoptes-production-redis
           image: redis:6.0.5
-          args: ['--appendonly yes', '--appendfsync no']
           resources:
             requests:
               memory: "2500Mi"
@@ -484,9 +483,17 @@ spec:
   tls:
   - hosts:
     - panoptes.azure.zooniverse.org
+    - panoptes.zooniverse.org
     secretName: panoptes-production-tls-secret
   rules:
   - host: panoptes.azure.zooniverse.org
+    http:
+      paths:
+      - backend:
+          serviceName: panoptes-production-app
+          servicePort: 80
+        path: /(.*)
+  - host: panoptes.zooniverse.org
     http:
       paths:
       - backend:
