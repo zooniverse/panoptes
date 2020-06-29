@@ -18,10 +18,14 @@ class ClassificationsDumpWorker
         # store a formatted representation for re-use in future exports
         # only if not already stored
         unless formatter.cache_resource
-          CachedExport.create!(
-            resource: formatter.model,
+          classification = formatter.model
+          cached_export = CachedExport.create!(
+            resource: classification,
             data: ClassificationExport.hash_format(formatter)
           )
+          # link the newly saved classification export to the
+          # classification for reuse in future exports
+          classification.update_column(:cached_export_id, cached_export.id) # rubocop:disable Rails/SkipsModelValidations
         end
       end
       @processor.execute

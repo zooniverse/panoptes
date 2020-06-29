@@ -38,12 +38,21 @@ RSpec.describe ClassificationsDumpWorker do
     end
 
     describe 'CachedExport resource storage' do
-      it 'stores the processed export for next run' do
+      let(:classification) do
         create(:classification, project: project, workflow: workflow, subjects: [subject])
-        expect { worker.perform(project.id, 'project') }.to change(
+      end
+
+      it 'stores the processed export for next run' do
+
+        expect { worker.perform(classification.project_id, 'project') }.to change(
           CachedExport,
           :count
         ).from(0).to(1)
+      end
+
+      it 'links the stored export to the classification' do
+        worker.perform(classification.project_id, 'project')
+        expect(classification.reload.cached_export).not_to be_nil
       end
 
       it 'does not try store one if one already exists' do
