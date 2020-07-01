@@ -48,7 +48,7 @@ module MediaStorage
 
     def load_from_included(adapter)
       case adapter.to_s
-      when "azure"
+      when 'azure'
         AzureAdapter
       when "aws"
         AwsAdapter
