@@ -84,7 +84,7 @@ module MediaStorage
 
     # @param expires_in [int]: time increment in minutes
     def get_expiry_time(expires_in)
-      (Time.now + expires_in.minutes).iso8601 # required format is ISO 8601
+      Time.now.utc.iso8601 + expires_in.minutes # required format is UTC time zone, ISO 8601
     end
 
     def generate_sas_url(path, sas_token)
