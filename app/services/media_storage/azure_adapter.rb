@@ -33,9 +33,9 @@ module MediaStorage
       expiry_time = get_expiry_time(expires_in)
       sas_token = @sas_generator.generate_service_sas_token(
         path,
-        service: 'b',
-        resource: 'b',
-        permissions: 'racwd',
+        service: 'b', # blob
+        resource: 'b', # blob
+        permissions: 'rcw', # read create write
         expiry: expiry_time
       )
       generate_sas_url(path, sas_token)
@@ -47,9 +47,9 @@ module MediaStorage
       expiry_time = get_expiry_time(expires_in)
       sas_token = @sas_generator.generate_service_sas_token(
         path,
-        service: 'b',
-        resource: 'b',
-        permissions: 'racwd',
+        service: 'b', # blob
+        resource: 'b', # blob
+        permissions: 'rcw', # read create write
         expiry: expiry_time,
         content_type: content_type
       )
