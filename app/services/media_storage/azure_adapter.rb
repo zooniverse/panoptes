@@ -4,8 +4,7 @@ module MediaStorage
 
     def initialize(opts={})
       @storage_account_name = opts[:storage_account_name]
-      @container_name = opts[:storage_container]
-      @prefix = opts[:prefix] || Rails.env
+      @container_name = opts[:storage_container] || Rails.env
       @get_expiration = opts.dig(:expiration, :get) || DEFAULT_EXPIRES_IN
       @put_expiration = opts.dig(:expiration, :put) || DEFAULT_EXPIRES_IN
 
@@ -22,9 +21,7 @@ module MediaStorage
     def stored_path(content_type, medium_type, *path_prefix)
       # do we want to change anything about how the stored_path is generated? this is copied from aws
       extension = get_extension(content_type)
-      path = @prefix.to_s
-      path += "/" unless path[-1] == '/'
-      path += "#{medium_type}/"
+      path = "#{medium_type}/"
       path += "#{path_prefix.join('/')}/" unless path_prefix.empty?
       path + "#{SecureRandom.uuid}.#{extension}"
     end
