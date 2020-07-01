@@ -196,7 +196,7 @@ spec:
               exec:
                 command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
         - name: panoptes-production-nginx
-          image: zooniverse/apps-nginx:xenial
+          image: zooniverse/nginx:1.19.0
           resources:
             requests:
               memory: "100Mi"
@@ -380,7 +380,6 @@ spec:
       containers:
         - name: panoptes-production-redis
           image: redis:6.0.5
-          args: ['--appendonly yes', '--appendfsync no']
           resources:
             requests:
               memory: "2500Mi"
