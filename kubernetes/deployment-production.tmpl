@@ -226,7 +226,10 @@ spec:
               mountPath: "/etc/nginx-sites"
       volumes:
         - name: static-assets
-          emptyDir: {}
+          hostPath:
+            # directory location on host node temp disk
+            path: /mnt/panoptes-production-app-static-assets
+            type: DirectoryOrCreate
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-production
