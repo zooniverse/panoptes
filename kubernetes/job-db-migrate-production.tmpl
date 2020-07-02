@@ -1,12 +1,12 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: panoptes-migrate-db-production
+  name: __JOB_NAME__
 spec:
   template:
     spec:
       containers:
-      - name: panoptes-migrate-db-production-__IMAGE_TAG__
+      - name: panoptes-migrate-db-production
         image: zooniverse/panoptes:__IMAGE_TAG__
         command: ["/rails_app/migrate.sh"]
         envFrom:
