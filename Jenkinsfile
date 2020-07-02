@@ -196,15 +196,15 @@ pipeline {
         sh """
           sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-production.tmpl | kubectl --context azure apply --record -f -
 
-          kubectl wait --for=condition=complete --timeout=1200s job/panoptes-migrate-db-production-${GIT_COMMIT}
+          kubectl wait --for=condition=complete --timeout=1200s job/panoptes-migrate-db-production-${GIT_COMMIT} 
           SUCCESS=$?
 
-          kubectl describe job/panoptes-migrate-db-production-${GIT_COMMIT}
+          kubectl describe job/panoptes-migrate-db-production-${GIT_COMMIT} 
           kubectl logs $(kubectl get pods --selector=job-name=panoptes-migrate-db-production-${GIT_COMMIT} --output=jsonpath='{.items[*].metadata.name}')
 
           if [ $SUCCESS -eq 0 ]
           then
-            kubectl delete job panoptes-migrate-db-production-${GIT_COMMIT}
+            kubectl delete job panoptes-migrate-db-production-${GIT_COMMIT} 
           fi
 
           exit $SUCCESS
@@ -218,15 +218,16 @@ pipeline {
       steps {
         sh """
           sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-staging.tmpl | kubectl --context azure apply --record -f -
-          kubectl wait --for=condition=complete --timeout=1200s job/panoptes-migrate-db-staging-${GIT_COMMIT}
+          
+          kubectl wait --for=condition=complete --timeout=1200s job/panoptes-migrate-db-staging-${GIT_COMMIT} 
           SUCCESS=$?
 
-          kubectl describe job/panoptes-migrate-db-staging-${GIT_COMMIT}
+          kubectl describe job/panoptes-migrate-db-staging-${GIT_COMMIT} 
           kubectl logs $(kubectl get pods --selector=job-name=panoptes-migrate-db-staging-${GIT_COMMIT} --output=jsonpath='{.items[*].metadata.name}')
 
           if [ $SUCCESS -eq 0 ]
           then
-            kubectl delete job panoptes-migrate-db-staging-${GIT_COMMIT}
+            kubectl delete job panoptes-migrate-db-staging-${GIT_COMMIT} 
           fi
 
           exit $SUCCESS
