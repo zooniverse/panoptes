@@ -6,7 +6,7 @@ spec:
   template:
     spec:
       containers:
-      - name: panoptes-migrate-db-production
+      - name: panoptes-migrate-db-production-__IMAGE_TAG__
         image: zooniverse/panoptes:__IMAGE_TAG__
         command: ["/rails_app/migrate.sh"]
         envFrom:
