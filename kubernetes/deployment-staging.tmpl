@@ -252,7 +252,10 @@ spec:
             readOnly: true
       volumes:
         - name: panoptes-staging-dumpworker-data
-          emptyDir: {}
+          hostPath:
+            # directory location on host node temp disk
+            path: /mnt/panoptes-staging-dumpworker-data
+            type: DirectoryOrCreate
         - name: jwt-staging
           secret:
             secretName: panoptes-doorkeeper-jwt-staging
