@@ -140,7 +140,7 @@ spec:
               exec:
                 command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
         - name: panoptes-staging-nginx
-          image: zooniverse/apps-nginx:xenial
+          image: zooniverse/nginx:1.19.0
           resources:
             requests:
               memory: "100Mi"
@@ -170,7 +170,10 @@ spec:
               mountPath: "/etc/nginx-sites"
       volumes:
         - name: static-assets
-          emptyDir: {}
+          hostPath:
+            # directory location on host node temp disk
+            path: /mnt/panoptes-staging-app-static-assets
+            type: DirectoryOrCreate
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-staging
@@ -252,7 +255,10 @@ spec:
             readOnly: true
       volumes:
         - name: panoptes-staging-dumpworker-data
-          emptyDir: {}
+          hostPath:
+            # directory location on host node temp disk
+            path: /mnt/panoptes-staging-dumpworker-data
+            type: DirectoryOrCreate
         - name: jwt-staging
           secret:
             secretName: panoptes-doorkeeper-jwt-staging

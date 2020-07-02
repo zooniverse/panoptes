@@ -42,10 +42,135 @@ pipeline {
               newImage.push('latest')
             }
           }
+          if (env.TAG_NAME == 'production-release') {
+            stage('Update production release tag') {
+              newImage.push('production-release')
+            }
+          }
         }
       }
     }
 
+    stage('Build AMIs') {
+      when { tag 'production-release' }
+      failFast true
+      parallel {
+        stage('Production API') {
+          options {
+            skipDefaultCheckout true
+          }
+          agent {
+            docker {
+              image 'zooniverse/operations:latest'
+              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
+            }
+          }
+          steps {
+            sh """#!/bin/bash -e
+              while true; do sleep 3; echo -n "."; done &
+              KEEP_ALIVE_ECHO_JOB=\$!
+              cd /operations
+              ./rebuild.sh -c panoptes-api
+              kill \${KEEP_ALIVE_ECHO_JOB}
+            """
+          }
+          post {
+            failure {
+              slackSend (
+                  color: '#FF0000',
+                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
+          }
+        }
+        stage('Production Dump workers') {
+          options {
+            skipDefaultCheckout true
+          }
+          agent {
+            docker {
+              image 'zooniverse/operations:latest'
+              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
+            }
+          }
+          steps {
+            sh """#!/bin/bash -e
+              while true; do sleep 3; echo -n "."; done &
+              KEEP_ALIVE_ECHO_JOB=\$!
+              cd /operations
+              ./rebuild.sh -c panoptes-dumpworker
+              kill \${KEEP_ALIVE_ECHO_JOB}
+            """
+          }
+          post {
+            failure {
+              slackSend (
+                  color: '#FF0000',
+                  message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+                  channel: "#ops"
+                  )
+            }
+          }
+        }
+      }
+    }
+
+    stage('Deploy production AMIs') {
+      when { tag 'production-release' }
+      failFast true
+      parallel {
+        stage('Deploy API') {
+          options {
+            skipDefaultCheckout true
+          }
+          agent {
+            docker {
+              image 'zooniverse/operations:latest'
+              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
+            }
+          }
+          steps {
+            sh """#!/bin/bash -e
+              while true; do sleep 3; echo -n "."; done &
+              KEEP_ALIVE_ECHO_JOB=\$!
+              cd /operations
+              ./deploy_latest.sh panoptes-api
+              kill \${KEEP_ALIVE_ECHO_JOB}
+            """
+          }
+        }
+        stage('Deploy Dump workers') {
+          options {
+            skipDefaultCheckout true
+          }
+          agent {
+            docker {
+              image 'zooniverse/operations:latest'
+              args '-v "$HOME/.ssh/:/home/ubuntu/.ssh" -v "$HOME/.aws/:/home/ubuntu/.aws"'
+            }
+          }
+          steps {
+            sh """#!/bin/bash -e
+              while true; do sleep 3; echo -n "."; done &
+              KEEP_ALIVE_ECHO_JOB=\$!
+              cd /operations
+              ./deploy_latest.sh panoptes-dumpworker
+              kill \${KEEP_ALIVE_ECHO_JOB}
+            """
+          }
+        }
+      }
+      post {
+        failure {
+          slackSend (
+              color: '#FF0000',
+              message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+              channel: "#ops"
+              )
+        }
+      }
+    }
     stage('Dry run deployments') {
       agent any
       steps {
