@@ -175,6 +175,14 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 81
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
+            initialDelaySeconds: 20
           env:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
@@ -212,6 +220,14 @@ spec:
                  - name: X-Forwarded-Proto
                    value: https
             initialDelaySeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
+            initialDelaySeconds: 20
           lifecycle:
             preStop:
               exec:
