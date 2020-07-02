@@ -176,6 +176,8 @@ pipeline {
       steps {
         sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-staging.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
         sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-production.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-production.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-staging.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
       }
     }
 
@@ -185,30 +187,61 @@ pipeline {
       steps {
         sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-production.tmpl | kubectl --context azure apply --record -f -"
       }
-      post {
-        success {
-          script {
-            if (env.TAG_NAME == 'production-release') {
-              slackSend (
-                color: '#00FF00',
-                message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-                channel: "#ops"
-              )
-            }
-          }
-        }
+    }
 
-        failure {
-          script {
-            if (env.TAG_NAME == 'production-release') {
-              slackSend (
-                color: '#FF0000',
-                message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-                channel: "#ops"
-              )
-            }
-          }
-        }
+    stage('Migrate production database') {
+      when { tag 'production-migrate' }
+      agent any
+      steps {
+        slackSend (
+          color: '#0000FF',
+          message: "Starting Panoptes production DB migration - Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+          channel: "#ops"
+        )
+        sh """
+          sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-production.tmpl | kubectl --context azure apply --record -f -
+
+          kubectl wait --for=condition=complete --timeout=86400s job/panoptes-migrate-db-production-$GIT_COMMIT
+          SUCCESS=\$?
+
+          kubectl describe job/panoptes-migrate-db-production-$GIT_COMMIT
+          kubectl logs \$(kubectl get pods --selector=job-name=panoptes-migrate-db-production-$GIT_COMMIT --output=jsonpath='{.items[*].metadata.name}')
+
+          if [ \$SUCCESS -eq 0 ]
+          then
+            kubectl delete job panoptes-migrate-db-production-$GIT_COMMIT
+          fi
+
+          exit \$SUCCESS
+        """
+      }
+    }
+
+    stage('Migrate staging database') {
+      when { branch 'master' }
+      agent any
+      steps {
+        slackSend (
+          color: '#0000FF',
+          message: "Starting Panoptes staging DB migration - Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+          channel: "#ops"
+        )
+        sh """
+          sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-staging.tmpl | kubectl --context azure apply --record -f -
+
+          kubectl wait --for=condition=complete --timeout=86400s job/panoptes-migrate-db-staging-$GIT_COMMIT
+          SUCCESS=\$?
+
+          kubectl describe job/panoptes-migrate-db-staging-$GIT_COMMIT
+          kubectl logs \$(kubectl get pods --selector=job-name=panoptes-migrate-db-staging-$GIT_COMMIT --output=jsonpath='{.items[*].metadata.name}')
+
+          if [ \$SUCCESS -eq 0 ]
+          then
+            kubectl delete job panoptes-migrate-db-staging-$GIT_COMMIT
+          fi
+
+          exit \$SUCCESS
+        """
       }
     }
 
@@ -218,29 +251,29 @@ pipeline {
       steps {
         sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-staging.tmpl | kubectl --context azure apply --record -f -"
       }
-      post {
-        success {
-          script {
-            if (env.BRANCH_NAME == 'master') {
-              slackSend (
-                color: '#00FF00',
-                message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-                channel: "#ops"
-              )
-            }
-          }
+    }
+  }
+  post {
+    success {
+      script {
+        if (env.BRANCH_NAME == 'master' || env.TAG_NAME == 'production-release' || env.TAG_NAME == 'production-migrate') {
+          slackSend (
+            color: '#00FF00',
+            message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+            channel: "#ops"
+          )
         }
+      }
+    }
 
-        failure {
-          script {
-            if (env.BRANCH_NAME == 'master') {
-              slackSend (
-                color: '#FF0000',
-                message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-                channel: "#ops"
-              )
-            }
-          }
+    failure {
+      script {
+        if (env.BRANCH_NAME == 'master' || env.TAG_NAME == 'production-release' || env.TAG_NAME == 'production-migrate') {
+          slackSend (
+            color: '#FF0000',
+            message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+            channel: "#ops"
+          )
         }
       }
     }
