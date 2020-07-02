@@ -193,6 +193,11 @@ pipeline {
       when { tag 'production-migrate' }
       agent any
       steps {
+        slackSend (
+          color: '#0000FF',
+          message: "Starting Panoptes production DB migration - Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+          channel: "#ops"
+        )
         sh """
           sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-production.tmpl | kubectl --context azure apply --record -f -
 
@@ -216,6 +221,11 @@ pipeline {
       when { branch 'master' }
       agent any
       steps {
+        slackSend (
+          color: '#0000FF',
+          message: "Starting Panoptes staging DB migration - Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
+          channel: "#ops"
+        )
         sh """
           sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-staging.tmpl | kubectl --context azure apply --record -f -
 
