@@ -119,6 +119,14 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 81
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
+            initialDelaySeconds: 20
           env:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
@@ -156,6 +164,14 @@ spec:
                  - name: X-Forwarded-Proto
                    value: https
             initialDelaySeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
+            initialDelaySeconds: 20
           lifecycle:
             preStop:
               exec:
@@ -330,7 +346,6 @@ spec:
       containers:
         - name: panoptes-staging-redis
           image: redis:6.0.5
-          args: ['--save ""', '--appendonly no']
           resources:
             requests:
               memory: "100Mi"
