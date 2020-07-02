@@ -386,6 +386,7 @@ spec:
       containers:
         - name: panoptes-production-redis
           image: redis:6.0.5
+          args: ['--save ""', '--appendonly no']
           resources:
             requests:
               memory: "2500Mi"

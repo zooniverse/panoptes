@@ -330,6 +330,7 @@ spec:
       containers:
         - name: panoptes-staging-redis
           image: redis:6.0.5
+          args: ['--save ""', '--appendonly no']
           resources:
             requests:
               memory: "100Mi"
