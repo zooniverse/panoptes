@@ -198,20 +198,21 @@ pipeline {
           message: "Starting Panoptes production DB migration - Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
           channel: "#ops"
         )
+        def jobName = "panoptes-migrate-db-production-$env.BUILD_NUMBER"
         sh """
           sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-production.tmpl \
             | sed 's/__BUILD_NUMBER__/${env.BUILD_NUMBER}/g'
             | kubectl --context azure apply --record -f -
 
-          kubectl wait --for=condition=complete --timeout=86400s job/panoptes-migrate-db-production-$env.BUILD_NUMBER
+          kubectl wait --for=condition=complete --timeout=86400s job/$jobName
           SUCCESS=\$?
 
-          kubectl describe job/panoptes-migrate-db-production-$env.BUILD_NUMBER
-          kubectl logs \$(kubectl get pods --selector=job-name=panoptes-migrate-db-production-$env.BUILD_NUMBER --output=jsonpath='{.items[*].metadata.name}')
+          kubectl describe job/$jobName
+          kubectl logs \$(kubectl get pods --selector=job-name=$jobName --output=jsonpath='{.items[*].metadata.name}')
 
           if [ \$SUCCESS -eq 0 ]
           then
-            kubectl delete job panoptes-migrate-db-production-$env.BUILD_NUMBER
+            kubectl delete job $jobName
           fi
 
           exit \$SUCCESS
@@ -228,20 +229,21 @@ pipeline {
           message: "Starting Panoptes staging DB migration - Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
           channel: "#ops"
         )
+        def jobName = "panoptes-migrate-db-staging-$env.BUILD_NUMBER"
         sh """
           sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-staging.tmpl \
             | sed 's/__BUILD_NUMBER__/${env.BUILD_NUMBER}/g'
             | kubectl --context azure apply --record -f -
 
-          kubectl wait --for=condition=complete --timeout=86400s job/panoptes-migrate-db-staging-$env.BUILD_NUMBER
+          kubectl wait --for=condition=complete --timeout=86400s job/$jobName
           SUCCESS=\$?
 
-          kubectl describe job/panoptes-migrate-db-staging-$env.BUILD_NUMBER
-          kubectl logs \$(kubectl get pods --selector=job-name=panoptes-migrate-db-staging-$env.BUILD_NUMBER --output=jsonpath='{.items[*].metadata.name}')
+          kubectl describe job/$jobName
+          kubectl logs \$(kubectl get pods --selector=job-name=$jobName --output=jsonpath='{.items[*].metadata.name}')
 
           if [ \$SUCCESS -eq 0 ]
           then
-            kubectl delete job panoptes-migrate-db-staging-$env.BUILD_NUMBER
+            kubectl delete job $jobName
           fi
 
           exit \$SUCCESS
