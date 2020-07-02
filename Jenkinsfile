@@ -197,19 +197,19 @@ pipeline {
       }
     }
 
-    stage('Deploy staging to Kubernetes') {
-      when { branch 'master' }
-      agent any
-      steps {
-        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-staging.tmpl | kubectl --context azure apply --record -f -"
-      }
-    }
-
     stage('Migrate staging database') {
       when { branch 'master' }
       agent any
       steps {
         sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-staging.tmpl | kubectl --context azure apply --record -f -"
+      }
+    }
+
+    stage('Deploy staging to Kubernetes') {
+      when { branch 'master' }
+      agent any
+      steps {
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-staging.tmpl | kubectl --context azure apply --record -f -"
       }
     }
   }
