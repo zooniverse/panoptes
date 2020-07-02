@@ -52,7 +52,7 @@ module MediaStorage
     end
 
     def put_file(path, file_path, opts={})
-      # to do: implement options
+      # TO DO: implement options: content_type, content_disposition, private v public, encoding
       content = get_file_contents file_path
       @client.create_block_blob(@container, path, content)
     end
@@ -62,7 +62,7 @@ module MediaStorage
     end
 
     def encrypted_bucket?
-      # to do
+      # TO DO
     end
 
     private
