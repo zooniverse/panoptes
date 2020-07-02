@@ -196,7 +196,7 @@ pipeline {
         sh """
           sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-production.tmpl | kubectl --context azure apply --record -f -
 
-          kubectl wait --for=condition=complete --timeout=1200s job/panoptes-migrate-db-production-$GIT_COMMIT
+          kubectl wait --for=condition=complete --timeout=86400s job/panoptes-migrate-db-production-$GIT_COMMIT
           SUCCESS=\$?
 
           kubectl describe job/panoptes-migrate-db-production-$GIT_COMMIT
@@ -219,7 +219,7 @@ pipeline {
         sh """
           sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-staging.tmpl | kubectl --context azure apply --record -f -
 
-          kubectl wait --for=condition=complete --timeout=1200s job/panoptes-migrate-db-staging-$GIT_COMMIT
+          kubectl wait --for=condition=complete --timeout=86400s job/panoptes-migrate-db-staging-$GIT_COMMIT
           SUCCESS=\$?
 
           kubectl describe job/panoptes-migrate-db-staging-$GIT_COMMIT
