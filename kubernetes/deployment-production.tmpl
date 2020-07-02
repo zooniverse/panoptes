@@ -308,7 +308,10 @@ spec:
             readOnly: true
       volumes:
         - name: panoptes-production-dumpworker-data
-          emptyDir: {}
+          hostPath:
+            # directory location on host node temp disk
+            path: /mnt/panoptes-production-dumpworker-data
+            type: DirectoryOrCreate
         - name: jwt-production
           secret:
             secretName: panoptes-doorkeeper-jwt-production
