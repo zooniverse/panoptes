@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe MediaStorage::AzureAdapter do
-  let(:storage_account_name) { "tiny-watermelons" }
-  let(:container) { "test" }
+  let(:storage_account_name) { 'tiny-watermelons' }
+  let(:container) { 'test' }
   let(:opts) do
     {
       storage_account_name: storage_account_name,
@@ -14,7 +14,7 @@ RSpec.describe MediaStorage::AzureAdapter do
   let(:adapter) { described_class.new(opts) }
 
   context 'when opts are passed to the initializer' do
-    it 'should use default expiration values when no expiration values are passed' do
+    it 'uses default expiration values when no expiration values are passed' do
       default = MediaStorage::AzureAdapter::DEFAULT_EXPIRES_IN
       expect(adapter.instance_variable_get(:@get_expiration)).to eq(default)
       expect(adapter.instance_variable_get(:@put_expiration)).to eq(default)
@@ -25,7 +25,7 @@ RSpec.describe MediaStorage::AzureAdapter do
       expect(adapter.instance_variable_get(:@container)).to eq('test')
     end
 
-    it 'should create the blob storage client using passed in options' do
+    it 'creates the blob storage client using passed in options' do
       expect(Azure::Storage::Blob::BlobService)
         .to receive(:create)
         .with(opts.except(:storage_container, :stub_responses))
@@ -33,7 +33,7 @@ RSpec.describe MediaStorage::AzureAdapter do
       adapter
     end
 
-    it 'should initialize the signer using passed in options' do
+    it 'initializes the signer using passed in options' do
       expect(Azure::Storage::Common::Core::Auth::SharedAccessSignature)
         .to receive(:new)
         .with(opts[:storage_account_name], opts[:storage_access_key])

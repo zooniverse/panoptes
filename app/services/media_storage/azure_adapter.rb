@@ -33,7 +33,7 @@ module MediaStorage
         generate_uri(path), false,
         service: 'b', # blob
         permissions: 'rcw', # read create write
-        expiry: expiry_time,
+        expiry: expiry_time
       )
     end
 
@@ -62,7 +62,9 @@ module MediaStorage
     end
 
     def encrypted_bucket?
-      # TO DO
+      # encryption is automatically enabled for all azure storage accounts and
+      # cannot be disabled, so this is always true
+      true
     end
 
     private
