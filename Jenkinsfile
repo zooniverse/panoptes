@@ -201,7 +201,7 @@ pipeline {
         sh """
           export JOB_NAME="panoptes-migrate-db-production-$env.BUILD_NUMBER"
           sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-production.tmpl \
-            | sed 's/__JOB_NAME__/\$JOB_NAME/g'
+            | sed "s/__JOB_NAME__/\$JOB_NAME/g" \
             | kubectl --context azure apply --record -f -
 
           kubectl wait --for=condition=complete --timeout=86400s job/\$JOB_NAME
@@ -232,7 +232,7 @@ pipeline {
         sh """
           export JOB_NAME="panoptes-migrate-db-staging-$env.BUILD_NUMBER"
           sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-staging.tmpl \
-            | sed 's/__JOB_NAME__/\$JOB_NAME/g'
+            | sed "s/__JOB_NAME__/\$JOB_NAME/g" \
             | kubectl --context azure apply --record -f -
 
           kubectl wait --for=condition=complete --timeout=86400s job/\$JOB_NAME
