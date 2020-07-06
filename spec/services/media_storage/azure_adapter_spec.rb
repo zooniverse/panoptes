@@ -53,15 +53,15 @@ RSpec.describe MediaStorage::AzureAdapter do
     it { is_expected.to match(uuid_v4_regex)}
 
     context 'with additional path prefixes' do
-      subject { adapter.stored_path('image/jpeg', 'subject_location', 'extra', 'prefixes')}
+      subject { adapter.stored_path('image/jpeg', 'subject_location', 'extra', 'prefixes') }
 
       it { is_expected.to match(%r{extra\/prefixes})}
     end
 
     context 'with an application/x-gzip content-type' do
-      subject { adapter.stored_path('application/x-gzip', 'subject_location')}
+      subject { adapter.stored_path('application/x-gzip', 'subject_location') }
 
-      it { is_expected.to match(/\.tar\.gz\z/)}
+      it { is_expected.to match(/\.tar\.gz\z/) }
     end
   end
 
@@ -70,7 +70,7 @@ RSpec.describe MediaStorage::AzureAdapter do
     it { is_expected.to match(/\Ahttps:\/\/#{storage_account_name}.blob.core.windows.net\/#{container}\//) }
     it { is_expected.to match(/sp=rcw&sv=\d{4}-\d{2}-\d{2}&se=\d{4}-\d{2}-\d{2}T[%A0-9]+Z&sr=b&sig=[%A-z0-9]+\z/) }
     it 'sets expiry time in the url' do
-      allow(adapter).to receive(:get_expiry_time).and_return("2020-07-06T18:05:29Z")
+      allow(adapter).to receive(:get_expiry_time).and_return('2020-07-06T18:05:29Z')
 
       it { is expected.to match(/se=2020-07-06T18:05:29Z}/) }
     end
