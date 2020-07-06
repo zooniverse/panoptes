@@ -26,6 +26,7 @@ module MediaStorage
     end
 
     def get_path(path, opts={})
+      # TO DO: implement private v public uploads
       expires_in = opts[:get_expires] || @get_expiration # time in minutes
       expiry_time = get_expiry_time(expires_in)
 
@@ -34,10 +35,11 @@ module MediaStorage
         service: 'b', # blob
         permissions: 'rcw', # read create write
         expiry: expiry_time
-      )
+      ).to_s
     end
 
     def put_path(path, opts={})
+      # TO DO: implement private v public uploads
       content_type = opts[:content_type]
       expires_in = opts[:put_expires] || @put_expiration # time in minutes
       expiry_time = get_expiry_time(expires_in)
@@ -48,13 +50,19 @@ module MediaStorage
         permissions: 'rcw', # read create write
         expiry: expiry_time,
         content_type: content_type
-      )
+      ).to_s
     end
 
     def put_file(path, file_path, opts={})
-      # TO DO: implement options: content_type, content_disposition, private v public, encoding
+      # TO DO: implement private v public uploads
+      upload_options = { content_type: opts[:content_type] }
+      upload_options[:content_encoding] = 'gzip' if opts[:compressed]
+      if opts[:content_disposition]
+        upload_options[:content_disposition] = opts[:content_disposition]
+      end
+
       content = get_file_contents file_path
-      @client.create_block_blob(@container, path, content)
+      @client.create_block_blob(@container, path, content, upload_options)
     end
 
     def delete_file(path)
