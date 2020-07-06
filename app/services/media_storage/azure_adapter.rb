@@ -66,6 +66,7 @@ module MediaStorage
     end
 
     def delete_file(path)
+      # TO DO: implement private v public uploads
       @client.delete_blob(@container, path)
     end
 
