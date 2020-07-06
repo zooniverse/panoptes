@@ -12,6 +12,8 @@ RSpec.describe MediaStorage::AzureAdapter do
     }
   end
   let(:adapter) { described_class.new(opts) }
+  let(:uri_regex) { /\A#{URI::DEFAULT_PARSER.make_regexp}\z/ }
+  let(:uuid_v4_regex) { /[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/ }
 
   context 'when opts are passed to the initializer' do
     it 'uses default expiration values when no expiration values are passed' do
@@ -39,6 +41,72 @@ RSpec.describe MediaStorage::AzureAdapter do
         .with(opts[:storage_account_name], opts[:storage_access_key])
         .and_call_original
       adapter
+    end
+  end
+
+  describe '#stored_path' do
+    subject { adapter.stored_path('image/jpeg', 'subject_location') }
+
+    it { is_expected.to be_a(String) }
+    it { is_expected.to match(/subject_location/)}
+    it { is_expected.to match(/\.jpeg/)}
+    it { is_expected.to match(uuid_v4_regex)}
+
+    context 'with additional path prefixes' do
+      subject { adapter.stored_path('image/jpeg', 'subject_location', 'extra', 'prefixes')}
+
+      it { is_expected.to match(%r{extra\/prefixes})}
+    end
+
+    context 'with an application/x-gzip content-type' do
+      subject { adapter.stored_path('application/x-gzip', 'subject_location')}
+
+      it { is_expected.to match(/\.tar\.gz\z/)}
+    end
+  end
+
+  shared_examples 'presigned url' do
+    it { is_expected.to match(uri_regex) }
+    it { is_expected.to match(/\Ahttps:\/\/#{storage_account_name}.blob.core.windows.net\/#{container}\//) }
+    it { is_expected.to match(/sp=rcw&sv=\d{4}-\d{2}-\d{2}&se=\d{4}-\d{2}-\d{2}T[%A0-9]+Z&sr=b&sig=[%A-z0-9]+\z/) }
+    it 'sets expiry time in the url' do
+      allow(adapter).to receive(:get_expiry_time).and_return("2020-07-06T18:05:29Z")
+
+      it { is expected.to match(/se=2020-07-06T18:05:29Z}/) }
+    end
+  end
+
+  describe '#get_path' do
+    subject { adapter.get_path('subject_locations/name.jpg') }
+
+    it_behaves_like 'presigned url'
+    it { is_expected.to match(/subject_locations\/name.jpg/) }
+
+    context 'when get_expires option is set' do
+      let(:upload_options) { { get_expires: 10 } }
+
+      it 'uses passed in option for generating expiry time' do
+        expect(adapter).to receive(:get_expiry_time).with(10)
+
+        adapter.get_path('subject_locations/name.jpg', upload_options)
+      end
+    end
+  end
+
+  describe '#put_path' do
+    let(:upload_options) { { content_type: 'image/jpeg' } }
+    subject { adapter.put_path('subject_locations/name.jpg') }
+
+    it_behaves_like 'presigned url'
+    it { is_expected.to match(/subject_locations\/name.jpg/) }
+
+    context 'when put_expires option is set' do
+      it 'uses passed in option for generating expiry time' do
+        upload_options[:put_expires] = 10
+        expect(adapter).to receive(:get_expiry_time).with(10)
+
+        adapter.get_path('subject_locations/name.jpg', upload_options)
+      end
     end
   end
 end
