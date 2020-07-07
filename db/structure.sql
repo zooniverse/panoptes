@@ -1153,8 +1153,7 @@ CREATE TABLE public.recents (
     project_id integer,
     workflow_id integer,
     user_id integer,
-    user_group_id integer,
-    mark_remove boolean DEFAULT false
+    user_group_id integer
 );
 
 
@@ -3265,6 +3264,13 @@ CREATE INDEX index_projects_on_tsv ON public.projects USING gin (tsv);
 
 
 --
+-- Name: index_recents_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recents_on_created_at ON public.recents USING btree (created_at);
+
+
+--
 -- Name: index_recents_on_project_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3272,10 +3278,24 @@ CREATE INDEX index_recents_on_project_id ON public.recents USING btree (project_
 
 
 --
+-- Name: index_recents_on_subject_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recents_on_subject_id ON public.recents USING btree (subject_id);
+
+
+--
 -- Name: index_recents_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_recents_on_user_id ON public.recents USING btree (user_id);
+
+
+--
+-- Name: index_recents_on_workflow_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recents_on_workflow_id ON public.recents USING btree (workflow_id);
 
 
 --
@@ -3785,6 +3805,14 @@ ALTER TABLE ONLY public.collections_projects
 
 ALTER TABLE ONLY public.gold_standard_annotations
     ADD CONSTRAINT fk_rails_1d218ca624 FOREIGN KEY (workflow_id) REFERENCES public.workflows(id);
+
+
+--
+-- Name: fk_rails_1e54468460; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.recents
+    ADD CONSTRAINT fk_rails_1e54468460 FOREIGN KEY (classification_id) REFERENCES public.classifications(id);
 
 
 --
@@ -4696,8 +4724,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190507103007');
 INSERT INTO schema_migrations (version) VALUES ('20190524111214');
 
 INSERT INTO schema_migrations (version) VALUES ('20190624094308');
-
-INSERT INTO schema_migrations (version) VALUES ('20200327164455');
 
 INSERT INTO schema_migrations (version) VALUES ('20200513124310');
 
