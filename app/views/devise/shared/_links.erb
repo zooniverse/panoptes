@@ -8,16 +8,6 @@
     <%- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>
       <%= link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name), class: 'devise-shared-link' %>
     <% end -%>
-
-    <%- if devise_mapping.omniauthable? %>
-      <%- resource_class.omniauth_providers.each do |provider| %>
-        <%- if provider.to_s == 'facebook' %>
-          <%= link_to ("<i class='fa fa-facebook-official fa-lg'></i> Sign in").html_safe, user_facebook_omniauth_authorize_path, class: "devise-shared-link #{provider.to_s}-link" %>
-        <%- elsif provider.to_s == 'google_oauth2' %>
-          <%= link_to ("<i class='fa fa-google fa-lg'></i> Sign in").html_safe, user_google_oauth2_omniauth_authorize_path, class: "devise-shared-link #{provider.to_s}-link" %>
-        <% end -%>
-      <% end -%>
-    <% end -%>
   </div>
 
   <div class="action-links">
