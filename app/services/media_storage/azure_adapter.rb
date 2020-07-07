@@ -8,8 +8,8 @@ module MediaStorage
       @get_expiration = opts.dig(:expiration, :get) || DEFAULT_EXPIRES_IN
       @put_expiration = opts.dig(:expiration, :put) || DEFAULT_EXPIRES_IN
 
-      @client = initialize_blob_client
-      @signer = initialize_signer
+      @client = initialize_blob_client(opts)
+      @signer = initialize_signer(opts)
     end
 
     def stored_path(content_type, medium_type, *path_prefix)
