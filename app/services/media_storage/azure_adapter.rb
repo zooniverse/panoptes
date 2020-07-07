@@ -27,7 +27,7 @@ module MediaStorage
       @signer.signed_uri(
         generate_uri(path), false,
         service: 'b', # blob
-        permissions: 'rcw', # read create write
+        permissions: 'r', # read
         expiry: expiry_time
       ).to_s
     end
