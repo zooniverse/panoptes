@@ -16,7 +16,7 @@ module Panoptes
 
     private
 
-    def get_adapter
+    def self.get_adapter
       if Panoptes.flipper[:azure_storage]
         'azure'
       else
