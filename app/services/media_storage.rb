@@ -18,6 +18,7 @@ module MediaStorage
     def adapter(adapter=nil, opts={})
       if adapter
         @adapter = load_adapter(adapter, opts)
+        load_azure_and_aws(opts)
       else
         @adapter ||= default_adapter
       end
@@ -25,6 +26,14 @@ module MediaStorage
 
     def get_adapter
       @adapter
+    end
+
+    def set_adapter(user)
+      @adapter =  if Panoptes.flipper[:use_azure_storage].enabled? user
+                    @azure_adapter
+                  else
+                    @aws_adapter
+                  end
     end
 
     private
@@ -57,6 +66,18 @@ module MediaStorage
       else
         default_adapter
       end
+    end
+
+    def load_azure_and_aws(opts)
+      case @adapter
+      when AzureAdapter
+        @azure_adapter = @adapter
+      when AwsAdapter
+        @aws_adapter = @adapter
+      end
+
+      @azure_adapter ||= AzureAdapter.new(**opts)
+      @aws_adapter ||= AwsAdapter.new(**opts)
     end
   end
 end
