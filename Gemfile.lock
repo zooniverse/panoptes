@@ -104,7 +104,7 @@ GEM
     connection_pool (2.2.2)
     crass (1.0.6)
     dalli (2.7.10)
-    database_cleaner (1.7.0)
+    database_cleaner (1.8.5)
     debug_inspector (0.0.3)
     deep_cloneable (2.3.2)
       activerecord (>= 3.1.0, < 6)
@@ -464,7 +464,7 @@ DEPENDENCIES
   aws-sdk (~> 2.10)
   congestion!
   dalli
-  database_cleaner (~> 1.7.0)
+  database_cleaner (~> 1.8.5)
   deep_cloneable (~> 2.3.2)
   devise (~> 4.7)
   doorkeeper (~> 4.4)
