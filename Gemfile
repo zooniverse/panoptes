@@ -9,7 +9,7 @@ gem 'congestion', git: 'https://github.com/camallen/Congestion.git', branch: 'tt
 gem 'dalli'
 gem 'deep_cloneable', '~> 2.3.2'
 gem 'devise', '~> 4.7'
-gem 'doorkeeper', '~> 4.4'
+gem 'doorkeeper', '~> 5.0'
 gem 'doorkeeper-jwt', '~> 0.2.1'
 gem 'faraday', '~> 0.15'
 gem 'faraday-http-cache', '~> 2.0'
