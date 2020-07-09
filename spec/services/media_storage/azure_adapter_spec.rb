@@ -33,10 +33,10 @@ RSpec.describe MediaStorage::AzureAdapter do
       adapter
       expect(Azure::Storage::Blob::BlobService)
         .to have_received(:create)
-        .with({
+        .with(
                 storage_account_name: opts[:azure_storage_account],
                 storage_access_key: opts[:azure_storage_access_key]
-              })
+             )
     end
 
     it 'initializes the signer using passed in options' do
@@ -53,14 +53,14 @@ RSpec.describe MediaStorage::AzureAdapter do
     subject { adapter.stored_path('image/jpeg', 'subject_location') }
 
     it { is_expected.to be_a(String) }
-    it { is_expected.to match(/subject_location/)}
-    it { is_expected.to match(/\.jpeg/)}
-    it { is_expected.to match(uuid_v4_regex)}
+    it { is_expected.to match(/subject_location/) }
+    it { is_expected.to match(/\.jpeg/) }
+    it { is_expected.to match(uuid_v4_regex) }
 
     context 'with additional path prefixes' do
       subject { adapter.stored_path('image/jpeg', 'subject_location', 'extra', 'prefixes') }
 
-      it { is_expected.to match(%r{extra\/prefixes})}
+      it { is_expected.to match(%r{extra\/prefixes}) }
     end
 
     context 'with an application/x-gzip content-type' do
@@ -100,8 +100,8 @@ RSpec.describe MediaStorage::AzureAdapter do
   end
 
   describe '#put_path' do
-    let(:upload_options) { { content_type: 'image/jpeg' } }
     subject { adapter.put_path('subject_locations/name.jpg') }
+    let(:upload_options) { { content_type: 'image/jpeg' } }
 
     it_behaves_like 'presigned url'
     it { is_expected.to match(/sp=rcw&sv=\d{4}-\d{2}-\d{2}&se=\d{4}-\d{2}-\d{2}T[%A0-9]+Z&sr=b&sig=[%A-z0-9]+\z/) }

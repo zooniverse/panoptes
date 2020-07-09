@@ -57,9 +57,7 @@ module MediaStorage
       # TO DO: implement private v public uploads
       upload_options = { content_type: opts[:content_type] }
       upload_options[:content_encoding] = 'gzip' if opts[:compressed]
-      if opts[:content_disposition]
-        upload_options[:content_disposition] = opts[:content_disposition]
-      end
+      upload_options[:content_disposition] = opts[:content_disposition] if opts[:content_disposition]
 
       file = File.open file_path, 'r'
       @client.create_block_blob(@container, path, file, upload_options)
