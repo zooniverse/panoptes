@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: __JOB_NAME__
+spec:
+  template:
+    spec:
+      containers:
+      - name: panoptes-migrate-db-staging
+        image: zooniverse/panoptes:__IMAGE_TAG__
+        command: ["/rails_app/migrate.sh"]
+        envFrom:
+        - secretRef:
+            name: panoptes-common-env-vars
+        - secretRef:
+            name: panoptes-staging-env-vars
+        - configMapRef:
+            name: panoptes-staging-shared
+      restartPolicy: Never
+  backoffLimit: 1

@@ -12,17 +12,20 @@ module Subjects
 
     def add_seen(user_id, subject_id)
       return unless enabled?
-      self.class.client.add_seen(workflow.id, user_id, subject_id)
+
+      CellectClient.add_seen(workflow.id, user_id, subject_id)
     end
 
     def load_user(user_id)
       return unless enabled?
-      self.class.client.load_user(workflow.id, user_id)
+
+      CellectClient.load_user(workflow.id, user_id)
     end
 
     def reload_workflow
       return unless enabled?
-      self.class.client.reload_workflow(workflow.id)
+
+      CellectClient.reload_workflow(workflow.id)
     end
 
     def remove_subject(subject_id)
@@ -30,22 +33,18 @@ module Subjects
 
       smses = workflow.set_member_subjects.where(subject_id: subject_id)
       smses.each do |sms|
-        self.class.client.remove_subject(subject_id, workflow.id, sms.subject_set_id)
+        CellectClient.remove_subject(subject_id, workflow.id, sms.subject_set_id)
       end
     end
 
     def get_subjects(user, group_id, limit)
       return unless enabled?
 
-      self.class.client.get_subjects(workflow.id, user.try(&:id), group_id, limit)
+      CellectClient.get_subjects(workflow.id, user.try(&:id), group_id, limit)
     end
 
     def enabled?
-      Panoptes.flipper["cellect"].enabled?
-    end
-
-    def self.client
-      @client ||= CellectClient
+      Panoptes.flipper['cellect'].enabled?
     end
   end
 end

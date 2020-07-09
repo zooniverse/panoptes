@@ -14,6 +14,8 @@ RSpec.describe ClassificationsDumpWorker do
       let(:num_entries) { classifications.size + 1 }
     end
 
+    it_behaves_like 'rate limit dump worker'
+
     context "with standby read replica enabled" do
       before do
         Panoptes.flipper["dump_data_from_read_replica"].enable

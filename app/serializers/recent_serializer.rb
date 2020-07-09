@@ -1,6 +1,7 @@
 class RecentSerializer
   include Serialization::PanoptesRestpack
   include CachedSerializer
+  include NoCountSerializer
 
   attributes :id, :created_at, :updated_at, :locations, :href
   can_include :project, :workflow, :subject
