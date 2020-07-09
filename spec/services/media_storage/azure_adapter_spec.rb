@@ -5,9 +5,9 @@ RSpec.describe MediaStorage::AzureAdapter do
   let(:container) { 'test' }
   let(:opts) do
     {
-      storage_account_name: storage_account_name,
-      storage_access_key: 'fake',
-      storage_container: container,
+      azure_storage_account: storage_account_name,
+      azure_storage_access_key: 'fake',
+      azure_storage_container: container,
       stub_responses: true
     }
   end
@@ -23,14 +23,14 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     it 'defaults to current rails environment for the container name when no container is given' do
-      adapter = described_class.new(opts.except(:storage_container))
+      adapter = described_class.new(opts.except(:azure_storage_container))
       expect(adapter.instance_variable_get(:@container)).to eq('test')
     end
 
     it 'creates the blob storage client using passed in options' do
       expect(Azure::Storage::Blob::BlobService)
         .to receive(:create)
-        .with(opts.except(:storage_container, :stub_responses))
+        .with(opts.except(:azure_storage_container, :stub_responses))
         .and_call_original
       adapter
     end
@@ -38,7 +38,7 @@ RSpec.describe MediaStorage::AzureAdapter do
     it 'initializes the signer using passed in options' do
       expect(Azure::Storage::Common::Core::Auth::SharedAccessSignature)
         .to receive(:new)
-        .with(opts[:storage_account_name], opts[:storage_access_key])
+        .with(opts[:azure_storage_account], opts[:azure_storage_access_key])
         .and_call_original
       adapter
     end
