@@ -266,6 +266,16 @@ spec:
   maxReplicas: 16
   targetCPUUtilizationPercentage: 80
 ---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+   name: panoptes-production-app-pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: panoptes-production-app
+---
 apiVersion: v1
 kind: Service
 metadata:
