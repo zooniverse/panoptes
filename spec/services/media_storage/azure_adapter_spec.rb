@@ -110,13 +110,12 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
   end
 
-  describe '#put_file' do
-    let(:file) { instance_double("File") }
-    let(:blob_client) { instance_double("Azure::Storage::Blob::BlobService") }
+  describe '#put_file', :focus do
+    let(:file) { instance_double('File') }
+    let(:blob_client) { instance_double('Azure::Storage::Blob::BlobService') }
     let(:method_call_options) { { content_type: 'text/plain' } }
 
     before do
-      allow(file).to receive(:read) { 'file contents' }
       allow(file).to receive(:close)
       allow(File).to receive(:open) { file }
 
@@ -125,7 +124,7 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     it 'calls the create_block_blob method with correct arguments' do
-      expect(blob_client).to receive(:create_block_blob).with(container, 'storage_path.txt', 'file contents', method_call_options)
+      expect(blob_client).to receive(:create_block_blob).with(container, 'storage_path.txt', file, method_call_options)
       adapter.put_file('storage_path.txt', 'path_to_file.txt', method_call_options)
     end
 
@@ -133,20 +132,20 @@ RSpec.describe MediaStorage::AzureAdapter do
       method_call_options[:compressed] = true
       expected_blob_client_options = { content_type: 'text/plain', content_encoding: 'gzip' }
 
-      expect(blob_client).to receive(:create_block_blob).with(container, 'storage_path.txt', 'file contents', expected_blob_client_options)
+      expect(blob_client).to receive(:create_block_blob).with(container, 'storage_path.txt', file, expected_blob_client_options)
       adapter.put_file('storage_path.txt', 'path_to_file.txt', method_call_options)
     end
 
     it 'passes content disposition to the blob client when option is set' do
       method_call_options[:content_disposition] = 'attachment'
 
-      expect(blob_client).to receive(:create_block_blob).with(container, 'storage_path.txt', 'file contents', method_call_options)
+      expect(blob_client).to receive(:create_block_blob).with(container, 'storage_path.txt', file, method_call_options)
       adapter.put_file('storage_path.txt', 'path_to_file.txt', method_call_options)
     end
   end
 
   describe '#delete_file' do
-    let(:blob_client) { instance_double("Azure::Storage::Blob::BlobService") }
+    let(:blob_client) { instance_double('Azure::Storage::Blob::BlobService') }
 
     it 'calls the delete_blob method with correct arguments' do
       allow(Azure::Storage::Blob::BlobService).to receive(:create) { blob_client }

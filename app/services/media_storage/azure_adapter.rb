@@ -61,8 +61,10 @@ module MediaStorage
         upload_options[:content_disposition] = opts[:content_disposition]
       end
 
-      content = get_file_contents file_path
-      @client.create_block_blob(@container, path, content, upload_options)
+      file = File.open file_path, 'r'
+      @client.create_block_blob(@container, path, file, upload_options)
+    ensure
+      file.close
     end
 
     def delete_file(path)
@@ -77,13 +79,6 @@ module MediaStorage
     end
 
     private
-
-    def get_file_contents(file_path)
-      file = File.open file_path
-      content = file.read
-      file.close
-      content
-    end
 
     # @param expires_in [int]: time increment in minutes
     def get_expiry_time(expires_in)
