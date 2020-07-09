@@ -28,19 +28,24 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     it 'creates the blob storage client using passed in options' do
-      expect(Azure::Storage::Blob::BlobService)
-        .to receive(:create)
-        .with(opts.except(:azure_storage_container, :stub_responses))
-        .and_call_original
+      allow(Azure::Storage::Blob::BlobService).to receive(:create)
+
       adapter
+      expect(Azure::Storage::Blob::BlobService)
+        .to have_received(:create)
+        .with({
+                storage_account_name: opts[:azure_storage_account],
+                storage_access_key: opts[:azure_storage_access_key]
+              })
     end
 
     it 'initializes the signer using passed in options' do
-      expect(Azure::Storage::Common::Core::Auth::SharedAccessSignature)
-        .to receive(:new)
-        .with(opts[:azure_storage_account], opts[:azure_storage_access_key])
-        .and_call_original
+      allow(Azure::Storage::Common::Core::Auth::SharedAccessSignature).to receive(:new)
+
       adapter
+      expect(Azure::Storage::Common::Core::Auth::SharedAccessSignature)
+        .to have_received(:new)
+        .with(opts[:azure_storage_account], opts[:azure_storage_access_key])
     end
   end
 
@@ -68,7 +73,6 @@ RSpec.describe MediaStorage::AzureAdapter do
   shared_examples 'presigned url' do
     it { is_expected.to match(uri_regex) }
     it { is_expected.to match(/\Ahttps:\/\/#{storage_account_name}.blob.core.windows.net\/#{container}\//) }
-    it { is_expected.to match(/sp=rcw&sv=\d{4}-\d{2}-\d{2}&se=\d{4}-\d{2}-\d{2}T[%A0-9]+Z&sr=b&sig=[%A-z0-9]+\z/) }
     it 'sets expiry time in the url' do
       allow(adapter).to receive(:get_expiry_time).and_return('2020-07-06T18:05:29Z')
 
@@ -80,15 +84,17 @@ RSpec.describe MediaStorage::AzureAdapter do
     subject { adapter.get_path('subject_locations/name.jpg') }
 
     it_behaves_like 'presigned url'
+    it { is_expected.to match(/sp=r&sv=\d{4}-\d{2}-\d{2}&se=\d{4}-\d{2}-\d{2}T[%A0-9]+Z&sr=b&sig=[%A-z0-9]+\z/) }
     it { is_expected.to match(/subject_locations\/name.jpg/) }
 
     context 'when get_expires option is set' do
       let(:upload_options) { { get_expires: 10 } }
 
       it 'uses passed in option for generating expiry time' do
-        expect(adapter).to receive(:get_expiry_time).with(10)
+        allow(adapter).to receive(:get_expiry_time)
 
         adapter.get_path('subject_locations/name.jpg', upload_options)
+        expect(adapter).to have_received(:get_expiry_time).with(10)
       end
     end
   end
@@ -98,19 +104,21 @@ RSpec.describe MediaStorage::AzureAdapter do
     subject { adapter.put_path('subject_locations/name.jpg') }
 
     it_behaves_like 'presigned url'
+    it { is_expected.to match(/sp=rcw&sv=\d{4}-\d{2}-\d{2}&se=\d{4}-\d{2}-\d{2}T[%A0-9]+Z&sr=b&sig=[%A-z0-9]+\z/) }
     it { is_expected.to match(/subject_locations\/name.jpg/) }
 
     context 'when put_expires option is set' do
       it 'uses passed in option for generating expiry time' do
+        allow(adapter).to receive(:get_expiry_time)
         upload_options[:put_expires] = 10
-        expect(adapter).to receive(:get_expiry_time).with(10)
 
-        adapter.get_path('subject_locations/name.jpg', upload_options)
+        adapter.put_path('subject_locations/name.jpg', upload_options)
+        expect(adapter).to have_received(:get_expiry_time).with(10)
       end
     end
   end
 
-  describe '#put_file', :focus do
+  describe '#put_file' do
     let(:file) { instance_double('File') }
     let(:blob_client) { instance_double('Azure::Storage::Blob::BlobService') }
     let(:method_call_options) { { content_type: 'text/plain' } }
@@ -124,23 +132,23 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     it 'calls the create_block_blob method with correct arguments' do
-      expect(blob_client).to receive(:create_block_blob).with(container, 'storage_path.txt', file, method_call_options)
       adapter.put_file('storage_path.txt', 'path_to_file.txt', method_call_options)
+      expect(blob_client).to have_received(:create_block_blob).with(container, 'storage_path.txt', file, method_call_options)
     end
 
     it 'sets content encoding to gzip if compressed option is set' do
       method_call_options[:compressed] = true
       expected_blob_client_options = { content_type: 'text/plain', content_encoding: 'gzip' }
 
-      expect(blob_client).to receive(:create_block_blob).with(container, 'storage_path.txt', file, expected_blob_client_options)
       adapter.put_file('storage_path.txt', 'path_to_file.txt', method_call_options)
+      expect(blob_client).to have_received(:create_block_blob).with(container, 'storage_path.txt', file, expected_blob_client_options)
     end
 
     it 'passes content disposition to the blob client when option is set' do
       method_call_options[:content_disposition] = 'attachment'
 
-      expect(blob_client).to receive(:create_block_blob).with(container, 'storage_path.txt', file, method_call_options)
       adapter.put_file('storage_path.txt', 'path_to_file.txt', method_call_options)
+      expect(blob_client).to have_received(:create_block_blob).with(container, 'storage_path.txt', file, method_call_options)
     end
   end
 
@@ -151,8 +159,8 @@ RSpec.describe MediaStorage::AzureAdapter do
       allow(Azure::Storage::Blob::BlobService).to receive(:create) { blob_client }
       allow(blob_client).to receive(:delete_blob)
 
-      expect(blob_client).to receive(:delete_blob).with(container, 'path_to_file.txt')
       adapter.delete_file('path_to_file.txt')
+      expect(blob_client).to have_received(:delete_blob).with(container, 'path_to_file.txt')
     end
   end
 
