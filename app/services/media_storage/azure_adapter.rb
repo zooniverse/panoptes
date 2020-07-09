@@ -8,8 +8,14 @@ module MediaStorage
       @get_expiration = opts.dig(:expiration, :get) || DEFAULT_EXPIRES_IN
       @put_expiration = opts.dig(:expiration, :put) || DEFAULT_EXPIRES_IN
 
-      @client = initialize_blob_client(opts)
-      @signer = initialize_signer(opts)
+      @client = Azure::Storage::Blob::BlobService.create(
+        storage_account_name: opts[:azure_storage_account],
+        storage_access_key: opts[:azure_storage_access_key]
+      )
+      @signer = Azure::Storage::Common::Core::Auth::SharedAccessSignature.new(
+        opts[:azure_storage_account],
+        opts[:azure_storage_access_key]
+      )
     end
 
     def stored_path(content_type, medium_type, *path_prefix)
@@ -86,20 +92,6 @@ module MediaStorage
 
     def generate_uri(path)
       URI("https://#{@storage_account_name}.blob.core.windows.net/#{@container}/#{path}")
-    end
-
-    def initialize_blob_client(opts)
-      Azure::Storage::Blob::BlobService.create(
-        storage_account_name: opts[:azure_storage_account],
-        storage_access_key: opts[:azure_storage_access_key]
-      )
-    end
-
-    def initialize_signer(opts)
-      Azure::Storage::Common::Core::Auth::SharedAccessSignature.new(
-        opts[:azure_storage_account],
-        opts[:azure_storage_access_key]
-      )
     end
   end
 end
