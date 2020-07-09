@@ -41,11 +41,6 @@ data:
         add_header Cache-Control public;
       }
 
-      location /health_check {
-        proxy_set_header X-Forwarded-Proto https;
-        proxy_pass http://docker-panoptes;
-      }
-
       location / {
         # avoid attacker setting the host value for links in rails_app
         # https://github.com/rails/rails/issues/29893
@@ -88,11 +83,6 @@ data:
         root /static-assets/;
         expires max;
         add_header Cache-Control public;
-      }
-
-      location /health_check {
-        proxy_set_header X-Forwarded-Proto https;
-        proxy_pass http://docker-panoptes;
       }
 
       location / {
@@ -265,6 +255,16 @@ spec:
   minReplicas: 2
   maxReplicas: 16
   targetCPUUtilizationPercentage: 80
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+   name: panoptes-production-app-pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: panoptes-production-app
 ---
 apiVersion: v1
 kind: Service
