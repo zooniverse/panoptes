@@ -1,6 +1,6 @@
 module MediaStorage
   class AzureAdapter < AbstractAdapter
-    DEFAULT_EXPIRES_IN = 3 # time in minutes
+    DEFAULT_EXPIRES_IN = 3 # time in minutes, see get_expiry_time(expires_in)
 
     def initialize(opts={})
       @storage_account_name = opts[:azure_storage_account]
