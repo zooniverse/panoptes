@@ -5,7 +5,6 @@ gem 'active_model_serializers', '0.10.0.rc2' # Event stream
 gem 'active_record_union', '~> 1.3.0'
 gem 'activerecord-import', '~> 1.0'
 gem 'aws-sdk', '~> 2.10'
-gem 'congestion', git: 'https://github.com/camallen/Congestion.git', branch: 'ttl-freshly-added-keys', ref: '6bf0ffa7b2'
 gem 'dalli'
 gem 'deep_cloneable', '~> 2.3.2'
 gem 'devise', '~> 4.7'
