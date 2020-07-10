@@ -1,6 +1,6 @@
 module MediaStorage
   class AzureAdapter < AbstractAdapter
-    attr_reader :prefix, :container
+    attr_reader :prefix, :container, :storage_account_name, :get_expiration, :put_expiration, :client, :signer
     DEFAULT_EXPIRES_IN = 3 # time in minutes, see get_expiry_time(expires_in)
 
     def initialize(opts={})
@@ -32,29 +32,24 @@ module MediaStorage
 
     def get_path(path, opts={})
       # TO DO: implement private v public uploads
-      expires_in = opts[:get_expires] || @get_expiration # time in minutes
-      expiry_time = get_expiry_time(expires_in)
-
-      @signer.signed_uri(
-        generate_uri(path), false,
+      signer.signed_uri(
+        client.generate_uri("#{container}/#{path}"),
+        false,
         service: 'b', # blob
         permissions: 'r', # read
-        expiry: expiry_time
+        expiry: get_expiry_time(opts[:get_expires] || get_expiration)
       ).to_s
     end
 
     def put_path(path, opts={})
       # TO DO: implement private v public uploads
-      content_type = opts[:content_type]
-      expires_in = opts[:put_expires] || @put_expiration # time in minutes
-      expiry_time = get_expiry_time(expires_in)
-
-      @signer.signed_uri(
-        generate_uri(path), false,
+      signer.signed_uri(
+        client.generate_uri("#{container}/#{path}"),
+        false,
         service: 'b', # blob
         permissions: 'rcw', # read create write
-        expiry: expiry_time,
-        content_type: content_type
+        expiry: get_expiry_time(opts[:put_expires] || put_expiration),
+        content_type: opts[:content_type]
       ).to_s
     end
 
@@ -65,14 +60,13 @@ module MediaStorage
       upload_options[:content_disposition] = opts[:content_disposition] if opts[:content_disposition]
 
       file = File.open file_path, 'r'
-      @client.create_block_blob(container, path, file, upload_options)
+      client.create_block_blob(container, path, file, upload_options)
     ensure
       file.close
     end
 
     def delete_file(path)
-      # TO DO: implement private v public uploads
-      @client.delete_blob(container, path)
+      client.delete_blob(container, path)
     end
 
     def encrypted_bucket?
@@ -86,10 +80,6 @@ module MediaStorage
     # @param expires_in [int]: time increment in minutes
     def get_expiry_time(expires_in)
       Time.now.utc.advance(minutes: expires_in).iso8601 # required format is UTC time zone, ISO 8601
-    end
-
-    def generate_uri(path)
-      URI("https://#{@storage_account_name}.blob.core.windows.net/#{container}/#{path}")
     end
   end
 end
