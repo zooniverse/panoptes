@@ -8,6 +8,7 @@ module Panoptes
           adapter: ENV.fetch('STORAGE_ADAPTER', 'test'),
           bucket: ENV['STORAGE_BUCKET'],
           prefix: ENV['STORAGE_PREFIX'],
+          azure_prefix: ENV['AZURE_STORAGE_PREFIX'],
           azure_storage_account: ENV.fetch('AZURE_STORAGE_ACCOUNT', 'panoptes'),
           azure_storage_access_key: ENV['AZURE_STORAGE_ACCESS_KEY'],
           azure_storage_container: ENV.fetch('AZURE_STORAGE_CONTAINER', 'test')

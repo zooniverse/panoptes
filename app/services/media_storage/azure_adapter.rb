@@ -1,10 +1,12 @@
 module MediaStorage
   class AzureAdapter < AbstractAdapter
+    attr_reader :prefix, :container
     DEFAULT_EXPIRES_IN = 3 # time in minutes, see get_expiry_time(expires_in)
 
     def initialize(opts={})
       @storage_account_name = opts[:azure_storage_account]
       @container = opts[:azure_storage_container] || Rails.env
+      @prefix = opts[:azure_prefix]
       @get_expiration = opts.dig(:expiration, :get) || DEFAULT_EXPIRES_IN
       @put_expiration = opts.dig(:expiration, :put) || DEFAULT_EXPIRES_IN
 
@@ -20,7 +22,10 @@ module MediaStorage
 
     def stored_path(content_type, medium_type, *path_prefix)
       extension = get_extension(content_type)
-      path = "#{medium_type}/"
+      path = prefix.to_s
+      path += '/' unless path[-1] == '/'
+      path += container + '/'
+      path += "#{medium_type}/"
       path += "#{path_prefix.join('/')}/" unless path_prefix.empty?
       path + "#{SecureRandom.uuid}.#{extension}"
     end
@@ -60,14 +65,14 @@ module MediaStorage
       upload_options[:content_disposition] = opts[:content_disposition] if opts[:content_disposition]
 
       file = File.open file_path, 'r'
-      @client.create_block_blob(@container, path, file, upload_options)
+      @client.create_block_blob(container, path, file, upload_options)
     ensure
       file.close
     end
 
     def delete_file(path)
       # TO DO: implement private v public uploads
-      @client.delete_blob(@container, path)
+      @client.delete_blob(container, path)
     end
 
     def encrypted_bucket?
@@ -84,7 +89,7 @@ module MediaStorage
     end
 
     def generate_uri(path)
-      URI("https://#{@storage_account_name}.blob.core.windows.net/#{@container}/#{path}")
+      URI("https://#{@storage_account_name}.blob.core.windows.net/#{container}/#{path}")
     end
   end
 end

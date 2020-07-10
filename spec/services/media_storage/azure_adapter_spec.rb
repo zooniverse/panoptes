@@ -5,6 +5,7 @@ RSpec.describe MediaStorage::AzureAdapter do
   let(:container) { 'test' }
   let(:opts) do
     {
+      azure_prefix: 'test-uploads.zooniverse.org/',
       azure_storage_account: storage_account_name,
       azure_storage_access_key: 'fake',
       azure_storage_container: container,
@@ -50,10 +51,12 @@ RSpec.describe MediaStorage::AzureAdapter do
   end
 
   describe '#stored_path' do
-    subject { adapter.stored_path('image/jpeg', 'subject_location') }
+    subject do
+      adapter.stored_path('image/jpeg', 'subject_location')
+    end
 
     it { is_expected.to be_a(String) }
-    it { is_expected.to match(/subject_location/) }
+    it { is_expected.to match(/test-uploads.zooniverse.org\/test\/subject_location/) }
     it { is_expected.to match(/\.jpeg/) }
     it { is_expected.to match(uuid_v4_regex) }
 
