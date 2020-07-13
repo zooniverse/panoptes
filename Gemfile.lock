@@ -401,7 +401,7 @@ GEM
     sidekiq-congestion (0.1.1)
       congestion (~> 0.1)
       sidekiq (>= 3.0)
-    sidekiq-unique-jobs (6.0.20)
+    sidekiq-unique-jobs (6.0.22)
       concurrent-ruby (~> 1.0, >= 1.0.5)
       sidekiq (>= 4.0, < 7.0)
       thor (~> 0)
