@@ -506,6 +506,7 @@ spec:
   - hosts:
     - panoptes.azure.zooniverse.org
     - panoptes.zooniverse.org
+    - signin.zooniverse.org
     secretName: panoptes-production-tls-secret
   rules:
   - host: panoptes.azure.zooniverse.org
@@ -522,3 +523,11 @@ spec:
           serviceName: panoptes-production-app
           servicePort: 80
         path: /(.*)
+- host: signin.zooniverse.org
+  http:
+    paths:
+    - backend:
+        serviceName: panoptes-production-app
+        servicePort: 80
+      path: /(.*)
+
