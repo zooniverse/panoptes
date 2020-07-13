@@ -9,8 +9,13 @@ module Validators
     def validate(new_record)
       return unless new_record.owner && new_record.favorite
 
-      owner_has_existing_favorite = new_record.owner.collections.where(favorite: true).exists?
-      return unless owner_has_existing_favorite
+      owner_fav_collections = new_record.owner.collections.where(favorite: true)
+      owner_has_existing_fav_for_project = owner_fav_collections
+        .joins(:projects)
+        .where(projects: { id: new_record.project_ids })
+        .exists?
+
+      return unless owner_has_existing_fav_for_project
 
       new_record.errors[:favorite] = 'An owner can only have one favorite collection per project'
     end
