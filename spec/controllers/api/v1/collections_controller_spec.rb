@@ -154,6 +154,8 @@ describe Api::V1::CollectionsController, type: :controller do
       end
 
       before do
+        default_request scopes: scopes, user_id: authorized_user.id
+
         collection.favorite = true
         collection.save!
       end
