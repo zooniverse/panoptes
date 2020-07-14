@@ -142,6 +142,27 @@ describe Api::V1::CollectionsController, type: :controller do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
+
+    context 'when favorite collection has existing subjects' do
+      let(:additional_subject) { create(:subject) }
+      let(:params) do
+        {
+          link_relation: 'subjects',
+          subjects: [additional_subject.id],
+          collection_id: collection.id
+        }
+      end
+
+      before do
+        collection.favorite = true
+        collection.save!
+      end
+
+      it 'allows another subject to be added' do
+        post :update_links, params
+        expect(response).to have_http_status(:ok)
+      end
+    end
   end
 
   describe '#create' do
