@@ -3,7 +3,8 @@ class EmailsController < ActionController::Base
   UNSUBSCRIBE_USER_ATTRIBUTES = {
     global_email_communication: false,
     project_email_communication: false,
-    beta_email_communication: false
+    beta_email_communication: false,
+    nasa_email_communication: false
   }
 
   def unsubscribe_via_token
