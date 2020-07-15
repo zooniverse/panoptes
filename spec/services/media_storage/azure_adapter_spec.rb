@@ -8,7 +8,7 @@ RSpec.describe MediaStorage::AzureAdapter do
       azure_prefix: 'test-uploads.zooniverse.org/',
       azure_storage_account: storage_account_name,
       azure_storage_access_key: 'fake',
-      azure_storage_container: container,
+      azure_storage_container: container
     }
   end
   let(:adapter) { described_class.new(opts) }
@@ -18,7 +18,7 @@ RSpec.describe MediaStorage::AzureAdapter do
   let(:signer) { instance_double('Azure::Storage::Common::Core::Auth::SharedAccessSignature') }
   let(:blob_client) { instance_double('Azure::Storage::Blob::BlobService') }
 
-  before :each do
+  before do
     allow(Azure::Storage::Common::Core::Auth::SharedAccessSignature).to receive(:new) { signer }
     allow(Azure::Storage::Blob::BlobService).to receive(:create) { blob_client }
   end
@@ -82,7 +82,7 @@ RSpec.describe MediaStorage::AzureAdapter do
       allow(blob_client).to receive(:generate_uri) {
         'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg'
       }
-      allow(adapter).to receive(:get_expiry_time) { 'time-isnt-real' }
+      allow(adapter).to receive(:get_expiry_time).and_return('time-isnt-real')
     end
 
     context 'when no options are passed' do
@@ -92,14 +92,14 @@ RSpec.describe MediaStorage::AzureAdapter do
 
       it 'passes the expected params to the signer' do
         expect(signer)
-        .to have_received(:signed_uri)
-        .with(
-          'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg',
-          false,
-          service: 'b',
-          permissions: 'r',
-          expiry: 'time-isnt-real'
-        )
+          .to have_received(:signed_uri)
+          .with(
+            'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg',
+            false,
+            service: 'b',
+            permissions: 'r',
+            expiry: 'time-isnt-real'
+          )
       end
 
       it 'passes the expected params to the blob client' do
@@ -125,7 +125,7 @@ RSpec.describe MediaStorage::AzureAdapter do
       allow(blob_client).to receive(:generate_uri) {
         'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg'
       }
-      allow(adapter).to receive(:get_expiry_time) { 'time-isnt-real' }
+      allow(adapter).to receive(:get_expiry_time).and_return('time-isnt-real')
     end
 
     context 'when required options are set' do
@@ -135,15 +135,15 @@ RSpec.describe MediaStorage::AzureAdapter do
 
       it 'passes the expected params to the signer' do
         expect(signer)
-        .to have_received(:signed_uri)
-        .with(
-          'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg',
-          false,
-          service: 'b',
-          permissions: 'rcw',
-          expiry: 'time-isnt-real',
-          content_type: 'image/jpg'
-        )
+          .to have_received(:signed_uri)
+          .with(
+            'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg',
+            false,
+            service: 'b',
+            permissions: 'rcw',
+            expiry: 'time-isnt-real',
+            content_type: 'image/jpg'
+          )
       end
 
       it 'passes the expected params to the blob client' do
