@@ -59,7 +59,7 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     it { is_expected.to be_a(String) }
-    it { is_expected.to match(/test-uploads.zooniverse.org\/test\/subject_location/) }
+    it { is_expected.to match(/test-uploads.zooniverse.org\/subject_location/) }
     it { is_expected.to match(/\.jpeg/) }
     it { is_expected.to match(uuid_v4_regex) }
 

@@ -24,7 +24,6 @@ module MediaStorage
       extension = get_extension(content_type)
       path = prefix.to_s
       path += '/' unless path[-1] == '/'
-      path += container + '/'
       path += "#{medium_type}/"
       path += "#{path_prefix.join('/')}/" unless path_prefix.empty?
       path + "#{SecureRandom.uuid}.#{extension}"
