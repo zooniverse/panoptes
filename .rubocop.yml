@@ -27,6 +27,10 @@ Metrics/MethodLength:
 Style/RegexpLiteral:
   EnforcedStyle: slashes
 
+# disable 'Missing top-level class documentation' warning
+Style/Documentation:
+  Enabled: false
+
 # new linters - opt in
 Layout/SpaceAroundMethodCallOperator:
   Enabled: true
@@ -42,4 +46,6 @@ Style/HashTransformKeys:
   Enabled: true
 Style/HashTransformValues:
   Enabled: true
+
+
 
