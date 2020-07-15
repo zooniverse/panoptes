@@ -79,9 +79,9 @@ RSpec.describe MediaStorage::AzureAdapter do
   describe '#get_path' do
     before do
       allow(signer).to receive(:signed_uri)
-      allow(blob_client).to receive(:generate_uri) {
+      allow(blob_client).to receive(:generate_uri).and_return(
         'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg'
-      }
+      )
       allow(adapter).to receive(:get_expiry_time).and_return('time-isnt-real')
     end
 
@@ -122,9 +122,9 @@ RSpec.describe MediaStorage::AzureAdapter do
 
     before do
       allow(signer).to receive(:signed_uri)
-      allow(blob_client).to receive(:generate_uri) {
+      allow(blob_client).to receive(:generate_uri)and_return(
         'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg'
-      }
+      )
       allow(adapter).to receive(:get_expiry_time).and_return('time-isnt-real')
     end
 
