@@ -2,35 +2,40 @@ require 'spec_helper'
 
 RSpec.describe MediaStorage::AzureAdapter do
   let(:storage_account_name) { 'tiny-watermelons' }
-  let(:container) { 'test' }
+  let(:container) { 'magic-container' }
   let(:opts) do
     {
       azure_prefix: 'test-uploads.zooniverse.org/',
       azure_storage_account: storage_account_name,
       azure_storage_access_key: 'fake',
       azure_storage_container: container,
-      stub_responses: true
     }
   end
   let(:adapter) { described_class.new(opts) }
   let(:uri_regex) { /\A#{URI::DEFAULT_PARSER.make_regexp}\z/ }
   let(:uuid_v4_regex) { /[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/ }
 
+  let(:signer) { instance_double('Azure::Storage::Common::Core::Auth::SharedAccessSignature') }
+  let(:blob_client) { instance_double('Azure::Storage::Blob::BlobService') }
+
+  before :each do
+    allow(Azure::Storage::Common::Core::Auth::SharedAccessSignature).to receive(:new) { signer }
+    allow(Azure::Storage::Blob::BlobService).to receive(:create) { blob_client }
+  end
+
   context 'when opts are passed to the initializer' do
     it 'uses default expiration values when no expiration values are passed' do
       default = MediaStorage::AzureAdapter::DEFAULT_EXPIRES_IN
-      expect(adapter.instance_variable_get(:@get_expiration)).to eq(default)
-      expect(adapter.instance_variable_get(:@put_expiration)).to eq(default)
+      expect(adapter.get_expiration).to eq(default)
+      expect(adapter.put_expiration).to eq(default)
     end
 
     it 'defaults to current rails environment for the container name when no container is given' do
       adapter = described_class.new(opts.except(:azure_storage_container))
-      expect(adapter.instance_variable_get(:@container)).to eq('test')
+      expect(adapter.container).to eq('test')
     end
 
     it 'creates the blob storage client using passed in options' do
-      allow(Azure::Storage::Blob::BlobService).to receive(:create)
-
       adapter
       expect(Azure::Storage::Blob::BlobService)
         .to have_received(:create)
@@ -41,8 +46,6 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     it 'initializes the signer using passed in options' do
-      allow(Azure::Storage::Common::Core::Auth::SharedAccessSignature).to receive(:new)
-
       adapter
       expect(Azure::Storage::Common::Core::Auth::SharedAccessSignature)
         .to have_received(:new)
@@ -73,29 +76,41 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
   end
 
-  shared_examples 'presigned url' do
-    it { is_expected.to match(uri_regex) }
-    it { is_expected.to match(/\Ahttps:\/\/#{storage_account_name}.blob.core.windows.net\/#{container}\//) }
-    it 'sets expiry time in the url' do
-      allow(adapter).to receive(:get_expiry_time).and_return('2020-07-06T18:05:29Z')
-
-      it { is expected.to match(/se=2020-07-06T18:05:29Z}/) }
-    end
-  end
-
   describe '#get_path' do
-    subject { adapter.get_path('subject_locations/name.jpg') }
+    before do
+      allow(signer).to receive(:signed_uri)
+      allow(blob_client).to receive(:generate_uri) {
+        'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg'
+      }
+      allow(adapter).to receive(:get_expiry_time) { 'time-isnt-real' }
+    end
 
-    it_behaves_like 'presigned url'
-    it { is_expected.to match(/sp=r&sv=\d{4}-\d{2}-\d{2}&se=\d{4}-\d{2}-\d{2}T[%A0-9]+Z&sr=b&sig=[%A-z0-9]+\z/) }
-    it { is_expected.to match(/subject_locations\/name.jpg/) }
+    context 'when no options are passed' do
+      before do
+        adapter.get_path('subject_locations/name.jpg')
+      end
+
+      it 'passes the expected params to the signer' do
+        expect(signer)
+        .to have_received(:signed_uri)
+        .with(
+          'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg',
+          false,
+          service: 'b',
+          permissions: 'r',
+          expiry: 'time-isnt-real'
+        )
+      end
+
+      it 'passes the expected params to the blob client' do
+        expect(blob_client).to have_received(:generate_uri).with('magic-container/subject_locations/name.jpg')
+      end
+    end
 
     context 'when get_expires option is set' do
       let(:upload_options) { { get_expires: 10 } }
 
       it 'uses passed in option for generating expiry time' do
-        allow(adapter).to receive(:get_expiry_time)
-
         adapter.get_path('subject_locations/name.jpg', upload_options)
         expect(adapter).to have_received(:get_expiry_time).with(10)
       end
@@ -103,12 +118,38 @@ RSpec.describe MediaStorage::AzureAdapter do
   end
 
   describe '#put_path' do
-    subject { adapter.put_path('subject_locations/name.jpg') }
-    let(:upload_options) { { content_type: 'image/jpeg' } }
+    let(:upload_options) { { content_type: 'image/jpg' } }
 
-    it_behaves_like 'presigned url'
-    it { is_expected.to match(/sp=rcw&sv=\d{4}-\d{2}-\d{2}&se=\d{4}-\d{2}-\d{2}T[%A0-9]+Z&sr=b&sig=[%A-z0-9]+\z/) }
-    it { is_expected.to match(/subject_locations\/name.jpg/) }
+    before do
+      allow(signer).to receive(:signed_uri)
+      allow(blob_client).to receive(:generate_uri) {
+        'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg'
+      }
+      allow(adapter).to receive(:get_expiry_time) { 'time-isnt-real' }
+    end
+
+    context 'when required options are set' do
+      before do
+        adapter.put_path('subject_locations/name.jpg', upload_options)
+      end
+
+      it 'passes the expected params to the signer' do
+        expect(signer)
+        .to have_received(:signed_uri)
+        .with(
+          'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg',
+          false,
+          service: 'b',
+          permissions: 'rcw',
+          expiry: 'time-isnt-real',
+          content_type: 'image/jpg'
+        )
+      end
+
+      it 'passes the expected params to the blob client' do
+        expect(blob_client).to have_received(:generate_uri).with('magic-container/subject_locations/name.jpg')
+      end
+    end
 
     context 'when put_expires option is set' do
       it 'uses passed in option for generating expiry time' do
@@ -123,14 +164,12 @@ RSpec.describe MediaStorage::AzureAdapter do
 
   describe '#put_file' do
     let(:file) { instance_double('File') }
-    let(:blob_client) { instance_double('Azure::Storage::Blob::BlobService') }
     let(:method_call_options) { { content_type: 'text/plain' } }
 
     before do
       allow(file).to receive(:close)
       allow(File).to receive(:open) { file }
 
-      allow(Azure::Storage::Blob::BlobService).to receive(:create) { blob_client }
       allow(blob_client).to receive(:create_block_blob)
     end
 
@@ -156,10 +195,7 @@ RSpec.describe MediaStorage::AzureAdapter do
   end
 
   describe '#delete_file' do
-    let(:blob_client) { instance_double('Azure::Storage::Blob::BlobService') }
-
     it 'calls the delete_blob method with correct arguments' do
-      allow(Azure::Storage::Blob::BlobService).to receive(:create) { blob_client }
       allow(blob_client).to receive(:delete_blob)
 
       adapter.delete_file('path_to_file.txt')
