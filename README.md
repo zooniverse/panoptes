@@ -75,7 +75,7 @@ There are multiple options for setting up a testing environment:
         * Use rspec focus keyword in your specs or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test panoptes rspec path/to/spec/file.rb`
 
 0. Use docker to run a testing environment bash shell and run test commands .
-    1. Run `docker-compose run --rm -e RAILS_ENV=test panoptes bash` to start the containers
+    1. Run `docker-compose run --service-ports --rm -e RAILS_ENV=test panoptes bash` to start the containers
     0. Run `bundle exec rspec` to run the full test suite
 
 0. Use parts of docker-compose manually and wire them up manually to create a testing environment.
