@@ -504,7 +504,7 @@ describe Api::V1::UsersController, type: :controller do
       let(:new_gec) { false }
       let(:new_pec) { false }
       let(:new_bec) { false }
-      let(:new_nec) { false }
+      let(:new_nec) { true }
       let(:new_ux_testing) { false }
       let(:new_intervention_notifications) { false }
       let(:put_operations) do
