@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe CsvDumps::FullEmailList do
-  let!(:all_email_user) { create(:user, global_email_communication: true, beta_email_communication: true) }
+  let!(:all_email_user) { create(:user, global_email_communication: true, beta_email_communication: true, nasa_email_communication: true) }
   let!(:global_email_user) { create(:user, global_email_communication: true, beta_email_communication: false) }
   let!(:beta_email_user) { create(:user, global_email_communication: false, beta_email_communication: true) }
   let!(:nasa_email_user) { create(:user, global_email_communication: false, nasa_email_communication: true) }
@@ -16,6 +16,12 @@ describe CsvDumps::FullEmailList do
   it 'returns beta email list' do
     users = [all_email_user, beta_email_user]
     list = described_class.new(:beta)
+    expect { |b| list.each(&b) }.to yield_successive_args(*users)
+  end
+
+  it 'returns nasa email list' do
+    users = [all_email_user, nasa_email_user]
+    list = described_class.new(:nasa)
     expect { |b| list.each(&b) }.to yield_successive_args(*users)
   end
 
