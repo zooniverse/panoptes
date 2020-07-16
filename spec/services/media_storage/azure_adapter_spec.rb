@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe MediaStorage::AzureAdapter do
@@ -30,7 +32,7 @@ RSpec.describe MediaStorage::AzureAdapter do
       expect(adapter.put_expiration).to eq(default)
     end
 
-    it 'defaults to current rails environment for the container name when no container is given' do
+    it 'defaults to current rails environment for the prefix when no prefix is given' do
       adapter = described_class.new(opts.except(:azure_prefix))
       expect(adapter.prefix).to eq('test')
     end
