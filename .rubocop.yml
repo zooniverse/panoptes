@@ -16,6 +16,10 @@ Metrics/BlockLength:
     - '**/*_spec.rb'
     - 'spec/support/*.rb'
 
+Rails/SkipsModelValidations:
+  Whitelist:
+  - update_all
+
 # new linters - opt in
 Layout/SpaceAroundMethodCallOperator:
   Enabled: true
