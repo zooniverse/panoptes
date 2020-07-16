@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.21
--- Dumped by pg_dump version 9.5.21
+-- Dumped from database version 9.5.22
+-- Dumped by pg_dump version 9.5.22
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1779,7 +1779,8 @@ CREATE TABLE public.users (
     tsv tsvector,
     upload_whitelist boolean DEFAULT false NOT NULL,
     ux_testing_email_communication boolean DEFAULT false,
-    intervention_notifications boolean DEFAULT true
+    intervention_notifications boolean DEFAULT true,
+    nasa_email_communication boolean
 );
 
 
@@ -3565,6 +3566,13 @@ CREATE INDEX index_users_on_lower_names ON public.users USING btree (lower((logi
 
 
 --
+-- Name: index_users_on_nasa_email_communication; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_nasa_email_communication ON public.users USING btree (nasa_email_communication) WHERE (nasa_email_communication = true);
+
+
+--
 -- Name: index_users_on_private_profile; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4726,4 +4734,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190524111214');
 INSERT INTO schema_migrations (version) VALUES ('20190624094308');
 
 INSERT INTO schema_migrations (version) VALUES ('20200513124310');
+
+INSERT INTO schema_migrations (version) VALUES ('20200714191914');
 
