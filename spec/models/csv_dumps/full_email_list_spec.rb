@@ -4,7 +4,7 @@ describe CsvDumps::FullEmailList do
   let!(:all_email_user) { create(:user, global_email_communication: true, beta_email_communication: true, nasa_email_communication: true) }
   let!(:global_email_user) { create(:user, global_email_communication: true, beta_email_communication: false) }
   let!(:beta_email_user) { create(:user, global_email_communication: false, beta_email_communication: true) }
-  let!(:nasa_email_user) { create(:user, global_email_communication: false, nasa_email_communication: true) }
+  let!(:nasa_email_user) { create(:user, global_email_communication: false, beta_email_communication: false, nasa_email_communication: true) }
   let!(:no_email_user) { create(:user, global_email_communication: false, beta_email_communication: false) }
 
   it 'returns global email list' do

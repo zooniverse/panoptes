@@ -542,7 +542,7 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should have updated the nasa email communication attribute" do
-        expect(user.reload.nasa_email_communication).to eq(new_bec)
+        expect(user.reload.nasa_email_communication).to eq(new_nec)
       end
 
       it "should have updated the ux testing email comms attribute" do
