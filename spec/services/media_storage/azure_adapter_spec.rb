@@ -31,8 +31,8 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     it 'defaults to current rails environment for the container name when no container is given' do
-      adapter = described_class.new(opts.except(:azure_storage_container))
-      expect(adapter.container).to eq('test')
+      adapter = described_class.new(opts.except(:azure_prefix))
+      expect(adapter.prefix).to eq('test')
     end
 
     it 'creates the blob storage client using passed in options' do

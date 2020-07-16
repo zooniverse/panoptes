@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MediaStorage
   class AzureAdapter < AbstractAdapter
     attr_reader :prefix, :container, :storage_account_name, :get_expiration, :put_expiration, :client, :signer
@@ -5,8 +7,8 @@ module MediaStorage
 
     def initialize(opts={})
       @storage_account_name = opts[:azure_storage_account]
-      @container = opts[:azure_storage_container] || Rails.env
-      @prefix = opts[:azure_prefix]
+      @container = opts[:azure_storage_container]
+      @prefix = opts[:azure_prefix] || Rails.env
       @get_expiration = opts.dig(:expiration, :get) || DEFAULT_EXPIRES_IN
       @put_expiration = opts.dig(:expiration, :put) || DEFAULT_EXPIRES_IN
 
