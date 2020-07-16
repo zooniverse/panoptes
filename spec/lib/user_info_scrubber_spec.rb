@@ -23,6 +23,7 @@ describe UserInfoScrubber do
       it { is_expected.to change(user, :global_email_communication).to(false) }
       it { is_expected.to change(user, :project_email_communication).to(false) }
       it { is_expected.to change(user, :beta_email_communication).to(false) }
+      it { is_expected.to change(user, :nasa_email_communication).to(false) }
       it { is_expected.to change(user, :valid_email).to(false) }
       it { is_expected.to change(user, :private_profile).to(true) }
       it { is_expected.to change(user, :api_key).to(nil) }

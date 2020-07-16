@@ -377,6 +377,10 @@ describe Api::V1::UsersController, type: :controller do
       expect(user_response["beta_email_communication"]).to eq(true)
     end
 
+    it "should have the nasa email communication for the user" do
+      expect(user_response["nasa_email_communication"]).to eq(true)
+    end
+
     it "should have the zooniverse_id for the user" do
       result = user_response["zooniverse_id"]
       expect(result).to eq(user.zooniverse_id)
@@ -500,6 +504,7 @@ describe Api::V1::UsersController, type: :controller do
       let(:new_gec) { false }
       let(:new_pec) { false }
       let(:new_bec) { false }
+      let(:new_nec) { false }
       let(:new_ux_testing) { false }
       let(:new_intervention_notifications) { false }
       let(:put_operations) do
@@ -509,6 +514,7 @@ describe Api::V1::UsersController, type: :controller do
             global_email_communication: new_gec,
             project_email_communication: new_pec,
             beta_email_communication: new_bec,
+            nasa_email_communication: new_nec,
             ux_testing_email_communication: new_ux_testing,
             intervention_notifications: new_intervention_notifications
           }
@@ -533,6 +539,10 @@ describe Api::V1::UsersController, type: :controller do
 
       it "should have updated the beta email communication attribute" do
         expect(user.reload.beta_email_communication).to eq(new_bec)
+      end
+
+      it "should have updated the nasa email communication attribute" do
+        expect(user.reload.nasa_email_communication).to eq(new_bec)
       end
 
       it "should have updated the ux testing email comms attribute" do
