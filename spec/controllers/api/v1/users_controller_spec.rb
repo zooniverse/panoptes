@@ -378,7 +378,7 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     it "should have the nasa email communication for the user" do
-      expect(user_response["nasa_email_communication"]).to eq(true)
+      expect(user_response["nasa_email_communication"]).to eq(false)
     end
 
     it "should have the zooniverse_id for the user" do
