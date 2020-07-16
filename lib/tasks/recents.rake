@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :recents do
   desc 'Backfill mark_remove column default in batches'
   task backfill_recents_mark_remove_column_default: :environment do
