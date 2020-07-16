@@ -1780,7 +1780,7 @@ CREATE TABLE public.users (
     upload_whitelist boolean DEFAULT false NOT NULL,
     ux_testing_email_communication boolean DEFAULT false,
     intervention_notifications boolean DEFAULT true,
-    nasa_email_communication boolean
+    nasa_email_communication boolean DEFAULT false
 );
 
 
