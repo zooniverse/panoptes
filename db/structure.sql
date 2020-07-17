@@ -1153,7 +1153,8 @@ CREATE TABLE public.recents (
     project_id integer,
     workflow_id integer,
     user_id integer,
-    user_group_id integer
+    user_group_id integer,
+    mark_remove boolean DEFAULT false
 );
 
 
@@ -4736,4 +4737,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190624094308');
 INSERT INTO schema_migrations (version) VALUES ('20200513124310');
 
 INSERT INTO schema_migrations (version) VALUES ('20200714191914');
+
+INSERT INTO schema_migrations (version) VALUES ('20200716170833');
 
