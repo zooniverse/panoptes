@@ -23,12 +23,12 @@ class ApplicationController < ActionController::Base
       u.permit(:email, :password, :password_confirmation, :login, :display_name,
                :credited_name, :global_email_communication,
                :project_email_communication, :beta_email_communication,
-               :project_id, :minor_age)
+               :nasa_email_communication, :project_id, :minor_age)
     end
 
     devise_parameter_sanitizer.permit(:account_update) do |u|
       u.permit(:email, :password, :password_confirmation, :current_password, :display_name,
-               :credited_name, :global_email_communication,
+               :credited_name, :global_email_communication, :nasa_email_communication,
                :project_email_communication, :beta_email_communication)
     end
   end
