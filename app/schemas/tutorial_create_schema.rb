@@ -49,5 +49,9 @@ class TutorialCreateSchema < JsonSchema
       end
 
     end
+
+    property "configuration" do
+      type "object"
+    end
   end
 end
