@@ -178,51 +178,6 @@ ALTER SEQUENCE public.authorizations_id_seq OWNED BY public.authorizations.id;
 
 
 --
--- Name: classification_export_rows; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.classification_export_rows (
-    id integer NOT NULL,
-    classification_id integer NOT NULL,
-    project_id integer NOT NULL,
-    workflow_id integer NOT NULL,
-    user_id integer,
-    user_name character varying,
-    user_ip character varying,
-    workflow_name character varying,
-    workflow_version character varying,
-    classification_created_at timestamp without time zone,
-    gold_standard boolean,
-    expert character varying,
-    metadata jsonb,
-    annotations jsonb,
-    subject_data jsonb,
-    subject_ids character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: classification_export_rows_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.classification_export_rows_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: classification_export_rows_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.classification_export_rows_id_seq OWNED BY public.classification_export_rows.id;
-
-
---
 -- Name: classification_subjects; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1994,13 +1949,6 @@ ALTER TABLE ONLY public.authorizations ALTER COLUMN id SET DEFAULT nextval('publ
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.classification_export_rows ALTER COLUMN id SET DEFAULT nextval('public.classification_export_rows_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY public.classifications ALTER COLUMN id SET DEFAULT nextval('public.classifications_id_seq'::regclass);
 
 
@@ -2341,14 +2289,6 @@ ALTER TABLE ONLY public.aggregations
 
 ALTER TABLE ONLY public.authorizations
     ADD CONSTRAINT authorizations_pkey PRIMARY KEY (id);
-
-
---
--- Name: classification_export_rows_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.classification_export_rows
-    ADD CONSTRAINT classification_export_rows_pkey PRIMARY KEY (id);
 
 
 --
@@ -2773,27 +2713,6 @@ CREATE INDEX index_aggregations_on_workflow_id ON public.aggregations USING btre
 --
 
 CREATE INDEX index_authorizations_on_user_id ON public.authorizations USING btree (user_id);
-
-
---
--- Name: index_classification_export_rows_on_classification_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_classification_export_rows_on_classification_id ON public.classification_export_rows USING btree (classification_id);
-
-
---
--- Name: index_classification_export_rows_on_project_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_classification_export_rows_on_project_id ON public.classification_export_rows USING btree (project_id);
-
-
---
--- Name: index_classification_export_rows_on_workflow_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_classification_export_rows_on_workflow_id ON public.classification_export_rows USING btree (workflow_id);
 
 
 --
@@ -4739,4 +4658,6 @@ INSERT INTO schema_migrations (version) VALUES ('20200513124310');
 INSERT INTO schema_migrations (version) VALUES ('20200714191914');
 
 INSERT INTO schema_migrations (version) VALUES ('20200716170833');
+
+INSERT INTO schema_migrations (version) VALUES ('20200720125246');
 
