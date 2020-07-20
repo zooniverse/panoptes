@@ -4,8 +4,6 @@ class Classification < ActiveRecord::Base
   belongs_to :workflow
   belongs_to :user_group
 
-  has_one :export_row, class_name: "ClassificationExportRow"
-
   has_many :recents, dependent: :destroy
 
   has_and_belongs_to_many :subjects,
