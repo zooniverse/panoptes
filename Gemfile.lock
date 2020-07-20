@@ -123,8 +123,8 @@ GEM
       railties (>= 4.2.0)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
-    faraday-http-cache (2.0.0)
-      faraday (~> 0.8)
+    faraday-http-cache (2.2.0)
+      faraday (>= 0.8)
     faraday-panoptes (0.3.0)
       faraday (~> 0.9)
       faraday_middleware (~> 0.10)
@@ -468,7 +468,7 @@ DEPENDENCIES
   doorkeeper-jwt (~> 0.2.1)
   factory_bot_rails
   faraday (~> 0.15)
-  faraday-http-cache (~> 2.0)
+  faraday-http-cache (~> 2.2)
   faraday_middleware (~> 0.13)
   flipper
   flipper-active_record
