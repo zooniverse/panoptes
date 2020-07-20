@@ -17,12 +17,6 @@ describe Classification, :type => :model do
     expect(build(:classification, workflow: nil)).to_not be_valid
   end
 
-  it 'can have an export row' do
-    row_export = create(:classification_export_row)
-    classification = row_export.classification
-    expect(classification.export_row).to eq(row_export)
-  end
-
   it "must have a user_ip" do
     expect(build(:classification, user_ip: nil)).to_not be_valid
   end
