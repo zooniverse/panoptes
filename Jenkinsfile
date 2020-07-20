@@ -42,11 +42,6 @@ pipeline {
               newImage.push('latest')
             }
           }
-          if (env.TAG_NAME == 'production-release') {
-            stage('Update production release tag') {
-              newImage.push('production-release')
-            }
-          }
         }
       }
     }
