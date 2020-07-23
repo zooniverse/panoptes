@@ -91,6 +91,6 @@ class Medium < ActiveRecord::Base
   private
 
   def queue_medium_removal
-    MediumRemovalWorker.perform_async(src)
+    MediumRemovalWorker.perform_async(src, indifferent_attributes)
   end
 end

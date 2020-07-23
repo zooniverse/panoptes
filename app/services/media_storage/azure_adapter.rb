@@ -71,8 +71,8 @@ module MediaStorage
       file.close
     end
 
-    def delete_file(path)
-      # TO DO: how to determine if the file to be deleted will be in public or in private container?
+    def delete_file(path, opts={})
+      container = opts[:private] ? private_container : public_container
       client.delete_blob(public_container, path)
     end
 
