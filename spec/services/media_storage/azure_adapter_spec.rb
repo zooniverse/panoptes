@@ -197,7 +197,7 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
   end
 
-  describe '#put_file', :focus do
+  describe '#put_file' do
     let(:file) { instance_double('File') }
     let(:method_call_options) { { content_type: 'text/plain' } }
 
