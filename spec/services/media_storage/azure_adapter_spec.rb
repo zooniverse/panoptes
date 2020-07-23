@@ -197,7 +197,7 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
   end
 
-  describe '#put_file' do
+  describe '#put_file', :focus do
     let(:file) { instance_double('File') }
     let(:method_call_options) { { content_type: 'text/plain' } }
 
@@ -213,12 +213,17 @@ RSpec.describe MediaStorage::AzureAdapter do
       expect(blob_client).to have_received(:create_block_blob).with(public_container, 'storage_path.txt', file, method_call_options)
     end
 
+    it 'passes the private container to the blob client when the file is private' do
+      method_call_options[:private] = true
+      adapter.put_file('storage_path.txt', 'path_to_file.txt', method_call_options)
+      expect(blob_client).to have_received(:create_block_blob).with(private_container, 'storage_path.txt', file, { content_type: 'text/plain' })
+
+    end
+
     it 'sets content encoding to gzip if compressed option is set' do
       method_call_options[:compressed] = true
-      expected_blob_client_options = { content_type: 'text/plain', content_encoding: 'gzip' }
-
       adapter.put_file('storage_path.txt', 'path_to_file.txt', method_call_options)
-      expect(blob_client).to have_received(:create_block_blob).with(public_container, 'storage_path.txt', file, expected_blob_client_options)
+      expect(blob_client).to have_received(:create_block_blob).with(public_container, 'storage_path.txt', file, { content_type: 'text/plain', content_encoding: 'gzip' })
     end
 
     it 'passes content disposition to the blob client when option is set' do

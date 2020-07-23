@@ -60,7 +60,7 @@ module MediaStorage
     end
 
     def put_file(path, file_path, opts={})
-      container = opts[:private] ? public_container : private_container
+      container = opts[:private] ? private_container : public_container
       upload_options = { content_type: opts[:content_type] }
       upload_options[:content_encoding] = 'gzip' if opts[:compressed]
       upload_options[:content_disposition] = opts[:content_disposition] if opts[:content_disposition]
