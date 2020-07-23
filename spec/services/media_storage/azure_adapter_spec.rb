@@ -42,9 +42,9 @@ RSpec.describe MediaStorage::AzureAdapter do
       expect(Azure::Storage::Blob::BlobService)
         .to have_received(:create)
         .with(
-                storage_account_name: opts[:azure_storage_account],
-                storage_access_key: opts[:azure_storage_access_key]
-             )
+          storage_account_name: opts[:azure_storage_account],
+          storage_access_key: opts[:azure_storage_access_key]
+        )
     end
 
     it 'initializes the signer using passed in options' do
