@@ -117,11 +117,8 @@ RSpec.describe MediaStorage::AzureAdapter do
       end
     end
 
-
-
     context 'when medium is public' do
       it 'returns the path as a https link' do
-
         expect(adapter.get_path('subject_locations/name.jpg'))
           .to eq('https://subject_locations/name.jpg')
       end
@@ -217,13 +214,14 @@ RSpec.describe MediaStorage::AzureAdapter do
       method_call_options[:private] = true
       adapter.put_file('storage_path.txt', 'path_to_file.txt', method_call_options)
       expect(blob_client).to have_received(:create_block_blob).with(private_container, 'storage_path.txt', file, { content_type: 'text/plain' })
-
     end
 
     it 'sets content encoding to gzip if compressed option is set' do
       method_call_options[:compressed] = true
       adapter.put_file('storage_path.txt', 'path_to_file.txt', method_call_options)
-      expect(blob_client).to have_received(:create_block_blob).with(public_container, 'storage_path.txt', file, { content_type: 'text/plain', content_encoding: 'gzip' })
+      expect(blob_client)
+        .to have_received(:create_block_blob)
+        .with(public_container, 'storage_path.txt', file, { content_type: 'text/plain', content_encoding: 'gzip' })
     end
 
     it 'passes content disposition to the blob client when option is set' do
