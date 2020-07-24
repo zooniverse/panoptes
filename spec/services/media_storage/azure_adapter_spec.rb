@@ -122,7 +122,6 @@ RSpec.describe MediaStorage::AzureAdapter do
         expect(adapter.get_path('subject_locations/name.jpg'))
           .to eq('https://subject_locations/name.jpg')
       end
-
     end
   end
 
