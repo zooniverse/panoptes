@@ -73,7 +73,7 @@ module MediaStorage
 
     def delete_file(path, opts={})
       container = opts[:private] ? private_container : public_container
-      client.delete_blob(public_container, path)
+      client.delete_blob(container, path)
     end
 
     def encrypted_bucket?
