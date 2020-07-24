@@ -2,6 +2,8 @@ class SubjectMetadataWorker
   include Sidekiq::Worker
   attr_reader :sms_ids
 
+  sidekiq_options retry: 10, dead: false
+
   def perform(sms_ids)
     return if Panoptes.flipper[:skip_subject_metadata_worker].enabled?
 
