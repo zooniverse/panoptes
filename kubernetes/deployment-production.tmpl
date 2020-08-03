@@ -54,19 +54,19 @@ data:
     server {
       server_name www.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
-      include /etc/nginx-sites/panoptes-nginx-common.conf;
+      include /etc/nginx/panoptes-nginx-common.conf;
     }
 
     server {
       server_name panoptes.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
-      include /etc/nginx-sites/panoptes-nginx-common.conf;
+      include /etc/nginx/panoptes-nginx-common.conf;
     }
 
     server {
       server_name signin.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
-      include /etc/nginx-sites/panoptes-nginx-common.conf;
+      include /etc/nginx/panoptes-nginx-common.conf;
     }
 kind: ConfigMap
 metadata:
@@ -207,7 +207,7 @@ spec:
             - name: panoptes-nginx-config
               mountPath: "/etc/nginx-sites"
             - name: panoptes-nginx-common.conf
-              mountPath: "/etc/nginx-sites"
+              mountPath: "/etc/nginx"
       volumes:
         - name: static-assets
           hostPath:
