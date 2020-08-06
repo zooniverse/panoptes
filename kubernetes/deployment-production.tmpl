@@ -1,6 +1,6 @@
 apiVersion: v1
 data:
-  nginx.conf: |+
+  panoptes-nginx-common.conf: |+
     gzip_types *;
 
     proxy_buffer_size 8k;
@@ -50,7 +50,7 @@ data:
     upstream docker-panoptes {
       server localhost:81;
     }
-    
+
     server {
       server_name www.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
@@ -206,7 +206,7 @@ spec:
               mountPath: "/static-assets"
             - name: panoptes-nginx-config
               mountPath: "/etc/nginx-sites"
-            - name: panoptes-nginx-common.conf
+            - name: panoptes-nginx-common
               mountPath: "/etc/nginx"
       volumes:
         - name: static-assets
@@ -217,7 +217,7 @@ spec:
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-production
-        - name: panoptes-nginx-common.conf
+        - name: panoptes-nginx-common
           configMap:
             name: panoptes-nginx-common-conf-production
         - name: jwt-production
