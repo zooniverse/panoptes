@@ -41,13 +41,19 @@ spec:
           env:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
+          - name: AZURE_STORAGE_ACCOUNT
+            value: panoptes
+          - name: AZURE_STORAGE_CONTAINER_PUBLIC
+            value: public
+          - name: AZURE_STORAGE_CONTAINER_PRIVATE
+            value: private
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
           - secretRef:
               name: panoptes-staging-env-vars
           - configMapRef:
-              name: panoptes-staging-azure-canary-shared
+              name: panoptes-staging-shared
           volumeMounts:
             - name: static-assets
               mountPath: "/static-assets"
@@ -107,46 +113,6 @@ spec:
         - name: jwt-staging
           secret:
             secretName: panoptes-doorkeeper-jwt-staging
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: panoptes-staging-azure-canary-shared
-data:
-  RAILS_ENV: staging
-  ZOO_STREAM_KINESIS_STREAM_NAME: zooniverse-staging
-  ZOO_STREAM_SOURCE: panoptes
-  DUMP_CONGESTION_OPTS_INTERVAL: "60"
-  DUMP_CONGESTION_OPTS_MIN_DELAY: "60"
-  CORS_ORIGINS_REGEX: '^https?:\/\/([a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
-  DESIGNATOR_API_HOST: https://designator-staging.zooniverse.org/
-  DESIGNATOR_API_USERNAME: staging
-  EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
-  EVENTS_API_USERNAME: staging_api
-  REDIRECTS_BASE: https://master.pfe-preview.zooniverse.org
-  REDIRECTS_PASSWORD_RESET: /#/reset-password
-  REDIRECTS_UNSUBSCRIBE: /#/unsubscribe
-  MAILER_ADDRESS: email-smtp.us-east-1.amazonaws.com
-  MAILER_DOMAIN: zooniverse.org
-  MEMCACHE_SERVERS: 'panoptes-staging-memcached:11211'
-  NEW_RELIC_APP_NAME: Panoptes Staging
-  NEW_RELIC_LOG_LEVEL: info
-  NEW_RELIC_MONITOR_MODE: 'true'
-  PAGE_SIZE_LIMIT: '100'
-  REDIS_URL: 'redis://panoptes-staging-redis:6379/0'
-  RAILS_MAX_THREADS: '4'
-  SIDEKIQ_CONCURRENCY: '4'
-  STORAGE_ADAPTER: aws
-  STORAGE_BUCKET: zooniverse-static
-  STORAGE_PREFIX: panoptes-uploads.zooniverse.org/staging/
-  AZURE_STORAGE_ACCOUNT: panoptes
-  AZURE_STORAGE_CONTAINER_PUBLIC: public
-  AZURE_STORAGE_CONTAINER_PRIVATE: private
-  TALK_API_HOST: https://talk-staging.zooniverse.org
-  TALK_API_USER: '1'
-  TALK_API_APPLICATION: '1'
-  USER_SUBJECT_LIMIT: '100'
----
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
