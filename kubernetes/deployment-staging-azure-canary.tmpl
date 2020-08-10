@@ -101,6 +101,8 @@ spec:
               mountPath: "/static-assets"
             - name: panoptes-nginx-config
               mountPath: "/etc/nginx-sites"
+            - name: panoptes-nginx-common
+              mountPath: "/etc/nginx/shared"
       volumes:
         - name: static-assets
           hostPath:
@@ -110,6 +112,9 @@ spec:
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-staging
+        - name: panoptes-nginx-common
+          configMap:
+            name: panoptes-nginx-common-conf-staging
         - name: jwt-staging
           secret:
             secretName: panoptes-doorkeeper-jwt-staging
