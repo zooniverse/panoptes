@@ -54,7 +54,7 @@ data:
     server {
       server_name panoptes-staging.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
-      include /etc/nginx/panoptes-nginx-common.conf;
+      include /etc/nginx/shared/panoptes-nginx-common.conf;
     }
 kind: ConfigMap
 metadata:
@@ -194,7 +194,7 @@ spec:
             - name: panoptes-nginx-config
               mountPath: "/etc/nginx-sites"
             - name: panoptes-nginx-common
-              mountPath: "/etc/nginx"
+              mountPath: "/etc/nginx/shared"
       volumes:
         - name: static-assets
           hostPath:
