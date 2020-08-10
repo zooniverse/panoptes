@@ -114,6 +114,19 @@ spec:
           secret:
             secretName: panoptes-doorkeeper-jwt-staging
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: panoptes-staging-canary
+spec:
+  selector:
+    app: panoptes-staging-azure-canary-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
+---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -132,6 +145,6 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: panoptes-staging-azure-canary-app
+          serviceName: panoptes-staging-canary
           servicePort: 80
         path: /(.*)
