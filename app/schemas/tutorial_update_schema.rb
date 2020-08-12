@@ -24,8 +24,8 @@ class TutorialUpdateSchema < JsonSchema
       end
     end
 
-    property "configuration" do
-      type "object"
+    property 'configuration' do
+      type 'object'
     end
   end
 end

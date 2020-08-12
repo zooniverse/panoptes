@@ -103,7 +103,7 @@ describe Api::V1::TutorialsController, type: :controller do
             workflows: [workflow.id]
           },
           configuration: {
-            an_option: "a setting"
+            an_option: 'a setting'
           }
         }
       }
@@ -130,7 +130,7 @@ describe Api::V1::TutorialsController, type: :controller do
           steps: [{"media" => "asdf", "content" => "asdf"}]
         },
         configuration: {
-          an_option: "a setting"
+          an_option: 'a setting'
         }
       }
     end
