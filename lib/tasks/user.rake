@@ -26,7 +26,7 @@ namespace :user do
 
   desc "Backfill NASA email communication field in batches"
   task backfill_nasa_email_communications_field: :environment do
-    User.where(select(:id).find_in_batches do |users|
+    User.select(:id).find_in_batches do |users|
       null_nasa_email_user_scope = User.where(
         id: users.map(&:id),
         nasa_email_communication: nil
