@@ -8,7 +8,7 @@ RSpec.describe MediaStorage::AzureAdapter do
   let(:private_container) { 'secret-magic-container' }
   let(:opts) do
     {
-      azure_prefix: 'test-uploads.zooniverse.org/',
+      prefix: 'test-uploads.zooniverse.org/',
       azure_storage_account: storage_account_name,
       azure_storage_access_key: 'fake',
       azure_storage_container_public: public_container,
