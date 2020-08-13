@@ -1,96 +1,72 @@
 apiVersion: v1
 data:
+  panoptes-nginx-common.conf: |+
+    gzip_types *;
+
+    proxy_buffer_size 8k;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+
+    location = /commit_id.txt {
+      root /static-assets/;
+      expires off;
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, HEAD';
+      add_header 'Access-Control-Allow-Credentials' 'true';
+    }
+
+    location ~ ^/api-assets/ {
+      root /static-assets/;
+      gzip_static on; # to serve pre-gzipped version
+      expires max;
+      add_header Cache-Control public;
+    }
+
+    location = /favicon.ico {
+      root /static-assets/;
+      expires max;
+      add_header Cache-Control public;
+    }
+
+    location = /robots.txt {
+      root /static-assets/;
+      expires max;
+      add_header Cache-Control public;
+    }
+
+    location / {
+      # avoid attacker setting the host value for links in rails_app
+      # https://github.com/rails/rails/issues/29893
+      proxy_set_header X-Forwarded-Host $server_name;
+      proxy_pass http://docker-panoptes;
+    }
+kind: ConfigMap
+metadata:
+  name: panoptes-nginx-common-conf-production
+---
+apiVersion: v1
+data:
   nginx.conf: |+
     upstream docker-panoptes {
       server localhost:81;
     }
 
     server {
+      server_name www.zooniverse.org;
+      include /etc/nginx/ssl.default.conf;
+      include /etc/nginx/shared/panoptes-nginx-common.conf;
+    }
+
+    server {
       server_name panoptes.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
-      gzip_types *;
-
-      proxy_buffer_size 8k;
-      proxy_set_header Host $http_host;
-      proxy_set_header X-Real-IP $remote_addr;
-
-      location = /commit_id.txt {
-        root /static-assets/;
-        expires off;
-        add_header 'Access-Control-Allow-Origin' '*';
-        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, HEAD';
-        add_header 'Access-Control-Allow-Credentials' 'true';
-      }
-
-      location ~ ^/api-assets/ {
-        root /static-assets/;
-        gzip_static on; # to serve pre-gzipped version
-        expires max;
-        add_header Cache-Control public;
-      }
-
-      location = /favicon.ico {
-        root /static-assets/;
-        expires max;
-        add_header Cache-Control public;
-      }
-
-      location = /robots.txt {
-        root /static-assets/;
-        expires max;
-        add_header Cache-Control public;
-      }
-
-      location / {
-        # avoid attacker setting the host value for links in rails_app
-        # https://github.com/rails/rails/issues/29893
-        proxy_set_header X-Forwarded-Host $server_name;
-        proxy_pass http://docker-panoptes;
-      }
+      include /etc/nginx/shared/panoptes-nginx-common.conf;
     }
 
     server {
       server_name signin.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
-      gzip_types *;
-
-      proxy_buffer_size 8k;
-      proxy_set_header Host $http_host;
-      proxy_set_header X-Real-IP $remote_addr;
-
-      location = /commit_id.txt {
-        root /static-assets/;
-        expires off;
-        add_header 'Access-Control-Allow-Origin' '*';
-        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, HEAD';
-        add_header 'Access-Control-Allow-Credentials' 'true';
-      }
-
-      location ~ ^/api-assets/ {
-        root /static-assets/;
-        gzip_static on; # to serve pre-gzipped version
-        expires max;
-        add_header Cache-Control public;
-      }
-
-      location = /favicon.ico {
-        root /static-assets/;
-        expires max;
-        add_header Cache-Control public;
-      }
-
-      location = /robots.txt {
-        root /static-assets/;
-        expires max;
-        add_header Cache-Control public;
-      }
-
-      location / {
-        # avoid attacker setting the host value for links in rails_app
-        # https://github.com/rails/rails/issues/29893
-        proxy_set_header X-Forwarded-Host $server_name;
-        proxy_pass http://docker-panoptes;
-      }
+      include /etc/nginx/shared/panoptes-nginx-common.conf;
     }
 kind: ConfigMap
 metadata:
@@ -232,6 +208,8 @@ spec:
               mountPath: "/static-assets"
             - name: panoptes-nginx-config
               mountPath: "/etc/nginx-sites"
+            - name: panoptes-nginx-common
+              mountPath: "/etc/nginx/shared"
       volumes:
         - name: static-assets
           hostPath:
@@ -241,6 +219,9 @@ spec:
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-production
+        - name: panoptes-nginx-common
+          configMap:
+            name: panoptes-nginx-common-conf-production
         - name: jwt-production
           secret:
             secretName: panoptes-doorkeeper-jwt-production

@@ -1,7 +1,7 @@
 class NotifySubjectSelectorOfRetirementWorker
   include Sidekiq::Worker
 
-  sidekiq_options retry: 3, queue: :data_high
+  sidekiq_options retry: 3, dead: false, queue: :data_high
 
   def perform(subject_id, workflow_id)
     workflow = Workflow.find_without_json_attrs(workflow_id)
