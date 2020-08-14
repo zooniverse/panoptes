@@ -2,6 +2,6 @@
 
 class AddConfigurationToTutorials < ActiveRecord::Migration
   def change
-    add_column :tutorials, :configuration, :jsonb
+    safety_assured { add_column :tutorials, :configuration, :jsonb, default: {} }
   end
 end
