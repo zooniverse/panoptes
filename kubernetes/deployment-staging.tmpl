@@ -1,14 +1,7 @@
 apiVersion: v1
 data:
-  nginx.conf: |+
-    upstream docker-panoptes {
-      server localhost:81;
-    }
-
-    server {
-      server_name panoptes-staging.zooniverse.org;
-      include /etc/nginx/ssl.default.conf;
-      gzip_types *;
+  panoptes-nginx-common.conf: |+
+    gzip_types *;
 
       proxy_buffer_size 8k;
       proxy_set_header Host $http_host;
@@ -47,6 +40,21 @@ data:
         proxy_set_header X-Forwarded-Host $server_name;
         proxy_pass http://docker-panoptes;
       }
+kind: ConfigMap
+metadata:
+  name: panoptes-nginx-common-conf-staging
+---
+apiVersion: v1
+data:
+  nginx.conf: |+
+    upstream docker-panoptes {
+      server localhost:81;
+    }
+
+    server {
+      server_name panoptes-staging.zooniverse.org;
+      include /etc/nginx/ssl.default.conf;
+      include /etc/nginx/shared/panoptes-nginx-common.conf;
     }
 kind: ConfigMap
 metadata:
@@ -185,6 +193,8 @@ spec:
               mountPath: "/static-assets"
             - name: panoptes-nginx-config
               mountPath: "/etc/nginx-sites"
+            - name: panoptes-nginx-common
+              mountPath: "/etc/nginx/shared"
       volumes:
         - name: static-assets
           hostPath:
@@ -194,6 +204,9 @@ spec:
         - name: panoptes-nginx-config
           configMap:
             name: panoptes-nginx-conf-staging
+        - name: panoptes-nginx-common
+          configMap:
+            name: panoptes-nginx-common-conf-staging
         - name: jwt-staging
           secret:
             secretName: panoptes-doorkeeper-jwt-staging

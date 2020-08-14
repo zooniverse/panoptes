@@ -131,6 +131,7 @@ pipeline {
       agent any
       steps {
         sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-staging.tmpl | kubectl --context azure apply --record -f -"
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-staging-azure-canary.tmpl | kubectl --context azure apply --record -f -"
       }
     }
   }
