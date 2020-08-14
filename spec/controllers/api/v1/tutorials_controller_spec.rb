@@ -101,6 +101,9 @@ describe Api::V1::TutorialsController, type: :controller do
           links: {
             project: project.id.to_s,
             workflows: [workflow.id]
+          },
+          configuration: {
+            an_option: 'a setting'
           }
         }
       }
@@ -125,6 +128,9 @@ describe Api::V1::TutorialsController, type: :controller do
       {
         tutorials: {
           steps: [{"media" => "asdf", "content" => "asdf"}]
+        },
+        configuration: {
+          an_option: 'a setting'
         }
       }
     end

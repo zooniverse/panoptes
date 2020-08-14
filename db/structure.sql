@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.22
+-- Dumped from database version 9.5.20
 -- Dumped by pg_dump version 9.5.22
 
 SET statement_timeout = 0;
@@ -1529,7 +1529,8 @@ CREATE TABLE public.tutorials (
     updated_at timestamp without time zone NOT NULL,
     project_id integer NOT NULL,
     kind character varying,
-    display_name text DEFAULT ''::text
+    display_name text DEFAULT ''::text,
+    configuration jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -4658,6 +4659,8 @@ INSERT INTO schema_migrations (version) VALUES ('20200513124310');
 INSERT INTO schema_migrations (version) VALUES ('20200714191914');
 
 INSERT INTO schema_migrations (version) VALUES ('20200716170833');
+
+INSERT INTO schema_migrations (version) VALUES ('20200717155424');
 
 INSERT INTO schema_migrations (version) VALUES ('20200720125246');
 
