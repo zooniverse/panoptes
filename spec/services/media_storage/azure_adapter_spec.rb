@@ -35,7 +35,7 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     it 'defaults to current rails environment for the prefix when no prefix is given' do
-      adapter = described_class.new(opts.except(:azure_prefix))
+      adapter = described_class.new(opts.except(:prefix))
       expect(adapter.prefix).to eq('test')
     end
 
