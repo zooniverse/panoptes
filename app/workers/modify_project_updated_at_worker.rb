@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class ModifyProjectUpdatedAtWorker
-    include Sidekiq::Worker
+  include Sidekiq::Worker
 
-    sidekiq_options queue: :data_low
+  sidekiq_options queue: :data_low
 
-    def perform(project_id)
-        Project.find(project_id).touch
-    end
+  def perform(project_id)
+    Project.find(project_id).touch
+  end
 end
