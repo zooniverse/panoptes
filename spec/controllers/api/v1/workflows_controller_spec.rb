@@ -215,7 +215,6 @@ describe Api::V1::WorkflowsController, type: :controller do
           }.to change {
             resource.reload.active
           }.to(true)
-          expect(resource.project).to receive(:touch).once
         end
 
         it "should not update the workflow tasks" do

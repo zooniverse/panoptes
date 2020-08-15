@@ -17,6 +17,14 @@ class Api::V1::WorkflowsController < Api::ApiController
     super
   end
 
+  def update
+    super do |workflow|
+      if update_params.key?(:active)
+        ModifyProjectUpdatedAtWorker.perform_async(workflow.project_id)
+      end
+    end
+  end
+
   def update_links
     super do |workflow|
       post_link_actions(workflow)
