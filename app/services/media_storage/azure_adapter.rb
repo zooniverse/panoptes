@@ -53,7 +53,7 @@ module MediaStorage
         client.generate_uri("#{container}/#{path}"),
         false,
         service: 'b', # blob
-        permissions: 'rcw', # read create write
+        permissions: 'cw', # create write
         expiry: get_expiry_time(opts[:put_expires] || put_expiration),
         content_type: opts[:content_type]
       ).to_s
