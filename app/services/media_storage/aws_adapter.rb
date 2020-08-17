@@ -57,7 +57,7 @@ module MediaStorage
       object(path).upload_file(file_path, upload_options)
     end
 
-    def delete_file(path)
+    def delete_file(path, _opts={})
       object(path).delete
     end
 
