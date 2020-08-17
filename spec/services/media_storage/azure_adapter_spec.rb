@@ -153,7 +153,7 @@ RSpec.describe MediaStorage::AzureAdapter do
             'https://tiny-watermelons.microsoftland.com/magic-container/subject_locations/name.jpg',
             false,
             service: 'b',
-            permissions: 'rcw',
+            permissions: 'cw',
             expiry: 'time-isnt-real',
             content_type: 'image/jpg'
           )
@@ -185,7 +185,7 @@ RSpec.describe MediaStorage::AzureAdapter do
             'https://tiny-watermelons.microsoftland.com/secret-magic-container/subject_locations/name.jpg',
             false,
             service: 'b',
-            permissions: 'rcw',
+            permissions: 'cw',
             expiry: 'time-isnt-real',
             content_type: 'image/jpg'
           )
