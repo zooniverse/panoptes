@@ -141,6 +141,8 @@ metadata:
     nginx.ingress.kubernetes.io/canary: "true"
     nginx.ingress.kubernetes.io/canary-weight: "0"
     nginx.ingress.kubernetes.io/canary-by-cookie: "canary_api_testing_opt_in"
+    nginx.ingress.kubernetes.io/canary-by-header: "Canary"
+    nginx.ingress.kubernetes.io/canary-by-header-value: "always"
 spec:
   tls:
   - hosts:
