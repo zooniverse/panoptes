@@ -8,7 +8,8 @@ RSpec.describe MediaStorage::AzureAdapter do
   let(:private_container) { 'secret-magic-container' }
   let(:opts) do
     {
-      prefix: 'test-uploads.zooniverse.org/',
+      prefix: '',
+      domain: 'test-uploads.zooniverse.org/'
       azure_storage_account: storage_account_name,
       azure_storage_access_key: 'fake',
       azure_storage_container_public: public_container,
@@ -34,9 +35,9 @@ RSpec.describe MediaStorage::AzureAdapter do
       expect(adapter.put_expiration).to eq(default)
     end
 
-    it 'defaults to current rails environment for the prefix when no prefix is given' do
+    it 'defaults to empty string when no prefix is given', :focus do
       adapter = described_class.new(opts.except(:prefix))
-      expect(adapter.prefix).to eq('test')
+      expect(adapter.prefix).to eq('')
     end
 
     it 'creates the blob storage client using passed in options' do
@@ -117,7 +118,13 @@ RSpec.describe MediaStorage::AzureAdapter do
       end
     end
 
-    context 'when medium is public' do
+    context 'when medium is public', :focus do
+      it 'uses the StoredPath.url_from_src method' do
+        src = 'subject_locations/name.jpg'
+        adapter.get_path(src)
+        expect(StoredPath).to have_received(:url_from_src).with(src)
+      end
+
       it 'returns the path as a https link' do
         expect(adapter.get_path('subject_locations/name.jpg'))
           .to eq('https://subject_locations/name.jpg')
