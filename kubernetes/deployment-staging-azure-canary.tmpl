@@ -41,12 +41,8 @@ spec:
           env:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
-          - name: AZURE_STORAGE_ACCOUNT
-            value: panoptes
-          - name: AZURE_STORAGE_CONTAINER_PUBLIC
-            value: public
-          - name: AZURE_STORAGE_CONTAINER_PRIVATE
-            value: private
+          - name: MEDIA_ADAPTER
+            value: azure
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars

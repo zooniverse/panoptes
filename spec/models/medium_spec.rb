@@ -210,7 +210,7 @@ RSpec.describe Medium, :type => :model do
       medium = create(:medium)
       aggregate_failures do
         expect(medium).to receive(:queue_medium_removal).and_call_original
-        expect(MediumRemovalWorker).to receive(:perform_async).with(medium.src)
+        expect(MediumRemovalWorker).to receive(:perform_async).with(medium.src, HashWithIndifferentAccess)
       end
       medium.destroy
     end
