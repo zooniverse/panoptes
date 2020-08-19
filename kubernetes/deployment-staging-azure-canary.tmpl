@@ -41,6 +41,8 @@ spec:
           env:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
+          - name: MEDIA_ADAPTER
+            value: azure
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
