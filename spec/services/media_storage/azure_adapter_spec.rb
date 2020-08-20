@@ -8,8 +8,8 @@ RSpec.describe MediaStorage::AzureAdapter do
   let(:private_container) { 'secret-magic-container' }
   let(:opts) do
     {
-      prefix: '',
-      domain: 'test-uploads.zooniverse.org/'
+      prefix: 'test',
+      url: 'https://test-uploads.zooniverse.org/container_name',
       azure_storage_account: storage_account_name,
       azure_storage_access_key: 'fake',
       azure_storage_container_public: public_container,
@@ -35,9 +35,9 @@ RSpec.describe MediaStorage::AzureAdapter do
       expect(adapter.put_expiration).to eq(default)
     end
 
-    it 'defaults to empty string when no prefix is given', :focus do
+    it 'defaults to current rails environment for the prefix when no prefix is given' do
       adapter = described_class.new(opts.except(:prefix))
-      expect(adapter.prefix).to eq('')
+      expect(adapter.prefix).to eq('test')
     end
 
     it 'creates the blob storage client using passed in options' do
@@ -58,13 +58,13 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
   end
 
-  describe '#stored_path' do
+  describe '#stored_path'  do
     subject do
       adapter.stored_path('image/jpeg', 'subject_location')
     end
 
     it { is_expected.to be_a(String) }
-    it { is_expected.to match(/test-uploads.zooniverse.org\/subject_location/) }
+    it { is_expected.to match(/test\/subject_location/) }
     it { is_expected.to match(/\.jpeg/) }
     it { is_expected.to match(uuid_v4_regex) }
 
@@ -118,16 +118,18 @@ RSpec.describe MediaStorage::AzureAdapter do
       end
     end
 
-    context 'when medium is public', :focus do
-      it 'uses the StoredPath.url_from_src method' do
+    context 'when medium is public' do
+      it 'uses the StoredPath.media_url method' do
+        allow(MediaStorage::StoredPath).to receive(:media_url)
         src = 'subject_locations/name.jpg'
         adapter.get_path(src)
-        expect(StoredPath).to have_received(:url_from_src).with(src)
+        expect(MediaStorage::StoredPath).to have_received(:media_url).with(opts[:url], src)
       end
 
       it 'returns the path as a https link' do
-        expect(adapter.get_path('subject_locations/name.jpg'))
-          .to eq('https://subject_locations/name.jpg')
+        expected_url = 'https://test-uploads.zooniverse.org/container_name/subject_locations/name.jpg'
+        expect(adapter.get_path('subject_locations/name.jpg')).to eq(expected_url)
+
       end
     end
   end
