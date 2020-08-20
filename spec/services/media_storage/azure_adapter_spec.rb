@@ -58,7 +58,7 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
   end
 
-  describe '#stored_path'  do
+  describe '#stored_path' do
     subject do
       adapter.stored_path('image/jpeg', 'subject_location')
     end
@@ -129,7 +129,6 @@ RSpec.describe MediaStorage::AzureAdapter do
       it 'returns the path as a https link' do
         expected_url = 'https://test-uploads.zooniverse.org/container_name/subject_locations/name.jpg'
         expect(adapter.get_path('subject_locations/name.jpg')).to eq(expected_url)
-
       end
     end
   end
