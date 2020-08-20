@@ -7,7 +7,7 @@ module Panoptes
         {
           adapter: ENV.fetch('STORAGE_ADAPTER', 'test'),
           prefix: ENV['STORAGE_PREFIX'],
-          domain: ENV.fetch('STORAGE_DOMAIN', 'panoptes-uploads.zooniverse.org'),
+          url: ENV['STORAGE_URL'],
           # s3 adapter specific
           bucket: ENV['STORAGE_BUCKET'],
           # azure adapter specific
