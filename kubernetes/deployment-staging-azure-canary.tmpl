@@ -43,6 +43,10 @@ spec:
             value: '65000'
           - name: STORAGE_ADAPTER
             value: azure
+          - name:  STORAGE_URL
+            value: 'https://panoptes.blob.core.windows.net/staging'
+          - name: STORAGE_PREFIX
+            value: 'staging/'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
