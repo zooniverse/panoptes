@@ -24,6 +24,7 @@ module MediaStorage
       )
     end
 
+    # Returns the path at which the medium lives in Blob Storage
     def stored_path(content_type, medium_type, *path_prefix)
       extension = get_extension(content_type)
       path = prefix.to_s
@@ -33,6 +34,7 @@ module MediaStorage
       path + "#{SecureRandom.uuid}.#{extension}"
     end
 
+    # Returns URL/path to be used to make a GET request to the Blob Service
     def get_path(path, opts={})
       if opts[:private]
         signer.signed_uri(
@@ -47,6 +49,7 @@ module MediaStorage
       end
     end
 
+    # Returns URL/path to be used to make a PUT request to the Blob Service
     def put_path(path, opts={})
       container = opts[:private] ? private_container : public_container
 
@@ -58,6 +61,11 @@ module MediaStorage
         expiry: get_expiry_time(opts[:put_expires] || put_expiration),
         content_type: opts[:content_type]
       ).to_s
+    end
+
+    # Returns required headers for making a put request to the Blob Service
+    def headers_for_direct_upload
+      { "x-ms-blob-type" => "BlockBlob" }
     end
 
     def put_file(path, file_path, opts={})
