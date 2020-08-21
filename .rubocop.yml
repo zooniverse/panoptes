@@ -19,6 +19,7 @@ Metrics/BlockLength:
 Rails/SkipsModelValidations:
   Whitelist:
   - update_all
+  - touch
 
 Metrics/MethodLength:
   Description: 'Avoid methods longer than 12 lines of code.'
