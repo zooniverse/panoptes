@@ -20,7 +20,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   def update
     super do |workflow|
       if update_params.key?(:active)
-        ModifyProjectUpdatedAtWorker.perform_async(workflow.project_id)
+        TouchProjectWorker.perform_async(workflow.project_id)
       end
     end
   end

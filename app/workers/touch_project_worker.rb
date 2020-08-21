@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class ModifyProjectUpdatedAtWorker
+class TouchProjectWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :data_low
+  sidekiq_options queue: :data_high
 
   def perform(project_id)
     Project.find(project_id).touch
