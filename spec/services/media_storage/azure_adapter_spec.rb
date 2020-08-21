@@ -203,7 +203,7 @@ RSpec.describe MediaStorage::AzureAdapter do
 
   describe '#headers_for_direct_upload' do
     it 'returns the blob-type header' do
-      expect(adapter.headers_for_direct_upload).to eq({ "x-ms-blob-type" => "BlockBlob" })
+      expect(adapter.headers_for_direct_upload).to eq({ 'x-ms-blob-type' => 'BlockBlob' })
     end
   end
 

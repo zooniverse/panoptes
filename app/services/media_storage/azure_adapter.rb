@@ -65,7 +65,7 @@ module MediaStorage
 
     # Returns required headers for making a put request to the Blob Service
     def headers_for_direct_upload
-      { "x-ms-blob-type" => "BlockBlob" }
+      { 'x-ms-blob-type' => 'BlockBlob' }
     end
 
     def put_file(path, file_path, opts={})
