@@ -41,12 +41,12 @@ spec:
           env:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
-          - name: AZURE_STORAGE_ACCOUNT
-            value: panoptes
-          - name: AZURE_STORAGE_CONTAINER_PUBLIC
-            value: public
-          - name: AZURE_STORAGE_CONTAINER_PRIVATE
-            value: private
+          - name: STORAGE_ADAPTER
+            value: azure
+          - name:  STORAGE_URL
+            value: 'https://panoptes.blob.core.windows.net/public'
+          - name: STORAGE_PREFIX
+            value: 'staging/'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
@@ -140,7 +140,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/canary: "true"
     nginx.ingress.kubernetes.io/canary-weight: "0"
-    nginx.ingress.kubernetes.io/canary-by-cookie: "canary_api_testing_opt_in"
+    nginx.ingress.kubernetes.io/canary-by-header: "Canary-Testing-Opt-In"
 spec:
   tls:
   - hosts:
