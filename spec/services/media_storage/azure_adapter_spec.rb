@@ -201,6 +201,12 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
   end
 
+  describe '#headers_for_direct_upload' do
+    it 'returns the blob-type header' do
+      expect(adapter.headers_for_direct_upload).to eq({ "x-ms-blob-type" => "BlockBlob" })
+    end
+  end
+
   describe '#put_file' do
     let(:file) { instance_double('File') }
     let(:method_call_options) { { content_type: 'text/plain' } }
