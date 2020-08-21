@@ -6,7 +6,7 @@ require:
 Style/NumericLiterals:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 160
 Layout/SpaceAroundEqualsInParameterDefault:
   EnforcedStyle: 'no_space'

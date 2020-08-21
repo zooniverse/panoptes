@@ -8,7 +8,8 @@ RSpec.describe MediaStorage::AzureAdapter do
   let(:private_container) { 'secret-magic-container' }
   let(:opts) do
     {
-      prefix: 'test-uploads.zooniverse.org/',
+      prefix: 'test',
+      url: 'https://test-uploads.zooniverse.org/container_name',
       azure_storage_account: storage_account_name,
       azure_storage_access_key: 'fake',
       azure_storage_container_public: public_container,
@@ -63,7 +64,7 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     it { is_expected.to be_a(String) }
-    it { is_expected.to match(/test-uploads.zooniverse.org\/subject_location/) }
+    it { is_expected.to match(/test\/subject_location/) }
     it { is_expected.to match(/\.jpeg/) }
     it { is_expected.to match(uuid_v4_regex) }
 
@@ -118,9 +119,16 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     context 'when medium is public' do
+      it 'uses the StoredPath.media_url method' do
+        allow(MediaStorage::StoredPath).to receive(:media_url)
+        src = 'subject_locations/name.jpg'
+        adapter.get_path(src)
+        expect(MediaStorage::StoredPath).to have_received(:media_url).with(opts[:url], src)
+      end
+
       it 'returns the path as a https link' do
-        expect(adapter.get_path('subject_locations/name.jpg'))
-          .to eq('https://subject_locations/name.jpg')
+        expected_url = 'https://test-uploads.zooniverse.org/container_name/subject_locations/name.jpg'
+        expect(adapter.get_path('subject_locations/name.jpg')).to eq(expected_url)
       end
     end
   end

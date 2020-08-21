@@ -2,13 +2,14 @@
 
 module MediaStorage
   class AzureAdapter < AbstractAdapter
-    attr_reader :prefix, :public_container, :private_container, :storage_account_name, :get_expiration, :put_expiration, :client, :signer
+    attr_reader :url, :prefix, :public_container, :private_container, :storage_account_name, :get_expiration, :put_expiration, :client, :signer
     DEFAULT_EXPIRES_IN = 3 # time in minutes, see get_expiry_time(expires_in)
 
     def initialize(opts={})
       @storage_account_name = opts[:azure_storage_account]
       @public_container = opts[:azure_storage_container_public]
       @private_container = opts[:azure_storage_container_private]
+      @url = opts[:url]
       @prefix = opts[:prefix] || Rails.env
       @get_expiration = opts.dig(:expiration, :get) || DEFAULT_EXPIRES_IN
       @put_expiration = opts.dig(:expiration, :put) || DEFAULT_EXPIRES_IN
@@ -42,7 +43,7 @@ module MediaStorage
           expiry: get_expiry_time(opts[:get_expires] || get_expiration)
         ).to_s
       else
-        "https://#{path}"
+        StoredPath.media_url(url, path)
       end
     end
 
