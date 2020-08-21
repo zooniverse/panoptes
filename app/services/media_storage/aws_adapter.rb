@@ -45,6 +45,11 @@ module MediaStorage
       ).to_s
     end
 
+    # Returns empty hash since AWS does not require any special headers for uploads
+    def headers_for_direct_upload
+      {}
+    end
+
     def put_file(path, file_path, opts={})
       upload_options = {
         content_type: opts[:content_type],

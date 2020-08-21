@@ -12,11 +12,18 @@ module MediaStorage
       raise NotImplementedError
     end
 
+    # Returns URL/path to be used to make a GET request to the storage service
     def get_path(path, opts={})
       raise NotImplementedError
     end
 
+    # Returns URL/path to be used to make a PUT request to the storage service
     def put_path(path, opts={})
+      raise NotImplementedError
+    end
+
+    # Returns required headers for making a put request to the storage service
+    def headers_for_direct_upload
       raise NotImplementedError
     end
 
