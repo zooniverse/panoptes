@@ -19,6 +19,7 @@ Metrics/BlockLength:
 Rails/SkipsModelValidations:
   Whitelist:
   - update_all
+  - touch
 
 # new linters - opt in
 Layout/SpaceAroundMethodCallOperator:
