@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe SubjectSetCopier do
-  let(:subject_set) { create(:subject_set) }
+  let(:subject_set) { create(:subject_set_with_subjects) }
   let(:project) { subject_set.project }
 
-  describe '.duplicate_subject_set_and_subjects', :focus do
+  describe '.duplicate_subject_set_and_subjects' do
     let(:copied_subject_set) do
       described_class.new(subject_set, project.id).duplicate_subject_set_and_subjects
     end

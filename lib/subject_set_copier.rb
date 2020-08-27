@@ -10,11 +10,10 @@ class SubjectSetCopier
 
   def duplicate_subject_set_and_subjects
     orig_subject_set.dup.tap do |subject_set|
-      @copied_subject_set = copied_subject_set
       @orig_set_member_subjects = orig_subject_set.set_member_subjects
       subject_set.project_id = new_project_id
-      subject_set.set_member_subjects_count = 0
       subject_set.set_member_subjects = copy_set_member_subjects
+      subject_set.set_member_subjects_count = copy_set_member_subjects.size
     end
   end
 
@@ -23,7 +22,7 @@ class SubjectSetCopier
   def copy_set_member_subjects
     [].tap do |new_smss|
       orig_set_member_subjects.find_each do |sms|
-        sms_attrs = { subject_set: copied_subject_set, subject_id: sms.subject_id }
+        sms_attrs = { subject_id: sms.subject_id, priority: sms.priority }
         new_smss << SetMemberSubject.new(sms_attrs)
       end
     end
