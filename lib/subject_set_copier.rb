@@ -1,7 +1,7 @@
-class SubjectSetCopier
+# frozen_string_literal: true
 
-  attr_reader :orig_subject_set, :new_project_id, :orig_set_member_subjects,
-   :copied_subject_set
+class SubjectSetCopier
+  attr_reader :orig_subject_set, :new_project_id, :orig_set_member_subjects
 
   def initialize(orig_subject_set, new_project_id=nil)
     @orig_subject_set = orig_subject_set
