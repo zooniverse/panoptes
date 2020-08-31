@@ -39,7 +39,9 @@ module Subjects
       end
 
       if subject_ids.blank?
-        subject_ids = fallback_selector.any_workflow_data
+        subject_ids = DatabaseReplica.read('fallback_subject_selection_from_replica') do
+          fallback_selector.any_workflow_data
+        end
         @selection_state = 2
       end
 
@@ -91,12 +93,13 @@ module Subjects
     end
 
     def internal_fallback
-      subject_ids = fallback_selector.select
+      subject_ids = DatabaseReplica.read('fallback_subject_selection_from_replica') do
+        fallback_selector.select
+      end
 
-      if data_available = !subject_ids.empty?
-        if Panoptes.flipper[:selector_sync_error_reload].enabled?
-          NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
-        end
+      data_available = !subject_ids.empty?
+      if data_available && Panoptes.flipper[:selector_sync_error_reload].enabled?
+        NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
       end
 
       subject_ids
