@@ -47,3 +47,6 @@ Style/HashTransformKeys:
   Enabled: true
 Style/HashTransformValues:
   Enabled: true
+
+AllCops:
+  NewCops: enable
