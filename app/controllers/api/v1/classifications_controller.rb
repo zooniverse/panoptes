@@ -20,6 +20,12 @@ class Api::V1::ClassificationsController < Api::ApiController
   before_action :filter_plural_subject_ids,
     only: [ :index, :gold_standard, :incomplete, :project ]
 
+  def index
+    DatabaseReplica.read('classification_serializer_data_from_replica') do
+      super
+    end
+  end
+
   def create
     super { |classification| lifecycle(:create, classification) }
   end
@@ -30,38 +36,44 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def gold_standard
-    skip_policy_scope
-    resources = Pundit.policy!(api_user, GoldStandardAnnotation).scope_for(:index)
-    resources = resources.where(workflow_id: params[:workflow_id]) if params[:workflow_id]
+    DatabaseReplica.read('classification_serializer_data_from_replica') do
+      skip_policy_scope
+      resources = Pundit.policy!(api_user, GoldStandardAnnotation).scope_for(:index)
+      resources = resources.where(workflow_id: params[:workflow_id]) if params[:workflow_id]
 
-    if resource_ids.present?
-      resources = resources.where(id: resource_ids)
+      if resource_ids.present?
+        resources = resources.where(id: resource_ids)
+      end
+
+      gold_standard_page = GoldStandardAnnotationSerializer.page(
+        params,
+        resources,
+        context
+      )
+      render json_api: gold_standard_page, generate_response_obj_etag: true
     end
-
-    gold_standard_page = GoldStandardAnnotationSerializer.page(
-      params,
-      resources,
-      context
-    )
-    render json_api: gold_standard_page, generate_response_obj_etag: true
   end
 
   def incomplete
-    index
+    DatabaseReplica.read('classification_serializer_data_from_replica') do
+      index
+    end
   end
 
   def project
-    if params[:last_id] && !params[:project_id]
-      raise MissingParameter.new("Project ID required if last_id is included")
+    DatabaseReplica.read('classification_serializer_data_from_replica') do
+      if params[:last_id] && !params[:project_id]
+        raise MissingParameter.new("Project ID required if last_id is included")
+      end
+
+      resources = controlled_resources
+      resources = resources.where(project_id: params[:project_id]) if params[:project_id]
+      resources = resources.after_id(params[:last_id]) if params[:last_id]
+
+      render json_api: serializer.page(params, resources, context),
+            generate_response_obj_etag: true,
+            add_http_cache: params[:http_cache]
     end
-
-    resources = controlled_resources
-    resources = resources.where(project_id: params[:project_id]) if params[:project_id]
-    resources = resources.after_id(params[:last_id]) if params[:last_id]
-
-    render json_api: serializer.page(params, resources, context),
-           generate_response_obj_etag: true,
-           add_http_cache: params[:http_cache]
   end
 
   private
