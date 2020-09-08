@@ -41,9 +41,7 @@ class Api::V1::ClassificationsController < Api::ApiController
       resources = Pundit.policy!(api_user, GoldStandardAnnotation).scope_for(:index)
       resources = resources.where(workflow_id: params[:workflow_id]) if params[:workflow_id]
 
-      if resource_ids.present?
-        resources = resources.where(id: resource_ids)
-      end
+      resources = resources.where(id: resource_ids) if resource_ids.present?
 
       gold_standard_page = GoldStandardAnnotationSerializer.page(
         params,
@@ -63,7 +61,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   def project
     DatabaseReplica.read('classification_serializer_data_from_replica') do
       if params[:last_id] && !params[:project_id]
-        raise MissingParameter.new("Project ID required if last_id is included")
+        raise MissingParameter, 'Project ID required if last_id is included'
       end
 
       resources = controlled_resources
@@ -71,8 +69,8 @@ class Api::V1::ClassificationsController < Api::ApiController
       resources = resources.after_id(params[:last_id]) if params[:last_id]
 
       render json_api: serializer.page(params, resources, context),
-            generate_response_obj_etag: true,
-            add_http_cache: params[:http_cache]
+             generate_response_obj_etag: true,
+             add_http_cache: params[:http_cache]
     end
   end
 
