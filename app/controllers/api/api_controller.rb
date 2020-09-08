@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'accept_language_extractor'
 
 module Api
@@ -43,6 +45,7 @@ module Api
       ActiveRecord::RecordNotUnique,
       Operation::Error,
       ActiveInteraction::InvalidInteractionError,          with: :unprocessable_entity
+    rescue_from Kaminari::ZeroPerPageOperation,            with: :kaminari_zero_page
     rescue_from Api::FeatureDisabled,                      with: :service_unavailable
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
