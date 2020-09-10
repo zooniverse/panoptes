@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module JSONApiResponses
   extend ActiveSupport::Concern
 
@@ -67,5 +69,12 @@ module JSONApiResponses
 
   def forbidden(exception)
     json_api_render(:forbidden, exception)
+  end
+
+  def kaminari_zero_page(exception)
+    json_api_render(
+      :unprocessable_entity,
+      exception.class.new("Current page was incalculable. Perhaps you supplied 'page_size: 0' as a param?")
+    )
   end
 end
