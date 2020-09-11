@@ -53,9 +53,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def incomplete
-    DatabaseReplica.read('classification_serializer_data_from_replica') do
-      index
-    end
+    index
   end
 
   def project
