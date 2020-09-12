@@ -3,6 +3,7 @@
 module MediaStorage
   class AzureAdapter < AbstractAdapter
     attr_reader :url, :public_container, :private_container, :storage_account_name, :get_expiration, :put_expiration, :client, :signer
+
     DEFAULT_EXPIRES_IN = 3 # time in minutes, see get_expiry_time(expires_in)
 
     def initialize(opts={})
@@ -25,7 +26,7 @@ module MediaStorage
 
     def stored_path(content_type, medium_type, *path_prefix)
       extension = get_extension(content_type)
-      path += "#{medium_type}/"
+      path = "#{medium_type}/"
       path += "#{path_prefix.join('/')}/" unless path_prefix.empty?
       path + "#{SecureRandom.uuid}.#{extension}"
     end
