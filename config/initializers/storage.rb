@@ -6,9 +6,9 @@ module Panoptes
       @configuration ||=
         {
           adapter: ENV.fetch('STORAGE_ADAPTER', 'test'),
-          prefix: ENV['STORAGE_PREFIX'],
           url: ENV['STORAGE_URL'],
           # s3 adapter specific
+          prefix: ENV['STORAGE_PREFIX'],
           bucket: ENV['STORAGE_BUCKET'],
           # azure adapter specific
           azure_storage_account: ENV.fetch('AZURE_STORAGE_ACCOUNT', 'panoptes'),

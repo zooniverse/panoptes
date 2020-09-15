@@ -2,7 +2,8 @@
 
 module MediaStorage
   class AzureAdapter < AbstractAdapter
-    attr_reader :url, :prefix, :public_container, :private_container, :storage_account_name, :get_expiration, :put_expiration, :client, :signer
+    attr_reader :url, :public_container, :private_container, :storage_account_name, :get_expiration, :put_expiration, :client, :signer
+
     DEFAULT_EXPIRES_IN = 3 # time in minutes, see get_expiry_time(expires_in)
 
     def initialize(opts={})
@@ -10,7 +11,6 @@ module MediaStorage
       @public_container = opts[:azure_storage_container_public]
       @private_container = opts[:azure_storage_container_private]
       @url = opts[:url]
-      @prefix = opts[:prefix] || Rails.env
       @get_expiration = opts.dig(:expiration, :get) || DEFAULT_EXPIRES_IN
       @put_expiration = opts.dig(:expiration, :put) || DEFAULT_EXPIRES_IN
 
@@ -26,9 +26,7 @@ module MediaStorage
 
     def stored_path(content_type, medium_type, *path_prefix)
       extension = get_extension(content_type)
-      path = prefix.to_s
-      path += '/' unless path[-1] == '/'
-      path += "#{medium_type}/"
+      path = "#{medium_type}/"
       path += "#{path_prefix.join('/')}/" unless path_prefix.empty?
       path + "#{SecureRandom.uuid}.#{extension}"
     end

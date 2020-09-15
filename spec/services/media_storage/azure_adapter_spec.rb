@@ -8,7 +8,6 @@ RSpec.describe MediaStorage::AzureAdapter do
   let(:private_container) { 'secret-magic-container' }
   let(:opts) do
     {
-      prefix: 'test',
       url: 'https://test-uploads.zooniverse.org/container_name',
       azure_storage_account: storage_account_name,
       azure_storage_access_key: 'fake',
@@ -35,11 +34,6 @@ RSpec.describe MediaStorage::AzureAdapter do
       expect(adapter.put_expiration).to eq(default)
     end
 
-    it 'defaults to current rails environment for the prefix when no prefix is given' do
-      adapter = described_class.new(opts.except(:prefix))
-      expect(adapter.prefix).to eq('test')
-    end
-
     it 'creates the blob storage client using passed in options' do
       adapter
       expect(Azure::Storage::Blob::BlobService)
@@ -64,7 +58,7 @@ RSpec.describe MediaStorage::AzureAdapter do
     end
 
     it { is_expected.to be_a(String) }
-    it { is_expected.to match(/test\/subject_location/) }
+    it { is_expected.to match(/subject_location/) }
     it { is_expected.to match(/\.jpeg/) }
     it { is_expected.to match(uuid_v4_regex) }
 

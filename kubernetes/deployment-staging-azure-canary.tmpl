@@ -45,8 +45,6 @@ spec:
             value: azure
           - name:  STORAGE_URL
             value: 'https://panoptesuploadsstaging.blob.core.windows.net/public'
-          - name: STORAGE_PREFIX
-            value: 'staging/'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
