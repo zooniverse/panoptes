@@ -42,7 +42,7 @@ RSpec.describe 'ingore pg cancelled errors honeybadger', type: :request do
 
     # use request spec to test HB config
     # https://docs.honeybadger.io/lib/ruby/getting-started/tests-and-honeybadger.html
-    it 'does not report to honeybadger', :focus do
+    it 'does not report to honeybadger' do
       expect {
         # Important: `Honeybadger.flush` ensures that asynchronous notifications
         # are delivered before the test's remaining expectations are verified.
