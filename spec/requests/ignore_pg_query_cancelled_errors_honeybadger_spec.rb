@@ -16,7 +16,8 @@ RSpec.describe 'ingore pg cancelled errors honeybadger', type: :request do
   end
 
   before do
-    Rails.application.routes.draw do
+    # add a test route for this
+    Rails.application.routes.append do
       get :test, to: 'test#test'
     end
     # API key has to be set to get HB reporting in test backend
