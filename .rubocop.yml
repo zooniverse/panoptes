@@ -3,9 +3,6 @@ require:
  - rubocop-performance
  - rubocop-rspec
 
-Style/NumericLiterals:
-  Enabled: false
-
 Layout/LineLength:
   Max: 160
 Layout/SpaceAroundEqualsInParameterDefault:
@@ -15,22 +12,25 @@ Metrics/BlockLength:
   Exclude:
     - '**/*_spec.rb'
     - 'spec/support/*.rb'
+Metrics/MethodLength:
+  Description: 'Avoid methods longer than 12 lines of code.'
+  Max: 12
 
 Rails/SkipsModelValidations:
   Whitelist:
   - update_all
   - touch
 
-Metrics/MethodLength:
-  Description: 'Avoid methods longer than 12 lines of code.'
-  Max: 12
-
+Style/NumericLiterals:
+  Enabled: false
 Style/RegexpLiteral:
   EnforcedStyle: slashes
-
 # disable 'Missing top-level class documentation' warning
 Style/Documentation:
   Enabled: false
+Style/BlockDelimiters:
+  Exclude:
+    - 'spec/**/*'
 
 # new linters - opt in
 Layout/SpaceAroundMethodCallOperator:
