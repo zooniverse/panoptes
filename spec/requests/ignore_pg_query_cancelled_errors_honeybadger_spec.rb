@@ -16,8 +16,8 @@ RSpec.describe 'ingore pg cancelled errors honeybadger', type: :request do
   end
 
   before do
-    # add a test route for this
-    Rails.application.routes.append do
+    # add a test route for this, clear the old ones
+    Rails.application.routes.draw do
       get :test, to: 'test#test'
     end
     # API key has to be set to get HB reporting in test backend
@@ -28,6 +28,9 @@ RSpec.describe 'ingore pg cancelled errors honeybadger', type: :request do
   end
 
   after do
+    # reset the routes back to their default value
+    Rails.application.routes.clear!
+    Rails.application.reload_routes!
     Honeybadger.configure do |config|
       config.api_key = nil
       config.backend = nil
@@ -45,6 +48,7 @@ RSpec.describe 'ingore pg cancelled errors honeybadger', type: :request do
     # https://docs.honeybadger.io/lib/ruby/getting-started/tests-and-honeybadger.html
     it 'does not report to honeybadger' do
       expect {
+        get_request
         # Important: `Honeybadger.flush` ensures that asynchronous notifications
         # are delivered before the test's remaining expectations are verified.
         Honeybadger.flush
