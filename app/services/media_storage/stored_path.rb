@@ -11,9 +11,8 @@ module MediaStorage
       # we have a valid domain prefix here so remove it
       # to allow us to construct the URL correctly
       env_prefix = '/' + Rails.env
-      if uri.path.start_with? env_prefix # remove env prefix if present
-        uri.path.slice! env_prefix
-      end
+      uri.path.slice! env_prefix if uri.path.start_with? env_prefix # remove env prefix if present
+
       File.join(url, uri.path)
     rescue PublicSuffix::DomainNotAllowed
       # failure here indicates we do not have
