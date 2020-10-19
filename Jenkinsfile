@@ -53,6 +53,8 @@ pipeline {
         sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/deployment-production.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
         sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-production.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
         sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-db-migrate-staging.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-rake-task-production.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
+        sh "sed 's/__IMAGE_TAG__/${GIT_COMMIT}/g' kubernetes/job-rake-task-staging.tmpl | kubectl --context azure apply --dry-run=client --record -f -"
       }
     }
 
