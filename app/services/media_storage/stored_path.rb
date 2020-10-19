@@ -10,11 +10,15 @@ module MediaStorage
       PublicSuffix.parse(uri.host)
       # we have a valid domain prefix here so remove it
       # to allow us to construct the URL correctly
+      env_prefix = '/' + Rails.env
+      if uri.path.start_with? env_prefix # remove env prefix if present
+        uri.path.slice! env_prefix
+      end
       File.join(url, uri.path)
     rescue PublicSuffix::DomainNotAllowed
       # failure here indicates we do not have
       # a valid domain prefix in the stored path
-      # e.g. production/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg
+      # e.g. /user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg
       # so we do not need to rewrite the URL
       File.join(url, stored_path)
     end

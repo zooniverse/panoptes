@@ -14,7 +14,13 @@ RSpec.describe MediaStorage::StoredPath do
         'panoptes-uploads.zooniverse.org/production/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg'
       end
       let(:expected_url) do
-        "#{url}/production/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg"
+        "#{url}/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg"
+      end
+
+      before do
+        allow(Rails)
+          .to receive(:env)
+          .and_return('production')
       end
 
       it 'returns a url without the old path prefix' do
@@ -23,6 +29,10 @@ RSpec.describe MediaStorage::StoredPath do
 
       it 'returns the url with our custom domain path prefix' do
         expect(result).to include(url)
+      end
+
+      it 'returns the url without the env prefix' do
+        expect(result).not_to include('/production')
       end
 
       it 'returns the expected url' do
