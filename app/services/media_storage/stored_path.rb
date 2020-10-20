@@ -13,9 +13,8 @@ module MediaStorage
       uri_path = uri.path
 
       env_prefix = '/' + Rails.env
-      if uri_path.start_with? env_prefix # remove env prefix if present
-        uri_path = uri_path.sub(env_prefix, '')
-      end
+      # remove env prefix if present
+      uri_path = uri_path.sub(env_prefix, '') if uri_path.start_with? env_prefix
 
       File.join(url, uri_path)
     rescue PublicSuffix::DomainNotAllowed
