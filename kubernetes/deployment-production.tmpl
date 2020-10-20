@@ -332,6 +332,16 @@ spec:
   maxReplicas: 6
   targetCPUUtilizationPercentage: 80
 ---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+   name: panoptes-production-sidekiq-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: panoptes-production-sidekiq
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
