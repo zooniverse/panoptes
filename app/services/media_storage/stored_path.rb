@@ -7,13 +7,17 @@ module MediaStorage
     # but leave intact any non old s3 URL, i.e. new azure ones
     def self.media_url(url, stored_path)
       uri = URI("https://#{stored_path}")
+      # if the parse succeeds, we know we have a valid domain prefix,
+      # i.e. it is an old s3 stored path - hence, we need to rewrite the url
       PublicSuffix.parse(uri.host)
-      # we have a valid domain prefix here so remove it
-      # to allow us to construct the URL correctly
-      env_prefix = '/' + Rails.env
-      uri.path.slice! env_prefix if uri.path.start_with? env_prefix # remove env prefix if present
+      uri_path = uri.path
 
-      File.join(url, uri.path)
+      env_prefix = '/' + Rails.env
+      if uri_path.start_with? env_prefix # remove env prefix if present
+        uri_path = uri_path.sub(env_prefix, '')
+      end
+
+      File.join(url, uri_path)
     rescue PublicSuffix::DomainNotAllowed
       # failure here indicates we do not have
       # a valid domain prefix in the stored path
