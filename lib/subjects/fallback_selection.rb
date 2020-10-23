@@ -2,8 +2,8 @@ module Subjects
   class FallbackSelection
     attr_reader :workflow, :limit, :options
 
-    def self.num_training_subjects_limit
-      ENV.fetch('FALLBACK_NUM_TRAINING_SUBJECTS_LIMIT', 10)
+    def self.num_training_subjects_denominator
+      ENV.fetch('FALLBACK_NUM_TRAINING_SUBJECTS_DENOMINATOR', 10)
     end
 
     def initialize(workflow, limit, options = {})
@@ -48,7 +48,7 @@ module Subjects
 
       # by default a ~10:1 ratio of real subjects to training
       # modify this ration by num_training_subjects_limit class method
-      training_limit = (limit.to_f / self.class.num_training_subjects_limit).round
+      training_limit = (limit.to_f / self.class.num_training_subjects_denominator).round
 
       SetMemberSubject
         .where(subject_set_id: workflow.training_set_ids)
