@@ -33,13 +33,21 @@ module Subjects
     end
 
     def fallback_selection
-      (non_training_subject_ids | training_subject_ids)
+      selected_training_subject_ids = training_subject_ids
+      if selected_training_subject_ids.empty?
+        non_training_subject_ids
+      else
+        # respect the request limit and return the correct mix of
+        # training and non-training subject ids
+        selected_non_training_subject_ids = non_training_subject_ids.take(non_training_limit)
+        selected_non_training_subject_ids | selected_training_subject_ids
+      end
     end
 
     def non_training_subject_ids
       SetMemberSubject
         .where(subject_set_id: workflow.non_training_subject_set_ids)
-        .limit(non_training_limit)
+        .limit(limit)
         .pluck('set_member_subjects.subject_id')
     end
 

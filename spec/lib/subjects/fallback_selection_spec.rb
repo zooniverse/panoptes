@@ -34,6 +34,10 @@ describe Subjects::FallbackSelection do
       expect(expected_ids).to include(*subject_ids)
     end
 
+    it 'returns the correct number of subjects' do
+      expect(subject_ids.count).to eq(request_limit)
+    end
+
     context 'with training sets on the workflow' do
       let(:training_set_id) { [workflow.subject_set_ids.sample] }
       let(:training_subject_ids) do
