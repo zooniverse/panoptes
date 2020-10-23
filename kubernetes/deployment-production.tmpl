@@ -245,7 +245,7 @@ kind: PodDisruptionBudget
 metadata:
    name: panoptes-production-app-pdb
 spec:
-  minAvailable: 2
+  minAvailable: 50%
   selector:
     matchLabels:
       app: panoptes-production-app
@@ -337,7 +337,7 @@ kind: PodDisruptionBudget
 metadata:
    name: panoptes-production-sidekiq-pdb
 spec:
-  minAvailable: 1
+  minAvailable: 50%
   selector:
     matchLabels:
       app: panoptes-production-sidekiq
