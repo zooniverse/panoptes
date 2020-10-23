@@ -428,6 +428,16 @@ spec:
       targetPort: 6379
   type: NodePort
 ---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+   name: panoptes-production-redis-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: panoptes-production-redis
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
