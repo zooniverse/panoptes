@@ -23,7 +23,8 @@ describe Subjects::FallbackSelection do
 
   describe "#any_workflow_data" do
     let(:subject_set_id) { nil }
-    let(:opts) { { limit: 5, subject_set_id: subject_set_id } }
+    let(:request_limit) { 5 }
+    let(:opts) { { limit: request_limit, subject_set_id: subject_set_id } }
     let(:expected_ids) do
       workflow.set_member_subjects.pluck("set_member_subjects.subject_id")
     end
@@ -46,6 +47,10 @@ describe Subjects::FallbackSelection do
       it 'includes some training subject ids from the workflow' do
         selected_training_subject_ids = training_subject_ids & subject_ids
         expect(selected_training_subject_ids).not_to be_empty
+      end
+
+      it 'returns the correct number of subjects' do
+        expect(subject_ids.count).to eq(request_limit)
       end
     end
 
