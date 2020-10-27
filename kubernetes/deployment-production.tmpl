@@ -245,7 +245,7 @@ kind: PodDisruptionBudget
 metadata:
    name: panoptes-production-app-pdb
 spec:
-  minAvailable: 2
+  minAvailable: 50%
   selector:
     matchLabels:
       app: panoptes-production-app
@@ -337,7 +337,7 @@ kind: PodDisruptionBudget
 metadata:
    name: panoptes-production-sidekiq-pdb
 spec:
-  minAvailable: 1
+  minAvailable: 50%
   selector:
     matchLabels:
       app: panoptes-production-sidekiq
@@ -427,6 +427,16 @@ spec:
       port: 6379
       targetPort: 6379
   type: NodePort
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+   name: panoptes-production-redis-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: panoptes-production-redis
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -227,16 +227,6 @@ spec:
   maxReplicas: 2
   targetCPUUtilizationPercentage: 80
 ---
-apiVersion: policy/v1beta1
-kind: PodDisruptionBudget
-metadata:
-   name: panoptes-staging-app-pdb
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app: panoptes-staging-app
----
 apiVersion: v1
 kind: Service
 metadata:
