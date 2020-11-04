@@ -6,7 +6,7 @@ module Panoptes
       @configuration ||=
         {
           adapter: ENV.fetch('STORAGE_ADAPTER', 'test'),
-          url: ENV['STORAGE_URL'],
+          domain_prefix: ENV['STORAGE_URL'],
           # s3 adapter specific
           prefix: ENV['STORAGE_PREFIX'],
           bucket: ENV['STORAGE_BUCKET'],

@@ -10,36 +10,43 @@ module MediaStorage
   # These URLs need to be rewritten such that domain prefix and env get removed
   # Azure native paths do not need to be rewritten
   module StoredPath
-    # Construct path and join to the passed in URL
-    def self.media_url(url, stored_path)
-      uri = URI("https://#{stored_path}")
-      # if the parse succeeds, we know we have a valid domain prefix,
-      # i.e. it is an old s3 stored path and we need to rewrite it
-      PublicSuffix.parse(uri.host)
+    class << self
+      ENV_PATH_PREFIX = '/' + Rails.env
 
-      uri_path = path_without_env_prefix(uri.path)
-      File.join(url, uri_path)
-    rescue PublicSuffix::DomainNotAllowed
-      # if parse fails, we do not have a valid domain prefix in the stored path
-      # e.g. /user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg
-      # so we do not need to rewrite the URL
-      File.join(url, stored_path)
-    end
+      def media_path(stored_path)
+        rewrite_stored_path(stored_path)
+      rescue PublicSuffix::DomainNotAllowed
+        # a valid stored path without a TLD prefix
+        stored_path
+      end
 
-    def self.media_path(stored_path)
-      uri = URI("https://#{stored_path}")
-      PublicSuffix.parse(uri.host)
-      # S3 path
-      path_without_env_prefix(uri.path)
-    rescue PublicSuffix::DomainNotAllowed
-      # azure path
-      stored_path
-    end
+      def media_url(domain_prefix, stored_path)
+        azure_path = rewrite_stored_path(stored_path)
+      rescue PublicSuffix::DomainNotAllowed
+        azure_path = stored_path
+      ensure
+        # a valid stored path without a TLD prefix, combine with the supplied domain prefix
+        return File.join(domain_prefix, azure_path)
+      end
 
-    private_class_method def self.path_without_env_prefix(uri_path)
-      # remove env prefix if present
-      env_prefix = '/' + Rails.env
-      uri_path.sub(env_prefix, '') if uri_path.start_with? env_prefix
+      private
+
+      def rewrite_stored_path(stored_path)
+        uri = URI("https://#{stored_path}")
+
+        # throw PublicSuffix::DomainNotAllowed if uri.host parse fails
+        # this indicates no valid top level domain (TLD) prefix in the stored path
+        # e.g. /user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg
+        # this means the stored_path is valid and we do not need to rewrite the URL at all
+        PublicSuffix.parse(uri.host)
+
+        # remove Rails env prefix if present (remnant path prefix from s3 land)
+        if uri.path.start_with?(ENV_PATH_PREFIX)
+          uri.path.sub(ENV_PATH_PREFIX, '')
+        else
+          uri.path
+        end
+      end
     end
   end
 end

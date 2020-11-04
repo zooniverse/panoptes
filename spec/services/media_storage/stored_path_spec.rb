@@ -5,12 +5,6 @@ require 'spec_helper'
 RSpec.describe MediaStorage::StoredPath do
   let(:url) { 'https://media.storage.domain/path' }
 
-  before do
-    allow(Rails)
-      .to receive(:env)
-      .and_return('production')
-  end
-
   describe '.media_url' do
     let(:result) do
       described_class.media_url(url, stored_path)
@@ -18,7 +12,7 @@ RSpec.describe MediaStorage::StoredPath do
 
     context 'with a migrated aws stored path' do
       let(:stored_path) do
-        'panoptes-uploads.zooniverse.org/production/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg'
+        'panoptes-uploads.zooniverse.org/test/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg'
       end
       let(:expected_url) do
         "#{url}/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg"
@@ -33,7 +27,7 @@ RSpec.describe MediaStorage::StoredPath do
       end
 
       it 'returns the url without the env prefix' do
-        expect(result).not_to include('/production')
+        expect(result).not_to include('/test')
       end
 
       it 'returns the expected url' do
@@ -60,14 +54,14 @@ RSpec.describe MediaStorage::StoredPath do
 
     context 'with a migrated aws stored path' do
       let(:stored_path) do
-        'panoptes-uploads.zooniverse.org/production/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg'
+        'panoptes-uploads.zooniverse.org/test/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg'
       end
       let(:expected_result) do
         '/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg'
       end
 
       it 'returns a path without the old domain prefix and env prefix' do
-        expect(result).not_to include('panoptes-uploads.zooniverse.org/production')
+        expect(result).not_to include('panoptes-uploads.zooniverse.org/test')
       end
 
       it 'returns the expected path' do
