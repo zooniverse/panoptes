@@ -22,11 +22,10 @@ module MediaStorage
 
       def media_url(domain_prefix, stored_path)
         azure_path = rewrite_stored_path(stored_path)
+        File.join(domain_prefix, azure_path)
       rescue PublicSuffix::DomainNotAllowed
         azure_path = stored_path
-      ensure
-        # a valid stored path without a TLD prefix, combine with the supplied domain prefix
-        return File.join(domain_prefix, azure_path)
+        File.join(domain_prefix, azure_path)
       end
 
       private
