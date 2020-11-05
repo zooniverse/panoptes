@@ -21,10 +21,11 @@ module MediaStorage
       end
 
       def media_url(domain_prefix, stored_path)
-        azure_path = rewrite_stored_path(stored_path)
-        File.join(domain_prefix, azure_path)
-      rescue PublicSuffix::DomainNotAllowed
-        azure_path = stored_path
+        begin
+          azure_path = rewrite_stored_path(stored_path)
+        rescue PublicSuffix::DomainNotAllowed
+          azure_path = stored_path
+        end
         File.join(domain_prefix, azure_path)
       end
 
