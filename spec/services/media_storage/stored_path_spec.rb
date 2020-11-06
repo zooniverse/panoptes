@@ -57,7 +57,7 @@ RSpec.describe MediaStorage::StoredPath do
         'panoptes-uploads.zooniverse.org/test/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg'
       end
       let(:expected_result) do
-        '/user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg'
+        'user_avatar/1e5fc9b5-86f1-4df3-986f-549f02f969a5.jpeg'
       end
 
       it 'returns a path without the old domain prefix and env prefix' do
