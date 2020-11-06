@@ -35,7 +35,7 @@ module MediaStorage
       if opts[:private]
         azure_path = StoredPath.media_path(path)
         signer.signed_uri(
-          client.generate_uri("#{private_container}/#{azure_path}"),
+          client.generate_uri(File.join(private_container, azure_path)),
           false,
           service: 'b', # blob
           permissions: 'r', # read
