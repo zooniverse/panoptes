@@ -11,7 +11,7 @@ module MediaStorage
   # Azure native paths do not need to be rewritten
   module StoredPath
     class << self
-      ENV_PATH_PREFIX = '/' + Rails.env
+      ENV_REMOVAL_REGEX = /\A(?:\/?#{Rails.env}\/?)?(.+)\z/.freeze
 
       def media_path(stored_path)
         rewrite_stored_path(stored_path)
@@ -41,11 +41,7 @@ module MediaStorage
         PublicSuffix.parse(uri.host)
 
         # remove Rails env prefix if present (remnant path prefix from s3 land)
-        if uri.path.start_with?(ENV_PATH_PREFIX)
-          uri.path.sub(ENV_PATH_PREFIX, '')
-        else
-          uri.path
-        end
+        uri.path.match(ENV_REMOVAL_REGEX)[1]
       end
     end
   end
