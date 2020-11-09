@@ -11,7 +11,7 @@ module MediaStorage
   # Azure native paths do not need to be rewritten
   module StoredPath
     class << self
-      ENV_REMOVAL_REGEX = /\A(?:\/?#{Rails.env}\/?)?(.+)\z/
+      ENV_REMOVAL_REGEX = /\A(?:\/?#{Rails.env}\/?)?(.+)\z/.freeze
 
       def media_path(stored_path)
         rewrite_stored_path(stored_path)
