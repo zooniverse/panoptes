@@ -34,7 +34,7 @@ module MediaStorage
     def get_path(path, opts={})
       if opts[:private]
         azure_path = StoredPath.media_path(path)
-        azure_container_path = File.join(private_container, azure_path);
+        azure_container_path = File.join(private_container, azure_path)
         signer.signed_uri(
           client.generate_uri(azure_container_path),
           false,
