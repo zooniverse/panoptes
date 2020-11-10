@@ -8,7 +8,7 @@ RSpec.describe MediaStorage::AzureAdapter do
   let(:private_container) { 'secret-magic-container' }
   let(:opts) do
     {
-      url: 'https://test-uploads.zooniverse.org/container_name',
+      url_prefix: 'https://test-uploads.zooniverse.org/container_name',
       azure_storage_account: storage_account_name,
       azure_storage_access_key: 'fake',
       azure_storage_container_public: public_container,
@@ -117,7 +117,7 @@ RSpec.describe MediaStorage::AzureAdapter do
         allow(MediaStorage::StoredPath).to receive(:media_url)
         src = 'subject_locations/name.jpg'
         adapter.get_path(src)
-        expect(MediaStorage::StoredPath).to have_received(:media_url).with(opts[:url], src)
+        expect(MediaStorage::StoredPath).to have_received(:media_url).with(opts[:url_prefix], src)
       end
 
       it 'returns the path as a https link' do
