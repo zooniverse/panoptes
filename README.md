@@ -6,8 +6,6 @@ The new Zooniverse API for supporting user-created projects.
 
 The Panoptes public API is documented [here](http://docs.panoptes.apiary.io), using [apiary.io](http://apiary.io).
 
-If you're interested in how Panoptes is implemented check out the [wiki](https://github.com/zooniverse/Panoptes/wiki) and the [Data Model Description](https://github.com/zooniverse/Panoptes/wiki/DataModel).
-
 ## Requirements
 
 Since Panoptes uses Docker to manage its environment, the requirements listed below are also found in `docker-compose.yml`. The means by which a new Panoptes instance is created with Docker is located in the `Dockerfile`. If you plan on using Docker to manage Panoptes, skip ahead to Installation.
