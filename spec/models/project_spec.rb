@@ -64,16 +64,18 @@ describe Project, type: :model do
   end
 
   describe 'featured projects' do
-    it 'can be featured' do
-      project = create :project, featured: true
-      expect(Project.featured).to eq([project])
+    let(:featured_project) do
+      create :project, featured: true
     end
 
-    it 'only allows one featured project at a time' do
-      featured_project = create :project, featured: true
+    it 'can be featured' do
+      expect(described_class.featured).to eq([featured_project])
+    end
+
+    it 'allows more than one featured project at a time' do
+      featured_project
       other_project = build :project, featured: true
-      expect(other_project).not_to be_valid
-      expect(other_project.errors[:featured]).to be_present
+      expect(other_project).to be_valid
     end
   end
 
@@ -526,6 +528,27 @@ describe Project, type: :model do
       it 'should return the owner and comms roles emails' do
         expect(project.communication_emails).to match_array([owner_email, comms_user.email])
       end
+    end
+  end
+
+  describe '#available_languages' do
+    let(:project) { build(:project) }
+    let(:primary_language) { project.primary_language }
+
+    it 'includes the primary langage by default' do
+      expect(project.available_languages).to match_array([primary_language])
+    end
+
+    it 'includes languages stored in the configuration' do
+      project.configuration['languages'] = ['es']
+      expected_languages = [primary_language, 'es']
+      expect(project.available_languages).to match_array(expected_languages)
+    end
+
+    it 'deduplicates configuration languages and primary language' do
+      expected_languages = [primary_language, 'es']
+      project.configuration['languages'] = expected_languages
+      expect(project.available_languages).to match_array(expected_languages)
     end
   end
 end

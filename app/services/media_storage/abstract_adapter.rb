@@ -20,7 +20,7 @@ module MediaStorage
       raise NotImplementedError
     end
 
-    def delete_file(path)
+    def delete_file(path, opts={})
       raise NotImplementedError
     end
 

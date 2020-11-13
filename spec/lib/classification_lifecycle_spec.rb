@@ -113,11 +113,6 @@ describe ClassificationLifecycle do
         expect(ClassificationCountWorker).to_not receive(:perform_async)
         subject.execute
       end
-
-      it "should call #create_export_row" do
-        expect(subject).to receive(:create_export_row)
-        subject.execute
-      end
     end
 
     context "when invalid classification updates are made" do
@@ -407,11 +402,6 @@ describe ClassificationLifecycle do
       subject.queue_associated_workers
     end
 
-    it "should call create_export_row" do
-      expect(subject).to receive(:create_export_row)
-      subject.queue_associated_workers
-    end
-
     it "should call notify_subject_selector" do
       expect(subject).to receive(:notify_subject_selector)
       subject.queue_associated_workers
@@ -549,36 +539,6 @@ describe ClassificationLifecycle do
           subject.add_seen_before_for_user
           expect(classification.metadata[:seen_before]).to eq(true)
         end
-      end
-    end
-  end
-
-  describe "#create_export_row" do
-    before do
-      Panoptes.flipper[:create_classification_export_row_in_lifecycle].enable
-    end
-
-    after(:each) { subject.create_export_row }
-
-    it 'should call the classification export row worker' do
-      expect(ClassificationExportRowWorker)
-      .to receive(:perform_async)
-      .with(classification.id)
-    end
-
-    context "when classification is incomplete" do
-      let(:classification) { build(:classification, completed: false) }
-
-      it 'should not call the classification export row worker' do
-        expect(ClassificationExportRowWorker).not_to receive(:perform_async)
-      end
-    end
-
-    context "when the create export_row feature flag is disabled" do
-
-      it 'should not call the classification export row worker' do
-        Panoptes.flipper[:create_classification_export_row_in_lifecycle].disable
-        expect(ClassificationExportRowWorker).not_to receive(:perform_async)
       end
     end
   end

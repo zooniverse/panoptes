@@ -11,20 +11,40 @@ describe ProjectSerializer do
     s
   end
 
-  it "should preload the serialized associations by default" do
-    expect_any_instance_of(Project::ActiveRecord_Relation)
-      .to receive(:preload)
-      .with(*ProjectSerializer.preloads)
-      .and_call_original
-    ProjectSerializer.page({}, Project.all, {})
-  end
+  describe 'preloading associations for page' do
+    it 'preloads avatars only with cards context' do
+      expect_any_instance_of(Project::ActiveRecord_Relation)
+        .to receive(:preload)
+        .with(:avatar)
+        .and_call_original
+      ProjectSerializer.page({}, Project.all, {cards: true})
+    end
 
-  it "should preload avatars with cards context" do
-    expect_any_instance_of(Project::ActiveRecord_Relation)
-      .to receive(:preload)
-      .with(:avatar)
-      .and_call_original
-    ProjectSerializer.page({}, Project.all, {cards: true})
+    it 'preloads the specified associations by default' do
+      expect_any_instance_of(Project::ActiveRecord_Relation)
+        .to receive(:preload)
+        .with(*ProjectSerializer.preloads)
+        .and_call_original
+      ProjectSerializer.page({}, Project.all, {})
+    end
+
+    it 'manually preloads the workflow associations' do
+      project
+      expect(described_class)
+        .to receive(:preload_workflows)
+        .with(Project.all.pluck(:id))
+        .and_call_original
+      ProjectSerializer.page({}, Project.all, {})
+    end
+
+    it 'handles includes correctly' do
+      project
+      expected_workflow_ids = project.workflows.pluck(:id).map(&:to_s)
+      params = { include: 'workflows,active_workflows' }
+      result = described_class.page(params, Project.all, {})
+      linked_worklfow_ids = result.dig(:linked, :workflows).map { |w| w[:id] }
+      expect(linked_worklfow_ids).to match_array(expected_workflow_ids)
+    end
   end
 
   it_should_behave_like "a panoptes restpack serializer", "test_owner_include", "test_blank_links" do

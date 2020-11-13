@@ -161,8 +161,10 @@ class Workflow < ActiveRecord::Base
   end
 
   def training_set_ids
-    config_training_set_ids = Array.wrap(configuration.dig("training_set_ids"))
-    config_training_set_ids.reject { |id| id.to_i.zero? }
+    config_training_set_ids = Array.wrap(configuration.dig('training_set_ids'))
+    config_training_set_ids = config_training_set_ids.map(&:to_i)
+    config_training_set_ids = config_training_set_ids.reject(&:zero?)
+    config_training_set_ids & subject_set_ids
   end
 
   def selector_page_size(default_page_size=10)

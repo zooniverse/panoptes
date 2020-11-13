@@ -6,8 +6,6 @@ The new Zooniverse API for supporting user-created projects.
 
 The Panoptes public API is documented [here](http://docs.panoptes.apiary.io), using [apiary.io](http://apiary.io).
 
-If you're interested in how Panoptes is implemented check out the [wiki](https://github.com/zooniverse/Panoptes/wiki) and the [Data Model Description](https://github.com/zooniverse/Panoptes/wiki/DataModel).
-
 ## Requirements
 
 Since Panoptes uses Docker to manage its environment, the requirements listed below are also found in `docker-compose.yml`. The means by which a new Panoptes instance is created with Docker is located in the `Dockerfile`. If you plan on using Docker to manage Panoptes, skip ahead to Installation.
@@ -50,9 +48,6 @@ We only support running Panoptes via Docker and Docker Compose. If you'd like to
 
 0. Setup the configuration files via a rake task
     * Run: `docker-compose run --rm panoptes bundle exec rake configure:local`
-    * Run: `docker-compose run --rm panoptes bundle exec rake configure:doorkeeper_keys`
-    * Alternatively, manually copy the example configuration files and setup the doorkeeper keys.
-      - Run: `find config/*.yml.hudson -exec bash -c 'for x; do x=${x#./}; cp -i "$x" "${x/.hudson/}"; done' _ {} +`
 
 0. Create and run the application containers with `docker-compose up`
 
@@ -78,7 +73,7 @@ There are multiple options for setting up a testing environment:
         * Use rspec focus keyword in your specs or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test panoptes rspec path/to/spec/file.rb`
 
 0. Use docker to run a testing environment bash shell and run test commands .
-    1. Run `docker-compose run --rm -e RAILS_ENV=test panoptes bash` to start the containers
+    1. Run `docker-compose run --service-ports --rm -e RAILS_ENV=test panoptes bash` to start the containers
     0. Run `bundle exec rspec` to run the full test suite
 
 0. Use parts of docker-compose manually and wire them up manually to create a testing environment.

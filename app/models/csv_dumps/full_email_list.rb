@@ -4,7 +4,8 @@ module CsvDumps
 
     EXPORT_FIELDS = {
       global: :global_email_communication,
-      beta: :beta_email_communication
+      beta: :beta_email_communication,
+      nasa: :nasa_email_communication
     }.with_indifferent_access.freeze
 
     def initialize(type)

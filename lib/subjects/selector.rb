@@ -1,6 +1,5 @@
 module Subjects
   class Selector
-    include Logging
 
     class MissingParameter < StandardError; end
     class MissingSubjectSet < StandardError; end
@@ -40,7 +39,11 @@ module Subjects
       end
 
       if subject_ids.blank?
-        subject_ids = fallback_selector.any_workflow_data
+        subject_ids = DatabaseReplica.read('fallback_subject_selection_from_replica') do
+          fallback_limit = ENV.fetch('FALLBACK_SELECTION_LIMIT', 100)
+          opts = { subject_set_id: subject_set_id }
+          FallbackSelection.new(workflow, fallback_limit, opts).any_workflow_data
+        end
         @selection_state = 2
       end
 
@@ -79,25 +82,22 @@ module Subjects
       ).select
     end
 
-    def fallback_selector_opts
-      { limit: subjects_page_size, subject_set_id: subject_set_id }
-    end
-
     def fallback_selector
       @fallback_selector ||= PostgresqlSelection.new(
         workflow,
         user,
-        fallback_selector_opts
+        { limit: subjects_page_size, subject_set_id: subject_set_id }
       )
     end
 
     def internal_fallback
-      subject_ids = fallback_selector.select
+      subject_ids = DatabaseReplica.read('fallback_subject_selection_from_replica') do
+        fallback_selector.select
+      end
 
-      if data_available = !subject_ids.empty?
-        if Panoptes.flipper[:selector_sync_error_reload].enabled?
-          NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
-        end
+      data_available = !subject_ids.empty?
+      if data_available && Panoptes.flipper[:selector_sync_error_reload].enabled?
+        NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
       end
 
       subject_ids
