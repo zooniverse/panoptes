@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: panoptes-production-azure-canary-app
+  name: panoptes-production-canary-app
   labels:
-    app: panoptes-production-azure-canary-app
+    app: panoptes-production-canary-app
 spec:
   selector:
     matchLabels:
-      app: panoptes-production-azure-canary-app
+      app: panoptes-production-canary-app
   template:
     metadata:
       labels:
-        app: panoptes-production-azure-canary-app
+        app: panoptes-production-canary-app
     spec:
       containers:
-        - name: panoptes-production-azure-canary-app
+        - name: panoptes-production-canary-app
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
@@ -123,7 +123,7 @@ metadata:
   name: panoptes-production-canary
 spec:
   selector:
-    app: panoptes-production-azure-canary-app
+    app: panoptes-production-canary-app
   ports:
     - protocol: TCP
       port: 80
