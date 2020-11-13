@@ -1,14 +1,10 @@
 class AddSubjectGroupResource < ActiveRecord::Migration
   def change
     create_table :subject_groups do |t|
-      # what else about the 'Group' will need to be recorded to understand the
-      # selection, creation and classification events for hte 'group' of subjects?
+      t.jsonb :context, null: false, default: {}
 
       # record which project the subject group belongs to
-      # I can't see us querying the Project.subject_groups relation
-      # so i don't think we will need an index on this
       t.references :project, foreign_key: true, null: false
-
       t.timestamps null: false
     end
 

@@ -1215,6 +1215,7 @@ ALTER SEQUENCE public.subject_group_members_id_seq OWNED BY public.subject_group
 
 CREATE TABLE public.subject_groups (
     id integer NOT NULL,
+    context jsonb DEFAULT '{}'::jsonb NOT NULL,
     project_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
