@@ -2,13 +2,8 @@
 -- PostgreSQL database dump
 --
 
-<<<<<<< HEAD
 -- Dumped from database version 9.5.21
--- Dumped by pg_dump version 9.5.21
-=======
--- Dumped from database version 9.5.20
--- Dumped by pg_dump version 9.5.22
->>>>>>> master
+-- Dumped by pg_dump version 9.5.23
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -183,54 +178,6 @@ ALTER SEQUENCE public.authorizations_id_seq OWNED BY public.authorizations.id;
 
 
 --
-<<<<<<< HEAD
--- Name: classification_export_rows; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.classification_export_rows (
-    id integer NOT NULL,
-    classification_id integer NOT NULL,
-    project_id integer NOT NULL,
-    workflow_id integer NOT NULL,
-    user_id integer,
-    user_name character varying,
-    user_ip character varying,
-    workflow_name character varying,
-    workflow_version character varying,
-    classification_created_at timestamp without time zone,
-    gold_standard boolean,
-    expert character varying,
-    metadata jsonb,
-    annotations jsonb,
-    subject_data jsonb,
-    subject_ids character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: classification_export_rows_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.classification_export_rows_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: classification_export_rows_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.classification_export_rows_id_seq OWNED BY public.classification_export_rows.id;
-
-
---
-=======
->>>>>>> master
 -- Name: classification_subjects; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1230,7 +1177,6 @@ ALTER SEQUENCE public.set_member_subjects_id_seq OWNED BY public.set_member_subj
 
 
 --
-<<<<<<< HEAD
 -- Name: subject_group_members; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1295,8 +1241,6 @@ ALTER SEQUENCE public.subject_groups_id_seq OWNED BY public.subject_groups.id;
 
 
 --
-=======
->>>>>>> master
 -- Name: subject_set_imports; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1881,44 +1825,6 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
-<<<<<<< HEAD
--- Name: versions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.versions (
-    id integer NOT NULL,
-    item_type character varying NOT NULL,
-    item_id integer NOT NULL,
-    event character varying NOT NULL,
-    whodunnit character varying,
-    object text,
-    created_at timestamp without time zone,
-    object_changes text
-);
-
-
---
--- Name: versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.versions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.versions_id_seq OWNED BY public.versions.id;
-
-
---
-=======
->>>>>>> master
 -- Name: workflow_contents; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2465,17 +2371,6 @@ ALTER TABLE ONLY public.authorizations
 
 
 --
-<<<<<<< HEAD
--- Name: classification_export_rows_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.classification_export_rows
-    ADD CONSTRAINT classification_export_rows_pkey PRIMARY KEY (id);
-
-
---
-=======
->>>>>>> master
 -- Name: classifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2684,7 +2579,6 @@ ALTER TABLE ONLY public.set_member_subjects
 
 
 --
-<<<<<<< HEAD
 -- Name: subject_group_members_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2701,8 +2595,6 @@ ALTER TABLE ONLY public.subject_groups
 
 
 --
-=======
->>>>>>> master
 -- Name: subject_set_imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2831,17 +2723,6 @@ ALTER TABLE ONLY public.users
 
 
 --
-<<<<<<< HEAD
--- Name: versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.versions
-    ADD CONSTRAINT versions_pkey PRIMARY KEY (id);
-
-
---
-=======
->>>>>>> master
 -- Name: workflow_contents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2930,30 +2811,6 @@ CREATE INDEX index_authorizations_on_user_id ON public.authorizations USING btre
 
 
 --
-<<<<<<< HEAD
--- Name: index_classification_export_rows_on_classification_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_classification_export_rows_on_classification_id ON public.classification_export_rows USING btree (classification_id);
-
-
---
--- Name: index_classification_export_rows_on_project_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_classification_export_rows_on_project_id ON public.classification_export_rows USING btree (project_id);
-
-
---
--- Name: index_classification_export_rows_on_workflow_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_classification_export_rows_on_workflow_id ON public.classification_export_rows USING btree (workflow_id);
-
-
---
-=======
->>>>>>> master
 -- Name: index_classification_subjects_on_subject_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3479,7 +3336,6 @@ CREATE INDEX index_set_member_subjects_on_subject_set_id ON public.set_member_su
 
 
 --
-<<<<<<< HEAD
 -- Name: index_subject_group_members_on_subject_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3494,8 +3350,6 @@ CREATE INDEX index_subject_group_members_on_subject_id ON public.subject_group_m
 
 
 --
-=======
->>>>>>> master
 -- Name: index_subject_set_imports_on_subject_set_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3741,8 +3595,6 @@ CREATE INDEX index_users_on_lower_names ON public.users USING btree (lower((logi
 
 
 --
-<<<<<<< HEAD
-=======
 -- Name: index_users_on_nasa_email_communication; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3750,7 +3602,6 @@ CREATE INDEX index_users_on_nasa_email_communication ON public.users USING btree
 
 
 --
->>>>>>> master
 -- Name: index_users_on_private_profile; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3793,16 +3644,6 @@ CREATE UNIQUE INDEX index_users_on_zooniverse_id ON public.users USING btree (zo
 
 
 --
-<<<<<<< HEAD
--- Name: index_versions_on_item_type_and_item_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_versions_on_item_type_and_item_id ON public.versions USING btree (item_type, item_id);
-
-
---
-=======
->>>>>>> master
 -- Name: index_workflow_contents_on_workflow_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4945,9 +4786,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190524111214');
 
 INSERT INTO schema_migrations (version) VALUES ('20190624094308');
 
-<<<<<<< HEAD
-INSERT INTO schema_migrations (version) VALUES ('20200313125219');
-=======
 INSERT INTO schema_migrations (version) VALUES ('20200513124310');
 
 INSERT INTO schema_migrations (version) VALUES ('20200714191914');
@@ -4957,5 +4795,6 @@ INSERT INTO schema_migrations (version) VALUES ('20200716170833');
 INSERT INTO schema_migrations (version) VALUES ('20200717155424');
 
 INSERT INTO schema_migrations (version) VALUES ('20200720125246');
->>>>>>> master
+
+INSERT INTO schema_migrations (version) VALUES ('20201113151433');
 

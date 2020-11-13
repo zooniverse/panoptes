@@ -1,6 +1,4 @@
-# frozen_string_literal: true
-
-class AddSubjectGroupModel < ActiveRecord::Migration
+class AddSubjectGroupResource < ActiveRecord::Migration
   def change
     create_table :subject_groups do |t|
       # what else about the 'Group' will need to be recorded to understand the
