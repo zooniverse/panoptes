@@ -38,8 +38,12 @@ describe SubjectGroup, type: :model do
     end
 
     describe '#key' do
+      it 'sets the key on save' do
+        expect { subject_group.save }.to change(subject_group, :key)
+      end
+
       it 'respects the display_order of the members' do
-        subject_group.valid?
+        subject_group.save
         expect(subject_group.key).to match(expected_key)
       end
     end

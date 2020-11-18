@@ -8,9 +8,10 @@ class SubjectGroup < ActiveRecord::Base
 
   validates :project, presence: true
   validates :members, presence: true
-  validates :key, presence: true
 
-  before_validation :set_key, on: :create
+  # ensure the key is set before save - manually too
+  before_save :set_key, on: :create
+  before_save :create_grouped_subject, on: :create
 
   # custom member record association ordering
   # to ensure we specify the key order and uniquely identify this subject group
