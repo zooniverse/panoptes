@@ -5,7 +5,7 @@ require 'spec_helper'
 describe SubjectGroup, type: :model do
   let(:subject_group) { build(:subject_group) }
 
-  it 'has a valid factory', :focus do
+  it 'has a valid factory' do
     expect(subject_group).to be_valid
   end
 
@@ -17,6 +17,32 @@ describe SubjectGroup, type: :model do
   it 'is invalid without any members' do
     subject_group.members = []
     expect(subject_group).to be_invalid
+  end
+
+  context 'with out of order member records' do
+    let(:current_members) { subject_group.members }
+    let(:another_member) { build(:subject_group_member, subject_group: subject_group) }
+    let(:out_of_order_members) { [another_member] | current_members }
+    let(:expected_key) do
+      out_of_order_members.sort { |m| m.display_order }.map(&:subject_id).join('-') # rubocop:disable Style/SymbolProc
+    end
+
+    before do
+      allow(subject_group).to receive(:members).and_return(out_of_order_members)
+    end
+
+    describe '#members_in_display_order' do
+      it 'respects the display_order of the members' do
+        expect(subject_group.members_in_display_order).to match_array(current_members | [another_member])
+      end
+    end
+
+    describe '#key' do
+      it 'respects the display_order of the members' do
+        subject_group.valid?
+        expect(subject_group.key).to match(expected_key)
+      end
+    end
   end
 
   describe '#subjects' do
