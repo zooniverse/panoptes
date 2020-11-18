@@ -8,8 +8,12 @@ class AddSubjectGroupResource < ActiveRecord::Migration
 
       # record which project the subject group belongs to
       t.references :project, foreign_key: true, null: false
+      # record the placeholder subject created for this group
+      t.belongs_to :group_subject, null: false
       t.timestamps null: false
     end
+    # add a subject FK to the group_subject_id column
+    add_foreign_key :subject_groups, :subjects, column: :group_subject_id
 
     create_table :subject_group_members do |t|
       t.references :subject_group, index: true, foreign_key: true

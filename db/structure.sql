@@ -1218,6 +1218,7 @@ CREATE TABLE public.subject_groups (
     context jsonb DEFAULT '{}'::jsonb NOT NULL,
     key character varying NOT NULL,
     project_id integer NOT NULL,
+    group_subject_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -3971,6 +3972,14 @@ ALTER TABLE ONLY public.recents
 
 ALTER TABLE ONLY public.organization_page_versions
     ADD CONSTRAINT fk_rails_53b1c6ff8a FOREIGN KEY (organization_page_id) REFERENCES public.organization_pages(id);
+
+
+--
+-- Name: fk_rails_59adcbe133; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_groups
+    ADD CONSTRAINT fk_rails_59adcbe133 FOREIGN KEY (group_subject_id) REFERENCES public.subjects(id);
 
 
 --
