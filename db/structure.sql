@@ -3355,7 +3355,7 @@ CREATE INDEX index_subject_group_members_on_subject_id ON public.subject_group_m
 -- Name: index_subject_groups_on_key; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_subject_groups_on_key ON public.subject_groups USING btree (key);
+CREATE UNIQUE INDEX index_subject_groups_on_key ON public.subject_groups USING btree (key);
 
 
 --
