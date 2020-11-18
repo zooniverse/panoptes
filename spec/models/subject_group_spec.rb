@@ -5,12 +5,17 @@ require 'spec_helper'
 describe SubjectGroup, type: :model do
   let(:subject_group) { build(:subject_group) }
 
-  it 'has a valid factory' do
+  it 'has a valid factory', :focus do
     expect(subject_group).to be_valid
   end
 
   it 'is invalid without a project_id' do
     subject_group.project = nil
+    expect(subject_group).to be_invalid
+  end
+
+  it 'is invalid without any members' do
+    subject_group.members = []
     expect(subject_group).to be_invalid
   end
 
@@ -32,11 +37,10 @@ describe SubjectGroup, type: :model do
     it 'cleans up the group member records' do
       members = subject_group.members
       subject_group.destroy
-      binding.pry
       expect(members.map(&:destroyed?)).to all(be true)
     end
 
-    it 'is leaves the subjects intact', :focus do
+    it 'is leaves the subjects intact' do
       # use true to force the assocation load
       test_subjects = subject_group.subjects(true)
       subject_group.destroy

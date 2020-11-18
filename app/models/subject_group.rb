@@ -7,4 +7,15 @@ class SubjectGroup < ActiveRecord::Base
 
   validates :project, presence: true
   validates :members, presence: true
+  validates :key, presence: true
+
+  before_validation :set_key, on: :create
+
+  private
+
+  def set_key
+    return if key.present? && members.present?
+
+    self.key = members.map(&:subject_id).join('-')
+  end
 end
