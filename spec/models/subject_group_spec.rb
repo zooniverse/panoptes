@@ -77,4 +77,28 @@ describe SubjectGroup, type: :model do
       expect(test_subjects.map(&:destroyed?)).to all(be false)
     end
   end
+
+  describe '#group_subject', :focus do
+    let(:subject_group) { build(:subject_group) }
+    let(:subject) { subject_group.members.first.subject }
+    let(:project_id) { subject.project_id }
+    let(:upload_user_id) { subject.upload_user_id }
+
+    before do
+      allow(ENV).to receive(:fetch).with('SUBJECT_GROUP_PROJECT_ID').and_return(project_id)
+      allow(ENV).to receive(:fetch).with('SUBJECT_GROUP_UPLOAD_USER_ID').and_return(upload_user_id)
+    end
+
+    it 'creates the group_subject on save' do
+      expect { subject_group.save }.to change { subject_group.group_subject }
+    end
+
+    it 'creates the group_subject based on the subject data' do
+      subject_group.save
+      locations_in_order = subject_group.members_in_display_order.map(&:subject).map(&:locations).flatten
+      expected_locations = locations_in_order.map { |loc| "https://#{loc.src}" }
+      result_locations = subject_group.group_subject&.locations.map(&:src)
+      expect(result_locations).to match(expected_locations)
+    end
+  end
 end
