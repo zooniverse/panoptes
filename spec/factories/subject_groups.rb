@@ -3,9 +3,11 @@
 FactoryBot.define do
   factory :subject_group do
     project { build(:project) }
+    group_subject { build(:subject) }
+    sequence(:key, &:to_s)
 
     after(:build) do |subject_group|
-      member = create(:subject_group_member, subject_group: subject_group)
+      member = build(:subject_group_member, subject_group: subject_group)
       subject_group.members << member
     end
   end

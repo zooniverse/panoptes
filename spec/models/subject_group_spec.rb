@@ -19,13 +19,20 @@ describe SubjectGroup, type: :model do
     expect(subject_group).to be_invalid
   end
 
+  it 'is invalid without a key' do
+    subject_group.key = nil
+    expect(subject_group).to be_invalid
+  end
+
+  it 'is invalid without a group_subject_id' do
+    subject_group.group_subject = nil
+    expect(subject_group).to be_invalid
+  end
+
   context 'with out of order member records' do
     let(:current_members) { subject_group.members }
     let(:another_member) { build(:subject_group_member, subject_group: subject_group) }
     let(:out_of_order_members) { [another_member] | current_members }
-    let(:expected_key) do
-      out_of_order_members.sort { |m| m.display_order }.map(&:subject_id).join('-') # rubocop:disable Style/SymbolProc
-    end
 
     before do
       allow(subject_group).to receive(:members).and_return(out_of_order_members)
@@ -34,17 +41,6 @@ describe SubjectGroup, type: :model do
     describe '#members_in_display_order' do
       it 'respects the display_order of the members' do
         expect(subject_group.members_in_display_order).to match_array(current_members | [another_member])
-      end
-    end
-
-    describe '#key' do
-      it 'sets the key on save' do
-        expect { subject_group.save }.to change(subject_group, :key)
-      end
-
-      it 'respects the display_order of the members' do
-        subject_group.save
-        expect(subject_group.key).to match(expected_key)
       end
     end
   end
@@ -75,30 +71,6 @@ describe SubjectGroup, type: :model do
       test_subjects = subject_group.subjects(true)
       subject_group.destroy
       expect(test_subjects.map(&:destroyed?)).to all(be false)
-    end
-  end
-
-  describe '#group_subject', :focus do
-    let(:subject_group) { build(:subject_group) }
-    let(:subject) { subject_group.members.first.subject }
-    let(:project_id) { subject.project_id }
-    let(:upload_user_id) { subject.upload_user_id }
-
-    before do
-      allow(ENV).to receive(:fetch).with('SUBJECT_GROUP_PROJECT_ID').and_return(project_id)
-      allow(ENV).to receive(:fetch).with('SUBJECT_GROUP_UPLOAD_USER_ID').and_return(upload_user_id)
-    end
-
-    it 'creates the group_subject on save' do
-      expect { subject_group.save }.to change { subject_group.group_subject }
-    end
-
-    it 'creates the group_subject based on the subject data' do
-      subject_group.save
-      locations_in_order = subject_group.members_in_display_order.map(&:subject).map(&:locations).flatten
-      expected_locations = locations_in_order.map { |loc| "https://#{loc.src}" }
-      result_locations = subject_group.group_subject&.locations.map(&:src)
-      expect(result_locations).to match(expected_locations)
     end
   end
 end
