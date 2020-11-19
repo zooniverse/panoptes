@@ -17,11 +17,22 @@ module SubjectGroups
       SubjectGroup.transaction(requires_new: true) do
         # save this subject_group and all the associated records (members, group_subject)
         subject_group.save!
+        # track the subject_group on the placeholder subject metadata
+        # useful for the subject exports and downstream analysis
+        # to know how the group is comprised of what subjects
+        # possible use in online retirement as well - TBD
+        update_group_subject_metadata(subject_group)
       end
       subject_group
     end
 
     private
+
+    def ensure_all_subjects_exist(subject_ids_size, group_subjects_in_order_size)
+      return if subject_ids_size == group_subjects_in_order_size
+
+      raise Error, 'Number of found subjects does not match the size of param subject_ids'
+    end
 
     def build_subject_group(subjects)
       subject_group = SubjectGroup.new(project: project, key: subject_group_key)
@@ -58,8 +69,11 @@ module SubjectGroups
     def build_subject_group_member(subject_group, subject, index)
       SubjectGroupMember.new(
         # TODO: look at adding some of the selection context in here
-        # is the workflow finished? (useful probs not)
-        # selecter state? is probably useful
+        # workflow finished? (useful probs not as retirement is offline for this project)
+        # selecter state is probably useful
+        # the passed in subject ids in their order?
+        # selection timing will be tracked by the record timestamps...
+        # what else?
         # context: {hash_of_useful_selector_context_info}
         project: project,
         subject: subject,
@@ -84,10 +98,14 @@ module SubjectGroups
       Subject.location_attributes_from_params(external_locations.reverse)
     end
 
-    def ensure_all_subjects_exist(subject_ids_size, group_subjects_in_order_size)
-      return if subject_ids_size == group_subjects_in_order_size
-
-      raise Error, 'Number of found subjects does not match the size of param subject_ids'
+    def update_group_subject_metadata(subject_group)
+      group_subject = subject_group.group_subject
+      group_subject_metadata = group_subject.metadata
+      group_subject_metadata['subject_group'] = {
+        subject_group_id: subject_group.id,
+        group_subject_ids: subject_group.key
+      }
+      group_subject.update_column(:metadata, group_subject_metadata) #rubocop:disable Rails/SkipsModelValidations
     end
   end
 end

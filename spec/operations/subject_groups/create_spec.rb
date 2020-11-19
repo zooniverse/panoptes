@@ -52,5 +52,11 @@ describe SubjectGroups::Create do
       result_locations = created_subject_group.group_subject.locations.map(&:src)
       expect(result_locations).to match(expected_locations)
     end
+
+    it 'tracks the subject_group id & subject_key in the group_subject metadata' do
+      group_subject = created_subject_group.group_subject
+      subject_group_metadata = { subject_group_id: created_subject_group.id, group_subject_ids: created_subject_group.key }
+      expect(group_subject.metadata['subject_group']).to match(subject_group_metadata)
+    end
   end
 end
