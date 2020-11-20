@@ -16,7 +16,6 @@ class User < ActiveRecord::Base
     :recoverable, :rememberable, :trackable, :validatable
 
   has_many :classifications, dependent: :restrict_with_exception
-  has_many :authorizations, dependent: :destroy
   has_many :collection_preferences, class_name: "UserCollectionPreference", dependent: :destroy
   has_many :project_preferences, class_name: "UserProjectPreference", dependent: :destroy
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner, dependent: :destroy
@@ -226,7 +225,7 @@ class User < ActiveRecord::Base
   end
 
   def email_required?
-    authorizations.blank? && !disabled?
+    !disabled?
   end
 
   def receives_email?
