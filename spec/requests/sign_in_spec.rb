@@ -9,11 +9,11 @@ describe "user sign in sessions", type: :request do
         get_sign_in
       end
 
-      it "should return the login options" do
+      it "should return the login options", do
 
         aggregate_failures "success" do
           expect(response.status).to eq(200)
-          expect(json_response).to include('login', 'facebook')
+          expect(json_response).to include('login')
         end
       end
 

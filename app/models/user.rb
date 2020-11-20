@@ -13,8 +13,7 @@ class User < ActiveRecord::Base
   attr_accessor :minor_age
 
   devise :database_authenticatable, :registerable,
-    :recoverable, :rememberable, :trackable, :validatable,
-    :omniauthable, omniauth_providers: [:facebook, :google_oauth2]
+    :recoverable, :rememberable, :trackable, :validatable
 
   has_many :classifications, dependent: :restrict_with_exception
   has_many :authorizations, dependent: :destroy
@@ -128,20 +127,6 @@ class User < ActiveRecord::Base
         if has_not_recently_classified
           yield(dormant_user)
         end
-      end
-    end
-  end
-
-  def self.from_omniauth(auth_hash)
-    transaction do
-      auth = Authorization.from_omniauth(auth_hash)
-      auth.user ||= create! do |u|
-        u.email = auth_hash.info.email
-        u.display_name = auth_hash.info.name
-        u.login = uniqueify(:login, sanitize_login(u.display_name))
-        u.password = Devise.friendly_token[0,20]
-        u.build_identity_group
-        u.authorizations << auth
       end
     end
   end
