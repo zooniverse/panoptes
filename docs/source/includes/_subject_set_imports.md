@@ -7,10 +7,10 @@ This resource is useful when a researcher has a large batch to add. The upload p
 1. A researcher uploads image files into a web accessible location (e.g. s3 bucket, azure blob store, etc).
 2. She also creates a manifest file (format described below) and uploads the manifest to a web accessible location.
    + The manifest file describes ['subjects'](https://help.zooniverse.org/getting-started/glossary/), which is the Zooniverse term for something that is to be classified.
-      + A subject is made up of:
-          + a unique UUID
-          + one or more URLs that host media files e.g. image, video, audio.
-          + metadata described as key-value pairs.
+   + A subject is made up of:
+     + a unique UUID
+     + one or more URLs that host media files e.g. image, video, audio.
+     + metadata described as key-value pairs.
 3. In the Zooniverse project builder, the researcher navigates to the subject set to which they would like to have the subjects added.
 4. The researcher then clicks "Import manifest" and enters the URL to the manifest (from by step 2 above).
 5. This calls the Zooniverse API which enqueues a background job on the Zooniverse servers.
@@ -24,11 +24,7 @@ The Zooniverse project builder will then make the Import button more prominent a
 
 After approval, when the researcher needs to get a full set of data into their Zooniverse project, at the end the supertask can call the Zooniverse API to trigger the import rather than requesting the researcher to go back to the project builder and click a button.
 
-***
-
 ## Zooniverse API Feature Description
-
-***
 
 ### Creating a new subject set import
 
@@ -49,8 +45,6 @@ Content-Type: application/json
 
 Returns a SubjectSetImport resource with an ID. This resource can be polled in order to get the status of the import.
 
-***
-
 ### Retrieve a single import
 
 ```http
@@ -61,8 +55,6 @@ Content-Type: application/json
 
 + Parameters
   + id (required, integer) ... integer id of the resource to retrieve
-
-***
 
 ## Manifest CSV format
 
