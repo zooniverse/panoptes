@@ -823,16 +823,13 @@ recommended. Instead, use the link endpoints explained below.</p>
 <li>She also creates a manifest file (format described below) and uploads the manifest to a web accessible location.
 
 <ul>
-<li>The manifest file describes <a href="https://help.zooniverse.org/getting-started/glossary/">&#39;subjects&#39;</a>, which is the Zooniverse term for something that is to be classified.
-
-<ul>
+<li>The manifest file describes <a href="https://help.zooniverse.org/getting-started/glossary/">&#39;subjects&#39;</a>, which is the Zooniverse term for something that is to be classified.</li>
 <li>A subject is made up of:
 
 <ul>
 <li>a unique UUID</li>
 <li>one or more URLs that host media files e.g. image, video, audio.</li>
 <li>metadata described as key-value pairs.</li>
-</ul></li>
 </ul></li>
 </ul></li>
 <li>In the Zooniverse project builder, the researcher navigates to the subject set to which they would like to have the subjects added.</li>
@@ -849,11 +846,7 @@ recommended. Instead, use the link endpoints explained below.</p>
 <p>The Zooniverse project builder will then make the Import button more prominent and prefill the URL.</p>
 
 <p>After approval, when the researcher needs to get a full set of data into their Zooniverse project, at the end the supertask can call the Zooniverse API to trigger the import rather than requesting the researcher to go back to the project builder and click a button.</p>
-
-<hr>
-<h2 id='zooniverse-api-feature-description'>Zooniverse API Feature Description</h2>
-<hr>
-<h3 id='creating-a-new-subject-set-import'>Creating a new subject set import</h3><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/subject_set_imports</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='zooniverse-api-feature-description'>Zooniverse API Feature Description</h2><h3 id='creating-a-new-subject-set-import'>Creating a new subject set import</h3><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/subject_set_imports</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
@@ -867,8 +860,6 @@ recommended. Instead, use the link endpoints explained below.</p>
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Returns a SubjectSetImport resource with an ID. This resource can be polled in order to get the status of the import.</p>
-
-<hr>
 <h3 id='retrieve-a-single-import'>Retrieve a single import</h3><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subject_set_imports/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
@@ -880,8 +871,6 @@ recommended. Instead, use the link endpoints explained below.</p>
 <li>id (required, integer) ... integer id of the resource to retrieve</li>
 </ul></li>
 </ul>
-
-<hr>
 <h2 id='manifest-csv-format'>Manifest CSV format</h2><pre class="highlight plaintext"><code>uuid,location:1,location:2,metadata:size,metadata:cuteness
 1,https://placekitten.com/200/300.jpg,https://placekitten.com/200/100.jpg,small,cute
 2,https://placekitten.com/400/900.jpg,https://placekitten.com/500/100.jpg,large,cute
