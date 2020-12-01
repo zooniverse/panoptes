@@ -1,4 +1,6 @@
-require "spec_helper"
+# frozen_string_literal: true
+
+require 'spec_helper'
 
 RSpec.describe SubjectGroupSerializer do
   let(:subject_group) { create(:subject_group) }

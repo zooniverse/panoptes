@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SubjectGroupSerializer
   include Serialization::PanoptesRestpack
   include CachedSerializer
