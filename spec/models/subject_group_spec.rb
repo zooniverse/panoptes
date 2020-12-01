@@ -14,8 +14,8 @@ describe SubjectGroup, type: :model do
     expect(subject_group).to be_invalid
   end
 
-  it 'is invalid without any members' do
-    subject_group.members = []
+  it 'is invalid without any subject_group_members' do
+    subject_group.subject_group_members = []
     expect(subject_group).to be_invalid
   end
 
@@ -27,22 +27,6 @@ describe SubjectGroup, type: :model do
   it 'is invalid without a group_subject_id' do
     subject_group.group_subject = nil
     expect(subject_group).to be_invalid
-  end
-
-  context 'with out of order member records' do
-    let(:current_members) { subject_group.members }
-    let(:another_member) { build(:subject_group_member, subject_group: subject_group) }
-    let(:out_of_order_members) { [another_member] | current_members }
-
-    before do
-      allow(subject_group).to receive(:members).and_return(out_of_order_members)
-    end
-
-    describe '#members_in_display_order' do
-      it 'respects the display_order of the members' do
-        expect(subject_group.members_in_display_order).to match_array(current_members | [another_member])
-      end
-    end
   end
 
   describe '#subjects' do
@@ -61,7 +45,7 @@ describe SubjectGroup, type: :model do
     let(:subject_group) { create(:subject_group) }
 
     it 'cleans up the group member records' do
-      members = subject_group.members
+      members = subject_group.subject_group_members
       subject_group.destroy
       expect(members.map(&:destroyed?)).to all(be true)
     end

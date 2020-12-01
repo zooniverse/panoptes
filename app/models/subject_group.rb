@@ -21,10 +21,4 @@ class SubjectGroup < ActiveRecord::Base
   validates :subject_group_members, presence: true
   validates :key, presence: true
   validates :group_subject, presence: true
-
-  # custom member record association ordering
-  # to ensure we specify the key order and uniquely identify this subject group
-  def members_in_display_order
-    members.sort { |m| m.display_order } # rubocop:disable Style/SymbolProc
-  end
 end
