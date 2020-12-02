@@ -4,7 +4,7 @@ class SubjectGroupSerializer
   include Serialization::PanoptesRestpack
   include CachedSerializer
 
-  attributes :id, :context, :key, :created_at, :updated_at
+  attributes :id, :context, :key, :created_at, :updated_at, :href
 
   can_include :group_subject, :subjects, :project
   preload :group_subject, :subjects, :project
