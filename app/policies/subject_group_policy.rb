@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SubjectGroupPolicy < ApplicationPolicy
   class Scope < Scope
     def resolve(action)
