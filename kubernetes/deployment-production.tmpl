@@ -544,8 +544,7 @@ metadata:
     certmanager.k8s.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
     nginx.ingress.kubernetes.io/set-real-ip-from: "10.0.0.0/8"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header Host www.zooniverse.org;
+    nginx.ingress.kubernetes.io/upstream-vhost: "www.zooniverse.org"
 spec:
   tls:
   - hosts:
