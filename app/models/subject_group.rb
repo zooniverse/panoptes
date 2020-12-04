@@ -6,7 +6,7 @@
 #
 # They have a special 'group_subject' that acts as the subject for use in the talk system
 # as well as the existing API data model to enable the tracking of
-#  lassifications, recents, seens data etc
+# classifications, recents, seens data etc
 #
 # This class is not associated with the 'SubjectSet' class (a way to association subjects with a workflow)
 class SubjectGroup < ActiveRecord::Base
