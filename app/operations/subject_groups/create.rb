@@ -37,7 +37,7 @@ module SubjectGroups
     def build_subject_group(subjects)
       subject_group = SubjectGroup.new(project: project, key: subject_group_key)
       subjects.each_with_index do |subject, index|
-        subject_group.members << build_subject_group_member(subject_group, subject, index)
+        subject_group.subject_group_members << build_subject_group_member(subject_group, subject, index)
       end
       subject_group.group_subject = build_group_subject
       subject_group
@@ -102,6 +102,7 @@ module SubjectGroups
       group_subject = subject_group.group_subject
       group_subject_metadata = group_subject.metadata
       group_subject_metadata['subject_group'] = {
+        # TODO: should this be hidden metadata?
         subject_group_id: subject_group.id,
         group_subject_ids: subject_group.key
       }
