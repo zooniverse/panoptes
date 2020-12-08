@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.20
--- Dumped by pg_dump version 9.5.22
+-- Dumped from database version 9.5.21
+-- Dumped by pg_dump version 9.5.23
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1177,6 +1177,73 @@ ALTER SEQUENCE public.set_member_subjects_id_seq OWNED BY public.set_member_subj
 
 
 --
+-- Name: subject_group_members; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.subject_group_members (
+    id integer NOT NULL,
+    subject_group_id integer,
+    subject_id integer,
+    display_order integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: subject_group_members_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.subject_group_members_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: subject_group_members_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.subject_group_members_id_seq OWNED BY public.subject_group_members.id;
+
+
+--
+-- Name: subject_groups; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.subject_groups (
+    id integer NOT NULL,
+    context jsonb DEFAULT '{}'::jsonb NOT NULL,
+    key character varying NOT NULL,
+    project_id integer NOT NULL,
+    group_subject_id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: subject_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.subject_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: subject_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.subject_groups_id_seq OWNED BY public.subject_groups.id;
+
+
+--
 -- Name: subject_set_imports; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2132,6 +2199,20 @@ ALTER TABLE ONLY public.set_member_subjects ALTER COLUMN id SET DEFAULT nextval(
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.subject_group_members ALTER COLUMN id SET DEFAULT nextval('public.subject_group_members_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_groups ALTER COLUMN id SET DEFAULT nextval('public.subject_groups_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public.subject_set_imports ALTER COLUMN id SET DEFAULT nextval('public.subject_set_imports_id_seq'::regclass);
 
 
@@ -2498,6 +2579,22 @@ ALTER TABLE ONLY public.recents
 
 ALTER TABLE ONLY public.set_member_subjects
     ADD CONSTRAINT set_member_subjects_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: subject_group_members_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_group_members
+    ADD CONSTRAINT subject_group_members_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: subject_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_groups
+    ADD CONSTRAINT subject_groups_pkey PRIMARY KEY (id);
 
 
 --
@@ -3242,6 +3339,27 @@ CREATE INDEX index_set_member_subjects_on_subject_set_id ON public.set_member_su
 
 
 --
+-- Name: index_subject_group_members_on_subject_group_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_subject_group_members_on_subject_group_id ON public.subject_group_members USING btree (subject_group_id);
+
+
+--
+-- Name: index_subject_group_members_on_subject_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_subject_group_members_on_subject_id ON public.subject_group_members USING btree (subject_id);
+
+
+--
+-- Name: index_subject_groups_on_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_subject_groups_on_key ON public.subject_groups USING btree (key);
+
+
+--
 -- Name: index_subject_set_imports_on_subject_set_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3761,6 +3879,14 @@ ALTER TABLE ONLY public.aggregations
 
 
 --
+-- Name: fk_rails_283ede5252; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_groups
+    ADD CONSTRAINT fk_rails_283ede5252 FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+
+--
 -- Name: fk_rails_28a7ada458; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3846,6 +3972,14 @@ ALTER TABLE ONLY public.recents
 
 ALTER TABLE ONLY public.organization_page_versions
     ADD CONSTRAINT fk_rails_53b1c6ff8a FOREIGN KEY (organization_page_id) REFERENCES public.organization_pages(id);
+
+
+--
+-- Name: fk_rails_59adcbe133; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_groups
+    ADD CONSTRAINT fk_rails_59adcbe133 FOREIGN KEY (group_subject_id) REFERENCES public.subjects(id);
 
 
 --
@@ -3982,6 +4116,14 @@ ALTER TABLE ONLY public.memberships
 
 ALTER TABLE ONLY public.field_guides
     ADD CONSTRAINT fk_rails_a1b35288b8 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_a5b8c1ffff; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_group_members
+    ADD CONSTRAINT fk_rails_a5b8c1ffff FOREIGN KEY (subject_id) REFERENCES public.subjects(id);
 
 
 --
@@ -4134,6 +4276,14 @@ ALTER TABLE ONLY public.subjects
 
 ALTER TABLE ONLY public.subjects
     ADD CONSTRAINT fk_rails_f26c409132 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fk_rails_f611f500c0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subject_group_members
+    ADD CONSTRAINT fk_rails_f611f500c0 FOREIGN KEY (subject_group_id) REFERENCES public.subject_groups(id);
 
 
 --
@@ -4663,4 +4813,6 @@ INSERT INTO schema_migrations (version) VALUES ('20200716170833');
 INSERT INTO schema_migrations (version) VALUES ('20200717155424');
 
 INSERT INTO schema_migrations (version) VALUES ('20200720125246');
+
+INSERT INTO schema_migrations (version) VALUES ('20201113151433');
 
