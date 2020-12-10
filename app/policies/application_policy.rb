@@ -8,6 +8,9 @@ class ApplicationPolicy
     @record = record
   end
 
+  # we use this setup so that a policy can have different scopes for different actions,
+  # e.g. a WriteScope and a ReadScope. you'll see this method called in a policy class like:
+  # scope :update, :destroy, with: WriteScope
   def self.scope(*actions, with:)
     actions.each do |action|
       @scopes_by_action ||= {}
