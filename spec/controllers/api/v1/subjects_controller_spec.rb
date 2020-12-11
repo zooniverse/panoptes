@@ -528,6 +528,77 @@ describe Api::V1::SubjectsController, type: :controller do
     end
   end
 
+  describe '#grouped', :focus do
+    let(:api_resource_links) { [] }
+    let(:sms) { create_list(:set_member_subject, 3, subject_set: subject_set) }
+    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 3 } }
+    let(:error_message_parts) { ['workflow_id', 'num_rows', 'num_columns', 'of type string did not match the following type: integer'] }
+
+    before do
+      sms
+      get :grouped, request_params
+    end
+
+    it 'returns 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns a page with only 1 resource' do
+      binding.pry
+      expect(json_response[api_resource_name].length).to eq(1)
+    end
+
+    context 'without num_rows and num_columns params' do
+      let(:request_params) { { workflow_id: workflow.id.to_s } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include(*error_message_parts)
+      end
+    end
+
+    context 'with nonsensical num_rows and num_columns params' do
+      let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 'hmm', num_rows: 1 } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include(*error_message_parts)
+      end
+    end
+
+    context 'with nonsensical num_rows and num_columns params' do
+      let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: [1] } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include(*error_message_parts)
+      end
+    end
+
+    context 'with mismatching num_rows and num_columns params compared to workflow config' do
+      let(:request_params) { { workflow_id: workflow.id.to_s, columns: 3, rows: 1 } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include(*error_message_parts)
+      end
+    end
+
+    it_behaves_like 'an api response'
+  end
+
   describe "#show" do
     let(:resource) { create(:subject) }
 

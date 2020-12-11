@@ -76,7 +76,8 @@ Rails.application.routes.draw do
 
       json_api_resources :subjects do
         collection do
-          get :queued
+          get :queued # Subject selection end point
+          get :grouped # SubjectGroup selection end point
         end
       end
 

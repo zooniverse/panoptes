@@ -50,6 +50,72 @@ class Api::V1::SubjectsController < Api::ApiController
     )
   end
 
+  # special end point to liaise with the selector to
+  # collate groups of selected subjects
+  # order of operations will be
+  def grouped
+    # ????
+    #  ? should we make more than one group at a time to ensure the
+    #    classifier has more than 1 subject to work on at a given time?
+    #  A yes!
+    #    FEM requires min 3 subjects, else it'll request more in the queue
+    #    so we should do our best to return at least 3 to avoid the extra requests
+    #    First pass at this will be 1
+    #    later on we can add a constant(default 3) multiplier to turn into constant num of groups
+    skip_policy_scope
+
+    # do the params validation - TODO: extract to a service object
+    required_param_keys = %i[workflow_id num_rows num_columns]
+    valid_integer_params = params.permit(*required_param_keys).transform_values do |param_value|
+      # ensure each param value is an int
+      # how can we offload the schema type validations for GET requests?
+      param_value.to_i
+    end
+    SubjectGroupsSelectionSchema.new.validate!(valid_integer_params)
+
+    # get the total number of subjects to be in the specific group
+    required_num_of_subjects = params[:num_rows].to_i * params[:num_columns].to_i
+    selector_params = params.dup
+    selector_params[:page_size] = required_num_of_subjects
+    # run the selector with the desired number of
+    subject_selector = Subjects::Selector.new(api_user.user, selector_params)
+    selected_subject_ids = subject_selector.get_subject_ids
+
+    # try to find any existing SubjectGroup with the key
+    subject_group_key = selected_subject_ids.join('-')
+    subject_group = SubjectGroup.find_by(key: subject_group_key)
+    unless subject_group
+      # create the subject group from the selected ids
+      subject_group = SubjectGroups::Create.run!(
+        subject_ids: selected_subject_ids,
+        uploader_id: subject_selector.workflow.owner.id.to_s,
+        project_id: subject_selector.workflow.project_id.to_s
+      )
+    end
+    # get the list of the groups 'placeholder' group_subject ids
+    group_subject_ids = [subject_group.group_subject.id]
+
+    selected_subject_scope =
+      Subject
+      .where(id: group_subject_ids)
+      .order(
+        "idx(array[#{group_subject_ids.join(',')}], id)"
+      )
+
+    selection_context = Subjects::SelectorContext.new(
+      subject_selector,
+      group_subject_ids
+    ).format
+
+    non_filterable_params = params.except(:project_id, :collection_id)
+    # serialize the subject group and associated subject data
+    render json_api: SubjectSelectorSerializer.page(
+      non_filterable_params,
+      selected_subject_scope,
+      selection_context
+    )
+  end
+
   def create
     raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_uploading].enabled?
     super do |subject|
