@@ -267,7 +267,7 @@ namespace :migrate do
     # All files have already been copied over to /subject_location, this task must be run
     # to update the media record src (which points to where the file is located)
     desc 'Update src to subject_locations for Snapshot Supernova media'
-    task :rewrite_supernova_file_locations => :environment do
+    task rewrite_supernova_file_locations: :environment do
       # regex to check whether current src is an old path
       OLD_PATH_REGEX = /\Apanoptes-uploads.zooniverse.org\/1\/0\//.freeze
       # this will return match data that will give us just the file name,
