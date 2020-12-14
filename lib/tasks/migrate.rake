@@ -261,6 +261,32 @@ namespace :migrate do
     end
   end
 
+  namespace :media do
+    # Media resources id 1 - 457799 are all subjects for project Snapshot Supernova.
+    # They currently exist outside of our media folder organizational structure.
+    # All files have already been copied over to /subject_location, this task must be run
+    # to update the media record src (which points to where the file is located)
+    desc 'Update src to subject_locations for Snapshot Supernova media'
+    task :rewrite_supernova_file_locations => :environment do
+      # regex to check whether current src is an old path
+      OLD_PATH_REGEX = /\Apanoptes-uploads.zooniverse.org\/1\/0\//.freeze
+      # this will return match data that will give us just the file name,
+      # which is the part of the string following the old path
+      CAPTURE_GROUP_REGEX = /\A(?:panoptes-uploads.zooniverse.org\/1\/0\/)?(.+)\z/.freeze
+
+      puts 'starting supernova src location rewrite'
+      Media.where('id < 457800').find_each do |medium|
+        if OLD_PATH_REGEX.match(medium.src)
+          file_name = medium.src.match(CAPTURE_GROUP_REGEX)[1]
+          new_path = 'subject_location/' + file_name
+          medium.src = new_path
+          medium.save!
+        end
+      end
+      puts 'finished supernova src location rewrite'
+    end
+  end
+
   namespace :subject_workflow_status do
     desc "Create SubjectWorklfowStatus records for the internal PG subject selector"
     task :create_records_for_pg_selector => :environment do
