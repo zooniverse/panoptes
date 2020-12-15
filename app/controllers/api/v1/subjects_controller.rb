@@ -77,9 +77,7 @@ class Api::V1::SubjectsController < Api::ApiController
     selected_subject_scope =
       Subject
       .where(id: group_subject_ids)
-      .order(
-        "idx(array[#{group_subject_ids.join(',')}], id)"
-      )
+      .order("idx(array[#{group_subject_ids.join(',')}], id)") # guardrails-disable-line
 
     selection_context = Subjects::SelectorContext.new(
       group_selection_result.subject_selector,
