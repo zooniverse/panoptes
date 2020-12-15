@@ -16,6 +16,7 @@ describe SubjectGroups::Selection do
   before do
     allow(subject_selector).to receive(:get_subject_ids).and_return([1])
     allow(Subjects::Selector).to receive(:new).and_return(subject_selector)
+    allow(SubjectGroups::Create).to receive(:run!).and_return(subject_group)
   end
 
   it 'handles num_rows and num_columns param validation' do
@@ -24,14 +25,16 @@ describe SubjectGroups::Selection do
   end
 
   it 'updates the subject selector page_size params for the group size' do
-    allow(SubjectGroups::Create).to receive(:run!).and_return(subject_group)
     described_class.run(operation_params)
-    expect(Subjects::Selector).to have_received(:new).with(user, params.merge(page_size: 4))
+    expect(Subjects::Selector).to have_received(:new).with(user.user, params.merge(page_size: 4))
   end
 
-  it 'creates a new group_subject as the operation result' do
-    allow(SubjectGroups::Create).to receive(:run!).and_return(subject_group)
-    expect(outcome.result).to eq(subject_group)
+  it 'returns a newly created subject_group in the operation result' do
+    expect(outcome.result.subject_group).to eq(subject_group)
+  end
+
+  it 'returns the selector in the operation result' do
+    expect(outcome.result.subject_selector).to eq(subject_selector)
   end
 
   context 'with an existing SubjectGroup' do
@@ -44,8 +47,8 @@ describe SubjectGroups::Selection do
       expect(subject_selector).to have_received(:get_subject_ids)
     end
 
-    it 're-uses an existing group_subject as the operation result' do
-      expect(outcome.result).to eq(subject_group)
+    it 're-uses an existing subject_group in the operation result' do
+      expect(outcome.result.subject_group).to eq(subject_group)
     end
   end
 end

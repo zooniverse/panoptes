@@ -11,19 +11,23 @@ module SubjectGroups
     object :user, class: ApiUser
 
     def execute
-      subject_selector = Subjects::Selector.new(user, selector_params)
+      subject_selector = Subjects::Selector.new(user.user, selector_params)
       selected_subject_ids = subject_selector.get_subject_ids
       subject_group_key = selected_subject_ids.join('-')
 
       # re-use any existing SubjectGroup based on key lookup
       subject_group = SubjectGroup.find_by(key: subject_group_key)
-      return subject_group if subject_group
 
       # if we didn't find it, create a new subject group from the selected ids
-      SubjectGroups::Create.run!(
+      subject_group ||= SubjectGroups::Create.run!(
         subject_ids: selected_subject_ids,
         uploader_id: uploader_id,
         project_id: subject_selector.workflow.project_id.to_s
+      )
+
+      OpenStruct.new(
+        subject_selector: subject_selector,
+        subject_group: subject_group
       )
     end
 
