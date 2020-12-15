@@ -528,13 +528,17 @@ describe Api::V1::SubjectsController, type: :controller do
     end
   end
 
-  describe '#grouped', :focus do
+  describe '#grouped' do
+    let(:workflow) do
+      create(:workflow_with_subject_sets, configuration: { subject_group: { num_rows: 1, num_columns: 1 } })
+    end
     let(:api_resource_links) { [] }
-    let(:sms) { create_list(:set_member_subject, 3, subject_set: subject_set) }
-    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 3 } }
-    let(:error_message_parts) { ['workflow_id', 'num_rows', 'num_columns', 'of type string did not match the following type: integer'] }
+    let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
+    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 1 } }
 
     before do
+      ENV['SUBJECT_GROUP_WORFKLOW_ID_ALLOWLIST'] = workflow.id.to_s
+      ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
       sms
       get :grouped, request_params
     end
@@ -544,9 +548,10 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     it 'returns a page with only 1 resource' do
-      binding.pry
       expect(json_response[api_resource_name].length).to eq(1)
     end
+
+    it_behaves_like 'an api response'
 
     context 'without num_rows and num_columns params' do
       let(:request_params) { { workflow_id: workflow.id.to_s } }
@@ -556,11 +561,11 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       it 'has a useful error message' do
-        expect(response.body).to include(*error_message_parts)
+        expect(response.body).to include('Num rows is required, Num columns is required')
       end
     end
 
-    context 'with nonsensical num_rows and num_columns params' do
+    context 'with num_columns non integer param' do
       let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 'hmm', num_rows: 1 } }
 
       it 'errors with 422' do
@@ -568,11 +573,11 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       it 'has a useful error message' do
-        expect(response.body).to include(*error_message_parts)
+        expect(response.body).to include('Num columns is not a valid integer')
       end
     end
 
-    context 'with nonsensical num_rows and num_columns params' do
+    context 'with num_rows array param' do
       let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: [1] } }
 
       it 'errors with 422' do
@@ -580,23 +585,21 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       it 'has a useful error message' do
-        expect(response.body).to include(*error_message_parts)
+        expect(response.body).to include('found unpermitted parameter: num_rows')
       end
     end
 
-    context 'with mismatching num_rows and num_columns params compared to workflow config' do
-      let(:request_params) { { workflow_id: workflow.id.to_s, columns: 3, rows: 1 } }
+    context 'with a workflow that is not allow listed for this end point' do
+      let(:request_params) { { workflow_id: (workflow.id - 1).to_s, num_columns: 3, num_rows: 1 } }
 
       it 'errors with 422' do
-        expect(response.status).to eq(422)
+        expect(response.status).to eq(503)
       end
 
       it 'has a useful error message' do
-        expect(response.body).to include(*error_message_parts)
+        expect(response.body).to include('Feature has been temporarily disabled')
       end
     end
-
-    it_behaves_like 'an api response'
   end
 
   describe "#show" do
