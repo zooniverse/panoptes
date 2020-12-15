@@ -7,8 +7,10 @@ module SubjectGroups
     string :uploader_id
     # allow all attributes of params through
     hash :params, strip: false
-
     object :user, class: ApiUser
+    # ensure the num_rows & columns are integers between 1 and 10
+    validates :num_rows, numericality: { less_than: 10, greater_than_or_equal_to: 1 }
+    validates :num_columns, numericality: { less_than: 10, greater_than_or_equal_to: 1 }
 
     def execute
       subject_selector = Subjects::Selector.new(user.user, selector_params)
@@ -46,6 +48,5 @@ module SubjectGroups
 
       raise Error, 'Supplied num_rows and num_colums mismatches the workflow configuration'
     end
-
   end
 end

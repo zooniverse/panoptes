@@ -61,4 +61,16 @@ describe SubjectGroups::Selection do
       }.to raise_error(Operation::Error, 'Supplied num_rows and num_colums mismatches the workflow configuration')
     end
   end
+
+  context 'when the num_rows and num_columns are not single digit integers' do
+    it 'fails num_rows and returns a useful error message' do
+      outcome = described_class.run(operation_params.merge(num_rows: '10', num_columns: '1'))
+      expect(outcome.errors.full_messages).to include('Num rows must be less than 10')
+    end
+
+    it 'fails num_columns and returns a useful error message' do
+      outcome = described_class.run(operation_params.merge(num_rows: '1', num_columns: '11'))
+      expect(outcome.errors.full_messages).to include('Num columns must be less than 10')
+    end
+  end
 end
