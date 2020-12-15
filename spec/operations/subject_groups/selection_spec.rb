@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe SubjectGroups::Selection do
-  let(:workflow) { create :workflow }
+  let(:workflow) { create(:workflow, configuration: { subject_group: { num_rows: 2, num_columns: 2 } }) }
   let(:user) { ApiUser.new(nil) }
   let(:subject_selector) { Subjects::Selector.new(user, params) }
   let(:params) { { workflow_id: workflow.id.to_s } }
@@ -49,6 +49,16 @@ describe SubjectGroups::Selection do
 
     it 're-uses an existing subject_group in the operation result' do
       expect(outcome.result.subject_group).to eq(subject_group)
+    end
+  end
+
+  context 'when the num_rows and num_columns params mismatch the workflow config' do
+    let(:workflow) { create(:workflow, configuration: { subject_group: { num_rows: 2, num_columns: 1 } }) }
+
+    it 'raises with error' do
+      expect {
+        described_class.run!(operation_params)
+      }.to raise_error(Operation::Error, 'Supplied num_rows and num_colums mismatches the workflow configuration')
     end
   end
 end
