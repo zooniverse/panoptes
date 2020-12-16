@@ -19,9 +19,15 @@ describe SubjectGroups::Selection do
     allow(SubjectGroups::Create).to receive(:run!).and_return(subject_group)
   end
 
-  it 'handles num_rows and num_columns param validation' do
+  it 'validates num_rows and num_columns param' do
     outcome = described_class.run(operation_params.merge(num_rows: 'invalid', num_columns: 'not a number'))
     expect(outcome.errors.full_messages).to include('Num rows is not a valid integer', 'Num columns is not a valid integer')
+  end
+
+  it 'validates the num_rows and num_columns do not create a subject groups beyond a threshold' do
+    # default max grid size is 5 x 5 (25)
+    outcome = described_class.run(operation_params.merge(num_rows: 5, num_columns: 6))
+    expect(outcome.errors.full_messages).to include('Grid size must be less than or equal to 25')
   end
 
   it 'updates the subject selector page_size params for the group size' do

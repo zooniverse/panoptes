@@ -4,6 +4,7 @@ module SubjectGroups
   class Selection < Operation
     integer :num_rows
     integer :num_columns
+    integer :grid_size, default: -> { num_rows.to_i * num_columns.to_i }
     string :uploader_id
     # allow all attributes of params through
     hash :params, strip: false
@@ -11,10 +12,15 @@ module SubjectGroups
     # ensure the num_rows & columns are integers between 1 and 10
     validates :num_rows, numericality: { less_than: 10, greater_than_or_equal_to: 1 }
     validates :num_columns, numericality: { less_than: 10, greater_than_or_equal_to: 1 }
+    validates :grid_size, numericality: { less_than_or_equal_to: ENV.fetch('SUBJECT_GROUP_MAX_GRID_SIZE', 25) }
 
     def execute
       subject_selector = Subjects::Selector.new(user.user, selector_params)
-      validate_workflow_group_dimensions(subject_selector.workflow, num_rows, num_columns)
+      validate_workflow_group_dimensions(
+        subject_selector.workflow.configuration['subject_group'],
+        num_rows,
+        num_columns
+      )
 
       selected_subject_ids = subject_selector.get_subject_ids
       subject_group_key = selected_subject_ids.join('-')
@@ -35,12 +41,12 @@ module SubjectGroups
 
     # update the page_size for the requested number of group subjects
     def selector_params
-      params[:page_size] = num_rows * num_columns
+      params[:page_size] = grid_size
       params
     end
 
-    def validate_workflow_group_dimensions(workflow, num_rows, num_columns)
-      if (subject_group_config = workflow.configuration['subject_group'])
+    def validate_workflow_group_dimensions(subject_group_config, num_rows, num_columns)
+      if subject_group_config
         num_rows_match = subject_group_config['num_rows'] == num_rows
         num_columns_match = subject_group_config['num_columns'] == num_columns
         return if num_rows_match && num_columns_match
