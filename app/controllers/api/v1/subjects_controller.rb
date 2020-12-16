@@ -70,9 +70,8 @@ class Api::V1::SubjectsController < Api::ApiController
       params: selector_params,
       user: api_user
     )
-    subject_group = group_selection_result.subject_group
     # get the list of the groups 'placeholder' group_subject ids
-    group_subject_ids = [subject_group.group_subject.id]
+    group_subject_ids = group_selection_result.subject_groups.map(&:group_subject_id)
 
     selected_subject_scope =
       Subject
