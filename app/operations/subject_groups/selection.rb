@@ -22,26 +22,24 @@ module SubjectGroups
         num_columns
       )
 
-      selected_subject_ids = subject_selector.get_subject_ids
-      subject_group_key = selected_subject_ids.join('-')
-
-      # re-use any existing SubjectGroup based on key lookup
-      subject_group = SubjectGroup.find_by(key: subject_group_key)
-
-      # if we didn't find it, create a new subject group from the selected ids
-      subject_group ||= SubjectGroups::Create.run!(
-        subject_ids: selected_subject_ids,
-        uploader_id: uploader_id,
-        project_id: subject_selector.workflow.project_id.to_s
+      subject_groups = find_or_create_subject_groups(
+        subject_selector.get_subject_ids,
+        subject_selector.workflow.project_id.to_s
       )
-      OpenStruct.new(subject_selector: subject_selector, subject_group: subject_group)
+
+      OpenStruct.new(subject_selector: subject_selector, subject_groups: subject_groups)
     end
 
     private
 
-    # update the page_size for the requested number of group subjects
+    # update the params to include the page_size value
+    # to equal the requested number of group subjects * the number of groups to select at once
+    #
+    #  Note: PFE / FEM requires at min 3 subjects being in the JS queue at any given time.
+    #  If the JS queue drops below 3 the client will request more data from this end point.
+    #  Thus we attempt to optimize the number of selection / subject group create requests
     def selector_params
-      params[:page_size] = grid_size
+      params[:page_size] = grid_size * ENV.fetch('SUBJECT_GROUPS_NUM_TO_SELECT', 3)
       params
     end
 
@@ -53,6 +51,28 @@ module SubjectGroups
       end
 
       raise Error, 'Supplied num_rows and num_colums mismatches the workflow configuration'
+    end
+
+    def find_or_create_subject_groups(selected_subject_ids, project_id)
+      [].tap do |subject_groups|
+        SubjectGroup.transaction do
+          # split the subject ids into equal groups of `grid_size`
+          selected_subject_ids.each_slice(grid_size) do |group_subject_ids|
+            subject_group_key = group_subject_ids.join('-')
+
+            # re-use any existing SubjectGroup based on key lookup
+            subject_group = SubjectGroup.find_by(key: subject_group_key)
+
+            # if we didn't find it, create a new subject group from the selected ids
+            subject_group ||= SubjectGroups::Create.run!(
+              subject_ids: selected_subject_ids,
+              uploader_id: uploader_id,
+              project_id: project_id
+            )
+            subject_groups << subject_group
+          end
+        end
+      end
     end
   end
 end
