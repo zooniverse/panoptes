@@ -83,10 +83,9 @@ class Api::V1::SubjectsController < Api::ApiController
       group_subject_ids
     ).format
 
-    non_filterable_params = group_selection_result.subject_selector.params.except(:project_id, :collection_id)
     # serialize the subject_group's group_subject data
     render json_api: SubjectSelectorSerializer.page(
-      non_filterable_params,
+      group_selection_result.subject_selector.params,
       selected_subject_scope,
       selection_context
     )
