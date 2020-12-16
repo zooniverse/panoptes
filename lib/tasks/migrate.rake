@@ -268,19 +268,19 @@ namespace :migrate do
     # to update the media record src (which points to where the file is located)
     desc 'Update src to subject_locations for Snapshot Supernova media'
     task rewrite_supernova_file_locations: :environment do
-      # regex to check whether current src is an old path
-      OLD_PATH_REGEX = /\Apanoptes-uploads.zooniverse.org\/1\/0\//.freeze
       # this will return match data that will give us just the file name,
       # which is the part of the string following the old path
-      CAPTURE_GROUP_REGEX = /\A(?:panoptes-uploads.zooniverse.org\/1\/0\/)?(.+)\z/.freeze
+      OLD_PATH_REGEX = /\A(panoptes-uploads.zooniverse.org\/1\/0\/)?(.+)\z/.freeze
 
       puts 'starting supernova src location rewrite'
-      Media.where('id < 457800').find_each do |medium|
-        if OLD_PATH_REGEX.match(medium.src)
-          file_name = medium.src.match(CAPTURE_GROUP_REGEX)[1]
+      Media.where('id <= 457799').find_each do |medium|
+        matches = OLD_PATH_REGEX.match(medium.src)
+        # array index 1 will be nil if src does not start with panoptes-uploads.../0/
+        if matches[1]
+          # array index 2 is the second capture group (anything after panoptes-uploads.../0/)
+          file_name = matches[2]
           new_path = 'subject_location/' + file_name
-          medium.src = new_path
-          medium.save!
+          medium.update_column(:src, new_path)
         end
       end
       puts 'finished supernova src location rewrite'
