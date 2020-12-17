@@ -528,6 +528,80 @@ describe Api::V1::SubjectsController, type: :controller do
     end
   end
 
+  describe '#grouped' do
+    let(:workflow) do
+      create(:workflow_with_subject_sets, configuration: { subject_group: { num_rows: 1, num_columns: 1 } })
+    end
+    let(:api_resource_links) { [] }
+    let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
+    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 1 } }
+
+    before do
+      ENV['SUBJECT_GROUP_WORFKLOW_ID_ALLOWLIST'] = workflow.id.to_s
+      ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
+      sms
+      get :grouped, request_params
+    end
+
+    it 'returns 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns a page with only 1 resource' do
+      expect(json_response[api_resource_name].length).to eq(1)
+    end
+
+    it_behaves_like 'an api response'
+
+    context 'without num_rows and num_columns params' do
+      let(:request_params) { { workflow_id: workflow.id.to_s } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Num rows is required, Num columns is required')
+      end
+    end
+
+    context 'with num_columns non integer param' do
+      let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 'hmm', num_rows: 1 } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Num columns is not a valid integer')
+      end
+    end
+
+    context 'with num_rows array param' do
+      let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: [1] } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('found unpermitted parameter: num_rows')
+      end
+    end
+
+    context 'with a workflow that is not allow listed for this end point' do
+      let(:request_params) { { workflow_id: (workflow.id - 1).to_s, num_columns: 3, num_rows: 1 } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(503)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Feature has been temporarily disabled')
+      end
+    end
+  end
+
   describe "#show" do
     let(:resource) { create(:subject) }
 

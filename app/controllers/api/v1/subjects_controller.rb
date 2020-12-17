@@ -50,6 +50,47 @@ class Api::V1::SubjectsController < Api::ApiController
     )
   end
 
+  # special selection end point create SubjectGroups
+  def grouped
+    skip_policy_scope
+
+    # setup the selector params from user input, note validation occurs in the operation class
+    selector_param_keys = %i[workflow_id subject_set_id num_rows num_columns]
+    selector_params = params.permit(*selector_param_keys)
+
+    # Sanity check -- use a testing feature flag
+    # against an allow listed workflow id env var
+    allowed_workflow_ids = ENV.fetch('SUBJECT_GROUP_WORFKLOW_ID_ALLOWLIST').split(',')
+    raise ApiErrors::FeatureDisabled unless allowed_workflow_ids.include?(selector_params[:workflow_id])
+
+    group_selection_result = SubjectGroups::Selection.run!(
+      num_rows: selector_params.delete(:num_rows),
+      num_columns: selector_params.delete(:num_columns),
+      uploader_id: ENV.fetch('SUBJECT_GROUP_UPLOADER_ID'),
+      params: selector_params,
+      user: api_user
+    )
+    # get the list of the groups 'placeholder' group_subject ids
+    group_subject_ids = group_selection_result.subject_groups.map(&:group_subject_id)
+
+    selected_subject_scope =
+      Subject
+      .where(id: group_subject_ids)
+      .order("idx(array[#{group_subject_ids.join(',')}], id)") # guardrails-disable-line
+
+    selection_context = Subjects::SelectorContext.new(
+      group_selection_result.subject_selector,
+      group_subject_ids
+    ).format
+
+    # serialize the subject_group's group_subject data
+    render json_api: SubjectSelectorSerializer.page(
+      group_selection_result.subject_selector.params,
+      selected_subject_scope,
+      selection_context
+    )
+  end
+
   def create
     raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_uploading].enabled?
     super do |subject|
