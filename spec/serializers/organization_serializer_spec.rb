@@ -61,7 +61,9 @@ describe OrganizationSerializer do
   end
 
   describe "#avatar_src" do
-    let(:avatar) { double("avatar", external_link: external_url, src: src) }
+    let(:avatar) do
+      instance_double('avatar', external_link: external_url, get_url: src)
+    end
     let(:src) { nil }
     let(:external_url) { nil }
 
