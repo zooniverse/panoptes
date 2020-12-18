@@ -273,7 +273,7 @@ namespace :migrate do
       OLD_PATH_REGEX = /\A(panoptes-uploads.zooniverse.org\/1\/0\/)?(.+)\z/.freeze
 
       puts 'starting supernova src location rewrite'
-      Media.where('id <= 457799').find_each do |medium|
+      Media.where('id <= 457799').find_each.with_index do |medium, index|
         matches = OLD_PATH_REGEX.match(medium.src)
         # array index 1 will be nil if src does not start with panoptes-uploads.../0/
         if matches[1]
@@ -282,6 +282,7 @@ namespace :migrate do
           new_path = 'subject_location/' + file_name
           medium.update_column(:src, new_path)
         end
+        puts "progress: #{index} records processed" if index % 1000 == 0
       end
       puts 'finished supernova src location rewrite'
     end
