@@ -52,6 +52,9 @@ class Api::V1::SubjectsController < Api::ApiController
 
   # special selection end point create SubjectGroups
   def grouped
+    # temporary feature flag in case we need a prod 'kill' switch for this feature
+    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_group_selection].enabled?
+
     skip_policy_scope
 
     # setup the selector params from user input, note validation occurs in the operation class
