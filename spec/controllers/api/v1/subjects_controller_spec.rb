@@ -535,11 +535,13 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:api_resource_links) { [] }
     let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
     let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 1 } }
+    let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].enable }
 
     before do
-      ENV['SUBJECT_GROUP_WORFKLOW_ID_ALLOWLIST'] = workflow.id.to_s
+      ENV['SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST'] = workflow.id.to_s
       ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
       sms
+      flipper_feature
       get :grouped, request_params
     end
 
@@ -590,9 +592,21 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     context 'with a workflow that is not allow listed for this end point' do
-      let(:request_params) { { workflow_id: (workflow.id - 1).to_s, num_columns: 3, num_rows: 1 } }
+      let(:request_params) { { workflow_id: (workflow.id - 1).to_s, num_columns: 1, num_rows: 1 } }
 
-      it 'errors with 422' do
+      it 'errors with 503' do
+        expect(response.status).to eq(503)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Feature has been temporarily disabled')
+      end
+    end
+
+    context 'when the feature flag is disabled for this end point' do
+      let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].disable }
+
+      it 'errors with 503' do
         expect(response.status).to eq(503)
       end
 
