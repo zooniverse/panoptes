@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe CsvDumps::DirectToS3 do
@@ -14,28 +16,35 @@ describe CsvDumps::DirectToS3 do
   end
   let(:file_path) { "/tmp/foobar" }
 
-  describe "uses custom storage adapter" do
-    it "should receive custom storage opts" do
-      opts = {
-        bucket: 'zooniverse-exports',
-        prefix: "#{Rails.env}/"
-      }
-      expect(MediaStorage)
-        .to receive(:load_adapter)
-        .with("test", opts)
-        .and_call_original
+
+  let(:opts) do
+    {
+      bucket: 'zooniverse-exports',
+      prefix: "#{Rails.env}/"
+    }
+  end
+  let(:test_adapter) { MediaStorage::TestAdapter.new(opts) }
+
+  before do
+    allow(MediaStorage).to receive(:load_adapter).with(:aws, opts).and_return(test_adapter)
+  end
+
+  it 'wires up the correct storage adapter with custom storage opts' do
+    direct_to_s3.put_file(file_path)
+    expect(MediaStorage).to have_received(:load_adapter).with(:aws, opts)
+  end
+
+  describe 'uploading using put_file' do
+    it 'correctly determines the s3 storage location path' do
+      allow(adapter).to receive(:stored_path).and_call_original
       direct_to_s3.put_file(file_path)
+      expect(adapter).to have_received(:stored_path).with('text/csv', 'email_exports')
     end
 
-    it "should upload the file to the a known bucket location" do
-      expect(adapter)
-        .to receive(:stored_path)
-        .with("text/csv", "email_exports")
-        .and_call_original
-      expect(adapter)
-        .to receive(:put_file)
-        .with(s3_path, file_path, s3_opts)
+    it 'uploads the file to the the correct s3 bucket location' do
+      allow(adapter).to receive(:put_file)
       direct_to_s3.put_file(file_path)
+      expect(adapter).to have_received(:put_file).with(s3_path, file_path, s3_opts)
     end
   end
 
