@@ -30,14 +30,14 @@ module CsvDumps
       )
     end
 
-    def storage_adapter
+    def storage_adapter(adapter='aws')
       return @storage_adapter if @storage_adapter
 
       storage_opts = {
         bucket: ENV.fetch("EMAIL_EXPORT_S3_BUCKET", 'zooniverse-exports'),
         prefix: ENV.fetch("EMAIL_EXPORT_S3_PREFIX", "#{Rails.env}/")
       }
-      @storage_adapter = MediaStorage.send(:load_adapter, :aws, storage_opts)
+      @storage_adapter = MediaStorage.send(:load_adapter, adapter, storage_opts)
     end
 
     private
