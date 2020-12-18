@@ -537,7 +537,7 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 1 } }
 
     before do
-      ENV['SUBJECT_GROUP_WORFKLOW_ID_ALLOWLIST'] = workflow.id.to_s
+      ENV['SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST'] = workflow.id.to_s
       ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
       sms
       get :grouped, request_params

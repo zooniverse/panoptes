@@ -60,7 +60,7 @@ class Api::V1::SubjectsController < Api::ApiController
 
     # Sanity check -- use a testing feature flag
     # against an allow listed workflow id env var
-    allowed_workflow_ids = ENV.fetch('SUBJECT_GROUP_WORFKLOW_ID_ALLOWLIST').split(',')
+    allowed_workflow_ids = ENV.fetch('SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST').split(',')
     raise ApiErrors::FeatureDisabled unless allowed_workflow_ids.include?(selector_params[:workflow_id])
 
     group_selection_result = SubjectGroups::Selection.run!(
