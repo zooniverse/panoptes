@@ -56,7 +56,7 @@ describe CsvDumps::DirectToS3 do
 
     describe 'bucket encryption' do
       it "raises an error if it's not encrypted" do
-        allow(adapter).to receive(:encrypted_bucket?).and_return(false)
+        allow(adapter).to receive(:safe_for_private_upload?).and_return(false)
         expect {
           direct_to_s3.put_file(file_path)
         }.to raise_error(CsvDumps::DirectToS3::UnencryptedBucket, 'the destination bucket is not encrypted')

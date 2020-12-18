@@ -64,7 +64,7 @@ module CsvDumps
     end
 
     def check_encrypted_bucket
-      unless storage_adapter.encrypted_bucket?
+      unless storage_adapter.safe_for_private_upload?
         raise UnencryptedBucket.new("the destination bucket is not encrypted")
       end
     end
