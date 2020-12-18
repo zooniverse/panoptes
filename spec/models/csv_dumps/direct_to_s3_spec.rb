@@ -16,7 +16,6 @@ describe CsvDumps::DirectToS3 do
   end
   let(:file_path) { "/tmp/foobar" }
 
-
   let(:opts) do
     {
       bucket: 'zooniverse-exports',
