@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'aws-sdk'
+
 ENV["RAILS_ENV"] ||= 'test'
 Aws.config[:stub_responses] = true
 require File.expand_path("../../config/environment", __FILE__)
