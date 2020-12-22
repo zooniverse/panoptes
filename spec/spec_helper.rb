@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 ENV["RAILS_ENV"] ||= 'test'
+Aws.config[:stub_responses] = true
 require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "sidekiq/testing"
