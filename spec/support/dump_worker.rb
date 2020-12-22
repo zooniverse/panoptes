@@ -11,8 +11,8 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
       worker.perform(another_project.id, "project")
     end
 
-    it "should not push a file to s3" do
-      expect(worker).to_not receive(:write_to_s3)
+    it 'does not push a file to the object store' do
+      expect(worker).to_not receive(:write_to_object_store)
       worker.perform(another_project.id, "project")
     end
 
