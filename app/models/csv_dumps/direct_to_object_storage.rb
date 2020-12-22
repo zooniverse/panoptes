@@ -23,7 +23,7 @@ module CsvDumps
       true
     end
 
-    def put_file(gzip_file_path, _compressed: true)
+    def put_file(gzip_file_path, compressed: true)
       safe_for_private_upload?
 
       storage_adapter.put_file(
