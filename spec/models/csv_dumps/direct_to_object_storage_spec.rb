@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe CsvDumps::DirectToObjectStorage do
-  let(:direct_to_object_store) { described_class.new("full", 'test') }
+  let(:direct_to_object_store) { described_class.new('full', 'test') }
   let(:adapter) { direct_to_object_store.storage_adapter }
   let(:object_store_file_name) { 'full_email_list' }
   let(:object_store_path) { "email_exports/#{object_store_file_name}.csv" }

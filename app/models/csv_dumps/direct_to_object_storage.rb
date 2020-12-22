@@ -38,8 +38,8 @@ module CsvDumps
 
       storage_opts = {
         # s3 adapter specific
-        bucket: ENV.fetch("EMAIL_EXPORT_S3_BUCKET", 'zooniverse-exports'),
-        prefix: ENV.fetch("EMAIL_EXPORT_S3_PREFIX", "#{Rails.env}/"),
+        bucket: ENV.fetch('EMAIL_EXPORT_S3_BUCKET', 'zooniverse-exports'),
+        prefix: ENV.fetch('EMAIL_EXPORT_S3_PREFIX', "#{Rails.env}/"),
         # azure adapter specific
         azure_storage_account: ENV.fetch('EMAIL_EXPORT_AZURE_STORAGE_ACCOUNT', 'zooniverse-exports'),
         azure_storage_access_key: ENV['EMAIL_EXPORT_AZURE_STORAGE_ACCESS_KEY'],
@@ -60,12 +60,12 @@ module CsvDumps
       }
     end
 
-    def object_storage_emails_export_path(path="email_exports")
-      storage_path = storage_adapter.stored_path("text/csv", path)
+    def object_storage_emails_export_path(path='email_exports')
+      storage_path = storage_adapter.stored_path('text/csv', path)
       prefix = File.dirname(storage_path)
-      file_paths = File.basename(storage_path).split(".")
+      file_paths = File.basename(storage_path).split('.')
       file_paths.shift
-      exts = file_paths.join(".")
+      exts = file_paths.join('.')
       "#{prefix}/#{export_file_name}.#{exts}"
     end
 

@@ -4,7 +4,6 @@ describe EmailsUsersExportWorker do
   let(:worker) { described_class.new }
   let(:users) { create_list(:user, 2) }
 
-
   it { is_expected.to be_a Sidekiq::Worker }
 
   it_behaves_like "an email dump exporter" do
