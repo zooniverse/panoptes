@@ -12,8 +12,9 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     end
 
     it 'does not push a file to the object store' do
-      expect(worker).to_not receive(:write_to_object_store)
-      worker.perform(another_project.id, "project")
+      allow(worker).to receive(:write_to_object_store)
+      worker.perform(another_project.id, 'project')
+      expect(worker).not_to have_received(:write_to_object_store)
     end
 
     it "should not queue a worker to send an email" do
