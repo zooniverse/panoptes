@@ -52,6 +52,9 @@ class Api::V1::SubjectsController < Api::ApiController
 
   # special selection end point create SubjectGroups
   def grouped
+    # temporary feature flag in case we need a prod 'kill' switch for this feature
+    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_group_selection].enabled?
+
     skip_policy_scope
 
     # setup the selector params from user input, note validation occurs in the operation class
@@ -60,7 +63,7 @@ class Api::V1::SubjectsController < Api::ApiController
 
     # Sanity check -- use a testing feature flag
     # against an allow listed workflow id env var
-    allowed_workflow_ids = ENV.fetch('SUBJECT_GROUP_WORFKLOW_ID_ALLOWLIST').split(',')
+    allowed_workflow_ids = ENV.fetch('SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST').split(',')
     raise ApiErrors::FeatureDisabled unless allowed_workflow_ids.include?(selector_params[:workflow_id])
 
     group_selection_result = SubjectGroups::Selection.run!(

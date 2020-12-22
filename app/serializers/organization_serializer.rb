@@ -15,11 +15,9 @@ class OrganizationSerializer
           :avatar, :background, :attached_images
 
   def avatar_src
-    if avatar = @model.avatar
-      avatar.external_link ? avatar.external_link : avatar.src
-    else
-      ""
-    end
+    return '' unless (avatar = @model.avatar)
+
+    avatar.external_link || avatar.get_url
   end
 
   def self.links
