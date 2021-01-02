@@ -53,10 +53,16 @@ describe SubjectGroups::Create do
       expect(result_locations).to match(expected_locations)
     end
 
-    it 'tracks the subject_group id & subject_key in the group_subject metadata' do
-      group_subject = created_subject_group.group_subject
-      subject_group_metadata = { subject_group_id: created_subject_group.id, group_subject_ids: created_subject_group.key }
-      expect(group_subject.metadata['subject_group']).to match(subject_group_metadata)
+    describe 'tracking the subject group info in the group_subject metadata' do
+      let(:group_subject) { created_subject_group.group_subject }
+
+      it 'records the subject_group id in hidden metadata attribute' do
+        expect(group_subject.metadata['#subject_group_id']).to match(created_subject_group.id)
+      end
+
+      it 'records the group subject ids in hidden metadata attribute' do
+        expect(group_subject.metadata['#group_subject_ids']).to match(created_subject_group.key)
+      end
     end
   end
 end

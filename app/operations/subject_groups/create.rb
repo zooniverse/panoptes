@@ -68,13 +68,6 @@ module SubjectGroups
 
     def build_subject_group_member(subject_group, subject, index)
       SubjectGroupMember.new(
-        # TODO: look at adding some of the selection context in here
-        # workflow finished? (useful probs not as retirement is offline for this project)
-        # selecter state is probably useful
-        # the passed in subject ids in their order?
-        # selection timing will be tracked by the record timestamps...
-        # what else?
-        # context: {hash_of_useful_selector_context_info}
         project: project,
         subject: subject,
         subject_group: subject_group,
@@ -101,11 +94,9 @@ module SubjectGroups
     def update_group_subject_metadata(subject_group)
       group_subject = subject_group.group_subject
       group_subject_metadata = group_subject.metadata
-      group_subject_metadata['subject_group'] = {
-        # TODO: should this be hidden metadata?
-        subject_group_id: subject_group.id,
-        group_subject_ids: subject_group.key
-      }
+      # ensure these metadata fields are hidden
+      group_subject_metadata['#subject_group_id'] = subject_group.id
+      group_subject_metadata['#group_subject_ids'] = subject_group.key
       group_subject.update_column(:metadata, group_subject_metadata) #rubocop:disable Rails/SkipsModelValidations
     end
   end
