@@ -282,7 +282,7 @@ namespace :migrate do
           new_path = 'subject_location/' + file_name
           medium.update_column(:src, new_path)
         end
-        puts "progress: #{index} records processed" if index % 1000 == 0
+        puts "progress: #{index} records processed" if index % 1000.zero?
       end
       puts 'finished supernova src location rewrite'
     end
