@@ -49,9 +49,10 @@ module MediaStorage
 
     def put_path(path, opts={})
       container = opts[:private] ? private_container : public_container
+      azure_path = StoredPath.media_path(path)
 
       signer.signed_uri(
-        client.generate_uri("#{container}/#{path}"),
+        client.generate_uri("#{container}/#{azure_path}"),
         false,
         service: 'b', # blob
         permissions: 'cw', # create write
