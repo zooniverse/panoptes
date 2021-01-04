@@ -286,6 +286,37 @@ namespace :migrate do
       end
       puts 'finished supernova src location rewrite'
     end
+
+    # Task to resolve issue where requesting a data export that has an existing export saved
+    # under the AWS path will save the newly generated export to the folder
+    # 'panoptes-uploads.zooniverse.org/{environment}/{media_type}/' rather than to
+    # the folder '{media_type}/' where it should be.
+    desc 'Update src to reflect Azure Blob Storage location for export resources'
+    task rewrite_export_src_attributes: :environment do
+      OLD_PATH_REGEX = /\A(panoptes-uploads.zooniverse.org\/#{Rails.env}\/)?(.+)\z/.freeze
+      export_media_types = %w[
+        project_aggregations_export
+        project_classifications_export
+        project_subjects_export
+        project_workflow_contents_export
+        project_workflows_export
+        workflow_classifications_export
+        Workflow_classifications_export
+      ]
+
+      puts 'starting export media src rewrite'
+      Medium.where(type: export_media_types).find_each.with_index do |medium, index|
+        matches = OLD_PATH_REGEX.match(medium.src)
+        # array index 1 will be nil if src does not start with panoptes-uploads.../production/
+        if matches[1]
+          puts matches[2]
+          # array index 2 is the second capture group (anything after panoptes-uploads.../production/)
+          medium.update_column(:src, matches[2])
+        end
+        puts "progress: #{index} records processed" if index % 1000.zero?
+      end
+      puts 'finished export media src rewrite'
+    end
   end
 
   namespace :subject_workflow_status do
