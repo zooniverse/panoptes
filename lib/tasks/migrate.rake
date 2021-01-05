@@ -301,7 +301,6 @@ namespace :migrate do
         project_workflow_contents_export
         project_workflows_export
         workflow_classifications_export
-        Workflow_classifications_export
       ]
 
       puts 'starting export media src rewrite'
