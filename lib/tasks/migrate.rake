@@ -305,15 +305,14 @@ namespace :migrate do
       ]
 
       puts 'starting export media src rewrite'
-      Medium.where(type: export_media_types).find_each.with_index do |medium, index|
+      Medium.where(private: true, type: export_media_types).find_each.with_index do |medium, index|
         matches = OLD_PATH_REGEX.match(medium.src)
         # array index 1 will be nil if src does not start with panoptes-uploads.../production/
         if matches[1]
-          puts matches[2]
           # array index 2 is the second capture group (anything after panoptes-uploads.../production/)
           medium.update_column(:src, matches[2])
         end
-        puts "progress: #{index} records processed" if index % 1000.zero?
+        puts "progress: #{index} records processed" if (index % 1000).zero?
       end
       puts 'finished export media src rewrite'
     end
