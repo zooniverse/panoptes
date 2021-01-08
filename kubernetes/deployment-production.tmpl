@@ -552,7 +552,7 @@ spec:
   tls:
   - hosts:
     - www-panoptes.zooniverse.org
-    secretName: www-panoptes-production-tls
+    secretName: panoptes-production-tls-secret
   rules:
   - host: www-panoptes.zooniverse.org
     http:
@@ -565,11 +565,14 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: www-panoptes-production-tls
+  name: panoptes-production-tls-secret
 spec:
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  secretName: www-panoptes-production-tls
+  secretName: panoptes-production-tls-secret
   dnsNames:
+    - panoptes.azure.zooniverse.org
+    - panoptes.zooniverse.org
+    - signin.zooniverse.org
     - www-panoptes.zooniverse.org
