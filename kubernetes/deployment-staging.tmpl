@@ -477,3 +477,15 @@ spec:
           serviceName: panoptes-staging-app
           servicePort: 80
         path: /(.*)
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: panoptes-staging-tls-secret
+spec:
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  secretName: panoptes-staging-tls-secret
+  dnsNames:
+    - panoptes-staging.zooniverse.org
