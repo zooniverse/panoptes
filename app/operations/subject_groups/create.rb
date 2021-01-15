@@ -106,9 +106,14 @@ module SubjectGroups
         # return the mime / url combination for building the media location resources
         { mime_type => media_url }
       end
-      Subject.location_attributes_from_params(external_locations).map do |location_param|
+      # build the subject location params for use in the AR association builder
+      build_external_location_params(external_locations, external_locations_subject_id_lut)
+    end
+
+    def build_external_location_params(media_locations, media_locations_subject_id_lut)
+      Subject.location_attributes_from_params(media_locations).map do |location_param|
         media_url = location_param[:src]
-        media_subject_id = external_locations_subject_id_lut[media_url]
+        media_subject_id = media_locations_subject_id_lut[media_url]
         # store the originating subject resource id to ensure track
         # how the group_subject media location resources are built and to
         # specifically understand the intended subject -> media location ordering
@@ -117,6 +122,7 @@ module SubjectGroups
         location_param[:metadata][:originating_subject_id] = media_subject_id
         location_param
       end
+
     end
 
     def update_group_subject_metadata(subject_group)
