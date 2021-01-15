@@ -96,12 +96,27 @@ module SubjectGroups
 
     def subject_location_params
       subject_locations = find_subjects_in_order(subject_ids).map(&:locations).flatten
+      external_locations_subject_id_lut = {}
       external_locations = subject_locations.map do |loc|
         extension = File.extname(loc.src).downcase[1..-1]
         mime_type = Mime::Type.lookup_by_extension(extension).to_s
-        { mime_type => "https://#{loc.src}" }
+        media_url = "https://#{loc.src}"
+        # track the subject URL and the originating subject id
+        external_locations_subject_id_lut[media_url] = loc.linked_id
+        # return the mime / url combination for building the media location resources
+        { mime_type => media_url }
       end
-      Subject.location_attributes_from_params(external_locations.reverse)
+      Subject.location_attributes_from_params(external_locations).map do |location_param|
+        media_url = location_param[:src]
+        media_subject_id = external_locations_subject_id_lut[media_url]
+        # store the originating subject resource id to ensure track
+        # how the group_subject media location resources are built and to
+        # specifically understand the intended subject -> media location ordering
+        # without this we may be incorrectly showing a different subject ids' media image
+        # and thus breaking the downstream classification data
+        location_param[:metadata][:originating_subject_id] = media_subject_id
+        location_param
+      end
     end
 
     def update_group_subject_metadata(subject_group)

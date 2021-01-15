@@ -67,9 +67,21 @@ describe SubjectGroups::Create do
 
     it 'creates the locations based on the subject data order' do
       locations_in_order = subjects.map(&:locations).flatten
-      expected_locations = locations_in_order.map { |loc| "https://#{loc.src}" }
-      result_locations = created_subject_group.group_subject.locations.map(&:src)
-      expect(result_locations).to match(expected_locations)
+      expected_locations = locations_in_order.map do |loc|
+        ["https://#{loc.src}", loc.linked_id]
+      end
+      # use the subject location medium resource subject id provenance
+      # metadata to ensure we are correctly setting up the subject media locations
+      # on the dummy subject, if we don't correctly order these media locations
+      # we will incorrectly link a subject to the wrong image resource
+      # and thus break the downstream classifications via the UI
+      result_locations = created_subject_group.group_subject.locations.map do |loc|
+        [loc.src, loc.metadata['originating_subject_id']]
+      end
+      expect(result_locations).to match_array(expected_locations)
+      # alternatively we could use the ordered locations
+      # but this is really important so i'd like to track / test the data provenance
+      # media resource metadata, e.g. result_locations = created_subject_group.group_subject.ordered_locations.map(&:src)
     end
 
     describe 'tracking the subject group info in the group_subject metadata' do
