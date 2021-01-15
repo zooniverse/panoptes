@@ -19,7 +19,7 @@ describe SubjectGroups::Create do
     expect(created_subject_group).to be_valid
   end
 
-  it 'raises with error if it can not find all the subject_ids'  do
+  it 'raises with error if it can not find all the subject_ids' do
     params[:subject_ids] = subject_ids | ['-1']
     params[:group_size] = params[:subject_ids].count
     expect {
