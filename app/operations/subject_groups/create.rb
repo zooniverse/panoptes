@@ -2,13 +2,20 @@
 
 module SubjectGroups
   class Create < Operation
-    string :project_id
-    string :uploader_id
-    array :subject_ids
+    string  :project_id
+    string  :uploader_id
+    array   :subject_ids
+    integer :subject_ids_size, default: -> { subject_ids.size }
+    integer :group_size
+
+    validates :subject_ids_size, numericality: { greater_than_or_equal_to: ENV.fetch('SUBJECT_GROUP_MIN_SIZE', 2) }
+    validate :group_size, :ensure_subject_ids_size_matches_group_size
 
     def execute
       group_subjects_in_order = find_subjects_in_order(subject_ids)
-      ensure_all_subjects_exist(subject_ids.size, group_subjects_in_order.size)
+
+      # ensure we find all the subjects we're looking for
+      ensure_all_subjects_exist(group_subjects_in_order.size)
 
       subject_group = build_subject_group(group_subjects_in_order)
 
@@ -28,10 +35,16 @@ module SubjectGroups
 
     private
 
-    def ensure_all_subjects_exist(subject_ids_size, group_subjects_in_order_size)
+    def ensure_all_subjects_exist(group_subjects_in_order_size)
       return if subject_ids_size == group_subjects_in_order_size
 
-      raise Error, 'Number of found subjects does not match the size of param subject_ids'
+      raise Error, 'Number of found subjects does not match the number of subject_ids'
+    end
+
+    def ensure_subject_ids_size_matches_group_size
+      return if subject_ids_size == group_size
+
+      raise Error, 'Number of subject_ids does not match the group_size'
     end
 
     def build_subject_group(subjects)

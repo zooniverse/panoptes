@@ -10,19 +10,36 @@ describe SubjectGroups::Create do
   end
   let(:subject_ids) { subjects.map(&:id) }
   let(:operation) { described_class.with(api_user: nil) }
+  let(:params) { { subject_ids: subject_ids, uploader_id: user.id.to_s, project_id: project.id.to_s, group_size: 2 } }
   let(:created_subject_group) do
-    operation.run!(subject_ids: subject_ids, uploader_id: user.id.to_s, project_id: project.id.to_s)
+    operation.run!(params)
   end
 
   it 'creates creates a valid subject_group' do
     expect(created_subject_group).to be_valid
   end
 
-  it 'raises with error if it can not find all the subject_ids' do
-    incorrect_subject_ids = subject_ids | ['-1']
+  it 'raises with error if it can not find all the subject_ids'  do
+    params[:subject_ids] = subject_ids | ['-1']
+    params[:group_size] = params[:subject_ids].count
     expect {
-      operation.run!(subject_ids: incorrect_subject_ids, uploader_id: user.id.to_s, project_id: project.id.to_s)
-    }.to raise_error(Operation::Error, 'Number of found subjects does not match the size of param subject_ids')
+      operation.run!(params)
+    }.to raise_error(Operation::Error, 'Number of found subjects does not match the number of subject_ids')
+  end
+
+  it 'raises with error if the number of subject_ids does not match the expected group_size' do
+    params[:subject_ids] = subject_ids | ['-1']
+    expect {
+      operation.run!(params)
+    }.to raise_error(Operation::Error, 'Number of subject_ids does not match the group_size')
+  end
+
+  it 'raises with error the number of subject_ids is less than 2' do
+    params[:subject_ids] = ['-1']
+    params[:group_size] = params[:subject_ids].count
+    expect {
+      operation.run!(params)
+    }.to raise_error(ActiveInteraction::InvalidInteractionError, 'Subject ids size must be greater than or equal to 2')
   end
 
   it 'sets the subject_group key' do
@@ -30,8 +47,10 @@ describe SubjectGroups::Create do
   end
 
   it 'respects the order of the subject_ids in the key' do
-    reverse_key_subject_group = operation.run!(subject_ids: subject_ids.reverse, uploader_id: user.id.to_s, project_id: project.id.to_s)
-    expect(reverse_key_subject_group.key).to match(subject_ids.reverse.join('-'))
+    reversed_subject_ids = subject_ids.reverse
+    params[:subject_ids] = reversed_subject_ids
+    reverse_key_subject_group = operation.run!(params)
+    expect(reverse_key_subject_group.key).to match(reversed_subject_ids.join('-'))
   end
 
   describe 'group_subject' do
