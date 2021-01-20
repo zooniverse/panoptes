@@ -540,6 +540,7 @@ describe Api::V1::SubjectsController, type: :controller do
     before do
       ENV['SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST'] = workflow.id.to_s
       ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
+      ENV['SUBJECT_GROUP_MIN_SIZE'] = '1'
       sms
       flipper_feature
       get :grouped, request_params
