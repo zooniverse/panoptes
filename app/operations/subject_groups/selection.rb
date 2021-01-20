@@ -12,7 +12,7 @@ module SubjectGroups
     # ensure the num_rows & columns are integers between 1 and 10
     validates :num_rows, numericality: { less_than: 10, greater_than_or_equal_to: 1 }
     validates :num_columns, numericality: { less_than: 10, greater_than_or_equal_to: 1 }
-    validates :grid_size, numericality: { less_than_or_equal_to: ENV.fetch('SUBJECT_GROUP_MAX_GRID_SIZE', 25) }
+    validates :grid_size, numericality: { less_than_or_equal_to: ENV.fetch('SUBJECT_GROUP_MAX_GRID_SIZE', 25).to_i }
 
     def execute
       subject_selector = Subjects::Selector.new(user.user, selector_params)

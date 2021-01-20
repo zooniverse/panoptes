@@ -8,7 +8,7 @@ module SubjectGroups
     integer :subject_ids_size, default: -> { subject_ids.size }
     integer :group_size
 
-    validates :subject_ids_size, numericality: { greater_than_or_equal_to: ENV.fetch('SUBJECT_GROUP_MIN_SIZE', 2) }
+    validates :subject_ids_size, numericality: { greater_than_or_equal_to: ENV.fetch('SUBJECT_GROUP_MIN_SIZE', 2).to_i }
     validate :group_size, :ensure_subject_ids_size_matches_group_size
 
     def execute
