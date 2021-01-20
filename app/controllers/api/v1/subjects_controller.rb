@@ -58,7 +58,7 @@ class Api::V1::SubjectsController < Api::ApiController
     skip_policy_scope
 
     # setup the selector params from user input, note validation occurs in the operation class
-    selector_param_keys = %i[workflow_id subject_set_id num_rows num_columns]
+    selector_param_keys = %i[workflow_id subject_set_id num_rows num_columns http_cache]
     selector_params = params.permit(*selector_param_keys)
 
     # Sanity check -- use a testing feature flag
