@@ -36,6 +36,23 @@ describe SubjectGroups::Selection do
     expect(Subjects::Selector).to have_received(:new).with(user.user, params.merge(page_size: 3))
   end
 
+  it 'calls the subject group create operations correctly' do
+    described_class.run(operation_params)
+    create_operation_params = {
+      subject_ids: [1],
+      uploader_id: workflow.owner.id.to_s,
+      project_id: workflow.project_id.to_s,
+      group_size: 1
+    }
+    # can not test the order of these calls via .ordered expectation
+    # https://github.com/rspec/rspec-mocks/issues/916
+    expect(SubjectGroups::Create).to have_received(:run!).with(create_operation_params)
+    create_operation_params[:subject_ids] = [2]
+    expect(SubjectGroups::Create).to have_received(:run!).with(create_operation_params)
+    create_operation_params[:subject_ids] = [3]
+    expect(SubjectGroups::Create).to have_received(:run!).with(create_operation_params)
+  end
+
   it 'returns three newly created subject_group in the operation result' do
     expect(result.subject_groups).to match_array(created_subject_groups)
   end

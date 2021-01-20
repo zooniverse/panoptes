@@ -57,17 +57,18 @@ module SubjectGroups
       [].tap do |subject_groups|
         SubjectGroup.transaction do
           # split the subject ids into equal groups of `grid_size`
-          selected_subject_ids.each_slice(grid_size) do |group_subject_ids|
-            subject_group_key = group_subject_ids.join('-')
+          selected_subject_ids.each_slice(grid_size) do |per_grid_subject_ids|
+            subject_group_key = per_grid_subject_ids.join('-')
 
             # re-use any existing SubjectGroup based on key lookup
             subject_group = SubjectGroup.find_by(key: subject_group_key)
 
             # if we didn't find it, create a new subject group from the selected ids
             subject_group ||= SubjectGroups::Create.run!(
-              subject_ids: selected_subject_ids,
+              subject_ids: per_grid_subject_ids,
               uploader_id: uploader_id,
-              project_id: project_id
+              project_id: project_id,
+              group_size: grid_size
             )
             subject_groups << subject_group
           end
