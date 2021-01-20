@@ -122,7 +122,6 @@ module SubjectGroups
         location_param[:metadata][:originating_subject_id] = media_subject_id
         location_param
       end
-
     end
 
     def update_group_subject_metadata(subject_group)
