@@ -534,7 +534,7 @@ describe Api::V1::SubjectsController, type: :controller do
     end
     let(:api_resource_links) { [] }
     let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
-    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 1 } }
+    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 1, http_cache: 'true' } }
     let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].enable }
 
     before do
