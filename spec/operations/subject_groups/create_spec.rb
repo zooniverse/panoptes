@@ -10,8 +10,9 @@ describe SubjectGroups::Create do
   end
   let(:subject_ids) { subjects.map(&:id) }
   let(:operation) { described_class.with(api_user: nil) }
+  let(:params) { { subject_ids: subject_ids, uploader_id: user.id.to_s, project_id: project.id.to_s, group_size: 2 } }
   let(:created_subject_group) do
-    operation.run!(subject_ids: subject_ids, uploader_id: user.id.to_s, project_id: project.id.to_s)
+    operation.run!(params)
   end
 
   it 'creates creates a valid subject_group' do
@@ -19,10 +20,45 @@ describe SubjectGroups::Create do
   end
 
   it 'raises with error if it can not find all the subject_ids' do
-    incorrect_subject_ids = subject_ids | ['-1']
+    params[:subject_ids] = subject_ids | ['-1']
+    params[:group_size] = params[:subject_ids].count
     expect {
-      operation.run!(subject_ids: incorrect_subject_ids, uploader_id: user.id.to_s, project_id: project.id.to_s)
-    }.to raise_error(Operation::Error, 'Number of found subjects does not match the size of param subject_ids')
+      operation.run!(params)
+    }.to raise_error(Operation::Error, 'Number of found subjects does not match the number of subject_ids')
+  end
+
+  it 'raises with error if the number of subject_ids does not match the expected group_size' do
+    params[:subject_ids] = subject_ids | ['-1']
+    expect {
+      operation.run!(params)
+    }.to raise_error(Operation::Error, 'Number of subject_ids does not match the group_size')
+  end
+
+  it 'raises with error the number of subject_ids is less than 2' do
+    params[:subject_ids] = ['-1']
+    params[:group_size] = params[:subject_ids].count
+    expect {
+      operation.run!(params)
+    }.to raise_error(ActiveInteraction::InvalidInteractionError, 'Subject ids size must be greater than or equal to 2')
+  end
+
+  it 'raises with error if any of the group subjects have more than one linked media location' do
+    multi_location_subject = create(:subject, :with_mediums, num_media: 2, project: project, uploader: user)
+    params[:subject_ids] = subject_ids | [multi_location_subject.id]
+    params[:group_size] = params[:subject_ids].count
+    expect {
+      operation.run!(params)
+    }.to raise_error(Operation::Error, 'Linked subjects can not have more than one media location')
+  end
+
+  it 'raises with error if any of the group subjects are missing a linked media location' do
+    no_location_subject = create(:subject, project: project, uploader: user)
+    multi_location_subject = create(:subject, :with_mediums, num_media: 2, project: project, uploader: user)
+    params[:subject_ids] = [no_location_subject.id, multi_location_subject.id]
+    params[:group_size] = params[:subject_ids].count
+    expect {
+      operation.run!(params)
+    }.to raise_error(Operation::Error, 'Linked subjects can not have more than one media location')
   end
 
   it 'sets the subject_group key' do
@@ -30,8 +66,10 @@ describe SubjectGroups::Create do
   end
 
   it 'respects the order of the subject_ids in the key' do
-    reverse_key_subject_group = operation.run!(subject_ids: subject_ids.reverse, uploader_id: user.id.to_s, project_id: project.id.to_s)
-    expect(reverse_key_subject_group.key).to match(subject_ids.reverse.join('-'))
+    reversed_subject_ids = subject_ids.reverse
+    params[:subject_ids] = reversed_subject_ids
+    reverse_key_subject_group = operation.run!(params)
+    expect(reverse_key_subject_group.key).to match(reversed_subject_ids.join('-'))
   end
 
   describe 'group_subject' do
@@ -48,9 +86,21 @@ describe SubjectGroups::Create do
 
     it 'creates the locations based on the subject data order' do
       locations_in_order = subjects.map(&:locations).flatten
-      expected_locations = locations_in_order.map { |loc| "https://#{loc.src}" }
-      result_locations = created_subject_group.group_subject.locations.map(&:src)
-      expect(result_locations).to match(expected_locations)
+      expected_locations = locations_in_order.map do |loc|
+        ["https://#{loc.src}", loc.linked_id]
+      end
+      # use the subject location medium resource subject id provenance
+      # metadata to ensure we are correctly setting up the subject media locations
+      # on the dummy subject, if we don't correctly order these media locations
+      # we will incorrectly link a subject to the wrong image resource
+      # and thus break the downstream classifications via the UI
+      result_locations = created_subject_group.group_subject.locations.map do |loc|
+        [loc.src, loc.metadata['originating_subject_id']]
+      end
+      expect(result_locations).to match_array(expected_locations)
+      # alternatively we could use the ordered locations
+      # but this is really important so i'd like to track / test the data provenance
+      # media resource metadata, e.g. result_locations = created_subject_group.group_subject.ordered_locations.map(&:src)
     end
 
     describe 'tracking the subject group info in the group_subject metadata' do
