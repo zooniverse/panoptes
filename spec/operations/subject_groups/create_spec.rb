@@ -42,6 +42,25 @@ describe SubjectGroups::Create do
     }.to raise_error(ActiveInteraction::InvalidInteractionError, 'Subject ids size must be greater than or equal to 2')
   end
 
+  it 'raises with error if any of the group subjects have more than one linked media location' do
+    multi_location_subject = create(:subject, :with_mediums, num_media: 2, project: project, uploader: user)
+    params[:subject_ids] = subject_ids | [multi_location_subject.id]
+    params[:group_size] = params[:subject_ids].count
+    expect {
+      operation.run!(params)
+    }.to raise_error(Operation::Error, 'Linked subjects can not have more than one media location')
+  end
+
+  it 'raises with error if any of the group subjects are missing a linked media location' do
+    no_location_subject = create(:subject, project: project, uploader: user)
+    multi_location_subject = create(:subject, :with_mediums, num_media: 2, project: project, uploader: user)
+    params[:subject_ids] = [no_location_subject.id, multi_location_subject.id]
+    params[:group_size] = params[:subject_ids].count
+    expect {
+      operation.run!(params)
+    }.to raise_error(Operation::Error, 'Linked subjects can not have more than one media location')
+  end
+
   it 'sets the subject_group key' do
     expect(created_subject_group.key).to match(subject_ids.join('-'))
   end

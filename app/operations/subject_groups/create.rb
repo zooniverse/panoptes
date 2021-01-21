@@ -16,6 +16,8 @@ module SubjectGroups
 
       # ensure we find all the subjects we're looking for
       ensure_all_subjects_exist(group_subjects_in_order.size)
+      # ensure all subjects in the group will have more than 1 media location (image)
+      ensure_all_subjects_have_one_media_location(subject_ids)
 
       subject_group = build_subject_group(group_subjects_in_order)
 
@@ -45,6 +47,22 @@ module SubjectGroups
       return if subject_ids_size == group_size
 
       raise Error, 'Number of subject_ids does not match the group_size'
+    end
+
+    def ensure_all_subjects_have_one_media_location(subject_ids)
+      # find all the linked subject media resources
+      # group by their subject_id and count them
+      # test if any groups (subjects) have more than 1 linked media resource
+      any_subject_has_multiple_media_locations =
+        Medium
+        .where(linked_type: 'Subject', linked_id: subject_ids)
+        .group(:linked_id)
+        .having('COUNT (*) > ?', 1)
+        .exists?
+      return unless any_subject_has_multiple_media_locations
+
+      # raise if any subject has multiple media locations
+      raise Error, 'Linked subjects can not have more than one media location'
     end
 
     def build_subject_group(subjects)
