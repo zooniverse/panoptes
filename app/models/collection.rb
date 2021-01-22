@@ -1,7 +1,7 @@
 class Collection < ActiveRecord::Base
   include RoleControl::Owned
   include Activatable
-  include PgSearch
+  include PgSearch::Model
   include SluggedName
 
   has_and_belongs_to_many :projects
