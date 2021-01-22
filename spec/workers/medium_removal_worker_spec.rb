@@ -27,7 +27,7 @@ RSpec.describe MediumRemovalWorker do
     expect { worker.perform(medium_src) }.not_to raise_error
   end
 
-  it 'does not modify the storage path for the object store' do
+  it 'does not modify the storage path for the object store when not using azure adapter' do
     allow(MediaStorage).to receive(:delete_file)
     allow(MediaStorage::StoredPath).to receive(:media_path)
     worker.perform(medium_src)
