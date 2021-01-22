@@ -66,7 +66,7 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'pry-stack_explorer'
-  gem 'rubocop', '~> 0.87.1'
+  gem 'rubocop', '~> 0.93.1'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
