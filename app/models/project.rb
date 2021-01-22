@@ -2,7 +2,7 @@ class Project < ActiveRecord::Base
   include RoleControl::Owned
   include Activatable
   include ExtendedCacheKey
-  include PgSearch
+  include PgSearch::Model
   include RankedModel
   include SluggedName
   include Translatable
