@@ -48,5 +48,7 @@ matrix:
         - DATABASE_URL=postgresql://localhost/travis_ci_test?user=postgres
         - SPECS="spec/lib spec/workers spec/serializers spec/services spec/requests spec/middleware spec/mailers spec/policies"
     - rvm: 2.6
+      env:
+        - DATABASE_URL=postgresql://localhost/travis_ci_test?user=postgres
 
 script: "bundle exec rspec $SPECS"
