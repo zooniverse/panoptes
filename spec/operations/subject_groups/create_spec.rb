@@ -97,7 +97,7 @@ describe SubjectGroups::Create do
       expect(external_locations).to match_array(original_locations)
     end
 
-    it 'correctly orders the locations based on the original selected subject ids', :focus do
+    it 'correctly orders the locations based on the original selected subject ids' do
       locations_in_order = subjects.map(&:locations).flatten
       expected_locations = locations_in_order.map { |loc| "https://#{loc.src}" }
       result_locations = created_subject_group.group_subject.ordered_locations.map(&:src)
