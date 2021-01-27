@@ -118,7 +118,7 @@ module SubjectGroups
       external_locations = subject_locations.map do |loc|
         extension = File.extname(loc.src).downcase[1..-1]
         mime_type = Mime::Type.lookup_by_extension(extension).to_s
-        media_url = "https://#{loc.src}"
+        media_url = loc.get_url
         # track the subject URL and the originating subject id
         external_locations_subject_id_lut[media_url] = loc.linked_id
         # return the mime / url combination for building the media location resources
