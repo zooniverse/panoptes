@@ -78,7 +78,7 @@ describe SubjectGroups::Create do
       expect { created_subject_group }.to change(Subject, :count).by(1)
     end
 
-    it 'uses creates external media locations' do
+    it 'creates external media locations' do
       group_subject = created_subject_group.group_subject
       external_locations = group_subject.locations.map(&:external_link)
       expect(external_locations).to match_array(Array.new(subjects.size, true))
@@ -96,6 +96,15 @@ describe SubjectGroups::Create do
       original_locations = subjects.map(&:locations).flatten.map { |loc| "https://#{loc.src}" }
       expect(external_locations).to match_array(original_locations)
     end
+
+    it 'correctly orders the locations based on the original selected subject ids', :focus do
+      locations_in_order = subjects.map(&:locations).flatten
+      expected_locations = locations_in_order.map { |loc| "https://#{loc.src}" }
+      result_locations = created_subject_group.group_subject.ordered_locations.map(&:src)
+      expect(result_locations).to match_array(expected_locations)
+    end
+
+    it 'tracks the original subject data provenance in the linked locations' do
       locations_in_order = subjects.map(&:locations).flatten
       expected_locations = locations_in_order.map do |loc|
         ["https://#{loc.src}", loc.linked_id]
@@ -109,9 +118,6 @@ describe SubjectGroups::Create do
         [loc.src, loc.metadata['originating_subject_id']]
       end
       expect(result_locations).to match_array(expected_locations)
-      # alternatively we could use the ordered locations
-      # but this is really important so i'd like to track / test the data provenance
-      # media resource metadata, e.g. result_locations = created_subject_group.group_subject.ordered_locations.map(&:src)
     end
 
     describe 'tracking the subject group info in the group_subject metadata' do
