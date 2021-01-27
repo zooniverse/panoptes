@@ -84,7 +84,18 @@ describe SubjectGroups::Create do
       expect(external_locations).to match_array(Array.new(subjects.size, true))
     end
 
-    it 'creates the locations based on the subject data order' do
+    it 'uses the MediaStorage service to construct the external media locations' do
+      allow(MediaStorage).to receive(:get_path)
+      created_subject_group.group_subject
+      expect(MediaStorage).to have_received(:get_path).twice
+    end
+
+    it 'creates correct media locations' do
+      group_subject = created_subject_group.group_subject
+      external_locations = group_subject.locations.map(&:src)
+      original_locations = subjects.map(&:locations).flatten.map { |loc| "https://#{loc.src}" }
+      expect(external_locations).to match_array(original_locations)
+    end
       locations_in_order = subjects.map(&:locations).flatten
       expected_locations = locations_in_order.map do |loc|
         ["https://#{loc.src}", loc.linked_id]
