@@ -4,7 +4,7 @@ class SubjectsDumpWorker
   include Sidekiq::Worker
   include RateLimitDumpWorker
 
-  sidekiq_options queue: :data_high
+  sidekiq_options queue: ENV.fetch('DUMP_WORKER_SIDEKIQ_QUEUE', 'data_high').to_sym
 
   attr_reader :resource, :medium, :scope, :processor
 
