@@ -83,6 +83,7 @@ data:
   CORS_ORIGINS_REGEX: '^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|relaunch|field-book)\.notesfromnature\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
   DESIGNATOR_API_HOST: https://designator.zooniverse.org/
   DESIGNATOR_API_USERNAME: production
+  DUMP_WORKER_SIDEKIQ_QUEUE: dumpworker
   EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
   EVENTS_API_USERNAME: api
   REDIRECTS_BASE: https://www.zooniverse.org
@@ -156,8 +157,6 @@ spec:
                    value: https
             initialDelaySeconds: 20
           env:
-          - name: DUMP_WORKER_SIDEKIQ_QUEUE
-            value: 'dumpworker'
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
           envFrom:
@@ -303,9 +302,7 @@ spec:
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           env:
           - name: SIDEKIQ_ARGS
-              value: '-q dumpworker -q really_high -q high -q data_high -q data_medium -q default -q data_low'
-          - name: DUMP_WORKER_SIDEKIQ_QUEUE
-            value: 'dumpworker'
+            value: '-q dumpworker -q really_high -q high -q data_high -q data_medium -q default -q data_low'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
