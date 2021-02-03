@@ -68,11 +68,12 @@ data:
   RAILS_ENV: staging
   ZOO_STREAM_KINESIS_STREAM_NAME: zooniverse-staging
   ZOO_STREAM_SOURCE: panoptes
-  DUMP_CONGESTION_OPTS_INTERVAL: "60"
-  DUMP_CONGESTION_OPTS_MIN_DELAY: "60"
   CORS_ORIGINS_REGEX: '^https?:\/\/([a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
   DESIGNATOR_API_HOST: https://designator-staging.zooniverse.org/
   DESIGNATOR_API_USERNAME: staging
+  DUMP_CONGESTION_OPTS_INTERVAL: "60"
+  DUMP_CONGESTION_OPTS_MIN_DELAY: "60"
+  DUMP_WORKER_SIDEKIQ_QUEUE: dumpworker
   EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
   EVENTS_API_USERNAME: staging_api
   REDIRECTS_BASE: https://master.pfe-preview.zooniverse.org
@@ -242,6 +243,66 @@ spec:
       port: 80
       targetPort: 80
   type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: panoptes-staging-sidekiq-dumpworker
+  labels:
+    app: panoptes-staging-sidekiq-dumpworker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: panoptes-staging-sidekiq-dumpworker
+  template:
+    metadata:
+      labels:
+        app: panoptes-staging-sidekiq-dumpworker
+    spec:
+      containers:
+        - name: panoptes-staging-sidekiq
+          image: zooniverse/panoptes:__IMAGE_TAG__
+          resources:
+            requests:
+              memory: "700Mi"
+              cpu: "100m"
+              ephemeral-storage: "10Gi"
+            limits:
+              memory: "700Mi"
+              cpu: "500m"
+              ephemeral-storage: "10Gi"
+          livenessProbe:
+            exec:
+              command:
+                - /rails_app/scripts/docker/sidekiq_status
+            initialDelaySeconds: 20
+          args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
+          env:
+          - name: SIDEKIQ_ARGS
+            value: '-q dumpworker -q really_high -q high -q data_high -q data_medium -q default -q data_low'
+          envFrom:
+          - secretRef:
+              name: panoptes-common-env-vars
+          - secretRef:
+              name: panoptes-staging-env-vars
+          - configMapRef:
+              name: panoptes-staging-shared
+          volumeMounts:
+          - mountPath: /tmp
+            name: panoptes-staging-dumpworker-data
+          - name: jwt-staging
+            mountPath: "/rails_app/config/keys"
+            readOnly: true
+      volumes:
+        - name: panoptes-staging-dumpworker-data
+          hostPath:
+            # directory location on host node temp disk
+            path: /mnt/panoptes-staging-dumpworker-data
+            type: DirectoryOrCreate
+        - name: jwt-staging
+          secret:
+            secretName: panoptes-doorkeeper-jwt-staging
 ---
 apiVersion: apps/v1
 kind: Deployment
