@@ -274,7 +274,7 @@ metadata:
   labels:
     app: panoptes-production-sidekiq-dumpworker
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: panoptes-production-sidekiq-dumpworker
@@ -293,7 +293,7 @@ spec:
               ephemeral-storage: "50Gi"
             limits:
               memory: "4000Mi"
-              cpu: "2000m"
+              cpu: "1000m"
               ephemeral-storage: "50Gi"
           livenessProbe:
             exec:
