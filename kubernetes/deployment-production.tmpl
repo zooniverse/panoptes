@@ -288,12 +288,12 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "4000Mi"
+              memory: "6000Mi"
               cpu: "1000m"
               ephemeral-storage: "50Gi"
             limits:
-              memory: "4000Mi"
-              cpu: "1000m"
+              memory: "6000Mi"
+              cpu: "2000m"
               ephemeral-storage: "50Gi"
           livenessProbe:
             exec:
@@ -302,6 +302,10 @@ spec:
             initialDelaySeconds: 20
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           env:
+          - name: RAILS_MAX_THREADS
+            value: '2'
+          - name: SIDEKIQ_CONCURRENCY
+            value: '2'
           - name: SIDEKIQ_ARGS
             value: '-q dumpworker -q really_high -q high -q data_high -q data_medium -q default -q data_low'
           envFrom:
