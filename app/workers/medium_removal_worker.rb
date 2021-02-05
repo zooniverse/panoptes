@@ -8,7 +8,11 @@ class MediumRemovalWorker
   def perform(medium_src, opts={})
     MediaStorage.delete_file(object_store_path(medium_src), opts)
   rescue Aws::S3::Errors::AccessDenied
-    # do nothing and don't retry this worker
+    # ignore the missing s3 object and don't retry this worker
+  rescue Azure::Core::Http::HTTPError => e
+    # don't retry this worker if it's a 404 unknown blob
+    # otherwise surface these unknown azure errors
+    raise e unless e.status_code == 404
   end
 
   private
