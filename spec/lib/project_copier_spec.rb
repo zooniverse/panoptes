@@ -7,7 +7,12 @@ describe ProjectCopier do
     let!(:tags) { create(:tag, resource: project) }
     let!(:field_guide) { create(:field_guide, project: project) }
     let!(:page) { create(:project_page, project: project) }
-    let!(:project_translation) { create(:project_translation, translated: project) }
+    let!(:project_translation) do
+      create(:project_translation, translated: project) do |translation|
+        translated_strings = TranslationStrings.new(project).extract
+        translation.update_strings_and_versions(translated_strings, project.latest_version_id)
+      end
+    end
 
     context "a template project" do
       let(:copied_project) { described_class.copy(project.id, copyist.id) }
@@ -39,7 +44,7 @@ describe ProjectCopier do
       end
 
       it "adds the source project id to the copied project's configuration" do
-        expect(copied_project.configuration[:source_project_id]).to be(project.id)
+        expect(copied_project.configuration['source_project_id']).to be(project.id)
       end
 
       it "has valid copied workflows" do
@@ -52,6 +57,11 @@ describe ProjectCopier do
         expect(copied_project.field_guides.first).to be_valid
         expect(copied_project.pages.first).to be_valid
         expect(copied_project.translations.first).to be_valid
+      end
+
+      it 'correctly sets the string versions to the newly minted copied project version ids' do
+        translation_string_version_ids = copied_project.translations.map { |tr| tr.string_versions.values }.flatten.uniq
+        expect(translation_string_version_ids).to match([copied_project.latest_version_id])
       end
     end
   end
