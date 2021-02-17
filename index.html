@@ -827,7 +827,7 @@ recommended. Instead, use the link endpoints explained below.</p>
 <li>A subject is made up of:
 
 <ul>
-<li>a unique UUID</li>
+<li>a unique external ID (used to track the subject from your organization)</li>
 <li>one or more URLs that host media files e.g. image, video, audio.</li>
 <li>metadata described as key-value pairs.</li>
 </ul></li>
@@ -852,7 +852,7 @@ recommended. Instead, use the link endpoints explained below.</p>
 
 <span class="p">{</span><span class="w">
     </span><span class="s2">"subject_set_imports"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-       </span><span class="s2">"source_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://path.to/some/manifest.json"</span><span class="p">,</span><span class="w">
+       </span><span class="s2">"source_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://path.to/some/manifest.csv"</span><span class="p">,</span><span class="w">
        </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
            </span><span class="s2">"subject_set"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="w">
        </span><span class="p">}</span><span class="w">
@@ -871,7 +871,7 @@ recommended. Instead, use the link endpoints explained below.</p>
 <li>id (required, integer) ... integer id of the resource to retrieve</li>
 </ul></li>
 </ul>
-<h2 id='manifest-csv-format'>Manifest CSV format</h2><pre class="highlight plaintext"><code>uuid,location:1,location:2,metadata:size,metadata:cuteness
+<h2 id='manifest-csv-format'>Manifest CSV format</h2><pre class="highlight plaintext"><code>external_id,location:1,location:2,metadata:size,metadata:cuteness
 1,https://placekitten.com/200/300.jpg,https://placekitten.com/200/100.jpg,small,cute
 2,https://placekitten.com/400/900.jpg,https://placekitten.com/500/100.jpg,large,cute
 </code></pre>
@@ -879,7 +879,7 @@ recommended. Instead, use the link endpoints explained below.</p>
 the following columns:</p>
 
 <ul>
-<li><code>uuid</code> - Zooniverse uses this to deduplicate/upsert existing subjects, so that
+<li><code>external_id</code> - Zooniverse uses this to deduplicate/upsert existing subjects, so that
 it&#39;s possible to reimport a manifest into a subject set.</li>
 <li><p><code>location:</code> - One or more columns that begin with <code>location:</code> (including the colon), followed by any
 sequence of characters. The values of cells in this column are URLs pointing
