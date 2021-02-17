@@ -35,7 +35,7 @@ Content-Type: application/json
 
 {
     "subject_set_imports": {
-       "source_url": "https://path.to/some/manifest.json",
+       "source_url": "https://path.to/some/manifest.csv",
        "links": {
            "subject_set": "1"
        }
