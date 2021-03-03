@@ -630,15 +630,22 @@ describe Api::V1::SubjectsController, type: :controller do
     before do
       subject_ids
       flipper_feature
+      allow(SubjectSelectorSerializer).to receive(:page).and_call_original
       get :selection, request_params
     end
 
-    it 'returns 200', :focus do
+    it 'returns 200' do
+      get :selection, request_params
       expect(response.status).to eq(200)
     end
 
     it 'returns a page with only 1 resource' do
+      get :selection, request_params
       expect(json_response[api_resource_name].length).to eq(1)
+    end
+
+    it 'uses the SubjectSelectorSerializer class' do
+      expect(SubjectSelectorSerializer).to have_received(:page)
     end
 
     it_behaves_like 'an api response'

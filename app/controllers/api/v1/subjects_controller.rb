@@ -71,7 +71,7 @@ class Api::V1::SubjectsController < Api::ApiController
       if selected_subject_ids.empty?
         Subject.none
       else
-        Subject.active.where(id: selected_subject_ids).order("idx(array[#{selected_subject_ids.join(',')}], id)")
+        Subject.active.where(id: selected_subject_ids).order("idx(array[#{selected_subject_ids.join(',')}], id)") # guardrails-disable-line
       end
 
     # create a special 'fake' selector for the serializer
