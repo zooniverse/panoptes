@@ -617,7 +617,7 @@ describe Api::V1::SubjectsController, type: :controller do
     end
   end
 
-  describe '#selection', :focus do
+  describe '#selection' do
     let(:workflow) { create(:workflow_with_subject_sets) }
     let(:api_resource_links) { [] }
     let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
@@ -633,7 +633,7 @@ describe Api::V1::SubjectsController, type: :controller do
       get :selection, request_params
     end
 
-    it 'returns 200' do
+    it 'returns 200', :focus do
       expect(response.status).to eq(200)
     end
 
@@ -651,7 +651,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       it 'has a useful error message' do
-        expect(response.body).to include('Subject ids required')
+        expect(response.body).to include('Ids is required')
       end
     end
 
