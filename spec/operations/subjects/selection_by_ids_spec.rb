@@ -24,6 +24,11 @@ describe Subjects::SelectionByIds do
     expect(outcome.errors.full_messages).to include('Ids must be a comma seperated list of digits (max 10)')
   end
 
+  it 'validates ids param does is present' do
+    outcome = described_class.run(operation_params.except(:ids))
+    expect(outcome.errors.full_messages).to include('Ids is required')
+  end
+
   context 'with subjects that belong to the workflow' do
     let(:workflow) { create(:workflow_with_subject_sets) }
     let(:subject_set) { workflow.subject_sets.first }

@@ -10,7 +10,7 @@ module Subjects
       message: 'must be a comma seperated list of digits (max 10)'
     }
     # lazily loaded and split the formated ids string up
-    array :subject_ids, default: -> { ids.split(',') }
+    array :subject_ids, default: -> { ids&.split(',') }
 
     def execute
       validate_workflow_subject_linkage
