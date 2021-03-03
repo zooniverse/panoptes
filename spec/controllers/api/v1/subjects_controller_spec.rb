@@ -617,6 +617,57 @@ describe Api::V1::SubjectsController, type: :controller do
     end
   end
 
+  describe '#selection', :focus do
+    let(:workflow) { create(:workflow_with_subject_sets) }
+    let(:api_resource_links) { [] }
+    let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
+    let(:subject_ids) { sms.map(&:subject_id) }
+    let(:request_params) do
+      { workflow_id: workflow.id.to_s, ids: subject_ids.join(','), http_cache: 'true' }
+    end
+    let(:flipper_feature) { Panoptes.flipper[:subject_selection_by_ids].enable }
+
+    before do
+      subject_ids
+      flipper_feature
+      get :selection, request_params
+    end
+
+    it 'returns 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns a page with only 1 resource' do
+      expect(json_response[api_resource_name].length).to eq(1)
+    end
+
+    it_behaves_like 'an api response'
+
+    context 'without subject ids params' do
+      let(:request_params) { { workflow_id: workflow.id.to_s } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Subject ids required')
+      end
+    end
+
+    context 'when the feature flag is disabled for this end point' do
+      let(:flipper_feature) { Panoptes.flipper[:subject_selection_by_ids].disable }
+
+      it 'errors with 503' do
+        expect(response.status).to eq(503)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Feature has been temporarily disabled')
+      end
+    end
+  end
+
   describe "#show" do
     let(:resource) { create(:subject) }
 

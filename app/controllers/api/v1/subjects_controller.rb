@@ -50,6 +50,26 @@ class Api::V1::SubjectsController < Api::ApiController
     )
   end
 
+  # special selection end point for known subject ids
+  def selection
+    # temporary feature flag in case we need a prod 'kill' switch for this feature
+    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_selection_by_ids].enabled?
+
+    skip_policy_scope
+
+    # setup the selector params from user input, note validation occurs in the operation class
+    selector_param_keys = %i[workflow_id ids http_cache]
+    selector_params = params.permit(*selector_param_keys)
+
+    _selected_subjects = Subjects::SelectionByIds.run!(
+      subject_ids: selector_params.delete(:ids),
+      workflow_id: selector_params.delete(:workflow_id),
+      params: selector_params,
+      user: api_user
+    )
+
+  end
+
   # special selection end point create SubjectGroups
   def grouped
     # temporary feature flag in case we need a prod 'kill' switch for this feature
