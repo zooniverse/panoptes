@@ -25,10 +25,4 @@ describe SubjectSetImport, type: :model do
   it 'imports subjects to the set' do
     expect(subject_set.subjects.count).to eq(2)
   end
-
-  it 'removes the subject_set_import if the set is deleted', :focus do
-    # uses FK on delete cascade constraint
-    subject_set_import.save
-    expect { subject_set.delete }.not_to raise_error
-  end
 end
