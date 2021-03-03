@@ -78,6 +78,7 @@ Rails.application.routes.draw do
         collection do
           get :queued # Subject selection end point
           get :grouped # SubjectGroup selection end point
+          get :selection # Subject selection by subject ids end point
         end
       end
 
