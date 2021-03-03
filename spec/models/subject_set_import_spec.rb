@@ -13,12 +13,16 @@ describe SubjectSetImport, type: :model do
       2,https://placekitten.com/400/900.jpg,https://placekitten.com/500/100.jpg,large,cute
     CSV
   end
+  let(:subject_set_import) do
+    described_class.new(source_url: source_url, subject_set: subject_set, user: user)
+  end
 
-  it 'imports subjects' do
+  before do
     allow(UrlDownloader).to receive(:stream).with(source_url).and_yield(csv_file)
-    subject_set_import = SubjectSetImport.new(source_url: source_url, subject_set: subject_set, user: user)
     subject_set_import.import!
+  end
 
+  it 'imports subjects to the set' do
     expect(subject_set.subjects.count).to eq(2)
   end
 end

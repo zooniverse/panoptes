@@ -4022,7 +4022,7 @@ ALTER TABLE ONLY public.tutorials
 --
 
 ALTER TABLE ONLY public.subject_set_imports
-    ADD CONSTRAINT fk_rails_8661e689b0 FOREIGN KEY (subject_set_id) REFERENCES public.subject_sets(id);
+    ADD CONSTRAINT fk_rails_8661e689b0 FOREIGN KEY (subject_set_id) REFERENCES public.subject_sets(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -4802,4 +4802,6 @@ INSERT INTO schema_migrations (version) VALUES ('20200717155424');
 INSERT INTO schema_migrations (version) VALUES ('20200720125246');
 
 INSERT INTO schema_migrations (version) VALUES ('20201113151433');
+
+INSERT INTO schema_migrations (version) VALUES ('20210226173243');
 

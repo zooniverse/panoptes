@@ -83,4 +83,16 @@ describe SubjectSet, :type => :model do
       expect(subject_set.belongs_to_project?(subject_set.project_id)).to eq(true)
     end
   end
+
+  describe '#subject_set_imports' do
+    let(:subject_set_import) do
+      create(:subject_set_import, subject_set: subject_set)
+    end
+
+    it 'removes all subject_set_imports on destroy' do
+      subject_set_import
+      subject_set.destroy
+      expect { subject_set_import.reload }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
 end
