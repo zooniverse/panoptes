@@ -28,25 +28,13 @@ describe Subjects::SelectionByIds do
     let(:workflow) { create(:workflow_with_subject_sets) }
     let(:subject_set) { workflow.subject_sets.first }
     let(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
-    let(:subject_ids) { sms.map(&:subject_id) }
+    let(:subject_ids) { sms.map(&:subject_id).map(&:to_s) }
     let(:operation_params) do
       { workflow_id: workflow.id, ids: subject_ids.join(',') }
     end
-    let(:selected_subject_ids) { result.map(&:id) }
 
-    it 'returns the active subjects scope in order' do
-      expect(selected_subject_ids).to eq(subject_ids)
-    end
-
-    it 'returns only active subjects' do
-      sms.first.subject.inactive!
-      expect(selected_subject_ids).to eq([sms.last.subject_id])
-    end
-
-    it 'returns an empty array if no active subjects' do
-      sms.map { |sms| sms.subject.inactive! }
-      selected_subject_ids = result.map(&:id)
-      expect(selected_subject_ids).to match_array([])
+    it 'returns the subjects scope in order' do
+      expect(result).to eq(subject_ids)
     end
 
     context 'when subject ids do not belong to the workflow' do

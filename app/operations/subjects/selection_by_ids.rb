@@ -15,7 +15,7 @@ module Subjects
     def execute
       validate_workflow_subject_linkage
 
-      Subject.active.where(id: subject_ids).order("idx(array[#{subject_ids.join(',')}], id)")
+      subject_ids
     end
 
     private
