@@ -635,12 +635,10 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     it 'returns 200' do
-      get :selection, request_params
       expect(response.status).to eq(200)
     end
 
     it 'returns a page with only 1 resource' do
-      get :selection, request_params
       expect(json_response[api_resource_name].length).to eq(1)
     end
 
