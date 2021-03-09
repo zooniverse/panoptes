@@ -21,6 +21,9 @@ Rails/SkipsModelValidations:
   - update_all
   - touch
 
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
 Style/NumericLiterals:
   Enabled: false
 Style/RegexpLiteral:
@@ -50,3 +53,4 @@ Style/HashTransformValues:
 
 AllCops:
   NewCops: enable
+  TargetRailsVersion: 4.2
