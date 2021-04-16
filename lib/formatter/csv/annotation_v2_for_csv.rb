@@ -11,6 +11,8 @@
 module Formatter
   module Csv
     class AnnotationV2ForCsv
+      class V2DropdownSimpleTaskError < StandardError; end
+
       attr_reader :classification, :annotation, :cache
 
       def initialize(classification, annotation, cache)
@@ -109,6 +111,9 @@ module Formatter
         # the project builders are using PFE lab dropdown workflows to configure
         # https://github.com/zooniverse/front-end-monorepo/blob/master/docs/arch/adr-30.md#consequences
         # https://github.com/zooniverse/front-end-monorepo/tree/master/packages/lib-classifier/src/plugins/tasks/SimpleDropdownTask/models/helpers/legacyDropdownAdapter
+        if task_info['selects'].count > 1
+          raise V2DropdownSimpleTaskError, 'Dropdown task has multiple selects and is not conformant to v2 dropdown-simple task type - aborting'
+        end
 
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
