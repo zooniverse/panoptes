@@ -3,7 +3,6 @@
 module Formatter
   module Csv
     class WorkflowInformation
-
       attr_reader :cache, :workflow, :workflow_version, :content_version
 
       def initialize(cache, workflow, workflow_version_string)
