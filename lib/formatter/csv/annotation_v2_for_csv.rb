@@ -1,4 +1,3 @@
-
 # frozen_string_literal: true
 
 # Copy of the AnnotationForCsv class bringing over the default annotation formatting behaviour
