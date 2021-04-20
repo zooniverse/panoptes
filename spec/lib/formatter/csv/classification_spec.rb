@@ -58,6 +58,12 @@ RSpec.describe Formatter::Csv::Classification do
       allow(Subject).to receive(:where).with(id: classification.subject_ids).and_return([subject])
     end
 
+    it 'uses the default annotation formatter' do
+      allow(Formatter::Csv::AnnotationForCsv).to receive(:new).and_call_original
+      formatter.to_rows(classification)
+      expect(Formatter::Csv::AnnotationForCsv).to have_received(:new).twice
+    end
+
     it 'return an array formatted classifcation data' do
       expect(formatter.to_rows(classification)).to match_array(formatted_data)
     end
@@ -75,6 +81,19 @@ RSpec.describe Formatter::Csv::Classification do
         allow(classification).to receive(:user).and_return(nil)
         user_id = formatter.to_rows(classification)[0][1]
         expect(user_id).to eq("not-logged-in-#{secure_user_ip}")
+      end
+    end
+
+    context 'when the classification.metadata classifier_version is >= 2.0' do
+      before do
+        updated_metadata = classification.metadata.merge('classifier_version' => '2.0')
+        classification.metadata = updated_metadata
+      end
+
+      it 'uses the v2 annotation formatter' do
+        allow(Formatter::Csv::AnnotationV2ForCsv).to receive(:new).and_call_original
+        formatter.to_rows(classification)
+        expect(Formatter::Csv::AnnotationV2ForCsv).to have_received(:new).twice
       end
     end
   end
