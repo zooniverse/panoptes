@@ -12,7 +12,7 @@ module Formatter
     class AnnotationV2ForCsv
       class V2DropdownSimpleTaskError < StandardError; end
 
-      attr_reader :classification, :annotation, :cache, :default_formatter
+      attr_reader :classification, :annotation, :cache, :default_formatter, :workflow_information
 
       def initialize(classification, annotation, cache, default_formatter=nil)
         @classification = classification
@@ -21,9 +21,11 @@ module Formatter
         @cache = cache
         # setup a default formatter for unknown v2 annotation types (i.e. all the v1 tasks)
         @default_formatter = default_formatter || AnnotationForCsv.new(@classification, @annotation, @cache)
+        @workflow_information = WorkflowInformation.new(cache, classification.workflow, classification.workflow_version)
       end
 
       def to_h
+        task = workflow_information.workflow_task(annotation["task"])
         return dropdown(task) if task['type'] == 'dropdown'
 
         # use the default formatter (v1) for non v2 specific task types
@@ -60,7 +62,7 @@ module Formatter
           if (selected_option = dropdown_find_selected_option(selected_dropdown, answer_value))
             drop_anno['option'] = true
             drop_anno['value'] = selected_option['value']
-            drop_anno['label'] = translate(selected_option['label'])
+            drop_anno['label'] = workflow_information.workflow_string(selected_option['label'])
           end
         end
       end
@@ -82,32 +84,6 @@ module Formatter
         return unless task_info['selects'].count > 1
 
         raise V2DropdownSimpleTaskError, 'Dropdown task has multiple selects and is not conformant to v2 dropdown-simple task type - aborting'
-      end
-
-      # these can be extracted to a common collaborator / base class?
-      def translate(string)
-        @translations ||= workflow_at_version.strings
-        @translations[string]
-      end
-
-      def workflow_at_version
-        cache.workflow_at_version(classification.workflow, workflow_version, content_version)
-      end
-
-      def workflow_version
-        classification.workflow_version.split(".")[0].to_i
-      end
-
-      def content_version
-        classification.workflow_version.split(".")[1].to_i
-      end
-
-      def task
-        return @task if @task
-        task_annotation = workflow_at_version.tasks.find do |key, task|
-         key == annotation["task"]
-        end
-        @task = task_annotation.try(:last) || {}
       end
     end
   end
