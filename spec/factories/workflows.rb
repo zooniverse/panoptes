@@ -344,7 +344,7 @@ FactoryBot.define do
     end
 
     trait :dropdown_simple do
-      display_name { "Simple Dropdown (PFE format used in FEM)" }
+      display_name { 'Simple Dropdown (PFE format used in FEM)' }
       tasks {
         {
           "T1"=>{
