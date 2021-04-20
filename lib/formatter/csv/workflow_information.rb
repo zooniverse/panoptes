@@ -14,17 +14,17 @@ module Formatter
         @content_version = wf_version_strings[1].to_i
       end
 
-      def workflow_at_version
-        cache.workflow_at_version(workflow, workflow_version, content_version)
+      def at_version
+        @at_version ||= cache.workflow_at_version(workflow, workflow_version, content_version)
       end
 
-      def workflow_string(string)
-        @workflow_string ||= workflow_at_version.strings
+      def string(string)
+        @workflow_string ||= at_version.strings
         @workflow_string[string]
       end
 
-      def workflow_task(task_key_to_find)
-        task_annotation = workflow_at_version.tasks.find do |key, _task|
+      def task(task_key_to_find)
+        task_annotation = at_version.tasks.find do |key, _task|
           key == task_key_to_find
         end
         task_annotation.try(:last) || {}

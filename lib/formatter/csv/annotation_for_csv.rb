@@ -1,27 +1,29 @@
 module Formatter
   module Csv
     class AnnotationForCsv
-      attr_reader :classification, :annotation, :cache
+      attr_reader :classification, :annotation, :cache, :workflow_information
 
       def initialize(classification, annotation, cache)
         @classification = classification
         @annotation = annotation.dup.with_indifferent_access
         @current = @annotation.dup
         @cache = cache
+        @workflow_information = WorkflowInformation.new(cache, classification.workflow, classification.workflow_version)
       end
 
       def to_h
+        task = workflow_information.task(annotation['task'])
         case task['type']
-        when "drawing"
-          drawing
+        when 'drawing'
+          drawing(task)
         when /single|multiple|shortcut/
-          simple
-        when "text"
-          text
-        when "combo"
-          combo
-        when "dropdown"
-          dropdown
+          simple(task)
+        when 'text'
+          text(task)
+        when 'dropdown'
+          dropdown(task)
+        when 'combo'
+          combo # combo iterates over the submitted task annotation values
         else
           @annotation
         end
@@ -32,7 +34,7 @@ module Formatter
 
       private
 
-      def drawing(task_info=task)
+      def drawing(task_info)
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
           new_anno['task_label'] = task_label(task_info)
@@ -50,15 +52,20 @@ module Formatter
         end
       end
 
-      def simple(task_info=task)
+      def simple(task_info)
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
           new_anno['task_label'] = task_label(task_info)
-          new_anno['value'] = ['multiple', 'shortcut'].include?(task_info['type']) ? answer_labels : answer_labels.first
+          new_anno['value'] =
+            if %w[multiple shortcut].include?(task_info['type'])
+              answer_labels
+            else
+              answer_labels.first
+            end
         end
       end
 
-      def text(task_info=task)
+      def text(task_info)
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
           new_anno['value'] = @current['value']
@@ -73,7 +80,7 @@ module Formatter
           new_anno['value'] ||= []
           Array.wrap(annotation['value']).each do |subtask|
             @current = subtask
-            task_info = get_task_info(subtask)
+            task_info = workflow_information.task(subtask['task'])
             new_anno['value'].push case task_info['type']
               when "drawing"
                 drawing(task_info)
@@ -92,7 +99,7 @@ module Formatter
         end
       end
 
-      def dropdown(task_info=task)
+      def dropdown(task_info)
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
           new_anno['value'] = task_info['selects'].map.with_index do |selects, index|
@@ -118,7 +125,7 @@ module Formatter
           if selected_option = dropdown_find_selected_option(selects, answer_value)
             drop_anno['option'] = true
             drop_anno['value'] = selected_option['value']
-            drop_anno['label'] = translate(selected_option['label'])
+            drop_anno['label'] = workflow_information.strings(selected_option['label'])
           end
         end
       end
@@ -133,14 +140,14 @@ module Formatter
       end
 
       def task_label(task_info)
-        translate(task_info["question"] || task_info["instruction"])
+        workflow_information.string(task_info['question'] || task_info['instruction'])
       end
 
       def tool_label(task_info, tool)
         tool_index = tool["tool"]
         have_tool_lookup_info = !!(task_info["tools"] && tool_index)
         known_tool = have_tool_lookup_info && task_info["tools"][tool_index]
-        translate(known_tool["label"]) if known_tool
+        workflow_information.string(known_tool['label']) if known_tool
       end
 
       def answer_labels
@@ -148,50 +155,15 @@ module Formatter
           begin
             task_answer = workflow_at_version.tasks[@current['task']]['answers'][answer_idx]
             answer_string = task_answer['label']
-            translate(answer_string)
+            workflow_information.string(answer_string)
           rescue TypeError, NoMethodError
             "unknown answer label"
           end
         end
       end
 
-      def translate(string)
-        @translations ||= workflow_at_version.strings
-        @translations[string]
-      end
-
       def workflow_at_version
-        cache.workflow_at_version(classification.workflow, workflow_version, content_version)
-      end
-
-      def workflow_version
-        classification.workflow_version.split(".")[0].to_i
-      end
-
-      def content_version
-        classification.workflow_version.split(".")[1].to_i
-      end
-
-      def annotation_by_task(subtask)
-        workflow_at_version.tasks.find do |key, task|
-          key == subtask['task']
-        end
-      end
-
-      def get_task_info(subtask)
-        workflow_at_version.tasks.find do |key, task|
-         key == subtask["task"]
-        end.try(:last) || {}
-      rescue
-        {}
-      end
-
-      def task
-        return @task if @task
-        task_annotation = workflow_at_version.tasks.find do |key, task|
-         key == annotation["task"]
-        end
-        @task = task_annotation.try(:last) || {}
+        workflow_information.at_version
       end
     end
   end
