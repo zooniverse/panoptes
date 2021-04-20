@@ -80,7 +80,7 @@ module Formatter
           new_anno['value'] ||= []
           Array.wrap(annotation['value']).each do |subtask|
             @current = subtask
-            task_info = workflow_information.task(subtask['task'])
+            task_info = get_task_info(subtask)
             new_anno['value'].push case task_info['type']
               when "drawing"
                 drawing(task_info)
@@ -125,7 +125,7 @@ module Formatter
           if selected_option = dropdown_find_selected_option(selects, answer_value)
             drop_anno['option'] = true
             drop_anno['value'] = selected_option['value']
-            drop_anno['label'] = workflow_information.strings(selected_option['label'])
+            drop_anno['label'] = workflow_information.string(selected_option['label'])
           end
         end
       end
@@ -164,6 +164,15 @@ module Formatter
 
       def workflow_at_version
         workflow_information.at_version
+      end
+
+      # used in combo task to protect against invalid annotations
+      # i.e. bad annotation data from tropical sweden project
+      def get_task_info(task)
+        task_key = task['task']
+        workflow_information.task(task_key)
+      rescue TypeError
+        {}
       end
     end
   end
