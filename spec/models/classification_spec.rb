@@ -200,4 +200,23 @@ describe Classification, :type => :model do
       expect(build(:classification).seen_before?).to be_falsey
     end
   end
+
+  describe '#v2_annotations?' do
+    it 'is false when missing metadata key' do
+      classification = build_stubbed(:classification)
+      expect(classification.be_v2_annotation_format).to be_falsey
+    end
+
+    context 'when the metadata classifier_version key is set to 2.x' do
+      it 'is true when 2.0' do
+        classification = build_stubbed(:classification, metadata: { 'classifier_version' => '2.0' })
+        expect(classification.be_v2_annotation_format).to be_truthy
+      end
+
+      it 'is true when 2.x' do
+        classification = build_stubbed(:classification, metadata: { 'classifier_version' => '2.9' })
+        expect(classification.be_v2_annotation_format).to be_truthy
+      end
+    end
+  end
 end
