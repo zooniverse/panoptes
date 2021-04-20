@@ -25,7 +25,7 @@ module Formatter
       end
 
       def to_h
-        task = workflow_information.workflow_task(annotation["task"])
+        task = workflow_information.task(annotation['task'])
         return dropdown(task) if task['type'] == 'dropdown'
 
         # use the default formatter (v1) for non v2 specific task types
@@ -62,7 +62,7 @@ module Formatter
           if (selected_option = dropdown_find_selected_option(selected_dropdown, answer_value))
             drop_anno['option'] = true
             drop_anno['value'] = selected_option['value']
-            drop_anno['label'] = workflow_information.workflow_string(selected_option['label'])
+            drop_anno['label'] = workflow_information.string(selected_option['label'])
           end
         end
       end
