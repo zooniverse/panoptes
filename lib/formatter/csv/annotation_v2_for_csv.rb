@@ -13,107 +13,30 @@ module Formatter
     class AnnotationV2ForCsv
       class V2DropdownSimpleTaskError < StandardError; end
 
-      attr_reader :classification, :annotation, :cache
+      attr_reader :classification, :annotation, :cache, :default_formatter
 
-      def initialize(classification, annotation, cache)
+      def initialize(classification, annotation, cache, default_formatter=nil)
         @classification = classification
         @annotation = annotation.dup.with_indifferent_access
         @current = @annotation.dup
         @cache = cache
+        # setup a default formatter for unknown v2 annotation types (i.e. all the v1 tasks)
+        @default_formatter = default_formatter || AnnotationForCsv.new(@classification, @annotation, @cache)
       end
 
       def to_h
-        case task['type']
-        when "drawing"
-          drawing
-        when /single|multiple|shortcut/
-          simple
-        when "text"
-          text
-        when "combo"
-          combo
-        when "dropdown"
-          dropdown
-        else
-          @annotation
-        end
-      rescue ClassificationDumpCache::MissingWorkflowVersion => error
-        Honeybadger.notify(error, context: {classification_id: classification.id})
-        @annotation
+        return dropdown(task) if task['type'] == 'dropdown'
+
+        # use the default formatter (v1) for non v2 specific task types
+        # as time goes on behaviour will eventually move from default formatter
+        # to above in order to handle the newer v2 specific annotation formats
+        default_formatter.to_h
       end
 
       private
 
-      def drawing(task_info=task)
-        {}.tap do |new_anno|
-          new_anno['task'] = @current['task']
-          new_anno['task_label'] = task_label(task_info)
-
-          added_tool_lables = Array.wrap(@current["value"]).map do |drawn_item|
-            if drawn_item.is_a?(Hash)
-              tool_label = tool_label(task_info, drawn_item)
-              drawn_item.merge("tool_label" => tool_label)
-            else
-              drawn_item
-            end
-          end
-
-          new_anno["value"] = added_tool_lables
-        end
-      end
-
-      def simple(task_info=task)
-        {}.tap do |new_anno|
-          new_anno['task'] = @current['task']
-          new_anno['task_label'] = task_label(task_info)
-          new_anno['value'] = ['multiple', 'shortcut'].include?(task_info['type']) ? answer_labels : answer_labels.first
-        end
-      end
-
-      def text(task_info=task)
-        {}.tap do |new_anno|
-          new_anno['task'] = @current['task']
-          new_anno['value'] = @current['value']
-          new_anno['task_label'] = task_label(task_info)
-        end
-      end
-
-      def combo
-        {}.tap do |new_anno|
-          new_anno['task'] = annotation['task']
-          new_anno['task_label'] = nil
-          new_anno['value'] ||= []
-          Array.wrap(annotation['value']).each do |subtask|
-            @current = subtask
-            task_info = get_task_info(subtask)
-            new_anno['value'].push case task_info['type']
-              when "drawing"
-                drawing(task_info)
-              when "single", "multiple"
-                simple(task_info)
-              when "text"
-                text(task_info)
-              when "combo"
-                { error: "combo tasks cannot be nested" }
-              when "dropdown"
-                dropdown(task_info)
-              else
-                @current
-              end
-          end
-        end
-      end
-
-      def dropdown(task_info=task)
-        # TODO raise if annotation format is not @current['taskType'] == "dropdown-simple"
-        # and there is only 1 select (dropdown) configured for the task.
-        # as FEM only supports simple dropdowns currently and
-        # the project builders are using PFE lab dropdown workflows to configure
-        # https://github.com/zooniverse/front-end-monorepo/blob/master/docs/arch/adr-30.md#consequences
-        # https://github.com/zooniverse/front-end-monorepo/tree/master/packages/lib-classifier/src/plugins/tasks/SimpleDropdownTask/models/helpers/legacyDropdownAdapter
-        if task_info['selects'].count > 1
-          raise V2DropdownSimpleTaskError, 'Dropdown task has multiple selects and is not conformant to v2 dropdown-simple task type - aborting'
-        end
+      def dropdown(task_info)
+        ensure_v2_dropdown_task_format(task_info)
 
         {}.tap do |new_anno|
           new_anno['task'] = @current['task']
@@ -150,29 +73,19 @@ module Formatter
         end
       end
 
-      def task_label(task_info)
-        translate(task_info["question"] || task_info["instruction"])
+      # raise if annotation format is not @current['taskType'] == "dropdown-simple"
+      # and there is only 1 select (dropdown) configured for the task.
+      # as FEM only supports simple dropdowns currently and
+      # the project builders are using PFE lab dropdown workflows to configure
+      # https://github.com/zooniverse/front-end-monorepo/blob/master/docs/arch/adr-30.md#consequences
+      # https://github.com/zooniverse/front-end-monorepo/tree/master/packages/lib-classifier/src/plugins/tasks/SimpleDropdownTask/models/helpers/legacyDropdownAdapter
+      def ensure_v2_dropdown_task_format(task_info)
+        return unless task_info['selects'].count > 1
+
+        raise V2DropdownSimpleTaskError, 'Dropdown task has multiple selects and is not conformant to v2 dropdown-simple task type - aborting'
       end
 
-      def tool_label(task_info, tool)
-        tool_index = tool["tool"]
-        have_tool_lookup_info = !!(task_info["tools"] && tool_index)
-        known_tool = have_tool_lookup_info && task_info["tools"][tool_index]
-        translate(known_tool["label"]) if known_tool
-      end
-
-      def answer_labels
-        Array.wrap(@current["value"]).map do |answer_idx|
-          begin
-            task_answer = workflow_at_version.tasks[@current['task']]['answers'][answer_idx]
-            answer_string = task_answer['label']
-            translate(answer_string)
-          rescue TypeError, NoMethodError
-            "unknown answer label"
-          end
-        end
-      end
-
+      # these can be extracted to a common collaborator / base class?
       def translate(string)
         @translations ||= workflow_at_version.strings
         @translations[string]
@@ -188,20 +101,6 @@ module Formatter
 
       def content_version
         classification.workflow_version.split(".")[1].to_i
-      end
-
-      def annotation_by_task(subtask)
-        workflow_at_version.tasks.find do |key, task|
-          key == subtask['task']
-        end
-      end
-
-      def get_task_info(subtask)
-        workflow_at_version.tasks.find do |key, task|
-         key == subtask["task"]
-        end.try(:last) || {}
-      rescue
-        {}
       end
 
       def task

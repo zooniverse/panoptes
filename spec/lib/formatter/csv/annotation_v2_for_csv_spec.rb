@@ -4,7 +4,33 @@ require 'spec_helper'
 
 RSpec.describe Formatter::Csv::AnnotationV2ForCsv do
   let(:workflow_version) { build_stubbed(:workflow_version, workflow: workflow, tasks: workflow.tasks, strings: workflow.strings) }
+  let(:classification) do
+    build_stubbed(:classification, subjects: [], workflow: workflow, annotations: [annotation])
+  end
   let(:cache) { instance_double('ClassificationDumpCache') }
+
+  before do
+    maj, min = classification.workflow_version.split('.').map(&:to_i)
+    allow(cache).to receive(:workflow_at_version).with(workflow, maj, min).and_return(workflow_version)
+  end
+
+  context 'with a non-dropdown task workflow and annotation' do
+    let(:workflow) { build_stubbed(:workflow) }
+    let(:annotation) { { 'task' => 'interest', 'value' => {} } }
+    let(:formatter) do
+      described_class.new(classification, classification.annotations[0], cache)
+    end
+    let(:default_formatter) { formatter.default_formatter }
+
+    before do
+      allow(default_formatter).to receive(:to_h).and_call_original
+    end
+
+    it 'uses the default annotation formatter' do
+      formatter.to_h
+      expect(default_formatter).to have_received(:to_h)
+    end
+  end
 
   context 'with a v2 dropdown (simple) task' do
     let(:workflow) { build_stubbed(:workflow, :dropdown_simple) }
@@ -14,11 +40,6 @@ RSpec.describe Formatter::Csv::AnnotationV2ForCsv do
         'value' => { 'selection' => '3844fc24a3df7', 'option' => true, 'taskType' => 'dropdown-simple' }
       }
     end
-
-    let(:classification) do
-      build_stubbed(:classification, subjects: [], workflow: workflow, annotations: [annotation])
-    end
-
     let(:results) do
       {
         'task' => 'T1',
@@ -29,11 +50,6 @@ RSpec.describe Formatter::Csv::AnnotationV2ForCsv do
           'label' => 'US'
         }
       }
-    end
-
-    before do
-      maj, min = classification.workflow_version.split('.').map(&:to_i)
-      allow(cache).to receive(:workflow_at_version).with(workflow, maj, min).and_return(workflow_version)
     end
 
     it 'adds the correct answer labels' do
