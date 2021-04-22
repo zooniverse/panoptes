@@ -53,6 +53,12 @@ class Api::V1::WorkflowsController < Api::ApiController
     render nothing: true, status: 204
   end
 
+  def unretire_subjects
+    put 'mdy114 params'
+    put params
+    render nothing: true, status: 204
+  end
+
   def create_classifications_export
     medium = CreateClassificationsExport.with( api_user: api_user, object: controlled_resource ).run!(params)
     medium_response(medium)
