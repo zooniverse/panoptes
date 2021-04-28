@@ -24,7 +24,7 @@ module Formatter
           selected_dropdown = task_info['selects'].first
           selection_value = annotation.dig('value', 'selection')
           dropdown_annotation.merge(
-            'value' => dropdown_process_select(selected_dropdown, selection_value),
+            'value' => dropdown_process_select(selected_dropdown, selection_value)
           )
         end
 
