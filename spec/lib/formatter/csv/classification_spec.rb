@@ -91,9 +91,9 @@ RSpec.describe Formatter::Csv::Classification do
       end
 
       it 'uses the v2 annotation formatter' do
-        allow(Formatter::Csv::AnnotationV2ForCsv).to receive(:new).and_call_original
+        allow(Formatter::Csv::V2::Annotation).to receive(:new).and_call_original
         formatter.to_rows(classification)
-        expect(Formatter::Csv::AnnotationV2ForCsv).to have_received(:new).twice
+        expect(Formatter::Csv::V2::Annotation).to have_received(:new).twice
       end
     end
   end
