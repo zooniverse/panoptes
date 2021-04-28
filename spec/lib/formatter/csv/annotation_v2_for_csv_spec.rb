@@ -33,11 +33,18 @@ RSpec.describe Formatter::Csv::AnnotationV2ForCsv do
   end
 
   context 'with a v2 dropdown (simple) task' do
+    # details on what allowCreate wf task values for dropdowns do
+    # and how that relates to the annotaion value `option: false`
+    # https://github.com/zooniverse/caesar/pull/842#issuecomment-499586993
     let(:workflow) { build_stubbed(:workflow, :dropdown_simple) }
     let(:annotation) do
       {
         'task' => 'T1',
-        'value' => { 'selection' => '3844fc24a3df7', 'option' => true, 'taskType' => 'dropdown-simple' }
+        # Note: the selected value is not index based (similar to single / simple tasks)
+        # and not the old PFE value key. See details at
+        # https://github.com/zooniverse/front-end-monorepo/discussions/2131
+        'value' => { 'selection' => 2, 'option' => true },
+        'taskType' => 'dropdown-simple'
       }
     end
     let(:results) do
@@ -46,7 +53,7 @@ RSpec.describe Formatter::Csv::AnnotationV2ForCsv do
         'value' => {
           'select_label' => 'Country',
           'option' => true,
-          'value' => '3844fc24a3df7',
+          'value' => 2,
           'label' => 'US'
         }
       }

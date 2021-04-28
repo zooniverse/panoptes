@@ -54,24 +54,30 @@ module Formatter
         {}.tap do |drop_anno|
           drop_anno['select_label'] = selected_dropdown['title']
 
+          # `allowCreate` means a volunteer may override the selects and create free text
+          # however they may still choose to use a supplied select option from the wf tasks
+          # hence below we still have to check the answer is a known select option
           if selected_dropdown['allowCreate']
-            drop_anno['option'] = false
+            drop_anno['option'] = false # this means volunteer created value
             drop_anno['value'] = answer_value
           end
 
-          if (selected_option = dropdown_find_selected_option(selected_dropdown, answer_value))
-            drop_anno['option'] = true
+          if answer_value && (selected_option = dropdown_find_selected_option(selected_dropdown, answer_value))
+            drop_anno['option'] = true # this means volunteer selected a provided worfklow option select
             drop_anno['value'] = selected_option['value']
             drop_anno['label'] = workflow_information.string(selected_option['label'])
           end
         end
       end
 
-      def dropdown_find_selected_option(selected_dropdown, answer_value)
+      def dropdown_find_selected_option(selected_dropdown, answer_index)
         flattened_dropdown_option_values = selected_dropdown['options'].values.flatten
-        flattened_dropdown_option_values.find do |option|
-          option['value'] == answer_value
-        end
+        found_option = flattened_dropdown_option_values[answer_index]
+        return unless found_option
+
+        # override the value in the workflow's task option representation
+        # to preserve the supplied answer index for downstream consumers
+        found_option.merge('value' => answer_index)
       end
 
       # raise if annotation format is not @current['taskType'] == "dropdown-simple"
