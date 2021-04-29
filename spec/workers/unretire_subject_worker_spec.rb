@@ -15,6 +15,13 @@ RSpec.describe UnretireSubjectWorker do
                     status.reload.retired_at
             }.to(nil)
             end
+
+            it "should set retirement_reason to nil", :focus => true do 
+                expect{ worker.perform(workflow.id, [ subject.id ] ) }.to change {
+                    status.reload.retirement_reason
+            }.to(nil)
+            end
+
         end
     end
 end

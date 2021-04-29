@@ -54,8 +54,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def unretire_subjects
-    puts 'mdy114 params'
-    puts params
+    operation.run!(params)
     render nothing: true, status: 204
   end
 
