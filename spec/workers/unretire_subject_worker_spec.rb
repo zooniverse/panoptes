@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe UnretireSubjectWorker do
   let(:worker) { described_class.new }
-  let(:workflow) { create(:workflow_with_subjects, num_sPets: 1) }
+  let(:workflow) { create(:workflow_with_subjects, num_sets: 1) }
   let(:subject) { workflow.subjects.first }
   let(:sms) { subject.set_member_subject.first }
   let(:set) { sms.subject_set }
@@ -13,13 +13,13 @@ RSpec.describe UnretireSubjectWorker do
       it "should set retired_at to nil" do
         expect{ worker.perform(workflow.id, [ subject.id ] ) }.to change {
           status.reload.retired_at
-      }.to(nil)
+        }.to(nil)
       end
 
       it "should set retirement_reason to nil" do
         expect{ worker.perform(workflow.id, [ subject.id ] ) }.to change {
           status.reload.retirement_reason
-      }.to(nil)
+        }.to(nil)
       end
     end
   end
