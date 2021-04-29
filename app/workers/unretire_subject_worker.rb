@@ -14,6 +14,8 @@ class UnretireSubjectWorker
         end
     end
 
+    private
+
     def workflow_exists?
         Workflow.where(id: workflow_id).exists?
     end
