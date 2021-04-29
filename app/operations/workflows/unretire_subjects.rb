@@ -11,9 +11,7 @@ module Workflows
         def execute
             return if subject_ids.empty?
 
-            SubjectWorkflowStatus.where.not(retired_at: nil).where(workflow_id: workflow_id, subject_id: subject_ids).update_all(retired_at: nil, retirement_reason: nil)
-            RefreshWorkflowStatusWorker.perform_async(workflow_id)
-            NotifySubjectSelectorOfChangeWorker.perform_async(workflow_id)
+            UnretireSubjectWorker.perform_async(workflow_id, subject_ids)
         end
 
         def subject_ids 
