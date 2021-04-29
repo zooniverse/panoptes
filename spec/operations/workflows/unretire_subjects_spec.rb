@@ -12,10 +12,14 @@ describe Workflows::UnretireSubjects do
           workflow_id: workflow.id,
           subject_id: subject1.id,
         }
-      end
+    end
+    let(:operation) { described_class.with(api_user: api_user) }
 
-    it "should unretire given subjects with subject ids for the workflow", :focus => true do 
-        result = operation.run(params)
-        SubjectWorkflowStatus
+
+    it "should call unretirement worker with subject_id", :focus => true do 
+        expect(UnretireSubjectWorker)
+            .to receive(:perform_async)
+            .with(workflow.id, [ subject1.id ])
+        operation.run!(params)
     end
 end
