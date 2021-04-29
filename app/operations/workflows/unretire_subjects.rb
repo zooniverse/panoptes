@@ -17,6 +17,5 @@ module Workflows
         def subject_ids 
             @cached_subject_ids ||= Array.wrap(@subject_ids) | Array.wrap(@subject_id)
         end
-
     end
 end
