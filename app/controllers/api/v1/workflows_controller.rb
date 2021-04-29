@@ -3,7 +3,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   include SyncResourceTranslationStrings
   include MediumResponse
 
-  require_authentication :update, :create, :destroy, :retire_subjects, :create_classifications_export, scopes: [:project]
+  require_authentication :update, :create, :destroy, :retire_subjects, :create_classifications_export, :unretire_subjects, scopes: [:project]
 
   resource_actions :index, :show, :create, :update, :deactivate
   schema_type :json_schema
