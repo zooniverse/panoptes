@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Workflows
   class UnretireSubjects < Operation
     validates :workflow_id, presence: true
@@ -10,11 +12,12 @@ module Workflows
 
     def execute
       return if subject_ids.empty?
+
       UnretireSubjectWorker.perform_async(workflow_id, subject_ids)
     end
 
-    def subject_ids 
-      @cached_subject_ids ||= Array.wrap(@subject_ids) | Array.wrap(@subject_id)
+    def subject_ids
+      @subject_ids ||= Array.wrap(@subject_ids) | Array.wrap(@subject_id)
     end
   end
 end
