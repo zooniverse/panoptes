@@ -742,17 +742,17 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:subject_set_project) { project }
     let(:subject_set) { create(:subject_set, project: project, workflows: [project.workflows.first]) }
     let(:subject_set_id) { subject_set.id }
-    let(:subject) { create(:subject, subject_sets: [subject_set]) }
+    let(:subject1) { create(:subject, subject_sets: [subject_set]) }
 
-    it 'returns a 204 status' do 
-      post :unretire_subjects, workflow_id: workflow.id, subject_id: subject.id
+    it 'returns a 204 status' do
+      post :unretire_subjects, workflow_id: workflow.id, subject_id: subject1.id
       expect(response.status).to eq(204)
     end
 
-    it 'queues an unretire subject worker' do 
-      allow(UnretireSubjectWorker).to receive(:perform_async).with(workflow.id, [subject.id])
-      post :unretire_subjects, workflow_id: workflow.id, subject_id: subject.id
-      expect(UnretireSubjectWorker).to have_received(:perform_async).with(workflow.id, [subject.id])
+    it 'queues an unretire subject worker' do
+      allow(UnretireSubjectWorker).to receive(:perform_async).with(workflow.id, [subject1.id])
+      post :unretire_subjects, workflow_id: workflow.id, subject_id: subject1.id
+      expect(UnretireSubjectWorker).to have_received(:perform_async).with(workflow.id, [subject1.id])
     end
   end
 

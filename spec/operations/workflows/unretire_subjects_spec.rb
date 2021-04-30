@@ -16,7 +16,6 @@ describe Workflows::UnretireSubjects do
     }
   end
   let(:operation) { described_class.with(api_user: api_user) }
-
   before do 
     allow(UnretireSubjectWorker).to receive(:perform_async).and_return(true)
   end

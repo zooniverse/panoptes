@@ -11,6 +11,11 @@ RSpec.describe UnretireSubjectWorker do
   let(:status) { create(:subject_workflow_status, subject: subject1, workflow: workflow, retired_at: 1.day.ago, retirement_reason: 'other') }
 
   describe '#perform' do
+    before do
+      allow(RefreshWorkflowStatusWorker).to receive(:perform_async)
+      allow(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async)
+    end
+
     context 'when subjects are unretireable' do
       it 'sets retired_at to nil' do
         expect { worker.perform(workflow.id, [subject1.id]) }.to change {
@@ -25,13 +30,11 @@ RSpec.describe UnretireSubjectWorker do
       end
 
       it 'calls RefreshWorkflowStatusWorker with workflow id' do
-        allow(RefreshWorkflowStatusWorker).to receive(:perform_async).and_return(true)
         worker.perform(workflow.id, [subject1.id])
         expect(RefreshWorkflowStatusWorker).to have_received(:perform_async).with(workflow.id)
       end
 
       it 'calls NotifySubjectSelectorOfChangeWorker with workflow id' do
-        allow(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async).and_return(true)
         worker.perform(workflow.id, [subject1.id])
         expect(NotifySubjectSelectorOfChangeWorker).to have_received(:perform_async).with(workflow.id)
       end
@@ -43,17 +46,16 @@ RSpec.describe UnretireSubjectWorker do
 
     it 'handles unknown subject id' do
       expect { worker.perform(workflow.id, [-1]) }.not_to raise_error
-    end
-    
+    end    
     context 'when unknown workflow' do 
       it 'does not run RefreshWorkflowStatusWorker' do
-        expect(RefreshWorkflowStatusWorker).not_to receive(:perform_async)
         worker.perform(-1, [subject1.id])
+        expect(RefreshWorkflowStatusWorker).not_to have_received(:perform_async).with(workflow.id)
       end
 
       it 'does not run NotifySubjectSelectorOfChangeWorker' do
-        expect(NotifySubjectSelectorOfChangeWorker).not_to receive(:perform_async)
         worker.perform(-1, [subject1.id])
+        expect(NotifySubjectSelectorOfChangeWorker).not_to have_received(:perform_async).with(workflow.id)
       end
     end
   end
