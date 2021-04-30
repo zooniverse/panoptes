@@ -38,7 +38,7 @@ describe Workflows::RetireSubjects do
       .with(workflow.id, [subject1.id], "nothing_here")
     operation.run!(params.merge(retirement_reason: "blank"))
   end
- 
+
   it 'is invalid with a missing workflow_id param' do
     result = operation.run(params.except(:workflow_id))
     expect(result).not_to be_valid
