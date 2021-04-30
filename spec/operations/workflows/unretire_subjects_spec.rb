@@ -34,7 +34,7 @@ describe Workflows::UnretireSubjects do
     operation.run!(run_params.merge(subject_ids: [subject1.id, subject2.id]))
     expect(UnretireSubjectWorker)
       .to have_received(:perform_async)
-      .with(workflow.id, subject_ids)
+      .with(workflow.id, [subject1.id, subject2.id])
   end
 
   it 'is invalid with a missing workflow_id param' do
