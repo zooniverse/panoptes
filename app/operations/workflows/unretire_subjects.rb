@@ -11,13 +11,13 @@ module Workflows
     end
 
     def execute
-      return if subject_ids.empty?
+      return if cached_subject_ids.empty?
 
-      UnretireSubjectWorker.perform_async(workflow_id, subject_ids)
+      UnretireSubjectWorker.perform_async(workflow_id, cached_subject_ids)
     end
 
-    def subject_ids
-      @subject_ids ||= Array.wrap(@subject_ids) | Array.wrap(@subject_id)
+    def cached_subject_ids
+      @cached_subject_ids ||= Array.wrap(@subject_ids) | Array.wrap(@subject_id)
     end
   end
 end

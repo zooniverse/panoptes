@@ -23,4 +23,19 @@ describe Workflows::UnretireSubjects do
       .with(workflow.id, [subject1.id])
     operation.run!(params)
   end
+
+  it 'calls unretirement worker with ubject_ids' do
+    subject2 = create(:subject, subject_sets: [subject_set])
+    subject_ids = [subject1.id, subject2.id]
+    expect(UnretireSubjectWorker)
+      .to receive(:perform_async)
+      .with(workflow.id, subject_ids)
+    run_params = params.except(:subject_id)
+    operation.run!(run_params.merge(subject_ids: subject_ids))
+  end
+
+  it 'is invalid with a missing workflow_id param' do
+    result = operation.run(params.except(:workflow_id))
+    expect(result).not_to be_valid
+  end
 end
