@@ -734,6 +734,28 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
   end
 
+  describe '#unretire_subjects' do
+    before do
+      default_request scopes: scopes, user_id: authorized_user.id
+    end
+
+    let(:subject_set_project) { project }
+    let(:subject_set) { create(:subject_set, project: project, workflows: [project.workflows.first]) }
+    let(:subject_set_id) { subject_set.id }
+    let(:subject) { create(:subject, subject_sets: [subject_set]) }
+
+    it 'returns a 204 status' do 
+      post :unretire_subjects, workflow_id: workflow.id, subject_id: subject.id
+      expect(response.status).to eq(204)
+    end
+
+    it 'queues an unretire subject worker' do 
+      allow(UnretireSubjectWorker).to receive(:perform_async).with(workflow.id, [subject.id])
+      post :unretire_subjects, workflow_id: workflow.id, subject_id: subject.id
+      expect(UnretireSubjectWorker).to have_received(:perform_async).with(workflow.id, [subject.id])
+    end
+  end
+
   describe "#create_classifications_export" do
     let(:test_attr) { :type }
     let(:api_resource_name) { "media" }
