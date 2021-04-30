@@ -42,12 +42,13 @@ RSpec.describe UnretireSubjectWorker do
 
     it 'handles unknown workflow' do
       expect { worker.perform(-1, [subject1.id]) }.not_to raise_error
-    end 
+    end
 
     it 'handles unknown subject id' do
       expect { worker.perform(workflow.id, [-1]) }.not_to raise_error
-    end    
-    context 'when unknown workflow' do 
+    end
+
+    context 'when unknown workflow' do
       it 'does not run RefreshWorkflowStatusWorker' do
         worker.perform(-1, [subject1.id])
         expect(RefreshWorkflowStatusWorker).not_to have_received(:perform_async).with(workflow.id)

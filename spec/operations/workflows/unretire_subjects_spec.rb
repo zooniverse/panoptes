@@ -8,6 +8,7 @@ describe Workflows::UnretireSubjects do
   let(:subject_set) { create(:subject_set, project: workflow.project, workflows: [workflow]) }
   let(:subject_set_id) { subject_set.id }
   let(:subject1) { create(:subject, subject_sets: [subject_set]) }
+  let(:subject2) { create(:subject, subject_sets: [subject_set]) }
   let(:subject_workflow_count) { create }
   let(:params) do
     {
@@ -16,7 +17,8 @@ describe Workflows::UnretireSubjects do
     }
   end
   let(:operation) { described_class.with(api_user: api_user) }
-  before do 
+
+  before do
     allow(UnretireSubjectWorker).to receive(:perform_async).and_return(true)
   end
 
@@ -28,10 +30,8 @@ describe Workflows::UnretireSubjects do
   end
 
   it 'calls unretirement worker with subject_ids' do
-    subject2 = create(:subject, subject_sets: [subject_set])
-    subject_ids = [subject1.id, subject2.id]
     run_params = params.except(:subject_id)
-    operation.run!(run_params.merge(subject_ids: subject_ids))
+    operation.run!(run_params.merge(subject_ids: [subject1.id, subject2.id]))
     expect(UnretireSubjectWorker)
       .to have_received(:perform_async)
       .with(workflow.id, subject_ids)
