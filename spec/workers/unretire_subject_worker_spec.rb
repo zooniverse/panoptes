@@ -16,7 +16,7 @@ RSpec.describe UnretireSubjectWorker do
       allow(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async)
     end
 
-    context 'when subjects are unretireable' do
+    context 'when subjects are already retired' do
       it 'sets retired_at to nil' do
         expect { worker.perform(workflow.id, [subject1.id]) }.to change {
           status.reload.retired_at
