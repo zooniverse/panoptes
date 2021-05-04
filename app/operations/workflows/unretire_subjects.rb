@@ -2,7 +2,7 @@
 
 module Workflows
   class UnretireSubjects < Operation
-    validates :workflow_id, presence: true
+    validates :workflow_id, presence: true, numericality: { greater_than: 0, only_integer: true }
 
     integer :workflow_id
     integer :subject_id, default: nil
