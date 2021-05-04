@@ -740,9 +740,9 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     let(:subject_set_project) { project }
-    let(:subject_set) { create(:subject_set, project: project, workflows: [project.workflows.first]) }
+    let(:subject_set) { create(:subject_set_with_subjects, num_subjects: 1, project: project, workflows: [project.workflows.first]) }
     let(:subject_set_id) { subject_set.id }
-    let(:subject1) { create(:subject, subject_sets: [subject_set]) }
+    let(:subject1) { subject_set.subjects.first }
 
     it 'returns a 204 status' do
       post :unretire_subjects, workflow_id: workflow.id, subject_id: subject1.id

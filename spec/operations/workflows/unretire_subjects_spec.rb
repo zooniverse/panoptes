@@ -5,9 +5,11 @@ require 'spec_helper'
 describe Workflows::UnretireSubjects do
   let(:api_user) { ApiUser.new(build_stubbed(:user)) }
   let(:workflow) { create(:workflow) }
-  let(:subject_set) { create(:subject_set, project: workflow.project, workflows: [workflow]) }
-  let(:subject1) { create(:subject, subject_sets: [subject_set]) }
-  let(:subject2) { create(:subject, subject_sets: [subject_set]) }
+  let(:subject_set) do
+    create(:subject_set_with_subjects, num_subjects: 2, project: workflow.project, workflows: [workflow])
+  end
+  let(:subject1) { subject_set.subjects.first }
+  let(:subject2) { subject_set.subjects.last }
   let(:params) do
     {
       workflow_id: workflow.id,
