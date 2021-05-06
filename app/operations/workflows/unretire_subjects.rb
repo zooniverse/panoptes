@@ -21,9 +21,9 @@ module Workflows
     end
 
     def cached_subject_ids
-      @cached_subject_ids ||= Array.wrap(@subject_ids) | Array.wrap(@subject_id)
-      @cached_subject_ids.push(*subject_set_subject_ids) unless subject_set_subject_ids.empty?
-      @cached_subject_ids
+      cached_subject_ids ||= Array.wrap(@subject_ids) | Array.wrap(@subject_id)
+      cached_subject_ids.push(*subject_set_subject_ids) unless subject_set_subject_ids.empty?
+      @cached_subject_ids = cached_subject_ids
     end
 
     def subject_set_subject_ids

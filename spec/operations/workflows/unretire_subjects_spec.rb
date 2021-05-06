@@ -45,7 +45,7 @@ describe Workflows::UnretireSubjects do
       .with(workflow.id, [subject1.id, subject2.id])
   end
 
-  it 'calls unretirement worker with subject ids of subject set ids given' do
+  it 'calls unretirement worker with subject_ids of subject_set_ids given' do
     run_params = params.except(:subject_id)
     operation.run!(run_params.merge(subject_set_ids: [subject_set.id]))
     expect(UnretireSubjectWorker)
