@@ -44,7 +44,7 @@ RSpec.describe Formatter::Csv::V2::DropdownAnnotation do
     expect(formatted_results).to eq(results)
   end
 
-  context 'with a nil value in the annotation' do
+  context 'with missing value JSON (nil value)' do
     let(:annotation) do
       { 'task' => 'T1', 'value' => nil, 'taskType' => 'dropdown-simple' }
     end
@@ -82,6 +82,43 @@ RSpec.describe Formatter::Csv::V2::DropdownAnnotation do
         Formatter::Csv::V2::DropdownAnnotation::TaskError,
         'Dropdown task has multiple selects and is not conformant to v2 dropdown-simple task type - aborting'
       )
+    end
+  end
+
+  # for the case where a FEM annotation for a dropdown-simple
+  # but with a workflow that allows for use supplied values
+  # technically disabled right now but may be enabled in the future
+  # https://github.com/zooniverse/front-end-monorepo/blob/582e6e48181d814f529d2c34e6969641cb5cbbeb/packages/lib-classifier/src/plugins/tasks/SimpleDropdownTask/README.md#dev-notes
+  context 'with a task that allows user provided values' do
+    let(:workflow) do
+      build_stubbed(:workflow, :dropdown_simple) do |w|
+        # update the simple dropdown task to allow user supplied values
+        w.tasks['T1']['selects'][0]['allowCreate'] = true
+      end
+    end
+    let(:task_info) { workflow.tasks['T1'] }
+    let(:annotation) do
+      {
+        'task' => 'T1',
+        'value' => { 'selection' => 'Hey! Listen!', 'option' => false },
+        'taskType' => 'dropdown-simple'
+      }
+    end
+    let(:results) do
+      {
+        'task' => 'T1',
+        'task_type' => 'dropdown-simple',
+        'value' => {
+          'select_label' => 'Country',
+          'option' => false,
+          'value' => 'Hey! Listen!'
+        }
+      }
+    end
+
+    it 'adds the user supplied label correctly' do
+      formatted_results = dropdown_annotation.format
+      expect(formatted_results).to eq(results)
     end
   end
 end

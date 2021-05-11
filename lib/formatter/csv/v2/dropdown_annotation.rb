@@ -65,7 +65,11 @@ module Formatter
         end
 
         def dropdown_find_selected_option(selected_dropdown, answer_index)
+          # skip the user supplied string values
+          return if answer_index.is_a?(String)
+
           flattened_dropdown_option_values = selected_dropdown['options'].values.flatten
+          # non user supplied values are select option index integer values
           found_option = flattened_dropdown_option_values[answer_index]
           return unless found_option
 
