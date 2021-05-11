@@ -7,11 +7,24 @@ Layout/LineLength:
   Max: 160
 Layout/SpaceAroundEqualsInParameterDefault:
   EnforcedStyle: 'no_space'
+Layout/SpaceInsideHashLiteralBraces:
+  Exclude:
+    - 'spec/factories/workflows.rb'
+Layout/ArrayAlignment:
+  Exclude:
+    - 'spec/factories/workflows.rb'
+Layout/HashAlignment:
+  Exclude:
+    - 'spec/factories/workflows.rb'
+Layout/SpaceAroundOperators:
+  Exclude:
+    - 'spec/factories/workflows.rb'
 
 Metrics/BlockLength:
   Exclude:
     - '**/*_spec.rb'
     - 'spec/support/*.rb'
+    - 'spec/factories/*.rb'
 Metrics/MethodLength:
   Description: 'Avoid methods longer than 12 lines of code.'
   Max: 12
@@ -34,6 +47,9 @@ Style/Documentation:
 Style/BlockDelimiters:
   Exclude:
     - 'spec/**/*'
+Style/StringLiterals:
+  Exclude:
+    - 'spec/factories/workflows.rb'
 
 # new linters - opt in
 Layout/SpaceAroundMethodCallOperator:
