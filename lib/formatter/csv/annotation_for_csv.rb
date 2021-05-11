@@ -168,6 +168,7 @@ module Formatter
 
       # used in combo task to protect against invalid annotations
       # i.e. bad annotation data from tropical sweden project
+      # https://github.com/zooniverse/panoptes/blob/5928d94cffb424e68aec480c619271d0783bb0dc/spec/lib/formatter/csv/annotation_for_csv_spec.rb#L196-L210
       def get_task_info(task)
         task_key = task['task']
         workflow_information.task(task_key)
