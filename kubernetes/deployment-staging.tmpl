@@ -123,7 +123,7 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "700Mi"
+              memory: "500Mi"
               cpu: "100m"
             limits:
               memory: "700Mi"
@@ -167,11 +167,11 @@ spec:
           image: zooniverse/nginx:1.19.0
           resources:
             requests:
-              memory: "100Mi"
+              memory: "25Mi"
               cpu: "10m"
             limits:
-              memory: "100Mi"
-              cpu: "500m"
+              memory: "50Mi"
+              cpu: "200m"
           livenessProbe:
             httpGet:
               path: /
