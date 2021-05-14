@@ -123,8 +123,8 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "700Mi"
-              cpu: "100m"
+              memory: "500Mi"
+              cpu: "500m"
             limits:
               memory: "700Mi"
               cpu: "1000m"
@@ -167,11 +167,11 @@ spec:
           image: zooniverse/nginx:1.19.0
           resources:
             requests:
-              memory: "100Mi"
+              memory: "25Mi"
               cpu: "10m"
             limits:
-              memory: "100Mi"
-              cpu: "500m"
+              memory: "50Mi"
+              cpu: "200m"
           livenessProbe:
             httpGet:
               path: /
@@ -229,7 +229,7 @@ spec:
     name: panoptes-staging-app
   minReplicas: 1
   maxReplicas: 2
-  targetCPUUtilizationPercentage: 80
+  targetCPUUtilizationPercentage: 95
 ---
 apiVersion: v1
 kind: Service
@@ -265,13 +265,11 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "700Mi"
+              memory: "500Mi"
               cpu: "100m"
-              ephemeral-storage: "10Gi"
             limits:
               memory: "700Mi"
               cpu: "500m"
-              ephemeral-storage: "10Gi"
           livenessProbe:
             exec:
               command:
@@ -324,13 +322,11 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "700Mi"
+              memory: "500Mi"
               cpu: "100m"
-              ephemeral-storage: "10Gi"
             limits:
               memory: "700Mi"
               cpu: "500m"
-              ephemeral-storage: "10Gi"
           livenessProbe:
             exec:
               command:

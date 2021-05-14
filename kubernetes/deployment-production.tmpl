@@ -136,7 +136,7 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "1500Mi"
+              memory: "1000Mi"
               cpu: "500m"
             limits:
               memory: "1500Mi"
@@ -180,7 +180,7 @@ spec:
           image: zooniverse/nginx:1.19.0
           resources:
             requests:
-              memory: "100Mi"
+              memory: "50Mi"
               cpu: "10m"
             limits:
               memory: "100Mi"
@@ -240,7 +240,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: panoptes-production-app
-  minReplicas: 2
+  minReplicas: 3
   maxReplicas: 16
   targetCPUUtilizationPercentage: 80
 ---
@@ -288,13 +288,11 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "6000Mi"
+              memory: "2000Mi"
               cpu: "1000m"
-              ephemeral-storage: "50Gi"
             limits:
               memory: "6000Mi"
               cpu: "2000m"
-              ephemeral-storage: "50Gi"
           livenessProbe:
             exec:
               command:
@@ -351,13 +349,11 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "4000Mi"
+              memory: "500Mi"
               cpu: "1000m"
-              ephemeral-storage: "50Gi"
             limits:
-              memory: "4000Mi"
+              memory: "2000Mi"
               cpu: "2000m"
-              ephemeral-storage: "50Gi"
           livenessProbe:
             exec:
               command:
@@ -396,9 +392,9 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: panoptes-production-sidekiq
-  minReplicas: 1
-  maxReplicas: 6
-  targetCPUUtilizationPercentage: 80
+  minReplicas: 2
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 95
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
