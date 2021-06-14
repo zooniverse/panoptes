@@ -458,7 +458,7 @@ namespace :migrate do
 
   namespace :projects do
     desc 'Set default value for authentication invitation' do
-      task :authentication_invitation_default => :environment do
+      task authentication_invitation_default: :environment do
         Project.where(authentication_invitation: nil).select('id').find_in_batches do |batch|
           Project.where(id: batch.map(&:id)).update_all(authentication_invitation: 'default')
         end
