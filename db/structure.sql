@@ -1060,7 +1060,7 @@ CREATE TABLE public.projects (
     url_labels jsonb,
     workflow_description text,
     researcher_quote text,
-    authentication_invitation character varying
+    authentication_invitation text
 );
 
 
