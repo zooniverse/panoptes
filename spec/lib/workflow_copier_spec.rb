@@ -11,9 +11,9 @@ describe WorkflowCopier do
   describe '#copy_by_id' do
     it 'find the workflow and uses the .copy method' do
       allow(Workflow).to receive(:find).and_return(workflow)
-      allow(WorkflowCopier).to receive(:copy)
+      allow(described_class).to receive(:copy)
       described_class.copy_by_id(workflow.id, target_project.id)
-      expect(WorkflowCopier).to have_received(:copy).with(workflow, target_project.id)
+      expect(described_class).to have_received(:copy).with(workflow, target_project.id)
     end
   end
 
