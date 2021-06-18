@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 # A sample Guardfile
 # More info at https://github.com/guard/guard#readme
 
- # ignore files (avoid high CPU use for FS events)
+# ignore files (avoid high CPU use for FS events)
 ignore([%r{^bin/*}, %r{^db/*}, %r{^log/*}, %r{^public/*}, %r{^tmp/*}, %r{^.git/*}, %r{^docs/*}])
 
-default_watch_proc = Proc.new do
+default_watch_proc = proc do
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
   watch('spec/spec_helper.rb')  { "spec" }
