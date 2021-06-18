@@ -755,9 +755,9 @@ describe Api::V1::ProjectsController, type: :controller do
 
         it_behaves_like "supports update_links via a copy of the original" do
 
-          it 'should have the same name' do
+          it 'has a copy suffix added to the name' do
             update_via_links
-            expect(copied_resource.display_name).to eq(linked_resource.display_name)
+            expect(copied_resource.display_name).to include("#{linked_resource.display_name} (copy:")
           end
 
           it 'should belong to the correct project' do
