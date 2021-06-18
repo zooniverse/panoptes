@@ -3,12 +3,21 @@
 require 'spec_helper'
 
 describe WorkflowCopier do
-  describe '#copy' do
-    let(:workflow) { create(:workflow) }
-    let(:target_project) { create(:project) }
-    let(:copier) { target_project.user }
-    let(:copied_workflow) { described_class.copy(workflow.id, target_project.id) }
+  let(:workflow) { create(:workflow) }
+  let(:target_project) { create(:project) }
+  let(:copier) { target_project.user }
+  let(:copied_workflow) { described_class.copy(workflow, target_project.id) }
 
+  describe '#copy_by_id' do
+    it 'find the workflow and uses the .copy method' do
+      allow(Workflow).to receive(:find).and_return(workflow)
+      allow(WorkflowCopier).to receive(:copy)
+      described_class.copy_by_id(workflow.id, target_project.id)
+      expect(WorkflowCopier).to have_received(:copy).with(workflow, target_project.id)
+    end
+  end
+
+  describe '#copy' do
     it 'returns a valid workflow' do
       expect(copied_workflow).to be_valid
     end

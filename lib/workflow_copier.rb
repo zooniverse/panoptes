@@ -1,14 +1,17 @@
 # frozen_string_literal: true
 
 class WorkflowCopier
-  def self.copy(workflow_id, target_project_id)
+  def self.copy_by_id(workflow_id, target_project_id)
     source_workflow = Workflow.find(workflow_id)
+    copy(source_workflow, target_project_id)
+  end
 
+  def self.copy(source_workflow, target_project_id)
     copied_workflow = source_workflow.deep_clone(except: %i[published_version_id])
     copied_workflow.project_id = target_project_id
     copied_workflow.active = false
     copied_workflow.display_name = "#{copied_workflow.display_name} (copy: #{Time.now.utc})"
-    copied_workflow.configuration['source_workflow_id'] = workflow_id
+    copied_workflow.configuration['source_workflow_id'] = source_workflow.id
     copied_workflow.current_version_number = nil
     copied_workflow.major_version = 0
     copied_workflow.minor_version = 0
