@@ -2,12 +2,12 @@ name: Run Tests CI
 on:
   pull_request:
   push: { branches: master }
+env:
+  COMPOSE_FILE: docker-compose.yml
 jobs:
   setup:
     name: Setup test env using docker & compose
     runs-on: ubuntu-latest
-    env:
-      COMPOSE_FILE: docker-compose.yml
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
