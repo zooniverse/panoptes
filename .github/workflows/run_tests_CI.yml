@@ -1,10 +1,10 @@
-name: Test CI
+name: Run Tests CI
 on:
   pull_request:
   push: { branches: master }
 jobs:
   setup:
-    name: Setup test env
+    name: Setup test env using docker & compose
     runs-on: ubuntu-latest
     env:
       COMPOSE_FILE: .docker-compose.yml
