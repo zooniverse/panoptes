@@ -1,0 +1,27 @@
+name: Test CI
+on:
+  pull_request:
+  push: { branches: master }
+jobs:
+  setup:
+    name: Setup test env
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_FILE: .docker-compose.yml
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build docker images
+        run: docker-compose build
+      - name: Create the test env DB
+        run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rake db:setup
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    env:
+      SPECS: spec/controllers/api/v1/[a-m]*.rb
+    steps:
+      - name: Run tests
+        run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rspec $SPECS
+
+
