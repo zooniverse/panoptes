@@ -15,13 +15,15 @@ jobs:
         run: docker-compose build
       - name: Create the test env DB
         run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rake db:setup
-  test:
-    needs: setup
-    runs-on: ubuntu-latest
-    env:
-      SPECS: spec/controllers/api/v1/[a-m]*.rb
-    steps:
-      - name: Run tests
-        run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rspec $SPECS
+      - name: Run all the tests
+        run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rspec
+  # test:
+  #   needs: setup
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     SPECS: spec/controllers/api/v1/[a-m]*.rb
+  #   steps:
+  #     - name: Run tests
+  #       run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rspec $SPECS
 
 
