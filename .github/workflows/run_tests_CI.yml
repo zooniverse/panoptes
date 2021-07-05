@@ -5,16 +5,20 @@ on:
 env:
   COMPOSE_FILE: docker-compose.yml
 jobs:
-  setup:
-    name: Setup test env using docker & compose
+  test:
+    name: Run all Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Build docker images
+        run: ./scripts/no_focus.sh
+      - name: Build docker images
         run: docker-compose build
       - name: Create the test env DB
         run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rake db:setup
+      - name: Setup config files
+        run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rake configure:local
       - name: Run all the tests
         run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rspec
   # test:
