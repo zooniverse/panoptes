@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Build docker images
+      - name: Check for focus specs
         run: ./scripts/no_focus.sh
       - name: Build docker images
         run: docker-compose build
