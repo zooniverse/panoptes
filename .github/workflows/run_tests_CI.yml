@@ -1,4 +1,4 @@
-name: Run Tests CI
+name: Zooni CI
 on:
   pull_request:
   push: { branches: master }
@@ -6,7 +6,7 @@ env:
   COMPOSE_FILE: docker-compose.yml
 jobs:
   test:
-    name: Run all Tests
+    name: Run Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
