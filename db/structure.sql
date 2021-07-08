@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 11.11 (Debian 11.11-1.pgdg90+1)
--- Dumped by pg_dump version 11.11
+-- Dumped by pg_dump version 11.12 (Debian 11.12-0+deb10u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1059,7 +1059,8 @@ CREATE TABLE public.projects (
     introduction text,
     url_labels jsonb,
     workflow_description text,
-    researcher_quote text
+    researcher_quote text,
+    authentication_invitation text
 );
 
 
@@ -4804,4 +4805,6 @@ INSERT INTO schema_migrations (version) VALUES ('20200720125246');
 INSERT INTO schema_migrations (version) VALUES ('20201113151433');
 
 INSERT INTO schema_migrations (version) VALUES ('20210226173243');
+
+INSERT INTO schema_migrations (version) VALUES ('20210602210437');
 
