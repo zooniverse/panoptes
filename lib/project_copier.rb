@@ -7,7 +7,6 @@ class ProjectCopier
                           :tagged_resources,
                           :avatar,
                           :background,
-                          :translations,
                           {active_workflows: [:tutorials, :attached_images]}].freeze
 
   def self.copy(project_id, user_id)
@@ -24,18 +23,24 @@ class ProjectCopier
     copied_project.assign_attributes(launch_approved: false, live: false)
     # reset the project's configuration but record the source project id
     copied_project.configuration = { source_project_id: project.id }
-    # reset the copied translations to not have any old string versions
-    copied_project.translations.each { |tr| tr.string_versions = {} }
+
+    # copy the translation resources from the source project
+    # note they currently have the wrong version id as it relates to the source project
+    copied_translations = project.translations.map(&:dup)
 
     Project.transaction(requires_new: true) do
       # save the project and create the project versions for use in translation strings
       copied_project.save!
+
       # update all the translation strings versions to match the latest project_version resource
-      copied_project.translations.each do |translation|
-        translated_strings = TranslationStrings.new(copied_project).extract
-        translation.update_strings_and_versions(translated_strings, copied_project.latest_version_id)
-        translation.save!
+      translation_strings_version_id = copied_project.latest_version_id
+      copied_translations.map do |translation|
+        # do not touch the translated strings
+        # instead only update string versions to the latest_version_id of the copied workflow resource
+        translation.string_versions.transform_values! { |_v| translation_strings_version_id }
       end
+      # persist the translations association
+      copied_project.translations = copied_translations
     end
     copied_project
   end
