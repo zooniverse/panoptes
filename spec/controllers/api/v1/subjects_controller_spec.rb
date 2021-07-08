@@ -593,7 +593,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
     context 'with admin param' do
       let(:request_params) do
-        { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 1, admin: true }
+        { workflow_id: workflow.id.to_s, num_columns: 2, num_rows: 1, admin: true }
       end
 
       it 'responds with 200' do
