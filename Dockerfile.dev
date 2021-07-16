@@ -19,8 +19,8 @@ RUN --mount=type=cache,target=/var/cache/apt --mount=type=cache,target=/var/lib/
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
-RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1` && \
-    bundle install
+RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
+RUN --mount=type=cache,id=panoptes-gems,target=/usr/local/bundle/cache bundle install
 
 ADD ./ /rails_app
 
