@@ -44,7 +44,7 @@ jobs:
         run: |
           RAILS_ENV=test bundle exec rake db:setup
           RAILS_ENV=panoptes_test bundle exec rake db:create
-          RAILS_ENV=test bundle exec rake rake configure:local
+          RAILS_ENV=test bundle exec rake configure:local
       - name: Run tests
         run: bundle exec rspec ${{ matrix.spec-commands }}
         env:
