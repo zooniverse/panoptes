@@ -40,7 +40,7 @@ jobs:
       - name: Install PG Client
         run: |
           sudo apt-get -yqq install libpq-dev
-      - name: Setup
+      - name: Setup DB and configs
         run: |
           RAILS_ENV=test bundle exec rake db:setup
           RAILS_ENV=panoptes_test bundle exec rake db:create
