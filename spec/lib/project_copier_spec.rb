@@ -1,13 +1,13 @@
 require 'spec_helper'
 
 describe ProjectCopier do
-  describe '#copy' do
+  describe '#copy', :focus do
     let(:project) { create(:full_project) }
     let(:copyist) { create(:user) }
-    let(:copied_project) { described_class.copy(project.id, copyist.id) }
+    let(:copied_project) { described_class.new(project.id, copyist.id).copy }
 
     it 'returns a valid project' do
-      expect(described_class.copy(project.id, copyist.id)).to be_valid
+      expect(described_class.new(project.id, copyist.id).copy).to be_valid
     end
 
     it 'sets the owner to the api_user' do
@@ -15,7 +15,7 @@ describe ProjectCopier do
     end
 
     it 'renames a project when the owner is copying their own project' do
-      new_copy = described_class.copy(project.id, project.owner.id)
+      new_copy = described_class.new(project.id, project.owner.id).copy
       expect(new_copy.display_name).to include('(copy)')
     end
 
