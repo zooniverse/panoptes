@@ -21,7 +21,11 @@ class ProjectCopier
   def copy
     copied_project = copy_project
 
+    # sync the project translations
+    sync_project_translations!(copied_project)
 
+    # sync the association primary language translations
+    #
     # Note for the newly copied project relations
     # the below syncs the primary language translation strings
     # but it doesn't copy the associated resource's translations
@@ -29,20 +33,23 @@ class ProjectCopier
     #
     # active_workflows and their tutorials
     # copied_project.active_workflows.each do |workflow|
-    #   TranslationSyncWorker.new.perform(workflow.class.name, workflow.id, workflow.translatable_language)
-    #   wf.tutorials.each do |tutorial|
-    #     TranslationSyncWorker.new.perform(tutorial.class.name, tutorial.id, tutorial.translatable_language)
+    #   sync_association_translations_via_worker(workflow)
+    #   workflow.tutorials.each do |tutorial|
+    #     sync_association_translations_via_worker(tutorial)
     #   end
     # end
-    # # project field_guides
+    #
+    # project field_guides
     # copied_project.field_guides.each do |field_guide|
-    #   TranslationSyncWorker.new.perform(field_guide.class.name, field_guide.id, field_guide.translatable_language)
+    #   sync_association_translations_via_worker(field_guide)
     # end
-    # # project pages
-    # copied_project.pages.each do |pages|
-    #   TranslationSyncWorker.new.perform(pages.class.name, pages.id, pages.translatable_language)
+    #
+    # project pages
+    # copied_project.pages.each do |page|
+    #   sync_association_translations_via_worker(page)
     # end
 
+    # return the newly copied project
     copied_project
   end
 
@@ -57,9 +64,6 @@ class ProjectCopier
     copied_project.assign_attributes(launch_approved: false, live: false)
     # reset the project's configuration but record the source project id
     copied_project.configuration = { source_project_id: project_to_copy.id }
-
-    # sync the project translations
-    sync_project_translations!(copied_project)
 
     # return the newly copied project
     copied_project
@@ -84,5 +88,13 @@ class ProjectCopier
       # persist the translations association
       copied_project.translations = copied_translations
     end
+  end
+
+  def sync_association_translations_via_worker(association_resource)
+    TranslationSyncWorker.perform_async(
+      association_resource.class.name,
+      association_resource.id,
+      association_resource.translatable_language
+    )
   end
 end
