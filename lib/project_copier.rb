@@ -19,6 +19,10 @@ class ProjectCopier
   end
 
   def copy
+    # shoudl this all be wrapped in a transaction to ensure we
+    # rollback an sub resource creations,
+    # e.g. inband primary lang strings for the associated resources....
+  # Project.transaction(requires_new: true) do ??
     copied_project = copy_project
 
     # sync the project translations
@@ -91,6 +95,7 @@ class ProjectCopier
   end
 
   def sync_association_translations_via_worker(association_resource)
+    # Should this be in band or async?
     TranslationSyncWorker.perform_async(
       association_resource.class.name,
       association_resource.id,

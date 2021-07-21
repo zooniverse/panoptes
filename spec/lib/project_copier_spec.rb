@@ -92,5 +92,13 @@ describe ProjectCopier do
         expect(translation_string_version_ids).to match([copied_project.latest_version_id])
       end
     end
+
+    # add tests for the testing the syncing of the pimary language translation strings
+    # for when the project has
+    # - active workflows
+    # - active workflows
+    #   - tutorials
+    # - field_guides
+    # - pages
   end
 end
