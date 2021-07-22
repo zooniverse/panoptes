@@ -19,42 +19,25 @@ class ProjectCopier
   end
 
   def copy
-    # shoudl this all be wrapped in a transaction to ensure we
-    # rollback an sub resource creations,
+    # Should this all be wrapped in a transaction?
+    # to ensure we rollback an sub resource creations,
     # e.g. inband primary lang strings for the associated resources....
-  # Project.transaction(requires_new: true) do ??
-    copied_project = copy_project
+    Project.transaction(requires_new: true) do
+      copied_project = copy_project
 
-    # sync the project translations
-    sync_project_translations!(copied_project)
+      # save the project and create the project versions for use in translation strings
+      copied_project.save!
 
-    # sync the association primary language translations
-    #
-    # Note for the newly copied project relations
-    # the below syncs the primary language translation strings
-    # but it doesn't copy the associated resource's translations
-    # long term we may want to ensure these are copied as well
-    #
-    # active_workflows and their tutorials
-    # copied_project.active_workflows.each do |workflow|
-    #   sync_association_translations_via_worker(workflow)
-    #   workflow.tutorials.each do |tutorial|
-    #     sync_association_translations_via_worker(tutorial)
-    #   end
-    # end
-    #
-    # project field_guides
-    # copied_project.field_guides.each do |field_guide|
-    #   sync_association_translations_via_worker(field_guide)
-    # end
-    #
-    # project pages
-    # copied_project.pages.each do |page|
-    #   sync_association_translations_via_worker(page)
-    # end
+      # sync and persist the project translation associations
+      copied_project.translations = copy_project_translations(copied_project)
 
-    # return the newly copied project
-    copied_project
+      # sync the associated resources primary language translations
+      # to keep the translations system working with these copied resources
+      setup_associated_primary_language_translations(copied_project)
+
+      # return the newly copied project
+      copied_project
+    end
   end
 
   private
@@ -73,30 +56,59 @@ class ProjectCopier
     copied_project
   end
 
-  def sync_project_translations!(copied_project)
+  def copy_project_translations(copied_project)
     # copy the translation resources from the source project
     # note they currently have the wrong version id as it relates to the source project
     copied_translations = project_to_copy.translations.map(&:dup)
 
-    Project.transaction(requires_new: true) do
-      # save the project and create the project versions for use in translation strings
-      copied_project.save!
+    # update all the translation strings versions to match the latest project_version resource
+    translation_strings_version_id = copied_project.latest_version_id
+    copied_translations.map do |translation|
+      # do not touch the translated strings
+      # instead only update string versions to the latest_version_id of the copied workflow resource
+      translation.string_versions.transform_values! { |_v| translation_strings_version_id }
+    end
 
-      # update all the translation strings versions to match the latest project_version resource
-      translation_strings_version_id = copied_project.latest_version_id
-      copied_translations.map do |translation|
-        # do not touch the translated strings
-        # instead only update string versions to the latest_version_id of the copied workflow resource
-        translation.string_versions.transform_values! { |_v| translation_strings_version_id }
+    copied_translations
+  end
+
+  # setup the associated primary language translations
+  # e.g. project.pages, project.field_guides, project.active_workflows
+  #
+  # Note for the newly copied project relations
+  # translations.zooniverse.org need the primary language translation strings
+  # however this approach this does not copy the undlerying resource translations :( yet...
+  # e.g. project.active_workflows.translations are not copied with each active_workflow
+  #
+  # long term we may want to ensure these translation resources are copied as well
+  # (perhaps by re-using the workflow copier class?)
+  # but short term this approach will ensure the translations app can work
+  # and we can revisit code once / if this is being actively used by project teams
+  # and they need the translations to be copied as well (i.e. a fully translated template project)
+  def setup_associated_primary_language_translations(copied_project)
+    # active_workflows
+    copied_project.active_workflows.each do |workflow|
+      sync_association_translations(workflow)
+      # and sync their tutorials
+      workflow.tutorials.each do |tutorial|
+        sync_association_translations(tutorial)
       end
-      # persist the translations association
-      copied_project.translations = copied_translations
+    end
+
+    # project field_guides
+    copied_project.field_guides.each do |field_guide|
+      sync_association_translations(field_guide)
+    end
+
+    # project pages
+    copied_project.pages.each do |page|
+      sync_association_translations(page)
     end
   end
 
-  def sync_association_translations_via_worker(association_resource)
-    # Should this be in band or async?
-    TranslationSyncWorker.perform_async(
+  def sync_association_translations(association_resource)
+    # if needed this can be moved to async worker
+    TranslationSyncWorker.new.perform(
       association_resource.class.name,
       association_resource.id,
       association_resource.translatable_language
