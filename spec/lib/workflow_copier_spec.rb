@@ -4,9 +4,7 @@ require 'spec_helper'
 
 describe WorkflowCopier do
   let(:workflow) do
-    create(:workflow, classifications_count: 100, retired_set_member_subjects_count: 10, real_set_member_subjects_count: 10, finished_at: Time.now.utc, completeness: 100.0) do |wf|
-      wf.publish!
-    end
+    create(:workflow, classifications_count: 100, retired_set_member_subjects_count: 10, real_set_member_subjects_count: 10, finished_at: Time.now.utc, completeness: 100.0, &:publish!)
   end
   let(:target_project) { create(:project) }
   let(:copier) { target_project.user }
