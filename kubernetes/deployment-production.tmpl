@@ -34,6 +34,11 @@ data:
       add_header Cache-Control public;
     }
 
+    location /healthz {
+      add_header Content-Type text/plain;
+      return 200;
+    }
+
     location / {
       # avoid attacker setting the host value for links in rails_app
       # https://github.com/rails/rails/issues/29893
@@ -188,7 +193,7 @@ spec:
               cpu: "500m"
           livenessProbe:
             httpGet:
-              path: /
+              path: /healthz
               port: 80
               httpHeaders:
                  - name: X-Forwarded-Proto
@@ -196,7 +201,7 @@ spec:
             initialDelaySeconds: 10
           readinessProbe:
             httpGet:
-              path: /
+              path: /healthz
               port: 80
               httpHeaders:
                  - name: X-Forwarded-Proto
