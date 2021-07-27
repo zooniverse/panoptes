@@ -151,6 +151,8 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
+            # allow a longer response time than 1s
+            timeoutSeconds: 10
           readinessProbe:
             httpGet:
               path: /
@@ -159,6 +161,8 @@ spec:
                  - name: X-Forwarded-Proto
                    value: https
             initialDelaySeconds: 20
+            # allow a longer response time than 1s
+            timeoutSeconds: 10
           env:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
