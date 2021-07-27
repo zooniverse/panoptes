@@ -13,7 +13,7 @@ RSpec.describe CellectClient do
   describe '::host' do
     it 'configures the host through ENV var' do
       host = 'http://cellect.org'
-      allow(ENV).to receive(:fetch).and_return(host)
+      allow(ENV).to receive(:fetch).with('CELLECT_HOST').and_return(host)
       expect(described_class.host).to eq(host)
     end
   end
@@ -69,6 +69,10 @@ RSpec.describe CellectClient::Request do
   let(:host) { 'test.example.com' }
   let(:url) { "https://#{host}" }
 
+  before do
+    allow(CellectClient).to receive(:host).and_return(url)
+  end
+
   describe '#request' do
     let(:headers) do
       {
@@ -78,11 +82,9 @@ RSpec.describe CellectClient::Request do
     end
 
     it 'adds connection middleware for json encoding and decoding' do
-      ENV['CELLECT_HOST'] = url
       middleware = described_class.new.connection.builder.handlers
       expected = [FaradayMiddleware::EncodeJson, FaradayMiddleware::ParseJson]
       expect(middleware).to include(*expected)
-      ENV.delete('CELLECT_HOST')
     end
 
     it 'sends get request to the remote host' do
