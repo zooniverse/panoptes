@@ -134,6 +134,16 @@ spec:
             limits:
               memory: "700Mi"
               cpu: "1000m"
+          startupProbe:
+            httpGet:
+              path: /
+              port: 81
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
+            # wait 6 * 10 seconds(default periodSeconds) for the container to start
+            # after this succeeds once the liveness probe takes over
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /
