@@ -80,8 +80,9 @@ data:
   RAILS_ENV: production
   ZOO_STREAM_KINESIS_STREAM_NAME: zooniverse-production
   ZOO_STREAM_SOURCE: panoptes
+  CELLECT_HOST: http://cellect-production-app/
   CORS_ORIGINS_REGEX: '^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|relaunch|field-book)\.notesfromnature\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
-  DESIGNATOR_API_HOST: https://designator.zooniverse.org/
+  DESIGNATOR_API_HOST: http://designator-production-app/
   DESIGNATOR_API_USERNAME: production
   DUMP_WORKER_SIDEKIQ_QUEUE: dumpworker
   EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
@@ -110,7 +111,7 @@ data:
   AZURE_STORAGE_ACCOUNT: panoptesuploads
   AZURE_STORAGE_CONTAINER_PUBLIC: public
   AZURE_STORAGE_CONTAINER_PRIVATE: private
-  TALK_API_HOST: https://talk.zooniverse.org
+  TALK_API_HOST: http://talk-production-app
   TALK_API_USER: '1'
   TALK_API_APPLICATION: '1'
   UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY: '604800'
