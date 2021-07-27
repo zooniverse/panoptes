@@ -78,9 +78,11 @@ RSpec.describe CellectClient::Request do
     end
 
     it 'adds connection middleware for json encoding and decoding' do
+      ENV['CELLECT_HOST'] = url
       middleware = described_class.new.connection.builder.handlers
       expected = [FaradayMiddleware::EncodeJson, FaradayMiddleware::ParseJson]
       expect(middleware).to include(*expected)
+      ENV.delete('CELLECT_HOST')
     end
 
     it 'sends get request to the remote host' do
