@@ -34,6 +34,11 @@ data:
         add_header Cache-Control public;
       }
 
+      location /healthz {
+        add_header Content-Type text/plain;
+        return 200;
+      }
+
       location / {
         # avoid attacker setting the host value for links in rails_app
         # https://github.com/rails/rails/issues/29893
@@ -129,6 +134,16 @@ spec:
             limits:
               memory: "700Mi"
               cpu: "1000m"
+          startupProbe:
+            httpGet:
+              path: /
+              port: 81
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
+            # wait 6 * 10 seconds(default periodSeconds) for the container to start
+            # after this succeeds once the liveness probe takes over
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /
@@ -136,6 +151,8 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
+            # allow a longer response time than 1s
+            timeoutSeconds: 10
           readinessProbe:
             httpGet:
               path: /
@@ -143,7 +160,10 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
+            # start checking for readiness after 20s (to serve traffic)
             initialDelaySeconds: 20
+            # allow a longer response time than 1s
+            timeoutSeconds: 10
           env:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
@@ -175,7 +195,7 @@ spec:
               cpu: "200m"
           livenessProbe:
             httpGet:
-              path: /
+              path: /healthz
               port: 80
               httpHeaders:
                  - name: X-Forwarded-Proto
@@ -183,12 +203,12 @@ spec:
             initialDelaySeconds: 10
           readinessProbe:
             httpGet:
-              path: /
+              path: /healthz
               port: 80
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
-            initialDelaySeconds: 20
+            initialDelaySeconds: 5
           lifecycle:
             preStop:
               exec:
