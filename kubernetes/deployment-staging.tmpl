@@ -53,7 +53,7 @@ apiVersion: v1
 data:
   nginx.conf: |+
     upstream docker-panoptes {
-      server localhost:81;
+      server 127.0.0.1:81;
     }
 
     server {
