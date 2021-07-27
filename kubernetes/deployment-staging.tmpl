@@ -68,8 +68,9 @@ data:
   RAILS_ENV: staging
   ZOO_STREAM_KINESIS_STREAM_NAME: zooniverse-staging
   ZOO_STREAM_SOURCE: panoptes
+  CELLECT_HOST: http://cellect-staging-app/
   CORS_ORIGINS_REGEX: '^https?:\/\/([a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
-  DESIGNATOR_API_HOST: https://designator-staging.zooniverse.org/
+  DESIGNATOR_API_HOST: http://designator-staging-app/
   DESIGNATOR_API_USERNAME: staging
   DUMP_CONGESTION_OPTS_INTERVAL: "60"
   DUMP_CONGESTION_OPTS_MIN_DELAY: "60"
@@ -98,7 +99,7 @@ data:
   AZURE_STORAGE_ACCOUNT: panoptesuploadsstaging
   AZURE_STORAGE_CONTAINER_PUBLIC: public
   AZURE_STORAGE_CONTAINER_PRIVATE: private
-  TALK_API_HOST: https://talk-staging.zooniverse.org
+  TALK_API_HOST: http://talk-staging-app
   TALK_API_USER: '1'
   TALK_API_APPLICATION: '1'
   USER_SUBJECT_LIMIT: '100'
