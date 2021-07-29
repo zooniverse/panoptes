@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
-RSpec.describe SubjectSetCompletenessWorker, :focus do
-  subject(:worker) { SubjectSetCompletenessWorker.new }
+RSpec.describe SubjectSetCompletenessWorker do
+  subject(:worker) { described_class.new }
+
   let(:subject_set) { create(:subject_set_with_subjects, num_workflows: 1, num_subjects: 2) }
   let(:workflow) { subject_set.workflows.first }
 
-  describe '#perform' do
+  describe '#perform', :focus do
     it 'ignore an unkonwn subject set' do
       expect{ worker.perform(workflow.id, -1) }.not_to raise_error
     end
