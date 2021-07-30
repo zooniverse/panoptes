@@ -11,7 +11,7 @@ class SubjectSetCompletenessWorker
     max_in_interval: 1, # only 1 job every interval above
     min_delay: 60, # next job can run 60s after the last one
     reject_with: :reschedule, # reschedule the job to run later (avoid db pressure) so we don't eventually run all the jobs and the stored metrics eventually align
-    key: ->(workflow_id, subject_set_id) { "subject_set_#{subject_set_id}_completeness_#{workflow_id}_worker" }
+    key: ->(subject_set_id, workflow_id) { "subject_set_#{subject_set_id}_completeness_#{workflow_id}_worker" }
   }
 
   sidekiq_options lock: :until_executing
