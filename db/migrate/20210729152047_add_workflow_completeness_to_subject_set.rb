@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddWorkflowCompletenessToSubjectSet < ActiveRecord::Migration
   def change
     # since PG v11+ we can add a new column and a default at the same time
