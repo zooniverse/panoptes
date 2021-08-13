@@ -12,8 +12,14 @@ RSpec.describe RetireSubjectWorker do
   let(:subject_ids) { [sms.subject_id, sms2.subject_id] }
 
   describe "#perform" do
-    it 'should handle an unknow workflow' do
+    it 'ignores an unknown workflow' do
       expect { worker.perform(-1, subject.id) }.not_to raise_error
+    end
+
+    it 'ignores an unknown subject' do
+      allow(RetirementWorker).to receive(:perform_async)
+      worker.perform(workflow.id, [-1, subject.id])
+      expect(RetirementWorker).to have_received(:perform_async).once
     end
 
     it 'should call the retirement worker with the subject workflow status resource' do
