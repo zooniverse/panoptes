@@ -154,6 +154,15 @@ describe Api::V1::SubjectSetsController, type: :controller do
         run_update_links
       end
 
+      it 'queues the subject_set completeness worker' do
+        allow(SubjectSetCompletenessWorker).to receive(:perform_async)
+        run_update_links
+        linked_workflow_id = resource.workflow_ids.first
+        expect(SubjectSetCompletenessWorker)
+          .to have_received(:perform_async)
+          .with(resource.id, linked_workflow_id)
+      end
+
       it "should queue the SMS metadata worker" do
         fake_sms_ids = %w[1318 1319 1320 1321]
         import_result_double = instance_double(
@@ -388,6 +397,15 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
 
       it_behaves_like "cleans up the linked set member subjects"
+
+      it 'queues the subject_set completeness worker' do
+        allow(SubjectSetCompletenessWorker).to receive(:perform_async)
+        delete_resources
+        linked_workflow_id = subject_set.workflow_ids.first
+        expect(SubjectSetCompletenessWorker)
+          .to have_received(:perform_async)
+          .with(subject_set.id, linked_workflow_id)
+      end
     end
   end
 end

@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 11.11 (Debian 11.11-1.pgdg90+1)
--- Dumped by pg_dump version 11.12 (Debian 11.12-0+deb10u1)
+-- Dumped by pg_dump version 11.12
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1280,7 +1280,8 @@ CREATE TABLE public.subject_sets (
     set_member_subjects_count integer DEFAULT 0 NOT NULL,
     metadata jsonb DEFAULT '{}'::jsonb,
     lock_version integer DEFAULT 0,
-    expert_set boolean
+    expert_set boolean,
+    completeness jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -4807,4 +4808,6 @@ INSERT INTO schema_migrations (version) VALUES ('20201113151433');
 INSERT INTO schema_migrations (version) VALUES ('20210226173243');
 
 INSERT INTO schema_migrations (version) VALUES ('20210602210437');
+
+INSERT INTO schema_migrations (version) VALUES ('20210729152047');
 

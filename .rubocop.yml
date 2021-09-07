@@ -19,6 +19,9 @@ Layout/HashAlignment:
 Layout/SpaceAroundOperators:
   Exclude:
     - 'spec/factories/workflows.rb'
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "spec/**/*"
 
 Metrics/BlockLength:
   Exclude:
@@ -32,6 +35,7 @@ Metrics/MethodLength:
 Rails/SkipsModelValidations:
   Whitelist:
   - update_all
+  - update_column
   - touch
 
 RSpec/MultipleMemoizedHelpers:
