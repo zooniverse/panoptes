@@ -50,7 +50,7 @@ module CsvDumps
     end
 
     def write_to_object_store(gzip_file_path)
-      medium.put_file(gzip_file_path, compressed: true)
+      medium.put_file_with_retry(gzip_file_path, compressed: true)
     end
   end
 end
