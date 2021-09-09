@@ -29,7 +29,7 @@ RSpec.describe CsvDumps::DumpProcessor do
     processor.execute
   end
 
-  it "push the file to an object store" do
+  it 'push the file to an object store' do
     path = double
     allow(csv_dump).to receive(:gzip!).and_return(path)
     allow(medium).to receive(:put_file_with_retry)
@@ -37,7 +37,7 @@ RSpec.describe CsvDumps::DumpProcessor do
     expect(medium).to have_received(:put_file_with_retry).with(path, compressed: true).once
   end
 
-  it "should clean up the file after sending to object store" do
+  it 'cleans up the file after sending to object store' do
     expect(csv_dump).to receive(:cleanup!).once
     processor.execute
   end
