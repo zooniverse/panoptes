@@ -68,6 +68,12 @@ class Classification < ActiveRecord::Base
     read_attribute(:metadata).with_indifferent_access
   end
 
+  def be_v2_annotation_format
+    return false unless metadata.key?(:classifier_version)
+
+    metadata[:classifier_version].start_with?('2.')
+  end
+
   private
 
   def validate_metadata

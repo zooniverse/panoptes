@@ -149,7 +149,7 @@ class Api::V1::ProjectsController < Api::ApiController
     Array.wrap(item_scope).map do |item|
       case item
       when Workflow
-        item.dup
+        WorkflowCopier.copy(item, project_id)
       when SubjectSet
         if !item.belongs_to_project?(project_id)
           SubjectSetCopier.new(item, project_id).duplicate_subject_set_and_subjects

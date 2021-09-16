@@ -1,14 +1,17 @@
-FROM ruby:2.5-stretch
+# debian stretch has libjemalloc1 https://packages.debian.org/stretch/libjemalloc1
+FROM ruby:2.5-slim-stretch
 
 WORKDIR /rails_app
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
+        build-essential \
+        # git is required for installing gems from git repos
         git \
-        curl \
+        # libjemalloc1 (v3) provides big memory savings vs jemalloc v5+ (default on debian buster)
+        libjemalloc1 \
         libpq-dev \
         tmpreaper \
-        libjemalloc1 \
         && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -19,8 +22,6 @@ ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 # to write assets to target dir set in `config.assets.prefix`
 ARG RAILS_ENV=production
 ENV RAILS_ENV=$RAILS_ENV
-
-RUN mkdir config && curl "https://ip-ranges.amazonaws.com/ip-ranges.json" > config/aws_ips.json
 
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/

@@ -20,6 +20,10 @@ class ProjectPreferenceUpdateSchema < JsonSchema
         type "string", "integer"
         pattern "^[0-9]*$"
       end
+
+      property 'hidden' do
+        type 'boolean'
+      end
     end
 
     property "links" do

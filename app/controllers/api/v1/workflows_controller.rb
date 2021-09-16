@@ -3,7 +3,7 @@ class Api::V1::WorkflowsController < Api::ApiController
   include SyncResourceTranslationStrings
   include MediumResponse
 
-  require_authentication :update, :create, :destroy, :retire_subjects, :create_classifications_export, scopes: [:project]
+  require_authentication :update, :create, :destroy, :retire_subjects, :create_classifications_export, :unretire_subjects, scopes: [:project]
 
   resource_actions :index, :show, :create, :update, :deactivate
   schema_type :json_schema
@@ -53,6 +53,11 @@ class Api::V1::WorkflowsController < Api::ApiController
     render nothing: true, status: 204
   end
 
+  def unretire_subjects
+    operation.run!(params)
+    render nothing: true, status: 204
+  end
+
   def create_classifications_export
     medium = CreateClassificationsExport.with( api_user: api_user, object: controlled_resource ).run!(params)
     medium_response(medium)
@@ -69,7 +74,6 @@ class Api::V1::WorkflowsController < Api::ApiController
     case action_name
     when "show", "index"
       {
-        languages: current_languages,
         published: params["published"]
       }.merge(field_context)
     else
