@@ -487,7 +487,6 @@ DEPENDENCIES
   mime-types
   mock_redis
   newrelic_rpm
-  oauth2
   omniauth (~> 1.9)
   omniauth-facebook (~> 5.0)
   omniauth-google-oauth2
