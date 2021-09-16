@@ -34,6 +34,11 @@ data:
       add_header Cache-Control public;
     }
 
+    location /healthz {
+      add_header Content-Type text/plain;
+      return 200;
+    }
+
     location / {
       # avoid attacker setting the host value for links in rails_app
       # https://github.com/rails/rails/issues/29893
@@ -48,7 +53,7 @@ apiVersion: v1
 data:
   nginx.conf: |+
     upstream docker-panoptes {
-      server localhost:81;
+      server 127.0.0.1:81;
     }
 
     server {
@@ -80,9 +85,11 @@ data:
   RAILS_ENV: production
   ZOO_STREAM_KINESIS_STREAM_NAME: zooniverse-production
   ZOO_STREAM_SOURCE: panoptes
+  CELLECT_HOST: http://cellect-production-app/
   CORS_ORIGINS_REGEX: '^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|relaunch|field-book)\.notesfromnature\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
-  DESIGNATOR_API_HOST: https://designator.zooniverse.org/
+  DESIGNATOR_API_HOST: http://designator-production-app/
   DESIGNATOR_API_USERNAME: production
+  DUMP_WORKER_SIDEKIQ_QUEUE: dumpworker
   EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
   EVENTS_API_USERNAME: api
   REDIRECTS_BASE: https://www.zooniverse.org
@@ -105,11 +112,11 @@ data:
   STORAGE_BUCKET: zooniverse-static
   STORAGE_PREFIX: panoptes-uploads.zooniverse.org/production/
   SUBJECT_GROUP_UPLOADER_ID: '1'
-  SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST: ''
+  SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST: '17619,18407,18510'
   AZURE_STORAGE_ACCOUNT: panoptesuploads
   AZURE_STORAGE_CONTAINER_PUBLIC: public
   AZURE_STORAGE_CONTAINER_PRIVATE: private
-  TALK_API_HOST: https://talk.zooniverse.org
+  TALK_API_HOST: http://talk-production-app
   TALK_API_USER: '1'
   TALK_API_APPLICATION: '1'
   UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY: '604800'
@@ -135,11 +142,21 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "1500Mi"
+              memory: "1000Mi"
               cpu: "500m"
             limits:
               memory: "1500Mi"
               cpu: "1000m"
+          startupProbe:
+            httpGet:
+              path: /
+              port: 81
+              httpHeaders:
+                 - name: X-Forwarded-Proto
+                   value: https
+            # wait 6 * 10 seconds(default periodSeconds) for the container to start
+            # after this succeeds once the liveness probe takes over
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /
@@ -147,6 +164,8 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
+            # allow a longer response time than 1s
+            timeoutSeconds: 10
           readinessProbe:
             httpGet:
               path: /
@@ -154,7 +173,10 @@ spec:
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
+            # start checking for readiness after 20s (to serve traffic)
             initialDelaySeconds: 20
+            # allow a longer response time than 1s
+            timeoutSeconds: 10
           env:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
@@ -179,14 +201,14 @@ spec:
           image: zooniverse/nginx:1.19.0
           resources:
             requests:
-              memory: "100Mi"
+              memory: "50Mi"
               cpu: "10m"
             limits:
               memory: "100Mi"
               cpu: "500m"
           livenessProbe:
             httpGet:
-              path: /
+              path: /healthz
               port: 80
               httpHeaders:
                  - name: X-Forwarded-Proto
@@ -194,12 +216,12 @@ spec:
             initialDelaySeconds: 10
           readinessProbe:
             httpGet:
-              path: /
+              path: /healthz
               port: 80
               httpHeaders:
                  - name: X-Forwarded-Proto
                    value: https
-            initialDelaySeconds: 20
+            initialDelaySeconds: 5
           lifecycle:
             preStop:
               exec:
@@ -239,7 +261,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: panoptes-production-app
-  minReplicas: 2
+  minReplicas: 3
   maxReplicas: 16
   targetCPUUtilizationPercentage: 80
 ---
@@ -269,6 +291,68 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: panoptes-production-sidekiq-dumpworker
+  labels:
+    app: panoptes-production-sidekiq-dumpworker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: panoptes-production-sidekiq-dumpworker
+  template:
+    metadata:
+      labels:
+        app: panoptes-production-sidekiq-dumpworker
+    spec:
+      containers:
+        - name: panoptes-production-sidekiq
+          image: zooniverse/panoptes:__IMAGE_TAG__
+          resources:
+            requests:
+              memory: "2000Mi"
+              cpu: "250m"
+            limits:
+              memory: "6000Mi"
+              cpu: "2000m"
+          livenessProbe:
+            exec:
+              command:
+                - /rails_app/scripts/docker/sidekiq_status
+            initialDelaySeconds: 20
+          args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
+          env:
+          - name: RAILS_MAX_THREADS
+            value: '2'
+          - name: SIDEKIQ_CONCURRENCY
+            value: '2'
+          - name: SIDEKIQ_ARGS
+            value: '-q dumpworker -q really_high -q high -q data_high -q data_medium -q default -q data_low'
+          envFrom:
+          - secretRef:
+              name: panoptes-common-env-vars
+          - secretRef:
+              name: panoptes-production-env-vars
+          - configMapRef:
+              name: panoptes-production-shared
+          volumeMounts:
+          - mountPath: /tmp
+            name: panoptes-production-dumpworker-data
+          - name: jwt-production
+            mountPath: "/rails_app/config/keys"
+            readOnly: true
+      volumes:
+        - name: panoptes-production-dumpworker-data
+          hostPath:
+            # directory location on host node temp disk
+            path: /mnt/panoptes-production-dumpworker-data
+            type: DirectoryOrCreate
+        - name: jwt-production
+          secret:
+            secretName: panoptes-doorkeeper-jwt-production
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: panoptes-production-sidekiq
   labels:
     app: panoptes-production-sidekiq
@@ -286,13 +370,11 @@ spec:
           image: zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "4000Mi"
-              cpu: "1000m"
-              ephemeral-storage: "50Gi"
+              memory: "500Mi"
+              cpu: "500m"
             limits:
-              memory: "4000Mi"
+              memory: "2000Mi"
               cpu: "2000m"
-              ephemeral-storage: "50Gi"
           livenessProbe:
             exec:
               command:
@@ -331,9 +413,9 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: panoptes-production-sidekiq
-  minReplicas: 1
-  maxReplicas: 6
-  targetCPUUtilizationPercentage: 80
+  minReplicas: 2
+  maxReplicas: 16
+  targetCPUUtilizationPercentage: 95
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget

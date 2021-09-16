@@ -36,11 +36,12 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def gold_standard
+    # load the api_user out of the replica read only block
+    skip_policy_scope
+    gold_standard_policy = Pundit.policy!(api_user, GoldStandardAnnotation)
     DatabaseReplica.read('classification_serializer_data_from_replica') do
-      skip_policy_scope
-      resources = Pundit.policy!(api_user, GoldStandardAnnotation).scope_for(:index)
+      resources = gold_standard_policy.scope_for(:index)
       resources = resources.where(workflow_id: params[:workflow_id]) if params[:workflow_id]
-
       resources = resources.where(id: resource_ids) if resource_ids.present?
 
       gold_standard_page = GoldStandardAnnotationSerializer.page(

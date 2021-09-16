@@ -14,6 +14,11 @@ class RetirementWorker
       NotifySubjectSelectorOfRetirementWorker.perform_async(
         status.subject_id, status.workflow_id
       )
+      # recalculate the subject set completeness metric
+      # for the workflow and each linked subject's subject_set
+      status.subject.subject_set_ids.each do |subject_set_id|
+        SubjectSetCompletenessWorker.perform_async(subject_set_id, status.workflow_id)
+      end
     end
   rescue ActiveRecord::RecordNotFound
   end

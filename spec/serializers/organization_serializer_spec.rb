@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe OrganizationSerializer do
   let(:organization) { create(:organization) }
-  let(:context) { {languages: ['en'], fields: [:title]} }
+  let(:context) { { fields: [:title] } }
 
   let(:serializer) do
     s = OrganizationSerializer.new

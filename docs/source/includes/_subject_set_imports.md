@@ -8,7 +8,7 @@ This resource is useful when a researcher has a large batch to add. The upload p
 2. She also creates a manifest file (format described below) and uploads the manifest to a web accessible location.
    + The manifest file describes ['subjects'](https://help.zooniverse.org/getting-started/glossary/), which is the Zooniverse term for something that is to be classified.
    + A subject is made up of:
-     + a unique UUID
+     + a unique external ID (used to track the subject from your organization)
      + one or more URLs that host media files e.g. image, video, audio.
      + metadata described as key-value pairs.
 3. In the Zooniverse project builder, the researcher navigates to the subject set to which they would like to have the subjects added.
@@ -35,7 +35,7 @@ Content-Type: application/json
 
 {
     "subject_set_imports": {
-       "source_url": "https://path.to/some/manifest.json",
+       "source_url": "https://path.to/some/manifest.csv",
        "links": {
            "subject_set": "1"
        }
@@ -59,7 +59,7 @@ Content-Type: application/json
 ## Manifest CSV format
 
 ```csv
-uuid,location:1,location:2,metadata:size,metadata:cuteness
+external_id,location:1,location:2,metadata:size,metadata:cuteness
 1,https://placekitten.com/200/300.jpg,https://placekitten.com/200/100.jpg,small,cute
 2,https://placekitten.com/400/900.jpg,https://placekitten.com/500/100.jpg,large,cute
 ```
@@ -67,7 +67,7 @@ uuid,location:1,location:2,metadata:size,metadata:cuteness
 The manifest.csv file is contains one row per subject. See the example to the right. It is expected to have
 the following columns:
 
-+ `uuid` - Zooniverse uses this to deduplicate/upsert existing subjects, so that
++ `external_id` - Zooniverse uses this to deduplicate/upsert existing subjects, so that
   it's possible to reimport a manifest into a subject set.
 + `location:` - One or more columns that begin with `location:` (including the colon), followed by any
   sequence of characters. The values of cells in this column are URLs pointing

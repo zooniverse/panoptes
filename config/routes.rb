@@ -78,6 +78,7 @@ Rails.application.routes.draw do
         collection do
           get :queued # Subject selection end point
           get :grouped # SubjectGroup selection end point
+          get :selection # Subject selection by subject ids end point
         end
       end
 
@@ -117,6 +118,7 @@ Rails.application.routes.draw do
         media_resources :attached_images, classifications_export: { except: [:create] }
 
         post "/retired_subjects", to: "workflows#retire_subjects"
+        post '/unretire_subjects', to: 'workflows#unretire_subjects'
         post "/classifications_export", to: "workflows#create_classifications_export", format: false
         post '/publish', to: 'workflows#publish'
       end

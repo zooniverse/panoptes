@@ -2,11 +2,12 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.21
--- Dumped by pg_dump version 9.5.23
+-- Dumped from database version 11.11 (Debian 11.11-1.pgdg90+1)
+-- Dumped by pg_dump version 11.12
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -14,20 +15,6 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
 
 --
 -- Name: intarray; Type: EXTENSION; Schema: -; Owner: -
@@ -1072,7 +1059,8 @@ CREATE TABLE public.projects (
     introduction text,
     url_labels jsonb,
     workflow_description text,
-    researcher_quote text
+    researcher_quote text,
+    authentication_invitation text
 );
 
 
@@ -1292,7 +1280,8 @@ CREATE TABLE public.subject_sets (
     set_member_subjects_count integer DEFAULT 0 NOT NULL,
     metadata jsonb DEFAULT '{}'::jsonb,
     lock_version integer DEFAULT 0,
-    expert_set boolean
+    expert_set boolean,
+    completeness jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -1993,364 +1982,364 @@ ALTER SEQUENCE public.workflows_id_seq OWNED BY public.workflows.id;
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: access_control_lists id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.access_control_lists ALTER COLUMN id SET DEFAULT nextval('public.access_control_lists_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: aggregations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.aggregations ALTER COLUMN id SET DEFAULT nextval('public.aggregations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: authorizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.authorizations ALTER COLUMN id SET DEFAULT nextval('public.authorizations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: classifications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.classifications ALTER COLUMN id SET DEFAULT nextval('public.classifications_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: code_experiment_configs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.code_experiment_configs ALTER COLUMN id SET DEFAULT nextval('public.code_experiment_configs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: collections id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.collections ALTER COLUMN id SET DEFAULT nextval('public.collections_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: collections_subjects id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.collections_subjects ALTER COLUMN id SET DEFAULT nextval('public.collections_subjects_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: field_guide_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.field_guide_versions ALTER COLUMN id SET DEFAULT nextval('public.field_guide_versions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: field_guides id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.field_guides ALTER COLUMN id SET DEFAULT nextval('public.field_guides_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: flipper_features id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.flipper_features ALTER COLUMN id SET DEFAULT nextval('public.flipper_features_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: flipper_gates id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.flipper_gates ALTER COLUMN id SET DEFAULT nextval('public.flipper_gates_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: gold_standard_annotations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.gold_standard_annotations ALTER COLUMN id SET DEFAULT nextval('public.gold_standard_annotations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: media id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.media ALTER COLUMN id SET DEFAULT nextval('public.media_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: memberships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.memberships ALTER COLUMN id SET DEFAULT nextval('public.memberships_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: oauth_access_grants id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oauth_access_grants ALTER COLUMN id SET DEFAULT nextval('public.oauth_access_grants_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: oauth_access_tokens id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oauth_access_tokens ALTER COLUMN id SET DEFAULT nextval('public.oauth_access_tokens_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: oauth_applications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oauth_applications ALTER COLUMN id SET DEFAULT nextval('public.oauth_applications_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organization_contents id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_contents ALTER COLUMN id SET DEFAULT nextval('public.organization_contents_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organization_page_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_page_versions ALTER COLUMN id SET DEFAULT nextval('public.organization_page_versions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organization_pages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_pages ALTER COLUMN id SET DEFAULT nextval('public.organization_pages_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organization_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_versions ALTER COLUMN id SET DEFAULT nextval('public.organization_versions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organizations ALTER COLUMN id SET DEFAULT nextval('public.organizations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: project_contents id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_contents ALTER COLUMN id SET DEFAULT nextval('public.project_contents_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: project_page_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_page_versions ALTER COLUMN id SET DEFAULT nextval('public.project_page_versions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: project_pages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_pages ALTER COLUMN id SET DEFAULT nextval('public.project_pages_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: project_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_versions ALTER COLUMN id SET DEFAULT nextval('public.project_versions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: projects id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval('public.projects_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: recents id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.recents ALTER COLUMN id SET DEFAULT nextval('public.recents_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: set_member_subjects id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.set_member_subjects ALTER COLUMN id SET DEFAULT nextval('public.set_member_subjects_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: subject_group_members id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_group_members ALTER COLUMN id SET DEFAULT nextval('public.subject_group_members_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: subject_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_groups ALTER COLUMN id SET DEFAULT nextval('public.subject_groups_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: subject_set_imports id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_set_imports ALTER COLUMN id SET DEFAULT nextval('public.subject_set_imports_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: subject_sets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_sets ALTER COLUMN id SET DEFAULT nextval('public.subject_sets_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: subject_sets_workflows id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_sets_workflows ALTER COLUMN id SET DEFAULT nextval('public.subject_sets_workflows_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: subject_workflow_counts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_workflow_counts ALTER COLUMN id SET DEFAULT nextval('public.subject_workflow_counts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: subjects id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subjects ALTER COLUMN id SET DEFAULT nextval('public.subjects_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tagged_resources id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tagged_resources ALTER COLUMN id SET DEFAULT nextval('public.tagged_resources_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tags id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: translation_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.translation_versions ALTER COLUMN id SET DEFAULT nextval('public.translation_versions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: translations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.translations ALTER COLUMN id SET DEFAULT nextval('public.translations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tutorial_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tutorial_versions ALTER COLUMN id SET DEFAULT nextval('public.tutorial_versions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tutorials id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tutorials ALTER COLUMN id SET DEFAULT nextval('public.tutorials_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_collection_preferences id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_collection_preferences ALTER COLUMN id SET DEFAULT nextval('public.user_collection_preferences_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_groups ALTER COLUMN id SET DEFAULT nextval('public.user_groups_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_project_preferences id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_project_preferences ALTER COLUMN id SET DEFAULT nextval('public.user_project_preferences_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_seen_subjects id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_seen_subjects ALTER COLUMN id SET DEFAULT nextval('public.user_seen_subjects_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: workflow_contents id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_contents ALTER COLUMN id SET DEFAULT nextval('public.workflow_contents_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: workflow_tutorials id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_tutorials ALTER COLUMN id SET DEFAULT nextval('public.workflow_tutorials_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: workflow_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_versions ALTER COLUMN id SET DEFAULT nextval('public.workflow_versions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: workflows id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflows ALTER COLUMN id SET DEFAULT nextval('public.workflows_id_seq'::regclass);
 
 
 --
--- Name: access_control_lists_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: access_control_lists access_control_lists_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.access_control_lists
@@ -2358,7 +2347,7 @@ ALTER TABLE ONLY public.access_control_lists
 
 
 --
--- Name: aggregations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: aggregations aggregations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.aggregations
@@ -2366,7 +2355,7 @@ ALTER TABLE ONLY public.aggregations
 
 
 --
--- Name: authorizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: authorizations authorizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.authorizations
@@ -2374,7 +2363,7 @@ ALTER TABLE ONLY public.authorizations
 
 
 --
--- Name: classifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: classifications classifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.classifications
@@ -2382,7 +2371,7 @@ ALTER TABLE ONLY public.classifications
 
 
 --
--- Name: code_experiment_configs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: code_experiment_configs code_experiment_configs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.code_experiment_configs
@@ -2390,7 +2379,7 @@ ALTER TABLE ONLY public.code_experiment_configs
 
 
 --
--- Name: collections_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: collections collections_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.collections
@@ -2398,7 +2387,7 @@ ALTER TABLE ONLY public.collections
 
 
 --
--- Name: collections_subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: collections_subjects collections_subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.collections_subjects
@@ -2406,7 +2395,7 @@ ALTER TABLE ONLY public.collections_subjects
 
 
 --
--- Name: field_guide_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: field_guide_versions field_guide_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.field_guide_versions
@@ -2414,7 +2403,7 @@ ALTER TABLE ONLY public.field_guide_versions
 
 
 --
--- Name: field_guides_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: field_guides field_guides_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.field_guides
@@ -2422,7 +2411,7 @@ ALTER TABLE ONLY public.field_guides
 
 
 --
--- Name: flipper_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: flipper_features flipper_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.flipper_features
@@ -2430,7 +2419,7 @@ ALTER TABLE ONLY public.flipper_features
 
 
 --
--- Name: flipper_gates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: flipper_gates flipper_gates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.flipper_gates
@@ -2438,7 +2427,7 @@ ALTER TABLE ONLY public.flipper_gates
 
 
 --
--- Name: gold_standard_annotations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: gold_standard_annotations gold_standard_annotations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.gold_standard_annotations
@@ -2446,7 +2435,7 @@ ALTER TABLE ONLY public.gold_standard_annotations
 
 
 --
--- Name: media_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: media media_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.media
@@ -2454,7 +2443,7 @@ ALTER TABLE ONLY public.media
 
 
 --
--- Name: memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: memberships memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.memberships
@@ -2462,7 +2451,7 @@ ALTER TABLE ONLY public.memberships
 
 
 --
--- Name: oauth_access_grants_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: oauth_access_grants oauth_access_grants_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oauth_access_grants
@@ -2470,7 +2459,7 @@ ALTER TABLE ONLY public.oauth_access_grants
 
 
 --
--- Name: oauth_access_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: oauth_access_tokens oauth_access_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oauth_access_tokens
@@ -2478,7 +2467,7 @@ ALTER TABLE ONLY public.oauth_access_tokens
 
 
 --
--- Name: oauth_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: oauth_applications oauth_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oauth_applications
@@ -2486,7 +2475,7 @@ ALTER TABLE ONLY public.oauth_applications
 
 
 --
--- Name: organization_contents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_contents organization_contents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_contents
@@ -2494,7 +2483,7 @@ ALTER TABLE ONLY public.organization_contents
 
 
 --
--- Name: organization_page_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_page_versions organization_page_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_page_versions
@@ -2502,7 +2491,7 @@ ALTER TABLE ONLY public.organization_page_versions
 
 
 --
--- Name: organization_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_pages organization_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_pages
@@ -2510,7 +2499,7 @@ ALTER TABLE ONLY public.organization_pages
 
 
 --
--- Name: organization_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_versions organization_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_versions
@@ -2518,7 +2507,7 @@ ALTER TABLE ONLY public.organization_versions
 
 
 --
--- Name: organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organizations organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organizations
@@ -2526,7 +2515,7 @@ ALTER TABLE ONLY public.organizations
 
 
 --
--- Name: project_contents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_contents project_contents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_contents
@@ -2534,7 +2523,7 @@ ALTER TABLE ONLY public.project_contents
 
 
 --
--- Name: project_page_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_page_versions project_page_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_page_versions
@@ -2542,7 +2531,7 @@ ALTER TABLE ONLY public.project_page_versions
 
 
 --
--- Name: project_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_pages project_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_pages
@@ -2550,7 +2539,7 @@ ALTER TABLE ONLY public.project_pages
 
 
 --
--- Name: project_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_versions project_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_versions
@@ -2558,7 +2547,7 @@ ALTER TABLE ONLY public.project_versions
 
 
 --
--- Name: projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.projects
@@ -2566,7 +2555,7 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- Name: recents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: recents recents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.recents
@@ -2574,7 +2563,7 @@ ALTER TABLE ONLY public.recents
 
 
 --
--- Name: set_member_subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: set_member_subjects set_member_subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.set_member_subjects
@@ -2582,7 +2571,7 @@ ALTER TABLE ONLY public.set_member_subjects
 
 
 --
--- Name: subject_group_members_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_group_members subject_group_members_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_group_members
@@ -2590,7 +2579,7 @@ ALTER TABLE ONLY public.subject_group_members
 
 
 --
--- Name: subject_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_groups subject_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_groups
@@ -2598,7 +2587,7 @@ ALTER TABLE ONLY public.subject_groups
 
 
 --
--- Name: subject_set_imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_set_imports subject_set_imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_set_imports
@@ -2606,7 +2595,7 @@ ALTER TABLE ONLY public.subject_set_imports
 
 
 --
--- Name: subject_sets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_sets subject_sets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_sets
@@ -2614,7 +2603,7 @@ ALTER TABLE ONLY public.subject_sets
 
 
 --
--- Name: subject_sets_workflows_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_sets_workflows subject_sets_workflows_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_sets_workflows
@@ -2622,7 +2611,7 @@ ALTER TABLE ONLY public.subject_sets_workflows
 
 
 --
--- Name: subject_workflow_counts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_workflow_counts subject_workflow_counts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_workflow_counts
@@ -2630,7 +2619,7 @@ ALTER TABLE ONLY public.subject_workflow_counts
 
 
 --
--- Name: subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: subjects subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subjects
@@ -2638,7 +2627,7 @@ ALTER TABLE ONLY public.subjects
 
 
 --
--- Name: tagged_resources_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: tagged_resources tagged_resources_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tagged_resources
@@ -2646,7 +2635,7 @@ ALTER TABLE ONLY public.tagged_resources
 
 
 --
--- Name: tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tags
@@ -2654,7 +2643,7 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: translation_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: translation_versions translation_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.translation_versions
@@ -2662,7 +2651,7 @@ ALTER TABLE ONLY public.translation_versions
 
 
 --
--- Name: translations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: translations translations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.translations
@@ -2670,7 +2659,7 @@ ALTER TABLE ONLY public.translations
 
 
 --
--- Name: tutorial_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: tutorial_versions tutorial_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tutorial_versions
@@ -2678,7 +2667,7 @@ ALTER TABLE ONLY public.tutorial_versions
 
 
 --
--- Name: tutorials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: tutorials tutorials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tutorials
@@ -2686,7 +2675,7 @@ ALTER TABLE ONLY public.tutorials
 
 
 --
--- Name: user_collection_preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_collection_preferences user_collection_preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_collection_preferences
@@ -2694,7 +2683,7 @@ ALTER TABLE ONLY public.user_collection_preferences
 
 
 --
--- Name: user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_groups user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_groups
@@ -2702,7 +2691,7 @@ ALTER TABLE ONLY public.user_groups
 
 
 --
--- Name: user_project_preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_project_preferences user_project_preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_project_preferences
@@ -2710,7 +2699,7 @@ ALTER TABLE ONLY public.user_project_preferences
 
 
 --
--- Name: user_seen_subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_seen_subjects user_seen_subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_seen_subjects
@@ -2718,7 +2707,7 @@ ALTER TABLE ONLY public.user_seen_subjects
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -2726,7 +2715,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: workflow_contents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: workflow_contents workflow_contents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_contents
@@ -2734,7 +2723,7 @@ ALTER TABLE ONLY public.workflow_contents
 
 
 --
--- Name: workflow_tutorials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: workflow_tutorials workflow_tutorials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_tutorials
@@ -2742,7 +2731,7 @@ ALTER TABLE ONLY public.workflow_tutorials
 
 
 --
--- Name: workflow_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: workflow_versions workflow_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_versions
@@ -2750,7 +2739,7 @@ ALTER TABLE ONLY public.workflow_versions
 
 
 --
--- Name: workflows_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: workflows workflows_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflows
@@ -2880,7 +2869,7 @@ CREATE UNIQUE INDEX index_code_experiment_configs_on_name ON public.code_experim
 -- Name: index_collections_display_name_trgrm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_collections_display_name_trgrm ON public.collections USING gin ((COALESCE((display_name)::text, ''::text)) public.gin_trgm_ops);
+CREATE INDEX index_collections_display_name_trgrm ON public.collections USING gin (COALESCE((display_name)::text, ''::text) public.gin_trgm_ops);
 
 
 --
@@ -3167,7 +3156,7 @@ CREATE INDEX index_project_versions_on_project_id ON public.project_versions USI
 -- Name: index_projects_display_name_trgrm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_projects_display_name_trgrm ON public.projects USING gin ((COALESCE((display_name)::text, ''::text)) public.gin_trgm_ops);
+CREATE INDEX index_projects_display_name_trgrm ON public.projects USING gin (COALESCE((display_name)::text, ''::text) public.gin_trgm_ops);
 
 
 --
@@ -3447,7 +3436,7 @@ CREATE INDEX index_tagged_resources_on_tag_id ON public.tagged_resources USING b
 -- Name: index_tags_name_trgrm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_tags_name_trgrm ON public.tags USING gin ((COALESCE(name, ''::text)) public.gin_trgm_ops);
+CREATE INDEX index_tags_name_trgrm ON public.tags USING gin (COALESCE(name, ''::text) public.gin_trgm_ops);
 
 
 --
@@ -3510,7 +3499,7 @@ CREATE INDEX index_user_collection_preferences_on_user_id ON public.user_collect
 -- Name: index_user_groups_display_name_trgrm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_user_groups_display_name_trgrm ON public.user_groups USING gin ((COALESCE((display_name)::text, ''::text)) public.gin_trgm_ops);
+CREATE INDEX index_user_groups_display_name_trgrm ON public.user_groups USING gin (COALESCE((display_name)::text, ''::text) public.gin_trgm_ops);
 
 
 --
@@ -3741,25 +3730,25 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 -- Name: users_idx_trgm_login; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX users_idx_trgm_login ON public.users USING gin ((COALESCE((login)::text, ''::text)) public.gin_trgm_ops);
+CREATE INDEX users_idx_trgm_login ON public.users USING gin (COALESCE((login)::text, ''::text) public.gin_trgm_ops);
 
 
 --
--- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
+-- Name: projects tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON public.projects FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
 
 
 --
--- Name: tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
+-- Name: users tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON public.users FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'login');
 
 
 --
--- Name: fk_rails_02f2e5d7ed; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_collection_preferences fk_rails_02f2e5d7ed; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_collection_preferences
@@ -3767,7 +3756,7 @@ ALTER TABLE ONLY public.user_collection_preferences
 
 
 --
--- Name: fk_rails_038f6f9f13; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_sets_workflows fk_rails_038f6f9f13; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_sets_workflows
@@ -3775,7 +3764,7 @@ ALTER TABLE ONLY public.subject_sets_workflows
 
 
 --
--- Name: fk_rails_06fc22e4c3; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: gold_standard_annotations fk_rails_06fc22e4c3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.gold_standard_annotations
@@ -3783,7 +3772,7 @@ ALTER TABLE ONLY public.gold_standard_annotations
 
 
 --
--- Name: fk_rails_082b4f1af7; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: gold_standard_annotations fk_rails_082b4f1af7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.gold_standard_annotations
@@ -3791,7 +3780,7 @@ ALTER TABLE ONLY public.gold_standard_annotations
 
 
 --
--- Name: fk_rails_085970853c; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: field_guide_versions fk_rails_085970853c; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.field_guide_versions
@@ -3799,7 +3788,7 @@ ALTER TABLE ONLY public.field_guide_versions
 
 
 --
--- Name: fk_rails_0be1922a0e; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: access_control_lists fk_rails_0be1922a0e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.access_control_lists
@@ -3807,7 +3796,7 @@ ALTER TABLE ONLY public.access_control_lists
 
 
 --
--- Name: fk_rails_0ca158de43; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: workflow_tutorials fk_rails_0ca158de43; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_tutorials
@@ -3815,7 +3804,7 @@ ALTER TABLE ONLY public.workflow_tutorials
 
 
 --
--- Name: fk_rails_0de211431f; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tutorial_versions fk_rails_0de211431f; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tutorial_versions
@@ -3823,7 +3812,7 @@ ALTER TABLE ONLY public.tutorial_versions
 
 
 --
--- Name: fk_rails_0e782fcb3c; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: gold_standard_annotations fk_rails_0e782fcb3c; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.gold_standard_annotations
@@ -3831,7 +3820,7 @@ ALTER TABLE ONLY public.gold_standard_annotations
 
 
 --
--- Name: fk_rails_107209726e; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: workflow_contents fk_rails_107209726e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_contents
@@ -3839,7 +3828,7 @@ ALTER TABLE ONLY public.workflow_contents
 
 
 --
--- Name: fk_rails_1be0872ee9; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: collections_projects fk_rails_1be0872ee9; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.collections_projects
@@ -3847,7 +3836,7 @@ ALTER TABLE ONLY public.collections_projects
 
 
 --
--- Name: fk_rails_1d218ca624; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: gold_standard_annotations fk_rails_1d218ca624; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.gold_standard_annotations
@@ -3855,7 +3844,7 @@ ALTER TABLE ONLY public.gold_standard_annotations
 
 
 --
--- Name: fk_rails_1e54468460; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: recents fk_rails_1e54468460; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.recents
@@ -3863,7 +3852,7 @@ ALTER TABLE ONLY public.recents
 
 
 --
--- Name: fk_rails_2001a01c81; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_workflow_counts fk_rails_2001a01c81; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_workflow_counts
@@ -3871,7 +3860,7 @@ ALTER TABLE ONLY public.subject_workflow_counts
 
 
 --
--- Name: fk_rails_27ae8e8a0d; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: aggregations fk_rails_27ae8e8a0d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.aggregations
@@ -3879,7 +3868,7 @@ ALTER TABLE ONLY public.aggregations
 
 
 --
--- Name: fk_rails_283ede5252; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_groups fk_rails_283ede5252; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_groups
@@ -3887,7 +3876,7 @@ ALTER TABLE ONLY public.subject_groups
 
 
 --
--- Name: fk_rails_28a7ada458; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: aggregations fk_rails_28a7ada458; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.aggregations
@@ -3895,7 +3884,7 @@ ALTER TABLE ONLY public.aggregations
 
 
 --
--- Name: fk_rails_305e6d8bf1; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_contents fk_rails_305e6d8bf1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_contents
@@ -3903,7 +3892,7 @@ ALTER TABLE ONLY public.project_contents
 
 
 --
--- Name: fk_rails_330c32d8d9; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: oauth_access_grants fk_rails_330c32d8d9; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oauth_access_grants
@@ -3911,7 +3900,7 @@ ALTER TABLE ONLY public.oauth_access_grants
 
 
 --
--- Name: fk_rails_382d2c48c7; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: workflows fk_rails_382d2c48c7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflows
@@ -3919,7 +3908,7 @@ ALTER TABLE ONLY public.workflows
 
 
 --
--- Name: fk_rails_489b3ea925; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_pages fk_rails_489b3ea925; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_pages
@@ -3927,7 +3916,7 @@ ALTER TABLE ONLY public.project_pages
 
 
 --
--- Name: fk_rails_4a73c0f7f5; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_workflow_counts fk_rails_4a73c0f7f5; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_workflow_counts
@@ -3935,7 +3924,7 @@ ALTER TABLE ONLY public.subject_workflow_counts
 
 
 --
--- Name: fk_rails_4da2a0f9d6; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_project_preferences fk_rails_4da2a0f9d6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_project_preferences
@@ -3943,7 +3932,7 @@ ALTER TABLE ONLY public.user_project_preferences
 
 
 --
--- Name: fk_rails_4e8620169e; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_project_preferences fk_rails_4e8620169e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_project_preferences
@@ -3951,7 +3940,7 @@ ALTER TABLE ONLY public.user_project_preferences
 
 
 --
--- Name: fk_rails_4ecef5b8c5; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: authorizations fk_rails_4ecef5b8c5; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.authorizations
@@ -3959,7 +3948,7 @@ ALTER TABLE ONLY public.authorizations
 
 
 --
--- Name: fk_rails_5244e2cc55; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: recents fk_rails_5244e2cc55; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.recents
@@ -3967,7 +3956,7 @@ ALTER TABLE ONLY public.recents
 
 
 --
--- Name: fk_rails_53b1c6ff8a; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_page_versions fk_rails_53b1c6ff8a; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_page_versions
@@ -3975,7 +3964,7 @@ ALTER TABLE ONLY public.organization_page_versions
 
 
 --
--- Name: fk_rails_59adcbe133; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_groups fk_rails_59adcbe133; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_groups
@@ -3983,7 +3972,7 @@ ALTER TABLE ONLY public.subject_groups
 
 
 --
--- Name: fk_rails_670188dbc7; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_collection_preferences fk_rails_670188dbc7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_collection_preferences
@@ -3991,7 +3980,7 @@ ALTER TABLE ONLY public.user_collection_preferences
 
 
 --
--- Name: fk_rails_694e2977cf; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: workflows fk_rails_694e2977cf; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflows
@@ -3999,7 +3988,7 @@ ALTER TABLE ONLY public.workflows
 
 
 --
--- Name: fk_rails_6c88edf7d9; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: workflow_versions fk_rails_6c88edf7d9; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_versions
@@ -4007,7 +3996,7 @@ ALTER TABLE ONLY public.workflow_versions
 
 
 --
--- Name: fk_rails_732cb83ab7; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: oauth_access_tokens fk_rails_732cb83ab7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oauth_access_tokens
@@ -4015,7 +4004,7 @@ ALTER TABLE ONLY public.oauth_access_tokens
 
 
 --
--- Name: fk_rails_7c8fb1018a; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: classification_subjects fk_rails_7c8fb1018a; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.classification_subjects
@@ -4023,7 +4012,7 @@ ALTER TABLE ONLY public.classification_subjects
 
 
 --
--- Name: fk_rails_82e4d0479b; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tutorials fk_rails_82e4d0479b; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tutorials
@@ -4031,15 +4020,15 @@ ALTER TABLE ONLY public.tutorials
 
 
 --
--- Name: fk_rails_8661e689b0; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_set_imports fk_rails_8661e689b0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_set_imports
-    ADD CONSTRAINT fk_rails_8661e689b0 FOREIGN KEY (subject_set_id) REFERENCES public.subject_sets(id);
+    ADD CONSTRAINT fk_rails_8661e689b0 FOREIGN KEY (subject_set_id) REFERENCES public.subject_sets(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: fk_rails_895b025564; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: collections_projects fk_rails_895b025564; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.collections_projects
@@ -4047,7 +4036,7 @@ ALTER TABLE ONLY public.collections_projects
 
 
 --
--- Name: fk_rails_93073bf3b1; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: set_member_subjects fk_rails_93073bf3b1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.set_member_subjects
@@ -4055,7 +4044,7 @@ ALTER TABLE ONLY public.set_member_subjects
 
 
 --
--- Name: fk_rails_937b47dc37; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: gold_standard_annotations fk_rails_937b47dc37; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.gold_standard_annotations
@@ -4063,7 +4052,7 @@ ALTER TABLE ONLY public.gold_standard_annotations
 
 
 --
--- Name: fk_rails_960d10a3c6; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_sets fk_rails_960d10a3c6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_sets
@@ -4071,7 +4060,7 @@ ALTER TABLE ONLY public.subject_sets
 
 
 --
--- Name: fk_rails_991d5ad7ab; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: collections fk_rails_991d5ad7ab; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.collections
@@ -4079,7 +4068,7 @@ ALTER TABLE ONLY public.collections
 
 
 --
--- Name: fk_rails_99326fb65d; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: memberships fk_rails_99326fb65d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.memberships
@@ -4087,7 +4076,7 @@ ALTER TABLE ONLY public.memberships
 
 
 --
--- Name: fk_rails_9aee26923d; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: projects fk_rails_9aee26923d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.projects
@@ -4095,7 +4084,7 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- Name: fk_rails_9c86377aa8; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_seen_subjects fk_rails_9c86377aa8; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_seen_subjects
@@ -4103,7 +4092,7 @@ ALTER TABLE ONLY public.user_seen_subjects
 
 
 --
--- Name: fk_rails_9dd81aaaa3; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: memberships fk_rails_9dd81aaaa3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.memberships
@@ -4111,7 +4100,7 @@ ALTER TABLE ONLY public.memberships
 
 
 --
--- Name: fk_rails_a1b35288b8; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: field_guides fk_rails_a1b35288b8; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.field_guides
@@ -4119,7 +4108,7 @@ ALTER TABLE ONLY public.field_guides
 
 
 --
--- Name: fk_rails_a5b8c1ffff; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_group_members fk_rails_a5b8c1ffff; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_group_members
@@ -4127,7 +4116,7 @@ ALTER TABLE ONLY public.subject_group_members
 
 
 --
--- Name: fk_rails_ad41ce8e02; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: translation_versions fk_rails_ad41ce8e02; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.translation_versions
@@ -4135,7 +4124,7 @@ ALTER TABLE ONLY public.translation_versions
 
 
 --
--- Name: fk_rails_b029d72783; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: workflows fk_rails_b029d72783; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflows
@@ -4143,7 +4132,7 @@ ALTER TABLE ONLY public.workflows
 
 
 --
--- Name: fk_rails_b08d342668; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_sets_workflows fk_rails_b08d342668; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_sets_workflows
@@ -4151,7 +4140,7 @@ ALTER TABLE ONLY public.subject_sets_workflows
 
 
 --
--- Name: fk_rails_b4b53e07b8; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: oauth_access_grants fk_rails_b4b53e07b8; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oauth_access_grants
@@ -4159,7 +4148,7 @@ ALTER TABLE ONLY public.oauth_access_grants
 
 
 --
--- Name: fk_rails_b7ce3e711e; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_page_versions fk_rails_b7ce3e711e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_page_versions
@@ -4167,7 +4156,7 @@ ALTER TABLE ONLY public.project_page_versions
 
 
 --
--- Name: fk_rails_bae361a0ab; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: translations fk_rails_bae361a0ab; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.translations
@@ -4175,7 +4164,7 @@ ALTER TABLE ONLY public.translations
 
 
 --
--- Name: fk_rails_bbb4bf5489; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: set_member_subjects fk_rails_bbb4bf5489; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.set_member_subjects
@@ -4183,7 +4172,7 @@ ALTER TABLE ONLY public.set_member_subjects
 
 
 --
--- Name: fk_rails_bcabfcd540; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: workflow_tutorials fk_rails_bcabfcd540; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_tutorials
@@ -4191,7 +4180,7 @@ ALTER TABLE ONLY public.workflow_tutorials
 
 
 --
--- Name: fk_rails_be858ed31d; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_versions fk_rails_be858ed31d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_versions
@@ -4199,7 +4188,7 @@ ALTER TABLE ONLY public.organization_versions
 
 
 --
--- Name: fk_rails_d596712569; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_set_imports fk_rails_d596712569; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_set_imports
@@ -4207,7 +4196,7 @@ ALTER TABLE ONLY public.subject_set_imports
 
 
 --
--- Name: fk_rails_d6fe15ec78; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tagged_resources fk_rails_d6fe15ec78; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tagged_resources
@@ -4215,7 +4204,7 @@ ALTER TABLE ONLY public.tagged_resources
 
 
 --
--- Name: fk_rails_d80672ecd1; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_contents fk_rails_d80672ecd1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_contents
@@ -4223,7 +4212,7 @@ ALTER TABLE ONLY public.organization_contents
 
 
 --
--- Name: fk_rails_dff7cd1e07; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: collections_subjects fk_rails_dff7cd1e07; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.collections_subjects
@@ -4231,7 +4220,7 @@ ALTER TABLE ONLY public.collections_subjects
 
 
 --
--- Name: fk_rails_e881fca299; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_seen_subjects fk_rails_e881fca299; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_seen_subjects
@@ -4239,7 +4228,7 @@ ALTER TABLE ONLY public.user_seen_subjects
 
 
 --
--- Name: fk_rails_e9323f2e30; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: collections_subjects fk_rails_e9323f2e30; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.collections_subjects
@@ -4247,7 +4236,7 @@ ALTER TABLE ONLY public.collections_subjects
 
 
 --
--- Name: fk_rails_ee63f25419; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: oauth_access_tokens fk_rails_ee63f25419; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oauth_access_tokens
@@ -4255,7 +4244,7 @@ ALTER TABLE ONLY public.oauth_access_tokens
 
 
 --
--- Name: fk_rails_eee5ff31fd; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_versions fk_rails_eee5ff31fd; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_versions
@@ -4263,7 +4252,7 @@ ALTER TABLE ONLY public.project_versions
 
 
 --
--- Name: fk_rails_f1e22b77bf; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subjects fk_rails_f1e22b77bf; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subjects
@@ -4271,7 +4260,7 @@ ALTER TABLE ONLY public.subjects
 
 
 --
--- Name: fk_rails_f26c409132; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subjects fk_rails_f26c409132; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subjects
@@ -4279,7 +4268,7 @@ ALTER TABLE ONLY public.subjects
 
 
 --
--- Name: fk_rails_f611f500c0; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: subject_group_members fk_rails_f611f500c0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subject_group_members
@@ -4287,7 +4276,7 @@ ALTER TABLE ONLY public.subject_group_members
 
 
 --
--- Name: fk_rails_fc0cd14ebe; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: classification_subjects fk_rails_fc0cd14ebe; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.classification_subjects
@@ -4295,7 +4284,7 @@ ALTER TABLE ONLY public.classification_subjects
 
 
 --
--- Name: fk_rails_fedc809cf8; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: users fk_rails_fedc809cf8; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -4815,4 +4804,10 @@ INSERT INTO schema_migrations (version) VALUES ('20200717155424');
 INSERT INTO schema_migrations (version) VALUES ('20200720125246');
 
 INSERT INTO schema_migrations (version) VALUES ('20201113151433');
+
+INSERT INTO schema_migrations (version) VALUES ('20210226173243');
+
+INSERT INTO schema_migrations (version) VALUES ('20210602210437');
+
+INSERT INTO schema_migrations (version) VALUES ('20210729152047');
 

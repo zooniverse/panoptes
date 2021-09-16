@@ -54,6 +54,16 @@ RSpec.describe RetirementWorker do
         worker.perform(status.id)
       end
 
+      it 'queues the subject_set completeness worker' do
+        allow(SubjectSetCompletenessWorker).to receive(:perform_async)
+        linked_subject_set_id = status.subject.subject_set_ids.first
+        linked_workflow_id = status.workflow.id
+        worker.perform(status.id)
+        expect(SubjectSetCompletenessWorker)
+          .to have_received(:perform_async)
+          .with(linked_subject_set_id, linked_workflow_id)
+      end
+
       it "should call the publish retire event worker" do
         expect(PublishRetirementEventWorker)
           .to receive(:perform_async)
