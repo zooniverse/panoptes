@@ -10,7 +10,8 @@ module Panoptes
         { origins: '*', resource: '/api/*' },
         { origins: '*', resource: '/graphql' },
         { origins: cors_origins_regex, resource: '/users*', credentials: true },
-        { origins: cors_origins_regex, resource: '/oauth/*', credentials: true }
+        { origins: cors_origins_regex, resource: '/oauth/*', credentials: true },
+        { origins: cors_origins_regex, resource: '/unsubscribe', credentials: true }
       ]
     )
   end
