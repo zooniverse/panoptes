@@ -4,7 +4,7 @@ FROM ruby:2.5-slim-stretch
 WORKDIR /rails_app
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
-RUN --mount=type=cache,target=/var/cache/apt --mount=type=cache,target=/var/lib/apt \
+RUN --mount=type=cache,id=panoptes-apt-cache,target=/var/cache/apt --mount=type=cache,id=panoptes-apt-lib,target=/var/lib/apt \
     apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y \
         build-essential \
@@ -13,9 +13,7 @@ RUN --mount=type=cache,target=/var/cache/apt --mount=type=cache,target=/var/lib/
         # libjemalloc1 (v3) provides big memory savings vs jemalloc v5+ (default on debian buster)
         libjemalloc1 \
         libpq-dev \
-        tmpreaper \
-        && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+        tmpreaper
 
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 
