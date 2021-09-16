@@ -530,17 +530,16 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe '#grouped' do
     let(:workflow) do
-      create(:workflow_with_subject_sets, configuration: { subject_group: { num_rows: 1, num_columns: 1 } })
+      create(:workflow_with_subject_sets, configuration: { subject_group: { num_rows: 1, num_columns: 2 } })
     end
     let(:api_resource_links) { [] }
-    let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
-    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 1, http_cache: 'true' } }
+    let(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 2, num_rows: 1, http_cache: 'true' } }
     let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].enable }
 
     before do
       ENV['SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST'] = workflow.id.to_s
       ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
-      ENV['SUBJECT_GROUP_MIN_SIZE'] = '1'
       sms
       flipper_feature
       get :grouped, request_params
@@ -592,6 +591,16 @@ describe Api::V1::SubjectsController, type: :controller do
       end
     end
 
+    context 'with admin param' do
+      let(:request_params) do
+        { workflow_id: workflow.id.to_s, num_columns: 2, num_rows: 1, admin: true }
+      end
+
+      it 'responds with 200' do
+        expect(response.status).to eq(200)
+      end
+    end
+
     context 'with a workflow that is not allow listed for this end point' do
       let(:request_params) { { workflow_id: (workflow.id - 1).to_s, num_columns: 1, num_rows: 1 } }
 
@@ -606,6 +615,62 @@ describe Api::V1::SubjectsController, type: :controller do
 
     context 'when the feature flag is disabled for this end point' do
       let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].disable }
+
+      it 'errors with 503' do
+        expect(response.status).to eq(503)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Feature has been temporarily disabled')
+      end
+    end
+  end
+
+  describe '#selection' do
+    let(:workflow) { create(:workflow_with_subject_sets) }
+    let(:api_resource_links) { [] }
+    let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
+    let(:subject_ids) { sms.map(&:subject_id) }
+    let(:request_params) do
+      { workflow_id: workflow.id.to_s, ids: subject_ids.join(','), http_cache: 'true' }
+    end
+    let(:flipper_feature) { Panoptes.flipper[:subject_selection_by_ids].enable }
+
+    before do
+      subject_ids
+      flipper_feature
+      allow(SubjectSelectorSerializer).to receive(:page).and_call_original
+      get :selection, request_params
+    end
+
+    it 'returns 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns a page with only 1 resource' do
+      expect(json_response[api_resource_name].length).to eq(1)
+    end
+
+    it 'uses the SubjectSelectorSerializer class' do
+      expect(SubjectSelectorSerializer).to have_received(:page)
+    end
+
+    it_behaves_like 'an api response'
+
+    context 'without subject ids params' do
+      let(:request_params) { { workflow_id: workflow.id.to_s } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Ids is required')
+      end
+    end
+
+    context 'when the feature flag is disabled for this end point' do
+      let(:flipper_feature) { Panoptes.flipper[:subject_selection_by_ids].disable }
 
       it 'errors with 503' do
         expect(response.status).to eq(503)

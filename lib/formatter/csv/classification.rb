@@ -61,7 +61,11 @@ module Formatter
 
       def annotations
         classification.annotations.map do |annotation|
-          AnnotationForCsv.new(classification, annotation, cache).to_h
+          if classification.be_v2_annotation_format
+            V2::Annotation.new(classification, annotation, cache).to_h
+          else
+            AnnotationForCsv.new(classification, annotation, cache).to_h
+          end
         end.to_json
       end
 

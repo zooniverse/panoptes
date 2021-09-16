@@ -27,8 +27,10 @@ class Api::V1::SubjectSetsController < Api::ApiController
       notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
 
-      subject_set.subject_sets_workflows.pluck(:workflow_id).each do |workflow_id|
+      subject_set.workflow_ids.each do |workflow_id|
         UnfinishWorkflowWorker.perform_async(workflow_id)
+        # recalculate the set's completeness values if we've added new subjects
+        SubjectSetCompletenessWorker.perform_async(subject_set.id, workflow_id) if params.key?(:subjects)
         duration = params[:subjects].length * 4 # Pad times to prevent backlogs
         params[:subjects].each do |subject_id|
           SubjectWorkflowStatusCreateWorker.perform_in(duration.seconds*rand, subject_id, workflow_id)
@@ -67,6 +69,13 @@ class Api::V1::SubjectSetsController < Api::ApiController
       notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
       reset_workflow_retired_counts(subject_set.workflow_ids)
+
+      if params['link_relation'] == 'subjects'
+        # recalculate the set's completeness values if # we're removing subjects
+        subject_set.workflow_ids.each do |workflow_id|
+          SubjectSetCompletenessWorker.perform_async(subject_set.id, workflow_id)
+        end
+      end
     end
   end
 

@@ -342,5 +342,44 @@ FactoryBot.define do
         }
       }
     end
+
+    trait :dropdown_simple do
+      display_name { 'Simple Dropdown (PFE format used in FEM)' }
+      tasks {
+        {
+          "T1"=>{
+            "help"=>"T1.help",
+            "type"=>"dropdown",
+            "selects"=>
+              [
+                {
+                  "id"=>"c99e5ef444475",
+                  "title"=>"Country",
+                  "options"=>
+                  {"*"=>
+                    [{"label"=>"T1.selects.0.options.*.0.label",
+                      "value"=>"c6e0d98477ec8"},
+                      {"label"=>"T1.selects.0.options.*.1.label",
+                      "value"=>"3a9b7c7d53d6f"},
+                      {"label"=>"T1.selects.0.options.*.2.label",
+                      "value"=>"3844fc24a3df7"}]},
+                  "required"=>true,
+                  "allowCreate"=>false
+                }
+              ],
+             "instruction"=>"T1.instruction"
+          }
+        }
+      }
+      strings {
+        {
+          "T1.help"=>"it drops down",
+          "T1.selects.0.options.*.0.label"=>"Oceania",
+          "T1.selects.0.options.*.1.label"=>"Eurasia",
+          "T1.selects.0.options.*.2.label"=>"US",
+          "T1.instruction"=>"DROPPIN' DOWN"
+        }
+      }
+    end
   end
 end

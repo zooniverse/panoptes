@@ -22,10 +22,15 @@ RSpec.describe MediumRemovalWorker do
 
   it 'ignores any missing azure (BlobNotFound (404)) media paths' do
     require 'azure/core/http/http_error'
+    response = instance_double('Azure::Core::Http::HTTPResponse', uri: 'fake-uri', status_code: 404, body: '', reason_phrase: '')
+    allow(MediaStorage).to receive(:delete_file).and_raise(Azure::Core::Http::HTTPError, response)
+    expect { worker.perform(medium_src) }.not_to raise_error
+  end
+
+  it 'raises any unknown azure responses' do
+    require 'azure/core/http/http_error'
     response = instance_double('Azure::Core::Http::HTTPResponse', uri: 'fake-uri', status_code: 500, body: '', reason_phrase: '')
     allow(MediaStorage).to receive(:delete_file).and_raise(Azure::Core::Http::HTTPError, response)
-    # allow this worker to fail right now so we can track any azure blob store
-    # path cleanup errors, https://github.com/zooniverse/panoptes/pull/3538/files#r547433486
     expect { worker.perform(medium_src) }.to raise_error(Azure::Core::Http::HTTPError)
   end
 

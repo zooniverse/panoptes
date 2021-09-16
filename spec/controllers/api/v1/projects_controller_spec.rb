@@ -700,24 +700,31 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
 
-    context "update_links" do
-      before(:each) do
+    context 'update_links' do
+      let(:params) { update_params.merge(id: resource.id) }
+
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
-        params = update_params.merge(id: resource.id)
-        put :update, params
       end
 
-      context "copy linked workflow" do
-        it 'should have the same tasks workflow' do
-          expect(resource.workflows.first.tasks).to eq(workflow.tasks)
+      context 'copy linked workflow' do
+        it 'copies the workflow using the WorkflowCopier' do
+          allow(WorkflowCopier).to receive(:copy).and_call_original
+          put :update, params
+          expect(WorkflowCopier).to have_received(:copy).with(workflow, resource.id)
         end
 
-        it 'should have a different id' do
+        it 'has a different id to the original workflow' do
+          put :update, params
           expect(resource.workflows.first.id).to_not eq(workflow.id)
         end
       end
 
-      context "copy linked subject_set" do
+      context 'copy linked subject_set' do
+        before do
+          put :update, params
+        end
+
         it 'should have the same name' do
           expect(resource.subject_sets.first.display_name).to eq(subject_set.display_name)
         end
@@ -748,9 +755,9 @@ describe Api::V1::ProjectsController, type: :controller do
 
         it_behaves_like "supports update_links via a copy of the original" do
 
-          it 'should have the same name' do
+          it 'has a copy suffix added to the name' do
             update_via_links
-            expect(copied_resource.display_name).to eq(linked_resource.display_name)
+            expect(copied_resource.display_name).to include("#{linked_resource.display_name} (copy:")
           end
 
           it 'should belong to the correct project' do

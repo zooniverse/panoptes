@@ -7,11 +7,27 @@ Layout/LineLength:
   Max: 160
 Layout/SpaceAroundEqualsInParameterDefault:
   EnforcedStyle: 'no_space'
+Layout/SpaceInsideHashLiteralBraces:
+  Exclude:
+    - 'spec/factories/workflows.rb'
+Layout/ArrayAlignment:
+  Exclude:
+    - 'spec/factories/workflows.rb'
+Layout/HashAlignment:
+  Exclude:
+    - 'spec/factories/workflows.rb'
+Layout/SpaceAroundOperators:
+  Exclude:
+    - 'spec/factories/workflows.rb'
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "spec/**/*"
 
 Metrics/BlockLength:
   Exclude:
     - '**/*_spec.rb'
     - 'spec/support/*.rb'
+    - 'spec/factories/*.rb'
 Metrics/MethodLength:
   Description: 'Avoid methods longer than 12 lines of code.'
   Max: 12
@@ -19,7 +35,11 @@ Metrics/MethodLength:
 Rails/SkipsModelValidations:
   Whitelist:
   - update_all
+  - update_column
   - touch
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
 
 Style/NumericLiterals:
   Enabled: false
@@ -31,6 +51,9 @@ Style/Documentation:
 Style/BlockDelimiters:
   Exclude:
     - 'spec/**/*'
+Style/StringLiterals:
+  Exclude:
+    - 'spec/factories/workflows.rb'
 
 # new linters - opt in
 Layout/SpaceAroundMethodCallOperator:
@@ -50,3 +73,4 @@ Style/HashTransformValues:
 
 AllCops:
   NewCops: enable
+  TargetRailsVersion: 4.2

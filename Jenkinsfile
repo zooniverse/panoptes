@@ -74,7 +74,7 @@ pipeline {
         slackSend (
           color: '#0000FF',
           message: "Starting Panoptes production DB migration - Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-          channel: "#ops"
+          channel: "#deploys"
         )
         sh """
           export JOB_NAME="panoptes-migrate-db-production-$env.BUILD_NUMBER"
@@ -105,7 +105,7 @@ pipeline {
         slackSend (
           color: '#0000FF',
           message: "Starting Panoptes staging DB migration - Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-          channel: "#ops"
+          channel: "#deploys"
         )
         sh """
           export JOB_NAME="panoptes-migrate-db-staging-$env.BUILD_NUMBER"
@@ -145,7 +145,7 @@ pipeline {
           slackSend (
             color: '#00FF00',
             message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-            channel: "#ops"
+            channel: "#deploys"
           )
         }
       }
@@ -157,7 +157,7 @@ pipeline {
           slackSend (
             color: '#FF0000',
             message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})",
-            channel: "#ops"
+            channel: "#deploys"
           )
         }
       }
