@@ -106,7 +106,7 @@ GEM
     celluloid-supervision (0.20.6)
       timers (>= 4.1.1)
     coderay (1.1.3)
-    concurrent-ruby (1.1.8)
+    concurrent-ruby (1.1.9)
     congestion (0.1.0)
       connection_pool (>= 2.0)
       redis (>= 3.1)
@@ -233,7 +233,7 @@ GEM
     mime-types-data (3.2020.0512)
     mini_mime (1.0.2)
     mini_portile2 (2.5.1)
-    minitest (5.14.3)
+    minitest (5.14.4)
     mock_redis (0.25.0)
     modware (0.1.3)
       key_struct (~> 0.4)
@@ -333,7 +333,7 @@ GEM
       thor (>= 0.18.1, < 2.0)
     rainbow (3.0.0)
     rake (13.0.3)
-    ranked-model (0.4.6)
+    ranked-model (0.4.7)
       activerecord (>= 4.2)
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
@@ -515,7 +515,7 @@ DEPENDENCIES
   pundit (~> 2.1.0)
   rack-cors (~> 1.0)
   rails (~> 4.2.11)
-  ranked-model (~> 0.4.6)
+  ranked-model (~> 0.4.7)
   restpack_serializer!
   rspec
   rspec-its
