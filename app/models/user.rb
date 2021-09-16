@@ -347,7 +347,9 @@ class User < ActiveRecord::Base
 
   def uploaded_subjects_count
     count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry) do
-      Subject.where(upload_user_id: id).count
+      DatabaseReplica.read('read_user_uploaded_subjects_counts_from_replica') do
+        Subject.where(upload_user_id: id).count
+      end
     end
     count.to_i
   end

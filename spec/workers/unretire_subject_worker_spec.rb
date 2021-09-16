@@ -6,14 +6,13 @@ RSpec.describe UnretireSubjectWorker do
   let(:worker) { described_class.new }
   let(:workflow) { create(:workflow_with_subjects, num_sets: 1) }
   let(:subject1) { workflow.subjects.first }
-  let(:sms) { subject.set_member_subject.first }
-  let(:set) { sms.subject_set }
   let(:status) { create(:subject_workflow_status, subject: subject1, workflow: workflow, retired_at: 1.day.ago, retirement_reason: 'other') }
 
   describe '#perform' do
     before do
       allow(RefreshWorkflowStatusWorker).to receive(:perform_async)
       allow(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async)
+      allow(SubjectSetCompletenessWorker).to receive(:perform_async)
     end
 
     context 'when subjects are already retired' do
@@ -37,6 +36,12 @@ RSpec.describe UnretireSubjectWorker do
       it 'calls NotifySubjectSelectorOfChangeWorker with workflow id' do
         worker.perform(workflow.id, [subject1.id])
         expect(NotifySubjectSelectorOfChangeWorker).to have_received(:perform_async).with(workflow.id)
+      end
+
+      it 'queues the subject_set completeness worker' do
+        linked_subject_set_id = subject1.subject_set_ids.first
+        worker.perform(workflow.id, [subject1.id])
+        expect(SubjectSetCompletenessWorker).to have_received(:perform_async).with(linked_subject_set_id, workflow.id)
       end
     end
 

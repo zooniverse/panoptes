@@ -1,13 +1,22 @@
 # frozen_string_literal: true
 
 class WorkflowCopier
+  EXCLUDE_ATTRIBUTES = %i[
+    classifications_count
+    completeness
+    published_version_id
+    real_set_member_subjects_count
+    retired_set_member_subjects_count
+    finished_at
+  ].freeze
+
   def self.copy_by_id(workflow_id, target_project_id)
     source_workflow = Workflow.find(workflow_id)
     copy(source_workflow, target_project_id)
   end
 
   def self.copy(source_workflow, target_project_id)
-    copied_workflow = source_workflow.deep_clone(except: %i[published_version_id])
+    copied_workflow = source_workflow.deep_clone(except: EXCLUDE_ATTRIBUTES)
     copied_workflow.project_id = target_project_id
     copied_workflow.active = false
     copied_workflow.display_name = "#{copied_workflow.display_name} (copy: #{Time.now.utc})"
