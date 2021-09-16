@@ -5,24 +5,4 @@ updates:
   schedule:
     interval: weekly
     time: "10:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: paper_trail
-    versions:
-    - "> 4.2.0"
-  - dependency-name: sidekiq
-    versions:
-    - 5.2.4
-  - dependency-name: sprockets
-    versions:
-    - ">= 4.0.a, < 4.1"
-  - dependency-name: omniauth
-    versions:
-    - 2.0.0
-  - dependency-name: honeybadger
-    versions:
-    - 4.7.2
-    - 4.7.3
-  - dependency-name: oauth2
-    versions:
-    - 1.4.4
+  open-pull-requests-limit: 20
