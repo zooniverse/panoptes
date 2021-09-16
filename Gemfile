@@ -61,10 +61,8 @@ group :production, :staging do
 end
 
 group :development, :test do
-  gem "factory_bot_rails"
-  gem 'pry-byebug'
-  gem 'pry-rails'
-  gem 'pry-stack_explorer'
+  gem 'factory_bot_rails'
+  gem 'pry'
   gem 'rubocop', '~> 0.91.0'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
