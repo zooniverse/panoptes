@@ -3,21 +3,49 @@ on:
   pull_request:
   push: { branches: master }
 env:
-  COMPOSE_FILE: docker-compose.yml
+  DATABASE_URL: postgresql://panoptes:password@localhost/gh_ci_test
 jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11-alpine
+        env:
+          POSTGRES_USER: panoptes
+          POSTGRES_PASSWORD: password
+        ports: ['5432:5432']
+        options:
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        spec-commands: ['spec/controllers/api/v1/[a-m]*.rb', 'spec/controllers/api/v1/[n-s]*.rb', 'spec/controllers/api/v1/[t-z]*.rb', "spec/controllers/**.rb spec/controllers/api/*.rb spec/models spec/operations spec/counters spec/routes", "spec/lib spec/workers spec/serializers spec/services spec/requests spec/middleware spec/mailers spec/policies"]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Check specs
+        run: |
+          mkdir -p tmp
+          find spec -maxdepth 1 -type d | grep spec/ > tmp/curr_spec_dirs.txt
+          if grep -Fxvc -f spec/known_dirs.txt tmp/curr_spec_dirs.txt; then echo 'Detected unkown Spec directories, check the spec/known_dirs.txt!'; exit 1; fi
       - name: Check for focus specs
         run: ./scripts/no_focus.sh
-      - name: Build docker images
-        run: docker-compose build
-      - name: Create the test env DB
-        run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rake db:setup
-      - name: Setup config files
-        run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rake configure:local
-      - name: Run all the tests
-        run: docker-compose run -T --rm -e RAILS_ENV=test panoptes bundle exec rspec
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.5
+          bundler-cache: true
+      - name: Install PG Client
+        run: |
+          sudo apt-get -yqq install libpq-dev
+      - name: Setup DB and configs
+        run: |
+          RAILS_ENV=test bundle exec rake db:setup
+          RAILS_ENV=panoptes_test bundle exec rake db:create
+          RAILS_ENV=test bundle exec rake configure:local
+      - name: Run tests
+        run: bundle exec rspec ${{ matrix.spec-commands }}
+        env:
+           RAILS_ENV: test

@@ -180,6 +180,40 @@ RSpec.describe Medium, :type => :model do
     end
   end
 
+  describe '#put_file_with_retry' do
+    let(:file_path) { Rails.root.join('/tmp/project_x_dump.csv') }
+    let(:media_storage_put_file_params) do
+      [medium.src, file_path, medium.attributes]
+    end
+
+    it 'calls MediaStorage put_file with the src and other attributes' do
+      allow(MediaStorage).to receive(:put_file)
+      medium.put_file_with_retry(file_path)
+      expect(MediaStorage).to have_received(:put_file).with(*media_storage_put_file_params)
+    end
+
+    it 'retries the correct number of times' do
+      allow(MediaStorage).to receive(:put_file).and_raise(Faraday::ConnectionFailed, 'Connection reset by peer')
+      medium.put_file_with_retry(file_path)
+    rescue Faraday::ConnectionFailed
+      expect(MediaStorage).to have_received(:put_file).with(*media_storage_put_file_params).exactly(5).times
+    end
+
+    it 'allows the retry number to be modified at runtime' do
+      allow(MediaStorage).to receive(:put_file).and_raise(Faraday::ConnectionFailed, 'Connection reset by peer')
+      medium.put_file_with_retry(file_path, {}, 2)
+    rescue Faraday::ConnectionFailed
+      expect(MediaStorage).to have_received(:put_file).with(*media_storage_put_file_params).twice
+    end
+
+    it 'does not retry if put_file raises MissingPutFilePath' do
+      allow(medium).to receive(:put_file).and_call_original
+      medium.put_file_with_retry('')
+    rescue Medium::MissingPutFilePath
+      expect(medium).to have_received(:put_file).once
+    end
+  end
+
   describe "#locations" do
     let(:project) { create(:project) }
     context "when type is one of project_avatar, user_avatar, or project_background" do
