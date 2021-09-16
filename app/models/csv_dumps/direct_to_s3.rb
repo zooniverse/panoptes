@@ -30,6 +30,19 @@ module CsvDumps
       )
     end
 
+    def put_file_with_retry(gzip_file_path, opts={}, num_retries=5)
+      attempts ||= 1
+      put_file(gzip_file_path, opts)
+    rescue UnencryptedBucket => e # do not retry this error
+      raise e
+    rescue => e # rubocop:disable Style/RescueStandardError
+      retry if (attempts += 1) <= num_retries
+
+      # ensure we raise unexpected errors once we've exhausted
+      # the number of retries to continute to surface these errors
+      raise e
+    end
+
     def storage_adapter(adapter='aws')
       return @storage_adapter if @storage_adapter
 

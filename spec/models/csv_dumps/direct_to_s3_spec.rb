@@ -54,6 +54,35 @@ describe CsvDumps::DirectToS3 do
       end
     end
 
+    describe '#put_file_with_retry' do
+      it 'calls put_file with the src and other attributes' do
+        allow(adapter).to receive(:put_file)
+        direct_to_s3.put_file_with_retry(file_path)
+        expect(adapter).to have_received(:put_file).with(s3_path, file_path, s3_opts)
+      end
+
+      it 'retries the correct number of times' do
+        allow(adapter).to receive(:put_file).and_raise(Faraday::ConnectionFailed, 'some error in aws lib')
+        direct_to_s3.put_file_with_retry(file_path)
+      rescue Faraday::ConnectionFailed
+        expect(adapter).to have_received(:put_file).with(s3_path, file_path, s3_opts).exactly(5).times
+      end
+
+      it 'allows the retry number to be modified at runtime' do
+        allow(adapter).to receive(:put_file).and_raise(Faraday::ConnectionFailed, 'Connection reset by peer')
+        direct_to_s3.put_file_with_retry(file_path, {}, 2)
+      rescue Faraday::ConnectionFailed
+        expect(adapter).to have_received(:put_file).with(s3_path, file_path, s3_opts).twice
+      end
+
+      it 'does not retry if put_file raises UnencryptedBucket' do
+        allow(direct_to_s3).to receive(:put_file).and_raise(CsvDumps::DirectToS3::UnencryptedBucket)
+        direct_to_s3.put_file_with_retry('')
+      rescue CsvDumps::DirectToS3::UnencryptedBucket
+        expect(direct_to_s3).to have_received(:put_file).once
+      end
+    end
+
     describe 'bucket encryption' do
       it "raises an error if it's not encrypted" do
         allow(adapter).to receive(:encrypted_bucket?).and_return(false)

@@ -530,17 +530,16 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe '#grouped' do
     let(:workflow) do
-      create(:workflow_with_subject_sets, configuration: { subject_group: { num_rows: 1, num_columns: 1 } })
+      create(:workflow_with_subject_sets, configuration: { subject_group: { num_rows: 1, num_columns: 2 } })
     end
     let(:api_resource_links) { [] }
-    let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
-    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: 1, http_cache: 'true' } }
+    let(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 2, num_rows: 1, http_cache: 'true' } }
     let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].enable }
 
     before do
       ENV['SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST'] = workflow.id.to_s
       ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
-      ENV['SUBJECT_GROUP_MIN_SIZE'] = '1'
       sms
       flipper_feature
       get :grouped, request_params
@@ -589,6 +588,16 @@ describe Api::V1::SubjectsController, type: :controller do
 
       it 'has a useful error message' do
         expect(response.body).to include('found unpermitted parameter: num_rows')
+      end
+    end
+
+    context 'with admin param' do
+      let(:request_params) do
+        { workflow_id: workflow.id.to_s, num_columns: 2, num_rows: 1, admin: true }
+      end
+
+      it 'responds with 200' do
+        expect(response.status).to eq(200)
       end
     end
 
