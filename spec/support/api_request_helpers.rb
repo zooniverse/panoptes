@@ -47,10 +47,6 @@ module APIRequestHelpers
     request.env["CONTENT_TYPE"] = "application/json"
   end
 
-  def set_accept_language
-    request.env['HTTP_ACCEPT_LANGUAGE'] = 'en, zh;q=0.9, zh-tw;q=0.8, fr-fr;q=0.6'
-  end
-
   def set_patch_content_type
     request.headers["Content-Type"] = "application/json-patch"
   end
@@ -89,7 +85,6 @@ module APIRequestHelpers
   def default_request(scopes: ["public"], user_id: nil)
     set_accept
     set_content_type
-    set_accept_language
     set_preconditions
     stub_content_filter
     stub_token(scopes: scopes, user_id: user_id)
@@ -97,7 +92,6 @@ module APIRequestHelpers
 
   def unauthenticated_request
     set_accept
-    set_accept_language
     set_preconditions
     stub_content_filter
     stub_token

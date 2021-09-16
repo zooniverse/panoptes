@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'accept_language_extractor'
-
 module Api
   include ApiErrors
 
@@ -75,24 +73,6 @@ module Api
       @api_user ||= ApiUser.new(current_resource_owner, admin: admin_flag?)
     end
 
-    def current_languages
-      param_langs  = [ params[:language] ]
-      user_langs   = user_accept_languages
-      header_langs = parse_http_accept_languages
-      ( param_langs | user_langs | header_langs ).compact
-    end
-
-    def user_accept_languages
-      api_user.try(:languages) || []
-    end
-
-    def parse_http_accept_languages
-      language_extractor = AcceptLanguageExtractor
-        .new(request.env['HTTP_ACCEPT_LANGUAGE'])
-
-      language_extractor.parse_languages
-    end
-
     def request_ip
       request.remote_ip
     end
@@ -117,15 +97,6 @@ module Api
         when "destroy"
           head :no_content
         end
-      end
-    end
-
-    def context
-      case action_name
-      when "show", "index"
-        { languages: current_languages }
-      else
-        { }
       end
     end
   end
