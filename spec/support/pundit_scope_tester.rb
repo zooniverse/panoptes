@@ -78,4 +78,9 @@ class PunditScopeTester
   def retire_subjects
     Pundit.policy!(@user, @klass).scope_for(:retire_subjects)
   end
+
+  # Used by workflows controller:
+  def unretire_subjects
+    Pundit.policy!(@user, @klass).scope_for(:unretire_subjects)
+  end
 end

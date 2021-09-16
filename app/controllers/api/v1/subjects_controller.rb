@@ -50,6 +50,49 @@ class Api::V1::SubjectsController < Api::ApiController
     )
   end
 
+  # special selection end point for known subject ids
+  def selection
+    # temporary feature flag in case we need a prod 'kill' switch for this feature
+    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_selection_by_ids].enabled?
+
+    skip_policy_scope
+
+    # setup the selector params from user input, note validation occurs in the operation class
+    selector_param_keys = %i[workflow_id ids http_cache admin]
+    selector_params = params.permit(*selector_param_keys)
+    worfklow_id = selector_params.delete(:workflow_id)
+
+    selected_subject_ids = Subjects::SelectionByIds.run!(
+      ids: selector_params.delete(:ids),
+      workflow_id: worfklow_id
+    )
+
+    selected_subject_scope =
+      if selected_subject_ids.empty?
+        Subject.none
+      else
+        Subject.active.where(id: selected_subject_ids).order("idx(array[#{selected_subject_ids.join(',')}], id)") # guardrails-disable-line
+      end
+
+    # create a special 'fake' selector for the serializer
+    subject_selector = OpenStruct.new(
+      user: api_user.user,
+      workflow: Workflow.find_without_json_attrs(worfklow_id),
+      selection_state: :normal # this end point will always be normal or raise
+    )
+
+    selection_context = Subjects::SelectorContext.new(
+      subject_selector,
+      selected_subject_ids
+    ).format
+
+    render json_api: SubjectSelectorSerializer.page(
+      selector_params,
+      selected_subject_scope,
+      selection_context
+    )
+  end
+
   # special selection end point create SubjectGroups
   def grouped
     # temporary feature flag in case we need a prod 'kill' switch for this feature
@@ -58,7 +101,7 @@ class Api::V1::SubjectsController < Api::ApiController
     skip_policy_scope
 
     # setup the selector params from user input, note validation occurs in the operation class
-    selector_param_keys = %i[workflow_id subject_set_id num_rows num_columns http_cache]
+    selector_param_keys = %i[workflow_id subject_set_id num_rows num_columns http_cache admin]
     selector_params = params.permit(*selector_param_keys)
 
     # Sanity check -- use a testing feature flag
