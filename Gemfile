@@ -28,7 +28,6 @@ gem 'json-schema', '~> 2.8'
 gem 'librato-metrics', '~> 2.1.2'
 gem 'logstasher', '~> 1.3'
 gem 'mime-types'
-gem 'mini_racer'
 gem 'omniauth', '~> 1.9'
 gem 'omniauth-facebook', '~> 5.0'
 gem 'omniauth-google-oauth2'
@@ -61,6 +60,7 @@ end
 
 group :development, :test do
   gem 'factory_bot_rails'
+  gem 'mini_racer'
   gem 'pry'
   gem 'rubocop', '~> 0.91.0'
   gem 'rubocop-performance'
