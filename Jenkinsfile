@@ -30,6 +30,9 @@ pipeline {
 
     stage('Build Docker image') {
       agent any
+      environment {
+        DOCKER_BUILDKIT = 1
+      }
       steps {
         script {
           def dockerRepoName = 'zooniverse/panoptes'
