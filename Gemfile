@@ -60,8 +60,8 @@ end
 
 group :development, :test do
   gem 'factory_bot_rails'
-  gem 'pry'
   gem 'mini_racer'
+  gem 'pry'
   gem 'rubocop', '~> 0.91.0'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
