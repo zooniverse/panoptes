@@ -28,7 +28,6 @@ gem 'json-schema', '~> 2.8'
 gem 'librato-metrics', '~> 2.1.2'
 gem 'logstasher', '~> 1.3'
 gem 'mime-types'
-gem 'oauth2'
 gem 'omniauth', '~> 1.9'
 gem 'omniauth-facebook', '~> 5.0'
 gem 'omniauth-google-oauth2'
@@ -61,10 +60,8 @@ group :production, :staging do
 end
 
 group :development, :test do
-  gem "factory_bot_rails"
-  gem 'pry-byebug'
-  gem 'pry-rails'
-  gem 'pry-stack_explorer'
+  gem 'factory_bot_rails'
+  gem 'pry'
   gem 'rubocop', '~> 0.91.0'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
@@ -77,7 +74,6 @@ group :test do
   gem 'database_cleaner', '~> 1.99.0'
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.7'
-  gem 'hashdiff'
   gem 'mock_redis'
   gem 'rspec'
   gem 'rspec-its'
