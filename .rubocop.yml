@@ -33,7 +33,7 @@ Metrics/MethodLength:
   Max: 12
 
 Rails/SkipsModelValidations:
-  Whitelist:
+  AllowedMethods:
   - update_all
   - update_column
   - touch
