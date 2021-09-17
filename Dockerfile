@@ -13,6 +13,7 @@ RUN --mount=type=cache,id=panoptes-apt-cache,target=/var/cache/apt --mount=type=
         # libjemalloc1 (v3) provides big memory savings vs jemalloc v5+ (default on debian buster)
         libjemalloc1 \
         libpq-dev \
+        nodejs \
         tmpreaper
 
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
