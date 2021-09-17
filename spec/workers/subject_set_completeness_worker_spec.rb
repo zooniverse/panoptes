@@ -85,5 +85,15 @@ RSpec.describe SubjectSetCompletenessWorker do
         }.to(0.0)
       end
     end
+
+    context 'with no subjects in the subect set' do
+      let(:subject_set) { create(:subject_set) }
+
+      it 'raises a custom EmptySubjectSet error' do
+        expect {
+          worker.perform(subject_set.id, workflow.id)
+        }.to raise_error(SubjectSetCompletenessWorker::EmptySubjectSet, "No subjets in subject set: #{subject_set.id}")
+      end
+    end
   end
 end

@@ -4,6 +4,8 @@ class SubjectSetCompletenessWorker
   include Sidekiq::Worker
   using Refinements::RangeClamping
 
+  class EmptySubjectSet < StandardError; end
+
   sidekiq_options queue: :data_low
 
   sidekiq_options congestion: {
@@ -26,6 +28,10 @@ class SubjectSetCompletenessWorker
     DatabaseReplica.read('subject_set_completeness_from_read_replica') do
       retired_subjects_count = SubjectSetWorkflowCounter.new(subject_set.id, workflow.id).retired_subjects * 1.0
       total_subjects_count = subject_set.set_member_subjects_count * 1.0
+
+      # avoid trying to set NaN in the DB
+      raise EmptySubjectSet, "No subjets in subject set: #{subject_set.id}" if total_subjects_count.zero?
+
       # calculate and clamp the completeness value between 0.0 and 1.0, i.e. 0 to 100%
       retired_subjects_completeness = (0.0..1.0).clamp(retired_subjects_count / total_subjects_count)
     end
