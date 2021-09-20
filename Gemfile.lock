@@ -239,7 +239,7 @@ GEM
     multipart-post (2.1.1)
     nenv (0.3.0)
     newrelic_rpm (7.2.0)
-    nio4r (2.5.7)
+    nio4r (2.5.8)
     nokogiri (1.11.4)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
@@ -284,7 +284,7 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (4.0.6)
-    puma (5.3.1)
+    puma (5.5.0)
       nio4r (~> 2.0)
     pundit (2.1.1)
       activesupport (>= 3.0.0)
@@ -495,7 +495,7 @@ DEPENDENCIES
   pg (~> 0.21)
   pg_search
   pry
-  puma (~> 5.3.1)
+  puma (~> 5.5.0)
   pundit (~> 2.1.1)
   rack-cors (~> 1.0)
   rails (~> 4.2.11)
