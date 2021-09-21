@@ -360,17 +360,17 @@ GEM
       rspec-mocks (~> 3.7.0)
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
-    rubocop (0.91.1)
+    rubocop (0.93.1)
       parallel (~> 1.10)
-      parser (>= 2.7.1.1)
+      parser (>= 2.7.1.5)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 1.7)
+      regexp_parser (>= 1.8)
       rexml
-      rubocop-ast (>= 0.4.0, < 1.0)
+      rubocop-ast (>= 0.6.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 2.0)
-    rubocop-ast (0.8.0)
-      parser (>= 2.7.1.5)
+    rubocop-ast (1.11.0)
+      parser (>= 3.0.1.1)
     rubocop-performance (1.10.2)
       rubocop (>= 0.90.0, < 2.0)
       rubocop-ast (>= 0.4.0)
@@ -506,7 +506,7 @@ DEPENDENCIES
   rspec
   rspec-its
   rspec-rails
-  rubocop (~> 0.91.0)
+  rubocop (~> 0.93.1)
   rubocop-performance
   rubocop-rails
   rubocop-rspec
