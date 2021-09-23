@@ -12,13 +12,28 @@ describe SubjectSetWorkflowCounter do
       expect(counter.retired_subjects).to eq(0)
     end
 
-    context 'with retired_subjects' do
+    context 'with retired, unretired and unrelated subjects' do
       let(:subject_to_retire) { subject_set.subjects.first }
+      let(:subject_not_retired) { subject_set.subjects.last }
+      let(:another_subject_set) { create(:subject_set_with_subjects, num_workflows: 1, workflows: [workflow], num_subjects: 1) }
+      let(:another_subject_set_subject) { another_subject_set.subjects.first }
 
       before do
+        # retired subject in the set
         SubjectWorkflowStatus.create(
           workflow_id: workflow.id,
           subject_id: subject_to_retire.id,
+          retired_at: Time.now.utc
+        )
+        # unretired subject in the set
+        SubjectWorkflowStatus.create(
+          workflow_id: workflow.id,
+          subject_id: subject_not_retired.id
+        )
+        # retired subject in another unrelated set
+        SubjectWorkflowStatus.create(
+          workflow_id: workflow.id,
+          subject_id: another_subject_set_subject.id,
           retired_at: Time.now.utc
         )
       end

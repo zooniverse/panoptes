@@ -11,12 +11,8 @@ class SubjectSetWorkflowCounter
   # count the number of subjects in this subject set
   # that have been retired for this workflow
   def retired_subjects
-    scope =
-      SubjectWorkflowStatus
-      .where(workflow: workflow_id)
-      .joins(workflow: :subject_sets)
-      .where(subject_sets: { id: subject_set_id })
-      .retired
+    sms_subject_ids_scope = SetMemberSubject.where(subject_set_id: subject_set_id).select(:subject_id)
+    scope = SubjectWorkflowStatus.where(workflow: workflow_id).where(subject_id: sms_subject_ids_scope).retired
 
     scope.count
   end
