@@ -46,13 +46,11 @@ class CalculateProjectCompletenessWorker
   def workflow_completeness(workflow)
     workflow_subjects_count = workflow.subjects_count
 
-    if workflow_subjects_count == 0
-      0.0
-    else
-      retired_subjects = workflow.retired_subjects_count
-      total_subjects = workflow_subjects_count
-      (0.0..1.0).clamp(retired_subjects / total_subjects.to_f)
-    end
+    return 0.0 if workflow_subjects_count.zero?
+
+    retired_subjects = workflow.retired_subjects_count
+    total_subjects = workflow_subjects_count
+    (0.0..1.0).clamp(retired_subjects / total_subjects.to_f)
   end
 
   def project_columns_to_update
@@ -60,11 +58,9 @@ class CalculateProjectCompletenessWorker
     columns_to_update = { completeness: completeness }
 
     # avoid the overriden project.finished? method
-    if project.state == "finished"
-      return columns_to_update
-    end
+    return columns_to_update if project.state == 'finished'
 
-    if completeness.to_i == 1 || no_active_workflows?
+    if completeness.to_i == 1 || no_active_workflows? || no_linked_subjects?
       columns_to_update[:state] = Project.states[:paused]
     elsif project.paused?
       columns_to_update[:state] = Project.states[:active]
@@ -75,5 +71,9 @@ class CalculateProjectCompletenessWorker
 
   def no_active_workflows?
     project.active_workflows.empty?
+  end
+
+  def no_linked_subjects?
+    project.active_workflows.all? { |workflow| workflow.subjects_count.zero? }
   end
 end
