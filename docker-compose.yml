@@ -23,7 +23,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - "RAILS_ENV=development"
+      - "RAILS_ENV=test"
       - "DATABASE_URL=postgresql://panoptes:panoptes@pg"
       - "REDIS_URL=redis://redis:6379/0"
       - "DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true"

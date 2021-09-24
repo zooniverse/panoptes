@@ -3,8 +3,7 @@ FROM ruby:2.5-slim-buster
 WORKDIR /rails_app
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
-RUN --mount=type=cache,id=panoptes-apt-cache,target=/var/cache/apt --mount=type=cache,id=panoptes-apt-lib,target=/var/lib/apt \
-    apt-get update && apt-get -y upgrade && \
+RUN apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y \
       build-essential \
       # git is required for installing gems from git repos
@@ -18,7 +17,7 @@ ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
 RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
-RUN --mount=type=cache,id=panoptes-gems,target=/usr/local/bundle/cache bundle install
+RUN bundle install
 
 ADD ./ /rails_app
 
