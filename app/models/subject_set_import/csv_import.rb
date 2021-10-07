@@ -1,14 +1,18 @@
 require 'csv'
 
 class SubjectSetImport::CsvImport
+  attr_reader :csv
+
   def initialize(io)
-    @io = io
+    @csv = CSV.new(io, headers: true)
+  end
+
+  def headers
+    csv.headers
   end
 
   def each
     return Enumerator.new(self) unless block_given?
-
-    csv = CSV.new(@io, headers: true)
 
     csv.each do |row|
       external_id = row['external_id']
