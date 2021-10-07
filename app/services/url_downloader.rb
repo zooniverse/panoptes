@@ -7,7 +7,7 @@ class UrlDownloader
       # rewind the file post writing for new reads
       file.rewind
 
-      yield file, num_lines
+      yield file
     end
   end
 end
