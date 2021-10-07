@@ -1,5 +1,6 @@
-class SubjectSetImport < ActiveRecord::Base
+# frozen_string_literal: true
 
+class SubjectSetImport < ActiveRecord::Base
   belongs_to :subject_set
   belongs_to :user
 
