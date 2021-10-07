@@ -3,7 +3,7 @@ class SubjectSetImport < ActiveRecord::Base
   belongs_to :subject_set
   belongs_to :user
 
-  def import!(update_progress_every_rows=100)
+  def import!(update_progress_every_rows=500)
     processor = SubjectSetImport::Processor.new(subject_set, user)
 
     UrlDownloader.stream(source_url) do |io|
