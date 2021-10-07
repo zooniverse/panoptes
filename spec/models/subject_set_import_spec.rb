@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SubjectSetImport, type: :model do
+describe SubjectSetImport, type: :model, focus: true do
   let(:user) { create :user }
   let(:project) { create :project, owner: user }
   let(:subject_set) { create :subject_set, project: project }
@@ -16,13 +16,31 @@ describe SubjectSetImport, type: :model do
   let(:subject_set_import) do
     described_class.new(source_url: source_url, subject_set: subject_set, user: user)
   end
+  let(:num_lines) { 3 }
 
   before do
-    allow(UrlDownloader).to receive(:stream).with(source_url).and_yield(csv_file)
-    subject_set_import.import!
+    allow(UrlDownloader).to receive(:stream).with(source_url).and_yield(csv_file, num_lines)
   end
 
   it 'imports subjects to the set' do
+    subject_set_import.import!
     expect(subject_set.subjects.count).to eq(2)
+  end
+
+  it 'stores the count of the expected total subjects' do
+    subject_set_import.import!
+    expect(subject_set_import.manifest_count).to eq(2)
+  end
+
+  it 'stores the count of imported subjects' do
+    subject_set_import.import!
+    expect(subject_set_import.imported_count).to eq(2)
+  end
+
+  # imported_count / manifest_count should give us the progress measure :)
+  it 'correctly records the progress status during import' do
+    allow(subject_set_import).to receive(:update_column).with(:imported_count)
+    subject_set_import.import!
+    expect(subject_set_import).to have_received(:update_column).with(:imported_count).exactly(10).times
   end
 end
