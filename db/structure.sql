@@ -1244,7 +1244,8 @@ CREATE TABLE public.subject_set_imports (
     failed_count integer DEFAULT 0 NOT NULL,
     failed_uuids character varying[] DEFAULT '{}'::character varying[] NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    manifest_count integer DEFAULT 0
 );
 
 
@@ -4810,4 +4811,6 @@ INSERT INTO schema_migrations (version) VALUES ('20210226173243');
 INSERT INTO schema_migrations (version) VALUES ('20210602210437');
 
 INSERT INTO schema_migrations (version) VALUES ('20210729152047');
+
+INSERT INTO schema_migrations (version) VALUES ('20211007125705');
 
