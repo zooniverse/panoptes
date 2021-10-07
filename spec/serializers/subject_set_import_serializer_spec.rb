@@ -20,5 +20,10 @@ describe SubjectSetImportSerializer do
     it 'reports the correct progress' do
       expect(result[:progress]).to eq(0.5)
     end
+
+    it 'handles 0 manifest count records correctly' do
+      subject_set_import.update_column(:manifest_count, 0)
+      expect(result[:progress]).to eq(0.0)
+    end
   end
 end
