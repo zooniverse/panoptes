@@ -1,14 +1,15 @@
 require 'csv'
 
 class SubjectSetImport::CsvImport
-  attr_reader :csv
+  attr_reader :csv, :count
+
+  delegate :headers, to: :csv
 
   def initialize(io)
     @csv = CSV.new(io, headers: true)
-  end
-
-  def headers
-    csv.headers
+    @count = csv.count
+    # ensure after counting we rewind the file for all future reads
+    csv.rewind
   end
 
   def each

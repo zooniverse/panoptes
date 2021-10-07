@@ -43,16 +43,26 @@ describe SubjectSetImport::CsvImport do
 
   describe '#headers' do
     let(:expected_headers) do
-      %w(external_id location:1 location:2 metadata:size metadata:cuteness)
+      %w[external_id location:1 location:2 metadata:size metadata:cuteness]
     end
 
-    it 'uses headers' do
+    it 'returns true as it uses CSV read headers' do
       expect(csv_import.headers).to eq(true)
     end
 
     it 'returns the headers strings after accessing csv data' do
       csv_import.each.to_a
       expect(csv_import.headers).to match_array(expected_headers)
+    end
+  end
+
+  describe '#count' do
+    it 'returns the correct number of data rows not including headers' do
+      expect(csv_import.count).to eq(2)
+    end
+
+    it 'ensures the csv file is rewound for re-reading' do
+      expect(csv_import.csv.lineno).to eq(0)
     end
   end
 end
