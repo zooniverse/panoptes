@@ -5,9 +5,11 @@ class SubjectSetCompletedMailerWorker
 
   sidekiq_options queue: :data_high
 
-  def perform(project_id)
-    return unless project = Project.find(project_id)
+  def perform(subject_set_id)
+    subject_set = SubjectSet.find(subject_set_id)
+    return unless subject_set
 
-    SubjectSetCompletedMailer.notify_project_team(project).deliver
+    project = subject_set.project
+    SubjectSetCompletedMailer.notify_project_team(project, subject_set).deliver
   end
 end
