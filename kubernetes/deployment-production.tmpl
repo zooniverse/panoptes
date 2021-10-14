@@ -265,7 +265,7 @@ spec:
   maxReplicas: 16
   targetCPUUtilizationPercentage: 80
 ---
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
    name: panoptes-production-app-pdb
@@ -513,7 +513,7 @@ spec:
       targetPort: 6379
   type: NodePort
 ---
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
    name: panoptes-production-redis-pdb
@@ -580,7 +580,7 @@ spec:
       targetPort: 11211
   type: NodePort
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: panoptes-production-ingress
@@ -620,7 +620,7 @@ spec:
           servicePort: 80
         path: /(.*)
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: www-panoptes-production-ingress
