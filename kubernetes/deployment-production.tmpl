@@ -580,7 +580,7 @@ spec:
       targetPort: 11211
   type: NodePort
 ---
-apiVersion: networking.k8s.io/v1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: panoptes-production-ingress
@@ -620,7 +620,7 @@ spec:
           servicePort: 80
         path: /(.*)
 ---
-apiVersion: networking.k8s.io/v1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: www-panoptes-production-ingress
