@@ -36,6 +36,7 @@ Rails/SkipsModelValidations:
   AllowedMethods:
   - update_all
   - update_column
+  - update_columns
   - touch
 
 RSpec/MultipleMemoizedHelpers:
