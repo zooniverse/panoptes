@@ -4,7 +4,7 @@ class UrlDownloader
       HTTParty.get(url, stream_body: true) do |fragment|
         file.write(fragment)
       end
-
+      # rewind the file post writing for new reads
       file.rewind
 
       yield file
