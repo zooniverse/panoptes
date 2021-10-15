@@ -16,7 +16,17 @@ class SubjectSetImport < ActiveRecord::Base
       imported_row_count = 0
 
       csv_import.each do |external_id, attributes|
-        processor.import(external_id, attributes)
+        begin
+          processor.import(external_id, attributes)
+        rescue SubjectSetImport::Processor::FailedImport
+          update_columns(
+            # increment the failed_count field
+            failed_count: failed_count + 1,
+            # log the failed external unique identifier
+            failed_uuids: failed_uuids | [external_id]
+          )
+        end
+
         imported_row_count += 1
 
         # update the imported_count as we progress through the import
