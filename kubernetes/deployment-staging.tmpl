@@ -532,7 +532,7 @@ spec:
       targetPort: 11211
   type: NodePort
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: panoptes-staging-ingress
@@ -551,10 +551,13 @@ spec:
   - host: panoptes-staging.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-staging-app
-          servicePort: 80
-        path: /(.*)
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: panoptes-staging-app
+            port:
+              number: 80
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
