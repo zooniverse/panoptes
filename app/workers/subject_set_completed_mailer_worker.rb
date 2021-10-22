@@ -8,7 +8,6 @@ class SubjectSetCompletedMailerWorker
   def perform(subject_set_id)
     subject_set = SubjectSet.find(subject_set_id)
 
-    project = subject_set.project
-    SubjectSetCompletedMailer.notify_project_team(project, subject_set).deliver
+    SubjectSetCompletedMailer.notify_project_team(subject_set.project, subject_set).deliver
   end
 end
