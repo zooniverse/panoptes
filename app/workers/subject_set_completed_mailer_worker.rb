@@ -7,7 +7,6 @@ class SubjectSetCompletedMailerWorker
 
   def perform(subject_set_id)
     subject_set = SubjectSet.find(subject_set_id)
-    return unless subject_set
 
     project = subject_set.project
     SubjectSetCompletedMailer.notify_project_team(project, subject_set).deliver
