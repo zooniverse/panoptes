@@ -81,6 +81,9 @@ class SubjectSetCompletenessWorker
     # if we use a configuration setting - we can't let user's self assign this one
     # to avoid the rate limiting feature of the exports (or should we use that?)
 
+    # ALTERNATIVELY - can we reimaging exports at the subject set level?
+    # would this work with our existing Lab / Client tools to avoid issues with rate limiting, etc here?
+
     # CreateClassificationsExport.with( api_user: , object: workflow ).run!(params)
     # ClassificationsDumpWorker.perform_async(subject_set.project, resource_type, medium_id=nil, requester_id=nil, *args)
   end
