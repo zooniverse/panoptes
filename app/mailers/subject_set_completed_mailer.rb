@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SubjectSetCompletedMailer < ApplicationMailer
   layout false
 
@@ -8,7 +10,7 @@ class SubjectSetCompletedMailer < ApplicationMailer
     @project_lab_data_export_url = lab_export_url(project.id)
     @email_to = project.communication_emails
 
-    subject = "Your Zooniverse project - a subject set has been completed"
+    subject = 'Your Zooniverse project - a subject set has been completed'
 
     mail(to: @email_to, subject: subject)
   end
