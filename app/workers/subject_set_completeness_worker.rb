@@ -24,7 +24,11 @@ class SubjectSetCompletenessWorker
     @subject_set = SubjectSet.find(subject_set_id)
     @workflow = Workflow.find_without_json_attrs(workflow_id)
 
-    subject_set_completeness = calculate_subject_set_completeness
+    subject_set_completeness = 0.0
+    # use the read replica if the feature flag is enabled
+    DatabaseReplica.read('subject_set_completeness_from_read_replica') do
+      subject_set_completeness = calculate_subject_set_completeness
+    end
     # store these per workflow completeness metric in a json object keyed by the workflow id
     # use the atomic DB json operator to avoid clobbering data in the jsonb attribute by other updates
     # https://www.postgresql.org/docs/11/functions-json.html
@@ -41,17 +45,14 @@ class SubjectSetCompletenessWorker
 
   # find the proportion of all retired subjects, for a known subject set, in the context of a known workflow
   def calculate_subject_set_completeness
-    # use the read replica if the feature flag is enabled
-    DatabaseReplica.read('subject_set_completeness_from_read_replica') do
-      retired_subjects_count = SubjectSetWorkflowCounter.new(subject_set.id, workflow.id).retired_subjects * 1.0
-      total_subjects_count = subject_set.set_member_subjects_count * 1.0
+    retired_subjects_count = SubjectSetWorkflowCounter.new(subject_set.id, workflow.id).retired_subjects * 1.0
+    total_subjects_count = subject_set.set_member_subjects_count * 1.0
 
-      # avoid trying to set NaN in the DB
-      raise EmptySubjectSet, "No subjets in subject set: #{subject_set.id}" if total_subjects_count.zero?
+    # avoid trying to set NaN in the DB
+    raise EmptySubjectSet, "No subjets in subject set: #{subject_set.id}" if total_subjects_count.zero?
 
-      # calculate and clamp the completeness value between 0.0 and 1.0, i.e. 0 to 100%
-      (0.0..1.0).clamp(retired_subjects_count / total_subjects_count)
-    end
+    # calculate and clamp the completeness value between 0.0 and 1.0, i.e. 0 to 100%
+    (0.0..1.0).clamp(retired_subjects_count / total_subjects_count)
   end
 
   def subject_set_completed?(completeness)
