@@ -32,7 +32,7 @@ class SubjectSetCompletenessWorker
       "completeness = jsonb_set(completeness, '{#{workflow_id}}', '#{subject_set_completeness}', true)"
     )
 
-    notify_project_team if subject_set_completed?(subject_set_completeness)
+    run_subject_set_completion_events if subject_set_completed?(subject_set_completeness)
   rescue ActiveRecord::RecordNotFound
     # avoid running sql count queries for subject sets and workflows we can't find
   end
@@ -54,8 +54,15 @@ class SubjectSetCompletenessWorker
     end
   end
 
+# TODO: the below is starting to look like an operation class
+# where we encapsulat the logic on completion events
   def subject_set_completed?(completeness)
     completeness.to_i == 1
+  end
+
+  def run_subject_set_completion_events
+    create_workflow_classifications_export
+    notify_project_team
   end
 
   def notify_project_team
@@ -63,5 +70,18 @@ class SubjectSetCompletenessWorker
     return unless subject_set.project.notify_on_subject_set_completion?
 
     SubjectSetCompletedMailerWorker.perform_async(subject_set.id)
+  end
+
+  def create_workflow_classifications_export
+    requesting_user = ApiUser.new(nil) # use nil to avoid rate limiting exports
+    # do we want to have this run for all projects when their sets complete??
+
+    # perhaps we can use another project / workflow level configuration setting?
+
+    # if we use a configuration setting - we can't let user's self assign this one
+    # to avoid the rate limiting feature of the exports (or should we use that?)
+
+    # CreateClassificationsExport.with( api_user: , object: workflow ).run!(params)
+    # ClassificationsDumpWorker.perform_async(subject_set.project, resource_type, medium_id=nil, requester_id=nil, *args)
   end
 end

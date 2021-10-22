@@ -96,11 +96,19 @@ RSpec.describe SubjectSetCompletenessWorker do
       end
     end
 
-    context 'when the set is complete' do
+    context 'when the set is complete', :focus do
       let(:counter_double) { instance_double(SubjectSetWorkflowCounter, retired_subjects: 2) }
 
       before do
         allow(SubjectSetWorkflowCounter).to receive(:new).and_return(counter_double)
+      end
+
+      it 'runs the workflow CreateClassificationsExport operation' do
+        operation_double = CreateClassificationsExport.with(api_user: ApiUser.new(nil), object: workflow)
+        allow(operation_double).to receive(:run!)
+        allow(CreateClassificationsExport).to receive(:with).and_return(operation_double)
+        worker.perform(subject_set.id, workflow.id)
+        expect(operation_double).to have_received(:run!).with({})
       end
 
       it 'does not run the SubjectSetCompletedMailerWorker' do
