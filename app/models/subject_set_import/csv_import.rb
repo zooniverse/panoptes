@@ -36,6 +36,15 @@ class SubjectSetImport::CsvImport
     end
   end
 
+  # TODO: spec this out
+  def to_a
+    [].tap do |import_batch|
+      each do |external_id, attributes|
+        import_batch << [external_id, attributes]
+      end
+    end
+  end
+
   private
 
   def extract_header(header)

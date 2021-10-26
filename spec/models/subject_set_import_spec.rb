@@ -36,22 +36,22 @@ describe SubjectSetImport, type: :model do
 
   it 'stores the count of imported subjects' do
     subject_set_import.import!
-    expect(subject_set_import.imported_count).to eq(2)
+    expect(subject_set_import.reload.imported_count).to eq(2)
   end
 
   # imported_count / manifest_count gives us the progress measure
   it 'correctly records the progress status during import' do
     allow(subject_set_import).to receive(:save_imported_row_count)
-    subject_set_import.import!(2)
-    # twice: once when the progress is mod 2 == 0 and once at the end
+    subject_set_import.import!(1)
     expect(subject_set_import).to have_received(:save_imported_row_count).twice
   end
 
   context 'when a subject fails to import' do
+    let(:failed_instances) { [Subject.new(external_id: 1), Subject.new(external_id: 2)] }
+
     before do
-      processor_double = instance_double('SubjectSetImport::Processor')
-      allow(processor_double).to receive(:import).and_raise(SubjectSetImport::Processor::FailedImport)
-      allow(SubjectSetImport::Processor).to receive(:new).and_return(processor_double)
+      import_result_double = instance_double('ActiveRecord::Import::Result', ids: [], failed_instances: failed_instances)
+      allow(Subject).to receive(:import).and_return(import_result_double)
     end
 
     it 'continues processing' do
@@ -60,11 +60,13 @@ describe SubjectSetImport, type: :model do
 
     it 'stores the failed count' do
       subject_set_import.import!
+      subject_set_import.reload
       expect(subject_set_import.failed_count).to eq(2)
     end
 
     it 'stores the failed UUIDs' do
       subject_set_import.import!
+      subject_set_import.reload
       expect(subject_set_import.failed_uuids).to match_array(%w[1 2])
     end
   end

@@ -4,35 +4,25 @@ class SubjectSetImport::Processor
   class FailedImport < StandardError; end
   attr_reader :subject_set, :uploader
 
+  # TODO: we don't need this subject set context anymore
   def initialize(subject_set, uploader)
     @subject_set = subject_set
     @uploader = uploader
   end
 
+  # TODO modify spec and cleanup beahviours
+  # perhaps this class can go / change to be a subejct builder??
   def import(external_id, attributes)
-    subject = find_or_initialize_subject(external_id)
+    subject = Subject.new
+    subject.external_id = external_id
+    subject.project_id = subject_set.project_id
+    subject.upload_user_id = uploader.id
+    subject.assign_attributes(attributes.except(:locations))
 
-    Subject.transaction do
-      subject.subject_sets << subject_set
-      subject.project_id = subject_set.project_id
-      subject.uploader = uploader
-      subject.assign_attributes(attributes.except(:locations))
-
-      Subject.location_attributes_from_params(attributes[:locations]).each do |location_attributes|
-        subject.locations.build(location_attributes)
-      end
-
-      subject.save!
+    Subject.location_attributes_from_params(attributes[:locations]).each do |location_attributes|
+      subject.locations.build(location_attributes)
     end
-  rescue ActiveRecord::RecordInvalid => e
-    raise FailedImport, e.message
-  end
 
-  private
-
-  def find_or_initialize_subject(external_id)
-    # Note: this query doesn't have an index but should be
-    # constrained by the SubjectSet mapping via SetMemberSubjects
-    subject_set.subjects.where(external_id: external_id).first_or_initialize
+    subject
   end
 end
