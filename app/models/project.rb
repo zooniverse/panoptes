@@ -169,4 +169,11 @@ class Project < ActiveRecord::Base
   def communication_emails
     users_with_project_roles(%w(owner communications)).pluck(:email)
   end
+
+  def notify_on_subject_set_completion?
+    # default behaviour will be to opt in to subject set completion notifications
+    # but we can by changing this below on the fetch fallback.
+    notify_value = configuration.fetch('notify_on_subject_set_completion', 'false')
+    notify_value.to_s.casecmp('true').zero?
+  end
 end

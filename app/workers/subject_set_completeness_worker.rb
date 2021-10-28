@@ -6,6 +6,8 @@ class SubjectSetCompletenessWorker
 
   class EmptySubjectSet < StandardError; end
 
+  attr_reader :subject_set, :workflow
+
   sidekiq_options queue: :data_low
 
   sidekiq_options congestion: {
@@ -19,30 +21,48 @@ class SubjectSetCompletenessWorker
   sidekiq_options lock: :until_executing
 
   def perform(subject_set_id, workflow_id)
-    subject_set = SubjectSet.find(subject_set_id)
-    workflow = Workflow.find_without_json_attrs(workflow_id)
+    @subject_set = SubjectSet.find(subject_set_id)
+    @workflow = Workflow.find_without_json_attrs(workflow_id)
 
-    # find the count of all retired subjects, for a known subject set, in the context of a known workflow
-    # using the read replica if the feature flag is enabled
-    retired_subjects_completeness = 0.0
+    subject_set_completeness = 0.0
+    # use the read replica if the feature flag is enabled
     DatabaseReplica.read('subject_set_completeness_from_read_replica') do
-      retired_subjects_count = SubjectSetWorkflowCounter.new(subject_set.id, workflow.id).retired_subjects * 1.0
-      total_subjects_count = subject_set.set_member_subjects_count * 1.0
-
-      # avoid trying to set NaN in the DB
-      raise EmptySubjectSet, "No subjets in subject set: #{subject_set.id}" if total_subjects_count.zero?
-
-      # calculate and clamp the completeness value between 0.0 and 1.0, i.e. 0 to 100%
-      retired_subjects_completeness = (0.0..1.0).clamp(retired_subjects_count / total_subjects_count)
+      subject_set_completeness = calculate_subject_set_completeness
     end
-
     # store these per workflow completeness metric in a json object keyed by the workflow id
     # use the atomic DB json operator to avoid clobbering data in the jsonb attribute by other updates
     # https://www.postgresql.org/docs/11/functions-json.html
     SubjectSet.where(id: subject_set.id).update_all(
-      "completeness = jsonb_set(completeness, '{#{workflow_id}}', '#{retired_subjects_completeness}', true)"
+      "completeness = jsonb_set(completeness, '{#{workflow_id}}', '#{subject_set_completeness}', true)"
     )
+
+    notify_project_team if subject_set_completed?(subject_set_completeness)
   rescue ActiveRecord::RecordNotFound
     # avoid running sql count queries for subject sets and workflows we can't find
+  end
+
+  private
+
+  # find the proportion of all retired subjects, for a known subject set, in the context of a known workflow
+  def calculate_subject_set_completeness
+    retired_subjects_count = SubjectSetWorkflowCounter.new(subject_set.id, workflow.id).retired_subjects * 1.0
+    total_subjects_count = subject_set.set_member_subjects_count * 1.0
+
+    # avoid trying to set NaN in the DB
+    raise EmptySubjectSet, "No subjets in subject set: #{subject_set.id}" if total_subjects_count.zero?
+
+    # calculate and clamp the completeness value between 0.0 and 1.0, i.e. 0 to 100%
+    (0.0..1.0).clamp(retired_subjects_count / total_subjects_count)
+  end
+
+  def subject_set_completed?(completeness)
+    completeness.to_i == 1
+  end
+
+  def notify_project_team
+    # allow project teams to configure their project notification emails
+    return unless subject_set.project.notify_on_subject_set_completion?
+
+    SubjectSetCompletedMailerWorker.perform_async(subject_set.id)
   end
 end
