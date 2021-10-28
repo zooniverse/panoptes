@@ -125,7 +125,10 @@ Rails.application.routes.draw do
 
       json_api_resources :workflow_versions, links: [:workflow]
 
-      json_api_resources :subject_sets, links: [:subjects]
+      json_api_resources :subject_sets, links: [:subjects] do
+        media_resources classifications_export: { except: %i[create update] }
+        post '/classifications_export', to: 'subject_sets#create_classifications_export', format: false
+      end
 
       json_api_resources :subject_set_imports, links: [:subject_sets, :users], only: [:index, :show, :create]
 
