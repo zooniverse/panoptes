@@ -557,7 +557,7 @@ describe Project, type: :model do
       expect(project.notify_on_subject_set_completion?).to eq(false)
     end
 
-    it 'returns false if the project is configured to notify' do
+    it 'returns true if the project is configured to notify' do
       project.configuration['notify_on_subject_set_completion'] = true
       expect(project.notify_on_subject_set_completion?).to eq(true)
     end
