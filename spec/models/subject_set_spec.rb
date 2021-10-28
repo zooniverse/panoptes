@@ -95,4 +95,11 @@ describe SubjectSet, :type => :model do
       expect { subject_set_import.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
+
+  describe '#classification_export' do
+    it 'has the association' do
+      export = subject_set.build_classifications_export(src: 'test', content_type: 'text/csv')
+      expect(subject_set.classifications_export).to eq(export)
+    end
+  end
 end

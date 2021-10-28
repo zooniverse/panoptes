@@ -7,6 +7,12 @@ class SubjectSet < ActiveRecord::Base
   has_many :set_member_subjects, dependent: :destroy
   has_many :subjects, through: :set_member_subjects
   has_many :subject_set_imports, dependent: :destroy
+  has_one :classifications_export,
+          -> { where(type: 'subject_set_classifications_export').order(created_at: :desc) },
+          class_name: 'Medium',
+          as: :linked,
+          inverse_of: :linked
+
   validates_presence_of :project
 
   validates_uniqueness_of :display_name, scope: :project_id
