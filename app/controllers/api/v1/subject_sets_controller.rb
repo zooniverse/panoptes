@@ -3,7 +3,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
   include FilterByMetadata
   include MediumResponse
 
-  require_authentication %i[create update destroy create_classifications_export], scopes: [:project]
+  require_authentication :create, :update, :destroy, :create_classifications_export, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
   prepend_before_action :require_login, only: %i[create update destroy create_classifications_export]
