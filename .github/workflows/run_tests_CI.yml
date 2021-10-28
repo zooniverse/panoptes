@@ -22,7 +22,12 @@ jobs:
           --health-retries 5
     strategy:
       matrix:
-        spec-commands: ['spec/controllers/api/v1/[a-m]*.rb', 'spec/controllers/api/v1/[n-s]*.rb', 'spec/controllers/api/v1/[t-z]*.rb', "spec/controllers/**.rb spec/controllers/api/*.rb spec/models spec/operations spec/counters spec/routes spec/workers", "spec/lib", "spec/serializers", "spec/services", "spec/requests", "spec/middleware", "spec/mailers", "spec/policies"]
+        spec-commands:
+          - 'spec/controllers/api/v1/[a-m]*.rb spec/serializers'
+          - 'spec/controllers/api/v1/[n-s]*.rb'
+          - 'spec/controllers/api/v1/[t-z]*.rb spec/lib'
+          - 'spec/controllers/**.rb spec/controllers/api/*.rb spec/models spec/operations spec/counters spec/routes spec/workers spec/middleware spec/mailers'
+          - 'spec/services spec/requests spec/policies'
     steps:
       - uses: actions/checkout@v2
       - name: Check specs
