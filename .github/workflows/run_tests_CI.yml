@@ -23,22 +23,10 @@ jobs:
     strategy:
       matrix:
         spec-commands:
-          - 'spec/controllers/api/v1/[a-m]*.rb'
-          - 'spec/serializers'
-          - 'spec/controllers/api/v1/[n-s]*.rb'
-          - 'spec/controllers/api/v1/[t-z]*.rb spec/lib'
-          - 'spec/controllers/**.rb'
-          - 'spec/controllers/api/*.rb'
-          - 'spec/models'
-          - 'spec/operations'
-          - 'spec/counters'
-          - 'spec/routes'
-          - 'spec/workers'
-          - 'spec/middleware'
-          - 'spec/mailers'
-          - 'spec/services'
-          - 'spec/requests'
-          - 'spec/policies'
+          - 'spec/controllers/api/v1/[a-m]*.rb spec/serializers spec/workers'
+          - 'spec/controllers/api/v1/[n-s]*.rb spec/operations spec/counters'
+          - 'spec/controllers/api/v1/[t-z]*.rb spec/controllers/**.rb spec/lib spec/requests'
+          - 'spec/controllers/api/*.rb spec/mailers spec/middleware spec/models spec/policies spec/routes spec/services'
     steps:
       - uses: actions/checkout@v2
       - name: Check specs
