@@ -409,7 +409,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
     end
   end
 
-  describe '#create_classifications_export', :focus do
+  describe '#create_classifications_export' do
     let(:test_attr) { :type }
     let(:new_resource) { Medium.find(created_instance_id(api_resource_name)) }
     let(:api_resource_name) { 'media' }

@@ -1,6 +1,7 @@
 class Api::V1::SubjectSetsController < Api::ApiController
   include JsonApiController::PunditPolicy
   include FilterByMetadata
+  include MediumResponse
 
   require_authentication %i[create update destroy create_classifications_export], scopes: [:project]
   resource_actions :default
@@ -81,8 +82,8 @@ class Api::V1::SubjectSetsController < Api::ApiController
   end
 
   def create_classifications_export
-    # medium = CreateClassificationsExport.with( api_user: api_user, object: controlled_resource ).run!(params)
-    # medium_response(medium)
+    medium = CreateClassificationsExport.with(api_user: api_user, object: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   protected
