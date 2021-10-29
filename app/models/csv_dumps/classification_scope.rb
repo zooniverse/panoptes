@@ -2,12 +2,11 @@
 
 module CsvDumps
   class ClassificationScope < DumpScope
-    attr_reader :cache, :resource_classifications_scope
+    attr_reader :cache
 
-    def initialize(resource, cache, resource_classifications_scope)
+    def initialize(resource, cache)
       super(resource)
       @cache = cache
-      @resource_classifications_scope = resource_classifications_scope
     end
 
     def each
@@ -35,7 +34,8 @@ module CsvDumps
     end
 
     def completed_resource_classifications
-      resource_classifications_scope
+      resource
+        .classifications
         .complete
         .joins(:workflow)
         .where(workflows: { activated_state: 'active' })
