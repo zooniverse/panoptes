@@ -23,4 +23,17 @@ class SubjectSet < ActiveRecord::Base
   def belongs_to_project?(other_project_id)
     project_id == other_project_id
   end
+
+  # custom AR scope to find the classifications that belong to this subject set
+  #
+  # it will return classifications for all workflows that this set is linked to
+  # it will not return classifiations for subjects across projects
+  #
+  # Q?: do we want to isolate even further perhaps to the workflow level
+  def classifications
+    Classification
+      .where(workflow: workflow_ids)
+      .joins('INNER JOIN classification_subjects ON classifications.id = classification_subjects.classification_id')
+      .where(classification_subjects: { subject_id: set_member_subjects.select(:subject_id) })
+  end
 end
