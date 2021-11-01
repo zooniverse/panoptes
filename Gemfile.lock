@@ -256,7 +256,7 @@ GEM
     omniauth (1.9.1)
       hashie (>= 3.4.6)
       rack (>= 1.6.2, < 3)
-    omniauth-facebook (5.0.0)
+    omniauth-facebook (9.0.0)
       omniauth-oauth2 (~> 1.2)
     omniauth-google-oauth2 (0.5.4)
       jwt (>= 1.5)
@@ -491,7 +491,7 @@ DEPENDENCIES
   mock_redis
   newrelic_rpm
   omniauth (~> 1.9)
-  omniauth-facebook (~> 5.0)
+  omniauth-facebook (~> 9.0)
   omniauth-google-oauth2
   p3p (~> 2.0)
   panoptes-client
