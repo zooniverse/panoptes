@@ -38,7 +38,7 @@ RSpec.describe ClassificationsDumpWorker do
       end
     end
 
-    context 'with a workflow as a resource', :focus do
+    context 'with a workflow as a resource' do
       it_behaves_like 'dump worker', ClassificationDataMailerWorker, 'workflow_classifications_export' do
         let(:resource) { workflow }
         let(:num_entries) { classifications.size + 1 }
