@@ -19,6 +19,7 @@ class SubjectSet < ActiveRecord::Base
 
   scope :expert_sets, -> { where(expert_set: true) }
 
+  delegate :communication_emails, to: :project
 
   def belongs_to_project?(other_project_id)
     project_id == other_project_id

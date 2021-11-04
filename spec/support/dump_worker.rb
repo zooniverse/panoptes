@@ -1,5 +1,7 @@
-RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
+RSpec.shared_examples 'dump worker' do |mailer_class, dump_type|
   let(:another_project) { create(:project) }
+  let(:resource) { project }
+  let(:resource_type) { resource.model_name.singular }
 
   context "when the project id doesn't correspond to a project" do
     before(:each) do
@@ -23,22 +25,18 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
     end
   end
 
-  context "when the project exists" do
-    let(:project_file_name) do
-      "#{dump_type}_#{project.owner.login}_#{project.display_name.downcase.gsub(/\s/, "_")}.csv"
-    end
-
-    it "should create a csv file with the correct number of entries" do
+  context 'when the resource exists' do
+    it 'creates a csv file with the correct number of entries' do
       expect_any_instance_of(CSV).to receive(:<<).exactly(num_entries).times
-      worker.perform(project.id, "project")
+      worker.perform(resource.id, resource_type)
     end
 
     it "should queue a worker to send an email" do
-      expect(mailer_class).to receive(:perform_async).with(project.id,
-                                                           "project",
+      expect(mailer_class).to receive(:perform_async).with(resource.id,
+                                                           resource_type,
                                                            anything,
                                                            [project.owner.email])
-      worker.perform(project.id, "project")
+      worker.perform(resource.id, resource_type)
     end
   end
 
@@ -55,15 +53,15 @@ RSpec.shared_examples "dump worker" do |mailer_class, dump_type|
 
     it 'should email the users in the recipients hash' do
       expect(mailer_class).to receive(:perform_async)
-        .with(anything, "project", anything, array_including(receivers.map(&:email)))
-      worker.perform(project.id, "project", medium.id)
+        .with(anything, resource_type, anything, array_including(receivers.map(&:email)))
+      worker.perform(resource.id, resource_type, medium.id)
     end
 
     context "Dump workers are disabled" do
       before { Panoptes.flipper[:dump_worker_exports].disable }
 
       it "raises an exception" do
-        expect { worker.perform(project.id, "project", medium.id) }.to raise_error(ApiErrors::FeatureDisabled)
+        expect { worker.perform(resource.id, resource_type, medium.id) }.to raise_error(ApiErrors::FeatureDisabled)
       end
     end
   end
