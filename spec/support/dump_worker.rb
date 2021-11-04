@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'dump worker' do |mailer_class, dump_type|
   let(:another_project) { create(:project) }
   let(:resource) { project }
@@ -31,12 +33,17 @@ RSpec.shared_examples 'dump worker' do |mailer_class, dump_type|
       worker.perform(resource.id, resource_type)
     end
 
-    it "should queue a worker to send an email" do
-      expect(mailer_class).to receive(:perform_async).with(resource.id,
-                                                           resource_type,
-                                                           anything,
-                                                           [project.owner.email])
+    it 'queues a worker to send an email' do
+      allow(mailer_class).to receive(:perform_async)
       worker.perform(resource.id, resource_type)
+      expect(mailer_class)
+        .to have_received(:perform_async)
+        .with(
+          resource.id,
+          resource_type,
+          anything,
+          [project.owner.email]
+        )
     end
   end
 
