@@ -116,6 +116,7 @@ describe SubjectSet, :type => :model do
       expect(subject_set.classifications).to include(classification)
     end
 
+    # TODO: double check this sql on this
     it 'does not include classifications for subjects across project workflows' do
       other_project_workflow = create(:workflow, project: project, activated_state: 'inactive')
       other_workflow_classification = create(:classification, project: project, workflow: other_project_workflow, subjects: [subject])
