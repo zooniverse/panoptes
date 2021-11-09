@@ -29,8 +29,6 @@ class SubjectSet < ActiveRecord::Base
   #
   # it will return classifications for all workflows that this set is linked to
   # it will not return classifiations for subjects across projects
-  #
-  # Q?: do we want to isolate even further perhaps to the workflow level
   def classifications
     Classification
       .where(workflow: workflow_ids)
