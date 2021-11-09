@@ -95,5 +95,27 @@ RSpec.describe SubjectSetCompletenessWorker do
         }.to raise_error(SubjectSetCompletenessWorker::EmptySubjectSet, "No subjets in subject set: #{subject_set.id}")
       end
     end
+
+    context 'when the set is complete' do
+      let(:counter_double) { instance_double(SubjectSetWorkflowCounter, retired_subjects: 2) }
+
+      before do
+        allow(SubjectSetWorkflowCounter).to receive(:new).and_return(counter_double)
+      end
+
+      it 'does not run the SubjectSetCompletedMailerWorker' do
+        allow(SubjectSetCompletedMailerWorker).to receive(:perform_async)
+        worker.perform(subject_set.id, workflow.id)
+        expect(SubjectSetCompletedMailerWorker).not_to have_received(:perform_async)
+      end
+
+      it 'runs the SubjectSetCompletedMailerWorker when the project is configured to' do
+        allow(SubjectSet).to receive(:find).with(subject_set.id).and_return(subject_set)
+        allow(subject_set.project).to receive(:notify_on_subject_set_completion?).and_return(true)
+        allow(SubjectSetCompletedMailerWorker).to receive(:perform_async)
+        worker.perform(subject_set.id, workflow.id)
+        expect(SubjectSetCompletedMailerWorker).to have_received(:perform_async).with(subject_set.id)
+      end
+    end
   end
 end
