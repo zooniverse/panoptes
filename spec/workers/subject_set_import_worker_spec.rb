@@ -3,6 +3,12 @@
 require 'spec_helper'
 
 RSpec.describe SubjectSetImportWorker do
+  # avoid re-running the import on failures
+  it 'does not retry imports' do
+    retry_count = described_class.get_sidekiq_options['retry']
+    expect(retry_count).to eq(0)
+  end
+
   describe '#perform' do
     let(:import_double) do
       instance_double(SubjectSetImport, id: 1, import!: true, subject_set_id: 1)
