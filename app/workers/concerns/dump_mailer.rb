@@ -12,7 +12,7 @@ class DumpMailer
 
     mailer.perform_async(
       resource.id,
-      resource.class.to_s.downcase,
+      resource.model_name.singular,
       lab_export_url,
       emails
     )

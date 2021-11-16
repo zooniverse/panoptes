@@ -9,6 +9,9 @@ class CreateOrUpdateMedium < Operation
         integer
       end
     end
+    # default to private exports by default, can be overiden
+    # by operation input composition `inputs.merge(media: { private: true })`
+    boolean :private, default: -> { true }
   end
 
   def execute
