@@ -35,4 +35,9 @@ class SubjectSet < ActiveRecord::Base
       .joins('INNER JOIN classification_subjects ON classifications.id = classification_subjects.classification_id')
       .where(classification_subjects: { subject_id: set_member_subjects.select(:subject_id) })
   end
+
+  # delegate method to project but with a more succinct name
+  def run_completion_events?
+    project.run_subject_set_completion_events?
+  end
 end
