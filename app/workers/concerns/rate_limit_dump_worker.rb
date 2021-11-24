@@ -21,8 +21,8 @@ module RateLimitDumpWorker
 
   module ClassMethods
     def congestion_enabled?(requester_id)
-      # if the user is missing, which should only happen via the
-      # rails console or the automated subject set completion events
+      # if the user is missing, which should only happen via the rails console
+      # TODO: determine if we want this?? or the automated subject set completion events
       return false if requester_id.blank?
       
       # Q? How will this work with the subject set export that is
