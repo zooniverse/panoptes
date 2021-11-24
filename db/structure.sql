@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 11.11 (Debian 11.11-1.pgdg90+1)
--- Dumped by pg_dump version 11.12
+-- Dumped by pg_dump version 11.14
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1312,7 +1312,8 @@ ALTER SEQUENCE public.subject_sets_id_seq OWNED BY public.subject_sets.id;
 CREATE TABLE public.subject_sets_workflows (
     id integer NOT NULL,
     workflow_id integer,
-    subject_set_id integer
+    subject_set_id integer,
+    completeness numeric DEFAULT 0.0
 );
 
 
@@ -4813,4 +4814,6 @@ INSERT INTO schema_migrations (version) VALUES ('20210602210437');
 INSERT INTO schema_migrations (version) VALUES ('20210729152047');
 
 INSERT INTO schema_migrations (version) VALUES ('20211007125705');
+
+INSERT INTO schema_migrations (version) VALUES ('20211124175756');
 
