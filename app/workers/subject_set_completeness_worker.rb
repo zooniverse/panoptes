@@ -36,8 +36,8 @@ class SubjectSetCompletenessWorker
       "completeness = jsonb_set(completeness, '{#{workflow_id}}', '#{subject_set_completeness}', true)"
     )
 
-  # TODO handle state transiotion here
-  # i.e. don't run this twice if a set is already completed
+  # TODO handle state transition here
+  # i.e. don't run this again if a set is already completed
     run_subject_set_completion_events if subject_set_completed?(subject_set_completeness)
   rescue ActiveRecord::RecordNotFound
     # avoid running sql count queries for subject sets and workflows we can't find
@@ -61,6 +61,8 @@ class SubjectSetCompletenessWorker
   end
 
   def subject_set_completed?(completeness)
+    # TODO: consider the times when a set has previously completed
+    # we won't want to run the mailer / exporter twice....
     completeness.to_i == 1
   end
 
