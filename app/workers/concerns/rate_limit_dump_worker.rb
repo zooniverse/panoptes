@@ -24,7 +24,7 @@ module RateLimitDumpWorker
       # if the user is missing, which should only happen via the rails console
       # TODO: determine if we want this?? or the automated subject set completion events
       return false if requester_id.blank?
-      
+
       # Q? How will this work with the subject set export that is
       # intiated by an automated process and the requester_id is blank?
       # and thus not rate limited :(

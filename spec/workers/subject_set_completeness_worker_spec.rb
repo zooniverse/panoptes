@@ -96,19 +96,11 @@ RSpec.describe SubjectSetCompletenessWorker do
       end
     end
 
-    context 'when the set is complete', :focus do
+    context 'when the set is complete' do
       let(:counter_double) { instance_double(SubjectSetWorkflowCounter, retired_subjects: 2) }
 
       before do
         allow(SubjectSetWorkflowCounter).to receive(:new).and_return(counter_double)
-      end
-
-      it 'runs the workflow CreateClassificationsExport operation' do
-        operation_double = CreateClassificationsExport.with(api_user: ApiUser.new(nil), object: workflow)
-        allow(operation_double).to receive(:run!)
-        allow(CreateClassificationsExport).to receive(:with).and_return(operation_double)
-        worker.perform(subject_set.id, workflow.id)
-        expect(operation_double).to have_received(:run!).with({})
       end
 
       it 'does not run the SubjectSetCompletedMailerWorker' do
@@ -117,12 +109,32 @@ RSpec.describe SubjectSetCompletenessWorker do
         expect(SubjectSetCompletedMailerWorker).not_to have_received(:perform_async)
       end
 
-      it 'runs the SubjectSetCompletedMailerWorker when the project is configured to' do
-        allow(SubjectSet).to receive(:find).with(subject_set.id).and_return(subject_set)
-        allow(subject_set.project).to receive(:notify_on_subject_set_completion?).and_return(true)
-        allow(SubjectSetCompletedMailerWorker).to receive(:perform_async)
+      it 'does not run the CreateClassificationsExport operation' do
+        allow(CreateClassificationsExport).to receive(:with)
         worker.perform(subject_set.id, workflow.id)
-        expect(SubjectSetCompletedMailerWorker).to have_received(:perform_async).with(subject_set.id)
+
+        expect(CreateClassificationsExport).not_to have_received(:with)
+      end
+
+      context 'when the project is configured for subject set completeness events' do
+        before do
+          allow(subject_set).to receive(:run_completion_events?).and_return(true)
+          allow(SubjectSet).to receive(:find).with(subject_set.id).and_return(subject_set)
+        end
+
+        it 'runs the CreateClassificationsExport operation' do
+          operation_double = CreateClassificationsExport.with(api_user: ApiUser.new(nil), object: subject_set)
+          allow(operation_double).to receive(:run!)
+          allow(CreateClassificationsExport).to receive(:with).and_return(operation_double)
+          worker.perform(subject_set.id, workflow.id)
+          expect(operation_double).to have_received(:run!).with({ media: { metadata: { recipients: [] } } })
+        end
+
+        it 'runs the SubjectSetCompletedMailerWorker' do
+          allow(SubjectSetCompletedMailerWorker).to receive(:perform_async)
+          worker.perform(subject_set.id, workflow.id)
+          expect(SubjectSetCompletedMailerWorker).to have_received(:perform_async).with(subject_set.id)
+        end
       end
     end
   end
