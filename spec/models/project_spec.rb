@@ -552,14 +552,16 @@ describe Project, type: :model do
     end
   end
 
-  describe 'notify_on_subject_set_completion?' do
+  describe 'run_subject_set_completion_events?' do
     it 'returns false if the project is not configured to notify' do
-      expect(project.notify_on_subject_set_completion?).to eq(false)
+      expect(project.run_subject_set_completion_events?).to eq(false)
     end
 
     it 'returns true if the project is configured to notify' do
-      project.configuration['notify_on_subject_set_completion'] = true
-      expect(project.notify_on_subject_set_completion?).to eq(true)
+      project.id = 1
+      ENV['SUBJECT_SET_COMPLETION_EVENT_PROJECT_IDS'] = project.id.to_s
+      expect(project.run_subject_set_completion_events?).to eq(true)
+      ENV.delete('SUBJECT_SET_COMPLETION_EVENT_PROJECT_IDS')
     end
   end
 end
