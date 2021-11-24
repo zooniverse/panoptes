@@ -33,6 +33,15 @@ describe DumpMailer do
         dump_mailer.send_email
       end
     end
+
+    context 'with emptry recipients list' do
+      let(:metadata) { { 'recipients' => [] } }
+      let(:expected_emails) { [owner.email] }
+
+      it 'queues an email to the owner' do
+        dump_mailer.send_email
+      end
+    end
   end
 
   describe 'lab_export_url' do

@@ -23,12 +23,13 @@ class DumpMailer
   end
 
   def emails
-    metadata = medium&.metadata
-    if recipients = metadata&.dig("recipients")
-      User.where(id: recipients).pluck(:email)
-    else
-      resource_comms_emails
-    end
+    metadata = medium.metadata || {}
+    recipients = metadata['recipients']
+    # fallback to project communication emails if receipients are not set or empty
+    return resource.communication_emails if recipients.blank?
+
+    # find the specified recipient emails
+    User.where(id: recipients).pluck(:email)
   end
 
   def lab_export_url
@@ -41,11 +42,5 @@ class DumpMailer
       end
 
     "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports"
-  end
-
-  private
-
-  def resource_comms_emails
-    resource.communication_emails
   end
 end
