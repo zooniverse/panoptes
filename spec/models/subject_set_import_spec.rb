@@ -46,4 +46,26 @@ describe SubjectSetImport, type: :model do
     # twice: once when the progress is mod 2 == 0 and once at the end
     expect(subject_set_import).to have_received(:save_imported_row_count).twice
   end
+
+  context 'when a subject fails to import' do
+    before do
+      processor_double = instance_double('SubjectSetImport::Processor')
+      allow(processor_double).to receive(:import).and_raise(SubjectSetImport::Processor::FailedImport)
+      allow(SubjectSetImport::Processor).to receive(:new).and_return(processor_double)
+    end
+
+    it 'continues processing' do
+      expect { subject_set_import.import! }.not_to raise_error
+    end
+
+    it 'stores the failed count' do
+      subject_set_import.import!
+      expect(subject_set_import.failed_count).to eq(2)
+    end
+
+    it 'stores the failed UUIDs' do
+      subject_set_import.import!
+      expect(subject_set_import.failed_uuids).to match_array(%w[1 2])
+    end
+  end
 end

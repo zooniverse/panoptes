@@ -408,4 +408,30 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
     end
   end
+
+  describe '#create_classifications_export' do
+    let(:test_attr) { :type }
+    let(:new_resource) { Medium.find(created_instance_id(api_resource_name)) }
+    let(:api_resource_name) { 'media' }
+    let(:api_resource_attributes) do
+      %w[id src created_at content_type media_type href]
+    end
+    let(:api_resource_links) { [] }
+    let(:resource_class) { Medium }
+    let(:content_type) { 'text/csv' }
+    let(:create_params) do
+      {
+        subject_set_id: subject_set.id,
+        media: {
+          content_type: content_type,
+          metadata: { recipients: [owner.id] }
+        }
+      }
+    end
+
+    it_behaves_like 'is creatable', :create_classifications_export do
+      let(:resource_url) { %r{http://test.host/api/subject_sets/#{subject_set.id}/classifications_export} }
+      let(:test_attr_value) { 'subject_set_classifications_export' }
+    end
+  end
 end

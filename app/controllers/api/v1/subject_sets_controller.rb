@@ -1,10 +1,12 @@
 class Api::V1::SubjectSetsController < Api::ApiController
   include JsonApiController::PunditPolicy
   include FilterByMetadata
+  include MediumResponse
 
-  require_authentication :create, :update, :destroy, scopes: [:project]
+  require_authentication :create, :update, :destroy, :create_classifications_export, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
+  prepend_before_action :require_login, only: %i[create update destroy create_classifications_export]
 
   IMPORT_COLUMNS = %w(subject_set_id subject_id random).freeze
 
@@ -77,6 +79,11 @@ class Api::V1::SubjectSetsController < Api::ApiController
         end
       end
     end
+  end
+
+  def create_classifications_export
+    medium = CreateClassificationsExport.with(api_user: api_user, object: controlled_resource).run!(params)
+    medium_response(medium)
   end
 
   protected

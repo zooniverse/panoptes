@@ -54,7 +54,7 @@ class PunditScopeTester
     Pundit.policy!(@user, @klass).scope_for(:incomplete)
   end
 
-  # Used by projects controller:
+  # Used by projects, workflows, subejct_sets controller:
   def create_classifications_export
     Pundit.policy!(@user, @klass).scope_for(:create_classifications_export)
   end
@@ -74,7 +74,7 @@ class PunditScopeTester
     Pundit.policy!(@user, @klass).scope_for(:create_workflow_contents_export)
   end
 
-  # Used by projects controller:
+  # Used by workflows controller:
   def retire_subjects
     Pundit.policy!(@user, @klass).scope_for(:retire_subjects)
   end
