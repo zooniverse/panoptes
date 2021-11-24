@@ -29,11 +29,19 @@ class SubjectSetCompletenessWorker
     DatabaseReplica.read('subject_set_completeness_from_read_replica') do
       subject_set_completeness = calculate_subject_set_completeness
     end
+
+# ONLY RUN THE FOLLOWING STATE TRANSITIONS IF WE ARE MOVING COMPLETENESS STATES
+
+
     # store these per workflow completeness metric in a json object keyed by the workflow id
     # use the atomic DB json operator to avoid clobbering data in the jsonb attribute by other updates
     # https://www.postgresql.org/docs/11/functions-json.html
     SubjectSet.where(id: subject_set.id).update_all(
       "completeness = jsonb_set(completeness, '{#{workflow_id}}', '#{subject_set_completeness}', true)"
+    )
+    # update the individual join model record for the subject set workflow relation
+    SubjectSetsWorkflow.where(subject_set_id: subject_set.id, workflow_id: workflow.id).update_all(
+      completeness: subject_set_completeness
     )
 
     notify_project_team if subject_set_completed?(subject_set_completeness)
