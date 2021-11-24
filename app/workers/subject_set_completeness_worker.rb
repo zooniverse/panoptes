@@ -36,6 +36,8 @@ class SubjectSetCompletenessWorker
       "completeness = jsonb_set(completeness, '{#{workflow_id}}', '#{subject_set_completeness}', true)"
     )
 
+  # TODO handle state transiotion here
+  # i.e. don't run this twice if a set is already completed
     run_subject_set_completion_events if subject_set_completed?(subject_set_completeness)
   rescue ActiveRecord::RecordNotFound
     # avoid running sql count queries for subject sets and workflows we can't find
@@ -63,30 +65,22 @@ class SubjectSetCompletenessWorker
   end
 
   def run_subject_set_completion_events
+    # only run these events if the subject set is opted in for completion events
+    return unless subject_set.run_completion_events?
+
     create_workflow_classifications_export
     notify_project_team
   end
 
   def notify_project_team
-    # allow project teams to configure their project notification emails
-    return unless subject_set.project.notify_on_subject_set_completion?
-
     SubjectSetCompletedMailerWorker.perform_async(subject_set.id)
   end
 
   def create_workflow_classifications_export
-    requesting_user = ApiUser.new(nil) # use nil to avoid rate limiting exports
-    # do we want to have this run for all projects when their sets complete??
-
-    # perhaps we can use another project / workflow level configuration setting?
-
-    # if we use a configuration setting - we can't let user's self assign this one
-    # to avoid the rate limiting feature of the exports (or should we use that?)
-
-    # ALTERNATIVELY - can we reimaging exports at the subject set level?
-    # would this work with our existing Lab / Client tools to avoid issues with rate limiting, etc here?
-
-    # CreateClassificationsExport.with( api_user: , object: workflow ).run!(params)
-    # ClassificationsDumpWorker.perform_async(subject_set.project, resource_type, medium_id=nil, requester_id=nil, *args)
+    # use a fake Api / internal user here to trigger the rate limiter
+    fake_requesting_user = ApiUser.new(User.new(id: -1))
+    # override the recipients list to ensure the dump mailer uses the subject_set.communication_emails list
+    params = { media: { metadata: { recipients: [] } } }
+    CreateClassificationsExport.with(api_user: fake_requesting_user, object: subject_set).run!(params)
   end
 end
