@@ -21,7 +21,7 @@ module RateLimitDumpWorker
 
   module ClassMethods
     def congestion_enabled?(requester_id)
-      # if the user is missing, which should only happen via the rails console
+      # if the user is missing, should only happen via the rails console
       return false if requester_id.blank?
 
       skip_user_ids = Panoptes::RateLimitDumpWorker.skip_rate_limit_user_ids
