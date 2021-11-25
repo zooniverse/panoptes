@@ -126,22 +126,5 @@ RSpec.describe SubjectSetCompletenessWorker do
         expect(SubjectSetCompletedMailerWorker).to have_received(:perform_async).with(subject_set.id)
       end
     end
-
-    context 'when the subject set was already complete' do
-      let(:counter_double) { instance_double(SubjectSetWorkflowCounter, retired_subjects: 2) }
-
-      before do
-        allow(SubjectSetWorkflowCounter).to receive(:new).and_return(counter_double)
-        subject_set.update_column(:completeness, { workflow.id.to_s => '1.0' })
-      end
-
-      it 'does not run the SubjectSetCompletedMailerWorker' do
-        allow(SubjectSet).to receive(:find).with(subject_set.id).and_return(subject_set)
-        allow(subject_set.project).to receive(:notify_on_subject_set_completion?).and_return(true)
-        allow(SubjectSetCompletedMailerWorker).to receive(:perform_async)
-        worker.perform(subject_set.id, workflow.id)
-        expect(SubjectSetCompletedMailerWorker).not_to have_received(:perform_async)
-      end
-    end
   end
 end

@@ -30,13 +30,6 @@ class SubjectSetCompletenessWorker
       subject_set_completeness = calculate_subject_set_completeness
     end
 
-    # check if we've got a completeness record for this workflow
-    if (existing_set_completeness = subject_set.completeness[workflow.id.to_s])
-      no_completeness_change = existing_set_completeness.to_d == subject_set_completeness.to_d
-      # return if the completeness state has not changed
-      return if no_completeness_change
-    end
-
     # store these per workflow completeness metric in a json object keyed by the workflow id
     # use the atomic DB json operator to avoid clobbering data in the jsonb attribute by other updates
     # https://www.postgresql.org/docs/11/functions-json.html
