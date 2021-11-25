@@ -33,14 +33,15 @@ class DumpMailer
   end
 
   def lab_export_url
-    # resources from export operations are projects but may not be
-    project_id =
-      if resource.is_a?(Workflow)
-        resource.project_id
-      else
-        resource.id
-      end
+    # lab urls should be identified by the project
+    project_id = resource.id
+    # use the SubjectSet | Workflow project id in the URL
+    project_id = resource.project_id if resource.respond_to?(:project_id)
 
-    "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports"
+    suffix = ''
+    # add the unique ID for Subject Set specific suffix exports page behaviours
+    suffix = "?subject-sets=#{resource.id}" if resource.is_a?(SubjectSet)
+
+    "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports#{suffix}"
   end
 end

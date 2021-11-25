@@ -49,13 +49,23 @@ describe DumpMailer do
     let(:project_id) { resource.id }
     let(:lab_url) { "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports" }
 
-    it 'corretly determines the lab url' do
+    it 'correctly determines the lab url' do
       expect(dump_mailer.lab_export_url).to eq(lab_url)
     end
 
     context "when the resource is a workflow" do
       let(:resource) { Workflow.new(project_id: 2) }
       let(:project_id) { resource.project_id }
+
+      it 'corretly determines the lab url' do
+        expect(dump_mailer.lab_export_url).to eq(lab_url)
+      end
+    end
+
+    context 'when the resource is a subject set' do
+      let(:resource) { SubjectSet.new(project_id: 2) }
+      let(:project_id) { resource.project_id }
+      let(:lab_url) { "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports?subject-sets=#{resource.id}" }
 
       it 'corretly determines the lab url' do
         expect(dump_mailer.lab_export_url).to eq(lab_url)
