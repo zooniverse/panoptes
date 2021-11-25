@@ -36,17 +36,12 @@ class SubjectSetCompletenessWorker
       "completeness = jsonb_set(completeness, '{#{workflow_id}}', '#{subject_set_completeness}', true)"
     )
 
-  # TODO handle state transition here
-  # i.e. don't run this again if a set is already completed
-    run_subject_set_completion_events if subject_set_completed?(subject_set_completeness)
+    run_completion_events_operation if subject_set_completed?(subject_set_completeness)
   rescue ActiveRecord::RecordNotFound
     # avoid running sql count queries for subject sets and workflows we can't find
   end
 
   private
-
-  # TODO: the below is starting to look like an operation class
-  # where we encapsulate the logic on completion events
 
   # find the proportion of all retired subjects, for a known subject set, in the context of a known workflow
   def calculate_subject_set_completeness
@@ -61,28 +56,10 @@ class SubjectSetCompletenessWorker
   end
 
   def subject_set_completed?(completeness)
-    # TODO: consider the times when a set has previously completed
-    # we won't want to run the mailer / exporter twice....
     completeness.to_i == 1
   end
 
-  def run_subject_set_completion_events
-    # only run these events if the subject set is opted in for completion events
-    return unless subject_set.run_completion_events?
-
-    create_workflow_classifications_export
-    notify_project_team
-  end
-
-  def notify_project_team
-    SubjectSetCompletedMailerWorker.perform_async(subject_set.id)
-  end
-
-  def create_workflow_classifications_export
-    # use a fake Api / internal user here to trigger the rate limiter
-    fake_requesting_user = ApiUser.new(User.new(id: -1))
-    # override the recipients list to ensure the dump mailer uses the subject_set.communication_emails list
-    params = { media: { metadata: { recipients: [] } } }
-    CreateClassificationsExport.with(api_user: fake_requesting_user, object: subject_set).run!(params)
+  def run_completion_events_operation
+    SubjectSets::RunCompletionEvents.with(subject_set: subject_set, workflow: workflow).run!
   end
 end
