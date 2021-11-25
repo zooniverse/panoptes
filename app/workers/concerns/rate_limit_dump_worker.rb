@@ -22,17 +22,7 @@ module RateLimitDumpWorker
   module ClassMethods
     def congestion_enabled?(requester_id)
       # if the user is missing, which should only happen via the rails console
-      # TODO: determine if we want this?? or the automated subject set completion events
       return false if requester_id.blank?
-
-      # Q? How will this work with the subject set export that is
-      # intiated by an automated process and the requester_id is blank?
-      # and thus not rate limited :(
-      #
-      # (will requester_id be blank or should it be?)
-      #
-      # we could add another param here to enforce rate limt
-      # and pass in via worker call....TBD
 
       skip_user_ids = Panoptes::RateLimitDumpWorker.skip_rate_limit_user_ids
 
