@@ -119,5 +119,20 @@ RSpec.describe SubjectSetCompletenessWorker do
         expect(operation_double).to have_received(:run!)
       end
     end
+
+    context 'when the subject set was already complete' do
+      let(:counter_double) { instance_double(SubjectSetWorkflowCounter, retired_subjects: 2) }
+
+      before do
+        allow(SubjectSetWorkflowCounter).to receive(:new).and_return(counter_double)
+        subject_set.update_column(:completeness, { workflow.id.to_s => '1.0' })
+      end
+
+      it 'does not run the SubjectSets::RunCompletionEvents operation' do
+        allow(SubjectSets::RunCompletionEvents).to receive(:with)
+        worker.perform(subject_set.id, workflow.id)
+        expect(SubjectSets::RunCompletionEvents).not_to have_received(:with)
+      end
+    end
   end
 end

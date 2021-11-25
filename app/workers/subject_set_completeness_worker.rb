@@ -29,6 +29,10 @@ class SubjectSetCompletenessWorker
     DatabaseReplica.read('subject_set_completeness_from_read_replica') do
       subject_set_completeness = calculate_subject_set_completeness
     end
+
+    # don't re-run updates or completion events if the completeness value is the same
+    return unless subject_set_completeness_has_changed?(subject_set_completeness)
+
     # store these per workflow completeness metric in a json object keyed by the workflow id
     # use the atomic DB json operator to avoid clobbering data in the jsonb attribute by other updates
     # https://www.postgresql.org/docs/11/functions-json.html
@@ -53,6 +57,15 @@ class SubjectSetCompletenessWorker
 
     # calculate and clamp the completeness value between 0.0 and 1.0, i.e. 0 to 100%
     (0.0..1.0).clamp(retired_subjects_count / total_subjects_count)
+  end
+
+  def subject_set_completeness_has_changed?(subject_set_completeness)
+    # check if we've got a completeness record for this workflow
+    existing_set_completeness = subject_set.completeness[workflow.id.to_s]
+    return true unless existing_set_completeness
+
+    # has it changed value?
+    existing_set_completeness.to_d != subject_set_completeness.to_d
   end
 
   def subject_set_completed?(completeness)
