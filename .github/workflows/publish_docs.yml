@@ -1,7 +1,5 @@
 name: Update Documentation Site
 on:
-  workflow_dispatch:
-  pull_request:
   push: { branches: master }
 jobs:
   build_and_deploy:
