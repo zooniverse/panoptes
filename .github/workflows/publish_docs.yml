@@ -13,4 +13,4 @@ jobs:
           REMOTE_BRANCH: gh-pages
           SITE_LOCATION: docs
           BUILD_LOCATION: build
-        uses: zooniverse/middleman-gh-pages-action@master
+        uses: zooniverse/middleman-gh-pages-action@v1.0.0
