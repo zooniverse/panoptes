@@ -20,6 +20,8 @@ We only support running the documentation site via Docker and Docker Compose.
 
 3. Run `docker-compose up` to serve the docs on localhost
 
+Alternatively run `docker-compose run --rm --service-ports docs bash` to start a bash shell in a docs container
+
 ## Deploying
 
 These docs autodeploy to the `gh-pages` branch on the repo on all pushes to master branch (i.e. all merged pull requests).
