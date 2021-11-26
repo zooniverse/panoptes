@@ -12,7 +12,6 @@ jobs:
       - name: Build & Deploy to GitHub Pages
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_PUSH_DRY_RUN: true
           REMOTE_BRANCH: gh-pages
           SITE_LOCATION: docs
           BUILD_LOCATION: build
