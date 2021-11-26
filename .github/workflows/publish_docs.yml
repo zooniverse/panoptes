@@ -14,4 +14,5 @@ jobs:
           GIT_PUSH_DRY_RUN: true
           REMOTE_BRANCH: gh-pages
           SITE_LOCATION: docs
+          BUILD_LOCATION: build
         uses: zooniverse/middleman-gh-pages-action@master
