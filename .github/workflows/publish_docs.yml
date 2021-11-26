@@ -1,7 +1,7 @@
 name: Update Documentation Site
 on:
   workflow_dispatch:
-  push: { branches: master }
+  # push: { branches: master }
 jobs:
   build_and_deploy:
     name: Build & Deploy
