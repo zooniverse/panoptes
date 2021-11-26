@@ -832,20 +832,19 @@ recommended. Instead, use the link endpoints explained below.</p>
 <li>metadata described as key-value pairs.</li>
 </ul></li>
 </ul></li>
-<li>In the Zooniverse project builder, the researcher navigates to the subject set to which they would like to have the subjects added.</li>
-<li>The researcher then clicks &quot;Import manifest&quot; and enters the URL to the manifest (from by step 2 above).</li>
+<li>The researcher will then send the manifest payload to the Zooniverse API programatically
+
+<ul>
+<li><a href="https://github.com/zooniverse/panoptes-python-notebook/blob/master/examples/subject_set_import_vera_rubin.ipynb">Python example of how to send a manifest</a></li>
+<li>The repsonse to this manifest upload will be a <code>SubjectSetImport</code> API resource.</li>
+</ul></li>
 <li>This calls the Zooniverse API which enqueues a background job on the Zooniverse servers.
 
 <ul>
 <li>In the background, the Zooniverse&#39;s systems process the downloaded manifest file, creating subjects in the specified subject set.</li>
 </ul></li>
+<li>The <code>SubjectSetImport</code> resource API end point response can be polled for information on the progress and state of an import (see python example above or &#39;Retrieve a single import&#39; below).</li>
 </ol>
-<h3 id='additional-features-beyond-the-mvp'>Additional features beyond the MVP</h3>
-<p>When the science platform opens a new browser tab/window to send the researcher to the project builder, it can pass along the manifest URL for the small sample of &lt;100 subjects as URL query parameters.</p>
-
-<p>The Zooniverse project builder will then make the Import button more prominent and prefill the URL.</p>
-
-<p>After approval, when the researcher needs to get a full set of data into their Zooniverse project, at the end the supertask can call the Zooniverse API to trigger the import rather than requesting the researcher to go back to the project builder and click a button.</p>
 <h2 id='zooniverse-api-feature-description'>Zooniverse API Feature Description</h2><h3 id='creating-a-new-subject-set-import'>Creating a new subject set import</h3><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/subject_set_imports</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
