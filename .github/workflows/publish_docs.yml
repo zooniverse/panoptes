@@ -1,0 +1,16 @@
+name: Update Documentation Site
+on:
+  push: { branches: master }
+jobs:
+  build_and_deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build & Deploy to GitHub Pages
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_PUSH_DRY_RUN: true
+          REMOTE_BRANCH: gh-pages
+          SITE_LOCATION: docs
+        uses: zooniverse/middleman-gh-pages-action@master
