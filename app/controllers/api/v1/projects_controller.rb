@@ -107,9 +107,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def admin_allowed_params
-    [ :beta_approved, :launch_approved, :redirect,
-      :launched_row_order_position, :beta_row_order_position,
-      :experimental_tools, :featured ]
+    %i[ beta_approved launch_approved redirect launched_row_order_position
+        beta_row_order_position experimental_tools featured run_subject_set_completion_events ]
   end
 
   def build_resource_for_create(create_params)

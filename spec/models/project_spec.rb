@@ -535,7 +535,7 @@ describe Project, type: :model do
     let(:project) { build(:project) }
     let(:primary_language) { project.primary_language }
 
-    it 'includes the primary langage by default' do
+    it 'includes the primary langage by default', :focus do
       expect(project.available_languages).to match_array([primary_language])
     end
 
