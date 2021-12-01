@@ -30,6 +30,9 @@ class SubjectSetCompletenessWorker
       subject_set_completeness = calculate_subject_set_completeness
     end
 
+    # don't re-run updates or completion events if the completeness value is the same
+    return unless subject_set_completeness_has_changed?(subject_set_completeness)
+
     # store these per workflow completeness metric in a json object keyed by the workflow id
     # use the atomic DB json operator to avoid clobbering data in the jsonb attribute by other updates
     # https://www.postgresql.org/docs/11/functions-json.html
@@ -41,7 +44,7 @@ class SubjectSetCompletenessWorker
       completeness: subject_set_completeness
     )
 
-    notify_project_team if subject_set_completed?(subject_set_completeness)
+    run_completion_events_operation if subject_set_completed?(subject_set_completeness)
   rescue ActiveRecord::RecordNotFound
     # avoid running sql count queries for subject sets and workflows we can't find
   end
@@ -60,14 +63,20 @@ class SubjectSetCompletenessWorker
     (0.0..1.0).clamp(retired_subjects_count / total_subjects_count)
   end
 
+  def subject_set_completeness_has_changed?(subject_set_completeness)
+    # check if we've got a completeness record for this workflow
+    existing_set_completeness = subject_set.completeness[workflow.id.to_s]
+    return true unless existing_set_completeness
+
+    # has it changed value?
+    existing_set_completeness.to_d != subject_set_completeness.to_d
+  end
+
   def subject_set_completed?(completeness)
     completeness.to_i == 1
   end
 
-  def notify_project_team
-    # allow project teams to configure their project notification emails
-    return unless subject_set.project.notify_on_subject_set_completion?
-
-    SubjectSetCompletedMailerWorker.perform_async(subject_set.id)
+  def run_completion_events_operation
+    SubjectSets::RunCompletionEvents.with(subject_set: subject_set, workflow: workflow).run!
   end
 end

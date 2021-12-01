@@ -95,13 +95,21 @@ RSpec.describe SubjectSetCompletenessWorker do
       end
     end
 
-    context 'with no subjects in the subect set' do
+    context 'with no subjects in the subject set' do
       let(:subject_set) { create(:subject_set) }
 
       it 'raises a custom EmptySubjectSet error' do
         expect {
           worker.perform(subject_set.id, workflow.id)
         }.to raise_error(SubjectSetCompletenessWorker::EmptySubjectSet, "No subjets in subject set: #{subject_set.id}")
+      end
+    end
+
+    context 'when the set is incomplete' do
+      it 'does not run the SubjectSets::RunCompletionEvents operation' do
+        allow(SubjectSets::RunCompletionEvents).to receive(:with)
+        worker.perform(subject_set.id, workflow.id)
+        expect(SubjectSets::RunCompletionEvents).not_to have_received(:with)
       end
     end
 
@@ -112,18 +120,27 @@ RSpec.describe SubjectSetCompletenessWorker do
         allow(SubjectSetWorkflowCounter).to receive(:new).and_return(counter_double)
       end
 
-      it 'does not run the SubjectSetCompletedMailerWorker' do
-        allow(SubjectSetCompletedMailerWorker).to receive(:perform_async)
+      it 'does run the SubjectSets::RunCompletionEvents operation' do
+        operation_double = SubjectSets::RunCompletionEvents.with(subject_set: subject_set, workflow: workflow)
+        allow(operation_double).to receive(:run!)
+        allow(SubjectSets::RunCompletionEvents).to receive(:with).and_return(operation_double)
         worker.perform(subject_set.id, workflow.id)
-        expect(SubjectSetCompletedMailerWorker).not_to have_received(:perform_async)
+        expect(operation_double).to have_received(:run!)
+      end
+    end
+
+    context 'when the subject set was already complete' do
+      let(:counter_double) { instance_double(SubjectSetWorkflowCounter, retired_subjects: 2) }
+
+      before do
+        allow(SubjectSetWorkflowCounter).to receive(:new).and_return(counter_double)
+        subject_set.update_column(:completeness, { workflow.id.to_s => '1.0' })
       end
 
-      it 'runs the SubjectSetCompletedMailerWorker when the project is configured to' do
-        allow(SubjectSet).to receive(:find).with(subject_set.id).and_return(subject_set)
-        allow(subject_set.project).to receive(:notify_on_subject_set_completion?).and_return(true)
-        allow(SubjectSetCompletedMailerWorker).to receive(:perform_async)
+      it 'does not run the SubjectSets::RunCompletionEvents operation' do
+        allow(SubjectSets::RunCompletionEvents).to receive(:with)
         worker.perform(subject_set.id, workflow.id)
-        expect(SubjectSetCompletedMailerWorker).to have_received(:perform_async).with(subject_set.id)
+        expect(SubjectSets::RunCompletionEvents).not_to have_received(:with)
       end
     end
   end

@@ -18,7 +18,7 @@ RSpec.describe SubjectSetCompletedMailer, type: :mailer do
     end
 
     it 'includes the lab link' do
-      expect(mail.body.encoded).to include("#{Panoptes.frontend_url}/lab/#{project.id}/data-exports")
+      expect(mail.body.encoded).to include("#{Panoptes.frontend_url}/lab/#{project.id}/data-exports?subject-sets=#{subject_set.id}")
     end
 
     it 'includes the subject set name' do
