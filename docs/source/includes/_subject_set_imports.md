@@ -11,18 +11,12 @@ This resource is useful when a researcher has a large batch to add. The upload p
      + a unique external ID (used to track the subject from your organization)
      + one or more URLs that host media files e.g. image, video, audio.
      + metadata described as key-value pairs.
-3. In the Zooniverse project builder, the researcher navigates to the subject set to which they would like to have the subjects added.
-4. The researcher then clicks "Import manifest" and enters the URL to the manifest (from by step 2 above).
-5. This calls the Zooniverse API which enqueues a background job on the Zooniverse servers.
+3. The researcher will then send the manifest payload to the Zooniverse API programatically
+    + [Python example of how to send a manifest](https://github.com/zooniverse/panoptes-python-notebook/blob/master/examples/subject_set_import_vera_rubin.ipynb)
+    + The repsonse to this manifest upload will be a `SubjectSetImport` API resource.
+4. This calls the Zooniverse API which enqueues a background job on the Zooniverse servers.
     + In the background, the Zooniverse's systems process the downloaded manifest file, creating subjects in the specified subject set.
-
-### Additional features beyond the MVP
-
-When the science platform opens a new browser tab/window to send the researcher to the project builder, it can pass along the manifest URL for the small sample of <100 subjects as URL query parameters.
-
-The Zooniverse project builder will then make the Import button more prominent and prefill the URL.
-
-After approval, when the researcher needs to get a full set of data into their Zooniverse project, at the end the supertask can call the Zooniverse API to trigger the import rather than requesting the researcher to go back to the project builder and click a button.
+5. The `SubjectSetImport` resource API end point response can be polled for information on the progress and state of an import (see python example above or 'Retrieve a single import' below).
 
 ## Zooniverse API Feature Description
 

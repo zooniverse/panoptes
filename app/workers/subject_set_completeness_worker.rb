@@ -39,6 +39,10 @@ class SubjectSetCompletenessWorker
     SubjectSet.where(id: subject_set.id).update_all(
       "completeness = jsonb_set(completeness, '{#{workflow_id}}', '#{subject_set_completeness}', true)"
     )
+    # update the individual join model record for the subject set workflow relation
+    SubjectSetsWorkflow.where(subject_set_id: subject_set.id, workflow_id: workflow.id).update_all(
+      completeness: subject_set_completeness
+    )
 
     run_completion_events_operation if subject_set_completed?(subject_set_completeness)
   rescue ActiveRecord::RecordNotFound

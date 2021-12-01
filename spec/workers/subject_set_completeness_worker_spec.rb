@@ -10,6 +10,7 @@ RSpec.describe SubjectSetCompletenessWorker do
     create(:subject_set_with_subjects, num_workflows: 1, num_subjects: 2, completeness: { fake_wf_id => 0.8 })
   end
   let(:workflow) { subject_set.workflows.first }
+  let(:subject_sets_workflow) { subject_set.subject_sets_workflows.where(workflow_id: workflow.id).first }
 
   describe '#perform' do
     it 'ignores an unknown subject set' do
@@ -43,6 +44,14 @@ RSpec.describe SubjectSetCompletenessWorker do
         }.to change {
           subject_set.reload.completeness[workflow.id.to_s]
         }.from(nil).to(0.5)
+      end
+
+      it 'stores 0.5 in the linked subject_set_workflows record' do
+        expect {
+          worker.perform(subject_set.id, workflow.id)
+        }.to change {
+          subject_sets_workflow.reload.completeness
+        }.from(0.0).to(0.5)
       end
 
       it 'does not clobber existing per workflow completeness data' do
