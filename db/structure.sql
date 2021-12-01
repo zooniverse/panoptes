@@ -1060,7 +1060,8 @@ CREATE TABLE public.projects (
     url_labels jsonb,
     workflow_description text,
     researcher_quote text,
-    authentication_invitation text
+    authentication_invitation text,
+    run_subject_set_completion_events boolean DEFAULT false
 );
 
 
@@ -4816,4 +4817,6 @@ INSERT INTO schema_migrations (version) VALUES ('20210729152047');
 INSERT INTO schema_migrations (version) VALUES ('20211007125705');
 
 INSERT INTO schema_migrations (version) VALUES ('20211124175756');
+
+INSERT INTO schema_migrations (version) VALUES ('20211201164326');
 

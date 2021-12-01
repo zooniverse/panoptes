@@ -404,6 +404,10 @@ describe Api::V1::ProjectsController, type: :controller do
       it_behaves_like "admin only option", :experimental_tools, ["survey"]
     end
 
+    describe 'run_subject_set_completion_events attribute' do
+      it_behaves_like 'admin only option', :run_subject_set_completion_events, true
+    end
+
     describe "create talk admin" do
       it 'should queue a talk admin create worker' do
         expect(TalkAdminCreateWorker)

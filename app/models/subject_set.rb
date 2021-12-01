@@ -38,6 +38,6 @@ class SubjectSet < ActiveRecord::Base
 
   # delegate method to project but with a more succinct name
   def run_completion_events?
-    project.run_subject_set_completion_events?
+    project.run_subject_set_completion_events
   end
 end

@@ -169,12 +169,4 @@ class Project < ActiveRecord::Base
   def communication_emails
     users_with_project_roles(%w(owner communications)).pluck(:email)
   end
-
-  def run_subject_set_completion_events?
-    # short term use ENV vars to 'allowlist' projects into this functionality - so we control it
-    # longer term perhaps switch to opt in behaviours via project configuration setting?
-    # or should this be an admin only flag for our control??
-    allow_list_project_ids = ENV.fetch('SUBJECT_SET_COMPLETION_EVENT_PROJECT_IDS', '').split(',').map(&:to_i)
-    allow_list_project_ids.include?(id)
-  end
 end
