@@ -853,7 +853,7 @@ describe Api::V1::ProjectsController, type: :controller do
     it_behaves_like "is deactivatable"
   end
 
-  describe '#copy', :focus do
+  describe '#copy' do
     let(:resource) { create(:private_project, owner: authorized_user, configuration: {template: true} ) }
     let(:req) do
       post :copy, { project_id: resource.id }
@@ -867,14 +867,20 @@ describe Api::V1::ProjectsController, type: :controller do
 
     it 'calls the service operation' do
       operation_double = Projects::Copy.with(api_user: ApiUser.new(nil))
-      allow(operation_double).to receive(:run!)
+      allow(operation_double).to receive(:run!).and_return(resource)
       allow(Projects::Copy).to receive(:with).and_return(operation_double)
       req
       expect(operation_double).to have_received(:run!).with({ project: resource })
     end
 
-    xit 'returns a created resonse ffs' do
-      # flesh this out last
+    it 'return created response code' do
+      req
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'serializes the created resource in the response body' do
+      req
+      expect(created_instance('projects')).not_to be_empty
     end
 
     context 'with an uncopyable project' do

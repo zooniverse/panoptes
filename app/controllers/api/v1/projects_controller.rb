@@ -96,14 +96,7 @@ class Api::V1::ProjectsController < Api::ApiController
 
     copied_project = Projects::Copy.with(api_user: api_user).run!(project: project)
 
-
-    # move this response to be a resource crated response ffs
-    # how the fuck are people meant to programatically
-    # interact with this copied resource...
-    # listing all their projects and filtering on the fucking display name...
-    # fuck me.....
-
-    head :accepted
+    created_resource_response(copied_project)
   end
 
   private
