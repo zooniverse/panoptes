@@ -5,7 +5,6 @@ module Projects
 
     validates :user, presence: true
 
-
     def execute
       ProjectCopier.new(project.id, user.id).copy
     end
