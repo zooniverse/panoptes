@@ -94,7 +94,15 @@ class Api::V1::ProjectsController < Api::ApiController
       raise(Api::MethodNotAllowed, error_message)
     end
 
-    ProjectCopyWorker.perform_async(project.id, api_user.id)
+    copied_project = Projects::Copy.with(api_user: api_user).run!(project: project)
+
+
+    # move this response to be a resource crated response ffs
+    # how the fuck are people meant to programatically
+    # interact with this copied resource...
+    # listing all their projects and filtering on the fucking display name...
+    # fuck me.....
+
     head :accepted
   end
 

@@ -865,10 +865,16 @@ describe Api::V1::ProjectsController, type: :controller do
       default_request scopes: scopes, user_id: requesting_user.id
     end
 
-    it 'queues a ProjectCopy worker' do
-      allow(ProjectCopyWorker).to receive(:perform_async)
+    it 'calls the service operation' do
+      operation_double = Projects::Copy.with(api_user: ApiUser.new(nil))
+      allow(operation_double).to receive(:run!)
+      allow(Projects::Copy).to receive(:with).and_return(operation_double)
       req
-      expect(ProjectCopyWorker).to have_received(:perform_async).with(resource.id, authorized_user.id)
+      expect(operation_double).to have_received(:run!).with({ project: resource })
+    end
+
+    xit 'returns a created resonse ffs' do
+      # flesh this out last
     end
 
     context 'with an uncopyable project' do
@@ -876,8 +882,10 @@ describe Api::V1::ProjectsController, type: :controller do
         resource.update(live: true)
       end
 
-      it 'is not copied' do
-        expect { req }.not_to change(Project, :count)
+      it 'does not call the operation' do
+        allow(Projects::Copy).to receive(:with)
+        req
+        expect(Projects::Copy).not_to have_received(:with)
       end
 
       it 'returns status code 405' do
@@ -896,8 +904,10 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:unauthorized_user) { create(:user) }
       let(:requesting_user) { unauthorized_user }
 
-      it 'is not copied' do
-        expect { req }.not_to change(Project, :count)
+      it 'does not call the operation' do
+        allow(Projects::Copy).to receive(:with)
+        req
+        expect(Projects::Copy).not_to have_received(:with)
       end
 
       it 'returns status code 404' do
