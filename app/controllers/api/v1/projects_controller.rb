@@ -96,6 +96,11 @@ class Api::V1::ProjectsController < Api::ApiController
 
     copied_project = Projects::Copy.with(api_user: api_user).run!(project: project)
 
+    # TODO: look at creating a new subject set for the VRO use case
+    # perhaps if this end point has an additionaly param payload
+    # "create_subject_set: 'new-subject-setname'"
+    # we can create a new empty subject set here before serializing the response
+
     created_resource_response(copied_project)
   end
 
