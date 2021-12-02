@@ -853,41 +853,55 @@ describe Api::V1::ProjectsController, type: :controller do
     it_behaves_like "is deactivatable"
   end
 
-  describe "#copy" do
-    let!(:resource) { create(:private_project, owner: authorized_user, configuration: {template: true} ) }
+  describe '#copy', :focus do
+    let(:resource) { create(:private_project, owner: authorized_user, configuration: {template: true} ) }
+    let(:req) do
+      post :copy, { project_id: resource.id }
+    end
+    let(:requesting_user) { authorized_user }
 
-    context "by the owner" do
-      let(:req) do
-        default_request scopes: scopes, user_id: authorized_user.id
-        post :copy, { project_id: resource.id }
+    before do
+      resource
+      default_request scopes: scopes, user_id: requesting_user.id
+    end
+
+    it 'queues a ProjectCopy worker' do
+      allow(ProjectCopyWorker).to receive(:perform_async)
+      req
+      expect(ProjectCopyWorker).to have_received(:perform_async).with(resource.id, authorized_user.id)
+    end
+
+    context 'with an uncopyable project' do
+      before do
+        resource.update(live: true)
       end
 
-      it 'queues a ProjectCopy worker' do
-        expect(ProjectCopyWorker)
-          .to receive(:perform_async)
-          .with(resource.id, authorized_user.id)
+      it 'is not copied' do
+        expect { req }.not_to change(Project, :count)
+      end
+
+      it 'returns status code 405' do
         req
+        expect(response).to have_http_status(:method_not_allowed)
       end
 
-      context "the project is uncopyable" do
-        before { resource.update(live: true) }
-
-        it "is not copied and returns status code 405" do
-          expect{ req }.to_not change{Project.count}
-          expect(response).to have_http_status(:method_not_allowed)
-        end
+      it 'returns a useful error message' do
+        req
+        error_message = "The Project with id #{resource.id} does not support copy functionality, check the configuration json has 'template' attribute and the project is not set as 'live'."
+        expect(response.body).to eq(json_error_message(error_message))
       end
     end
 
-    context "an unauthorized user" do
+    context 'with an unauthorized user' do
       let(:unauthorized_user) { create(:user) }
-      let(:req) do
-        default_request scopes: scopes, user_id: unauthorized_user.id
-        post :copy, { project_id: resource.id }
+      let(:requesting_user) { unauthorized_user }
+
+      it 'is not copied' do
+        expect { req }.not_to change(Project, :count)
       end
 
-      it "is not copied and returns status code 404" do
-        expect{ req }.to_not change{Project.count}
+      it 'returns status code 404' do
+        req
         expect(response).to have_http_status(:not_found)
       end
     end

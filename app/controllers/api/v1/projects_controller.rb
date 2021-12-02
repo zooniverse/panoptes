@@ -88,12 +88,14 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def copy
-    if project.configuration["template"] && !project.live
-      ProjectCopyWorker.perform_async(project.id, api_user.id)
-      head :accepted
-    else
-      head :method_not_allowed
+    can_copy_project = project.configuration.key?('template') && !project.live
+    unless can_copy_project
+      error_message = "The Project with id #{project.id} does not support copy functionality, check the configuration json has 'template' attribute and the project is not set as 'live'."
+      raise(Api::MethodNotAllowed, error_message)
     end
+
+    ProjectCopyWorker.perform_async(project.id, api_user.id)
+    head :accepted
   end
 
   private
