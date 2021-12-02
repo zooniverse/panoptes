@@ -5,7 +5,7 @@ describe Projects::Copy do
   let(:api_user) { ApiUser.new(user) }
   let(:operation) { described_class.with(api_user: api_user) }
   let(:project_to_copy) { create(:project, owner: user) }
-  let(:params) { { project: project_to_copy, user: user } }
+  let(:params) { { project: project_to_copy } }
   let(:copied_project) { operation.run!(params) }
 
   it 'sets up the Project copier instance correctly' do
@@ -29,9 +29,10 @@ describe Projects::Copy do
     }.to raise_error(ActiveInteraction::InvalidInteractionError, 'Project is required')
   end
 
-  it 'raises an error without user param' do
+  it 'raises an error without api_user param' do
+    operation = described_class.with({})
     expect {
-      operation.run!(operation.run!(params.except(:user)))
-    }.to raise_error(ActiveInteraction::InvalidInteractionError, 'User is required')
+      operation.run!(operation.run!(params))
+    }.to raise_error(ActiveInteraction::InvalidInteractionError, "User can't be blank")
   end
 end
