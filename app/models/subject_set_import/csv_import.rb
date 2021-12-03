@@ -1,15 +1,22 @@
 require 'csv'
 
 class SubjectSetImport::CsvImport
-  attr_reader :csv, :count
+  attr_reader :csv
 
   delegate :headers, to: :csv
 
   def initialize(io)
     @csv = CSV.new(io, headers: true)
+  end
+
+  def count
+    return @count if @count
+
     @count = csv.count
     # ensure after counting we rewind the file for all future reads
     csv.rewind
+
+    @count
   end
 
   def each
@@ -49,5 +56,13 @@ class SubjectSetImport::CsvImport
   def mime_type_from_file_extension(url)
     extension = File.extname(url).sub(/\A\./, '')
     Mime::Type.lookup_by_extension(extension).to_s
+  end
+
+  def count_records
+    return @count if @count
+
+    @count = csv.count
+    # ensure after counting we rewind the file for all future reads
+    csv.rewind
   end
 end

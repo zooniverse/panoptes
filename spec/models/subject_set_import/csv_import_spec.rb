@@ -58,6 +58,7 @@ describe SubjectSetImport::CsvImport do
 
   describe '#count' do
     it 'returns the correct number of data rows not including headers' do
+      csv_import.count
       expect(csv_import.count).to eq(2)
     end
 
