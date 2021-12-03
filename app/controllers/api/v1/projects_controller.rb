@@ -91,8 +91,10 @@ class Api::V1::ProjectsController < Api::ApiController
     # check we are copying a template project
     template_project_to_copy = project.configuration.key?('template') && !project.live
     unless template_project_to_copy
-      error_message = "The Project with id #{project.id} does not support copy functionality, check the configuration json has 'template' attribute and the project is not set as 'live'."
-      raise(Api::MethodNotAllowed, error_message)
+      raise(
+        Api::MethodNotAllowed,
+        "Project with id #{project.id} can not be copied, the project must not be 'live' and the configuration json must have the 'template' attribute set"
+      )
     end
 
     operations_params = params.slice(:create_subject_set).merge(project: project)

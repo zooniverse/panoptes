@@ -921,8 +921,10 @@ describe Api::V1::ProjectsController, type: :controller do
 
       it 'returns a useful error message' do
         req
-        error_message = "The Project with id #{resource.id} does not support copy functionality, check the configuration json has 'template' attribute and the project is not set as 'live'."
-        expect(response.body).to eq(json_error_message(error_message))
+        error_message = json_error_message(
+          "Project with id #{resource.id} can not be copied, the project must not be 'live' and the configuration json must have the 'template' attribute set"
+        )
+        expect(response.body).to eq(error_message)
       end
     end
 
