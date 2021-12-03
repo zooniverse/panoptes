@@ -88,18 +88,15 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def copy
-    can_copy_project = project.configuration.key?('template') && !project.live
-    unless can_copy_project
+    # check we are copying a template project
+    template_project_to_copy = project.configuration.key?('template') && !project.live
+    unless template_project_to_copy
       error_message = "The Project with id #{project.id} does not support copy functionality, check the configuration json has 'template' attribute and the project is not set as 'live'."
       raise(Api::MethodNotAllowed, error_message)
     end
 
-    copied_project = Projects::Copy.with(api_user: api_user).run!(project: project)
-
-    # TODO: look at creating a new subject set for the VRO use case
-    # perhaps if this end point has an additionaly param payload
-    # "create_subject_set: 'new-subject-setname'"
-    # we can create a new empty subject set here before serializing the response
+    operations_params = params.slice(:create_subject_set).merge(project: project)
+    copied_project = Projects::Copy.with(api_user: api_user).run!(operations_params)
 
     created_resource_response(copied_project)
   end

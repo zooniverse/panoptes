@@ -857,7 +857,8 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:resource) do
       create(:private_project, owner: authorized_user, configuration: { template: true })
     end
-    let(:req) { post :copy, { project_id: resource.id } }
+    let(:copy_params) { { project_id: resource.id } }
+    let(:req) { post :copy, copy_params }
     let(:requesting_user) { authorized_user }
 
     before do
@@ -881,6 +882,25 @@ describe Api::V1::ProjectsController, type: :controller do
     it 'serializes the created resource in the response body' do
       req
       expect(created_instance('projects')).not_to be_empty
+    end
+
+    it 'has no linked subject sets by default' do
+      req
+      linked_subject_set_ids = created_instance('projects').dig('links', 'subject_sets')
+      expect(linked_subject_set_ids).to be_empty
+    end
+
+    context 'with a create_subject_set param' do
+      let(:new_display_name) { 'Tropical F*** Storm' }
+      let(:copy_params) { { project_id: resource.id, create_subject_set: new_display_name } }
+
+      it 'calls the service operation' do
+        operation_double = Projects::Copy.with(api_user: ApiUser.new(nil))
+        allow(operation_double).to receive(:run!).and_return(resource)
+        allow(Projects::Copy).to receive(:with).and_return(operation_double)
+        req
+        expect(operation_double).to have_received(:run!).with({ project: resource, create_subject_set: new_display_name })
+      end
     end
 
     context 'with an uncopyable project' do
