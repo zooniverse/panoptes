@@ -854,10 +854,10 @@ describe Api::V1::ProjectsController, type: :controller do
   end
 
   describe '#copy' do
-    let(:resource) { create(:private_project, owner: authorized_user, configuration: {template: true} ) }
-    let(:req) do
-      post :copy, { project_id: resource.id }
+    let(:resource) do
+      create(:private_project, owner: authorized_user, configuration: { template: true })
     end
+    let(:req) { post :copy, { project_id: resource.id } }
     let(:requesting_user) { authorized_user }
 
     before do
