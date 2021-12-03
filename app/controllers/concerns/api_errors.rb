@@ -30,4 +30,5 @@ module ApiErrors
       super("Feature has been temporarily disabled")
     end
   end
+  class ImportManifestLimitExceeded < PanoptesApiError; end
 end

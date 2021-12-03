@@ -35,9 +35,9 @@ describe Api::V1::SubjectSetImportsController, type: :controller do
     it_behaves_like "is showable"
   end
 
-  describe "#create" do
+  describe '#create' do
     let(:test_attr) { :source_url }
-    let(:source_url) { "https://example.org/file.csv" }
+    let(:source_url) { 'https://example.org/file.csv' }
     let(:test_attr_value)  { source_url }
     let(:create_params) do
       {
@@ -50,12 +50,49 @@ describe Api::V1::SubjectSetImportsController, type: :controller do
       }
     end
 
-    it_behaves_like "is creatable"
+    before do
+      allow(UrlDownloader).to receive(:stream).and_yield(true)
+      csv_import_double = instance_double(SubjectSetImport::CsvImport, count: 2)
+      allow(SubjectSetImport::CsvImport).to receive(:new).and_return(csv_import_double)
+    end
+
+    it_behaves_like 'is creatable'
 
     it 'enqueues a worker' do
       default_request scopes: scopes, user_id: authorized_user.id
       expect { post :create, create_params }
         .to change(SubjectSetImportWorker.jobs, :size).by(1)
+    end
+
+    it 'sets the manifest_count attribute' do
+      default_request scopes: scopes, user_id: authorized_user.id
+      post :create, create_params
+      import = SubjectSetImport.find(created_instance_id('subject_set_imports'))
+      expect(import.manifest_count).to eq(2)
+    end
+
+    context 'when the manifest is over the limit' do
+      before do
+        allow(ENV).to receive(:fetch).with('SUBJECT_SET_IMPORT_MANIFEST_ROW_LIMIT', 10000).and_return(1)
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'returns a fobidden status code when the manifest is over the limit' do
+        post :create, create_params
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'returns a useful error message when the manifest is over the limit' do
+        post :create, create_params
+        error_message = json_error_message('Manifest row count (2) exceeds the limit (1) and can not be imported')
+        expect(response.body).to eq(error_message)
+      end
+
+      it 'skips validation for admin uploads' do
+        project.owner.update_column(:admin, true)
+        post :create, create_params.merge(admin: true)
+        expect(response).to have_http_status(:created)
+      end
     end
   end
 end
