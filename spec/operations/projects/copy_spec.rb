@@ -37,4 +37,21 @@ describe Projects::Copy do
       operation.run!(operation.run!(params))
     }.to raise_error(ActiveInteraction::InvalidInteractionError, "User can't be blank")
   end
+
+  describe 'adding a new empty subject set to the newly copied project' do
+    let(:new_display_name) { 'Tropical F*** Storm' }
+    let(:params) { { project: project_to_copy, create_subject_set: new_display_name } }
+    let(:linked_subject_sets) { copied_project.subject_sets }
+
+    it 'creates one new subject set' do
+      copied_project
+      expect(linked_subject_sets.length).to eq(1)
+    end
+
+    it 'sets the correct display_name for the new subject set' do
+      copied_project
+      new_subject_set = linked_subject_sets.first
+      expect(new_subject_set.display_name).to eq(new_display_name)
+    end
+  end
 end
