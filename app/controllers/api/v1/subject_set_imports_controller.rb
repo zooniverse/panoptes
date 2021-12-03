@@ -28,6 +28,9 @@ class Api::V1::SubjectSetImportsController < Api::ApiController
 
   private
 
+  # TODO: extract this to an operation that returns the manifest count
+  # and avoid the controller test setup cruft
+  # should have done this the first time :(
   def count_manifest_rows
     manifest_count = UrlDownloader.stream(create_params[:source_url]) do |io|
       csv_import = SubjectSetImport::CsvImport.new(io)
