@@ -34,7 +34,7 @@ describe Projects::Copy do
   it 'raises an error without api_user param' do
     operation = described_class.with({})
     expect {
-      operation.run!(operation.run!(params))
+      operation.run!(params)
     }.to raise_error(ActiveInteraction::InvalidInteractionError, "User can't be blank")
   end
 
