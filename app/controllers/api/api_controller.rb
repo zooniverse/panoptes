@@ -45,6 +45,7 @@ module Api
       ActiveInteraction::InvalidInteractionError,          with: :unprocessable_entity
     rescue_from Kaminari::ZeroPerPageOperation,            with: :kaminari_zero_page
     rescue_from Api::FeatureDisabled,                      with: :service_unavailable
+    rescue_from Api::MethodNotAllowed,                     with: :method_not_allowed
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]
