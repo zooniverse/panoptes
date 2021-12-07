@@ -27,7 +27,7 @@ describe Projects::Copy do
 
   it 'raises an error without project param' do
     expect {
-      operation.run!(operation.run!(params.except(:project)))
+      operation.run!(params.except(:project))
     }.to raise_error(ActiveInteraction::InvalidInteractionError, 'Project is required')
   end
 
