@@ -15,7 +15,10 @@ module SubjectSetImports
       return manifest_count if user_is_admin || manifest_is_under_limit
 
       # raise if the incoming manifest is over the allowed limit
-      raise(LimitExceeded, limit_error_message)
+      raise(
+        LimitExceeded,
+        "Manifest row count (#{manifest_count}) exceeds the limit (#{manifest_row_count_limit}) and can not be imported"
+      )
     end
 
     private
@@ -30,10 +33,6 @@ module SubjectSetImports
 
     def manifest_is_under_limit
       manifest_count <= manifest_row_count_limit
-    end
-
-    def limit_error_message
-      "Manifest row count (#{manifest_count}) exceeds the limit (#{manifest_row_count_limit}) and can not be imported"
     end
   end
 end

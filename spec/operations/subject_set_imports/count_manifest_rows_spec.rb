@@ -35,10 +35,7 @@ describe SubjectSetImports::CountManifestRows do
     it 'raises an error code when the manifest is over the limit' do
       expect {
         operation.run!(operation_params)
-      }.to raise_error(
-        SubjectSetImports::CountManifestRows::LimitExceeded,
-        'Manifest row count (2) exceeds the limit (1) and can not be imported'
-      )
+      }.to raise_error(SubjectSetImports::CountManifestRows::LimitExceeded, 'Manifest row count (2) exceeds the limit (1) and can not be imported')
     end
 
     it 'skips validation for admin uploads' do
