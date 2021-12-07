@@ -18,7 +18,7 @@ module Api
       Subjects::Selector::MissingSubjects,                 with: :not_found
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
     rescue_from Api::LiveProjectChanges,
-                Api::ImportManifestLimitExceeded,          with: :forbidden
+      SubjectSetImports::CountManifestRows::LimitExceeded, with: :forbidden
     rescue_from Api::NotLoggedIn,
       Api::UnauthorizedTokenError,
       Operation::Unauthenticated,                          with: :not_authenticated

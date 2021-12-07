@@ -2,7 +2,7 @@
 
 module SubjectSetImports
   class CountManifestRows < Operation
-    class LimitExceeded < Error; end
+    class LimitExceeded < ApiErrors::PanoptesApiError; end
     string :source_url
     integer :manifest_count, default: -> {
       UrlDownloader.stream(source_url) do |io|
