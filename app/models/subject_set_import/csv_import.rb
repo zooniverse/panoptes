@@ -57,12 +57,4 @@ class SubjectSetImport::CsvImport
     extension = File.extname(url).sub(/\A\./, '')
     Mime::Type.lookup_by_extension(extension).to_s
   end
-
-  def count_records
-    return @count if @count
-
-    @count = csv.count
-    # ensure after counting we rewind the file for all future reads
-    csv.rewind
-  end
 end
