@@ -2,7 +2,7 @@
 
 module SubjectSetImports
   class CountManifestRows < Operation
-    class ImportManifestLimitExceeded < Error; end
+    class LimitExceeded < Error; end
     string :source_url
     integer :manifest_count, default: -> {
       UrlDownloader.stream(source_url) do |io|
@@ -15,7 +15,7 @@ module SubjectSetImports
       return manifest_count if user_is_admin || manifest_is_under_limit
 
       # raise if the incoming manifest is over the allowed limit
-      raise(ImportManifestLimitExceeded, limit_error_message)
+      raise(LimitExceeded, limit_error_message)
     end
 
     private
