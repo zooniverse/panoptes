@@ -87,7 +87,7 @@ describe Api::V1::SubjectSetImportsController, type: :controller do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
-      it 'returns a fobidden status code when the manifest is over the limit' do
+      it 'returns a forbidden status code when the manifest is over the limit' do
         post :create, create_params
         expect(response).to have_http_status(:forbidden)
       end
