@@ -29,11 +29,6 @@ describe SubjectSetImport, type: :model do
     expect(subject_set.subjects.count).to eq(2)
   end
 
-  it 'stores the count of the expected total subjects' do
-    subject_set_import.import!
-    expect(subject_set_import.reload.manifest_count).to eq(2)
-  end
-
   it 'stores the count of imported subjects' do
     subject_set_import.import!
     expect(subject_set_import.imported_count).to eq(2)

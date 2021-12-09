@@ -8,6 +8,11 @@ class Api::V1::SubjectSetImportsController < Api::ApiController
   schema_type :json_schema
 
   def create
+    operation = SubjectSetImports::CountManifestRows.with(api_user: api_user)
+    # add the count of data rows to store on the SubjectSetImport resource
+    # as this count is used for progress reporting while the import runs
+    create_params['manifest_count'] = operation.run!(source_url: create_params[:source_url])
+
     super do |subject_set_import|
       SubjectSetImportWorker.perform_async(subject_set_import.id)
     end

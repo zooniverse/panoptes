@@ -10,9 +10,6 @@ class SubjectSetImport < ActiveRecord::Base
     UrlDownloader.stream(source_url) do |io|
       csv_import = SubjectSetImport::CsvImport.new(io)
 
-      # store the number of data lines in our manifest for progress reporting
-      update_column(:manifest_count, csv_import.count)
-
       imported_row_count = 0
 
       csv_import.each do |external_id, attributes|
