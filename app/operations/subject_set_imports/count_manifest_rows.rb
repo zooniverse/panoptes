@@ -10,6 +10,9 @@ module SubjectSetImports
         csv_import.count
       end
     }
+    integer :manifest_row_count_limit, default: -> {
+      ENV.fetch('SUBJECT_SET_IMPORT_MANIFEST_ROW_LIMIT', 10000).to_i
+    }
 
     def execute
       return manifest_count if user_is_admin || manifest_is_under_limit
@@ -22,10 +25,6 @@ module SubjectSetImports
     end
 
     private
-
-    def manifest_row_count_limit
-      ENV.fetch('SUBJECT_SET_IMPORT_MANIFEST_ROW_LIMIT', 10000)
-    end
 
     def user_is_admin
       api_user.is_admin?

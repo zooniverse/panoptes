@@ -29,7 +29,7 @@ describe SubjectSetImports::CountManifestRows do
 
   context 'when the manifest is over the limit' do
     before do
-      allow(ENV).to receive(:fetch).with('SUBJECT_SET_IMPORT_MANIFEST_ROW_LIMIT', 10000).and_return(1)
+      allow(ENV).to receive(:fetch).with('SUBJECT_SET_IMPORT_MANIFEST_ROW_LIMIT', 10000).and_return('1')
     end
 
     it 'raises an error code when the manifest is over the limit' do
