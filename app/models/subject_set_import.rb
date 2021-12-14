@@ -39,6 +39,7 @@ class SubjectSetImport < ActiveRecord::Base
   private
 
   def save_imported_row_count(imported_row_count)
-    update_column(:imported_count, imported_row_count)
+    self.imported_count = imported_row_count
+    save! # ensure we touch updated_at for busting any serializer cache
   end
 end

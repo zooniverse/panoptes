@@ -35,7 +35,7 @@ describe SubjectSetImport, type: :model do
   end
 
   # imported_count / manifest_count gives us the progress measure
-  it 'correctly records the progress status during import' do
+  it 'correctly records the progress status during import'do
     allow(subject_set_import).to receive(:save_imported_row_count)
     subject_set_import.import!(2)
     # twice: once when the progress is mod 2 == 0 and once at the end
