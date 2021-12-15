@@ -4,7 +4,8 @@ class SubjectSetImport < ActiveRecord::Base
   belongs_to :subject_set
   belongs_to :user
 
-  def import!(update_progress_every_rows=500)
+  def import!(manifest_row_count)
+    update_progress_every_rows = ProgressUpdateCadence.calculate(manifest_row_count)
     processor = SubjectSetImport::Processor.new(subject_set, user)
 
     UrlDownloader.stream(source_url) do |io|
@@ -41,5 +42,30 @@ class SubjectSetImport < ActiveRecord::Base
   def save_imported_row_count(imported_row_count)
     self.imported_count = imported_row_count
     save! # ensure we touch updated_at for busting any serializer cache
+  end
+
+  class ProgressUpdateCadence
+    def self.calculate(manifest_row_count)
+      return 0 if manifest_row_count.zero?
+
+      # manifest row count can be 10000 or more (see ENV['SUBJECT_SET_IMPORT_MANIFEST_ROW_LIMIT'])
+      # thus we want to offset the value being used to calculate the
+      # order of magnitude to fit our desired ranges
+      manifest_row_count -= 1 if manifest_row_count > 1
+
+      order_of_magnitude = Math.log10(manifest_row_count).floor
+      case order_of_magnitude
+      when 0
+        5   # num rows 1 to 10 - update up to two times
+      when 1
+        25  # num rows 11 to 100 - update up to 4 times
+      when 2
+        50  # num rows 101 to 1000 - update up to 20 times
+      when 3
+        250 # num rows 1001 to 10000 - update up to 40 times
+      else
+        500 # fallback for any really large imports, avoid lots of updates
+      end
+    end
   end
 end

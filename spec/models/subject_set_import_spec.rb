@@ -37,6 +37,7 @@ describe SubjectSetImport, type: :model do
   # imported_count / manifest_count gives us the progress measure
   it 'correctly records the progress status during import' do
     allow(subject_set_import).to receive(:save_imported_row_count)
+    allow(SubjectSetImport::ProgressUpdateCadence).to receive(:calculate).and_return(2)
     subject_set_import.import!(2)
     # twice: once when the progress is mod 2 == 0 and once at the end
     expect(subject_set_import).to have_received(:save_imported_row_count).twice
@@ -61,6 +62,42 @@ describe SubjectSetImport, type: :model do
     it 'stores the failed UUIDs' do
       subject_set_import.import!
       expect(subject_set_import.failed_uuids).to match_array(%w[1 2])
+    end
+  end
+
+  describe SubjectSetImport::ProgressUpdateCadence do
+    describe '.calculate' do
+      it 'returns the correct update cadence for 0 rows' do
+        expect(described_class.calculate(0)).to eq(0)
+      end
+
+      it 'returns the correct update cadence for 1 row' do
+        expect(described_class.calculate(1)).to eq(5)
+      end
+
+      it 'returns the correct update cadence for 10 rows' do
+        expect(described_class.calculate(10)).to eq(5)
+      end
+
+      it 'returns the correct update cadence for 100 rows' do
+        expect(described_class.calculate(100)).to eq(25)
+      end
+
+      it 'returns the correct update cadence for 1000 rows' do
+        expect(described_class.calculate(1000)).to eq(50)
+      end
+
+      it 'returns the correct update cadence for 10000 rows' do
+        expect(described_class.calculate(10000)).to eq(250)
+      end
+
+      it 'returns the correct update cadence for above 10000 rows' do
+        expect(described_class.calculate(10001)).to eq(500)
+      end
+
+      it 'returns the correct update cadence for large num of rows' do
+        expect(described_class.calculate(100000)).to eq(500)
+      end
     end
   end
 end
