@@ -14,7 +14,7 @@ class Api::V1::SubjectSetImportsController < Api::ApiController
     create_params['manifest_count'] = operation.run!(source_url: create_params[:source_url])
 
     super do |subject_set_import|
-      SubjectSetImportWorker.perform_async(subject_set_import.id)
+      SubjectSetImportWorker.perform_async(subject_set_import.id, create_params['manifest_count'])
     end
   end
 
