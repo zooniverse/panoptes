@@ -16,6 +16,7 @@ RSpec.describe SubjectSetImportWorker do
     let(:count_worker_double) do
       instance_double(SubjectSetSubjectCounterWorker, perform: true)
     end
+    let(:manifest_row_count) { 2 }
 
     before do
       allow(SubjectSetImport).to receive(:find).and_return(import_double)
@@ -23,12 +24,12 @@ RSpec.describe SubjectSetImportWorker do
     end
 
     it 'runs the subjet set import code' do
-      described_class.new.perform(import_double.id)
-      expect(import_double).to have_received(:import!)
+      described_class.new.perform(import_double.id, manifest_row_count)
+      expect(import_double).to have_received(:import!).with(manifest_row_count)
     end
 
     it 'calls the subject set counter worker inline' do
-      described_class.new.perform(import_double.id)
+      described_class.new.perform(import_double.id, manifest_row_count)
       expect(count_worker_double).to have_received(:perform).with(import_double.subject_set_id)
     end
   end
