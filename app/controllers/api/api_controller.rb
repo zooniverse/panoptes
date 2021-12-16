@@ -17,7 +17,8 @@ module Api
       Subjects::Selector::MissingSubjectSet,
       Subjects::Selector::MissingSubjects,                 with: :not_found
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
-    rescue_from Api::LiveProjectChanges,                   with: :forbidden
+    rescue_from Api::LiveProjectChanges,
+      SubjectSetImports::CountManifestRows::LimitExceeded, with: :forbidden
     rescue_from Api::NotLoggedIn,
       Api::UnauthorizedTokenError,
       Operation::Unauthenticated,                          with: :not_authenticated
@@ -45,6 +46,7 @@ module Api
       ActiveInteraction::InvalidInteractionError,          with: :unprocessable_entity
     rescue_from Kaminari::ZeroPerPageOperation,            with: :kaminari_zero_page
     rescue_from Api::FeatureDisabled,                      with: :service_unavailable
+    rescue_from Api::MethodNotAllowed,                     with: :method_not_allowed
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]
