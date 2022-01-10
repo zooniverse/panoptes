@@ -46,5 +46,27 @@ RSpec.describe PublishClassificationWorker do
         worker.perform(classification.id)
       end
     end
+
+    context 'when a classification payload is greater than 1MB limit' do
+      let(:publish_error) do
+        Aws::Kinesis::Errors::ValidationException.new(
+          Seahorse::Client::RequestContext,
+          "1 validation error detected: Value at 'data' failed to satisfy constraint: Member must have length less than or equal to 1048576"
+        )
+      end
+
+      before do
+        allow(ZooStream).to receive(:publish).and_raise(publish_error)
+      end
+
+      it 'raises an error if the project id is not in the ignore list' do
+        expect { worker.perform(classification.id) }.to raise_error(Aws::Kinesis::Errors::ValidationException)
+      end
+
+      it 'does not raise an error if project id is in the ignore list' do
+        allow(ENV).to receive(:fetch).with('KINESIS_PAYLOAD_SIZE_ERROR_PROJECT_ID_INGORE_LIST', '').and_return(classification.project_id.to_s)
+        expect { worker.perform(classification.id) }.not_to raise_error
+      end
+    end
   end
 end
