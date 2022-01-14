@@ -3,7 +3,7 @@ class SubjectSetImportSerializer
   include CachedSerializer
   using Refinements::RangeClamping
 
-  attributes :id, :href, :created_at, :updated_at, :source_url, :imported_count, :manifest_count, :progress
+  attributes :id, :href, :created_at, :updated_at, :source_url, :imported_count, :manifest_count, :failed_count, :progress
   can_include :subject_set, :user
 
   can_filter_by :subject_set, :user
