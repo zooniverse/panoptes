@@ -12,8 +12,6 @@ module SubjectSetImports
       ENV.fetch('SUBJECT_SET_IMPORT_MANIFEST_ROW_LIMIT', 10000).to_i
     }
 
-    attr_reader :manifest
-
     def execute
       return manifest_count if user_is_admin || manifest_is_under_limit
 
@@ -36,10 +34,10 @@ module SubjectSetImports
 
     def count_manifest_data_rows
       UrlDownloader.stream(source_url) do |io|
-        csv_import = SubjectSetImport::CsvImport.new(manifest)
+        csv_import = SubjectSetImport::CsvImport.new(io)
         csv_import.count
       end
-    rescue UrlDownloader::Failed => e
+    rescue UrlDownloader::Failed
       raise ManifestError, "Failed to download manifest: #{source_url}"
     end
   end
