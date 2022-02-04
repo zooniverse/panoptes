@@ -45,4 +45,26 @@ describe SubjectSetImports::CountManifestRows do
       }.not_to raise_error
     end
   end
+
+  context 'when the manifest is not publically available' do
+    let(:error_message) { '404 - Failed to download URL: $URL' }
+    let(:operation_error_message) { "Failed to download manifest: #{source_url}" }
+
+    before do
+      allow(UrlDownloader).to receive(:stream).and_raise(UrlDownloader::Failed, error_message)
+    end
+
+    it 'raises a relevant error' do
+      expect {
+        operation.run!(operation_params)
+      }.to raise_error(SubjectSetImports::CountManifestRows::ManifestError, operation_error_message)
+    end
+
+    it 'raises an error on admin uploads' do
+      allow(api_user).to receive(:is_admin?).and_return(true)
+      expect {
+        operation.run!(operation_params)
+      }.to raise_error(SubjectSetImports::CountManifestRows::ManifestError, operation_error_message)
+    end
+  end
 end

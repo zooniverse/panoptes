@@ -65,6 +65,10 @@ RSpec.describe UserSeenSubject, :type => :model do
           user_seen_subject.reload
           expect(user_seen_subject.subject_ids).to include(subject.id)
         end
+
+        it 'touches the updated_at timestamp' do
+          expect { described_class.add_seen_subjects_for_user(params) }.to change { user_seen_subject.reload.updated_at }
+        end
       end
     end
   end

@@ -43,6 +43,7 @@ module Api
       RestPack::Serializer::InvalidInclude,
       ActiveRecord::RecordNotUnique,
       Operation::Error,
+      SubjectSetImports::CountManifestRows::ManifestError,
       ActiveInteraction::InvalidInteractionError,          with: :unprocessable_entity
     rescue_from Kaminari::ZeroPerPageOperation,            with: :kaminari_zero_page
     rescue_from Api::FeatureDisabled,                      with: :service_unavailable

@@ -58,6 +58,21 @@ describe Api::V1::SubjectSetImportsController, type: :controller do
       allow(SubjectSetImports::CountManifestRows).to receive(:with).and_return(operation_double)
     end
 
+    context 'when the manifest is not downloadable' do
+      let(:error_message) { "Failed to download manifest: #{source_url}" }
+
+      before do
+        allow(operation_double).to receive(:run!).and_raise(SubjectSetImports::CountManifestRows::ManifestError, error_message)
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'returns a useful error message' do
+        post :create, create_params
+        returned_error_message = json_error_message(error_message)
+        expect(response.body).to eq(returned_error_message)
+      end
+    end
+
     context 'when the manifest is under the limit' do
       before do
         allow(operation_double).to receive(:run!).and_return(data_row_count)

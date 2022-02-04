@@ -64,7 +64,7 @@ spec:
               exec:
                 command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
         - name: panoptes-staging-nginx
-          image: zooniverse/nginx:1.19.0
+          image: zooniverse/nginx
           resources:
             requests:
               memory: "100Mi"

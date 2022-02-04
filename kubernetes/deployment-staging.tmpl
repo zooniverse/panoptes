@@ -85,6 +85,7 @@ data:
   REDIRECTS_BASE: https://master.pfe-preview.zooniverse.org
   REDIRECTS_PASSWORD_RESET: /#/reset-password
   REDIRECTS_UNSUBSCRIBE: /#/unsubscribe
+  KINESIS_PAYLOAD_SIZE_ERROR_PROJECT_ID_INGORE_LIST: '1873'
   MAILER_ADDRESS: email-smtp.us-east-1.amazonaws.com
   MAILER_DOMAIN: zooniverse.org
   MEMCACHE_SERVERS: 'panoptes-staging-memcached:11211'
@@ -185,7 +186,7 @@ spec:
               exec:
                 command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
         - name: panoptes-staging-nginx
-          image: zooniverse/nginx:1.19.0
+          image: zooniverse/nginx
           resources:
             requests:
               memory: "25Mi"
@@ -541,6 +542,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
     nginx.ingress.kubernetes.io/set-real-ip-from: "10.0.0.0/8"
 spec:
   tls:
