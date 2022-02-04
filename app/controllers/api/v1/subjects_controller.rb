@@ -104,11 +104,6 @@ class Api::V1::SubjectsController < Api::ApiController
     selector_param_keys = %i[workflow_id subject_set_id num_rows num_columns http_cache admin]
     selector_params = params.permit(*selector_param_keys)
 
-    # Sanity check -- use a testing feature flag
-    # against an allow listed workflow id env var
-    allowed_workflow_ids = ENV.fetch('SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST').split(',')
-    raise ApiErrors::FeatureDisabled unless allowed_workflow_ids.include?(selector_params[:workflow_id])
-
     group_selection_result = SubjectGroups::Selection.run!(
       num_rows: selector_params.delete(:num_rows),
       num_columns: selector_params.delete(:num_columns),

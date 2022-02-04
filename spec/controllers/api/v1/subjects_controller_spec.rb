@@ -538,7 +538,6 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].enable }
 
     before do
-      ENV['SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST'] = workflow.id.to_s
       ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
       sms
       flipper_feature
@@ -598,18 +597,6 @@ describe Api::V1::SubjectsController, type: :controller do
 
       it 'responds with 200' do
         expect(response.status).to eq(200)
-      end
-    end
-
-    context 'with a workflow that is not allow listed for this end point' do
-      let(:request_params) { { workflow_id: (workflow.id - 1).to_s, num_columns: 1, num_rows: 1 } }
-
-      it 'errors with 503' do
-        expect(response.status).to eq(503)
-      end
-
-      it 'has a useful error message' do
-        expect(response.body).to include('Feature has been temporarily disabled')
       end
     end
 
