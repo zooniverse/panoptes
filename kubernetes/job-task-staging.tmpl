@@ -6,9 +6,9 @@ spec:
   template:
     spec:
       containers:
-      - name: panoptes-migrate-db-staging
-        image: zooniverse/panoptes:__IMAGE_TAG__
-        command: ["/rails_app/migrate.sh"]
+      - name: panoptes-rake-task-staging
+        image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
+        command: ["bundle",  "exec", "rake", __RAKE_TASK_NAME__]
         envFrom:
         - secretRef:
             name: panoptes-common-env-vars
