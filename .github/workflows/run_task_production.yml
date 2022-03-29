@@ -1,0 +1,34 @@
+name: Run Production Task
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: Task to run
+        required: true
+        default: 'routes'
+
+jobs:
+  run_production_task:
+    name: Run Production Task
+    uses: zooniverse/ci-cd/.github/workflows/run_task.yaml@main
+    with:
+      app_name: panoptes
+      task_name: ${{ github.event.inputs.task }}
+      environment: production
+    secrets:
+      creds: ${{ secrets.AZURE_AKS }}
+
+  slack_notification:
+    name: Slack notification
+    uses: zooniverse/ci-cd/.github/workflows/slack_notification.yaml@main
+    needs: run_production_task
+    if: always()
+    with:
+      commit_id: ${{ github.sha }}
+      job_name: Run Production Task / run_production_task
+      status: ${{ needs.run_production_task.result }}
+      title: "Panoptes Production task complete"
+      title_link: "https://github.com/zooniverse/panoptes/actions/${{ github.run_id }}"
+    secrets:
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

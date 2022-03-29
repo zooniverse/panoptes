@@ -1,0 +1,33 @@
+name: Deploy to Production
+
+on:
+  push:
+    tags:
+      - production-release
+  workflow_dispatch:
+
+jobs:
+  deploy_production:
+    name: Deploy to Production
+    uses: zooniverse/ci-cd/.github/workflows/deploy_app.yaml@main
+    with:
+      app_name: panoptes
+      repo_name: panoptes
+      commit_id: ${{ github.sha }}
+      environment: production
+    secrets:
+      creds: ${{ secrets.AZURE_AKS }}
+
+  slack_notification:
+    name: Slack notification
+    uses: zooniverse/ci-cd/.github/workflows/slack_notification.yaml@main
+    needs: deploy_production
+    if: always()
+    with:
+      commit_id: ${{ github.sha }}
+      job_name: Deploy to Production / deploy_production
+      status: ${{ needs.deploy_production.result }}
+      title: "Panoptes production deploy complete"
+      title_link: "https://panoptes.zooniverse.org"
+    secrets:
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
