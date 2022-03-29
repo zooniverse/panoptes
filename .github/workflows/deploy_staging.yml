@@ -1,0 +1,53 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build_and_push_image:
+    name: Build and Push Image
+    uses: zooniverse/ci-cd/.github/workflows/build_and_push_image.yaml@main
+    with:
+      repo_name: panoptes
+      commit_id: ${{ github.sha }}
+      latest: true
+
+  db_migration_staging:
+    name: Staging DB Migration
+    uses: zooniverse/ci-cd/.github/workflows/db_migration.yaml@main
+    needs: build_and_push_image
+    with:
+      app_name: panoptes
+      environment: staging
+      commit_id: ${{ github.sha }}
+    secrets:
+      creds: ${{ secrets.AZURE_AKS }}
+
+  deploy_staging:
+    name: Deploy to Staging
+    uses: zooniverse/ci-cd/.github/workflows/deploy_app.yaml@main
+    needs: [build_and_push_image, db_migration_staging]
+    with:
+      app_name: panoptes
+      repo_name: panoptes
+      commit_id: ${{ github.sha }}
+      environment: staging
+    secrets:
+      creds: ${{ secrets.AZURE_AKS }}
+
+  slack_notification:
+    name: Slack notification
+    uses: zooniverse/ci-cd/.github/workflows/slack_notification.yaml@main
+    needs: deploy_staging
+    if: always()
+    with:
+      commit_id: ${{ github.sha }}
+      job_name: Build and Push Image / build_and_push_image
+      status: ${{ needs.deploy_staging.result }}
+      title: "Panoptes Staging deploy & migration complete"
+      title_link: "https://panoptes-staging.zooniverse.org"
+    secrets:
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
