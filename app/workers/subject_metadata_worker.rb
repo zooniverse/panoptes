@@ -29,12 +29,13 @@ class SubjectMetadataWorker
 
   def run_ar5_update
     update_sms_priority_sql =
-      <<-SQL
+      <<-SQL.squish
         UPDATE set_member_subjects
-        SET    priority = CAST(subjects.metadata->>'#priority' AS NUMERIC)
+        SET    priority = CAST(value AS NUMERIC)
         FROM   subjects
+        cross join jsonb_each_text(metadata)
         WHERE  subjects.id = set_member_subjects.subject_id
-        AND    subjects.metadata ? '#priority'
+        AND    lower(key) = '#priority'
         AND    set_member_subjects.id IN $1
       SQL
     ActiveRecord::Base.connection.exec_update(
@@ -46,12 +47,13 @@ class SubjectMetadataWorker
 
   def run_ar4_update
     update_sms_priority_sql =
-      <<-SQL
+      <<-SQL.squish
         UPDATE set_member_subjects
-        SET    priority = CAST(subjects.metadata->>'#priority' AS NUMERIC)
+        SET    priority = CAST(value AS NUMERIC)
         FROM   subjects
+        cross join jsonb_each_text(metadata)
         WHERE  subjects.id = set_member_subjects.subject_id
-        AND    subjects.metadata ? '#priority'
+        AND    lower(key) = '#priority'
         AND    set_member_subjects.id IN (:sms_ids)
       SQL
     # handle incorrect bind params for non preparted statements

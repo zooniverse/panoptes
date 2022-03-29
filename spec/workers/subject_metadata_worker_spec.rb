@@ -8,7 +8,7 @@ RSpec.describe SubjectMetadataWorker do
     create(:subject, project: project, uploader: project.owner, metadata: {'#priority'=>1/3.0})
   end
   let(:subject_two) do
-    create(:subject, project: project, uploader: project.owner, metadata: {'#priority'=>'2'})
+    create(:subject, project: project, uploader: project.owner, metadata: {'#PrioRITy'=>'2'})
   end
   let(:subject_set) do
     create(
@@ -39,6 +39,7 @@ RSpec.describe SubjectMetadataWorker do
 
     # TODO: Rails 5 combine the tests to one
     # to test behaviour not AR calling interface
+
     it 'calls the correct RAILS 5 AR methods' do
       stub_const("ActiveRecord::VERSION::MAJOR", 5)
       expect(ActiveRecord::Base.connection)
