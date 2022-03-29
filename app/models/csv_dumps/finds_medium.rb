@@ -47,7 +47,7 @@ module CsvDumps
 
     def content_disposition
       case resource
-      when Workflow
+      when Workflow, SubjectSet
         name = resource.display_name.parameterize
       when Project
         name = resource.slug.split("/")[1]
