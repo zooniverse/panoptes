@@ -5,10 +5,10 @@ RSpec.describe SubjectMetadataWorker do
   let(:project) { create :project_with_workflow, owner: user }
   let(:workflow) { project.workflows.first }
   let(:subject_one) do
-    create(:subject, project: project, uploader: project.owner, metadata: {'#priority'=>1/3.0})
+    create(:subject, project: project, uploader: project.owner, metadata: { '#priority' => 1 / 3.0 })
   end
   let(:subject_two) do
-    create(:subject, project: project, uploader: project.owner, metadata: {'#PrioRITy'=>'2'})
+    create(:subject, project: project, uploader: project.owner, metadata: { '#PrioRITy' => '2' })
   end
   let(:subject_set) do
     create(
