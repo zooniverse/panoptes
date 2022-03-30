@@ -1,6 +1,8 @@
 class Api::V1::SubjectsController < Api::ApiController
   include JsonApiController::PunditPolicy
 
+  RESERVED_METADATA_KEYS = ['#priority'].freeze
+
   require_authentication :update, :create, :destroy, :version, :versions,
     scopes: [:subject]
   resource_actions :show, :index, :create, :update, :deactivate
@@ -163,6 +165,7 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
+    downcase_reserved_metadata_keys(create_params)
     locations = create_params.delete(:locations)
     subject = super(create_params) do |object, linked|
       object[:uploader] = api_user.user
@@ -172,6 +175,7 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def build_update_hash(update_params, resource)
+    downcase_reserved_metadata_keys(update_params)
     locations = update_params.delete(:locations)
     new_locations = add_locations(locations, resource)
     subject.save!
@@ -193,6 +197,16 @@ class Api::V1::SubjectsController < Api::ApiController
       { url_format: :put }
     else
       { url_format: :get }
+    end
+  end
+
+  def downcase_reserved_metadata_keys(params)
+    params[:metadata].transform_keys! do |key|
+      if RESERVED_METADATA_KEYS.include?(key.downcase)
+        key.downcase
+      else
+        key
+      end
     end
   end
 end

@@ -697,20 +697,22 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
       {
-       "interesting_data" => "Tested Collection",
-       "an_interesting_array" => ["1", "2", "asdf", "99.99"]
+        '#priority' => '1',
+        'interesting_data' => 'Tested Collection',
+        'an_interesting_array' => %w[1 2 asdf 99.99]
       }
     end
     let(:locations) { [ "image/jpeg" ] }
     let(:update_params) do
       {
-       subjects: {
-                  metadata: {
-                             interesting_data: "Tested Collection",
-                             an_interesting_array: ["1", "2", "asdf", "99.99"]
-                            },
-                  locations: locations
-                 }
+        subjects: {
+          metadata: {
+            '#PRIOritY' => '1',
+            interesting_data: 'Tested Collection',
+            an_interesting_array: %w[1 2 asdf 99.99]
+          },
+          locations: locations
+        }
       }
     end
 
@@ -758,18 +760,16 @@ describe Api::V1::SubjectsController, type: :controller do
   describe "#create" do
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
-      { "cool_factor" => "11" }
+      { 'cool_factor' => '11', '#priority' => '1' }
     end
 
     let(:create_params) do
       {
-       subjects: {
-                  metadata: { cool_factor: "11" },
-                  locations: ["image/jpeg", "image/jpeg", "image/png"],
-                  links: {
-                          project: project.id
-                         }
-                 }
+        subjects: {
+          metadata: { cool_factor: '11', '#PRIOritY' => '1' },
+          locations: ['image/jpeg', 'image/jpeg', 'image/png'],
+          links: { project: project.id }
+        }
       }
     end
 
@@ -802,6 +802,13 @@ describe Api::V1::SubjectsController, type: :controller do
       post :create, create_params
       locations = json_response[api_resource_name][0]["locations"].flat_map(&:keys)
       expect(locations).to eq(["audio/mpeg", "audio/mpeg"])
+    end
+
+    it "downcases the reserved metadata keyword fields" do
+      default_request user_id: authorized_user.id, scopes: scopes
+      post :create, create_params
+      metadata = json_response[api_resource_name][0]['metadata'].keys
+      expect(metadata).to match_array(['cool_factor', '#priority'])
     end
 
     it 'should create externally linked media resources' do
