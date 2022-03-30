@@ -804,7 +804,7 @@ describe Api::V1::SubjectsController, type: :controller do
       expect(locations).to eq(["audio/mpeg", "audio/mpeg"])
     end
 
-    it "downcases the reserved metadata keyword fields" do
+    it 'downcases the reserved metadata keyword fields' do
       default_request user_id: authorized_user.id, scopes: scopes
       post :create, create_params
       metadata = json_response[api_resource_name][0]['metadata'].keys
