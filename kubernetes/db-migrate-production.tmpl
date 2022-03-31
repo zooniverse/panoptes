@@ -6,15 +6,15 @@ spec:
   template:
     spec:
       containers:
-      - name: panoptes-rake-task-staging
+      - name: panoptes-migrate-db-production
         image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
-        command: ["bundle",  "exec", "rake", __RAKE_TASK_NAME__]
+        command: ["/rails_app/migrate.sh"]
         envFrom:
         - secretRef:
             name: panoptes-common-env-vars
         - secretRef:
-            name: panoptes-staging-env-vars
+            name: panoptes-production-env-vars
         - configMapRef:
-            name: panoptes-staging-shared
+            name: panoptes-production-shared
       restartPolicy: Never
   backoffLimit: 1
