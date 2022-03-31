@@ -139,7 +139,7 @@ spec:
     spec:
       containers:
         - name: panoptes-production-app
-          image: zooniverse/panoptes:__IMAGE_TAG__
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
               memory: "1000Mi"
@@ -306,7 +306,7 @@ spec:
     spec:
       containers:
         - name: panoptes-production-sidekiq
-          image: zooniverse/panoptes:__IMAGE_TAG__
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
               memory: "2000Mi"
@@ -367,7 +367,7 @@ spec:
     spec:
       containers:
         - name: panoptes-production-sidekiq
-          image: zooniverse/panoptes:__IMAGE_TAG__
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
               memory: "500Mi"
