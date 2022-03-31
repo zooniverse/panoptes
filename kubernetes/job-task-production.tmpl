@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: panoptes-rake-task-production
-        image: zooniverse/panoptes:__IMAGE_TAG__
+        image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
         command: ["bundle",  "exec", "rake", __RAKE_TASK_NAME__]
         envFrom:
         - secretRef:
