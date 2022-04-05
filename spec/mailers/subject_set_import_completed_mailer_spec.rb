@@ -19,7 +19,7 @@ RSpec.describe SubjectSetImportCompletedMailer, type: :mailer do
     end
 
     it 'includes the subject set name' do
-      expect(mail.body.encoded).to include("subject set #{subject_set.display_name}")
+      expect(mail.body.encoded).to include("subject set named: '#{subject_set.display_name}'")
     end
 
     it 'includes the subject sets lab link' do
@@ -42,7 +42,7 @@ RSpec.describe SubjectSetImportCompletedMailer, type: :mailer do
       end
 
       it 'reports the failures statement' do
-        expect(mail.body.encoded).to include('There were some errors when importing your manifest to the the subject set')
+        expect(mail.body.encoded).to include('There were some errors when importing your manifest')
       end
     end
   end
