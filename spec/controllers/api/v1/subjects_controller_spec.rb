@@ -723,6 +723,14 @@ describe Api::V1::SubjectsController, type: :controller do
         default_request user_id: authorized_user.id, scopes: scopes
       end
 
+      it 'updates without errors without metadata params' do
+        no_metadata_update_params = {
+          id: resource.id,
+          subjects: { locations: locations }
+        }
+        expect { put :update, no_metadata_update_params }.not_to raise_error
+      end
+
       describe "using external urls" do
         let(:external_locs) do
           [

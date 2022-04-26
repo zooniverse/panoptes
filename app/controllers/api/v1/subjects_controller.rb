@@ -201,6 +201,8 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def downcase_reserved_metadata_keys(params)
+    return unless params.key?(:metadata)
+
     params[:metadata].transform_keys! do |key|
       if RESERVED_METADATA_KEYS.include?(key.downcase)
         key.downcase
