@@ -483,6 +483,7 @@ DEPENDENCIES
   azure-storage
   azure-storage-blob
   azure-storage-common
+  celluloid (~> 0.17.3)
   dalli
   database_cleaner (~> 1.99.0)
   deep_cloneable (~> 3.2.0)
