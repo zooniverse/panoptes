@@ -39,6 +39,8 @@ jobs:
             ruby: 2.6
           - gemfile: Gemfile.next
             ruby: 2.5
+          - gemfile: Gemfile.next
+            experimental: true
     steps:
       - uses: actions/checkout@v2
       - name: Check specs
