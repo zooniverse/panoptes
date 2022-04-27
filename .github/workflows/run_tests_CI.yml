@@ -20,27 +20,25 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: true
     strategy:
       matrix:
-        gemfile: [ Gemfile, Gemfile.next ]
-        ruby: [2.5, 2.6]
+        gemfile:
+          - Gemfile
+          - Gemfile.next
+        ruby:
+          - 2.5
+          - 2.6
         spec-commands:
           - 'spec/controllers/api/v1/[a-m]*.rb spec/counters spec/operations spec/serializers spec/workers'
           - 'spec/controllers/api/v1/[n-s]*.rb'
           - 'spec/controllers/api/v1/[t-z]*.rb spec/controllers/**.rb spec/lib spec/requests'
           - 'spec/controllers/api/*.rb spec/mailers spec/middleware spec/models spec/policies spec/routes spec/services'
-        experimental: [false]
-        include:
-          - gemfile: Gemfile.next
-            experimental: true
         exclude:
           - gemfile: Gemfile
             ruby: 2.6
           - gemfile: Gemfile.next
             ruby: 2.5
-          - gemfile: Gemfile.next
-            experimental: true
     env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
       BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}
     steps:
