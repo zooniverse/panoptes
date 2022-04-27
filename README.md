@@ -97,7 +97,7 @@ https://www.youtube.com/watch?v=6aCfc0DkSFo
 #### Using docker-compose for env setup
 
 `docker-compose -f docker-compose-rails-5.yml build`
-`docker-compose -f docker-compose-rails-5.yml run --rm -e RAILS_ENV=test panoptes bash`
+`docker-compose -f docker-compose-rails-5.yml run --service-ports --rm panoptes bash`
 
 #### Install the gems via next
 
@@ -105,20 +105,30 @@ https://www.youtube.com/watch?v=6aCfc0DkSFo
 
 ### check for incompatible gems for target rails verion
 
-`bundle exec bundle_report compatibility --rails-version=5.0.7`
+`next bundle exec bundle_report compatibility --rails-version=5.0.7`
+
+### check for outdated gems
+
+`next bundle exec bundle_report outdated`
 
 #### Run the specs
 
 It's recommeded to enable spring for testing env
 `unset DISABLE_SPRING`
 run all specs for rails 5 gemfile
-`BUNDLE_GEMFILE=Gemfile.next bundle exec rspec`
+`next bundle exec rspec`
 
 or fail fast
-`BUNDLE_GEMFILE=Gemfile.next bundle exec rspec --fail-fast`
+`next bundle exec rspec --fail-fast`
 
 or with gaurd (recommended to enable spring)
 `bundle exec guard -g rails5 --no-interactions`
+
+#### Boot the rails app
+
+`next rails s`
+or
+`next bundle exec puma -C config/puma.rb`
 
 ## Contributing
 
