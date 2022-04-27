@@ -15,6 +15,7 @@ FactoryBot.define do
     global_email_communication { true }
     project_email_communication { true }
     beta_email_communication { true }
+    nasa_email_communication { false }
     admin { false }
     banned { false }
 

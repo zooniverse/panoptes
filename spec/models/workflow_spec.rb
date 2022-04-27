@@ -428,18 +428,27 @@ describe Workflow, type: :model do
     end
   end
 
-  describe "#training_subject_sets" do
-    let(:training_ids) { ["1"] }
+  describe '#training_set_ids' do
+    let(:training_ids) { ['1'] }
+    let(:expected_training_ids) { training_ids.map(&:to_i) }
 
-    it "should return the data in the config object" do
-
-      workflow.configuration["training_set_ids"] = training_ids
-      expect(workflow.training_set_ids).to match_array(training_ids)
+    before do
+      allow(workflow).to receive(:subject_set_ids).and_return(expected_training_ids)
     end
 
-    it "should sanitize the return values to known integer values" do
-      workflow.configuration["training_set_ids"] = training_ids | ["test"]
-      expect(workflow.training_set_ids).to match_array(training_ids)
+    it 'returns the data in the config object' do
+      workflow.configuration['training_set_ids'] = training_ids
+      expect(workflow.training_set_ids).to match_array(expected_training_ids)
+    end
+
+    it 'sanitizes the return values to known integer values' do
+      workflow.configuration['training_set_ids'] = training_ids | ['test']
+      expect(workflow.training_set_ids).to match_array(expected_training_ids)
+    end
+
+    it 'returns the intersection with the currently linked subject_set_ids' do
+      workflow.configuration['training_set_ids'] = training_ids | [-1]
+      expect(workflow.training_set_ids).to match_array(expected_training_ids)
     end
   end
 

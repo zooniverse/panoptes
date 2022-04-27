@@ -36,7 +36,7 @@ class Medium < ActiveRecord::Base
 
   def linked_resource_details
     # field_guide has a _ in it so manually find it vs prefix_*
-    details = /\A(?<resource>field_guide|[a-z]+)_(?<media_type>\w+)/i.match(type)
+    details = /\A(?<resource>field_guide|subject_set|[a-z]+)_(?<media_type>\w+)/i.match(type)
     [ details[:resource], details[:media_type] ]
   end
 
@@ -82,15 +82,27 @@ class Medium < ActiveRecord::Base
   end
 
   def put_file(file_path, opts={})
-    if file_path.blank?
-      raise MissingPutFilePath.new("Must specify a file_path to store")
-    end
+    raise MissingPutFilePath, 'Must specify a file_path to store' if file_path.blank?
+
     MediaStorage.put_file(src, file_path, indifferent_attributes.merge(opts))
+  end
+
+  def put_file_with_retry(file_path, opts={}, num_retries=5)
+    attempts ||= 1
+    put_file(file_path, opts)
+  rescue MissingPutFilePath => e # do not retry these invalid put_file args
+    raise e
+  rescue => e # rubocop:disable Style/RescueStandardError
+    retry if (attempts += 1) <= num_retries
+
+    # ensure we raise unexpected errors once we've exhausted
+    # the number of retries to continute to surface these errors
+    raise e
   end
 
   private
 
   def queue_medium_removal
-    MediumRemovalWorker.perform_async(src)
+    MediumRemovalWorker.perform_async(src, indifferent_attributes)
   end
 end

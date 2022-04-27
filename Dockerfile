@@ -1,16 +1,20 @@
-FROM ruby:2.5-stretch
+# debian stretch has libjemalloc1 https://packages.debian.org/stretch/libjemalloc1
+FROM ruby:2.5-slim-stretch
 
 WORKDIR /rails_app
 
-RUN apt-get update && \
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+RUN --mount=type=cache,id=panoptes-apt-cache,target=/var/cache/apt --mount=type=cache,id=panoptes-apt-lib,target=/var/lib/apt \
+    apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y \
+        build-essential \
+        # git is required for installing gems from git repos
         git \
-        curl \
-        libpq-dev \
-        tmpreaper \
+        # libjemalloc1 (v3) provides big memory savings vs jemalloc v5+ (default on debian buster)
         libjemalloc1 \
-        && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+        libpq-dev \
+        nodejs \
+        tmpreaper
 
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 
@@ -20,13 +24,11 @@ ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 ARG RAILS_ENV=production
 ENV RAILS_ENV=$RAILS_ENV
 
-RUN mkdir config && curl "https://ip-ranges.amazonaws.com/ip-ranges.json" > config/aws_ips.json
-
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
 RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
-RUN bundle install --without development test
+RUN --mount=type=cache,id=panoptes-gems,target=/usr/local/bundle/cache bundle install --without development test
 
 ADD ./ /rails_app
 

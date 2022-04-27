@@ -42,7 +42,6 @@ class ClassificationLifecycle
     process_project_preference
     create_recent
     update_seen_subjects
-    create_export_row
     notify_subject_selector
     update_counters
     publish_data
@@ -93,13 +92,6 @@ class ClassificationLifecycle
 
     subject_ids.each do |subject_id|
       NotifySubjectSelectorOfSeenWorker.perform_async(workflow.id, user.try(:id), subject_id)
-    end
-  end
-
-  def create_export_row
-    return unless classification.complete?
-    if Panoptes.flipper[:create_classification_export_row_in_lifecycle].enabled?
-      ClassificationExportRowWorker.perform_async(classification.id)
     end
   end
 

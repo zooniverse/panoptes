@@ -404,6 +404,10 @@ describe Api::V1::ProjectsController, type: :controller do
       it_behaves_like "admin only option", :experimental_tools, ["survey"]
     end
 
+    describe 'run_subject_set_completion_events attribute' do
+      it_behaves_like 'admin only option', :run_subject_set_completion_events, true
+    end
+
     describe "create talk admin" do
       it 'should queue a talk admin create worker' do
         expect(TalkAdminCreateWorker)
@@ -700,24 +704,31 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
 
-    context "update_links" do
-      before(:each) do
+    context 'update_links' do
+      let(:params) { update_params.merge(id: resource.id) }
+
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
-        params = update_params.merge(id: resource.id)
-        put :update, params
       end
 
-      context "copy linked workflow" do
-        it 'should have the same tasks workflow' do
-          expect(resource.workflows.first.tasks).to eq(workflow.tasks)
+      context 'copy linked workflow' do
+        it 'copies the workflow using the WorkflowCopier' do
+          allow(WorkflowCopier).to receive(:copy).and_call_original
+          put :update, params
+          expect(WorkflowCopier).to have_received(:copy).with(workflow, resource.id)
         end
 
-        it 'should have a different id' do
+        it 'has a different id to the original workflow' do
+          put :update, params
           expect(resource.workflows.first.id).to_not eq(workflow.id)
         end
       end
 
-      context "copy linked subject_set" do
+      context 'copy linked subject_set' do
+        before do
+          put :update, params
+        end
+
         it 'should have the same name' do
           expect(resource.subject_sets.first.display_name).to eq(subject_set.display_name)
         end
@@ -748,9 +759,9 @@ describe Api::V1::ProjectsController, type: :controller do
 
         it_behaves_like "supports update_links via a copy of the original" do
 
-          it 'should have the same name' do
+          it 'has a copy suffix added to the name' do
             update_via_links
-            expect(copied_resource.display_name).to eq(linked_resource.display_name)
+            expect(copied_resource.display_name).to include("#{linked_resource.display_name} (copy:")
           end
 
           it 'should belong to the correct project' do
@@ -842,41 +853,93 @@ describe Api::V1::ProjectsController, type: :controller do
     it_behaves_like "is deactivatable"
   end
 
-  describe "#copy" do
-    let!(:resource) { create(:private_project, owner: authorized_user, configuration: {template: true} ) }
+  describe '#copy' do
+    let(:resource) do
+      create(:private_project, owner: authorized_user, configuration: { template: true })
+    end
+    let(:copy_params) { { project_id: resource.id } }
+    let(:req) { post :copy, copy_params }
+    let(:requesting_user) { authorized_user }
 
-    context "by the owner" do
-      let(:req) do
-        default_request scopes: scopes, user_id: authorized_user.id
-        post :copy, { project_id: resource.id }
-      end
+    before do
+      resource
+      default_request scopes: scopes, user_id: requesting_user.id
+    end
 
-      it 'queues a ProjectCopy worker' do
-        expect(ProjectCopyWorker)
-          .to receive(:perform_async)
-          .with(resource.id, authorized_user.id)
+    it 'calls the service operation' do
+      operation_double = Projects::Copy.with(api_user: ApiUser.new(nil))
+      allow(operation_double).to receive(:run!).and_return(resource)
+      allow(Projects::Copy).to receive(:with).and_return(operation_double)
+      req
+      expect(operation_double).to have_received(:run!).with({ project: resource })
+    end
+
+    it 'return created response code' do
+      req
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'serializes the created resource in the response body' do
+      req
+      expect(created_instance('projects')).not_to be_empty
+    end
+
+    it 'has no linked subject sets by default' do
+      req
+      linked_subject_set_ids = created_instance('projects').dig('links', 'subject_sets')
+      expect(linked_subject_set_ids).to be_empty
+    end
+
+    context 'with a create_subject_set param' do
+      let(:new_display_name) { 'Tropical F*** Storm' }
+      let(:copy_params) { { project_id: resource.id, create_subject_set: new_display_name } }
+
+      it 'calls the service operation' do
+        operation_double = Projects::Copy.with(api_user: ApiUser.new(nil))
+        allow(operation_double).to receive(:run!).and_return(resource)
+        allow(Projects::Copy).to receive(:with).and_return(operation_double)
         req
-      end
-
-      context "the project is uncopyable" do
-        before { resource.update(live: true) }
-
-        it "is not copied and returns status code 405" do
-          expect{ req }.to_not change{Project.count}
-          expect(response).to have_http_status(:method_not_allowed)
-        end
+        expect(operation_double).to have_received(:run!).with({ project: resource, create_subject_set: new_display_name })
       end
     end
 
-    context "an unauthorized user" do
-      let(:unauthorized_user) { create(:user) }
-      let(:req) do
-        default_request scopes: scopes, user_id: unauthorized_user.id
-        post :copy, { project_id: resource.id }
+    context 'with an uncopyable project' do
+      before do
+        resource.update(live: true)
       end
 
-      it "is not copied and returns status code 404" do
-        expect{ req }.to_not change{Project.count}
+      it 'does not call the operation' do
+        allow(Projects::Copy).to receive(:with)
+        req
+        expect(Projects::Copy).not_to have_received(:with)
+      end
+
+      it 'returns status code 405' do
+        req
+        expect(response).to have_http_status(:method_not_allowed)
+      end
+
+      it 'returns a useful error message' do
+        req
+        error_message = json_error_message(
+          "Project with id #{resource.id} can not be copied, the project must not be 'live' and the configuration json must have the 'template' attribute set"
+        )
+        expect(response.body).to eq(error_message)
+      end
+    end
+
+    context 'with an unauthorized user' do
+      let(:unauthorized_user) { create(:user) }
+      let(:requesting_user) { unauthorized_user }
+
+      it 'does not call the operation' do
+        allow(Projects::Copy).to receive(:with)
+        req
+        expect(Projects::Copy).not_to have_received(:with)
+      end
+
+      it 'returns status code 404' do
+        req
         expect(response).to have_http_status(:not_found)
       end
     end

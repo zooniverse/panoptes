@@ -113,12 +113,12 @@ RSpec.describe Subjects::Selector do
       before do
         allow_any_instance_of(Subjects::PostgresqlSelection)
           .to receive(:select).and_return([])
-        expect_any_instance_of(Subjects::PostgresqlSelection)
+        expect_any_instance_of(Subjects::FallbackSelection)
           .to receive(:any_workflow_data)
           .and_call_original
       end
 
-      it 'should fallback to selecting some data' do
+      it 'returns data from the fallback selector' do
         subjects = subject.get_subject_ids
       end
 
@@ -131,7 +131,7 @@ RSpec.describe Subjects::Selector do
           }
         end
 
-        it 'should fallback to selecting some grouped data' do
+        it 'returns grouped data from the fallback selector' do
           allow_any_instance_of(Workflow).to receive(:grouped).and_return(true)
           subjects = subject.get_subject_ids
         end
@@ -144,7 +144,7 @@ RSpec.describe Subjects::Selector do
         stub_designator_client
       end
 
-      it 'should fallback to using postgres selection' do
+      it 'uses postgres selection' do
         expect_any_instance_of(Subjects::PostgresqlSelection)
           .to receive(:select)
           .and_call_original
@@ -162,15 +162,15 @@ RSpec.describe Subjects::Selector do
         subject.get_subject_ids
       end
 
-      context "when the default postgres selector returns no data" do
+      context 'when the postgres selector returns no data' do
         before do
           allow_any_instance_of(Subjects::PostgresqlSelection)
             .to receive(:select)
             .and_return([])
         end
 
-        it "should fallback to just returning any data" do
-          expect_any_instance_of(Subjects::PostgresqlSelection)
+        it 'uses the fallback selector and returns any data' do
+          expect_any_instance_of(Subjects::FallbackSelection)
             .to receive(:any_workflow_data)
             .and_call_original
           subject.get_subject_ids

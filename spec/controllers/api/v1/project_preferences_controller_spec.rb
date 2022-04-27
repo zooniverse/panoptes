@@ -48,7 +48,15 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     let(:test_attr) { :email_communication }
     let(:test_attr_value) { false }
     let(:update_params) do
-      { project_preferences: { email_communication: false, settings: { workflow_id: 1234 } } }
+      {
+        project_preferences: {
+          email_communication: false,
+          settings: {
+            workflow_id: 1234,
+            hidden: true
+          }
+        }
+      }
     end
 
     it_behaves_like "is updatable"

@@ -528,6 +528,147 @@ describe Api::V1::SubjectsController, type: :controller do
     end
   end
 
+  describe '#grouped' do
+    let(:workflow) do
+      create(:workflow_with_subject_sets, configuration: { subject_group: { num_rows: 1, num_columns: 2 } })
+    end
+    let(:api_resource_links) { [] }
+    let(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 2, num_rows: 1, http_cache: 'true' } }
+    let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].enable }
+
+    before do
+      ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
+      sms
+      flipper_feature
+      get :grouped, request_params
+    end
+
+    it 'returns 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns a page with only 1 resource' do
+      expect(json_response[api_resource_name].length).to eq(1)
+    end
+
+    it_behaves_like 'an api response'
+
+    context 'without num_rows and num_columns params' do
+      let(:request_params) { { workflow_id: workflow.id.to_s } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Num rows is required, Num columns is required')
+      end
+    end
+
+    context 'with num_columns non integer param' do
+      let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 'hmm', num_rows: 1 } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Num columns is not a valid integer')
+      end
+    end
+
+    context 'with num_rows array param' do
+      let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: [1] } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('found unpermitted parameter: num_rows')
+      end
+    end
+
+    context 'with admin param' do
+      let(:request_params) do
+        { workflow_id: workflow.id.to_s, num_columns: 2, num_rows: 1, admin: true }
+      end
+
+      it 'responds with 200' do
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context 'when the feature flag is disabled for this end point' do
+      let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].disable }
+
+      it 'errors with 503' do
+        expect(response.status).to eq(503)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Feature has been temporarily disabled')
+      end
+    end
+  end
+
+  describe '#selection' do
+    let(:workflow) { create(:workflow_with_subject_sets) }
+    let(:api_resource_links) { [] }
+    let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
+    let(:subject_ids) { sms.map(&:subject_id) }
+    let(:request_params) do
+      { workflow_id: workflow.id.to_s, ids: subject_ids.join(','), http_cache: 'true' }
+    end
+    let(:flipper_feature) { Panoptes.flipper[:subject_selection_by_ids].enable }
+
+    before do
+      subject_ids
+      flipper_feature
+      allow(SubjectSelectorSerializer).to receive(:page).and_call_original
+      get :selection, request_params
+    end
+
+    it 'returns 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns a page with only 1 resource' do
+      expect(json_response[api_resource_name].length).to eq(1)
+    end
+
+    it 'uses the SubjectSelectorSerializer class' do
+      expect(SubjectSelectorSerializer).to have_received(:page)
+    end
+
+    it_behaves_like 'an api response'
+
+    context 'without subject ids params' do
+      let(:request_params) { { workflow_id: workflow.id.to_s } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Ids is required')
+      end
+    end
+
+    context 'when the feature flag is disabled for this end point' do
+      let(:flipper_feature) { Panoptes.flipper[:subject_selection_by_ids].disable }
+
+      it 'errors with 503' do
+        expect(response.status).to eq(503)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Feature has been temporarily disabled')
+      end
+    end
+  end
+
   describe "#show" do
     let(:resource) { create(:subject) }
 
@@ -556,20 +697,22 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
       {
-       "interesting_data" => "Tested Collection",
-       "an_interesting_array" => ["1", "2", "asdf", "99.99"]
+        '#priority' => '1',
+        'interesting_data' => 'Tested Collection',
+        'an_interesting_array' => %w[1 2 asdf 99.99]
       }
     end
     let(:locations) { [ "image/jpeg" ] }
     let(:update_params) do
       {
-       subjects: {
-                  metadata: {
-                             interesting_data: "Tested Collection",
-                             an_interesting_array: ["1", "2", "asdf", "99.99"]
-                            },
-                  locations: locations
-                 }
+        subjects: {
+          metadata: {
+            '#PRIOritY' => '1',
+            interesting_data: 'Tested Collection',
+            an_interesting_array: %w[1 2 asdf 99.99]
+          },
+          locations: locations
+        }
       }
     end
 
@@ -578,6 +721,14 @@ describe Api::V1::SubjectsController, type: :controller do
     context "with an authorized user" do
       before do
         default_request user_id: authorized_user.id, scopes: scopes
+      end
+
+      it 'updates without errors without metadata params' do
+        no_metadata_update_params = {
+          id: resource.id,
+          subjects: { locations: locations }
+        }
+        expect { put :update, no_metadata_update_params }.not_to raise_error
       end
 
       describe "using external urls" do
@@ -617,18 +768,16 @@ describe Api::V1::SubjectsController, type: :controller do
   describe "#create" do
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
-      { "cool_factor" => "11" }
+      { 'cool_factor' => '11', '#priority' => '1' }
     end
 
     let(:create_params) do
       {
-       subjects: {
-                  metadata: { cool_factor: "11" },
-                  locations: ["image/jpeg", "image/jpeg", "image/png"],
-                  links: {
-                          project: project.id
-                         }
-                 }
+        subjects: {
+          metadata: { cool_factor: '11', '#PRIOritY' => '1' },
+          locations: ['image/jpeg', 'image/jpeg', 'image/png'],
+          links: { project: project.id }
+        }
       }
     end
 
@@ -661,6 +810,13 @@ describe Api::V1::SubjectsController, type: :controller do
       post :create, create_params
       locations = json_response[api_resource_name][0]["locations"].flat_map(&:keys)
       expect(locations).to eq(["audio/mpeg", "audio/mpeg"])
+    end
+
+    it 'downcases the reserved metadata keyword fields' do
+      default_request user_id: authorized_user.id, scopes: scopes
+      post :create, create_params
+      metadata = json_response[api_resource_name][0]['metadata'].keys
+      expect(metadata).to match_array(['cool_factor', '#priority'])
     end
 
     it 'should create externally linked media resources' do

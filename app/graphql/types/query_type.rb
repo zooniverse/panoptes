@@ -25,7 +25,7 @@ module Types
     end
 
     def organization(id:)
-      context[:api_user].scope(klass: Organization, action: :show, ids: id)
+      OrganizationPolicy.new(context[:api_user], Organization).scope_for(:show).where(id: id)
     end
 
     def organizations(**filters)

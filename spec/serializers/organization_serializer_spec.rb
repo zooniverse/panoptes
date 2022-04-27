@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe OrganizationSerializer do
   let(:organization) { create(:organization) }
-  let(:context) { {languages: ['en'], fields: [:title]} }
+  let(:context) { { fields: [:title] } }
 
   let(:serializer) do
     s = OrganizationSerializer.new
@@ -61,7 +61,9 @@ describe OrganizationSerializer do
   end
 
   describe "#avatar_src" do
-    let(:avatar) { double("avatar", external_link: external_url, src: src) }
+    let(:avatar) do
+      instance_double('avatar', external_link: external_url, get_url: src)
+    end
     let(:src) { nil }
     let(:external_url) { nil }
 

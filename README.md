@@ -1,12 +1,10 @@
-# Panoptes ![Build Status](https://travis-ci.org/zooniverse/Panoptes.svg?branch=master) [![pullreminders](https://pullreminders.com/badge.svg)](https://pullreminders.com?ref=badge)
+# Panoptes ![Build Status](https://github.com/zooniverse/panoptes/actions/workflows/run_tests_CI.yml/badge.svg?branch=master)
 
 The new Zooniverse API for supporting user-created projects.
 
 ## Documentation
 
 The Panoptes public API is documented [here](http://docs.panoptes.apiary.io), using [apiary.io](http://apiary.io).
-
-If you're interested in how Panoptes is implemented check out the [wiki](https://github.com/zooniverse/Panoptes/wiki) and the [Data Model Description](https://github.com/zooniverse/Panoptes/wiki/DataModel).
 
 ## Requirements
 
@@ -75,7 +73,7 @@ There are multiple options for setting up a testing environment:
         * Use rspec focus keyword in your specs or specify the spec you want to run, e.g. `docker-compose run -T --rm -e RAILS_ENV=test panoptes rspec path/to/spec/file.rb`
 
 0. Use docker to run a testing environment bash shell and run test commands .
-    1. Run `docker-compose run --rm -e RAILS_ENV=test panoptes bash` to start the containers
+    1. Run `docker-compose run --service-ports --rm -e RAILS_ENV=test panoptes bash` to start the containers
     0. Run `bundle exec rspec` to run the full test suite
 
 0. Use parts of docker-compose manually and wire them up manually to create a testing environment.

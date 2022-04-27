@@ -17,12 +17,6 @@ describe Classification, :type => :model do
     expect(build(:classification, workflow: nil)).to_not be_valid
   end
 
-  it 'can have an export row' do
-    row_export = create(:classification_export_row)
-    classification = row_export.classification
-    expect(classification.export_row).to eq(row_export)
-  end
-
   it "must have a user_ip" do
     expect(build(:classification, user_ip: nil)).to_not be_valid
   end
@@ -204,6 +198,25 @@ describe Classification, :type => :model do
 
     it "should be falsey if missing the seen_before metadata attribute" do
       expect(build(:classification).seen_before?).to be_falsey
+    end
+  end
+
+  describe '#v2_annotations?' do
+    it 'is false when missing metadata key' do
+      classification = build_stubbed(:classification)
+      expect(classification.be_v2_annotation_format).to be_falsey
+    end
+
+    context 'when the metadata classifier_version key is set to 2.x' do
+      it 'is true when 2.0' do
+        classification = build_stubbed(:classification, metadata: { 'classifier_version' => '2.0' })
+        expect(classification.be_v2_annotation_format).to be_truthy
+      end
+
+      it 'is true when 2.x' do
+        classification = build_stubbed(:classification, metadata: { 'classifier_version' => '2.9' })
+        expect(classification.be_v2_annotation_format).to be_truthy
+      end
     end
   end
 end

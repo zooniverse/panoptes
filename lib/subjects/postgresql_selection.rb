@@ -10,10 +10,6 @@ module Subjects
       selection_strategy.new(available, limit).select
     end
 
-    def any_workflow_data
-      FallbackSelection.new(workflow, limit, opts).any_workflow_data
-    end
-
     private
 
     def selection_strategy

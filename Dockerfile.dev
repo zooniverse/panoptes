@@ -1,26 +1,24 @@
-FROM ruby:2.5
+FROM ruby:2.5-slim-buster
 
 WORKDIR /rails_app
 
-RUN echo $(grep "VERSION=" /etc/os-release | cut -d "(" -f2 | cut -d ")" -f1) | \
-    xargs -i echo "deb http://apt.postgresql.org/pub/repos/apt/ {}-pgdg main" > /etc/apt/sources.list.d/postgresql.list && \
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-
-RUN apt-get update && apt-get -y upgrade && \
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+RUN --mount=type=cache,id=panoptes-apt-cache,target=/var/cache/apt --mount=type=cache,id=panoptes-apt-lib,target=/var/lib/apt \
+    apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y \
-    git \
-    curl \
-    libpq-dev \
-    postgresql-client-9.5 \
-    tmpreaper \
-    && \
-    apt-get clean
+      build-essential \
+      # git is required for installing gems from git repos
+      git \
+      libpq-dev \
+      # debian buster has v11 by default
+      postgresql-client-11 \
+      tmpreaper
 
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
-RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1` && \
-    bundle install
+RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
+RUN --mount=type=cache,id=panoptes-gems,target=/usr/local/bundle/cache bundle install
 
 ADD ./ /rails_app
 

@@ -1,4 +1,4 @@
-require 'accept_language_extractor'
+# frozen_string_literal: true
 
 module Api
   include ApiErrors
@@ -17,7 +17,8 @@ module Api
       Subjects::Selector::MissingSubjectSet,
       Subjects::Selector::MissingSubjects,                 with: :not_found
     rescue_from ActiveRecord::RecordInvalid,               with: :invalid_record
-    rescue_from Api::LiveProjectChanges,                   with: :forbidden
+    rescue_from Api::LiveProjectChanges,
+      SubjectSetImports::CountManifestRows::LimitExceeded, with: :forbidden
     rescue_from Api::NotLoggedIn,
       Api::UnauthorizedTokenError,
       Operation::Unauthenticated,                          with: :not_authenticated
@@ -42,8 +43,11 @@ module Api
       RestPack::Serializer::InvalidInclude,
       ActiveRecord::RecordNotUnique,
       Operation::Error,
+      SubjectSetImports::CountManifestRows::ManifestError,
       ActiveInteraction::InvalidInteractionError,          with: :unprocessable_entity
+    rescue_from Kaminari::ZeroPerPageOperation,            with: :kaminari_zero_page
     rescue_from Api::FeatureDisabled,                      with: :service_unavailable
+    rescue_from Api::MethodNotAllowed,                     with: :method_not_allowed
 
     prepend_before_action :require_login, only: [:create, :update, :destroy]
     prepend_before_action :ban_user, only: [:create, :update, :destroy]
@@ -72,24 +76,6 @@ module Api
       @api_user ||= ApiUser.new(current_resource_owner, admin: admin_flag?)
     end
 
-    def current_languages
-      param_langs  = [ params[:language] ]
-      user_langs   = user_accept_languages
-      header_langs = parse_http_accept_languages
-      ( param_langs | user_langs | header_langs ).compact
-    end
-
-    def user_accept_languages
-      api_user.try(:languages) || []
-    end
-
-    def parse_http_accept_languages
-      language_extractor = AcceptLanguageExtractor
-        .new(request.env['HTTP_ACCEPT_LANGUAGE'])
-
-      language_extractor.parse_languages
-    end
-
     def request_ip
       request.remote_ip
     end
@@ -114,15 +100,6 @@ module Api
         when "destroy"
           head :no_content
         end
-      end
-    end
-
-    def context
-      case action_name
-      when "show", "index"
-        { languages: current_languages }
-      else
-        { }
       end
     end
   end

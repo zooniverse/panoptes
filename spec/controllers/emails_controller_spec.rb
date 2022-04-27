@@ -43,7 +43,8 @@ describe EmailsController, type: :controller do
     {
       global_email_communication: true,
       project_email_communication: true,
-      beta_email_communication: true
+      beta_email_communication: true,
+      nasa_email_communication: true
     }
   end
   let(:base_url) { "http://localhost:2727/#/unsubscribe" }

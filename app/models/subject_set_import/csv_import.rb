@@ -1,17 +1,29 @@
 require 'csv'
 
 class SubjectSetImport::CsvImport
+  attr_reader :csv
+
+  delegate :headers, to: :csv
+
   def initialize(io)
-    @io = io
+    @csv = CSV.new(io, headers: true)
+  end
+
+  def count
+    return @count if @count
+
+    @count = csv.count
+    # ensure after counting we rewind the file for all future reads
+    csv.rewind
+
+    @count
   end
 
   def each
     return Enumerator.new(self) unless block_given?
 
-    csv = CSV.new(@io, headers: true)
-
     csv.each do |row|
-      external_id = row["id"]
+      external_id = row['external_id']
       locations = []
       metadata = {}
 

@@ -1,6 +1,6 @@
 class UserGroup < ActiveRecord::Base
   include Activatable
-  include PgSearch
+  include PgSearch::Model
 
   has_many :memberships, dependent: :destroy
   has_many :active_memberships, -> { active.not_identity }, class_name: "Membership"

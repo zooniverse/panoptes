@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe ProjectSerializer do
   let(:project) { create(:full_project, state: "finished", live: false) }
-  let(:context) { {languages: ['en'], fields: [:title, :url_labels]} }
+  let(:context) { { fields: %i[title url_labels] } }
 
   let(:serializer) do
     s = ProjectSerializer.new
@@ -106,7 +106,9 @@ describe ProjectSerializer do
   end
 
   describe "#avatar_src" do
-    let(:avatar) { double("avatar", external_link: external_url, src: src) }
+    let(:avatar) do
+      instance_double('avatar', external_link: external_url, get_url: src)
+    end
     let(:src) { nil }
     let(:external_url) { nil }
 

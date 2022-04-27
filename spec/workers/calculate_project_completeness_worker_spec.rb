@@ -34,10 +34,13 @@ describe CalculateProjectCompletenessWorker do
   end
 
   describe '#project_completeness' do
-    let(:project) do
-      workflows_double = double(pluck: [1, 0], empty?: false)
-      double(active_workflows: workflows_double)
+    let(:workflows_relation_double) do
+      double(pluck: [1, 0], empty?: false)
     end
+    let(:project) do
+      instance_double('Project', active_workflows: workflows_relation_double)
+    end
+
     before do
       allow(worker).to receive(:project).and_return(project)
     end
@@ -48,6 +51,11 @@ describe CalculateProjectCompletenessWorker do
 
     it "should set to 0.0 when a project has no active workflows" do
       allow(project).to receive(:active_workflows).and_return([])
+      expect(worker.project_completeness).to eq(0.0)
+    end
+
+    it 'returns 0.0 when a project has active workflows with 0 completeness (no linked subjects)' do
+      allow(workflows_relation_double).to receive(:pluck).and_return([0, 0])
       expect(worker.project_completeness).to eq(0.0)
     end
   end
@@ -106,8 +114,8 @@ describe CalculateProjectCompletenessWorker do
     context "when the project is not complete" do
       before do
         allow(project)
-        .to receive(:active_workflows)
-        .and_return(double(pluck: [0.91], empty?: false))
+          .to receive(:active_workflows)
+          .and_return(double(pluck: [0.91], empty?: false, all?: false))
       end
 
       it "should not move the project to paused" do
@@ -186,6 +194,16 @@ describe CalculateProjectCompletenessWorker do
         }.to change {
           project.state
         }.to("paused")
+      end
+    end
+
+    context 'when the project has active workflows 0.0 completeness(no linked subjects)' do
+      let(:project) { create(:project_with_workflow) }
+
+      it 'move the state attribute to paused' do
+        expect {
+          worker.perform(project)
+        }.to change(project, :state).to('paused')
       end
     end
   end

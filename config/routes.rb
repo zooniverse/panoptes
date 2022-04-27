@@ -76,7 +76,9 @@ Rails.application.routes.draw do
 
       json_api_resources :subjects do
         collection do
-          get :queued
+          get :queued # Subject selection end point
+          get :grouped # SubjectGroup selection end point
+          get :selection # Subject selection by subject ids end point
         end
       end
 
@@ -116,13 +118,17 @@ Rails.application.routes.draw do
         media_resources :attached_images, classifications_export: { except: [:create] }
 
         post "/retired_subjects", to: "workflows#retire_subjects"
+        post '/unretire_subjects', to: 'workflows#unretire_subjects'
         post "/classifications_export", to: "workflows#create_classifications_export", format: false
         post '/publish', to: 'workflows#publish'
       end
 
       json_api_resources :workflow_versions, links: [:workflow]
 
-      json_api_resources :subject_sets, links: [:subjects]
+      json_api_resources :subject_sets, links: [:subjects] do
+        media_resources classifications_export: { except: %i[create update] }
+        post '/classifications_export', to: 'subject_sets#create_classifications_export', format: false
+      end
 
       json_api_resources :subject_set_imports, links: [:subject_sets, :users], only: [:index, :show, :create]
 
@@ -145,6 +151,8 @@ Rails.application.routes.draw do
         constraints: Routes::Constraints::TranslationsConstraint.new,
         except: %i(new edit destroy)
       })
+
+      json_api_resources :subject_groups, only: %w[index show]
     end
   end
 

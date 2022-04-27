@@ -17,29 +17,34 @@ describe EmailsExportWorker do
   context "with the export email feature enabled" do
     before do
       Panoptes.flipper[:export_emails].enable
+      allow(EmailsUsersExportWorker).to receive(:perform_in)
+      allow(EmailsUsersExportWorker).to receive(:perform_async)
+      allow(EmailsProjectsExportWorker).to receive(:perform_in)
     end
 
     it 'enqueues an all users email export worker' do
-      expect(EmailsUsersExportWorker).to receive(:perform_async).with(:global)
       worker.perform
+      expect(EmailsUsersExportWorker).to have_received(:perform_async).with(:global)
     end
 
-    it 'enqueues an beta users email export worker' do
-      expect(EmailsUsersExportWorker)
-        .to receive(:perform_in)
-        .with(EmailsExportWorker::BETA_DELAY, :beta)
+    it 'enqueues two email list export workers' do
       worker.perform
+      expect(EmailsUsersExportWorker).to have_received(:perform_in).twice
+    end
+
+    it 'enqueues both beta and nasa email list export workers' do
+      worker.perform
+      expect(EmailsUsersExportWorker).to have_received(:perform_in).with(EmailsExportWorker::BETA_DELAY, :beta).ordered
+      expect(EmailsUsersExportWorker).to have_received(:perform_in).with(EmailsExportWorker::NASA_DELAY, :nasa).ordered
     end
 
     it 'enqueues a email export worker for each launch_approved project' do
       projects = create_list(:project, 2)
-      not_launched = create(:project, launch_approved: false)
-      projects.each_with_index do |p, i|
-        expect(EmailsProjectsExportWorker)
-          .to receive(:perform_in)
-          .with(an_instance_of(Float), p.id)
-      end
+      _not_launched = create(:project, launch_approved: false)
       worker.perform
+      projects.each_with_index do |p, _i|
+        expect(EmailsProjectsExportWorker).to have_received(:perform_in).with(an_instance_of(Float), p.id)
+      end
     end
   end
 end

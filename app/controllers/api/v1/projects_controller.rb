@@ -88,12 +88,19 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def copy
-    if project.configuration["template"] && !project.live
-      ProjectCopyWorker.perform_async(project.id, api_user.id)
-      head :accepted
-    else
-      head :method_not_allowed
+    # check we are copying a template project
+    template_project_to_copy = project.configuration.key?('template') && !project.live
+    unless template_project_to_copy
+      raise(
+        Api::MethodNotAllowed,
+        "Project with id #{project.id} can not be copied, the project must not be 'live' and the configuration json must have the 'template' attribute set"
+      )
     end
+
+    operations_params = params.slice(:create_subject_set).merge(project: project)
+    copied_project = Projects::Copy.with(api_user: api_user).run!(operations_params)
+
+    created_resource_response(copied_project)
   end
 
   private
@@ -107,9 +114,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def admin_allowed_params
-    [ :beta_approved, :launch_approved, :redirect,
-      :launched_row_order_position, :beta_row_order_position,
-      :experimental_tools, :featured ]
+    %i[ beta_approved launch_approved redirect launched_row_order_position
+        beta_row_order_position experimental_tools featured run_subject_set_completion_events ]
   end
 
   def build_resource_for_create(create_params)
@@ -149,7 +155,7 @@ class Api::V1::ProjectsController < Api::ApiController
     Array.wrap(item_scope).map do |item|
       case item
       when Workflow
-        item.dup
+        WorkflowCopier.copy(item, project_id)
       when SubjectSet
         if !item.belongs_to_project?(project_id)
           SubjectSetCopier.new(item, project_id).duplicate_subject_set_and_subjects

@@ -142,12 +142,35 @@ describe Api::V1::CollectionsController, type: :controller do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
+
+    context 'when favorite collection has existing subjects' do
+      let(:additional_subject) { create(:subject) }
+      let(:params) do
+        {
+          link_relation: 'subjects',
+          subjects: [additional_subject.id],
+          collection_id: collection.id
+        }
+      end
+
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+
+        collection.favorite = true
+        collection.save!
+      end
+
+      it 'allows another subject to be added' do
+        post :update_links, params
+        expect(response).to have_http_status(:ok)
+      end
+    end
   end
 
   describe '#create' do
     let(:test_attr) { :name }
     let(:test_attr_value) { 'test__collection' }
-    let(:create_links) { { projects: [project.id] } }
+    let(:create_links) { { subjects: [], projects: [project.id.to_s] } }
     let(:create_params) do
       {
         collections: {
@@ -212,7 +235,7 @@ describe Api::V1::CollectionsController, type: :controller do
       end
 
       context 'when favorite collection already exists for given user/project' do
-        before { create(:collection, favorite: true, owner: owner) }
+        before { create(:collection, favorite: true, project_ids: [project.id], owner: owner) }
 
         it 'returns a bad request error trying to create a favorite collection' do
           post :create, favorite_params
@@ -221,7 +244,16 @@ describe Api::V1::CollectionsController, type: :controller do
       end
 
       context 'when a non-favorite collection exists for a given user/project' do
-        before { create(:collection, favorite: false, owner: owner) }
+        before { create(:collection, favorite: false, project_ids: [project.id], owner: owner) }
+
+        it 'successfully creates a favorite collection' do
+          post :create, favorite_params
+          expect(response).to have_http_status(:created)
+        end
+      end
+
+      context 'when a favorite exists, but for a separate project' do
+        before { create(:collection, favorite: true, project_ids: [project.id + 1], owner: owner) }
 
         it 'successfully creates a favorite collection' do
           post :create, favorite_params

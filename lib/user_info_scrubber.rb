@@ -25,6 +25,7 @@ class UserInfoScrubber
     user.global_email_communication = false
     user.project_email_communication = false
     user.beta_email_communication = false
+    user.nasa_email_communication = false
     user.valid_email = false
     user.private_profile = true
     user.api_key = nil

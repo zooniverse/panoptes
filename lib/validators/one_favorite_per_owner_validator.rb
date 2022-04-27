@@ -6,13 +6,19 @@ module Validators
   # and the fact our validations exist in ruby land and not strictly enforced at the database layer
   # it's low probablity but worth noting here if folks wonder how it can happen
   class OneFavoritePerOwnerValidator < ActiveModel::Validator
-    def validate(new_record)
-      return unless new_record.owner && new_record.favorite
+    def validate(record)
+      return unless record.owner && record.favorite
 
-      owner_has_existing_favorite = new_record.owner.collections.where(favorite: true).exists?
-      return unless owner_has_existing_favorite
+      owner_fav_collections = record.owner.collections.where(favorite: true)
+      owner_fav_collections = owner_fav_collections.where.not(id: record.id) if record.persisted?
+      owner_has_existing_fav_for_project = owner_fav_collections
+        .joins(:projects)
+        .where(projects: { id: record.project_ids })
+        .exists?
 
-      new_record.errors[:favorite] = 'An owner can only have one favorite collection per project'
+      return unless owner_has_existing_fav_for_project
+
+      record.errors[:favorite] = 'An owner can only have one favorite collection per project'
     end
   end
 end

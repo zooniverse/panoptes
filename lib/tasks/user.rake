@@ -3,7 +3,7 @@
 
 namespace :user do
 
-  desc "Touch user updated at"
+  desc 'Touch user updated at'
   task touch_user_record: :environment do
     User.select('id').find_in_batches do |users|
       ids = users.map(&:id)
@@ -11,7 +11,7 @@ namespace :user do
     end
   end
 
-  desc "Backfill UX testing emails comms field in batches"
+  desc 'Backfill UX testing emails comms field in batches'
   task backfill_ux_testing_email_field: :environment do
     User.select(:id).find_in_batches do |users|
       null_ux_testing_user_scope = User.where(
@@ -24,7 +24,20 @@ namespace :user do
     end
   end
 
-  desc "Backfill intervention_notifications field in batches (restartable)"
+  desc 'Backfill NASA email communication field in batches'
+  task backfill_nasa_email_communications_field: :environment do
+    User.select(:id).find_in_batches do |users|
+      null_nasa_email_user_scope = User.where(
+        id: users.map(&:id),
+        nasa_email_communication: nil
+      )
+      null_nasa_email_user_scope.update_all(
+        nasa_email_communication: false
+      )
+    end
+  end
+
+  desc 'Backfill intervention_notifications field in batches (restartable)'
   task backfill_intervention_notifications_field: :environment do
     User.select(:id).find_in_batches do |users|
       non_backfilled_users = User.where(
@@ -53,7 +66,7 @@ namespace :user do
       User.find_by!("lower(login) = '#{login.downcase}'")
     end
 
-    desc "update user subject limits"
+    desc 'update user subject limits'
     task :update_subject_limits, [:user_login, :new_subject_limit] => [:environment] do |t, args|
       begin
         login, new_subject_limit = update_user_limit_params(args)
@@ -68,7 +81,7 @@ namespace :user do
       end
     end
 
-    desc "show user subject limits"
+    desc 'show user subject limits'
     task :show_subject_limits, [:user_login ] => [:environment] do |t, args|
       begin
         if login = args[:user_login].try(:downcase)
