@@ -47,7 +47,7 @@ gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 if next?
   gem 'rails', '~> 5.0.0'
 else
-  gem 'rails', '~> 4.2.11' # rubocop:disable Bundler/DuplicatedGem
+  gem 'rails', '~> 4.2.11'
 end
 gem 'ranked-model', '~> 0.4.7'
 gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: 'cef0969cef'
