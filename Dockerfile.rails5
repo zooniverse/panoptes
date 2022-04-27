@@ -1,17 +1,13 @@
-FROM ruby:2.6
+FROM ruby:2.6-slim
 
 WORKDIR /rails_app
 
-RUN echo $(grep "VERSION=" /etc/os-release | cut -d "(" -f2 | cut -d ")" -f1) | \
-    xargs -i echo "deb http://apt.postgresql.org/pub/repos/apt/ {}-pgdg main" > /etc/apt/sources.list.d/postgresql.list && \
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-
 RUN apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y \
+    build-essential \
     git \
-    curl \
     libpq-dev \
-    postgresql-client-9.5 \
+    postgresql-client-11 \
     tmpreaper \
     && \
     apt-get clean
