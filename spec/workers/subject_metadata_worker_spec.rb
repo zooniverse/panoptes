@@ -37,20 +37,6 @@ RSpec.describe SubjectMetadataWorker do
       expect(ActiveRecord::Base).not_to have_received(:connection)
     end
 
-    # TODO: Rails 5 combine the tests to one
-    # to test behaviour not AR calling interface
-    it 'calls the correct RAILS 5 AR methods' do
-      stub_const("ActiveRecord::VERSION::MAJOR", 5)
-      expect(ActiveRecord::Base.connection)
-        .to receive(:exec_update)
-        .with(
-          instance_of(String),
-          'SQL',
-          [[nil, set_member_subject_ids]]
-        )
-      worker.perform(set_member_subject_ids)
-    end
-
     it 'copies priority from metadata to SMS attribute' do
       worker.perform(set_member_subject_ids)
       sms_one, sms_two, sms_three = SetMemberSubject.find(
