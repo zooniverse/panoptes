@@ -538,7 +538,7 @@ DEPENDENCIES
   sidekiq-congestion (~> 0.1.0)
   sidekiq-unique-jobs
   sidetiq (~> 0.7)
-  spring
+  spring (~> 2.1.1)
   spring-commands-rspec
   sprockets (~> 3.7)
   standby

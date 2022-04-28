@@ -443,7 +443,7 @@ GEM
       celluloid (>= 0.17.3)
       ice_cube (~> 0.14.0)
       sidekiq (>= 4.1.0)
-    spring (3.1.1)
+    spring (2.1.1)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
     sprockets (3.7.2)
@@ -557,7 +557,7 @@ DEPENDENCIES
   sidekiq-congestion (~> 0.1.0)
   sidekiq-unique-jobs
   sidetiq (~> 0.7)
-  spring
+  spring (~> 2.1.1)
   spring-commands-rspec
   sprockets (~> 3.7)
   standby

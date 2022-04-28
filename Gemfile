@@ -77,7 +77,7 @@ group :development, :test do
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
-  gem 'spring'
+  gem 'spring', '~>2.1.1'
   gem 'sprockets', '~>3.7'
   gem 'ten_years_rails'
 end
