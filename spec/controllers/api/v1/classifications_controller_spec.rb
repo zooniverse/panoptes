@@ -7,7 +7,7 @@ def metadata_values
     workflow_version: "1.1",
     user_language: 'en',
     user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0",
-    utc_offset: Time.now.utc_offset
+    utc_offset: Time.now.utc_offset.to_s
   }
 end
 
