@@ -122,7 +122,7 @@ or fail fast
 `next bundle exec rspec --fail-fast`
 
 or with gaurd (recommended to enable spring)
-`bundle exec guard -g rails5 --no-interactions`
+`next bundle exec guard --no-interactions`
 
 #### Boot the rails app
 
