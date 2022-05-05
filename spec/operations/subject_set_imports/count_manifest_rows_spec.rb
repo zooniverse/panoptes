@@ -22,6 +22,12 @@ describe SubjectSetImports::CountManifestRows do
     }.to raise_error(ActiveInteraction::InvalidInteractionError, 'Source url is required')
   end
 
+  it 'is invalid with a non url format source_url param' do
+    expect {
+      operation.run!({ source_url: 'just a string'} )
+    }.to raise_error(SubjectSetImports::CountManifestRows::InvalidUrl, 'Source url is malformed')
+  end
+
   it 'returns the data row count of the manifest' do
     outcome = operation.run!(operation_params)
     expect(outcome).to eq(data_row_count)

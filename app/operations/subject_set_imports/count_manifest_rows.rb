@@ -2,6 +2,7 @@
 
 module SubjectSetImports
   class CountManifestRows < Operation
+    class InvalidUrl < StandardError; end
     class LimitExceeded < StandardError; end
     class ManifestError < StandardError; end
     string :source_url
@@ -13,6 +14,8 @@ module SubjectSetImports
     }
 
     def execute
+      raise(InvalidUrl, 'Source url is malformed') unless valid_url_format?
+
       return manifest_count if user_is_admin || manifest_is_under_limit
 
       # raise if the incoming manifest is over the allowed limit
@@ -23,6 +26,14 @@ module SubjectSetImports
     end
 
     private
+
+    def valid_url_format?
+      uri = URI.parse(source_url)
+      uri.is_a?(URI::HTTP) && !uri.host.nil?
+    rescue URI::InvalidURIError
+      false
+    end
+
 
     def user_is_admin
       api_user.is_admin?
