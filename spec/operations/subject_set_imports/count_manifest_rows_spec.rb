@@ -25,7 +25,7 @@ describe SubjectSetImports::CountManifestRows do
   it 'is invalid with a non url format source_url param' do
     expect {
       operation.run!({ source_url: 'just a string'} )
-    }.to raise_error(SubjectSetImports::CountManifestRows::InvalidUrl, 'Source url is malformed')
+    }.to raise_error(SubjectSetImports::CountManifestRows::ManifestError, 'Source url is malformed')
   end
 
   it 'returns the data row count of the manifest' do
