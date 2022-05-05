@@ -13,7 +13,7 @@ module SubjectSetImports
     }
 
     def execute
-      return manifest_count if user_is_admin || manifest_is_under_limit
+      return manifest_count if validate_manifest_url && (user_is_admin || manifest_is_under_limit)
 
       # raise if the incoming manifest is over the allowed limit
       raise(
@@ -23,6 +23,13 @@ module SubjectSetImports
     end
 
     private
+
+    def validate_manifest_url
+      uri = URI.parse(source_url)
+      uri.is_a?(URI::HTTP) && !uri.host.nil?
+    rescue URI::InvalidURIError
+      raise ManifestError, 'Source url is malformed'
+    end
 
     def user_is_admin
       api_user.is_admin?
