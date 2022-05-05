@@ -48,4 +48,12 @@ Rails.application.configure do
   config.to_prepare do
     Doorkeeper::ApplicationsController.helper Doorkeeper::Helpers::Controller
   end
+
+  if ENV['DISABLE_TEST_LOGGING']
+    # rubocop:disable Rails/Output
+    puts 'Logs are being suppressed to speed up the test suite. ' \
+         'Remove DISABLE_TEST_LOGGING env var to add logging back.'
+    # rubocop:enable Rails/Output
+    config.log_level = :warn
+  end
 end
