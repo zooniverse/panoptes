@@ -107,4 +107,6 @@ Rails.application.configure do
   config.logstasher.logger = Logger.new(STDOUT)
   # turn off rails logs
   config.logstasher.suppress_app_log = true
+  # link rails logger to logstasher logger
+  config.logger = config.logstasher.logger
 end
