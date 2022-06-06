@@ -135,7 +135,7 @@ GEM
       railties (>= 4.2.0)
     faraday (0.17.5)
       multipart-post (>= 1.2, < 3)
-    faraday-http-cache (2.2.0)
+    faraday-http-cache (2.3.0)
       faraday (>= 0.8)
     faraday-panoptes (0.3.0)
       faraday (~> 0.9)
@@ -237,7 +237,7 @@ GEM
       key_struct (~> 0.4)
     multi_json (1.15.0)
     multi_xml (0.6.0)
-    multipart-post (2.1.1)
+    multipart-post (2.2.0)
     nenv (0.3.0)
     newrelic_rpm (8.7.0)
     nio4r (2.5.8)
@@ -471,7 +471,7 @@ DEPENDENCIES
   doorkeeper-jwt (~> 0.2.1)
   factory_bot_rails
   faraday (~> 0.17)
-  faraday-http-cache (~> 2.2)
+  faraday-http-cache (~> 2.3)
   faraday_middleware (~> 0.14)
   flipper
   flipper-active_record
