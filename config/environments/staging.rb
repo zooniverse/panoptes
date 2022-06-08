@@ -99,14 +99,13 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  # Enable the logstasher logs for the current environment
-  config.logstasher.enabled = true
-  # Enable logging of controller params
-  config.logstasher.log_controller_parameters = true
-  # log to stdout
-  config.logstasher.logger = Logger.new(STDOUT)
-  # turn off rails logs
-  config.logstasher.suppress_app_log = true
-  # link rails logger to logstasher logger
-  config.logger = config.logstasher.logger
+  # lograge configs for new relic
+  config.lograge.enabled = true
+  # don't log to the original rails log file
+  config.lograge.keep_original_rails_log = false
+  # use the new relic logger and formatter to ensure we have log in NR
+  config.lograge.logger = ::NewRelic::Agent::Logging::DecoratingLogger.new(
+    $stdout,
+    formatter: ::NewRelic::Agent::Logging::DecoratingFormatter.new
+  )
 end
