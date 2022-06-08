@@ -35,7 +35,11 @@ Rails.application.configure do
 
   # override default log to stdout, unless env var key exists
   unless ENV.key?('RAILS_LOG_TO_FILE')
-    config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+    $stdout.sync = true
+    logger = ActiveSupport::Logger.new($stdout)
+    # Use default logging formatter so that PID and timestamp are not suppressed.
+    logger.formatter = ::Logger::Formatter.new
+    config.logger = ActiveSupport::TaggedLogging.new(logger)
   end
 
   config.log_tags = [:uuid]
