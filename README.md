@@ -89,6 +89,47 @@ There are multiple options for setting up a testing environment:
     0. Setup the testing database if you haven't already, by running `RAILS_ENV=test rake db:setup`
     0. Finally, run rspec with `RAILS_ENV=test rspec`
 
+## Rails 5
+
+Using the gem https://github.com/clio/ten_years_rails to help with the upgrade path
+https://www.youtube.com/watch?v=6aCfc0DkSFo
+
+#### Using docker-compose for env setup
+
+`docker-compose -f docker-compose-rails-5.yml build`
+`docker-compose -f docker-compose-rails-5.yml run --service-ports --rm panoptes bash`
+
+#### Install the gems via next
+
+`next bundle install`
+
+### check for incompatible gems for target rails verion
+
+`next bundle exec bundle_report compatibility --rails-version=5.0.7`
+
+### check for outdated gems
+
+`next bundle exec bundle_report outdated`
+
+#### Run the specs
+
+It's recommeded to enable spring for testing env
+`unset DISABLE_SPRING`
+run all specs for rails 5 gemfile
+`next bundle exec rspec`
+
+or fail fast
+`next bundle exec rspec --fail-fast`
+
+or with gaurd (recommended to enable spring)
+`next bundle exec guard --no-interactions`
+
+#### Boot the rails app
+
+`next rails s`
+or
+`next bundle exec puma -C config/puma.rb`
+
 ## Contributing
 
 Thanks a bunch for wanting to help Zooniverse. Here are few quick guidelines to start working on our project:

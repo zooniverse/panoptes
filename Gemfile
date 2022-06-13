@@ -1,13 +1,20 @@
+# frozen_string_literal: true
+
+def next?
+  File.basename(__FILE__) == 'Gemfile.next'
+end
+
 source 'https://rubygems.org'
 
 gem 'active_interaction', '~> 3.8.3'
 gem 'active_model_serializers', '0.10.0.rc2' # Event stream
-gem 'active_record_union', '~> 1.3.0'
 gem 'activerecord-import', '~> 1.4'
+gem 'active_record_union', '~> 1.3.0'
 gem 'aws-sdk', '~> 2.10'
 gem 'azure-storage'
 gem 'azure-storage-blob'
 gem 'azure-storage-common'
+gem 'celluloid', '~> 0.17.3'
 gem 'dalli'
 gem 'deep_cloneable', '~> 3.2.0'
 gem 'devise', '~> 4.7'
@@ -38,7 +45,11 @@ gem 'pg_search'
 gem 'puma', '~> 5.6.4'
 gem 'pundit', '~> 2.2.0'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
-gem 'rails', '~> 4.2.11'
+if next?
+  gem 'rails', '~> 5.0'
+else
+  gem 'rails', '~> 4.2.11'
+end
 gem 'ranked-model', '~> 0.4.8'
 gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: 'cef0969cef'
 gem 'schema_plus_pg_indexes', '~> 0.1'
@@ -66,8 +77,9 @@ group :development, :test do
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
-  gem 'spring'
+  gem 'spring', '~>2.1.1' # remove constraint once on or past rails 5.2
   gem 'sprockets', '~>3.7'
+  gem 'ten_years_rails'
 end
 
 group :test do
@@ -75,6 +87,7 @@ group :test do
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.7'
   gem 'mock_redis'
+  gem 'rails-controller-testing' if next?
   gem 'rspec'
   gem 'rspec-its'
   gem 'rspec-rails'

@@ -22,13 +22,14 @@ class WorkflowSerializer
 
   def self.paging_scope(params, scope, context)
     if params[:complete]
-      # In Rails 5 convert to use ActiveModel::Type::Boolean.new.cast(value)
-      complete_filter = ActiveRecord::Type::Boolean.new.type_cast_from_user(params[:complete])
-      scope = if complete_filter
-        scope.where(completeness: 1.0)
-      else
-        scope.where('completeness < 1.0')
-      end
+      # convert the 'true' filter param to a completeness sql value
+      completed_workflow_filter = params[:complete].to_s.casecmp('true').zero?
+      scope =
+        if completed_workflow_filter
+          scope.where(completeness: 1.0)
+        else
+          scope.where('completeness < 1.0')
+        end
     end
 
     super(params, scope, context)

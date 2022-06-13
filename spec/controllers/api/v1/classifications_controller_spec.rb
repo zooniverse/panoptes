@@ -7,7 +7,7 @@ def metadata_values
     workflow_version: "1.1",
     user_language: 'en',
     user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0",
-    utc_offset: Time.now.utc_offset
+    utc_offset: Time.zone.now.utc_offset.to_s
   }
 end
 
@@ -340,7 +340,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
     context "a non-logged in user" do
       before(:each) do
-        stub_content_filter
+        default_request scopes: scopes
       end
 
       it "should not set the user" do
@@ -360,7 +360,7 @@ describe Api::V1::ClassificationsController, type: :controller do
     context "when redis is unavailable" do
       [Redis::CannotConnectError, Redis::TimeoutError, Timeout::Error].each do |redis_error|
         it 'should not raise an error but still report it' do
-          stub_content_filter
+          default_request user_id: authorized_user.id, scopes: scopes
           allow(ClassificationLifecycle).to receive(:queue).and_raise(redis_error)
           expect(Honeybadger).to receive(:notify)
           expect do

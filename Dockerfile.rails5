@@ -1,0 +1,29 @@
+FROM ruby:2.6-slim-buster
+
+WORKDIR /rails_app
+
+RUN apt-get update && apt-get -y upgrade && \
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    git \
+    libpq-dev \
+    postgresql-client-11 \
+    tmpreaper \
+    && \
+    apt-get clean
+
+ADD ./Gemfile /rails_app/
+ADD ./Gemfile.lock /rails_app/
+
+RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1` && \
+    bundle install
+
+ADD ./Gemfile.next /rails_app/
+ADD ./Gemfile.next.lock /rails_app/
+RUN next bundle install
+
+ADD ./ /rails_app
+
+RUN (cd /rails_app && mkdir -p tmp/pids && rm -f tmp/pids/*.pid)
+
+CMD ["/rails_app/scripts/docker/start.sh"]
