@@ -66,4 +66,4 @@ jobs:
         run: bundle exec rspec ${{ matrix.spec-commands }}
         env:
            RAILS_ENV: test
-
+           DISABLE_TEST_LOGGING: 1

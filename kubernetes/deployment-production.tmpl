@@ -327,6 +327,8 @@ spec:
             value: '2'
           - name: SIDEKIQ_ARGS
             value: '-q dumpworker -q really_high -q high -q data_high -q data_medium -q default -q data_low'
+          - name: NEW_RELIC_APPLICATION_LOGGING_ENABLED
+            value: 'false'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
@@ -381,6 +383,9 @@ spec:
                 - /rails_app/scripts/docker/sidekiq_status
             initialDelaySeconds: 20
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
+          env:
+          - name: NEW_RELIC_APPLICATION_LOGGING_ENABLED
+            value: 'false'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
