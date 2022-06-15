@@ -160,7 +160,7 @@ describe SetMemberSubject, :type => :model do
         let(:subject_ids) { [smses.map(&:subject_id)] }
 
         it "should return an empty set" do
-          expect(SetMemberSubject.unseen_for_user_by_workflow(user, workflow)).to be_empty
+          expect(SetMemberSubject.unseen_for_user_by_workflow(user.id, workflow.id)).to be_empty
         end
       end
     end
