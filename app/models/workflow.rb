@@ -47,7 +47,8 @@ class Workflow < ActiveRecord::Base
   SELECTOR_PAGE_SIZE_KEY = 'subject_queue_page_size'.freeze
 
   # Used by HttpCacheable
-  scope :private_scope, -> { where(project_id: Project.private_scope) }
+  # TODO remove this
+  # scope :private_scope, -> { where(project_id: Project.private_scope) }
 
   validates_presence_of :project, :display_name
 

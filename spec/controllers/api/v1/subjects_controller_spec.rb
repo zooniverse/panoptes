@@ -20,17 +20,6 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe "#index" do
     context "logged out user" do
-
-      it_behaves_like "an indexable unauthenticated http cacheable response" do
-        let(:action) { :index }
-        let(:private_resource) do
-          project = create(:project, private: true) do |p|
-            p.owner = user
-          end
-          create(:subject, project: project)
-        end
-      end
-
       describe "filtering" do
         let(:expected_filtered_ids) { formated_string_ids(filterable_resources) }
 
@@ -91,12 +80,6 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:api_resource_links) { [] }
 
         context "with queued subjects" do
-
-          it_behaves_like "is not a http cacheable response" do
-            let(:action) { :queued }
-            let(:params) { { workflow_id: workflow.id } }
-          end
-
           context "when firing the request before the test" do
             before(:each) do
               get :index, request_params
@@ -148,16 +131,6 @@ describe Api::V1::SubjectsController, type: :controller do
     context "logged in user" do
       before(:each) do
         default_request user_id: user.id, scopes: scopes
-      end
-
-      it_behaves_like "an indexable authenticated http cacheable response" do
-        let(:action) { :index }
-        let(:private_resource) do
-          project = create(:project, private: true) do |p|
-            p.owner = user
-          end
-          create(:subject, project: project)
-        end
       end
 
       context "without any sort" do
@@ -684,9 +657,6 @@ describe Api::V1::SubjectsController, type: :controller do
       end
       let(:private_resource_id) { private_resource.id }
       let(:public_resource_id) { resource.id }
-
-      it_behaves_like "a showable unauthenticated http cacheable response"
-      it_behaves_like "a showable authenticated http cacheable response"
     end
   end
 
