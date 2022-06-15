@@ -152,7 +152,7 @@ describe SetMemberSubject, :type => :model do
         let(:subject_ids) { [] }
 
         it "should return the all the worflow set_member_subjects" do
-          expect(SetMemberSubject.unseen_for_user_by_workflow(user.id, workflow.id)).to match_array(smses)
+          expect(described_class.unseen_for_user_by_workflow(user.id, workflow.id)).to match_array(smses)
         end
       end
 
@@ -160,7 +160,7 @@ describe SetMemberSubject, :type => :model do
         let(:subject_ids) { [smses.map(&:subject_id)] }
 
         it "should return an empty set" do
-          expect(SetMemberSubject.unseen_for_user_by_workflow(user.id, workflow.id)).to be_empty
+          expect(described_class.unseen_for_user_by_workflow(user.id, workflow.id)).to be_empty
         end
       end
     end
