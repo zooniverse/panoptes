@@ -36,7 +36,7 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:deactivated_resource) { create(:project, activated_state: :inactive) }
 
   describe "#index" do
-    context "not logged in", :focus do
+    context "not logged in" do
       let(:authorized_user) { nil }
       let(:n_visible) { 2 }
 
