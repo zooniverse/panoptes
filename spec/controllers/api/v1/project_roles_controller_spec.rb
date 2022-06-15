@@ -175,14 +175,14 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     end
 
     context "mailers" do
-      let(:user) { create(:user) }
+      let(:user) { create(:user).id.to_s }
 
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
       it "calls the mailer if user added to project" do
-        expect(UserAddedToProjectMailerWorker).to receive(:perform_async).with(user.id.to_i, project.id.to_i, ["collaborator"]).once
+        expect(UserAddedToProjectMailerWorker).to receive(:perform_async).with(user.to_i, project.id.to_i, ["collaborator"]).once
         post :create, create_params
       end
 
