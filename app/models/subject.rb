@@ -40,7 +40,7 @@ class Subject < ActiveRecord::Base
       location_params = case loc
                         when String
                           { content_type: standardize_mimetype(loc) }
-                        when Hash
+                        when Hash, ActionController::Parameters
                           {
                             content_type: standardize_mimetype(loc.keys.first),
                             external_link: true,
