@@ -174,22 +174,23 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
       it_behaves_like "no user"
     end
 
-    context "mailers" do
-      let(:user) { create(:user) }
+    describe 'mailers' do
+      let(:user) { create(:user).id.to_s }
 
-      before(:each) do
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
+        allow(UserAddedToProjectMailerWorker).to receive(:perform_async)
       end
 
-      it "calls the mailer if user added to project" do
-        expect(UserAddedToProjectMailerWorker).to receive(:perform_async).with(user.id.to_i, project.id.to_i, ["collaborator"]).once
+      it 'calls the mailer if user added to project as a collaborator' do
         post :create, create_params
+        expect(UserAddedToProjectMailerWorker).to have_received(:perform_async).with(user.to_i, project.id.to_i, ['collaborator']).once
       end
 
-      it "does not call the mailer not appropriate" do
-        create_params[:project_roles][:roles] = ["tester"]
-        expect(UserAddedToProjectMailerWorker).to_not receive(:perform_async)
+      it 'does not call the mailer if no relevant project role changes' do
+        create_params[:project_roles][:roles] = ['tester']
         post :create, create_params
+        expect(UserAddedToProjectMailerWorker).not_to have_received(:perform_async)
       end
     end
 

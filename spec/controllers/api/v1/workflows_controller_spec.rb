@@ -38,21 +38,6 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     it_behaves_like 'has many filterable', :subject_sets
 
-    it_behaves_like "an indexable unauthenticated http cacheable response" do
-      let(:action) { :index }
-      let(:private_resource) do
-        create(:workflow, project: private_project)
-      end
-    end
-
-    it_behaves_like "an indexable authenticated http cacheable response" do
-      let(:action) { :index }
-      let(:private_resource) do
-        create(:workflow, project: private_project)
-      end
-      let(:authorized_user) { private_project.owner }
-    end
-
     describe "filter by" do
       before(:each) do
         filterable_resources
@@ -700,9 +685,6 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
       let(:private_resource_id) { private_resource.id }
       let(:public_resource_id) { resource.id }
-
-      it_behaves_like "a showable unauthenticated http cacheable response"
-      it_behaves_like "a showable authenticated http cacheable response"
     end
   end
 

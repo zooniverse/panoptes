@@ -24,9 +24,6 @@ class Subject < ActiveRecord::Base
   has_many :subject_group_members, dependent: :restrict_with_exception
   has_many :subject_groups, through: :subject_group_members
 
-  # Used by HttpCacheable
-  scope :private_scope, -> { where(project_id: Project.private_scope) }
-
   validates_presence_of :project, :uploader
 
   NONSTANDARD_MIMETYPES = {

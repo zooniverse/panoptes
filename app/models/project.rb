@@ -60,9 +60,6 @@ class Project < ActiveRecord::Base
   after_save :save_version
   after_update :send_notifications
 
-  # Still needed for HttpCacheable
-  scope :private_scope, -> { where(private: true) }
-
   scope :launched, -> { where("launch_approved IS TRUE") }
   scope :featured, -> { where(featured: true) }
 
