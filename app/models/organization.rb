@@ -5,10 +5,6 @@ class Organization < ActiveRecord::Base
   include Translatable
   include Versioning
 
-  # Still needed for HttpCacheable
-  # TODO remove this
-  # scope :private_scope, -> { where(listed: false) }
-
   has_many :projects
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
   has_one :avatar, -> { where(type: "organization_avatar") }, class_name: "Medium", as: :linked
