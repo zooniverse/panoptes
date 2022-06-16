@@ -87,7 +87,10 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         project_preferences: {
           user_id: upp.user_id,
           project_id: project.id,
-          settings: { workflow_id: 1234, designator: {subject_set_weights: {1 => 100, 2 => 1000}} }
+          settings: {
+            workflow_id: '1234',
+            designator: { subject_set_weights: { 1 => 100, 2 => 1000 } }
+          }
         }
       }
     end
