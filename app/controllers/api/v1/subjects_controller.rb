@@ -104,7 +104,7 @@ class Api::V1::SubjectsController < Api::ApiController
 
     # setup the selector params from user input, note validation occurs in the operation class
     selector_param_keys = %i[workflow_id subject_set_id num_rows num_columns http_cache admin]
-    selector_params = params.permit(*selector_param_keys)
+    selector_params = params.permit(*selector_param_keys).to_h
 
     group_selection_result = SubjectGroups::Selection.run!(
       num_rows: selector_params.delete(:num_rows),
