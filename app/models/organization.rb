@@ -6,7 +6,8 @@ class Organization < ActiveRecord::Base
   include Versioning
 
   # Still needed for HttpCacheable
-  scope :private_scope, -> { where(listed: false) }
+  # TODO remove this
+  # scope :private_scope, -> { where(listed: false) }
 
   has_many :projects
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
