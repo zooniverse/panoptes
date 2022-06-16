@@ -12,11 +12,6 @@ class Membership < ActiveRecord::Base
   validates_presence_of :state, :user_group
   validates_uniqueness_of :user_group, scope: :user
 
-  scope :private_scope, -> { joins(@parent).merge(parent_class.private_scope) }
-  scope :public_scope, -> {
-    joins(@parent).where(state: states[:active]).merge(parent_class.public_scope)
-  }
-
   def disable!
     inactive!
   end
