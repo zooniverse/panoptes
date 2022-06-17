@@ -110,7 +110,7 @@ class Api::V1::SubjectsController < Api::ApiController
       num_rows: selector_params.delete(:num_rows),
       num_columns: selector_params.delete(:num_columns),
       uploader_id: ENV.fetch('SUBJECT_GROUP_UPLOADER_ID'),
-      params: selector_params,
+      params: selector_params.to_h,
       user: api_user
     )
     # get the list of the groups 'placeholder' group_subject ids
