@@ -102,13 +102,25 @@ https://www.youtube.com/watch?v=6aCfc0DkSFo
 
 #### Install the gems via next
 
+`BUNDLE_GEMFILE=Gemfile.next bundle install`
+
+or
+
 `next bundle install`
 
 ### check for incompatible gems for target rails verion
 
+`BUNDLE_GEMFILE=Gemfile.next bundle exec bundle_report compatibility --rails-version=5.0.7`
+
+or
+
 `next bundle exec bundle_report compatibility --rails-version=5.0.7`
 
 ### check for outdated gems
+
+`BUNDLE_GEMFILE=Gemfile.next bundle exec bundle_report outdated`
+
+or
 
 `next bundle exec bundle_report outdated`
 
@@ -117,18 +129,42 @@ https://www.youtube.com/watch?v=6aCfc0DkSFo
 It's recommeded to enable spring for testing env
 `unset DISABLE_SPRING`
 run all specs for rails 5 gemfile
+`BUNDLE_GEMFILE=Gemfile.next bundle exec rspec`
+
+or
+
 `next bundle exec rspec`
 
 or fail fast
+`BUNDLE_GEMFILE=Gemfile.next bundle exec rspec --fail-fast`
+
+or
+
 `next bundle exec rspec --fail-fast`
 
 or with gaurd (recommended to enable spring)
+`BUNDLE_GEMFILE=Gemfile.next bundle exec guard --no-interactions`
+
+or
+
 `next bundle exec guard --no-interactions`
 
 #### Boot the rails app
 
-`next rails s`
+#### Via Rails server
+
+`BUNDLE_GEMFILE=Gemfile.next rails s`
+
 or
+
+`next rails s`
+
+#### Via Puma
+
+`BUNDLE_GEMFILE=Gemfile.next bundle exec puma -C config/puma.rb`
+
+or
+
 `next bundle exec puma -C config/puma.rb`
 
 ## Contributing
