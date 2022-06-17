@@ -1,9 +1,9 @@
 # Backported .or query methods from Rails 5.0
 # https://github.com/rails/rails/pull/16052/files
-
-if Gem::Version.new(Rails.version) < Gem::Version.new("5.0")
+#
+# Remove this library extension once the upgrade to Rails 5.0 is done
+if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
   ActiveRecord::QueryMethods.module_eval do
-
     # Returns a new relation, which is the logical union of this relation and the one passed as an
     # argument.
     #
