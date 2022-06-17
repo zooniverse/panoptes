@@ -87,7 +87,7 @@ describe Api::EventsController, type: :controller do
 
         it "should return 422" do
           allow(subject).to receive(:create_params)
-            .and_raise(ActionDispatch::ParamsParser::ParseError.new('test', 'test'))
+            .and_raise(JsonSchema::ValidationError.new)
           post :create, event_params
           expect(response.status).to eq(422)
         end
