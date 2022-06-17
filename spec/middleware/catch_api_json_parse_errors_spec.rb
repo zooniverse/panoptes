@@ -43,7 +43,7 @@ describe CatchApiJsonParseErrors do
       # to match the deprecated params parsing error behaviour
       # via last know error $! (https://til.hashrocket.com/posts/da62981e47-ruby-)
       begin
-        # this would really be a specific parser error in reality, by Rails 5.1 should be ActionDispatch::Http::Parameters::ParseError
+        # this would really be a specific parser error in reality, e.g. a `JSON::ParserError` error
         raise StandardError
       rescue StandardError
         return ActionDispatch::ParamsParser::ParseError.new('test', 'test')
