@@ -17,7 +17,7 @@ class Api::V1::MediaController < Api::ApiController
   def index
     if has_one_assocation?
       #generate the etag here as we use the index route for linked media has_one relations
-      headers['ETag'] = gen_etag(controlled_resources)
+      headers['ETag'] = gen_etag(controlled_resources.to_a)
       render json_api: serializer.page(params, controlled_resources, context)
     else
       super
