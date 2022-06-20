@@ -138,7 +138,7 @@ module PolymorphicResourceScope
   end
 
   def array_id_params(string_id_params)
-    ids = string_id_params.split(',')
+    ids = string_id_params.to_s.split(',')
     if ids.length < 2
       ids.first
     else
