@@ -7,8 +7,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include FilterByTags
   include AdminAllowed
   include Slug
-  include MediumResponse
-
+  include ExportMediumResponse
   require_authentication :update, :create, :destroy, :create_classifications_export,
     :create_subjects_export, :create_workflows_export, :create_workflow_contents_export, :copy,
     scopes: [:project]
@@ -66,17 +65,17 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def create_classifications_export
     medium = CreateClassificationsExport.with( api_user: api_user, object: controlled_resource ).run!(params)
-    medium_response(medium)
+    export_medium_response(medium)
   end
 
   def create_subjects_export
     medium = Projects::CreateSubjectsExport.with(api_user: api_user, object: controlled_resource).run!(params)
-    medium_response(medium)
+    export_medium_response(medium)
   end
 
   def create_workflows_export
     medium = Projects::CreateWorkflowsExport.with(api_user: api_user, object: controlled_resource).run!(params)
-    medium_response(medium)
+    export_medium_response(medium)
   end
 
   def create_workflow_contents_export
