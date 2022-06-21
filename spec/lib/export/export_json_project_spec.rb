@@ -68,7 +68,7 @@ RSpec.describe Export::JSON::Project do
 
     describe "project_avatar" do
       let(:new_project_avatar) do
-        Medium.new(export_values("project_avatar"), linked: project)
+        Medium.new(export_values('project_avatar').merge(linked: project))
       end
 
       it "should be able to rebuild the project_avatar from the export" do
@@ -85,7 +85,7 @@ RSpec.describe Export::JSON::Project do
 
     describe "project_background" do
       let(:new_project_background) do
-        Medium.new(export_values("project_background"), linked: project)
+        Medium.new(export_values('project_background').merge(linked: project))
       end
 
       it "should be able to rebuild the new_project_background from the export" do
