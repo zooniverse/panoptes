@@ -444,7 +444,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it_behaves_like "supports update_links" do
         it 'links the tutorial to the workflow' do
-          expect(resource.tutorials.pluck(:id).map(&:to_s)).to eq(test_relation_ids)
+          expect(updated_resource.tutorials.pluck(:id).map(&:to_s)).to eq(test_relation_ids)
         end
 
       end
