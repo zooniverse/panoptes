@@ -46,7 +46,7 @@ describe TokensController, type: :controller do
       end
 
       context "when supplying valid user credentials" do
-        let(:valid_creds) { params.merge!(login: owner.login, password: owner.password) }
+        let(:valid_creds) { params.merge!('login' => owner.login, 'password' => owner.password) }
         let(:req) { post :create, valid_creds }
 
         it_behaves_like "a valid login"
