@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ExportMediumResponse
   def export_medium_response(medium)
     scope = Medium.where(id: medium.id)
