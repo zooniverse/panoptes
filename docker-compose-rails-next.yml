@@ -16,7 +16,7 @@ services:
     image: panoptes:rails-5-local
     build:
       context: .
-      dockerfile: Dockerfile.rails5
+      dockerfile: Dockerfile.rails-next
     volumes:
       - ./:/rails_app
       - gem_cache:/usr/local/bundle
