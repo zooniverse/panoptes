@@ -96,9 +96,9 @@ https://www.youtube.com/watch?v=6aCfc0DkSFo
 
 #### Using docker-compose for env setup
 
-`docker-compose -f docker-compose-rails-5.yml build`
+`docker-compose -f docker-compose-rails-next.yml build`
 
-`docker-compose -f docker-compose-rails-5.yml run --service-ports --rm panoptes bash`
+`docker-compose -f docker-compose-rails-next.yml run --service-ports --rm panoptes bash`
 
 #### Install the gems via next
 

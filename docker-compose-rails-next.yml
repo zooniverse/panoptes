@@ -13,10 +13,10 @@ services:
     command: redis-server --appendonly yes
 
   panoptes:
-    image: panoptes:rails-5-local
+    image: panoptes:rails-next-local
     build:
       context: .
-      dockerfile: Dockerfile.rails5
+      dockerfile: Dockerfile.rails-next
     volumes:
       - ./:/rails_app
       - gem_cache:/usr/local/bundle
@@ -34,7 +34,7 @@ services:
       - postgres:pg
 
   sidekiq:
-    image: panoptes:rails-5-local
+    image: panoptes:rails-next-local
     volumes:
       - ./:/rails_app
       - gem_cache:/usr/local/bundle
